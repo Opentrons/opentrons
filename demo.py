@@ -23,11 +23,19 @@ pipe.transfer(10, wells.well('a1'), wells.well('a2'))
 pipe.trash_tip()
 
 pipe.get_tip()
-pipe.transfer(10, wells.row('b'), wells.row('c'), reuse_tip=True)
+pipe.transfer(10, wells.row('2'), wells.row('3'), reuse_tip=True)
 pipe.trash_tip()
 
 """ Get tip and trash tip should be implicit. """
-pipe.transfer(10, wells.row('c'), wells.row('d'), reuse_tip=True)
+"""
+TODO: It shouldn't be possible in theory to move the same amount of liquid
+      into and out of an empty well because we need to remain within
+      recommended working volumes.
+
+      We're not currently worried about liquid volumes, though.  We're more
+      concerned with the pipette properly navigating the deck.
+"""
+pipe.transfer(10, wells.row('3'), wells.row('2'), reuse_tip=True)
 
 """ Get tip; transfer; trash tip """
 pipe.transfer(10, wells.well('a2'), wells.well('a1'))
