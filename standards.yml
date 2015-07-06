@@ -1,0 +1,39 @@
+microplate:
+  96:
+    # All the root-level definitions are default values, which can be
+    # overridden at lower levels.
+    rows:        8
+    columns:    12
+    volume:    100
+    min_vol:    50
+    max_vol:    90
+    height:     14.45
+    length:    127.76
+    width:      85.47
+    diameter:    7.15
+    depth:       3.25
+    a1_x:       14.38
+    a1_y:       11.24
+    spacing:     9
+    deepwell:
+      # Deepwell takes all the parameters as specified above, but defines
+      # its own extensions here.
+      volume:  400
+      min_vol:  50
+      max_vol: 380
+      height:   14.6
+      depth:    10.8
+
+pipette:
+  p10:
+    min_vol:     0.5
+    max_vol:    10
+  p20:
+    min_vol:    10
+    max_vol     20
+  p200:
+    min_vol:    20
+    max_vol:   200
+  p1000:
+    min_vol:   200
+    max_vol:  1000
