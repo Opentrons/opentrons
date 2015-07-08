@@ -105,6 +105,11 @@ class Pipette():
 	def transfer(start, end):
 		pass
 
+class Pipette_P2(Pipette):
+	size     = 'P2'
+	min_vol  =   0.0
+	max_vol  =   2
+
 class Pipette_P10(Pipette):
 	size     = 'P10'
 	min_vol  =    0.5

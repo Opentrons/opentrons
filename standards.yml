@@ -25,6 +25,9 @@ microplate:
       depth:    10.8
 
 pipette:
+  p2: 
+    min_vol:     0.0
+    max_vol:     2
   p10:
     min_vol:     0.5
     max_vol:    10
