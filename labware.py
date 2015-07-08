@@ -46,6 +46,45 @@ class Labware():
 		"""
 		pass
 
+class Deck():
+
+	_slots = {} # Keys are tuples of zero-index positions. A1 = (0, 0)
+
+	def __init__(self, **kwargs):
+		self.add_modules(**kwargs)
+
+	def add_modules(self, **kwargs):
+		for position in kwargs:
+			self.add_module(position, kwargs[position])
+	
+	def add_module(self, position, module):
+		pos = Deck._normalize_position(position)
+		if pos not in self._slots:
+			self._slots[pos] = module
+		else:
+			raise Exception("Trying to overwrite existing slot {}.".format(pos))
+
+	def slot(self, position):
+		pos = Deck._normalize_position(position)
+		if pos not in self._slots:
+			raise KeyError(
+				"No deck module at slot {}/{}.".format(position.upper(), pos)
+			)
+		return self._slots[pos]
+
+	def configure(self, obj):
+		calibration = obj['calibration']
+		for pos in calibration:
+			module = self.slot(pos)
+			module.calibrate(calibration[pos])
+
+	@staticmethod
+	def _normalize_position(position):
+		row, col = position # 'A1' = ['A', '1']
+		row_num  = ord(row.upper())-65 # 65 = ANSI code for 'A'
+		col_num  = int(col)-1 # We want it zero-indexed.
+		return (row_num, col_num)
+
 class Pipette():
 
 	channels = 1 
@@ -138,23 +177,17 @@ class Microplate(Labware):
 
 	def get_well_coordinates(self, position):
 		""" Get a well based on a row, col string like "A1". """
-		row, col = self._normalize_position(position)
+		row, col = Deck._normalize_position(position)
 		offset_x = self.spacing*row
 		offset_y = self.spacing*col
 		return (offset_x+self.start_x, offset_y+self.start_y, self.transfer_z)
 
 	def well(self, position):
-		key = self._normalize_position(position)
+		key = Deck._normalize_position(position)
 		if key not in self._wells:
 			well = MicroplateWell(self, position)
 			self._wells[key] = well
 		return self._wells[key]
-
-	def _normalize_position(self, position):
-		row, col = position # 'A1' = ['A', '1']
-		row_num  = ord(row.upper())-65 # 65 = ANSI code for 'A'
-		col_num  = int(col)-1 # We want it zero-indexed.
-		return (row_num, col_num)
 
 class Microplate_96(Microplate):
 	pass

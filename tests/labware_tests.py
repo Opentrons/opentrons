@@ -35,3 +35,31 @@ class MicroplateTest(unittest.TestCase):
 		b2 = plate.well('b2').coordinates()
 		margin = self.expected_margin
 		self.assertEqual(b2, (10+margin, 10+margin, 10))
+
+	def deck_calibration_test(self):
+
+		m_offset = 10
+
+		config = {
+			'calibration': {
+				'a1': {
+					'type':'microplate_96',
+					'x': m_offset,
+					'y': m_offset,
+					'z': m_offset
+				}
+			}
+		}
+
+		deck = labware.Deck(a1=labware.Microplate())
+		deck.configure(config)
+
+		margin = self.expected_margin
+
+		plate = deck.slot('a1')
+
+		a1 = plate.well('a1').coordinates()
+		b2 = plate.well('b2').coordinates()
+
+		self.assertEqual(a1, (m_offset, m_offset, m_offset))
+		self.assertEqual(b2, (m_offset+margin, m_offset+margin, m_offset))
