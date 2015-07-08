@@ -32,10 +32,39 @@ class Labware():
 	For example, even though a Trash module is an empty plastic box, it still
 	can respond to a 'dispose' command.
 	"""
-	pass
+	
+	def configure(self):
+		"""
+		TODO: Some sort of sane configuration mechanism that allows for
+		      labware instances to define their required configuration
+		      values, and then a mechanism that ensures this configuration
+		      has taken place with all required values before the protocol
+		      can be run.
+
+		      Mostly because not configuring things will break the actual
+		      robot.
+		"""
+		pass
 
 class Pipette():
-	channels = 1
+
+	channels = 1 
+
+	def __init__(self):
+		pass
+
+	def configure(self, stop=None, drop=None, volume=None, side=None):
+		if stop:
+			self.stop = stop
+		if drop:
+			self.drop = drop
+		if volume:
+			self.volume = volume
+		if side:
+			self.side = side
+
+	def transfer(start, end):
+		pass
 
 class Pipette_P10(Pipette):
 	size     = 'P10'
@@ -86,6 +115,28 @@ class Microplate(Labware):
 	a1_x     =  14.38
 	a1_y     =  11.24
 	spacing  =   9
+
+	def __init__(self, parentDeck=None):
+		self.parentDeck = parentDeck
+		pass
+
+	def calibrate(self, x=None, y=None, z=None):
+		"""
+		Coordinates should represent the center and near-bottom of well
+		A1 with the pipette tip in place.
+		"""
+		self.start_x    = x
+		self.start_y    = y
+		self.transfer_z = z
+
+	def get_well_position(self, position):
+		""" Get a well based on a row, col string like "A1". """
+		row, col = position
+		row_num  = ord(row.upper())-65 # 65 = ANSI code for 'A'
+		col_num  = int(col)-1 # We want it zero-indexed.
+		offset_x = self.spacing*row_num
+		offset_y = self.spacing*col_num
+		return (offset_x+self.start_x, offset_y+self.start_y, self.transfer_z)
 
 class Microplate_96(Microplate):
 	pass
