@@ -71,7 +71,8 @@ class Deck():
 		pos = Deck._normalize_position(position)
 		if pos not in self._slots:
 			raise KeyError(
-				"No deck module at slot {}/{}.".format(position.upper(), pos)
+				"No deck module at slot {}/{}."\
+				.format(position.upper(), pos)
 			)
 		return self._slots[pos]
 
