@@ -62,7 +62,10 @@ class Deck():
 		if pos not in self._slots:
 			self._slots[pos] = module
 		else:
-			raise Exception("Trying to overwrite existing slot {}.".format(pos))
+			raise Exception(
+				"Can't overwrite existing slot {}/{}."\
+				.format(position.upper(), pos)
+			)
 
 	def slot(self, position):
 		pos = Deck._normalize_position(position)
