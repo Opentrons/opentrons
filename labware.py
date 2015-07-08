@@ -116,8 +116,15 @@ class Microplate(Labware):
 	a1_y     =  11.24
 	spacing  =   9
 
-	def __init__(self, parentDeck=None):
-		self.parentDeck = parentDeck
+	"""
+	A dict containing tuples of zero-indexed well coordinates.
+	We only initialize them when they're accessed because until then, there's
+	no way to mutate their (non-existent) state.
+	"""
+	_wells   = {}
+
+	def __init__(self, parent_deck=None):
+		self.parent_deck = parent_deck
 		pass
 
 	def calibrate(self, x=None, y=None, z=None):
@@ -129,14 +136,25 @@ class Microplate(Labware):
 		self.start_y    = y
 		self.transfer_z = z
 
-	def get_well_position(self, position):
+	def get_well_coordinates(self, position):
 		""" Get a well based on a row, col string like "A1". """
-		row, col = position
+		row, col = self._normalize_position(position)
+		offset_x = self.spacing*row
+		offset_y = self.spacing*col
+		return (offset_x+self.start_x, offset_y+self.start_y, self.transfer_z)
+
+	def well(self, position):
+		key = self._normalize_position(position)
+		if key not in self._wells:
+			well = MicroplateWell(self, position)
+			self._wells[key] = well
+		return self._wells[key]
+
+	def _normalize_position(self, position):
+		row, col = position # 'A1' = ['A', '1']
 		row_num  = ord(row.upper())-65 # 65 = ANSI code for 'A'
 		col_num  = int(col)-1 # We want it zero-indexed.
-		offset_x = self.spacing*row_num
-		offset_y = self.spacing*col_num
-		return (offset_x+self.start_x, offset_y+self.start_y, self.transfer_z)
+		return (row_num, col_num)
 
 class Microplate_96(Microplate):
 	pass
@@ -147,6 +165,21 @@ class Microplate_96_deepwell(Microplate_96):
 	max_vol  = 380
 	height   =  14.6
 	depth    =  10.8
+
+class LiquidContainer():
+	pass
+
+class MicroplateWell(LiquidContainer):
+	
+	parent   = None
+	position = None
+
+	def __init__(self, parent, position):
+		self.parent = parent
+		self.position = position
+
+	def coordinates(self):
+		return self.parent.get_well_coordinates(self.position)
 
 class Trash(Labware):
 	pass
