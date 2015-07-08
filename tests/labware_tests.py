@@ -117,3 +117,18 @@ class TiprackTest(unittest.TestCase):
 
 		self.assertEqual(a1, (m_offset, m_offset, m_offset))
 		self.assertEqual(b2, (m_offset+margin, m_offset+margin, m_offset))
+
+	def tip_inventory_test(self):
+
+		self.assertEqual(self.rack.slot('a1').get_tip(), True)
+
+		with self.assertRaises(Exception):
+			self.rack.slot('a1').get_tip()
+
+		""" Secondary syntax just in case. """
+
+		slot = self.rack.slot('a2')
+		self.assertEqual(slot.get_tip(), True)
+
+		with self.assertRaises(Exception):
+			slot.get_tip()

@@ -58,10 +58,11 @@ class Deck():
 		for position in kwargs:
 			self.add_module(position, kwargs[position])
 	
-	def add_module(self, position, module):
+	def add_module(self, position, mod):
 		pos = Deck._normalize_position(position)
 		if pos not in self._slots:
-			self._slots[pos] = module
+			self._slots[pos] = mod
+			mod.position = position
 		else:
 			raise Exception(
 				"Can't overwrite existing slot {}/{}."\
@@ -153,6 +154,8 @@ class ContainerGrid(Labware):
 	no way to mutate their (non-existent) state.
 	"""
 	_children = None #{}
+
+	position = None
 
 	def __init__(self, parent_deck=None):
 		self.parent_deck = parent_deck
@@ -263,7 +266,18 @@ class MicroplateWell(GridContainerChild):
 	pass
 
 class TiprackSlot(GridContainerChild):
-	pass
+	
+	has_tip = True
+
+	def get_tip(self):
+		if self.has_tip:
+			self.has_tip = False
+			return True
+		else:
+			raise Exception(
+				"No tip left in slot {} of tiprack"\
+				.format(self.position)
+			)
 
 class Trash(Labware):
 	pass
