@@ -96,8 +96,13 @@ class MicroplateWellTest(unittest.TestCase):
 			well.add_liquid(water=1)
 
 	def liquid_total_capacity_test(self):
-		well = self.plate.well('A1')
-		well.allocate(water=90)
-		well.add_liquid(water=10)
+		self.well.allocate(water=90)
+		self.well.add_liquid(water=10)
 		with self.assertRaises(ValueError):
-			well.add_liquid(water=1)
+			self.well.add_liquid(water=1)
+
+	def liquid_total_mixture_test(self):
+		self.well.allocate(water=90)
+		self.well.add_liquid(buffer=10)
+		with self.assertRaises(ValueError):
+			self.well.add_liquid(saline=1)
