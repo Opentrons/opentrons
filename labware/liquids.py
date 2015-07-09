@@ -74,10 +74,11 @@ class LiquidContainer():
 	def check_capacity(self, new_amount, ml=False):
 		if not self.max_volume:
 			return
-		if (self.calculate_total_volume()+new_amount > self.max_volume):
+		new_value = self.calculate_total_volume()+new_amount
+		if (new_value > self.max_volume):
 			raise VolumeError(
 				"Liquid amount ({}{}l) exceeds max volume ({}{}l)."\
-				.format(new_amount, u'\u03BC', self.max_volume, u'\u03BC')
+				.format(new_value, u'\u03BC', self.max_volume, u'\u03BC')
 			)
 
 	def calculate_total_volume(self, data=None):

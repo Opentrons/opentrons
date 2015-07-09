@@ -82,6 +82,13 @@ class MicroplateTest(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			self.plate.well('A1').allocate(water=set_vol)
 
+	def well_liquid_mixture_capacity_test(self):
+		well = self.plate.well('A1')
+		well.allocate(water=90)
+		well.add_liquid(water=10)
+		with self.assertRaises(ValueError):
+			well.add_liquid(water=1)
+
 class TiprackTest(unittest.TestCase):
 
 	expected_margin = 9 # ANSI standard.

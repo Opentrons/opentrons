@@ -15,6 +15,9 @@ class MicroplateWell(GridItem):
 	def allocate(self, **kwargs):
 		self._liquid.add_liquid(**kwargs)
 
+	def add_liquid(self, **kwargs):
+		self._liquid.add_liquid(**kwargs)
+
 	def get_volume(self, liquid):
 		return self._liquid.get_volume(liquid)
 
