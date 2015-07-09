@@ -1,7 +1,22 @@
 from .grid import GridContainer, GridItem
+from .liquids import LiquidContainer
 
 class MicroplateWell(GridItem):
-	pass
+
+	_liquid = None
+	
+	def __init__(self, *args, **kwargs):
+		super(MicroplateWell, self).__init__(*args, **kwargs)
+		p = self.parent
+		self._liquid = LiquidContainer(
+			max=p.volume, min_working=p.min_vol, max_working=p.max_vol
+		)
+
+	def allocate(self, **kwargs):
+		self._liquid.add_liquid(**kwargs)
+
+	def get_volume(self, liquid):
+		return self._liquid.get_volume(liquid)
 
 class Microplate(GridContainer):
 	rows     =   8

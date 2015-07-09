@@ -69,6 +69,18 @@ class MicroplateTest(unittest.TestCase):
 		self.assertEqual(a1, (m_offset, m_offset, m_offset))
 		self.assertEqual(b2, (m_offset+margin, m_offset+margin, m_offset))
 
+	def well_liquid_allocation_test(self):
+		set_vol = 50
+		# Add an initial value of 100ul water to this well.
+		self.plate.well('A1').allocate(water=set_vol)
+		vol = self.plate.well('A1').get_volume('water')
+		self.assertEqual(vol, set_vol)
+
+	def well_liquid_capacity_test(self):
+		set_vol = 10000
+		# Way too much water for a microplate!
+		with self.assertRaises(ValueError):
+			self.plate.well('A1').allocate(water=set_vol)
 
 class TiprackTest(unittest.TestCase):
 

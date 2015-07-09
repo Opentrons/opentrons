@@ -75,7 +75,7 @@ class GridContainer():
 		row = position[0].upper()
 		col = position[1:]
 		row_num  = ord(row)-ord('A')
-		col_num  = int(col)-1  # We want it zero-indexed.
+		col_num  = int(col)-1 # We want it zero-indexed.
 		if self.rows and row_num > self.rows-1:
 			print(self.rows)
 			raise ValueError(
