@@ -2,6 +2,9 @@ from .grid import GridContainer
 
 class Deck(GridContainer):
 
+	rows = 3
+	cols = 5
+
 	def __init__(self, **kwargs):
 		super(Deck, self).__init__()
 		self.add_modules(**kwargs)

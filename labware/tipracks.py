@@ -19,6 +19,9 @@ class Tiprack(GridContainer):
 
 	size = None
 
+	rows = 8
+	cols = 12
+
 	"""
 	I'm not even sure there is a standard for spacing on
 	tipracks. I'm just using the microplate spacing, and

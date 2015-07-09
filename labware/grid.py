@@ -11,9 +11,14 @@ class GridItem():
 		return self.parent.get_child_coordinates(self.position)
 
 class GridContainer():
-	rows = 0
-	cols = 0
-	spacing = 0
+
+	"""
+	Change these in child implementations if you want to constrain to an
+	actual grid.  Good for making sure people don't try to navigate to 
+	row 9999 and go way out of bounds.
+	"""
+	rows = None
+	cols = None
 
 	"""
 	Calibration.
@@ -67,7 +72,17 @@ class GridContainer():
 
 	def _normalize_position(self, position):
 		""" Don't use this; it's not part of the public API. """
-		row, col = position # 'A1' = ['A', '1']
-		row_num  = ord(row.upper())-65 # 65 = ANSI code for 'A'
-		col_num  = int(col)-1 # We want it zero-indexed.
+		row = position[0].upper()
+		col = position[1:]
+		row_num  = ord(row)-ord('A')
+		col_num  = int(col)-1  # We want it zero-indexed.
+		if self.rows and row_num > self.rows-1:
+			print(self.rows)
+			raise ValueError(
+				"Row {} out of range.".format(row)
+			)
+		if self.cols and col_num > self.cols-1:
+			raise ValueError(
+				"Column #{} out of range.".format(col)
+			)
 		return (row_num, col_num)
