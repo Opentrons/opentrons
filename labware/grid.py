@@ -1,6 +1,16 @@
-from .deck import Deck
+class GridItem():
 
-class ContainerGrid():
+	parent   = None
+	position = None
+
+	def __init__(self, parent, position):
+		self.parent = parent
+		self.position = position
+
+	def coordinates(self):
+		return self.parent.get_child_coordinates(self.position)
+
+class GridContainer():
 	rows = 0
 	cols = 0
 	spacing = 0
@@ -19,16 +29,17 @@ class ContainerGrid():
 	"""
 	_children = None #{}
 
-	position = None
+	child_class = GridItem
 
-	def __init__(self, parent_deck=None):
-		self.parent_deck = parent_deck
+	def __init__(self, parent=None, **kwargs):
+		self.parent = parent
 		self._children = {}
 
 	def calibrate(self, x=None, y=None, z=None, **kwargs):
 		"""
-		Coordinates should represent the center and near-bottom of well
-		A1 with the pipette tip in place.
+		Generic calibration mechanism. It would be a good idea to override
+		this in child classes just to provide better documentation about
+		where the calibration point for a particular module should be.
 		"""
 		self.start_x = x
 		self.start_y = y
@@ -36,7 +47,7 @@ class ContainerGrid():
 
 	def get_child_coordinates(self, position):
 		""" Get a well based on a row, col string like "A1". """
-		row, col = Deck._normalize_position(position)
+		row, col = self._normalize_position(position)
 		offset_x = self.spacing*row
 		offset_y = self.spacing*col
 		print(self.start_x)
@@ -45,24 +56,18 @@ class ContainerGrid():
 		return (offset_x+self.start_x, offset_y+self.start_y, self.start_z)
 
 	def get_child(self, position):
-		key = Deck._normalize_position(position)
+		key = self._normalize_position(position)
 		if key not in self._children:
 			child = self.init_child(position)
 			self._children[key] = child
 		return self._children[key]
 
 	def init_child(self, position):
-		return Object()
+		return self.child_class(self, position)
 
-
-class ContainerGridChild():
-
-	parent   = None
-	position = None
-
-	def __init__(self, parent, position):
-		self.parent = parent
-		self.position = position
-
-	def coordinates(self):
-		return self.parent.get_child_coordinates(self.position)
+	def _normalize_position(self, position):
+		""" Don't use this; it's not part of the public API. """
+		row, col = position # 'A1' = ['A', '1']
+		row_num  = ord(row.upper())-65 # 65 = ANSI code for 'A'
+		col_num  = int(col)-1 # We want it zero-indexed.
+		return (row_num, col_num)

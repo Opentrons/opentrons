@@ -1,6 +1,9 @@
-from .util_classes import ContainerGrid, ContainerGridChild
+from .grid import GridContainer, GridItem
 
-class Microplate(ContainerGrid):
+class MicroplateWell(GridItem):
+	pass
+
+class Microplate(GridContainer):
 	rows     =   8
 	cols     =  12
 	volume   = 100
@@ -15,11 +18,17 @@ class Microplate(ContainerGrid):
 	a1_y     =  11.24
 	spacing  =   9
 
+	child_class = MicroplateWell
+
 	def well(self, position):
 		return self.get_child(position)
 
-	def init_child(self, position):
-		return MicroplateWell(self, position)
+	def calibrate(self, **kwargs):
+		"""
+		Coordinates should represent the center and near-bottom of well
+		A1 with the pipette tip in place.
+		"""
+		super(Microplate, self).calibrate(**kwargs)
 
 class Microplate_96(Microplate):
 	pass
@@ -30,6 +39,3 @@ class Microplate_96_deepwell(Microplate_96):
 	max_vol  = 380
 	height   =  14.6
 	depth    =  10.8
-
-class MicroplateWell(ContainerGridChild):
-	pass
