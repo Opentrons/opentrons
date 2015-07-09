@@ -69,20 +69,33 @@ class MicroplateTest(unittest.TestCase):
 		self.assertEqual(a1, (10, 11, 12))
 		self.assertEqual(b2, (10+margin, 11+margin, 12))
 
-	def well_liquid_allocation_test(self):
+class MicroplateWellTest(unittest.TestCase):
+
+	def setUp(self):
+		self.plate = labware.Microplate()
+		self.well  = self.plate.well('A1')
+
+	def liquid_allocation_test(self):
 		set_vol = 50
 		# Add an initial value of 100ul water to this well.
-		self.plate.well('A1').allocate(water=set_vol)
-		vol = self.plate.well('A1').get_volume('water')
+		self.well.allocate(water=set_vol)
+		vol = self.well.get_volume('water')
 		self.assertEqual(vol, set_vol)
 
-	def well_liquid_capacity_test(self):
+	def liquid_capacity_test(self):
 		set_vol = 10000
 		# Way too much water for a microplate!
 		with self.assertRaises(ValueError):
-			self.plate.well('A1').allocate(water=set_vol)
+			self.well.allocate(water=set_vol)
 
-	def well_liquid_mixture_capacity_test(self):
+	def liquid_total_capacity_test(self):
+		well = self.plate.well('A1')
+		well.allocate(water=90)
+		well.add_liquid(water=10)
+		with self.assertRaises(ValueError):
+			well.add_liquid(water=1)
+
+	def liquid_total_capacity_test(self):
 		well = self.plate.well('A1')
 		well.allocate(water=90)
 		well.add_liquid(water=10)
