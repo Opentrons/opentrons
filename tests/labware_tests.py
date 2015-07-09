@@ -31,6 +31,16 @@ class MicroplateTest(unittest.TestCase):
 		margin = self.expected_margin
 		self.assertEqual(b2, (10+margin, 10+margin, 10))
 
+	def row_sanity_test(self):
+		row = chr( ord('a') + self.plate.rows + 1 )
+		with self.assertRaises(ValueError):
+			self.plate.well('{}1'.format(row))
+
+	def col_sanity_test(self):
+		col = chr( self.plate.cols + 1 )
+		with self.assertRaises(ValueError):
+			self.plate.well('A{}'.format(col))
+
 	def deck_calibration_test(self):
 
 		m_offset = 10
@@ -89,6 +99,25 @@ class TiprackTest(unittest.TestCase):
 		b2 = self.rack.slot('b2').coordinates()
 		margin = self.expected_margin
 		self.assertEqual(b2, (10+margin, 10+margin, 10))
+
+	def row_sanity_test(self):
+
+		row = chr( ord('a') + self.rack.rows + 1 )
+		with self.assertRaises(ValueError):
+			self.rack.slot('{}1'.format(row))
+		
+		row = chr( ord('a') + self.rack.rows - 1 )
+		self.rack.slot('{}1'.format(row))
+
+	def col_sanity_test(self):
+
+		col = self.rack.cols + 1
+
+		with self.assertRaises(ValueError):
+			self.rack.slot('A{}'.format(col))
+
+		col = self.rack.cols
+		self.rack.slot('A{}'.format(col))
 
 	def deck_calibration_test(self):
 
