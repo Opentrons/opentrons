@@ -1,3 +1,6 @@
+from .grid import GridContainer, GridItem
+from .liquids import LiquidContainer
+
 class TiprackTest(unittest.TestCase):
 
 	expected_margin = 9 # ANSI standard.
