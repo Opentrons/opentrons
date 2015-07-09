@@ -1,5 +1,5 @@
-from .grid import GridContainer, GridItem
-from .liquids import LiquidContainer
+import unittest
+import labware
 
 class TiprackTest(unittest.TestCase):
 
