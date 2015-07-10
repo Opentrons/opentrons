@@ -106,3 +106,33 @@ class MicroplateWellTest(unittest.TestCase):
 		self.well.add_liquid(buffer=10)
 		with self.assertRaises(ValueError):
 			self.well.add_liquid(saline=1)
+
+	def mixture_transfer_test(self):
+		
+		wellA = self.well
+		wellB = self.plate.well('A2')
+		
+		wellA.allocate(water=90, buffer=9, saline=1)
+		wellA.transfer(20, wellB)
+
+		# Check Well A to ensure things have been removed.
+		water = wellA.get_volume('water')
+		buff  = wellA.get_volume('buffer')
+		sal   = wellA.get_volume('saline')
+
+		# We use almostEqual because it's floating-point.
+		self.assertAlmostEqual(water, 80*.9)
+		self.assertAlmostEqual(buff, 80*.09)
+		self.assertAlmostEqual(sal, 80*.01)
+
+		# Check WellB to ensure things have been added.
+		water = wellB.get_volume('water')
+		buff  = wellB.get_volume('buffer')
+		sal   = wellB.get_volume('saline')
+
+		# We use almostEqual because it's floating-point.
+		self.assertAlmostEqual(water, 20*.9)
+		self.assertAlmostEqual(buff, 20*.09)
+		self.assertAlmostEqual(sal, 20*.01)
+
+		self.assertEqual(water+buff+sal, 20)

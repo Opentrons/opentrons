@@ -71,6 +71,11 @@ class LiquidContainer():
 			else:
 				self._contents[liquid] = vol
 
+	def remove_liquid(self, amount, ml=False):
+		amount = self.convert_ml(amount, ml)
+		self.check_capacity(amount*-1)
+
+
 	def check_capacity(self, new_amount, ml=False):
 		if not self.max_volume:
 			return
@@ -108,6 +113,35 @@ class LiquidContainer():
 			return self._contents[key]
 		else:
 			return None
+
+	def transfer(self, amount, destination, ml=False):	
+		amount = self.convert_ml(amount, ml)
+
+		# Let's ensure there's room in the destination well first.
+		# This should throw an exception, so no need to worry about
+		# an if statement or anything fancy like that.
+		destination.check_capacity(amount)
+
+		# Make sure we have enough total volume to proceed with the
+		# request. (Don't worry about working volumes for now.)
+		total_volume = self.calculate_total_volume()
+		if (total_volume<amount):
+			raise ValueError(
+				"Not enough liquid ({}{}l) for transfer ({}{}l)."\
+				.format(total_volume, u'\u03BC', amount, u'\u03BC')
+			)
+
+		# Proportion math.
+		mix = {}
+		liq = self._contents
+		for l in liq:
+			proportion = liq[l]/total_volume
+			value      = proportion*amount 
+			# TODO: alternate add_liquid syntax for dynamic things like this.
+			kwargs     = {}
+			kwargs[l]  = value
+			self._contents[l] = self._contents[l]-value
+			destination.add_liquid(**kwargs)
 
 class VolumeError(ValueError):
 	pass
