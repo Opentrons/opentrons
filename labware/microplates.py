@@ -24,8 +24,8 @@ class MicroplateWell(GridItem):
 	def transfer(self, amount, destination, ml=False):
 		return self._liquid.transfer(amount, destination, ml=ml)
 
-	def check_capacity(self, amount, ml=False):
-		return self._liquid.check_capacity(amount, ml=ml)
+	def assert_capacity(self, amount, ml=False):
+		return self._liquid.assert_capacity(amount, ml=ml)
 
 class Microplate(GridContainer):
 	rows     =   8

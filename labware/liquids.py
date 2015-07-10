@@ -60,9 +60,9 @@ class LiquidContainer():
 
 		new_liquid = self.convert_ml(new_liquid, ml)
 
-		self.check_capacity(new_liquid)
+		self.assert_capacity(new_liquid)
 
-		# check_capacity will raise an error if the value is out of
+		# assert_capacity will raise an error if the value is out of
 		# bounds, so now we can add our liquids.
 		for liquid in kwargs:
 			vol = self.convert_ml(kwargs[liquid])
@@ -73,10 +73,10 @@ class LiquidContainer():
 
 	def remove_liquid(self, amount, ml=False):
 		amount = self.convert_ml(amount, ml)
-		self.check_capacity(amount*-1)
+		self.assert_capacity(amount*-1)
 
 
-	def check_capacity(self, new_amount, ml=False):
+	def assert_capacity(self, new_amount, ml=False):
 		if not self.max_volume:
 			return
 		new_value = self.calculate_total_volume()+new_amount
@@ -117,12 +117,10 @@ class LiquidContainer():
 	def transfer(self, amount, destination, ml=False):	
 		amount = self.convert_ml(amount, ml)
 
-		# Let's ensure there's room in the destination well first.
-		# This should throw an exception, so no need to worry about
-		# an if statement or anything fancy like that.
-		destination.check_capacity(amount)
+		# Ensure there's room in the destination well first.
+		destination.assert_capacity(amount)
 
-		# Make sure we have enough total volume to proceed with the
+		# Ensure we have enough total volume to proceed with the
 		# request. (Don't worry about working volumes for now.)
 		total_volume = self.calculate_total_volume()
 		if (total_volume<amount):
