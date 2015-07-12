@@ -88,14 +88,16 @@ class LiquidContainer():
 			total = total + liqs[l]
 		return total
 
-	def convert_ml(self, volume, ml=False):
+	def convert_ml(self, volume, ml=None):
 		"""
 		Simple utility method to allow input of ul volume and multiply by
 		a thousand if ml is set to True.
 
 		Python doesn't support passing by reference. ;_;
 		"""
-		if ml:
+		if ml is None:
+			raise Exception("Keyword argument 'ml' is required.")
+		elif ml:
 			return volume*1000 # OMG metric <3 <3
 		else:
 			return volume
