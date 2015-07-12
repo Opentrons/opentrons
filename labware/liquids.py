@@ -65,7 +65,7 @@ class LiquidContainer():
 		# assert_capacity will raise an error if the value is out of
 		# bounds, so now we can add our liquids.
 		for liquid in kwargs:
-			vol = self.convert_ml(kwargs[liquid])
+			vol = self.convert_ml(kwargs[liquid], ml)
 			if liquid in self._contents:
 				self._contents[liquid] = self._contents[liquid]+vol
 			else:
