@@ -18,8 +18,11 @@ class MicroplateWell(GridItem):
 	def add_liquid(self, **kwargs):
 		self._liquid.add_liquid(**kwargs)
 
-	def get_volume(self, liquid):
-		return self._liquid.get_volume(liquid)
+	def get_volume(self):
+		return self._liquid.get_volume()
+
+	def get_proportion(self, liquid):
+		return self._liquid.get_proportion(liquid)
 
 	def transfer(self, amount, destination, ml=False):
 		return self._liquid.transfer(amount, destination, ml=ml)

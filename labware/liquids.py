@@ -105,12 +105,12 @@ class LiquidContainer():
 		else:
 			return volume
 
-	def get_volume(self, key):
-		"""
-		Returns the volume (ul) of a particular liquid by name.
-		"""
+	def get_volume(self):
+		return self.calculate_total_volume()
+		
+	def get_proportion(self, key):
 		if key in self._contents:
-			return self._contents[key]
+			return self._contents[key]/self.calculate_total_volume()
 		else:
 			return None
 

@@ -79,7 +79,7 @@ class MicroplateWellTest(unittest.TestCase):
 		set_vol = 50
 		# Add an initial value of 100ul water to this well.
 		self.well.allocate(water=set_vol)
-		vol = self.well.get_volume('water')
+		vol = self.well.get_volume()
 		self.assertEqual(vol, set_vol)
 
 	def liquid_capacity_test(self):
@@ -116,23 +116,25 @@ class MicroplateWellTest(unittest.TestCase):
 		wellA.transfer(20, wellB)
 
 		# Check Well A to ensure things have been removed.
-		water = wellA.get_volume('water')
-		buff  = wellA.get_volume('buffer')
-		sal   = wellA.get_volume('saline')
+		water = wellA.get_proportion('water')
+		buff  = wellA.get_proportion('buffer')
+		sal   = wellA.get_proportion('saline')
 
 		# We use almostEqual because it's floating-point.
-		self.assertAlmostEqual(water, 80*.9)
-		self.assertAlmostEqual(buff, 80*.09)
-		self.assertAlmostEqual(sal, 80*.01)
+		self.assertAlmostEqual(water, .9)
+		self.assertAlmostEqual(buff, .09)
+		self.assertAlmostEqual(sal,  .01)
+
+		self.assertEqual(wellA.get_volume(), 80)
 
 		# Check WellB to ensure things have been added.
-		water = wellB.get_volume('water')
-		buff  = wellB.get_volume('buffer')
-		sal   = wellB.get_volume('saline')
+		water = wellB.get_proportion('water')
+		buff  = wellB.get_proportion('buffer')
+		sal   = wellB.get_proportion('saline')
 
 		# We use almostEqual because it's floating-point.
-		self.assertAlmostEqual(water, 20*.9)
-		self.assertAlmostEqual(buff, 20*.09)
-		self.assertAlmostEqual(sal, 20*.01)
+		self.assertAlmostEqual(water, .9)
+		self.assertAlmostEqual(buff, .09)
+		self.assertAlmostEqual(sal,  .01)
 
-		self.assertEqual(water+buff+sal, 20)
+		self.assertEqual(wellB.get_volume(), 20)
