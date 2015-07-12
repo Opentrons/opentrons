@@ -142,7 +142,3 @@ class MicroplateWellTest(unittest.TestCase):
 	def proportion_key_error_test(self):
 		with self.assertRaises(KeyError):
 			self.well.get_proportion('water')
-
-	def ml_conversion_test(self):
-		self.well.allocate(water=.1, ml=True)
-		self.assertEqual(self.well.get_volume(), 100)
