@@ -71,11 +71,6 @@ class LiquidContainer():
 			else:
 				self._contents[liquid] = vol
 
-	def remove_liquid(self, amount, ml=False):
-		amount = self.convert_ml(amount, ml)
-		self.assert_capacity(amount*-1)
-
-
 	def assert_capacity(self, new_amount, ml=False):
 		if not self.max_volume:
 			return
