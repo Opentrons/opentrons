@@ -65,7 +65,7 @@ class LiquidContainer():
 		# assert_capacity will raise an error if the value is out of
 		# bounds, so now we can add our liquids.
 		for liquid in kwargs:
-			vol = self.convert_ml(kwargs[liquid])
+			vol = self.convert_ml(kwargs[liquid], ml)
 			if liquid in self._contents:
 				self._contents[liquid] = self._contents[liquid]+vol
 			else:
@@ -88,13 +88,15 @@ class LiquidContainer():
 			total = total + liqs[l]
 		return total
 
-	def convert_ml(self, volume, ml=False):
+	def convert_ml(self, volume, ml=None):
 		"""
 		Simple utility method to allow input of ul volume and multiply by
 		a thousand if ml is set to True.
 
 		Python doesn't support passing by reference. ;_;
 		"""
+		if ml is None:
+			raise Exception("Keyword paramter 'ml' is required.")
 		if ml:
 			return volume*1000 # OMG metric <3 <3
 		else:
