@@ -138,3 +138,7 @@ class MicroplateWellTest(unittest.TestCase):
 		self.assertAlmostEqual(sal,  .01)
 
 		self.assertEqual(wellB.get_volume(), 20)
+
+	def proportion_key_error_test(self):
+		with self.assertRaises(KeyError):
+			self.well.get_proportion('water')

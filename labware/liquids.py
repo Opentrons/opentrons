@@ -112,7 +112,10 @@ class LiquidContainer():
 		if key in self._contents:
 			return self._contents[key]/self.calculate_total_volume()
 		else:
-			return None
+			raise KeyError(
+				"Liquid '{}' not found in this container."\
+				.format(key)
+			)
 
 	def transfer(self, amount, destination, ml=False):	
 		amount = self.convert_ml(amount, ml)
