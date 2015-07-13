@@ -40,9 +40,3 @@ class Microplate_96_deepwell(Microplate_96):
 	max_vol  = 380
 	height   =  14.6
 	depth    =  10.8
-
-class Reservoir_12_deepwell(GridContainer):
-	rows = 1
-	cols = 12
-	min_vol = 500
-	max_vol = 21*1000
