@@ -73,7 +73,7 @@ class LiquidContainer():
 
 	def assert_capacity(self, new_amount, ml=False):
 		if not self.max_volume:
-			return
+			raise ValueError("No maximum liquid amount set for well.")
 		new_value = self.calculate_total_volume()+new_amount
 		if (new_value > self.max_volume):
 			raise VolumeError(
