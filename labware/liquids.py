@@ -1,3 +1,5 @@
+from .grid import GridItem
+
 class LiquidContainer():
 
 	max_volume = None
@@ -76,7 +78,7 @@ class LiquidContainer():
 			raise ValueError("No maximum liquid amount set for well.")
 		new_value = self.calculate_total_volume()+new_amount
 		if (new_value > self.max_volume):
-			raise VolumeError(
+			raise ValueError(
 				"Liquid amount ({}{}l) exceeds max volume ({}{}l)."\
 				.format(new_value, u'\u03BC', self.max_volume, u'\u03BC')
 			)
@@ -141,5 +143,32 @@ class LiquidContainer():
 			self._contents[l] = self._contents[l]-value
 			destination.add_liquid(**kwargs)
 
-class VolumeError(ValueError):
-	pass
+
+class LiquidWell(GridItem):
+
+	_liquid = None
+	
+	def __init__(self, *args, **kwargs):
+		super(LiquidWell, self).__init__(*args, **kwargs)
+		p = self.parent
+		self._liquid = LiquidContainer(
+			max=p.volume, min_working=p.min_vol, max_working=p.max_vol
+		)
+
+	def allocate(self, **kwargs):
+		self._liquid.add_liquid(**kwargs)
+
+	def add_liquid(self, **kwargs):
+		self._liquid.add_liquid(**kwargs)
+
+	def get_volume(self):
+		return self._liquid.get_volume()
+
+	def get_proportion(self, liquid):
+		return self._liquid.get_proportion(liquid)
+
+	def transfer(self, amount, destination, ml=False):
+		return self._liquid.transfer(amount, destination, ml=ml)
+
+	def assert_capacity(self, amount, ml=False):
+		return self._liquid.assert_capacity(amount, ml=ml)

@@ -1,34 +1,8 @@
 from .grid import GridContainer, GridItem
-from .liquids import LiquidContainer
+from .liquids import LiquidContainer, LiquidWell
 
-class MicroplateWell(GridItem):
-
-	_liquid = None
-	
-	def __init__(self, *args, **kwargs):
-		super(MicroplateWell, self).__init__(*args, **kwargs)
-		p = self.parent
-		self._liquid = LiquidContainer(
-			max=p.volume, min_working=p.min_vol, max_working=p.max_vol
-		)
-
-	def allocate(self, **kwargs):
-		self._liquid.add_liquid(**kwargs)
-
-	def add_liquid(self, **kwargs):
-		self._liquid.add_liquid(**kwargs)
-
-	def get_volume(self):
-		return self._liquid.get_volume()
-
-	def get_proportion(self, liquid):
-		return self._liquid.get_proportion(liquid)
-
-	def transfer(self, amount, destination, ml=False):
-		return self._liquid.transfer(amount, destination, ml=ml)
-
-	def assert_capacity(self, amount, ml=False):
-		return self._liquid.assert_capacity(amount, ml=ml)
+class MicroplateWell(LiquidWell):
+	pass
 
 class Microplate(GridContainer):
 	rows     =   8
@@ -66,3 +40,9 @@ class Microplate_96_deepwell(Microplate_96):
 	max_vol  = 380
 	height   =  14.6
 	depth    =  10.8
+
+class Reservoir_12_deepwell(GridContainer):
+	rows = 1
+	cols = 12
+	min_vol = 500
+	max_vol = 21*1000
