@@ -55,9 +55,6 @@ class GridContainer():
 		row, col = self._normalize_position(position)
 		offset_x = self.spacing*row
 		offset_y = self.spacing*col
-		print(self.start_x)
-		print(self.start_y)
-		print(self.start_z)
 		return (offset_x+self.start_x, offset_y+self.start_y, self.start_z)
 
 	def get_child(self, position):
@@ -77,7 +74,6 @@ class GridContainer():
 		row_num  = ord(row)-ord('A')
 		col_num  = int(col)-1 # We want it zero-indexed.
 		if self.rows and row_num > self.rows-1:
-			print(self.rows)
 			raise ValueError(
 				"Row {} out of range.".format(row)
 			)
