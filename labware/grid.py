@@ -73,6 +73,10 @@ class GridContainer():
 		col = position[1:]
 		row_num  = ord(row)-ord('A')
 		col_num  = int(col)-1 # We want it zero-indexed.
+		if self.rows is None:
+			raise Exception("No maximum row provided.")
+		if self.cols is None:
+			raise Exception("No maximum cols provided.")
 		if self.rows and row_num > self.rows-1:
 			raise ValueError(
 				"Row {} out of range.".format(row)
