@@ -1,9 +1,6 @@
 from .grid import GridContainer
 from .liquids import LiquidWell
 
-class ReservoirWell(LiquidWell):
-	pass
-
 class Reservoir(GridContainer):
 
 	rows = 1
@@ -15,7 +12,7 @@ class Reservoir(GridContainer):
 	length  = 127.76
 	width   =  85.47
 
-	child_class = ReservoirWell
+	child_class = LiquidWell
 
 	def col(self, col):
 		position = 'A{}'.format(col)
