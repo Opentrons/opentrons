@@ -32,6 +32,32 @@ class ReservoirTest(unittest.TestCase):
 			col = self.reservoir.cols + 1
 			self.reservoir.get_child('A{}'.format(col))
 
+	def deck_calibration_test(self):
+
+		config = {
+			'calibration': {
+				'a1': {
+					'type':'reservoir',
+					'x': 10,
+					'y': 11,
+					'z': 12
+				}
+			}
+		}
+
+		deck = labware.Deck(a1=labware.Reservoir())
+		deck.configure(config)
+
+		margin = self.expected_margin
+
+		reservoir = deck.slot('a1')
+
+		col1 = reservoir.col(1).coordinates()
+		col2 = reservoir.col(2).coordinates()
+
+		self.assertEqual(col1, (10, 11, 12))
+		self.assertEqual(col2, (10, 11+margin, 12))
+
 class ReservoirWellTest(unittest.TestCase):
 
 	def setUp(self):
