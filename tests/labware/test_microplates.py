@@ -118,26 +118,26 @@ class MicroplateWellTest(unittest.TestCase):
         wellA.transfer(20, wellB)
 
         # Check Well A to ensure things have been removed.
-        water = wellA.get_proportion('water')
-        buff  = wellA.get_proportion('buffer')
-        sal   = wellA.get_proportion('saline')
+        wat = wellA.get_proportion('water')
+        buf = wellA.get_proportion('buffer')
+        sal = wellA.get_proportion('saline')
 
         # We use almostEqual because it's floating-point.
-        self.assertAlmostEqual(water, .9)
-        self.assertAlmostEqual(buff, .09)
-        self.assertAlmostEqual(sal,  .01)
+        self.assertAlmostEqual(wat, .9)
+        self.assertAlmostEqual(buf, .09)
+        self.assertAlmostEqual(sal, .01)
 
         self.assertEqual(wellA.get_volume(), 80)
 
         # Check WellB to ensure things have been added.
-        water = wellB.get_proportion('water')
-        buff  = wellB.get_proportion('buffer')
-        sal   = wellB.get_proportion('saline')
+        wat = wellB.get_proportion('water')
+        buf = wellB.get_proportion('buffer')
+        sal = wellB.get_proportion('saline')
 
         # We use almostEqual because it's floating-point.
-        self.assertAlmostEqual(water, .9)
-        self.assertAlmostEqual(buff, .09)
-        self.assertAlmostEqual(sal,  .01)
+        self.assertAlmostEqual(wat, .9)
+        self.assertAlmostEqual(buf, .09)
+        self.assertAlmostEqual(sal, .01)
 
         self.assertEqual(wellB.get_volume(), 20)
 
