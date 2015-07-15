@@ -1,9 +1,10 @@
 import unittest
 import labware
 
+
 class MicroplateTest(unittest.TestCase):
 
-    expected_margin = 9 # ANSI standard.
+    expected_margin = 9  # ANSI standard.
 
     def setUp(self):
         self.plate = labware.Microplate()
@@ -15,29 +16,29 @@ class MicroplateTest(unittest.TestCase):
 
     def a2_coordinate_test(self):
         a2 = self.plate.well('A2').coordinates()
-        self.assertEqual(a2, (10, 11+self.expected_margin, 12))
+        self.assertEqual(a2, (10, 11 + self.expected_margin, 12))
 
     def b1_coordinate_test(self):
         b1 = self.plate.well('B1').coordinates()
-        self.assertEqual(b1, (10+self.expected_margin, 11, 12))
+        self.assertEqual(b1, (10 + self.expected_margin, 11, 12))
 
     def b2_coordinate_test(self):
         b2 = self.plate.well('B2').coordinates()
         margin = self.expected_margin
-        self.assertEqual(b2, (10+margin, 11+margin, 12))
+        self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
     def coordinate_lowercase_test(self):
         b2 = self.plate.well('b2').coordinates()
         margin = self.expected_margin
-        self.assertEqual(b2, (10+margin, 11+margin, 12))
+        self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
     def row_sanity_test(self):
-        row = chr( ord('a') + self.plate.rows + 1 )
+        row = chr(ord('a') + self.plate.rows + 1)
         with self.assertRaises(ValueError):
             self.plate.well('{}1'.format(row))
 
     def col_sanity_test(self):
-        col = chr( self.plate.cols + 1 )
+        col = chr(self.plate.cols + 1)
         with self.assertRaises(ValueError):
             self.plate.well('A{}'.format(col))
 
@@ -48,7 +49,7 @@ class MicroplateTest(unittest.TestCase):
         config = {
             'calibration': {
                 'a1': {
-                    'type':'microplate_96',
+                    'type': 'microplate_96',
                     'x': 10,
                     'y': 11,
                     'z': 12
@@ -67,7 +68,8 @@ class MicroplateTest(unittest.TestCase):
         b2 = plate.well('b2').coordinates()
 
         self.assertEqual(a1, (10, 11, 12))
-        self.assertEqual(b2, (10+margin, 11+margin, 12))
+        self.assertEqual(b2, (10 + margin, 11 + margin, 12))
+
 
 class MicroplateWellTest(unittest.TestCase):
 
@@ -108,10 +110,10 @@ class MicroplateWellTest(unittest.TestCase):
             self.well.add_liquid(saline=1)
 
     def mixture_transfer_test(self):
-        
+
         wellA = self.well
         wellB = self.plate.well('A2')
-        
+
         wellA.allocate(water=90, buffer=9, saline=1)
         wellA.transfer(20, wellB)
 

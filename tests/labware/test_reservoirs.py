@@ -1,6 +1,7 @@
 import unittest
 import labware
 
+
 class ReservoirTest(unittest.TestCase):
 
     expected_margin = labware.Reservoir.spacing
@@ -15,7 +16,7 @@ class ReservoirTest(unittest.TestCase):
 
     def col2_calibration_test(self):
         col2 = self.reservoir.col(2).coordinates()
-        self.assertEqual(col2, (10, 11+self.expected_margin, 12))
+        self.assertEqual(col2, (10, 11 + self.expected_margin, 12))
 
     def col_sanity_test(self):
         with self.assertRaises(ValueError):
@@ -23,7 +24,7 @@ class ReservoirTest(unittest.TestCase):
             self.col(col)
 
     def row_sanity_test(self):
-        row = chr( ord('a') + self.reservoir.rows + 1 )
+        row = chr(ord('a') + self.reservoir.rows + 1)
         with self.assertRaises(ValueError):
             self.reservoir.get_child('{}1'.format(row))
 
@@ -37,7 +38,7 @@ class ReservoirTest(unittest.TestCase):
         config = {
             'calibration': {
                 'a1': {
-                    'type':'reservoir',
+                    'type': 'reservoir',
                     'x': 10,
                     'y': 11,
                     'z': 12
@@ -56,7 +57,8 @@ class ReservoirTest(unittest.TestCase):
         col2 = reservoir.col(2).coordinates()
 
         self.assertEqual(col1, (10, 11, 12))
-        self.assertEqual(col2, (10, 11+margin, 12))
+        self.assertEqual(col2, (10, 11 + margin, 12))
+
 
 class ReservoirWellTest(unittest.TestCase):
 

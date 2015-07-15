@@ -1,6 +1,7 @@
 import unittest
 import labware
 
+
 class DeckTest(unittest.TestCase):
 
     def setUp(self):
@@ -9,7 +10,7 @@ class DeckTest(unittest.TestCase):
     def test_module_add(self):
         self.deck.add_modules(a1=labware.Microplate())
         plate = self.deck.slot('a1')
-        self.assertTrue(isinstance(plate, labware.Microplate)) 
+        self.assertTrue(isinstance(plate, labware.Microplate))
 
     def test_module_add_to_filled_slot(self):
         self.deck.add_modules(a1=labware.Microplate())
