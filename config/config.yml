@@ -1,8 +1,6 @@
 calibration:
   pipette_a:
     type: pipette_p200
-    # The stop is actually a function of volume.
-    volume: 50
     stop: 20
     drop: 25
   # Right now, calibrations are module-specific.
