@@ -89,7 +89,7 @@ class GridContainer():
         """
         row = position[0].upper()
         col = position[1:]
-        row_num  = ord(row) - ord('A')
+        row_num  = ord(row) - ord('A')  # Get the row's alphabetical index.
         col_num  = int(col) - 1  # We want it zero-indexed.
         if self.rows is None:
             raise Exception("No maximum row number provided.")
