@@ -69,7 +69,24 @@ class GridContainer():
         return self.child_class(self, position)
 
     def _normalize_position(self, position):
-        """ Don't use this; it's not part of the public API. """
+        """
+        Normalizes a coordinate (A1, B12, etc) into a tuple.
+
+        This allows us to pass 'A1' around and seemingly use it as a key
+        without relying on constants.
+
+        Also does sanity check to ensure that the given coordinates are
+        within bounds of the grid.
+
+        >>> grid._normalize_position(A1)
+        (0, 0)
+
+        >>> grid._normalize_position(A2)
+        (0, 1)
+
+        >>> grid._normalize_position(C4)
+        (3, 4)
+        """
         row = position[0].upper()
         col = position[1:]
         row_num  = ord(row) - ord('A')
