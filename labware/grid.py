@@ -1,3 +1,27 @@
+def normalize_position(position):
+    """
+    Normalizes a coordinate (A1, B12, etc) into a tuple.
+
+    This allows us to pass 'A1' around and seemingly use it as a key
+    without relying on constants.
+
+    >>> normalize_position('A1')
+    (0, 0)
+
+    >>> normalize_position('A2')
+    (0, 1)
+
+    >>> normalize_position('C4')
+    (3, 4)
+    """
+    row = position[0].upper()
+    col = position[1:]
+    row_num  = ord(row) - ord('A')  # Get the row's alphabetical index.
+    col_num  = int(col) - 1  # We want it zero-indexed.
+
+    return (row_num, col_num)
+
+
 class GridItem():
 
     parent   = None
@@ -70,37 +94,20 @@ class GridContainer():
 
     def _normalize_position(self, position):
         """
-        Normalizes a coordinate (A1, B12, etc) into a tuple.
-
-        This allows us to pass 'A1' around and seemingly use it as a key
-        without relying on constants.
-
-        Also does sanity check to ensure that the given coordinates are
-        within bounds of the grid.
-
-        >>> grid._normalize_position(A1)
-        (0, 0)
-
-        >>> grid._normalize_position(A2)
-        (0, 1)
-
-        >>> grid._normalize_position(C4)
-        (3, 4)
+        Normalizes a position (A2, B5, etc) and does a sanity check to ensure
+        that the given coordinates are within bounds of the grid.
         """
-        row = position[0].upper()
-        col = position[1:]
-        row_num  = ord(row) - ord('A')  # Get the row's alphabetical index.
-        col_num  = int(col) - 1  # We want it zero-indexed.
+        row_num, col_num = normalize_position(position)
         if self.rows is None:
             raise Exception("No maximum row number provided.")
         if self.cols is None:
             raise Exception("No maximum column number provided.")
         if self.rows and row_num > self.rows - 1:
             raise ValueError(
-                "Row {} out of range.".format(row)
+                "Row {} out of range.".format(row_num)
             )
         if self.cols and col_num > self.cols - 1:
             raise ValueError(
-                "Column #{} out of range.".format(col)
+                "Column #{} out of range.".format(col_num)
             )
         return (row_num, col_num)
