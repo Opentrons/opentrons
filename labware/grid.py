@@ -5,7 +5,9 @@ def normalize_position(position):
     This allows us to pass 'A1' around and seemingly use it as a key
     without relying on constants.
 
-    You can also pass through a 
+    You can also pass through a tuple that's already been normalized and get
+    the same tuple back again. Useful if you want to dynamically construct
+    tuples at a higher level of the application.
 
     >>> normalize_position('A1')
     (0, 0)
