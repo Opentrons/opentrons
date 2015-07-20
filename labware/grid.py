@@ -5,6 +5,8 @@ def normalize_position(position):
     This allows us to pass 'A1' around and seemingly use it as a key
     without relying on constants.
 
+    You can also pass through a 
+
     >>> normalize_position('A1')
     (0, 0)
 
@@ -13,13 +15,28 @@ def normalize_position(position):
 
     >>> normalize_position('C4')
     (3, 4)
-    """
-    row = position[0].upper()
-    col = position[1:]
-    row_num  = ord(row) - ord('A')  # Get the row's alphabetical index.
-    col_num  = int(col) - 1  # We want it zero-indexed.
 
-    return (row_num, col_num)
+    >>> normalize_position('c4')
+    (3, 4)
+
+    >>> normalize_positon(3, 4)
+    (3, 4)
+    """
+    if isinstance(position, tuple) and len(position) is 2:
+        if isinstance(position[0], int) and isinstance(position[1], int):
+            return position
+        raise TypeError("Tuple arguments must be integers.")
+    elif isinstance(position, str):
+        row = position[0].upper()
+        col = position[1:]
+        row_num  = ord(row) - ord('A')  # Get the row's alphabetical index.
+        try:
+            col_num  = int(col) - 1  # We want it zero-indexed.
+        except ValueError:
+            raise ValueError("Column must be a number.")
+        return (row_num, col_num)
+    else:
+        raise TypeError("Position must be a str or tuple of ints.")
 
 
 class GridItem():

@@ -19,17 +19,17 @@ class ReservoirTest(unittest.TestCase):
         self.assertEqual(col2, (10, 11 + self.expected_margin, 12))
 
     def col_sanity_test(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             col = self.reservoir.cols + 1
             self.col(col)
 
     def row_sanity_test(self):
         row = chr(ord('a') + self.reservoir.rows + 1)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.reservoir.get_child('{}1'.format(row))
 
     def col_sanity_test(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             col = self.reservoir.cols + 1
             self.reservoir.get_child('A{}'.format(col))
 

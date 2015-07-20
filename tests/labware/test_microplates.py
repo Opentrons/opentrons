@@ -34,13 +34,20 @@ class MicroplateTest(unittest.TestCase):
 
     def row_sanity_test(self):
         row = chr(ord('a') + self.plate.rows + 1)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.plate.well('{}1'.format(row))
 
+    def unicode_coord_test(self):
+        self.plate.well(u'A1')
+
     def col_sanity_test(self):
-        col = chr(self.plate.cols + 1)
-        with self.assertRaises(ValueError):
+        col = self.plate.cols + 1
+        with self.assertRaises(KeyError):
             self.plate.well('A{}'.format(col))
+
+    def col_type_sanity_test(self):
+        with self.assertRaises(ValueError):
+            self.plate.well('ABC')
 
     def deck_calibration_test(self):
 

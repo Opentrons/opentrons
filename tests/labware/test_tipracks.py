@@ -35,7 +35,7 @@ class TiprackTest(unittest.TestCase):
     def row_sanity_test(self):
 
         row = chr(ord('a') + self.rack.rows + 1)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.rack.slot('{}1'.format(row))
 
         row = chr(ord('a') + self.rack.rows - 1)
@@ -45,7 +45,7 @@ class TiprackTest(unittest.TestCase):
 
         col = self.rack.cols + 1
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.rack.slot('A{}'.format(col))
 
         col = self.rack.cols
