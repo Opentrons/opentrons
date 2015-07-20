@@ -20,3 +20,7 @@ class DeckTest(unittest.TestCase):
     def test_module_access_empty_slot(self):
         with self.assertRaises(KeyError):
             self.deck.slot('a1')
+
+    def test_slot_out_of_range(self):
+        with self.assertRaises(KeyError):
+            self.deck.slot('z1')

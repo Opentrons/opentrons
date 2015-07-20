@@ -103,11 +103,11 @@ class GridContainer():
         if self.cols is None:
             raise Exception("No maximum column number provided.")
         if self.rows and row_num > self.rows - 1:
-            raise ValueError(
+            raise KeyError(
                 "Row {} out of range.".format(row_num)
             )
         if self.cols and col_num > self.cols - 1:
-            raise ValueError(
+            raise KeyError(
                 "Column #{} out of range.".format(col_num)
             )
         return (row_num, col_num)
