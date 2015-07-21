@@ -21,7 +21,7 @@ def normalize_position(position):
     >>> normalize_position('c4')
     (3, 4)
 
-    >>> normalize_positon(3, 4)
+    >>> normalize_position((3, 4))
     (3, 4)
     """
     if isinstance(position, tuple) and len(position) is 2:
