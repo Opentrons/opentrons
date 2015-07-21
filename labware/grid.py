@@ -5,10 +5,6 @@ def normalize_position(position):
     This allows us to pass 'A1' around and seemingly use it as a key
     without relying on constants.
 
-    You can also pass through a tuple that's already been normalized and get
-    the same tuple back again. Useful if you want to dynamically construct
-    tuples at a higher level of the application.
-
     >>> normalize_position('A1')
     (0, 0)
 
@@ -21,8 +17,15 @@ def normalize_position(position):
     >>> normalize_position('c4')
     (3, 4)
 
+    You can also pass through a tuple that's already been normalized and get
+    the same tuple back again:
+
     >>> normalize_position((3, 4))
     (3, 4)
+
+    Useful if you want to dynamically construct tuples at a higher level of
+    the application.
+
     """
     if isinstance(position, tuple) and len(position) is 2:
         if isinstance(position[0], int) and isinstance(position[1], int):
