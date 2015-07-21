@@ -34,7 +34,7 @@ class LiquidContainer():
         if max_working:
             self.max_working_volume = self.convert_ml(max_working, ml)
 
-    def add_liquid(self, ml=False, **kwargs):
+    def add_liquid(self, name=None, value=None, ml=False, **kwargs):
         """
         You provide as keyword arguments liquid names and volumes in
         microliters.
@@ -44,11 +44,11 @@ class LiquidContainer():
 
         400ul of water:
 
-            container.add_liquid(water=400)
+        >>> container.add_liquid(water=400)
 
         400ml of water:
 
-            container.add_liquid(water=400, ml=True)
+        >>> container.add_liquid(water=400, ml=True)
 
         TODO: Attach to a global ingredients list to ensure that all
               specified liquids have been defined.  For now, just
@@ -105,7 +105,16 @@ class LiquidContainer():
         else:
             return volume
 
-    def get_volume(self):
+    def get_volume(self, name=None):
+        if name:
+            if name not in self._contents:
+                raise KeyError(
+                    "Liquid '{}' not in container.".format(name)
+                )
+            if len(self._contents.keys()) > 1:
+                raise ValueError(
+                    "Liquid '{}' is a component of a mixture.".format(name)
+                )
         return self.calculate_total_volume()
 
     def get_proportion(self, key):
@@ -162,8 +171,11 @@ class LiquidWell(GridItem):
     def add_liquid(self, **kwargs):
         self._liquid.add_liquid(**kwargs)
 
-    def get_volume(self):
-        return self._liquid.get_volume()
+    def get_volume(self, name=None):
+        return self._liquid.get_volume(name)
+
+    def get_liquid_name(self):
+        return self._liquid.get_liquid_name()
 
     def get_proportion(self, liquid):
         return self._liquid.get_proportion(liquid)
