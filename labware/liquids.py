@@ -34,7 +34,7 @@ class LiquidContainer():
         if max_working:
             self.max_working_volume = self.convert_ml(max_working, ml)
 
-    def add_liquid(self, name=None, value=None, ml=False, **kwargs):
+    def add_liquid(self, ml=False, **kwargs):
         """
         You provide as keyword arguments liquid names and volumes in
         microliters.
