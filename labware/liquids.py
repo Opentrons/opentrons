@@ -80,8 +80,8 @@ class LiquidContainer():
         new_value = self.calculate_total_volume() + new_amount
         if (new_value > self.max_volume):
             raise ValueError(
-                "Liquid amount ({}{}l) exceeds max volume ({}{}l)."
-                .format(new_value, u'\u03BC', self.max_volume, u'\u03BC')
+                "Liquid amount ({}µl) exceeds max volume ({}µl)."
+                .format(new_value, self.max_volume)
             )
 
     def calculate_total_volume(self, data=None):
@@ -137,8 +137,8 @@ class LiquidContainer():
         total_volume = self.calculate_total_volume()
         if (total_volume < amount):
             raise ValueError(
-                "Not enough liquid ({}{}l) for transfer ({}{}l)."
-                .format(total_volume, u'\u03BC', amount, u'\u03BC')
+                "Not enough liquid ({}µl) for transfer ({}µl)."
+                .format(total_volume, amount)
             )
 
         # Proportion math.
