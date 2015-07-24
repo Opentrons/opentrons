@@ -98,7 +98,11 @@ class GridContainer():
         self.start_z = z
 
     def get_child_coordinates(self, position):
-        """ Get a well based on a row, col string like "A1". """
+        """
+        Get the x, y, z coords for a child well.
+
+        If things are properly calibrated, this should be absolute.
+        """
         row, col = self._normalize_position(position)
         offset_x = self.spacing * row
         offset_y = self.spacing * col
