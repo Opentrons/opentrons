@@ -12,7 +12,7 @@ design that will enable us to build extremely user-friendly interfaces
 that can translate user goals to an optimized list of actions.
 
 It will also allow us to do error checking on an **entire run** of protocol
-actions and then list the necessary steps to removing those errors in an 
+actions and then list the necessary steps to removing those errors in an
 intelligent manner.
 
 On the lower-level, since the software will be designed to output to our 
