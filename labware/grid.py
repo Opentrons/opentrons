@@ -118,6 +118,9 @@ class GridContainer():
     def init_child(self, position):
         return self.child_class(self, position)
 
+    def init_child_collection(self, positions):
+        return self.collection_class(self, positions)
+
     def _normalize_position(self, position):
         """
         Normalizes a position (A2, B5, etc) and does a sanity check to ensure
