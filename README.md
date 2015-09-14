@@ -9,7 +9,8 @@ mixtures of liquids) between liquid containers.
 
 Later versions will build upon this to provide an interface for Protocol
 design that will enable us to build extremely user-friendly interfaces
-that can translate user goals to an optimized list of actions.
+that can translate user goals to an optimized list of actions, then
+export those actions to industry-standard tools such as Autoprotocol.
 
 It will also allow us to do error checking on an **entire run** of protocol
 actions and then list the necessary steps to removing those errors in an
