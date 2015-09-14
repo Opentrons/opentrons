@@ -2,7 +2,7 @@ from .grid import GridContainer, GridItem
 from .liquids import LiquidContainer, LiquidWell
 
 
-class Microplate(GridContainer):
+class Microplate(GridContainer, LiquidContainer):
     rows     =   8
     cols     =  12
     volume   = 100
@@ -16,8 +16,6 @@ class Microplate(GridContainer):
     a1_x     =  14.38
     a1_y     =  11.24
     spacing  =   9
-
-    child_class = LiquidWell
 
     def well(self, position):
         return self.get_child(position)
