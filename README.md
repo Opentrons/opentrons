@@ -22,3 +22,7 @@ having to write underlying infrastructure code to manipulate complex JSON
 structures directly. 
 
 See the `tests/` directory for examples of API usage and current support.
+
+While a lot of base functionality regarding tracking of liquid levels and
+particular components exists, there hasn't been time to implement any data
+export capability or support for third-party labware modules.
