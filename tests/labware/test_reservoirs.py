@@ -11,11 +11,11 @@ class ReservoirTest(unittest.TestCase):
         self.reservoir.calibrate(x=10, y=11, z=12)
 
     def col1_calibration_test(self):
-        col1 = self.reservoir.col(1).coordinates()
+        col1 = self.reservoir.col(1).coordinates
         self.assertEqual(col1, (10, 11, 12))
 
     def col2_calibration_test(self):
-        col2 = self.reservoir.col(2).coordinates()
+        col2 = self.reservoir.col(2).coordinates
         self.assertEqual(col2, (10, 11 + self.expected_margin, 12))
 
     def col_sanity_test(self):
@@ -53,8 +53,8 @@ class ReservoirTest(unittest.TestCase):
 
         reservoir = deck.slot('a1')
 
-        col1 = reservoir.col(1).coordinates()
-        col2 = reservoir.col(2).coordinates()
+        col1 = reservoir.col(1).coordinates
+        col2 = reservoir.col(2).coordinates
 
         self.assertEqual(col1, (10, 11, 12))
         self.assertEqual(col2, (10, 11 + margin, 12))

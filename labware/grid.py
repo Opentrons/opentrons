@@ -53,6 +53,7 @@ class GridItem():
         self.parent = parent
         self.position = position
 
+    @property
     def coordinates(self):
         return self.parent.get_child_coordinates(self.position)
 
