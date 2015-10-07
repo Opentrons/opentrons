@@ -1,5 +1,5 @@
 from .grid import GridContainer, GridItem
-from .liquids import LiquidContainer, LiquidWell
+from .liquids import LiquidWell
 
 
 class Microplate(GridContainer):

@@ -1,7 +1,13 @@
 from .grid import GridItem
 
 
-class LiquidContainer():
+class LiquidInventory():
+
+    """
+    This is the generic class for a mixture of liquids.  Each well and trough
+    and such contains a LiquidInventory, which it uses to keep track of liquid
+    inventory.
+    """
 
     max_volume = None
     min_working_volume = None
@@ -161,7 +167,7 @@ class LiquidWell(GridItem):
     def __init__(self, *args, **kwargs):
         super(LiquidWell, self).__init__(*args, **kwargs)
         p = self.parent
-        self._liquid = LiquidContainer(
+        self._liquid = LiquidInventory(
             max=p.volume, min_working=p.min_vol, max_working=p.max_vol
         )
 
