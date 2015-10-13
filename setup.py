@@ -8,7 +8,7 @@ config = {
     'author': "OpenTrons",
     'url': 'http://opentrons.com',
     'version': '0.1',
-    'install_requires': ['nose'],
+    'install_requires': ['nose', 'pyyaml'],
     'packages': ['labware'],
     'name': 'opentrons',
     'test_suite': 'nose.collector'
