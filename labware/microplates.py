@@ -34,7 +34,7 @@ class Microplate_96(Microplate):
     pass
 
 
-class Microplate_96_deepwell(Microplate_96):
+class Microplate_96_Deepwell(Microplate_96):
     volume   = 400
     min_vol  =  50
     max_vol  = 380

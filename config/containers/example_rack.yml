@@ -1,0 +1,19 @@
+# This is an example of a customer container definition.
+#
+# Two containers are specified here: 'example' (based on the filename)
+# and its subset 'example.deepwell'.
+#
+# Dimensions are in millimeters; volumes are in microliters.
+
+type: tiprack 
+
+rows: 8
+cols: 12
+a1_x: 10    # X-offset of A1 from container edge
+a1_y: 11    # Y-offset of A1 from container edge
+spacing: 12 # Well-center to well-center spacing
+
+# Container outer dimensions
+height: 100
+length: 100
+width: 100
