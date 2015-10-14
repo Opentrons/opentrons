@@ -7,7 +7,7 @@ The containers aren't stored or defined here, merely aggregated under the
 namespace expected by the external API.
 
 For example, `containers.load_container('microplate.96.deepwell')` will load
-`microplates.Microplate_96_Deepwell`.  The name that gets passed to the 
+`microplates.Microplate_96_Deepwell`.  The name that gets passed to the
 container is the same as the name that should be defined in the JSON
 Protocol file.
 
@@ -15,8 +15,6 @@ There's also support for custom containers, either by placing them in the
 config/containers directory of this library (see included examples), or by
 using the load_custom_containers function of this module to specify an
 alternate configuration directory.
-
-This code is a big pile of magic.  Sorry.
 """
 
 import os
@@ -46,7 +44,13 @@ _valid_properties = [
 # These are the types that can be defined within a custom container.
 _valid_values = (int, float, str)
 
-_containers = { }
+# The list of modules to automatically catalog as supported containers.
+_container_modules = [
+    labware.tipracks, labware.microplates, labware.reservoirs
+]
+
+_containers = {}
+
 
 def load_custom_containers(folder=None):
     """
@@ -57,7 +61,7 @@ def load_custom_containers(folder=None):
     specified type.
 
     For example, a file named "foo.yml" which specifies that its
-    container is a microplate will be officially called 
+    container is a microplate will be officially called
     "microplate.foo" for reference purposes within JSON Protocols
     and other parts of the system.
     """
@@ -74,6 +78,7 @@ def load_custom_containers(folder=None):
             name = os.path.splitext(f)[0]
             add_custom_container(name, data)
 
+
 def _load_default_containers():
     """
     Traverses the set list of default container types in order to provide
@@ -83,14 +88,14 @@ def _load_default_containers():
     module everytime we add a new one.
     """
     _containers['grid'] = GridContainer
-    container_modules = [labware.tipracks, labware.microplates, labware.reservoirs]
-    for mod in container_modules:
+    for mod in _container_modules:
         props = dir(mod)
         for name in props:
             prop = getattr(mod, name)
             if inspect.isclass(prop) and issubclass(prop, GridContainer):
                 name = normalize_container_name(name)
                 _containers[name] = prop
+
 
 def normalize_container_name(name):
     """
@@ -99,6 +104,7 @@ def normalize_container_name(name):
     """
     return str(name).lower().replace('_', '.')
 
+
 def add_custom_container(name, data, parent=None):
     """
     Create a new container with custom dimensions and properties.  See the
@@ -106,11 +112,11 @@ def add_custom_container(name, data, parent=None):
     properties.
 
     Additionally, custom containers can be "subclassed" by providing the
-    names of child types and their unique properties within the 
+    names of child types and their unique properties within the
     'subsets' property.  Subsets are recursive, meaning that a subset
     can itself define further subsets.
 
-    See config/containers/example_plate.yml for more information on 
+    See config/containers/example_plate.yml for more information on
     custom container definitions.
     """
     obj_type = data.pop('type', 'grid')
@@ -124,8 +130,8 @@ def add_custom_container(name, data, parent=None):
         container_name = name
     else:
         # Otherwise, prefix with its base container type.
-        container_name = obj_type+'.'+name
-    
+        container_name = obj_type + '.' + name
+
     subsets = data.pop('subsets', {})
 
     # Make sure nobody's trying any funny business with property
@@ -133,12 +139,12 @@ def add_custom_container(name, data, parent=None):
     for key in data:
         if key not in _valid_properties:
             raise KeyError(
-                "Unknown container property for custom container {}: {}"\
+                "Unknown container property for custom container {}: {}"
                 .format(name, key)
             )
         if not isinstance(data[key], _valid_values):
             raise ValueError(
-                "Invalid container value for custom container {}: {}"\
+                "Invalid container value for custom container {}: {}"
                 .format(name, key)
             )
 
@@ -146,9 +152,9 @@ def add_custom_container(name, data, parent=None):
     base = _typemap.get(obj_type, None)
     if not base:
         raise KeyError(
-            "Invalid container type for custom container {}: {}. "\
-            .format(name, obj_type)+
-            "Valid choices: {}"\
+            "Invalid container type for custom container {}: {}. "
+            .format(name, obj_type) +
+            "Valid choices: {}"
             .format(", ".join(list_container_types()))
         )
 
@@ -158,7 +164,8 @@ def add_custom_container(name, data, parent=None):
 
     # Recurse for subsets.
     for name in subsets:
-        add_custom_container(container_name+"."+name, subsets[name], data)
+        add_custom_container(container_name + "." + name, subsets[name], data)
+
 
 def load_container(name):
     """
@@ -169,15 +176,17 @@ def load_container(name):
     if name in _containers:
         return _containers[name]
     raise KeyError(
-        "Invalid container name {}.  Valid containers: {}"\
+        "Invalid container name {}.  Valid containers: {}"
         .format(name, ", ".join(list_containers()))
     )
+
 
 def list_containers():
     """
     Returns a list of all valid container names for use in the JSON protocol
     """
     return sorted(list(_containers.keys()))
+
 
 def list_container_types():
     """
