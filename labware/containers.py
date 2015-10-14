@@ -6,13 +6,15 @@ such as microplates, tipracks, and reservoirs.
 The containers aren't stored or defined here, merely aggregated under the
 namespace expected by the external API.
 
-For example, `containers.load('microplate.96.deepwell')` will simply load
+For example, `containers.load_container('microplate.96.deepwell')` will load
 `microplates.Microplate_96_Deepwell`.  The name that gets passed to the 
 container is the same as the name that should be defined in the JSON
 Protocol file.
 
-There's also support for custom containers, by placing them in 
-config/containers.yml.
+There's also support for custom containers, either by placing them in the
+config/containers directory of this library (see included examples), or by
+using the load_custom_containers function of this module to specify an
+alternate configuration directory.
 
 This code is a big pile of magic.  Sorry.
 """
@@ -41,14 +43,30 @@ _valid_properties = [
     'volume', 'min_vol', 'max_vol', 'well_depth'
 ]
 
+# These are the types that can be defined within a custom container.
 _valid_values = (int, float, str)
 
 _containers = { }
 
 def load_custom_containers(folder=None):
+    """
+    Loads YAML files from the directory specified, or the default
+    configuration directory for this module.
+
+    Loaded containers will be named for their filename and their
+    specified type.
+
+    For example, a file named "foo.yml" which specifies that its
+    container is a microplate will be officially called 
+    "microplate.foo" for reference purposes within JSON Protocols
+    and other parts of the system.
+    """
+    # Default to local library configuration.
     if not folder:
         folder = os.path.join(os.getcwd(), 'config/containers')
     files = []
+    # Get all YAML files from the specified directory, parse then,
+    # and send the data to add_custom_container.
     for f in os.listdir(folder):
         full_path = os.path.join(folder, f)
         if os.path.isfile(full_path) and full_path.endswith('.yml'):
@@ -57,6 +75,13 @@ def load_custom_containers(folder=None):
             add_custom_container(name, data)
 
 def _load_default_containers():
+    """
+    Traverses the set list of default container types in order to provide
+    access to them through standardized container reference names.
+
+    We do this so that we don't have to manually list a container in this
+    module everytime we add a new one.
+    """
     _containers['grid'] = GridContainer
     container_modules = [labware.tipracks, labware.microplates, labware.reservoirs]
     for mod in container_modules:
@@ -68,12 +93,29 @@ def _load_default_containers():
                 _containers[name] = prop
 
 def normalize_container_name(name):
+    """
+    Takes a container class name like Microplate_96_Deepwell and normalizes
+    it to a container reference name in the form of microplate.96.deepwell.
+    """
     return str(name).lower().replace('_', '.')
 
 def add_custom_container(name, data, parent=None):
+    """
+    Create a new container with custom dimensions and properties.  See the
+    _valid_properties list above for a list of all valid container
+    properties.
 
+    Additionally, custom containers can be "subclassed" by providing the
+    names of child types and their unique properties within the 
+    'subsets' property.  Subsets are recursive, meaning that a subset
+    can itself define further subsets.
+
+    See config/containers/example_plate.yml for more information on 
+    custom container definitions.
+    """
     obj_type = data.pop('type', 'grid')
 
+    # Handle subsets, figure out container name.
     if parent:
         # Merge in parent data if this is a subset.
         parent = parent.copy()
@@ -119,6 +161,11 @@ def add_custom_container(name, data, parent=None):
         add_custom_container(container_name+"."+name, subsets[name], data)
 
 def load_container(name):
+    """
+    Returns a reference to a Python class representing the named container.
+
+    For a list of all valid containers, use list_containers.
+    """
     if name in _containers:
         return _containers[name]
     raise KeyError(
@@ -127,9 +174,16 @@ def load_container(name):
     )
 
 def list_containers():
+    """
+    Returns a list of all valid container names for use in the JSON protocol
+    """
     return sorted(list(_containers.keys()))
 
 def list_container_types():
+    """
+    Returns a list of all valid container types (microplate, tiprack, etc)
+    for use in custom container definitions.
+    """
     return sorted(list(_typemap.keys()))
 
 _load_default_containers()
