@@ -64,6 +64,9 @@ def load_custom_containers(folder=None):
     container is a microplate will be officially called
     "microplate.foo" for reference purposes within JSON Protocols
     and other parts of the system.
+
+    If a container name is reused, the old container will be 
+    replaced.
     """
     # Default to local library configuration.
     if not folder:
