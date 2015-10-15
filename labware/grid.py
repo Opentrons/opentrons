@@ -38,10 +38,8 @@ def normalize_position(position):
         row = position[1:]
         # Normalize column.
         col_num  = ord(col) - ord('A')  # Get the col's alphabetical index.
-        if col_num < 0:
-            raise ValueError("Column must be a letter.")
-        if col_num > 25:
-            raise ValueError("Column letter must be A-Z.")
+        if col_num < 0 or col_num > 25:
+            raise ValueError("Column must be a letter (A-Z).")
         # Normalize row.
         try:
             row_num  = int(row) - 1  # We want it zero-indexed.

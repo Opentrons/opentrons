@@ -35,9 +35,14 @@ class GridTest(unittest.TestCase):
         """
         Exception on invalid coordinate string (']1').
         """
+        # Make sure the entire valid range works.
+        normalize_position('A1')
         normalize_position('Z1')
+        # Test out of range (@ and ] are the edges of A-Z in ASCII).
         with self.assertRaises(ValueError):
             normalize_position(']1')
+        with self.assertRaises(ValueError):
+            normalize_position('@1')
 
     def test_invalid_coordinate_string(self):
         """
