@@ -38,7 +38,7 @@ _typemap = {
 # TODO: Define this on each container type.
 _valid_properties = [
     'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'height', 'length', 'width',
-    'volume', 'min_vol', 'max_vol', 'well_depth'
+    'volume', 'min_vol', 'max_vol', 'well_depth', 'spacing_y', 'spacing_x'
 ]
 
 # These are the types that can be defined within a custom container.

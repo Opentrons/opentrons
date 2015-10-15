@@ -29,6 +29,8 @@ subsets:
   # 'example.deepwell'
   deepwell:
     well_depth: 15
+    spacing_y: 10
+    spacing_x: 13
     subsets:
       red:
         well_depth: 25

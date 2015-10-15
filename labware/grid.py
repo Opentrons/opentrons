@@ -74,6 +74,11 @@ class GridContainer():
     rows = None
     cols = None
 
+    spacing_x = None
+    spacing_y = None
+
+    spacing = 0
+
     """
     Calibration.
     """
@@ -103,6 +108,25 @@ class GridContainer():
         self.start_x = x
         self.start_y = y
         self.start_z = z
+
+    @classmethod
+    def calculate_offset(cls, position):
+        """
+        Returns the x, y distance from the calibration point of A1 of the
+        provided grid coordinate.
+        """
+        row, col = normalize_position(position)
+        offset_x = (cls.spacing_x or cls.spacing) * row
+        offset_y = (cls.spacing_y or cls.spacing) * col
+        if cls.rows and row > cls.rows - 1:
+            raise KeyError(
+                "Row {} out of range.".format(chr(row+ord('A')))
+            )
+        if cls.cols and col > cls.cols - 1:
+            raise KeyError(
+                "Column #{} out of range.".format(col+1)
+            )
+        return (offset_x, offset_y)
 
     def get_child_coordinates(self, position):
         """

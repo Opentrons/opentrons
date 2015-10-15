@@ -96,6 +96,24 @@ class ContainerTest(unittest.TestCase):
         rack = containers.load_container('tiprack.example_rack')
         self.assertIs(rack, labware.Tiprack)
 
+    def test_static_coordinates(self):
+        """ 
+        Containers should calculate coordinates statically.
+        """
+        # Microplate has spacing as x: 12, y: 12.
+        plate  = containers.load_container('microplate.example_plate')
+        coords = plate.calculate_offset('b12')
+        self.assertEqual(coords, (12, 132)) 
+
+    def test_static_coordinates_custom_x_y_spacing(self):
+        """
+        Custom x, y margins should supercede spacing.
+        """
+        # Deepwell has spacing as x: 13, y: 10
+        plate = containers.load_container('microplate.example_plate.deepwell')
+        coords = plate.calculate_offset('b12')
+        self.assertEqual(coords, (13, 110))
+
     def test_list_microplates(self):
         """
         Container list includes microplates.
@@ -127,7 +145,6 @@ class ContainerTest(unittest.TestCase):
         Container list includes tipracks.
         """
         inv = containers.list_containers()
-        print(inv)
         self.assertTrue('tiprack' in inv)
         self.assertTrue('tiprack.p10' in inv)
         self.assertTrue('tiprack.p20' in inv)
