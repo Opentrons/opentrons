@@ -147,7 +147,7 @@ def add_custom_container(name, data, parent=None):
             )
         if not isinstance(data[key], _valid_values):
             raise ValueError(
-                "Invalid container value for custom container {}: {}"
+                "Invalid property value for custom container {}: {}"
                 .format(name, key)
             )
 
