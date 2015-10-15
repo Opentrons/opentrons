@@ -27,19 +27,27 @@ def normalize_position(position):
     the application.
 
     """
+    # Check and pass through if we've already normalized the tuple.
     if isinstance(position, tuple) and len(position) is 2:
         if isinstance(position[0], int) and isinstance(position[1], int):
             return position
         raise TypeError("Tuple arguments must be integers.")
+    # Normalize a string and return a tuple.
     elif isinstance(position, str):
-        row = position[0].upper()
-        col = position[1:]
-        row_num  = ord(row) - ord('A')  # Get the row's alphabetical index.
+        col = position[0].upper()
+        row = position[1:]
+        # Normalize column.
+        col_num  = ord(col) - ord('A')  # Get the col's alphabetical index.
+        if col_num < 0:
+            raise ValueError("Column must be a letter.")
+        if col_num > 25:
+            raise ValueError("Column letter must be A-Z.")
+        # Normalize row.
         try:
-            col_num  = int(col) - 1  # We want it zero-indexed.
+            row_num  = int(row) - 1  # We want it zero-indexed.
         except ValueError:
-            raise ValueError("Column must be a number.")
-        return (row_num, col_num)
+            raise ValueError("Row must be a number.")
+        return (col_num, row_num)
     else:
         raise TypeError("Position must be a str or tuple of ints.")
 
