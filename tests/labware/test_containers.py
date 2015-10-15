@@ -114,6 +114,15 @@ class ContainerTest(unittest.TestCase):
         coords = plate.calculate_offset('b12')
         self.assertEqual(coords, (13, 110))
 
+    def test_instance_coordinates_custom_x_y_spacing(self):
+        """
+        Custom x, y margins should supercede spacing.
+        """
+        # Deepwell has spacing as x: 13, y: 10
+        plate = containers.load_container('microplate.example_plate.deepwell')
+        coords = plate().get_child_coordinates('b12')
+        self.assertEqual(coords, (13, 110, 0))
+
     def test_list_microplates(self):
         """
         Container list includes microplates.

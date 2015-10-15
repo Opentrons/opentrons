@@ -135,8 +135,8 @@ class GridContainer():
         If things are properly calibrated, this should be absolute.
         """
         row, col = self._normalize_position(position)
-        offset_x = self.spacing * row
-        offset_y = self.spacing * col
+        offset_x = (self.spacing_x or self.spacing) * row
+        offset_y = (self.spacing_y or self.spacing) * col
         return (offset_x + self.start_x, offset_y + self.start_y, self.start_z)
 
     def get_child(self, position):
