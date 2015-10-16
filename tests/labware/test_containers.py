@@ -77,6 +77,7 @@ class ContainerTest(unittest.TestCase):
         self.assertTrue(plate.cols is 12)
         self.assertTrue(plate.a1_x is 10)
         self.assertTrue(plate.a1_y is 11)
+        self.assertTrue(plate.diameter is 7)
 
     def test_custom_container_subset(self):
         """

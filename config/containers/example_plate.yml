@@ -12,6 +12,7 @@ cols: 12
 a1_x: 10    # X-offset of A1 from container edge
 a1_y: 11    # Y-offset of A1 from container edge
 spacing: 12 # Well-center to well-center spacing
+diameter: 7
 
 # Container outer dimensions
 height: 150
