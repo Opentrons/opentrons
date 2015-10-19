@@ -50,11 +50,11 @@ class LiquidInventory():
 
         400ul of water:
 
-        >>> container.add_liquid(water=400)
+        >> container.add_liquid(water=400)
 
         400ml of water:
 
-        >>> container.add_liquid(water=400, ml=True)
+        >> container.add_liquid(water=400, ml=True)
 
         TODO: Attach to a global ingredients list to ensure that all
               specified liquids have been defined.  For now, just
