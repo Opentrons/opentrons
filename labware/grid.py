@@ -12,10 +12,10 @@ def normalize_position(position):
     (0, 1)
 
     >>> normalize_position('C4')
-    (2, 4)
+    (2, 3)
 
     >>> normalize_position('c4')
-    (2, 4)
+    (2, 3)
 
     You can also pass through a tuple that's already been normalized and get
     the same tuple back again:
