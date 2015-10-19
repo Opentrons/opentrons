@@ -4,9 +4,9 @@ from .liquids import LiquidWell
 
 class Reservoir(GridContainer):
 
-    rows = 1
-    cols = 12
-    spacing = .1  # TODO: Look this up.
+    rows = 12
+    cols = 1
+    spacing = 1  # TODO: Look this up.
     min_vol = 500
     max_vol = 21 * 1000
     volume  = 21 * 1000
@@ -15,6 +15,6 @@ class Reservoir(GridContainer):
 
     child_class = LiquidWell
 
-    def col(self, col):
-        position = 'A{}'.format(col)
+    def row(self, row):
+        position = self._normalize_position('A{}'.format(row))
         return self.get_child(position)

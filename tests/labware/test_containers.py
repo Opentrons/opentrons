@@ -73,8 +73,8 @@ class ContainerTest(unittest.TestCase):
         # Example definition lives in config/containers/example.yml
         plate = containers.load_container('microplate.example_plate')
         self.assertIs(plate, labware.Microplate)
-        self.assertTrue(plate.rows is 8)
-        self.assertTrue(plate.cols is 12)
+        self.assertTrue(plate.rows is 12)
+        self.assertTrue(plate.cols is 8)
         self.assertTrue(plate.a1_x is 10)
         self.assertTrue(plate.a1_y is 11)
         self.assertTrue(plate.diameter is 7)
@@ -85,8 +85,8 @@ class ContainerTest(unittest.TestCase):
         """
         plate = containers.load_container('microplate.example_plate.deepwell')
         self.assertTrue(plate.well_depth is 15)
-        self.assertTrue(plate.rows is 8)
-        self.assertTrue(plate.cols is 12)
+        self.assertTrue(plate.rows is 12)
+        self.assertTrue(plate.cols is 8)
         self.assertTrue(plate.a1_x is 10)
         self.assertTrue(plate.a1_y is 11)
 
@@ -101,28 +101,29 @@ class ContainerTest(unittest.TestCase):
         """ 
         Containers should calculate coordinates statically.
         """
-        # Microplate has spacing as x: 12, y: 12.
+        # Microplate has spacing as row: 12, col: 12.
         plate  = containers.load_container('microplate.example_plate')
         coords = plate.calculate_offset('b12')
-        self.assertEqual(coords, (12, 132)) 
+        self.assertEqual(coords, (12*1, 12*11)) 
 
     def test_static_coordinates_custom_x_y_spacing(self):
         """
-        Custom x, y margins should supercede spacing.
+        Custom row, col spacing should supercede spacing.
         """
-        # Deepwell has spacing as x: 13, y: 10
+        # Deepwell has spacing as col: 10, row: 13
         plate = containers.load_container('microplate.example_plate.deepwell')
         coords = plate.calculate_offset('b12')
-        self.assertEqual(coords, (13, 110))
+        print(plate.col_spacing, plate.row_spacing)
+        self.assertEqual(coords, (10, 13*11))
 
     def test_instance_coordinates_custom_x_y_spacing(self):
         """
-        Custom x, y margins should supercede spacing.
+        Custom row, col spacing should supercede spacing.
         """
-        # Deepwell has spacing as x: 13, y: 10
+        # Deepwell has spacing as col: 10, row: 13
         plate = containers.load_container('microplate.example_plate.deepwell')
         coords = plate().get_child_coordinates('b12')
-        self.assertEqual(coords, (13, 110, 0))
+        self.assertEqual(coords, (10, 13*11, 0))
 
     def test_list_microplates(self):
         """

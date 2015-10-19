@@ -7,8 +7,8 @@
 
 type: microplate
 
-rows: 8
-cols: 12
+rows: 12
+cols: 8
 a1_x: 10    # X-offset of A1 from container edge
 a1_y: 11    # Y-offset of A1 from container edge
 spacing: 12 # Well-center to well-center spacing
@@ -30,8 +30,8 @@ subsets:
   # 'example.deepwell'
   deepwell:
     well_depth: 15
-    spacing_y: 10
-    spacing_x: 13
+    row_spacing: 13
+    col_spacing: 10
     subsets:
       red:
         well_depth: 25

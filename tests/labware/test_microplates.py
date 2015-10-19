@@ -32,18 +32,18 @@ class MicroplateTest(unittest.TestCase):
         margin = self.expected_margin
         self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
-    def row_sanity_test(self):
-        row = chr(ord('a') + self.plate.rows + 1)
+    def col_sanity_test(self):
+        col = chr(ord('a') + self.plate.cols + 1)
         with self.assertRaises(KeyError):
-            self.plate.well('{}1'.format(row))
+            self.plate.well('{}1'.format(col))
 
     def unicode_coord_test(self):
         self.plate.well(u'A1')
 
-    def col_sanity_test(self):
-        col = self.plate.cols + 1
+    def row_sanity_test(self):
+        row = self.plate.rows + 1
         with self.assertRaises(KeyError):
-            self.plate.well('A{}'.format(col))
+            self.plate.well('A{}'.format(row))
 
     def col_type_sanity_test(self):
         with self.assertRaises(ValueError):

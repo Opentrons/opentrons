@@ -12,10 +12,10 @@ def normalize_position(position):
     (0, 1)
 
     >>> normalize_position('C4')
-    (3, 4)
+    (2, 4)
 
     >>> normalize_position('c4')
-    (3, 4)
+    (2, 4)
 
     You can also pass through a tuple that's already been normalized and get
     the same tuple back again:
@@ -37,12 +37,12 @@ def normalize_position(position):
         col = position[0].upper()
         row = position[1:]
         # Normalize column.
-        col_num  = ord(col) - ord('A')  # Get the col's alphabetical index.
+        col_num = ord(col) - ord('A')  # Get the col's alphabetical index.
         if col_num < 0 or col_num > 25:
             raise ValueError("Column must be a letter (A-Z).")
         # Normalize row.
         try:
-            row_num  = int(row) - 1  # We want it zero-indexed.
+            row_num = int(row) - 1  # We want it zero-indexed.
         except ValueError:
             raise ValueError("Row must be a number.")
         return (col_num, row_num)
@@ -74,8 +74,8 @@ class GridContainer():
     rows = None
     cols = None
 
-    spacing_x = None
-    spacing_y = None
+    row_spacing = None
+    col_spacing = None
 
     spacing = 0
 
@@ -115,16 +115,17 @@ class GridContainer():
         Returns the x, y distance from the calibration point of A1 of the
         provided grid coordinate.
         """
-        row, col = normalize_position(position)
-        offset_x = (cls.spacing_x or cls.spacing) * row
-        offset_y = (cls.spacing_y or cls.spacing) * col
-        if cls.rows and row > cls.rows - 1:
+        col, row = normalize_position(position)
+        offset_x = (cls.col_spacing or cls.spacing) * col
+        offset_y = (cls.row_spacing or cls.spacing) * row
+        if cls.cols and col+1 > cls.cols:  # Normalized col is zero-indexed
             raise KeyError(
-                "Row {} out of range.".format(chr(row+ord('A')))
+                "Column {} out of range (max is {})."
+                .format(chr(col+ord('A')), chr(self.cols-1+ord('A')))
             )
-        if cls.cols and col > cls.cols - 1:
+        if cls.rows and (row+1 > cls.rows):  # Normalized row is zero-indexed
             raise KeyError(
-                "Column #{} out of range.".format(col+1)
+                "Row {} out of range (max is {}).".format(row+1, cls.rows)
             )
         return (offset_x, offset_y)
 
@@ -134,9 +135,9 @@ class GridContainer():
 
         If things are properly calibrated, this should be absolute.
         """
-        row, col = self._normalize_position(position)
-        offset_x = (self.spacing_x or self.spacing) * row
-        offset_y = (self.spacing_y or self.spacing) * col
+        col, row = self._normalize_position(position)
+        offset_x = (self.col_spacing or self.spacing) * col
+        offset_y = (self.row_spacing or self.spacing) * row
         return (offset_x + self.start_x, offset_y + self.start_y, self.start_z)
 
     def get_child(self, position):
@@ -157,17 +158,18 @@ class GridContainer():
         Normalizes a position (A2, B5, etc) and does a sanity check to ensure
         that the given coordinates are within bounds of the grid.
         """
-        row_num, col_num = normalize_position(position)
+        col, row = normalize_position(position)
         if self.rows is None:
             raise Exception("No maximum row number provided.")
         if self.cols is None:
             raise Exception("No maximum column number provided.")
-        if self.rows and row_num > self.rows - 1:
+        if self.rows and (row+1 > self.rows):  # Normalized row is zero-indexed
             raise KeyError(
-                "Row {} out of range.".format(row_num)
+                "Row #{} out of range (max is {}).".format(row, self.rows)
             )
-        if self.cols and col_num > self.cols - 1:
+        if self.cols and col+1 > self.cols:  # Normalized col is zero-indexed
             raise KeyError(
-                "Column #{} out of range.".format(col_num)
+                "Column {} out of range (max is {})."
+                .format(chr(col+ord('A')), chr(self.cols-1+ord('A')))
             )
-        return (row_num, col_num)
+        return (col, row)

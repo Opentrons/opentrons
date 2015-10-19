@@ -47,28 +47,28 @@ class TiprackTest(unittest.TestCase):
         margin = self.expected_margin
         self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
-    def row_sanity_test(self):
-        """
-        Maintain sanity of rowumn values.
-        """
-        row = chr(ord('a') + self.rack.rows + 1)
-        with self.assertRaises(KeyError):
-            self.rack.slot('{}1'.format(row))
-
-        row = chr(ord('a') + self.rack.rows - 1)
-        self.rack.slot('{}1'.format(row))
-
     def col_sanity_test(self):
         """
-        Maintain sanity of col values.
+        Maintain sanity of column values.
         """
-        col = self.rack.cols + 1
+        col = chr(ord('a') + self.rack.cols)
+        with self.assertRaises(KeyError):
+            self.rack.slot('{}1'.format(col))
+
+        col = chr(ord('a') + self.rack.cols - 1)
+        self.rack.slot('{}1'.format(col))
+
+    def row_sanity_test(self):
+        """
+        Maintain sanity of row values.
+        """
+        row = self.rack.rows + 1
 
         with self.assertRaises(KeyError):
-            self.rack.slot('A{}'.format(col))
+            self.rack.slot('A{}'.format(row))
 
-        col = self.rack.cols
-        self.rack.slot('A{}'.format(col))
+        row = self.rack.rows
+        self.rack.slot('A{}'.format(row))
 
     def deck_calibration_test(self):
         """

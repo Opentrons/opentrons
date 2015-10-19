@@ -5,36 +5,59 @@ import labware
 class ReservoirTest(unittest.TestCase):
 
     expected_margin = labware.Reservoir.spacing
+    offset_x = 10
+    offset_y = 11
+    offset_z = 12
 
     def setUp(self):
         self.reservoir = labware.Reservoir()
-        self.reservoir.calibrate(x=10, y=11, z=12)
+        self.reservoir.calibrate(
+            x=self.offset_x,
+            y=self.offset_y,
+            z=self.offset_z
+        )
 
-    def col1_calibration_test(self):
-        col1 = self.reservoir.col(1).coordinates
-        self.assertEqual(col1, (10, 11, 12))
+    def row1_calibration_test(self):
+        """
+        Row 1 coordinates after calibration.
+        """
+        row1 = self.reservoir.row(1).coordinates
+        self.assertEqual(row1, (
+            self.offset_x,
+            self.offset_y,
+            self.offset_z
+        ))
 
-    def col2_calibration_test(self):
-        col2 = self.reservoir.col(2).coordinates
-        self.assertEqual(col2, (10, 11 + self.expected_margin, 12))
-
-    def col_sanity_test(self):
-        with self.assertRaises(KeyError):
-            col = self.reservoir.cols + 1
-            self.col(col)
+    def row2_calibration_test(self):
+        """
+        Row 2 coordinates after calibration.
+        """
+        row2 = self.reservoir.row(2).coordinates
+        self.assertEqual(row2, (
+            self.offset_x,
+            self.offset_y + self.expected_margin,
+            self.offset_z
+        ))
 
     def row_sanity_test(self):
-        row = chr(ord('a') + self.reservoir.rows + 1)
+        """
+        Row sanity check.
+        """
+        row = self.reservoir.rows + 1
         with self.assertRaises(KeyError):
-            self.reservoir.get_child('{}1'.format(row))
+            self.reservoir.get_child('A{}'.format(row))
 
     def col_sanity_test(self):
+        """
+        Column sanity check.
+        """
         with self.assertRaises(KeyError):
-            col = self.reservoir.cols + 1
-            self.reservoir.get_child('A{}'.format(col))
+            self.reservoir.get_child('B1')
 
     def deck_calibration_test(self):
-
+        """
+        Deck calibration.
+        """
         config = {
             'calibration': {
                 'a1': {
@@ -53,8 +76,8 @@ class ReservoirTest(unittest.TestCase):
 
         reservoir = deck.slot('a1')
 
-        col1 = reservoir.col(1).coordinates
-        col2 = reservoir.col(2).coordinates
+        col1 = reservoir.row(1).coordinates
+        col2 = reservoir.row(2).coordinates
 
         self.assertEqual(col1, (10, 11, 12))
         self.assertEqual(col2, (10, 11 + margin, 12))
@@ -64,27 +87,27 @@ class ReservoirWellTest(unittest.TestCase):
 
     def setUp(self):
         self.reservoir = labware.Reservoir()
-        self.col = self.reservoir.col(1)
+        self.row = self.reservoir.row(1)
 
     def liquid_allocation_test(self):
         set_vol = 50
-        self.col.allocate(water=set_vol)
-        vol = self.col.get_volume()
+        self.row.allocate(water=set_vol)
+        vol = self.row.get_volume()
         self.assertEqual(vol, set_vol)
 
     def liquid_capacity_test(self):
         with self.assertRaises(ValueError):
-            self.col.allocate(water=10000, ml=True)
+            self.row.allocate(water=10000, ml=True)
 
     def liquid_total_capacity_test(self):
-        col = self.col
-        col.allocate(water=20, ml=True)
-        col.add_liquid(water=1, ml=True)
+        row = self.row
+        row.allocate(water=20, ml=True)
+        row.add_liquid(water=1, ml=True)
         with self.assertRaises(ValueError):
-            col.add_liquid(water=1, ml=True)
+            row.add_liquid(water=1, ml=True)
 
     def liquid_total_mixture_test(self):
-        self.col.allocate(water=20000)
-        self.col.add_liquid(buffer=1000)
+        self.row.allocate(water=20000)
+        self.row.add_liquid(buffer=1000)
         with self.assertRaises(ValueError):
-            self.col.add_liquid(saline=1)
+            self.row.add_liquid(saline=1)

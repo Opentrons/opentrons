@@ -3,8 +3,8 @@ from .liquids import LiquidWell
 
 
 class Microplate(GridContainer):
-    rows     =   8
-    cols     =  12
+    rows     =  12
+    cols     =   8
     volume   = 100
     min_vol  =  50
     max_vol  =  90

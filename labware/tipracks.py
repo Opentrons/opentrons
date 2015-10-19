@@ -20,15 +20,15 @@ class Tiprack(GridContainer):
 
     size = None
 
-    rows = 8
-    cols = 12
+    rows = 12
+    cols = 8
 
     """
-    I'm not even sure there is a standard for spacing on
-    tipracks. I'm just using the microplate spacing, and
-    it works with the rack I have.
+    Taken from microplate specs.
     """
     spacing = 9
+    a1_x = 14.38
+    a1_y = 11.24
 
     child_class = TiprackSlot
 
