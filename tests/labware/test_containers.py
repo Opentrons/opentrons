@@ -161,3 +161,10 @@ class ContainerTest(unittest.TestCase):
         self.assertTrue('tiprack.p20' in inv)
         self.assertTrue('tiprack.p200' in inv)
         self.assertTrue('tiprack.p1000' in inv)
+
+    def test_24_well_microplate(self):
+        """
+        24 well microplate should exist.
+        """
+        plate = containers.load_container('microplate.24')
+        self.assertEqual(plate.rows*plate.cols, 24)

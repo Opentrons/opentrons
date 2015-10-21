@@ -81,6 +81,8 @@ def load_custom_containers(folder=None):
             data = yaml.load(open(full_path, 'r'))
             name = os.path.splitext(f)[0]
             add_custom_container(name, data)
+        elif os.path.isdir(full_path):
+            load_custom_containers(full_path)
 
 
 def _load_default_containers():
