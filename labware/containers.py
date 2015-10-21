@@ -20,6 +20,7 @@ alternate configuration directory.
 import os
 import yaml
 import inspect
+import json
 
 import labware
 
@@ -200,6 +201,57 @@ def list_container_types():
     for use in custom container definitions.
     """
     return sorted(list(_typemap.keys()))
+
+
+def generate_legacy_container(container_name, format=False):
+    """
+    Loads a container and outputs a dict in the format expected by
+    the legacy containers.json file in the otone_frontend repository.
+
+    If format is set to True, then a string will be output with nicely-
+    formatted JSON, for pasting directly into the containers.json file.
+    """
+
+    container = load_container(container_name)
+
+    data = {}
+
+    data['origin-offset'] = {
+        'x': container.a1_x,
+        'y': container.a1_y
+    }
+
+    if format is True:
+        print('"{}": {{'.format(container_name))
+        print('\t"origin-offset": ', json.dumps(data['origin-offset'])+',')
+
+    locs = {}
+
+    if format is True:
+        print('\t"locations": {"')
+    for col in range(0, container.cols):
+        for row in range(1, container.rows+1):
+            loc = []
+            pos = '{}{}'.format(chr(col+ord('A')), row)
+            (x, y) = container.calculate_offset(pos)
+            locs[pos] = {
+                'x': round(x, 2),
+                'y': round(y, 2),
+                'z': 0,
+                'depth': container.depth,
+                'diameter': container.diameter,
+                'total-liquid-volume': container.volume
+            }
+            if format is True:
+                print('\t\t"{}":'.format(pos), json.dumps(locs[pos])+',')
+
+    if format is True:
+        print("\t}")
+
+    data['locations'] = locs
+
+    return data
+
 
 _load_default_containers()
 load_custom_containers()
