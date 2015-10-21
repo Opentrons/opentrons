@@ -87,6 +87,13 @@ class GridContainer():
     start_z = 0
 
     """
+    Margin
+    """
+
+    a1_x = 0
+    a1_y = 0
+
+    """
     A dict containing tuples of zero-indexed child coordinates.
     We only initialize them when they're accessed because until then, there's
     no way to mutate their (non-existent) state.
