@@ -228,7 +228,7 @@ def generate_legacy_container(container_name, format=False):
     locs = {}
 
     if format is True:
-        print('\t"locations": {"')
+        print('\t"locations": {')
     for col in range(0, container.cols):
         for row in range(1, container.rows+1):
             loc = []
