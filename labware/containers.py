@@ -247,6 +247,7 @@ def generate_legacy_container(container_name, format=False):
 
     if format is True:
         print("\t}")
+        return None
 
     data['locations'] = locs
 
