@@ -25,7 +25,9 @@ import json
 import labware
 
 from labware import Microplate, Tiprack, Reservoir
-from .grid import GridContainer
+from .grid import GridContainer, normalize_position
+
+import warnings
 
 # These are the base types that containers can extend from.
 _typemap = {
@@ -40,7 +42,7 @@ _typemap = {
 _valid_properties = [
     'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'height', 'length', 'width',
     'volume', 'min_vol', 'max_vol', 'well_depth', 'row_spacing', 
-    'col_spacing', 'diameter'
+    'col_spacing', 'diameter', 'legacy_name'
 ]
 
 # These are the types that can be defined within a custom container.
@@ -173,6 +175,8 @@ def add_custom_container(name, data, parent=None):
     for name in subsets:
         add_custom_container(container_name + "." + name, subsets[name], data)
 
+    return _containers[container_name]
+
 
 def load_container(name):
     """
@@ -252,6 +256,108 @@ def generate_legacy_container(container_name, format=False):
     data['locations'] = locs
 
     return data
+
+def convert_legacy_containers(containers=None, path=None, interactive=False):
+    """
+    Takes a dict from a legacy containers struct and converts each container
+    listed to the new YAML format.
+
+    If you provide path instead of a dict representing containers (use the
+    same structure as containers.json), then that file will be loaded and
+    its JSON parsed.
+
+    If you put it into interactive mode, it will prompt you to provide new
+    file paths (relative to config/containers) for each container and 
+    automatically save them in the default config/containers.
+    """
+
+    if path:
+        containers = json.load(open(path).read())
+
+    yaml = ""
+
+    for name in containers:
+
+        out = convert_legacy_container(containers[name])
+
+        # Pretty-print this because we're going to be maintaining them.
+        key_order = [
+            # Empty array values will insert a new line. ¯\_(ツ)_/¯
+            'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'col_spacing', 
+            'row_spacing', None, 'height', 'diameter',
+            'well_depth', None, 'volume', None
+        ]
+
+        # Are we concatting our big string or saving this bit to its own file?
+        if interactive:
+            yaml = ""  # Flush.
+        else:
+            yaml = "---\n"
+
+        for key in key_order:
+            val = out.get(key)
+            if key is None:
+                yaml = yaml + "\n"
+            elif val is not None:
+                yaml = yaml + "{}: {}\n".format(key, val)
+
+        if interactive:
+            print("Converted: {}".format(name))
+            path = input("New path: ")
+            f = open(os.path.join(os.getcwd(), 'config/containers', path))
+            f.write(yaml)
+
+        yaml += 'legacy_name: '+json.dumps(name)
+
+    return yaml
+
+
+def convert_legacy_container(container):
+    """
+    Takes the dict from an old-style legacy containers.json format and
+    converts it to the new format for serializing to YAML.
+    """
+
+    lines = []
+
+    wells = container['locations']
+
+    a1 = wells.get('A1')
+    b1 = wells.get('B1', {})
+    a2 = wells.get('A2', {})
+
+    out = {}
+
+    out['volume'] = a1.get('total-liquid-volume')
+    out['diameter'] = a1.get('diameter')
+    out['well_depth'] = a1.get('depth')
+    out['height'] = a1.get('depth')
+    out['a1_x'] = container.get('origin-offset', {'x': None}).get('x')
+    out['a1_y'] = container.get('origin-offset', {'y': None}).get('y')
+
+    spacing_x = b1.get('x')
+    spacing_y = a2.get('y')
+
+    if spacing_x == spacing_y:
+        out['spacing'] = spacing_y
+    else:
+        out['col_spacing'] = spacing_x
+        out['row_spacing'] = spacing_y
+
+    # Get the max row and col by traversing all the keys.
+    max_row = 0
+    max_col = 0
+    for pos in wells:
+        col, row = normalize_position(pos)
+        if col > max_col:
+            max_col = col
+        if row > max_row:
+            max_row = row
+
+    out['rows'] = max_row + 1 
+    out['cols'] = max_col + 1
+
+    return out
 
 
 _load_default_containers()

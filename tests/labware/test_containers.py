@@ -2,6 +2,7 @@ import unittest
 from labware import containers
 import labware
 
+import yaml
 
 class ContainerTest(unittest.TestCase):
 
@@ -168,3 +169,48 @@ class ContainerTest(unittest.TestCase):
         """
         plate = containers.load_container('microplate.24')
         self.assertEqual(plate.rows*plate.cols, 24)
+
+    def test_convert_legacy_containers(self):
+        """
+        Container from old data structure converted to new one.
+        """
+
+        data = {
+            "24-plate":{
+                "origin-offset":{
+                    "x":13,
+                    "y":14.5
+                },
+                "locations":{
+                    "A1":{"x":0, "total-liquid-volume":3400, "y":0.0, "depth":16.2, "z":0, "diameter":15.62 },
+                    "A2":{"x":0, "total-liquid-volume":3400, "y":10, "depth":16.2, "z":0, "diameter":15.62 },
+                    "A3":{"x":0.0, "total-liquid-volume":3400, "y":20, "depth":16.2, "z":0, "diameter":15.62 },
+                    "B1":{"x":12, "total-liquid-volume":3400, "y":0, "depth":16.2, "z":0, "diameter":15.62 },
+                    "B2":{"x":12, "total-liquid-volume":3400, "y":10, "depth":16.2, "z":0, "diameter":15.62 },
+                    "B3":{"x":12, "total-liquid-volume":3400, "y":20, "depth":16.2, "z":0, "diameter":15.62 },
+                    "C1": {"x":24, "total-liquid-volume":3400, "y":0, "depth":16.2, "z":0, "diameter":15.62 },
+                }
+            }
+        }
+
+        result = containers.convert_legacy_container(data['24-plate'])
+
+        expected = {
+            'diameter': 15.62,
+            'well_depth': 16.2,
+            'cols': 3,
+            'rows': 3,
+            'height': 16.2,
+            'a1_y': 14.5,
+            'a1_x': 13,
+            'row_spacing': 10,
+            'col_spacing': 12,
+            'volume': 3400
+        }
+
+        self.assertDictEqual(result, expected)
+
+        # Make sure the YAML works, too.
+        result = containers.convert_legacy_containers(data)
+        expected['legacy_name'] = '24-plate'
+        self.assertDictEqual(yaml.load(result), expected)
