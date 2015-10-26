@@ -189,6 +189,8 @@ class ContainerTest(unittest.TestCase):
                     "B2":{"x":12, "total-liquid-volume":3400, "y":10, "depth":16.2, "z":0, "diameter":15.62 },
                     "B3":{"x":12, "total-liquid-volume":3400, "y":20, "depth":16.2, "z":0, "diameter":15.62 },
                     "C1": {"x":24, "total-liquid-volume":3400, "y":0, "depth":16.2, "z":0, "diameter":15.62 },
+                    "C2": {"x":24, "total-liquid-volume":3400, "y":10, "depth":16.2, "z":0, "diameter":15.62 },
+                    "C3": {"x":24, "total-liquid-volume":3400, "y":20, "depth":16.2, "z":0, "diameter":15.62 },
                 }
             }
         }

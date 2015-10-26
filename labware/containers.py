@@ -27,8 +27,6 @@ import labware
 from labware import Microplate, Tiprack, Reservoir
 from .grid import GridContainer, normalize_position
 
-import warnings
-
 # These are the base types that containers can extend from.
 _typemap = {
     'grid': GridContainer,
@@ -344,15 +342,7 @@ def convert_legacy_container(container):
         out['col_spacing'] = spacing_x
         out['row_spacing'] = spacing_y
 
-    # Get the max row and col by traversing all the keys.
-    max_row = 0
-    max_col = 0
-    for pos in wells:
-        col, row = normalize_position(pos)
-        if col > max_col:
-            max_col = col
-        if row > max_row:
-            max_row = row
+    max_col, max_row = normalize_position(max(wells.keys()))
 
     out['rows'] = max_row + 1 
     out['cols'] = max_col + 1
