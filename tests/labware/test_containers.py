@@ -14,7 +14,7 @@ class ContainerTest(unittest.TestCase):
         Enforce valid custom container type.
         """
         with self.assertRaises(KeyError):
-            containers.add_custom_container('foo', {'type':'imaginary'})
+            containers.add_custom_container({'type':'imaginary'})
 
     def test_invaid_container_name(self):
         """
@@ -28,7 +28,7 @@ class ContainerTest(unittest.TestCase):
         Reject unknown properties.
         """
         with self.assertRaises(KeyError):
-            containers.add_custom_container('foo', {'fake_key':True})
+            containers.add_custom_container({'fake_key':True})
 
     def test_custom_container_value_method(self):
         """ 
@@ -37,7 +37,7 @@ class ContainerTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             def fun():
                 print(":)")
-            containers.add_custom_container('foo', {'well_depth': fun})
+            containers.add_custom_container({'well_depth': fun})
 
     def test_microplate(self):
         """
@@ -150,7 +150,7 @@ class ContainerTest(unittest.TestCase):
         inv = containers.list_containers()
         self.assertTrue('microplate.example_plate.deepwell.red' in inv)
         plate = containers.load_container('microplate.example_plate.deepwell.red')
-        self.assertTrue(plate.well_depth is 25)
+        self.assertEqual(plate.well_depth, 25)
 
     def test_tiprack_defaults(self):
         """
