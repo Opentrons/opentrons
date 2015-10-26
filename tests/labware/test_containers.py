@@ -74,22 +74,22 @@ class ContainerTest(unittest.TestCase):
         # Example definition lives in config/containers/example.yml
         plate = containers.load_container('microplate.example_plate')
         self.assertIs(plate, labware.Microplate)
-        self.assertTrue(plate.rows is 12)
-        self.assertTrue(plate.cols is 8)
-        self.assertTrue(plate.a1_x is 10)
-        self.assertTrue(plate.a1_y is 11)
-        self.assertTrue(plate.diameter is 7)
+        self.assertEqual(plate.rows, 12)
+        self.assertEqual(plate.cols, 8)
+        self.assertEqual(plate.a1_x, 10)
+        self.assertEqual(plate.a1_y, 11)
+        self.assertEqual(plate.diameter, 7)
 
     def test_custom_container_subset(self):
         """
         Custom container subsets inherit parent values.
         """
         plate = containers.load_container('microplate.example_plate.deepwell')
-        self.assertTrue(plate.well_depth is 15)
-        self.assertTrue(plate.rows is 12)
-        self.assertTrue(plate.cols is 8)
-        self.assertTrue(plate.a1_x is 10)
-        self.assertTrue(plate.a1_y is 11)
+        self.assertEqual(plate.well_depth, 15)
+        self.assertEqual(plate.rows, 12)
+        self.assertEqual(plate.cols, 8)
+        self.assertEqual(plate.a1_x, 10)
+        self.assertEqual(plate.a1_y, 11)
 
     def test_custom_tiprack(self):
         """
