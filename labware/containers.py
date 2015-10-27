@@ -71,7 +71,8 @@ def load_custom_containers(folder=None):
     """
     # Default to local library configuration.
     if not folder:
-        folder = os.path.join(os.getcwd(), 'config/containers')
+        modpath = os.path.dirname(labware.__file__)
+        folder = os.path.join(modpath, '..', 'config', 'containers')
     files = []
     # Get all YAML files from the specified directory, parse then,
     # and send the data to add_custom_container.
