@@ -216,3 +216,10 @@ class ContainerTest(unittest.TestCase):
         result = containers.convert_legacy_containers(data)
         expected['legacy_name'] = '24-plate'
         self.assertDictEqual(yaml.load(result), expected)
+
+    def test_stock_containers_valid(self):
+        """
+        All stock containers load.
+        """
+        for n in containers.list_containers():
+            containers.generate_legacy_container(n)
