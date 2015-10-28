@@ -112,7 +112,7 @@ def normalize_container_name(name):
     return str(name).lower().replace('_', '.')
 
 
-def add_custom_container(data, name=None, parent=None):
+def add_custom_container(data, name=None, parent=None, legacy=False):
     """
     Create a new container with custom dimensions and properties.  See the
     _valid_properties list above for a list of all valid container
@@ -120,6 +120,12 @@ def add_custom_container(data, name=None, parent=None):
 
     If a name is provided, the new container will be added to the list of
     available containers.
+
+    If a parent dict is provided, the container will implement those values
+    by default.
+
+    If legacy is set to True, the data structure will be converted from
+    the old containers.json format to the new format.
 
     Additionally, custom containers can be "subclassed" by providing the
     names of child types and their unique properties within the
@@ -357,6 +363,7 @@ def convert_legacy_container(container):
     out['cols'] = max_col + 1
 
     return out
+
 
 _load_default_containers()
 load_custom_containers()
