@@ -71,8 +71,8 @@ class GridContainer():
     actual grid.  Good for making sure people don't try to navigate to
     row 9999 and go way out of bounds.
     """
-    rows = None
-    cols = None
+    rows = 0
+    cols = 0
 
     row_spacing = None
     col_spacing = None
@@ -92,6 +92,15 @@ class GridContainer():
 
     a1_x = 0
     a1_y = 0
+
+    """
+    Depth, diameter and volume are expected by the old-style containers, so 
+    for legacy reasons we have them here.
+    """
+
+    depth = 0
+    diameter = 0
+    volume = 0
 
     """
     A dict containing tuples of zero-indexed child coordinates.
