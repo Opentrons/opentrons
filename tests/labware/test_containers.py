@@ -213,7 +213,7 @@ class ContainerTest(unittest.TestCase):
         self.assertDictEqual(result, expected)
 
         # Make sure the YAML works, too.
-        result = containers.convert_legacy_containers(data)
+        result = containers.legacy_json_to_yaml(data)
         expected['legacy_name'] = '24-plate'
         self.assertDictEqual(yaml.load(result), expected)
 
@@ -223,3 +223,7 @@ class ContainerTest(unittest.TestCase):
         """
         for n in containers.list_containers():
             containers.generate_legacy_container(n)
+
+    def test_legacy_container_load(self):
+        containers.load_legacy_containers_file()
+        containers.load_container('legacy.dtube-rack-2ml_PCR')

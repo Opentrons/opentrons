@@ -32,7 +32,8 @@ _typemap = {
     'grid': GridContainer,
     'tiprack': Tiprack,
     'microplate': Microplate,
-    'reservoir': Reservoir
+    'reservoir': Reservoir, 
+    'legacy': Microplate
 }
 
 # Valid properties to configure.
@@ -52,6 +53,19 @@ _container_modules = [
 ]
 
 _containers = {}
+
+def _get_container_filepath(name):
+    """
+    Given a name such as "microplate/24", this function will return the full
+    file path to that container file.
+    """
+    base = os.path.join(os.getcwd(), 'config/containers')
+    path = name.strip().split('/')
+    fname = path.pop()+'.yml'
+    path = os.path.join(base, os.path.join(*path or []))
+    if not os.path.exists(path):
+        os.makedirs(path)
+    fpath = os.path.join(path, fname)
 
 def load_custom_containers(folder=None):
     """
@@ -85,6 +99,23 @@ def load_custom_containers(folder=None):
         elif os.path.isdir(full_path):
             load_custom_containers(full_path)
 
+def load_legacy_containers_file(path=None):
+    """
+    Takes a path to the old-school containers.json file (or defaults
+    to the one in config/containers/legacy_containers.json) and 
+    adds each container to the list of supported containers under the
+    legacy namespace.
+    """
+    if not path:
+        modpath = os.path.dirname(labware.__file__)
+        folder = os.path.join(modpath, '..', 'config', 'containers')
+        path = os.path.join(folder, 'legacy_containers.json')
+
+    containers = json.load(open(path))['containers']
+
+    for k in containers:
+        data = convert_legacy_container(containers[k])
+        add_custom_container(data, 'legacy.'+k)
 
 def _load_default_containers():
     """
@@ -135,6 +166,7 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
     See config/containers/example_plate.yml for more information on
     custom container definitions.
     """
+
     obj_type = data.pop('type', 'grid')
 
     # Handle subsets, figure out container name.
@@ -144,9 +176,11 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
         parent.update(data)
         data = parent
         container_name = name
-    elif name:
+    elif name and '.' not in name:
         # Otherwise, prefix with its base container type.
         container_name = obj_type + '.' + name
+    else:
+        container_name = name
 
     subsets = data.pop('subsets', {})
 
@@ -160,8 +194,8 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
             )
         if not isinstance(data[key], _valid_values):
             raise ValueError(
-                "Invalid property value for custom container {}: {}"
-                .format(name or '', key)
+                "Invalid property value for custom container {}: {}={}"
+                .format(name or '', key, data[key])
             )
 
     # Figure out what base we're extending.
@@ -199,6 +233,8 @@ def load_container(name):
     """
     if name in _containers:
         return _containers[name]
+    elif 'legacy.'+name in _containers:
+        return _containers['legacy.'+name]
     raise KeyError(
         "Invalid container name {}.  Valid containers: {}"
         .format(name, ", ".join(list_containers()))
@@ -270,7 +306,7 @@ def generate_legacy_container(container_name, format=False):
 
     return data
 
-def convert_legacy_containers(containers=None, path=None, interactive=False):
+def legacy_json_to_yaml(containers=None, path=None, interactive=False):
     """
     Takes a dict from a legacy containers struct and converts each container
     listed to the new YAML format.
@@ -285,7 +321,7 @@ def convert_legacy_containers(containers=None, path=None, interactive=False):
     """
 
     if path:
-        containers = json.load(open(path).read())
+        containers = json.load(open(path))['containers']
 
     yaml = ""
 
@@ -305,7 +341,7 @@ def convert_legacy_containers(containers=None, path=None, interactive=False):
         if interactive:
             yaml = ""  # Flush.
         else:
-            yaml = "---\n"
+            yaml = yaml + "---\n"
 
         for key in key_order:
             val = out.get(key)
@@ -314,13 +350,15 @@ def convert_legacy_containers(containers=None, path=None, interactive=False):
             elif val is not None:
                 yaml = yaml + "{}: {}\n".format(key, val)
 
+        yaml = yaml + 'legacy_name: '+json.dumps(name)
+
         if interactive:
             print("Converted: {}".format(name))
-            path = input("New path: ")
-            f = open(os.path.join(os.getcwd(), 'config/containers', path))
+            fpath = _get_container_filepath(name)
+            f = open(fpath, 'w')
             f.write(yaml)
-
-        yaml += 'legacy_name: '+json.dumps(name)
+            print("Saved to {}:".format(fpath))
+            print(yaml)
 
     return yaml
 
@@ -341,15 +379,15 @@ def convert_legacy_container(container):
 
     out = {}
 
-    out['volume'] = a1.get('total-liquid-volume')
-    out['diameter'] = a1.get('diameter')
-    out['well_depth'] = a1.get('depth')
-    out['height'] = a1.get('depth')
-    out['a1_x'] = container.get('origin-offset', {'x': None}).get('x')
-    out['a1_y'] = container.get('origin-offset', {'y': None}).get('y')
+    out['volume'] = a1.get('total-liquid-volume', 0)
+    out['diameter'] = a1.get('diameter', 0)
+    out['well_depth'] = a1.get('depth', 0)
+    out['height'] = a1.get('depth', 0)
+    out['a1_x'] = container.get('origin-offset', {'x': 0}).get('x')
+    out['a1_y'] = container.get('origin-offset', {'y': 0}).get('y')
 
-    spacing_x = b1.get('x')
-    spacing_y = a2.get('y')
+    spacing_x = b1.get('x', 0)
+    spacing_y = a2.get('y', 0)
 
     if spacing_x == spacing_y:
         out['spacing'] = spacing_y
