@@ -219,11 +219,14 @@ class ContainerTest(unittest.TestCase):
 
     def test_stock_containers_valid(self):
         """
-        All stock containers load.
+        All stock containers are backwards compatible.
         """
         for n in containers.list_containers():
             containers.generate_legacy_container(n)
 
     def test_legacy_container_load(self):
+        """
+        All legacy containers load.
+        """
         containers.load_legacy_containers_file()
-        containers.load_container('legacy.dtube-rack-2ml_PCR')
+        containers.load_container('legacy.tube-rack-2ml_PCR')
