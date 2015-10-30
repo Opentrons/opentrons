@@ -214,7 +214,6 @@ class ContainerTest(unittest.TestCase):
 
         # Make sure the YAML works, too.
         result = containers.legacy_json_to_yaml(data)
-        expected['legacy_name'] = '24-plate'
         self.assertDictEqual(yaml.load(result), expected)
 
     def test_stock_containers_valid(self):

@@ -306,6 +306,7 @@ def generate_legacy_container(container_name, format=False):
 
     return data
 
+
 def legacy_json_to_yaml(containers=None, path=None, interactive=False):
     """
     Takes a dict from a legacy containers struct and converts each container
@@ -317,7 +318,7 @@ def legacy_json_to_yaml(containers=None, path=None, interactive=False):
 
     If you put it into interactive mode, it will prompt you to provide new
     file paths (relative to config/containers) for each container and 
-    automatically save them in the default config/containers.
+    automatically save them.
     """
 
     if path:
@@ -327,38 +328,44 @@ def legacy_json_to_yaml(containers=None, path=None, interactive=False):
 
     for name in containers:
 
-        out = convert_legacy_container(containers[name])
+        data = convert_legacy_container(containers[name])
 
-        # Pretty-print this because we're going to be maintaining them.
-        key_order = [
-            # Empty array values will insert a new line. ¯\_(ツ)_/¯
-            'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'col_spacing', 
-            'row_spacing', None, 'height', 'diameter',
-            'well_depth', None, 'volume', None
-        ]
+        container = add_custom_container(data)
 
-        # Are we concatting our big string or saving this bit to its own file?
-        if interactive:
-            yaml = ""  # Flush.
-        else:
-            yaml = yaml + "---\n"
-
-        for key in key_order:
-            val = out.get(key)
-            if key is None:
-                yaml = yaml + "\n"
-            elif val is not None:
-                yaml = yaml + "{}: {}\n".format(key, val)
-
-        yaml = yaml + 'legacy_name: '+json.dumps(name)
+        yaml = yaml + "\n" + container_to_yaml(container)
 
         if interactive:
             print("Converted: {}".format(name))
-            fpath = _get_container_filepath(name)
+            path = input("New name: ")
+            fpath = _get_container_filepath(path)
             f = open(fpath, 'w')
             f.write(yaml)
             print("Saved to {}:".format(fpath))
             print(yaml)
+            yaml = "" # Flush
+
+    return yaml
+
+
+def container_to_yaml(container):
+
+    # Pretty-print this because we're going to be maintaining them.
+    key_order = [
+        # Empty array values will insert a new line. ¯\_(ツ)_/¯
+        'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'col_spacing', 
+        'row_spacing', None, 'height', 'diameter',
+        'well_depth', None, 'volume', None
+    ]
+
+    yaml = ""
+
+    for key in key_order:
+        if key is None:
+            yaml = yaml + "\n"
+        else:
+            value = getattr(container, key)
+            if value:
+                yaml = yaml + "{}: {}\n".format(key, value)
 
     return yaml
 
