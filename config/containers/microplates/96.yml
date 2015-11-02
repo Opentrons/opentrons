@@ -1,0 +1,30 @@
+type: microplate
+
+rows: 9
+cols: 8
+a1_x: 13.5
+a1_y: 16.5
+spacing: 9
+
+height: 33.5
+diameter: 7.5
+well_depth: 33.5
+
+volume: 2000
+
+legacy_name: "96-deep-well"
+
+subsets:
+  pcr:
+    subsets:
+      tall:
+        height: 15.4
+        diameter: 6.4
+        well_depth: 15.4
+        volume: 300
+        legacy_name: "96-PCR-tall"
+      flat:
+        height: 10.5
+        diameter: 6.4
+        well_depth: 10.5
+        legacy_name: "96-PCR-flat"

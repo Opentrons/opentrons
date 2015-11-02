@@ -1,0 +1,10 @@
+type: tiprack
+
+rows: 9
+cols: 8
+
+spacing: 8.85
+
+diameter: 3.5
+
+legacy_name: "tiprack-200ul"

@@ -1,0 +1,15 @@
+type: reservoir
+
+rows: 9
+cols: 1
+a1_x: 0
+a1_y: 0
+col_spacing: 0
+row_spacing: 9
+
+height: 40
+well_depth: 40
+
+volume: 22000
+
+legacy_name: "trough-12row"

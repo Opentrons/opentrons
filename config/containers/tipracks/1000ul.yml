@@ -1,0 +1,9 @@
+type: tiprack
+
+rows: 9
+cols: 8
+spacing: 9
+
+diameter: 6.4
+
+legacy_name: "tiprack-1000ul"
