@@ -16,15 +16,22 @@ legacy_name: "96-deep-well"
 
 subsets:
   pcr:
+    diameter: 6.4
     subsets:
       tall:
         height: 15.4
-        diameter: 6.4
         well_depth: 15.4
         volume: 300
         legacy_name: "96-PCR-tall"
       flat:
-        height: 10.5
-        diameter: 6.4
-        well_depth: 10.5
+        height: 10.4
+        well_depth: 10.4
         legacy_name: "96-PCR-flat"
+      strip:
+        rows: 1
+        cols: 8
+        height: 19.5
+        diameter: 6.4
+        well_depth: 19.5
+        volume: 280
+        legacy_name: "PCR-strip-tall"
