@@ -348,7 +348,7 @@ def legacy_json_to_yaml(containers=None, path=None, interactive=False):
     return yaml
 
 
-def container_to_yaml(container):
+def container_to_yaml(container, legacy_name=None):
 
     # Pretty-print this because we're going to be maintaining them.
     key_order = [
@@ -365,8 +365,11 @@ def container_to_yaml(container):
             yaml = yaml + "\n"
         else:
             value = getattr(container, key)
-            if value:
+            if value is not None:
                 yaml = yaml + "{}: {}\n".format(key, value)
+    
+    if legacy_name:
+        yaml = yaml + "legacy_name: {}".format(json.dumps(legacy_name))
 
     return yaml
 
