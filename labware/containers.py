@@ -24,7 +24,7 @@ import json
 
 import labware
 
-from labware import Microplate, Tiprack, Reservoir
+from labware import Microplate, Tiprack, Reservoir, Tuberack
 from .grid import GridContainer, normalize_position
 
 # These are the base types that containers can extend from.
@@ -33,7 +33,8 @@ _typemap = {
     'tiprack': Tiprack,
     'microplate': Microplate,
     'reservoir': Reservoir, 
-    'legacy': Microplate
+    'legacy': Microplate,
+    'tuberack': Tuberack
 }
 
 # Valid properties to configure.
