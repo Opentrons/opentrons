@@ -114,7 +114,7 @@ class GridContainer():
     """
     We do some Singleton stuff right now for grid offset calculations.
     """
-    _instance = None 
+    _instance = None
 
     def __init__(self, parent=None, **kwargs):
         self.parent = parent
