@@ -184,7 +184,7 @@ class GridContainer():
     @classmethod
     def calculate_offset(cls, position):
         """
-        Returns the x, y distance from the calibration point of A1 of the
-        provided grid coordinate.
+        Returns a tuple containing (x, y, z) of the given position on this
+        container, without calibration.
         """
         return cls._get_instance().get_child_coordinates(position)
