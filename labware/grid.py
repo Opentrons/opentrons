@@ -111,6 +111,11 @@ class GridContainer():
 
     child_class = GridItem
 
+    """
+    We do some Singleton stuff right now for grid offset calculations.
+    """
+    _instance = None 
+
     def __init__(self, parent=None, **kwargs):
         self.parent = parent
         self._children = {}
@@ -124,14 +129,6 @@ class GridContainer():
         self.start_x = x
         self.start_y = y
         self.start_z = z
-
-    @classmethod
-    def calculate_offset(cls, position):
-        """
-        Returns the x, y distance from the calibration point of A1 of the
-        provided grid coordinate.
-        """
-        return cls().get_child_coordinates(position)
 
     def get_child_coordinates(self, position):
         """
@@ -177,3 +174,17 @@ class GridContainer():
                 .format(chr(col+ord('A')), chr(self.cols-1+ord('A')))
             )
         return (col, row)
+
+    @classmethod
+    def _get_instance(cls):
+        if not cls._instance or not isinstance(cls._instance, cls):
+            cls._instance = cls()
+        return cls._instance
+
+    @classmethod
+    def calculate_offset(cls, position):
+        """
+        Returns the x, y distance from the calibration point of A1 of the
+        provided grid coordinate.
+        """
+        return cls._get_instance().get_child_coordinates(position)
