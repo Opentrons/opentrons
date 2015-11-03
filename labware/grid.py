@@ -131,19 +131,7 @@ class GridContainer():
         Returns the x, y distance from the calibration point of A1 of the
         provided grid coordinate.
         """
-        col, row = normalize_position(position)
-        offset_x = (cls.col_spacing or cls.spacing) * col
-        offset_y = (cls.row_spacing or cls.spacing) * row
-        if cls.cols and col+1 > cls.cols:  # Normalized col is zero-indexed
-            raise KeyError(
-                "Column {} out of range (max is {})."
-                .format(chr(col+ord('A')), chr(self.cols-1+ord('A')))
-            )
-        if cls.rows and (row+1 > cls.rows):  # Normalized row is zero-indexed
-            raise KeyError(
-                "Row {} out of range (max is {}).".format(row+1, cls.rows)
-            )
-        return (offset_x, offset_y)
+        return cls().get_child_coordinates(position)
 
     def get_child_coordinates(self, position):
         """

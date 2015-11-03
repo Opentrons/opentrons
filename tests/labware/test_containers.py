@@ -105,7 +105,7 @@ class ContainerTest(unittest.TestCase):
         # Microplate has spacing as row: 12, col: 12.
         plate  = containers.load_container('microplate.example_plate')
         coords = plate.calculate_offset('b12')
-        self.assertEqual(coords, (12*1, 12*11)) 
+        self.assertEqual(coords, (12*1, 12*11, 0)) 
 
     def test_static_coordinates_custom_x_y_spacing(self):
         """
@@ -115,7 +115,7 @@ class ContainerTest(unittest.TestCase):
         plate = containers.load_container('microplate.example_plate.deepwell')
         coords = plate.calculate_offset('b12')
         print(plate.col_spacing, plate.row_spacing)
-        self.assertEqual(coords, (10, 13*11))
+        self.assertEqual(coords, (10, 13*11, 0))
 
     def test_instance_coordinates_custom_x_y_spacing(self):
         """
