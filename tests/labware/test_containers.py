@@ -51,7 +51,7 @@ class ContainerTest(unittest.TestCase):
         Provide access to child microplates.
         """
         plate = containers.load_container('microplate.96')
-        self.assertIs(plate, labware.microplates.Microplate_96)
+        self.assertIs(plate, labware.microplates.Microplate)
 
     def test_microplate_subsubset(self):
         """
@@ -214,6 +214,7 @@ class ContainerTest(unittest.TestCase):
 
         # Make sure the YAML works, too.
         result = containers.legacy_json_to_yaml(data)
+        expected['spacing'] = 0
         self.assertDictEqual(yaml.load(result), expected)
 
     def test_stock_containers_valid(self):
