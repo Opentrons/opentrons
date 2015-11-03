@@ -28,3 +28,15 @@ class Microplate(GridContainer):
         A1 with the pipette tip in place.
         """
         super(Microplate, self).calibrate(**kwargs)
+
+
+class Microplate_96(Microplate):
+    pass
+
+
+class Microplate_96_Deepwell(Microplate_96):
+    volume   = 400
+    min_vol  =  50
+    max_vol  = 380
+    height   =  14.6
+    depth    =  10.8
