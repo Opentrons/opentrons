@@ -42,7 +42,7 @@ _typemap = {
 _valid_properties = [
     'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'height', 'length', 'width',
     'volume', 'min_vol', 'max_vol', 'well_depth', 'row_spacing', 
-    'col_spacing', 'diameter', 'legacy_name'
+    'col_spacing', 'diameter', 'legacy_name', 'custom_wells'
 ]
 
 # These are the types that can be defined within a custom container.
@@ -184,6 +184,7 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
         container_name = name
 
     subsets = data.pop('subsets', {})
+    custom_wells = data.pop('custom_wells', None)
 
     # Make sure nobody's trying any funny business with property
     # extensions.
@@ -212,6 +213,10 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
     # Do the extension.
     tname = name or 'CustomContainer'
     subclass = type(tname, (base, object), data)
+
+    # Add custom wells if they're there.
+    if custom_wells:
+        subclass._set_custom_wells(custom_wells)
 
     # If this is a named container, add it to our list of containers.
     if name:
@@ -287,11 +292,11 @@ def generate_legacy_container(container_name, format=False):
         for row in range(1, container.rows+1):
             loc = []
             pos = '{}{}'.format(chr(col+ord('A')), row)
-            (x, y) = container.calculate_offset(pos)
+            (x, y, z) = container.calculate_offset(pos)
             locs[pos] = {
                 'x': round(x, 2),
                 'y': round(y, 2),
-                'z': 0,
+                'z': round(z, 2),
                 'depth': container.depth,
                 'diameter': container.diameter,
                 'total-liquid-volume': container.volume

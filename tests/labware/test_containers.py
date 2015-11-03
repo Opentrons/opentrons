@@ -230,3 +230,20 @@ class ContainerTest(unittest.TestCase):
         """
         containers.load_legacy_containers_file()
         containers.load_container('legacy.tube-rack-2ml_PCR')
+
+    def test_custom_wells(self):
+        """
+        Custom well positions.
+        """
+        rack = containers.load_container('tuberack.15-50ml')
+ 
+        # Values taken from legacy containers.json file.
+        self.assertEqual(rack.calculate_offset('A1'), (0, 0, 0))
+        self.assertEqual(rack.calculate_offset('A3'), (10, 50, 0))
+        self.assertEqual(rack.calculate_offset('B1'), (32, 0, 0))
+        self.assertEqual(rack.calculate_offset('B2'), (32, 24, 0))
+        self.assertEqual(rack.calculate_offset('B3'), (55, 50, 0))
+        self.assertEqual(rack.calculate_offset('C1'), (64, 0, 0))
+        self.assertEqual(rack.calculate_offset('C2'), (64, 24, 0))
+        
+        

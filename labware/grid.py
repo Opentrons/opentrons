@@ -55,9 +55,19 @@ class GridItem():
     parent   = None
     position = None
 
-    def __init__(self, parent, position):
+    _custom_properties = None
+
+    def __init__(self, parent, position, properties=None):
         self.parent = parent
         self.position = position
+
+        """
+        Some container positions have arbitrary custom properies not
+        by all of the wells. For example, a 15/50 tube rack has positions
+        for both 15ml and 50ml tubes.
+        """
+        if properties:
+            self._custom_properties = properties
 
     @property
     def coordinates(self):
@@ -102,6 +112,8 @@ class GridContainer():
     diameter = 0
     volume = 0
 
+    _custom_wells = None
+
     """
     A dict containing tuples of zero-indexed child coordinates.
     We only initialize them when they're accessed because until then, there's
@@ -137,8 +149,9 @@ class GridContainer():
         If things are properly calibrated, this should be absolute.
         """
         col, row = self._normalize_position(position)
-        offset_x = (self.col_spacing or self.spacing) * col
-        offset_y = (self.row_spacing or self.spacing) * row
+        w = (self._custom_wells or {}).get((col, row)) or {}
+        offset_x = w.get('x') or (self.col_spacing or self.spacing) * col
+        offset_y = w.get('y') or (self.row_spacing or self.spacing) * row
         return (offset_x + self.start_x, offset_y + self.start_y, self.start_z)
 
     def get_child(self, position):
@@ -149,7 +162,8 @@ class GridContainer():
         return self._children[key]
 
     def init_child(self, position):
-        return self.child_class(self, position)
+        pos = self._normalize_position(position)
+        return self.child_class(self, pos)
 
     def init_child_collection(self, positions):
         return self.collection_class(self, positions)
@@ -188,3 +202,16 @@ class GridContainer():
         container, without calibration.
         """
         return cls._get_instance().get_child_coordinates(position)
+
+    @classmethod
+    def _set_custom_wells(cls, wells):
+        """
+        Provides a mechanism for generating dynamic containers from user
+        configuration in which any well can override the default properties
+        of wells on the container.
+        """
+        normalized = {}
+        for pos in wells:
+            normalized[normalize_position(pos)] = wells[pos]
+        cls._custom_wells = normalized
+
