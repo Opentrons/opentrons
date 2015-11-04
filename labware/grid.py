@@ -55,11 +55,19 @@ class GridItem():
     parent   = None
     position = None
 
+    depth = None
+    diameter = None
+
     _custom_properties = None
 
     def __init__(self, parent, position, properties=None):
         self.parent = parent
         self.position = position
+
+        properties = properties or {}
+
+        self.depth = properties.get('depth', self.parent.depth)
+        self.diameter = properties.get('diameter', self.parent.diameter)
 
         """
         Some container positions have arbitrary custom properies not

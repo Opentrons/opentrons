@@ -42,7 +42,7 @@ _typemap = {
 _valid_properties = [
     'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'height', 'length', 'width',
     'volume', 'min_vol', 'max_vol', 'well_depth', 'row_spacing', 
-    'col_spacing', 'diameter', 'legacy_name', 'custom_wells'
+    'col_spacing', 'diameter', 'legacy_name', 'custom_wells', 'depth'
 ]
 
 # These are the types that can be defined within a custom container.
@@ -185,6 +185,11 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
 
     subsets = data.pop('subsets', {})
     custom_wells = data.pop('custom_wells', None)
+
+    # Alias for depth; makes container files more user friendly.
+    depth = data.pop('well_depth', None)
+    if depth:
+        data['depth'] = depth
 
     # Make sure nobody's trying any funny business with property
     # extensions.
@@ -360,7 +365,7 @@ def container_to_yaml(container, legacy_name=None):
         # Empty array values will insert a new line. ¯\_(ツ)_/¯
         'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'col_spacing', 
         'row_spacing', None, 'height', 'diameter',
-        'well_depth', None, 'volume', None
+        'depth', None, 'volume', None
     ]
 
     yaml = ""

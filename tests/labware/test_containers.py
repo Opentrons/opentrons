@@ -85,7 +85,7 @@ class ContainerTest(unittest.TestCase):
         Custom container subsets inherit parent values.
         """
         plate = containers.load_container('microplate.example_plate.deepwell')
-        self.assertEqual(plate.well_depth, 15)
+        self.assertEqual(plate.depth, 15)
         self.assertEqual(plate.rows, 12)
         self.assertEqual(plate.cols, 8)
         self.assertEqual(plate.a1_x, 10)
@@ -150,7 +150,7 @@ class ContainerTest(unittest.TestCase):
         inv = containers.list_containers()
         self.assertTrue('microplate.example_plate.deepwell.red' in inv)
         plate = containers.load_container('microplate.example_plate.deepwell.red')
-        self.assertEqual(plate.well_depth, 25)
+        self.assertEqual(plate.depth, 25)
 
     def test_tiprack_defaults(self):
         """
@@ -213,9 +213,12 @@ class ContainerTest(unittest.TestCase):
         self.assertDictEqual(result, expected)
 
         # Make sure the YAML works, too.
-        result = containers.legacy_json_to_yaml(data)
+        result = yaml.load(containers.legacy_json_to_yaml(data))
+
         expected['spacing'] = 0
-        self.assertDictEqual(yaml.load(result), expected)
+        result['well_depth'] = result.pop('depth')
+        
+        self.assertDictEqual(result, expected)
 
     def test_stock_containers_valid(self):
         """
@@ -253,15 +256,18 @@ class ContainerTest(unittest.TestCase):
         self.assertEqual(rack.calculate_offset('C1'), (64, 0, 0))
         self.assertEqual(rack.calculate_offset('C2'), (64, 24, 0))
         
-    def test_custom_well_volume(self):
+    def test_custom_well_properties(self):
         """
-        Custom well volume.
+        Custom well properties.
         """
         rack = containers.load_container('tuberack.15-50ml')()
 
         self.assertEqual(rack.volume, 15000)  # Default volume.
  
-        # Values taken from legacy containers.json file.
         self.assertEqual(rack.tube('A1').max_volume, 15000)
         self.assertEqual(rack.tube('B3').max_volume, 50000)
         
+        self.assertEqual(rack.tube('A1').depth, 76)
+        self.assertEqual(rack.tube('A3').depth, 76)
+        self.assertEqual(rack.tube('A1').diameter, 16)
+        self.assertEqual(rack.tube('A3').diameter, 26)
