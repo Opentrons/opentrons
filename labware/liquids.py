@@ -165,10 +165,18 @@ class LiquidWell(GridItem):
     _liquid = None
 
     def __init__(self, *args, **kwargs):
+
         super(LiquidWell, self).__init__(*args, **kwargs)
-        p = self.parent
+
+        custom = self._custom_properties or {}
+        par = self.parent
+
+        volume = custom.get('volume', par.volume)
+        min_vol = custom.get('min_vol', par.min_vol)
+        max_vol = custom.get('max_vol', par.max_vol)
+
         self._liquid = LiquidInventory(
-            max=p.volume, min_working=p.min_vol, max_working=p.max_vol
+            max=volume, min_working=min_vol, max_working=max_vol
         )
 
     def allocate(self, **kwargs):
@@ -178,7 +186,14 @@ class LiquidWell(GridItem):
         self._liquid.add_liquid(**kwargs)
 
     def get_volume(self, name=None):
+        """
+        This will return the computed volume of actual liquid in the well.
+        """
         return self._liquid.get_volume(name)
+
+    @property
+    def max_volume(self):
+        return self._liquid.max_volume
 
     def get_liquid_name(self):
         return self._liquid.get_liquid_name()

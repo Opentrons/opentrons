@@ -224,6 +224,13 @@ class ContainerTest(unittest.TestCase):
         for n in containers.list_containers():
             containers.generate_legacy_container(n)
 
+    def test_custom_container_volume(self):
+        """
+        Custom containers can specify custom volume.
+        """
+        rack = containers.load_container('tuberack.750ul')
+        self.assertEqual(rack.volume, 750)
+
     def test_legacy_container_load(self):
         """
         All legacy containers load.
@@ -231,7 +238,7 @@ class ContainerTest(unittest.TestCase):
         containers.load_legacy_containers_file()
         containers.load_container('legacy.tube-rack-2ml_PCR')
 
-    def test_custom_wells(self):
+    def test_custom_well_positions(self):
         """
         Custom well positions.
         """
@@ -246,4 +253,15 @@ class ContainerTest(unittest.TestCase):
         self.assertEqual(rack.calculate_offset('C1'), (64, 0, 0))
         self.assertEqual(rack.calculate_offset('C2'), (64, 24, 0))
         
+    def test_custom_well_volume(self):
+        """
+        Custom well volume.
+        """
+        rack = containers.load_container('tuberack.15-50ml')()
+
+        self.assertEqual(rack.volume, 15000)  # Default volume.
+ 
+        # Values taken from legacy containers.json file.
+        self.assertEqual(rack.tube('A1').max_volume, 15000)
+        self.assertEqual(rack.tube('B3').max_volume, 50000)
         

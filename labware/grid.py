@@ -111,6 +111,8 @@ class GridContainer():
     depth = 0
     diameter = 0
     volume = 0
+    min_vol = 0
+    max_vol = 0
 
     _custom_wells = None
 
@@ -163,7 +165,13 @@ class GridContainer():
 
     def init_child(self, position):
         pos = self._normalize_position(position)
-        return self.child_class(self, pos)
+        # Some wells have custom properties specified in their containers
+        # config.
+        if self._custom_wells:
+            props = self._custom_wells.get(pos, None)
+        else:
+            props = None
+        return self.child_class(self, pos, props)
 
     def init_child_collection(self, positions):
         return self.collection_class(self, positions)
