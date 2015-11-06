@@ -83,3 +83,20 @@ labware.containers.load_custom_containers('/path/to/containers')
 
 This will do a recursive glob through the directory provided and add all 
 YAML files to the list of available labware containers.
+
+### Supported Container Types
+
+As of this writing, supported container types are as follows:
+
+* Grid (all containers extend from this base)
+* Legacy (containers specified within the old containers.json format)
+* Microplate
+* Reservoir
+* Tiprack
+* Tuberack
+
+For an up-to-date list, please use the `containers.list_container_types()`
+method.
+
+These types are implemented in the internal code and are currently not
+extendable by the end user.
