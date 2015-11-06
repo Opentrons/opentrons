@@ -1,0 +1,13 @@
+type: microplate
+
+rows: 24
+cols: 16
+a1_x: 12.13
+a1_y: 8.99
+spacing: 4.5
+diameter: 3.1
+
+height: 16.2
+well_depth: 9.5
+
+volume: 55
