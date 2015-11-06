@@ -220,6 +220,14 @@ class GridContainer():
         return cls._get_instance().get_child_coordinates(position)
 
     @classmethod
+    def offset(cls, position):
+        """
+        Returns a tuple containing (x, y, z) of the given position on this
+        container, without calibration.
+        """
+        return cls.calculate_offset(position)
+
+    @classmethod
     def _set_custom_wells(cls, wells):
         """
         Provides a mechanism for generating dynamic containers from user
