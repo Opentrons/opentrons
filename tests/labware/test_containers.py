@@ -282,13 +282,13 @@ class ContainerTest(unittest.TestCase):
         a2 = rack.tip_offset(1)
         a3 = rack.tip_offset(2)
         a4 = rack.tip_offset(3)
-        b1 = rack.tip_offset(9)
-        b2 = rack.tip_offset(10)
+        b1 = rack.tip_offset(8)
+        b3 = rack.tip_offset(10)
 
         self.assertEqual(a1, rack.offset('a1'))
         self.assertEqual(a2, rack.offset('a2'))
         self.assertEqual(a3, rack.offset('a3'))
         self.assertEqual(a4, rack.offset('a4'))
         self.assertEqual(b1, rack.offset('b1'))
-        self.assertEqual(b2, rack.offset('b2'))
+        self.assertEqual(b3, rack.offset('b3'))
 
