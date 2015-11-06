@@ -217,7 +217,7 @@ class ContainerTest(unittest.TestCase):
 
         expected['spacing'] = 0
         result['well_depth'] = result.pop('depth')
-        
+
         self.assertDictEqual(result, expected)
 
     def test_stock_containers_valid(self):
@@ -271,3 +271,25 @@ class ContainerTest(unittest.TestCase):
         self.assertEqual(rack.tube('A3').depth, 76)
         self.assertEqual(rack.tube('A1').diameter, 16)
         self.assertEqual(rack.tube('A3').diameter, 26)
+
+    def test_tiprack_next_tip(self):
+        """
+        Tip offset.
+        """
+        rack = containers.load_container('tiprack.1000ul')
+
+        a1 = rack.tip_offset()
+        a2 = rack.tip_offset(1)
+        a3 = rack.tip_offset(2)
+        a4 = rack.tip_offset(3)
+        b1 = rack.tip_offset(9)
+        b2 = rack.tip_offset(10)
+
+
+        self.assertEqual(a1, rack.offset('a1'))
+        self.assertEqual(a2, rack.offset('a2'))
+        self.assertEqual(a3, rack.offset('a3'))
+        self.assertEqual(a4, rack.offset('a4'))
+        self.assertEqual(b1, rack.offset('b1'))
+        self.assertEqual(b2, rack.offset('b2'))
+

@@ -35,6 +35,14 @@ class Tiprack(GridContainer):
     def slot(self, position):
         return self.get_child(position)
 
+    @classmethod
+    def tip_offset(cls, used=0):
+        """
+        Returns the x, y, z offset for a tip position, incremented by the
+        number of tips previously used.
+        """
+        return cls.offset(cls._position_in_sequence(used))
+
 
 class Tiprack_P10(Tiprack):
     size = 'P10'

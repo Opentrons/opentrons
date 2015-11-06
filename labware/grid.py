@@ -1,3 +1,5 @@
+from math import floor
+
 def normalize_position(position):
     """
     Normalizes a coordinate (A1, B12, etc) into a tuple.
@@ -238,4 +240,13 @@ class GridContainer():
         for pos in wells:
             normalized[normalize_position(pos)] = wells[pos]
         cls._custom_wells = normalized
+
+    @classmethod
+    def _position_in_sequence(cls, offset=0):
+        """
+        Returns a col, row tuple for a position after the given offset.
+        """
+        col = floor(offset / cls.cols)
+        row = offset % cls.cols
+        return (col, row)
 
