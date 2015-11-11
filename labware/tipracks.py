@@ -18,9 +18,6 @@ class Tiprack(GridContainer):
     a1_x = 14.38
     a1_y = 11.24
 
-    def slot(self, position):
-        return self.get_child(position)
-
     def tip(self, position):
         return self.get_child(position)
 
@@ -48,7 +45,7 @@ class Tiprack(GridContainer):
         else:
             self._used = self._used + 1  # Standard increment.
 
-        return self.slot(self._position_in_sequence(offset))
+        return self.tip(self._position_in_sequence(offset))
 
     @classmethod
     def tip_offset(cls, used=0):

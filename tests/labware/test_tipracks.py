@@ -14,28 +14,28 @@ class TiprackTest(unittest.TestCase):
         """
         Calibration included in A1 slot coordinates.
         """
-        a1 = self.rack.slot('A1').coordinates
+        a1 = self.rack.tip('A1').coordinates
         self.assertEqual(a1, (10, 11, 12))
 
     def a2_coordinate_test(self):
         """
         Calibration included in A2 slot coordinates.
         """
-        a2 = self.rack.slot('A2').coordinates
+        a2 = self.rack.tip('A2').coordinates
         self.assertEqual(a2, (10, 11 + self.expected_margin, 12))
 
     def b1_coordinate_test(self):
         """
         Coordinates for B1 position.
         """
-        b1 = self.rack.slot('B1').coordinates
+        b1 = self.rack.tip('B1').coordinates
         self.assertEqual(b1, (10 + self.expected_margin, 11, 12))
 
     def b2_coordinate_test(self):
         """
         Coordinates for B2 position.
         """
-        b2 = self.rack.slot('B2').coordinates
+        b2 = self.rack.tip('B2').coordinates
         margin = self.expected_margin
         self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
@@ -43,7 +43,7 @@ class TiprackTest(unittest.TestCase):
         """
         Accept lowercase coordinates.
         """
-        b2 = self.rack.slot('b2').coordinates
+        b2 = self.rack.tip('b2').coordinates
         margin = self.expected_margin
         self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
@@ -53,10 +53,10 @@ class TiprackTest(unittest.TestCase):
         """
         col = chr(ord('a') + self.rack.cols)
         with self.assertRaises(KeyError):
-            self.rack.slot('{}1'.format(col))
+            self.rack.tip('{}1'.format(col))
 
         col = chr(ord('a') + self.rack.cols - 1)
-        self.rack.slot('{}1'.format(col))
+        self.rack.tip('{}1'.format(col))
 
     def row_sanity_test(self):
         """
@@ -65,10 +65,10 @@ class TiprackTest(unittest.TestCase):
         row = self.rack.rows + 1
 
         with self.assertRaises(KeyError):
-            self.rack.slot('A{}'.format(row))
+            self.rack.tip('A{}'.format(row))
 
         row = self.rack.rows
-        self.rack.slot('A{}'.format(row))
+        self.rack.tip('A{}'.format(row))
 
     def deck_calibration_test(self):
         """
@@ -93,8 +93,8 @@ class TiprackTest(unittest.TestCase):
 
         rack = deck.slot('a1')
 
-        a1 = rack.slot('a1').coordinates
-        b2 = rack.slot('b2').coordinates
+        a1 = rack.tip('a1').coordinates
+        b2 = rack.tip('b2').coordinates
 
         self.assertEqual(a1, (10, 11, 12))
         self.assertEqual(b2, (10 + margin, 11 + margin, 12))
