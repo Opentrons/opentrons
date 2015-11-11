@@ -1,27 +1,15 @@
 from .grid import GridContainer, GridItem
 
 
-class TiprackSlot(GridItem):
-
-    has_tip = True
-
-    def get_tip(self):
-        if self.has_tip:
-            self.has_tip = False
-            return True
-        else:
-            raise Exception(
-                "No tip left in slot {} of tiprack"
-                .format(self.position)
-            )
-
-
 class Tiprack(GridContainer):
 
     size = None
 
     rows = 12
     cols = 8
+
+    _used = 0  # get_next_tip counter
+    _tagged_tips = None  # Dict containing tags and offsets for tip reuse.
 
     """
     Taken from microplate specs.
@@ -30,10 +18,37 @@ class Tiprack(GridContainer):
     a1_x = 14.38
     a1_y = 11.24
 
-    child_class = TiprackSlot
-
     def slot(self, position):
         return self.get_child(position)
+
+    def tip(self, position):
+        return self.get_child(position)
+
+    def get_next_tip(self, tag=None):
+        """
+        Returns the next tip in the sequence. If a tag is passed, that tag
+        will automatically be reused. (For scenarios in which the robot is
+        capable of dropping a used tip back into the rack rather than
+        disposing it.)
+        """
+        offset = self._used
+
+        if tag:
+            # Ensure tag map exists.
+            if self._tagged_tips is None:
+                self._tagged_tips = {}
+            # Check for tag or create it.
+            if tag not in self._tagged_tips:
+                # Increment used tip for new tag.
+                self._tagged_tips[tag] = offset
+                self._used = self._used + 1
+            else:
+                # Reuse old tip.
+                offset = self._tagged_tips[tag]
+        else:
+            self._used = self._used + 1  # Standard increment.
+
+        return self.slot(self._position_in_sequence(offset))
 
     @classmethod
     def tip_offset(cls, used=0):
@@ -41,7 +56,7 @@ class Tiprack(GridContainer):
         Returns the x, y, z offset for a tip position, incremented by the
         number of tips previously used.
         """
-        return cls.offset(cls._position_in_sequence(used))
+        return cls.coordinates(cls._position_in_sequence(used))
 
 
 class Tiprack_P10(Tiprack):

@@ -214,20 +214,20 @@ class GridContainer():
         return cls._instance
 
     @classmethod
-    def calculate_offset(cls, position):
+    def coordinates(cls, position):
         """
         Returns a tuple containing (x, y, z) of the given position on this
-        container, without calibration.
+        container, without calibration.  (Relative coordinates.)
         """
         return cls._get_instance().get_child_coordinates(position)
 
     @classmethod
-    def offset(cls, position):
+    def calculate_offset(cls, position):
         """
         Returns a tuple containing (x, y, z) of the given position on this
-        container, without calibration.
+        container, without calibration.  (Relative coordinates.)
         """
-        return cls.calculate_offset(position)
+        return cls.coordinates(position)
 
     @classmethod
     def _set_custom_wells(cls, wells):

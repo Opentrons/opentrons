@@ -248,13 +248,13 @@ class ContainerTest(unittest.TestCase):
         rack = containers.load_container('tuberack.15-50ml')
  
         # Values taken from legacy containers.json file.
-        self.assertEqual(rack.calculate_offset('A1'), (0, 0, 0))
-        self.assertEqual(rack.calculate_offset('A3'), (10, 50, 0))
-        self.assertEqual(rack.calculate_offset('B1'), (32, 0, 0))
-        self.assertEqual(rack.calculate_offset('B2'), (32, 24, 0))
-        self.assertEqual(rack.calculate_offset('B3'), (55, 50, 0))
-        self.assertEqual(rack.calculate_offset('C1'), (64, 0, 0))
-        self.assertEqual(rack.calculate_offset('C2'), (64, 24, 0))
+        self.assertEqual(rack.coordinates('A1'), (0, 0, 0))
+        self.assertEqual(rack.coordinates('A3'), (10, 50, 0))
+        self.assertEqual(rack.coordinates('B1'), (32, 0, 0))
+        self.assertEqual(rack.coordinates('B2'), (32, 24, 0))
+        self.assertEqual(rack.coordinates('B3'), (55, 50, 0))
+        self.assertEqual(rack.coordinates('C1'), (64, 0, 0))
+        self.assertEqual(rack.coordinates('C2'), (64, 24, 0))
         
     def test_custom_well_properties(self):
         """
@@ -285,10 +285,34 @@ class ContainerTest(unittest.TestCase):
         b1 = rack.tip_offset(8)
         b3 = rack.tip_offset(10)
 
-        self.assertEqual(a1, rack.offset('a1'))
-        self.assertEqual(a2, rack.offset('a2'))
-        self.assertEqual(a3, rack.offset('a3'))
-        self.assertEqual(a4, rack.offset('a4'))
-        self.assertEqual(b1, rack.offset('b1'))
-        self.assertEqual(b3, rack.offset('b3'))
+        self.assertEqual(a1, rack.coordinates('a1'))
+        self.assertEqual(a2, rack.coordinates('a2'))
+        self.assertEqual(a3, rack.coordinates('a3'))
+        self.assertEqual(a4, rack.coordinates('a4'))
+        self.assertEqual(b1, rack.coordinates('b1'))
+        self.assertEqual(b3, rack.coordinates('b3'))
+
+    def test_tiprack_tag(self):
+        """
+        Tips on specific racks can be tagged for reuse.
+        """
+        rack = containers.load_container('tiprack.1000ul')()
+        
+        a1 = rack.get_next_tip().coordinates
+        a2 = rack.get_next_tip().coordinates
+        a3 = rack.get_next_tip().coordinates
+
+        a4 = rack.get_next_tip(tag='water').coordinates
+        a5 = rack.get_next_tip(tag='saline').coordinates
+
+        also_a4 = rack.get_next_tip(tag='water').coordinates
+        also_a5 = rack.get_next_tip('saline').coordinates
+
+        self.assertEqual(a1, rack.coordinates('a1'))
+        self.assertEqual(a2, rack.coordinates('a2'))
+        self.assertEqual(a3, rack.coordinates('a3'))
+        self.assertEqual(a4, rack.coordinates('a4'))
+        self.assertEqual(a5, rack.coordinates('a5'))
+        self.assertEqual(also_a4, rack.coordinates('a4'))
+        self.assertEqual(also_a5, rack.coordinates('a5'))
 
