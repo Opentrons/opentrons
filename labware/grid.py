@@ -249,4 +249,3 @@ class GridContainer():
         col = floor(offset / cls.cols)
         row = offset % cls.cols
         return (col, row)
-
