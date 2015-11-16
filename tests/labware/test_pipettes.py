@@ -11,8 +11,6 @@ class MockPipette(Pipette):
 
     _points = [
         {'f1': 1, 'f2': 1 },
-        {'f1': 5, 'f2': 5 },
-        {'f1': 7, 'f2': 7 },
         {'f1': 10, 'f2': 10 }
     ]
 
