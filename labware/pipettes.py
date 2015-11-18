@@ -13,7 +13,7 @@ class Pipette():
 
     _points = [
         {'f1': 1, 'f2': 1 },
-        {'f1': 10, 'f2': 10 }
+        {'f1': 2000, 'f2': 2000 }
     ]
 
     _tip_plunge = 6  # Distance from calibrated top of tiprack to pickup tip.
