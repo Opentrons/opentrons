@@ -42,3 +42,7 @@ class PipetteTest(unittest.TestCase):
         depth = self.pipette.plunge_depth(1)
         self.assertEqual(depth, 25)
 
+    def test_max_volume(self):
+        """Returns percentage for max volume."""
+        self.pipette._volume_percentage(10)
+
