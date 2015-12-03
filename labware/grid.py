@@ -79,9 +79,6 @@ class GridItem():
         if properties:
             self._custom_properties = properties
 
-    def serialize(self):
-        return {}
-
     @property
     def coordinates(self):
         return self.parent.get_child_coordinates(self.position)
