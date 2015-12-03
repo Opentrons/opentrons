@@ -79,6 +79,9 @@ class GridItem():
         if properties:
             self._custom_properties = properties
 
+    def serialize(self):
+        return {}
+
     @property
     def coordinates(self):
         return self.parent.get_child_coordinates(self.position)
@@ -150,9 +153,12 @@ class GridContainer():
         this in child classes just to provide better documentation about
         where the calibration point for a particular module should be.
         """
-        self.start_x = x
-        self.start_y = y
-        self.start_z = z
+        if x:
+            self.start_x = x
+        if y:
+            self.start_y = y
+        if z:
+            self.start_z = z
 
     def get_child_coordinates(self, position):
         """
@@ -223,7 +229,6 @@ class GridContainer():
     def calibration(self):
         return (self.start_x, self.start_y, self.start_z)
     
-
     @classmethod
     def _get_instance(cls):
         if not cls._instance or not isinstance(cls._instance, cls):
