@@ -40,5 +40,11 @@ class DeckTest(unittest.TestCase):
         a2.start_x = 13
         a2.start_y = 14
         a2.start_z = 15
-        self.assertEqual(self.deck.dump_calibration(), {'A1': (10, 11, 12), 'A2': (13, 14, 15)})
+
+        expected = {
+            'A1': { 'x': 10, 'y': 11, 'z': 12 },
+            'A2': { 'x': 13, 'y': 14, 'z': 15 }
+        }
+
+        self.assertEqual(self.deck.dump_calibration(), expected)
 

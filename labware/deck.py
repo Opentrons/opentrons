@@ -47,5 +47,6 @@ class Deck(GridContainer):
             col = chr(ord('A') + col)
             row = row + 1
             key = "{}{}".format(col, row)
-            obj[key] = self._children[pos].calibration
+            x, y, z = self._children[pos].calibration
+            obj[key] = {'x': x, 'y': y, 'z': z}
         return obj
