@@ -207,6 +207,23 @@ class GridContainer():
             )
         return (col, row)
 
+    @property
+    def calibrated(self):
+        """
+        Returns True if the container has been calibrated, False if it
+        hasn't.
+
+        Knowing whether or not the container has been calibrated
+        is essential for determining whether given coordinates are 
+        absolute to the deck or relative to the container.
+        """
+        return self.start_x and self.start_y and self.start_z
+
+    @property
+    def calibration(self):
+        return (self.start_x, self.start_y, self.start_z)
+    
+
     @classmethod
     def _get_instance(cls):
         if not cls._instance or not isinstance(cls._instance, cls):
@@ -217,7 +234,13 @@ class GridContainer():
     def coordinates(cls, position):
         """
         Returns a tuple containing (x, y, z) of the given position on this
-        container, without calibration.  (Relative coordinates.)
+        container, without calibration.
+
+        Because it's a class method, and the class doesn't contain data on
+        particular calibration positions.
+
+        For calibrated positions, which are absolute to the deck, instantiate
+        and calibrate a specific container object.
         """
         return cls._get_instance().get_child_coordinates(position)
 

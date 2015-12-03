@@ -39,3 +39,13 @@ class Deck(GridContainer):
         for pos in calibration:
             module = self.slot(pos)
             module.calibrate(**calibration[pos])
+
+    def dump_calibration(self):
+        obj = {}
+        for pos in self._children:
+            col, row = pos
+            col = chr(ord('A') + col)
+            row = row + 1
+            key = "{}{}".format(col, row)
+            obj[key] = self._children[pos].calibration
+        return obj
