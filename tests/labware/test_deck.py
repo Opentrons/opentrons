@@ -30,6 +30,7 @@ class DeckTest(unittest.TestCase):
             self.deck.slot('z1')
 
     def test_return_calibration(self):
+        """Dump calibration values."""
         Plate96 = containers.load_container('microplate.96')
         self.deck.add_modules(a1=labware.Microplate(), a2=Plate96())
         a1 = self.deck.slot('a1')
@@ -48,4 +49,23 @@ class DeckTest(unittest.TestCase):
         }
 
         self.assertEqual(self.deck.dump_calibration(), expected)
+
+    def test_reload_calibration(self):
+        """Reload calibration values."""
+        dumped = {
+            'A1': { 'name': 'microplate', 'x': 10, 'y': 11, 'z': 12 },
+            'A2': { 'name': 'microplate.96', 'x': 13, 'y': 14, 'z': 15 }
+        }
+
+        self.deck.load_calibration(dumped)
+
+        a1 = self.deck.slot('a1')
+        self.assertEqual(a1.calibration, (10, 11, 12))
+        self.assertEqual(a1.name, 'microplate')
+
+        a2 = self.deck.slot('a2')
+        self.assertEqual(a2.calibration, (13, 14, 15))
+        self.assertEqual(a2.name, 'microplate.96')
+
+
 
