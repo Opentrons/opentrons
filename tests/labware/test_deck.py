@@ -1,6 +1,6 @@
 import unittest
 import labware
-
+from labware import containers
 
 class DeckTest(unittest.TestCase):
 
@@ -30,7 +30,8 @@ class DeckTest(unittest.TestCase):
             self.deck.slot('z1')
 
     def test_return_calibration(self):
-        self.deck.add_modules(a1=labware.Microplate(), a2=labware.Microplate())
+        Plate96 = containers.load_container('microplate.96')
+        self.deck.add_modules(a1=labware.Microplate(), a2=Plate96())
         a1 = self.deck.slot('a1')
         a1.start_x = 10
         a1.start_y = 11
@@ -42,8 +43,8 @@ class DeckTest(unittest.TestCase):
         a2.start_z = 15
 
         expected = {
-            'A1': { 'x': 10, 'y': 11, 'z': 12 },
-            'A2': { 'x': 13, 'y': 14, 'z': 15 }
+            'A1': { 'name': 'microplate', 'x': 10, 'y': 11, 'z': 12 },
+            'A2': { 'name': 'microplate.96', 'x': 13, 'y': 14, 'z': 15 }
         }
 
         self.assertEqual(self.deck.dump_calibration(), expected)
