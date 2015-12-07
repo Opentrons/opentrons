@@ -125,6 +125,7 @@ class GridContainer():
     max_vol = 0
 
     _custom_wells = None
+    _name = None
 
     """
     A dict containing tuples of zero-indexed child coordinates.
@@ -226,6 +227,10 @@ class GridContainer():
     def calibration(self):
         return (self.start_x, self.start_y, self.start_z)
     
+    @property
+    def name(self):
+        return self._name or self.__class__.__name__.lower().replace('_', '.')
+
     @classmethod
     def _get_instance(cls):
         if not cls._instance or not isinstance(cls._instance, cls):
