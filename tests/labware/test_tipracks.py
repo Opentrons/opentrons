@@ -98,3 +98,40 @@ class TiprackTest(unittest.TestCase):
 
         self.assertEqual(a1, (10, 11, 12))
         self.assertEqual(b2, (10 + margin, 11 + margin, 12))
+
+    def test_tiprack_tag(self):
+        """
+        Tips on specific racks can be tagged for reuse.
+        """
+        rack = self.rack
+        
+        a1 = rack.get_next_tip().coordinates
+        a2 = rack.get_next_tip().coordinates
+        a3 = rack.get_next_tip().coordinates
+
+        a4 = rack.get_next_tip(tag='water').coordinates
+        a5 = rack.get_next_tip(tag='saline').coordinates
+
+        also_a4 = rack.get_next_tip(tag='water').coordinates
+        also_a5 = rack.get_next_tip('saline').coordinates
+
+        self.assertEqual(a1, rack.tip('a1').coordinates)
+        self.assertEqual(a2, rack.tip('a2').coordinates)
+        self.assertEqual(a3, rack.tip('a3').coordinates)
+        self.assertEqual(a4, rack.tip('a4').coordinates)
+        self.assertEqual(a5, rack.tip('a5').coordinates)
+        self.assertEqual(also_a4, rack.tip('a4').coordinates)
+        self.assertEqual(also_a5, rack.tip('a5').coordinates)
+
+    def set_tips_used_test(self):
+        """ Dump and reload tips used. """
+        self.rack.set_tips_used(10)
+        self.assertEqual(self.rack.tips_used, 10)
+
+    def used_tip_offset(self):
+        """ Account for used tip offset. """
+        self.rack.set_tips_used(10)
+        self.assertEqual(
+            self.rack.tip('A12').coordinates,
+            self.rack.get_next_tip().coordinates
+        )

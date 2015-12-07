@@ -21,6 +21,19 @@ class Tiprack(GridContainer):
     def tip(self, position):
         return self.get_child(position)
 
+    def set_tips_used(self, number):
+        """
+        Sets the number of used tips in the tiprack.
+        """
+        self._used = number - 1
+
+    @property
+    def tips_used(self):
+        """
+        Returns the number of tips used so far in this tiprack.
+        """
+        return self._used + 1
+    
     def get_next_tip(self, tag=None):
         """
         Returns the next tip in the sequence. If a tag is passed, that tag
