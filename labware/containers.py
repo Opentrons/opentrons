@@ -216,7 +216,7 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
         )
 
     # Do the extension.
-    tname = name or 'CustomContainer'
+    tname = (container_name or 'CustomContainer').replace('.', '_').title()
     subclass = type(tname, (base, object), data)
 
     # Add custom wells if they're there.
