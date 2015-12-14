@@ -102,9 +102,9 @@ class GridContainer():
     """
     Calibration.
     """
-    start_x = 0
-    start_y = 0
-    start_z = 0
+    _start_x = 0
+    _start_y = 0
+    _start_z = 0
 
     """
     Margin
@@ -152,11 +152,11 @@ class GridContainer():
         where the calibration point for a particular module should be.
         """
         if x:
-            self.start_x = x
+            self._start_x = x
         if y:
-            self.start_y = y
+            self._start_y = y
         if z:
-            self.start_z = z
+            self._start_z = z
 
     def get_child_coordinates(self, position):
         """
@@ -168,7 +168,7 @@ class GridContainer():
         w = (self._custom_wells or {}).get((col, row)) or {}
         offset_x = w.get('x') or (self.col_spacing or self.spacing) * col
         offset_y = w.get('y') or (self.row_spacing or self.spacing) * row
-        return (offset_x + self.start_x, offset_y + self.start_y, self.start_z)
+        return (offset_x + self._start_x, offset_y + self._start_y, self._start_z)
 
     def get_child(self, position):
         key = self._normalize_position(position)
@@ -221,11 +221,11 @@ class GridContainer():
         is essential for determining whether given coordinates are 
         absolute to the deck or relative to the container.
         """
-        return self.start_x and self.start_y and self.start_z
+        return self._start_x and self._start_y and self._start_z
 
     @property
     def calibration(self):
-        return (self.start_x, self.start_y, self.start_z)
+        return (self._start_x, self._start_y, self._start_z)
     
     @property
     def name(self):
