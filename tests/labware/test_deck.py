@@ -29,19 +29,15 @@ class DeckTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             self.deck.slot('z1')
 
-    def test_return_calibration(self):
+    def test_return_primary_calibration(self):
         """Dump calibration values."""
         Plate96 = containers.load_container('microplate.96')
         self.deck.add_modules(a1=labware.Microplate(), a2=Plate96())
         a1 = self.deck.slot('a1')
-        a1.start_x = 10
-        a1.start_y = 11
-        a1.start_z = 12
+        a1.calibrate(x=10, y=11, z=12)
 
         a2 = self.deck.slot('a2')
-        a2.start_x = 13
-        a2.start_y = 14
-        a2.start_z = 15
+        a2.calibrate(x=13, y=14, z=15)
 
         expected = {
             'A1': { 'name': 'microplate', 'x': 10, 'y': 11, 'z': 12 },
