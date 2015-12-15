@@ -73,6 +73,12 @@ class GridItem():
     """
     _custom_properties = None
 
+    """
+    Dict containing calibration values; see the GridContainer implementation
+    below for more info.
+    """
+    _calibration = None
+
     def __init__(self, parent, position, properties=None):
         self.parent = parent
         self.position = position
@@ -90,10 +96,62 @@ class GridItem():
         if properties:
             self._custom_properties = properties
 
-    @property
-    def coordinates(self):
-        return self.parent.get_child_coordinates(self.position)
+    def calibrate(self, x=None, y=None, z=None, instrument='primary'):
+        """
+        Allows for overriding the default coordinates that would be otherwise
+        be calculated dynamically by the parent well based on the labware
+        specification.
 
+        A use case for this would be attaching a custom depth value for just
+        one well because the robot operation knows the well liquid depth is
+        slightly different than all the other wells (for example if they're
+        using a custom tube not explicitly defined as a component within the
+        protocol itself).
+
+        Custom calibration can also theoretically be redefined at particular
+        steps in a protocol as the robot is running, though for each of these
+        cases we should seek out a more general solution and support it at
+        a higher, more dynamic level.
+
+        See the related calibration on the GridContainer class for more
+        details.
+
+        This method might go away when we make the GridItems recursive
+        GridContainers, but the external interface shouldn't change.
+        """
+
+        # Python dictionaries are always passed by reference, meaning changes
+        # to 'cal' are also changes to self._calibration[instrument].
+        cal = self._get_calibration(instrument)
+
+        if x:
+            cal['x'] = x
+        if y:
+            cal['y'] = y
+        if z:
+            cal['z'] = z
+
+    def _get_calibration(self, instrument):
+        """
+        DO NOT USE THIS; it's likely to change dramatically in future 
+        releases as instruments become first-class citizens within the
+        library.
+        """
+        if not self._calibration:
+            self._calibration = {}
+        if not self._calibration.get(instrument):
+            self._calibration[instrument] = {}
+
+        return self._calibration[instrument]
+
+    def coordinates(self, instrument='primary'):
+        px, py, pz = self.parent.get_child_coordinates(self.position)
+        # Roll in custom calibration.
+        c = self._get_calibration(instrument)
+        x = c.get('x', px)
+        y = c.get('y', py)
+        z = c.get('z', pz)
+        return (x, y, z)
 
 class GridContainer():
 
@@ -112,10 +170,15 @@ class GridContainer():
 
     """
     Calibration.
+
+    Looks like:
+
+    {'primary': { 'x': 1, 'y': 2, 'z': 3 }}
+
+    Where 'primary' is the default axis when not specified. Any arbitrary
+    axis label can be specified within the calibration methods.
     """
-    _start_x = 0
-    _start_y = 0
-    _start_z = 0
+    _calibration = None
 
     """
     Margin
@@ -160,31 +223,68 @@ class GridContainer():
         self.parent = parent
         self._children = {}
 
-    def calibrate(self, x=None, y=None, z=None, **kwargs):
+    def calibrate(self, x=None, y=None, z=None, instrument='primary', **kwargs):
         """
-        Generic calibration mechanism. It would be a good idea to override
-        this in child classes just to provide better documentation about
-        where the calibration point for a particular module should be.
-        """
-        if x:
-            self._start_x = x
-        if y:
-            self._start_y = y
-        if z:
-            self._start_z = z
+        Saves the absolute coordinates on the deck of the first GridItem
+        within a particular container, relative to a given instrument.
 
-    def get_child_coordinates(self, position):
+        The instrument label defaults to 'primary', but can be set to
+        anything. For example, left/right/middle or a/b/c.  In the future,
+        this will be validated as an existing instrument on the robot,
+        which will not be backwards compatible.
+
+        Keyword arguments are for compatibility with overriding methods.
         """
-        Get the x, y, z coords for a child well.
+        # Python dictionaries are always passed by reference.
+        cal = self._get_calibration(instrument)
+
+        if x:
+            cal['x'] = x
+        if y:
+            cal['y'] = y
+        if z:
+            cal['z'] = z
+
+    def _get_calibration(self, instrument):
+        """
+        Ensures the existence of and returns calibration object for a given
+        instrument.
+
+        DO NOT USE THIS; it's likely to change dramatically in future 
+        releases as instruments become first-class citizens within the
+        library.
+
+        Another method that will go away when GridItems become recursive
+        GridContainers.
+        """
+        if not self._calibration:
+            self._calibration = {}
+        if not self._calibration.get(instrument):
+            self._calibration[instrument] = {}
+
+        return self._calibration[instrument]
+
+
+    def get_child_coordinates(self, position, instrument='primary'):
+        """
+        Get the x, y, z coords for a child well relative to the given
+        instrument (defaults to primary).
 
         If things are properly calibrated, this should be absolute.
         """
         col, row = self._normalize_position(position)
+        calibration = self._get_calibration(instrument)
+        start_x = calibration.get('x', 0)
+        start_y = calibration.get('y', 0)
+        start_z = calibration.get('z', 0)
         w = (self._custom_wells or {}).get((col, row)) or {}
         offset_x = w.get('x') or (self.col_spacing or self.spacing) * col
         offset_y = w.get('y') or (self.row_spacing or self.spacing) * row
-        offset_z = w.get('z') or self._start_z
-        return (offset_x + self._start_x, offset_y + self._start_y, offset_z)
+        # We don't do any dynamic offset for Z because all our labware is
+        # flat at the moment. Edge cases can be handled by manually 
+        # calibrating specific child positions.
+        offset_z = w.get('z') or start_z
+        return (offset_x + start_x, offset_y + start_y, offset_z)
 
     def get_child(self, position):
         key = self._normalize_position(position)
@@ -227,8 +327,21 @@ class GridContainer():
             )
         return (col, row)
 
+    def _get_calibration(self, instrument):
+        """
+        DO NOT USE THIS; it's likely to change dramatically in future 
+        releases as instruments become first-class citizens within the
+        library.
+        """
+        if not self._calibration:
+            self._calibration = {}
+        if not self._calibration.get(instrument):
+            self._calibration[instrument] = {}
+
+        return self._calibration[instrument]
+
     @property
-    def calibrated(self):
+    def calibrated(self, instrument='primary'):
         """
         Returns True if the container has been calibrated, False if it
         hasn't.
@@ -237,11 +350,15 @@ class GridContainer():
         is essential for determining whether given coordinates are 
         absolute to the deck or relative to the container.
         """
-        return self._start_x and self._start_y and self._start_z
+        data = self._get_calibration(instrument)
+        return len(data.keys()) > 0
 
-    @property
-    def calibration(self):
-        return (self._start_x, self._start_y, self._start_z)
+    def calibration(self, instrument='primary'):
+        cal = self._get_calibration(instrument)
+        x = cal.get('x', 0)
+        y = cal.get('y', 0)
+        z = cal.get('z', 0)
+        return (x, y, z)
     
     @property
     def name(self):

@@ -298,15 +298,15 @@ class ContainerTest(unittest.TestCase):
         """
         rack = containers.load_container('tiprack.1000ul')()
         
-        a1 = rack.get_next_tip().coordinates
-        a2 = rack.get_next_tip().coordinates
-        a3 = rack.get_next_tip().coordinates
+        a1 = rack.get_next_tip().coordinates()
+        a2 = rack.get_next_tip().coordinates()
+        a3 = rack.get_next_tip().coordinates()
 
-        a4 = rack.get_next_tip(tag='water').coordinates
-        a5 = rack.get_next_tip(tag='saline').coordinates
+        a4 = rack.get_next_tip(tag='water').coordinates()
+        a5 = rack.get_next_tip(tag='saline').coordinates()
 
-        also_a4 = rack.get_next_tip(tag='water').coordinates
-        also_a5 = rack.get_next_tip('saline').coordinates
+        also_a4 = rack.get_next_tip(tag='water').coordinates()
+        also_a5 = rack.get_next_tip('saline').coordinates()
 
         self.assertEqual(a1, rack.coordinates('a1'))
         self.assertEqual(a2, rack.coordinates('a2'))

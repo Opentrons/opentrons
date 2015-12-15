@@ -21,7 +21,7 @@ class ReservoirTest(unittest.TestCase):
         """
         Row 1 coordinates after calibration.
         """
-        row1 = self.reservoir.row(1).coordinates
+        row1 = self.reservoir.row(1).coordinates()
         self.assertEqual(row1, (
             self.offset_x,
             self.offset_y,
@@ -32,7 +32,7 @@ class ReservoirTest(unittest.TestCase):
         """
         Row 2 coordinates after calibration.
         """
-        row2 = self.reservoir.row(2).coordinates
+        row2 = self.reservoir.row(2).coordinates()
         self.assertEqual(row2, (
             self.offset_x,
             self.offset_y + self.expected_margin,
@@ -76,8 +76,8 @@ class ReservoirTest(unittest.TestCase):
 
         reservoir = deck.slot('a1')
 
-        col1 = reservoir.row(1).coordinates
-        col2 = reservoir.row(2).coordinates
+        col1 = reservoir.row(1).coordinates()
+        col2 = reservoir.row(2).coordinates()
 
         self.assertEqual(col1, (10, 11, 12))
         self.assertEqual(col2, (10, 11 + margin, 12))

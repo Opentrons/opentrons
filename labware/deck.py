@@ -1,6 +1,8 @@
 from .grid import GridContainer
 from .containers import load_container
 
+import copy
+
 class Deck(GridContainer):
 
     rows = 3
@@ -49,9 +51,12 @@ class Deck(GridContainer):
             col = chr(ord('A') + col)
             row = row + 1
             key = "{}{}".format(col, row)
-            x, y, z = self._children[pos].calibration
+            obj[key] = {}
+            data = copy.deepcopy(self._children[pos]._calibration or {})
+            obj[key]['calibration'] = data
             name = self._children[pos].name
-            obj[key] = {'name': name, 'x': x, 'y': y, 'z': z}
+            if name:
+                obj[key]['name'] = name
         return obj
 
     def load_calibration(self, data):
@@ -59,3 +64,9 @@ class Deck(GridContainer):
             Container = load_container(data[pos]['name'])
             self.add_module(pos, Container())
         self.calibrate(**data)
+
+    def needs_calibration(self, side='A'):
+        """
+        Returns a list of all modules which still require calibration.
+        """
+

@@ -162,6 +162,14 @@ class LiquidInventory():
 
 class LiquidWell(GridItem):
 
+    """
+    This is what you should use if you want to implement the smallest
+    base component capable of keeping track of liquid inventories.
+
+    It's a child of GridItem, so you also get coordinates, assuming it's
+    been initialized within the context of a parent GridContainer.
+    """
+
     _liquid = None
 
     def __init__(self, *args, **kwargs):
