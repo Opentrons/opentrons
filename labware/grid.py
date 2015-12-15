@@ -60,6 +60,17 @@ class GridItem():
     depth = None
     diameter = None
 
+    """
+    We use custom properties to handle situations like tube racks with
+    multiple volumes of tubes.
+
+    This problem might be solved more generally in the future by using custom
+    components (such as tubes and PCR strips) which can be placed into parent
+    grid cells.
+
+    See the initialization method below for more information on how custom
+    properties are used.
+    """
     _custom_properties = None
 
     def __init__(self, parent, position, properties=None):
@@ -115,7 +126,9 @@ class GridContainer():
 
     """
     Depth, diameter and volume are expected by the old-style containers, so 
-    for legacy reasons we have them here.
+    for legacy reasons we have them here, even in cases where these values
+    don't apply (for example, tips have no real depth, reservoir troughs have
+    no diameter).
     """
 
     depth = 0
