@@ -128,7 +128,9 @@ class GridContainer():
     _name = None
 
     """
-    A dict containing tuples of zero-indexed child coordinates.
+    A dict containing tuples of zero-indexed child coordinates as keys and 
+    GridItems (or designated child_class instances) as values.
+
     We only initialize them when they're accessed because until then, there's
     no way to mutate their (non-existent) state.
     """
@@ -168,7 +170,8 @@ class GridContainer():
         w = (self._custom_wells or {}).get((col, row)) or {}
         offset_x = w.get('x') or (self.col_spacing or self.spacing) * col
         offset_y = w.get('y') or (self.row_spacing or self.spacing) * row
-        return (offset_x + self._start_x, offset_y + self._start_y, self._start_z)
+        offset_z = w.get('z') or self._start_z
+        return (offset_x + self._start_x, offset_y + self._start_y, offset_z)
 
     def get_child(self, position):
         key = self._normalize_position(position)
@@ -265,6 +268,10 @@ class GridContainer():
         Provides a mechanism for generating dynamic containers from user
         configuration in which any well can override the default properties
         of wells on the container.
+
+        Wells need to be a dict containing cell coordinates (which will be
+        normalized internally) as keys and tuples containing (x, y, z) as
+        values.
         """
         normalized = {}
         for pos in wells:
