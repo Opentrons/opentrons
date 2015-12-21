@@ -28,3 +28,12 @@ class DeckTest(unittest.TestCase):
         """Raise when accessing out-of-range deck slot."""
         with self.assertRaises(KeyError):
             self.deck.slot('z1')
+
+    def test_custom_calibration_point(self):
+        """ Allow for setting custom calibration points. """
+        self.deck.add_modules(a1=labware.Microplate())
+        plate = self.deck.slot('a1')
+        plate.calibrate(x=1, y=2, z=3)
+        self.assertEqual(plate.well('a1').coordinates(), (1, 2, 3))
+        plate.well('b10').calibrate(4, 5, 6)
+        self.assertEqual(plate.well('b10').coordinates(), (4, 5, 6))
