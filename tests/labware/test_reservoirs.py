@@ -1,5 +1,6 @@
 import unittest
 import labware
+from labware.liquids import LiquidInventory
 
 
 class ReservoirTest(unittest.TestCase):
@@ -115,3 +116,32 @@ class ReservoirWellTest(unittest.TestCase):
         self.row.add_liquid(buffer=1000)
         with self.assertRaises(ValueError):
             self.row.add_liquid(saline=1)
+
+class LiquidDebtTest(unittest.TestCase):
+
+    def setUp(self):
+        LiquidInventory._allow_liquid_debt = True
+        self.reservoir = labware.Reservoir()
+        self.row = self.reservoir.row(1)
+
+    def tearDown(self):
+        LiquidInventory._allow_liquid_debt = False
+
+    def liquid_total_capacity_test(self):
+        """
+        Supports negative liquid capacity.
+        """
+        row1 = self.reservoir.row(1)
+        row2 = self.reservoir.row(2)
+        row1.transfer(1000, row2, name="water")
+        self.assertEqual(row1.get_volume(), -1000)
+        self.assertEqual(row1.get_volume("water"), -1000)
+
+    def liquid_named_debt_test(self):
+        """
+        Only allows for named liquid debt.
+        """
+        with self.assertRaises(Exception):
+            # This shouldn't work because we have no idea what they're
+            # transfering, so it's not very useful to us.
+            row1.transfer(1000, row2)

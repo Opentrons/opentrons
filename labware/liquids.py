@@ -13,6 +13,8 @@ class LiquidInventory():
     min_working_volume = None
     max_working_volume = None
 
+    _allow_liquid_debt = False
+
     """
     A dict containing the liquid key (a user-specified name) along with
     the amount of that particular liquid in this blend.
@@ -39,6 +41,24 @@ class LiquidInventory():
             self.min_working_volume = self.convert_ml(min_working, ml)
         if max_working:
             self.max_working_volume = self.convert_ml(max_working, ml)
+
+    @property
+    def allow_liquid_debt(self):
+        """
+        Whether or not to allow for negative liquid values.
+
+        The easiest way to work backwards to determine starting 
+        solutions is to allow for negative liquid values.
+
+        Also highly dependent on user configuration and operating context
+        and a bunch of other variables as of yet undetermined, probably
+        dependent on container type.
+
+        For now, we'll just manually set it for testing purposes to know
+        that it works.
+        """
+        return self.__class__._allow_liquid_debt
+
 
     def add_liquid(self, ml=False, **kwargs):
         """
@@ -149,13 +169,23 @@ class LiquidInventory():
         # Ensure we have enough total volume to proceed with the
         # request. (Don't worry about working volumes for now.)
         total_volume = self.calculate_total_volume()
-        if (total_volume < amount):
+        if (self._allow_liquid_debt is False and total_volume < amount):
             raise ValueError(
                 "Not enough liquid ({}µl) for transfer ({}µl)."
                 .format(total_volume, amount)
             )
 
-        # Proportion math.
+        if self._allow_liquid_debt and total_volume is 0:
+            if name is None:
+                raise Exception(
+                    "Liquid name required when liquid debt is enabled."
+                )
+            destination.add_named_liquid(amount, name=name)
+            self._contents[name] = amount * -1
+            return  # Skip the rest of the proportion stuff.
+
+        # Proportion math. We want to include an equal proportion of 
+        # all the liquids mixed into this well.
         mix = {}
         liq = self._contents
         for l in liq:
