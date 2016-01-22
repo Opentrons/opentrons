@@ -80,6 +80,14 @@ class LiquidInventory():
             else:
                 self._contents[liquid] = vol
 
+    def add_named_liquid(self, amount, name, ml=False):
+        """
+        Adds a single liquid amount by liquid name.
+        """
+        kwargs = {}
+        kwargs[name] = amount
+        self.add_liquid(ml=ml, **kwargs)
+
     def assert_capacity(self, new_amount, ml=False):
         if not self.max_volume:
             raise ValueError("No maximum liquid amount set for well.")
@@ -132,7 +140,7 @@ class LiquidInventory():
                 .format(key)
             )
 
-    def transfer(self, amount, destination, ml=False):
+    def transfer(self, amount, destination, ml=False, name=None):
         amount = self.convert_ml(amount, ml)
 
         # Ensure there's room in the destination well first.
@@ -153,11 +161,8 @@ class LiquidInventory():
         for l in liq:
             proportion = liq[l] / total_volume
             value      = proportion * amount
-            # TODO: alternate add_liquid syntax for dynamic things like this.
-            kwargs     = {}
-            kwargs[l]  = value
             self._contents[l] = self._contents[l] - value
-            destination.add_liquid(**kwargs)
+            destination.add_named_liquid(value, l)
 
 
 class LiquidWell(GridItem):
@@ -193,6 +198,9 @@ class LiquidWell(GridItem):
     def add_liquid(self, **kwargs):
         self._liquid.add_liquid(**kwargs)
 
+    def add_named_liquid(self, amount, name, **kwargs):
+        self._liquid.add_named_liquid(amount, name, **kwargs)
+
     def get_volume(self, name=None):
         """
         This will return the computed volume of actual liquid in the well.
@@ -209,8 +217,8 @@ class LiquidWell(GridItem):
     def get_proportion(self, liquid):
         return self._liquid.get_proportion(liquid)
 
-    def transfer(self, amount, destination, ml=False):
-        return self._liquid.transfer(amount, destination, ml=ml)
+    def transfer(self, amount, destination, ml=False, name=None):
+        return self._liquid.transfer(amount, destination, ml=ml, name=name)
 
     def assert_capacity(self, amount, ml=False):
         return self._liquid.assert_capacity(amount, ml=ml)

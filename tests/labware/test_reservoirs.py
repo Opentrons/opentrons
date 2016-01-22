@@ -106,6 +106,10 @@ class ReservoirWellTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             row.add_liquid(water=1, ml=True)
 
+    def named_liquid_test(self):
+        self.row.add_named_liquid(100, 'water')
+        self.assertEqual(self.row.get_volume('water'), 100)
+
     def liquid_total_mixture_test(self):
         self.row.allocate(water=20000)
         self.row.add_liquid(buffer=1000)
