@@ -9,7 +9,7 @@ config = {
     'url': 'http://opentrons.com',
     'version': '0.1',
     'install_requires': ['nose', 'pyyaml'],
-    'packages': ['labware'],
+    'packages': ['labware', 'engine'],
     'name': 'opentrons',
     'test_suite': 'nose.collector'
 }
