@@ -1,12 +1,20 @@
 import unittest
-from engine import commands
+from engine.commands import define_argument, syntax, execute
+
+define_argument(
+	'string',
+	'"([^"]*?)"',
+	'Any string, enclosed in double quotes.'
+)
+
+@syntax('<string>')
+def echo(message):
+	""" Print a message to the console. """
+	return 'You wanted to print: '+ message
 
 class CommandTest(unittest.TestCase):
 
 	def test_basic_parsing(self):
-		parsed = commands.parse('echo Hello, world!')
-		expected = {
-		  'command': 'echo',
-		  'message': 'Hello, world!'
-		}
+		parsed = execute('echo "Hello, world!"')
+		expected = 'You wanted to print: Hello, world!'
 		self.assertEqual(expected, parsed)
