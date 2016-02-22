@@ -10,6 +10,8 @@ The virtual robot dispatches commands to the actual robot using low-level
 commands based on calculated absolute coordinates for movements.
 """
 
+from engine import Context
+
 _sessions = {}
 
 def connect(sessionID):
@@ -25,6 +27,9 @@ def close(sessionID):
 
 class Session():
 
+	_sessionID = None
+	_context = None  # Operational context (virtual robot)
+
 	def __init__(self, sessionID):
 		"""
 		Handshake between the server and the client which instantiates a
@@ -32,18 +37,20 @@ class Session():
 		maintaining connection with one particular client.
 		"""
 		self._sessionID = sessionID
+		self._context = Context()
+
 
 	@property
 	def sessionID(self):
 	    return self._sessionID
 	
-	def execute(self, command):
+	def execute(self, command, *args, **kwargs):
 		"""
 		Executes and returns the response of a command.
 
 		Stubbed out for now, obviously.
 		"""
-		return {'sessionID': self.sessionID}
+		return self._context.execute(command, *args, **kwargs)
 
 	def close(self):
 		""" Closes the session and deletes related session object. """
