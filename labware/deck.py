@@ -18,6 +18,8 @@ class Deck(GridContainer):
 
     def add_module(self, position, mod):
         pos = self._normalize_position(position)
+        if isinstance(mod, str):
+            mod = load_container(mod)()
         if pos not in self._children:
             self._children[pos] = mod
             mod.position = position
@@ -42,6 +44,8 @@ class Deck(GridContainer):
     def calibrate(self, **calibration):
         for pos in calibration:
             module = self.slot(pos)
+            if not module:
+                raise AttributeError("No module in slot {}.".format(pos))
             module.calibrate(**calibration[pos])
 
     def dump_calibration(self):

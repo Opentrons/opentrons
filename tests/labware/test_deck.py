@@ -13,6 +13,21 @@ class DeckTest(unittest.TestCase):
         plate = self.deck.slot('a1')
         self.assertTrue(isinstance(plate, labware.Microplate))
 
+    def test_module_add_by_container_name(self):
+        """ Add a module to deck by container name. """
+        self.deck.add_module('a1', 'microplate.96')
+        plate = self.deck.slot('a1')
+        self.assertTrue(isinstance(plate, labware.Microplate))
+
+    def test_modules_add_by_container_name(self):
+        """ Add modules to deck by container name. """
+        self.deck.add_modules(
+            a1='microplate.96',
+            a2='microplate.96.deepwell'
+        )
+        self.assertEqual(self.deck.slot('a1').name, 'microplate.96')
+        self.assertEqual(self.deck.slot('a2').name, 'microplate.96.deepwell')
+
     def test_module_add_to_filled_slot(self):
         """Raise when adding module to filled deck slot."""
         self.deck.add_modules(a1=labware.Microplate())
