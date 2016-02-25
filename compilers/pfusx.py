@@ -1,6 +1,7 @@
 """
 This script takes a 15 nucleotide target sequence for a TALEN protein and 
-outputs an OT-One protocol to assemble it with the pFusX system.
+outputs an OT-One protocol to assemble it with the pFusX system, which
+provides a pre-plated library of RVDs.
 
 Input is a string representing an RVD sequence, whitespace optional, 
 such as:
