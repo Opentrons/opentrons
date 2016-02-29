@@ -56,7 +56,6 @@ class PFUSXTest(unittest.TestCase):
 		self.assertEqual(pfusx.rvd_to_tal(commas), expected)
 		self.assertEqual(pfusx.rvd_to_tal(space_commas), expected)
 
-
 	def test_rvd_invalid_input(self):
 		"""
 		Don't accept invalid RVD sequences.
@@ -66,5 +65,18 @@ class PFUSXTest(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			pfusx.rvd_to_tal("atatatagatataga")  # DNA and not RVD
 
+	def test_tal_sequence(self):
+		""" 
+		Segment TAL sequence.
+		"""
+		result = pfusx.tal_to_codons('ATACCRTCTTATTT')
+		expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TTT']
+		self.assertEqual(result, expected)
 
-		
+	def test_tal_sequence_sixteen(self):
+		"""
+		Segment 16-character TAL sequence.
+		"""
+		result = pfusx.tal_to_codons('ATACCRTCTTATTTA')
+		expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TTTA']
+		self.assertEqual(result, expected)

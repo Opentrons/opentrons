@@ -68,3 +68,18 @@ def rvd_to_tal(string):
 			out.append(translation[code])
 	return ''.join(out)
 
+def tal_to_codons(tal):
+	"""
+	Takes a 15 or 16-character ATGC sequence and outputs an array of five
+	codon sequences after doing validation.
+	"""
+	if re.match(r'[^ACTG]]', tal):  # Content check.
+		raise ValueError("TALEN sequence must be in ACTG form.")
+	if len(tal) not in [15, 16]:  # Length check.
+		raise ValueError("FusX TALEN sequence must be 15 or 16 characters.")
+	sequences = []
+	for n in range(0, 12, 3):  # Chunk into four parts of 3.
+		sequences.append(tal[n:n+3])
+	sequences.append(tal[11:])  # Grab the last 3 or 4 characters.
+	return sequences
+
