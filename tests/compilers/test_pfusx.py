@@ -32,3 +32,39 @@ class PFUSXTest(unittest.TestCase):
 		"""
 		with self.assertRaises(ValueError):
 			pfusx.dna_to_rvd('AXACCGTCTTATTTT')
+
+	def test_rvd_to_tal(self):
+		"""
+		Translate RVD2 to TAL2.
+		"""
+
+		# Various input formats.
+		stripped = 'NIHDNGNNNN'
+		slashes = 'NI/HD/NG/NN/NN'
+		spaces = 'NI HD NG NN NN'
+		dashes = 'NI-HD-NG-NN-NN'
+		commas = 'NI,HD,NG,NN,NN'
+		space_commas = 'NI, HD, NG, NN, NN'
+
+		# Uniform output.
+		expected = 'ACTGG'
+
+		self.assertEqual(pfusx.rvd_to_tal(stripped), expected)
+		self.assertEqual(pfusx.rvd_to_tal(slashes), expected)
+		self.assertEqual(pfusx.rvd_to_tal(spaces), expected)
+		self.assertEqual(pfusx.rvd_to_tal(dashes), expected)
+		self.assertEqual(pfusx.rvd_to_tal(commas), expected)
+		self.assertEqual(pfusx.rvd_to_tal(space_commas), expected)
+
+
+	def test_rvd_invalid_input(self):
+		"""
+		Don't accept invalid RVD sequences.
+		"""
+		with self.assertRaises(ValueError):
+			pfusx.rvd_to_tal("This is not valid input.")
+		with self.assertRaises(ValueError):
+			pfusx.rvd_to_tal("atatatagatataga")  # DNA and not RVD
+
+
+		
