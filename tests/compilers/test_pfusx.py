@@ -80,3 +80,17 @@ class PFUSXTest(unittest.TestCase):
 		result = pfusx.tal_to_codons('ATACCRTCTTATTTA')
 		expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TTTA']
 		self.assertEqual(result, expected)
+
+	def test_fusx_query(self):
+		"""
+		Query FusX database to find the well positions of necessary plasmids.
+		"""
+		# Example from the FusX PHP script at <http://talendesign.org>.
+		rvd = pfusx.rvd_to_tal('NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG')
+		sequences = pfusx.tal_to_codons(rvd)
+		result = pfusx.get_transfers(sequences)
+		expected = [
+			('pFX1', 'E2'), ('pFX2', 'G3'), ('pFX3', 'H7'), ('pFX4', 'D7'),
+			('pB2/B3', 'H12')
+		]
+		self.assertEqual(result, expected)

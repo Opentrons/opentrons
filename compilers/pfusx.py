@@ -16,7 +16,9 @@ Output is a JSON file which represents a protocol that can run on any
 OT-One machine.
 """
 
+import os
 import re
+import sqlite3
 
 def dna_to_rvd(string):
 	"""
@@ -36,7 +38,7 @@ def dna_to_rvd(string):
 			# Apparently for restriction enzymes pyridians need to be more
 			# specific than purines.
 			raise ValueError(
-				"Invalid character: 'Y'; pyrimidines must be specified."
+				"Invalid base: 'Y'; pyrimidines must be specified."
 			)
 		elif c not in translation:
 			raise ValueError("Invalid character: {}".format(c))
@@ -70,16 +72,60 @@ def rvd_to_tal(string):
 
 def tal_to_codons(tal):
 	"""
-	Takes a 15 or 16-character ATGC sequence and outputs an array of five
+	Takes a 15 or 16-base ATGC sequence and outputs an array of five
 	codon sequences after doing validation.
 	"""
 	if re.match(r'[^ACTG]]', tal):  # Content check.
-		raise ValueError("TALEN sequence must be in ACTG form.")
-	if len(tal) not in [15, 16]:  # Length check.
-		raise ValueError("FusX TALEN sequence must be 15 or 16 characters.")
+		raise ValueError("FusX TALEN sequence must be in ACTG form.")
 	sequences = []
 	for n in range(0, 12, 3):  # Chunk into four parts of 3.
 		sequences.append(tal[n:n+3])
-	sequences.append(tal[11:])  # Grab the last 3 or 4 characters.
+	sequences.append(tal[11:])  # Grab the last 2, 3 or 4 bases.
 	return sequences
 
+def get_transfers(sequences):
+	"""
+	Takes an array of five codons and outputs a list of well and plate
+	positions for producing the final recombined plasmid using the
+	FusX system.
+	"""
+	if len(sequences) != 5:
+		raise ValueError("Sequence must be an array of five codons.")
+
+	# We're using a SQL database provided by the FusX team. Important fields
+	# for our purposes are well, plate, rvd_sequence, and plasmid_name.
+	
+	# plasmid_name is a special composite key of a prefix, the codon index,
+	# and the TAL sequence. For example, pFUX1_TTC targets TTC as the first
+	# codon in a sequence of codons. The target codon is redundantly stored
+	# as an RVD sequence, but no field in the table provides the codon
+	# index as a standalone field.
+
+	sql = """
+		SELECT plate, well FROM pFUX_recipe_library
+		WHERE rtrim(rvd_sequence)=? AND plasmid_name=?
+	"""
+
+	queries = []
+	for i, codon in enumerate(sequences):
+		codon_index = i+1
+		if codon_index < 5:
+			plasmid_name = 'pFUX{}_{}'.format(codon_index, codon)
+		else:
+			codon = codon[0:-1] # Ignore the last basepair.
+			plasmid_name = 'pFUSB{}_{}'.format(len(codon), codon)
+		rvd = dna_to_rvd(codon)
+		queries.append((rvd, plasmid_name))
+
+	# Send it to the database.
+	connection = sqlite3.connect(os.path.dirname(__file__)+'/data/pFusX.db')
+	cursor = connection.cursor()
+	results = []
+	for args in queries:
+		cursor.execute(sql, args)
+		result = cursor.fetchone()
+		if not result:
+			raise ValueError("Can't find plasmid named {}.".format(args[1]))
+		results.append(result)
+	return results
+	
