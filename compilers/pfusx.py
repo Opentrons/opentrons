@@ -127,5 +127,6 @@ def get_transfers(sequences):
 		if not result:
 			raise ValueError("Can't find plasmid named {}.".format(args[1]))
 		results.append(result)
+	connection.close()
 	return results
 	
