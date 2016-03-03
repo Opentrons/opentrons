@@ -22,9 +22,12 @@ import yaml
 import inspect
 import json
 
-import labware
+from labsuite import labware
 
-from labware import Microplate, Tiprack, Reservoir, Tuberack
+from .microplates import Microplate
+from .tipracks import Tiprack
+from .reservoirs import Reservoir
+from .tuberacks import Tuberack
 from .grid import GridContainer, normalize_position
 
 # These are the base types that containers can extend from.

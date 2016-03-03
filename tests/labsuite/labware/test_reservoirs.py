@@ -1,17 +1,18 @@
 import unittest
-import labware
-from labware.liquids import LiquidInventory
 
+from labsuite.labware.reservoirs import Reservoir
+from labsuite.labware.liquids import LiquidInventory
+from labsuite.labware.deck import Deck
 
 class ReservoirTest(unittest.TestCase):
 
-    expected_margin = labware.Reservoir.spacing
+    expected_margin = Reservoir.spacing
     offset_x = 10
     offset_y = 11
     offset_z = 12
 
     def setUp(self):
-        self.reservoir = labware.Reservoir()
+        self.reservoir = Reservoir()
         self.reservoir.calibrate(
             x=self.offset_x,
             y=self.offset_y,
@@ -70,7 +71,7 @@ class ReservoirTest(unittest.TestCase):
             }
         }
 
-        deck = labware.Deck(a1=labware.Reservoir())
+        deck = Deck(a1=Reservoir())
         deck.configure(config)
 
         margin = self.expected_margin
@@ -87,7 +88,7 @@ class ReservoirTest(unittest.TestCase):
 class ReservoirWellTest(unittest.TestCase):
 
     def setUp(self):
-        self.reservoir = labware.Reservoir()
+        self.reservoir = Reservoir()
         self.row = self.reservoir.row(1)
 
     def liquid_allocation_test(self):
@@ -121,7 +122,7 @@ class LiquidDebtTest(unittest.TestCase):
 
     def setUp(self):
         LiquidInventory._allow_liquid_debt = True
-        self.reservoir = labware.Reservoir()
+        self.reservoir = Reservoir()
         self.row = self.reservoir.row(1)
 
     def tearDown(self):

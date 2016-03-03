@@ -1,6 +1,6 @@
 import unittest
-from labware import containers
-import labware
+
+from labsuite.labware import containers, microplates, tipracks
 
 import yaml
 
@@ -44,28 +44,28 @@ class ContainerTest(unittest.TestCase):
         Provide access to microplates.
         """
         plate = containers.load_container('microplate')
-        self.assertIs(plate, labware.Microplate)
+        self.assertIs(plate, microplates.Microplate)
 
     def test_microplate_subset(self):
         """
         Provide access to child microplates.
         """
         plate = containers.load_container('microplate.96')
-        self.assertIs(plate, labware.microplates.Microplate)
+        self.assertIs(plate, microplates.Microplate)
 
     def test_microplate_subsubset(self):
         """
         Provide access to subchild microplates.
         """
         plate = containers.load_container('microplate.96.deepwell')
-        self.assertIs(plate, labware.microplates.Microplate_96_Deepwell)
+        self.assertIs(plate, microplates.Microplate_96_Deepwell)
 
     def test_tiprack(self):
         """
         Provide access to tipracks.
         """
         rack = containers.load_container('tiprack')
-        self.assertIs(rack, labware.Tiprack)
+        self.assertIs(rack, tipracks.Tiprack)
 
     def test_custom_container(self):
         """
@@ -73,7 +73,7 @@ class ContainerTest(unittest.TestCase):
         """
         # Example definition lives in config/containers/example.yml
         plate = containers.load_container('microplate.example_plate')
-        self.assertIs(plate, labware.Microplate)
+        self.assertIs(plate, microplates.Microplate)
         self.assertEqual(plate.rows, 12)
         self.assertEqual(plate.cols, 8)
         self.assertEqual(plate.a1_x, 10)
@@ -96,7 +96,7 @@ class ContainerTest(unittest.TestCase):
         Custom container should inherit from Tiprack type.
         """
         rack = containers.load_container('tiprack.example_rack')
-        self.assertIs(rack, labware.Tiprack)
+        self.assertIs(rack, tipracks.Tiprack)
 
     def test_static_coordinates(self):
         """ 

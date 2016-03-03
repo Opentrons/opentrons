@@ -1,5 +1,5 @@
 import unittest
-from engine.session import Session
+from labsuite.engine.session import Session
 
 class CommandTest(unittest.TestCase):
 

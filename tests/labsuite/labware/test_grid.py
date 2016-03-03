@@ -1,5 +1,5 @@
 import unittest
-from labware.grid import normalize_position
+from labsuite.labware.grid import normalize_position
 
 
 class GridTest(unittest.TestCase):

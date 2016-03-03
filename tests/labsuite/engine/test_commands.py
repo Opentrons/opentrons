@@ -1,5 +1,5 @@
 import unittest
-from engine.commands import define_argument, syntax, execute
+from labsuite.engine.commands import define_argument, syntax, execute
 
 define_argument(
 	'string',

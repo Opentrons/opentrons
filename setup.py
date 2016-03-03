@@ -4,13 +4,13 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': "Python implementations of labware.",
+    'description': "A suite of Python libraries for automated scientific protocols.",
     'author': "OpenTrons",
     'url': 'http://opentrons.com',
     'version': '0.1',
     'install_requires': ['nose', 'pyyaml'],
-    'packages': ['labware', 'engine'],
-    'name': 'opentrons',
+    'packages': ['labsuite'],
+    'name': 'labsuite',
     'test_suite': 'nose.collector'
 }
 

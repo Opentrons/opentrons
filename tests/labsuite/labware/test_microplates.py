@@ -1,13 +1,14 @@
 import unittest
-import labware
 
+from labsuite.labware.microplates import Microplate
+from labsuite.labware.deck import Deck
 
 class MicroplateTest(unittest.TestCase):
 
     expected_margin = 9  # ANSI standard.
 
     def setUp(self):
-        self.plate = labware.Microplate()
+        self.plate = Microplate()
         self.plate.calibrate(x=10, y=11, z=12)
 
     def a1_calibration_test(self):
@@ -72,7 +73,7 @@ class MicroplateTest(unittest.TestCase):
             }
         }
 
-        deck = labware.Deck(a1=labware.Microplate())
+        deck = Deck(a1=Microplate())
         deck.configure(config)
 
         margin = self.expected_margin
@@ -89,7 +90,7 @@ class MicroplateTest(unittest.TestCase):
 class MicroplateWellTest(unittest.TestCase):
 
     def setUp(self):
-        self.plate = labware.Microplate()
+        self.plate = Microplate()
         self.well  = self.plate.well('A1')
 
     def liquid_allocation_test(self):

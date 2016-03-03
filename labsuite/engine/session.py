@@ -10,7 +10,7 @@ The virtual robot dispatches commands to the actual robot using low-level
 commands based on calculated absolute coordinates for movements.
 """
 
-from engine import Context
+from labsuite.engine import Context
 
 _sessions = {}
 

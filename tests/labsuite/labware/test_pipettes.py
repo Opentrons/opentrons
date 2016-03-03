@@ -1,5 +1,6 @@
 import unittest
-from labware import Pipette
+
+from labsuite.labware.pipettes import Pipette
 
 class MockPipette(Pipette):
     min_vol = 0

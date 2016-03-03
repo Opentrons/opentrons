@@ -1,13 +1,14 @@
 import unittest
-import labware
 
+from labsuite.labware import tipracks
+from labsuite.labware.deck import Deck
 
 class TiprackTest(unittest.TestCase):
 
     expected_margin = 9  # ANSI standard.
 
     def setUp(self):
-        self.rack = labware.Tiprack()
+        self.rack = tipracks.Tiprack()
         self.rack.calibrate(x=10, y=11, z=12)
 
     def a1_calibration_test(self):
@@ -86,7 +87,7 @@ class TiprackTest(unittest.TestCase):
             }
         }
 
-        deck = labware.Deck(a1=labware.Tiprack())
+        deck = Deck(a1=tipracks.Tiprack())
         deck.configure(config)
 
         margin = self.expected_margin

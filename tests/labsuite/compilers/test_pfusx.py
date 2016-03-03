@@ -1,5 +1,5 @@
 import unittest
-from compilers import pfusx
+from labsuite.compilers import pfusx
 
 class PFUSXTest(unittest.TestCase):
 

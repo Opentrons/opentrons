@@ -12,12 +12,12 @@ will need to be reinstantiated, and all commands will need to be
 reissued.
 """
 
-import labware
+from labsuite.labware import deck
 
 class Context():
 
 	def __init__(self):
-		self.deck = labware.Deck()
+		self.deck = deck.Deck()
 
 	def execute(self, method, *args, **kwargs):
 		"""
