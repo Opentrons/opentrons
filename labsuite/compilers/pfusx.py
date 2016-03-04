@@ -77,19 +77,20 @@ def tal_to_codons(tal):
 	"""
 	if re.match(r'[^ACTG]]', tal):  # Content check.
 		raise ValueError("FusX TALEN sequence must be in ACTG form.")
-	sequences = []
+	codons = []
 	for n in range(0, 12, 3):  # Chunk into four parts of 3.
-		sequences.append(tal[n:n+3])
-	sequences.append(tal[11:])  # Grab the last 2, 3 or 4 bases.
-	return sequences
+		codons.append(tal[n:n+3])
+	codons.append(tal[11:])  # Grab the last 2, 3 or 4 bases.
+	return codons
 
-def get_transfers(sequences):
+def get_plasmid_locations(codons):
 	"""
 	Takes an array of five codons and outputs a list of well and plate
 	positions for producing the final recombined plasmid using the
 	FusX system.
 	"""
-	if len(sequences) != 5:
+
+	if len(codons) != 5:
 		raise ValueError("Sequence must be an array of five codons.")
 
 	# We're using a SQL database provided by the FusX team. Important fields
@@ -107,12 +108,12 @@ def get_transfers(sequences):
 	"""
 
 	queries = []
-	for i, codon in enumerate(sequences):
+	for i, codon in enumerate(codons):
 		codon_index = i+1
 		if codon_index < 5:
 			plasmid_name = 'pFUX{}_{}'.format(codon_index, codon)
 		else:
-			codon = codon[0:-1] # Ignore the last basepair.
+			codon = codon[0:-1] # Ignore last basepair (receiver plasmid).
 			plasmid_name = 'pFUSB{}_{}'.format(len(codon), codon)
 		rvd = dna_to_rvd(codon)
 		queries.append((rvd, plasmid_name))
@@ -126,7 +127,6 @@ def get_transfers(sequences):
 		result = cursor.fetchone()
 		if not result:
 			raise ValueError("Can't find plasmid named {}.".format(args[1]))
-		results.append(result)
+		results.append(result)  # Result is (plate, well)
 	connection.close()
 	return results
-	
