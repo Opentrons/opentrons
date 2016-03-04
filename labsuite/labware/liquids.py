@@ -1,4 +1,4 @@
-from .grid import GridItem
+from labsuite.labware.grid import GridItem
 
 
 class LiquidInventory():

@@ -1,5 +1,5 @@
-from .grid import GridContainer
-from .containers import load_container
+from labsuite.labware.grid import GridContainer
+from labsuite.labware.containers import load_container
 
 import copy
 

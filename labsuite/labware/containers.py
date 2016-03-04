@@ -23,12 +23,11 @@ import inspect
 import json
 
 from labsuite import labware
-
-from .microplates import Microplate
-from .tipracks import Tiprack
-from .reservoirs import Reservoir
-from .tuberacks import Tuberack
-from .grid import GridContainer, normalize_position
+from labsuite.labware.microplates import Microplate
+from labsuite.labware.tipracks import Tiprack
+from labsuite.labware.reservoirs import Reservoir
+from labsuite.labware.tuberacks import Tuberack
+from labsuite.labware.grid import GridContainer, normalize_position
 
 # These are the base types that containers can extend from.
 _typemap = {

@@ -1,5 +1,5 @@
-from .grid import GridContainer
-from .liquids import LiquidWell
+from labsuite.labware.grid import GridContainer
+from labsuite.labware.liquids import LiquidWell
 
 
 class Reservoir(GridContainer):

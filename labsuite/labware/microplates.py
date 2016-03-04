@@ -1,5 +1,5 @@
-from .grid import GridContainer, GridItem
-from .liquids import LiquidWell
+from labsuite.labware.grid import GridContainer, GridItem
+from labsuite.labware.liquids import LiquidWell
 
 
 class Microplate(GridContainer):

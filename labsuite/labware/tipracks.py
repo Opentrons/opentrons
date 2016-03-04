@@ -1,4 +1,4 @@
-from .grid import GridContainer, GridItem
+from labsuite.labware.grid import GridContainer, GridItem
 
 
 class Tiprack(GridContainer):
