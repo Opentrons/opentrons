@@ -134,9 +134,12 @@ def get_fusx_locations(codons):
 
 def get_plasmid_wells(sequence, backbone='DNA'):
 	"""
-	This method takes a string of either RVD or DNA basepairs (15 or 16)
-	and outputs well positions (not plates; those are hard-coded in the
-	template at the moment).
+	Takes a string of either RVD or DNA basepairs (15 or 16), does a 
+	bunch of input normalization and outputs a hash containing well
+	positions for pfusx_[1..5], receiver, and backbone.
+
+	No plate data is necessary at the moment; those are hard-coded in the
+	template.
 	"""
 
 	# Normalize the input, uppercase; no separators, A-Z only.
