@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': "A suite of Python libraries for automated scientific protocols.",
+    'description': "A suite of tools for automated scientific protocols.",
     'author': "OpenTrons",
     'url': 'http://opentrons.com',
     'version': '0.1',
