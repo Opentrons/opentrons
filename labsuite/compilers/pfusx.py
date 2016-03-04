@@ -83,7 +83,7 @@ def tal_to_codons(tal):
 	codons.append(tal[11:])  # Grab the last 2, 3 or 4 bases.
 	return codons
 
-def get_plasmid_locations(codons):
+def get_fusx_locations(codons):
 	"""
 	Takes an array of five codons and outputs a list of well and plate
 	positions for producing the final recombined plasmid using the

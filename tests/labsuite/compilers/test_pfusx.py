@@ -88,7 +88,7 @@ class PFUSXTest(unittest.TestCase):
 		# Example from the FusX PHP script at <http://talendesign.org>.
 		rvd = pfusx.rvd_to_tal('NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG')
 		sequences = pfusx.tal_to_codons(rvd)
-		result = pfusx.get_transfers(sequences)
+		result = pfusx.get_fusx_locations(sequences)
 		expected = [
 			('pFX1', 'E2'), ('pFX2', 'G3'), ('pFX3', 'H7'), ('pFX4', 'D7'),
 			('pB2/B3', 'H12')
