@@ -94,3 +94,17 @@ class PFUSXTest(unittest.TestCase):
 			('pB2/B3', 'H12')
 		]
 		self.assertEqual(result, expected)
+
+	def test_well_locations(self):
+		target = 'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG'
+		result = pfusx.get_plasmid_wells(target)
+		expected = {
+			'pfusx_1': 'E2',
+			'pfusx_2': 'G3',
+			'pfusx_3': 'H7',
+			'pfusx_4': 'D7',
+			'pfusx_5': 'H12',
+			'receiver': 'B12',
+			'backbone': 'C11'
+		}
+		self.assertEqual(result, expected)

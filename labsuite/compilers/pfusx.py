@@ -130,3 +130,60 @@ def get_fusx_locations(codons):
 		results.append(result)  # Result is (plate, well)
 	connection.close()
 	return results
+
+
+def get_plasmid_wells(sequence, backbone='DNA'):
+	"""
+	This method takes a string of either RVD or DNA basepairs (15 or 16)
+	and outputs well positions (not plates; those are hard-coded in the
+	template at the moment).
+	"""
+
+	# Normalize the input, uppercase; no separators, A-Z only.
+	sequence = sequence.upper()
+	sequence = re.sub(r'[^A-Z]+', '', sequence)
+
+	# Normalize to RVD input.
+	if re.match(r'^[ATGCYR]*$', sequence):  # Match: DNA bases.
+		sequence = dna_to_rvd(sequence)
+	elif re.match(r'^[NIHDG]*', sequence):  # Match: RVD bases.
+		sequence = sequence
+	else:
+		raise ValueError("Input must be a sequence of RVD or DNA bases.")
+
+	codons = tal_to_codons(rvd_to_tal(sequence))  # Misdirection, sorry.
+
+	# The receiver plasmid depends on the last basepair of the RVD input
+	# and isn't stored in the provided pFusX database.
+	receiver_map = {
+		'HD': 'A11',
+		'NN': 'A12',
+		'NI': 'B11',
+		'NG': 'B12'
+	}
+
+	# We only actually need well coordinates for these because the plate
+	# names are hard-coded into the pFusX JSON template.
+	well_locs = {}
+
+	# We pull the FusX plasmid locations from the database, five in total.
+	plasmid_locs = get_fusx_locations(codons)
+	for i, loc in enumerate(plasmid_locs):
+		well_locs['pfusx_{}'.format(i+1)] = loc[1]  # Well position.
+
+	# The last basepair of input is the receiver plasmid.
+	receiver_bp = sequence[-2:]
+	well_locs['receiver'] = receiver_map.get(receiver_bp, None)
+	if not well_locs['receiver']:
+		raise ValueError("Invalid receiver: {}".format(receiver_bp))
+
+	# The backbone plasmid varies for DNA expression or RNA expression.
+	backbone = backbone.upper()
+	if backbone == 'DNA':
+		well_locs['backbone'] = 'C11'
+	elif backbone == 'RNA':
+		well_locs['backbone'] = 'C12'
+	else:
+		raise ValueError("Expression backbone must be DNA or RNA.")
+
+	return well_locs
