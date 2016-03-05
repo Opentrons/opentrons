@@ -1,7 +1,10 @@
 """
-This script takes a 15 nucleotide target sequence for a TALEN protein and 
-outputs an OT-One protocol to assemble it with the pFusX system, which
-provides a pre-plated library of RVDs.
+This script takes a 15 nucleotide target sequence followed by a base pair
+representing the receiver plasmid.
+
+It outputs an OT-One protocol to assemble a TALEN protein with the pFusX
+system, which provides a pre-plated library of plasmids and a database
+of well positions for this script to query.
 
 Input is a string representing an RVD sequence, whitespace optional, 
 such as:
@@ -88,6 +91,13 @@ def get_fusx_locations(codons):
 	Takes an array of five codons and outputs a list of well and plate
 	positions for producing the final recombined plasmid using the
 	FusX system.
+
+	Each plasmid chosen depends on the codon and also the index of the
+	codon in the full target sequence.
+
+	This code assumes that the target sequence also includes the 
+	receiver plasmid at the end, and as such discards the last RVD
+	basepair.
 	"""
 
 	if len(codons) != 5:
