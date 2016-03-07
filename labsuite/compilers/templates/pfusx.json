@@ -1,0 +1,92 @@
+{
+    "info": {
+        "name": "Mix.Bio TALEN Protocol (Generated)", 
+        "description": "Mix.Bio TALEN Protocol (Generated)", 
+        "create-date": "Feb 29", 
+        "version": "1.0.1", 
+        "run-notes": "none"
+    }, 
+    "deck": {
+        "p10-rack1": {
+            "labware": "tiprack-10ul"
+        },
+        "p10-rack2": {
+            "labware": "tiprack-10ul"
+        },
+        "p10-rack3": {
+            "labware": "tiprack-10ul"
+        }, 
+        "trash": {
+            "labware": "point"
+        }, 
+        "TALE1": {
+            "labware": "96-pcr-flat"
+        }, 
+        "TALE2": {
+            "labware": "96-pcr-flat"
+        }, 
+        "TALE3": {
+            "labware": "96-pcr-flat"
+        }, 
+        "TALE4": {
+            "labware": "96-pcr-flat"
+        }, 
+        "TALE5": {
+            "labware": "96-pcr-flat"
+        }, 
+        "FusX Output": {
+            "labware": "96-pcr-flat"
+        }, 
+        "Ingredients": {
+            "labware": "96-pcr-flat"
+        }
+    }, 
+    "head": {
+        "p10": {
+            "tip-racks": [
+                {
+                    "container": "p10-rack"
+
+                }
+            ], 
+            "tool": "pipette", 
+            "trash-container": {
+                "container": "trash"
+            }, 
+            "multi-channel": false, 
+            "axis": "a", 
+            "volume": 10, 
+            "down-plunger-speed": 300, 
+            "up-plunger-speed": 500, 
+            "tip-plunge": 6, 
+            "extra-pull-volume": 0, 
+            "extra-pull-delay": 200, 
+            "distribute-percentage": 0.1, 
+            "points": [
+                {
+                    "f1": 1, 
+                    "f2": 1
+                }, 
+                {
+                    "f1": 5, 
+                    "f2": 5
+                }, 
+                {
+                    "f1": 7, 
+                    "f2": 7
+                }, 
+                {
+                    "f1": 10, 
+                    "f2": 10
+                }
+            ]
+        }
+    }, 
+    "ingredients": {}, 
+    "instructions": [
+        {
+            "tool": "p10", 
+            "groups": []
+        }
+    ]
+}

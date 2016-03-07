@@ -21,6 +21,7 @@ OT-One machine.
 
 import os
 import re
+import json
 import sqlite3
 
 def dna_to_rvd(string):
@@ -251,3 +252,80 @@ def _make_transfer(start, end, volume=0, touch=True):
 	args['volume'] = volume
  
 	return transfer
+
+def _format_transfers(sequence, well='A1', backbone='DNA'):
+	"""
+	Creates an array of transfers formatted in the way that the current
+	software's JSON protocol format expects.
+	"""
+
+	output_well = "FusX Output:{}".format(well)
+	plasmids = get_plasmid_wells(sequence, backbone)
+
+	start_mix = [
+		('Ingredients:A1', output_well),  # Buffer
+		('Ingredients:A1', output_well)  # Enzyme (BsmBI)
+	]
+
+	# TAL Plasmid transfers
+	tals = []
+	for n in range(1, 6):  # TALEN plasmids, 1 through 5
+		tals.append(
+			(
+				"TALE{}:{}".format(n, plasmids['pfusx_{}'.format(n)]),
+				output_well, 
+				3
+			)
+		)
+
+	# Backbone and Receiver transfers
+	backbone = [('TALE5:{}'.format(plasmids['backbone']), output_well, 3)]
+	receiver = [('TALE5:{}'.format(plasmids['receiver']), output_well, 3)]
+
+	end_mix = [
+		# Current robot is tempermental about 11µl...
+		("Ingredients:A1", output_well, 6),
+		("Ingredients:A1", output_well, 5)
+	]
+
+	transfers = start_mix + tals + receiver + backbone + end_mix
+
+	group = []  # This is what we're going to inject into the template.
+
+	for t in transfers:
+		group.append(_make_transfer(*t))
+
+	return group
+
+def compile(*sequences):
+	"""
+	Takes a list of sequence arguments (RVD or DNA) and outputs a generated
+	protocol to make plasmids targetting those sequences.
+	"""
+
+	# Limit right now is the number of tips in the static deck map we're
+	# using for this protocol.
+	if len(sequences) > 15:
+		raise ValueError(
+			"This script only supports up to 15 sequences."
+		)
+
+	# Make the transfers for every sequence.
+	transfers = []
+	for n, s in enumerate(sequences):
+		n = n+1
+		if n>12:
+			well = 'B{}'.format(n-12)
+		else:
+			well = 'A{}'.format(n)
+		transfers += _format_transfers(s, well=well)
+
+	# Open up our template and inject the transfers.
+	with open(os.path.dirname(__file__)+'/templates/pfusx.json') as data:
+		protocol = json.load(data)
+
+	protocol['instructions'][0]['groups'] = transfers
+
+	protocol["info"]["description"] = "\n".join(sequences)
+
+	return json.dumps(protocol, indent=4)
