@@ -125,5 +125,172 @@ class PFUSXTest(unittest.TestCase):
 				"blowout": True
 			}]
 		}
-		result = pfusx._make_transfer('FOO:A1', 'BAR:B1', volume=10)
+		result = pfusx._make_transfer('FOO:A1', 'BAR:B1', 10)
+		self.assertEqual(expected, result)
+
+	def test_format_transfers(self):
+		"""
+		Format transfers for JSON protocol 1.0.
+		"""
+
+		seq = 'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG'
+		result = pfusx._format_transfers(seq, well='B2')
+
+		# Sorry, this is long.
+		expected = [{
+			'transfer': [{
+				'volume': 0,
+				'blowout': True,
+				'from': {
+					'location': 'A1',
+					'container': 'Ingredients'
+				},
+				'to': {
+					'location': 'B2',
+					'container': 'FusX Output',
+					'touch-tip': True
+				}
+			}]
+			}, {
+				'transfer': [{
+					'volume': 0,
+					'blowout': True,
+					'from': {
+						'location': 'A1',
+						'container': 'Ingredients'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'E2',
+						'container': 'TALE1'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'G3',
+						'container': 'TALE2'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'H7',
+						'container': 'TALE3'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'D7',
+						'container': 'TALE4'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'H12',
+						'container': 'TALE5'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'B12',
+						'container': 'TALE5'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 3,
+					'blowout': True,
+					'from': {
+						'location': 'C11',
+						'container': 'TALE5'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 6,
+					'blowout': True,
+					'from': {
+						'location': 'A1',
+						'container': 'Ingredients'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+			}, {
+				'transfer': [{
+					'volume': 5,
+					'blowout': True,
+					'from': {
+						'location': 'A1',
+						'container': 'Ingredients'
+					},
+					'to': {
+						'location': 'B2',
+						'container': 'FusX Output',
+						'touch-tip': True
+					}
+				}]
+		}]
+
 		self.assertEqual(expected, result)
