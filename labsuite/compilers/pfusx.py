@@ -201,14 +201,27 @@ def get_plasmid_wells(sequence, backbone='DNA'):
 
 	return well_locs
 
-def _make_transfer(fplate, fwell, tplate, twell, volume=0, touch=True):
+def _make_transfer(start, end, volume=0, touch=True):
 	"""
 	Creates a new transfer object for injection into an instruction group
 	within the OpenTrons JSON Protocol format.
 
 	Code could be simplified; but it's an experiment on how to do it on a
 	more general scale.
+
+	Start and end are strings in <Plate Name>:<Well> format, for example
+	`Ingredients:A1`. You can have spaces in the name.
+
+	We're not doing any normalizing or validation on this yet; be careful!
 	"""
+
+	try:
+		fplate, fwell = start.split(':')
+		tplate, twell = end.split(':')
+	except ValueError:
+		raise ValueError(
+			"Start and end must be in <plate>:<well> format (Plate:A1)."
+		)
 
 	transfer = {
 		"transfer": [{
