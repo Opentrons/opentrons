@@ -201,7 +201,8 @@ def get_plasmid_wells(sequence, backbone='DNA'):
 
 	return well_locs
 
-def _make_transfer(from_plate, from_well, to_plate, to_well, touch=True):
+def _make_transfer(from_plate, from_well, to_plate, to_well, volume=0, touch=True):
+	
 	transfer = {
 		"transfer": [{
 			"from": {
@@ -211,17 +212,22 @@ def _make_transfer(from_plate, from_well, to_plate, to_well, touch=True):
 			"to": {
 				"container": None,
 				"location": None,
-				"touch-tip": touch
+				"touch-tip": None
 			},
 			"volume": None,
 			"blowout": True
 		}]
 	}
+
 	args = transfer["transfer"][0]
+
 	fm = args['from']
 	to = args['to']
 	fm['container'] = from_plate
 	fm['location'] = from_well
 	to['container'] = to_plate
 	to['location'] = to_well
+	to['touch-tip'] = touch
+	args['volume'] = volume
+ 
 	return transfer

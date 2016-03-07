@@ -125,4 +125,5 @@ class PFUSXTest(unittest.TestCase):
 				"blowout": True
 			}]
 		}
-		result = pfusx._make_transfer('FOO', 'A1', 'BAR', 'B1')
+		result = pfusx._make_transfer('FOO', 'A1', 'BAR', 'B1', volume=10)
+		self.assertEqual(expected, result)
