@@ -23,6 +23,7 @@ import os
 import re
 import json
 import sqlite3
+import collections
 
 def dna_to_rvd(string):
 	"""
@@ -322,7 +323,9 @@ def compile(*sequences):
 
 	# Open up our template and inject the transfers.
 	with open(os.path.dirname(__file__)+'/templates/pfusx.json') as data:
-		protocol = json.load(data)
+		protocol = json.JSONDecoder(
+			object_pairs_hook=collections.OrderedDict
+		).decode(data.read())
 
 	protocol['instructions'][0]['groups'] = transfers
 
