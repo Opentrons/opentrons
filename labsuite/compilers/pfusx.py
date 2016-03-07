@@ -201,8 +201,15 @@ def get_plasmid_wells(sequence, backbone='DNA'):
 
 	return well_locs
 
-def _make_transfer(from_plate, from_well, to_plate, to_well, volume=0, touch=True):
-	
+def _make_transfer(fplate, fwell, tplate, twell, volume=0, touch=True):
+	"""
+	Creates a new transfer object for injection into an instruction group
+	within the OpenTrons JSON Protocol format.
+
+	Code could be simplified; but it's an experiment on how to do it on a
+	more general scale.
+	"""
+
 	transfer = {
 		"transfer": [{
 			"from": {
@@ -223,10 +230,10 @@ def _make_transfer(from_plate, from_well, to_plate, to_well, volume=0, touch=Tru
 
 	fm = args['from']
 	to = args['to']
-	fm['container'] = from_plate
-	fm['location'] = from_well
-	to['container'] = to_plate
-	to['location'] = to_well
+	fm['container'] = fplate
+	fm['location'] = fwell
+	to['container'] = tplate
+	to['location'] = twell
 	to['touch-tip'] = touch
 	args['volume'] = volume
  
