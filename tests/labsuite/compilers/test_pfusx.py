@@ -108,3 +108,21 @@ class PFUSXTest(unittest.TestCase):
 			'backbone': 'C11'
 		}
 		self.assertEqual(result, expected)
+
+	def test_make_transfer(self):
+		expected = {
+			"transfer": [{
+				"from": {
+					"container": 'FOO',
+					"location": 'A1'
+				},
+				"to": {
+					"container": 'BAR',
+					"location": "B1",
+					"touch-tip": True
+				},
+				"volume": 10,
+				"blowout": True
+			}]
+		}
+		result = pfusx._make_transfer('FOO', 'A1', 'BAR', 'B1')

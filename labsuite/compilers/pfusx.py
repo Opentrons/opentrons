@@ -200,3 +200,28 @@ def get_plasmid_wells(sequence, backbone='DNA'):
 		raise ValueError("Expression backbone must be DNA or RNA.")
 
 	return well_locs
+
+def _make_transfer(from_plate, from_well, to_plate, to_well, touch=True):
+	transfer = {
+		"transfer": [{
+			"from": {
+				"container": None,
+				"location": None
+			},
+			"to": {
+				"container": None,
+				"location": None,
+				"touch-tip": touch
+			},
+			"volume": None,
+			"blowout": True
+		}]
+	}
+	args = transfer["transfer"][0]
+	fm = args['from']
+	to = args['to']
+	fm['container'] = from_plate
+	fm['location'] = from_well
+	to['container'] = to_plate
+	to['location'] = to_well
+	return transfer
