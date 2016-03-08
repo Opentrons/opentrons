@@ -213,7 +213,6 @@ def _make_transfer_group(*transfers, reuse_tip=False):
 	tip. Good when you're moving one particular mixture, bad when you're
 	mixing different things because it contaminates the tips.
 	"""
-	print(transfers)
 	if reuse_tip:
 		group = { "transfer": [] }
 		for t in transfers:
@@ -320,10 +319,6 @@ def compile(*sequences, output=None):
 			("Ingredients:B1", 'FusX Output:'+well, 5)
 		]
 		well_map[well] = s  # For printing an output map.
-
-	print(buffers)
-	print(tals)
-	print(enzymes)
 
 	# Take our three transfer groups and make them into a consolidated
 	# transfer list.
