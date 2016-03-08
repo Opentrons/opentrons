@@ -227,19 +227,21 @@ def _make_transfer(start, end, volume, touch=True):
 		)
 
 	transfer = {
-		"transfer": [{
-			"from": {
-				"container": None,
-				"location": None
-			},
-			"to": {
-				"container": None,
-				"location": None,
-				"touch-tip": None
-			},
-			"volume": None,
-			"blowout": True
-		}]
+		"transfer": [ 
+			collections.OrderedDict([
+				("from", {
+					"container": None,
+					"location": None
+				}),
+				("to", {
+					"container": None,
+					"location": None,
+					"touch-tip": None
+				}),
+				("volume", None),
+				("blowout", True)
+			])
+		]
 	}
 
 	args = transfer["transfer"][0]
@@ -265,8 +267,7 @@ def _format_transfers(sequence, well='A1', backbone='DNA'):
 	plasmids = get_plasmid_wells(sequence, backbone)
 
 	start_mix = [
-		('Ingredients:A1', output_well, 10),  # Buffer
-		('Ingredients:A1', output_well, 3)  # Enzyme (BsmBI)
+		('Ingredients:A1', output_well, 10)
 	]
 
 	# TAL Plasmid transfers
@@ -284,10 +285,11 @@ def _format_transfers(sequence, well='A1', backbone='DNA'):
 	backbone = [('TALE5:{}'.format(plasmids['backbone']), output_well, 3)]
 	receiver = [('TALE5:{}'.format(plasmids['receiver']), output_well, 3)]
 
+	# Enzyme (BsmBI)
 	end_mix = [
 		# Current robot is tempermental about 11µl...
-		("Ingredients:A1", output_well, 6),
-		("Ingredients:A1", output_well, 5)
+		("Ingredients:B1", output_well, 6),
+		("Ingredients:B1", output_well, 5)
 	]
 
 	transfers = start_mix + tals + receiver + backbone + end_mix
