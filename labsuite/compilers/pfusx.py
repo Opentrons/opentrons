@@ -308,7 +308,7 @@ def compile(*sequences, output=None):
 	# using for this protocol.
 	if len(sequences) > 15:
 		raise ValueError(
-			"This script only supports up to 15 sequences."
+			"FusX compiler only supports up to 15 sequences."
 		)
 
 	# Make the transfers for every sequence.
