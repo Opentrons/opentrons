@@ -322,12 +322,9 @@ def compile(*sequences, output=None):
         # TALs in the middle...
         tals +=  _get_tal_transfers(s, well=well)
         # Enzyme (BsmBI) at the end.
-        enzymes += [
-            # Current robot driver is tempermental about 11µl.
-            ("Ingredients:B1", 'FusX Output:' + well, 6),
-            ("Ingredients:B1", 'FusX Output:' + well, 5)
-        ]
-        well_map[well] = s  # For printing an output map.
+        enzymes += [("Ingredients:B1", 'FusX Output:' + well, 10)]
+        # For printing an output map.
+        well_map[well] = s
 
     # Take our three transfer groups and make them into a consolidated
     # transfer list.
