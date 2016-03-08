@@ -111,176 +111,40 @@ class PFUSXTest(unittest.TestCase):
 		self.assertEqual(result, expected)
 
 	def test_make_transfer(self):
+
 		expected = {
-			"transfer": [{
-				"from": {
-					"container": 'FOO',
-					"location": 'A1'
-				},
-				"to": {
-					"container": 'BAR',
-					"location": "B1",
-					"touch-tip": True
-				},
-				"volume": 10,
-				"blowout": True
-			}]
+			"from": {
+				"container": 'FOO',
+				"location": 'A1'
+			},
+			"to": {
+				"container": 'BAR',
+				"location": "B1",
+				"touch-tip": True
+			},
+			"volume": 10,
+			"blowout": True
 		}
+
 		result = pfusx._make_transfer('FOO:A1', 'BAR:B1', 10)
 		self.assertEqual(expected, result)
 
-	def test_format_transfers(self):
+	def test_tal_transfers(self):
 		"""
-		Format transfers for JSON protocol 1.0.
+		Construct TAL transfers.
 		"""
 
 		seq = 'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG'
-		result = pfusx._format_transfers(seq, well='B2')
+		result = pfusx._get_tal_transfers(seq, well='B2')
 
-		# Sorry, this is long.
-		expected = [{
-			'transfer': [{
-				'volume': 10,
-				'blowout': True,
-				'from': {
-					'location': 'A1',
-					'container': 'Ingredients'
-				},
-				'to': {
-					'location': 'B2',
-					'container': 'FusX Output',
-					'touch-tip': True
-				}
-			}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'E2',
-						'container': 'TALE1'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'G3',
-						'container': 'TALE2'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'H7',
-						'container': 'TALE3'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'D7',
-						'container': 'TALE4'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'H12',
-						'container': 'TALE5'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'B12',
-						'container': 'TALE5'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
-						'location': 'C11',
-						'container': 'TALE5'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 6,
-					'blowout': True,
-					'from': {
-						'location': 'B1',
-						'container': 'Ingredients'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 5,
-					'blowout': True,
-					'from': {
-						'location': 'B1',
-						'container': 'Ingredients'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-		}]
-
-		# Clear out the OrderedDict which will mess up assertion.
-		result = json.loads(json.dumps(result))
+		expected = [
+			('TALE1:E2', 'FusX Output:B2', 3),
+			('TALE2:G3', 'FusX Output:B2', 3),
+			('TALE3:H7', 'FusX Output:B2', 3),
+			('TALE4:D7', 'FusX Output:B2', 3),
+			('TALE5:H12', 'FusX Output:B2', 3),
+			('TALE5:B12', 'FusX Output:B2', 3),
+			('TALE5:C11', 'FusX Output:B2', 3)
+		]
 
 		self.assertEqual(expected, result)

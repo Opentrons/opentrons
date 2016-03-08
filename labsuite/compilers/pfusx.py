@@ -204,13 +204,32 @@ def get_plasmid_wells(sequence, backbone='DNA'):
 
 	return well_locs
 
+def _make_transfer_group(*transfers, reuse_tip=False):
+	"""
+	Takes a bunch of trasfer tuples (start, end, volume) and returns a
+	transfer group formatted for the OT-One protocol.
+
+	If group is set to True, the transfers will be done with a single
+	tip. Good when you're moving one particular mixture, bad when you're
+	mixing different things because it contaminates the tips.
+	"""
+	print(transfers)
+	if reuse_tip:
+		group = { "transfer": [] }
+		for t in transfers:
+			group["transfer"].append(_make_transfer(*t))
+	else:
+		group = []
+		for t in transfers:
+			print(t)
+			group.append({ "transfer": [ _make_transfer(*t) ]})
+	
+	return group
+
 def _make_transfer(start, end, volume, touch=True):
 	"""
 	Creates a new transfer object for injection into an instruction group
 	within the OpenTrons JSON Protocol format.
-
-	Code could be simplified; but it's an experiment on how to do it on a
-	more general scale.
 
 	Start and end are strings in <Plate Name>:<Well> format, for example
 	`Ingredients:A1`. You can have spaces in the name.
@@ -226,49 +245,27 @@ def _make_transfer(start, end, volume, touch=True):
 			"Start and end must be in <plate>:<well> format (Plate:A1)."
 		)
 
-	transfer = {
-		"transfer": [ 
-			collections.OrderedDict([
-				("from", {
-					"container": None,
-					"location": None
-				}),
-				("to", {
-					"container": None,
-					"location": None,
-					"touch-tip": None
-				}),
-				("volume", None),
-				("blowout", True)
-			])
-		]
-	}
+	return collections.OrderedDict([
+		("from", {
+			"container": fplate,
+			"location": fwell
+		}),
+		("to", {
+			"container": tplate,
+			"location": twell,
+			"touch-tip": touch
+		}),
+		("volume", volume),
+		("blowout", True)
+	])
 
-	args = transfer["transfer"][0]
-
-	fm = args['from']
-	to = args['to']
-	fm['container'] = fplate
-	fm['location'] = fwell
-	to['container'] = tplate
-	to['location'] = twell
-	to['touch-tip'] = touch
-	args['volume'] = volume
- 
-	return transfer
-
-def _format_transfers(sequence, well='A1', backbone='DNA'):
+def _get_tal_transfers(sequence, well='A1', backbone='DNA'):
 	"""
-	Creates an array of transfers formatted in the way that the current
-	software's JSON protocol format expects.
+	Creates an array of transfer arguments for a TAL sequence.
 	"""
 
 	output_well = "FusX Output:{}".format(well)
 	plasmids = get_plasmid_wells(sequence, backbone)
-
-	start_mix = [
-		('Ingredients:A1', output_well, 10)
-	]
 
 	# TAL Plasmid transfers
 	tals = []
@@ -285,21 +282,7 @@ def _format_transfers(sequence, well='A1', backbone='DNA'):
 	backbone = [('TALE5:{}'.format(plasmids['backbone']), output_well, 3)]
 	receiver = [('TALE5:{}'.format(plasmids['receiver']), output_well, 3)]
 
-	# Enzyme (BsmBI)
-	end_mix = [
-		# Current robot is tempermental about 11µl...
-		("Ingredients:B1", output_well, 6),
-		("Ingredients:B1", output_well, 5)
-	]
-
-	transfers = start_mix + tals + receiver + backbone + end_mix
-
-	group = []  # This is what we're going to inject into the template.
-
-	for t in transfers:
-		group.append(_make_transfer(*t))
-
-	return group
+	return tals + receiver + backbone
 
 def compile(*sequences, output=None):
 	"""
@@ -315,7 +298,10 @@ def compile(*sequences, output=None):
 		)
 
 	# Make the transfers for every sequence.
-	transfers = []
+	buffers = []
+	tals = []
+	enzymes = []
+
 	well_map = {}
 	for n, s in enumerate(sequences):
 		n = n+1
@@ -323,20 +309,41 @@ def compile(*sequences, output=None):
 			well = 'B{}'.format(n-12)
 		else:
 			well = 'A{}'.format(n)
-		transfers += _format_transfers(s, well=well)
+		# We're going to do all the buffers at the start...
+		buffers += [('Ingredients:A1', 'FusX Output:'+well, 10)]
+		# TALs in the middle...
+		tals +=  _get_tal_transfers(s, well=well)
+		# Enzyme (BsmBI) at the end.
+		enzymes += [
+			# Current robot driver is tempermental about 11µl.
+			("Ingredients:B1", 'FusX Output:'+well, 6),
+			("Ingredients:B1", 'FusX Output:'+well, 5)
+		]
 		well_map[well] = s  # For printing an output map.
+
+	print(buffers)
+	print(tals)
+	print(enzymes)
+
+	# Take our three transfer groups and make them into a consolidated
+	# transfer list.
+	instructions = []
+	instructions.append(_make_transfer_group(*buffers, reuse_tip=True))
+	instructions.append(_make_transfer_group(*tals))
+	instructions.append(_make_transfer_group(*enzymes, reuse_tip=True))
 
 	# Open up our template and inject the transfers.
 	with open(os.path.dirname(__file__)+'/templates/pfusx.json') as data:
 		protocol = json.JSONDecoder(
 			object_pairs_hook=collections.OrderedDict
 		).decode(data.read())
-	
+
+	# Nicely formatted well map for the description.
 	output_map = []
 	for well, seq in well_map.items():
 		output_map.append("{}: {}".format(well, seq))
 
-	protocol['instructions'][0]['groups'] = transfers
+	protocol['instructions'][0]['groups'] = instructions
 	protocol['info']['create-date'] = str(datetime.date.today())
 	protocol['info']['description'] = "; ".join(output_map)
 
