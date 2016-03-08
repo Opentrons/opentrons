@@ -203,7 +203,7 @@ def get_plasmid_wells(sequence, backbone='DNA'):
 
 	return well_locs
 
-def _make_transfer(start, end, volume=0, touch=True):
+def _make_transfer(start, end, volume, touch=True):
 	"""
 	Creates a new transfer object for injection into an instruction group
 	within the OpenTrons JSON Protocol format.
@@ -264,8 +264,8 @@ def _format_transfers(sequence, well='A1', backbone='DNA'):
 	plasmids = get_plasmid_wells(sequence, backbone)
 
 	start_mix = [
-		('Ingredients:A1', output_well),  # Buffer
-		('Ingredients:A1', output_well)  # Enzyme (BsmBI)
+		('Ingredients:A1', output_well, 10),  # Buffer
+		('Ingredients:A1', output_well, 3)  # Enzyme (BsmBI)
 	]
 
 	# TAL Plasmid transfers

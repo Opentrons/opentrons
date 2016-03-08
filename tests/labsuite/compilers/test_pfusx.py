@@ -139,7 +139,7 @@ class PFUSXTest(unittest.TestCase):
 		# Sorry, this is long.
 		expected = [{
 			'transfer': [{
-				'volume': 0,
+				'volume': 10,
 				'blowout': True,
 				'from': {
 					'location': 'A1',
@@ -153,7 +153,7 @@ class PFUSXTest(unittest.TestCase):
 			}]
 			}, {
 				'transfer': [{
-					'volume': 0,
+					'volume': 3,
 					'blowout': True,
 					'from': {
 						'location': 'A1',
