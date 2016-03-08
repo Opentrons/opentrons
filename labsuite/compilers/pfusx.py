@@ -298,7 +298,7 @@ def _format_transfers(sequence, well='A1', backbone='DNA'):
 
 	return group
 
-def compile(*sequences):
+def compile(*sequences, output=None):
 	"""
 	Takes a list of sequence arguments (RVD or DNA) and outputs a generated
 	protocol to make plasmids targetting those sequences.
@@ -331,4 +331,10 @@ def compile(*sequences):
 
 	protocol["info"]["description"] = "\n".join(sequences)
 
-	return json.dumps(protocol, indent=4)
+	compiled = json.dumps(protocol, indent=4)
+
+	if output:
+		with open(output, 'w') as f:
+			f.write(compiled)
+
+	return compiled
