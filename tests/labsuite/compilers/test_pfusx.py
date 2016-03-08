@@ -1,5 +1,6 @@
 import unittest
 from labsuite.compilers import pfusx
+import json
 
 class PFUSXTest(unittest.TestCase):
 
@@ -156,20 +157,6 @@ class PFUSXTest(unittest.TestCase):
 					'volume': 3,
 					'blowout': True,
 					'from': {
-						'location': 'A1',
-						'container': 'Ingredients'
-					},
-					'to': {
-						'location': 'B2',
-						'container': 'FusX Output',
-						'touch-tip': True
-					}
-				}]
-			}, {
-				'transfer': [{
-					'volume': 3,
-					'blowout': True,
-					'from': {
 						'location': 'E2',
 						'container': 'TALE1'
 					},
@@ -268,7 +255,7 @@ class PFUSXTest(unittest.TestCase):
 					'volume': 6,
 					'blowout': True,
 					'from': {
-						'location': 'A1',
+						'location': 'B1',
 						'container': 'Ingredients'
 					},
 					'to': {
@@ -282,7 +269,7 @@ class PFUSXTest(unittest.TestCase):
 					'volume': 5,
 					'blowout': True,
 					'from': {
-						'location': 'A1',
+						'location': 'B1',
 						'container': 'Ingredients'
 					},
 					'to': {
@@ -292,5 +279,8 @@ class PFUSXTest(unittest.TestCase):
 					}
 				}]
 		}]
+
+		# Clear out the OrderedDict which will mess up assertion.
+		result = json.loads(json.dumps(result))
 
 		self.assertEqual(expected, result)
