@@ -14,44 +14,46 @@ from labsuite.engine import Context
 
 _sessions = {}
 
+
 def connect(sessionID):
-	""" Starts a session or reconnects to a previously started session. """
-	if sessionID not in _sessions:
-		_sessions[sessionID] = Session(sessionID)
-	return _sessions[sessionID]
+    """ Starts a session or reconnects to a previously started session. """
+    if sessionID not in _sessions:
+        _sessions[sessionID] = Session(sessionID)
+    return _sessions[sessionID]
+
 
 def close(sessionID):
-	""" Closes a session based on sessionID. """
-	if sessionID in _sessions:
-		_sessions[sessionID].close()
+    """ Closes a session based on sessionID. """
+    if sessionID in _sessions:
+        _sessions[sessionID].close()
+
 
 class Session():
 
-	_sessionID = None
-	_context = None  # Operational context (virtual robot)
+    _sessionID = None
+    _context = None  # Operational context (virtual robot)
 
-	def __init__(self, sessionID):
-		"""
-		Handshake between the server and the client which instantiates a
-		virtual robot to keep track of the state of the robot, while 
-		maintaining connection with one particular client.
-		"""
-		self._sessionID = sessionID
-		self._context = Context()
+    def __init__(self, sessionID):
+        """
+        Handshake between the server and the client which instantiates a
+        virtual robot to keep track of the state of the robot, while
+        maintaining connection with one particular client.
+        """
+        self._sessionID = sessionID
+        self._context = Context()
 
+    @property
+    def sessionID(self):
+        return self._sessionID
 
-	@property
-	def sessionID(self):
-	    return self._sessionID
-	
-	def execute(self, command, *args, **kwargs):
-		"""
-		Executes and returns the response of a command.
+    def execute(self, command, *args, **kwargs):
+        """
+        Executes and returns the response of a command.
 
-		Stubbed out for now, obviously.
-		"""
-		return self._context.execute(command, *args, **kwargs)
+        Stubbed out for now, obviously.
+        """
+        return self._context.execute(command, *args, **kwargs)
 
-	def close(self):
-		""" Closes the session and deletes related session object. """
-		del _sessions[self.sessionID]
+    def close(self):
+        """ Closes the session and deletes related session object. """
+        del _sessions[self.sessionID]
