@@ -24,6 +24,7 @@ import re
 import json
 import sqlite3
 import collections
+import datetime
 
 def dna_to_rvd(string):
 	"""
@@ -313,6 +314,7 @@ def compile(*sequences, output=None):
 
 	# Make the transfers for every sequence.
 	transfers = []
+	well_map = {}
 	for n, s in enumerate(sequences):
 		n = n+1
 		if n>12:
@@ -320,16 +322,21 @@ def compile(*sequences, output=None):
 		else:
 			well = 'A{}'.format(n)
 		transfers += _format_transfers(s, well=well)
+		well_map[well] = s  # For printing an output map.
 
 	# Open up our template and inject the transfers.
 	with open(os.path.dirname(__file__)+'/templates/pfusx.json') as data:
 		protocol = json.JSONDecoder(
 			object_pairs_hook=collections.OrderedDict
 		).decode(data.read())
+	
+	output_map = []
+	for well, seq in well_map.items():
+		output_map.append("{}: {}".format(well, seq))
 
 	protocol['instructions'][0]['groups'] = transfers
-
-	protocol["info"]["description"] = "\n".join(sequences)
+	protocol['info']['create-date'] = str(datetime.date.today())
+	protocol['info']['description'] = "; ".join(output_map)
 
 	compiled = json.dumps(protocol, indent=4)
 
