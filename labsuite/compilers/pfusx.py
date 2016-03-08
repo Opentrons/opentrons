@@ -23,8 +23,9 @@ import os
 import re
 import json
 import sqlite3
-import collections
 import datetime
+
+from collections import OrderedDict
 
 def dna_to_rvd(string):
 	"""
@@ -244,16 +245,16 @@ def _make_transfer(start, end, volume, touch=True):
 			"Start and end must be in <plate>:<well> format (Plate:A1)."
 		)
 
-	return collections.OrderedDict([
-		("from", {
-			"container": fplate,
-			"location": fwell
-		}),
-		("to", {
-			"container": tplate,
-			"location": twell,
-			"touch-tip": touch
-		}),
+	return OrderedDict([
+		("from", OrderedDict([
+			("container", fplate),
+			("location", fwell)
+		])),
+		("to", OrderedDict([
+			("container", tplate),
+			("location", twell),
+			("touch-tip", touch)
+		])),
 		("volume", volume),
 		("blowout", True)
 	])
@@ -330,7 +331,7 @@ def compile(*sequences, output=None):
 	# Open up our template and inject the transfers.
 	with open(os.path.dirname(__file__)+'/templates/pfusx.json') as data:
 		protocol = json.JSONDecoder(
-			object_pairs_hook=collections.OrderedDict
+			object_pairs_hook=OrderedDict
 		).decode(data.read())
 
 	# Nicely formatted well map for the description.
