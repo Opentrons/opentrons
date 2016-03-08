@@ -326,7 +326,7 @@ def compile(*sequences, output=None):
 	instructions = []
 	instructions.append(_make_transfer_group(*buffers, reuse_tip=True))
 	instructions.append(_make_transfer_group(*tals))
-	instructions.append(_make_transfer_group(*enzymes, reuse_tip=True))
+	instructions.append(_make_transfer_group(*enzymes))
 
 	# Open up our template and inject the transfers.
 	with open(os.path.dirname(__file__)+'/templates/pfusx.json') as data:
