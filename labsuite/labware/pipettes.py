@@ -12,8 +12,8 @@ class Pipette():
     _axis = 'A'
 
     _points = [
-        {'f1': 1, 'f2': 1 },
-        {'f1': 2000, 'f2': 2000 }
+        {'f1': 1, 'f2': 1},
+        {'f1': 2000, 'f2': 2000}
     ]
 
     _tip_plunge = 6  # Distance from calibrated top of tiprack to pickup tip.
@@ -21,7 +21,7 @@ class Pipette():
     def calibrate(self, top=None, blowout=None, droptip=None, axis='A'):
         """Set calibration values for the pipette plunger.
 
-        This can be called multiple times as the user sets each value, 
+        This can be called multiple times as the user sets each value,
         or you can set them all at once.
 
         Parameters
@@ -81,10 +81,10 @@ class Pipette():
 
         # Find the correct point.
         points = sorted(self._points, key=lambda a: a['f1'])
-        for i in range(len(points)-1):
-            if volume >= points[i]['f1'] and volume <= points[i+1]['f1']:
+        for i in range(len(points) - 1):
+            if volume >= points[i]['f1'] and volume <= points[i + 1]['f1']:
                 p1 = points[i]
-                p2 = points[i+1]
+                p2 = points[i + 1]
                 break
 
         if not (p1 and p2):

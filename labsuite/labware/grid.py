@@ -1,5 +1,6 @@
 from math import floor
 
+
 def normalize_position(position):
     """
     Normalizes a coordinate (A1, B12, etc) into a tuple.
@@ -133,7 +134,7 @@ class GridItem():
 
     def _get_calibration(self, instrument):
         """
-        DO NOT USE THIS; it's likely to change dramatically in future 
+        DO NOT USE THIS; it's likely to change dramatically in future
         releases as instruments become first-class citizens within the
         library.
         """
@@ -152,6 +153,7 @@ class GridItem():
         y = c.get('y', py)
         z = c.get('z', pz)
         return (x, y, z)
+
 
 class GridContainer():
 
@@ -188,7 +190,7 @@ class GridContainer():
     a1_y = 0
 
     """
-    Depth, diameter and volume are expected by the old-style containers, so 
+    Depth, diameter and volume are expected by the old-style containers, so
     for legacy reasons we have them here, even in cases where these values
     don't apply (for example, tips have no real depth, reservoir troughs have
     no diameter).
@@ -204,7 +206,7 @@ class GridContainer():
     _name = None
 
     """
-    A dict containing tuples of zero-indexed child coordinates as keys and 
+    A dict containing tuples of zero-indexed child coordinates as keys and
     GridItems (or designated child_class instances) as values.
 
     We only initialize them when they're accessed because until then, there's
@@ -250,7 +252,7 @@ class GridContainer():
         Ensures the existence of and returns calibration object for a given
         instrument.
 
-        DO NOT USE THIS; it's likely to change dramatically in future 
+        DO NOT USE THIS; it's likely to change dramatically in future
         releases as instruments become first-class citizens within the
         library.
 
@@ -263,7 +265,6 @@ class GridContainer():
             self._calibration[instrument] = {}
 
         return self._calibration[instrument]
-
 
     def get_child_coordinates(self, position, instrument='primary'):
         """
@@ -281,7 +282,7 @@ class GridContainer():
         offset_x = w.get('x') or (self.col_spacing or self.spacing) * col
         offset_y = w.get('y') or (self.row_spacing or self.spacing) * row
         # We don't do any dynamic offset for Z because all our labware is
-        # flat at the moment. Edge cases can be handled by manually 
+        # flat at the moment. Edge cases can be handled by manually
         # calibrating specific child positions.
         offset_z = w.get('z') or start_z
         return (offset_x + start_x, offset_y + start_y, offset_z)
@@ -316,20 +317,20 @@ class GridContainer():
             raise Exception("No maximum row number provided.")
         if self.cols is None:
             raise Exception("No maximum column number provided.")
-        if self.rows and (row+1 > self.rows):  # Normalized row is zero-indexed
+        if self.rows and (row + 1 > self.rows):  # row is zero-indexed
             raise KeyError(
                 "Row #{} out of range (max is {}).".format(row, self.rows)
             )
-        if self.cols and col+1 > self.cols:  # Normalized col is zero-indexed
+        if self.cols and col + 1 > self.cols:  # col is zero-indexed
             raise KeyError(
                 "Column {} out of range (max is {})."
-                .format(chr(col+ord('A')), chr(self.cols-1+ord('A')))
+                .format(chr(col + ord('A')), chr(self.cols - 1 + ord('A')))
             )
         return (col, row)
 
     def _get_calibration(self, instrument):
         """
-        DO NOT USE THIS; it's likely to change dramatically in future 
+        DO NOT USE THIS; it's likely to change dramatically in future
         releases as instruments become first-class citizens within the
         library.
         """
@@ -347,7 +348,7 @@ class GridContainer():
         hasn't.
 
         Knowing whether or not the container has been calibrated
-        is essential for determining whether given coordinates are 
+        is essential for determining whether given coordinates are
         absolute to the deck or relative to the container.
         """
         data = self._get_calibration(instrument)
@@ -359,7 +360,7 @@ class GridContainer():
         y = cal.get('y', 0)
         z = cal.get('z', 0)
         return (x, y, z)
-    
+
     @property
     def name(self):
         return self._name or self.__class__.__name__.lower().replace('_', '.')

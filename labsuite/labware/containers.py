@@ -34,7 +34,7 @@ _typemap = {
     'grid': GridContainer,
     'tiprack': Tiprack,
     'microplate': Microplate,
-    'reservoir': Reservoir, 
+    'reservoir': Reservoir,
     'legacy': Microplate,
     'tuberack': Tuberack
 }
@@ -43,7 +43,7 @@ _typemap = {
 # TODO: Define this on each container type.
 _valid_properties = [
     'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'height', 'length', 'width',
-    'volume', 'min_vol', 'max_vol', 'well_depth', 'row_spacing', 
+    'volume', 'min_vol', 'max_vol', 'well_depth', 'row_spacing',
     'col_spacing', 'diameter', 'legacy_name', 'custom_wells', 'depth'
 ]
 
@@ -57,6 +57,7 @@ _container_modules = [
 
 _containers = {}
 
+
 def _get_container_filepath(name):
     """
     Given a name such as "microplate/24", this function will return the full
@@ -64,11 +65,12 @@ def _get_container_filepath(name):
     """
     base = os.path.join(os.getcwd(), 'config/containers')
     path = name.strip().split('/')
-    fname = path.pop()+'.yml'
+    fname = path.pop() + '.yml'
     path = os.path.join(base, os.path.join(*path or []))
     if not os.path.exists(path):
         os.makedirs(path)
     fpath = os.path.join(path, fname)
+
 
 def load_custom_containers(folder=None):
     """
@@ -83,7 +85,7 @@ def load_custom_containers(folder=None):
     "microplate.foo" for reference purposes within JSON Protocols
     and other parts of the system.
 
-    If a container name is reused, the old container will be 
+    If a container name is reused, the old container will be
     replaced.
     """
     # Default to local library configuration.
@@ -102,10 +104,11 @@ def load_custom_containers(folder=None):
         elif os.path.isdir(full_path):
             load_custom_containers(full_path)
 
+
 def load_legacy_containers_file(path=None):
     """
     Takes a path to the old-school containers.json file (or defaults
-    to the one in config/containers/legacy_containers.json) and 
+    to the one in config/containers/legacy_containers.json) and
     adds each container to the list of supported containers under the
     legacy namespace.
     """
@@ -118,7 +121,8 @@ def load_legacy_containers_file(path=None):
 
     for k in containers:
         data = convert_legacy_container(containers[k])
-        add_custom_container(data, 'legacy.'+k)
+        add_custom_container(data, 'legacy.' + k)
+
 
 def _load_default_containers():
     """
@@ -246,8 +250,8 @@ def load_container(name):
     """
     if name in _containers:
         return _containers[name]
-    elif 'legacy.'+name in _containers:
-        return _containers['legacy.'+name]
+    elif 'legacy.' + name in _containers:
+        return _containers['legacy.' + name]
     raise KeyError(
         "Invalid container name {}.  Valid containers: {}"
         .format(name, ", ".join(list_containers()))
@@ -289,16 +293,16 @@ def generate_legacy_container(container_name, format=False):
 
     if format is True:
         print('"{}": {{'.format(container_name))
-        print('\t"origin-offset": ', json.dumps(data['origin-offset'])+',')
+        print('\t"origin-offset": ', json.dumps(data['origin-offset']) + ',')
 
     locs = {}
 
     if format is True:
         print('\t"locations": {')
     for col in range(0, container.cols):
-        for row in range(1, container.rows+1):
+        for row in range(1, container.rows + 1):
             loc = []
-            pos = '{}{}'.format(chr(col+ord('A')), row)
+            pos = '{}{}'.format(chr(col + ord('A')), row)
             (x, y, z) = container.calculate_offset(pos)
             locs[pos] = {
                 'x': round(x, 2),
@@ -309,7 +313,7 @@ def generate_legacy_container(container_name, format=False):
                 'total-liquid-volume': container.volume
             }
             if format is True:
-                print('\t\t"{}":'.format(pos), json.dumps(locs[pos])+',')
+                print('\t\t"{}":'.format(pos), json.dumps(locs[pos]) + ',')
 
     if format is True:
         print("\t}")
@@ -330,7 +334,7 @@ def legacy_json_to_yaml(containers=None, path=None, interactive=False):
     its JSON parsed.
 
     If you put it into interactive mode, it will prompt you to provide new
-    file paths (relative to config/containers) for each container and 
+    file paths (relative to config/containers) for each container and
     automatically save them.
     """
 
@@ -355,7 +359,7 @@ def legacy_json_to_yaml(containers=None, path=None, interactive=False):
             f.write(yaml)
             print("Saved to {}:".format(fpath))
             print(yaml)
-            yaml = "" # Flush
+            yaml = ""  # Flush
 
     return yaml
 
@@ -365,7 +369,7 @@ def container_to_yaml(container, legacy_name=None):
     # Pretty-print this because we're going to be maintaining them.
     key_order = [
         # Empty array values will insert a new line. ¯\_(ツ)_/¯
-        'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'col_spacing', 
+        'rows', 'cols', 'a1_x', 'a1_y', 'spacing', 'col_spacing',
         'row_spacing', None, 'height', 'diameter',
         'depth', None, 'volume', None
     ]
@@ -379,7 +383,7 @@ def container_to_yaml(container, legacy_name=None):
             value = getattr(container, key)
             if value is not None:
                 yaml = yaml + "{}: {}\n".format(key, value)
-    
+
     if legacy_name:
         yaml = yaml + "legacy_name: {}".format(json.dumps(legacy_name))
 
@@ -420,7 +424,7 @@ def convert_legacy_container(container):
 
     max_col, max_row = normalize_position(max(wells.keys()))
 
-    out['rows'] = max_row + 1 
+    out['rows'] = max_row + 1
     out['cols'] = max_col + 1
 
     return out

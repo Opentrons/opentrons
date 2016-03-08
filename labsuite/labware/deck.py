@@ -3,6 +3,7 @@ from labsuite.labware.containers import load_container
 
 import copy
 
+
 class Deck(GridContainer):
 
     rows = 3
@@ -73,4 +74,3 @@ class Deck(GridContainer):
         """
         Returns a list of all modules which still require calibration.
         """
-

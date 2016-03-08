@@ -33,7 +33,7 @@ class Tiprack(GridContainer):
         Returns the number of tips used so far in this tiprack.
         """
         return self._used + 1
-    
+
     def get_next_tip(self, tag=None):
         """
         Returns the next tip in the sequence. If a tag is passed, that tag

@@ -47,7 +47,7 @@ class LiquidInventory():
         """
         Whether or not to allow for negative liquid values.
 
-        The easiest way to work backwards to determine starting 
+        The easiest way to work backwards to determine starting
         solutions is to allow for negative liquid values.
 
         Also highly dependent on user configuration and operating context
@@ -58,7 +58,6 @@ class LiquidInventory():
         that it works.
         """
         return self.__class__._allow_liquid_debt
-
 
     def add_liquid(self, ml=False, **kwargs):
         """
@@ -184,7 +183,7 @@ class LiquidInventory():
             self._contents[name] = amount * -1
             return  # Skip the rest of the proportion stuff.
 
-        # Proportion math. We want to include an equal proportion of 
+        # Proportion math. We want to include an equal proportion of
         # all the liquids mixed into this well.
         mix = {}
         liq = self._contents
