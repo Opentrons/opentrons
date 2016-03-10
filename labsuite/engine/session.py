@@ -49,8 +49,6 @@ class Session():
     def execute(self, command, *args, **kwargs):
         """
         Executes and returns the response of a command.
-
-        Stubbed out for now, obviously.
         """
         return self._context.execute(command, *args, **kwargs)
 
