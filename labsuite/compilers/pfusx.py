@@ -325,6 +325,11 @@ def compile(*sequences, output=None):
         # For printing an output map.
         well_map[well] = s
 
+    # Nicely formatted well map for the description.
+    output_map = []
+    for well, seq in well_map.items():
+        output_map.append("{}: {}".format(well, seq))
+
     # Take our three transfer groups and make them into a consolidated
     # transfer list.
     instructions = []
@@ -337,11 +342,6 @@ def compile(*sequences, output=None):
         protocol = json.JSONDecoder(
             object_pairs_hook=OrderedDict
         ).decode(data.read())
-
-    # Nicely formatted well map for the description.
-    output_map = []
-    for well, seq in well_map.items():
-        output_map.append("{}: {}".format(well, seq))
 
     protocol['instructions'][0]['groups'] = instructions
     protocol['info']['create-date'] = str(datetime.date.today())
