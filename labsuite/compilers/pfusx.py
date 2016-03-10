@@ -226,7 +226,6 @@ def _make_transfer_group(*transfers, reuse_tip=False):
     else:
         group = []
         for t in transfers:
-            print(t)
             group.append({"transfer": [_make_transfer(*t)]})
 
     return group
