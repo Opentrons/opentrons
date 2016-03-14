@@ -6,7 +6,7 @@ compiler modules in this directory.
 
 For example, you can do:
 
-    python compile.py pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
+    python compiler.py pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
 
 It works because there's a pfusx.py file with a compile method.
 
@@ -15,11 +15,11 @@ JSON file, which will then be printed to the console.
 
 To save a protocol to a file, you can do something like this:
 
-    python compile.py my_compiler some_input > filename.json
+    python compiler.py my_compiler some_input > filename.json
 
 You can read from a file and output to another file like this:
 
-    python input.txt | compile.py my_compiler > filename.json
+    python input.txt | python compiler.py my_compiler > filename.json
 
 """
 
