@@ -297,7 +297,7 @@ def compile(*sequences, output=None):
     Takes a list of sequence arguments (RVD or DNA) and outputs a generated
     protocol to make plasmids targetting those sequences.
     """
-    
+
     # Limit right now is the number of tips in the static deck map we're
     # using for this protocol.
     if len(sequences) > 15:
@@ -320,7 +320,10 @@ def compile(*sequences, output=None):
         # We're going to do all the buffers at the start...
         buffers += [('Ingredients:A1', 'FusX Output:' + well, 10)]
         # TALs in the middle...
-        tals +=  _get_tal_transfers(s, well=well)
+        try:
+            tals +=  _get_tal_transfers(s, well=well)
+        except ValueError as e:
+            raise ValueError("Sequence #{}: {}".format(n, e))
         # Enzyme (BsmBI) at the end.
         enzymes += [("Ingredients:B1", 'FusX Output:' + well, 10)]
         # For printing an output map.
