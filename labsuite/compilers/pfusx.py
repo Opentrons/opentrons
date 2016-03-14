@@ -19,6 +19,7 @@ Output is a JSON file which represents a protocol that can run on any
 OT-One machine.
 """
 
+import sys
 import os
 import re
 import json
@@ -296,7 +297,7 @@ def compile(*sequences, output=None):
     Takes a list of sequence arguments (RVD or DNA) and outputs a generated
     protocol to make plasmids targetting those sequences.
     """
-
+    
     # Limit right now is the number of tips in the static deck map we're
     # using for this protocol.
     if len(sequences) > 15:
@@ -328,7 +329,7 @@ def compile(*sequences, output=None):
     # Nicely formatted well map for the description.
     output_map = []
     for well in sorted(well_map):
-        output_map.append("{}: {}".format(well_map[well]))
+        output_map.append("{}: {}".format(well, well_map[well]))
 
     # Take our three transfer groups and make them into a consolidated
     # transfer list.
