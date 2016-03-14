@@ -161,18 +161,6 @@ def get_plasmid_wells(sequence, backbone='DNA'):
     template.
     """
 
-    # Normalize the input, uppercase; no separators, A-Z only.
-    sequence = sequence.upper()
-    sequence = re.sub(r'[^A-Z]+', '', sequence)
-
-    # Normalize to RVD input.
-    if re.match(r'^[ATGCYR]*$', sequence):  # Match: DNA bases.
-        sequence = dna_to_rvd(sequence)
-    elif re.match(r'^[NIHDG]*', sequence):  # Match: RVD bases.
-        sequence = sequence
-    else:
-        raise ValueError("Input must be a sequence of RVD or DNA bases.")
-
     codons = tal_to_codons(rvd_to_tal(sequence))  # Misdirection, sorry.
 
     # The receiver plasmid depends on the last basepair of the RVD input
@@ -292,11 +280,35 @@ def _get_tal_transfers(sequence, well='A1', backbone='DNA'):
     return tals + receiver + backbone
 
 
+def _normalize_sequence(sequence):
+    """
+    Validate and normalize input sequences to RVD.
+    """
+
+    # Uppercase; no separators, A-Z only.
+    sequence = sequence.upper()
+    sequence = re.sub(r'[^A-Z]+', '', sequence)
+
+    # Normalize to RVD input.
+    if re.match(r'^[ATGCYR]*$', sequence):  # Match: DNA bases.
+        sequence = dna_to_rvd(sequence)
+    elif re.match(r'^[NIHDG]*$', sequence):  # Match: RVD bases.
+        sequence = sequence
+    else:
+        raise ValueError("Input must be a sequence of RVD or DNA bases.")
+
+    if len(sequence) not in [32, 30]:
+        raise ValueError("Sequence must be 15 RNA or DNA bases.")
+
+    return sequence
+
 def compile(*sequences, output=None):
     """
     Takes a list of sequence arguments (RVD or DNA) and outputs a generated
     protocol to make plasmids targetting those sequences.
     """
+
+    sequences = list(sequences)
 
     # Limit right now is the number of tips in the static deck map we're
     # using for this protocol.
@@ -305,13 +317,21 @@ def compile(*sequences, output=None):
             "FusX compiler only supports up to 15 sequences."
         )
 
+    # Argument normalization.
+    normalized = []
+    for i, s in enumerate(sequences):
+        try:
+            normalized.append(_normalize_sequence(s))
+        except ValueError as e:
+            raise ValueError("Sequence #{}: {}".format(i + 1, e))
+
     # Make the transfers for every sequence.
     buffers = []
     tals = []
     enzymes = []
 
     well_map = {}
-    for n, s in enumerate(sequences):
+    for n, s in enumerate(normalized):
         n = n + 1
         if n > 12:
             well = 'B{}'.format(n - 12)
@@ -320,14 +340,11 @@ def compile(*sequences, output=None):
         # We're going to do all the buffers at the start...
         buffers += [('Ingredients:A1', 'FusX Output:' + well, 10)]
         # TALs in the middle...
-        try:
-            tals +=  _get_tal_transfers(s, well=well)
-        except ValueError as e:
-            raise ValueError("Sequence #{}: {}".format(n, e))
+        tals +=  _get_tal_transfers(s, well=well)
         # Enzyme (BsmBI) at the end.
         enzymes += [("Ingredients:B1", 'FusX Output:' + well, 10)]
         # For printing an output map.
-        well_map[well] = s
+        well_map[well] = sequences[n - 1]  # Map to original input.
 
     # Nicely formatted well map for the description.
     output_map = []
