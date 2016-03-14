@@ -327,8 +327,8 @@ def compile(*sequences, output=None):
 
     # Nicely formatted well map for the description.
     output_map = []
-    for well, seq in well_map.items():
-        output_map.append("{}: {}".format(well, seq))
+    for well in sorted(well_map):
+        output_map.append("{}: {}".format(well_map[well]))
 
     # Take our three transfer groups and make them into a consolidated
     # transfer list.
