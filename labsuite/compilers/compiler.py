@@ -81,7 +81,7 @@ if __name__ == "__main__":
     elif ',' in data:
         data = data.split(',')
     else:
-        data = data
+        data = [data]
 
     try:
         print(compile(compiler, data))
