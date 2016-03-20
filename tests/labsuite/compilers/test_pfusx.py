@@ -148,3 +148,41 @@ class PFUSXTest(unittest.TestCase):
 		]
 
 		self.assertEqual(expected, result)
+
+	def test_compile_dna(self):
+		"""
+		Should compile single DNA sequence.
+		"""
+		text = pfusx.compile('ATACCGTCTTATTTT')
+		json.loads(text)
+
+	def test_compile_multi_dna(self):
+		"""
+		Should compile multiple DNA sequences.
+		"""
+		text = pfusx.compile('ATACCGTCTTATTTT', 'ATACCGTCTTATTTA')
+		json.loads(text)
+
+	def test_compile_short_dna_input(self):
+		"""
+		Compiler should return error on short input.
+		"""
+		with self.assertRaises(ValueError):
+			pfusx.compile('GATTACA')
+
+	def test_compile_invalid_sequence(self):
+		"""
+		Compiler validates input.
+		"""
+		with self.assertRaises(ValueError):
+			pfusx.compile("Cats with laser eyes.")
+
+	def test_compile_dna_rvd_mix(self):
+		"""
+		Compile DNA and RVD mixture.
+		"""
+		text = pfusx.compile(
+			'NI NN NN NN HD NG NI NI NG NN NI NG NI NN NG',
+			'ATACCGTCTTATTTT'
+		)
+		json.loads(text)
