@@ -291,7 +291,7 @@ def _normalize_sequence(sequence):
 
     # Normalize to RVD input.
     if re.match(r'^[ATGCYR]*$', sequence):  # Match: DNA bases.
-        sequence = dna_to_rvd(sequence)
+        sequence = re.sub('\s', '', dna_to_rvd(sequence))
     elif re.match(r'^[NIHDG]*$', sequence):  # Match: RVD bases.
         sequence = sequence
     else:
@@ -307,7 +307,6 @@ def compile(*sequences, output=None):
     Takes a list of sequence arguments (RVD or DNA) and outputs a generated
     protocol to make plasmids targetting those sequences.
     """
-
     sequences = list(sequences)
 
     # Limit right now is the number of tips in the static deck map we're
