@@ -39,8 +39,17 @@ class Session():
         virtual robot to keep track of the state of the robot, while
         maintaining connection with one particular client.
         """
+        if sessionID in _sessions:
+            raise KeyError("Session already exists: "+sessionID)
+        _sessions[sessionID] = sessionID
         self._sessionID = sessionID
         self._context = Context()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
 
     @property
     def sessionID(self):
