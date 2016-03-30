@@ -26,6 +26,7 @@ You can read from a file and output to another file like this:
 import sys
 import re
 import inspect
+# Dynamic import: Compiler module based on the compiler name. 
 
 def compile(compiler, data, **kwargs):
     """
@@ -38,7 +39,7 @@ def compile(compiler, data, **kwargs):
         raise ImportError("Invalid compiler name.")
 
     try:
-        mod = __import__("." + compiler, fromlist=[''])
+        mod = __import__("labsuite.compilers." + compiler, fromlist=[''])
     except ImportError:
         raise ImportError("Unsupported compiler: " + compiler)
 
