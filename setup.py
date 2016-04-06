@@ -4,14 +4,15 @@ config = {
     'description': "A suite of tools for portable automated scientific protocols.",
     'author': "OpenTrons",
     'url': 'http://opentrons.com',
-    'version': '0.3',
+    'version': '0.32',
     'install_requires': ['pyyaml'],
     'packages': find_packages(),
     'package_data': { 
         "labsuite": [
             "config/containers/**/*.yml",
             "config/containers/legacy_containers.json",
-            "compilers/data/*"
+            "compilers/data/*",
+            "compilers/templates/*"
         ]
     },
     'name': 'labsuite',
