@@ -4,7 +4,7 @@ config = {
     'description': "A suite of tools for portable automated scientific protocols.",
     'author': "OpenTrons",
     'url': 'http://opentrons.com',
-    'version': '0.32',
+    'version': '0.4',
     'install_requires': ['pyyaml'],
     'packages': find_packages(),
     'package_data': { 
