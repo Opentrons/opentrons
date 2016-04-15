@@ -14,7 +14,7 @@ in charge of running the OpenTrons [frontend](https://github.com/Opentrons/otone
 
 ## Containers API
 
-The [labware.containers](labware/containers.py) module provides data about
+The [labware.containers](labsuite/labware/containers.py) module provides data about
 all supported containers, as well as conversions between old and new data
 formats.
 
@@ -23,23 +23,23 @@ Containers can be specified by the user.
 ### Listing Containers
 
 ```python
-import labware.containers
+from labsuite.labware import containers
 
 list = labware.containers.list_containers()
 ```
 
 ### Defining a Container
 
-Containers definitions are stored in [config/containers](config/containers).
+Containers definitions are stored in [config/containers](labsuite/config/containers).
 These are YAML files specifying the base type of container, the number of 
 columns and rows, the A1 offset, and well margin.
 
-See the documented [example container](config/containers/example_plate.yml)
+See the documented [example container](labsuite/config/containers/example_plate.yml)
 for more detailed instructions.
 
 For containers with varying well or tube sizes, you can specify each
 variation as a `custom_well` within the YAML structure.  See the
-[15-50ml tuberack](config/containers/15-50ml.yml) for an example of this
+[15-50ml tuberack](labsuite/config/containers/15-50ml.yml) for an example of this
 functionality being used.
 
 ### Getting Container Well Offset
@@ -49,9 +49,9 @@ well offsets, which are all in reference to the A1 (or first coordinate) of
 each plate.
 
 ```python
-import labware.containers
+from labsuite.labware import containers
 
-microplate = labware.containers.load_container('microplate.24')
+microplate = containers.load_container('microplate.24')
 microplate.offset('A1')
 ```
 
@@ -65,9 +65,9 @@ For example, the code below will provide the offset to the eleventh tip
 position, in the event that the first ten have already been used.
 
 ```python
-import labware.containers
+from labsuite.labware import containers
 
-tiprack = labware.containers.load_container('tiprack.10ul')
+tiprack = containers.load_container('tiprack.10ul')
 tiprack.tip_offset(10)
 ```
 
@@ -78,9 +78,9 @@ containers can be stored anywhere, but must be loaded within the containers
 module before being accessible.
 
 ```python
-import labware.containers
+from labsuite.labware import containers
 
-labware.containers.load_custom_containers('/path/to/containers')
+containers.load_custom_containers('/path/to/containers')
 ```
 
 This will do a recursive glob through the directory provided and add all 
