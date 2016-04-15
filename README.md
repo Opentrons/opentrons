@@ -39,7 +39,7 @@ for more detailed instructions.
 
 For containers with varying well or tube sizes, you can specify each
 variation as a `custom_well` within the YAML structure.  See the
-[15-50ml tuberack](labsuite/config/containers/15-50ml.yml) for an example of this
+[15-50ml tuberack](labsuite/config/containers/tuberacks/15-50ml.yml) for an example of this
 functionality being used.
 
 ### Getting Container Well Offset
