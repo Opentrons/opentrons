@@ -39,7 +39,7 @@ def compile(compiler, data, **kwargs):
         raise ImportError("Invalid compiler name.")
 
     try:
-        mod = __import__("labsuite.compilers." + compiler, fromlist=[''])
+        mod = __import__("." + compiler, fromlist=[''])
     except ImportError:
         raise ImportError("Unsupported compiler: " + compiler)
 
