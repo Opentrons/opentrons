@@ -353,9 +353,9 @@ def compile(*sequences, output=None):
     # Take our three transfer groups and make them into a consolidated
     # transfer list.
     instructions = []
-    instructions.append(_make_transfer_group(*buffers, reuse_tip=True))
-    instructions.append(_make_transfer_group(*tals))
-    instructions.append(_make_transfer_group(*enzymes))
+    instructions += _make_transfer_group(*buffers, reuse_tip=True)
+    instructions += _make_transfer_group(*tals)
+    instructions += _make_transfer_group(*enzymes)
 
     # Open up our template and inject the transfers.
     with open(os.path.dirname(__file__) + '/templates/pfusx.json') as data:
