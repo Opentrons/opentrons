@@ -45,10 +45,15 @@
         "p10": {
             "tip-racks": [
                 {
-                    "container": "p10-rack"
-
+                    "container": "p10-rack1"
+                }, 
+                {
+                    "container": "p10-rack2"
+                }, 
+                {
+                    "container": "p10-rack3"
                 }
-            ], 
+            ],
             "tool": "pipette", 
             "trash-container": {
                 "container": "trash"
