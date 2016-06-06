@@ -53,6 +53,32 @@ def normalize_position(position):
         raise TypeError("Position must be a str or tuple of ints.")
 
 
+def humanize_position(position):
+    """
+    Takes a position as either "A1" or (0, 0) and returns the humanized
+    position name, ie "A1".
+
+    This will run an already humanized position back through the normalizer
+    and then humanize it again. Inefficient but kind of profound.
+
+    >>> humanize_position((0, 0))
+    'A1'
+
+    >>> humanize_position((1, 4))
+    'B5'
+
+    >>> humanize_position('K12')
+    'K12'
+    """
+    col, row = normalize_position(position)
+    if col > 25:  # Support this later.
+        raise ValueError(
+            "Column value of {} is out of supported range."
+            .format(col)
+        )
+    return "{}{}".format(chr(col + ord('A')), row + 1)
+
+
 class GridItem():
 
     parent   = None
