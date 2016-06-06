@@ -273,24 +273,6 @@ class GridContainer():
         if z:
             cal['z'] = z
 
-    def _get_calibration(self, instrument):
-        """
-        Ensures the existence of and returns calibration object for a given
-        instrument.
-
-        DO NOT USE THIS; it's likely to change dramatically in future
-        releases as instruments become first-class citizens within the
-        library.
-
-        Another method that will go away when GridItems become recursive
-        GridContainers.
-        """
-        if not self._calibration:
-            self._calibration = {}
-        if not self._calibration.get(instrument):
-            self._calibration[instrument] = {}
-
-        return self._calibration[instrument]
 
     def get_child_coordinates(self, position, instrument='primary'):
         """
