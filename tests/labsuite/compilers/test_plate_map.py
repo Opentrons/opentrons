@@ -49,6 +49,16 @@ class PlateMapTest(unittest.TestCase):
         self.assertEqual(plates.get_plate('96numbers').get_well('E8'), '61')
         self.assertEqual(plates.get_plate('96letters').get_well('A12'), 'A')
 
+    def test_add_plate(self):
+        """
+        Add plate references with options.
+        """
+        plates = PlateMap(self.csv_file)
+        plates.add_plate('small', 'G24', rows=3, cols=2)
+        plates.add_plate('big', 'M26', rows=18, cols=12)
+        self.assertEqual(plates.get_plate('small').get_well('A1'), 'c')
+        self.assertEqual(plates.get_plate('big').get_well('A18'), 'A18')
+
     def test_plate_map_tiny(self):
         """
         Produce plate map from plate start position (small plates).

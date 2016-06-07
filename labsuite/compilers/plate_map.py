@@ -72,6 +72,14 @@ class PlateMap():
             self._plates[start] = Plate(start, self._sheet, **kwargs)
         return self._plates[start]
 
+    def add_plate(self, label, start, **kwargs):
+        """
+        Allows adding plates by reference along with config vars.
+        """
+        start = normalize_position(start)
+        self._labels[label] = start
+        self._plates[start] = self.get_plate(start, **kwargs)
+
 
 class Sheet():
 
