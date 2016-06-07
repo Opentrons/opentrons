@@ -25,8 +25,9 @@ class PlateMap():
     _sheet = None  # Sheet
     _plates = None  # {}: keys are start tuples and vals are Plate objects.
     _labels = None  # {}: keys are plate labels, vals are start tuples.
+    _rotated = None  # Default for entire platemap, can be overriden.
 
-    def __init__(self, csv_file, **kwargs):
+    def __init__(self, csv_file, rotated=None, **kwargs):
         """
         Loads the provided CSV file location and converts it to a PlateMap.
 
@@ -42,6 +43,7 @@ class PlateMap():
         self._plates = {}
         self._labels = kwargs
         self._sheet = Sheet(csv_file)
+        self._rotated = rotated
 
     def get_plate(self, label_cell, **kwargs):
         """
@@ -65,6 +67,10 @@ class PlateMap():
         # Only works for 96 well plates for now.
         if label_cell in self._labels:
             label_cell = self._labels[label_cell]
+
+        # Pass default orientation option.
+        if 'rotated' not in kwargs and self._rotated is not None:
+            kwargs['rotated'] = self._rotated
 
         col, row = normalize_position(label_cell)
         start = (col, row)
@@ -101,11 +107,15 @@ class Plate():
     _rows = 0
     _cols = 0
 
-    def __init__(self, start_tuple, plate_map, rows=12, cols=8):
+    _rotated = False  # If True, it's in "portrait" mode.
+
+    def __init__(self, start_tuple, plate_map, rows=12, cols=8,
+                 rotated=False):
         self._sheet = plate_map
         self._start = start_tuple
         self._rows = rows
         self._cols = cols
+        self._rotated = rotated
 
     def get_well(self, well):
         """
@@ -119,8 +129,13 @@ class Plate():
         """
         col, row = normalize_position(well)
         scol, srow = self._start
-        cell_col = scol + col + 1
-        cell_row = srow + self._rows - row
+        if (self._rotated):
+            cell_col = scol + col + 1
+            cell_row = srow + self._rows - row
+        else:
+            cell_row = srow + col + 1
+            cell_col = scol + row + 1
+
         return self._sheet.get_cell((cell_col, cell_row))
 
     @property

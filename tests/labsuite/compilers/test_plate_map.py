@@ -11,7 +11,7 @@ class PlateMapTest(unittest.TestCase):
             cdir,
             '../../fixtures/example_platemap.csv'
         )
-        self.plate_map = PlateMap(self.csv_file)
+        self.plate_map = PlateMap(self.csv_file, rotated=True)
 
     def test_plate_labels(self):
         """
@@ -45,7 +45,7 @@ class PlateMapTest(unittest.TestCase):
             '96numbers': 'A1',
             '96letters': 'K1',
         }
-        plates = PlateMap(self.csv_file, **starts)
+        plates = PlateMap(self.csv_file, rotated=True, **starts)
         self.assertEqual(plates.get_plate('96numbers').get_well('E8'), '61')
         self.assertEqual(plates.get_plate('96letters').get_well('A12'), 'A')
 
@@ -53,7 +53,7 @@ class PlateMapTest(unittest.TestCase):
         """
         Add plate references with options.
         """
-        plates = PlateMap(self.csv_file)
+        plates = PlateMap(self.csv_file, rotated=True)
         plates.add_plate('small', 'G24', rows=3, cols=2)
         plates.add_plate('big', 'M26', rows=18, cols=12)
         self.assertEqual(plates.get_plate('small').get_well('A1'), 'c')
@@ -66,7 +66,7 @@ class PlateMapTest(unittest.TestCase):
         plate = self.plate_map.get_plate('G24', rows=3, cols=2)
         expected = {
             'A1': 'c', 'A2': 'b', 'A3': 'a',
-            'B1': 'f', 'B2': 'e', 'B3': 'd'
+            'B1': 'd', 'B2': 'e', 'B3': 'f'
         }
         self.assertEqual(plate.map, expected)
 
@@ -77,7 +77,7 @@ class PlateMapTest(unittest.TestCase):
         plate = self.plate_map.get_plate('G24', rows=3, cols=2)
         expected = {
             'c': 'A1', 'b': 'A2', 'a': 'A3',
-            'f': 'B1', 'e': 'B2', 'd': 'B3'
+            'd': 'B1', 'e': 'B2', 'f': 'B3'
         }
         self.assertEqual(plate.value_map, expected)
 
@@ -89,3 +89,19 @@ class PlateMapTest(unittest.TestCase):
         wells = ['A1', 'A18', 'F10', 'H1', 'L1', 'L11', 'L18']
         for well in wells:
             self.assertEqual(plate.get_well(well), well)
+
+    def test_portrait_plate_layout(self):
+        """
+        Work with plate in portrait layout (override default).
+        """
+        plate = self.plate_map.get_plate('E32', rotated=False)
+        self.assertEqual(plate.get_well('A1'), 'a')
+        self.assertEqual(plate.get_well('C1'), 'c')
+        self.assertEqual(plate.get_well('A2'), 'f')
+
+    def test_portrait_default_plate_layout(self):
+        plates = PlateMap(self.csv_file)
+        plate = plates.get_plate('E32')
+        self.assertEqual(plate.get_well('A1'), 'a')
+        self.assertEqual(plate.get_well('C1'), 'c')
+        self.assertEqual(plate.get_well('A2'), 'f')
