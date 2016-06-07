@@ -132,6 +132,7 @@ def _load_default_containers():
     We do this so that we don't have to manually list a container in this
     module everytime we add a new one.
     """
+    _containers['point'] = GridContainer
     _containers['grid'] = GridContainer
     for mod in _container_modules:
         props = dir(mod)
@@ -232,6 +233,8 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
     # If this is a named container, add it to our list of containers.
     if name:
         _containers[container_name] = subclass
+        if 'legacy_name' in data:
+            _containers['legacy.'+data['legacy_name']] = subclass
 
     # Recurse for subsets.
     for k in subsets:
