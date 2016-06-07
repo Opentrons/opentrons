@@ -7,8 +7,11 @@ class PlateMapTest(unittest.TestCase):
 
     def setUp(self):
         cdir = os.path.dirname(os.path.realpath(__file__))
-        csv_file = os.path.join(cdir, '../../fixtures/example_platemap.csv')
-        self.plate_map = PlateMap(csv_file)
+        self.csv_file = os.path.join(
+            cdir,
+            '../../fixtures/example_platemap.csv'
+        )
+        self.plate_map = PlateMap(self.csv_file)
 
     def test_plate_labels(self):
         """
@@ -26,7 +29,29 @@ class PlateMapTest(unittest.TestCase):
 
     def test_plate_map(self):
         """
-        Produce plate map from plate start position.
+        Get well contents for plates.
+        """
+        plate = self.plate_map.get_plate('A1')
+        self.assertEqual(plate.get_well('A12'), '89')
+        self.assertEqual(plate.get_well('B12'), '90')
+        self.assertEqual(plate.get_well('H12'), '96')
+        self.assertEqual(plate.get_well('H1'), '8')
+
+    def test_named_plates(self):
+        """
+        Keep track of plate names for later reference.
+        """
+        starts = {
+            '96numbers': 'A1',
+            '96letters': 'K1',
+        }
+        plates = PlateMap(self.csv_file, **starts)
+        self.assertEqual(plates.get_plate('96numbers').get_well('E8'), '61')
+        self.assertEqual(plates.get_plate('96letters').get_well('A12'), 'A')
+
+    def test_plate_map_tiny(self):
+        """
+        Produce plate map from plate start position (small plates).
         """
         plate = self.plate_map.get_plate('G24', rows=3, cols=2)
         expected = {

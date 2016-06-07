@@ -24,12 +24,23 @@ class PlateMap():
 
     _sheet = None  # Sheet
     _plates = None  # {}: keys are start tuples and vals are Plate objects.
+    _labels = None  # {}: keys are plate labels, vals are start tuples.
 
-    def __init__(self, csv_file):
+    def __init__(self, csv_file, **kwargs):
         """
         Loads the provided CSV file location and converts it to a PlateMap.
+
+        Optional kwargs can be passed as named references to the starting
+        cells of each plate.
+
+        For example:
+
+            plate = PlateMap('file.csv', my_plate='A5')
+            plate.get_plate('my_plate')
+
         """
         self._plates = {}
+        self._labels = kwargs
         self._sheet = Sheet(csv_file)
 
     def get_plate(self, label_cell, **kwargs):
@@ -47,6 +58,14 @@ class PlateMap():
         Where 'K2' is the spreadsheet cell containing the plate label and
         'H12' is the specific well in that plate.
         """
+
+        # If the label_cell is in labels, use that position instead of
+        # converting it to a coordinate tuple.
+        #
+        # Only works for 96 well plates for now.
+        if label_cell in self._labels:
+            label_cell = self._labels[label_cell]
+
         col, row = normalize_position(label_cell)
         start = (col, row)
         if start not in self._plates:
