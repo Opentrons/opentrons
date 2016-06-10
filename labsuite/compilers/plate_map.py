@@ -169,6 +169,6 @@ class Plate():
         """
         Returns the well position on this plate matching a particular value.
         """
-        for pos in self.map:
+        for pos in sorted(self.map.keys()):
             if self.map[pos].strip() == value:
                 return humanize_position(pos)
