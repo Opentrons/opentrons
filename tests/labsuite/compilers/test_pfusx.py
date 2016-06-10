@@ -72,7 +72,7 @@ class PFUSXTest(unittest.TestCase):
         Segment TAL sequence.
         """
         result = pfusx.tal_to_codons('ATACCRTCTTATTT')
-        expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TTT']
+        expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TT']
         self.assertEqual(result, expected)
 
     def test_tal_sequence_sixteen(self):

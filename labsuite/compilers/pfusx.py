@@ -91,7 +91,7 @@ def tal_to_codons(tal):
     codons = []
     for n in range(0, 12, 3):  # Chunk into four parts of 3.
         codons.append(tal[n:n + 3])
-    codons.append(tal[11:])  # Grab the last 2, 3 or 4 bases.
+    codons.append(tal[12:])  # Grab the last 2, 3 or 4 bases.
     return codons
 
 
