@@ -1,6 +1,6 @@
 # OpenTrons Labware Library
 
-![TravisCI status](https://travis-ci.org/OpenTrons/labware.svg)
+[![Build Status](https://travis-ci.org/OpenTrons/labware.svg?branch=master)](https://travis-ci.org/OpenTrons/labware)
 
 The point of this repository is to provide a software equivalent to
 an operating OpenTrons machine, including all related deck modules
