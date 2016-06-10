@@ -80,33 +80,20 @@ class PFUSXTest(unittest.TestCase):
         Segment 16-character TAL sequence.
         """
         result = pfusx.tal_to_codons('ATACCRTCTTATTTA')
-        expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TTTA']
-        self.assertEqual(result, expected)
-
-    def test_fusx_query(self):
-        """
-        Query FusX database to find the well positions of necessary plasmids.
-        """
-        # Example from the FusX PHP script at <http://talendesign.org>.
-        rvd = pfusx.rvd_to_tal('NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG')
-        sequences = pfusx.tal_to_codons(rvd)
-        result = pfusx.get_fusx_locations(sequences)
-        expected = [
-            ('pFX1', 'E2'), ('pFX2', 'G3'), ('pFX3', 'H7'), ('pFX4', 'D7'),
-            ('pB2/B3', 'H12')
-        ]
+        expected = ['ATA', 'CCR', 'TCT', 'TAT', 'TTA']
         self.assertEqual(result, expected)
 
     def test_well_locations(self):
         target = 'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG'
         result = pfusx.get_plasmid_wells(target)
+
         expected = {
-            'pfusx_1': 'E2',
-            'pfusx_2': 'G3',
-            'pfusx_3': 'H7',
-            'pfusx_4': 'D7',
-            'pfusx_5': 'H12',
-            'receiver': 'B12',
+            'TALE1': 'E2',
+            'TALE2': 'G3',
+            'TALE3': 'H7',
+            'TALE4': 'D7',
+            'TALE5': 'H10',
+            'receiver': 'D11',
             'backbone': 'C11'
         }
         self.assertEqual(result, expected)
@@ -143,8 +130,8 @@ class PFUSXTest(unittest.TestCase):
             ('TALE2:G3', 'FusX Output:B2', 3),
             ('TALE3:H7', 'FusX Output:B2', 3),
             ('TALE4:D7', 'FusX Output:B2', 3),
-            ('TALE5:H12', 'FusX Output:B2', 3),
-            ('TALE5:B12', 'FusX Output:B2', 3),
+            ('TALE5:H10', 'FusX Output:B2', 3),
+            ('TALE5:D11', 'FusX Output:B2', 3),
             ('TALE5:C11', 'FusX Output:B2', 3)
         ]
 

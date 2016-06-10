@@ -23,10 +23,21 @@ import sys
 import os
 import re
 import json
-import sqlite3
 import datetime
 
 from collections import OrderedDict
+
+from .plate_map import PlateMap
+
+_fusx_plates = PlateMap(
+    os.path.dirname(__file__) + '/data/fusx_platemap.csv',
+    rotated=True,
+    TALE1='A33',
+    TALE2='K33',
+    TALE3='U33',
+    TALE4='A48',
+    TALE5='K48'
+)
 
 
 def dna_to_rvd(string):
@@ -95,62 +106,6 @@ def tal_to_codons(tal):
     return codons
 
 
-def get_fusx_locations(codons):
-    """
-    Takes an array of five codons and outputs a list of well and plate
-    positions for producing the final recombined plasmid using the
-    FusX system.
-
-    Each plasmid chosen depends on the codon and also the index of the
-    codon in the full target sequence.
-
-    This code assumes that the target sequence also includes the
-    receiver plasmid at the end, and as such discards the last RVD
-    basepair.
-    """
-
-    if len(codons) != 5:
-        raise ValueError("Sequence must be an array of five codons.")
-
-    # We're using a SQL database provided by the FusX team. Important fields
-    # for our purposes are well, plate, rvd_sequence, and plasmid_name.
-
-    # plasmid_name is a special composite key of a prefix, the codon index,
-    # and the TAL sequence. For example, pFUX1_TTC targets TTC as the first
-    # codon in a sequence of codons. The target codon is redundantly stored
-    # as an RVD sequence, but no field in the table provides the codon
-    # index as a standalone field.
-
-    sql = """
-        SELECT plate, well FROM pFUX_recipe_library
-        WHERE rtrim(rvd_sequence)=? AND plasmid_name=?
-    """
-
-    queries = []
-    for i, codon in enumerate(codons):
-        codon_index = i + 1
-        if codon_index < 5:
-            plasmid_name = 'pFUX{}_{}'.format(codon_index, codon)
-        else:
-            codon = codon[0:-1]  # Ignore last basepair (receiver plasmid).
-            plasmid_name = 'pFUSB{}_{}'.format(len(codon), codon)
-        rvd = dna_to_rvd(codon)
-        queries.append((rvd, plasmid_name))
-
-    # Send it to the database.
-    connection = sqlite3.connect(os.path.dirname(__file__) + '/data/pFusX.db')
-    cursor = connection.cursor()
-    results = []
-    for args in queries:
-        cursor.execute(sql, args)
-        result = cursor.fetchone()
-        if not result:
-            raise ValueError("Can't find plasmid named {}.".format(args[1]))
-        results.append(result)  # Result is (plate, well)
-    connection.close()
-    return results
-
-
 def get_plasmid_wells(sequence, backbone='DNA'):
     """
     Takes a string of either RVD or DNA basepairs (15 or 16), does a
@@ -161,29 +116,33 @@ def get_plasmid_wells(sequence, backbone='DNA'):
     template.
     """
 
-    codons = tal_to_codons(rvd_to_tal(sequence))  # Misdirection, sorry.
+    tal = rvd_to_tal(sequence)  # Normalize the sequence.
 
-    # The receiver plasmid depends on the last basepair of the RVD input
-    # and isn't stored in the provided pFusX database.
-    receiver_map = {
-        'HD': 'A11',
-        'NN': 'A12',
-        'NI': 'B11',
-        'NG': 'B12'
-    }
+    codons = tal_to_codons(tal[0:-1])
+    receiver_bp = tal[-1]  # Last base is the receiver.
+
+    if len(codons) != 5:
+        raise ValueError("Sequence must be an array of five codons.")
 
     # We only actually need well coordinates for these because the plate
     # names are hard-coded into the pFusX JSON template.
     well_locs = {}
 
-    # We pull the FusX plasmid locations from the database, five in total.
-    plasmid_locs = get_fusx_locations(codons)
-    for i, loc in enumerate(plasmid_locs):
-        well_locs['pfusx_{}'.format(i + 1)] = loc[1]  # Well position.
+    # We pull the FusX plasmid locations from the plate map, five in total.
+    for i, codon in enumerate(codons):
+        codon_index = i + 1
+        plate_name = 'TALE{}'.format(codon_index)
+        location = _fusx_plates.get_plate(plate_name).find_well(codon)
+        if not location:
+            raise ValueError(
+                "Can't find well position for '{}' on plate {}.".
+                format(codon, plate_name)
+            )
+        else:
+            well_locs[plate_name] = location
 
-    # The last basepair of input is the receiver plasmid.
-    receiver_bp = sequence[-2:]
-    well_locs['receiver'] = receiver_map.get(receiver_bp, None)
+    plate = _fusx_plates.get_plate('K48')
+    well_locs['receiver'] = plate.find_well('pLR: {}'.format(receiver_bp))
     if not well_locs['receiver']:
         raise ValueError("Invalid receiver: {}".format(receiver_bp))
 
@@ -267,7 +226,7 @@ def _get_tal_transfers(sequence, well='A1', backbone='DNA'):
     for n in range(1, 6):  # TALEN plasmids, 1 through 5
         tals.append(
             (
-                "TALE{}:{}".format(n, plasmids['pfusx_{}'.format(n)]),
+                "TALE{}:{}".format(n, plasmids['TALE{}'.format(n)]),
                 output_well,
                 3
             )
@@ -301,6 +260,7 @@ def _normalize_sequence(sequence):
         raise ValueError("Sequence must be 15 RNA or DNA bases.")
 
     return sequence
+
 
 def compile(*sequences, output=None):
     """
@@ -339,7 +299,7 @@ def compile(*sequences, output=None):
         # We're going to do all the buffers at the start...
         buffers += [('Ingredients:A1', 'FusX Output:' + well, 10)]
         # TALs in the middle...
-        tals +=  _get_tal_transfers(s, well=well)
+        tals += _get_tal_transfers(s, well=well)
         # Enzyme (BsmBI) at the end.
         enzymes += [("Ingredients:B1", 'FusX Output:' + well, 10)]
         # For printing an output map.
