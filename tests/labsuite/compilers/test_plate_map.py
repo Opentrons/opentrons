@@ -105,3 +105,15 @@ class PlateMapTest(unittest.TestCase):
         self.assertEqual(plate.get_well('A1'), 'a')
         self.assertEqual(plate.get_well('C1'), 'c')
         self.assertEqual(plate.get_well('A2'), 'f')
+
+    def test_find_well(self):
+        """ Get well positions of a value in a plate. """
+        plates = PlateMap(self.csv_file)
+        plate = plates.get_plate('E32')
+        self.assertEqual(plate.find_well('a'), 'A1')
+        self.assertEqual(plate.find_well('b'), 'B1')
+
+    def test_find_well_rotated(self):
+        """ Get well positions of a value in a rotated plate. """
+        a = self.plate_map.get_plate('A1').find_well('60')
+        self.assertEqual('D8', a)

@@ -164,3 +164,11 @@ class Plate():
         the key as a value. Just a reverse of the normal map.
         """
         return dict((v, k) for k, v in self.map.items())
+
+    def find_well(self, value):
+        """
+        Returns the well position on this plate matching a particular value.
+        """
+        for pos in self.map:
+            if self.map[pos].strip() == value:
+                return humanize_position(pos)
