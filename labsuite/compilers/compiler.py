@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Allows you to use the command line to compile scripts for any of the 
+Allows you to use the command line to compile scripts for any of the
 compiler modules in this directory.
 
 For example, you can do:
@@ -10,7 +10,7 @@ For example, you can do:
 
 It works because there's a pfusx.py file with a compile method.
 
-Compilers are designed to take a list of inputs (or lines) and output a 
+Compilers are designed to take a list of inputs (or lines) and output a
 JSON file, which will then be printed to the console.
 
 To save a protocol to a file, you can do something like this:
@@ -26,12 +26,15 @@ You can read from a file and output to another file like this:
 import sys
 import re
 import inspect
-# Dynamic import: Compiler module based on the compiler name. 
+
 
 def compile(compiler, data, **kwargs):
     """
     Send provided arguments to the designated compiler and outputs a JSON
     protocol file that can run on the OT-One machine.
+
+    This is a dynamic import; the compiler module is based on the compiler
+    name passed in.
     """
 
     # Don't even leave an opening for weird stuff.
@@ -62,7 +65,7 @@ if __name__ == "__main__":
     is going to be in charge of figuring out what to do with the input
     list.
 
-    For example, in the case of FusX, each list item is a separate 
+    For example, in the case of FusX, each list item is a separate
     RVD sequence.
 
     In other cases, each list item might be a line in a file.
