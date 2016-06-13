@@ -93,8 +93,8 @@ class PFUSXTest(unittest.TestCase):
             'TALE3': 'H7',
             'TALE4': 'D7',
             'TALE5': 'H10',
-            'receiver': 'D11',
-            'backbone': 'C11'
+            'pLR': 'D11',
+            'receiver': 'B12'
         }
         self.assertEqual(result, expected)
 
@@ -131,11 +131,16 @@ class PFUSXTest(unittest.TestCase):
             ('TALE3:H7', 'FusX Output:B2', 3),
             ('TALE4:D7', 'FusX Output:B2', 3),
             ('TALE5:H10', 'FusX Output:B2', 3),
-            ('TALE5:D11', 'FusX Output:B2', 3),
-            ('TALE5:C11', 'FusX Output:B2', 3)
+            ('TALE5:D11', 'FusX Output:B2', 3),  # pLR
+            ('TALE5:B12', 'FusX Output:B2', 3)  # Receiver
         ]
 
         self.assertEqual(expected, result)
+
+    def test_invalid_receiver(self):
+        seq = 'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG'
+        with self.assertRaises(ValueError):
+            pfusx._get_tal_transfers(seq, well='B2', receiver="foo")
 
     def test_compile_dna(self):
         """

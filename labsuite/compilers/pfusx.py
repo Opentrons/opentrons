@@ -106,7 +106,7 @@ def tal_to_codons(tal):
     return codons
 
 
-def get_plasmid_wells(sequence, backbone='DNA'):
+def get_plasmid_wells(sequence, receiver='pC'):
     """
     Takes a string of either RVD or DNA basepairs (15 or 16), does a
     bunch of input normalization and outputs a hash containing well
@@ -119,7 +119,7 @@ def get_plasmid_wells(sequence, backbone='DNA'):
     tal = rvd_to_tal(sequence)  # Normalize the sequence.
 
     codons = tal_to_codons(tal[0:-1])
-    receiver_bp = tal[-1]  # Last base is the receiver.
+    pLR_bp = tal[-1]  # Last base is the receiver.
 
     if len(codons) != 5:
         raise ValueError("Sequence must be an array of five codons.")
@@ -141,19 +141,20 @@ def get_plasmid_wells(sequence, backbone='DNA'):
         else:
             well_locs[plate_name] = location
 
-    plate = _fusx_plates.get_plate('K48')
-    well_locs['receiver'] = plate.find_well('pLR: {}'.format(receiver_bp))
-    if not well_locs['receiver']:
-        raise ValueError("Invalid receiver: {}".format(receiver_bp))
+    plate = _fusx_plates.get_plate('TALE5')
+    well_locs['pLR'] = plate.find_well('pLR: {}'.format(pLR_bp))
+    if not well_locs['pLR']:
+        raise ValueError("Invalid pLR: {}".format(pLR_bp))
 
-    # The backbone plasmid varies for DNA expression or RNA expression.
-    backbone = backbone.upper()
-    if backbone == 'DNA':
-        well_locs['backbone'] = 'C11'
-    elif backbone == 'RNA':
-        well_locs['backbone'] = 'C12'
-    else:
-        raise ValueError("Expression backbone must be DNA or RNA.")
+    valid_receivers = ['pT3TS', 'pC', 'pKT3']
+    if receiver not in valid_receivers:
+        raise ValueError(
+            "Receiver must be one of: {}"
+            .format(", ".join(valid_receivers))
+        )
+
+    receiver = plate.find_well(receiver)
+    well_locs['receiver'] = receiver
 
     return well_locs
 
@@ -213,13 +214,13 @@ def _make_transfer(start, end, volume, touch=True):
     ])
 
 
-def _get_tal_transfers(sequence, well='A1', backbone='DNA'):
+def _get_tal_transfers(sequence, well='A1', receiver='pC'):
     """
     Creates an array of transfer arguments for a TAL sequence.
     """
 
     output_well = "FusX Output:{}".format(well)
-    plasmids = get_plasmid_wells(sequence, backbone)
+    plasmids = get_plasmid_wells(sequence, receiver)
 
     # TAL Plasmid transfers
     tals = []
@@ -232,11 +233,11 @@ def _get_tal_transfers(sequence, well='A1', backbone='DNA'):
             )
         )
 
-    # Backbone and Receiver transfers
-    backbone = [('TALE5:{}'.format(plasmids['backbone']), output_well, 3)]
+    # pLR and Receiver transfers
+    pLR = [('TALE5:{}'.format(plasmids['pLR']), output_well, 3)]
     receiver = [('TALE5:{}'.format(plasmids['receiver']), output_well, 3)]
 
-    return tals + receiver + backbone
+    return tals + pLR + receiver
 
 
 def _normalize_sequence(sequence):
