@@ -153,8 +153,15 @@ def get_plasmid_wells(sequence, receiver='pC'):
             .format(", ".join(valid_receivers))
         )
 
-    receiver = plate.find_well(receiver)
-    well_locs['receiver'] = receiver
+    rec_well = plate.find_well(receiver)
+    if not rec_well:
+        # No way to really test this bit without adding an invalid
+        # receiver that doesn't exist in the plate mapping...
+        raise ValueError(
+            "Can't find receiver well for '{}'.".
+            format(receiver)
+        )
+    well_locs['receiver'] = rec_well
 
     return well_locs
 
