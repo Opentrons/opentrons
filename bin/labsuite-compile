@@ -6,7 +6,7 @@ compiler modules in this directory.
 
 For example, you can do:
 
-    python compiler.py pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
+    labsuite-compile pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
 
 It works because there's a pfusx.py file with a compile method.
 
@@ -15,11 +15,11 @@ JSON file, which will then be printed to the console.
 
 To save a protocol to a file, you can do something like this:
 
-    python compiler.py my_compiler some_input > filename.json
+    labsuite-compile my_compiler some_input > filename.json
 
 You can read from a file and output to another file like this:
 
-    python input.txt | python compiler.py my_compiler > filename.json
+    input.txt | labsuite-compile my_compiler > filename.json
 
 """
 
@@ -42,7 +42,7 @@ def compile(compiler, data, **kwargs):
         raise ImportError("Invalid compiler name.")
 
     try:
-        mod = __import__("." + compiler, fromlist=[''])
+        mod = __import__("labsuite.compilers." + compiler, fromlist=[''])
     except ImportError:
         raise ImportError("Unsupported compiler: " + compiler)
 

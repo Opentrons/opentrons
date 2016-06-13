@@ -8,7 +8,7 @@ config = {
     'version': '0.4',
     'install_requires': ['pyyaml'],
     'packages': find_packages(exclude=["tests"]),
-    'package_data': { 
+    'package_data': {
         "labsuite": [
             "config/containers/**/*.yml",
             "config/containers/legacy_containers.json",
@@ -16,6 +16,9 @@ config = {
             "compilers/templates/*"
         ]
     },
+    'scripts': [
+        'bin/labsuite-compile'
+    ],
     'name': 'labsuite',
     'test_suite': 'nose.collector',
     'zip_safe': False
