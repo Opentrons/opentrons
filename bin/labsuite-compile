@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     compiler = sys.argv[1]
 
-    # stdin is like `foo.txt | labsuite-compile` 
+    # stdin is like `foo.txt | labsuite-compile`
     # or `labsuite-compile < foo.txt`
     if not sys.stdin.isatty():
         data = sys.stdin.read().split('\n')
