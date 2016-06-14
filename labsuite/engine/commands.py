@@ -28,16 +28,12 @@ class CommandHandler():
 
         Returns a list of arguments or None if there's no match.
         """
-        args = re.findall(self._syntax_pattern, string)
-        # See if the arity matches; if not, we can't parse.
-        if (self._handler.__code__.co_argcount == len(args)):
-            return args
-        else:
-            return None
+        p = self._syntax_pattern
+        return [m.groupdict() for m in p.finditer(string)][0]
 
     def execute(self, string):
         args = self.parse(string)
-        return self._handler(*args)
+        return self._handler(**args)
 
 
 def define_command(command, syntax, handler):
@@ -74,6 +70,11 @@ def generate_expression(syntax):
     tags = re.findall(r'(<([^>]*)>)', syntax)
     for m in tags:
         match, tag_name = m
+        # Support for named tags.
+        if ':' in tag_name:
+            tag_name, arg_name = tag_name.split(':')
+        else:
+            arg_name = tag_name
         tag_pattern = _argument_list.get(tag_name)
         if not tag_pattern:
             raise KeyError(
@@ -81,7 +82,8 @@ def generate_expression(syntax):
                 "is not a valid tag name. Please use define_argument to " +
                 "define each argument before using it as a syntax tag."
             )
-        pattern = re.sub(match, tag_pattern, pattern)
+        replace = '(?P<{}>{})'.format(arg_name, tag_pattern)
+        pattern = re.sub(match, replace, pattern)
     return re.compile(pattern)
 
 
