@@ -104,13 +104,3 @@ def execute(command_string):
     if not handler:
         raise KeyError("Command not found: " + command)
     return handler.execute(args)
-
-
-def __clear_commands():
-    """
-    Clears all previously defined commands.
-
-    Mostly for testing, but you could also use it to break everything in a
-    really difficult to debug way.
-    """
-    _command_list = {}
