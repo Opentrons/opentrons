@@ -9,6 +9,17 @@ _argument_list = {}
 _command_list = {}
 
 
+def _flush_context():
+    """
+    One of those fun methods that will break everything if you use it
+    outside of a testing context.
+    """
+    global _argument_list
+    global _command_list
+    _argument_list = {}
+    _command_list = {}
+
+
 class CommandHandler():
 
     _syntax = ''  # The human-readable syntax string.
