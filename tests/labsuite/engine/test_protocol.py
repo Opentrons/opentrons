@@ -119,3 +119,44 @@ class ProtocolTest(unittest.TestCase):
             }
         }]
         self.assertEqual(self.instructions, expected)
+
+    def test_consolidate(self):
+        self.protocol.consolidate(
+            'A1:A1',
+            ('B1:B1', 50),
+            ('C1:C1', 5),
+            ('D1:D1', 10)
+        )
+        expected = [
+            {
+                'transfer': {
+                    'tool': 'p10',
+                    'volume': 50,
+                    'start': ((1, 0), (1, 0)),  # B1:B1
+                    'end': ((0, 0), (0, 0)),  # A1:A1
+                    'blowout': True,
+                    'touchtip': True
+                }
+            },
+            {
+                'transfer': {
+                    'tool': 'p10',
+                    'volume': 5,
+                    'start': ((2, 0), (2, 0)),  # C1:C1
+                    'end': ((0, 0), (0, 0)),  # A1:A1
+                    'blowout': True,
+                    'touchtip': True
+                }
+            },
+            {
+                'transfer': {
+                    'tool': 'p10',
+                    'volume': 10,
+                    'start': ((3, 0), (3, 0)),  # D1:D1
+                    'end': ((0, 0), (0, 0)),  # A1:A1
+                    'blowout': True,
+                    'touchtip': True
+                }
+            },
+        ]
+        self.assertEqual(self.instructions, expected)

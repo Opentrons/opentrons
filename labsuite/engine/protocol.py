@@ -109,8 +109,10 @@ class Protocol():
             'transfers': transfers
         }})
 
-    def consolidate(self):
-        pass
+    def consolidate(self, end, *wells, **kwargs):
+        for item in wells:
+            start, volume = item
+            self.transfer(start, end, ul=volume)
 
     def mix(self):
         pass
@@ -145,6 +147,7 @@ class Protocol():
         containers can be assigned to different slots within the user
         interface.
         """
+
         if ':' not in address:
             raise ValueError(
                 "Address must be in the form of 'container:well'."
