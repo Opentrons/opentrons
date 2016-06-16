@@ -89,3 +89,33 @@ class ProtocolTest(unittest.TestCase):
             ul=12
         )
         self.assertEqual(self.instructions, expected)
+
+    def test_distribute(self):
+        self.protocol.distribute(
+            'A1:A1',
+            ('B1:B1', 50),
+            ('C1:C1', 5),
+            ('D1:D1', 10)
+        )
+        expected = [{
+            'distribute': {
+                'tool': 'p10',
+                'blowout': True,
+                'start': ((0, 0), (0, 0)),
+                'transfers': [
+                    {
+                        'volume': 50,
+                        'end': ((1, 0), (1, 0)),  # B1:B1
+                    },
+                    {
+                        'volume': 5,
+                        'end': ((2, 0), (2, 0)),  # C1:C1
+                    },
+                    {
+                        'volume': 10,
+                        'end': ((3, 0), (3, 0))  # D1:D1
+                    }
+                ]
+            }
+        }]
+        self.assertEqual(self.instructions, expected)

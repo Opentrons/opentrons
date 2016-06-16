@@ -94,8 +94,20 @@ class Protocol():
             }
         })
 
-    def distribute(self, ul=None, ml=None, start=None, end=None):
-        pass
+    def distribute(self, start, *wells, blowout=True):
+        transfers = []
+        for item in wells:
+            end, volume = item
+            transfers.append({
+                'volume': volume,
+                'end': self._normalize_address(end)
+            })
+        self._actions.append({'distribute': {
+            'tool': 'p10',
+            'start': self._normalize_address(start),
+            'blowout': blowout,
+            'transfers': transfers
+        }})
 
     def consolidate(self):
         pass
