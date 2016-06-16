@@ -127,7 +127,7 @@ class Protocol():
     def _normalize_address(self, address):
         """
         Takes an address like "A1:A1" or "Ingredients:A1" and returns a tuple
-        like (0, 0) or ('Ingredients', 0).
+        like (0, 0) or ('ingredients', 0).
 
         Container labels are retained in the address tuples so that named
         containers can be assigned to different slots within the user
