@@ -157,6 +157,6 @@ class ProtocolTest(unittest.TestCase):
                     'blowout': True,
                     'touchtip': True
                 }
-            },
+            }
         ]
         self.assertEqual(self.instructions, expected)
