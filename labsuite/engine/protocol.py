@@ -51,10 +51,10 @@ class Protocol():
             'transfer': {
                 'tool': 'p10',
                 'volume': volume,
-                'from': self._normalize_address(start),
-                'to': self._normalize_address(end),
+                'start': self._normalize_address(start),
+                'end': self._normalize_address(end),
                 'blowout': blowout,
-                'touch-tip': touchtip
+                'touchtip': touchtip
             }
         })
 
@@ -82,10 +82,10 @@ class Protocol():
             vol = vol or volume
             transfers.append({
                 'volume': vol,
-                'from': self._normalize_address(start),
-                'to': self._normalize_address(end),
+                'start': self._normalize_address(start),
+                'end': self._normalize_address(end),
                 'blowout': options['blowout'],
-                'touch-tip': options['touchtip']
+                'touchtip': options['touchtip']
             })
         self._actions.append({
             'transfer_group': {

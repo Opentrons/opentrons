@@ -8,7 +8,6 @@ class ProtocolTest(unittest.TestCase):
     def setUp(self):
         self.protocol = Protocol()
         self.protocol.add_instrument('p10')
-        self.maxDiff = None
 
     @property
     def instructions(self):
@@ -28,10 +27,10 @@ class ProtocolTest(unittest.TestCase):
             'transfer': {
                 'tool': 'p10',
                 'volume': 100,
-                'from': ((0, 0), (0, 0)),
-                'to': ((1, 0), (1, 0)),
+                'start': ((0, 0), (0, 0)),
+                'end': ((1, 0), (1, 0)),
                 'blowout': True,
-                'touch-tip': True
+                'touchtip': True
             }
         }]
         self.assertEqual(self.instructions, expected)
@@ -44,38 +43,38 @@ class ProtocolTest(unittest.TestCase):
                 'transfers': [
                     {
                         'volume': 15,
-                        'from': ((0, 0), (0, 0)),  # A1:A1
-                        'to': ((1, 0), (1, 0)),  # B1:B1
+                        'start': ((0, 0), (0, 0)),  # A1:A1
+                        'end': ((1, 0), (1, 0)),  # B1:B1
                         'blowout': True,
-                        'touch-tip': True
+                        'touchtip': True
                     },
                     {
                         'volume': 1000,
-                        'from': ((0, 1), (0, 1)),  # A2:A2
-                        'to': ((1, 1), (1, 1)),  # B2:B2
+                        'start': ((0, 1), (0, 1)),  # A2:A2
+                        'end': ((1, 1), (1, 1)),  # B2:B2
                         'blowout': True,
-                        'touch-tip': True
+                        'touchtip': True
                     },
                     {
                         'volume': 12,
-                        'from': ((0, 2), (0, 2)),  # A3:A3
-                        'to': ((1, 2), (1, 2)),  # B3:B3
+                        'start': ((0, 2), (0, 2)),  # A3:A3
+                        'end': ((1, 2), (1, 2)),  # B3:B3
                         'blowout': False,
-                        'touch-tip': True
+                        'touchtip': True
                     },
                     {
                         'volume': 12,
-                        'from': ((0, 3), (0, 3)),  # A4:A4
-                        'to': ((1, 3), (1, 3)),  # B4:B4
+                        'start': ((0, 3), (0, 3)),  # A4:A4
+                        'end': ((1, 3), (1, 3)),  # B4:B4
                         'blowout': True,
-                        'touch-tip': True
+                        'touchtip': True
                     },
                     {
                         'volume': 12,
-                        'from': ('label', (0, 4)),  # label:A5
-                        'to': ((1, 4), (2, 0)),  # B5:C1
+                        'start': ('label', (0, 4)),  # label:A5
+                        'end': ((1, 4), (2, 0)),  # B5:C1
                         'blowout': True,
-                        'touch-tip': True
+                        'touchtip': True
                     }
                 ]
             }
