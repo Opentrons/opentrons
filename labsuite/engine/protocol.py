@@ -109,10 +109,20 @@ class Protocol():
             'transfers': transfers
         }})
 
-    def consolidate(self, end, *wells, **kwargs):
+    def consolidate(self, end, *wells, blowout=True):
+        transfers = []
         for item in wells:
             start, volume = item
-            self.transfer(start, end, ul=volume)
+            transfers.append({
+                'volume': volume,
+                'start': self._normalize_address(start)
+            })
+        self._actions.append({'consolidate': {
+            'tool': 'p10',
+            'end': self._normalize_address(end),
+            'blowout': blowout,
+            'transfers': transfers
+        }})
 
     def mix(self):
         pass
