@@ -149,3 +149,18 @@ class ProtocolTest(unittest.TestCase):
             }
         }]
         self.assertEqual(self.instructions, expected)
+
+    def test_mix(self):
+        self.protocol.mix(
+            'A1:A1',
+            volume=50,
+            repetitions=10
+        )
+        expected = [{'mix': {
+            'tool': 'p10',
+            'start': ((0, 0), (0, 0)),  # A1:A1
+            'blowout': True,
+            'volume': 50,
+            'reps': 10
+        }}]
+        self.assertEqual(self.instructions, expected)

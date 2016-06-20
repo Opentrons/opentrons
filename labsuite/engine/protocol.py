@@ -124,8 +124,14 @@ class Protocol():
             'transfers': transfers
         }})
 
-    def mix(self):
-        pass
+    def mix(self, start, volume=None, repetitions=None, blowout=True):
+        self._actions.append({'mix': {
+            'tool': 'p10',
+            'start': self._normalize_address(start),
+            'blowout': blowout,
+            'volume': volume,
+            'reps': repetitions
+        }})
 
     def _get_slot(self, name):
         """
