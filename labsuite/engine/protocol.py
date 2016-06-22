@@ -12,9 +12,6 @@ class Protocol():
 
     _container_labels = None  # Aliases. { 'foo': (0,0), 'bar': (0,1) }
 
-    # We bottle action-based calls and then unpack them later using
-    # *args and **kwargs. Some normalization happens between protocol
-    # formats.
     _actions = None  # []
 
     def __init__(self):
@@ -40,7 +37,7 @@ class Protocol():
     def allocate(self, **kwargs):
         pass
 
-    def transfer(self, start, end, ul=None, ml=None, 
+    def transfer(self, start, end, ul=None, ml=None,
                  blowout=True, touchtip=True):
         if ul:
             volume = ul
