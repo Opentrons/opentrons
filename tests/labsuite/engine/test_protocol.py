@@ -11,7 +11,7 @@ class ProtocolTest(unittest.TestCase):
 
     @property
     def instructions(self):
-        return self.protocol._actions
+        return self.protocol._commands
 
     def test_normalize_address(self):
         self.protocol.add_container('microplate.96', 'A1', label="Output")

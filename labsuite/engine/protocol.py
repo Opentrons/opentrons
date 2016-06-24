@@ -12,13 +12,13 @@ class Protocol():
 
     _container_labels = None  # Aliases. { 'foo': (0,0), 'bar': (0,1) }
 
-    _actions = None  # []
+    _commands = None  # []
 
     def __init__(self):
         self._ingredients = {}
         self._deck = {}
         self._container_labels = {}
-        self._actions = []
+        self._commands = []
 
     def add_container(self, name, slot, label=None):
         slot = normalize_position(slot)
@@ -44,7 +44,7 @@ class Protocol():
         else:
             volume = ml * 1000
 
-        self._actions.append({
+        self._commands.append({
             'transfer': {
                 'tool': 'p10',
                 'volume': volume,
@@ -84,7 +84,7 @@ class Protocol():
                 'blowout': options['blowout'],
                 'touchtip': options['touchtip']
             })
-        self._actions.append({
+        self._commands.append({
             'transfer_group': {
                 'tool': 'p10',
                 'transfers': transfers
@@ -99,7 +99,7 @@ class Protocol():
                 'volume': volume,
                 'end': self._normalize_address(end)
             })
-        self._actions.append({'distribute': {
+        self._commands.append({'distribute': {
             'tool': 'p10',
             'start': self._normalize_address(start),
             'blowout': blowout,
@@ -114,7 +114,7 @@ class Protocol():
                 'volume': volume,
                 'start': self._normalize_address(start)
             })
-        self._actions.append({'consolidate': {
+        self._commands.append({'consolidate': {
             'tool': 'p10',
             'end': self._normalize_address(end),
             'blowout': blowout,
@@ -122,7 +122,7 @@ class Protocol():
         }})
 
     def mix(self, start, volume=None, repetitions=None, blowout=True):
-        self._actions.append({'mix': {
+        self._commands.append({'mix': {
             'tool': 'p10',
             'start': self._normalize_address(start),
             'blowout': blowout,
