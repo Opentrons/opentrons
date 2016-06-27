@@ -1,4 +1,4 @@
-from labsuite.labware.grid import GridContainer
+from labsuite.labware.grid import GridContainer, humanize_position
 from labsuite.labware.containers import load_container
 
 import copy
@@ -52,10 +52,7 @@ class Deck(GridContainer):
     def dump_calibration(self):
         obj = {}
         for pos in self._children:
-            col, row = pos
-            col = chr(ord('A') + col)
-            row = row + 1
-            key = "{}{}".format(col, row)
+            key = humanize_position(pos)
             obj[key] = {}
             data = copy.deepcopy(self._children[pos]._calibration or {})
             obj[key]['calibration'] = data
