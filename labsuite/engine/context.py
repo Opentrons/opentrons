@@ -25,10 +25,6 @@ class Context():
         Traverses through child components until it finds something that
         has the same method name, then passes the arguments and returns
         the response.
-
-        This essentially provides full machine-level permissions to anyone
-        with web console access. Fine for now because this runs on a local
-        server hosted on the robot.
         """
         deck_method = getattr(self.deck, method, None)
         if callable(deck_method):
