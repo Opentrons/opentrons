@@ -1,5 +1,6 @@
 import serial
 import time
+import os
 
 
 class GCodeLogger():
@@ -103,7 +104,7 @@ class CNCDriver(object):
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         if self.connection.isOpen():
-            self.connection.write(data)
+            self.connection.write(str(data).encode())
         elif max_tries > 0:
             time.sleep(try_interval)
             self.write_to_serial(
