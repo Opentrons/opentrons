@@ -13,7 +13,8 @@ class LiquidInventory():
     min_working_volume = None
     max_working_volume = None
 
-    _allow_liquid_debt = False
+    _allow_liquid_debt = True
+    _allow_unspecified_liquids = True
 
     """
     A dict containing the liquid key (a user-specified name) along with
@@ -175,6 +176,8 @@ class LiquidInventory():
             )
 
         if self._allow_liquid_debt and total_volume is 0:
+            if name is None and self._allow_unspecified_liquids:
+                name = 'unspecified'
             if name is None:
                 raise Exception(
                     "Liquid name required when liquid debt is enabled."
