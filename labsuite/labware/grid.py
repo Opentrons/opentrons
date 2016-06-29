@@ -81,7 +81,7 @@ def humanize_position(position):
 
 class GridItem():
 
-    parent   = None
+    parent = None
     position = None
 
     depth = None
