@@ -169,7 +169,6 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
-        print(self.protocol._commands)
         self.protocol.run_next()
-        vol = self.protocol._context.get_volume('A1:A1')
+        vol = self.protocol._context.get_volume('A1:A2')
         self.assertEqual(vol, 100)
