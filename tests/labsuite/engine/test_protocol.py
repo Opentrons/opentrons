@@ -14,7 +14,7 @@ class ProtocolTest(unittest.TestCase):
         return self.protocol._commands
 
     def test_normalize_address(self):
-        self.protocol.add_container('microplate.96', 'A1', label="Output")
+        self.protocol.add_container('A1', 'microplate.96', label="Output")
         label = self.protocol._normalize_address('Output:A1')
         self.assertEqual(label, ('output', (0, 0)))
         slot = self.protocol._normalize_address('A1:A1')
@@ -79,7 +79,7 @@ class ProtocolTest(unittest.TestCase):
                 ]
             }
         }]
-        self.protocol.add_container('microplate.96', 'A1', label="Label")
+        self.protocol.add_container('A1', 'microplate.96', label="Label")
         self.protocol.transfer_group(
             ('A1:A1', 'B1:B1', {'ul': 15}),
             ('A2:A2', 'B2:B2', {'ml': 1}),
@@ -164,3 +164,12 @@ class ProtocolTest(unittest.TestCase):
             'reps': 10
         }}]
         self.assertEqual(self.instructions, expected)
+
+    def test_context(self):
+        self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.calibrate('A1', x=1, y=2, z=3)
+        self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
+        print(self.protocol._commands)
+        self.protocol.run_next()
+        vol = self.protocol._context.get_volume('A1:A1')
+        self.assertEqual(vol, 100)
