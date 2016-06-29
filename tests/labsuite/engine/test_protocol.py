@@ -176,5 +176,5 @@ class ProtocolTest(unittest.TestCase):
         vol2 = self.protocol._context.get_volume('A1:A2')
         self.assertEqual(vol2, 100)
         self.protocol.run_next()
-        vol2 = self.protocol._context.get_volume('A1:A3')
-        self.assertEqual(vol2, 80)
+        vol3 = self.protocol._context.get_volume('A1:A3')
+        self.assertEqual(vol3, 80)
