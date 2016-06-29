@@ -55,11 +55,11 @@ class GridTest(unittest.TestCase):
         """
         Passthrough normalization of 2-member tuple.
         """
-        expected = normalize_position((2,1))
+        expected = normalize_position((2, 1))
         self.assertEqual(expected, (2, 1))
 
     def test_short_tuple(self):
-        """ 
+        """
         Raise exception on one-member tuple.
         """
         with self.assertRaises(TypeError):
@@ -70,7 +70,7 @@ class GridTest(unittest.TestCase):
         Raise exception on three-member tuple.
         """
         with self.assertRaises(TypeError):
-            normalize_position((1,2,3))
+            normalize_position((1, 2, 3))
 
     def test_mistyped_tuple(self):
         """
