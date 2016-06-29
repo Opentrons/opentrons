@@ -14,7 +14,6 @@ class MicroplateTest(unittest.TestCase):
     def a1_calibration_test(self):
         """Basic calibration."""
         a1 = self.plate.well('A1').coordinates()
-        print(self.plate._calibration)
         self.assertEqual(a1, (10, 11, 12))
 
     def a2_coordinate_test(self):
