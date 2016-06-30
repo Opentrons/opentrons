@@ -6,7 +6,7 @@ config = {
     'author_email': 'info@opentrons.com',
     'url': 'http://opentrons.com',
     'version': '0.4',
-    'install_requires': ['pyyaml'],
+    'install_requires': ['pyyaml', 'serial'],
     'packages': find_packages(exclude=["tests"]),
     'package_data': {
         "labsuite": [
