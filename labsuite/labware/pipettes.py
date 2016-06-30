@@ -52,11 +52,11 @@ class Pipette():
             connected to this pipette.
 
         """
-        if top:
+        if top is not None:
             self._top = top
-        if blowout:
+        if blowout is not None:
             self._blowout = blowout
-        if droptip:
+        if droptip is not None:
             self._droptip = droptip
         if axis:
             self._axis = axis
@@ -70,6 +70,11 @@ class Pipette():
         Calibration of the top and blowout positions are necessary for
         these calculations to work.
         """
+        if self._blowout is None or self._top is None:
+            print(self._blowout, self._top)
+            raise ValueError(
+                "Pipette {} not calibrated.".format(self.axis)
+            )
         percent = self._volume_percentage(volume)
         travel = self._blowout - self._top
         distance = travel * percent
@@ -113,6 +118,10 @@ class Pipette():
 
     def supports_volume(self, volume):
         return volume <= self.max_vol and volume >= self.min_vol
+
+    @property
+    def axis(self):
+        return self._axis
 
 
 class Pipette_P2(Pipette):
