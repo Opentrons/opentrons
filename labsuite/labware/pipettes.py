@@ -1,3 +1,13 @@
+import sys
+
+
+def load_instrument(name):
+    return getattr(
+        sys.modules[__name__],
+        'Pipette_{}'.format(name.upper())
+    )
+
+
 class Pipette():
 
     channels = 1
