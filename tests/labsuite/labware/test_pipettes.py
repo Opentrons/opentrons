@@ -3,7 +3,7 @@ from labsuite.labware import pipettes
 
 
 class MockPipette(pipettes.Pipette):
-    min_vol = 0
+    min_vol = 1
     max_vol = 10
 
     _top = None
@@ -52,3 +52,9 @@ class PipetteTest(unittest.TestCase):
         """Loads instruments."""
         p = pipettes.load_instrument('p10')
         self.assertIsInstance(p, pipettes.Pipette_P10)
+
+    def test_volume_support(self):
+        self.assertEqual(self.pipette.supports_volume(10), True)
+        self.assertEqual(self.pipette.supports_volume(1), True)
+        self.assertEqual(self.pipette.supports_volume(0), False)
+        self.assertEqual(self.pipette.supports_volume(11), False)

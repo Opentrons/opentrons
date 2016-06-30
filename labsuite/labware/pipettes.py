@@ -111,6 +111,9 @@ class Pipette():
 
         return volume * scale / self.max_vol
 
+    def supports_volume(self, volume):
+        return volume <= self.max_vol and volume >= self.min_vol
+
 
 class Pipette_P2(Pipette):
     size = 'P2'
