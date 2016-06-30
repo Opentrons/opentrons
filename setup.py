@@ -18,7 +18,7 @@ config = {
     },
     'scripts': [
         'bin/labsuite-compile'
-    ],p
+    ],
     'name': 'labsuite',
     'test_suite': 'nose.collector',
     'zip_safe': False
