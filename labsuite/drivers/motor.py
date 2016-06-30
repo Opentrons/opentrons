@@ -13,6 +13,8 @@ class GCodeLogger():
 
     open = False
 
+    write_buffer = None
+
     def __init__(self):
         self.write_buffer = []
 
@@ -63,7 +65,7 @@ class CNCDriver(object):
     internal list instead of being sent to the actual device.
     """
     simulated = False
-    command_queue = []
+    command_queue = None  # []
 
     """
     Serial port connection to talk to the device.
@@ -72,6 +74,7 @@ class CNCDriver(object):
 
     def __init__(self, inches=False, simulate=False):
         self.simulated = simulate
+        self.command_queue = []
 
     def connect(self, device=None, port=None):
         self.connection = serial.Serial(port=device or port)
@@ -189,16 +192,13 @@ class OpenTrons(CNCDriver):
     DEBUG_ON = 'M62'
     DEBUG_OFF = 'M63'
 
-    def __init__(self, *args, **kwargs):
-        super(self.__class__, self).__init__(*args, **kwargs)
-
     def move(self, **kwargs):
         """
         We want to move our pipette sequentially so it doesn't bang into any
         obstacles in its path or drag against the sides of any containers.
         """
+        move = super(OpenTrons, self).move
 
-        move = super(self.__class__, self)
         move(z=1)
 
         if ('x' in kwargs):
@@ -207,3 +207,24 @@ class OpenTrons(CNCDriver):
             move(y=kwargs['y'])
         if ('z' in kwargs):
             move(z=kwargs['z'])
+
+
+class MoveLogger(CNCDriver):
+
+    """
+    This is one level higher than the G-code; it logs moves.
+    """
+
+    movements = []
+
+    def __init__(self):
+        self.movements = []
+
+    def move(self, **kwargs):
+        self.movements.append(kwargs)
+
+    def isOpen(self):
+        return True
+
+    def write(self, data):
+        pass
