@@ -212,7 +212,13 @@ class OpenTrons(CNCDriver):
 class MoveLogger(CNCDriver):
 
     """
-    This is one level higher than the G-code; it logs moves.
+    This is one level higher than the G-code; it logs moves whereas the
+    G-code logger logs low-level serial data being written to the physical
+    motor controller.
+
+    We can use this to get a low-level movement command to send off to some
+    other theoretical motor control driver stack, or we can use it for
+    testing.
     """
 
     movements = []

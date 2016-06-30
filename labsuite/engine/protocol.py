@@ -211,6 +211,23 @@ class Protocol():
             method(**kwargs)
 
     def attach_handler(self, handler_class):
+        """
+        When you attach a handler, commands are run on the handler in sequence
+        when Protocol.run_next() is called.
+
+        You don't have to attach the ContextHandler, you get that for free.
+        It's a good example implementation of what these things are
+        supposed to do.
+
+        Any command that the robot supports must be present on the Handler
+        you pass in, or you'll get exceptions. Just make sure you subclass
+        from ProtocolHandler and you'll be fine; empty methods are stubbed
+        out for all supported commands.
+
+        Pass in the class, not an instance. This method returns the
+        instantiated object, which you can use to do any additional setup
+        required for the particular Handler.
+        """
         handler = handler_class(self, self._context)
         self._handlers.append(handler)
         return handler
