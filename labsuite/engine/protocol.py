@@ -1,6 +1,7 @@
 from labsuite.labware import containers, deck
 from labsuite.labware.grid import normalize_position
 from labsuite.engine.context import Context
+import labsuite.drivers.motor as motor_drivers
 
 import copy
 
@@ -19,11 +20,14 @@ class Protocol():
 
     _command_index = 0  # Index of the running command.
 
+    _handlers = None  # List of attached handlers for run_next.
+
     def __init__(self):
         self._ingredients = {}
         self._container_labels = {}
         self._commands = []
         self._context = ContextHandler(self)
+        self._handlers = []
 
     def add_container(self, slot, name, label=None):
         slot = normalize_position(slot)
@@ -202,6 +206,14 @@ class Protocol():
         if not method:
             raise KeyError("Command not defined: " + command)
         method(**kwargs)
+        for h in self._handlers:
+            method = getattr(h, command)
+            method(**kwargs)
+
+    def attach_handler(self, handler_class):
+        handler = handler_class(self, self._context)
+        self._handlers.append(handler)
+        return handler
 
 
 class ProtocolHandler():
@@ -250,6 +262,11 @@ class ProtocolHandler():
 
 class ContextHandler(ProtocolHandler):
 
+    """
+    ContextHandler runs all the stuff on the virtual robot in the background
+    and makes relevant data available.
+    """
+
     _deck = None
 
     def setup(self):
@@ -260,6 +277,11 @@ class ContextHandler(ProtocolHandler):
 
     def calibrate(self, slot, x=None, y=None, z=None):
         self._deck.calibrate(**{slot: {'x': x, 'y': y, 'z': z}})
+
+    def get_coordinates(self, position):
+        """ Returns the calibrated coordinates for a position. """
+        slot, well = position
+        return self._deck.slot(slot).well(well).coordinates()
 
     def get_volume(self, well):
         slot, well = self._protocol._normalize_address(well)
@@ -283,3 +305,64 @@ class ContextHandler(ProtocolHandler):
 
     def consolidate(self):
         pass
+
+
+class MotorControlHandler(ProtocolHandler):
+
+    _driver = None
+
+    def set_driver(self, connection):
+        self._driver = connection
+
+    def transfer(self, start=None, end=None, volume=None, **kwargs):
+        self.pickup_tip()
+        self.move_volume(start, end, volume)
+        self.dispose_tip()
+
+    def move_volume(self, start, end, volume):
+        self.move_to_well(start)
+        self.move_to_well(end)
+        """
+        Full sequence; we're implementing it iteratively:
+            self.move_to_well(start)
+            self.depress_plunger(volume)
+            self.move_into_well(start)
+            self.release_plunger()
+            self.move_to_well(end)
+            self.move_into_well(end)
+            self.blowout()
+            self.move_to_well(end)
+            self.release_plunger()
+        """
+
+    def pickup_tip(self):
+        pass
+
+    def lower_tip(self):
+        pass
+
+    def dispose_tip(self):
+        pass
+
+    def move_to_well(self, well):
+        coords = self._context.get_coordinates(well)
+        x, y, z = coords
+        self._move_motors(x=x, y=y, z=z)
+
+    def move_into_well(self, well):
+        pass
+
+    def depress_plunger(self, volume):
+        pass
+
+    def release_plunger(self):
+        pass
+
+    def blowout(self):
+        pass
+
+    def dispense(self):
+        pass
+
+    def _move_motors(self, **kwargs):
+        self._driver.move(**kwargs)

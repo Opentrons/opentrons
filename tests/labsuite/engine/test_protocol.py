@@ -1,6 +1,6 @@
 import unittest
-import json
-from labsuite.engine.protocol import Protocol
+from labsuite.engine.protocol import Protocol, MotorControlHandler
+import labsuite.drivers.motor as motor_drivers
 
 
 class ProtocolTest(unittest.TestCase):
@@ -178,3 +178,23 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.run_next()
         vol3 = self.protocol._context.get_volume('A1:A3')
         self.assertEqual(vol3, 80)
+
+    def test_motor_handler(self):
+        output_log = motor_drivers.MoveLogger()
+        motor_handler = self.protocol.attach_handler(MotorControlHandler)
+        motor_handler.set_driver(output_log)
+        self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.calibrate('A1', x=1, y=2, z=3)
+        self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
+        self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
+        self.protocol.run_next()
+        self.protocol.run_next()
+        expected = [
+            # Transfer A1:A1 to A1:A2
+            {'x': 1, 'y': 2, 'z': 3},  # move_to_well A1:A1
+            {'x': 1, 'y': 11, 'z': 3},  # move_to_well A1:A2
+            # Transfer A1:A2 to A1:A3
+            {'x': 1, 'y': 11, 'z': 3},  # move_to_well A1:A2
+            {'x': 1, 'y': 20, 'z': 3},  # move_to_well A1:A3
+        ]
+        self.assertEqual(expected, output_log.movements)
