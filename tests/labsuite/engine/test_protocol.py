@@ -191,10 +191,18 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.run_next()
         expected = [
             # Transfer A1:A1 to A1:A2
-            {'x': 1, 'y': 2, 'z': 3},  # move_to_well A1:A1
-            {'x': 1, 'y': 11, 'z': 3},  # move_to_well A1:A2
+            {'z': 0},  # Move up (so we don't hit things).
+            {'x': 1, 'y': 2},  # move_to_well A1:A1
+            {'z': 3},  # Move down.
+            {'z': 0},  # Move up.
+            {'x': 1, 'y': 11},  # move_to_well A1:A2
+            {'z': 3},  # Move down.
             # Transfer A1:A2 to A1:A3
-            {'x': 1, 'y': 11, 'z': 3},  # move_to_well A1:A2
-            {'x': 1, 'y': 20, 'z': 3},  # move_to_well A1:A3
+            {'z': 0},  # Move up.
+            {'x': 1, 'y': 11},  # move_to_well A1:A2
+            {'z': 3},  # Move down.
+            {'z': 0},  # Move up.
+            {'x': 1, 'y': 20},  # move_to_well A1:A3
+            {'z': 3}  # Move down.
         ]
         self.assertEqual(expected, output_log.movements)

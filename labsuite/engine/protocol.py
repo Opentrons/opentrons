@@ -304,6 +304,13 @@ class ContextHandler(ProtocolHandler):
         slot, well = self._protocol._normalize_address(well)
         return self._deck.slot(slot).well(well).get_volume()
 
+    def get_tip_coordinates(self, size):
+        """
+        Returns the coordinates of the next available pipette tip for that
+        particular size (ie, p10).
+        """
+        pass
+
     def transfer(self, start=None, end=None, volume=None, **kwargs):
         start_slot, start_well = start
         end_slot, end_well = end
@@ -332,9 +339,7 @@ class MotorControlHandler(ProtocolHandler):
         self._driver = connection
 
     def transfer(self, start=None, end=None, volume=None, **kwargs):
-        self.pickup_tip()
         self.move_volume(start, end, volume)
-        self.dispose_tip()
 
     def move_volume(self, start, end, volume):
         self.move_to_well(start)
@@ -355,16 +360,15 @@ class MotorControlHandler(ProtocolHandler):
     def pickup_tip(self):
         pass
 
-    def lower_tip(self):
-        pass
-
     def dispose_tip(self):
         pass
 
     def move_to_well(self, well):
+        self._move_motors(z=0)  # Move up so we don't hit things.
         coords = self._context.get_coordinates(well)
         x, y, z = coords
-        self._move_motors(x=x, y=y, z=z)
+        self._move_motors(x=x, y=y)
+        self._move_motors(z=z)
 
     def move_into_well(self, well):
         pass
