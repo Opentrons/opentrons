@@ -7,7 +7,6 @@ class ProtocolTest(unittest.TestCase):
 
     def setUp(self):
         self.protocol = Protocol()
-        self.protocol.add_instrument('p10')
 
     @property
     def instructions(self):
@@ -206,3 +205,8 @@ class ProtocolTest(unittest.TestCase):
             {'z': 3}  # Move down.
         ]
         self.assertEqual(expected, output_log.movements)
+
+    def test_find_instrument_by_volume(self):
+        self.protocol.add_instrument('A', 'p10')
+        i = self.protocol._context.get_instrument(volume=6)
+        self.assertEqual(i.supports_volume(6), True)

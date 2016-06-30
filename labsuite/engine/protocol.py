@@ -1,4 +1,4 @@
-from labsuite.labware import containers, deck
+from labsuite.labware import containers, deck, pipettes
 from labsuite.labware.grid import normalize_position
 from labsuite.engine.context import Context
 import labsuite.drivers.motor as motor_drivers
@@ -36,8 +36,8 @@ class Protocol():
             label = label.lower()
             self._container_labels[label] = slot
 
-    def add_instrument(self, *args, **kwargs):
-        pass
+    def add_instrument(self, slot, name):
+        self._context.add_instrument(slot, name)
 
     def add_ingredient(self, name, location):
         pass
@@ -285,9 +285,38 @@ class ContextHandler(ProtocolHandler):
     """
 
     _deck = None
+    _instruments = None  # Axis as keys; Pipette object as vals.
 
     def setup(self):
         self._deck = deck.Deck()
+        self._instruments = {}
+
+    def add_instrument(self, axis, name):
+        # We only have pipettes now so this is pipette-specific.
+        self._instruments[axis] = pipettes.load_instrument(name)
+
+    def get_instrument(self, axis=None, volume=None):
+        if axis:
+            if axis not in self._instruments:
+                raise KeyError(
+                    "No instrument assigned to {} axis.".format(axis)
+                )
+            else:
+                return self._instruments[axis]
+        if volume:
+            for k, i in self._instruments.items():
+                if i.supports_volume(volume):
+                    return i
+
+        raise KeyError(
+            "No instrument found to support a volume of {}µl."
+            .format(volume)
+        )
+
+    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
+        kwargs = {'top': top, 'blowout': blowout, 'droptip': droptip,
+                  'axis': axis}
+        self._instruments[axis].calibrate(**kwargs)
 
     def add_container(self, slot, container_name):
         self._deck.add_module(slot, container_name)
