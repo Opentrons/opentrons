@@ -6,7 +6,7 @@ config = {
     'author_email': 'info@opentrons.com',
     'url': 'http://opentrons.com',
     'version': '0.4',
-    'install_requires': ['pyyaml', 'serial'],
+    'install_requires': ['pyyaml', 'pyserial'],
     'packages': find_packages(exclude=["tests"]),
     'package_data': {
         "labsuite": [
@@ -18,7 +18,7 @@ config = {
     },
     'scripts': [
         'bin/labsuite-compile'
-    ],
+    ],p
     'name': 'labsuite',
     'test_suite': 'nose.collector',
     'zip_safe': False
