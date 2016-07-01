@@ -1,8 +1,8 @@
 import unittest
-
-from labsuite.labware import containers
 from labsuite.labware.deck import Deck
 from labsuite.labware.microplates import Microplate
+from labsuite.labware.tipracks import Tiprack
+
 
 class DeckTest(unittest.TestCase):
 
@@ -54,3 +54,11 @@ class DeckTest(unittest.TestCase):
         self.assertEqual(plate.well('a1').coordinates(), (1, 2, 3))
         plate.well('b10').calibrate(4, 5, 6)
         self.assertEqual(plate.well('b10').coordinates(), (4, 5, 6))
+
+    def test_find_module(self):
+        self.deck.add_module('a1', 'microplate.96')
+        plate = self.deck.find_module(name='microplate.96')
+        self.assertIsInstance(plate, Microplate)
+        self.deck.add_module('a2', 'tiprack.p10')
+        rack = self.deck.find_module(size='P10')
+        self.assertIsInstance(rack, Tiprack)
