@@ -71,7 +71,6 @@ class Pipette():
         these calculations to work.
         """
         if self._blowout is None or self._top is None:
-            print(self._blowout, self._top)
             raise ValueError(
                 "Pipette {} not calibrated.".format(self.axis)
             )
@@ -122,6 +121,10 @@ class Pipette():
     @property
     def axis(self):
         return self._axis
+
+    @property
+    def blowout(self):
+        return self._blowout
 
 
 class Pipette_P2(Pipette):
