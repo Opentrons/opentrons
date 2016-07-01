@@ -9,9 +9,6 @@ filename = os.path.join(
     'operation_log.log'
 )
 
-f = open(filename)
-f.close()
-
 logging.basicConfig(
     filename=filename,
     level=logging.DEBUG,
