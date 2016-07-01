@@ -48,6 +48,11 @@ class Protocol():
     def calibrate(self, *args, **kwargs):
         self._context.calibrate(*args, **kwargs)
 
+    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
+        self._context.calibrate_instrument(
+            axis, top=top, blowout=blowout, droptip=droptip
+        )
+
     def transfer(self, start, end, ul=None, ml=None,
                  blowout=True, touchtip=True):
         if ul:
@@ -316,7 +321,7 @@ class ContextHandler(ProtocolHandler):
     def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
         kwargs = {'top': top, 'blowout': blowout, 'droptip': droptip,
                   'axis': axis}
-        self._instruments[axis].calibrate(**kwargs)
+        self.get_instrument(axis=axis).calibrate(**kwargs)
 
     def add_container(self, slot, container_name):
         self._deck.add_module(slot, container_name)
@@ -371,20 +376,16 @@ class MotorControlHandler(ProtocolHandler):
         self.move_volume(start, end, volume)
 
     def move_volume(self, start, end, volume):
+        pipette = self.get_pipette(volume=volume)
         self.move_to_well(start)
+        pipette.plunge()
+        self.move_into_well(start)
+        pipette.release()
         self.move_to_well(end)
-        """
-        Full sequence; we're implementing it iteratively:
-            self.move_to_well(start)
-            self.depress_plunger(volume)
-            self.move_into_well(start)
-            self.release_plunger()
-            self.move_to_well(end)
-            self.move_into_well(end)
-            self.blowout()
-            self.move_to_well(end)
-            self.release_plunger()
-        """
+        self.move_into_well(end)
+        pipette.blowout()
+        self.move_up()
+        pipette.release()
 
     def pickup_tip(self):
         pass
@@ -400,19 +401,38 @@ class MotorControlHandler(ProtocolHandler):
         self._move_motors(z=z)
 
     def move_into_well(self, well):
-        pass
+        x, y, z = self._context.get_coordinates(well)
+        z = z + 10
+        self._move_motors(x=x, y=y, z=z)
+
+    def move_up(self):
+        self._move_motors(z=0)
 
     def depress_plunger(self, volume):
-        pass
+        axis, depth = self._context.get_plunge(volume=volume)
+        self._move_motors(**{axis: depth})
 
-    def release_plunger(self):
-        pass
+    def get_pipette(self, volume=None, axis=None):
+        """
+        Returns a closure object that allows for the plunge, release, and
+        blowout of a certain pipette and volume.
+        """
+        pipette = self._context.get_instrument(volume=volume, axis=axis)
+        axis = pipette.axis
 
-    def blowout(self):
-        pass
+        class TempPipette():
 
-    def dispense(self):
-        pass
+            def plunge():
+                depth = pipette.plunge_depth(volume)
+                self._move_motors(**{axis: depth})
+
+            def release():
+                self._move_motors(**{axis: 0})
+
+            def blowout():
+                self._move_motors(**{axis: pipette.blowout})
+
+        return TempPipette
 
     def _move_motors(self, **kwargs):
         self._driver.move(**kwargs)

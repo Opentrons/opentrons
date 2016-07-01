@@ -182,27 +182,43 @@ class ProtocolTest(unittest.TestCase):
         output_log = motor_drivers.MoveLogger()
         motor_handler = self.protocol.attach_handler(MotorControlHandler)
         motor_handler.set_driver(output_log)
+        self.protocol.add_instrument('A', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
+        self.protocol.calibrate_instrument('A', top=0, blowout=10)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         self.protocol.run_next()
         self.protocol.run_next()
         expected = [
-            # Transfer A1:A1 to A1:A2
-            {'z': 0},  # Move up (so we don't hit things).
-            {'x': 1, 'y': 2},  # move_to_well A1:A1
-            {'z': 3},  # Move down.
+            # Transfer 1.
+            {'z': 0},  # Move to well.
+            {'x': 1, 'y': 2},
+            {'z': 3},
+            {'a': 5.0},  # Plunge.
+            {'x': 1, 'y': 2, 'z': 13},  # Move into well.
+            {'a': 0},  # Release.
             {'z': 0},  # Move up.
-            {'x': 1, 'y': 11},  # move_to_well A1:A2
-            {'z': 3},  # Move down.
-            # Transfer A1:A2 to A1:A3
+            {'x': 1, 'y': 11},  # Move to well.
+            {'z': 3},
+            {'x': 1, 'y': 11, 'z': 13},  # Move into well.
+            {'a': 10},  # Blowout.
             {'z': 0},  # Move up.
-            {'x': 1, 'y': 11},  # move_to_well A1:A2
-            {'z': 3},  # Move down.
-            {'z': 0},  # Move up.
-            {'x': 1, 'y': 20},  # move_to_well A1:A3
-            {'z': 3}  # Move down.
+            {'a': 0},  # Release.
+            # Transfer 2.
+            {'z': 0},
+            {'x': 1, 'y': 11},
+            {'z': 3},
+            {'a': 4.0},
+            {'x': 1, 'y': 11, 'z': 13},
+            {'a': 0},
+            {'z': 0},
+            {'x': 1, 'y': 20},
+            {'z': 3},
+            {'x': 1, 'y': 20, 'z': 13},
+            {'a': 10},
+            {'z': 0},
+            {'a': 0}
         ]
         self.assertEqual(expected, output_log.movements)
 
