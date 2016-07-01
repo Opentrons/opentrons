@@ -368,9 +368,11 @@ class ContextHandler(ProtocolHandler):
 class MotorControlHandler(ProtocolHandler):
 
     _driver = None
+    _pipette_motors = None  # {axis: PipetteMotor}
 
     def set_driver(self, connection):
         self._driver = connection
+        self._pipette_motors = {}
 
     def transfer(self, start=None, end=None, volume=None, **kwargs):
         self.move_volume(start, end, volume)
@@ -378,7 +380,7 @@ class MotorControlHandler(ProtocolHandler):
     def move_volume(self, start, end, volume):
         pipette = self.get_pipette(volume=volume)
         self.move_to_well(start)
-        pipette.plunge()
+        pipette.plunge(volume)
         self.move_into_well(start)
         pipette.release()
         self.move_to_well(end)
@@ -394,23 +396,23 @@ class MotorControlHandler(ProtocolHandler):
         pass
 
     def move_to_well(self, well):
-        self._move_motors(z=0)  # Move up so we don't hit things.
+        self.move_motors(z=0)  # Move up so we don't hit things.
         coords = self._context.get_coordinates(well)
         x, y, z = coords
-        self._move_motors(x=x, y=y)
-        self._move_motors(z=z)
+        self.move_motors(x=x, y=y)
+        self.move_motors(z=z)
 
     def move_into_well(self, well):
         x, y, z = self._context.get_coordinates(well)
         z = z + 10
-        self._move_motors(x=x, y=y, z=z)
+        self.move_motors(x=x, y=y, z=z)
 
     def move_up(self):
-        self._move_motors(z=0)
+        self.move_motors(z=0)
 
     def depress_plunger(self, volume):
         axis, depth = self._context.get_plunge(volume=volume)
-        self._move_motors(**{axis: depth})
+        self.move_motors(**{axis: depth})
 
     def get_pipette(self, volume=None, axis=None):
         """
@@ -419,20 +421,33 @@ class MotorControlHandler(ProtocolHandler):
         """
         pipette = self._context.get_instrument(volume=volume, axis=axis)
         axis = pipette.axis
+        if axis not in self._pipette_motors:
+            self._pipette_motors[axis] = PipetteMotor(pipette, self)
+        return self._pipette_motors[axis]
 
-        class TempPipette():
-
-            def plunge():
-                depth = pipette.plunge_depth(volume)
-                self._move_motors(**{axis: depth})
-
-            def release():
-                self._move_motors(**{axis: 0})
-
-            def blowout():
-                self._move_motors(**{axis: pipette.blowout})
-
-        return TempPipette
-
-    def _move_motors(self, **kwargs):
+    def move_motors(self, **kwargs):
         self._driver.move(**kwargs)
+
+
+class PipetteMotor():
+
+        def __init__(self, pipette, motor):
+            self.pipette = pipette
+            self.motor = motor
+
+        def plunge(self, volume):
+            depth = self.pipette.plunge_depth(volume)
+            axis = self.axis
+            self.motor.move_motors(**{axis: depth})
+
+        def release(self):
+            axis = self.axis
+            self.motor.move_motors(**{axis: 0})
+
+        def blowout(self):
+            axis = self.axis
+            self.motor.move_motors(**{axis: self.pipette.blowout})
+
+        @property
+        def axis(self):
+            return self.pipette.axis
