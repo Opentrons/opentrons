@@ -2,6 +2,7 @@ from labsuite.labware import containers, deck, pipettes
 from labsuite.labware.grid import normalize_position
 from labsuite.engine.context import Context
 import labsuite.drivers.motor as motor_drivers
+from labsuite.util.log import debug
 
 import copy
 
@@ -203,7 +204,9 @@ class Protocol():
         next_command = self._commands[self._command_index]
         cur = self._commands[i]
         command = list(cur)[0]
-        self._run(command, cur[command])
+        args = cur[command]
+        debug("Protocol", "Running {} with args: {}".format(command, args))
+        self._run(command, args)
         self._command_index += 1
 
     def _run(self, command, kwargs):
@@ -374,6 +377,9 @@ class MotorControlHandler(ProtocolHandler):
         self._driver = connection
         self._pipette_motors = {}
 
+    def connect(self, port):
+        self._driver.connect(device=port)
+
     def transfer(self, start=None, end=None, volume=None, **kwargs):
         self.move_volume(start, end, volume)
 
@@ -426,6 +432,7 @@ class MotorControlHandler(ProtocolHandler):
         return self._pipette_motors[axis]
 
     def move_motors(self, **kwargs):
+        debug("MotorHandler", "Moving: {}".format(kwargs))
         self._driver.move(**kwargs)
 
 
@@ -437,16 +444,17 @@ class PipetteMotor():
 
         def plunge(self, volume):
             depth = self.pipette.plunge_depth(volume)
-            axis = self.axis
-            self.motor.move_motors(**{axis: depth})
+            self.move(depth)
 
         def release(self):
-            axis = self.axis
-            self.motor.move_motors(**{axis: 0})
+            self.move(0)
 
         def blowout(self):
+            self.move(self.pipette.blowout)
+
+        def move(self, position):
             axis = self.axis
-            self.motor.move_motors(**{axis: self.pipette.blowout})
+            self.motor.move_motors(**{axis: position})
 
         @property
         def axis(self):
