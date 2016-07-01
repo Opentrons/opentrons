@@ -205,7 +205,6 @@ class Protocol():
         cur = self._commands[i]
         command = list(cur)[0]
         args = cur[command]
-        debug("Protocol", "Running {} with args: {}".format(command, args))
         self._run(command, args)
         self._command_index += 1
 
@@ -215,6 +214,11 @@ class Protocol():
             raise KeyError("Command not defined: " + command)
         method(**kwargs)
         for h in self._handlers:
+            debug(
+                "Protocol",
+                "{}.{}: {}"
+                .format(type(h).__name__, command, kwargs)
+            )
             method = getattr(h, command)
             method(**kwargs)
 
