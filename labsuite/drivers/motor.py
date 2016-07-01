@@ -227,6 +227,7 @@ class MoveLogger(CNCDriver):
         self.movements = []
 
     def move(self, **kwargs):
+        kwargs = dict((k.lower(), v) for k, v in kwargs.items())
         self.movements.append(kwargs)
 
     def isOpen(self):
