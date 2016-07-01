@@ -1,6 +1,7 @@
 import serial
 import time
 import os
+from labsuite.util.log import debug
 
 
 class GCodeLogger():
@@ -36,6 +37,9 @@ class GCodeLogger():
         if self.isOpen() is False:
             raise IOError("Connection not open.")
         return None
+
+    def readline(self):
+        return 'ok'
 
 
 class CNCDriver(object):
@@ -80,6 +84,7 @@ class CNCDriver(object):
         self.connection = serial.Serial(port=device or port)
         self.connection.close()
         self.connection.open()
+        debug("Serial", "Connected to {}".format(device or port))
 
     def send_command(self, command, **kwargs):
         """
@@ -107,7 +112,11 @@ class CNCDriver(object):
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         if self.connection.isOpen():
+            debug("Serial", "Write: {}".format(str(data).encode()))
             self.connection.write(str(data).encode())
+            out = self.connection.readline()
+            debug("Serial", "Read: {}".format(out))
+            return out
         elif max_tries > 0:
             time.sleep(try_interval)
             self.write_to_serial(
@@ -136,21 +145,17 @@ class CNCDriver(object):
         as explicit keyword arguments, but it's much nicer to be able to pass
         them as anonymous parameters when calling this method.
         """
-        if x:
-            kwargs['x'] = x
-        if y:
-            kwargs['y'] = y
-        if z:
-            kwargs['z'] = z
+        if x is not None:
+            args['x'] = x
+        if y is not None:
+            args['y'] = y
+        if z is not None:
+            args['z'] = z
 
         for k in kwargs:
-            if len(k) is 1:
-                """
-                If the length of the key is a single character, it's probably
-                a custom axis. (We're using A and B for pipette arms, for
-                example.)
-                """
-                args[k.upper()] = kwargs[k]
+            args[k.upper()] = kwargs[k]
+
+        debug("MotorDriver", "Moving: {}".format(args))
 
         self.send_command(code, **args)
 
@@ -192,22 +197,6 @@ class OpenTrons(CNCDriver):
     DEBUG_ON = 'M62'
     DEBUG_OFF = 'M63'
 
-    def move(self, **kwargs):
-        """
-        We want to move our pipette sequentially so it doesn't bang into any
-        obstacles in its path or drag against the sides of any containers.
-        """
-        move = super(OpenTrons, self).move
-
-        move(z=1)
-
-        if ('x' in kwargs):
-            move(x=kwargs['x'])
-        if ('y' in kwargs):
-            move(y=kwargs['y'])
-        if ('z' in kwargs):
-            move(z=kwargs['z'])
-
 
 class MoveLogger(CNCDriver):
 
@@ -225,10 +214,13 @@ class MoveLogger(CNCDriver):
 
     def __init__(self):
         self.movements = []
+        self.motor = OpenTrons()
+        self.motor.connection = GCodeLogger()
 
     def move(self, **kwargs):
         kwargs = dict((k.lower(), v) for k, v in kwargs.items())
         self.movements.append(kwargs)
+        self.motor.move(**kwargs)
 
     def isOpen(self):
         return True
