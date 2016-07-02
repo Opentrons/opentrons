@@ -123,15 +123,18 @@ class ReservoirWellTest(unittest.TestCase):
 class LiquidDebtTest(unittest.TestCase):
 
     _allow_liquid_debt = None  # Store library value to restore.
+    _allow_unspec = None  # Store library value to restore.
 
     def setUp(self):
         self._allow_liquid_debt = LiquidInventory._allow_liquid_debt
+        self._allow_unspec = LiquidInventory._allow_unspecified_liquids
         LiquidInventory._allow_liquid_debt = True
         self.reservoir = Reservoir()
         self.row = self.reservoir.row(1)
 
     def tearDown(self):
         LiquidInventory._allow_liquid_debt = self._allow_liquid_debt
+        LiquidInventory._allow_unspecified_liquids = self._allow_unspec
 
     def liquid_total_capacity_test(self):
         """
@@ -147,6 +150,10 @@ class LiquidDebtTest(unittest.TestCase):
         """
         Only allows for named liquid debt.
         """
+        LiquidInventory._allow_liquid_debt = True
+        LiquidInventory._allow_unspecified_liquids = False
+        row1 = self.reservoir.row(1)
+        row2 = self.reservoir.row(2)
         with self.assertRaises(Exception):
             # This shouldn't work because we have no idea what they're
             # transfering, so it's not very useful to us.
