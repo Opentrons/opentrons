@@ -1,5 +1,6 @@
 import unittest
-from labsuite.engine.protocol import Protocol, MotorControlHandler
+from labsuite.protocol import Protocol
+from labsuite.protocol.handlers.motor_control import MotorControlHandler
 import labsuite.drivers.motor as motor_drivers
 
 

@@ -4,6 +4,7 @@ from labsuite.labware.reservoirs import Reservoir
 from labsuite.labware.liquids import LiquidInventory
 from labsuite.labware.deck import Deck
 
+
 class ReservoirTest(unittest.TestCase):
 
     expected_margin = Reservoir.spacing
@@ -118,15 +119,19 @@ class ReservoirWellTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.row.add_liquid(saline=1)
 
+
 class LiquidDebtTest(unittest.TestCase):
 
+    _allow_liquid_debt = None  # Store library value to restore.
+
     def setUp(self):
+        self._allow_liquid_debt = LiquidInventory._allow_liquid_debt
         LiquidInventory._allow_liquid_debt = True
         self.reservoir = Reservoir()
         self.row = self.reservoir.row(1)
 
     def tearDown(self):
-        LiquidInventory._allow_liquid_debt = False
+        LiquidInventory._allow_liquid_debt = self._allow_liquid_debt
 
     def liquid_total_capacity_test(self):
         """
