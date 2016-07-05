@@ -27,6 +27,14 @@ def info(system, message):
     logging.info("[{}] {}".format(system, message))
 
 
+def error(system, message):
+    logging.error("[{}] {}".format(system, message))
+
+
+def warn(system, message):
+    logging.warning("[{}] {}".format(system, message))
+
+
 log_path = os.path.join(
     os.path.dirname(labsuite.__file__),
     '..',
