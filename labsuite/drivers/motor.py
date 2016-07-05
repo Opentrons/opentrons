@@ -31,6 +31,7 @@ class GCodeLogger():
     def write(self, data):
         if self.isOpen() is False:
             raise IOError("Connection not open.")
+        log.debug('GCodeLogger', 'Writing: {}'.format(data))
         self.write_buffer.append(data)
 
     def read(self, data):
@@ -85,6 +86,9 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         log.debug("Serial", "Connected to {}".format(device or port))
+
+    def disconnect(self):
+        self.connection.close()
 
     def send_command(self, command, **kwargs):
         """
