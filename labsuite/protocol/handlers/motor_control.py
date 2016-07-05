@@ -11,6 +11,9 @@ class MotorControlHandler(ProtocolHandler):
     def setup(self):
         self._pipette_motors = {}
 
+    def set_driver(self, driver):
+        self._driver = driver
+
     def connect(self, port):
         """
         Connects the MotorControlHandler to a serial port.
