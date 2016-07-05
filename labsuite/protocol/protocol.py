@@ -201,7 +201,10 @@ class Protocol():
 
     def run_next(self):
         i = self._command_index
-        next_command = self._commands[self._command_index]
+        try:
+            next_command = self._commands[self._command_index]
+        except IndexError:
+            return False
         cur = self._commands[i]
         command = list(cur)[0]
         args = cur[command]
