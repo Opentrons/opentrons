@@ -78,7 +78,7 @@ class CNCDriver(object):
     connection = None
 
     _wait_for_stat = False
-    _stat_command = '{"stat":0}'
+    _stat_command = None
 
     def __init__(self, inches=False, simulate=False):
         self.simulated = simulate
@@ -89,7 +89,6 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         log.debug("Serial", "Connected to {}".format(device or port))
-        self.wait_for_stat()
 
     def wait_for_stat(self, stat=None):
         if self.DEBUG_ON:
@@ -133,7 +132,7 @@ class CNCDriver(object):
             return
         if self.connection.isOpen():
             self.connection.write(str(data).encode())
-            if self._wait_for_stat is True:
+            if self._wait_for_stat is True and self._stat_command:
                 waiting = True
                 count = 0
                 while waiting:
@@ -239,6 +238,9 @@ class OpenTrons(CNCDriver):
 
     DEBUG_ON = 'M62'
     DEBUG_OFF = 'M63'
+
+    _wait_for_stat = True
+    _stat_command = '{"stat":0}'
 
 
 class MoveLogger(CNCDriver):
