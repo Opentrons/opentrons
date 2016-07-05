@@ -1,7 +1,7 @@
 import serial
 import time
 import os
-from labsuite.util.log import debug
+from labsuite.util import log
 
 
 class GCodeLogger():
@@ -84,7 +84,7 @@ class CNCDriver(object):
         self.connection = serial.Serial(port=device or port)
         self.connection.close()
         self.connection.open()
-        debug("Serial", "Connected to {}".format(device or port))
+        log.debug("Serial", "Connected to {}".format(device or port))
 
     def send_command(self, command, **kwargs):
         """
@@ -111,17 +111,22 @@ class CNCDriver(object):
         return command
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
+        log.debug("Serial", "Write: {}".format(str(data).encode()))
+        if self.connection is None:
+            log.warn("Serial", "No connection found.")
+            return
         if self.connection.isOpen():
-            debug("Serial", "Write: {}".format(str(data).encode()))
             self.connection.write(str(data).encode())
             out = self.connection.readline()
-            debug("Serial", "Read: {}".format(out))
+            log.debug("Serial", "Read: {}".format(out))
             return out
         elif max_tries > 0:
             time.sleep(try_interval)
             self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
+        else:
+            log.error("Serial", "Cannot connect to serial port.")
 
     def read_from_serial(self, size=16):
         return self.connection.read(size)
@@ -155,7 +160,7 @@ class CNCDriver(object):
         for k in kwargs:
             args[k.upper()] = kwargs[k]
 
-        debug("MotorDriver", "Moving: {}".format(args))
+        log.debug("MotorDriver", "Moving: {}".format(args))
 
         self.send_command(code, **args)
 
