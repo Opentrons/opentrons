@@ -5,6 +5,7 @@ import labsuite.drivers.motor as motor_drivers
 from labsuite.util.log import debug
 
 import copy
+import math
 
 
 class Protocol():
@@ -198,6 +199,18 @@ class Protocol():
                 raise KeyError("Container not found: {}".format(container))
 
         return (container, well)
+
+    @property
+    def length(self):
+        return len(self._commands)
+
+    @property
+    def percent_complete(self):
+        return math.floor((self._command_index / self.length) * 100)
+
+    @property
+    def command_index(self):
+        return self._command_index
 
     def run_next(self):
         i = self._command_index
