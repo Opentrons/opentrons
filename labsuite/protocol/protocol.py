@@ -262,6 +262,10 @@ class Protocol():
         self._handlers.append(handler)
         return handler
 
+    def teardown(self):
+        for h in self._handlers:
+            h.teardown()
+
 
 class ProtocolHandler():
 
@@ -288,6 +292,13 @@ class ProtocolHandler():
     def setup(self):
         """
         Whatever setup you need to do for your context, do it here.
+        """
+        pass
+
+    def teardown(self):
+        """
+        Whatever cleanup you need to do after a protocol is does
+        running.
         """
         pass
 
