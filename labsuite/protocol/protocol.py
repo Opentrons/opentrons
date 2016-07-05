@@ -219,8 +219,10 @@ class Protocol():
                 "{}.{}: {}"
                 .format(type(h).__name__, command, kwargs)
             )
+            h.before_each()
             method = getattr(h, command)
             method(**kwargs)
+            h.after_each()
 
     def attach_handler(self, handler_class):
         """
@@ -271,6 +273,12 @@ class ProtocolHandler():
         """
         Whatever setup you need to do for your context, do it here.
         """
+        pass
+
+    def before_each(self):
+        pass
+
+    def after_each(self):
         pass
 
     def transfer(self, start=None, end=None, volume=None, **kwargs):
