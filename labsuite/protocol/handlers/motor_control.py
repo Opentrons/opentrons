@@ -1,5 +1,6 @@
 from labsuite.util.log import debug
 from labsuite.protocol import ProtocolHandler
+import labsuite.drivers.motor as motor_drivers
 
 
 class MotorControlHandler(ProtocolHandler):
@@ -7,11 +8,20 @@ class MotorControlHandler(ProtocolHandler):
     _driver = None
     _pipette_motors = None  # {axis: PipetteMotor}
 
-    def set_driver(self, connection):
-        self._driver = connection
+    def setup(self):
         self._pipette_motors = {}
 
+    def set_driver(self, connection):
+        self._driver = connection
+
     def connect(self, port):
+        """
+        Connects the MotorControlHandler to a serial port.
+
+        If a device connection is set, then any dummy or alternate motor
+        drivers are replaced with the serial driver.
+        """
+        self.set_driver(motor_drivers.OpenTrons())
         self._driver.connect(device=port)
 
     def transfer(self, start=None, end=None, volume=None, **kwargs):
