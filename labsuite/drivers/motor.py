@@ -65,6 +65,9 @@ class CNCDriver(object):
     UNITS_TO_INCHES = 'G20'
     UNITS_TO_MILLIMETERS = 'G22'
 
+    DEBUG_ON = None
+    DEBUG_OFF = None
+
     """
     If simulated is set to true, all GCode commands will be saved to an
     internal list instead of being sent to the actual device.
@@ -93,6 +96,7 @@ class CNCDriver(object):
     def wait_for_stat(self, stat=None):
         if self.DEBUG_ON:
             log.debug("Serial", "Turning on debug mode.")
+            log.debug("Serial", "Awaiting stat responses.")
             self.send_command(self.DEBUG_ON)
             self._wait_for_stat = True
             if stat is not None:
@@ -260,6 +264,7 @@ class MoveLogger(CNCDriver):
     def __init__(self):
         self.movements = []
         self.motor = OpenTrons()
+        self.motor._wait_for_stat = False
         self.motor.connection = GCodeLogger()
 
     def move(self, **kwargs):
