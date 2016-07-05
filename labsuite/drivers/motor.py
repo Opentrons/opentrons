@@ -77,6 +77,9 @@ class CNCDriver(object):
     """
     connection = None
 
+    _wait_for_stat = False
+    _stat_command = '{"stat":0}'
+
     def __init__(self, inches=False, simulate=False):
         self.simulated = simulate
         self.command_queue = []
@@ -86,6 +89,15 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         log.debug("Serial", "Connected to {}".format(device or port))
+        self.wait_for_stat()
+
+    def wait_for_stat(self, stat=None):
+        if self.DEBUG_ON:
+            log.debug("Serial", "Turning on debug mode.")
+            self.send_command(self.DEBUG_ON)
+            self._wait_for_stat = True
+            if stat is not None:
+                self._stat_command = stat
 
     def disconnect(self):
         self.connection.close()
@@ -121,8 +133,30 @@ class CNCDriver(object):
             return
         if self.connection.isOpen():
             self.connection.write(str(data).encode())
-            out = self.connection.readline()
-            log.debug("Serial", "Read: {}".format(out))
+            if self._wait_for_stat is True:
+                waiting = True
+                count = 0
+                while waiting:
+                    count = count + 1
+                    out = self.connection.readline().decode().strip()
+                    log.debug("Serial", "Read: {}".format(out))
+                    if out == self._stat_command:
+                        waiting = False
+                        log.debug(
+                            "Serial",
+                            "Waited {} lines for stat.".format(count)
+                        )
+                    else:
+                        if count == 1 or count % 10 == 0:
+                            # Don't log all the time; gets spammy.
+                            log.debug(
+                                "Serial",
+                                "Waiting {} lines for stat ({})."
+                                .format(count, self._stat_command)
+                            )
+            else:
+                out = self.connection.readline()
+                log.debug("Serial", "Read: {}".format(out))
             return out
         elif max_tries > 0:
             time.sleep(try_interval)
