@@ -22,6 +22,8 @@ class ProtocolTest(unittest.TestCase):
 
     def test_transfer(self):
         """ Basic transfer. """
+        self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.add_container('B1', 'microplate.96')
         self.protocol.transfer('A1:A1', 'B1:B1', ul=100)
         expected = [{
             'transfer': {
@@ -170,6 +172,7 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.calibrate('A1', x=1, y=2, z=3)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
+        self.protocol._initialize_context()
         vol1 = self.protocol._context.get_volume('A1:A2')
         self.assertEqual(vol1, 0)
         self.protocol._run(0)
@@ -229,3 +232,13 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.add_instrument('A', 'p10')
         i = self.protocol._context.get_instrument(volume=6)
         self.assertEqual(i.supports_volume(6), True)
+
+    def test_protocol_run_twice(self):
+        self.protocol.add_instrument('A', 'p200')
+        self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.calibrate('A1', x=1, y=2, z=3)
+        self.protocol.calibrate_instrument('A', top=0, blowout=10)
+        self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
+        self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
+        self.protocol.run_all()
+        self.protocol.run_all()

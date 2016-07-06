@@ -13,7 +13,7 @@ class Protocol():
 
     _context = None  # Operational context (virtual robot).
 
-    _instruments = None  # { 'A': instrument, 'B': instrument }
+    _instruments = None  # { motor_axis: instrument }
 
     _container_labels = None  # Aliases. { 'foo': (0,0), 'bar': (0,1) }
 
@@ -21,22 +21,28 @@ class Protocol():
 
     _handlers = None  # List of attached handlers for run_next.
 
+    _containers = None  # { slot: container_name }
+
     def __init__(self):
         self._ingredients = {}
         self._container_labels = {}
+        self._instruments = {}
+        self._containers = {}
         self._commands = []
-        self._context = ContextHandler(self)
         self._handlers = []
+        self._initialize_context()
 
     def add_container(self, slot, name, label=None):
         slot = normalize_position(slot)
         self._context.add_container(slot, name)
+        self._containers[slot] = name
         if (label):
             label = label.lower()
             self._container_labels[label] = slot
 
-    def add_instrument(self, slot, name):
-        self._context.add_instrument(slot, name)
+    def add_instrument(self, axis, name):
+        self._instruments[axis] = name
+        self._context.add_instrument(axis, name)
 
     def add_ingredient(self, name, location):
         pass
@@ -53,6 +59,7 @@ class Protocol():
         )
 
     def add_command(self, command, **kwargs):
+        self._run_in_context(command, **kwargs)
         self._commands.append({command: kwargs})
 
     def transfer(self, start, end, ul=None, ml=None,
@@ -205,6 +212,7 @@ class Protocol():
         A generator that runs each command and yields the current command
         index and the number of total commands.
         """
+        self._initialize_context()
         i = 0
         yield(0, len(self._commands))
         while i < len(self._commands):
@@ -224,14 +232,36 @@ class Protocol():
         for _ in self.run():
             pass
 
-    def _run(self, index):
-        cur = self._commands[index]
-        command = list(cur)[0]
-        kwargs = cur[command]
+    def _initialize_context(self):
+        """
+        Initializes the context.
+        """
+        self._context = ContextHandler(self)
+        for slot, name in self._containers.items():
+            self._context.add_container(slot, name)
+        for axis, name in self._instruments.items():
+            self._context.add_instrument(axis, name)
+
+    def _run_in_context(self, command, **kwargs):
+        """
+        Runs a command in the virtualized context.
+
+        This is useful for letting us know if there's a problem with a
+        particular command without having to wait to run it on the robot.
+
+        If you use this on your own you're going to end up with weird state
+        bugs that have nothing to do with the protocol.
+        """
         method = getattr(self._context, command)
         if not method:
             raise KeyError("Command not defined: " + command)
         method(**kwargs)
+
+    def _run(self, index):
+        cur = self._commands[index]
+        command = list(cur)[0]
+        kwargs = cur[command]
+        self._run_in_context(command, **kwargs)
         for h in self._handlers:
             debug(
                 "Protocol",
@@ -397,14 +427,14 @@ class ContextHandler(ProtocolHandler):
         end = self._deck.slot(end_slot).well(end_well)
         start.transfer(volume, end)
 
-    def transfer_group(self, *transfers):
+    def transfer_group(self, *args, **kwargs):
         pass
 
-    def distribute(self):
+    def distribute(self, *args, **kwargs):
         pass
 
-    def mix(self):
+    def mix(self, *args, **kwargs):
         pass
 
-    def consolidate(self):
+    def consolidate(self, *args, **kwargs):
         pass
