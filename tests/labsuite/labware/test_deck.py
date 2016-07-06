@@ -33,7 +33,7 @@ class DeckTest(unittest.TestCase):
     def test_module_add_to_filled_slot(self):
         """Raise when adding module to filled deck slot."""
         self.deck.add_modules(a1=Microplate())
-        with self.assertRaises(Exception):
+        with self.assertRaises(KeyError):
             self.deck.add_modules(a1=Microplate())
 
     def test_module_access_empty_slot(self):
