@@ -27,7 +27,7 @@ class Deck(GridContainer):
         else:
             raise Exception(
                 "Module already allocated to slot: {}/{}."
-                .format(position.upper(), pos)
+                .format(humanize_position(pos), pos)
             )
 
     def find_module(self, **filters):
