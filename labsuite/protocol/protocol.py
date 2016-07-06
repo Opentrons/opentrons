@@ -198,6 +198,10 @@ class Protocol():
         return (container, well)
 
     def run(self):
+        """
+        A generator that runs each command and yields the current command
+        index and the number of total commands.
+        """
         i = 0
         yield(0, len(self._commands))
         while i < len(self._commands):
@@ -207,6 +211,15 @@ class Protocol():
             self._run(i)
             i += 1
             yield (i, len(self._commands))
+
+    def run_all(self):
+        """
+        Convenience method to run every command in a protocol.
+
+        Useful for when you don't care about the progress.
+        """
+        for _ in self.run():
+            pass
 
     def _run(self, index):
         cur = self._commands[index]
