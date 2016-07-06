@@ -1,0 +1,24 @@
+{% extends "/layout.html" %} {% block body %}
+<div class="wrapper">
+    <!-- No Wizard Yet -->
+    <section class="connect">
+        <h1 class="title">Connect to Robot</h1>
+        <p>Welcome screen text. Make sure robot is connected and powered on. Checklist with links to popup diagrams below.</p>
+        <ul>
+            <li><a href="#info">item with info modal</a></li>
+            <li>item</li>
+            <li>item</li>
+            <li>item</li>
+        </ul>
+        <nav class="connect"><a href="/upload/protocol" class=" first next">Next</a></nav>
+    </section>
+    <div id="info" class="infoModal">
+        <div> <a href="#close" title="Close" class="close">X</a>
+            <h2>Title</h2>
+            <p>
+                Images would go here along with explanation text.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

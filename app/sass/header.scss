@@ -1,0 +1,49 @@
+/************************
+Header Styles
+************************/
+.nav-full-dark{
+    background-color: $primary-black;
+}
+.nav-full-light{
+    background-color: $primary-brand;
+}
+.brand {
+    @include grid-row();
+    
+    color: white;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    .links {
+        justify-content: flex-start;
+        li {
+            @include grid-col-air(1);
+            text-align: center;
+        }
+    }
+    .robot {
+        span {
+            display: block;
+            text-align: center;
+            justify-content: flex-end;
+            @include grid-col-air(4);
+        }
+    }
+}
+
+.controls {
+    @include grid-row();
+    color: white;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    line-height: 40px;
+    .home {
+        justify-content: flex-start;
+        li {
+            @include grid-col-full(1);
+            text-align: center;
+        }
+    }
+    .tabs {
+        justify-content: flex-end;
+    }
+}

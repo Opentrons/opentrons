@@ -1,0 +1,19 @@
+<ul>
+    {{#each steps}}
+    <li {{{class_if "active" this.active}}}>
+        <a href="{{this.href}}">
+            {{this.title}} 
+            {{#if this.enumerate}}
+                ({{ this.n_steps }})
+            {{/if}}
+        </a>
+    	{{#if this.enumerate}}
+        <ul>
+            {{#each this.steps}}
+            	<li {{{class_if "active" this.active}}} {{{class_if "completed" this.completed}}}><a href="{{this.href}}">{{this.title}}</a></li>
+            {{/each}}
+        </ul>
+        {{/if}}
+    </li>
+    {{/each}}
+</ul>

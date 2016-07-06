@@ -1,0 +1,31 @@
+{% extends "/layout.html" %} {% block body %}
+<div class="wrapper">
+    <!-- No Wizard Yet -->
+    <section class="upload">
+        <h1 class="title">Upload a Protocol</h1>
+        <p>Upload your .json file here.</p>
+        <input id="uploadFile" placeholder="No File Selected" disabled="disabled" />
+        <div class="fileUpload">
+            <span>Upload</span>
+            <input id="uploadBtn" type="file" class="upload" />
+        </div>
+        <nav><a href="/welcome/connect" class="prev">Prev</a><a href="#info" class="help">?</a><a href="/protocol_setup/calibrate/uniquekey3" class="next">Next</a></nav>
+    </section>
+    <div id="info" class="infoModal">
+        <div> <a href="#close" title="Close" class="close">X</a>
+            <h2>Title</h2>
+            <p>
+                Images would go here along with explanation text.
+            </p>
+        </div>
+    </div>
+</div>
+<!-- Demo Script for File Name Display -->
+<script type="text/javascript">
+document.getElementById("uploadBtn").onchange = function() {
+    var file = this.value.split('\\');
+    var f = file[file.length - 1];
+    document.getElementById("uploadFile").value = f;
+};
+</script>
+{% endblock %}

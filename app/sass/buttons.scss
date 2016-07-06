@@ -1,0 +1,101 @@
+/************************
+Buttons Labels Tabs
+************************/
+
+.label {
+    @include btn-square-a(1);
+}
+
+.tab {
+    @include btn-col-a(2);
+    background-color: white;
+    border-bottom: $gutter-width solid white;
+    margin-bottom: 0;
+    .active {
+        font-style: italic;
+    }
+}
+
+.btn-home {
+    @include btn-square-a(1);
+    background-color: white;
+    color: $primary-black;
+    &:hover {
+        background-color: lighten($primary-brand, 30%);
+    }
+}
+
+.btn-full {
+    @include btn-square-f(1);
+    background-color: $primary-brand;
+    color: white;
+    &:hover {
+        background: darken($primary-brand, 20%);
+    }
+}
+
+.btn-x {
+ @include offset(1, 2);
+}
+.btn-y {
+    @include offset(1, 0);
+}
+.btn-down {
+    @include offset-v(1, 0);
+}
+
+
+.btn-z {
+    @include offset(3, 0);
+    background-color: $secondary-brand;
+    &:hover {
+        background-color: darken($secondary-brand, 10%);
+    }
+}
+
+.btn-ab {
+    @include btn-square-f(1);
+    background-color: $primary-brand;
+}
+
+.btn-slot {
+    @include btn-col-f(3);
+}
+
+.btn-group,
+.btn-slot {
+    outline: 1px solid white;
+    background-color:lighten($primary-brand, 35%);
+    color: $primary-text;
+    &:hover {
+        background: lighten($primary-brand, 30%);
+    }
+}
+
+.deck {
+    outline: 2px solid lighten($primary-brand, 30%);
+    .btn-deck {
+        @include rect(3/5, 0.5);
+        color:$primary-text;
+        outline: 1px solid lighten($primary-brand, 35%);
+    }
+}
+
+.btn-update {
+    @include btn-col-a(2);
+    color: white;
+    &.save {
+        background-color: $call-to-action;
+        &:hover {
+            background: darken($call-to-action, 10%);
+        }
+    }
+    &.moveto {
+        background-color: $secondary-brand;
+        &:hover {
+            background: darken($secondary-brand, 10%);
+        }
+    }
+}
+
+

@@ -1,0 +1,44 @@
+/************************
+Step List Styles
+************************/
+#step-list {
+    @include grid-col-full(4);
+    @include offset-v(1, 0);
+}
+
+#step-list a {
+    display: block;
+    padding-left: $gutter-width;
+    color: inherit;
+    font-size: 12px;
+    line-height: 40px;
+    text-decoration: none;
+    transition: all 0.5s ease;
+
+}
+
+#step-list li.active > a:first-child {
+    font-style: italic;
+}
+
+#step-list li.active a {
+    background: lighten($primary-brand, 40%);
+    border-left: 5px solid $primary-brand;
+}
+
+#step-list li li.active a {
+    border-left: 15px solid $primary-brand;
+    font-style: italic;
+}
+
+#step-list li.completed a:after {
+    content: "\2713";
+    float: right;
+    padding-right: 10px;
+}
+
+#step-list a:hover,
+#step-list a:focus {
+    background: lighten($primary-brand, 40%);
+   
+}

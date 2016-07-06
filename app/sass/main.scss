@@ -1,0 +1,344 @@
+@import "util";
+@import "header";
+@import "steplist";
+@import "buttons";
+nav {
+    display: flex;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.coords {
+    input {
+        pointer-events: none;
+        text-align: center;
+        @include grid-col-full(1);
+        border: none;
+        margin: 0;
+        padding: 0;
+        background: lighten($primary-brand, 40%);
+    }
+}
+
+#uploadFile {
+    @include grid-col-full(4);
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-align: center;
+    line-height: 40px;
+}
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    @include btn-col-f(4);
+    background-color: $primary-brand;
+    color: white;
+    &:hover {
+        background: lighten($primary-brand, 20%);
+    }
+}
+
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 15px;
+    padding: 0;
+    font-size: 30px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+
+/************************
+Static Screens
+************************/
+
+.connect,
+.upload {
+    @include grid-col-full(24);
+    flex-direction: column;
+    text-align: center;
+    ul {
+        @include rect(24, 8);
+    }
+    #uploadFile {
+        @include offset(10, 10);
+    }
+    .fileUpload {
+        @include offset(10, 10);
+        @include offset-v(1, 7);
+    }
+    nav {
+        @include offset-v(1, 1);
+        display: flex;
+        justify-content: space-between;
+        a {
+            @include btn-col-f(4);
+            font-size: 15px;
+            outline: 1px solid $primary-link;
+            &.first {
+                @include offset(20, 0);
+            }
+        }
+    }
+}
+
+
+/************************
+Wizard Screens
+************************/
+
+.wrapper {
+    @include grid-row();
+}
+
+.instructions {
+    height: 40px;
+    display: block;
+}
+
+#task-pane {
+    display: flex;
+    section {
+        @include grid-col-full(19);
+        @include offset(1, 0);
+        display: flex;
+        flex-direction: column;
+        .step {
+            display: flex;
+            flex-wrap: wrap;
+            min-height: 400px;
+        }
+        .step-error,
+        .step-upload {
+            @include rect(7, 6);
+            @include offset(6, 5);
+            flex-direction: column;
+            justify-content: center;
+            align-content: flex-start;
+            text-align: center;
+            #uploadFile {
+                @include btn-col-f(5);
+                @include offset(1, 1);
+                @include offset-v(1, 1);
+            }
+            .fileUpload {
+                @include btn-col-f(5);
+                @include offset(1, 1);
+            }
+
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            @include offset-v(1, 1);
+            a {
+                @include btn-col-f(4);
+                font-size: 15px;
+                outline: 1px solid $primary-link;
+                &.first,
+                &.last {
+                    visibility: hidden;
+                }
+            }
+            .help {
+                @include btn-col-f(1);
+            }
+        }
+    }
+}
+
+
+/************************
+Deck|Container
+************************/
+
+.move {
+    @include grid-col-full(6);
+    .jog {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(6);
+    }
+    .increment {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(7);
+        @include offset(0, 6);
+    }
+    .deck {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(3);
+        @include offset-v(0, 0.5);
+    }
+}
+
+.save-deck {
+    @include grid-col-full(8);
+    @include offset(5, 0);
+    .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(8);
+    }
+    .update {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(6);
+        .position {
+            @include grid-col-air(2);
+            text-align: center;
+        }
+        .bottom {
+            @include offset-v-air(2, 0);
+        }
+    }
+    .well {
+        @include rect(2, 3);
+    }
+    .coords {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(8);
+        @include offset-v(0, 1);
+    }
+}
+
+
+/************************
+Pipette
+************************/
+
+.move-pipette {
+    @include grid-col-full(2);
+    @include offset(1, 1);
+    .plunger {
+        @include grid-col-full(2);
+        display: flex;
+        flex-wrap: wrap;
+        .jog-a {
+            display: flex;
+            flex-wrap: wrap;
+            @include grid-col-full(1);
+            @include offset(1, 0);
+        }
+        .jog-b {
+            display: flex;
+            flex-wrap: wrap;
+            @include grid-col-full(1);
+            @include offset(0, 1);
+        }
+    }
+    .increment {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(5);
+        @include offset(0, 6);
+    }
+    .pipette {
+        @include offset-v(1, 0);
+    }
+}
+
+.save-pipette {
+    @include grid-col-full(8);
+    .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(10);
+    }
+    .plunger {
+        @include rect(3, 6);
+    }
+    .update {
+        @include grid-col-full(6);
+        display: flex;
+        flex-wrap: wrap;
+        .position {
+            @include grid-col-full(2);
+            text-align: center;
+            line-height: 40px;
+        }
+        .bottom {
+            @include offset-v-air(2, 0);
+        }
+        span.position.bottom {
+            @include offset-v(2, 0);
+        }
+    }
+    .coords {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(8);
+        @include offset(1, 0);
+        @include offset-v(0, 1);
+    }
+    .bottom {
+        @include offset-v-air(2, 0);
+    }
+}
+
+
+/************************
+Pop-up Modal Styles
+************************/
+
+.infoModal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 400ms ease-in;
+    pointer-events: none;
+}
+
+.infoModal:target {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.infoModal > div {
+    @include rect(12, 12);
+    position: relative;
+    margin: 10% auto;
+    padding: 15px;
+    background: #fff;
+    .diagram {
+        @include grid-col-full(6);
+        @include offset(3, 3);
+    }
+    p {
+        @include grid-col-full(8);
+        @include offset(2, 2);
+        text-align: left;
+    }
+}
+
+.close {
+    @include btn-square-f(1);
+    background: white;
+    color: $primary-link;
+    position: absolute;
+    right: 0px;
+    text-align: center;
+    top: 0px;
+    text-decoration: none;
+}
+
+.close:hover {
+    background: $primary-link;
+    color: white;
+}
