@@ -42,7 +42,7 @@ class Deck(GridContainer):
         if pos not in self._children:
             raise KeyError(
                 "No deck module at slot {}/{}."
-                .format(position.upper(), pos)
+                .format(humanize_position(pos), pos)
             )
         return self._children[pos]
 
