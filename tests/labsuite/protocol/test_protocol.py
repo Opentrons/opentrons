@@ -223,7 +223,7 @@ class ProtocolTest(unittest.TestCase):
             {'a': 0}
         ]
         self.assertEqual(expected, output_log.movements)
-        self.assertEqual([0, 50, 100], prog_out)
+        self.assertEqual([(0, 2), (1, 2), (2, 2)], prog_out)
 
     def test_find_instrument_by_volume(self):
         self.protocol.add_instrument('A', 'p10')
