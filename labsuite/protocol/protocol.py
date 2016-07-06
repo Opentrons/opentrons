@@ -52,23 +52,24 @@ class Protocol():
             axis, top=top, blowout=blowout, droptip=droptip
         )
 
+    def add_command(self, command, **kwargs):
+        self._commands.append({command: kwargs})
+
     def transfer(self, start, end, ul=None, ml=None,
                  blowout=True, touchtip=True):
         if ul:
             volume = ul
         else:
             volume = ml * 1000
-
-        self._commands.append({
-            'transfer': {
-                'tool': 'p10',
-                'volume': volume,
-                'start': self._normalize_address(start),
-                'end': self._normalize_address(end),
-                'blowout': blowout,
-                'touchtip': touchtip
-            }
-        })
+        self.add_command(
+            'transfer',
+            tool='p10',
+            volume=volume,
+            start=self._normalize_address(start),
+            end=self._normalize_address(end),
+            blowout=blowout,
+            touchtip=touchtip
+        )
 
     def transfer_group(self, *wells, ul=None, ml=None, **defaults):
         if ul:
@@ -99,12 +100,11 @@ class Protocol():
                 'blowout': options['blowout'],
                 'touchtip': options['touchtip']
             })
-        self._commands.append({
-            'transfer_group': {
-                'tool': 'p10',
-                'transfers': transfers
-            }
-        })
+        self.add_command(
+            'transfer_group',
+            tool='p10',
+            transfers=transfers
+        )
 
     def distribute(self, start, *wells, blowout=True):
         transfers = []
@@ -114,12 +114,13 @@ class Protocol():
                 'volume': volume,
                 'end': self._normalize_address(end)
             })
-        self._commands.append({'distribute': {
-            'tool': 'p10',
-            'start': self._normalize_address(start),
-            'blowout': blowout,
-            'transfers': transfers
-        }})
+        self.add_command(
+            'distribute',
+            tool='p10',
+            start=self._normalize_address(start),
+            blowout=blowout,
+            transfers=transfers
+        )
 
     def consolidate(self, end, *wells, blowout=True):
         transfers = []
@@ -129,21 +130,23 @@ class Protocol():
                 'volume': volume,
                 'start': self._normalize_address(start)
             })
-        self._commands.append({'consolidate': {
-            'tool': 'p10',
-            'end': self._normalize_address(end),
-            'blowout': blowout,
-            'transfers': transfers
-        }})
+        self.add_command(
+            'consolidate',
+            tool='p10',
+            end=self._normalize_address(end),
+            blowout=blowout,
+            transfers=transfers
+        )
 
     def mix(self, start, volume=None, repetitions=None, blowout=True):
-        self._commands.append({'mix': {
-            'tool': 'p10',
-            'start': self._normalize_address(start),
-            'blowout': blowout,
-            'volume': volume,
-            'reps': repetitions
-        }})
+        self.add_command(
+            'mix',
+            tool='p10',
+            start=self._normalize_address(start),
+            blowout=blowout,
+            volume=volume,
+            reps=repetitions
+        )
 
     @property
     def actions(self):
