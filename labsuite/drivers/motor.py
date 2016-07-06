@@ -92,6 +92,7 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         log.debug("Serial", "Connected to {}".format(device or port))
+        self.wait_for_stat()
 
     def wait_for_stat(self, stat=None):
         if self.DEBUG_ON:
@@ -243,7 +244,6 @@ class OpenTrons(CNCDriver):
     DEBUG_ON = 'M62'
     DEBUG_OFF = 'M63'
 
-    _wait_for_stat = True
     _stat_command = '{"stat":0}'
 
 
