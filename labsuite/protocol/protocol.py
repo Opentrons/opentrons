@@ -5,7 +5,6 @@ import labsuite.drivers.motor as motor_drivers
 from labsuite.util.log import debug
 
 import copy
-import math
 
 
 class Protocol():
@@ -19,8 +18,6 @@ class Protocol():
     _container_labels = None  # Aliases. { 'foo': (0,0), 'bar': (0,1) }
 
     _commands = None  # []
-
-    _command_index = 0  # Index of the running command.
 
     _handlers = None  # List of attached handlers for run_next.
 
@@ -200,31 +197,21 @@ class Protocol():
 
         return (container, well)
 
-    @property
-    def length(self):
-        return len(self._commands)
+    def run(self):
+        i = 0
+        yield(0, len(self._commands))
+        while i < len(self._commands):
+            cur = self._commands[i]
+            command = list(cur)[0]
+            args = cur[command]
+            self._run(i)
+            i += 1
+            yield (i, len(self._commands))
 
-    @property
-    def percent_complete(self):
-        return math.floor((self._command_index / self.length) * 100)
-
-    @property
-    def command_index(self):
-        return self._command_index
-
-    def run_next(self):
-        i = self._command_index
-        try:
-            next_command = self._commands[self._command_index]
-        except IndexError:
-            return False
-        cur = self._commands[i]
+    def _run(self, index):
+        cur = self._commands[index]
         command = list(cur)[0]
-        args = cur[command]
-        self._run(command, args)
-        self._command_index += 1
-
-    def _run(self, command, kwargs):
+        kwargs = cur[command]
         method = getattr(self._context, command)
         if not method:
             raise KeyError("Command not defined: " + command)

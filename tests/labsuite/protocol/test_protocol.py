@@ -172,10 +172,10 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         vol1 = self.protocol._context.get_volume('A1:A2')
         self.assertEqual(vol1, 0)
-        self.protocol.run_next()
+        self.protocol._run(0)
         vol2 = self.protocol._context.get_volume('A1:A2')
         self.assertEqual(vol2, 100)
-        self.protocol.run_next()
+        self.protocol._run(1)
         vol3 = self.protocol._context.get_volume('A1:A3')
         self.assertEqual(vol3, 80)
 
@@ -189,8 +189,9 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.calibrate_instrument('A', top=0, blowout=10)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
-        self.protocol.run_next()
-        self.protocol.run_next()
+        prog_out = []
+        for progress in self.protocol.run():
+            prog_out.append(progress)
         expected = [
             # Transfer 1.
             {'z': 0},  # Move to well.
@@ -222,6 +223,7 @@ class ProtocolTest(unittest.TestCase):
             {'a': 0}
         ]
         self.assertEqual(expected, output_log.movements)
+        self.assertEqual([0, 50, 100], prog_out)
 
     def test_find_instrument_by_volume(self):
         self.protocol.add_instrument('A', 'p10')
