@@ -25,7 +25,7 @@ class Deck(GridContainer):
             self._children[pos] = mod
             mod.position = position
         else:
-            raise Exception(
+            raise KeyError(
                 "Module already allocated to slot: {}/{}."
                 .format(humanize_position(pos), pos)
             )
