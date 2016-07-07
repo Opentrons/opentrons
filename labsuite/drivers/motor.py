@@ -1,6 +1,5 @@
 import serial
 import time
-import os
 from labsuite.util import log
 
 

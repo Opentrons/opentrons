@@ -1,7 +1,5 @@
 import unittest
 from labsuite.protocol import Protocol
-from labsuite.protocol.handlers.motor_control import MotorControlHandler
-import labsuite.drivers.motor as motor_drivers
 
 
 class ProtocolTest(unittest.TestCase):
@@ -183,9 +181,8 @@ class ProtocolTest(unittest.TestCase):
         self.assertEqual(vol3, 80)
 
     def test_motor_handler(self):
-        output_log = motor_drivers.MoveLogger()
-        motor_handler = self.protocol.attach_handler(MotorControlHandler)
-        motor_handler.set_driver(output_log)
+        self.protocol.attach_motor()
+        output_log = self.protocol._motor_handler._driver
         self.protocol.add_instrument('A', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate('A1', x=1, y=2, z=3)

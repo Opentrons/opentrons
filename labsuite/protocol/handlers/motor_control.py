@@ -1,5 +1,5 @@
 from labsuite.util.log import debug
-from labsuite.protocol import ProtocolHandler
+from labsuite.protocol.handlers.interface import ProtocolHandler
 import labsuite.drivers.motor as motor_drivers
 
 
