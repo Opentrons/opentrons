@@ -173,19 +173,18 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         self.protocol._initialize_context()
-        vol1 = self.protocol._context.get_volume('A1:A2')
+        vol1 = self.protocol._context_handler.get_volume('A1:A2')
         self.assertEqual(vol1, 0)
         self.protocol._run(0)
-        vol2 = self.protocol._context.get_volume('A1:A2')
+        vol2 = self.protocol._context_handler.get_volume('A1:A2')
         self.assertEqual(vol2, 100)
         self.protocol._run(1)
-        vol3 = self.protocol._context.get_volume('A1:A3')
+        vol3 = self.protocol._context_handler.get_volume('A1:A3')
         self.assertEqual(vol3, 80)
 
     def test_motor_handler(self):
-        output_log = motor_drivers.MoveLogger()
-        motor_handler = self.protocol.attach_handler(MotorControlHandler)
-        motor_handler.set_driver(output_log)
+        motor = self.protocol.attach_motor()
+        output_log = motor._driver
         self.protocol.add_instrument('A', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
@@ -230,7 +229,7 @@ class ProtocolTest(unittest.TestCase):
 
     def test_find_instrument_by_volume(self):
         self.protocol.add_instrument('A', 'p10')
-        i = self.protocol._context.get_instrument(volume=6)
+        i = self.protocol._context_handler.get_instrument(volume=6)
         self.assertEqual(i.supports_volume(6), True)
 
     def test_protocol_run_twice(self):

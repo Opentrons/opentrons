@@ -2,7 +2,7 @@ from labsuite.labware import containers, deck, pipettes
 from labsuite.labware.grid import normalize_position
 import labsuite.drivers.motor as motor_drivers
 from labsuite.util.log import debug
-from labsuite.protocol.handlers.context import ContextHandler
+from labsuite.protocol.handlers import ContextHandler, MotorControlHandler
 
 import copy
 
@@ -11,8 +11,6 @@ class Protocol():
 
     _ingredients = None  # { 'name': "A1:A1" }
 
-    _context = None  # Operational context (virtual robot).
-
     _instruments = None  # { motor_axis: instrument }
 
     _container_labels = None  # Aliases. { 'foo': (0,0), 'bar': (0,1) }
@@ -20,6 +18,11 @@ class Protocol():
     _commands = None  # []
 
     _handlers = None  # List of attached handlers for run_next.
+
+    # Context and Motor are important handlers, so we provide
+    # a way to get at them.
+    _context_handler = None  # Operational context (virtual robot).
+    _motor_handler = None
 
     _containers = None  # { slot: container_name }
 
@@ -34,7 +37,7 @@ class Protocol():
 
     def add_container(self, slot, name, label=None):
         slot = normalize_position(slot)
-        self._context.add_container(slot, name)
+        self._context_handler.add_container(slot, name)
         self._containers[slot] = name
         if (label):
             label = label.lower()
@@ -42,7 +45,7 @@ class Protocol():
 
     def add_instrument(self, axis, name):
         self._instruments[axis] = name
-        self._context.add_instrument(axis, name)
+        self._context_handler.add_instrument(axis, name)
 
     def add_ingredient(self, name, location):
         pass
@@ -51,15 +54,15 @@ class Protocol():
         pass
 
     def calibrate(self, *args, **kwargs):
-        self._context.calibrate(*args, **kwargs)
+        self._context_handler.calibrate(*args, **kwargs)
 
     def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
-        self._context.calibrate_instrument(
+        self._context_handler.calibrate_instrument(
             axis, top=top, blowout=blowout, droptip=droptip
         )
 
     def add_command(self, command, **kwargs):
-        self._run_in_context(command, **kwargs)
+        self._run_in_context_handler(command, **kwargs)
         self._commands.append({command: kwargs})
 
     def transfer(self, start, end, ul=None, ml=None,
@@ -236,13 +239,13 @@ class Protocol():
         """
         Initializes the context.
         """
-        self._context = ContextHandler(self)
+        self._context_handler = ContextHandler(self)
         for slot, name in self._containers.items():
-            self._context.add_container(slot, name)
+            self._context_handler.add_container(slot, name)
         for axis, name in self._instruments.items():
-            self._context.add_instrument(axis, name)
+            self._context_handler.add_instrument(axis, name)
 
-    def _run_in_context(self, command, **kwargs):
+    def _run_in_context_handler(self, command, **kwargs):
         """
         Runs a command in the virtualized context.
 
@@ -252,7 +255,7 @@ class Protocol():
         If you use this on your own you're going to end up with weird state
         bugs that have nothing to do with the protocol.
         """
-        method = getattr(self._context, command)
+        method = getattr(self._context_handler, command)
         if not method:
             raise KeyError("Command not defined: " + command)
         method(**kwargs)
@@ -261,7 +264,7 @@ class Protocol():
         cur = self._commands[index]
         command = list(cur)[0]
         kwargs = cur[command]
-        self._run_in_context(command, **kwargs)
+        self._run_in_context_handler(command, **kwargs)
         for h in self._handlers:
             debug(
                 "Protocol",
@@ -291,9 +294,17 @@ class Protocol():
         instantiated object, which you can use to do any additional setup
         required for the particular Handler.
         """
-        handler = handler_class(self, self._context)
+        handler = handler_class(self, self._context_handler)
         self._handlers.append(handler)
         return handler
+
+    def attach_motor(self, port=None):
+        self._motor_handler = self.attach_handler(MotorControlHandler)
+        if port is not None:
+            self._motor_handler.connect(port)
+        else:
+            self._motor_handler.simulate()
+        return self._motor_handler
 
     def teardown(self):
         for h in self._handlers:

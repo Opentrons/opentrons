@@ -1,4 +1,4 @@
-from labsuite.protocol.handlers.interface import ProtocolHandler
+from labsuite.protocol.handlers import ProtocolHandler
 from labsuite.labware import deck, pipettes
 
 

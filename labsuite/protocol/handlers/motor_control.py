@@ -1,5 +1,5 @@
 from labsuite.util.log import debug
-from labsuite.protocol.handlers.interface import ProtocolHandler
+from labsuite.protocol.handlers import ProtocolHandler
 import labsuite.drivers.motor as motor_drivers
 
 
@@ -23,6 +23,10 @@ class MotorControlHandler(ProtocolHandler):
         """
         self.set_driver(motor_drivers.OpenTrons())
         self._driver.connect(device=port)
+
+    def simulate(self):
+        self._driver = motor_drivers.MoveLogger()
+        return self._driver
 
     def disconnect(self):
         self._driver.disconnect()
