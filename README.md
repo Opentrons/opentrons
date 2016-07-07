@@ -22,3 +22,14 @@ Currently, to start the server you have to install python3 and run python file d
 $ cd app
 $ python3 main.py
 ```
+
+### Routes
+The two static:
+```
+http://localhost:5000/welcome/connect
+http://localhost:5000/upload/protocol
+```
+Clicking [next button] on upload page will bring you to dynamic step wizard based on stub data. Scripts and views are loaded based on routes. Data is loaded based on uniqueIDs within the stub data.
+```
+http://localhost:5000/protocol_setup/calibrate/uniquekey3
+```
