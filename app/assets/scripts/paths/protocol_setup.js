@@ -232,6 +232,12 @@ wizard.setStepTransforms('calibrate', {
             return false;
         }
     },
+    //transform for specific well diagrams (currently not in use)
+    well_top: function(step){
+        var image = step.data.container_name + ".png"
+        return image;
+    },
+    //transforms for popup info diagram display logic
     image_top: function(step) {
         var pipette = step.data.pipette.split(' ');
         var image = pipette[1].toLowerCase() + "." + step.data.container_name + ".top.jpg";
@@ -267,33 +273,6 @@ wizard.setStepTransforms('calibrate_pipette', {
         }else{
             return false;
         }
-    }
-});
-
-wizard.setStepTransforms('review_deckmap', {
-    deckmap: function(step) {
-        var arrKeys = [];
-        //loop through array of all possible keys
-        //check if a key matches an assigned deckslot
-        //if step.deckmap[v]
-        //output data format for template
-        var output = [
-            { slot: "a1", container: "tiprack.200", title: "p200 Tiprack" },
-            { slot: "a2", container: false, title: false },
-            { slot: "a3", container: false, title: false },
-            { slot: "b1", container: false, title: false },
-            { slot: "b2", container: "point", title: "Trash" },
-            { slot: "b3", container: false, title: false },
-            { slot: "c1", container: "plate.96.flat.10.4mm", title: "Source" },
-            { slot: "c2", container: false, title: false },
-            { slot: "c3", container: "trough.12row", title: "Trough" },
-            { slot: "d1", container: "plate.96.flat.10.4mm", title: "Output" },
-            { slot: "d2", container: false, title: false },
-            { slot: "d3", container: false, title: false },
-            { slot: "e1", container: "plate.96.flat.10.4mm", title: "Standards" },
-            { slot: "e2", container: false, title: false },
-            { slot: "e3", container: false, title: false }
-        ];
     }
 });
 
@@ -338,11 +317,10 @@ wizard.setStepByID(stepID);
 
 
 // Event delegation lives here
-// (sends wizard commands)
+// (sends wizard command) example event listener:
 delegateEvent('click', 'li', function() {
     console.log(arguments);
 });
-
 
 
 //Delegators to handle prev next functionality
@@ -357,13 +335,6 @@ delegateEvent('click', '.next', function() {
 
 
 // Delegator to handle forms goes here.
-delegateEvent('submit', 'form[method=magic]', function(e, el) {
-    e.preventDefault();
-    var form = new FormData(el);
-    var bestThing = form.get('bestThing');
-    console.log("The best thing ever is:" + bestThing)
-});
-
 delegateEvent('submit', 'form[method=upload]', function(e, el) {
     e.preventDefault();
     var form = new FormData(el);
