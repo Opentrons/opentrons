@@ -79,6 +79,7 @@ Buttons Labels Tabs
         color:$primary-text;
         outline: 1px solid lighten($primary-brand, 35%);
     }
+    @include offset-v(0, 0.5);
 }
 
 .btn-update {

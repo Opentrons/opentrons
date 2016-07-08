@@ -116,6 +116,7 @@ Wizard Screens
             display: flex;
             flex-wrap: wrap;
             min-height: 400px;
+            max-height:400px;
         }
         .step-error,
         .step-upload {
@@ -134,7 +135,6 @@ Wizard Screens
                 @include btn-col-f(5);
                 @include offset(1, 1);
             }
-
         }
         nav {
             display: flex;
@@ -178,7 +178,7 @@ Deck|Container
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(3);
-        @include offset-v(0, 0.5);
+       
     }
 }
 
@@ -192,14 +192,12 @@ Deck|Container
     }
     .update {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap:wrap;
         @include grid-col-full(6);
+        @include offset-v-air(2, 0);
         .position {
             @include grid-col-air(2);
             text-align: center;
-        }
-        .bottom {
-            @include offset-v-air(2, 0);
         }
     }
     .well {
