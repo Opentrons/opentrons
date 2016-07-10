@@ -117,15 +117,16 @@ class ContextHandler(ProtocolHandler):
         ox, oy = self._deck.slot(slot).well(well).coordinates()
         # x, y, top bottom
         well_cal = cal.get((slot, well), {})
+        output.update(well_cal)
         # Use calculated offsets if no custom well calibration provided.
-        if 'x' not in well_cal:
+        if 'x' not in output:
             output['x'] = slot_cal['x'] + ox
-        if 'y' not in well_cal:
+        if 'y' not in output:
             output['y'] = slot_cal['y'] + oy
         # Merge slot and well calibration
-        if 'top' not in well_cal:
+        if 'top' not in output:
             output['top'] = slot_cal['top']
-        if 'bottom' not in well_cal:
+        if 'bottom' not in output:
             output['bottom'] = slot_cal['bottom']
         return output
 
