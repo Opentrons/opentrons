@@ -53,8 +53,12 @@ class Protocol():
     def allocate(self, **kwargs):
         pass
 
-    def calibrate(self, *args, **kwargs):
-        self._context_handler.calibrate(*args, **kwargs)
+    def calibrate(self, position, **kwargs):
+        if ':' in position:
+            pos = self._normalize_address(position)
+        else:
+            pos = normalize_position(position)
+        self._context_handler.calibrate(pos, **kwargs)
 
     def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
         self._context_handler.calibrate_instrument(

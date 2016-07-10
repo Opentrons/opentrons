@@ -55,14 +55,13 @@ class MotorControlHandler(ProtocolHandler):
     def move_to_well(self, well):
         self.move_motors(z=0)  # Move up so we don't hit things.
         coords = self._context.get_coordinates(well)
-        x, y, z = coords
-        self.move_motors(x=x, y=y)
-        self.move_motors(z=z)
+        self.move_motors(x=coords['x'], y=coords['y'])
+        self.move_motors(z=coords['top'])
 
     def move_into_well(self, well):
-        x, y, z = self._context.get_coordinates(well)
-        z = z + 10
-        self.move_motors(x=x, y=y, z=z)
+        coords = self._context.get_coordinates(well)
+        self.move_motors(x=coords['x'], y=coords['y'])
+        self.move_motors(z=coords['bottom'])
 
     def move_up(self):
         self.move_motors(z=0)

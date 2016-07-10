@@ -1,8 +1,6 @@
 from labsuite.labware.grid import GridContainer, humanize_position
 from labsuite.labware.containers import load_container
 
-import copy
-
 
 class Deck(GridContainer):
 
@@ -45,36 +43,3 @@ class Deck(GridContainer):
                 .format(humanize_position(pos), pos)
             )
         return self._children[pos]
-
-    def configure(self, obj):
-        self.calibrate(**obj['calibration'])
-
-    def calibrate(self, **calibration):
-        for pos in calibration:
-            module = self.slot(pos)
-            if not module:
-                raise AttributeError("No module in slot {}.".format(pos))
-            module.calibrate(**calibration[pos])
-
-    def dump_calibration(self):
-        obj = {}
-        for pos in self._children:
-            key = humanize_position(pos)
-            obj[key] = {}
-            data = copy.deepcopy(self._children[pos]._calibration or {})
-            obj[key]['calibration'] = data
-            name = self._children[pos].name
-            if name:
-                obj[key]['name'] = name
-        return obj
-
-    def load_calibration(self, data):
-        for pos in data:
-            Container = load_container(data[pos]['name'])
-            self.add_module(pos, Container())
-        self.calibrate(**data)
-
-    def needs_calibration(self, side='A'):
-        """
-        Returns a list of all modules which still require calibration.
-        """

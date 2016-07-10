@@ -99,13 +99,13 @@ class ContainerTest(unittest.TestCase):
         self.assertIs(rack, tipracks.Tiprack)
 
     def test_static_coordinates(self):
-        """ 
+        """
         Containers should calculate coordinates statically.
         """
         # Microplate has spacing as row: 12, col: 12.
-        plate  = containers.load_container('microplate.example_plate')
+        plate = containers.load_container('microplate.example_plate')
         coords = plate.calculate_offset('b12')
-        self.assertEqual(coords, (12*1, 12*11, 0)) 
+        self.assertEqual(coords, (12*1, 12*11)) 
 
     def test_static_coordinates_custom_x_y_spacing(self):
         """
@@ -114,8 +114,7 @@ class ContainerTest(unittest.TestCase):
         # Deepwell has spacing as col: 10, row: 13
         plate = containers.load_container('microplate.example_plate.deepwell')
         coords = plate.calculate_offset('b12')
-        print(plate.col_spacing, plate.row_spacing)
-        self.assertEqual(coords, (10, 13*11, 0))
+        self.assertEqual(coords, (10, 13*11))
 
     def test_instance_coordinates_custom_x_y_spacing(self):
         """
@@ -124,7 +123,7 @@ class ContainerTest(unittest.TestCase):
         # Deepwell has spacing as col: 10, row: 13
         plate = containers.load_container('microplate.example_plate.deepwell')
         coords = plate().get_child_coordinates('b12')
-        self.assertEqual(coords, (10, 13*11, 0))
+        self.assertEqual(coords, (10, 13*11))
 
     def test_list_microplates(self):
         """
@@ -248,13 +247,13 @@ class ContainerTest(unittest.TestCase):
         rack = containers.load_container('tuberack.15-50ml')
  
         # Values taken from legacy containers.json file.
-        self.assertEqual(rack.coordinates('A1'), (0, 0, 0))
-        self.assertEqual(rack.coordinates('A3'), (10, 50, 0))
-        self.assertEqual(rack.coordinates('B1'), (32, 0, 0))
-        self.assertEqual(rack.coordinates('B2'), (32, 24, 0))
-        self.assertEqual(rack.coordinates('B3'), (55, 50, 0))
-        self.assertEqual(rack.coordinates('C1'), (64, 0, 0))
-        self.assertEqual(rack.coordinates('C2'), (64, 24, 0))
+        self.assertEqual(rack.coordinates('A1'), (0, 0))
+        self.assertEqual(rack.coordinates('A3'), (10, 50))
+        self.assertEqual(rack.coordinates('B1'), (32, 0))
+        self.assertEqual(rack.coordinates('B2'), (32, 24))
+        self.assertEqual(rack.coordinates('B3'), (55, 50))
+        self.assertEqual(rack.coordinates('C1'), (64, 0))
+        self.assertEqual(rack.coordinates('C2'), (64, 24))
         
     def test_custom_well_properties(self):
         """

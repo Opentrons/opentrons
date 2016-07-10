@@ -9,34 +9,28 @@ class MicroplateTest(unittest.TestCase):
 
     def setUp(self):
         self.plate = Microplate()
-        self.plate.calibrate(x=10, y=11, z=12)
-
-    def a1_calibration_test(self):
-        """Basic calibration."""
-        a1 = self.plate.well('A1').coordinates()
-        self.assertEqual(a1, (10, 11, 12))
 
     def a2_coordinate_test(self):
         """Calibrated coordinates of A2."""
         a2 = self.plate.well('A2').coordinates()
-        self.assertEqual(a2, (10, 11 + self.expected_margin, 12))
+        self.assertEqual(a2, (0, self.expected_margin))
 
     def b1_coordinate_test(self):
         """Calibrated coordinates of B1."""
         b1 = self.plate.well('B1').coordinates()
-        self.assertEqual(b1, (10 + self.expected_margin, 11, 12))
+        self.assertEqual(b1, (self.expected_margin, 0))
 
     def b2_coordinate_test(self):
         """Calibrated coordinates of B2."""
         b2 = self.plate.well('B2').coordinates()
         margin = self.expected_margin
-        self.assertEqual(b2, (10 + margin, 11 + margin, 12))
+        self.assertEqual(b2, (margin, margin))
 
     def coordinate_lowercase_test(self):
         """Lowercase coordinates."""
         b2 = self.plate.well('b2').coordinates()
         margin = self.expected_margin
-        self.assertEqual(b2, (10 + margin, 11 + margin, 12))
+        self.assertEqual(b2, (margin, margin))
 
     def col_sanity_test(self):
         """Don't return out-of-range columns."""
@@ -58,32 +52,6 @@ class MicroplateTest(unittest.TestCase):
         """Sanity check on well coordinates."""
         with self.assertRaises(ValueError):
             self.plate.well('ABC')
-
-    def deck_calibration_test(self):
-        """Calibrates through deck."""
-        config = {
-            'calibration': {
-                'a1': {
-                    'type': 'microplate_96',
-                    'x': 10,
-                    'y': 11,
-                    'z': 12
-                }
-            }
-        }
-
-        deck = Deck(a1=Microplate())
-        deck.configure(config)
-
-        margin = self.expected_margin
-
-        plate = deck.slot('a1')
-
-        a1 = plate.well('a1').coordinates()
-        b2 = plate.well('b2').coordinates()
-
-        self.assertEqual(a1, (10, 11, 12))
-        self.assertEqual(b2, (10 + margin, 11 + margin, 12))
 
 
 class MicroplateWellTest(unittest.TestCase):

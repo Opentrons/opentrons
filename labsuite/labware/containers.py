@@ -306,11 +306,10 @@ def generate_legacy_container(container_name, format=False):
         for row in range(1, container.rows + 1):
             loc = []
             pos = '{}{}'.format(chr(col + ord('A')), row)
-            (x, y, z) = container.calculate_offset(pos)
+            x, y = container.calculate_offset(pos)
             locs[pos] = {
                 'x': round(x, 2),
                 'y': round(y, 2),
-                'z': round(z, 2),
                 'depth': container.depth,
                 'diameter': container.diameter,
                 'total-liquid-volume': container.volume

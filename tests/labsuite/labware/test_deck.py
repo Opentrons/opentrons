@@ -46,15 +46,6 @@ class DeckTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             self.deck.slot('z1')
 
-    def test_custom_calibration_point(self):
-        """ Allow for setting custom calibration points. """
-        self.deck.add_modules(a1=Microplate())
-        plate = self.deck.slot('a1')
-        plate.calibrate(x=1, y=2, z=3)
-        self.assertEqual(plate.well('a1').coordinates(), (1, 2, 3))
-        plate.well('b10').calibrate(4, 5, 6)
-        self.assertEqual(plate.well('b10').coordinates(), (4, 5, 6))
-
     def test_find_module(self):
         self.deck.add_module('a1', 'microplate.96')
         plate = self.deck.find_module(name='microplate.96')

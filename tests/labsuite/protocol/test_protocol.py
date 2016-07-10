@@ -169,6 +169,7 @@ class ProtocolTest(unittest.TestCase):
 
     def test_context(self):
         self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.add_instrument('A', 'p10')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
@@ -187,7 +188,7 @@ class ProtocolTest(unittest.TestCase):
         output_log = motor._driver
         self.protocol.add_instrument('A', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
-        self.protocol.calibrate('A1', x=1, y=2, z=3)
+        self.protocol.calibrate('A1', x=1, y=2, top=3, bottom=13)
         self.protocol.calibrate_instrument('A', top=0, blowout=10)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
@@ -200,12 +201,14 @@ class ProtocolTest(unittest.TestCase):
             {'x': 1, 'y': 2},
             {'z': 3},
             {'a': 5.0},  # Plunge.
-            {'x': 1, 'y': 2, 'z': 13},  # Move into well.
+            {'x': 1, 'y': 2},
+            {'z': 13},  # Move into well.
             {'a': 0},  # Release.
             {'z': 0},  # Move up.
             {'x': 1, 'y': 11},  # Move to well.
             {'z': 3},
-            {'x': 1, 'y': 11, 'z': 13},  # Move into well.
+            {'x': 1, 'y': 11},
+            {'z': 13},  # Move into well.
             {'a': 10},  # Blowout.
             {'z': 0},  # Move up.
             {'a': 0},  # Release.
@@ -214,12 +217,14 @@ class ProtocolTest(unittest.TestCase):
             {'x': 1, 'y': 11},
             {'z': 3},
             {'a': 4.0},
-            {'x': 1, 'y': 11, 'z': 13},
+            {'x': 1, 'y': 11},
+            {'z': 13},
             {'a': 0},
             {'z': 0},
             {'x': 1, 'y': 20},
             {'z': 3},
-            {'x': 1, 'y': 20, 'z': 13},
+            {'x': 1, 'y': 20},
+            {'z': 13},
             {'a': 10},
             {'z': 0},
             {'a': 0}
