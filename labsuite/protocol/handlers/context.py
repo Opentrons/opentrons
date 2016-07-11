@@ -11,6 +11,12 @@ class ContextHandler(ProtocolHandler):
 
     _deck = None
     _instruments = None  # Axis as keys; Pipette object as vals.
+
+    # Calibration is organized by axis.
+    #
+    # {
+    #   'a': {'_axis': {top, bottom, blowout}, (0,0): {x, y, top, bottom}}
+    # }
     _calibration = None
 
     def setup(self):

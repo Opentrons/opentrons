@@ -70,15 +70,18 @@ class Protocol():
         self._commands.append({command: kwargs})
 
     def transfer(self, start, end, ul=None, ml=None,
-                 blowout=True, touchtip=True):
+                 blowout=True, touchtip=True, tool=None):
         if ul:
             volume = ul
         else:
             volume = ml * 1000
+        if tool is None:
+            inst = self._context_handler.get_instrument(volume=volume)
+            tool = inst.name
         self.add_command(
             'transfer',
-            tool='p10',
             volume=volume,
+            tool=tool,
             start=self._normalize_address(start),
             end=self._normalize_address(end),
             blowout=blowout,
@@ -116,7 +119,7 @@ class Protocol():
             })
         self.add_command(
             'transfer_group',
-            tool='p10',
+            tool=options['tool'],
             transfers=transfers
         )
 

@@ -24,10 +24,12 @@ class ProtocolTest(unittest.TestCase):
         """ Basic transfer. """
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.add_container('B1', 'microplate.96')
-        self.protocol.transfer('A1:A1', 'B1:B1', ul=100)
+        self.protocol.add_instrument('A', 'p200')
+        self.protocol.add_instrument('B', 'p20')
+        self.protocol.transfer('A1:A1', 'B1:B1', ul=100, tool='p20')
         expected = [{
             'transfer': {
-                'tool': 'p10',
+                'tool': 'p20',
                 'volume': 100,
                 'start': ((0, 0), (0, 0)),
                 'end': ((1, 0), (1, 0)),
@@ -88,7 +90,8 @@ class ProtocolTest(unittest.TestCase):
             ('A3:A3', 'B3:B3', {'blowout': False}),
             ('A4:A4', 'B4:B4'),
             ('Label:A5', 'B5:C1'),
-            ul=12
+            ul=12,
+            tool='p10'
         )
         self.assertEqual(self.instructions, expected)
 
@@ -169,7 +172,7 @@ class ProtocolTest(unittest.TestCase):
 
     def test_context(self):
         self.protocol.add_container('A1', 'microplate.96')
-        self.protocol.add_instrument('A', 'p10')
+        self.protocol.add_instrument('A', 'p200')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)

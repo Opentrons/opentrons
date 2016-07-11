@@ -126,6 +126,10 @@ class Pipette():
     def blowout(self):
         return self._blowout
 
+    @property
+    def name(self):
+        return self.size.lower()
+
 
 class Pipette_P2(Pipette):
     size = 'P2'
