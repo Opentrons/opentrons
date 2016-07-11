@@ -224,14 +224,6 @@ wizard.setStepTransforms('calibrate', {
         name = name[0].toUpperCase() + name.slice(1);
         return name + " (" + step.data.deck_position + ")"
     },
-    isSingle: function(step){
-        var pipette = step.data.pipette.split(' ');
-        if (pipette[1].toLowerCase()== "single"){
-            return true;
-        }else{
-            return false;
-        }
-    },
     //transform for specific well diagrams (currently not in use)
     well_top: function(step){
         var image = step.data.container_name + ".png"
@@ -256,6 +248,24 @@ wizard.setStepTransforms('calibrate', {
             return true
         };
     },
+    isSingle: function(step){
+        var pipette = step.data.pipette.split(' ');
+        if (pipette[1].toLowerCase()== "single"){
+            return true;
+        }else{
+            return false;
+        }
+    },
+    isTipRack: function(step){
+        var container = step.data.container_name.split('.');
+        var type = container[0];
+        if (type == "tiprack"){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
 });
 
