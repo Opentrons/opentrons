@@ -29,12 +29,17 @@ class ContextHandler(ProtocolHandler):
         self._instruments[axis] = pipettes.load_instrument(name)
 
     def get_instrument(self, axis=None, volume=None):
+        axis = self.normalize_axis(axis)
         if axis:
             if axis not in self._instruments:
                 raise KeyError(
                     "No instrument assigned to {} axis.".format(axis)
                 )
             else:
+                inst = self._instruments[axis]
+                if axis in self._calibration:
+                    if '_axis' in self._calibration[axis]:
+                        inst.calibrate(**self._calibration[axis]['_axis'])
                 return self._instruments[axis]
         if volume:
             for k, i in self._instruments.items():
@@ -97,7 +102,7 @@ class ContextHandler(ProtocolHandler):
         if bottom is not None:
             pos_cal['bottom'] = bottom
 
-    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
+    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None, bottom=None):
         cal = self.get_axis_calibration(axis)
         if '_instrument' not in cal:
             cal['_instrument'] = {}
@@ -109,16 +114,20 @@ class ContextHandler(ProtocolHandler):
             a_cal['blowout'] = blowout
         if droptip is not None:
             a_cal['droptip'] = droptip
+        if bottom is not None:
+            a_cal['bottom'] = bottom
         self.get_instrument(axis=axis).calibrate(**a_cal)
 
     def get_coordinates(self, position, axis=None):
         """ Returns the calibrated coordinates for a position. """
         cal = self.get_axis_calibration(axis)
         slot, well = position
+        defaults = ({'top': 0, 'bottom': 0, 'x': 0, 'y': 0})
         output = {}
         # Calibration for A1 in this container (x, y, top, bottom).
-        slot_cal = cal.get((slot), {})
-        ({'top': 0, 'bottom': 0, 'x': 0, 'y': 0}).update(slot_cal)
+        slot_cal = {}
+        slot_cal.update(defaults)
+        slot_cal.update(cal.get((slot), {}))
         # Default offset on x, y calculated from container definition.
         ox, oy = self._deck.slot(slot).well(well).coordinates()
         # x, y, top bottom

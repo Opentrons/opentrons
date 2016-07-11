@@ -60,7 +60,8 @@ class Protocol():
             pos = normalize_position(position)
         self._context_handler.calibrate(pos, **kwargs)
 
-    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None):
+    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None,
+                             bottom=None):
         self._context_handler.calibrate_instrument(
             axis, top=top, blowout=blowout, droptip=droptip
         )
@@ -246,11 +247,17 @@ class Protocol():
         """
         Initializes the context.
         """
+        calibration = None
+        if self._context_handler:
+            calibration = self._context_handler._calibration
         self._context_handler = ContextHandler(self)
         for slot, name in self._containers.items():
             self._context_handler.add_container(slot, name)
         for axis, name in self._instruments.items():
             self._context_handler.add_instrument(axis, name)
+        if calibration:
+            self._context_handler._calibration = calibration
+
 
     def _run_in_context_handler(self, command, **kwargs):
         """
