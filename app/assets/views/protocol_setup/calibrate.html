@@ -1,12 +1,29 @@
 <section>
     <h2 class="title">Calibrate {{this.title}}</h2>
-    <div class="instructions">{{#if this.isContainer}} {{#if this.isSingle}}
-        <!-- if single -->
-        Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well. {{else}}
-        <!-- if multi -->
-        Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well. {{/if}} {{else}}
-        <!-- Trash or scale -->
-        Calibrate over the center of the container you choose to use. {{/if}}
+    <div class="instructions">
+        {{#if this.isTipRack}} 
+        <!-- TIPRACK -->
+            {{#if this.isSingle}}
+            <!-- SINGLE CHANNEL + TIPRACK -->
+            Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here- 
+            {{else}}
+            <!-- MULTI CHANNEL + TIPRACK -->
+            Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here- 
+            {{/if}} 
+        {{else}}
+        <!-- !TIPRACK -->
+            {{#if this.isContainer}} 
+                {{#if this.isSingle}}
+                <!-- SINGLE CHANNEL + CONTAINER -->
+                Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well. 
+                {{else}}
+                <!-- MULTI CHANNEL + CONTAINER -->
+                Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well. {{/if}}
+            {{else}}
+            <!-- !CONTAINER - POINT -->
+            Calibrate over the center of the container you choose to use. 
+            {{/if}} 
+        {{/if}}
     </div>
     <div class="step">
         <div class="move">
@@ -65,17 +82,26 @@
                 <div class="well">
                     <img src="../../img/well_top.png" />
                 </div>
-                <div class="update">   
-                
-                    <a href="#well_top" class="position" >Top</a>
+                {{#if this.isTipRack}} 
+                    <div class="update">
+                        <a href="#tiprack_top" class="position">Title</a>
+                        <a class="btn-update save ">Save </a>
+                        <a class="btn-update moveto">Move To</a>
+                        <!-- DROPTIP FOR TIPRACKS ONLY -->
+                        <a class="pick-tip ">Pick Up Tip </a>
+                         
+                </div>
+                {{else}}
+                <div class="update">
+                    
+                    <a href="#well_top" class="position">Top</a>
                     <a class="btn-update save ">Save </a>
                     <a class="btn-update moveto">Move To</a>
-
                     <a href="#well_bottom" class="position ">Bottom</a>
                     <a class="btn-update save ">Save </a>
                     <a class="btn-update moveto">Move To </a>
-
                 </div>
+                {{/if}}
             </div>
         </div>
     </div>
@@ -83,28 +109,27 @@
     <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
     <div id="info" class="infoModal">
         <div> <a href="#close" title="Close" class="close">X</a>
-            <h2 >Title</h2> 
-            {{#if this.isTipRack}}
+            <h2>Title</h2> 
+            {{#if this.isTipRack}} 
                 {{#if this.isSingle}}
-                    <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here-</p>
+                <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here-</p>
                 {{else}}
-                    <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here-</p>
-                {{/if}}
+                <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here-</p>
+                {{/if}} 
+            {{else}} 
+
+            {{#if this.isContainer}} {{#if this.isSingle}}
+            <!-- if single -->
+            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well.</p>
             {{else}}
-                {{#if this.isContainer}} 
-                    {{#if this.isSingle}}
-                        <!-- if single -->
-                        <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well.</p>
-                    {{else}}
-                    <!-- if multi -->
-                        <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well.</p>
-                    {{/if}}
-                        <h3 class="title">Front View</h3>
-                        <img class="diagram" src="../../img/{{this.image_front}}" />
-                {{else}}
-                    <!-- Trash or scale -->
-                    <p>Calibrate over the center of the container you choose to use.</p>
-                {{/if}}
+            <!-- if multi -->
+            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well.</p>
+            {{/if}}
+            <h3 class="title">Front View</h3>
+            <img class="diagram" src="../../img/{{this.image_front}}" /> {{else}}
+            <!-- Trash or scale -->
+            <p>Calibrate over the center of the container you choose to use.</p>
+            {{/if}} 
             {{/if}}
         </div>
     </div>
