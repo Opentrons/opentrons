@@ -99,4 +99,10 @@ Buttons Labels Tabs
     }
 }
 
+.pick-tip{
+    @include btn-col-a(4);
+    @include offset(2.12,0);
+    color:white;
+    background-color: $primary-brand;
+}
 
