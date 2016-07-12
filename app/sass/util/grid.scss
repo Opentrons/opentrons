@@ -76,6 +76,11 @@ $row-height: 40px;
     margin-right: num-col-full($r);
 }
 
+@mixin offset-air($l, $r){
+    margin-left:num-col-full($l) + $gutter-width;
+    margin-right:num-col-full($r) + $gutter-width;
+}
+
 @mixin offset-v($t, $b) {
     margin-top: num-col-full($t);
     margin-bottom: num-col-full($b);

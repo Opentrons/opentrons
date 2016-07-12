@@ -152,6 +152,7 @@ var stubData = [{
                 completed: false,
                 pipette: "p200 Multi Channel",
                 actuator: "center",
+                test_volume: 200,
                 top: 0,
                 bottom: 0,
                 blowout: 0,
@@ -224,11 +225,76 @@ wizard.setStepTransforms('calibrate', {
         name = name[0].toUpperCase() + name.slice(1);
         return name + " (" + step.data.deck_position + ")"
     },
-    //transform for specific well diagrams (currently not in use)
-    well_top: function(step){
-        var image = step.data.container_name + ".png"
-        return image;
+    
+    isContainer: function(step) {
+        var info = step.data.container_name.split('.');
+        if (info[0] == "point") {
+            return false
+        } else {
+            return true
+        };
     },
+
+    isTipRack: function(step) {
+        var container = step.data.container_name.split('.');
+        var type = container[0];
+        if (type == "tiprack") {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    isTubeRack: function(step) {
+        var container = step.data.container_name.split('.');
+        var type = container[0];
+        if (type == "tuberack") {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    isSingle: function(step) {
+        var pipette = step.data.pipette.split(' ');
+        if (pipette[1].toLowerCase() == "single") {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    //transform for specific well diagrams 
+    container_top: function(step) {
+        var container = step.data.container_name.split('.');
+        var type = container[0];
+        var top;
+        //tiprack or tubrack exceptions
+        if (type == "tiprack" || type == "tubrack" || type =="point") {
+            top = type+"_top.png";
+        }
+        //default diagram is generic well
+        else {
+            top = "well_top.png";
+        }
+        return top;
+    },
+    container_bottom: function(step) {
+        var container = step.data.container_name.split('.');
+        var type = container[0];
+        var bottom;
+        //tiprack calibration has no bottom position to save
+        //tuberack specific diagram
+        if (type == "tubrack") {
+            top = type+"_bottom.png";
+        }
+        //default diagram is generic well
+        else {
+            bottom = "well_bottom.png"
+        }
+        return bottom;
+    },
+
     //transforms for popup info diagram display logic
     image_top: function(step) {
         var pipette = step.data.pipette.split(' ');
@@ -239,31 +305,6 @@ wizard.setStepTransforms('calibrate', {
         var pipette = step.data.pipette.split(' ');
         var image = pipette[1].toLowerCase() + "." + step.data.container_name + ".front.jpg";
         return image;
-    },
-    isContainer: function(step) {
-        var info = step.data.container_name.split('.');
-        if (info[0] == "point") {
-            return false
-        } else {
-            return true
-        };
-    },
-    isSingle: function(step){
-        var pipette = step.data.pipette.split(' ');
-        if (pipette[1].toLowerCase()== "single"){
-            return true;
-        }else{
-            return false;
-        }
-    },
-    isTipRack: function(step){
-        var container = step.data.container_name.split('.');
-        var type = container[0];
-        if (type == "tiprack"){
-            return true;
-        }else{
-            return false;
-        }
     }
 
 
@@ -276,11 +317,11 @@ wizard.setStepTransforms('calibrate_pipette', {
         a = a.charAt(0);
         return name + " (" + a + ")";
     },
-    centerPipette: function(step){
+    centerPipette: function(step) {
         var a = step.data.actuator;
-        if (a =="center"){
+        if (a == "center") {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -311,7 +352,7 @@ wizard.setStepTransforms({
     index: function(step) {
         return step.task_index + '-' + step.step_index + '-' + step.num_steps;
     },
-    completed: function(step){
+    completed: function(step) {
         return step.data.completed;
     }
 
@@ -334,7 +375,7 @@ delegateEvent('click', 'li', function() {
 
 
 //Delegators to handle prev next functionality
-delegateEvent('click', '.prev', function() {    
+delegateEvent('click', '.prev', function() {
     wizard.prevStep();
 });
 

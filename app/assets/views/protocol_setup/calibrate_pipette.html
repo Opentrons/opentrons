@@ -88,25 +88,29 @@
                 <h3 class="title">{{this.title}} {{data.actuator}}</h3>
                 <div class="wrap">
                     <div class="pipette-pos">
-                        <img src="../../img/pipette_bottom.png" />
+                        <img src="../../img/pipette_top.png" />
                     </div>
                     <div class="update">
-                        
+                    
                         <a href="#pipette_top" class="position pipette-top">Top</a>
-                        <a class="btn-update save ">Save</a>
-                        <a class="btn-update moveto ">Move</a>
+                        <button class="btn-update save ">Save</button>
+                        <button class="btn-update moveto ">Move</button>
                         
                         <a href="#pipette_bottom" class="position bottom">Bottom</a>
-                        <a class="btn-update save bottom">Save</a>
-                        <a class="btn-update moveto bottom">Move</a>
+                        <button class="btn-update save bottom">Save</button>
+                        <button class="btn-update moveto bottom">Move</button>
                         
                         <a href="#pipette_blowout" class="position">Blowout</a>
-                        <a class="btn-update save">Save</a>
-                        <a class="btn-update moveto">Move</a>
+                        <button class="btn-update save">Save</button>
+                        <button class="btn-update moveto">Move</button>
                         
                         <a href="#pipette_droptip" class="position">Drop Tip</a>
-                        <a class="btn-update save">Save</a>
-                        <a class="btn-update moveto">Move</a>
+                        <button class="btn-update save">Save</button>
+                        <button class="btn-update moveto disabled">Move</button>
+
+                        
+                        <button class="btn-update test pick-liquid disabled">Pick Up {{data.test_volume}}</button>
+                        <button class="btn-update test eject-liquid disabled" >Eject {{data.test_volume}}</button>
                         
                     </div>
                 </div>

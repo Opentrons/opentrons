@@ -12,6 +12,8 @@ ul {
     padding: 0;
 }
 
+
+
 .coords {
     input {
         pointer-events: none;
@@ -30,7 +32,7 @@ ul {
     padding: 0;
     border: none;
     text-align: center;
-    line-height: 40px;
+    line-height: $baseline;
 }
 
 .fileUpload {
@@ -261,16 +263,14 @@ Pipette
         @include grid-col-full(6);
         display: flex;
         flex-wrap: wrap;
+
         .position {
             @include grid-col-full(2);
             text-align: center;
-            line-height: 40px;
+            line-height: $baseline;
         }
         .bottom {
-            @include offset-v-air(2, 0);
-        }
-        span.position.bottom {
-            @include offset-v(2, 0);
+            @include offset-v-air(1, 0);
         }
     }
     .coords {

@@ -80,26 +80,32 @@
             <h3 class="title">{{this.title}}</h3>
             <div class="wrap">
                 <div class="well">
-                    <img src="../../img/well_top.png" />
+                    <img src="../../img/{{this.container_top}}" />
                 </div>
-                {{#if this.isTipRack}} 
+                {{#if this.isContainer}}
+                    {{#if this.isTipRack}} 
                     <div class="update">
-                        <a href="#tiprack_top" class="position">Title</a>
+                        <a href="#{{this.container_top}}" class="position">Title</a>
                         <a class="btn-update save ">Save </a>
                         <a class="btn-update moveto">Move To</a>
                         <!-- DROPTIP FOR TIPRACKS ONLY -->
                         <a class="pick-tip ">Pick Up Tip </a>
-                         
-                </div>
+                    </div>
+                    {{else}}
+                    <div class="update">                   
+                        <a href="#{{this.container_top}}" class="position">Top</a>
+                        <a class="btn-update save ">Save </a>
+                        <a class="btn-update moveto">Move To</a>
+                        <a href="#{{this.container_bottom}}" class="position ">Bottom</a>
+                        <a class="btn-update save ">Save </a>
+                        <a class="btn-update moveto">Move To </a>
+                    </div>
+                    {{/if}}
                 {{else}}
                 <div class="update">
-                    
-                    <a href="#well_top" class="position">Top</a>
-                    <a class="btn-update save ">Save </a>
-                    <a class="btn-update moveto">Move To</a>
-                    <a href="#well_bottom" class="position ">Bottom</a>
-                    <a class="btn-update save ">Save </a>
-                    <a class="btn-update moveto">Move To </a>
+                        <a href="#{{this.container_top}}" class="position">Title</a>
+                        <a class="btn-update save ">Save </a>
+                        <a class="btn-update moveto">Move To</a>
                 </div>
                 {{/if}}
             </div>
