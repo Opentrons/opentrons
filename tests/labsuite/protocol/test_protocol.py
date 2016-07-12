@@ -189,11 +189,11 @@ class ProtocolTest(unittest.TestCase):
     def test_motor_handler(self):
         motor = self.protocol.attach_motor()
         output_log = motor._driver
-        self.protocol.add_instrument('A', 'p200')
+        self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate('A1', x=1, y=2, top=3, bottom=13)
         self.protocol.calibrate('A1:A2', bottom=5)
-        self.protocol.calibrate_instrument('A', top=0, blowout=10)
+        self.protocol.calibrate_instrument('B', top=0, blowout=10)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         prog_out = []
@@ -204,34 +204,34 @@ class ProtocolTest(unittest.TestCase):
             {'z': 0},  # Move to well.
             {'x': 1, 'y': 2},
             {'z': 3},
-            {'a': 5.0},  # Plunge.
+            {'b': 5.0},  # Plunge.
             {'x': 1, 'y': 2},
             {'z': 13},  # Move into well.
-            {'a': 0},  # Release.
+            {'b': 0},  # Release.
             {'z': 0},  # Move up.
             {'x': 1, 'y': 11},  # Move to well.
             {'z': 3},
             {'x': 1, 'y': 11},
             {'z': 5},  # Move into well.
-            {'a': 10},  # Blowout.
+            {'b': 10},  # Blowout.
             {'z': 0},  # Move up.
-            {'a': 0},  # Release.
+            {'b': 0},  # Release.
             # Transfer 2.
             {'z': 0},
             {'x': 1, 'y': 11},
             {'z': 3},
-            {'a': 4.0},
+            {'b': 4.0},
             {'x': 1, 'y': 11},
             {'z': 5},
-            {'a': 0},
+            {'b': 0},
             {'z': 0},
             {'x': 1, 'y': 20},
             {'z': 3},
             {'x': 1, 'y': 20},
             {'z': 13},
-            {'a': 10},
+            {'b': 10},
             {'z': 0},
-            {'a': 0}
+            {'b': 0}
         ]
         self.assertEqual(expected, output_log.movements)
         self.assertEqual([(0, 2), (1, 2), (2, 2)], prog_out)

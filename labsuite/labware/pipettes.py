@@ -19,7 +19,7 @@ class Pipette():
     _blowout = None  # Bottom of the plunger (all liquid expelled).
     _droptip = None  # Point where the screw on the axis hits the droptip.
 
-    _axis = 'A'
+    _axis = None
 
     _points = [
         {'f1': 1, 'f2': 1},

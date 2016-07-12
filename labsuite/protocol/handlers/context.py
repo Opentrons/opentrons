@@ -25,8 +25,10 @@ class ContextHandler(ProtocolHandler):
         self._calibration = {}
 
     def add_instrument(self, axis, name):
+        axis = axis.upper()
         # We only have pipettes now so this is pipette-specific.
         self._instruments[axis] = pipettes.load_instrument(name)
+        self._instruments[axis]._axis = axis
 
     def get_instrument(self, axis=None, volume=None):
         axis = self.normalize_axis(axis)
