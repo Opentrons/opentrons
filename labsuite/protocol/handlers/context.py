@@ -39,6 +39,7 @@ class ContextHandler(ProtocolHandler):
                 )
             else:
                 inst = self._instruments[axis]
+                inst._axis = axis
                 if axis in self._calibration:
                     if '_axis' in self._calibration[axis]:
                         inst.calibrate(**self._calibration[axis]['_axis'])
@@ -86,7 +87,8 @@ class ContextHandler(ProtocolHandler):
             self._calibration[axis] = {}
         return self._calibration[axis]
 
-    def calibrate(self, pos, axis=None, x=None, y=None, z=None, top=None, bottom=None):
+    def calibrate(self, pos, axis=None, x=None, y=None, z=None, top=None,
+                  bottom=None):
         axis = self.normalize_axis(axis)
         cal = self.get_axis_calibration(axis)
         if pos not in cal:
@@ -104,7 +106,8 @@ class ContextHandler(ProtocolHandler):
         if bottom is not None:
             pos_cal['bottom'] = bottom
 
-    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None, bottom=None):
+    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None,
+                             bottom=None):
         cal = self.get_axis_calibration(axis)
         if '_instrument' not in cal:
             cal['_instrument'] = {}
