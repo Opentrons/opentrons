@@ -419,3 +419,13 @@ delegateEvent('click', '.plunger', function(e, el) {
     jogController.moveRelative(axis,direction);
 });
 
+//Jog to Absolute Deck Slot locations
+delegateEvent('click', '.btn-deck', function(e, el) {
+    var coords = {};
+    coords.x = parseInt(e.target.dataset.x);
+    coords.y = parseInt(e.target.dataset.y);
+    //z pos will zero out before x y movements
+    //coords.z = parseInt(e.target.dataset.z);
+    jogController.moveAbsolute(coords);
+});
+

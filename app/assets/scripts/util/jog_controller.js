@@ -21,7 +21,6 @@
             }
             //check and apply proper increment property based on selected axis
             if (axis == 'a' || axis == 'b') {
-                console.log(axis);
                 increment = dir * this.increment_plunger;
 
             } else {
@@ -33,9 +32,9 @@
             this[axis] += increment;
 
             //now move to it
-            socket.emit("move", this.current_position);
-            console.log(this[axis]);
+            socket.emit("move", this.current_position);  
 
+            console.log(this.current_position);          
         },
         setIncrementXYZ: function(n) {
             this.increment = n;
@@ -45,16 +44,23 @@
         },
         setIncrementAB: function(n) {
             this.increment_plunger = n;
-            console.log(this.increment_plunger);
         },
         getIncrementAB: function() {
             return this.increment_plunger;
         },
-
-        moveAbsolute: function(x, y, z, a, b) {
+        moveAbsolute: function(coords) {
             //move to hardcoded coordinates for each deck slot
+            //zero out Z first
+            this.current_position.z = 0;
+            this.z = 0;
+            //them move x,y
+            for (var axis in coords) {
+                this.current_position[axis] = coords[axis];
+                this[axis] = coords[axis];
+            }
+            console.log(this.current_position);
+            socket.emit("move", this.current_position); 
         }
-
 
     }
 
