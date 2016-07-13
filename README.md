@@ -15,8 +15,22 @@ $ compass watch
 ```
 if you are editing the styles directly.
 
+###Setup
+First, clone and install labsuite.
+While in labsuite repo:
+```
+python3 setup.py install
+```
+Then install following:
+```
+$ pip3 install Flask_SocketIO
+$ pip3 install logging
+$ pip3 install gevent
+```
+
+
 ### Run Server
-Currently, to start the server you have to install python3 and run python file directly.
+Currently, to start the server you have to run python file directly.
 
 ```
 $ cd app
