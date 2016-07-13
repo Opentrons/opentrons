@@ -1,5 +1,7 @@
 /* Gets run every time the user is in protocol_setup/ anything. */
 
+
+//stub data, transforms, and event delegation for Wizard and Jog Controller
 var stubData = [{
         task_type: "select_protocol",
         steps: [{
@@ -177,6 +179,7 @@ var stubData = [{
 //{ step_id: 'uniquekey2', data: { completed: true } }
 
 wizard = new StepWizard();
+jogController = new JogController();
 
 wizard.setTaskTransforms({
     enumerate: function(task) {
@@ -368,12 +371,7 @@ wizard.setStepByID(stepID);
 
 
 // Event delegation lives here
-// (sends wizard command) example event listener:
-delegateEvent('click', 'li', function() {
-    console.log(arguments);
-});
-
-
+/**** Wizard Specific ***/
 //Delegators to handle prev next functionality
 delegateEvent('click', '.prev', function() {
     wizard.prevStep();
@@ -383,8 +381,6 @@ delegateEvent('click', '.next', function() {
     wizard.nextStep();
 });
 
-
-
 // Delegator to handle forms goes here.
 delegateEvent('submit', 'form[method=upload]', function(e, el) {
     e.preventDefault();
@@ -392,3 +388,34 @@ delegateEvent('submit', 'form[method=upload]', function(e, el) {
     var protocol = form.get('file');
     console.log("protocol uploaded: " + protocol);
 });
+
+/**** Jog Controller Specific ***/
+
+//Set XYZ Increment in jog controller
+delegateEvent('click', '.increment.xyz', function(e, el) {
+    var mm = parseFloat(e.target.dataset.increment);
+    jogController.setIncrementXYZ(mm);
+    console.log(e.target);
+});
+
+//Jog XYZ 
+delegateEvent('click', '.jog', function(e, el) {
+    var axis = e.target.dataset.axis;
+    var direction = e.target.dataset.direction;
+    jogController.moveRelative(axis,direction);
+});
+
+//Set AB Increment - separated from XYZ increments to avoid setting large 
+//increments that would break plunger
+delegateEvent('click', '.increment.pipette', function(e, el) {
+    var mm = parseFloat(e.target.dataset.increment);
+    jogController.setIncrementAB(mm);
+});
+
+//Jog AB
+delegateEvent('click', '.plunger', function(e, el) {
+    var axis = e.target.dataset.axis;
+    var direction = e.target.dataset.direction;
+    jogController.moveRelative(axis,direction);
+});
+

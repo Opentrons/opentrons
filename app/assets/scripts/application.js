@@ -1,7 +1,9 @@
 // This file is the only file that gets called by the initial page load.
 function Application() {
-
+	
 	function init() {
+		//connect sockets
+		socket = io.connect('//' + document.domain + ':' + location.port);
 		initialize_path();
 	}
 
