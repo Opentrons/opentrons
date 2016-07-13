@@ -244,9 +244,7 @@ Pipette
         @include grid-col-full(5);
         @include offset(0, 6);
     }
-    .pipette {
-        @include offset-v(1, 0);
-    }
+    
 }
 
 .save-pipette {
