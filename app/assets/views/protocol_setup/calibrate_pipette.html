@@ -13,23 +13,23 @@
         <div class="move">
             <h3 class="title">Jog X-Y-Z</h3>
             <div class="jog">
-                <a href="#" class="btn-full btn-y">Y</a>
-                <a href="#" class="btn-full btn-z">Z</a>
-                <a href="#" class="btn-full">X</a>
-                <a href="#" class="btn-full btn-x">X</a>
-                <a href="#" class="btn-full btn-y">Y</a>
-                <a href="#" class="btn-full btn-z ">Z</a>
+                <a href="#" data-axis="y" data-direction="neg" class="btn-full btn-y">Y</a>
+                <a href="#" data-axis="z" data-direction="neg" class="btn-full btn-z">Z</a>
+                <a href="#" data-axis="x" data-direction="neg" class="btn-full x">X</a>
+                <a href="#" data-axis="x" data-direction="pos" class="btn-full btn-x">X</a>
+                <a href="#" data-axis="y" data-direction="pos" class="btn-full btn-y">Y</a>
+                <a href="#" data-axis="z" data-direction="pos" class="btn-full btn-z">Z</a>
             </div>
             <h3 class="title">Select Increment [mm]</h3>
-            <div class="increment">
-                <a href="#" class="btn-full btn-group">20</a>
-                <a href="#" class="btn-full btn-group">10</a>
-                <a href="#" class="btn-full btn-group">5</a>
-                <a href="#" class="btn-full btn-group">1</a>
-                <a href="#" class="btn-full btn-group">0.5</a>
-                <a href="#" class="btn-full btn-group">0.1</a>
-                <a href="#" class="btn-slot">&#8596; slot-x </a>
-                <a href="#" class="btn-slot">&#8597; slot-y </a>
+            <div class="increment xyz">
+                <a href="#" data-increment="20" class="btn-full btn-group">20</a>
+                <a href="#" data-increment="10" class="btn-full btn-group">10</a>
+                <a href="#" data-increment="5" class="btn-full btn-group">5</a>
+                <a href="#" data-increment="1" class="btn-full btn-group">1</a>
+                <a href="#" data-increment="0.5" class="btn-full btn-group">0.5</a>
+                <a href="#" data-increment="0.1" class="btn-full btn-group">0.1</a>
+                <a href="#" data-increment="91" class="btn-slot">&#8596; slot-x </a>
+                <a href="#" data-increment="135" class="btn-slot">&#8597; slot-y </a>
             </div>
             <h3 class="title">Move to Slot</h3>
             <div class="deck">
@@ -56,68 +56,64 @@
             <div class="plunger">
                 {{#if this.centerPipette}}
                 <div class="jog-a">
-                    {{else}}
-                    <div class="jog-b">
-                        {{/if}}
-                        <a href="#" class="btn-full btn-ab">P</a>
-                        <a href="#" class="btn-full btn-ab btn-down">P</a>
-                    </div>
+                    <a href="#" data-axis="a" data-direction="neg" class="btn-full btn-ab">P</a>
+                    <a href="#" data-axis="a" data-direction="pos" class="btn-full btn-ab btn-down">P</a>
                 </div>
-                <div class="increment pipette">
-                    <a href="#" class="btn-full btn-group">2</a>
-                    <a href="#" class="btn-full btn-group">1</a>
+                {{else}}
+                <div class="jog-b">
+                    <a href="#" data-axis="b" data-direction="neg" class="btn-full btn-ab">P</a>
+                    <a href="#" data-axis="b" data-direction="pos"  class="btn-full btn-ab btn-down">P</a>
                 </div>
-                <div class="increment">
-                    <a href="#" class="btn-full btn-group">0.5</a>
-                    <a href="#" class="btn-full btn-group">0.1</a>
-                </div>
+                {{/if}}
             </div>
-            <!-- end move-pipette -->
-            <div class="save-pipette">
-                <h3 class="title">Current Position</h3>
-                <div class="coords">
-                    <label class="label">X:</label>
-                    <input type="text" value="0" />
-                    <label class="label">Y:</label>
-                    <input type="text" value="0" />
-                    <label class="label">Z:</label>
-                    <input type="text" value="0" />
-                    <label class="label">A:</label>
-                    <input type="text" value="0" />
-                </div>
-                <h3 class="title">{{this.title}} {{data.actuator}}</h3>
-                <div class="wrap">
-                    <div class="pipette-pos">
-                        <img src="../../img/pipette_top.png" />
-                    </div>
-                    <div class="update">
-                    
-                        <a href="#pipette_top" class="position pipette-top">Top</a>
-                        <button class="btn-update save ">Save</button>
-                        <button class="btn-update moveto ">Move</button>
-                        
-                        <a href="#pipette_bottom" class="position bottom">Bottom</a>
-                        <button class="btn-update save bottom">Save</button>
-                        <button class="btn-update moveto bottom">Move</button>
-                        
-                        <a href="#pipette_blowout" class="position">Blowout</a>
-                        <button class="btn-update save">Save</button>
-                        <button class="btn-update moveto">Move</button>
-                        
-                        <a href="#pipette_droptip" class="position">Drop Tip</a>
-                        <button class="btn-update save">Save</button>
-                        <button class="btn-update moveto disabled">Move</button>
-
-                        
-                        <button class="btn-update test pick-liquid disabled">Pick Up {{data.test_volume}}</button>
-                        <button class="btn-update test eject-liquid disabled" >Eject {{data.test_volume}}</button>
-                        
-                    </div>
-                </div>
+            <div class="increment pipette">
+                <a href="#" data-increment="2" class="btn-full btn-group">2</a>
+                <a href="#" data-increment="1" class="btn-full btn-group">1</a>
             </div>
-            <!-- end save pipette -->
+            <div class="increment pipette">
+                <a href="#" data-increment="0.5" class="btn-full btn-group">0.5</a>
+                <a href="#" data-increment="0.1" class="btn-full btn-group">0.1</a>
+            </div>
         </div>
-        <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
+        <!-- end move-pipette -->
+        <div class="save-pipette">
+            <h3 class="title">Current Position</h3>
+            <div class="coords">
+                <label class="label">X:</label>
+                <input type="text" value="0" />
+                <label class="label">Y:</label>
+                <input type="text" value="0" />
+                <label class="label">Z:</label>
+                <input type="text" value="0" />
+                <label class="label">A:</label>
+                <input type="text" value="0" />
+            </div>
+            <h3 class="title">{{this.title}} {{data.actuator}}</h3>
+            <div class="wrap">
+                <div class="pipette-pos">
+                    <img src="../../img/pipette_top.png" />
+                </div>
+                <div class="update">
+                    <a href="#pipette_top" class="position pipette-top">Top</a>
+                    <button class="btn-update save ">Save</button>
+                    <button class="btn-update moveto ">Move</button>
+                    <a href="#pipette_bottom" class="position bottom">Bottom</a>
+                    <button class="btn-update save bottom">Save</button>
+                    <button class="btn-update moveto bottom">Move</button>
+                    <a href="#pipette_blowout" class="position">Blowout</a>
+                    <button class="btn-update save">Save</button>
+                    <button class="btn-update moveto">Move</button>
+                    <a href="#pipette_droptip" class="position">Drop Tip</a>
+                    <button class="btn-update save">Save</button>
+                    <button class="btn-update moveto disabled">Move</button>
+                    <button class="btn-update test pick-liquid disabled">Pick Up {{data.test_volume}}</button>
+                    <button class="btn-update test eject-liquid disabled">Eject {{data.test_volume}}</button>
+                </div>
+            </div>
+        </div>
+        <!-- end save pipette -->
+    </div>
+    <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
 </section>
 <div id="info" class="infoModal">
     <div> <a href="#close" title="Close" class="close">X</a>
