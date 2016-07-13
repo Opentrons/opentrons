@@ -1,9 +1,17 @@
 from pathlib import Path
 from flask import Flask, request, render_template
 import flask
+from labsuite.protocol import Protocol
+from flask_socketio import SocketIO, emit
+import logging
+
+protocol = Protocol()
+motor_handler = protocol.attach_motor()
 
 app = Flask(__name__,static_url_path = "", static_folder = "static")
 app.jinja_env.autoescape = False
+socketio = SocketIO(app, async_mode='gevent')
+
 # welcome route for connecting to robot
 @app.route("/welcome/<path:path>")
 def welcome(path):
@@ -71,8 +79,26 @@ def inject_assets():
 def index(path=None):
     return render_template("welcome.html")
 
+# Here's the magic.
+@socketio.on('connect_serial')
+def handle_connect_serial(data):
+    motor_handler.connect(data['port'])
+    motor_handler.move_motors(x=10, y=10, z=10)
+
+@socketio.on('move')
+def handle_move(coords):
+    for k in coords:
+        coords[k] = int(coords[k])
+    motor_handler.move_motors(**coords)
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    datefmt='%d-%m-%y %H:%M:%S'
+)
 
 
 if __name__ == "__main__":
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    #app.run(host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True)
