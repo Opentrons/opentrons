@@ -44,12 +44,12 @@ class MotorControlHandler(ProtocolHandler):
         self.move_to_well(start)
         pipette.plunge(volume)
         self.move_into_well(start)
-        pipette.release()
+        pipette.reset()
         self.move_to_well(end)
         self.move_into_well(end)
         pipette.blowout()
         self.move_up()
-        pipette.release()
+        pipette.reset()
 
     def pickup_tip(self, pipette):
         coords = self._context.get_tip_coordinates(pipette)
