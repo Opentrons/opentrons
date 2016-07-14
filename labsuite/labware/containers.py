@@ -36,7 +36,8 @@ _typemap = {
     'microplate': Microplate,
     'reservoir': Reservoir,
     'legacy': Microplate,
-    'tuberack': Tuberack
+    'tuberack': Tuberack,
+    'point': GridContainer
 }
 
 # Valid properties to configure.
