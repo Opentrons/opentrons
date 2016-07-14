@@ -127,6 +127,10 @@ class Pipette():
         return self._blowout
 
     @property
+    def droptip(self):
+        return self._droptip
+
+    @property
     def name(self):
         return self.size.lower()
 

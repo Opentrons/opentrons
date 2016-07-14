@@ -164,7 +164,13 @@ class ContextHandler(ProtocolHandler):
         if tiprack is None:
             raise KeyError("No tiprack found for {}.".format(name))
         tip = tiprack.get_next_tip()
-        return self.get_coordinates(tip.address)
+        return self.get_coordinates(tip.address, axis=pipette.axis)
+
+    def get_trash_coordinates(self, axis=None):
+        trash = self.find_container(name='point.trash')
+        if trash is None:
+            raise KeyError("No disposal point (trash) on deck.")
+        return self.get_coordinates(trash.address + [(0, 0)], axis)
 
     def get_volume(self, well):
         slot, well = self._protocol._normalize_address(well)

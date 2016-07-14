@@ -37,8 +37,9 @@ class MotorControlHandler(ProtocolHandler):
         else:
             tool = self.get_pipette(name=tool)
         axis = tool.axis
-        self.pickup_tip(axis)
+        self.pickup_tip(tool)
         self.move_volume(axis, start, end, volume)
+        self.dispose_tip(tool)
 
     def move_volume(self, axis, start, end, volume):
         pipette = self.get_pipette(axis=axis)
@@ -52,14 +53,16 @@ class MotorControlHandler(ProtocolHandler):
         self.move_up()
         pipette.release()
 
-    def pickup_tip(self, axis):
-        pipette = self.get_pipette(axis=axis)
+    def pickup_tip(self, pipette):
         coords = self._context.get_tip_coordinates(pipette)
         self.move_motors(x=coords['x'], y=coords['y'])
         self.move_motors(z=coords['top'])
 
-    def dispose_tip(self):
-        pass
+    def dispose_tip(self, pipette):
+        coords = self._context.get_trash_coordinates(pipette.axis)
+        self.move_motors(x=coords['x'], y=coords['y'])
+        self.move_motors(z=coords['top'])
+        pipette.droptip()
 
     def move_to_well(self, well):
         self.move_motors(z=0)  # Move up so we don't hit things.
@@ -110,6 +113,9 @@ class PipetteMotor():
 
         def blowout(self):
             self.move(self.pipette.blowout)
+
+        def droptip(self):
+            self.move(self.pipette.droptip)
 
         def move(self, position):
             axis = self.axis

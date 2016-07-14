@@ -193,10 +193,12 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.add_container('C1', 'tiprack.p200')
+        self.protocol.add_container('B2', 'point.trash')
         self.protocol.calibrate('A1', x=1, y=2, top=3, bottom=13)
         self.protocol.calibrate('A1:A2', bottom=5)
         self.protocol.calibrate('C1', x=100, y=100, top=50)
-        self.protocol.calibrate_instrument('B', top=0, blowout=10)
+        self.protocol.calibrate('B2', x=200, y=250, top=15)
+        self.protocol.calibrate_instrument('B', top=0, blowout=10, droptip=25)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         prog_out = []
@@ -221,6 +223,9 @@ class ProtocolTest(unittest.TestCase):
             {'b': 10},  # Blowout.
             {'z': 0},  # Move up.
             {'b': 0},  # Release.
+            {'x': 200, 'y': 250},  # Dispose tip.
+            {'z': 15},
+            {'b': 25},
             # Transfer 2.
             {'x': 100, 'y': 109},
             {'z': 50},
@@ -238,7 +243,10 @@ class ProtocolTest(unittest.TestCase):
             {'z': 13},
             {'b': 10},
             {'z': 0},
-            {'b': 0}
+            {'b': 0},
+            {'x': 200, 'y': 250},
+            {'z': 15},
+            {'b': 25}
         ]
         self.assertEqual(expected, output_log.movements)
         self.assertEqual([(0, 2), (1, 2), (2, 2)], prog_out)
@@ -247,6 +255,18 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.attach_motor()
         self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.calibrate_instrument('B', top=0, blowout=10)
+        self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
+        self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
+        with self.assertRaises(KeyError):
+            for progress in self.protocol.run():
+                next
+
+    def test_transfer_without_dispose_point(self):
+        self.protocol.attach_motor()
+        self.protocol.add_instrument('B', 'p200')
+        self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.add_container('C1', 'tiprack.p200')
         self.protocol.calibrate_instrument('B', top=0, blowout=10)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
