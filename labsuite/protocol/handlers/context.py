@@ -30,7 +30,7 @@ class ContextHandler(ProtocolHandler):
         self._instruments[axis] = pipettes.load_instrument(name)
         self._instruments[axis]._axis = axis
 
-    def get_instrument(self, axis=None, volume=None):
+    def get_instrument(self, axis=None, **kwargs):
         axis = self.normalize_axis(axis)
         if axis:
             if axis not in self._instruments:
@@ -44,15 +44,23 @@ class ContextHandler(ProtocolHandler):
                     if '_axis' in self._calibration[axis]:
                         inst.calibrate(**self._calibration[axis]['_axis'])
                 return self._instruments[axis]
-        if volume:
-            for k, i in self._instruments.items():
-                if i.supports_volume(volume):
-                    return i
+
+        volume = kwargs.pop('volume')
+        for k, i in self._instruments.items():
+            if volume and i.supports_volume(volume) is False:
+                    next
+            for k, v in kwargs.items():
+                if getattr(i, k) != v:
+                    next
+            return i
 
         raise KeyError(
             "No instrument found to support a volume of {}µl."
             .format(volume)
         )
+
+    def find_container(self, **filters):
+        return self._deck.find_module(**filters)
 
     def add_container(self, slot, container_name):
         self._deck.add_module(slot, container_name)
@@ -134,7 +142,7 @@ class ContextHandler(ProtocolHandler):
         slot_cal.update(defaults)
         slot_cal.update(cal.get((slot), {}))
         # Default offset on x, y calculated from container definition.
-        ox, oy = self._deck.slot(slot).well(well).coordinates()
+        ox, oy = self._deck.slot(slot).get_child(well).coordinates()
         # x, y, top bottom
         well_cal = cal.get((slot, well), {})
         output.update(well_cal)
@@ -150,16 +158,15 @@ class ContextHandler(ProtocolHandler):
             output['bottom'] = slot_cal['bottom']
         return output
 
+    def get_tip_coordinates(self, pipette):
+        name = 'tiprack.{}'.format(pipette.name)
+        tiprack = self.find_container(name=name)
+        tip = tiprack.get_next_tip()
+        return self.get_coordinates(tip.address)
+
     def get_volume(self, well):
         slot, well = self._protocol._normalize_address(well)
         return self._deck.slot(slot).well(well).get_volume()
-
-    def get_tip_coordinates(self, size):
-        """
-        Returns the coordinates of the next available pipette tip for that
-        particular size (ie, p10).
-        """
-        pass
 
     def transfer(self, start=None, end=None, volume=None, **kwargs):
         start_slot, start_well = start

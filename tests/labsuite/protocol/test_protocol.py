@@ -172,6 +172,7 @@ class ProtocolTest(unittest.TestCase):
 
     def test_context(self):
         self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.add_container('C1', 'tiprack.p200')
         self.protocol.add_instrument('A', 'p200')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
@@ -191,8 +192,10 @@ class ProtocolTest(unittest.TestCase):
         output_log = motor._driver
         self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.add_container('C1', 'tiprack.p200')
         self.protocol.calibrate('A1', x=1, y=2, top=3, bottom=13)
         self.protocol.calibrate('A1:A2', bottom=5)
+        self.protocol.calibrate('C1', x=100, y=100, top=50)
         self.protocol.calibrate_instrument('B', top=0, blowout=10)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
@@ -201,6 +204,8 @@ class ProtocolTest(unittest.TestCase):
             prog_out.append(progress)
         expected = [
             # Transfer 1.
+            {'x': 100, 'y': 100},  # Pickup tip.
+            {'z': 50},
             {'z': 0},  # Move to well.
             {'x': 1, 'y': 2},
             {'z': 3},
@@ -217,6 +222,8 @@ class ProtocolTest(unittest.TestCase):
             {'z': 0},  # Move up.
             {'b': 0},  # Release.
             # Transfer 2.
+            {'x': 100, 'y': 109},
+            {'z': 50},
             {'z': 0},
             {'x': 1, 'y': 11},
             {'z': 3},
@@ -243,6 +250,7 @@ class ProtocolTest(unittest.TestCase):
 
     def test_protocol_run_twice(self):
         self.protocol.add_instrument('A', 'p200')
+        self.protocol.add_container('C1', 'tiprack.p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate('A1', x=1, y=2, z=3)
         self.protocol.calibrate_instrument('A', top=0, blowout=10)

@@ -31,11 +31,17 @@ class MotorControlHandler(ProtocolHandler):
     def disconnect(self):
         self._driver.disconnect()
 
-    def transfer(self, start=None, end=None, volume=None, **kwargs):
-        self.move_volume(start, end, volume)
+    def transfer(self, start=None, end=None, volume=None, tool=None, **kwargs):
+        if tool is None:
+            tool = self.get_pipette(volume=volume)
+        else:
+            tool = self.get_pipette(name=tool)
+        axis = tool.axis
+        self.pickup_tip(axis)
+        self.move_volume(axis, start, end, volume)
 
-    def move_volume(self, start, end, volume):
-        pipette = self.get_pipette(volume=volume)
+    def move_volume(self, axis, start, end, volume):
+        pipette = self.get_pipette(axis=axis)
         self.move_to_well(start)
         pipette.plunge(volume)
         self.move_into_well(start)
@@ -46,8 +52,11 @@ class MotorControlHandler(ProtocolHandler):
         self.move_up()
         pipette.release()
 
-    def pickup_tip(self):
-        pass
+    def pickup_tip(self, axis):
+        pipette = self.get_pipette(axis=axis)
+        coords = self._context.get_tip_coordinates(pipette)
+        self.move_motors(x=coords['x'], y=coords['y'])
+        self.move_motors(z=coords['top'])
 
     def dispose_tip(self):
         pass
@@ -70,12 +79,12 @@ class MotorControlHandler(ProtocolHandler):
         axis, depth = self._context.get_plunge(volume=volume)
         self.move_motors(**{axis: depth})
 
-    def get_pipette(self, volume=None, axis=None):
+    def get_pipette(self, **kwargs):
         """
         Returns a closure object that allows for the plunge, release, and
         blowout of a certain pipette and volume.
         """
-        pipette = self._context.get_instrument(volume=volume, axis=axis)
+        pipette = self._context.get_instrument(**kwargs)
         axis = pipette.axis
         if axis not in self._pipette_motors:
             self._pipette_motors[axis] = PipetteMotor(pipette, self)
@@ -109,3 +118,7 @@ class PipetteMotor():
         @property
         def axis(self):
             return self.pipette.axis
+
+        @property
+        def name(self):
+            return self.pipette.name

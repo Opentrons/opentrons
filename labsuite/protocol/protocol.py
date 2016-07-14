@@ -258,7 +258,6 @@ class Protocol():
         if calibration:
             self._context_handler._calibration = calibration
 
-
     def _run_in_context_handler(self, command, **kwargs):
         """
         Runs a command in the virtualized context.
