@@ -36,7 +36,6 @@ class MotorControlHandler(ProtocolHandler):
             tool = self.get_pipette(volume=volume)
         else:
             tool = self.get_pipette(name=tool)
-        axis = tool.axis
         self.pickup_tip(tool)
         self.move_volume(tool, start, end, volume)
         self.dispose_tip(tool)
@@ -104,19 +103,33 @@ class PipetteMotor():
             self.motor = motor
 
         def reset(self):
+            debug(
+                "PipetteMotor",
+                "Resetting {} axis ({}).".format(self.axis, self.name)
+            )
             self.move(0)
 
         def plunge(self, volume):
+            debug(
+                "PipetteMotor",
+                "Plunging {} axis ({}) to volume of {}µl."
+                .format(self.axis, self.name, volume)
+            )
             depth = self.pipette.plunge_depth(volume)
             self.move(depth)
 
-        def release(self):
-            self.move(0)
-
         def blowout(self):
+            debug(
+                "PipetteMotor",
+                "Blowout on {} axis ({}).".format(self.axis, self.name)
+            )
             self.move(self.pipette.blowout)
 
         def droptip(self):
+            debug(
+                "PipetteMotor",
+                "Droptip on {} axis ({}).".format(self.axis, self.name)
+            )
             self.move(self.pipette.droptip)
 
         def move(self, position):
