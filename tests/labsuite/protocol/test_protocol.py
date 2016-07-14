@@ -244,7 +244,7 @@ class ProtocolTest(unittest.TestCase):
         self.assertEqual([(0, 2), (1, 2), (2, 2)], prog_out)
 
     def test_transfer_without_tiprack(self):
-        motor = self.protocol.attach_motor()
+        self.protocol.attach_motor()
         self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.calibrate_instrument('B', top=0, blowout=10)
