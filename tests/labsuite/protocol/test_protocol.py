@@ -243,6 +243,17 @@ class ProtocolTest(unittest.TestCase):
         self.assertEqual(expected, output_log.movements)
         self.assertEqual([(0, 2), (1, 2), (2, 2)], prog_out)
 
+    def test_transfer_without_tiprack(self):
+        motor = self.protocol.attach_motor()
+        self.protocol.add_instrument('B', 'p200')
+        self.protocol.add_container('A1', 'microplate.96')
+        self.protocol.calibrate_instrument('B', top=0, blowout=10)
+        self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
+        self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
+        with self.assertRaises(KeyError):
+            for progress in self.protocol.run():
+                next
+
     def test_find_instrument_by_volume(self):
         self.protocol.add_instrument('A', 'p10')
         i = self.protocol._context_handler.get_instrument(volume=6)

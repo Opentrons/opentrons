@@ -161,6 +161,8 @@ class ContextHandler(ProtocolHandler):
     def get_tip_coordinates(self, pipette):
         name = 'tiprack.{}'.format(pipette.name)
         tiprack = self.find_container(name=name)
+        if tiprack is None:
+            raise KeyError("No tiprack found for {}.".format(name))
         tip = tiprack.get_next_tip()
         return self.get_coordinates(tip.address)
 
