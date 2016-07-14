@@ -78,9 +78,8 @@ class MotorControlHandler(ProtocolHandler):
     def move_up(self):
         self.move_motors(z=0)
 
-    def depress_plunger(self, volume):
-        axis, depth = self._context.get_plunge(volume=volume)
-        self.move_motors(**{axis: depth})
+    def depress_plunger(self, pipette, volume):
+        pipette.plunge(volume)
 
     def get_pipette(self, **kwargs):
         """
