@@ -226,6 +226,7 @@ class ProtocolTest(unittest.TestCase):
             {'x': 200, 'y': 250},  # Dispose tip.
             {'z': 15},
             {'b': 25},
+            {'b': 0},
             # Transfer 2.
             {'x': 100, 'y': 109},
             {'z': 50},
@@ -246,7 +247,8 @@ class ProtocolTest(unittest.TestCase):
             {'b': 0},
             {'x': 200, 'y': 250},
             {'z': 15},
-            {'b': 25}
+            {'b': 25},
+            {'b': 0}
         ]
         self.assertEqual(expected, output_log.movements)
         self.assertEqual([(0, 2), (1, 2), (2, 2)], prog_out)

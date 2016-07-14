@@ -38,11 +38,10 @@ class MotorControlHandler(ProtocolHandler):
             tool = self.get_pipette(name=tool)
         axis = tool.axis
         self.pickup_tip(tool)
-        self.move_volume(axis, start, end, volume)
+        self.move_volume(tool, start, end, volume)
         self.dispose_tip(tool)
 
-    def move_volume(self, axis, start, end, volume):
-        pipette = self.get_pipette(axis=axis)
+    def move_volume(self, pipette, start, end, volume):
         self.move_to_well(start)
         pipette.plunge(volume)
         self.move_into_well(start)
@@ -63,6 +62,7 @@ class MotorControlHandler(ProtocolHandler):
         self.move_motors(x=coords['x'], y=coords['y'])
         self.move_motors(z=coords['top'])
         pipette.droptip()
+        pipette.reset()
 
     def move_to_well(self, well):
         self.move_motors(z=0)  # Move up so we don't hit things.
@@ -102,6 +102,9 @@ class PipetteMotor():
         def __init__(self, pipette, motor):
             self.pipette = pipette
             self.motor = motor
+
+        def reset(self):
+            self.move(0)
 
         def plunge(self, volume):
             depth = self.pipette.plunge_depth(volume)
