@@ -125,6 +125,21 @@ class GridItem():
         x, y = self.parent.get_child_coordinates(self.position)
         return (x, y)
 
+    @property
+    def address(self):
+        """
+        Returns an address tuple of the address of this particular GridItem.
+
+        The tuple length varies depending on the nesting depth of the item.
+
+        For example, a Deck module at A1 would be [(0, 0)] and the A2 well
+        position on that module would be [(0, 0), (0, 1)].
+        """
+        if self.parent:
+            return self.parent.address + [self.position]
+        else:
+            return [self.position]
+
 
 class GridContainer():
 
@@ -187,7 +202,7 @@ class GridContainer():
     def get_child_coordinates(self, position):
         """
         Get the x, y, z coords for a child well relative to the given
-        instrument (defaults to primary).
+        instrument.
         """
         col, row = self._normalize_position(position)
         w = (self._custom_wells or {}).get((col, row)) or {}
@@ -239,6 +254,14 @@ class GridContainer():
     @property
     def name(self):
         return self._name or self.__class__.__name__.lower().replace('_', '.')
+
+    @property
+    def address(self):
+        pos = normalize_position(self.position)
+        if self.parent:
+            return self.parent.address + [pos]
+        else:
+            return [pos]
 
     @classmethod
     def _get_instance(cls):

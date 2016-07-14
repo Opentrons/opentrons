@@ -53,3 +53,11 @@ class DeckTest(unittest.TestCase):
         self.deck.add_module('a2', 'tiprack.p10')
         rack = self.deck.find_module(size='P10')
         self.assertIsInstance(rack, Tiprack)
+
+    def test_module_address(self):
+        """ Return module address as list of tuples. """
+        self.deck.add_module('B3', 'microplate.96')
+        slot = self.deck.slot('B3')
+        well = slot.well('H2')
+        self.assertEqual(slot.address, [(1, 2)])
+        self.assertEqual(well.address, [(1, 2), (7, 1)])
