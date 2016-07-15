@@ -84,7 +84,7 @@ class MotorHandlerTest(unittest.TestCase):
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         with self.assertRaises(KeyError):
             for progress in self.protocol.run():
-                next
+                continue
 
     def test_transfer_without_dispose_point(self):
         """ Raise when no dispose point set. """
@@ -97,4 +97,4 @@ class MotorHandlerTest(unittest.TestCase):
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         with self.assertRaises(KeyError):
             for progress in self.protocol.run():
-                next
+                continue
