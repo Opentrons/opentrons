@@ -1,0 +1,22 @@
+<section>
+    <h2 class="title">Review Saved Positions</h2>
+    <div class="instructions">
+       The following is a list of all of your saved calibrations for the current protocol. Please review. 
+    </div>
+    <div class="step">
+    <!-- Will become a table, listing for verification at this point -->
+    <ul>
+       {{#each this.data.saved_containers}}
+            <li>{{this.user_container_name}} X: {{this.x}} Y: {{this.y}} Z: {{this.z}} </li>
+       {{/each}}
+      </ul> 
+    </div>
+    </div>
+    <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
+    <div id="info" class="infoModal">
+        <div> <a href="#close" title="Close" class="close">X</a>
+            <h2>Title</h2> 
+          
+        </div>
+    </div>
+</section>

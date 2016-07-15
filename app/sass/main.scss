@@ -12,6 +12,10 @@ ul {
     padding: 0;
 }
 
+li{
+    line-height: 40px;
+}
+
 
 
 .coords {
@@ -104,6 +108,7 @@ Wizard Screens
 
 .instructions {
     height: 40px;
+    line-height: 40px;
     display: block;
 }
 

@@ -161,6 +161,87 @@ var stubData = [{
                 droptip: 0
             }
         }]
+    }, {
+        task_type: "review_calibration",
+        steps: [{
+            id: 'uniquekey10',
+            data: {
+                required: false,
+                completed: false,
+                saved_containers: [{
+                        parent_id:'uniquekey3', //added parent step ID for link back to calibrate if tested calibration needs to be updated upon review
+                        user_container_name: 'p200-rack',
+                        container_name: 'tiprack.p200',
+                        pipette: "p200 Multi Channel",
+                        actuator: "center",
+                        deck_position: 'A1',
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    }, {
+                        parent_id:'uniquekey4',
+                        user_container_name: 'Trough',
+                        container_name: 'reservior.12',
+                        pipette: "p200 Multi Channel",
+                        actuator: "center",
+                        deck_position: 'C3',
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    }, {
+                        parent_id:'uniquekey5',
+                        user_container_name: 'Standard',
+                        container_name: 'microplate.96.pcr.flat',
+                        pipette: "p200 Multi Channel",
+                        actuator: "center",
+                        deck_position: 'E1',
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    }, {
+                        parent_id:'uniquekey6',
+                        user_container_name: 'Trash',
+                        container_name: 'point',
+                        pipette: "p200 Multi Channel",
+                        actuator: "center",
+                        deck_position: 'B2',
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    }, {
+                        parent_id:'uniquekey7',
+                        user_container_name: 'Source-1',
+                        container_name: 'microplate.96.pcr.flat',
+                        pipette: "p200 Multi Channel",
+                        actuator: "center",
+                        deck_position: 'D1',
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    }, {
+                        parent_id:'uniquekey8',
+                        user_container_name: 'Output-1',
+                        container_name: 'microplate.96.pcr.flat',
+                        pipette: "p200 Multi Channel",
+                        actuator: "center",
+                        deck_position: 'C1',
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    }
+                ],
+                saved_pipettes: [{
+                    parent_id:'uniquekey9',
+                    pipette: "p200 Multi Channel",
+                    actuator: "center",
+                    test_volume: 200,
+                    top: 0,
+                    bottom: 0,
+                    blowout: 0,
+                    droptip: 0
+                }]
+            }
+        }]
     }
 
 ];
@@ -228,7 +309,7 @@ wizard.setStepTransforms('calibrate', {
         name = name[0].toUpperCase() + name.slice(1);
         return name + " (" + step.data.deck_position + ")"
     },
-    
+
     isContainer: function(step) {
         var info = step.data.container_name.split('.');
         if (info[0] == "point") {
@@ -273,8 +354,8 @@ wizard.setStepTransforms('calibrate', {
         var type = container[0];
         var top;
         //tiprack or tubrack exceptions
-        if (type == "tiprack" || type == "tubrack" || type =="point") {
-            top = type+"_top.png";
+        if (type == "tiprack" || type == "tubrack" || type == "point") {
+            top = type + "_top.png";
         }
         //default diagram is generic well
         else {
@@ -289,7 +370,7 @@ wizard.setStepTransforms('calibrate', {
         //tiprack calibration has no bottom position to save
         //tuberack specific diagram
         if (type == "tubrack") {
-            top = type+"_bottom.png";
+            top = type + "_bottom.png";
         }
         //default diagram is generic well
         else {
@@ -402,7 +483,7 @@ delegateEvent('click', '.increment.xyz', function(e, el) {
 delegateEvent('click', '.jog', function(e, el) {
     var axis = e.target.dataset.axis;
     var direction = e.target.dataset.direction;
-    jogController.moveRelative(axis,direction);
+    jogController.moveRelative(axis, direction);
 });
 
 //Set AB Increment - separated from XYZ increments to avoid setting large 
@@ -416,7 +497,7 @@ delegateEvent('click', '.increment.pipette', function(e, el) {
 delegateEvent('click', '.plunger', function(e, el) {
     var axis = e.target.dataset.axis;
     var direction = e.target.dataset.direction;
-    jogController.moveRelative(axis,direction);
+    jogController.moveRelative(axis, direction);
 });
 
 //Jog to Absolute Deck Slot locations
@@ -428,4 +509,3 @@ delegateEvent('click', '.btn-deck', function(e, el) {
     //coords.z = parseInt(e.target.dataset.z);
     jogController.moveAbsolute(coords);
 });
-
