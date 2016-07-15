@@ -32,3 +32,8 @@ class ContextHandlerTest(unittest.TestCase):
         self.protocol.add_instrument('A', 'p10')
         i = self.protocol._context_handler.get_instrument(volume=6)
         self.assertEqual(i.supports_volume(6), True)
+        j = self.protocol._context_handler.get_instrument(volume=50)
+        self.assertEqual(j, None)
+        self.protocol.add_instrument('B', 'p200')
+        k = self.protocol._context_handler.get_instrument(volume=50)
+        self.assertEqual(k.name, 'p200')

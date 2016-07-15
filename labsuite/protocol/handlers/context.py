@@ -31,8 +31,8 @@ class ContextHandler(ProtocolHandler):
         self._instruments[axis]._axis = axis
 
     def get_instrument(self, axis=None, **kwargs):
-        axis = self.normalize_axis(axis)
-        if axis:
+        if axis is not None:
+            axis = self.normalize_axis(axis)
             if axis not in self._instruments:
                 raise KeyError(
                     "No instrument assigned to {} axis.".format(axis)
@@ -44,26 +44,33 @@ class ContextHandler(ProtocolHandler):
                     if '_axis' in self._calibration[axis]:
                         inst.calibrate(**self._calibration[axis]['_axis'])
                 return self._instruments[axis]
-
-        volume = kwargs.pop('volume')
+        volume = kwargs.pop('volume', None)
         for k, i in self._instruments.items():
             if volume and i.supports_volume(volume) is False:
-                    next
-            for k, v in kwargs.items():
-                if getattr(i, k) != v:
-                    next
-            return i
+                    continue
+            for j, v in kwargs.items():
+                if getattr(i, j) != v:
+                    continue
+            return self.get_instrument(axis=k)
 
-        raise KeyError(
-            "No instrument found to support a volume of {}µl."
-            .format(volume)
-        )
+        return None
 
     def find_container(self, **filters):
         return self._deck.find_module(**filters)
 
     def add_container(self, slot, container_name):
         self._deck.add_module(slot, container_name)
+
+    def get_only_instrument(self):
+        ks = list(self._instruments)
+        if len(ks) is 1:
+            return self.get_instrument(axis=ks[0])
+        if len(ks) is 0:
+            raise KeyError("No instruments loaded.")
+        else:
+            raise KeyError(
+                "Axis must be specified when multiple instruments are loaded."
+            )
 
     def normalize_axis(self, axis):
         """
@@ -72,24 +79,21 @@ class ContextHandler(ProtocolHandler):
         If axis is none, the first instrument axis if only one instrument is
         attached to the protocol.
 
-        If no axis is provided, or if the axis isn't valid, it raises a
-        KeyError.
+        If the axis isn't valid, it raises a KeyError.
         """
         if axis is None:
-            ks = list(self._instruments)
-            if len(ks) is 1:
-                return ks[0]
-            else:
-                raise KeyError("Instrument axis must be specified.")
+            raise KeyError("Axis must be specified.")
         axis = axis.upper()
         if axis not in self._instruments:
             raise KeyError("Can't find instrument for axis {}.".format(axis))
         return axis
 
-    def get_axis_calibration(self, axis=None):
+    def get_axis_calibration(self, axis):
         """
         Initializes and returns calibration for a particular axis.
         """
+        if axis is None:
+            axis = self.get_only_instrument().axis
         axis = self.normalize_axis(axis)
         if axis not in self._calibration:
             self._calibration[axis] = {}
@@ -97,7 +101,9 @@ class ContextHandler(ProtocolHandler):
 
     def calibrate(self, pos, axis=None, x=None, y=None, z=None, top=None,
                   bottom=None):
-        axis = self.normalize_axis(axis)
+        if axis is None:
+            instrument = self.get_only_instrument()
+            axis = instrument.axis
         cal = self.get_axis_calibration(axis)
         if pos not in cal:
             cal[pos] = {}

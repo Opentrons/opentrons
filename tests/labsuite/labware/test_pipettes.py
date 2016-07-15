@@ -54,6 +54,7 @@ class PipetteTest(unittest.TestCase):
         self.assertIsInstance(p, pipettes.Pipette_P10)
 
     def test_volume_support(self):
+        """ Volume support. """
         self.assertEqual(self.pipette.supports_volume(10), True)
         self.assertEqual(self.pipette.supports_volume(1), True)
         self.assertEqual(self.pipette.supports_volume(0), False)
