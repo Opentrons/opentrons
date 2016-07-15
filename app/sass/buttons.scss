@@ -101,6 +101,24 @@ Buttons Labels Tabs
     }
 }
 
+.btn-test{
+    @include btn-col-a(2);
+    background-color: $call-to-action;
+    color:white;
+        &:hover {
+            background: darken($call-to-action, 10%);
+        }
+}
+
+.btn-overwrite{
+    @include btn-col-a(2);
+    background-color: $secondary-brand;
+    color:white;
+        &:hover {
+            background: darken($secondary-brand, 10%);
+        }
+}
+
 .test {
     @include btn-col-a(2);
     color: white;
@@ -120,6 +138,7 @@ Buttons Labels Tabs
     @include btn-col-a(4);
     @include offset-air(2, 0);
     color: white;
+    font-size: $basesize;
     background-color: $primary-brand;
     &:hover {
         background: darken($primary-brand, 10%);

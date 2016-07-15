@@ -16,6 +16,29 @@ li{
     line-height: 40px;
 }
 
+table{
+    @include grid-col-full(10);
+    @include offset-v(1,1);
+
+    tr{
+       flex-wrap:wrap;
+       line-height: 40px;
+       th{
+        text-align: left;
+        @include grid-col-full(3); 
+       }
+       td{
+        @include grid-col-full(2); 
+        text-align:center;
+        font-size:$basesize;
+        &.coords{
+            @include grid-col-full(1);
+        }
+       }
+    }
+
+}
+
 
 
 .coords {
