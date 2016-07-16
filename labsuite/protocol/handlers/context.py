@@ -68,9 +68,7 @@ class ContextHandler(ProtocolHandler):
         if len(ks) is 0:
             raise KeyError("No instruments loaded.")
         else:
-            raise KeyError(
-                "Axis must be specified when multiple instruments are loaded."
-            )
+            return None
 
     def normalize_axis(self, axis):
         """
@@ -94,6 +92,11 @@ class ContextHandler(ProtocolHandler):
         """
         if axis is None:
             axis = self.get_only_instrument().axis
+        if axis is None:
+            raise KeyError(
+                "Calibration axis must be specified when multiple " +
+                "instruments are loaded."
+            )
         axis = self.normalize_axis(axis)
         if axis not in self._calibration:
             self._calibration[axis] = {}
@@ -103,6 +106,11 @@ class ContextHandler(ProtocolHandler):
                   bottom=None):
         if axis is None:
             instrument = self.get_only_instrument()
+            if instrument is None:
+                raise KeyError(
+                    "Calibration axis must be specified when multiple " +
+                    "instruments are loaded."
+                )
             axis = instrument.axis
         cal = self.get_axis_calibration(axis)
         if pos not in cal:

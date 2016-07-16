@@ -37,3 +37,26 @@ class ContextHandlerTest(unittest.TestCase):
         self.protocol.add_instrument('B', 'p200')
         k = self.protocol._context_handler.get_instrument(volume=50)
         self.assertEqual(k.name, 'p200')
+
+    def test_tip_coordinates(self):
+        """ Return tip coordinates. """
+        context = self.protocol._context_handler
+        self.protocol.add_instrument('A', 'p200')
+        self.protocol.add_instrument('B', 'p10')
+        self.protocol.add_container('B1', 'tiprack.p200')
+        self.protocol.calibrate('B1', axis="A", x=100, y=150, top=60)
+        self.protocol.add_container('A1', 'tiprack.p10')
+        self.protocol.calibrate('A1', axis="B", x=200, y=250, top=160)
+
+        p200 = context.get_instrument(axis='A')
+        p10 = context.get_instrument(axis='B')
+
+        c1 = context.get_tip_coordinates(p200)
+        self.assertEqual(c1, {'x': 100, 'y': 150, 'top': 60, 'bottom': 0})
+        c2 = context.get_tip_coordinates(p200)  # Next tip.
+        self.assertEqual(c2, {'x': 100, 'y': 159, 'top': 60, 'bottom': 0})
+
+        c3 = context.get_tip_coordinates(p10)
+        self.assertEqual(c3, {'x': 200, 'y': 250, 'top': 160, 'bottom': 0})
+        c4 = context.get_tip_coordinates(p10)  # Next tip.
+        self.assertEqual(c4, {'x': 200, 'y': 259, 'top': 160, 'bottom': 0})
