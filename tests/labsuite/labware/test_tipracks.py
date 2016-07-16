@@ -1,7 +1,7 @@
 import unittest
 
 from labsuite.labware import tipracks
-from labsuite.labware.deck import Deck
+
 
 class TiprackTest(unittest.TestCase):
 
@@ -10,21 +10,21 @@ class TiprackTest(unittest.TestCase):
     def setUp(self):
         self.rack = tipracks.Tiprack()
 
-    def a2_coordinate_test(self):
+    def test_a2_coordinate(self):
         """
         Calibration included in A2 slot coordinates.
         """
         a2 = self.rack.tip('A2').coordinates()
         self.assertEqual(a2, (0, self.expected_margin))
 
-    def b1_coordinate_test(self):
+    def test_b1_coordinate(self):
         """
         Coordinates for B1 position.
         """
         b1 = self.rack.tip('B1').coordinates()
         self.assertEqual(b1, (self.expected_margin, 0))
 
-    def b2_coordinate_test(self):
+    def test_b2_coordinate(self):
         """
         Coordinates for B2 position.
         """
@@ -32,7 +32,7 @@ class TiprackTest(unittest.TestCase):
         margin = self.expected_margin
         self.assertEqual(b2, (margin, margin))
 
-    def coordinate_lowercase_test(self):
+    def test_coordinate_lowercase(self):
         """
         Accept lowercase coordinates.
         """
@@ -40,7 +40,7 @@ class TiprackTest(unittest.TestCase):
         margin = self.expected_margin
         self.assertEqual(b2, (margin, margin))
 
-    def col_sanity_test(self):
+    def test_col_sanity(self):
         """
         Maintain sanity of column values.
         """
@@ -51,7 +51,7 @@ class TiprackTest(unittest.TestCase):
         col = chr(ord('a') + self.rack.cols - 1)
         self.rack.tip('{}1'.format(col))
 
-    def row_sanity_test(self):
+    def test_row_sanity(self):
         """
         Maintain sanity of row values.
         """
@@ -87,15 +87,24 @@ class TiprackTest(unittest.TestCase):
         self.assertEqual(also_a4, rack.tip('a4').coordinates())
         self.assertEqual(also_a5, rack.tip('a5').coordinates())
 
-    def set_tips_used_test(self):
+    def test_set_tips_used_test(self):
         """ Dump and reload tips used. """
         self.rack.set_tips_used(10)
         self.assertEqual(self.rack.tips_used, 10)
 
-    def used_tip_offset(self):
+    def test_used_tip_offset(self):
         """ Account for used tip offset. """
-        self.rack.set_tips_used(10)
+        self.rack.set_tips_used(1)
         self.assertEqual(
-            self.rack.tip('A12').coordinates(),
-            self.rack.get_next_tip().coordinates()
+            self.rack.tip('A2').position,
+            self.rack.get_next_tip().position
         )
+        self.rack.set_tips_used(8)
+        self.assertEqual(
+            self.rack.tip('B1').position,
+            self.rack.get_next_tip().position  # 9th tip.
+        )
+
+    def test_empty(self):
+        self.rack.set_tips_used(8 * 12)
+        self.assertEqual(self.rack.has_tips, False)

@@ -312,6 +312,8 @@ class GridContainer():
         """
         Returns a col, row tuple for a position after the given offset.
         """
+        if offset is 0:
+            return (0, 0)
         col = floor(offset / cls.cols)
         row = offset % cls.cols
         return (col, row)

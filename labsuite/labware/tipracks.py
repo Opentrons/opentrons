@@ -25,14 +25,18 @@ class Tiprack(GridContainer):
         """
         Sets the number of used tips in the tiprack.
         """
-        self._used = number - 1
+        self._used = number
 
     @property
     def tips_used(self):
         """
         Returns the number of tips used so far in this tiprack.
         """
-        return self._used + 1
+        return self._used
+
+    @property
+    def has_tips(self):
+        return self.tips_used < self.rows * self.cols
 
     def get_next_tip(self, tag=None):
         """
@@ -51,12 +55,12 @@ class Tiprack(GridContainer):
             if tag not in self._tagged_tips:
                 # Increment used tip for new tag.
                 self._tagged_tips[tag] = offset
-                self._used = self._used + 1
+                self._used += 1
             else:
                 # Reuse old tip.
                 offset = self._tagged_tips[tag]
         else:
-            self._used = self._used + 1  # Standard increment.
+            self._used += 1  # Standard increment.
 
         return self.tip(self._position_in_sequence(offset))
 
