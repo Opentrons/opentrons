@@ -29,7 +29,7 @@ class Deck(GridContainer):
             )
 
     def find_module(self, **filters):
-        for pos, mod in self._children.items():
+        for pos, mod in sorted(self._children.items()):
             for k, v in filters.items():
                 if getattr(mod, k, None) != filters[k]:
                     break

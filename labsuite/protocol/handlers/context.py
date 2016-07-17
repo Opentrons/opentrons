@@ -45,7 +45,7 @@ class ContextHandler(ProtocolHandler):
                         inst.calibrate(**self._calibration[axis]['_axis'])
                 return self._instruments[axis]
         volume = kwargs.pop('volume', None)
-        for k, i in self._instruments.items():
+        for k, i in sorted(self._instruments.items()):
             if volume and i.supports_volume(volume) is False:
                     continue
             for j, v in kwargs.items():
