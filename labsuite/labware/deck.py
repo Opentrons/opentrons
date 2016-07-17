@@ -30,9 +30,12 @@ class Deck(GridContainer):
 
     def find_module(self, **filters):
         for pos, mod in sorted(self._children.items()):
+            match = True
             for k, v in filters.items():
                 if getattr(mod, k, None) != filters[k]:
+                    match = False
                     break
+            if match:
                 return mod
 
     def slot(self, position):

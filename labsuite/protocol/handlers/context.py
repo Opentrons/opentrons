@@ -46,12 +46,15 @@ class ContextHandler(ProtocolHandler):
                 return self._instruments[axis]
         volume = kwargs.pop('volume', None)
         for k, i in sorted(self._instruments.items()):
+            match = True
             if volume and i.supports_volume(volume) is False:
                     continue
             for j, v in kwargs.items():
                 if getattr(i, j) != v:
-                    continue
-            return self.get_instrument(axis=k)
+                    match = False
+                    break
+            if match:
+                return self.get_instrument(axis=k)
 
         return None
 
@@ -174,7 +177,7 @@ class ContextHandler(ProtocolHandler):
 
     def get_tip_coordinates(self, pipette):
         name = 'tiprack.{}'.format(pipette.name)
-        tiprack = self.find_container(name=name)
+        tiprack = self.find_container(name=name, has_tips=True)
         if tiprack is None:
             raise KeyError("No tiprack found for {}.".format(name))
         tip = tiprack.get_next_tip()
