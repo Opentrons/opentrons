@@ -105,6 +105,8 @@ class TiprackTest(unittest.TestCase):
             self.rack.get_next_tip().position  # 13th tip
         )
 
-    def test_empty(self):
-        self.rack.set_tips_used(8 * 12)
+    def test_has_tips(self):
+        self.rack.set_tips_used(95)
+        self.assertEqual(self.rack.has_tips, True)
+        self.rack.set_tips_used(96)
         self.assertEqual(self.rack.has_tips, False)

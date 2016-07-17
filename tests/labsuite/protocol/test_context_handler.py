@@ -60,3 +60,17 @@ class ContextHandlerTest(unittest.TestCase):
         self.assertEqual(c3, {'x': 200, 'y': 250, 'top': 160, 'bottom': 0})
         c4 = context.get_tip_coordinates(p10)  # Next tip.
         self.assertEqual(c4, {'x': 200, 'y': 259, 'top': 160, 'bottom': 0})
+
+    def test_tiprack_switch(self):
+        """ Return second tiprack when first is used up. """
+        context = self.protocol._context_handler
+        self.protocol.add_instrument('A', 'p200')
+        self.protocol.add_container('B1', 'tiprack.p200')
+        self.protocol.calibrate('B1', axis="A", x=100, y=150, top=60)
+        self.protocol.add_container('A1', 'tiprack.p200')
+        self.protocol.calibrate('A1', axis="A", x=200, y=250, top=160)
+        rack = context.find_container(name='tiprack.p200', has_tips=True)
+        self.assertEqual([(0, 0)], rack.address)
+        rack.set_tips_used(96)
+        rack = context.find_container(name='tiprack.p200', has_tips=True)
+        self.assertEqual([(1, 0)], rack.address)
