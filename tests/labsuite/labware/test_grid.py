@@ -1,6 +1,7 @@
 import unittest
-from labsuite.labware.grid import normalize_position
-
+from labsuite.labware.grid import GridContainer, normalize_position, humanize_position
+from labsuite.compilers.plate_map import PlateMap
+import os
 
 class GridTest(unittest.TestCase):
 
@@ -78,3 +79,28 @@ class GridTest(unittest.TestCase):
         """
         with self.assertRaises(TypeError):
             normalize_position(('a', 1))
+
+    def test_well_offsets(self):
+        """
+        Well offsets.
+        """
+
+        # We have a plate map listing offset order.
+        cdir = os.path.dirname(os.path.realpath(__file__))
+        self.csv_file = os.path.join(
+            cdir,
+            '../../fixtures/offset_map.csv'
+        )
+        self.plate_map = PlateMap(self.csv_file)
+        plate = self.plate_map.get_plate('A1', rotated=True)
+
+        # Go through every row, col in a standard 96 well plate
+        # and check against the documented offset order.
+        n = 0
+        for col in range(0, 8):
+            for row in range(0, 12):
+                c = humanize_position((col, row))
+                well = int(plate.get_well(c))
+                print(c, well)
+                self.assertEqual(int(plate.get_well(c)), n)
+                n += 1

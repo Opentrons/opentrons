@@ -251,9 +251,28 @@ class GridContainer():
             )
         return (col, row)
 
+    def _position_in_sequence(self, offset=0):
+        """
+        Returns a col, row tuple for a position after the given offset.
+        """
+        if offset > self.total_wells:
+            raise KeyError(
+                "Position at offset {} out of range. Max is {}."
+                .format(offset, self.total_wells)
+            )
+        if offset is 0:
+            return (0, 0)
+        col = floor(offset / self.rows)
+        row = offset % self.rows
+        return (col, row)
+
     @property
     def name(self):
         return self._name or self.__class__.__name__.lower().replace('_', '.')
+
+    @property
+    def total_wells(self):
+        return self.cols * self.rows
 
     @property
     def address(self):
@@ -306,14 +325,3 @@ class GridContainer():
         for pos in wells:
             normalized[normalize_position(pos)] = wells[pos]
         cls._custom_wells = normalized
-
-    @classmethod
-    def _position_in_sequence(cls, offset=0):
-        """
-        Returns a col, row tuple for a position after the given offset.
-        """
-        if offset is 0:
-            return (0, 0)
-        col = floor(offset / cls.cols)
-        row = offset % cls.cols
-        return (col, row)
