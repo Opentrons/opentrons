@@ -275,14 +275,14 @@ class ContainerTest(unittest.TestCase):
         """
         Tip offset.
         """
-        rack = containers.load_container('tiprack.1000ul')
+        rack = containers.load_container('tiprack.1000ul')()
 
-        a1 = rack.tip_offset()
+        a1 = rack.tip_offset(0)
         a2 = rack.tip_offset(1)
         a3 = rack.tip_offset(2)
         a4 = rack.tip_offset(3)
-        b1 = rack.tip_offset(8)
-        b3 = rack.tip_offset(10)
+        b1 = rack.tip_offset(12)
+        b3 = rack.tip_offset(14)
 
         self.assertEqual(a1, rack.coordinates('a1'))
         self.assertEqual(a2, rack.coordinates('a2'))

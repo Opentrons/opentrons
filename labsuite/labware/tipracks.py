@@ -64,13 +64,12 @@ class Tiprack(GridContainer):
 
         return self.tip(self._position_in_sequence(offset))
 
-    @classmethod
-    def tip_offset(cls, used=0):
+    def tip_offset(self, used=0):
         """
         Returns the x, y, z offset for a tip position, incremented by the
         number of tips previously used.
         """
-        return cls.coordinates(cls._position_in_sequence(used))
+        return self.coordinates(self._position_in_sequence(used))
 
 
 class Tiprack_P10(Tiprack):

@@ -68,24 +68,24 @@ class TiprackTest(unittest.TestCase):
         Tips on specific racks can be tagged for reuse.
         """
         rack = self.rack
-        
-        a1 = rack.get_next_tip().coordinates()
-        a2 = rack.get_next_tip().coordinates()
-        a3 = rack.get_next_tip().coordinates()
 
-        a4 = rack.get_next_tip(tag='water').coordinates()
-        a5 = rack.get_next_tip(tag='saline').coordinates()
+        a1 = rack.get_next_tip().position
+        a2 = rack.get_next_tip().position
+        a3 = rack.get_next_tip().position
 
-        also_a4 = rack.get_next_tip(tag='water').coordinates()
-        also_a5 = rack.get_next_tip('saline').coordinates()
+        a4 = rack.get_next_tip(tag='water').position
+        a5 = rack.get_next_tip(tag='saline').position
 
-        self.assertEqual(a1, rack.tip('a1').coordinates())
-        self.assertEqual(a2, rack.tip('a2').coordinates())
-        self.assertEqual(a3, rack.tip('a3').coordinates())
-        self.assertEqual(a4, rack.tip('a4').coordinates())
-        self.assertEqual(a5, rack.tip('a5').coordinates())
-        self.assertEqual(also_a4, rack.tip('a4').coordinates())
-        self.assertEqual(also_a5, rack.tip('a5').coordinates())
+        also_a4 = rack.get_next_tip(tag='water').position
+        also_a5 = rack.get_next_tip('saline').position
+
+        self.assertEqual(a1, rack.tip('a1').position)
+        self.assertEqual(a2, rack.tip('a2').position)
+        self.assertEqual(a3, rack.tip('a3').position)
+        self.assertEqual(a4, rack.tip('a4').position)
+        self.assertEqual(a5, rack.tip('a5').position)
+        self.assertEqual(also_a4, rack.tip('a4').position)
+        self.assertEqual(also_a5, rack.tip('a5').position)
 
     def test_set_tips_used_test(self):
         """ Dump and reload tips used. """
@@ -99,10 +99,10 @@ class TiprackTest(unittest.TestCase):
             self.rack.tip('A2').position,
             self.rack.get_next_tip().position
         )
-        self.rack.set_tips_used(8)
+        self.rack.set_tips_used(12)
         self.assertEqual(
             self.rack.tip('B1').position,
-            self.rack.get_next_tip().position  # 9th tip.
+            self.rack.get_next_tip().position  # 13th tip
         )
 
     def test_empty(self):
