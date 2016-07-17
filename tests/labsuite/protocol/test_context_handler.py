@@ -69,8 +69,12 @@ class ContextHandlerTest(unittest.TestCase):
         self.protocol.calibrate('B1', axis="A", x=100, y=150, top=60)
         self.protocol.add_container('A1', 'tiprack.p200')
         self.protocol.calibrate('A1', axis="A", x=200, y=250, top=160)
+        p200 = context.get_instrument(axis='A')
         rack = context.find_container(name='tiprack.p200', has_tips=True)
         self.assertEqual([(0, 0)], rack.address)
-        rack.set_tips_used(96)
+        rack.set_tips_used(95)  # We've used all but one tip from this rack.
+        c1 = context.get_tip_coordinates(p200)  # Last tip.
+        h12 = [(0, 0), (7, 11)]
+        self.assertEqual(c1, context.get_coordinates(h12, axis="A"))
         rack = context.find_container(name='tiprack.p200', has_tips=True)
         self.assertEqual([(1, 0)], rack.address)
