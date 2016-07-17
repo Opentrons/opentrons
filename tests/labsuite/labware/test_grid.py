@@ -100,7 +100,5 @@ class GridTest(unittest.TestCase):
         for col in range(0, 8):
             for row in range(0, 12):
                 c = humanize_position((col, row))
-                well = int(plate.get_well(c))
-                print(c, well)
                 self.assertEqual(int(plate.get_well(c)), n)
                 n += 1
