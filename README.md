@@ -54,7 +54,7 @@ debug command (`M62`) to the OpenTrons custom firmware and reads from the serial
 device until the line `{"stat":0}` is found.
 
 This functionaly can be changed by modifying 
-[drivers.motor.OpenTrons](https://github.com/OpenTrons/labware/blob/master/opentrons_sdk/drivers/motor.py#L241).
+[drivers.motor.OpenTrons](https://github.com/OpenTrons/opentrons_sdk/blob/master/opentrons_sdk/drivers/motor.py#L241).
 
 ```python
 # Calibrate containers relative to the only instrument.
