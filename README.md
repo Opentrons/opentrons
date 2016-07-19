@@ -1,6 +1,6 @@
 # OpenTrons Software Development Kit
 
-[![Build Status](https://travis-ci.org/OpenTrons/labware.svg?branch=master)](https://travis-ci.org/OpenTrons/labware)
+[![Build Status](https://travis-ci.org/OpenTrons/opentrons_sdk.svg?branch=master)](https://travis-ci.org/OpenTrons/opentrons_sdk)
 
 The point of this repository is to provide a software equivalent to
 an operating OpenTrons machine, including all related deck modules
@@ -24,7 +24,7 @@ Every instrument added must have a tiprack of the same size defined within
 the protocol.
 
 ```python
-from labsuite.protocol import Protocol
+from opentrons_sdk.protocol import Protocol
 
 protocol = Protocol()
 
@@ -54,7 +54,7 @@ debug command (`M62`) to the OpenTrons custom firmware and reads from the serial
 device until the line `{"stat":0}` is found.
 
 This functionaly can be changed by modifying 
-[drivers.motor.OpenTrons](https://github.com/OpenTrons/labware/blob/master/labsuite/drivers/motor.py#L241).
+[drivers.motor.OpenTrons](https://github.com/OpenTrons/labware/blob/master/opentrons_sdk/drivers/motor.py#L241).
 
 ```python
 # Calibrate containers relative to the only instrument.
@@ -117,7 +117,7 @@ Multiple sequences can be defined in either DNA or RVD format and compiled into
 a single protocol output file.
 
 ```python
-from labsuite.compilers import pfusx
+from opentrons_sdk.compilers import pfusx
 
 inputs = [
 	'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG',
@@ -191,7 +191,7 @@ def transfer(volume=None, from_plate=None, to_plate=None):
 #### Full example
 
 ```python
-from labsuite.engine.commands import define_argument, syntax, execute
+from opentrons_sdk.engine.commands import define_argument, syntax, execute
 
 define_argument(
     'plate',
@@ -222,7 +222,7 @@ protocol.run()
 
 ## Containers API
 
-The [labware.containers](labsuite/labware/containers.py) module provides data about
+The [labware.containers](opentrons_sdk/labware/containers.py) module provides data about
 all supported containers, as well as conversions between old and new data
 formats.
 
@@ -231,23 +231,23 @@ Containers can be specified by the user.
 ### Listing Containers
 
 ```python
-from labsuite.labware import containers
+from opentrons_sdk.labware import containers
 
 list = labware.containers.list_containers()
 ```
 
 ### Defining a Container
 
-Containers definitions are stored in [config/containers](labsuite/config/containers).
+Containers definitions are stored in [config/containers](opentrons_sdk/config/containers).
 These are YAML files specifying the base type of container, the number of 
 columns and rows, the A1 offset, and well margin.
 
-See the documented [example container](labsuite/config/containers/example_plate.yml)
+See the documented [example container](opentrons_sdk/config/containers/example_plate.yml)
 for more detailed instructions.
 
 For containers with varying well or tube sizes, you can specify each
 variation as a `custom_well` within the YAML structure.  See the
-[15-50ml tuberack](labsuite/config/containers/tuberacks/15-50ml.yml) for an example of this
+[15-50ml tuberack](opentrons_sdk/config/containers/tuberacks/15-50ml.yml) for an example of this
 functionality being used.
 
 ### Getting Container Well Offset
@@ -257,7 +257,7 @@ well offsets, which are all in reference to the A1 (or first coordinate) of
 each plate.
 
 ```python
-from labsuite.labware import containers
+from opentrons_sdk.labware import containers
 
 microplate = containers.load_container('microplate.24')
 microplate.offset('A1')
@@ -273,7 +273,7 @@ For example, the code below will provide the offset to the eleventh tip
 position, in the event that the first ten have already been used.
 
 ```python
-from labsuite.labware import containers
+from opentrons_sdk.labware import containers
 
 tiprack = containers.load_container('tiprack.10ul')
 tiprack.tip_offset(10)
@@ -286,7 +286,7 @@ containers can be stored anywhere, but must be loaded within the containers
 module before being accessible.
 
 ```python
-from labsuite.labware import containers
+from opentrons_sdk.labware import containers
 
 containers.load_custom_containers('/path/to/containers')
 ```
