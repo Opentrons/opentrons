@@ -49,6 +49,13 @@ attach the Protocol class to the serial port connected to the robot.
 `Protocol.run` is a generator that will yield the current progress and total
 number of commands within the protocol upon completion of each command.
 
+To know when each command has been completed by the robot, it sets a special
+debug command (`M62`) to the OpenTrons custom firmware and reads from the serial
+device until the line `{"stat":0}` is found.
+
+This functionaly can be changed by modifying 
+[drivers.motor.OpenTrons](https://github.com/OpenTrons/labware/blob/master/labsuite/drivers/motor.py#L241).
+
 ```python
 # Calibrate containers relative to the only instrument.
 protocol.calibrate('A1', x=1, y=2, top=40, bottom=50)
