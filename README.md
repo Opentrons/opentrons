@@ -140,7 +140,7 @@ as human-readable examples of what the input should look like.
 For example, the code below creates an argument syntax for a plate
 definition.
 
-```
+```python
 define_argument(
     'plate',
     '(([A-Z][1-9])|(\w+)):(([A-Z][1-9])|(\w+))',
