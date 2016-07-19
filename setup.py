@@ -9,7 +9,7 @@ config = {
     'install_requires': ['pyyaml', 'pyserial'],
     'packages': find_packages(exclude=["tests"]),
     'package_data': {
-        "labsuite": [
+        "opentrons_sdk": [
             "config/containers/**/*.yml",
             "config/containers/legacy_containers.json",
             "compilers/data/*",
@@ -17,9 +17,9 @@ config = {
         ]
     },
     'scripts': [
-        'bin/labsuite-compile'
+        'bin/opentrons_sdk-compile'
     ],
-    'name': 'labsuite',
+    'name': 'opentrons_sdk',
     'test_suite': 'nose.collector',
     'zip_safe': False
 }
