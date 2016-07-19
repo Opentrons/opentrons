@@ -13,9 +13,20 @@ It's currently exporting data concerning modules to a separate codebases
 in charge of running the OpenTrons [frontend](https://github.com/Opentrons/otone_frontend) and [backend](https://github.com/Opentrons/otone_backend).
 
 
-## Protocol Definition
+## Protocols
+
+Protocols are defined by importing the Protocol class, adding containers and
+instruments, and finally defining commands.
+
+Every instrument added must have a tiprack of the same size defined within
+the protocol.
 
 ```python
+from labsuite.protocol import Protocol
+
+protocol = Protocol()
+
+# Add containers.
 protocol.add_container('A1', 'microplate.96')
 protocol.add_container('C1', 'tiprack.p200')
 
@@ -28,6 +39,12 @@ protocol.transfer('A1:A2', 'A1:A3', ul=80)
 ```
 
 ### Running on the Robot
+
+To run a protocol on the OT-One machine, provide calibration data and then
+attach the Protocol class to the serial port connected to the robot.
+
+`Protocol.run` is a generator that will yield the current progress and total
+number of commands within the protocol upon completion of each command.
 
 ```python
 # Calibrate containers relative to the only instrument.
