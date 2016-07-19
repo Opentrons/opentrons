@@ -1,4 +1,4 @@
-# OpenTrons Labware Library
+# OpenTrons Software Development Kit
 
 [![Build Status](https://travis-ci.org/OpenTrons/labware.svg?branch=master)](https://travis-ci.org/OpenTrons/labware)
 
