@@ -319,6 +319,6 @@ class Protocol():
             self._motor_handler.simulate()
         return self._motor_handler
 
-    def teardown(self):
-        for h in self._handlers:
-            h.teardown()
+    def disconnect(self):
+        if self._motor_handler:
+            self.motor_handler.disconnect()
