@@ -180,7 +180,7 @@ Additionally, metadata regarding argument definitions (as specified within
 
 ```python
 @syntax('<volume> from <plate:from_plate> to <plate:to_plate>')
-def transfer(volume=None, from_plate, to_plate):
+def transfer(volume=None, from_plate=None, to_plate=None):
     """
     Transfers the specified amount of liquid from the start
     plate to the end plate.
