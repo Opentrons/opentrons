@@ -62,6 +62,33 @@ for current, total in protocol.run():
 protocol.disconnect()
 ```
 
+### Protocol Handlers
+
+The Protocol class itself is in charge of normalizing command arguments,
+storing them, and passing that data to designated Handlers to perform the
+work necessary to complete the protocol.
+
+Two Handlers are defined by default, Context and MotorController.
+
+#### Context Handler
+
+The Context Handler is in charge of keeping track of the state of the robot,
+calibrations, instruments, and other details using a virtualized deck map
+with classes that correspond to each labware item.
+
+Other Handlers may take advantage of this context in making intelligent
+decisions regarding their operations.
+
+#### Motor Handler
+
+The Motor Handler takes high-level commands from the Protocol class and
+translates them to serial data (G-Code) in order to perform these actions
+on the robot itself.
+
+If the Motor Handler is not attached to a USB port, it will still log
+its movements and the serial commands it would have executed using the
+standard `logging` library.
+
 ## Containers API
 
 The [labware.containers](labsuite/labware/containers.py) module provides data about
