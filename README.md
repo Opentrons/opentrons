@@ -100,6 +100,27 @@ If the Motor Handler is not attached to a USB port, it will still log
 its movements and the serial commands it would have executed using the
 standard `logging` library.
 
+### Creating Additional Handlers
+
+Additional handlers can be created by extending from ProtocolHandler. Once
+you've created a new protocol handler, you can attach it using Protocol's
+attach method.
+
+The attach method takes a class and returns an instance, which can then be
+manipulated at will.
+
+### Protocol Data Format
+
+From a design perspective, the main responsibility of the Protocol class is to
+normalize arguments passed to command methods, such as transfer and distribute.
+
+These calls are then stored within the class to be sent during the appropriate
+times to any attached Protocol Handlers.
+
+The data format is meant to be isomorphic with the OT-One JSON protocol, 
+meaning that ingesting and exporting to our legacy format should be a simple
+exercise.
+
 ## Compilers
 
 This library has support for custom compilers, which will generate protocols
