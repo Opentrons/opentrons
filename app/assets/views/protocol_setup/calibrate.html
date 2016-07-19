@@ -1,29 +1,21 @@
 <section>
     <h2 class="title">Calibrate {{this.title}}</h2>
     <div class="instructions">
-        {{#if this.isTipRack}} 
+        {{#if this.isTipRack}}
         <!-- TIPRACK -->
-            {{#if this.isSingle}}
-            <!-- SINGLE CHANNEL + TIPRACK -->
-            Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here- 
-            {{else}}
-            <!-- MULTI CHANNEL + TIPRACK -->
-            Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here- 
-            {{/if}} 
-        {{else}}
+        {{#if this.isSingle}}
+        <!-- SINGLE CHANNEL + TIPRACK -->
+        Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here- {{else}}
+        <!-- MULTI CHANNEL + TIPRACK -->
+        Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here- {{/if}} {{else}}
         <!-- !TIPRACK -->
-            {{#if this.isContainer}} 
-                {{#if this.isSingle}}
-                <!-- SINGLE CHANNEL + CONTAINER -->
-                Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well. 
-                {{else}}
-                <!-- MULTI CHANNEL + CONTAINER -->
-                Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well. {{/if}}
-            {{else}}
-            <!-- !CONTAINER - POINT -->
-            Calibrate over the center of the container you choose to use. 
-            {{/if}} 
-        {{/if}}
+        {{#if this.isContainer}} {{#if this.isSingle}}
+        <!-- SINGLE CHANNEL + CONTAINER -->
+        Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well. {{else}}
+        <!-- MULTI CHANNEL + CONTAINER -->
+        Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well. {{/if}} {{else}}
+        <!-- !CONTAINER - POINT -->
+        Calibrate over the center of the container you choose to use. {{/if}} {{/if}}
     </div>
     <div class="step">
         <div class="move">
@@ -46,11 +38,10 @@
                 <a href="#" data-increment="0.1" class="btn-full btn-group">0.1</a>
                 <a href="#" data-increment="91" class="btn-slot">&#8596; slot-x </a>
                 <a href="#" data-increment="135" class="btn-slot">&#8597; slot-y </a>
-        
             </div>
             <h3 class="title">Move to Slot</h3>
             <div class="deck">
-            <!-- testing x,y data attributes for absolute movement, 
+                <!-- testing x,y data attributes for absolute movement, 
             need specific coords moving forward -->
                 <a href="#" data-x="1" data-y="2" class="btn-deck">A3</a>
                 <a href="#" class="btn-deck">B3</a>
@@ -81,9 +72,45 @@
                 <input type="text" value="0" />
             </div>
             <h3 class="title">{{this.title}}</h3>
-            <div class="wrap">
+            
+            <div class="calibration-modal mode-top">
+                <div class="well-img">
+                    <img src="../../img/{{this.container_top}}" class="top"/>
+                    <img src="../../img/{{this.container_bottom}}" class="bottom" />
+                </div>
+                {{#if this.isContainer}}
+                    {{#if this.isTipRack}} 
+                    <div class="update">
+                        <!-- Tiprack Specific buttons -->
+                        <a href="#{{this.container_top}}" class="position top">Title</a>
+                        <a class="btn-update save top">Save </a>
+                        <a class="btn-update moveto">Move To</a>
+                        <a class="pick-tip top">Pick Up Tip </a>
+                    </div>
+                    {{else}}
+                    <div class="update">
+                     <a href="#{{this.container_top}}" class="position top">Top</a>
+                        <a class="btn-update save top">Save </a>
+                        <a class="btn-update moveto ">Move To</a>
+                        
+                        <a href="#{{this.container_bottom}}" class="position bottom">Bottom</a>
+                        <a class="btn-update save bottom">Save </a>
+                        <a class="btn-update moveto">Move To </a>
+                    </div>
+                    {{/if}}
+                    {{else}}
+                    <div class="update">
+                    <a href="#{{this.container_top}}" class="position">Title</a>
+                        <a class="btn-update save ">Save </a>
+                        <a class="btn-update moveto">Move To</a>
+                    </div>
+                {{/if}}
+
+            </div>
+            <!-- <div class="wrap">
                 <div class="well">
                     <img src="../../img/{{this.container_top}}" />
+
                 </div>
                 {{#if this.isContainer}}
                     {{#if this.isTipRack}} 
@@ -92,7 +119,7 @@
                         <a class="btn-update save ">Save </a>
                         <a class="btn-update moveto">Move To</a>
                         <!-- DROPTIP FOR TIPRACKS ONLY -->
-                        <a class="pick-tip ">Pick Up Tip </a>
+            <!-- <a class="pick-tip ">Pick Up Tip </a>
                     </div>
                     {{else}}
                     <div class="update">                   
@@ -111,23 +138,18 @@
                         <a class="btn-update moveto">Move To</a>
                 </div>
                 {{/if}}
-            </div>
+            </div> -->
         </div>
     </div>
     </div>
     <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
     <div id="info" class="infoModal">
         <div> <a href="#close" title="Close" class="close">X</a>
-            <h2>Title</h2> 
-            {{#if this.isTipRack}} 
-                {{#if this.isSingle}}
-                <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here-</p>
-                {{else}}
-                <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here-</p>
-                {{/if}} 
-            {{else}} 
-
-            {{#if this.isContainer}} {{#if this.isSingle}}
+            <h2>Title</h2> {{#if this.isTipRack}} {{#if this.isSingle}}
+            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here-</p>
+            {{else}}
+            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here-</p>
+            {{/if}} {{else}} {{#if this.isContainer}} {{#if this.isSingle}}
             <!-- if single -->
             <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well.</p>
             {{else}}
@@ -138,8 +160,7 @@
             <img class="diagram" src="../../img/{{this.image_front}}" /> {{else}}
             <!-- Trash or scale -->
             <p>Calibrate over the center of the container you choose to use.</p>
-            {{/if}} 
-            {{/if}}
+            {{/if}} {{/if}}
         </div>
     </div>
 </section>

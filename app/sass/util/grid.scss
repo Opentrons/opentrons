@@ -20,6 +20,7 @@ $row-height: 40px;
 @mixin grid-col-full($n) {
     width: num-col-full($n);
     flex: 0 0 num-col-full($n);
+    
 }
 
 @mixin grid-col-air($n) {

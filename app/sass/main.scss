@@ -2,6 +2,7 @@
 @import "header";
 @import "steplist";
 @import "buttons";
+@import "modals";
 nav {
     display: flex;
 }
@@ -12,34 +13,30 @@ ul {
     padding: 0;
 }
 
-li{
+li {
     line-height: 40px;
 }
 
-table{
+table {
     @include grid-col-full(10);
-    @include offset-v(1,1);
-
-    tr{
-       flex-wrap:wrap;
-       line-height: 40px;
-       th{
-        text-align: left;
-        @include grid-col-full(3); 
-       }
-       td{
-        @include grid-col-full(2); 
-        text-align:center;
-        font-size:$basesize;
-        &.coords{
-            @include grid-col-full(1);
+    @include offset-v(1, 1);
+    tr {
+        flex-wrap: wrap;
+        line-height: 40px;
+        th {
+            text-align: left;
+            @include grid-col-full(3);
         }
-       }
+        td {
+            @include grid-col-full(2);
+            text-align: center;
+            font-size: $basesize;
+            &.coords {
+                @include grid-col-full(1);
+            }
+        }
     }
-
 }
-
-
 
 .coords {
     input {
@@ -146,7 +143,7 @@ Wizard Screens
             display: flex;
             flex-wrap: wrap;
             min-height: 400px;
-            max-height:400px;
+            max-height: 400px;
         }
         .step-error,
         .step-upload {
@@ -208,36 +205,35 @@ Deck|Container
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(3);
-       
     }
 }
 
 .save-deck {
     @include grid-col-full(8);
     @include offset(5, 0);
-    .wrap {
-        display: flex;
-        flex-wrap: wrap;
-        @include grid-col-full(8);
-    }
-    .update {
-        display: flex;
-        flex-wrap:wrap;
-        @include grid-col-full(6);
-        @include offset-v-air(2, 0);
-        .position {
-            @include grid-col-air(2);
-            text-align: center;
-        }
-    }
-    .well {
-        @include rect(2, 3);
-    }
     .coords {
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(8);
         @include offset-v(0, 1);
+    }
+    .calibration-modal {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(8);
+        .well-img {
+            @include rect(2, 3);
+        }
+        .update {
+            display: flex;
+            flex-wrap: wrap;
+            @include grid-col-full(6);
+            @include offset-v-air(2, 0);
+            .position {
+                @include grid-col-air(2);
+                text-align: center;
+            }
+        }
     }
 }
 
@@ -272,7 +268,6 @@ Pipette
         @include grid-col-full(5);
         @include offset(0, 6);
     }
-    
 }
 
 .save-pipette {
@@ -289,7 +284,6 @@ Pipette
         @include grid-col-full(6);
         display: flex;
         flex-wrap: wrap;
-
         .position {
             @include grid-col-full(2);
             text-align: center;

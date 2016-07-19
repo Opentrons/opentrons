@@ -1,4 +1,4 @@
-require 'font-awesome-sass'
+#require 'font-awesome-sass'
 preferred_syntax = :scss
 http_path = '/'
 css_path = 'static/css'

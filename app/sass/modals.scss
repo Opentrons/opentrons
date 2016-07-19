@@ -1,0 +1,33 @@
+@import "util";
+
+.calibration-modal {
+    &.mode-top {
+        //display:inline;
+        .btn-update.top {
+            opacity: 1;
+            pointer-events: all;
+        }
+        img.top{
+            display:block;
+        }
+    }
+    &.mode-bottom {
+        display: inline;
+        .btn-update.bottom {
+            opacity: 1;
+            pointer-events: all;
+        }
+        img.bottom{
+            display:block;
+        }
+    }
+    .btn-update {
+        opacity: 0.1;
+        pointer-events: none;
+    }
+    .well-img{
+    	img{
+            display:none;
+        }
+    }
+}
