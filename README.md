@@ -49,7 +49,7 @@ attach the Protocol class to the serial port connected to the robot.
 `Protocol.run` is a generator that will yield the current progress and total
 number of commands within the protocol upon completion of each command.
 
-To know when each command has been completed by the robot, it sets a special
+To know when each command has been completed by the robot, it sends a special
 debug command (`M62`) to the OpenTrons custom firmware and reads from the serial
 device until the line `{"stat":0}` is found.
 
