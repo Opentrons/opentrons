@@ -10,7 +10,9 @@ This current version has basic support for keeping track of liquids (and
 mixtures of liquids) between liquid containers.
 
 It's currently exporting data concerning modules to a separate codebases
-in charge of running the OpenTrons [frontend](https://github.com/Opentrons/otone_frontend) and [backend](https://github.com/Opentrons/otone_backend).
+in charge of running the OpenTrons client.  An example of a minimalist Flask
+client to calibrate and run a protocol can be found at 
+[OpenTrons/sdk_demo](http://github.com/opentrons/sdk_demo).
 
 
 ## Protocols
@@ -88,6 +90,34 @@ on the robot itself.
 If the Motor Handler is not attached to a USB port, it will still log
 its movements and the serial commands it would have executed using the
 standard `logging` library.
+
+## Compilers
+
+This library has support for custom compilers, which will generate protocols
+in JSON format to run on the original OT-One software.
+
+## FusX
+
+The only compiler currently in service is the one running on the backend of
+[Mix.Bio's FusX](http://mix.bio/fusx) page.
+
+This code can be called through the library by importing the pfusx module
+from compilers.
+
+Multiple sequences can be defined in either DNA or RVD format and compiled into
+a single protocol output file.
+
+```python
+from labsuite.compilers import pfusx
+
+inputs = [
+	'NI NG NI HD HD NN NG HD NG NG NI NG NG NG NG',
+	'ATACCRTCTTATTT'
+]
+
+pfusx.compile(*inputs)
+```
+
 
 ## Containers API
 
