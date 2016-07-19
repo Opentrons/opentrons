@@ -31,6 +31,7 @@ protocol = Protocol()
 # Add containers.
 protocol.add_container('A1', 'microplate.96')
 protocol.add_container('C1', 'tiprack.p200')
+protocol.add_container('B2', 'point.trash')
 
 # Add a pipette (p200)
 protocol.add_instrument('A', 'p200')
@@ -52,6 +53,7 @@ number of commands within the protocol upon completion of each command.
 # Calibrate containers relative to the only instrument.
 protocol.calibrate('A1', x=1, y=2, top=40, bottom=50)
 protocol.calibrate('C1', x=100, y=100, top=40)
+protocol.calibrate('B2', x=200, y=200, top=40)
 
 # Attach to the robot via USB port.
 protocol.attach_motor('/dev/tty.usbmodem1421')
