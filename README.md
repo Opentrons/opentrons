@@ -30,7 +30,7 @@ $ pip3 install gevent
 
 
 ### Run Server
-Currently, to start the server you have to run python file directly.
+Currently, to start the server you have to run python file directly. 
 
 ```
 $ cd app
