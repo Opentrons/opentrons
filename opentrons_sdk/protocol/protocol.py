@@ -321,4 +321,4 @@ class Protocol():
 
     def disconnect(self):
         if self._motor_handler:
-            self.motor_handler.disconnect()
+            self._motor_handler.disconnect()
