@@ -120,6 +120,98 @@ inputs = [
 pfusx.compile(*inputs)
 ```
 
+## Command Engine
+
+A command engine is provided to allow for the specification of high-level syntax
+for human readable commands.
+
+A decorator is provided to allow for setting complex syntaxes and then passing
+parsed arguments from string-based input into the handler methods.
+
+This functionality can be utilized within a Protocol Ingestor and perhaps a 
+formatting system such as YAML to provide a new protocol language to replace
+the JSON protocols.
+
+### Argument Definition
+
+Arguments are defined via regular expressions and given names as well
+as human-readable examples of what the input should look like.
+
+For example, the code below creates an argument syntax for a plate
+definition.
+
+```
+define_argument(
+    'plate',
+    '(([A-Z][1-9])|(\w+)):(([A-Z][1-9])|(\w+))',
+    'A1:A1 or Plate1:A1'
+)
+```
+
+### Command Definition
+
+A function decorator is provided for the definition of full command
+syntax.
+
+The name of the method decorated becomes the name of the command.
+
+The syntax string is composed of argument tags, which will be automatically
+parsed by the execution handler (`execute`) and applied to the function.
+
+An argument tag is a name of a defined argument within angular brackets
+(< and >).  To define a label for an argument, place a colon after the
+argument name and follow it with the desired argument name.
+
+If no argument name is provided, then the argument will be passed as its
+base argument name.
+
+Documentation for the command handler can be provided to the user interface 
+by utilizing Python's docstring access, available as `fn.__doc__`.
+
+Additionally, metadata regarding argument definitions (as specified within
+`define_argument`) may also be sent to the user interface.
+
+```python
+@syntax('<volume> from <plate:from_plate> to <plate:to_plate>')
+def transfer(volume=None, from_plate, to_plate):
+    """
+    Transfers the specified amount of liquid from the start
+    plate to the end plate.
+    """
+    # [...]
+```
+
+#### Full example
+
+```python
+from labsuite.engine.commands import define_argument, syntax, execute
+
+define_argument(
+    'plate',
+    '(([A-Z][1-9])|(\w+)):(([A-Z][1-9])|(\w+))',
+    'A1:A1 or Plate1:A1'
+)
+
+define_argument(
+    'volume',
+    '\d+[umµ]l',
+    '10ul, 10ml, 10l, 10µl, etc.'
+)
+
+protocol = Protocol()
+
+@syntax('<volume> from <plate:from_plate> to <plate:to_plate>')
+def transfer(volume=None, from_plate, to_plate):
+    """
+    Transfers the specified amount of liquid from the start
+    plate to the end plate.
+    """
+    protocol.transfer(volume, from_plate, to_plate)
+
+execute("transfer 10µl from A1:A1 to A2:A2")
+
+protocol.run()
+```
 
 ## Containers API
 
@@ -205,6 +297,7 @@ As of this writing, supported container types are as follows:
 * Reservoir
 * Tiprack
 * Tuberack
+* Point
 
 For an up-to-date list, please use the `containers.list_container_types()`
 method.
