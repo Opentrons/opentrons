@@ -29,6 +29,11 @@ Header Styles
             justify-content: flex-end;
             @include grid-col-air(4);
         }
+        input{
+            @include grid-col-air(4);
+            outline:none;
+            color:$primary-text;
+        }
     }
 }
 

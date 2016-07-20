@@ -7,9 +7,13 @@ var connect_input = document.getElementById('connect_port');
 
 socket.on('connect', function() {
     socket.emit('connected', { data: 'Hello!' });
+
 });
 
 connect_button.addEventListener('click', function() {
     port = connect_input.value;
     socket.emit('connect_serial', { port: port });
 });
+
+//to-do: toggle connect connect disconnect based on serial connection
+//need response message from labsuite

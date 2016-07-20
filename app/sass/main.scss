@@ -22,6 +22,10 @@ a{
     cursor: auto;
 }
 
+input{
+    border:none;
+}
+
 table {
     @include grid-col-full(10);
     @include offset-v(1, 1);
