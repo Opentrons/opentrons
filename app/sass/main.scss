@@ -143,7 +143,7 @@ Wizard Screens
             display: flex;
             flex-wrap: wrap;
             min-height: 400px;
-            max-height: 400px;
+            //max-height: 400px;
         }
         .step-error,
         .step-upload {
@@ -204,7 +204,7 @@ Deck|Container
     .deck {
         display: flex;
         flex-wrap: wrap;
-        @include grid-col-full(3);
+        @include grid-col-full(5);
     }
 }
 

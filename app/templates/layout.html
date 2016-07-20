@@ -8,38 +8,40 @@
 </head>
 
 <body>
-<div class="nav-full-dark">
-<header class="brand">
-        <!-- Logo and Status Text  -->
-        <nav class="links">
-            <ul>
-                <li> Logo</li>
-            </ul>
-        </nav>
-        <nav class="robot">
-            <span>robot is moving</span>
-        </nav>
-</header>
-</div>
-<div class="nav-full-light">
-<header class="controls">
-        <!-- Home Buttons, Speed Control Slider, Tabs  -->
-        <nav class="home">
-            <span class="label">HOME:</span>
-            <a href="#" class="btn-home">X</a>
-            <a href="#" class="btn-home">Y</a>
-            <a href="#" class="btn-home">Z</a>
-            <a href="#" class="btn-home">A</a>
-            <a href="#" class="btn-home">B</a>
-            <a href="#" class="btn-home">ALL</a>
-        </nav>
-        <nav class="tabs">
-            <a href="#" class="tab active">Protocol</a>
-            <a href="#" class="tab">Config</a>
-        </nav>
-        </div>
-</header>
-</div>
+    <div class="nav-full-dark">
+        <header class="brand">
+            <!-- Logo and Status Text  -->
+            <nav class="links">
+                <ul>
+                    <li> Logo</li>
+                </ul>
+            </nav>
+            <nav class="robot">
+                <span>connect to robot</span>
+                <input type="hidden" id="connect_port" value="/dev/tty.usbmodem1421" />
+                <a href="#" class="btn-connect" id="connect_serial">Connect Serial</a>
+            </nav>
+        </header>
+    </div>
+    <div class="nav-full-light">
+        <header class="controls">
+            <!-- Home Buttons, Speed Control Slider, Tabs  -->
+            <nav class="home">
+                <span class="label">HOME:</span>
+                <a href="#" class="btn-home">X</a>
+                <a href="#" class="btn-home">Y</a>
+                <a href="#" class="btn-home">Z</a>
+                <a href="#" class="btn-home">A</a>
+                <a href="#" class="btn-home">B</a>
+                <a href="#" class="btn-home">ALL</a>
+            </nav>
+            <nav class="tabs">
+                <a href="#" class="tab active">Protocol</a>
+                <a href="#" class="tab">Config</a>
+            </nav>
+    </div>
+    </header>
+    </div>
     {% block body %}{% endblock %}
     <script name="pagehandler">
     /**
@@ -50,9 +52,7 @@
     PageHandlers = {};
     PathHandlers = {};
     </script>
- 
     <div id="main"></div>
-
     {% block scripts %} {% for src in scripts %}
     <script type="text/javascript" src="/{{ src }}"></script>
     {% endfor %} {% endblock %} {% block views %} {% for name, content in views %}

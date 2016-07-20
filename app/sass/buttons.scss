@@ -35,6 +35,12 @@ Buttons Labels Tabs
     }
 }
 
+.btn-connect{
+    @include btn-col-a(2);
+    background-color:$call-to-action;
+    color:white;
+}
+
 .btn-x {
     @include offset(1, 2);
 }
@@ -77,11 +83,11 @@ Buttons Labels Tabs
 .deck {
     outline: 2px solid lighten($primary-brand, 30%);
     .btn-deck {
-        @include rect(3/5, 0.5);
+        @include rect(1, 1);
         color: $primary-text;
         outline: 1px solid lighten($primary-brand, 35%);
     }
-    @include offset-v(0, 0.5);
+    @include offset-v(0, 1);
 }
 
 .btn-update {

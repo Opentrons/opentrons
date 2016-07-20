@@ -1,6 +1,4 @@
 /* Gets run every time the user is in protocol_setup/ anything. */
-
-
 //stub data, transforms, and event delegation for Wizard and Jog Controller
 var stubData = [{
         task_type: "select_protocol",

@@ -101,4 +101,4 @@ logging.basicConfig(
 if __name__ == "__main__":
     app.debug = True
     #app.run(host='0.0.0.0', port=5000)
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, port=5000)

@@ -4,6 +4,7 @@ Header Styles
 ************************/
 .nav-full-dark{
     background-color: $primary-black;
+    max-height:40px;
 }
 .nav-full-light{
     background-color: $primary-brand;
@@ -17,7 +18,7 @@ Header Styles
     .links {
         justify-content: flex-start;
         li {
-            @include grid-col-air(1);
+            @include grid-col-full(1);
             text-align: center;
         }
     }
