@@ -73,6 +73,16 @@ for current, total in protocol.run():
 protocol.disconnect()
 ```
 
+### Context Awareness
+
+The Protocol is capable of being context aware, in the sense that it
+can use data about what's been attached to the protocol in order to
+fill in variables automatically.
+
+For example, if two pipettes are added to a protocol and a transfer is
+specified without an explicitly defined axis or tool, the Context Handler
+is capable of returning a pipette which supports that volume automatically.
+
 ### Protocol Handlers
 
 The Protocol class itself is in charge of normalizing command arguments,
@@ -99,6 +109,10 @@ on the robot itself.
 If the Motor Handler is not attached to a USB port, it will still log
 its movements and the serial commands it would have executed using the
 standard `logging` library.
+
+Additionally, the MotorHandler includes a PipetteMotor class which wraps
+and tries to mimic the interface of a standard Pipette instance from the
+labware portion of the codebase.
 
 ### Creating Additional Handlers
 
@@ -147,6 +161,20 @@ inputs = [
 
 pfusx.compile(*inputs)
 ```
+
+## CSV Plate Maps
+
+A utility for working with CSV Plate Maps is defined within the compiler
+section of the framework.  Example plate map CSVs can be found in the 
+[test fixtures](tests/fixtures), as well as the compiler 
+[data directory](opentrons_sdk/compilers/data).
+
+This allows third parties to specify well layouts within Excel and then
+utilize that information for the creation of protocols.
+
+Currently, this functionality is being used in the FusX compiler to replace
+the original SQLite database from Mayo specifying plate positions, as well 
+as in a test for Tipracks to ensure proper tip offset order.
 
 ## Command Engine
 
@@ -241,7 +269,57 @@ execute("transfer 10µl from A1:A1 to A2:A2")
 protocol.run()
 ```
 
-## Containers API
+## Labware
+
+### Positions
+
+Positions throughout this library are normalized into zero-indexed tuples
+based on column letter and row number.  For example, "A1" becomes (0, 0).
+Tuples may be passed to any system where a position argument is valid.
+
+Full addresses of a deck slot and well within that slot are indicated
+with a colon in string format (`"A1:A1"`) and as a list of tuples in 
+normalized format (`[(0, 0), (0, 0)]`).
+
+### Deck
+
+All containers added to a Protocol are ultimately added to a deck, as part of
+the "Virtual Robot" that runs the handler.
+
+You can search for modules on the Deck by using `find_module` with keyword
+arguments representing filters.
+
+The filters work on dynamic properties as well, for example has_tips on
+Tipracks.
+
+```python
+tiprack = deck.find_module(name="tiprack.p200", has_tips=true)
+```
+
+### Pipettes
+
+Unlike containers, which are calibrated within the Context Handler, Pipettes store
+their calibration values within the base labware class.  This is because Pipettes
+will use their interal calibration values to make potentially complex calculations
+based on volume.
+
+Data collection and a more detailed `supports_volume` algorithm can account for 
+working volumes.  It's possible to get increased accuracy from physical pipettes
+by doing a distribution call using a larger volume instead of a single transfer
+of a smaller volume.
+
+Multi-channel pipettes are left as an exercise for the reader.  In the current 
+implementation, multi-channel transfers are simply specified as single transfers
+on the axis of a multi-channel pipette.
+
+### Well Volumes
+
+A complex liquid inventory system has been added to the labware containers.
+
+Most of this functionality has been disabled for the time being, but could be
+very useful to the creation of a more advanced protocol editor.
+
+### Containers
 
 The [labware.containers](opentrons_sdk/labware/containers.py) module provides data about
 all supported containers, as well as conversions between old and new data
@@ -249,7 +327,7 @@ formats.
 
 Containers can be specified by the user.
 
-### Listing Containers
+#### Listing Containers
 
 ```python
 from opentrons_sdk.labware import containers
@@ -257,7 +335,7 @@ from opentrons_sdk.labware import containers
 list = labware.containers.list_containers()
 ```
 
-### Defining a Container
+#### Defining a Container
 
 Containers definitions are stored in [config/containers](opentrons_sdk/config/containers).
 These are YAML files specifying the base type of container, the number of 
@@ -271,7 +349,7 @@ variation as a `custom_well` within the YAML structure.  See the
 [15-50ml tuberack](opentrons_sdk/config/containers/tuberacks/15-50ml.yml) for an example of this
 functionality being used.
 
-### Getting Container Well Offset
+#### Getting Container Well Offset
 
 All container classes provide a static interface for getting non-calibrated
 well offsets, which are all in reference to the A1 (or first coordinate) of
@@ -284,7 +362,7 @@ microplate = containers.load_container('microplate.24')
 microplate.offset('A1')
 ```
 
-### Tipracks and Tip Inventory
+#### Tipracks and Tip Inventory
 
 Containers of the Tiprack type have the ability to return the position of a
 tip from a given offset number of tips (which represent the tips that have
@@ -293,6 +371,14 @@ been used during the operation of the robot).
 For example, the code below will provide the offset to the eleventh tip
 position, in the event that the first ten have already been used.
 
+A CSV containing a Plate Maps of tip offset order can be found in the
+[test fixtures](tests/fixtures/offset_map.csv).  If the order is
+changed, so should the offset map to ensure that the tests pass.
+
+Tip offset can also be set at the Protocol level, and will allow the user
+to specify how many tips have been used in a particular rack and automatically
+switch to the next rack with remaining tips.
+
 ```python
 from opentrons_sdk.labware import containers
 
@@ -300,11 +386,14 @@ tiprack = containers.load_container('tiprack.10ul')
 tiprack.tip_offset(10)
 ```
 
-### User-Specific Containers
+#### User-Specific Containers
 
 Users can provide their own YAML files specifying custom containers. These
 containers can be stored anywhere, but must be loaded within the containers
 module before being accessible.
+
+This can be set to automatically load from a preloaded folder in the users'
+documents for the desktop client.
 
 ```python
 from opentrons_sdk.labware import containers
@@ -315,7 +404,7 @@ containers.load_custom_containers('/path/to/containers')
 This will do a recursive glob through the directory provided and add all 
 YAML files to the list of available labware containers.
 
-### Supported Container Types
+#### Supported Container Types
 
 As of this writing, supported container types are as follows:
 
