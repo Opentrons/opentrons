@@ -293,7 +293,7 @@ The filters work on dynamic properties as well, for example has_tips on
 Tipracks.
 
 ```python
-tiprack = deck.find_module(name="tiprack.p200", has_tips=true)
+tiprack = deck.find_module(name="tiprack.p200", has_tips=True)
 ```
 
 ### Pipettes
