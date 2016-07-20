@@ -22,32 +22,34 @@
             </div>
             <h3 class="title">Select Increment [mm]</h3>
             <div class="increment xyz">
-                <a href="#" data-increment="20" class="btn-full btn-group">20</a>
-                <a href="#" data-increment="10" class="btn-full btn-group">10</a>
-                <a href="#" data-increment="5" class="btn-full btn-group">5</a>
-                <a href="#" data-increment="1" class="btn-full btn-group">1</a>
-                <a href="#" data-increment="0.5" class="btn-full btn-group">0.5</a>
-                <a href="#" data-increment="0.1" class="btn-full btn-group">0.1</a>
-                <a href="#" data-increment="91" class="btn-slot">&#8596; slot-x </a>
-                <a href="#" data-increment="135" class="btn-slot">&#8597; slot-y </a>
+                <button data-increment="20" class="btn-full btn-group">20</button>
+                <button data-increment="10" class="btn-full btn-group">10</button>
+                <button data-increment="5" class="btn-full btn-group">5</button>
+                <button data-increment="1" class="btn-full btn-group">1</button>
+                <button data-increment="0.5" class="btn-full btn-group">0.5</button>
+                <button data-increment="0.1" class="btn-full btn-group">0.1</button>
+                <button data-increment="91" class="btn-slot">&#8596; slot-x </button>
+                <button data-increment="135" class="btn-slot">&#8597; slot-y </button>
             </div>
             <h3 class="title">Move to Slot</h3>
             <div class="deck">
-                <a href="#" class="btn-deck">A3</a>
-                <a href="#" class="btn-deck">B3</a>
-                <a href="#" class="btn-deck">C3</a>
-                <a href="#" class="btn-deck">D3</a>
-                <a href="#" class="btn-deck">E3</a>
-                <a href="#" class="btn-deck">A2</a>
-                <a href="#" class="btn-deck">B2</a>
-                <a href="#" class="btn-deck">C2</a>
-                <a href="#" class="btn-deck">D2</a>
-                <a href="#" class="btn-deck">E2</a>
-                <a href="#" class="btn-deck">A1</a>
-                <a href="#" class="btn-deck">B1</a>
-                <a href="#" class="btn-deck">C1</a>
-                <a href="#" class="btn-deck">D1</a>
-                <a href="#" class="btn-deck">E1</a>
+                <!-- testing x,y data attributes for absolute movement, 
+            need specific coords moving forward -->
+                <button data-x="1" data-y="2" class="btn-deck">A3</a>
+                <button class="btn-deck">B3</button>
+                <button class="btn-deck">C3</button>
+                <button class="btn-deck">D3</button>
+                <button class="btn-deck">E3</button>
+                <button class="btn-deck">A2</button>
+                <button class="btn-deck">B2</button>
+                <button class="btn-deck">C2</button>
+                <button class="btn-deck">D2</button>
+                <button class="btn-deck">E2</button>
+                <button class="btn-deck">A1</button>
+                <button class="btn-deck">B1</button>
+                <button class="btn-deck">C1</button>
+                <button class="btn-deck">D1</button>
+                <button class="btn-deck">E1</button>
             </div>
         </div>
         <!-- end move -->
@@ -67,12 +69,11 @@
                 {{/if}}
             </div>
             <div class="increment pipette">
-                <a href="#" data-increment="2" class="btn-full btn-group">2</a>
-                <a href="#" data-increment="1" class="btn-full btn-group">1</a>
-            </div>
-            <div class="increment pipette">
-                <a href="#" data-increment="0.5" class="btn-full btn-group">0.5</a>
-                <a href="#" data-increment="0.1" class="btn-full btn-group">0.1</a>
+                <button data-increment="2" class="btn-full btn-group">2</button>
+                <button data-increment="1" class="btn-full btn-group">1</button>
+            
+                <button data-increment="0.5" class="btn-full btn-group">0.5</button>
+                <button data-increment="0.1" class="btn-full btn-group">0.1</button>
             </div>
         </div>
         <!-- end move-pipette -->
@@ -89,22 +90,26 @@
                 <input type="text" value="0" />
             </div>
             <h3 class="title">{{this.title}} {{data.actuator}}</h3>
-            <div class="wrap">
-                <div class="pipette-pos">
-                    <img src="../../img/pipette_top.png" />
+            <div class="calibration-modal mode-droptip">
+                <div class="pipette-img">
+                    <img src="../../img/pipette_top.png" class="top"/>
+                    <img src="../../img/pipette_bottom.png" class="bottom"/>
+                    <img src="../../img/pipette_blowout.png" class="blowout"/>
+                    <img src="../../img/pipette_droptip.png" class="droptip"/>
                 </div>
                 <div class="update">
-                    <a href="#pipette_top" class="position pipette-top">Top</a>
-                    <button class="btn-update save ">Save</button>
+                    <a href="#pipette_top" class="position top">Top</a>
+                    <button class="btn-update save top">Save</button>
                     <button class="btn-update moveto ">Move</button>
+                    <div class="spacer"></div>
                     <a href="#pipette_bottom" class="position bottom">Bottom</a>
                     <button class="btn-update save bottom">Save</button>
-                    <button class="btn-update moveto bottom">Move</button>
-                    <a href="#pipette_blowout" class="position">Blowout</a>
-                    <button class="btn-update save">Save</button>
+                    <button class="btn-update moveto ">Move</button>
+                    <a href="#pipette_blowout" class="position blowout">Blowout</a>
+                    <button class="btn-update save blowout">Save</button>
                     <button class="btn-update moveto">Move</button>
-                    <a href="#pipette_droptip" class="position">Drop Tip</a>
-                    <button class="btn-update save">Save</button>
+                    <a href="#pipette_droptip" class="position droptip">Drop Tip</a>
+                    <button class="btn-update save droptip">Save</button>
                     <button class="btn-update moveto disabled">Move</button>
                     <button class="btn-update test pick-liquid disabled">Pick Up {{data.test_volume}}</button>
                     <button class="btn-update test eject-liquid disabled">Eject {{data.test_volume}}</button>

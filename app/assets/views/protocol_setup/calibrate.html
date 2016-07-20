@@ -30,34 +30,34 @@
             </div>
             <h3 class="title">Select Increment [mm]</h3>
             <div class="increment xyz">
-                <a href="#" data-increment="20" class="btn-full btn-group">20</a>
-                <a href="#" data-increment="10" class="btn-full btn-group">10</a>
-                <a href="#" data-increment="5" class="btn-full btn-group">5</a>
-                <a href="#" data-increment="1" class="btn-full btn-group">1</a>
-                <a href="#" data-increment="0.5" class="btn-full btn-group">0.5</a>
-                <a href="#" data-increment="0.1" class="btn-full btn-group">0.1</a>
-                <a href="#" data-increment="91" class="btn-slot">&#8596; slot-x </a>
-                <a href="#" data-increment="135" class="btn-slot">&#8597; slot-y </a>
+                <button data-increment="20" class="btn-full btn-group">20</button>
+                <button data-increment="10" class="btn-full btn-group">10</button>
+                <button data-increment="5" class="btn-full btn-group">5</button>
+                <button data-increment="1" class="btn-full btn-group">1</button>
+                <button data-increment="0.5" class="btn-full btn-group">0.5</button>
+                <button data-increment="0.1" class="btn-full btn-group">0.1</button>
+                <button data-increment="91" class="btn-slot">&#8596; slot-x </button>
+                <button data-increment="135" class="btn-slot">&#8597; slot-y </button>
             </div>
             <h3 class="title">Move to Slot</h3>
             <div class="deck">
                 <!-- testing x,y data attributes for absolute movement, 
             need specific coords moving forward -->
-                <a href="#" data-x="1" data-y="2" class="btn-deck">A3</a>
-                <a href="#" class="btn-deck">B3</a>
-                <a href="#" class="btn-deck">C3</a>
-                <a href="#" class="btn-deck">D3</a>
-                <a href="#" class="btn-deck">E3</a>
-                <a href="#" class="btn-deck">A2</a>
-                <a href="#" class="btn-deck">B2</a>
-                <a href="#" class="btn-deck">C2</a>
-                <a href="#" class="btn-deck">D2</a>
-                <a href="#" class="btn-deck">E2</a>
-                <a href="#" class="btn-deck">A1</a>
-                <a href="#" class="btn-deck">B1</a>
-                <a href="#" class="btn-deck">C1</a>
-                <a href="#" class="btn-deck">D1</a>
-                <a href="#" class="btn-deck">E1</a>
+                <button data-x="1" data-y="2" class="btn-deck">A3</a>
+                <button class="btn-deck">B3</button>
+                <button class="btn-deck">C3</button>
+                <button class="btn-deck">D3</button>
+                <button class="btn-deck">E3</button>
+                <button class="btn-deck">A2</button>
+                <button class="btn-deck">B2</button>
+                <button class="btn-deck">C2</button>
+                <button class="btn-deck">D2</button>
+                <button class="btn-deck">E2</button>
+                <button class="btn-deck">A1</button>
+                <button class="btn-deck">B1</button>
+                <button class="btn-deck">C1</button>
+                <button class="btn-deck">D1</button>
+                <button class="btn-deck">E1</button>
             </div>
         </div>
         <!-- end move -->
@@ -83,62 +83,30 @@
                     <div class="update">
                         <!-- Tiprack Specific buttons -->
                         <a href="#{{this.container_top}}" class="position top">Title</a>
-                        <a class="btn-update save top">Save </a>
-                        <a class="btn-update moveto">Move To</a>
-                        <a class="pick-tip top">Pick Up Tip </a>
+                        <button class="btn-update save top">Save </button>
+                        <button class="btn-update moveto">Move To</button>
+                        <button class="pick-tip top">Pick Up Tip </button>
                     </div>
                     {{else}}
                     <div class="update">
                      <a href="#{{this.container_top}}" class="position top">Top</a>
-                        <a class="btn-update save top">Save </a>
-                        <a class="btn-update moveto ">Move To</a>
+                        <button class="btn-update save top">Save </button>
+                        <button class="btn-update moveto ">Move To</button>
                         
                         <a href="#{{this.container_bottom}}" class="position bottom">Bottom</a>
-                        <a class="btn-update save bottom">Save </a>
-                        <a class="btn-update moveto">Move To </a>
+                        <button class="btn-update save bottom">Save </button>
+                        <button class="btn-update moveto">Move To </button>
                     </div>
                     {{/if}}
                     {{else}}
                     <div class="update">
-                    <a href="#{{this.container_top}}" class="position">Title</a>
-                        <a class="btn-update save ">Save </a>
-                        <a class="btn-update moveto">Move To</a>
+                    <a href="#{{this.container_top}}" class="position top">Title</a>
+                        <button class="btn-update save top ">Save </button>
+                        <button class="btn-update moveto">Move To</button>
                     </div>
                 {{/if}}
 
             </div>
-            <!-- <div class="wrap">
-                <div class="well">
-                    <img src="../../img/{{this.container_top}}" />
-
-                </div>
-                {{#if this.isContainer}}
-                    {{#if this.isTipRack}} 
-                    <div class="update">
-                        <a href="#{{this.container_top}}" class="position">Title</a>
-                        <a class="btn-update save ">Save </a>
-                        <a class="btn-update moveto">Move To</a>
-                        <!-- DROPTIP FOR TIPRACKS ONLY -->
-            <!-- <a class="pick-tip ">Pick Up Tip </a>
-                    </div>
-                    {{else}}
-                    <div class="update">                   
-                        <a href="#{{this.container_top}}" class="position">Top</a>
-                        <a class="btn-update save ">Save </a>
-                        <a class="btn-update moveto">Move To</a>
-                        <a href="#{{this.container_bottom}}" class="position ">Bottom</a>
-                        <a class="btn-update save ">Save </a>
-                        <a class="btn-update moveto">Move To </a>
-                    </div>
-                    {{/if}}
-                {{else}}
-                <div class="update">
-                        <a href="#{{this.container_top}}" class="position">Title</a>
-                        <a class="btn-update save ">Save </a>
-                        <a class="btn-update moveto">Move To</a>
-                </div>
-                {{/if}}
-            </div> -->
         </div>
     </div>
     </div>

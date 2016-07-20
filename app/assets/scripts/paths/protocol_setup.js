@@ -259,6 +259,7 @@ var stubData = [{
 
 wizard = new StepWizard();
 jogController = new JogController();
+modalController = new ModalController();
 
 wizard.setTaskTransforms({
     enumerate: function(task) {
@@ -474,11 +475,14 @@ delegateEvent('submit', 'form[method=upload]', function(e, el) {
 delegateEvent('click', '.increment.xyz', function(e, el) {
     var mm = parseFloat(e.target.dataset.increment);
     jogController.setIncrementXYZ(mm);
-    console.log(e.target);
+    var target = e.target;
+    var siblings = el.getElementsByTagName("BUTTON");
+    modalController.activateIncrement(target, siblings);
 });
 
 //Jog XYZ 
 delegateEvent('click', '.jog', function(e, el) {
+    e.preventDefault();
     var axis = e.target.dataset.axis;
     var direction = e.target.dataset.direction;
     jogController.moveRelative(axis, direction);
@@ -489,21 +493,44 @@ delegateEvent('click', '.jog', function(e, el) {
 delegateEvent('click', '.increment.pipette', function(e, el) {
     var mm = parseFloat(e.target.dataset.increment);
     jogController.setIncrementAB(mm);
+    var target = e.target;
+    var siblings = el.getElementsByTagName("BUTTON");
+    modalController.activateIncrement(target, siblings);
 });
 
 //Jog AB
 delegateEvent('click', '.plunger', function(e, el) {
+    e.preventDefault();
     var axis = e.target.dataset.axis;
     var direction = e.target.dataset.direction;
     jogController.moveRelative(axis, direction);
 });
 
 //Jog to Absolute Deck Slot locations
-delegateEvent('click', '.btn-deck', function(e, el) {
+delegateEvent('click', '.deck', function(e, el) {
     var coords = {};
     coords.x = parseInt(e.target.dataset.x);
     coords.y = parseInt(e.target.dataset.y);
-    //z pos will zero out before x y movements
-    //coords.z = parseInt(e.target.dataset.z);
+    var target = e.target;
+    var siblings = el.getElementsByTagName("BUTTON");
+    console.log(siblings);
+    modalController.activateIncrement(target, siblings); 
     jogController.moveAbsolute(coords);
 });
+
+//Display/toggle well z pos diagrams next to save container calibrations
+delegateEvent('click', '.position', function(e, el) {
+    e.preventDefault();
+    var mode = el.classList[1];
+    var modal = el.parentNode.parentNode;
+    modalController.setMode(modal,mode);    
+});
+
+delegateEvent('click', '.save', function(e, el) {
+    //to-do: send saved positions to labsuite
+    //on successful save, apply top class to move to button
+    //for now this lives here as a click event.
+    var mode = el.classList[2];
+    modalController.activateMove(el, mode)      
+});
+

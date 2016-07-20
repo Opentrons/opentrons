@@ -17,6 +17,11 @@ li {
     line-height: 40px;
 }
 
+a{
+    cursor: pointer;
+    cursor: auto;
+}
+
 table {
     @include grid-col-full(10);
     @include offset-v(1, 1);
@@ -166,7 +171,7 @@ Wizard Screens
         nav {
             display: flex;
             justify-content: space-between;
-            @include offset-v(1, 1);
+            //@include offset-v(1, 1);
             a {
                 @include btn-col-f(4);
                 font-size: 15px;
@@ -265,19 +270,17 @@ Pipette
     .increment {
         display: flex;
         flex-wrap: wrap;
-        @include grid-col-full(5);
-        @include offset(0, 6);
     }
 }
 
 .save-pipette {
     @include grid-col-full(8);
-    .wrap {
+    .calibration-modal{
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(10);
     }
-    .plunger {
+    .pipette-img{
         @include rect(3, 6);
     }
     .update {
@@ -287,10 +290,10 @@ Pipette
         .position {
             @include grid-col-full(2);
             text-align: center;
-            line-height: $baseline;
+            line-height: 40px;
         }
-        .bottom {
-            @include offset-v-air(1, 0);
+        .spacer{
+            @include rect(6,1);
         }
     }
     .coords {
@@ -300,9 +303,7 @@ Pipette
         @include offset(1, 0);
         @include offset-v(0, 1);
     }
-    .bottom {
-        @include offset-v-air(2, 0);
-    }
+
 }
 
 

@@ -2,9 +2,9 @@
 
 .calibration-modal {
     &.mode-top {
-        //display:inline;
         .btn-update.top {
             opacity: 1;
+            cursor: pointer;
             pointer-events: all;
         }
         img.top{
@@ -12,21 +12,47 @@
         }
     }
     &.mode-bottom {
-        display: inline;
         .btn-update.bottom {
             opacity: 1;
+            cursor: pointer;
             pointer-events: all;
         }
         img.bottom{
             display:block;
         }
     }
+    &.mode-blowout {
+        .btn-update.blowout{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.blowout{
+            display:block;
+        }
+    }
+    &.mode-droptip {
+        .btn-update.droptip{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.droptip{
+            display:block;
+        }
+    }
+
     .btn-update {
         opacity: 0.1;
         pointer-events: none;
     }
     .well-img{
     	img{
+            display:none;
+        }
+    }
+    .pipette-img{
+        img{
             display:none;
         }
     }

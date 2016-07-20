@@ -17,6 +17,12 @@ Buttons Labels Tabs
     }
 }
 
+button{
+    background-color:white;
+    &:focus {outline:0;}
+}
+
+
 .btn-home {
     @include btn-square-a(1);
     background-color: white;
@@ -78,6 +84,9 @@ Buttons Labels Tabs
     &:hover {
         background: lighten($primary-brand, 30%);
     }
+    &.active{
+        background: lighten($primary-brand,20%);
+    }
 }
 
 .deck {
@@ -86,6 +95,12 @@ Buttons Labels Tabs
         @include rect(1, 1);
         color: $primary-text;
         outline: 1px solid lighten($primary-brand, 35%);
+        &:hover{
+            background-color: lighten($primary-brand, 40%);
+        }
+        &.active{
+            background-color: lighten($primary-brand, 30%);
+        }
     }
     @include offset-v(0, 1);
 }
@@ -155,3 +170,5 @@ Buttons Labels Tabs
     opacity: 0.1;
     pointer-events: none;
 }
+
+
