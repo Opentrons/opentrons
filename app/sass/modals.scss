@@ -31,14 +31,18 @@
             display:block;
         }
     }
-    &.mode-droptip {
-        .btn-update.droptip{
+    &.mode-source {
+        .btn-update.source{
             opacity: 1;
             cursor: pointer;
             pointer-events: all;
         }
-        img.droptip{
-            display:block;
+    }
+    &.mode-destination{
+        .btn-update.destination{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
         }
     }
 

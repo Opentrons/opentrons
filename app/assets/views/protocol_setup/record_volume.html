@@ -1,0 +1,97 @@
+<section>
+    <h2 class="title">Test and Record Pipette Volume</h2>
+    <div class="instructions">
+        instructions pending...
+    </div>
+    <div class="step">
+        <div class="move">
+            <h3 class="title">Jog X-Y-Z</h3>
+            <div class="jog">
+                <a href="#" data-axis="y" data-direction="neg" class="btn-full btn-y">Y</a>
+                <a href="#" data-axis="z" data-direction="neg" class="btn-full btn-z">Z</a>
+                <a href="#" data-axis="x" data-direction="neg" class="btn-full x">X</a>
+                <a href="#" data-axis="x" data-direction="pos" class="btn-full btn-x">X</a>
+                <a href="#" data-axis="y" data-direction="pos" class="btn-full btn-y">Y</a>
+                <a href="#" data-axis="z" data-direction="pos" class="btn-full btn-z">Z</a>
+            </div>
+            <h3 class="title">Select Increment [mm]</h3>
+            <div class="increment xyz">
+                <button data-increment="20" class="btn-full btn-group">20</button>
+                <button data-increment="10" class="btn-full btn-group">10</button>
+                <button data-increment="5" class="btn-full btn-group">5</button>
+                <button data-increment="1" class="btn-full btn-group">1</button>
+                <button data-increment="0.5" class="btn-full btn-group">0.5</button>
+                <button data-increment="0.1" class="btn-full btn-group">0.1</button>
+                <button data-increment="91" class="btn-slot">&#8596; slot-x </button>
+                <button data-increment="135" class="btn-slot">&#8597; slot-y </button>
+            </div>
+            <h3 class="title">Move to Slot</h3>
+            <div class="deck">
+                <!-- testing x,y data attributes for absolute movement, 
+            need specific coords moving forward -->
+                <button data-x="1" data-y="2" class="btn-deck">A3</a>
+                    <button class="btn-deck">B3</button>
+                    <button class="btn-deck">C3</button>
+                    <button class="btn-deck">D3</button>
+                    <button class="btn-deck">E3</button>
+                    <button class="btn-deck">A2</button>
+                    <button class="btn-deck">B2</button>
+                    <button class="btn-deck">C2</button>
+                    <button class="btn-deck">D2</button>
+                    <button class="btn-deck">E2</button>
+                    <button class="btn-deck">A1</button>
+                    <button class="btn-deck">B1</button>
+                    <button class="btn-deck">C1</button>
+                    <button class="btn-deck">D1</button>
+                    <button class="btn-deck">E1</button>
+            </div>
+        </div>
+        <!-- end move -->
+        <div class="select-container">
+            <h3 class="title">Current Position</h3>
+            <div class="coords">
+                <label class="label">X:</label>
+                <input type="text" value="0" />
+                <label class="label">Y:</label>
+                <input type="text" value="0" />
+                <label class="label">Z:</label>
+                <input type="text" value="0" />
+            </div>
+            <div class="calibration-modal mode-source">
+                <label class="position">Source</label>
+                <select id="#source">
+                    {{#each this.labware}}
+                    <!-- to-do: figure out what we need to send back to labsuite 
+            to assign a specific container to the temp volume test protocol  -->
+                    <option value="{{this.user_container_name}}">{{this.user_container_name}}</option>
+                    {{/each}}
+                    <option>Current Position</option>
+                </select>
+                <label class="well">Well:</label>
+                <input type="text" value="A1" />
+                <button class="btn-update save source">Save </button>
+                <button class="btn-update moveto">Move To </button>
+                <label class="position">Destination</label>
+                <select id="#destination">
+                    {{#each this.labware}}
+                    <!-- to-do: figure out what we need to send back to labsuite 
+            to assign a specific container to the temp volume test protocol  -->
+                    <option value="{{this.user_container_name}}">{{this.user_container_name}}</option>
+                    {{/each}}
+                    <option>Current Position</option>
+                </select>
+                <label class="well">Well:</label>
+                <input type="text" value="A1" />
+                <button class="btn-update save source">Save </button>
+                <button class="btn-update moveto">Move To </button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
+    <div id="info" class="infoModal">
+        <div> <a href="#close" title="Close" class="close">X</a>
+            <h2>Title</h2>
+        </div>
+    </div>
+</section>

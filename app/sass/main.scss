@@ -17,13 +17,13 @@ li {
     line-height: 40px;
 }
 
-a{
+a {
     cursor: pointer;
     cursor: auto;
 }
 
-input{
-    border:none;
+input {
+    border: none;
 }
 
 table {
@@ -45,6 +45,20 @@ table {
             }
         }
     }
+}
+
+select {
+    background: $primary-brand;
+    border-radius: 1px;
+    border: none;
+    -webkit-appearance: none;
+    outline: none;
+    color: white;
+    @include grid-col-air(4);
+    padding-left: $gutter-width*2;
+    background-image: url(../img/caret.png);
+    background-repeat: no-repeat;
+    background-position: 95% 50%;
 }
 
 .coords {
@@ -279,12 +293,12 @@ Pipette
 
 .save-pipette {
     @include grid-col-full(8);
-    .calibration-modal{
+    .calibration-modal {
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(10);
     }
-    .pipette-img{
+    .pipette-img {
         @include rect(3, 6);
     }
     .update {
@@ -296,8 +310,8 @@ Pipette
             text-align: center;
             line-height: 40px;
         }
-        .spacer{
-            @include rect(6,1);
+        .spacer {
+            @include rect(6, 1);
         }
     }
     .coords {
@@ -307,7 +321,39 @@ Pipette
         @include offset(1, 0);
         @include offset-v(0, 1);
     }
+}
 
+.select-container {
+    @include grid-col-full(12);
+    @include offset(1, 0);
+    .coords {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(8);
+        @include offset-v(0, 1);
+    }
+    .calibration-modal {
+        display: flex;
+        flex-wrap: wrap;
+        @include grid-col-full(12);
+        label {
+            text-align: center;
+            &.position {
+                @include grid-col-full(2);
+            }
+            &.well {
+                @include grid-col-full(1);
+            }
+        }
+        input {
+            text-align: center;
+            @include grid-col-air(1);
+            
+            outline: none;
+            
+            background: lighten($primary-brand, 40%);
+        }
+    }
 }
 
 
