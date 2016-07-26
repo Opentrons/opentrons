@@ -31,6 +31,16 @@
             display:block;
         }
     }
+    &.mode-droptip {
+        .btn-update.droptip{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.droptip{
+            display:block;
+        }
+    }
     &.mode-source {
         .btn-update.source{
             opacity: 1;
