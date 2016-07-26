@@ -32,9 +32,7 @@
             this[axis] += increment;
 
             //now move to it
-            socket.emit("move", this.current_position);  
-
-            console.log(this.current_position);          
+            socket.emit("move", this.current_position);           
         },
         setIncrementXYZ: function(n) {
             this.increment = n;
@@ -58,9 +56,19 @@
                 this.current_position[axis] = coords[axis];
                 this[axis] = coords[axis];
             }
-            console.log(this.current_position);
             socket.emit("move", this.current_position); 
+        },
+        setCurrentPosition: function(coords){
+            //called when motor control driver has completed 
+            //moving the robot to a set deckslot, or saved container position
+        },
+        moveToContainer: function(container){
+            // called when moveTo buttons are clicked for saved container
+            // may be able to bundle this with move to deck slot functionality
+            // if we are just sending strings to labsuite
         }
+
+
 
     }
 
