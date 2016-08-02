@@ -619,6 +619,7 @@ delegateEvent('click', '.deck', function(e, el) {
     console.log(siblings);
     modalController.activateIncrement(target, siblings);
     jogController.moveAbsolute(coords);
+    //to-do: update jog_controller local coords on success message from labsuite or robot
 });
 
 //Display/toggle well z pos diagrams next to save container calibrations
@@ -634,5 +635,5 @@ delegateEvent('click', '.save', function(e, el) {
     //on successful save, apply top class to move to button
     //for now this lives here as a click event.
     var mode = el.classList[2];
-    modalController.activateMove(el, mode)
+    modalController.activateMove(el, mode);
 });

@@ -5,9 +5,13 @@
         <!-- TIPRACK -->
         {{#if this.isSingle}}
         <!-- SINGLE CHANNEL + TIPRACK -->
-        Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here- {{else}}
+        Calibrate {{data.pipette}} to tip A1 of {{data.user_container_name}}. 
+        {{else}}
         <!-- MULTI CHANNEL + TIPRACK -->
-        Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here- {{/if}} {{else}}
+        Calibrate {{data.pipette}} 
+        to the first row of {{data.user_container_name}}. 
+        {{/if}} 
+        {{else}}
         <!-- !TIPRACK -->
         {{#if this.isContainer}} {{#if this.isSingle}}
         <!-- SINGLE CHANNEL + CONTAINER -->
@@ -113,22 +117,23 @@
     <nav><a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a></nav>
     <div id="info" class="infoModal">
         <div> <a href="#close" title="Close" class="close">X</a>
-            <h2>Title</h2> {{#if this.isTipRack}} {{#if this.isSingle}}
-            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the - need wording for pipette and tip alignment here-</p>
-            {{else}}
-            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the - need wording for pipette and tip alignment here-</p>
-            {{/if}} {{else}} {{#if this.isContainer}} {{#if this.isSingle}}
-            <!-- if single -->
-            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} position A1, with the bottom of the tip(s) level with the top of the well.</p>
-            {{else}}
-            <!-- if multi -->
-            <p>Calibrate {{data.pipette}} to {{data.user_container_name}} row 1, with the bottom of the tip(s) level with the top of the well.</p>
-            {{/if}}
+            <h2>{{data.container_name}} Calibration</h2> 
+            
+            {{#if this.isTipRack}} 
+            <!-- TIPRACKS -->
+            <p>Jog the pipette over to the [tip rack] so that the bottom of the pipette is sitting several millimeters inside the tip[s].  Use the .1 and .5 mm increments to zero in on the tips.  Use the Pickup Tip button to make sure that your pipette is at the right height - it should be far enough down in the tip to pick them up with enough force to make a proper seal, but not too far down where it will jam into the tip rack. </p>
+            {{else}} 
+            {{#if this.isContainer}} 
+            <!-- CONTAINERS -->
+            <p>Before calibrating any non tip rack containers, make sure your have a tip on your pipette.  The “Top” position is when the bottom of the tip is level with the top of the container, while the “Bottom” position is when the bottom of the tip is just above the bottom of the well.  For {{data.user_container_name}}, calibrate to the center of the A1 well.
+            </p>
+      
             <h3 class="title">Front View</h3>
-            <img class="diagram" src="../../img/{{this.image_front}}" /> {{else}}
+            <img class="diagram" src="../../img/{{this.image_front}}" /> 
+            {{else}}
             <!-- Trash or scale -->
             <p>Calibrate over the center of the container you choose to use.</p>
-            {{/if}} {{/if}}
+             {{/if}} {{/if}}
         </div>
     </div>
 </section>

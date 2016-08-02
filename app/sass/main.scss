@@ -380,7 +380,7 @@ Pop-up Modal Styles
 }
 
 .infoModal > div {
-    @include rect(12, 12);
+    @include rect(16, 12);
     position: relative;
     margin: 10% auto;
     padding: 15px;
@@ -389,10 +389,11 @@ Pop-up Modal Styles
         @include grid-col-full(6);
         @include offset(3, 3);
     }
-    p {
-        @include grid-col-full(8);
+    p, ul li {
+        @include grid-col-full(12);
         @include offset(2, 2);
         text-align: left;
+        line-height: $baseline;
     }
 }
 
