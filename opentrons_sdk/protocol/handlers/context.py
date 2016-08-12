@@ -131,7 +131,7 @@ class ContextHandler(ProtocolHandler):
         if bottom is not None:
             pos_cal['bottom'] = bottom
 
-    def calibrate_instrument(self, axis, top=None, bottom=None, blowout=None, droptip=None,
+    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None,
                              bottom=None):
         cal = self.get_axis_calibration(axis)
         if '_instrument' not in cal:
