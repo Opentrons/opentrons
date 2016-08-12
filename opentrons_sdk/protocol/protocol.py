@@ -5,6 +5,7 @@ from opentrons_sdk.util.log import debug
 from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
 
 import copy
+import uuid
 
 
 class Protocol():
