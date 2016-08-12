@@ -136,7 +136,7 @@ class Pipette():
         return self.size.lower()
 
 
-class Pipette_P2(Pipette):
+class Pipette_P2_SINGLE(Pipette):
     size = 'P2'
     min_vol = 0.0
     max_vol = 2
@@ -148,7 +148,7 @@ class Pipette_P10_SINGLE(Pipette):
     max_vol = 10
 
 
-class Pipette_P20(Pipette):
+class Pipette_P20_SINGLE(Pipette):
     size = 'P20'
     min_vol = 2
     max_vol = 20
@@ -160,7 +160,7 @@ class Pipette_P200_SINGLE(Pipette):
     max_vol = 200
 
 
-class Pipette_P1000(Pipette):
+class Pipette_P1000_SINGLE(Pipette):
     size = 'P1000'
     min_vol = 200
     max_vol = 1000

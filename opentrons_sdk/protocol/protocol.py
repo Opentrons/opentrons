@@ -66,6 +66,99 @@ class Protocol():
             axis, top=top, blowout=blowout, droptip=droptip
         )
 
+    def calibration_checklist(self):
+
+        checklist = [
+            {
+                'task_type' : 'select_protocol',
+                'steps' : []
+            },
+            {
+                'task_type' : 'check_protocol',
+                'steps' : []
+            },
+            {
+                'task_type' : 'calibrate',
+                'steps' : self.deck_checklist('A') + self.deck_checklist('B')
+            },
+            {
+                'task_type' : 'calibrate_pipette',
+                'steps' : self.pipette_checklist('A') + self.pipette_checklist('B')
+            },
+            {
+                'task_type' : 'record_volume',
+                'steps' : []
+            },
+            {
+                'task_type' : 'review_calibration',
+                'steps' : []
+            }
+        ]
+
+        return checklist
+
+    def deck_checklist(self, axis):
+
+        deck_checklist = []
+
+        axis_calibrations = self._context_handler.get_axis_calibration(axis)
+
+        for slot in self._containers:
+
+            slot_data = {
+                'required': True,
+                'completed': False,
+                'user_container_name': '',
+                'container_name': self._containers[slot],
+                'pipette': self._instruments[axis],
+                'axis': axis,
+                'deck_position': humanize_position(slot)
+            }
+
+            if slot in axis_calibrations:
+                slot_data['completed'] = True
+                for key in axis_calibrations[slot]:
+                    slot_data[key] = axis_calibrations[slot][key]
+
+            deck_checklist.append({
+                'id': str(uuid.uuid4()),
+                'data': slot_data
+            })
+
+        return deck_checklist
+
+    def pipette_checklist(self, axis):
+
+        pipette_checklist = []
+
+        pipette_data = {
+            'required': True,
+            'pipette': self._instruments[axis],
+            'axis': axis,
+            'test_volume': 200
+        }
+
+        fully_calibrated = True
+        pipette_calibrations = self._context_handler.get_axis_calibration(axis).get('_instrument', None)
+        if pipette_calibrations:
+            plunger_pos = ['top','blowout','droptip']
+            for ppos in plunger_pos:
+                if pipette_calibrations.get(ppos):
+                    pipette_data[ppos] = pipette_calibrations[ppos]
+                else:
+                    fully_calibrated = False
+        else:
+            fully_calibrated = False
+
+        pipette_data['completed'] = fully_calibrated
+
+        pipette_checklist.append({
+            'id': str(uuid.uuid4()),
+            'data': pipette_data
+        })
+
+        return pipette_checklist
+
     def add_command(self, command, **kwargs):
         self._run_in_context_handler(command, **kwargs)
         self._commands.append({command: kwargs})
