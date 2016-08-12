@@ -17,6 +17,7 @@ class Pipette():
     max_vol = 10
 
     _top = None  # Top of the plunger.
+    _bottom = None
     _blowout = None  # Bottom of the plunger (all liquid expelled).
     _droptip = None  # Point where the screw on the axis hits the droptip.
 
@@ -29,7 +30,7 @@ class Pipette():
 
     _tip_plunge = 6  # Distance from calibrated top of tiprack to pickup tip.
 
-    def calibrate(self, top=None, blowout=None, droptip=None, axis='A'):
+    def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, axis='A'):
         """Set calibration values for the pipette plunger.
 
         This can be called multiple times as the user sets each value,
@@ -40,6 +41,9 @@ class Pipette():
 
         top : int
            Touching but not engaging the plunger.
+
+        bottom: int
+            Soft-stop
 
         blowout : int
             Plunger has been pushed down enough to expell all liquids.
@@ -55,6 +59,8 @@ class Pipette():
         """
         if top is not None:
             self._top = top
+        if bottom is not None:
+            self._bottom = bottom
         if blowout is not None:
             self._blowout = blowout
         if droptip is not None:
@@ -68,15 +74,15 @@ class Pipette():
         Translates the passed liquid volume to absolute coordinates
         on the axis associated with this pipette.
 
-        Calibration of the top and blowout positions are necessary for
+        Calibration of the top and bottom positions are necessary for
         these calculations to work.
         """
-        if self._blowout is None or self._top is None:
+        if self._bottom is None or self._top is None:
             raise ValueError(
                 "Pipette {} not calibrated.".format(self.axis)
             )
         percent = self._volume_percentage(volume)
-        travel = self._blowout - self._top
+        travel = self._bottom - self._top
         distance = travel * percent
         return self._top + distance
 
@@ -126,6 +132,10 @@ class Pipette():
     @property
     def blowout(self):
         return self._blowout
+
+    @property
+    def bottom(self):
+        return self._bottom
 
     @property
     def droptip(self):

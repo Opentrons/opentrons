@@ -1,5 +1,5 @@
 from opentrons_sdk.labware import containers, deck, pipettes
-from opentrons_sdk.labware.grid import normalize_position
+from opentrons_sdk.labware.grid import normalize_position, humanize_position
 import opentrons_sdk.drivers.motor as motor_drivers
 from opentrons_sdk.util.log import debug
 from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
@@ -63,7 +63,7 @@ class Protocol():
     def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None,
                              bottom=None):
         self._context_handler.calibrate_instrument(
-            axis, top=top, blowout=blowout, droptip=droptip
+            axis, top=top, bottom=bottom, blowout=blowout, droptip=droptip
         )
 
     def calibration_checklist(self):
@@ -141,7 +141,7 @@ class Protocol():
         fully_calibrated = True
         pipette_calibrations = self._context_handler.get_axis_calibration(axis).get('_instrument', None)
         if pipette_calibrations:
-            plunger_pos = ['top','blowout','droptip']
+            plunger_pos = ['top','bottom','blowout','droptip']
             for ppos in plunger_pos:
                 if pipette_calibrations.get(ppos):
                     pipette_data[ppos] = pipette_calibrations[ppos]
