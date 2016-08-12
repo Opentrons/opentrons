@@ -2,6 +2,7 @@ import sys
 
 
 def load_instrument(name):
+    name = name.replace('.', '_')
     return getattr(
         sys.modules[__name__],
         'Pipette_{}'.format(name.upper())
@@ -141,7 +142,7 @@ class Pipette_P2(Pipette):
     max_vol = 2
 
 
-class Pipette_P10(Pipette):
+class Pipette_P10_SINGLE(Pipette):
     size = 'P10'
     min_vol = 0.5
     max_vol = 10
@@ -153,7 +154,7 @@ class Pipette_P20(Pipette):
     max_vol = 20
 
 
-class Pipette_P200(Pipette):
+class Pipette_P200_SINGLE(Pipette):
     size = 'P200'
     min_vol = 20
     max_vol = 200

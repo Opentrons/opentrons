@@ -1,2 +1,26 @@
 __pycache__
 *.pyc
+
+
+# Distribution / packaging
+.Python
+env/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# pyCharm
+.idea
+logs/*
+
+.python-version
