@@ -1,7 +1,7 @@
 from pathlib import Path
 from flask import Flask, request, render_template
 import flask
-from labsuite.protocol import Protocol
+from opentrons_sdk.protocol import Protocol
 from flask_socketio import SocketIO, emit
 import logging
 
