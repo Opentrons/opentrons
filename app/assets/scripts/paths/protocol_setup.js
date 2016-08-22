@@ -125,10 +125,11 @@ var stubData = [{
                     required: true,
                     completed: true,
                     error: 'undefined labware line 67',
+                    //Provide lines of code with error as well?
                     support_docs: [{
                         text: 'Error Support Documentation',
                         type: 'link',
-                        url: 'http://www.animalplanet.com/tv-shows/my-cat-from-hell/'
+                        url:'HELPURL'
                     }]
                 }
             }
@@ -230,7 +231,7 @@ var stubData = [{
                 completed: false,
                 pipette: "p200 Multi Channel",
                 axis: "a",
-                test_volume: 200,
+                max_volume: 200, //needs to overwrite with user input for max volume calculations.
                 top: 0,
                 bottom: 0,
                 blowout: 0,
@@ -327,7 +328,7 @@ var stubData = [{
                     parent_id: 'uniquekey9',
                     pipette: "p200 Multi Channel",
                     axis: "a",
-                    test_volume: 200,
+                    max_volume: 196, //this would be the max volume inputed by user after weighing on scale.
                     top: 0,
                     bottom: 0,
                     blowout: 0,
