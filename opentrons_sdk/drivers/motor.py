@@ -79,9 +79,6 @@ class CNCDriver(object):
     """
     connection = None
 
-    _wait_for_stat = False
-    _stat_command = None
-
     def __init__(self, inches=False, simulate=False):
         self.simulated = simulate
         self.command_queue = []
@@ -91,16 +88,6 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         log.debug("Serial", "Connected to {}".format(device or port))
-        self.wait_for_stat()
-
-    def wait_for_stat(self, stat=None):
-        if self.DEBUG_ON:
-            log.debug("Serial", "Turning on debug mode.")
-            log.debug("Serial", "Awaiting stat responses.")
-            self.send_command(self.DEBUG_ON)
-            self._wait_for_stat = True
-            if stat is not None:
-                self._stat_command = stat
 
     def disconnect(self):
         self.connection.close()
@@ -136,30 +123,24 @@ class CNCDriver(object):
             return
         if self.connection.isOpen():
             self.connection.write(str(data).encode())
-            if self._wait_for_stat is True and self._stat_command:
-                waiting = True
-                count = 0
-                while waiting:
-                    count = count + 1
-                    out = self.connection.readline().decode().strip()
-                    log.debug("Serial", "Read: {}".format(out))
-                    if out == self._stat_command:
-                        waiting = False
+            count = 0
+            while True:
+                count = count + 1
+                out = self.readline_from_serial()
+                if out and out.startswith('ok'):
+                    log.debug(
+                        "Serial",
+                        "Waited {} lines for \"ok\".".format(count)
+                    )
+                    break
+                else:
+                    if count == 1 or count % 10 == 0:
+                        # Don't log all the time; gets spammy.
                         log.debug(
                             "Serial",
-                            "Waited {} lines for stat.".format(count)
+                            "Waiting {} lines for \"ok\"."
+                            .format(count)
                         )
-                    else:
-                        if count == 1 or count % 10 == 0:
-                            # Don't log all the time; gets spammy.
-                            log.debug(
-                                "Serial",
-                                "Waiting {} lines for stat ({})."
-                                .format(count, self._stat_command)
-                            )
-            else:
-                out = self.connection.readline()
-                log.debug("Serial", "Read: {}".format(out))
             return out
         elif max_tries > 0:
             time.sleep(try_interval)
@@ -171,6 +152,15 @@ class CNCDriver(object):
 
     def read_from_serial(self, size=16):
         return self.connection.read(size)
+
+    def readline_from_serial(self):
+        msg = ''
+        if self.connection.isOpen():
+            # serial.readline() returns an empty string if it times out
+            msg = self.connection.readline().strip()
+            if msg:
+                log.debug("Serial", "Read: {}".format(msg))
+        return msg
 
     def move(self, x=None, y=None, z=None, speed=None, absolute=True, **kwargs):
 
@@ -243,8 +233,6 @@ class OpenTrons(CNCDriver):
     DEBUG_ON = 'M62'
     DEBUG_OFF = 'M63'
 
-    _stat_command = '{"stat":0}'
-
 
 class MoveLogger(CNCDriver):
 
@@ -263,7 +251,6 @@ class MoveLogger(CNCDriver):
     def __init__(self):
         self.movements = []
         self.motor = OpenTrons()
-        self.motor._wait_for_stat = False
         self.motor.connection = GCodeLogger()
 
     def move(self, **kwargs):
