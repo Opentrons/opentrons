@@ -5,7 +5,7 @@ from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 class SerialTestCase(unittest.TestCase):
 
     def assertLastCommand(self, *commands):
-        lastCommand = self.motor.connection.write_buffer[-1]
+        lastCommand = self.motor.connection.write_buffer[-1].decode("utf-8") 
         foundOne = False
         for command in commands:
             if lastCommand.startswith(command):
@@ -24,7 +24,7 @@ class SerialTestCase(unittest.TestCase):
         self.assertTrue(foundOne, msg=msg)
 
     def assertLastArguments(self, *arguments):
-        lastCommand = self.motor.connection.write_buffer[-1]
+        lastCommand = self.motor.connection.write_buffer[-1].decode("utf-8") 
         for arg in arguments:
             msg = "Expected last command arguments to include " + \
                   "\"" + arg + "\" but got \"" + lastCommand.strip() +\
