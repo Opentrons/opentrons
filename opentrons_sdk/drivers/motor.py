@@ -141,6 +141,9 @@ class CNCDriver(object):
                             "Waiting {} lines for \"ok\"."
                             .format(count)
                         )
+
+            # TODO (andy):  here we should poll smoothie with `M114` 
+            #               until it's coordinates match what was sent
             return out
         elif max_tries > 0:
             time.sleep(try_interval)
