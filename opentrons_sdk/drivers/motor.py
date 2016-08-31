@@ -87,7 +87,7 @@ class CNCDriver(object):
         self.command_queue = []
 
     def connect(self, device=None, port=None):
-        self.connection = serial.Serial(port=device or port)
+        self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=0.1)
         self.connection.close()
         self.connection.open()
         log.debug("Serial", "Connected to {}".format(device or port))
