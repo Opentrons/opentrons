@@ -39,7 +39,7 @@ class OpenTronsTest(SerialTestCase):
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
         # and serial handshakes to be tested
-        self.smoothie_connected = True
+        self.smoothie_connected = False
 
         self.motor = OpenTrons()
 
@@ -125,7 +125,7 @@ class OpenTronsTest(SerialTestCase):
             self.assertTrue(success)
         else:
             self.assertLastCommand('G999')
-            self.assertLastArguments('X1', 'Y2', 'Z3')
+            self.assertLastArguments('x1', 'y2', 'z3')
 
     def test_wait(self):
         success = self.motor.wait(1.234)
