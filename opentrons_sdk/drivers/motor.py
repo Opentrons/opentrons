@@ -1,5 +1,8 @@
-import serial
+import json
 import time
+
+import serial
+
 from opentrons_sdk.util import log
 
 
@@ -39,7 +42,7 @@ class GCodeLogger():
         return None
 
     def readline(self):
-        return 'ok'
+        return b'ok'
 
 
 class CNCDriver(object):
@@ -86,13 +89,20 @@ class CNCDriver(object):
         self.command_queue = []
 
     def connect(self, device=None, port=None):
-        self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=0.1)
-        self.connection.close()
-        self.connection.open()
-        log.debug("Serial", "Connected to {}".format(device or port))
+        try:
+            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=0.1)
+            self.connection.close()
+            self.connection.open()
+            log.debug("Serial", "Connected to {}".format(device or port))
+            return True
+        except serial.SerialException as e:
+            log.debug("Serial", "Error connecting to {}".format(device or port))
+            log.error("Serial",e)
+            return False
 
     def disconnect(self):
-        self.connection.close()
+        if self.connection.isOpen():
+            self.connection.close()
 
     def send_command(self, command, **kwargs):
         """
@@ -195,22 +205,65 @@ class CNCDriver(object):
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
-        return self.send_command(code, **args)
+        res = self.send_command(code, **args)
+        return res == b'ok'
+
+    def wait_for_arrival(self):
+        arrived = False
+        while not arrived:
+            time.sleep(0.03) # don't over work the serial port
+            coords = self.get_position()
+            for axis in coords.get('target', {}):
+                if coords['current'][axis] == coords['target'][axis]:
+                    arrived = True
+                else:
+                    arrived = False
+                    break
+        return arrived
 
     def home(self):
-        return self.send_command(self.HOME)
+        res = self.send_command(self.HOME)
+        if res == b'ok':
+            # the axis aren't necessarily set to 0.0 after homing, so force it
+            return self.set_position(x=0, y=0, z=0, a=0, b=0)
+        return False
 
-    def wait(self, ms):
-        return self.send_command(self.DWELL, p=ms)
+    def wait(self, sec):
+        ms = int((sec % 1.0) * 1000)
+        s = int(sec)
+        res = self.send_command(self.DWELL, s=s, p=ms)
+        return res == b'ok'
 
     def halt(self):
-        return self.send_command(self.HALT)
+        res = self.send_command(self.HALT)
+        return res == b'ok Emergency Stop Requested - reset or M999 required to continue'
 
     def resume(self):
-        return self.send_command(self.CALM_DOWN)
+        res = self.send_command(self.CALM_DOWN)
+        return res == b'ok'
 
     def set_position(self, **kwargs):
-        return self.move(absolute=True, **kwargs)
+        res = self.send_command(self.SET_POSITION, **kwargs)
+        return res == b'ok'
+
+    def get_position(self):
+        res = self.send_command(self.GET_POSITION)
+        res = res.decode('utf-8')[3:] # remove the "ok "
+        coords = {}
+        try:
+            response_dict = json.loads(res).get(self.GET_POSITION)
+            # the lowercase axis are the "real-time" values
+            # the uppercase axis are the "target" values
+            coords = {'target':{}, 'current':{}}
+            for letter in 'xyzab':
+                coords['current'][letter]  = response_dict.get(letter,0)
+                coords['target'][letter]  = response_dict.get(letter.upper(),0)
+
+        except json.decoder.JSONDecodeError as e:
+            log.debug("Serial", "Error parsing JSON string:")
+            log.debug("Serial", res)
+
+        return coords
 
     def execute_queue(self):
         queue = self.flush_queue()
