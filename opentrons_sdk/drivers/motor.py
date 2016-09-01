@@ -52,6 +52,10 @@ class CNCDriver(object):
     DWELL = 'G4'
     HOME = 'G28'
     SET_POSITION = 'G92'
+    GET_POSITION = 'M114'
+    GET_ENDSTOPS = 'M119'
+    GET_SPEED = 'M199'
+    ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
     HALT = 'M112'
@@ -107,12 +111,14 @@ class CNCDriver(object):
 
         command = command + " " + ' '.join(args) + "\r\n"
 
+        response = ''
+
         if self.simulated:
             self.command_queue.append(command)
         else:
-            self.write_to_serial(command)
+            response = self.write_to_serial(command)
 
-        return command
+        return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         log.debug("Serial", "Write: {}".format(str(data).encode()))
@@ -136,20 +142,17 @@ class CNCDriver(object):
                         # Don't log all the time; gets spammy.
                         log.debug(
                             "Serial",
-                            "Waiting {} lines for \"ok\"."
-                            .format(count)
+                            "Waiting {} lines for \"ok\".".format(count)
                         )
-
-            # TODO (andy):  here we should poll smoothie with `M114` 
-            #               until it's coordinates match what was sent
             return out
         elif max_tries > 0:
             time.sleep(try_interval)
-            self.write_to_serial(
+            return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
         else:
             log.error("Serial", "Cannot connect to serial port.")
+            return ''
 
     def read_from_serial(self, size=16):
         return self.connection.read(size)
@@ -192,6 +195,9 @@ class CNCDriver(object):
         log.debug("MotorDriver", "Moving: {}".format(args))
 
         self.send_command(code, **args)
+
+        # TODO (andy):  here we should poll with `M114` 
+        #               until it's coordinates match what was sent
 
     def home(self):
         self.send_command(self.HOME)
