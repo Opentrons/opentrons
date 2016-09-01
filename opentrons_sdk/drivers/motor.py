@@ -99,7 +99,8 @@ class CNCDriver(object):
         Sends a GCode command.  Keyword arguments will be automatically
         converted to GCode syntax.
 
-        Returns a string represending the raw command sent.
+        Returns a string with the Smoothie board's response
+        Empty string if no response from Smoothie
 
         >>> send_command(self.MOVE, x=100 y=100)
         G0 X100 Y100
@@ -131,10 +132,10 @@ class CNCDriver(object):
             while True:
                 count = count + 1
                 out = self.readline_from_serial()
-                if out and out.startswith('ok'):
+                if out:
                     log.debug(
                         "Serial",
-                        "Waited {} lines for \"ok\".".format(count)
+                        "Waited {} lines for response {}.".format(count, out)
                     )
                     break
                 else:
@@ -142,7 +143,7 @@ class CNCDriver(object):
                         # Don't log all the time; gets spammy.
                         log.debug(
                             "Serial",
-                            "Waiting {} lines for \"ok\".".format(count)
+                            "Waiting {} lines for response.".format(count)
                         )
             return out
         elif max_tries > 0:
@@ -152,15 +153,15 @@ class CNCDriver(object):
             )
         else:
             log.error("Serial", "Cannot connect to serial port.")
-            return ''
+            return b''
 
     def read_from_serial(self, size=16):
         return self.connection.read(size)
 
     def readline_from_serial(self):
-        msg = ''
+        msg = b''
         if self.connection.isOpen():
-            # serial.readline() returns an empty string if it times out
+            # serial.readline() returns an empty byte string if it times out
             msg = self.connection.readline().strip()
             if msg:
                 log.debug("Serial", "Read: {}".format(msg))
@@ -194,25 +195,22 @@ class CNCDriver(object):
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
-        self.send_command(code, **args)
-
-        # TODO (andy):  here we should poll with `M114` 
-        #               until it's coordinates match what was sent
+        return self.send_command(code, **args)
 
     def home(self):
-        self.send_command(self.HOME)
+        return self.send_command(self.HOME)
 
     def wait(self, ms):
-        self.send_command(self.DWELL, p=ms)
+        return self.send_command(self.DWELL, p=ms)
 
     def halt(self):
-        self.send_command(self.HALT)
+        return self.send_command(self.HALT)
 
     def resume(self):
-        self.send_command(self.CALM_DOWN)
+        return self.send_command(self.CALM_DOWN)
 
     def set_position(self, **kwargs):
-        self.move(absolute=True, **kwargs)
+        return self.move(absolute=True, **kwargs)
 
     def execute_queue(self):
         queue = self.flush_queue()
