@@ -35,46 +35,86 @@ class SerialTestCase(unittest.TestCase):
 class OpenTronsTest(SerialTestCase):
 
     def setUp(self):
+
+        self.connected = True
+
         self.motor = OpenTrons()
-        self.motor.connection = GCodeLogger()
+
+        if self.connected:
+            self.motor.connect('/dev/tty.usbmodem1421')
+        else:
+            self.motor.connection = GCodeLogger()
+
+    def tearDown(self):
+        self.motor.disconnect()
 
     def test_home(self):
-        self.motor.home()
-        self.assertLastCommand('G28')
+        res = self.motor.home()
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G28')
 
     def test_move_x(self):
-        self.motor.move(x=1)
-        self.assertLastCommand('G0', 'G1')
-        self.assertLastArguments('X1')
+        res = self.motor.move(x=100)
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G0', 'G1')
+            self.assertLastArguments('X100')
 
     def test_move_y(self):
-        self.motor.move(y=1)
-        self.assertLastCommand('G0', 'G1')
-        self.assertLastArguments('Y1')
+        res = self.motor.move(y=100)
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G0', 'G1')
+            self.assertLastArguments('Y100')
 
     def test_move_z(self):
-        self.motor.move(z=1)
-        self.assertLastCommand('G0', 'G1')
-        self.assertLastArguments('Z1')
+        res = self.motor.move(z=30)
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G0', 'G1')
+            self.assertLastArguments('Z30')
 
     def test_send_command(self):
-        self.motor.send_command('G999 X1 Y1 Z1')
-        self.assertLastCommand('G999')
-        self.assertLastArguments('X1', 'Y1', 'Z1')
+        res = self.motor.send_command('G999 X1 Y1 Z1')
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G999')
+            self.assertLastArguments('X1', 'Y1', 'Z1')
 
     def test_send_command_with_kwargs(self):
-        self.motor.send_command('G999', x=1, y=2, z=3)
-        self.assertLastCommand('G999')
-        self.assertLastArguments('X1', 'Y2', 'Z3')
+        res = self.motor.send_command('G999', x=1, y=2, z=3)
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G999')
+            self.assertLastArguments('X1', 'Y2', 'Z3')
 
     def test_wait(self):
-        self.motor.wait(1)
-        self.assertLastCommand('G4')
+        res = self.motor.wait(1)
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('G4')
 
     def test_halt(self):
-        self.motor.halt()
-        self.assertLastCommand('M112')
+        res = self.motor.halt()
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('M112')
+
+        # must resume before any other commands can be processed
+        self.motor.resume()
 
     def test_resume(self):
-        self.motor.resume()
-        self.assertLastCommand('M999')
+        res = self.motor.resume()
+        if self.connected:
+            self.assertTrue(res.startswith(b'ok'))
+        else:
+            self.assertLastCommand('M999')
