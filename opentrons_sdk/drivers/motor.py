@@ -118,7 +118,7 @@ class CNCDriver(object):
 
         args = []
         for key in kwargs:
-            args.append("%s%d" % (key.upper(), kwargs[key]))
+            args.append("%s%d" % (key, kwargs[key]))
 
         command = command + " " + ' '.join(args) + "\r\n"
 
@@ -194,11 +194,11 @@ class CNCDriver(object):
         them as anonymous parameters when calling this method.
         """
         if x is not None:
-            args['x'] = x
+            args['X'] = x
         if y is not None:
-            args['y'] = y
+            args['Y'] = y
         if z is not None:
-            args['z'] = z
+            args['Z'] = z
 
         for k in kwargs:
             args[k.upper()] = kwargs[k]
@@ -221,8 +221,8 @@ class CNCDriver(object):
                     break
         return arrived
 
-    def home(self):
-        res = self.send_command(self.HOME)
+    def home(self, **kwargs):
+        res = self.send_command(self.HOME, **kwargs)
         if res == b'ok':
             # the axis aren't necessarily set to 0.0 values after homing, so force it
             return self.set_position(x=0, y=0, z=0, a=0, b=0)
@@ -232,7 +232,7 @@ class CNCDriver(object):
     def wait(self, sec):
         ms = int((sec % 1.0) * 1000)
         s = int(sec)
-        res = self.send_command(self.DWELL, s=s, p=ms)
+        res = self.send_command(self.DWELL, S=s, P=ms)
         return res == b'ok'
 
     def halt(self):
@@ -244,7 +244,10 @@ class CNCDriver(object):
         return res == b'ok'
 
     def set_position(self, **kwargs):
-        res = self.send_command(self.SET_POSITION, **kwargs)
+        uppercase_args = {}
+        for key in kwargs:
+            uppercase_args[key.upper()] = kwargs[key]
+        res = self.send_command(self.SET_POSITION, **uppercase_args)
         return res == b'ok'
 
     def get_position(self):
