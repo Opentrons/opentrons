@@ -48,8 +48,7 @@ class CNCDriver(object):
     This object outputs raw GCode commands to perform high-level tasks.
     """
 
-    RAPID_MOVE = 'G0'
-    MOVE = 'G1'
+    MOVE = 'G0'
     DWELL = 'G4'
     HOME = 'G28'
     SET_POSITION = 'G92'
@@ -64,8 +63,7 @@ class CNCDriver(object):
     UNITS_TO_INCHES = 'G20'
     UNITS_TO_MILLIMETERS = 'G22'
 
-    DEBUG_ON = None
-    DEBUG_OFF = None
+    VERSION = None
 
     """
     If simulated is set to true, all GCode commands will be saved to an
@@ -167,10 +165,7 @@ class CNCDriver(object):
 
     def move(self, x=None, y=None, z=None, speed=None, absolute=True, **kwargs):
 
-        if speed:
-            code = self.MOVE
-        else:
-            code = self.RAPID_MOVE
+        code = self.MOVE
 
         if absolute:
             self.send_command(self.ABSOLUTE_POSITIONING)
@@ -233,8 +228,7 @@ class CNCDriver(object):
 
 class OpenTrons(CNCDriver):
 
-    DEBUG_ON = 'M62'
-    DEBUG_OFF = 'M63'
+    VERSION = 'version'
 
 
 class MoveLogger(CNCDriver):
