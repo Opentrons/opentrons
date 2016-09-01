@@ -208,10 +208,10 @@ class CNCDriver(object):
         res = self.send_command(code, **args)
         return res == b'ok'
 
-    def wait_for_arrival(self):
+    def wait_for_arrival(self, try_interval=0.2):
         arrived = False
         while not arrived:
-            time.sleep(0.03) # don't over work the serial port
+            time.sleep(try_interval)
             coords = self.get_position()
             for axis in coords.get('target', {}):
                 if coords['current'][axis] == coords['target'][axis]:
@@ -224,9 +224,10 @@ class CNCDriver(object):
     def home(self):
         res = self.send_command(self.HOME)
         if res == b'ok':
-            # the axis aren't necessarily set to 0.0 after homing, so force it
+            # the axis aren't necessarily set to 0.0 values after homing, so force it
             return self.set_position(x=0, y=0, z=0, a=0, b=0)
-        return False
+        else:
+            return False
 
     def wait(self, sec):
         ms = int((sec % 1.0) * 1000)
@@ -248,15 +249,15 @@ class CNCDriver(object):
 
     def get_position(self):
         res = self.send_command(self.GET_POSITION)
-        res = res.decode('utf-8')[3:] # remove the "ok "
+        res = res.decode('utf-8')[3:] # remove the "ok " from beginning of response
         coords = {}
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
-            # the lowercase axis are the "real-time" values
-            # the uppercase axis are the "target" values
             coords = {'target':{}, 'current':{}}
             for letter in 'xyzab':
+                # the lowercase axis are the "real-time" values
                 coords['current'][letter]  = response_dict.get(letter,0)
+                # the uppercase axis are the "target" values
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
 
         except json.decoder.JSONDecodeError as e:
