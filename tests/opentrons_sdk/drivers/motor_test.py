@@ -85,7 +85,7 @@ class OpenTronsTest(SerialTestCase):
         else:
             self.assertLastCommand('G28XY',index=-2)
             self.assertLastCommand('G92')
-            self.assertLastArguments('X0', 'Y0', 'Z0', 'A0', 'B0')
+            self.assertLastArguments('X0', 'Y0')
 
         success = self.motor.home('ba')
         if self.smoothie_connected:
@@ -93,7 +93,7 @@ class OpenTronsTest(SerialTestCase):
         else:
             self.assertLastCommand('G28AB',index=-2)
             self.assertLastCommand('G92')
-            self.assertLastArguments('X0', 'Y0', 'Z0', 'A0', 'B0')
+            self.assertLastArguments('A0', 'B0')
 
     def test_move_x(self):
         success = self.motor.move(x=100)

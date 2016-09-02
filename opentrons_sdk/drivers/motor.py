@@ -237,7 +237,10 @@ class CNCDriver(object):
         res = self.send_command(home_command + axis_homed)
         if res == b'ok':
             # the axis aren't necessarily set to 0.0 values after homing, so force it
-            return self.set_position(x=0, y=0, z=0, a=0, b=0)
+            pos_args = {}
+            for l in axis_homed:
+                pos_args[l] = 0
+            return self.set_position(**pos_args)
         else:
             return False
 
