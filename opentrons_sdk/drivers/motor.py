@@ -210,19 +210,31 @@ class CNCDriver(object):
 
     def wait_for_arrival(self, try_interval=0.2):
         arrived = False
+        coords = self.get_position()
         while not arrived:
             time.sleep(try_interval)
+            prev_coords = dict(coords)
             coords = self.get_position()
             for axis in coords.get('target', {}):
-                if coords['current'][axis] == coords['target'][axis]:
-                    arrived = True
+                axis_diff = coords['current'][axis] - coords['target'][axis]
+                # smoothie not guaranteed to be EXACTLY where it's target is
+                # but could about +=0.05 mm from the target coordinate
+                if abs(axis_diff) < 0.1:
+                    if coords['current'][axis] == prev_coords['current'][axis]:
+                        arrived = True
                 else:
                     arrived = False
                     break
         return arrived
 
-    def home(self, **kwargs):
-        res = self.send_command(self.HOME, **kwargs)
+    def home(self, *axis):
+        home_command = self.HOME
+        axis_homed = ''
+        for a in axis:
+            ax = ''.join(sorted(a)).upper()
+            if ax in 'ABXYZ':
+                axis_homed += ax
+        res = self.send_command(home_command + axis_homed)
         if res == b'ok':
             # the axis aren't necessarily set to 0.0 values after homing, so force it
             return self.set_position(x=0, y=0, z=0, a=0, b=0)
