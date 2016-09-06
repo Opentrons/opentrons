@@ -218,7 +218,7 @@ class CNCDriver(object):
             for axis in coords.get('target', {}):
                 axis_diff = coords['current'][axis] - coords['target'][axis]
                 # smoothie not guaranteed to be EXACTLY where it's target is
-                # but could about +=0.05 mm from the target coordinate
+                # but could about +-0.05 mm from the target coordinate
                 if abs(axis_diff) < 0.1:
                     if coords['current'][axis] == prev_coords['current'][axis]:
                         arrived = True
