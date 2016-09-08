@@ -1,7 +1,14 @@
 from pathlib import Path
 from flask import Flask, request, render_template
 import flask
-from opentrons_sdk.protocol import Protocol
+try:
+    from opentrons_sdk.protocol import Protocol
+except Exception as e:
+    print(e)
+    import traceback
+    traceback.print_exc()
+    import pdb; pdb.set_trace()
+    import time; time.sleep(1000)
 from flask_socketio import SocketIO, emit
 import logging
 
