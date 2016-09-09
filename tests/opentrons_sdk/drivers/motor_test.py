@@ -39,7 +39,7 @@ class OpenTronsTest(SerialTestCase):
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
         # and serial handshakes to be tested
-        self.smoothie_connected = False
+        self.smoothie_connected = True
 
         self.motor = OpenTrons()
 
