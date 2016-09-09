@@ -1,3 +1,4 @@
+import sys
 import unittest
 from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 
