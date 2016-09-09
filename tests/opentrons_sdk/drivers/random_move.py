@@ -1,5 +1,7 @@
-from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 import random
+import sys
+
+from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 
 motor = OpenTrons()
 motor.connect(sys.argv[1])
