@@ -7,7 +7,6 @@ motor = OpenTrons()
 if not motor.connect(sys.argv[1]):
 	print('failed connecting to port {}'.format(sys.argv[1]))
 	sys.exit()
-motor.resume()
 
 try:
 	while True:
