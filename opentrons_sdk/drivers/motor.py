@@ -101,7 +101,7 @@ class CNCDriver(object):
             self.readline_from_serial()
             self.readline_from_serial()
 
-            return self.halt()
+            return self.resume()
 
         except serial.SerialException as e:
             log.debug("Serial", "Error connecting to {}".format(device or port))

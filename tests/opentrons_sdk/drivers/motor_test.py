@@ -54,7 +54,6 @@ class OpenTronsTest(SerialTestCase):
             self.smoothie_connected = True
             success = self.motor.connect(myport)
             self.assertTrue(success)
-            self.motor.resume()
         else:
             self.motor.connection = GCodeLogger()
 
