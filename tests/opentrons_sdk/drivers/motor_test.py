@@ -1,5 +1,7 @@
+import argparse
 import sys
 import unittest
+
 from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 
 
@@ -46,9 +48,11 @@ class OpenTronsTest(SerialTestCase):
 
         self.smoothie_connected = False
 
-        if sys.argv[1]:
+        myport = '/dev/tty.usbmodem1421'
+
+        if myport:
             self.smoothie_connected = True
-            success = self.motor.connect(sys.argv[1])
+            success = self.motor.connect(myport)
             self.assertTrue(success)
             self.motor.resume()
         else:

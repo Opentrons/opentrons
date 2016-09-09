@@ -4,7 +4,9 @@ import sys
 from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 
 motor = OpenTrons()
-motor.connect(sys.argv[1])
+if not motor.connect(sys.argv[1]):
+	print('failed connecting to port {}'.format(sys.argv[1]))
+	sys.exit()
 motor.resume()
 
 try:
