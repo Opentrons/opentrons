@@ -39,12 +39,13 @@ class OpenTronsTest(SerialTestCase):
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
         # and serial handshakes to be tested
-        self.smoothie_connected = False
+        self.smoothie_connected = True
 
         self.motor = OpenTrons()
 
         if self.smoothie_connected:
-            self.motor.connect('/dev/tty.usbmodem1421')
+            success = self.motor.connect('/dev/tty.usbmodem1421')
+            self.assertTrue(success)
             self.motor.resume()
         else:
             self.motor.connection = GCodeLogger()

@@ -93,8 +93,15 @@ class CNCDriver(object):
             self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=0.1)
             self.connection.close()
             self.connection.open()
+
             log.debug("Serial", "Connected to {}".format(device or port))
-            return True
+
+            time.sleep(0.5)
+            self.readline_from_serial()
+            self.readline_from_serial()
+
+            return self.halt()
+
         except serial.SerialException as e:
             log.debug("Serial", "Error connecting to {}".format(device or port))
             log.error("Serial",e)
@@ -138,24 +145,7 @@ class CNCDriver(object):
             return
         if self.connection.isOpen():
             self.connection.write(str(data).encode())
-            count = 0
-            while True:
-                count = count + 1
-                out = self.readline_from_serial()
-                if out:
-                    log.debug(
-                        "Serial",
-                        "Waited {} lines for response {}.".format(count, out)
-                    )
-                    break
-                else:
-                    if count == 1 or count % 10 == 0:
-                        # Don't log all the time; gets spammy.
-                        log.debug(
-                            "Serial",
-                            "Waiting {} lines for response.".format(count)
-                        )
-            return out
+            return self.wait_for_response()
         elif max_tries > 0:
             time.sleep(try_interval)
             return self.write_to_serial(
@@ -164,6 +154,27 @@ class CNCDriver(object):
         else:
             log.error("Serial", "Cannot connect to serial port.")
             return b''
+
+    def wait_for_response(self):
+        count = 0
+        out = b''
+        while True:
+            count = count + 1
+            out = self.readline_from_serial()
+            if out:
+                log.debug(
+                    "Serial",
+                    "Waited {} lines for response {}.".format(count, out)
+                )
+                break
+            else:
+                if count == 1 or count % 10 == 0:
+                    # Don't log all the time; gets spammy.
+                    log.debug(
+                        "Serial",
+                        "Waiting {} lines for response.".format(count)
+                    )
+        return out
 
     def read_from_serial(self, size=16):
         return self.connection.read(size)
