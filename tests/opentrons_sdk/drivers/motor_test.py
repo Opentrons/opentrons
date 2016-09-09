@@ -48,7 +48,7 @@ class OpenTronsTest(SerialTestCase):
 
         self.smoothie_connected = False
 
-        myport = '/dev/tty.usbmodem1421'
+        myport = ''
 
         if myport:
             self.smoothie_connected = True
