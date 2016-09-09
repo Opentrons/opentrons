@@ -97,9 +97,9 @@ class CNCDriver(object):
 
             log.debug("Serial", "Connected to {}".format(device or port))
 
-            time.sleep(0.5)
-            self.readline_from_serial()
-            self.readline_from_serial()
+            for i in range(10):
+                time.sleep(0.05)
+                self.readline_from_serial()
 
             return self.resume()
 
