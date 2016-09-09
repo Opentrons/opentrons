@@ -2,7 +2,7 @@ from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 import random
 
 motor = OpenTrons()
-motor.connect('/dev/tty.usbmodem1421')
+motor.connect(sys.argv[1])
 motor.resume()
 
 try:

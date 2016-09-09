@@ -43,8 +43,11 @@ class OpenTronsTest(SerialTestCase):
 
         self.motor = OpenTrons()
 
-        if self.smoothie_connected:
-            success = self.motor.connect('/dev/tty.usbmodem1421')
+        self.smoothie_connected = False
+
+        if sys.argv[1]:
+            self.smoothie_connected = True
+            success = self.motor.connect(sys.argv[1])
             self.assertTrue(success)
             self.motor.resume()
         else:
