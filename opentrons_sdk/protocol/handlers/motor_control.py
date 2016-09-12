@@ -14,6 +14,9 @@ class MotorControlHandler(ProtocolHandler):
     def set_driver(self, driver):
         self._driver = driver
 
+    def list_serial_ports(self):
+        return self._driver.list_serial_ports()
+
     def connect(self, port):
         """
         Connects the MotorControlHandler to a serial port.
