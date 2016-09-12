@@ -22,7 +22,7 @@ class MotorControlHandler(ProtocolHandler):
         drivers are replaced with the serial driver.
         """
         self.set_driver(motor_drivers.OpenTrons())
-        self._driver.connect(device=port)
+        return self._driver.connect(device=port)
 
     def home(self, axis):
         return self._driver.home(axis)
