@@ -24,6 +24,9 @@ class MotorControlHandler(ProtocolHandler):
         self.set_driver(motor_drivers.OpenTrons())
         self._driver.connect(device=port)
 
+    def home(self, axis):
+        return self._driver.home(axis)
+
     def simulate(self):
         self._driver = motor_drivers.MoveLogger()
         return self._driver
