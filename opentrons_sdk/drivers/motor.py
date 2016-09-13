@@ -162,7 +162,7 @@ class CNCDriver(object):
 
         args = []
         for key in kwargs:
-            args.append("%s%d" % (key, kwargs[key]))
+            args.append('{0}{1}'.format(key, kwargs[key]))
 
         command = command + " " + ' '.join(args) + "\r\n"
 
