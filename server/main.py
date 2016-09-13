@@ -15,7 +15,18 @@ import logging
 protocol = Protocol()
 motor_handler = protocol.attach_motor()
 
-app = Flask(__name__,static_url_path = "", static_folder = "static")
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    static_folder = os.path.join(sys._MEIPASS, 'static')
+    print(static_folder)
+    app = Flask(__name__,
+                static_url_path = "",
+                static_folder=static_folder,
+                template_folder=template_folder
+                )
+else:
+    app = Flask(__name__, static_url_path = "", static_folder = "static")
+
 app.jinja_env.autoescape = False
 socketio = SocketIO(app, async_mode='gevent')
 
