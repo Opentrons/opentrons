@@ -122,14 +122,19 @@ class CNCDriver(object):
 
     def connect(self, device=None, port=None):
         try:
-            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=0.1)
+
+            timeout = 0.1
+
+            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=timeout)
             self.connection.close()
             self.connection.open()
 
             log.debug("Serial", "Connected to {}".format(device or port))
 
-            for i in range(10):
-                time.sleep(0.05)
+            # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
+            # so just always swallow it ourselves
+            one_second = int(1.0 / timeout)
+            for i in range(one_second):
                 self.readline_from_serial()
 
             return self.resume()
@@ -140,7 +145,7 @@ class CNCDriver(object):
             return False
 
     def disconnect(self):
-        if self.connection.isOpen():
+        if self.connection and self.connection.isOpen():
             self.connection.close()
 
     def send_command(self, command, **kwargs):
@@ -208,9 +213,6 @@ class CNCDriver(object):
                     )
         return out
 
-    def read_from_serial(self, size=16):
-        return self.connection.read(size)
-
     def readline_from_serial(self):
         msg = b''
         if self.connection.isOpen():
@@ -218,6 +220,12 @@ class CNCDriver(object):
             msg = self.connection.readline().strip()
             if msg:
                 log.debug("Serial", "Read: {}".format(msg))
+
+        # detect if it hit a home switch
+        if b'!!' in msg or b'limit' in msg:
+            # TODO (andy): allow this to bubble up so UI is notified
+            log.debug('Serial', 'home switch hit')
+
         return msg
 
     def move(self, x=None, y=None, z=None, speed=None, absolute=True, **kwargs):
