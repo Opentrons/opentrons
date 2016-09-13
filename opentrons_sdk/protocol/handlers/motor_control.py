@@ -28,7 +28,11 @@ class MotorControlHandler(ProtocolHandler):
         return self._driver.connect(device=port)
 
     def home(self, axis):
-        return self._driver.home(axis)
+
+        if self._driver.resume():
+            return self._driver.home(axis)
+        else:
+            return False
 
     def simulate(self):
         self._driver = motor_drivers.MoveLogger()
