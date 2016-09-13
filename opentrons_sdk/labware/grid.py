@@ -208,6 +208,7 @@ class GridContainer():
         w = (self._custom_wells or {}).get((col, row)) or {}
         offset_x = w.get('x') or (self.col_spacing or self.spacing) * col
         offset_y = w.get('y') or (self.row_spacing or self.spacing) * row
+        offset_y *= -1
         return (offset_x, offset_y)
 
     def get_child(self, position):
