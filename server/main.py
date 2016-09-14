@@ -1,6 +1,7 @@
 import logging
 import os
-
+import sys
+sys.path.insert(0, os.path.abspath('..'))
 
 import flask
 from flask import Flask, render_template
@@ -17,9 +18,6 @@ motor_handler = protocol.attach_motor()
 
 TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
-
-print(STATIC_FOLDER)
-print(os.path.join(get_frozen_root() or 'server', 'assets'))
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
@@ -47,7 +45,7 @@ def protocol_setup(path):
 @app.route('/scripts/paths/<path:filename>')
 def page_script_loader(filename):
     """ Packs up page-specific code into callable closures. """
-    root = get_frozen_root() or 'server'
+    root = get_frozen_root() or app.root_path
     page_scripts_root = os.path.join(root, 'assets', 'scripts', 'paths')
     path = filename.replace('.js', '').lower()
     with open(os.path.join(page_scripts_root, filename)) as code:
@@ -58,7 +56,7 @@ def page_script_loader(filename):
 def view_script_loader(filename):
     """ Packs up page-specific code into callable closures. """
     path = filename.replace('.js', '').lower()
-    root = get_frozen_root() or 'server'
+    root = get_frozen_root() or app.root_path
     page_scripts_root = os.path.join(root, 'assets', 'pages', 'paths')
     with open(os.path.join(page_scripts_root, filename)) as code:
         print(code)

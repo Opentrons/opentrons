@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from helpers import get_assets
+from server.helpers import get_assets
 
 
 class HelpersTestCase(unittest.TestCase):
