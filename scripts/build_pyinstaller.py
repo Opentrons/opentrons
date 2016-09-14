@@ -55,9 +55,9 @@ def get_os():
 def get_spec_coll_name():
     os_type = get_os()
     if os_type == 'win':
-        return "otone_client.exe"
+        return "otone_server.exe"
     elif os_type == 'mac':
-        return "otone_client"
+        return "otone_server"
     raise SystemExit(
         'Unable to determine pyinstaller.spec COLL name for OS: {}'.format(
             os_type
