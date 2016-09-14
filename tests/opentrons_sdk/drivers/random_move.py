@@ -54,9 +54,6 @@ try:
 		motor.home('x','y')
 
 		send_move(**ranges)
-		if not success:
-			motor.resume()
-			motor.home()
 
 		for i in range(random.randint(5,20)):
 			rand_move()
