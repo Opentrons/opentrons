@@ -21,6 +21,7 @@ import os
 import yaml
 import inspect
 import json
+from pkg_resources import resource_filename
 
 from opentrons_sdk import labware
 from opentrons_sdk.labware.microplates import Microplate
@@ -64,7 +65,7 @@ def _get_container_filepath(name):
     Given a name such as "microplate/24", this function will return the full
     file path to that container file.
     """
-    base = os.path.join(os.getcwd(), 'config/containers')
+    base = os.path.join(__file__, '..', '..', 'config', 'containers')
     path = name.strip().split('/')
     fname = path.pop() + '.yml'
     path = os.path.join(base, os.path.join(*path or []))
@@ -89,10 +90,14 @@ def load_custom_containers(folder=None):
     If a container name is reused, the old container will be
     replaced.
     """
+
     # Default to local library configuration.
     if not folder:
-        modpath = os.path.dirname(labware.__file__)
-        folder = os.path.join(modpath, '..', 'config', 'containers')
+        return
+        # modpath = os.path.dirname(labware.__file__)
+        # folder = os.path.join(modpath, '..', 'config', 'containers')
+
+
     files = []
     # Get all YAML files from the specified directory, parse then,
     # and send the data to add_custom_container.
@@ -434,4 +439,5 @@ def convert_legacy_container(container):
 
 
 _load_default_containers()
-load_custom_containers()
+containers_path = resource_filename("opentrons_sdk.config", "containers")
+load_custom_containers(containers_path)
