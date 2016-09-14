@@ -1,3 +1,4 @@
+import datetime
 import random
 import sys
 
@@ -7,6 +8,10 @@ motor = OpenTrons()
 if not motor.connect(sys.argv[1]):
 	print('failed connecting to port {}'.format(sys.argv[1]))
 	sys.exit()
+
+def date_print(line):
+	time_string = str(datetime.datetime.now().time()).split('.')[0]
+	print(('{0}: {1}'.format(time_string, line))
 
 ranges = {
 	'x' : 250,
@@ -28,14 +33,17 @@ def rand_move(scale=1.0):
 		if random.random() < 0.3:
 			kwargs[axis] = random.random() * (ranges[axis] * scale)
 			kwargs[axis] += (ranges[axis]/2) * (1.0-scale)
+			kwargs[axis] = round(kwargs[axis], 3)
 
 	if bool(kwargs):
-		print('-->  {}'.format(kwargs))
+		date_print('-->  {}'.format(kwargs))
 		motor.move(**kwargs)
 
 try:
 	while True:
-		print('\nhoming')
+
+		date_print('\nhoming')
+
 		motor.home('abz')
 		motor.home('x','y')
 
@@ -46,8 +54,8 @@ try:
 			for i in range(random.randint(5,20)):
 				rand_move(0.025)
 
-		print('waiting for arrival...')
+		date_print('waiting for arrival...')
 		motor.wait_for_arrival()
 except Exception as e:
-	print(e)
+	date_print(e)
 	motor.disconnect()
