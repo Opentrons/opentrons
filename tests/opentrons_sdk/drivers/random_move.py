@@ -11,7 +11,7 @@ if not motor.connect(sys.argv[1]):
 
 def date_print(line):
 	time_string = str(datetime.datetime.now().time()).split('.')[0]
-	print(('{0}: {1}'.format(time_string, line))
+	print(('{0}: {1}'.format(time_string, line)))
 
 ranges = {
 	'x' : 250,
