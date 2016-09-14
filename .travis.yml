@@ -1,0 +1,31 @@
+# We are using the iOS build system to create Mac OS X python builds
+language: objective-c
+osx_image: beta-xcode6.3
+
+before_install:
+  # OS extra info
+  - uname -a
+  - python --version
+  - python -c "import struct; print(struct.calcsize('P') * 8)"
+
+  # Update brew
+  - brew update
+
+  # Install Python 2 and 3 with pip and check versions
+  - brew tap drolando/homebrew-deadsnakes
+  - brew install python34
+  - brew link --overwrite python34
+  - python3.4 --version
+  - python3.4 -c "import struct; print(struct.calcsize('P') * 8)"
+  - python --version
+  - echo $PATH
+
+  # Install Python packages (built with Python 3)
+  - pip3.4 install pyinstaller
+  - pyinstaller --version
+  - pip3.4 install -r requirements.txt
+  - python3.4 -m unittest
+
+install:
+  - python3.4 scripts/build_pyinstaller
+  - tree app/backend-dist
