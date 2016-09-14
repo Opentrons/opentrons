@@ -69,7 +69,7 @@ def view_script_loader(filename):
 
 @app.route('/scripts/<path:filename>')
 def script_loader(filename):
-    root = get_frozen_root() or 'server'
+    root = get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'assets', 'scripts')
     return flask.send_from_directory(scripts_root_path, filename)
 
@@ -79,8 +79,7 @@ def get_assets(kind, ext, content=False):
     assets_path = os.path.join(root, 'assets')
     p = Path(os.path.join(assets_path, kind))
     for path in p.glob('**/*.{}'.format(ext)):
-        name = str(path).replace('assets/'+kind+'/', '')
-        # name = str(path).replace(os.path.join('assets/', kind, '/'), '')
+        name = str(path.relative_to(assets_path))
         if content:
             with open(str(path)) as data:
                 assets[name] = data.read()
@@ -92,15 +91,14 @@ def get_assets(kind, ext, content=False):
 def inject_assets():
     views = get_assets('views', 'html', content=True)
     named_views = {}
-    scripts = []
     for k, v in views.items():
         k = k.replace('.html', '')
         k = k.replace('/', '.')
         named_views[k] = v
-    for s in sorted(get_assets('scripts', 'js')):
-        print(s)
-        scripts.append('scripts/'+s)
 
+    scripts = list(sorted(get_assets('scripts', 'js')))
+
+    print('scripts', scripts)
     return dict(
         scripts=scripts,
         views=named_views.items()
