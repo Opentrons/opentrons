@@ -74,7 +74,7 @@ def _get_container_filepath(name):
     fpath = os.path.join(path, fname)
 
 
-def load_custom_containers(folder=None):
+def load_custom_containers(folder):
     """
     Loads YAML files from the directory specified, or the default
     configuration directory for this module.
@@ -90,13 +90,6 @@ def load_custom_containers(folder=None):
     If a container name is reused, the old container will be
     replaced.
     """
-
-    # Default to local library configuration.
-    if not folder:
-        return
-        # modpath = os.path.dirname(labware.__file__)
-        # folder = os.path.join(modpath, '..', 'config', 'containers')
-
 
     files = []
     # Get all YAML files from the specified directory, parse then,
