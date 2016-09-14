@@ -26,7 +26,7 @@ def get_assets(root, kind, ext, content=False):
     for path in p.glob('**/*.{}'.format(ext)):
         name = str(path.relative_to(assets_path))
         if content:
-            with open(str(path)) as data:
+            with open(str(path), encoding='utf8') as data:
                 assets[name] = data.read()
         else:
             assets[name] = ''
