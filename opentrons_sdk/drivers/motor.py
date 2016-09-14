@@ -90,6 +90,8 @@ class CNCDriver(object):
         self.simulated = simulate
         self.command_queue = []
 
+        self.errored = False
+
     def list_serial_ports(self):
         """ Lists serial port names
 
@@ -225,6 +227,7 @@ class CNCDriver(object):
         if b'!!' in msg or b'limit' in msg:
             # TODO (andy): allow this to bubble up so UI is notified
             log.debug('Serial', 'home switch hit')
+            self.errored = True
 
         return msg
 
@@ -307,7 +310,11 @@ class CNCDriver(object):
 
     def resume(self):
         res = self.send_command(self.CALM_DOWN)
-        return res == b'ok'
+        if res == b'ok':
+            self.errored = False
+            return True
+        else:
+            return False
 
     def set_position(self, **kwargs):
         uppercase_args = {}

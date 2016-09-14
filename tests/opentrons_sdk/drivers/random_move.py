@@ -36,8 +36,14 @@ def rand_move(scale=1.0):
 			kwargs[axis] = round(kwargs[axis], 3)
 
 	if bool(kwargs):
-		date_print('-->  {}'.format(kwargs))
-		motor.move(**kwargs)
+		send_move(**kwargs)
+
+def send_move(**kwargs):
+	date_print('-->  {}'.format(kwargs))
+	while not motor.move(**kwargs) and motor.errored:
+		date_print('move command errored')
+		motor.resume()
+		motor.home()
 
 try:
 	while True:
@@ -47,7 +53,10 @@ try:
 		motor.home('abz')
 		motor.home('x','y')
 
-		motor.move(**ranges)
+		send_move(**ranges)
+		if not success:
+			motor.resume()
+			motor.home()
 
 		for i in range(random.randint(5,20)):
 			rand_move()
