@@ -65,7 +65,7 @@ def _get_container_filepath(name):
     Given a name such as "microplate/24", this function will return the full
     file path to that container file.
     """
-    base = os.path.join(__file__, '..', '..', 'config', 'containers')
+    base = resource_filename("opentrons_sdk.config", "containers")
     path = name.strip().split('/')
     fname = path.pop() + '.yml'
     path = os.path.join(base, os.path.join(*path or []))
