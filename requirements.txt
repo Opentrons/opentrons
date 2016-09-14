@@ -5,7 +5,7 @@ greenlet==0.4.10
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
--e git+git@github.com:OpenTrons/opentrons_sdk.git@4d04d9dd8f53a580bfe6b9c0d1a61f812b296b44#egg=opentrons_sdk
+-e git+git@github.com:OpenTrons/opentrons_sdk.git@20160908-122400-pyinstaller#egg=opentrons_sdk
 pyinstaller==3.1.1
 pyserial==3.1.1
 python-engineio==0.9.2
