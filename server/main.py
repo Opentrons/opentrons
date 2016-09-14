@@ -1,21 +1,19 @@
 import logging
-from pathlib import Path
 import os
-import sys
 
 
 import flask
-from flask import Flask, request, render_template
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+
 from opentrons_sdk.protocol import Protocol
-from flask_socketio import SocketIO, emit
+
+from server.helpers import get_assets, get_frozen_root
 
 
 protocol = Protocol()
 motor_handler = protocol.attach_motor()
 
-
-def get_frozen_root():
-    return sys._MEIPASS if getattr(sys, 'frozen', False) else None
 
 TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
@@ -66,39 +64,25 @@ def view_script_loader(filename):
         print(code)
         return "window.PageHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
 
-
 @app.route('/scripts/<path:filename>')
 def script_loader(filename):
     root = get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'assets', 'scripts')
     return flask.send_from_directory(scripts_root_path, filename)
 
-def get_assets(kind, ext, content=False):
-    assets = {}
-    root = get_frozen_root() or 'server'
-    assets_path = os.path.join(root, 'assets')
-    p = Path(os.path.join(assets_path, kind))
-    for path in p.glob('**/*.{}'.format(ext)):
-        name = str(path.relative_to(assets_path))
-        if content:
-            with open(str(path)) as data:
-                assets[name] = data.read()
-        else:
-            assets[name] = ''
-    return assets
-
 @app.context_processor
 def inject_assets():
-    views = get_assets('views', 'html', content=True)
+    root = get_frozen_root() or app.root_path
+
+    views = get_assets(root, 'views', 'html', content=True)
     named_views = {}
     for k, v in views.items():
         k = k.replace('.html', '')
         k = k.replace('/', '.')
         named_views[k] = v
 
-    scripts = list(sorted(get_assets('scripts', 'js')))
+    scripts = list(sorted(get_assets(root, 'scripts', 'js')))
 
-    print('scripts', scripts)
     return dict(
         scripts=scripts,
         views=named_views.items()
