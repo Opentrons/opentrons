@@ -49,7 +49,6 @@ def page_script_loader(filename):
     page_scripts_root = os.path.join(root, 'assets', 'scripts', 'paths')
     path = filename.replace('.js', '').lower()
     with open(os.path.join(page_scripts_root, filename)) as code:
-        print(code)
         return "window.PathHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
 
 @app.route('/scripts/pages/<path:filename>')
@@ -59,7 +58,6 @@ def view_script_loader(filename):
     root = get_frozen_root() or app.root_path
     page_scripts_root = os.path.join(root, 'assets', 'pages', 'paths')
     with open(os.path.join(page_scripts_root, filename)) as code:
-        print(code)
         return "window.PageHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
 
 @app.route('/scripts/<path:filename>')
