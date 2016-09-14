@@ -1,31 +1,32 @@
-from pathlib import Path
-from flask import Flask, request, render_template
-import flask
-try:
-    from opentrons_sdk.protocol import Protocol
-except Exception as e:
-    print(e)
-    import traceback
-    traceback.print_exc()
-    import pdb; pdb.set_trace()
-    import time; time.sleep(1000)
-from flask_socketio import SocketIO, emit
 import logging
+from pathlib import Path
+import os
+import sys
+
+
+import flask
+from flask import Flask, request, render_template
+from opentrons_sdk.protocol import Protocol
+from flask_socketio import SocketIO, emit
+
 
 protocol = Protocol()
 motor_handler = protocol.attach_motor()
 
-if getattr(sys, 'frozen', False):
-    template_folder = os.path.join(sys._MEIPASS, 'templates')
-    static_folder = os.path.join(sys._MEIPASS, 'static')
-    print(static_folder)
-    app = Flask(__name__,
-                static_url_path = "",
-                static_folder=static_folder,
-                template_folder=template_folder
-                )
-else:
-    app = Flask(__name__, static_url_path = "", static_folder = "static")
+
+def get_frozen_root():
+    return sys._MEIPASS if getattr(sys, 'frozen', False) else None
+
+TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
+STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
+
+print(STATIC_FOLDER)
+print(os.path.join(get_frozen_root() or 'server', 'assets'))
+
+app = Flask(__name__,
+            static_folder=STATIC_FOLDER,
+            template_folder=TEMPLATES_FOLDER
+            )
 
 app.jinja_env.autoescape = False
 socketio = SocketIO(app, async_mode='gevent')
@@ -48,27 +49,38 @@ def protocol_setup(path):
 @app.route('/scripts/paths/<path:filename>')
 def page_script_loader(filename):
     """ Packs up page-specific code into callable closures. """
+    root = get_frozen_root() or 'server'
+    page_scripts_root = os.path.join(root, 'assets', 'scripts', 'paths')
     path = filename.replace('.js', '').lower()
-    with open('assets/scripts/paths/'+filename) as code:
+    with open(os.path.join(page_scripts_root, filename)) as code:
+        print(code)
         return "window.PathHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
 
 @app.route('/scripts/pages/<path:filename>')
 def view_script_loader(filename):
     """ Packs up page-specific code into callable closures. """
     path = filename.replace('.js', '').lower()
-    with open('assets/scripts/pages/'+filename) as code:
+    root = get_frozen_root() or 'server'
+    page_scripts_root = os.path.join(root, 'assets', 'pages', 'paths')
+    with open(os.path.join(page_scripts_root, filename)) as code:
+        print(code)
         return "window.PageHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
 
 
 @app.route('/scripts/<path:filename>')
 def script_loader(filename):
-    return flask.send_from_directory('assets/scripts', filename)
+    root = get_frozen_root() or 'server'
+    scripts_root_path = os.path.join(root, 'assets', 'scripts')
+    return flask.send_from_directory(scripts_root_path, filename)
 
 def get_assets(kind, ext, content=False):
     assets = {}
-    p = Path('./assets/{}'.format(kind))
+    root = get_frozen_root() or 'server'
+    assets_path = os.path.join(root, 'assets')
+    p = Path(os.path.join(assets_path, kind))
     for path in p.glob('**/*.{}'.format(ext)):
         name = str(path).replace('assets/'+kind+'/', '')
+        # name = str(path).replace(os.path.join('assets/', kind, '/'), '')
         if content:
             with open(str(path)) as data:
                 assets[name] = data.read()
@@ -86,7 +98,9 @@ def inject_assets():
         k = k.replace('/', '.')
         named_views[k] = v
     for s in sorted(get_assets('scripts', 'js')):
+        print(s)
         scripts.append('scripts/'+s)
+
     return dict(
         scripts=scripts,
         views=named_views.items()
@@ -115,8 +129,7 @@ logging.basicConfig(
     datefmt='%d-%m-%y %H:%M:%S'
 )
 
-
 if __name__ == "__main__":
-    app.debug = True
-    #app.run(host='0.0.0.0', port=5000)
+    # app.debug = True
+    # app.run(host='0.0.0.0', port=5000)
     socketio.run(app, debug=True, port=5000)
