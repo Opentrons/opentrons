@@ -1,6 +1,7 @@
 import datetime
 import random
 import sys
+import time
 
 from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
 
@@ -40,12 +41,16 @@ def rand_move(scale=1.0):
 
 def send_move(**kwargs):
 	date_print('-->  {}'.format(kwargs))
-	motor.move(**kwargs):
+	sent_time = time.time()
+	motor.move(**kwargs)
+	time_diff = round(time.time() - sent_time, 2)
+	if time_diff > 1:
+		date_print('waited {} seconds'.format(time_diff))
 
 try:
 	while True:
 
-		date_print('\nhoming')
+		date_print('homing')
 
 		motor.home('abz')
 		motor.home('x','y')
