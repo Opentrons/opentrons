@@ -4,9 +4,12 @@ const electron = require('electron')
 const {app, BrowserWindow} = electron
 
 const {ServerManager} = require('./servermanager.js')
+const {getLogger} = require('./logging.js')
+
 
 
 let serverManager = new ServerManager()
+const mainLogger = getLogger('electron-main')
 let mainWindow
 
 
@@ -20,7 +23,17 @@ function createWindow () {
   })
 }
 
-app.on('ready', () => {serverManager.start(); setTimeout(createWindow, 2000)})
+function startUp() {
+  serverManager.start();
+  setTimeout(createWindow, 2000)
+  process.on('uncaughtException', function(error) {
+    if (process.listeners("uncaughtException").length > 1) {
+      main.info(error);
+    }
+  });
+}
+
+app.on('ready', startUp)
 
 app.on('quit', function(){
     serverManager.shutdown();
