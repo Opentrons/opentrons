@@ -343,7 +343,8 @@ class CNCDriver(object):
                 # the uppercase axis are the "target" values
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
 
-        except json.decoder.JSONDecodeError as e:
+        
+        except (ValueError, json.decoder.JSONDecodeError) as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
