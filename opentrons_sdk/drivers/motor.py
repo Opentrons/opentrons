@@ -90,8 +90,6 @@ class CNCDriver(object):
         self.simulated = simulate
         self.command_queue = []
 
-        self.errored = False
-
     def list_serial_ports(self):
         """ Lists serial port names
 
@@ -135,9 +133,7 @@ class CNCDriver(object):
 
             # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
             # so just always swallow it ourselves
-            one_second = int(1.0 / timeout)
-            for i in range(one_second):
-                self.readline_from_serial()
+            self.flush_port()
 
             return self.resume()
 
@@ -215,6 +211,11 @@ class CNCDriver(object):
                     )
         return out
 
+    def flush_port(self):
+        time.sleep(0.1)
+        while self.readline_from_serial():
+            time.sleep(0.1)
+
     def readline_from_serial(self):
         msg = b''
         if self.connection.isOpen():
@@ -227,7 +228,9 @@ class CNCDriver(object):
         if b'!!' in msg or b'limit' in msg:
             # TODO (andy): allow this to bubble up so UI is notified
             log.debug('Serial', 'home switch hit')
-            self.errored = True
+            self.flush_port()
+            self.resume()
+            raise RuntimeWarning('limit switch hit')
 
         return msg
 
@@ -271,8 +274,12 @@ class CNCDriver(object):
             coords = self.get_position()
             for axis in coords.get('target', {}):
                 axis_diff = coords['current'][axis] - coords['target'][axis]
-                # smoothie not guaranteed to be EXACTLY where it's target is
-                # but could about +-0.05 mm from the target coordinate
+
+                """
+                smoothie not guaranteed to be EXACTLY where it's target is
+                but seems to be about +-0.05 mm from the target coordinate
+                the robot's physical resolution is found with:  1mm / config_steps_per_mm 
+                """
                 if abs(axis_diff) < 0.1:
                     if coords['current'][axis] == prev_coords['current'][axis]:
                         arrived = True
@@ -310,11 +317,7 @@ class CNCDriver(object):
 
     def resume(self):
         res = self.send_command(self.CALM_DOWN)
-        if res == b'ok':
-            self.errored = False
-            return True
-        else:
-            return False
+        return res == b'ok'
 
     def set_position(self, **kwargs):
         uppercase_args = {}

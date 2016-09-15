@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 import unittest
 
 from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
@@ -48,7 +49,7 @@ class OpenTronsTest(SerialTestCase):
 
         self.smoothie_connected = False
 
-        myport = ''
+        myport = '/dev/tty.usbmodem1421'
 
         if myport:
             self.smoothie_connected = True
@@ -102,6 +103,17 @@ class OpenTronsTest(SerialTestCase):
             self.assertLastCommand('G28AB',index=-2)
             self.assertLastCommand('G92')
             self.assertLastArguments('A0', 'B0')
+
+    def test_limit_hit_exception(self):
+        if self.smoothie_connected:
+            self.motor.home()
+            try:
+                self.motor.move(x=-100)
+                self.motor.wait_for_arrival()
+            except RuntimeWarning as e:
+                self.assertEqual(str(RuntimeWarning('limit switch hit')), str(e))
+
+            self.motor.home()
 
     def test_move_x(self):
         success = self.motor.move(x=100)
