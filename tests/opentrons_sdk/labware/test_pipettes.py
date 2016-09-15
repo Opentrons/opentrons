@@ -40,7 +40,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_plunge_depth(self):
         """Calculates plunger depth."""
-        self.pipette.calibrate(top=15, blowout=115)
+        self.pipette.calibrate(top=15, bottom=115)
         depth = self.pipette.plunge_depth(1)
         self.assertEqual(depth, 25)
 
