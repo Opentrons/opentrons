@@ -20,8 +20,7 @@ function createWindow () {
   })
 }
 
-app.on('ready', createWindow)
-app.on('ready', () => serverManager.start())
+app.on('ready', () => {serverManager.start(); setTimeout(createWindow, 2000)})
 
 app.on('quit', function(){
     serverManager.shutdown();

@@ -5,11 +5,6 @@ const path = require('path')
 const {app} = electron
 
 
-
-/**
- * Starts otone_client backend executable; kills existing process if any
- */
-
 class ServerManager {
   constructor() {
     this.serverProcess = null;
