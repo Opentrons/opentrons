@@ -3,10 +3,10 @@ const child_process = require('child_process')
 const electron = require('electron')
 const {app, BrowserWindow} = electron
 
-const startServer = require('./processmanager.js').startServer
+const {ServerManager} = require('./servermanager.js')
 
-typeof startServer
 
+let serverManager = new ServerManager()
 let mainWindow
 
 
@@ -21,4 +21,8 @@ function createWindow () {
 }
 
 app.on('ready', createWindow)
-app.on('ready', startServer)
+app.on('ready', () => serverManager.start())
+
+app.on('quit', function(){
+    serverManager.shutdown();
+});
