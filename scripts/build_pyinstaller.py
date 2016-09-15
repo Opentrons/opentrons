@@ -130,10 +130,10 @@ def generate_static_css():
     os.chdir(server_dir)
     compass_process = subprocess.Popen(['compass', 'compile'])
     compass_process.communicate()
-    if compass_process.returncode != 0:
-        print(script_tab + "ERROR: Compass returned with exit code: %s" %
-              compass_process.returncode)
-        return False
+    # if compass_process.returncode != 0:
+    #     print(script_tab + "ERROR: Compass returned with exit code: %s" %
+    #           compass_process.returncode)
+    #     return False
     os.chdir(old_cwd)
     return True
 
