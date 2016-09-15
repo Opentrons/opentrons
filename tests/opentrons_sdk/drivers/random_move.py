@@ -35,6 +35,8 @@ def rand_move(scale=1.0):
 			kwargs[axis] = random.random() * (ranges[axis] * scale)
 			kwargs[axis] += (ranges[axis]/2) * (1.0-scale)
 			kwargs[axis] = round(kwargs[axis], 3)
+			if abs(kwargs[axis]) < 0.5:
+				kwargs[axis] *= 2.0
 
 	if bool(kwargs):
 		send_move(**kwargs)
@@ -47,27 +49,27 @@ def send_move(**kwargs):
 	if time_diff > 1:
 		date_print('waited {} seconds'.format(time_diff))
 
-try:
-	while True:
+while True:
+
+	try:
+		motor.reset_port()
 
 		date_print('homing')
 
 		motor.home('abz')
 		motor.home('x','y')
 
-		try:
-			send_move(**ranges)
+		send_move(**ranges)
 
+		for i in range(random.randint(5,20)):
+			rand_move()
 			for i in range(random.randint(5,20)):
-				rand_move()
-				for i in range(random.randint(5,20)):
-					rand_move(0.025)
+				rand_move(0.025)
 
-			date_print('waiting for arrival...')
-			motor.wait_for_arrival()
-		except RuntimeWarning as e:
-			date_print(e)
-
-except Exception as e:
-	date_print(e)
-	motor.disconnect()
+		date_print('waiting for arrival...')
+		motor.wait_for_arrival()
+	except RuntimeWarning as e:
+		date_print(e)
+	except Exception as e:
+		date_print('Exception: {}'.format(e))
+		motor.disconnect()

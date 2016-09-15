@@ -90,6 +90,8 @@ class CNCDriver(object):
         self.simulated = simulate
         self.command_queue = []
 
+        self.serial_timeout = 0.1
+
     def list_serial_ports(self):
         """ Lists serial port names
 
@@ -123,17 +125,13 @@ class CNCDriver(object):
     def connect(self, device=None, port=None):
         try:
 
-            timeout = 0.1
-
-            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=timeout)
-            self.connection.close()
-            self.connection.open()
-
-            log.debug("Serial", "Connected to {}".format(device or port))
+            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=self.serial_timeout)
 
             # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
             # so just always swallow it ourselves
-            self.flush_port()
+            self.reset_port()
+
+            log.debug("Serial", "Connected to {}".format(device or port))
 
             return self.resume()
 
@@ -141,6 +139,11 @@ class CNCDriver(object):
             log.debug("Serial", "Error connecting to {}".format(device or port))
             log.error("Serial",e)
             return False
+
+    def reset_port(self):
+        self.connection.close()
+        self.connection.open()
+        self.flush_port()
 
     def disconnect(self):
         if self.connection and self.connection.isOpen():
@@ -183,6 +186,7 @@ class CNCDriver(object):
             return self.wait_for_response()
         elif max_tries > 0:
             time.sleep(try_interval)
+            self.reset_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
@@ -190,10 +194,10 @@ class CNCDriver(object):
             log.error("Serial", "Cannot connect to serial port.")
             return b''
 
-    def wait_for_response(self):
+    def wait_for_response(self, timeout=20.0):
         count = 0
-        out = b''
-        while True:
+        max_retries = int(timeout / self.serial_timeout)
+        while count < max_retries:
             count = count + 1
             out = self.readline_from_serial()
             if out:
@@ -201,7 +205,7 @@ class CNCDriver(object):
                     "Serial",
                     "Waited {} lines for response {}.".format(count, out)
                 )
-                break
+                return out
             else:
                 if count == 1 or count % 10 == 0:
                     # Don't log all the time; gets spammy.
@@ -209,12 +213,12 @@ class CNCDriver(object):
                         "Serial",
                         "Waiting {} lines for response.".format(count)
                     )
-        return out
+        raise RuntimeWarning('no response after {} seconds'.format(timeout))
 
     def flush_port(self):
-        time.sleep(0.1)
+        time.sleep(self.serial_timeout)
         while self.readline_from_serial():
-            time.sleep(0.1)
+            time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
         msg = b''
@@ -265,11 +269,11 @@ class CNCDriver(object):
         res = self.send_command(code, **args)
         return res == b'ok'
 
-    def wait_for_arrival(self, try_interval=0.2):
+    def wait_for_arrival(self):
         arrived = False
         coords = self.get_position()
         while not arrived:
-            time.sleep(try_interval)
+            time.sleep(self.serial_timeout)
             prev_coords = dict(coords)
             coords = self.get_position()
             for axis in coords.get('target', {}):
