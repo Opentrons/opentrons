@@ -40,10 +40,7 @@ def rand_move(scale=1.0):
 
 def send_move(**kwargs):
 	date_print('-->  {}'.format(kwargs))
-	while not motor.move(**kwargs) and motor.errored:
-		date_print('move command errored')
-		motor.resume()
-		motor.home()
+	motor.move(**kwargs):
 
 try:
 	while True:
@@ -53,15 +50,19 @@ try:
 		motor.home('abz')
 		motor.home('x','y')
 
-		send_move(**ranges)
+		try:
+			send_move(**ranges)
 
-		for i in range(random.randint(5,20)):
-			rand_move()
 			for i in range(random.randint(5,20)):
-				rand_move(0.025)
+				rand_move()
+				for i in range(random.randint(5,20)):
+					rand_move(0.025)
 
-		date_print('waiting for arrival...')
-		motor.wait_for_arrival()
+			date_print('waiting for arrival...')
+			motor.wait_for_arrival()
+		except RuntimeWarning as e:
+			date_print(e)
+
 except Exception as e:
 	date_print(e)
 	motor.disconnect()
