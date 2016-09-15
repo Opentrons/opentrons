@@ -59,7 +59,7 @@ deploy:
   upload-dir: mac
   acl: public_read
   on:
-    repo: OpenTrons/otone_frontend
+    repo: OpenTrons/robot_frontend_v2
     all_branches: true
 
 notifications:
