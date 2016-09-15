@@ -11,6 +11,16 @@ before_install:
   # Update brew
   - brew update
 
+  # Install node.js
+  - brew install nvm
+  - mkdir ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
+  - echo "$(brew --prefix nvm)/nvm.sh" >> ~/.bashrc
+  - nvm install 6.0.0
+  - nvm use 6.0.0
+  - node --version
+  - npm --version
+  - npm install
+
   # Install Python 2 and 3 with pip and check versions
   - brew tap drolando/homebrew-deadsnakes
   - brew install python34
@@ -29,6 +39,30 @@ before_install:
   # Install compass
   - gem install compass
 
+
 install:
-  - python3.4 scripts/build_pyinstaller
-  - tree app/backend-dist
+  - node --version
+  - npm --version
+  - npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
+  - npm run release:mac
+  - ls dist/mac
+  - ls releases
+
+# Deploy the build version in an S3 bucket
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: ot-app-builds
+  skip_cleanup: true
+  local-dir: releases
+  upload-dir: mac
+  acl: public_read
+  on:
+    repo: OpenTrons/otone_frontend
+    all_branches: true
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
