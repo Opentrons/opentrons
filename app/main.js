@@ -5,6 +5,7 @@ const {app, BrowserWindow} = electron
 
 const {ServerManager} = require('./servermanager.js')
 const {getLogger} = require('./logging.js')
+const {initAutoUpdater} = require('./updater.js')
 
 
 
@@ -26,9 +27,10 @@ function createWindow () {
 function startUp() {
   serverManager.start();
   setTimeout(createWindow, 2000)
+  initAutoUpdater()
   process.on('uncaughtException', function(error) {
     if (process.listeners("uncaughtException").length > 1) {
-      main.info(error);
+      mainLogger.info(error);
     }
   });
 }
