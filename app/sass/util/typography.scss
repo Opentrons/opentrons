@@ -74,7 +74,7 @@ p,li,blockquote,pre {
 p, label{
 	margin-top    : 0;
 	//margin-bottom : $gutter-width*2;
-	line-height   : $baseline+ $gutter-width*2;
+	line-height   : 40px;
 }
 
 a {
