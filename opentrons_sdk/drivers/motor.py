@@ -7,6 +7,11 @@ import serial
 
 from opentrons_sdk.util import log
 
+JSON_ERROR = None
+if sys.version_info > (3, 4):
+    JSON_ERROR = ValueError
+else:
+    JSON_ERROR = json.decoder.JSONDecodeError
 
 class GCodeLogger():
 
@@ -344,7 +349,9 @@ class CNCDriver(object):
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
 
         
-        except (ValueError, json.decoder.JSONDecodeError) as e:
+        # TODO (andy): travis-ci is testing on both 3.4 and 3.5
+        #              JSONDecodeError does not exist in 3.4 so the build breaks here
+        except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
