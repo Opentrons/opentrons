@@ -10,6 +10,7 @@ from flask_socketio import SocketIO
 from opentrons_sdk.protocol import Protocol
 
 from server.helpers import get_assets, get_frozen_root
+from server.process_manager import run_once
 
 
 protocol = Protocol()
@@ -108,8 +109,17 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        data_dir = sys.argv[1]
+    else:
+        data_dir = os.getcwd()
+
+    IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
+    if not IS_DEBUG:
+        run_once(data_dir)
+
     socketio.run(
         app,
-        debug=os.environ.get('DEBUG', False),
+        debug=IS_DEBUG,
         port=5000
     )
