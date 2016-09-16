@@ -55,7 +55,7 @@ init:
   - ps: cp C:\Python34\python.exe C:\Python34\python3.4.exe
 
   - ps: ruby -v
-  - ps: gem install rdoc
+  # - ps: gem install rdoc
   - ps: gem uninstall ffi
   - ps: gem install ffi
   - ps: gem install compass
