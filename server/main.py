@@ -1,14 +1,30 @@
-from pathlib import Path
-from flask import Flask, request, render_template
-import flask
-from opentrons_sdk.protocol import Protocol
-from flask_socketio import SocketIO, emit
 import logging
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+import flask
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+
+from opentrons_sdk.protocol import Protocol
+
+from server.helpers import get_assets, get_frozen_root
+from server.process_manager import run_once
+
 
 protocol = Protocol()
 motor_handler = protocol.attach_motor()
 
-app = Flask(__name__,static_url_path = "", static_folder = "static")
+
+TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
+STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
+
+app = Flask(__name__,
+            static_folder=STATIC_FOLDER,
+            template_folder=TEMPLATES_FOLDER
+            )
+
 app.jinja_env.autoescape = False
 socketio = SocketIO(app, async_mode='gevent')
 
@@ -30,45 +46,40 @@ def protocol_setup(path):
 @app.route('/scripts/paths/<path:filename>')
 def page_script_loader(filename):
     """ Packs up page-specific code into callable closures. """
+    root = get_frozen_root() or app.root_path
+    page_scripts_root = os.path.join(root, 'assets', 'scripts', 'paths')
     path = filename.replace('.js', '').lower()
-    with open('assets/scripts/paths/'+filename) as code:
+    with open(os.path.join(page_scripts_root, filename)) as code:
         return "window.PathHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
 
 @app.route('/scripts/pages/<path:filename>')
 def view_script_loader(filename):
     """ Packs up page-specific code into callable closures. """
     path = filename.replace('.js', '').lower()
-    with open('assets/scripts/pages/'+filename) as code:
+    root = get_frozen_root() or app.root_path
+    page_scripts_root = os.path.join(root, 'assets', 'pages', 'paths')
+    with open(os.path.join(page_scripts_root, filename)) as code:
         return "window.PageHandlers['"+path+"']=(function(){\n"+code.read()+"\n});"
-
 
 @app.route('/scripts/<path:filename>')
 def script_loader(filename):
-    return flask.send_from_directory('assets/scripts', filename)
-
-def get_assets(kind, ext, content=False):
-    assets = {}
-    p = Path('./assets/{}'.format(kind))
-    for path in p.glob('**/*.{}'.format(ext)):
-        name = str(path).replace('assets/'+kind+'/', '')
-        if content:
-            with open(str(path)) as data:
-                assets[name] = data.read()
-        else:
-            assets[name] = ''
-    return assets
+    root = get_frozen_root() or app.root_path
+    scripts_root_path = os.path.join(root, 'assets', 'scripts')
+    return flask.send_from_directory(scripts_root_path, filename)
 
 @app.context_processor
 def inject_assets():
-    views = get_assets('views', 'html', content=True)
+    root = get_frozen_root() or app.root_path
+
+    views = get_assets(root, 'views', 'html', content=True)
     named_views = {}
-    scripts = []
     for k, v in views.items():
         k = k.replace('.html', '')
         k = k.replace('/', '.')
         named_views[k] = v
-    for s in sorted(get_assets('scripts', 'js')):
-        scripts.append('scripts/'+s)
+
+    scripts = list(sorted(get_assets(root, 'scripts', 'js')))
+
     return dict(
         scripts=scripts,
         views=named_views.items()
@@ -97,8 +108,18 @@ logging.basicConfig(
     datefmt='%d-%m-%y %H:%M:%S'
 )
 
-
 if __name__ == "__main__":
-    app.debug = True
-    #app.run(host='0.0.0.0', port=5000)
-    socketio.run(app, debug=True, port=5000)
+    if len(sys.argv) > 1:
+        data_dir = sys.argv[1]
+    else:
+        data_dir = os.getcwd()
+
+    IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
+    if not IS_DEBUG:
+        run_once(data_dir)
+
+    socketio.run(
+        app,
+        debug=IS_DEBUG,
+        port=5000
+    )

@@ -3,18 +3,16 @@ const child_process = require('child_process')
 const electron = require('electron')
 const {app, BrowserWindow} = electron
 
+const {ServerManager} = require('./servermanager.js')
+const {getLogger} = require('./logging.js')
+const {initAutoUpdater} = require('./updater.js')
+
+
+
+let serverManager = new ServerManager()
+const mainLogger = getLogger('electron-main')
 let mainWindow
 
-function startFlaskServer() {
-  child_process.exec("source frontend_env/bin/activate && python3 main.py", function(error, stdout, stderr){
-        console.log(stdout);
-        console.log(stderr);
-        if (error) {
-            throw error;
-        }
-    });
-  setTimeout(createWindow, 5000)
-}
 
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
@@ -26,5 +24,19 @@ function createWindow () {
   })
 }
 
-app.on('ready', startFlaskServer)
-app.on('ready', createWindow)
+function startUp() {
+  serverManager.start();
+  setTimeout(createWindow, 2000)
+  initAutoUpdater()
+  process.on('uncaughtException', function(error) {
+    if (process.listeners("uncaughtException").length > 1) {
+      mainLogger.info(error);
+    }
+  });
+}
+
+app.on('ready', startUp)
+
+app.on('quit', function(){
+    serverManager.shutdown();
+});
