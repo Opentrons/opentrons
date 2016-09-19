@@ -1,10 +1,19 @@
-__pycache__
-*.pyc
+.DS_Store
 
+.python-version
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
 
 # Distribution / packaging
 .Python
 env/
+build/
 develop-eggs/
 dist/
 downloads/
@@ -19,8 +28,41 @@ var/
 .installed.cfg
 *.egg
 
-# pyCharm
-.idea
-logs/*
+# PyInstaller
+pyinstaller/build
+pyinstaller/dist
 
-.python-version
+# Crossbar
+#  Usually these files are written by the Crossbar server
+*.priv
+*.pub
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+.idea/
+.setup_litter
