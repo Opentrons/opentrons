@@ -3,7 +3,7 @@ import random
 import sys
 import time
 
-from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
+from opentrons_sdk.drivers.motor import OpenTrons
 
 motor = OpenTrons()
 if not motor.connect(sys.argv[1]):
