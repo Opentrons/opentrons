@@ -66,7 +66,7 @@ class ContextHandler(ProtocolHandler):
 
     def get_only_instrument(self):
         ks = list(self._instruments)
-        if len(ks) is 1:
+        if len(ks) > 0:
             return self.get_instrument(axis=ks[0])
         if len(ks) is 0:
             raise KeyError("No instruments loaded.")
@@ -140,6 +140,8 @@ class ContextHandler(ProtocolHandler):
         # Roll in all the new calibration changes.
         if top is not None:
             a_cal['top'] = top
+        if bottom is not None:
+            a_cal['bottom'] = bottom
         if blowout is not None:
             a_cal['blowout'] = blowout
         if droptip is not None:

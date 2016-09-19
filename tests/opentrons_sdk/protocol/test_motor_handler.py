@@ -19,7 +19,7 @@ class MotorHandlerTest(unittest.TestCase):
         self.protocol.calibrate('A1:A2', bottom=5)
         self.protocol.calibrate('C1', x=100, y=100, top=50)
         self.protocol.calibrate('B2', x=200, y=250, top=15)
-        self.protocol.calibrate_instrument('B', top=0, blowout=10, droptip=25)
+        self.protocol.calibrate_instrument('B', top=0, bottom=10, blowout=10, droptip=25)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         prog_out = []
@@ -79,7 +79,7 @@ class MotorHandlerTest(unittest.TestCase):
         self.protocol.attach_motor()
         self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
-        self.protocol.calibrate_instrument('B', top=0, blowout=10)
+        self.protocol.calibrate_instrument('B', top=0, bottom=10, blowout=11, droptip=12)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         with self.assertRaises(KeyError):
@@ -92,7 +92,7 @@ class MotorHandlerTest(unittest.TestCase):
         self.protocol.add_instrument('B', 'p200')
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.add_container('C1', 'tiprack.p200')
-        self.protocol.calibrate_instrument('B', top=0, blowout=10)
+        self.protocol.calibrate_instrument('B', top=0, bottom=10, blowout=11, droptip=12)
         self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
         self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
         with self.assertRaises(KeyError):

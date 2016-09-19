@@ -1,7 +1,17 @@
-import serial
+import glob
+import json
+import sys
 import time
+
+import serial
+
 from opentrons_sdk.util import log
 
+JSON_ERROR = None
+if sys.version_info > (3, 4):
+    JSON_ERROR = ValueError
+else:
+    JSON_ERROR = json.decoder.JSONDecodeError
 
 class GCodeLogger():
 
@@ -39,7 +49,7 @@ class GCodeLogger():
         return None
 
     def readline(self):
-        return 'ok'
+        return b'ok'
 
 
 class CNCDriver(object):
@@ -48,11 +58,14 @@ class CNCDriver(object):
     This object outputs raw GCode commands to perform high-level tasks.
     """
 
-    RAPID_MOVE = 'G0'
-    MOVE = 'G1'
+    MOVE = 'G0'
     DWELL = 'G4'
     HOME = 'G28'
     SET_POSITION = 'G92'
+    GET_POSITION = 'M114'
+    GET_ENDSTOPS = 'M119'
+    GET_SPEED = 'M199'
+    ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
     HALT = 'M112'
@@ -64,8 +77,7 @@ class CNCDriver(object):
     UNITS_TO_INCHES = 'G20'
     UNITS_TO_MILLIMETERS = 'G22'
 
-    DEBUG_ON = None
-    DEBUG_OFF = None
+    VERSION = None
 
     """
     If simulated is set to true, all GCode commands will be saved to an
@@ -79,38 +91,76 @@ class CNCDriver(object):
     """
     connection = None
 
-    _wait_for_stat = False
-    _stat_command = None
-
     def __init__(self, inches=False, simulate=False):
         self.simulated = simulate
         self.command_queue = []
 
+        self.serial_timeout = 0.1
+
+    def list_serial_ports(self):
+        """ Lists serial port names
+
+            :raises EnvironmentError:
+                On unsupported or unknown platforms
+            :returns:
+                A list of the serial ports available on the system
+        """
+        if sys.platform.startswith('win'):
+            ports = ['COM%s' % (i + 1) for i in range(256)]
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            # this excludes your current terminal "/dev/tty"
+            ports = glob.glob('/dev/tty[A-Za-z]*')
+        elif sys.platform.startswith('darwin'):
+            ports = glob.glob('/dev/tty.*')
+        else:
+            raise EnvironmentError('Unsupported platform')
+
+        result = []
+        for port in ports:
+            try:
+                if 'usbmodem' in port or 'COM' in port:
+                    s = serial.Serial(port)
+                    s.close()
+                    result.append(port)
+            except Exception as e:
+                log.debug("Serial", 'Exception in testing port {}'.format(port))
+                log.debug("Serial", e)
+        return result
+
     def connect(self, device=None, port=None):
-        self.connection = serial.Serial(port=device or port)
+        try:
+
+            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=self.serial_timeout)
+
+            # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
+            # so just always swallow it ourselves
+            self.reset_port()
+
+            log.debug("Serial", "Connected to {}".format(device or port))
+
+            return self.resume()
+
+        except serial.SerialException as e:
+            log.debug("Serial", "Error connecting to {}".format(device or port))
+            log.error("Serial",e)
+            return False
+
+    def reset_port(self):
         self.connection.close()
         self.connection.open()
-        log.debug("Serial", "Connected to {}".format(device or port))
-        self.wait_for_stat()
-
-    def wait_for_stat(self, stat=None):
-        if self.DEBUG_ON:
-            log.debug("Serial", "Turning on debug mode.")
-            log.debug("Serial", "Awaiting stat responses.")
-            self.send_command(self.DEBUG_ON)
-            self._wait_for_stat = True
-            if stat is not None:
-                self._stat_command = stat
+        self.flush_port()
 
     def disconnect(self):
-        self.connection.close()
+        if self.connection and self.connection.isOpen():
+            self.connection.close()
 
     def send_command(self, command, **kwargs):
         """
         Sends a GCode command.  Keyword arguments will be automatically
         converted to GCode syntax.
 
-        Returns a string represending the raw command sent.
+        Returns a string with the Smoothie board's response
+        Empty string if no response from Smoothie
 
         >>> send_command(self.MOVE, x=100 y=100)
         G0 X100 Y100
@@ -118,16 +168,18 @@ class CNCDriver(object):
 
         args = []
         for key in kwargs:
-            args.append("%s%d" % (key.upper(), kwargs[key]))
+            args.append('{0}{1}'.format(key, kwargs[key]))
 
         command = command + " " + ' '.join(args) + "\r\n"
+
+        response = ''
 
         if self.simulated:
             self.command_queue.append(command)
         else:
-            self.write_to_serial(command)
+            response = self.write_to_serial(command)
 
-        return command
+        return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         log.debug("Serial", "Write: {}".format(str(data).encode()))
@@ -136,48 +188,64 @@ class CNCDriver(object):
             return
         if self.connection.isOpen():
             self.connection.write(str(data).encode())
-            if self._wait_for_stat is True and self._stat_command:
-                waiting = True
-                count = 0
-                while waiting:
-                    count = count + 1
-                    out = self.connection.readline().decode().strip()
-                    log.debug("Serial", "Read: {}".format(out))
-                    if out == self._stat_command:
-                        waiting = False
-                        log.debug(
-                            "Serial",
-                            "Waited {} lines for stat.".format(count)
-                        )
-                    else:
-                        if count == 1 or count % 10 == 0:
-                            # Don't log all the time; gets spammy.
-                            log.debug(
-                                "Serial",
-                                "Waiting {} lines for stat ({})."
-                                .format(count, self._stat_command)
-                            )
-            else:
-                out = self.connection.readline()
-                log.debug("Serial", "Read: {}".format(out))
-            return out
+            return self.wait_for_response()
         elif max_tries > 0:
             time.sleep(try_interval)
-            self.write_to_serial(
+            self.reset_port()
+            return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
         else:
             log.error("Serial", "Cannot connect to serial port.")
+            return b''
 
-    def read_from_serial(self, size=16):
-        return self.connection.read(size)
+    def wait_for_response(self, timeout=20.0):
+        count = 0
+        max_retries = int(timeout / self.serial_timeout)
+        while count < max_retries:
+            count = count + 1
+            out = self.readline_from_serial()
+            if out:
+                log.debug(
+                    "Serial",
+                    "Waited {} lines for response {}.".format(count, out)
+                )
+                return out
+            else:
+                if count == 1 or count % 10 == 0:
+                    # Don't log all the time; gets spammy.
+                    log.debug(
+                        "Serial",
+                        "Waiting {} lines for response.".format(count)
+                    )
+        raise RuntimeWarning('no response after {} seconds'.format(timeout))
+
+    def flush_port(self):
+        time.sleep(self.serial_timeout)
+        while self.readline_from_serial():
+            time.sleep(self.serial_timeout)
+
+    def readline_from_serial(self):
+        msg = b''
+        if self.connection.isOpen():
+            # serial.readline() returns an empty byte string if it times out
+            msg = self.connection.readline().strip()
+            if msg:
+                log.debug("Serial", "Read: {}".format(msg))
+
+        # detect if it hit a home switch
+        if b'!!' in msg or b'limit' in msg:
+            # TODO (andy): allow this to bubble up so UI is notified
+            log.debug('Serial', 'home switch hit')
+            self.flush_port()
+            self.resume()
+            raise RuntimeWarning('limit switch hit')
+
+        return msg
 
     def move(self, x=None, y=None, z=None, speed=None, absolute=True, **kwargs):
 
-        if speed:
-            code = self.MOVE
-        else:
-            code = self.RAPID_MOVE
+        code = self.MOVE
 
         if absolute:
             self.send_command(self.ABSOLUTE_POSITIONING)
@@ -192,33 +260,102 @@ class CNCDriver(object):
         them as anonymous parameters when calling this method.
         """
         if x is not None:
-            args['x'] = x
+            args['X'] = x
         if y is not None:
-            args['y'] = y
+            args['Y'] = y
         if z is not None:
-            args['z'] = z
+            args['Z'] = z
 
         for k in kwargs:
             args[k.upper()] = kwargs[k]
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
-        self.send_command(code, **args)
+        res = self.send_command(code, **args)
+        return res == b'ok'
 
-    def home(self):
-        self.send_command(self.HOME)
+    def wait_for_arrival(self):
+        arrived = False
+        coords = self.get_position()
+        while not arrived:
+            time.sleep(self.serial_timeout)
+            prev_coords = dict(coords)
+            coords = self.get_position()
+            for axis in coords.get('target', {}):
+                axis_diff = coords['current'][axis] - coords['target'][axis]
 
-    def wait(self, ms):
-        self.send_command(self.DWELL, p=ms)
+                """
+                smoothie not guaranteed to be EXACTLY where it's target is
+                but seems to be about +-0.05 mm from the target coordinate
+                the robot's physical resolution is found with:  1mm / config_steps_per_mm 
+                """
+                if abs(axis_diff) < 0.1:
+                    if coords['current'][axis] == prev_coords['current'][axis]:
+                        arrived = True
+                else:
+                    arrived = False
+                    break
+        return arrived
+
+    def home(self, *axis):
+        home_command = self.HOME
+        axis_homed = ''
+        for a in axis:
+            ax = ''.join(sorted(a)).upper()
+            if ax in 'ABXYZ':
+                axis_homed += ax
+        res = self.send_command(home_command + axis_homed)
+        if res == b'ok':
+            # the axis aren't necessarily set to 0.0 values after homing, so force it
+            pos_args = {}
+            for l in axis_homed:
+                pos_args[l] = 0
+            return self.set_position(**pos_args)
+        else:
+            return False
+
+    def wait(self, sec):
+        ms = int((sec % 1.0) * 1000)
+        s = int(sec)
+        res = self.send_command(self.DWELL, S=s, P=ms)
+        return res == b'ok'
 
     def halt(self):
-        self.send_command(self.HALT)
+        res = self.send_command(self.HALT)
+        return res == b'ok Emergency Stop Requested - reset or M999 required to continue'
 
     def resume(self):
-        self.send_command(self.CALM_DOWN)
+        res = self.send_command(self.CALM_DOWN)
+        return res == b'ok'
 
     def set_position(self, **kwargs):
-        self.move(absolute=True, **kwargs)
+        uppercase_args = {}
+        for key in kwargs:
+            uppercase_args[key.upper()] = kwargs[key]
+        res = self.send_command(self.SET_POSITION, **uppercase_args)
+        return res == b'ok'
+
+    def get_position(self):
+        res = self.send_command(self.GET_POSITION)
+        res = res.decode('utf-8')[3:] # remove the "ok " from beginning of response
+        coords = {}
+        try:
+            response_dict = json.loads(res).get(self.GET_POSITION)
+            coords = {'target':{}, 'current':{}}
+            for letter in 'xyzab':
+                # the lowercase axis are the "real-time" values
+                coords['current'][letter]  = response_dict.get(letter,0)
+                # the uppercase axis are the "target" values
+                coords['target'][letter]  = response_dict.get(letter.upper(),0)
+
+        
+        # TODO (andy): travis-ci is testing on both 3.4 and 3.5
+        #              JSONDecodeError does not exist in 3.4 so the build breaks here
+        except JSON_ERROR as e:
+            log.debug("Serial", "Error parsing JSON string:")
+            log.debug("Serial", res)
+
+        return coords
 
     def execute_queue(self):
         queue = self.flush_queue()
@@ -240,10 +377,7 @@ class CNCDriver(object):
 
 class OpenTrons(CNCDriver):
 
-    DEBUG_ON = 'M62'
-    DEBUG_OFF = 'M63'
-
-    _stat_command = '{"stat":0}'
+    VERSION = 'version'
 
 
 class MoveLogger(CNCDriver):
@@ -263,7 +397,6 @@ class MoveLogger(CNCDriver):
     def __init__(self):
         self.movements = []
         self.motor = OpenTrons()
-        self.motor._wait_for_stat = False
         self.motor.connection = GCodeLogger()
 
     def move(self, **kwargs):
