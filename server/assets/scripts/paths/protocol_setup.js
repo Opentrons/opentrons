@@ -1,79 +1,6 @@
 /* Gets run every time the user is in protocol_setup/ anything. */
 //stub data, transforms, and event delegation for Wizard and Jog Controller
 
-//separated saved positions for a test.
-var saved_containers = [{
-    parent_id: 'uniquekey3', //added parent step ID for link back to calibrate if tested calibration needs to be updated upon review
-    user_container_name: 'p200-rack',
-    container_name: 'tiprack.p200',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    deck_position: 'A1',
-    x: 0,
-    y: 0,
-    z: 0
-}, {
-    parent_id: 'uniquekey4',
-    user_container_name: 'Trough',
-    container_name: 'reservior.12',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    deck_position: 'C3',
-    x: 0,
-    y: 0,
-    z: 0
-}, {
-    parent_id: 'uniquekey5',
-    user_container_name: 'Standard',
-    container_name: 'microplate.96.pcr.flat',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    deck_position: 'E1',
-    x: 0,
-    y: 0,
-    z: 0
-}, {
-    parent_id: 'uniquekey6',
-    user_container_name: 'Trash',
-    container_name: 'point',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    deck_position: 'B2',
-    x: 0,
-    y: 0,
-    z: 0
-}, {
-    parent_id: 'uniquekey7',
-    user_container_name: 'Source-1',
-    container_name: 'microplate.96.pcr.flat',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    deck_position: 'D1',
-    x: 0,
-    y: 0,
-    z: 0
-}, {
-    parent_id: 'uniquekey8',
-    user_container_name: 'Output-1',
-    container_name: 'microplate.96.pcr.flat',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    deck_position: 'C1',
-    x: 0,
-    y: 0,
-    z: 0
-}];
-var saved_pipettes = [{
-    parent_id: 'uniquekey9',
-    pipette: "p200 Multi Channel",
-    axis: "a",
-    test_volume: 200,
-    top: 0,
-    bottom: 0,
-    blowout: 0,
-    droptip: 0
-}];
-
 var stubData = [{
         task_type: "select_protocol",
         steps: [{
@@ -238,22 +165,28 @@ var stubData = [{
                 droptip: 0
             }
         }]
-    }, {
-        task_type: "record_volume",
-        steps: [{
-            id: 'uniquekey10',
-            data: {
-                //might just use transforms here,
-                //volume needs to be entered by user
-                source: "",
-                destination: "",
-                volume: 0,
-                //pulling this from a saved containers array
-                //trying to allow for multiple data object flexibility
-                saved_containers: saved_containers
-            }
-        }]
-    }, {
+    }, 
+    /* removing this as separate task for now 
+    re: conversation with dagney - 
+    just keep as pick up liquid, eject liquid button 
+    and input to record max volume rather than separate mini protocol*/
+    // {
+    //     task_type: "record_volume",
+    //     steps: [{
+    //         id: 'uniquekey10',
+    //         data: {
+    //             //might just use transforms here,
+    //             //volume needs to be entered by user
+    //             source: "",
+    //             destination: "",
+    //             volume: 0,
+    //             //pulling this from a saved containers array
+    //             //trying to allow for multiple data object flexibility
+    //             saved_containers: saved_containers
+    //         }
+    //     }]
+    // }, 
+    {
         task_type: "review_calibration",
         steps: [{
             id: 'uniquekey11',
