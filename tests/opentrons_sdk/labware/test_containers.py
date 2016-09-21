@@ -9,6 +9,13 @@ class ContainerTest(unittest.TestCase):
     def assertIs(self, thing, comparison):
         self.assertTrue(issubclass(thing, comparison))
 
+    def test_load_container(self):
+        container_obj = containers.load('microplate.96', slot='A1')
+        print(type(container_obj))
+        self.assertEqual(type(container_obj).__name__,
+                         "Microplate_96")
+
+
     def test_custom_container_type(self):
         """
         Enforce valid custom container type.
