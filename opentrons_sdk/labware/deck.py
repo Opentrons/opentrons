@@ -15,7 +15,7 @@ class Deck(GridContainer):
         for position in kwargs:
             self.add_module(position, kwargs[position])
 
-    def add_module(self, position, mod):
+    def add_module(self, position, mod) -> 'Container':
         pos = self._normalize_position(position)
         if isinstance(mod, str):
             mod = load_container(mod)()
@@ -27,6 +27,7 @@ class Deck(GridContainer):
                 "Module already allocated to slot: {}/{}."
                 .format(humanize_position(pos), pos)
             )
+        return mod
 
     def find_module(self, **filters):
         for pos, mod in sorted(self._children.items()):

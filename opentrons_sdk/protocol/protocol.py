@@ -26,6 +26,14 @@ class Protocol():
 
     _containers = None  # { slot: container_name }
 
+    _instance = None
+
+    @classmethod
+    def _get_instance(cls):
+        if not cls._instance or not isinstance(cls._instance, cls):
+            cls._instance = cls()
+        return cls._instance
+
     def __init__(self):
         self._ingredients = {}
         self._container_labels = {}
@@ -37,11 +45,14 @@ class Protocol():
 
     def add_container(self, slot, name, label=None):
         slot = normalize_position(slot)
-        self._context_handler.add_container(slot, name)
+        container_obj = self._context_handler.add_container(slot, name)
         self._containers[slot] = name
         if (label):
             label = label.lower()
             self._container_labels[label] = slot
+        return container_obj
+
+
 
     def add_instrument(self, axis, name):
         self._instruments[axis] = name
