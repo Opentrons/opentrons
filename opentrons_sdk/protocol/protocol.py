@@ -345,4 +345,4 @@ class Protocol():
 
 
     def get_containers(self, **filters):
-        return self._context_handler.get_modules(**filters)
+        return self._context_handler.get_containers(**filters)

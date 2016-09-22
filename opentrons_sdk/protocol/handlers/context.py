@@ -62,7 +62,7 @@ class ContextHandler(ProtocolHandler):
         return self._deck.find_module(**filters)
 
     def get_containers(self, **filters):
-        return self._deck.get_containers(**filters)
+        return self._deck.get_modules(**filters)
 
     def add_container(self, slot, container_name):
         return self._deck.add_module(slot, container_name)
