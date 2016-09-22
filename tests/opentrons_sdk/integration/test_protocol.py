@@ -10,6 +10,7 @@ class ProtocolTestCase(unittest.TestCase):
         self.protocol = Protocol.get_instance()
 
     def test_protocol_load(self):
-        plate = containers.load('microplate.96', 'A1')
-        # self.protocol
+        container_name = 'microplate.96'
+        plate = containers.load(container_name, 'A1')
+        self.assertEqual(plate.name, container_name)
 

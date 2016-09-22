@@ -39,6 +39,9 @@ class Deck(GridContainer):
             if match:
                 return mod
 
+    def get_modules(self):
+        return sorted(self._children.items())
+
     def slot(self, position):
         pos = self._normalize_position(position)
         if pos not in self._children:

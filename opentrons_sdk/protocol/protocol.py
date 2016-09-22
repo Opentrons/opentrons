@@ -333,3 +333,7 @@ class Protocol():
     def disconnect(self):
         if self._motor_handler:
             self._motor_handler.disconnect()
+
+
+    def get_containers(self, **filters):
+        return self._context_handler.get_modules(**filters)
