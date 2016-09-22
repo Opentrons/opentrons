@@ -73,14 +73,14 @@ class MotorControlHandler(ProtocolHandler):
         pipette.droptip()
         pipette.reset()
 
-    def move_to_well(self, well):
+    def move_to_well(self, well, instrument):
         self.move_motors(z=0)  # Move up so we don't hit things.
-        coords = self._context.get_coordinates(well)
+        coords = self._context.get_coordinates(well, instrument._axis)
         self.move_motors(x=coords['x'], y=coords['y'])
         self.move_motors(z=coords['top'])
 
-    def move_into_well(self, well):
-        coords = self._context.get_coordinates(well)
+    def move_into_well(self, well, instrument):
+        coords = self._context.get_coordinates(well, instrument._axis)
         self.move_motors(x=coords['x'], y=coords['y'])
         self.move_motors(z=coords['bottom'])
 

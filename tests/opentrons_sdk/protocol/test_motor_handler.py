@@ -1,11 +1,43 @@
 import unittest
-from opentrons_sdk.protocol import Protocol
+
+from opentrons_sdk.protocol.protocol import Protocol
+from opentrons_sdk.labware import containers, instruments
+from opentrons_sdk.labware.grid import normalize_position, humanize_position
 
 
 class MotorHandlerTest(unittest.TestCase):
 
     def setUp(self):
-        self.protocol = Protocol()
+        Protocol.reset()
+        self.protocol = Protocol.get_instance()
+        self.motor = self.protocol.attach_motor() # simulated
+
+    def test_move_to_well(self):
+
+        plate = containers.load('microplate.96', 'A1')
+
+        p200 = instruments.Pipette(axis="b")
+
+        self.motor.home('xyzab')
+
+        self.protocol.calibrate('A1:A1', x=150, y=150, bottom=100, top=90)
+
+        self.motor.move_to_well(
+            ((0,0), (0,0)),
+            p200
+        )
+
+        self.assertEquals(self.motor._driver.movements[-2], {'x': 150, 'y': 150})
+        self.assertEquals(self.motor._driver.movements[-1], {'z': 90})
+
+        self.motor.move_into_well(
+            ((0,0), (0,0)),
+            p200
+        )
+
+        self.assertEquals(self.motor._driver.movements[-2], {'x': 150, 'y': 150})
+        self.assertEquals(self.motor._driver.movements[-1], {'z': 100})
+
 
     # TODO:
     # def test_basic_transfer(self):
