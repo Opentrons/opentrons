@@ -11,9 +11,10 @@ class ContainerTest(unittest.TestCase):
 
     def test_load_container(self):
         container_obj = containers.load('microplate.96', slot='A1')
-        print(type(container_obj))
-        self.assertEqual(type(container_obj).__name__,
-                         "Microplate_96")
+        self.assertEqual(
+            type(container_obj).__name__,
+            "Microplate_96"
+        )
 
 
     def test_custom_container_type(self):
