@@ -1,14 +1,6 @@
 import sys
 
 
-def load_instrument(name):
-    name = name.replace('.', '_')
-    return getattr(
-        sys.modules[__name__],
-        'Pipette_{}'.format(name.upper())
-    )()
-
-
 class Pipette(object):
 
     # channels = 1

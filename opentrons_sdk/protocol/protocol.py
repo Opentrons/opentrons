@@ -63,9 +63,11 @@ class Protocol():
 
 
 
-    def add_instrument(self, axis, name, instrument=None):
-        self._instruments[axis] = name
-        self._context_handler.add_instrument(axis, name, instrument)
+    def add_instrument(self, axis, instrument=None):
+        # TODO: Do we really want to keep this object in sync with what is in
+        # ContextHandler inst obj
+        # self._instruments[axis] = name
+        self._context_handler.add_instrument(axis, instrument)
 
     def add_ingredient(self, name, location):
         pass
@@ -344,5 +346,8 @@ class Protocol():
             self._motor_handler.disconnect()
 
 
-    def get_containers(self, **filters):
-        return self._context_handler.get_containers(**filters)
+    def get_containers(self):
+        return self._context_handler.get_containers()
+
+    def get_instruments(self):
+        return self._context_handler.get_instruments()
