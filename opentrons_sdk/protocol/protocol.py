@@ -1,4 +1,4 @@
-from opentrons_sdk.labware import containers, deck, pipettes
+from opentrons_sdk.labware import containers, deck, instruments
 from opentrons_sdk.labware.grid import normalize_position, humanize_position
 import opentrons_sdk.drivers.motor as motor_drivers
 from opentrons_sdk.util.log import debug

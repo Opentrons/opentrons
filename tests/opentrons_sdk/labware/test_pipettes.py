@@ -1,8 +1,8 @@
 import unittest
-from opentrons_sdk.labware import pipettes
+from opentrons_sdk.labware import instruments
 
 
-class MockPipette(pipettes.Pipette):
+class MockPipette(instruments.Pipette):
     min_vol = 1
     max_vol = 10
 
@@ -50,8 +50,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_load_instrument(self):
         """Loads instruments."""
-        p = pipettes.load_instrument('p10')
-        self.assertIsInstance(p, pipettes.Pipette_P10)
+        p = instruments.load_instrument('p10')
+        self.assertIsInstance(p, instruments.Pipette_P10)
 
     def test_volume_support(self):
         """ Volume support. """
