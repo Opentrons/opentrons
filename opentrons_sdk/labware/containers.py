@@ -29,7 +29,6 @@ from opentrons_sdk.labware.tipracks import Tiprack
 from opentrons_sdk.labware.reservoirs import Reservoir
 from opentrons_sdk.labware.tuberacks import Tuberack
 from opentrons_sdk.labware.grid import GridContainer, normalize_position
-# from opentrons_sdk.protocol.protocol import Protocol
 
 # These are the base types that containers can extend from.
 _typemap = {

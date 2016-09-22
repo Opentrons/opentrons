@@ -15,7 +15,12 @@ class Deck(GridContainer):
         for position in kwargs:
             self.add_module(position, kwargs[position])
 
-    def add_module(self, position, mod) -> 'Container':
+    def add_module(self, position, mod):
+        """
+        :param position: Slot location of module in OpenTrons deck
+        :param mod: str or object representing the module
+        :return: module object
+        """
         pos = self._normalize_position(position)
         if isinstance(mod, str):
             mod = load_container(mod)()
