@@ -9,11 +9,11 @@ def load_instrument(name):
     )()
 
 
-class Pipette():
+class Pipette(object):
 
-    channels = 1
-    size = 'P10'
-    min_vol = 0
+    # channels = 1
+    # size = 'P10'
+    # min_vol = 0
     max_vol = 10
 
     _top = None  # Top of the plunger.
@@ -21,7 +21,7 @@ class Pipette():
     _blowout = None  # Bottom of the plunger (all liquid expelled).
     _droptip = None  # Point where the screw on the axis hits the droptip.
 
-    _axis = None
+    # _axis = None
 
     _points = [
         {'f1': 1, 'f2': 1},
@@ -29,6 +29,17 @@ class Pipette():
     ]
 
     _tip_plunge = 6  # Distance from calibrated top of tiprack to pickup tip.
+
+    def __init__(self, axis, channels=1, min_vol=0, trash_container=None, tip_racks=None):
+        self.axis = axis
+        self.channels = channels
+        self.min_vol = min_vol
+        self.trash_container = trash_container
+        self.tip_racks = tip_racks
+
+        from opentrons_sdk.protocol.protocol import Protocol
+        self.protocol = Protocol.get_instance()
+        self.protocol.add_instrument(self.axis, self)
 
     def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, axis='A'):
         """Set calibration values for the pipette plunger.
@@ -124,10 +135,6 @@ class Pipette():
 
     def supports_volume(self, volume):
         return volume <= self.max_vol and volume >= self.min_vol
-
-    @property
-    def axis(self):
-        return self._axis
 
     @property
     def blowout(self):

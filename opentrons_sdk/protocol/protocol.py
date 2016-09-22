@@ -63,9 +63,9 @@ class Protocol():
 
 
 
-    def add_instrument(self, axis, name):
+    def add_instrument(self, axis, name, instrument=None):
         self._instruments[axis] = name
-        self._context_handler.add_instrument(axis, name)
+        self._context_handler.add_instrument(axis, name, instrument)
 
     def add_ingredient(self, name, location):
         pass

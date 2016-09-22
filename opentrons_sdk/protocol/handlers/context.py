@@ -24,10 +24,13 @@ class ContextHandler(ProtocolHandler):
         self._instruments = {}
         self._calibration = {}
 
-    def add_instrument(self, axis, name):
+    def add_instrument(self, axis, name, instrument=None):
         axis = axis.upper()
         # We only have pipettes now so this is pipette-specific.
-        self._instruments[axis] = instruments.load_instrument(name)
+        if instrument:
+            self._instruments[axis] = instrument
+        else:
+            self._instruments[axis] = instruments.load_instrument(name)
         self._instruments[axis]._axis = axis
 
     def get_instrument(self, axis=None, **kwargs):
