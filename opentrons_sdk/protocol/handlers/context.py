@@ -1,5 +1,5 @@
 from opentrons_sdk.protocol.handlers import ProtocolHandler
-from opentrons_sdk.labware import deck, pipettes
+from opentrons_sdk.labware import deck, instruments
 
 
 class ContextHandler(ProtocolHandler):
@@ -24,10 +24,10 @@ class ContextHandler(ProtocolHandler):
         self._instruments = {}
         self._calibration = {}
 
-    def add_instrument(self, axis, name):
+    def add_instrument(self, axis, instrument=None):
         axis = axis.upper()
         # We only have pipettes now so this is pipette-specific.
-        self._instruments[axis] = pipettes.load_instrument(name)
+        self._instruments[axis] = instrument
         self._instruments[axis]._axis = axis
 
     def get_instrument(self, axis=None, **kwargs):
@@ -57,6 +57,12 @@ class ContextHandler(ProtocolHandler):
                 return self.get_instrument(axis=k)
 
         return None
+
+    def get_instruments(self):
+        """
+        :returns: sorted list of (axis, instrument)
+        """
+        return sorted(self._instruments.items())
 
     def find_container(self, **filters):
         return self._deck.find_module(**filters)
