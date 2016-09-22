@@ -1,11 +1,13 @@
 import unittest
+from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.protocol import Protocol
 
 
 class ProtocolTest(unittest.TestCase):
 
     def setUp(self):
-        self.protocol = Protocol()
+        Protocol.reset()
+        self.protocol = Protocol.get_instance()
 
     @property
     def instructions(self):
@@ -22,9 +24,14 @@ class ProtocolTest(unittest.TestCase):
         """ Basic transfer. """
         self.protocol.add_container('A1', 'microplate.96')
         self.protocol.add_container('B1', 'microplate.96')
-        self.protocol.add_instrument('A', 'p200')
-        self.protocol.add_instrument('B', 'p20')
-        self.protocol.transfer('A1:A1', 'B1:B1', ul=100, tool='p20')
+
+        p200 = instruments.Pipette(axis='A')
+        p20 = instruments.Pipette(axis='B')
+
+        # self.protocol.add_instrument('A', p200)
+        # self.protocol.add_instrument('B', p20)
+
+        self.protocol.transfer('A1:A1', 'B1:B1', ul=100, tool=p20)
         expected = [{
             'transfer': {
                 'tool': 'p20',
