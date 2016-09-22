@@ -26,7 +26,6 @@ class ProtocolTestCase(unittest.TestCase):
         trash = containers.load('point.trash', 'A1')
         tiprack = containers.load('tiprack.p10', 'B2')
 
-
         p200 = instruments.Pipette(
             trash_container=trash,
             tip_racks=[tiprack],
@@ -37,7 +36,3 @@ class ProtocolTestCase(unittest.TestCase):
 
         instruments_list = self.protocol.get_instruments()
         self.assertEqual(instruments_list[0], ('B', p200))
-
-
-
-
