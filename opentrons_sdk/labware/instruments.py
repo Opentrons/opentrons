@@ -1,6 +1,3 @@
-import sys
-
-
 class Pipette(object):
 
     # channels = 1
@@ -19,8 +16,6 @@ class Pipette(object):
         {'f1': 1, 'f2': 1},
         {'f1': 2000, 'f2': 2000}
     ]
-
-    _tip_plunge = 6  # Distance from calibrated top of tiprack to pickup tip.
 
     def __init__(self, axis, channels=1, min_vol=0, trash_container=None, tip_racks=None):
         self.axis = axis
@@ -126,7 +121,7 @@ class Pipette(object):
         return volume * scale / self.max_vol
 
     def supports_volume(self, volume):
-        return volume <= self.max_vol and volume >= self.min_vol
+        return self.min_vol <= volume <= self.max_vol
 
     @property
     def blowout(self):

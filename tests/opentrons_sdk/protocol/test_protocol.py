@@ -34,7 +34,7 @@ class ProtocolTest(unittest.TestCase):
         self.protocol.transfer('A1:A1', 'B1:B1', ul=100, tool=p20)
         expected = [{
             'transfer': {
-                'tool': 'p20',
+                'tool': p20,
                 'volume': 100,
                 'start': ((0, 0), (0, 0)),
                 'end': ((1, 0), (1, 0)),
@@ -177,14 +177,17 @@ class ProtocolTest(unittest.TestCase):
         }}]
         self.assertEqual(self.instructions, expected)
 
-    def test_protocol_run_twice(self):
-        """ Run a protocol twice without error. """
-        self.protocol.add_instrument('A', 'p200')
-        self.protocol.add_container('C1', 'tiprack.p200')
-        self.protocol.add_container('A1', 'microplate.96')
-        self.protocol.calibrate('A1', x=1, y=2, z=3)
-        self.protocol.calibrate_instrument('A', top=0, blowout=10)
-        self.protocol.transfer('A1:A1', 'A1:A2', ul=100)
-        self.protocol.transfer('A1:A2', 'A1:A3', ul=80)
-        self.protocol.run_all()
-        self.protocol.run_all()
+    # def test_protocol_run_twice(self):
+    #     """ Run a protocol twice without error. """
+    #     self.protocol.add_container('C1', 'tiprack.p200')
+    #     self.protocol.add_container('A1', 'microplate.96')
+    #     p200 = instruments.Pipette(axis='B')
+    #
+    #     self.protocol.add_instrument('A', p200)
+    #
+    #     self.protocol.calibrate('A1', x=1, y=2, z=3)
+    #     self.protocol.calibrate_instrument('A', top=0, blowout=10)
+    #     self.protocol.transfer('A1:A1', 'A1:A2', ul=100, tool=p200)
+    #     self.protocol.transfer('A1:A2', 'A1:A3', ul=80, tool=p200)
+    #     self.protocol.run_all()
+    #     self.protocol.run_all()
