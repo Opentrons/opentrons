@@ -36,3 +36,19 @@ class ProtocolTestCase(unittest.TestCase):
 
         instruments_list = self.protocol.get_instruments()
         self.assertEqual(instruments_list[0], ('B', p200))
+
+    def test_protocol_microplate_wells(self):
+        plate = containers.load('microplate.96', 'A1')
+        tiprack = containers.load('tiprack.p10', 'B2')
+
+        from pprint import pprint as pp
+
+        self.assertEqual(
+            plate.total_wells,
+            len([well for well in plate])
+        )
+
+
+
+
+

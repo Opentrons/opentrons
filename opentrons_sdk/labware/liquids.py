@@ -1,7 +1,7 @@
 from opentrons_sdk.labware.grid import GridItem
 
 
-class LiquidInventory():
+class LiquidInventory(object):
 
     """
     This is the generic class for a mixture of liquids.  Each well and trough
