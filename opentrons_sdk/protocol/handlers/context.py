@@ -61,8 +61,11 @@ class ContextHandler(ProtocolHandler):
     def find_container(self, **filters):
         return self._deck.find_module(**filters)
 
+    def get_containers(self, **filters):
+        return self._deck.get_modules(**filters)
+
     def add_container(self, slot, container_name):
-        self._deck.add_module(slot, container_name)
+        return self._deck.add_module(slot, container_name)
 
     def get_only_instrument(self):
         ks = list(self._instruments)
