@@ -34,6 +34,15 @@ class Protocol():
             cls._instance = cls()
         return cls._instance
 
+    @classmethod
+    def reset(cls):
+        """
+        Use this for testing
+        :return:
+        """
+        Protocol._instance = None
+        return Protocol.get_instance()
+
     def __init__(self):
         self._ingredients = {}
         self._container_labels = {}

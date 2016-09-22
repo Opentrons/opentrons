@@ -54,6 +54,12 @@ class DeckTest(unittest.TestCase):
         rack = self.deck.find_module(size='P10')
         self.assertIsInstance(rack, Tiprack)
 
+    def test_get_modules(self):
+        self.deck.add_module('a1', 'microplate.96')
+        self.deck.add_module('a2', 'tiprack.p10')
+        self.deck.add_module('b1', 'tiprack.p10')
+        self.assertEqual(len(self.deck.get_modules()), 3)
+
     def test_module_address(self):
         """ Return module address as list of tuples. """
         self.deck.add_module('B3', 'microplate.96')
