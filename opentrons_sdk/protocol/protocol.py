@@ -29,7 +29,7 @@ class Protocol():
     _instance = None
 
     @classmethod
-    def _get_instance(cls):
+    def get_instance(cls):
         if not cls._instance or not isinstance(cls._instance, cls):
             cls._instance = cls()
         return cls._instance
