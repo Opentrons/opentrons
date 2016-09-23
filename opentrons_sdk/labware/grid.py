@@ -196,9 +196,14 @@ class GridContainer(object):
     _instance = None
 
     def __init__(self, parent=None, **kwargs):
-        # import pdb; pdb.set_trace()
         self.parent = parent
         self._children = {}
+    #     self.init_custom_wells()
+    #
+    # def init_custom_wells(self):
+    #     if GridContainer._custom_wells:
+    #         pass
+
 
     def __iter__(self):
         return (well for pos, well in sorted(self._children.items()))
