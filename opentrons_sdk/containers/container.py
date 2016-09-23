@@ -17,6 +17,9 @@ class Placeable(object):
     def __iter__(self):
         return iter(self.children.keys())
 
+    def __len__(self):
+        return len(self.children)
+
     def __next__(self):
         if not self.get_parent():
             raise Exception('Must have a parent')
