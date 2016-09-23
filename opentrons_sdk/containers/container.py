@@ -9,6 +9,20 @@ class Placeable(object):
         self.parent = parent
         self.coordinates = (0, 0, 50)
 
+    def __getitem__(self, name):
+        return self.get_child_by_name(name)
+
+    def __iter__(self):
+        return self.children.keys()
+
+    def __next__(self):
+        if not self.get_parent():
+            raise Exception('Must have a parent')
+
+        children = list(self.parent.get_children().keys())
+        my_loc = children.index(self)
+        return children[my_loc + 1]
+
     def get_coordinates(self, reference=None):
         if not reference:
             return self.parent.get_child_coordinates(self)
@@ -56,24 +70,11 @@ class Placeable(object):
     def get_children(self):
         return self.children
 
-    def __iter__(self):
-        return self.children.keys()
-
-    def __next__(self):
-        if not self.get_parent():
-            raise Exception('Must have a parent')
-
-        children = list(self.parent.get_children().keys())
-        my_loc = children.index(self)
-        return children[my_loc + 1]
-
-    def __getitem__(self, name):
-        return self.get_child_by_name(name)
-
     def get_child_by_name(self, name):
         for child, child_info in self.get_children():
             if child_info['name'] == name:
                 return child
+
 
 class Deck(Placeable):
     def get_containers(self):
@@ -81,6 +82,7 @@ class Deck(Placeable):
 
     def get_container(self):
         pass
+
 
 class Slot(Placeable):
     pass
@@ -91,7 +93,7 @@ class Container(Placeable):
         return self.get_child_by_name(name)
 
     def wells(self):
-        return self.get_children()
+        return self.get_children().keys
 
 
 class Well(Placeable):
