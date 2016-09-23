@@ -9,7 +9,10 @@ class Placeable(object):
         self.parent = parent
 
     def __getitem__(self, name):
-        return self.get_child_by_name(name)
+        if isinstance(name, int):
+            return list(self.children.keys())[name]
+        else:
+            return self.get_child_by_name(name)
 
     def __iter__(self):
         return iter(self.children.keys())
@@ -22,7 +25,7 @@ class Placeable(object):
         my_loc = children.index(self)
         return children[my_loc + 1]
 
-    def get_coordinates(self, reference=None):
+    def coordinates(self, reference=None):
         if not self.parent:
             return (0, 0, 0)
 
@@ -42,7 +45,7 @@ class Placeable(object):
 
         x, y, z = 0, 0, 0
         for i in trace:
-            i_x, i_y, i_z = i.get_coordinates()
+            i_x, i_y, i_z = i.coordinates()
             x += i_x
             y += i_y
             z += i_z
@@ -56,7 +59,7 @@ class Placeable(object):
             if child_info['name'] == name:
                 return child
 
-    def add_child(self, child, name, coordinates):
+    def add(self, child, name, coordinates):
         if child in self.children:
             raise Exception('Child previously added')
 
@@ -87,8 +90,8 @@ class Deck(Placeable):
 
 
 class Slot(Placeable):
-    def add_child(self, child, name='slot', coordinates=(0, 0, 0)):
-        super().add_child(child, name, coordinates)
+    def add(self, child, name='slot', coordinates=(0, 0, 0)):
+        super().add(child, name, coordinates)
 
 
 class Container(Placeable):
