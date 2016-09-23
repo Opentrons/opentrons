@@ -23,8 +23,6 @@ legacy_containers_dict = json.load(
     object_pairs_hook=OrderedDict
 )['containers']
 
-print(len(legacy_containers_dict))
-
 
 def get_legacy_container(container_name : str) -> Container:
     container_data = legacy_containers_dict.get(container_name)
