@@ -1,6 +1,8 @@
+import copy
+from collections import OrderedDict
+import json
 import numbers
 import os
-import json
 import pkg_resources
 
 
@@ -16,7 +18,12 @@ legacy_containers_json_path = os.path.join(
     'legacy_containers.json'
 )
 
-legacy_containers_dict = json.load(open(legacy_containers_json_path))['containers']
+legacy_containers_dict = json.load(
+    open(legacy_containers_json_path),
+    object_pairs_hook=OrderedDict
+)['containers']
+
+print(len(legacy_containers_dict))
 
 
 def get_legacy_container(container_name : str) -> Container:
@@ -30,10 +37,15 @@ def get_legacy_container(container_name : str) -> Container:
 
 def load_all_legacy_containers():
     containers = []
-    for container_data in legacy_containers_dict.values():
-        containers.append(
-            create_container_obj_from_dict(container_data)
-        )
+    for container_name, container_data in legacy_containers_dict.items():
+        try:
+            containers.append(
+                create_container_obj_from_dict(container_data)
+            )
+        except Exception as e:
+            print('Failed to load container: {}'.format(container_name))
+            raise e
+    return containers
 
 
 def create_container_obj_from_dict(container_data : dict) -> Container:
@@ -97,7 +109,7 @@ def create_container_obj_from_dict(container_data : dict) -> Container:
                "total-liquid-volume":22000
             }
     """
-
+    container_data = copy.deepcopy(container_data)
     origin_offset_x = container_data.get('origin-offset', {}).get('x') or 0
     origin_offset_y = container_data.get('origin-offset', {}).get('y') or 0
 
@@ -113,7 +125,7 @@ def create_container_obj_from_dict(container_data : dict) -> Container:
         # assert 'diameter' in well_properties
         # assert 'length' in well_properties
         # assert 'width' in well_properties
-        assert 'total-liquid-volume' in well_properties
+        # assert 'total-liquid-volume' in well_properties
         assert isinstance(x, numbers.Number)
         assert isinstance(y, numbers.Number)
         assert isinstance(z, numbers.Number)
@@ -125,5 +137,7 @@ def create_container_obj_from_dict(container_data : dict) -> Container:
             y + origin_offset_y,
             z
         )
+
         container.add(well, well_name, well_coordinates)
+
     return container
