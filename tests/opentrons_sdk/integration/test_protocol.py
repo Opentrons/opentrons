@@ -1,7 +1,7 @@
 import unittest
 
 from opentrons_sdk.protocol.protocol import Protocol
-from opentrons_sdk.containers.placeable import Container
+from opentrons_sdk.containers.placeable import Container, Deck
 from opentrons_sdk.labware import containers, instruments
 
 
@@ -12,8 +12,8 @@ class ProtocolTestCase(unittest.TestCase):
 
     def test_protocol_container_setup(self):
 
-        plate = containers.load('microplate.96', 'A1')
-        tiprack = containers.load('tiprack.p10', 'B2')
+        plate = containers.load('96-flat', 'A1')
+        tiprack = containers.load('tiprack-10ul', 'B2')
 
         containers_list = self.protocol.get_containers()
         self.assertEqual(len(containers_list), 2)
@@ -23,8 +23,8 @@ class ProtocolTestCase(unittest.TestCase):
 
     def test_protocol_head(self):
 
-        trash = containers.load('point.trash', 'A1')
-        tiprack = containers.load('tiprack.p10', 'B2')
+        trash = containers.load('point', 'A1')
+        tiprack = containers.load('tiprack-10ul', 'B2')
 
         p200 = instruments.Pipette(
             trash_container=trash,
@@ -40,8 +40,8 @@ class ProtocolTestCase(unittest.TestCase):
     def test_deck_setup(self):
         deck = self.protocol.get_deck()
 
-        trash = containers.load('point.trash', 'A1')
-        tiprack = containers.load('tiprack.p10', 'B2')
+        trash = containers.load('point', 'A1')
+        tiprack = containers.load('tiprack-10ul', 'B2')
 
         self.assertTrue(isinstance(tiprack, Container))
         self.assertTrue(isinstance(deck, Deck))

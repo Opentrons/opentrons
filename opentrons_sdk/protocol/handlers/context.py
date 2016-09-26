@@ -71,7 +71,7 @@ class ContextHandler(ProtocolHandler):
         row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
 
         for col_index, col in enumerate('EDCBA'):
-            for row_index, row in enumerate(range(robot_rows, 1, -1)):
+            for row_index, row in enumerate(range(robot_rows, 0, -1)):
                 slot = placeable.Slot()
                 slot_coordinates = (
                     (row_offset * row_index) + x_offset,
@@ -126,7 +126,6 @@ class ContextHandler(ProtocolHandler):
 
     def add_container(self, slot, container_name):
         container = legacy_containers.get_legacy_container(container_name)
-        print('legacy container found is..', container)
         self._deck[slot].add(container, container_name)
         return container
 
