@@ -17,10 +17,9 @@ class ProtocolTestCase(unittest.TestCase):
 
         containers_list = self.protocol.containers()
         self.assertEqual(len(containers_list), 2)
-        print(containers_list)
 
-        self.assertEqual(containers_list[0], plate)
-        self.assertEqual(containers_list[1], tiprack)
+        self.assertTrue(plate in containers_list)
+        self.assertTrue(tiprack in containers_list)
 
     def test_protocol_head(self):
 
