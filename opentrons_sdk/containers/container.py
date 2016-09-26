@@ -90,8 +90,8 @@ class Deck(Placeable):
     def get_containers(self):
         return self.get_children()
 
-    def get_container(self):
-        pass
+    def get_container(self, name):
+        return self.get_child_by_name(name)
 
 
 class Slot(Placeable):

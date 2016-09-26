@@ -174,9 +174,6 @@ def add_custom_container(data, name=None, parent=None, legacy=False):
     custom container definitions.
     """
 
-    # if name.startswith('tube-rack-15_50ml_PCR'):
-    #     import pdb; pdb.set_trace()
-
     obj_type = data.pop('type', 'grid')
 
     # Handle subsets, figure out container name.
