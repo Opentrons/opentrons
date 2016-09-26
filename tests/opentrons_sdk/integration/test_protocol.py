@@ -15,7 +15,7 @@ class ProtocolTestCase(unittest.TestCase):
         plate = containers.load('96-flat', 'A1')
         tiprack = containers.load('tiprack-10ul', 'B2')
 
-        containers_list = self.protocol.get_containers()
+        containers_list = self.protocol.containers()
         self.assertEqual(len(containers_list), 2)
 
         self.assertEqual(containers_list[0], ((0, 0), plate))
