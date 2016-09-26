@@ -26,12 +26,50 @@ class ContextHandler(ProtocolHandler):
         self._instruments = {}
         self._calibration = {}
 
+
+    def get_deck_slot_types(self):
+        return 'acrylic_slots'
+
+    def get_slot_offsets(self):
+        """
+        col_offset
+        - from bottom left corner of A to bottom corner of B
+
+        row_offset
+        - from bottom left corner of 1 to bottom corner of 2
+        """
+        SLOT_OFFSETS = {
+            '3d_printed_slots': {
+                'col_offset': 91,
+                'row_offset': 134.5
+            },
+            'acrylic_slots': {
+                'col_offset': 96.25,
+                'row_offset': 133.3
+            }
+
+        }
+        slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
+        row_offset = slot_settings.get('row_offset')
+        col_offset = slot_settings.get('col_offset')
+        return (row_offset, col_offset)
+
+    def get_max_robot_rows(self):
+        # TODO: dynamically figure out robot rows
+        return 3
+
     def setup_deck(self):
         self.deck = placeable.Deck()
-        slot = placeable.Slot()
-        deck.add(slot, 'A1', (0, 0, 0))
-        slot.add(plate)
-        pass
+        robot_rows = self.get_max_robot_rows()
+        # row_offset, col_offset
+
+        for col_index, col in enumerate('EDCBA'):
+            for row_index, row in enumerate(range(robot_rows,1, -1)):
+                slot = placeable.Slot()
+                self.deck.add(
+                    slot, "{}{}".format(col, row),
+                    (row_offset * row_index, col_offset * col_index, 0)  # TODO: should z always be zero?
+                )
 
     def add_instrument(self, axis, instrument=None):
         axis = axis.upper()
