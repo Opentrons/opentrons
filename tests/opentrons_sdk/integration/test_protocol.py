@@ -53,3 +53,26 @@ class ProtocolTestCase(unittest.TestCase):
             axis="b",
             channels=1
         )
+
+    def test_tip_manipulation(self):
+        deck = self.protocol.get_deck()
+
+        trash = containers.load('point', 'A1')
+        tiprack = containers.load('tiprack-10ul', 'B2')
+
+        p10 = instruments.Pipette(
+            trash_container=trash,
+            tip_racks=[tiprack],
+            min_vol=10,  # These are variable
+            axis="b",
+            channels=1
+        )
+
+        p10.new_tip()  # Finds a new tip and grabs that tip
+        p10.droptip()  # Drop the tip to the trash_container
+
+        p10.eject_tip(trash)
+        p10.pickup_tip(tiprack['B5'])
+        #no arg, go `to `tiprack, pickup tip
+        #with an arg, go to slot, pickup tip
+
