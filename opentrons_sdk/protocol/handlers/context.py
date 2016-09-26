@@ -129,6 +129,9 @@ class ContextHandler(ProtocolHandler):
         self._deck[slot].add(container, container_name)
         return container
 
+    def get_containers(self):
+        return self._deck.containers()
+
     def get_only_instrument(self):
         ks = list(self._instruments)
         if len(ks) > 0:

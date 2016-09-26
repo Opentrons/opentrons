@@ -342,7 +342,7 @@ class Protocol():
             self._motor_handler.disconnect()
 
 
-    def get_containers(self):
+    def containers(self):
         return self._context_handler.get_containers()
 
     def get_instruments(self):

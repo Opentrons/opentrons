@@ -86,11 +86,11 @@ class Placeable(object):
 
 
 class Deck(Placeable):
-    def containers(self) -> set:
-        containers = set()
+    def containers(self) -> list:
+        containers = []
         for slot in self:
             for container in slot:
-                containers.add(container)
+                containers.append(container)
         return containers
 
     def has_container(self, query):
