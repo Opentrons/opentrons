@@ -79,7 +79,7 @@ def humanize_position(position):
     return "{}{}".format(chr(col + ord('A')), row + 1)
 
 
-class GridItem():
+class GridItem(object):
 
     parent = None
     position = None
@@ -141,7 +141,7 @@ class GridItem():
             return [self.position]
 
 
-class GridContainer():
+class GridContainer(object):
 
     """
     Change these in child implementations if you want to constrain to an
@@ -198,6 +198,9 @@ class GridContainer():
     def __init__(self, parent=None, **kwargs):
         self.parent = parent
         self._children = {}
+
+    def __iter__(self):
+        return (well for pos, well in sorted(self._children.items()))
 
     def get_child_coordinates(self, position):
         """

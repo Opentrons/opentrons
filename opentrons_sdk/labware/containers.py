@@ -438,3 +438,10 @@ def load(container_name, slot):
 _load_default_containers()
 containers_path = resource_filename("opentrons_sdk.config", "containers")
 load_custom_containers(containers_path)
+
+containers_path = resource_filename("opentrons_sdk.config", "containers")
+load_legacy_containers_file(
+        os.path.join(containers_path,
+        'legacy_containers.json'
+    )
+)
