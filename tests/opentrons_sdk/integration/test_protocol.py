@@ -1,8 +1,8 @@
 import unittest
 
 from opentrons_sdk.protocol.protocol import Protocol
+from opentrons_sdk.containers.placeable import Container
 from opentrons_sdk.labware import containers, instruments
-
 
 
 class ProtocolTestCase(unittest.TestCase):
@@ -36,3 +36,19 @@ class ProtocolTestCase(unittest.TestCase):
 
         instruments_list = self.protocol.get_instruments()
         self.assertEqual(instruments_list[0], ('B', p200))
+
+    def test_protocol_tip_manipulation(self):
+
+        trash = containers.load('point.trash', 'A1')
+        tiprack = containers.load('tiprack.p10', 'B2')
+
+        self.assertTrue(isinstance(tiprack, Container))
+
+        p10 = instruments.Pipette(
+            trash_container=trash,
+            tip_racks=[tiprack],
+            min_vol=10,  # These are variable
+            axis="b",
+            channels=1
+        )
+

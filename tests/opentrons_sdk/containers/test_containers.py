@@ -1,7 +1,7 @@
 import unittest
 import math
 
-from opentrons_sdk.containers.container import (
+from opentrons_sdk.containers.placeable import (
     Container,
     Well,
     Deck,

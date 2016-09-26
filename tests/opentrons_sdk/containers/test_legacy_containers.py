@@ -2,7 +2,7 @@ import unittest
 import json
 from collections import OrderedDict
 
-from opentrons_sdk.containers.container import Container, Well
+from opentrons_sdk.containers.placeable import Container, Well
 from opentrons_sdk.containers.legacy_containers import (
     create_container_obj_from_dict,
     get_legacy_container,

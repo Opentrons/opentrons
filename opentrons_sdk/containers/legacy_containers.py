@@ -6,7 +6,7 @@ import os
 import pkg_resources
 
 
-from opentrons_sdk.containers.container import Container, Well
+from opentrons_sdk.containers.placeable import Container, Well
 
 
 containers_dir_path = pkg_resources.resource_filename(
