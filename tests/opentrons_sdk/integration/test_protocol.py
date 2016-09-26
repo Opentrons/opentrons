@@ -45,8 +45,8 @@ class ProtocolTestCase(unittest.TestCase):
 
         self.assertTrue(isinstance(tiprack, Container))
         self.assertTrue(isinstance(deck, Deck))
-        self.assertTrue(trash in deck)
-        self.assertTrue(tiprack in deck)
+        self.assertTrue(deck.has_container(trash))
+        self.assertTrue(deck.has_container(tiprack))
 
         p10 = instruments.Pipette(
             trash_container=trash,

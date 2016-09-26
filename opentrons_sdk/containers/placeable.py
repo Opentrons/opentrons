@@ -86,13 +86,15 @@ class Placeable(object):
 
 
 class Deck(Placeable):
-    # TODO: remove 'get' to be consistent
-    def get_containers(self):
-        # TODO: do we need to go slots
-        return self.get_children()
+    def containers(self) -> set:
+        containers = set()
+        for slot in self:
+            for container in slot:
+                containers.add(container)
+        return containers
 
-    def get_container(self, name):
-        return self.get_child_by_name(name)
+    def has_container(self, query):
+        return query in self.containers()
 
 
 class Slot(Placeable):
