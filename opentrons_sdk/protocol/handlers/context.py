@@ -1,6 +1,6 @@
 from opentrons_sdk.protocol.handlers import ProtocolHandler
 from opentrons_sdk.labware import deck, instruments
-from opentrons_sdk.containers import placeable
+from opentrons_sdk.containers import legacy_containers, placeable
 
 
 class ContextHandler(ProtocolHandler):
@@ -81,6 +81,9 @@ class ContextHandler(ProtocolHandler):
                 slot_name = "{}{}".format(col, row)
                 self.deck.add(slot, slot_name, (slot_coordinates))
 
+    def get_deck(self):
+        return self._deck
+
     def add_instrument(self, axis, instrument=None):
         axis = axis.upper()
         # We only have pipettes now so this is pipette-specific.
@@ -121,14 +124,10 @@ class ContextHandler(ProtocolHandler):
         """
         return sorted(self._instruments.items())
 
-    def find_container(self, **filters):
-        return self._deck.find_module(**filters)
-
-    def get_containers(self, **filters):
-        return self._deck.get_modules(**filters)
-
     def add_container(self, slot, container_name):
-        return self._deck.add_module(slot, container_name)
+        container = legacy_containers.get_legacy_container(container_name)
+        self._deck[slot].add(container, container_name)
+        return container
 
     def get_only_instrument(self):
         ks = list(self._instruments)

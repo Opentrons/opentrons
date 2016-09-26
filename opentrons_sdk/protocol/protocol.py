@@ -52,13 +52,9 @@ class Protocol():
         self._handlers = []
         self._initialize_context()
 
-    def add_container(self, slot, name, label=None):
-        slot = normalize_position(slot)
+    def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)
         self._containers[slot] = name
-        if (label):
-            label = label.lower()
-            self._container_labels[label] = slot
         return container_obj
 
 
@@ -351,3 +347,6 @@ class Protocol():
 
     def get_instruments(self):
         return self._context_handler.get_instruments()
+
+    def get_deck(self):
+        return self._context_handler.get_deck()

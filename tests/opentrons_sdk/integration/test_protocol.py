@@ -37,12 +37,16 @@ class ProtocolTestCase(unittest.TestCase):
         instruments_list = self.protocol.get_instruments()
         self.assertEqual(instruments_list[0], ('B', p200))
 
-    def test_protocol_tip_manipulation(self):
+    def test_deck_setup(self):
+        deck = self.protocol.get_deck()
 
         trash = containers.load('point.trash', 'A1')
         tiprack = containers.load('tiprack.p10', 'B2')
 
         self.assertTrue(isinstance(tiprack, Container))
+        self.assertTrue(isinstance(deck, Deck))
+        self.assertTrue(trash in deck)
+        self.assertTrue(tiprack in deck)
 
         p10 = instruments.Pipette(
             trash_container=trash,
@@ -51,4 +55,3 @@ class ProtocolTestCase(unittest.TestCase):
             axis="b",
             channels=1
         )
-
