@@ -68,7 +68,7 @@ class ContextHandler(ProtocolHandler):
 
     def setup_deck(self):
         robot_rows = self.get_max_robot_rows()
-        row_offset, col_offset, x_offset, y_offset = get_slot_offsets()
+        row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
 
         for col_index, col in enumerate('EDCBA'):
             for row_index, row in enumerate(range(robot_rows, 1, -1)):
@@ -79,7 +79,7 @@ class ContextHandler(ProtocolHandler):
                     0  # TODO: should z always be zero?
                 )
                 slot_name = "{}{}".format(col, row)
-                self.deck.add(slot, slot_name, (slot_coordinates))
+                self._deck.add(slot, slot_name, (slot_coordinates))
 
     def get_deck(self):
         return self._deck
