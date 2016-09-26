@@ -9,12 +9,12 @@ from opentrons_sdk.containers.container import (
 
 
 class ContainerTestCase(unittest.TestCase):
-    def generate_plate(self, wells, rows, spacing, offset, radius):
+    def generate_plate(self, wells, cols, spacing, offset, radius):
         c = Container()
 
         for i in range(0, wells):
             well = Well(properties={'radius': radius})
-            row, col = divmod(i, rows)
+            row, col = divmod(i, cols)
             name = chr(row + ord('A')) + str(1 + col)
             coordinates = (col * spacing[0] + offset[0],
                            row * spacing[1] + offset[1],
@@ -45,7 +45,7 @@ class ContainerTestCase(unittest.TestCase):
     def test_generate_plate(self):
         c = self.generate_plate(
             wells=96,
-            rows=8,
+            cols=8,
             spacing=(10, 15),
             offset=(5, 15),
             radius=5
@@ -59,7 +59,7 @@ class ContainerTestCase(unittest.TestCase):
         slot = Slot()
         plate = self.generate_plate(
             wells=96,
-            rows=8,
+            cols=8,
             spacing=(10, 15),
             offset=(5, 15),
             radius=5
@@ -74,7 +74,7 @@ class ContainerTestCase(unittest.TestCase):
         slot = Slot()
         plate = self.generate_plate(
             wells=4,
-            rows=2,
+            cols=2,
             spacing=(10, 10),
             offset=(0, 0),
             radius=5

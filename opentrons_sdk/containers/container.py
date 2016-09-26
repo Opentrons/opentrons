@@ -6,7 +6,6 @@ from collections import OrderedDict
 class Placeable(object):
 
     def __init__(self, parent=None):
-        self.name = None
         self.children = OrderedDict()
         self.parent = parent
 
@@ -87,7 +86,9 @@ class Placeable(object):
 
 
 class Deck(Placeable):
+    # TODO: remove 'get' to be consistent
     def get_containers(self):
+        # TODO: do we need to go slots
         return self.get_children()
 
     def get_container(self, name):
@@ -170,16 +171,15 @@ class Well(Placeable):
                 z)
 
     def from_center(self, x=None, y=None, z=None, r=None, theta=None, h=None):
-        res = None
+        coords_to_endpoint = None
         if all([isinstance(i, numbers.Number) for i in (x, y, z)]):
-            res = self.from_cartesian(x, y, z)
+            coords_to_endpoint = self.from_cartesian(x, y, z)
 
         if all([isinstance(i, numbers.Number) for i in (r, theta, h)]):
-            res = self.from_polar(r, theta, h)
+            coords_to_endpoint = self.from_polar(r, theta, h)
 
         deck = self.find_parent_deck()
-        res = tuple(
-            map(
-                lambda a: a[0] + a[1], zip(self.coordinates(deck), res)))
+        coords_to_deck = self.coordinates(deck)
+        res = tuple(a + b for a, b in zip(coords_to_deck, coords_to_endpoint))
         return res
 
