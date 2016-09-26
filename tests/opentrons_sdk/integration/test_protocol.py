@@ -11,7 +11,6 @@ class ProtocolTestCase(unittest.TestCase):
         self.protocol = Protocol.get_instance()
 
     def test_protocol_container_setup(self):
-
         plate = containers.load('96-flat', 'A1')
         tiprack = containers.load('tiprack-10ul', 'B2')
 
@@ -22,7 +21,6 @@ class ProtocolTestCase(unittest.TestCase):
         self.assertTrue(tiprack in containers_list)
 
     def test_protocol_head(self):
-
         trash = containers.load('point', 'A1')
         tiprack = containers.load('tiprack-10ul', 'B2')
 
