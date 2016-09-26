@@ -21,7 +21,7 @@ class ContextHandler(ProtocolHandler):
     _calibration = None
 
     def setup(self):
-        # self._deck = deck.Deck()
+        self._deck = placeable.Deck()
         self.setup_deck()
         self._instruments = {}
         self._calibration = {}
@@ -37,13 +37,19 @@ class ContextHandler(ProtocolHandler):
 
         row_offset
         - from bottom left corner of 1 to bottom corner of 2
+
+        TODO: figure out actual X and Y offsets (from origin)
         """
         SLOT_OFFSETS = {
             '3d_printed_slots': {
+                'x_offset': 10,
+                'y_offset': 10,
                 'col_offset': 91,
                 'row_offset': 134.5
             },
             'acrylic_slots': {
+                'x_offset': 10,
+                'y_offset': 10,
                 'col_offset': 96.25,
                 'row_offset': 133.3
             }
@@ -52,24 +58,28 @@ class ContextHandler(ProtocolHandler):
         slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
         row_offset = slot_settings.get('row_offset')
         col_offset = slot_settings.get('col_offset')
-        return (row_offset, col_offset)
+        x_offset = slot_settings.get('x_offset')
+        y_offset = slot_settings.get('y_offset')
+        return (row_offset, col_offset, x_offset, y_offset)
 
     def get_max_robot_rows(self):
         # TODO: dynamically figure out robot rows
         return 3
 
     def setup_deck(self):
-        self.deck = placeable.Deck()
         robot_rows = self.get_max_robot_rows()
-        # row_offset, col_offset
+        row_offset, col_offset, x_offset, y_offset = get_slot_offsets()
 
         for col_index, col in enumerate('EDCBA'):
-            for row_index, row in enumerate(range(robot_rows,1, -1)):
+            for row_index, row in enumerate(range(robot_rows, 1, -1)):
                 slot = placeable.Slot()
-                self.deck.add(
-                    slot, "{}{}".format(col, row),
-                    (row_offset * row_index, col_offset * col_index, 0)  # TODO: should z always be zero?
+                slot_coordinates = (
+                    (row_offset * row_index) + x_offset,
+                    (col_offset * col_index) + y_offset,
+                    0  # TODO: should z always be zero?
                 )
+                slot_name = "{}{}".format(col, row)
+                self.deck.add(slot, slot_name, (slot_coordinates))
 
     def add_instrument(self, axis, instrument=None):
         axis = axis.upper()
