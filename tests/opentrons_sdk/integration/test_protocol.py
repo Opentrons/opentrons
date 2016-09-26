@@ -36,4 +36,3 @@ class ProtocolTestCase(unittest.TestCase):
 
         instruments_list = self.protocol.get_instruments()
         self.assertEqual(instruments_list[0], ('B', p200))
-
