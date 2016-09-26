@@ -126,6 +126,7 @@ class ContextHandler(ProtocolHandler):
 
     def add_container(self, slot, container_name):
         container = legacy_containers.get_legacy_container(container_name)
+        print('legacy container found is..', container)
         self._deck[slot].add(container, container_name)
         return container
 

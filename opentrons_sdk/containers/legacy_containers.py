@@ -27,7 +27,7 @@ legacy_containers_dict = json.load(
 def get_legacy_container(container_name : str) -> Container:
     container_data = legacy_containers_dict.get(container_name)
     if not container_data:
-        return Exception(
+        raise Exception(
             'Legacy container "{}" does not exist'.format(container_name)
         )
     return create_container_obj_from_dict(container_data)
