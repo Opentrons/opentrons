@@ -76,82 +76,16 @@ class Protocol():
         # self._instruments[axis] = name
         self._context_handler.add_instrument(axis, instrument)
 
-    def add_ingredient(self, name, location):
-        pass
-
-    def allocate(self, **kwargs):
-        pass
-
-    def calibrate(self, position, **kwargs):
-        if ':' in position:
-            pos = self._normalize_address(position)
-        else:
-            pos = normalize_position(position)
-        self._context_handler.calibrate(pos, **kwargs)
-
-    def calibrate_instrument(self, axis, top=None, blowout=None, droptip=None,
-                             bottom=None):
-        self._context_handler.calibrate_instrument(
-            axis, top=top, bottom=bottom, blowout=blowout, droptip=droptip
-        )
-
     @property
     def actions(self):
         return copy.deepcopy(self._commands)
-
-    def _get_slot(self, name):
-        """
-        Returns a container within a given slot, can take a slot position
-        as a tuple (0, 0) or as a user-friendly name ('A1') or as a label
-        ('ingredients').
-        """
-        slot = None
-
-        try:
-            slot = normalize_position(name)
-        except TypeError:
-            if slot in self._container_labels:
-                slot = self._container_labels[slot]
-
-        if not slot:
-            raise KeyError("Slot not defined: " + name)
-        if slot not in self._deck:
-            raise KeyError("Nothing in slot: " + name)
-
-        return self._deck[slot]
-
-    def _normalize_address(self, address):
-        """
-        Takes an address like "A1:A1" or "Ingredients:A1" and returns a tuple
-        like (0, 0) or ('ingredients', 0).
-
-        Container labels are retained in the address tuples so that named
-        containers can be assigned to different slots within the user
-        interface.
-        """
-
-        if ':' not in address:
-            raise ValueError(
-                "Address must be in the form of 'container:well'."
-            )
-
-        container, well = address.split(':')
-        well = normalize_position(well)
-
-        try:
-            container = normalize_position(container)
-        except ValueError:
-            container = container.lower()
-            if container not in self._container_labels:
-                raise KeyError("Container not found: {}".format(container))
-
-        return (container, well)
 
     def run(self):
         """
         A generator that runs each command and yields the current command
         index and the number of total commands.
         """
+        # TODO: Rewrite to use new command queue
         self._initialize_context()
         i = 0
         yield(0, len(self._commands))
@@ -169,6 +103,7 @@ class Protocol():
 
         Useful for when you don't care about the progress.
         """
+        # TODO: Rewrite to use new command queue
         for _ in self.run():
             pass
 
@@ -203,6 +138,7 @@ class Protocol():
         method(**kwargs)
 
     def _run(self, index):
+        # TODO: Rewrite to use new command queue
         cur = self._commands[index]
         command = list(cur)[0]
         kwargs = cur[command]
