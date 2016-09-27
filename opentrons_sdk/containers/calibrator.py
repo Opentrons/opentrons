@@ -1,5 +1,4 @@
 import copy
-from collections import OrderedDict
 
 
 class Calibrator(object):
@@ -26,7 +25,6 @@ class Calibrator(object):
         path = list(reversed([item.get_name()
                              for item in placeable.get_trace()
                              if item.get_name() is not None]))
-
         calibration_data = copy.deepcopy(calibration_data)
 
         current = {'children': calibration_data}
