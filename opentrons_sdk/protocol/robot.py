@@ -8,15 +8,7 @@ from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
 from opentrons_sdk.protocol.command import Command
 
 
-
-class Robot():
-
-    _ingredients = None  # { 'name': "A1:A1" }
-
-    _instruments = None  # { motor_axis: instrument }
-
-    _container_labels = None  # Aliases. { 'foo': (0,0), 'bar': (0,1) }
-
+class Robot(object):
     _commands = None  # []
 
     _handlers = None  # List of attached handlers for run_next.
@@ -48,9 +40,6 @@ class Robot():
 
     def __init__(self):
         self._ingredients = {}
-        self._container_labels = {}
-        self._instruments = {}
-        self._containers = {}
         self._commands = []
         self._handlers = []
         self._initialize_context()
@@ -71,9 +60,6 @@ class Robot():
         return container_obj
 
     def add_instrument(self, axis, instrument=None):
-        # TODO: Do we really want to keep this object in sync with what is in
-        # ContextHandler inst obj
-        # self._instruments[axis] = name
         self._context_handler.add_instrument(axis, instrument)
 
     @property
@@ -117,8 +103,6 @@ class Robot():
         self._context_handler = ContextHandler(self)
         for slot, name in self._containers.items():
             self._context_handler.add_container(slot, name)
-        for axis, name in self._instruments.items():
-            self._context_handler.add_instrument(axis, name)
         if calibration:
             self._context_handler._calibration = calibration
 
