@@ -33,7 +33,7 @@ class Pipette(object):
         def _aspirate():
             self.protocol.move_to(address, instrument=self)
             self.motor.move(a=50)
-        self.protocol.add(command.Command(do=_aspirate))
+        self.protocol.add_command(command.Command(do=_aspirate))
 
     def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, max_volume=None):
         """Set calibration values for the pipette plunger.
