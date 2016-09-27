@@ -10,7 +10,7 @@ class PipetteTest(unittest.TestCase):
         Robot.reset()
         self.robot = Robot.get_instance()
         self.robot.connect(port='/dev/tty.usbmodem1421')
-        self.robot.home()
+        # self.robot.home()
 
         # self.robot.move_to = mock.Mock()
 
@@ -32,9 +32,22 @@ class PipetteTest(unittest.TestCase):
         # self.p200.motor = mock.Mock()
 
     def test_aspirate(self):
-        self.p200.aspirate(100, (100,0,0))
+        
 
-        self.p200.aspirate(100, self.plate['H12'])
+        def wuggle():
+            level = 5
+            while level:
+                self.p200.aspirate(100, (80,0,0))
+                self.p200.aspirate(100, (100,0,0))
+                self.robot.run()
+                print('something...', level)
+                level -= 1
+
+        self.robot.register('wuggle', wuggle)
+
+        self.robot.wuggle()
+
+        self.robot.run()
 
         # expected = [ mock.call.move(z=0), mock.call.move(x=100, y=0), mock.call.move(z=0) ]
         # self.assertEquals(self.robot.move_to.mock_calls, expected)
