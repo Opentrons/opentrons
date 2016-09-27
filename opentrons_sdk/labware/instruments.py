@@ -1,8 +1,7 @@
-class Pipette(object):
+from opentrons_sdk.protocol import command
 
-    # channels = 1
-    # size = 'P10'
-    # min_vol = 0
+
+class Pipette(object):
     max_vol = 10
 
     _top = None  # Top of the plunger.
@@ -10,25 +9,34 @@ class Pipette(object):
     _blowout = None  # Bottom of the plunger (all liquid expelled).
     _droptip = None  # Point where the screw on the axis hits the droptip.
 
-    # _axis = None
 
-    _points = [
-        {'f1': 1, 'f2': 1},
-        {'f1': 2000, 'f2': 2000}
-    ]
-
-    def __init__(self, axis, channels=1, min_vol=0, trash_container=None, tip_racks=None):
+    def __init__(
+            self,
+            axis,
+            channels=1,
+            min_vol=0,
+            trash_container=None,
+            tip_racks=None):
         self.axis = axis
         self.channels = channels
         self.min_vol = min_vol
         self.trash_container = trash_container
         self.tip_racks = tip_racks
+        self.motor = None
 
         from opentrons_sdk.protocol.protocol import Protocol
         self.protocol = Protocol.get_instance()
         self.protocol.add_instrument(self.axis, self)
 
-    def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, axis='A'):
+        self.motor = Protocol.get_motor_driver(axis=self.axis)
+
+    def aspirate(self, volume, address):
+        def _aspirate():
+            self.protocol.move_to(address, instrument=self)
+            self.motor.move(a=50)
+        self.protocol.add(command.Command(do=_aspirate))
+
+    def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, max_volume=None):
         """Set calibration values for the pipette plunger.
 
         This can be called multiple times as the user sets each value,
@@ -63,8 +71,8 @@ class Pipette(object):
             self._blowout = blowout
         if droptip is not None:
             self._droptip = droptip
-        if axis:
-            self._axis = axis
+        if max_volume:
+            self.max_vol = max_volume
 
     def plunge_depth(self, volume):
         """Calculate axis position for a given liquid volume.
@@ -82,7 +90,7 @@ class Pipette(object):
         percent = self._volume_percentage(volume)
         travel = self._bottom - self._top
         distance = travel * percent
-        return self._top + distance
+        return self._bottom - distance
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -138,33 +146,3 @@ class Pipette(object):
     @property
     def name(self):
         return self.size.lower()
-
-
-class Pipette_P2(Pipette):
-    size = 'P2'
-    min_vol = 0.0
-    max_vol = 2
-
-
-class Pipette_P10(Pipette):
-    size = 'P10'
-    min_vol = 0.5
-    max_vol = 10
-
-
-class Pipette_P20(Pipette):
-    size = 'P20'
-    min_vol = 2
-    max_vol = 20
-
-
-class Pipette_P200(Pipette):
-    size = 'P200'
-    min_vol = 20
-    max_vol = 200
-
-
-class Pipette_P1000(Pipette):
-    size = 'P1000'
-    min_vol = 200
-    max_vol = 1000

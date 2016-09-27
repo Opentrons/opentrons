@@ -1,10 +1,12 @@
-from opentrons_sdk.labware import containers, deck, instruments
-from opentrons_sdk.labware.grid import normalize_position, humanize_position
-import opentrons_sdk.drivers.motor as motor_drivers
-from opentrons_sdk.util.log import debug
-from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
 
 import copy
+
+from opentrons_sdk.labware.grid import normalize_position, humanize_position
+
+from opentrons_sdk.util.log import debug
+from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
+from opentrons_sdk.protocol.command import Command
+
 
 
 class Protocol():
@@ -27,6 +29,7 @@ class Protocol():
     _containers = None  # { slot: container_name }
 
     _instance = None
+
 
     @classmethod
     def get_instance(cls):
@@ -52,12 +55,20 @@ class Protocol():
         self._handlers = []
         self._initialize_context()
 
+    def add_command(self, command: Command):
+        # TODO: validate with isinstance
+        self._commands.append(command)
+
+    def move_to(self, address):
+        self.motor.move(x=100)
+        self.motor.move(y7=100)
+        # def _move_to():
+        # self._commands.add(command.Command(_move_to))
+
     def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)
         self._containers[slot] = name
         return container_obj
-
-
 
     def add_instrument(self, axis, instrument=None):
         # TODO: Do we really want to keep this object in sync with what is in
@@ -82,106 +93,6 @@ class Protocol():
                              bottom=None):
         self._context_handler.calibrate_instrument(
             axis, top=top, bottom=bottom, blowout=blowout, droptip=droptip
-        )
-
-    def add_command(self, command, **kwargs):
-        self._run_in_context_handler(command, **kwargs)
-        self._commands.append({command: kwargs})
-
-    def transfer(self, start, end, ul=None, ml=None,
-                 blowout=True, touchtip=True, tool=None):
-        if ul:
-            volume = ul
-        else:
-            volume = ml * 1000
-        if tool is None:
-            inst = self._context_handler.get_instrument(volume=volume)
-            tool = inst.name
-        self.add_command(
-            'transfer',
-            volume=volume,
-            tool=tool,
-            start=self._normalize_address(start),
-            end=self._normalize_address(end),
-            blowout=blowout,
-            touchtip=touchtip
-        )
-
-    def transfer_group(self, *wells, ul=None, ml=None, **defaults):
-        if ul:
-            volume = ul
-        elif ml:
-            volume = ul * 1000
-        else:
-            volume = None
-        defaults.update({
-            'touchtip': True,
-            'blowout': True,
-            'volume': volume
-        })
-        transfers = []
-        for item in wells:
-            options = defaults.copy()
-            if len(item) is 3:
-                start, end, opts = item
-                options.update(opts)
-            else:
-                start, end = item
-            vol = options.get('ul') or options.get('ml', 0) * 1000
-            vol = vol or volume
-            transfers.append({
-                'volume': vol,
-                'start': self._normalize_address(start),
-                'end': self._normalize_address(end),
-                'blowout': options['blowout'],
-                'touchtip': options['touchtip']
-            })
-        self.add_command(
-            'transfer_group',
-            tool=options['tool'],
-            transfers=transfers
-        )
-
-    def distribute(self, start, *wells, blowout=True):
-        transfers = []
-        for item in wells:
-            end, volume = item
-            transfers.append({
-                'volume': volume,
-                'end': self._normalize_address(end)
-            })
-        self.add_command(
-            'distribute',
-            tool='p10',
-            start=self._normalize_address(start),
-            blowout=blowout,
-            transfers=transfers
-        )
-
-    def consolidate(self, end, *wells, blowout=True):
-        transfers = []
-        for item in wells:
-            start, volume = item
-            transfers.append({
-                'volume': volume,
-                'start': self._normalize_address(start)
-            })
-        self.add_command(
-            'consolidate',
-            tool='p10',
-            end=self._normalize_address(end),
-            blowout=blowout,
-            transfers=transfers
-        )
-
-    def mix(self, start, volume=None, repetitions=None, blowout=True):
-        self.add_command(
-            'mix',
-            tool='p10',
-            start=self._normalize_address(start),
-            blowout=blowout,
-            volume=volume,
-            reps=repetitions
         )
 
     @property

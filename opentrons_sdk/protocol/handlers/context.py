@@ -23,6 +23,20 @@ class ContextHandler(ProtocolHandler):
     def setup(self):
         self._deck = placeable.Deck()
         self.setup_deck()
+
+        self._initial_deck = copy.deepcopy(self._deck)
+
+        'deck.slot.container.well'
+        '*.id(slot).microplate.A1': (+1, -2, +3)
+        '*.id(slot).microplate.A1': (+1, -2, +3)
+        '*.id(slot).microplate.A1': (+1, -2, +3)
+
+        calibrations = {
+            'deck': {
+                'slot':'',
+            }
+        }
+
         self._instruments = {}
         self._calibration = {}
 
