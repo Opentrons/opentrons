@@ -1,7 +1,7 @@
 import copy
 
 from opentrons_sdk.util.log import debug
-from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
+from opentrons_sdk.protocol.handlers import ContextHandler
 from opentrons_sdk.protocol.command import Command
 
 import opentrons_sdk.drivers.motor as motor_drivers
@@ -175,18 +175,9 @@ class Robot(object):
         self._handlers.append(handler)
         return handler
 
-    def attach_motor(self, port=None):
-        self._motor_handler = self.attach_handler(MotorControlHandler)
-        if port is not None:
-            self._motor_handler.connect(port)
-        else:
-            self._motor_handler.simulate()
-        return self._motor_handler
-
     def disconnect(self):
         if self._motor_handler:
             self._motor_handler.disconnect()
-
 
     def containers(self):
         return self._context_handler.get_containers()
