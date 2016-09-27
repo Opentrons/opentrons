@@ -68,11 +68,11 @@ class ProtocolTestCase(unittest.TestCase):
             channels=1
         )
 
-        p10.new_tip()  # Finds a new tip and grabs that tip
-        p10.droptip()  # Drop the tip to the trash_container
-
-        p10.eject_tip(trash)
-        p10.pickup_tip(tiprack['B5'])
+        # p10.new_tip()  # Finds a new tip and grabs that tip
+        # p10.droptip()  # Drop the tip to the trash_container
+        #
+        # p10.eject_tip(trash)
+        # p10.pickup_tip(tiprack['B5'])
         #no arg, go `to `tiprack, pickup tip
         #with an arg, go to slot, pickup tip
 

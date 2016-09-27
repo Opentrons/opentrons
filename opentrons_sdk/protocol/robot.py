@@ -41,6 +41,7 @@ class Robot(object):
         self._ingredients = {}
         self._commands = []
         self._handlers = []
+        self._initialize_context()
 
     def set_driver(self, driver):
         self._driver = driver
@@ -68,7 +69,7 @@ class Robot(object):
 
     def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)
-        self._containers[slot] = name
+        # self._containers[slot] = name
         return container_obj
 
     def add_instrument(self, axis, instrument=None):
@@ -113,8 +114,10 @@ class Robot(object):
         if self._context_handler:
             calibration = self._context_handler._calibration
         self._context_handler = ContextHandler(self)
-        for slot, name in self._containers.items():
-            self._context_handler.add_container(slot, name)
+        # for slot, name in self._containers.items():
+        #     self._context_handler.add_container(slot, name)
+        # for axis, name in self._instruments.items():
+        #     self._context_handler.add_instrument(axis, name)
         if calibration:
             self._context_handler._calibration = calibration
 
