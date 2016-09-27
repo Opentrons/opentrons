@@ -4,10 +4,10 @@ from opentrons_sdk.protocol import command
 class Pipette(object):
     max_vol = 10
 
-    _top = None  # Top of the plunger.
-    _bottom = None
-    _blowout = None  # Bottom of the plunger (all liquid expelled).
-    _droptip = None  # Point where the screw on the axis hits the droptip.
+    _top = 0  # Top of the plunger.
+    _bottom = 1
+    _blowout = 2  # Bottom of the plunger (all liquid expelled).
+    _droptip = 3  # Point where the screw on the axis hits the droptip.
 
 
     def __init__(
@@ -17,6 +17,7 @@ class Pipette(object):
             min_vol=0,
             trash_container=None,
             tip_racks=None):
+
         self.axis = axis
         self.channels = channels
         self.min_vol = min_vol
@@ -25,15 +26,19 @@ class Pipette(object):
         self.motor = None
 
         from opentrons_sdk.protocol.robot import Robot
-        self.protocol = Robot.get_instance()
-        self.protocol.add_instrument(self.axis, self)
-        # self.motor = Robot.get_motor_driver(axis=self.axis)
+        self.robot = Robot.get_instance()
+        self.robot.add_instrument(self.axis, self)
+        self.motor = self.robot.get_motor_driver(self.axis)
 
-    def aspirate(self, volume, address):
-        def _aspirate():
-            self.protocol.move_to(address, instrument=self)
-            self.motor.move(a=50)
-        self.protocol.add_command(command.Command(do=_aspirate))
+    def aspirate(self, volume, address=None):
+        #def _aspirate():
+        if address:
+            self.robot.move_to(address)
+
+        # use volume here
+        self.motor.move(self.bottom)
+        self.motor.move(self.top)
+        #self.robot.add_command(command.Command(do=_aspirate))
 
     def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, max_volume=None):
         """Set calibration values for the pipette plunger.
@@ -131,12 +136,16 @@ class Pipette(object):
         return self.min_vol <= volume <= self.max_vol
 
     @property
-    def blowout(self):
-        return self._blowout
+    def top(self):
+        return self._top
 
     @property
     def bottom(self):
         return self._bottom
+
+    @property
+    def blowout(self):
+        return self._blowout
 
     @property
     def droptip(self):

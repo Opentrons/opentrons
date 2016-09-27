@@ -47,6 +47,18 @@ class Robot(object):
     def set_driver(self, driver):
         self._driver = driver
 
+    def get_motor_driver(self, axis):
+        robot_self = self
+
+        class InstrumentMotor():
+            def move(self, value, speed=None, absolute=True):
+                kwargs = {axis:value}
+                return robot_self._driver.move(speed=speed, absolute=absolute, **kwargs)
+            def home(self):
+                return robot_self._driver.home(axis)
+
+        return InstrumentMotor()
+
     def list_serial_ports(self):
         return self._driver.list_serial_ports()
 
@@ -63,11 +75,17 @@ class Robot(object):
     def simulate(self):
         self.set_driver(motor_drivers.MoveLogger())
 
+    def home(self):
+        if self._driver.resume():
+            return self._driver.home()
+        else:
+            return False
+
     def add_command(self, command: Command):
         # TODO: validate with isinstance
         self._commands.append(command)
 
-    def move_to(self, address):
+    def move_to(self, address, instrument=None):
         coords = None
         if isinstance(address, placeable.Placeable):
             coords = address.coordinates()
@@ -80,6 +98,7 @@ class Robot(object):
         # TODO: (andy) path optomization goes here
         #       now it simply just goes to the top every time
 
+        print(coords)
         self._driver.move(z=0)
         self._driver.move(x=coords[0], y=coords[1])
         self._driver.move(z=coords[2])

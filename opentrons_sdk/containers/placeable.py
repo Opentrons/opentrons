@@ -21,6 +21,9 @@ class Placeable(object):
     def __len__(self):
         return len(self.children)
 
+    def __bool__(self):
+        return True
+
     def __next__(self):
         if not self.get_parent():
             raise Exception('Must have a parent')
