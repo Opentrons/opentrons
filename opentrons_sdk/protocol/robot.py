@@ -1,5 +1,6 @@
 import copy
 
+from opentrons_sdk.containers import placeable
 from opentrons_sdk.util.log import debug
 from opentrons_sdk.protocol.handlers import ContextHandler
 from opentrons_sdk.protocol.command import Command
@@ -59,13 +60,29 @@ class Robot(object):
         self.set_driver(motor_drivers.OpenTrons())
         return self._driver.connect(device=port)
 
+    def simulate(self):
+        self.set_driver(motor_drivers.MoveLogger())
+
     def add_command(self, command: Command):
         # TODO: validate with isinstance
         self._commands.append(command)
 
     def move_to(self, address):
-        self._driver.move(x=100)
-        self._driver.move(y=100)
+        coords = None
+        if isinstance(address, placeable.Placeable):
+            coords = address.coordinates()
+        elif isinstance(address, tuple) and len(address) == 3:
+            coords = address
+        else:
+            raise Exception('Unable to parse address: {}'.format(address))
+
+
+        # TODO: (andy) path optomization goes here
+        #       now it simply just goes to the top every time
+
+        self._driver.move(z=0)
+        self._driver.move(x=coords[0], y=coords[1])
+        self._driver.move(z=coords[2])
 
     def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)

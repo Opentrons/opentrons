@@ -1,6 +1,21 @@
 import unittest
+from unittest import mock
+
 from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.protocol import Robot
+
+class RobotTest(unittest.TestCase):
+
+	def setUp(self):
+		Robot.reset()
+		self.robot = Robot.get_instance()
+		self.robot.simulate()
+		self.robot._driver = mock.Mock()
+
+	def test_robot_move_to(self):
+		self.robot.move_to((0,0,0))
+		expected = [ mock.call.move(z=0), mock.call.move(x=0, y=0), mock.call.move(z=0) ]
+		self.assertEquals(self.robot._driver.mock_calls, expected)
 
 
 # class ProtocolTest(unittest.TestCase):
