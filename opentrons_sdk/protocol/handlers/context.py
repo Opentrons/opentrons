@@ -1,5 +1,5 @@
 from opentrons_sdk.protocol.handlers import ProtocolHandler
-from opentrons_sdk.labware import deck, instruments
+# from opentrons_sdk.labware import deck, instruments
 from opentrons_sdk.containers import legacy_containers, placeable
 
 
@@ -23,19 +23,6 @@ class ContextHandler(ProtocolHandler):
     def setup(self):
         self._deck = placeable.Deck()
         self.setup_deck()
-
-        self._initial_deck = copy.deepcopy(self._deck)
-
-        'deck.slot.container.well'
-        '*.id(slot).microplate.A1': (+1, -2, +3)
-        '*.id(slot).microplate.A1': (+1, -2, +3)
-        '*.id(slot).microplate.A1': (+1, -2, +3)
-
-        calibrations = {
-            'deck': {
-                'slot':'',
-            }
-        }
 
         self._instruments = {}
         self._calibration = {}
