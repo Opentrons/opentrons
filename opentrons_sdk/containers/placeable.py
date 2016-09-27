@@ -11,12 +11,12 @@ class Placeable(object):
 
     def __getitem__(self, name):
         if isinstance(name, int):
-            return list(self.children.keys())[name]
+            return self.get_children_list()[name]
         else:
             return self.get_child_by_name(name)
 
     def __iter__(self):
-        return iter(self.children.keys())
+        return iter(v['instance'] for k, v in self.children.items())
 
     def __len__(self):
         return len(self.children)
@@ -25,17 +25,22 @@ class Placeable(object):
         if not self.get_parent():
             raise Exception('Must have a parent')
 
-        children = list(self.parent.get_children().keys())
+        children = self.parent.get_children_list()
         my_loc = children.index(self)
         return children[my_loc + 1]
 
-    def coordinates(self, reference=None):
-        if not self.parent:
-            return (0, 0, 0)
+    def get_name(self):
+        if self.parent is None:
+            return None
 
-        if not reference:
-            return self.parent.get_child_coordinates(self)
+        for name, data in self.parent.children.items():
+            if data['instance'] == self:
+                return name
 
+    def get_children_list(self):
+        return list([v['instance'] for k, v in self.children.items()])
+
+    def get_trace(self, reference=None):
         trace = [self]
         parent = self.get_parent()
         while parent:
@@ -44,8 +49,18 @@ class Placeable(object):
                 break
             parent = parent.get_parent()
 
-        if reference not in trace:
-            raise Exception('Parent is not in Ancestry')
+        if reference is not None and reference not in trace:
+            raise Exception('Reference is not in Ancestry')
+        return trace
+
+    def coordinates(self, reference=None):
+        if not self.parent:
+            return (0, 0, 0)
+
+        if not reference:
+            return self.parent.get_child_coordinates(self)
+
+        trace = self.get_trace(reference)
 
         x, y, z = 0, 0, 0
         for i in trace:
@@ -55,23 +70,26 @@ class Placeable(object):
             z += i_z
         return (x, y, z)
 
-    def get_child_coordinates(self, child=None, name=None):
+    def get_child_coordinates(self, child):
+        if isinstance(child, Placeable):
+            for k, v in self.children.items():
+                if v['instance'] == child:
+                    return v['coordinates']
+
+        # if not instance of Placeable, assume name
         if child in self.children:
             return self.children[child]['coordinates']
 
-        for child, child_info in self.children.items():
-            if child_info['name'] == name:
-                return child
-
     def add(self, child, name, coordinates):
-        if child in self.children:
-            raise Exception('Child previously added')
+        if name in self.children:
+            raise Exception('Child with the name {} already exists'
+                            .format(name))
 
         child.parent = self
-        self.children[child] = {'name': name, 'coordinates': coordinates}
+        self.children[name] = {'instance': child, 'coordinates': coordinates}
 
-    def remove_child(self, child):
-        del self.children[child]
+    def remove_child(self, name):
+        del self.children[name]
 
     def get_parent(self):
         return self.parent
@@ -80,9 +98,7 @@ class Placeable(object):
         return self.children
 
     def get_child_by_name(self, name):
-        for child, child_info in self.get_children().items():
-            if child_info['name'] == name:
-                return child
+        return self.children[name]['instance']
 
 
 class Deck(Placeable):
@@ -162,6 +178,9 @@ class Well(Placeable):
         return (x + r * math.cos(-theta),
                 y + r * math.sin(-theta),
                 h)
+
+    def center(self):
+        return self.from_center(x=0.0, y=0.0, z=0.0)
 
     # TODO: add support for relative Z coordinates
     def from_cartesian(self, x, y, z):

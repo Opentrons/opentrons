@@ -42,6 +42,19 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEqual(c[3], c.get_child_by_name('B2'))
         self.assertEqual(c[1], c.get_child_by_name('A2'))
 
+    def test_named_well(self):
+        deck = Deck()
+        slot = Slot()
+        c = Container()
+        deck.add(slot, 'A1', (0, 0, 0))
+        red = Well(properties={'radius': 5})
+        blue = Well(properties={'radius': 5})
+        c.add(red, "Red", (0, 0, 0))
+        c.add(blue, "Blue", (10, 0, 0))
+        slot.add(c)
+
+        self.assertEqual(deck['A1'][0]['Red'], red)
+
     def test_generate_plate(self):
         c = self.generate_plate(
             wells=96,
@@ -69,6 +82,19 @@ class ContainerTestCase(unittest.TestCase):
 
         self.assertEqual(plate['A1'].coordinates(deck), (105, 215, 0))
 
+    def test_get_name(self):
+        deck = Deck()
+        slot = Slot()
+        c = Container()
+        deck.add(slot, 'A1', (0, 0, 0))
+        red = Well(properties={'radius': 5})
+        blue = Well(properties={'radius': 5})
+        c.add(red, "Red", (0, 0, 0))
+        c.add(blue, "Blue", (10, 0, 0))
+        slot.add(c)
+
+        self.assertEqual(red.get_name(), 'Red')
+
     def test_well_from_center(self):
         deck = Deck()
         slot = Slot()
@@ -82,6 +108,9 @@ class ContainerTestCase(unittest.TestCase):
         deck.add(slot, 'A1', (0, 0, 0))
         slot.add(plate)
 
+        self.assertEqual(
+            plate['B2'].center(),
+            (15, 15, 0))
         self.assertEqual(
             plate['B2'].from_center(x=0.0, y=0.0, z=0.0),
             (15, 15, 0))
