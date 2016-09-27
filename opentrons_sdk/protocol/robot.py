@@ -1,11 +1,10 @@
-
 import copy
-
-from opentrons_sdk.labware.grid import normalize_position, humanize_position
 
 from opentrons_sdk.util.log import debug
 from opentrons_sdk.protocol.handlers import ContextHandler, MotorControlHandler
 from opentrons_sdk.protocol.command import Command
+
+import opentrons_sdk.drivers.motor as motor_drivers
 
 
 class Robot(object):
@@ -42,17 +41,30 @@ class Robot(object):
         self._ingredients = {}
         self._commands = []
         self._handlers = []
-        self._initialize_context()
+
+    def set_driver(self, driver):
+        self._driver = driver
+
+    def list_serial_ports(self):
+        return self._driver.list_serial_ports()
+
+    def connect(self, port):
+        """
+        Connects the MotorControlHandler to a serial port.
+
+        If a device connection is set, then any dummy or alternate motor
+        drivers are replaced with the serial driver.
+        """
+        self.set_driver(motor_drivers.OpenTrons())
+        return self._driver.connect(device=port)
 
     def add_command(self, command: Command):
         # TODO: validate with isinstance
         self._commands.append(command)
 
     def move_to(self, address):
-        self.motor.move(x=100)
-        self.motor.move(y7=100)
-        # def _move_to():
-        # self._commands.add(command.Command(_move_to))
+        self._driver.move(x=100)
+        self._driver.move(y=100)
 
     def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)
