@@ -1,13 +1,13 @@
 import unittest
 
 from opentrons_sdk.labware import instruments
-from opentrons_sdk.protocol.protocol import Protocol
+from opentrons_sdk.protocol.robot import Robot
 
 
 class PipetteTest(unittest.TestCase):
 
     def setUp(self):
-        Protocol.reset()
+        Robot.reset()
         self.pipette = instruments.Pipette(
             axis='b',
             channels=1,

@@ -9,7 +9,7 @@ from opentrons_sdk.protocol.command import Command
 
 
 
-class Protocol():
+class Robot():
 
     _ingredients = None  # { 'name': "A1:A1" }
 
@@ -43,8 +43,8 @@ class Protocol():
         Use this for testing
         :return:
         """
-        Protocol._instance = None
-        return Protocol.get_instance()
+        Robot._instance = None
+        return Robot.get_instance()
 
     def __init__(self):
         self._ingredients = {}

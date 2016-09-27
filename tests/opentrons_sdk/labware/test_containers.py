@@ -1,7 +1,7 @@
 import unittest
 
 from opentrons_sdk.labware import containers, microplates, tipracks
-from opentrons_sdk.protocol.protocol import Protocol
+from opentrons_sdk.protocol.robot import Robot
 
 import yaml
 
@@ -11,7 +11,7 @@ class ContainerTest(unittest.TestCase):
         self.assertTrue(issubclass(thing, comparison))
 
     def setUp(self):
-        Protocol.reset()  # Clear previous protocol objects
+        Robot.reset()  # Clear previous protocol objects
 
     def test_load_container(self):
         container_obj = containers.load('microplate.96', slot='A1')

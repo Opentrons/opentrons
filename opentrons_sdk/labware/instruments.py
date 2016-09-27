@@ -24,11 +24,11 @@ class Pipette(object):
         self.tip_racks = tip_racks
         self.motor = None
 
-        from opentrons_sdk.protocol.protocol import Protocol
-        self.protocol = Protocol.get_instance()
+        from opentrons_sdk.protocol.robot import Robot
+        self.protocol = Robot.get_instance()
         self.protocol.add_instrument(self.axis, self)
 
-        self.motor = Protocol.get_motor_driver(axis=self.axis)
+        self.motor = Robot.get_motor_driver(axis=self.axis)
 
     def aspirate(self, volume, address):
         def _aspirate():

@@ -1,11 +1,11 @@
 import unittest
-from opentrons_sdk.protocol import Protocol
+from opentrons_sdk.protocol import Robot
 
 
 class ContextHandlerTest(unittest.TestCase):
 
     def setUp(self):
-        self.protocol = Protocol()
+        self.protocol = Robot()
 
     # TODO: Revisit
     # def test_transfer(self):

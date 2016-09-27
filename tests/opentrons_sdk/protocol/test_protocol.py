@@ -1,13 +1,13 @@
 import unittest
 from opentrons_sdk.labware import containers, instruments
-from opentrons_sdk.protocol import Protocol
+from opentrons_sdk.protocol import Robot
 
 
 class ProtocolTest(unittest.TestCase):
 
     def setUp(self):
-        Protocol.reset()
-        self.protocol = Protocol.get_instance()
+        Robot.reset()
+        self.protocol = Robot.get_instance()
 
     @property
     def instructions(self):

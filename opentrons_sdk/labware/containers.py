@@ -431,8 +431,8 @@ def convert_legacy_container(container):
     return out
 
 def load(container_name, slot):
-    from opentrons_sdk.protocol.protocol import Protocol
-    protocol = Protocol.get_instance()
+    from opentrons_sdk.protocol.robot import Robot
+    protocol = Robot.get_instance()
     return protocol.add_container(slot, container_name)
 
 _load_default_containers()

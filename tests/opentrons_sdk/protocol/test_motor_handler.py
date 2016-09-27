@@ -1,6 +1,6 @@
 import unittest
 
-from opentrons_sdk.protocol.protocol import Protocol
+from opentrons_sdk.protocol.robot import Robot
 from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.labware.grid import normalize_position, humanize_position
 
@@ -8,8 +8,8 @@ from opentrons_sdk.labware.grid import normalize_position, humanize_position
 class MotorHandlerTest(unittest.TestCase):
 
     def setUp(self):
-        Protocol.reset()
-        self.protocol = Protocol.get_instance()
+        Robot.reset()
+        self.protocol = Robot.get_instance()
         self.motor = self.protocol.attach_motor() # simulated
 
     def test_move_to_well(self):
