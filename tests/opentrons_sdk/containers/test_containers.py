@@ -110,10 +110,10 @@ class ContainerTestCase(unittest.TestCase):
 
         self.assertEqual(
             plate['B2'].center(),
-            (15, 15, 0))
+            (5, 5, 0))
         self.assertEqual(
             plate['B2'].from_center(x=0.0, y=0.0, z=0.0),
-            (15, 15, 0))
+            (5, 5, 0))
         self.assertEqual(
             plate['B2'].from_center(r=1.0, theta=math.pi / 2, h=0.0),
-            (15.0, 10.0, 0))
+            (5.0, 0.0, 0))
