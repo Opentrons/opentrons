@@ -105,9 +105,6 @@ class Placeable(object):
     def get_children(self):
         return self.children
 
-    def get_name(self, child):
-        return self.children[child]['name']
-
     def get_child_by_name(self, name):
         return self.children[name]['instance']
 
