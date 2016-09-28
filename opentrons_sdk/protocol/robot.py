@@ -1,7 +1,7 @@
 import copy
 
 from opentrons_sdk.containers import placeable
-from opentrons_sdk.util.log import debug
+from opentrons_sdk.util import log
 from opentrons_sdk.protocol.handlers import ContextHandler
 from opentrons_sdk.protocol.command import Command
 
@@ -111,7 +111,8 @@ class Robot(object):
             self._driver.move(z=coords[2])
             self._driver.wait_for_arrival()
 
-        self.add_command(Command(do=_do))
+        description = "Moving head to {}".format(str(address))
+        self.add_command(Command(do=_do, description=description))
 
     def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)
@@ -133,16 +134,8 @@ class Robot(object):
         while self._commands:
             command = self._commands.pop()
             command.do()
+            log.debug("Robot", command.description)
 
-    def run_all(self):
-        """
-        Convenience method to run every command in a protocol.
-
-        Useful for when you don't care about the progress.
-        """
-        # TODO: Rewrite to use new command queue
-        for _ in self.run():
-            pass
 
     def _initialize_context(self):
         """
@@ -152,66 +145,8 @@ class Robot(object):
         if self._context_handler:
             calibration = self._context_handler._calibration
         self._context_handler = ContextHandler(self)
-        # for slot, name in self._containers.items():
-        #     self._context_handler.add_container(slot, name)
-        # for axis, name in self._instruments.items():
-        #     self._context_handler.add_instrument(axis, name)
         if calibration:
             self._context_handler._calibration = calibration
-
-    def _run_in_context_handler(self, command, **kwargs):
-        """
-        Runs a command in the virtualized context.
-
-        This is useful for letting us know if there's a problem with a
-        particular command without having to wait to run it on the robot.
-
-        If you use this on your own you're going to end up with weird state
-        bugs that have nothing to do with the protocol.
-        """
-        method = getattr(self._context_handler, command)
-        if not method:
-            raise KeyError("Command not defined: " + command)
-        method(**kwargs)
-
-    def _run(self, index):
-        # TODO: Rewrite to use new command queue
-        cur = self._commands[index]
-        command = list(cur)[0]
-        kwargs = cur[command]
-        self._run_in_context_handler(command, **kwargs)
-        for h in self._handlers:
-            debug(
-                "Protocol",
-                "{}.{}: {}"
-                .format(type(h).__name__, command, kwargs)
-            )
-            h.before_each()
-            method = getattr(h, command)
-            method(**kwargs)
-            h.after_each()
-
-    def attach_handler(self, handler_class):
-        """
-        When you attach a handler, commands are run on the handler in sequence
-        when Protocol.run_next() is called.
-
-        You don't have to attach the ContextHandler, you get that for free.
-        It's a good example implementation of what these things are
-        supposed to do.
-
-        Any command that the robot supports must be present on the Handler
-        you pass in, or you'll get exceptions. Just make sure you subclass
-        from ProtocolHandler and you'll be fine; empty methods are stubbed
-        out for all supported commands.
-
-        Pass in the class, not an instance. This method returns the
-        instantiated object, which you can use to do any additional setup
-        required for the particular Handler.
-        """
-        handler = handler_class(self, self._context_handler)
-        self._handlers.append(handler)
-        return handler
 
     def disconnect(self):
         if self._motor_handler:

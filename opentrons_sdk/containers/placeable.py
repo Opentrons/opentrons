@@ -15,6 +15,9 @@ class Placeable(object):
         else:
             return self.get_child_by_name(name)
 
+    def __str__(self):
+        return '<{} {}>'.format(self.__class__.__name__, self.parent.get_name())
+
     def __iter__(self):
         return iter(self.children.keys())
 
@@ -81,6 +84,9 @@ class Placeable(object):
 
     def get_children(self):
         return self.children
+
+    def get_name(self, child):
+        return self.children[child]['name']
 
     def get_child_by_name(self, name):
         for child, child_info in self.get_children().items():

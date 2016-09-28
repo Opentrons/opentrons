@@ -40,7 +40,8 @@ class Pipette(object):
             self.motor.move(self.top)
             self.motor.wait_for_arrival()
 
-        self.robot.add_command(Command(do=_do))
+        description = "Aspirating {0}uL at {1}".format(volume, str(address))
+        self.robot.add_command(Command(do=_do, description=description))
 
     def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, max_volume=None):
         """Set calibration values for the pipette plunger.
