@@ -15,11 +15,19 @@ class Placeable(object):
         else:
             return self.get_child_by_name(name)
 
+    def __str__(self):
+        if not self.parent:
+            return '<{}>'.format(self.__class__.__name__)
+        return '<{} {}>'.format(self.__class__.__name__, self.parent.get_name(self))
+
     def __iter__(self):
         return iter(v['instance'] for k, v in self.children.items())
 
     def __len__(self):
         return len(self.children)
+
+    def __bool__(self):
+        return True
 
     def __next__(self):
         if not self.get_parent():
