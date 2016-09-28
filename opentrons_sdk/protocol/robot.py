@@ -1,16 +1,24 @@
 import copy
 
 from opentrons_sdk.containers import legacy_containers, placeable
-from opentrons_sdk.util import log
-from opentrons_sdk.protocol.handlers import ContextHandler
-from opentrons_sdk.protocol.command import Command
-
 import opentrons_sdk.drivers.motor as motor_drivers
+from opentrons_sdk.protocol.command import Command
+from opentrons_sdk.util import log
 
 
 class Robot(object):
     _commands = None  # []
     _instance = None
+
+    def __init__(self):
+        self._commands = []
+        self._handlers = []
+
+        self._deck = placeable.Deck()
+        self.setup_deck()
+
+        self._ingredients = {}  # TODO needs to be discusses/researched
+        self._instruments = {}
 
     @classmethod
     def get_instance(cls):
@@ -26,17 +34,6 @@ class Robot(object):
         """
         Robot._instance = None
         return Robot.get_instance()
-
-    def __init__(self):
-        self._commands = []
-        self._handlers = []
-
-        self._deck = placeable.Deck()
-        self.setup_deck()
-
-        self._ingredients = {}  # TODO needs to be discusses/researched
-        self._instruments = {}
-
 
     def set_driver(self, driver):
         self._driver = driver

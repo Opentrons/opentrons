@@ -1,6 +1,6 @@
 import unittest
 
-from opentrons_sdk.protocol.robot import Robot
+from opentrons_sdk.protocol import Robot
 from opentrons_sdk.containers.placeable import Container, Deck
 from opentrons_sdk.labware import containers, instruments
 
