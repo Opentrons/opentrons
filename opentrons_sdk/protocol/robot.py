@@ -10,17 +10,7 @@ import opentrons_sdk.drivers.motor as motor_drivers
 
 class Robot(object):
     _commands = None  # []
-    _handlers = None  # List of attached handlers for run_next.
-
-    # Context and Motor are important handlers, so we provide
-    # a way to get at them.
-    _context_handler = None  # Operational context (virtual robot).
-    _motor_handler = None
-
-    _containers = None  # { slot: container_name }
-
     _instance = None
-
 
     @classmethod
     def get_instance(cls):
@@ -46,7 +36,6 @@ class Robot(object):
 
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
-        self._initialize_context()
 
 
     def set_driver(self, driver):
@@ -138,21 +127,9 @@ class Robot(object):
             command.do()
             log.debug("Robot", command.description)
 
-
-    def _initialize_context(self):
-        """
-        Initializes the context.
-        """
-        calibration = None
-        if self._context_handler:
-            calibration = self._context_handler._calibration
-        self._context_handler = ContextHandler(self)
-        if calibration:
-            self._context_handler._calibration = calibration
-
     def disconnect(self):
-        if self._motor_handler:
-            self._motor_handler.disconnect()
+        if self._driver:
+            self._driver.disconnect()
 
     def containers(self):
         return self._deck.containers()
