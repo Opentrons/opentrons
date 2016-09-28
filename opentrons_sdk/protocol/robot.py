@@ -1,6 +1,6 @@
 import copy
 
-from opentrons_sdk.containers import placeable
+from opentrons_sdk.containers import legacy_containers, placeable
 from opentrons_sdk.util import log
 from opentrons_sdk.protocol.handlers import ContextHandler
 from opentrons_sdk.protocol.command import Command
@@ -10,7 +10,6 @@ import opentrons_sdk.drivers.motor as motor_drivers
 
 class Robot(object):
     _commands = None  # []
-
     _handlers = None  # List of attached handlers for run_next.
 
     # Context and Motor are important handlers, so we provide
@@ -39,13 +38,23 @@ class Robot(object):
         return Robot.get_instance()
 
     def __init__(self):
-        self._ingredients = {}
         self._commands = []
         self._handlers = []
+
+        self._deck = placeable.Deck()
+        self.setup_deck()
+
+        self._ingredients = {}  # TODO needs to be discusses/researched
+        self._instruments = {}
         self._initialize_context()
+
 
     def set_driver(self, driver):
         self._driver = driver
+
+    def add_instrument(self, axis, instrument):
+        axis = axis.upper()
+        self._instruments[axis] = instrument
 
     def get_motor(self, axis):
         robot_self = self
@@ -53,7 +62,9 @@ class Robot(object):
         class InstrumentMotor():
             def move(self, value, speed=None, absolute=True):
                 kwargs = {axis:value}
-                return robot_self._driver.move(speed=speed, absolute=absolute, **kwargs)
+                return robot_self._driver.move(
+                    speed=speed, absolute=absolute, **kwargs
+                )
             def home(self):
                 return robot_self._driver.home(axis)
             def wait_for_arrival(self):
@@ -66,7 +77,7 @@ class Robot(object):
 
     def connect(self, port):
         """
-        Connects the MotorControlHandler to a serial port.
+        Connects the motor to a serial port.
 
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
@@ -84,7 +95,6 @@ class Robot(object):
             return False
 
     def add_command(self, command: Command):
-        # TODO: validate with isinstance
         self._commands.append(command)
 
     def register(self, name, callback):
@@ -113,14 +123,6 @@ class Robot(object):
 
         description = "Moving head to {}".format(str(address))
         self.add_command(Command(do=_do, description=description))
-
-    def add_container(self, slot, name):
-        container_obj = self._context_handler.add_container(slot, name)
-        # self._containers[slot] = name
-        return container_obj
-
-    def add_instrument(self, axis, instrument=None):
-        self._context_handler.add_instrument(axis, instrument)
 
     @property
     def actions(self):
@@ -153,10 +155,73 @@ class Robot(object):
             self._motor_handler.disconnect()
 
     def containers(self):
-        return self._context_handler.get_containers()
+        return self._deck.containers()
+
+    def get_deck_slot_types(self):
+        return 'acrylic_slots'
+
+    def get_slot_offsets(self):
+        """
+        col_offset
+        - from bottom left corner of A to bottom corner of B
+
+        row_offset
+        - from bottom left corner of 1 to bottom corner of 2
+
+        TODO: figure out actual X and Y offsets (from origin)
+        """
+        SLOT_OFFSETS = {
+            '3d_printed_slots': {
+                'x_offset': 10,
+                'y_offset': 10,
+                'col_offset': 91,
+                'row_offset': 134.5
+            },
+            'acrylic_slots': {
+                'x_offset': 10,
+                'y_offset': 10,
+                'col_offset': 96.25,
+                'row_offset': 133.3
+            }
+
+        }
+        slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
+        row_offset = slot_settings.get('row_offset')
+        col_offset = slot_settings.get('col_offset')
+        x_offset = slot_settings.get('x_offset')
+        y_offset = slot_settings.get('y_offset')
+        return (row_offset, col_offset, x_offset, y_offset)
+
+    def get_max_robot_rows(self):
+        # TODO: dynamically figure out robot rows
+        return 3
+
+    def setup_deck(self):
+        robot_rows = self.get_max_robot_rows()
+        row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
+
+        for col_index, col in enumerate('EDCBA'):
+            for row_index, row in enumerate(range(robot_rows, 0, -1)):
+                slot = placeable.Slot()
+                slot_coordinates = (
+                    (row_offset * row_index) + x_offset,
+                    (col_offset * col_index) + y_offset,
+                    0  # TODO: should z always be zero?
+                )
+                slot_name = "{}{}".format(col, row)
+                self._deck.add(slot, slot_name, (slot_coordinates))
+
+    @property
+    def deck(self):
+        return self._deck
 
     def get_instruments(self):
-        return self._context_handler.get_instruments()
+        """
+        :returns: sorted list of (axis, instrument)
+        """
+        return sorted(self._instruments.items())
 
-    def get_deck(self):
-        return self._context_handler.get_deck()
+    def add_container(self, slot, container_name):
+        container = legacy_containers.get_legacy_container(container_name)
+        self._deck[slot].add(container, container_name)
+        return container

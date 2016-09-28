@@ -36,7 +36,7 @@ class ProtocolTestCase(unittest.TestCase):
         self.assertEqual(instruments_list[0], ('B', p200))
 
     def test_deck_setup(self):
-        deck = self.protocol.get_deck()
+        deck = self.protocol.deck
 
         trash = containers.load('point', 'A1')
         tiprack = containers.load('tiprack-10ul', 'B2')
@@ -55,7 +55,7 @@ class ProtocolTestCase(unittest.TestCase):
         )
 
     def test_tip_manipulation(self):
-        deck = self.protocol.get_deck()
+        deck = self.protocol.deck
 
         trash = containers.load('point', 'A1')
         tiprack = containers.load('tiprack-10ul', 'B2')
