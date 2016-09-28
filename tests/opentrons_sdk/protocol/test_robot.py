@@ -2,7 +2,6 @@ import unittest
 from unittest import mock
 from unittest.mock import call
 
-from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.protocol.robot import Robot
 
 class RobotTest(unittest.TestCase):
