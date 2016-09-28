@@ -8,7 +8,7 @@ from opentrons_sdk.containers.placeable import (
     Slot)
 
 
-class ContainerTestCase(unittest.TestCase):
+class PlaceableTestCase(unittest.TestCase):
     def generate_plate(self, wells, cols, spacing, offset, radius):
         c = Container()
 
@@ -21,6 +21,13 @@ class ContainerTestCase(unittest.TestCase):
                            0)
             c.add(well, name, coordinates)
         return c
+
+    def test_get_name(self):
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        expected = '<Well A1>'
+        self.assertEquals(str(c['A1']), expected)
+        expected = '<Container>'
+        self.assertEquals(str(c), expected)
 
     def test_iterator(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
