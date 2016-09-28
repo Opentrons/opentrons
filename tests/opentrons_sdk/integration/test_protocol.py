@@ -27,7 +27,7 @@ class ProtocolTestCase(unittest.TestCase):
         p200 = instruments.Pipette(
             trash_container=trash,
             tip_racks=[tiprack],
-            min_vol=10,  # These are variable
+            min_volume=10,  # These are variable
             axis="b",
             channels=1
         )
@@ -49,7 +49,7 @@ class ProtocolTestCase(unittest.TestCase):
         p10 = instruments.Pipette(
             trash_container=trash,
             tip_racks=[tiprack],
-            min_vol=10,  # These are variable
+            min_volume=10,  # These are variable
             axis="b",
             channels=1
         )
@@ -63,7 +63,7 @@ class ProtocolTestCase(unittest.TestCase):
         p10 = instruments.Pipette(
             trash_container=trash,
             tip_racks=[tiprack],
-            min_vol=10,  # These are variable
+            min_volume=10,  # These are variable
             axis="b",
             channels=1
         )
