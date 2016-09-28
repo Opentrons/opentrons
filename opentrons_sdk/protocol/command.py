@@ -1,5 +1,5 @@
 class Command(object):
-    def __int__(self, do, description=None):
+    def __init__(self, do, description=None):
         assert callable(do)
         self.do = do
         self.description = description

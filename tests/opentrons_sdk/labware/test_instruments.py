@@ -1,18 +1,20 @@
 import unittest
 from unittest import mock
+from unittest.mock import call
 
 from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.protocol import Robot
+from opentrons_sdk.protocol.command import Command
 
 class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         Robot.reset()
         self.robot = Robot.get_instance()
-        self.robot.connect(port='/dev/tty.usbmodem1421')
+        # self.robot.connect(port='/dev/tty.usbmodem1421')
         # self.robot.home()
 
-        # self.robot.move_to = mock.Mock()
+        self.robot._driver = mock.Mock()
 
         self.trash = containers.load('point', 'A1')
         self.tiprack = containers.load('tiprack-10ul', 'B2')
@@ -29,28 +31,28 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate(top=0,bottom=10,blowout=12,droptip=13,max_volume=100)
 
-        # self.p200.motor = mock.Mock()
-
     def test_aspirate(self):
-        
 
-        def wuggle():
-            level = 5
-            while level:
-                self.p200.aspirate(100, (80,0,0))
-                self.p200.aspirate(100, (100,0,0))
-                self.robot.run()
-                print('something...', level)
-                level -= 1
+        self.p200.aspirate(100, (100,0,0))
 
-        self.robot.register('wuggle', wuggle)
+        self.assertEquals(len(self.robot._commands), 2)
+        for command in self.robot._commands:
+            self.assertTrue(isinstance(command, Command))
 
-        self.robot.wuggle()
+    def test_run(self):
+
+        self.p200.aspirate(100, (100,0,0))
 
         self.robot.run()
 
-        # expected = [ mock.call.move(z=0), mock.call.move(x=100, y=0), mock.call.move(z=0) ]
-        # self.assertEquals(self.robot.move_to.mock_calls, expected)
+        expected = [
+            call.move(absolute=True, b=10, speed=None),
+            call.move(absolute=True, b=0, speed=None),
+            call.wait_for_arrival(),
+            call.move(z=0),
+            call.move(x=100, y=0),
+            call.move(z=0),
+            call.wait_for_arrival()
+        ]
 
-        # expected = [ mock.call.move(1) ]
-        # self.assertEquals(self.p200.motor.mock_calls, expected)
+        self.assertEquals(self.robot._driver.mock_calls, expected)

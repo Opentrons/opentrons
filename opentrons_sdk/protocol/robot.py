@@ -47,7 +47,7 @@ class Robot(object):
     def set_driver(self, driver):
         self._driver = driver
 
-    def get_motor_driver(self, axis):
+    def get_motor(self, axis):
         robot_self = self
 
         class InstrumentMotor():
@@ -56,6 +56,8 @@ class Robot(object):
                 return robot_self._driver.move(speed=speed, absolute=absolute, **kwargs)
             def home(self):
                 return robot_self._driver.home(axis)
+            def wait_for_arrival(self):
+                return robot_self._driver.wait_for_arrival()
 
         return InstrumentMotor()
 
@@ -85,6 +87,11 @@ class Robot(object):
         # TODO: validate with isinstance
         self._commands.append(command)
 
+    def register(self, name, callback):
+        def commandable():
+            self.add_command(Command(do=callback))
+        setattr(self, name, commandable)
+
     def move_to(self, address, instrument=None):
         coords = None
         if isinstance(address, placeable.Placeable):
@@ -98,10 +105,13 @@ class Robot(object):
         # TODO: (andy) path optomization goes here
         #       now it simply just goes to the top every time
 
-        print(coords)
-        self._driver.move(z=0)
-        self._driver.move(x=coords[0], y=coords[1])
-        self._driver.move(z=coords[2])
+        def _do():
+            self._driver.move(z=0)
+            self._driver.move(x=coords[0], y=coords[1])
+            self._driver.move(z=coords[2])
+            self._driver.wait_for_arrival()
+
+        self.add_command(Command(do=_do))
 
     def add_container(self, slot, name):
         container_obj = self._context_handler.add_container(slot, name)
@@ -120,17 +130,9 @@ class Robot(object):
         A generator that runs each command and yields the current command
         index and the number of total commands.
         """
-        # TODO: Rewrite to use new command queue
-        self._initialize_context()
-        i = 0
-        yield(0, len(self._commands))
-        while i < len(self._commands):
-            cur = self._commands[i]
-            command = list(cur)[0]
-            args = cur[command]
-            self._run(i)
-            i += 1
-            yield (i, len(self._commands))
+        while self._commands:
+            command = self._commands.pop()
+            command.do()
 
     def run_all(self):
         """

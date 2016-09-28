@@ -1,4 +1,5 @@
-from opentrons_sdk.protocol import command
+from opentrons_sdk.protocol.command import Command
+from opentrons_sdk.protocol.robot import Robot
 
 
 class Pipette(object):
@@ -25,20 +26,21 @@ class Pipette(object):
         self.tip_racks = tip_racks
         self.motor = None
 
-        from opentrons_sdk.protocol.robot import Robot
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.motor = self.robot.get_motor_driver(self.axis)
+        self.motor = self.robot.get_motor(self.axis)
 
     def aspirate(self, volume, address=None):
-        #def _aspirate():
         if address:
             self.robot.move_to(address)
 
-        # use volume here
-        self.motor.move(self.bottom)
-        self.motor.move(self.top)
-        #self.robot.add_command(command.Command(do=_aspirate))
+        def _do():
+            # use volume here
+            self.motor.move(self.bottom)
+            self.motor.move(self.top)
+            self.motor.wait_for_arrival()
+
+        self.robot.add_command(Command(do=_do))
 
     def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, max_volume=None):
         """Set calibration values for the pipette plunger.
