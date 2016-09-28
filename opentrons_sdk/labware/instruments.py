@@ -3,7 +3,7 @@ from opentrons_sdk.protocol.robot import Robot
 
 
 class Pipette(object):
-    max_vol = 10
+    max_volume = 10
 
     _top = 0  # Top of the plunger.
     _bottom = 1
@@ -16,13 +16,13 @@ class Pipette(object):
             self,
             axis,
             channels=1,
-            min_vol=0,
+            min_volume=0,
             trash_container=None,
             tip_racks=None):
 
         self.axis = axis
         self.channels = channels
-        self.min_vol = min_vol
+        self.min_volume = min_volume
         self.trash_container = trash_container
         self.tip_racks = tip_racks
         self.motor = None
@@ -31,15 +31,19 @@ class Pipette(object):
         self.robot.add_instrument(self.axis, self)
         self.motor = self.robot.get_motor(self.axis)
 
-    def aspirate(self, volume, address=None):
+    def aspirate(self, volume=None, address=None):
+
+        if not volume:
+            volume = self.max_volume - self._current_volume
+
+        if self._current_volume + volume > self.max_volume:
+            raise RuntimeWarning(
+                'Pipette cannot hold volume {}'
+                .format(self._current_volume + volume)
+            )
+
         if address:
             self.robot.move_to(address)
-
-        # depending on current volume,
-        # move the plunger so it picks up the supplied volume
-
-        # if current_volume=0, move plunger all the way down first
-        # else, move relatively from current position
 
         empty_pipette = False
         distance = self.plunge_distance(volume) * -1
@@ -54,19 +58,59 @@ class Pipette(object):
 
         description = "Aspirating {0}uL at {1}".format(volume, str(address))
         self.robot.add_command(Command(do=_do, description=description))
-
         self._current_volume += volume
 
         return self
 
-    def dispense(self, volume, address=None):
+    def dispense(self, volume=None, address=None):
+
+        if not volume:
+            volume = self.max_volume - self._current_volume
+
+        if self._current_volume - volume < 0:
+            raise RuntimeWarning(
+                'Pipette cannot dispense {}ul'.format(self._current_volume - volume)
+            )
+
+        if address:
+            self.robot.move_to(address)
+
+        distance = self.plunge_distance(volume)
+
+        def _do():
+            self.motor.move(distance, absolute=False)
+            self.motor.wait_for_arrival()
+
+        description = "Dispensing {0}uL at {1}".format(volume, str(address))
+        self.robot.add_command(Command(do=_do, description=description))
+        self._current_volume -= volume
+
         return self
 
-    def blowout(self):
+    def blowout(self, address=None):
+        if address:
+            self.robot.move_to(address)
+
+        def _do():
+            self.motor.move(self._blowout)
+            self.motor.wait_for_arrival()
+
+        description = "Blowout at {}".format(str(address))
+        self.robot.add_command(Command(do=_do, description=description))
         self._current_volume = 0
+
         return self
 
-    def drop_tip(self):
+    def drop_tip(self, address=None):
+        if address:
+            self.robot.move_to(address)
+
+        def _do():
+            self.motor.move(self._droptip)
+            self.motor.wait_for_arrival()
+
+        description = "Droptip at {}".format(str(address))
+        self.robot.add_command(Command(do=_do, description=description))
         self._current_volume = 0
         return self
 
@@ -107,7 +151,7 @@ class Pipette(object):
             self._droptip = droptip
 
     def set_max_volume(self, max_volume):
-        self.max_vol = max_volume
+        self.max_volume = max_volume
 
     def plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
@@ -134,15 +178,15 @@ class Pipette(object):
         """
         if volume < 0:
             raise IndexError("Volume must be a positive number.")
-        if volume > self.max_vol:
+        if volume > self.max_volume:
             raise IndexError("{}µl exceeds maximum volume.".format(volume))
-        if volume < self.min_vol:
+        if volume < self.min_volume:
             raise IndexError("{}µl is too small.".format(volume))
 
-        return volume / self.max_vol
+        return volume / self.max_volume
 
     def supports_volume(self, volume):
-        return self.min_vol <= volume <= self.max_vol
+        return self.max_volume <= volume <= self.max_volume
 
     @property
     def name(self):
