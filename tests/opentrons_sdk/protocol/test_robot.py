@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from unittest.mock import call
 
 from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.protocol import Robot
@@ -16,7 +17,8 @@ class RobotTest(unittest.TestCase):
 
 	def test_robot_move_to(self):
 		self.robot.move_to((100,0,0))
-		expected = [ mock.call.move(z=0), mock.call.move(x=0, y=0), mock.call.move(z=0) ]
+		self.robot.run()
+		expected = [ call.move(z=0), call.move(x=100, y=0), call.move(z=0), call.wait_for_arrival() ]
 		self.assertEquals(self.robot._driver.mock_calls, expected)
 
 
