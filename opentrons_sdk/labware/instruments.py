@@ -10,6 +10,7 @@ class Pipette(object):
     _blowout = 2  # Bottom of the plunger (all liquid expelled).
     _droptip = 3  # Point where the screw on the axis hits the droptip.
 
+    _current_volume = 0
 
     def __init__(
             self,
@@ -34,16 +35,42 @@ class Pipette(object):
         if address:
             self.robot.move_to(address)
 
+        # depending on current volume,
+        # move the plunger so it picks up the supplied volume
+
+        # if current_volume=0, move plunger all the way down first
+        # else, move relatively from current position
+
+        empty_pipette = False
+        distance = self.plunge_distance(volume) * -1
+        if self._current_volume == 0:
+            empty_pipette = True
+
         def _do():
-            # use volume here
-            self.motor.move(self.bottom)
-            self.motor.move(self.top)
+            if empty_pipette:
+                self.motor.move(self._bottom)
+            self.motor.move(distance, absolute=False)
             self.motor.wait_for_arrival()
 
         description = "Aspirating {0}uL at {1}".format(volume, str(address))
         self.robot.add_command(Command(do=_do, description=description))
 
-    def calibrate(self, top=None, bottom=None, blowout=None, droptip=None, max_volume=None):
+        self._current_volume += volume
+
+        return self
+
+    def dispense(self, volume, address=None):
+        return self
+
+    def blowout(self):
+        self._current_volume = 0
+        return self
+
+    def drop_tip(self):
+        self._current_volume = 0
+        return self
+
+    def calibrate_plunger(self, top=None, bottom=None, blowout=None, droptip=None):
         """Set calibration values for the pipette plunger.
 
         This can be called multiple times as the user sets each value,
@@ -78,10 +105,11 @@ class Pipette(object):
             self._blowout = blowout
         if droptip is not None:
             self._droptip = droptip
-        if max_volume:
-            self.max_vol = max_volume
 
-    def plunge_depth(self, volume):
+    def set_max_volume(self, max_volume):
+        self.max_vol = max_volume
+
+    def plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
@@ -96,8 +124,7 @@ class Pipette(object):
             )
         percent = self._volume_percentage(volume)
         travel = self._bottom - self._top
-        distance = travel * percent
-        return self._bottom - distance
+        return travel * percent
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -109,50 +136,13 @@ class Pipette(object):
             raise IndexError("Volume must be a positive number.")
         if volume > self.max_vol:
             raise IndexError("{}µl exceeds maximum volume.".format(volume))
+        if volume < self.min_vol:
+            raise IndexError("{}µl is too small.".format(volume))
 
-        p1 = None
-        p2 = None
-
-        # Find the correct point.
-        points = sorted(self._points, key=lambda a: a['f1'])
-        for i in range(len(points) - 1):
-            if volume >= points[i]['f1'] and volume <= points[i + 1]['f1']:
-                p1 = points[i]
-                p2 = points[i + 1]
-                break
-
-        if not (p1 and p2):
-            raise IndexError(
-                "Point data not found for volume {}.".format(volume)
-            )
-
-        # Calculate the volume based on this point (piecewise linear).
-        diff = p2['f1'] - p1['f1']
-        f1 = (volume - p1['f1']) / diff
-        lower = p1['f1'] / p1['f2']
-        upper = p2['f1'] / p2['f2']
-        scale = ((upper - lower) * f1) + lower
-
-        return volume * scale / self.max_vol
+        return volume / self.max_vol
 
     def supports_volume(self, volume):
         return self.min_vol <= volume <= self.max_vol
-
-    @property
-    def top(self):
-        return self._top
-
-    @property
-    def bottom(self):
-        return self._bottom
-
-    @property
-    def blowout(self):
-        return self._blowout
-
-    @property
-    def droptip(self):
-        return self._droptip
 
     @property
     def name(self):

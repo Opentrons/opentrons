@@ -132,7 +132,7 @@ class Robot(object):
         index and the number of total commands.
         """
         while self._commands:
-            command = self._commands.pop()
+            command = self._commands.pop(0)
             command.do()
             log.debug("Robot", command.description)
 

@@ -18,7 +18,7 @@ class Placeable(object):
     def __str__(self):
         if not self.parent:
             return '<{}>'.format(self.__class__.__name__)
-        return '<{} {}>'.format(self.__class__.__name__, self.parent.get_name(self))
+        return '<{} {}>'.format(self.__class__.__name__, self.get_name())
 
     def __iter__(self):
         return iter(v['instance'] for k, v in self.children.items())
