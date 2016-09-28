@@ -124,8 +124,8 @@ class Robot(object):
         """
         while self._commands:
             command = self._commands.pop()
-            command.do()
             log.debug("Robot", command.description)
+            command.do()
 
     def disconnect(self):
         if self._driver:
