@@ -4,9 +4,7 @@ from unittest.mock import call
 
 from opentrons_sdk.labware import containers, instruments
 from opentrons_sdk.protocol import Robot
-from opentrons_sdk.protocol.command import Command
 
-import inspect
 
 class PipetteTest(unittest.TestCase):
 
@@ -31,7 +29,7 @@ class PipetteTest(unittest.TestCase):
             channels=1
         )
 
-        self.p200.calibrate_plunger(top=0,bottom=10,blowout=12,droptip=13)
+        self.p200.calibrate_plunger(top=0, bottom=10, blowout=12, droptip=13)
         self.p200.set_max_volume(200)
 
     def test_empty_aspirate(self):
@@ -143,16 +141,3 @@ class PipetteTest(unittest.TestCase):
         ]
 
         self.assertEquals(self.robot._driver.mock_calls, expected)
-
-
-
-
-
-
-
-
-
-
-
-
-

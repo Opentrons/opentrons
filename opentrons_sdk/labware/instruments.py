@@ -69,7 +69,8 @@ class Pipette(object):
 
         if self._current_volume - volume < 0:
             raise RuntimeWarning(
-                'Pipette cannot dispense {}ul'.format(self._current_volume - volume)
+                'Pipette cannot dispense {}ul'.
+                format(self._current_volume - volume)
             )
 
         if address:
@@ -114,7 +115,12 @@ class Pipette(object):
         self._current_volume = 0
         return self
 
-    def calibrate_plunger(self, top=None, bottom=None, blowout=None, droptip=None):
+    def calibrate_plunger(
+            self,
+            top=None,
+            bottom=None,
+            blowout=None,
+            droptip=None):
         """Set calibration values for the pipette plunger.
 
         This can be called multiple times as the user sets each value,
