@@ -90,6 +90,9 @@ class Robot(object):
             self.add_command(Command(do=callback))
         setattr(self, name, commandable)
 
+    def move_head(self, *args, **kwargs):
+        self._driver.move(*args, **kwargs)
+
     def move_to(self, address, instrument=None):
         coords = None
         if isinstance(address, placeable.Placeable):
