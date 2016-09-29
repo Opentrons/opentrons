@@ -29,7 +29,7 @@ class PipetteTest(unittest.TestCase):
             channels=1
         )
 
-        self.p200.calibrate_plunger(top=0, bottom=10, blowout=12, droptip=13)
+        self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
 
     def test_empty_aspirate(self):
@@ -39,7 +39,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._bottom, speed=None),
+            call.move(absolute=True, b=10, speed=None),
             call.move(absolute=False, b=-5, speed=None),
             call.wait_for_arrival()
         ]
@@ -54,7 +54,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._bottom, speed=None),
+            call.move(absolute=True, b=10, speed=None),
             call.move(absolute=False, b=-5, speed=None),
             call.wait_for_arrival(),
             call.move(absolute=False, b=-1, speed=None),
@@ -69,7 +69,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._bottom, speed=None),
+            call.move(absolute=True, b=10, speed=None),
             call.move(absolute=False, b=-10, speed=None),
             call.wait_for_arrival()
         ]
@@ -87,7 +87,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._bottom, speed=None),
+            call.move(absolute=True, b=10, speed=None),
             call.move(absolute=False, b=-5, speed=None),
             call.wait_for_arrival(),
             call.move(absolute=False, b=1, speed=None),
@@ -103,7 +103,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._bottom, speed=None),
+            call.move(absolute=True, b=10, speed=None),
             call.move(absolute=False, b=-5, speed=None),
             call.wait_for_arrival(),
             call.move(absolute=False, b=5, speed=None),
@@ -116,14 +116,14 @@ class PipetteTest(unittest.TestCase):
         self.assertRaises(RuntimeWarning, self.p200.dispense, 1)
         self.assertRaises(IndexError, self.p200.dispense, -1)
 
-    def test_blowout(self):
+    def test_blow_out(self):
 
-        self.p200.blowout()
+        self.p200.blow_out()
 
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._blowout, speed=None),
+            call.move(absolute=True, b=12, speed=None),
             call.wait_for_arrival()
         ]
 
@@ -136,7 +136,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=self.p200._droptip, speed=None),
+            call.move(absolute=True, b=13, speed=None),
             call.home('b'),
             call.wait_for_arrival()
         ]
