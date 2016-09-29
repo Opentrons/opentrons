@@ -47,12 +47,14 @@ class Robot(object):
 
         class InstrumentMotor():
             def move(self, value, speed=None, absolute=True):
-                kwargs = {axis:value}
+                kwargs = {axis: value}
                 return robot_self._driver.move(
                     speed=speed, absolute=absolute, **kwargs
                 )
+
             def home(self):
                 return robot_self._driver.home(axis)
+
             def wait_for_arrival(self):
                 return robot_self._driver.wait_for_arrival()
 
@@ -80,7 +82,7 @@ class Robot(object):
         else:
             return False
 
-    def add_command(self, command: Command):
+    def add_command(self, command):
         self._commands.append(command)
 
     def register(self, name, callback):
@@ -96,7 +98,6 @@ class Robot(object):
             coords = address
         else:
             raise Exception('Unable to parse address: {}'.format(address))
-
 
         # TODO: (andy) path optomization goes here
         #       now it simply just goes to the top every time
@@ -120,7 +121,7 @@ class Robot(object):
         index and the number of total commands.
         """
         while self._commands:
-            command = self._commands.pop()
+            command = self._commands.pop(0)
             log.debug("Robot", command.description)
             command.do()
 
