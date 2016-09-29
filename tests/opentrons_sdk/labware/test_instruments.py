@@ -48,18 +48,43 @@ class PipetteTest(unittest.TestCase):
     def test_calibrate_placeable(self):
         robot_actual = (161.0, 416.7, 3.0)
         well = self.plate[0]
-        location = (self.plate, well.center(self.plate))
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
 
         self.p200.calibrate_placeable(location, robot_actual)
 
-        expected_result = {
+        expected_calibration_data = {
             'A2': {
                 'children': {
                     '96-flat': {
                         'delta': (1.0, 2.0, 3.0)
                     }}}}
 
-        self.assertDictEqual(self.p200.calibration_data, expected_result)
+        self.assertDictEqual(
+            self.p200.calibration_data,
+            expected_calibration_data)
+
+    def test_move_to(self):
+        robot_actual = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        location = (self.plate, well.center(self.plate))
+
+        self.p200.calibrate_placeable(location, robot_actual)
+
+        self.p200.aspirate(100, location)
+        self.robot.run()
+
+        expected = [
+            call.move(z=0),
+            call.move(x=161.0, y=416.7),
+            call.move(z=3.0),
+            call.wait_for_arrival(),
+            call.move(absolute=True, b=10, speed=None),
+            call.move(absolute=False, b=-5, speed=None),
+            call.wait_for_arrival()
+        ]
+
+        self.assertEquals(self.robot._driver.mock_calls, expected)
 
     def test_empty_aspirate(self):
 

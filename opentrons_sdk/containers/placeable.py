@@ -37,9 +37,12 @@ class Placeable(object):
             properties['width'] = properties['diameter']
             properties['length'] = properties['diameter']
 
-        # TODO: perhaps add checking width/length to verification
-        # assert 'width' in properties
-        # assert 'length' in properties
+        if 'depth' in properties:
+            properties['height'] = properties['depth']
+
+        for dimention in ['length', 'width', 'height']:
+            if dimention not in properties:
+                properties[dimention] = 0
 
     def __getitem__(self, name):
         if isinstance(name, int):
@@ -173,26 +176,30 @@ class Placeable(object):
     def y_length(self):
         return self.properties['length']
 
-    # TODO: add support for H
+    def z_length(self):
+        return self.properties['height']
+
     def from_polar(self, r, theta, h):
         x = self.x_length() / 2.0
         y = self.y_length() / 2.0
         r = x
+        z_center = (self.z_length() / 2.0)
+
         return (x + r * math.cos(-theta),
                 y + r * math.sin(-theta),
-                h)
+                z_center + z_center * h)
 
     def center(self, reference=None):
         return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
-    # TODO: add support for relative Z coordinates
     def from_cartesian(self, x, y, z):
         x_center = (self.x_length() / 2.0)
         y_center = (self.y_length() / 2.0)
+        z_center = (self.z_length() / 2.0)
 
         return (x_center + x_center * x,
                 y_center + y_center * y,
-                z)
+                z_center + z_center * z)
 
     def from_center(self, x=None, y=None, z=None, r=None,
                     theta=None, h=None, reference=None):
