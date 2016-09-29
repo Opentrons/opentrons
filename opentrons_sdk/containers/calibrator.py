@@ -2,18 +2,25 @@ import copy
 
 
 class Calibrator(object):
-    # Will return calibrated coordinates relative to deck
+    # Returns calibrated coordinates relative to deck
     def convert(self,
                 calibration_data,
                 placeable,
                 coordinates=(0, 0, 0)):
         path = placeable.get_path()
-        item = self.apply_calibration(calibration_data, placeable.get_deck())
-        for name in path:
-            item = item[name]
+        calibrated_placeable = self.apply_calibration(
+            calibration_data,
+            placeable.get_deck())
 
-        item_coordinates = item.coordinates(item.get_deck())
-        return tuple(a + b for a, b in zip(coordinates, item_coordinates))
+        for name in path:
+            calibrated_placeable = calibrated_placeable[name]
+
+        calibrated_deck = calibrated_placeable.get_deck()
+        calibrated_coordinates = calibrated_placeable.coordinates(
+            calibrated_deck)
+
+        return tuple(a + b for a, b in
+                     zip(coordinates, calibrated_coordinates))
 
     def apply_calibration(self, calibration_data, placeable):
         placeable = copy.deepcopy(placeable)
