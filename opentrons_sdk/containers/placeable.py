@@ -48,6 +48,11 @@ class Placeable(object):
     def get_children_list(self):
         return list([v['instance'] for k, v in self.children.items()])
 
+    def get_path(self, reference=None):
+        return list(reversed([item.get_name()
+                    for item in self.get_trace(reference)
+                    if item.get_name() is not None]))
+
     def get_trace(self, reference=None):
         trace = [self]
         parent = self.get_parent()
@@ -95,6 +100,21 @@ class Placeable(object):
 
         child.parent = self
         self.children[name] = {'instance': child, 'coordinates': coordinates}
+
+    def get_deck(self):
+        parent = self.parent
+
+        found = False
+        while not found:
+            if parent is None:
+                break
+            if isinstance(parent, Deck):
+                found = True
+                break
+            parent = parent.parent
+
+        return parent
+
 
     def remove_child(self, name):
         del self.children[name]
@@ -154,20 +174,6 @@ class Well(Placeable):
         assert 'width' in properties
         assert 'length' in properties
 
-    def find_parent_deck(self):
-        parent = self.parent
-
-        found = False
-        while not found:
-            if parent is None:
-                break
-            if isinstance(parent, Deck):
-                found = True
-                break
-            parent = parent.parent
-
-        return parent
-
     # axis_length is here to avoid confision with
     # height, width, depth
     def x_length(self):
@@ -187,8 +193,8 @@ class Well(Placeable):
                 y + r * math.sin(-theta),
                 h)
 
-    def center(self):
-        return self.from_center(x=0.0, y=0.0, z=0.0)
+    def center(self, reference=None):
+        return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
     # TODO: add support for relative Z coordinates
     def from_cartesian(self, x, y, z):
@@ -199,7 +205,8 @@ class Well(Placeable):
                 y_center + y_center * y,
                 z)
 
-    def from_center(self, x=None, y=None, z=None, r=None, theta=None, h=None):
+    def from_center(self, x=None, y=None, z=None, r=None,
+                    theta=None, h=None, reference=None):
         coords_to_endpoint = None
         if all([isinstance(i, numbers.Number) for i in (x, y, z)]):
             coords_to_endpoint = self.from_cartesian(x, y, z)
@@ -207,8 +214,14 @@ class Well(Placeable):
         if all([isinstance(i, numbers.Number) for i in (r, theta, h)]):
             coords_to_endpoint = self.from_polar(r, theta, h)
 
-        deck = self.find_parent_deck()
-        coords_to_deck = self.coordinates(deck)
-        res = tuple(a + b for a, b in zip(coords_to_deck, coords_to_endpoint))
+        deck = self.get_deck()
+
+        coords_to_reference = (0, 0, 0)
+        if reference:
+            coords_to_reference = self.coordinates(reference)
+
+        res = tuple(a + b for a, b in
+                    zip(coords_to_reference, coords_to_endpoint))
+
         return res
 

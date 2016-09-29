@@ -55,20 +55,57 @@ class CalibratorTestCase(unittest.TestCase):
             new_deck['A1']['tube_rack']['Blue'].coordinates(new_deck),
             (24, 19, 4))
 
+    def test_convert(self):
+        deck = self.generate_deck()
+        calibration_data = {
+            'A1':
+            {
+                'delta': (1, 1, 1),
+                'children': {
+                    'tube_rack': {
+                        'delta': (1, 1, 1),
+                        'children': {
+                            'Red':
+                            {
+                                'delta': (1, 1, 1)
+                            },
+                            'Blue':
+                            {
+                                'delta': (2, 2, 2)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        my_calibrator = Calibrator()
+        res = my_calibrator.convert(
+            calibration_data,
+            deck['A1']['tube_rack']['Blue'],
+            deck['A1']['tube_rack']['Blue'].center())
+        self.assertEqual(res, (29.0, 24.0, 4.0))
+
+        res = my_calibrator.convert(
+            calibration_data,
+            deck['A1']['tube_rack'])
+        self.assertEqual(res, (7, 12, 2))
+
     def test_calibrate(self):
         deck = self.generate_deck()
         my_calibrator = Calibrator()
         calibration_data = {}
 
         actual = (14, 19, -1)
-        expected = deck['A1']['tube_rack']['Red'].center()
+        tube_rack = deck['A1']['tube_rack']
+        expected = tube_rack['Red'].center(tube_rack)
 
         new_calibration_data = my_calibrator.calibrate(
             calibration_data,
             deck['A1']['tube_rack'],
-            expected,
-            actual)
-        expected = {
+            actual,
+            expected)
+
+        expected_result = {
             'A1': {
                 'children': {
                     'tube_rack': {
@@ -77,8 +114,9 @@ class CalibratorTestCase(unittest.TestCase):
                 }
             }
         }
-        self.assertDictEqual(new_calibration_data, expected)
+        self.assertDictEqual(new_calibration_data, expected_result)
 
         # apply calibration data to the original deck and get actual back
         new_deck = my_calibrator.apply_calibration(new_calibration_data, deck)
-        self.assertEquals(new_deck['A1']['tube_rack']['Red'].center(), actual)
+        self.assertEquals(
+            new_deck['A1']['tube_rack']['Red'].center(new_deck), actual)
