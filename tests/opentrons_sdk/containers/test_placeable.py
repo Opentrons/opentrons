@@ -124,3 +124,25 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertEqual(
             plate['B2'].from_center(r=1.0, theta=math.pi / 2, h=0.0),
             (5.0, 0.0, 0))
+
+    def test_get_all_children(self):
+        c1 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c2 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        deck = Deck()
+        deck.add(c1, "A1", (0, 0, 0))
+        deck.add(c2, "A2", (50, 50, 50))
+        self.assertEqual(len(deck.get_all_children()), 10)
+
+    def test_max_dimensions(self):
+        c1 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c2 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        deck = Deck()
+        deck.add(c1, "A1", (0, 0, 0))
+        deck.add(c2, "A2", (50, 50, 50))
+
+        actual = [(str(i), j) for i, j in deck.max_dimensions(deck)]
+        expected = [('<Well A2>', (65.0, 60.0, 50.0)),
+                    ('<Well B1>', (60.0, 65.0, 50.0)),
+                    ('<Container A2>', (50.0, 50.0, 50.0))]
+        self.assertListEqual(actual, expected)
+

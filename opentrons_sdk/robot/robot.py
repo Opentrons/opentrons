@@ -77,9 +77,9 @@ class Robot(object):
         """
         return self._driver.connect(device=port)
 
-    def home(self):
+    def home(self, *args):
         if self._driver.resume():
-            return self._driver.home()
+            return self._driver.home(*args)
         else:
             return False
 
@@ -91,10 +91,11 @@ class Robot(object):
             self.add_command(Command(do=callback))
         setattr(self, name, commandable)
 
+    def move_head(self, *args, **kwargs):
+        self._driver.move(*args, **kwargs)
+
     def move_to(self, location, instrument=None):
-
         placeable, coordinates = unpack_location(location)
-
         calibration_data = {}
         if instrument:
             calibration_data = instrument.calibration_data

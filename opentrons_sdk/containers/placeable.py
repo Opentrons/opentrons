@@ -166,24 +166,35 @@ class Placeable(object):
     def get_child_by_name(self, name):
         return self.children[name]['instance']
 
-    # axis_length is here to avoid confision with
-    # height, width, depth
-    def x_length(self):
+    def x_size(self):
         return self.properties['width']
 
-    # axis_length is here to avoid confision with
-    # height, width, depth
-    def y_length(self):
+    def y_size(self):
         return self.properties['length']
 
-    def z_length(self):
+    def z_size(self):
         return self.properties['height']
 
+    def get_all_children(self):
+        my_children = self.get_children_list()
+        children = []
+        children.extend(my_children)
+        for child in my_children:
+            children.extend(child.get_all_children())
+        return children
+
+    def max_dimensions(self, reference):
+        children = [(child, child.from_center(x=1, y=1, z=1, reference=reference))
+                    for child in self.get_all_children()]
+
+        return tuple([max(children, key=lambda a : a[1][axis])
+                    for axis in range(3)])
+
     def from_polar(self, r, theta, h):
-        x = self.x_length() / 2.0
-        y = self.y_length() / 2.0
+        x = self.x_size() / 2.0
+        y = self.y_size() / 2.0
         r = x
-        z_center = (self.z_length() / 2.0)
+        z_center = (self.z_size() / 2.0)
 
         return (x + r * math.cos(-theta),
                 y + r * math.sin(-theta),
@@ -193,9 +204,9 @@ class Placeable(object):
         return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
     def from_cartesian(self, x, y, z):
-        x_center = (self.x_length() / 2.0)
-        y_center = (self.y_length() / 2.0)
-        z_center = (self.z_length() / 2.0)
+        x_center = (self.x_size() / 2.0)
+        y_center = (self.y_size() / 2.0)
+        z_center = (self.z_size() / 2.0)
 
         return (x_center + x_center * x,
                 y_center + y_center * y,
