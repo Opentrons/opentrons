@@ -17,15 +17,9 @@ using the load_custom_containers function of this module to specify an
 alternate configuration directory.
 """
 
-import os
-from pkg_resources import resource_filename
 
 
 
-def load(container_name, slot):
-    from opentrons_sdk.protocol.robot import Robot
-    protocol = Robot.get_instance()
-    return protocol.add_container(slot, container_name)
 
 # _load_default_containers()
 # containers_path = resource_filename("opentrons_sdk.config", "containers")
