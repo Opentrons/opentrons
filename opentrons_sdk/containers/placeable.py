@@ -190,34 +190,6 @@ class Placeable(object):
         return tuple([max(children, key=lambda a : a[1][axis])
                     for axis in range(3)])
 
-    def max_dims(self, reference):
-        """Returns the highest point within the deck and the placeable of that point
-        """
-        best = (self, self.height())
-        get_height = lambda x: x[1]
-        to_visit = [self]
-        lowest_children = []
-
-        while to_visit:
-            current = to_visit.pop()
-            for child_name, child_info in current.get_children().items(): # TODO: get children doesn't really get children
-                instance = child_info['instance']
-                print(str(instance), instance.height())
-                if isinstance(instance, Well):
-                    lowest_children.append(instance)
-                to_visit.append(instance)
-
-        best_x, best_y, best_z = float('-inf'), float('-inf'), float('-inf')
-
-        for child in lowest_children:
-            x, y, z = child.from_center(x=1, y=1, z=1, reference=reference)
-
-            best_x = max(best_x, x)
-            best_y = max(best_y, y)
-            best_z = max(best_z, z)
-
-
-
     def from_polar(self, r, theta, h):
         x = self.x_size() / 2.0
         y = self.y_size() / 2.0
