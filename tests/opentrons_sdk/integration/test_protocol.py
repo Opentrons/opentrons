@@ -1,14 +1,14 @@
 import unittest
 
-from opentrons_sdk.protocol.protocol import Protocol
+from opentrons_sdk.protocol.robot import Robot
 from opentrons_sdk.containers.placeable import Container, Deck
 from opentrons_sdk.labware import containers, instruments
 
 
 class ProtocolTestCase(unittest.TestCase):
     def setUp(self):
-        Protocol.reset()
-        self.protocol = Protocol.get_instance()
+        Robot.reset()
+        self.protocol = Robot.get_instance()
 
     def test_protocol_container_setup(self):
         plate = containers.load('96-flat', 'A1')
@@ -68,11 +68,11 @@ class ProtocolTestCase(unittest.TestCase):
             channels=1
         )
 
-        p10.new_tip()  # Finds a new tip and grabs that tip
-        p10.droptip()  # Drop the tip to the trash_container
-
-        p10.eject_tip(trash)
-        p10.pickup_tip(tiprack['B5'])
+        # p10.new_tip()  # Finds a new tip and grabs that tip
+        # p10.droptip()  # Drop the tip to the trash_container
+        #
+        # p10.eject_tip(trash)
+        # p10.pickup_tip(tiprack['B5'])
         #no arg, go `to `tiprack, pickup tip
         #with an arg, go to slot, pickup tip
 
