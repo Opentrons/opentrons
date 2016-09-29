@@ -12,7 +12,6 @@ class RobotTest(unittest.TestCase):
 		self.robot = Robot.get_instance()
 		# self.robot.connect(port='/dev/tty.usbmodem1421')
 		# self.robot.home()
-		self.robot.simulate()
 		self.robot._driver = mock.Mock()
 
 	def test_robot_move_to(self):

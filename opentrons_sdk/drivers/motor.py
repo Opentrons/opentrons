@@ -77,25 +77,14 @@ class CNCDriver(object):
     UNITS_TO_INCHES = 'G20'
     UNITS_TO_MILLIMETERS = 'G22'
 
-    VERSION = None
-
-    """
-    If simulated is set to true, all GCode commands will be saved to an
-    internal list instead of being sent to the actual device.
-    """
-    simulated = False
-    command_queue = None  # []
+    VERSION = 'version'
 
     """
     Serial port connection to talk to the device.
     """
     connection = None
 
-    def __init__(self, inches=False, simulate=False):
-        self.simulated = simulate
-        self.command_queue = []
-
-        self.serial_timeout = 0.1
+    serial_timeout = 0.1
 
     def list_serial_ports(self):
         """ Lists serial port names
@@ -174,10 +163,7 @@ class CNCDriver(object):
 
         response = ''
 
-        if self.simulated:
-            self.command_queue.append(command)
-        else:
-            response = self.write_to_serial(command)
+        response = self.write_to_serial(command)
 
         return response
 
@@ -243,7 +229,7 @@ class CNCDriver(object):
 
         return msg
 
-    def move(self, x=None, y=None, z=None, speed=None, absolute=True, **kwargs):
+    def move(self, x=None, y=None, z=None, absolute=True, **kwargs):
 
         code = self.MOVE
 
@@ -357,28 +343,6 @@ class CNCDriver(object):
 
         return coords
 
-    def execute_queue(self):
-        queue = self.flush_queue()
-        map(self.send, queue)
-
-    def flush_queue(self):
-        q = self.command_queue
-        self.command_queue = []
-        return q
-
-    def run_tap(self, filename):
-        self.home()
-        self.send_command(self.UNITS_TO_MILLIMETERS)
-        self.send_command(self.ABSOLUTE_POSITIONING)
-        lines = open(filename).readlines()
-        for l in lines:
-            self.send_command(l)
-
-
-class OpenTrons(CNCDriver):
-
-    VERSION = 'version'
-
 
 class MoveLogger(CNCDriver):
 
@@ -396,13 +360,35 @@ class MoveLogger(CNCDriver):
 
     def __init__(self):
         self.movements = []
-        self.motor = OpenTrons()
+        self.motor = CNCDriver()
         self.motor.connection = GCodeLogger()
+
+        self.current_coords = {
+            'x': 0,
+            'y': 0,
+            'z': 0,
+            'a': 0,
+            'b': 0
+        }
 
     def move(self, **kwargs):
         kwargs = dict((k.lower(), v) for k, v in kwargs.items())
         self.movements.append(kwargs)
+
+        for axis in 'xyzab':
+            if kwargs.get(axis):
+                if kwargs.get('absolute') == False:
+                    self.current_coords[axis] += kwargs[axis]
+                else:
+                    self.current_coords[axis] = kwargs[axis]
+
         self.motor.move(**kwargs)
+
+    def get_position(self):
+        return {
+            'current': self.current_coords,
+            'target': self.current_coords
+        }
 
     def isOpen(self):
         return True

@@ -8,11 +8,12 @@ from opentrons_sdk.util import log
 from opentrons_sdk.containers.placeable import unpack_location
 from opentrons_sdk.containers.calibrator import apply_calibration
 
+
 class Robot(object):
     _commands = None  # []
     _instance = None
 
-    def __init__(self):
+    def __init__(self, driver_instance=None):
         self._commands = []
         self._handlers = []
 
@@ -21,6 +22,8 @@ class Robot(object):
 
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
+
+        self._driver = driver_instance or motor_drivers.MoveLogger()
 
     @classmethod
     def get_instance(cls):
@@ -72,11 +75,7 @@ class Robot(object):
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
         """
-        self.set_driver(motor_drivers.OpenTrons())
         return self._driver.connect(device=port)
-
-    def simulate(self):
-        self.set_driver(motor_drivers.MoveLogger())
 
     def home(self):
         if self._driver.resume():
