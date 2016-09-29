@@ -1,8 +1,9 @@
 import unittest
+from opentrons_sdk import containers
 
-from opentrons_sdk.protocol.robot import Robot
+from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container, Deck
-from opentrons_sdk.labware import containers, instruments
+from opentrons_sdk.labware import instruments
 
 
 class ProtocolTestCase(unittest.TestCase):
@@ -36,7 +37,7 @@ class ProtocolTestCase(unittest.TestCase):
         self.assertEqual(instruments_list[0], ('B', p200))
 
     def test_deck_setup(self):
-        deck = self.robot.get_deck()
+        deck = self.robot.deck
 
         trash = containers.load('point', 'A1')
         tiprack = containers.load('tiprack-10ul', 'B2')

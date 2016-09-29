@@ -1,5 +1,5 @@
-from opentrons_sdk.protocol.command import Command
-from opentrons_sdk.protocol.robot import Robot
+from opentrons_sdk.robot.command import Command
+from opentrons_sdk.robot.robot import Robot
 
 
 class Pipette(object):
