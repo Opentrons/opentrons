@@ -151,10 +151,18 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         expected = [
-            call.move(absolute=True, b=13, speed=None),
-            call.move(absolute=True, b=13, speed=None),
-            call.home('b'),
-            call.wait_for_arrival()
+            call.move(z=0),
+            call.move(y=0, x=0),
+            call.move(z=0),
+            call.wait_for_arrival(),
+            call.move(z=-6),
+            call.move(z=0),
+            call.move(z=-6),
+            call.move(z=0),
+            call.move(z=-6),
+            call.move(z=0),
+            call.wait_for_arrival(),
+            call.resume(),
+            call.home('z')
         ]
-
         self.assertEquals(self.robot._driver.mock_calls, expected)

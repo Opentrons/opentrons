@@ -1,6 +1,5 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
-from opentrons_sdk.util import geometry
 
 
 class Pipette(object):
@@ -107,11 +106,12 @@ class Pipette(object):
 
     def pick_up_tip(self, address):
         # TODO: Calibrations needed here
-        top_of_tip = address.coordinates(reference=address.get_deck())
+        _, _, tip_z_top = address.coordinates(reference=address.get_deck())
 
         # TODO: actual plunge depth for picking up a tip varies based on the tip
         # right now it's accounted for via plunge depth
-        bottom_of_tip = geometry.sum_tuples(top_of_tip, (0, 0, -6))
+        # TODO: Need to talk about containers z positioning
+        tip_z_bottom = tip_z_top - 6
 
         # Hover over tip
         self.robot.move_to(address)
@@ -119,8 +119,10 @@ class Pipette(object):
         def _do():
             # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=bottom_of_tip)
-                self.robot.move_head(z=top_of_tip)
+                self.robot.move_head(z=tip_z_bottom)
+                self.robot.move_head(z=tip_z_top)
+
+            self.motor.wait_for_arrival()
             self.robot.home('z')
 
         description = "Pickup up tip from {0}".format(str(address))
