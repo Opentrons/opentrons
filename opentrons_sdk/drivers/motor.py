@@ -371,6 +371,11 @@ class MoveLogger(CNCDriver):
             'b': 0
         }
 
+    def home(self, *axis):
+        for a in axis:
+            self.current_coords[a.lower()] = 0
+        return True
+
     def move(self, **kwargs):
         kwargs = dict((k.lower(), v) for k, v in kwargs.items())
         self.movements.append(kwargs)

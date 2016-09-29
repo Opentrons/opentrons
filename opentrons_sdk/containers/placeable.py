@@ -40,9 +40,9 @@ class Placeable(object):
         if 'depth' in properties:
             properties['height'] = properties['depth']
 
-        for dimention in ['length', 'width', 'height']:
-            if dimention not in properties:
-                properties[dimention] = 0
+        for dimension in ['length', 'width', 'height']:
+            if dimension not in properties:
+                properties[dimension] = 0
 
     def __getitem__(self, name):
         if isinstance(name, int):

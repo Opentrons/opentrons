@@ -61,7 +61,7 @@ class PipetteTest(unittest.TestCase):
             self.p200.calibration_data,
             expected_calibration_data)
 
-    def test_move_to(self):
+    def test_aspirate_move_to(self):
         x, y, z = (161.0, 416.7, 3.0)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
@@ -79,6 +79,67 @@ class PipetteTest(unittest.TestCase):
         self.assertDictEqual(
             current_pos,
             {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 5.0}
+        )
+
+    def test_dispense_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.aspirate(100, location)
+        self.p200.dispense(100, location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 10.0}
+        )
+
+    def test_blow_out_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.blow_out(location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 12.0}
+        )
+
+    def test_drop_tip_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.drop_tip(location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 0.0}
         )
 
     def test_empty_aspirate(self):
@@ -169,5 +230,5 @@ class PipetteTest(unittest.TestCase):
         current_pos = self.robot._driver.get_position()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 13.0}
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
         )

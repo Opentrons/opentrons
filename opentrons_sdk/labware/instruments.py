@@ -69,7 +69,7 @@ class Pipette(object):
 
         return self
 
-    def dispense(self, volume=None, address=None):
+    def dispense(self, volume=None, location=None):
 
         if not volume:
             volume = self.max_volume - self.current_volume
@@ -80,8 +80,8 @@ class Pipette(object):
                 format(self.current_volume - volume)
             )
 
-        if address:
-            self.robot.move_to(address)
+        if location:
+            self.robot.move_to(location, self)
 
         distance = self.plunge_distance(volume)
 
@@ -89,36 +89,36 @@ class Pipette(object):
             self.motor.move(distance, absolute=False)
             self.motor.wait_for_arrival()
 
-        description = "Dispensing {0}uL at {1}".format(volume, str(address))
+        description = "Dispensing {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume -= volume
 
         return self
 
-    def blow_out(self, address=None):
-        if address:
-            self.robot.move_to(address)
+    def blow_out(self, location=None):
+        if location:
+            self.robot.move_to(location, self)
 
         def _do():
             self.motor.move(self.positions['blow_out'])
             self.motor.wait_for_arrival()
 
-        description = "Blow_out at {}".format(str(address))
+        description = "Blow_out at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume = 0
 
         return self
 
-    def drop_tip(self, address=None):
-        if address:
-            self.robot.move_to(address)
+    def drop_tip(self, location=None):
+        if location:
+            self.robot.move_to(location, self)
 
         def _do():
             self.motor.move(self.positions['drop_tip'])
             self.motor.home()
             self.motor.wait_for_arrival()
 
-        description = "Drop_tip at {}".format(str(address))
+        description = "Drop_tip at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume = 0
         return self
