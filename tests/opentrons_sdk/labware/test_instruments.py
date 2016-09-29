@@ -6,6 +6,9 @@ from opentrons_sdk import containers
 from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 
+from opentrons_sdk.containers.placeable import unpack_location
+from opentrons_sdk.containers.calibrator import Calibrator
+
 
 class PipetteTest(unittest.TestCase):
 
@@ -32,6 +35,31 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
+
+    def test_unpack_location(self):
+
+        location = (self.plate[0], (1, 0, -1))
+        res = unpack_location(location)
+        self.assertEquals(res, (self.plate[0], (1, 0, -1)))
+
+        res = unpack_location(self.plate[0])
+        self.assertEquals(res, (self.plate[0], self.plate[0].center()))
+
+    def test_calibrate_placeable(self):
+        robot_actual = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        location = (self.plate, well.center(self.plate))
+
+        self.p200.calibrate_placeable(location, robot_actual)
+
+        expected_result = {
+            'A2': {
+                'children': {
+                    '96-flat': {
+                        'delta': (1.0, 2.0, 3.0)
+                    }}}}
+
+        self.assertDictEqual(self.p200.calibration_data, expected_result)
 
     def test_empty_aspirate(self):
 

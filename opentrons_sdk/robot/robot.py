@@ -5,6 +5,8 @@ from opentrons_sdk.containers import legacy_containers, placeable
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
 
+from opentrons_sdk.containers.placeable import unpack_location
+from opentrons_sdk.containers.calibrator import apply_calibration
 
 class Robot(object):
     _commands = None  # []
@@ -90,25 +92,29 @@ class Robot(object):
             self.add_command(Command(do=callback))
         setattr(self, name, commandable)
 
-    def move_to(self, address, instrument=None):
-        coords = None
-        if isinstance(address, placeable.Placeable):
-            coords = address.coordinates()
-        elif isinstance(address, tuple) and len(address) == 3:
-            coords = address
-        else:
-            raise Exception('Unable to parse address: {}'.format(address))
+    def move_to(self, location, instrument=None):
+        calibration_data = {}
+        if instrument:
+            calibration_data = instrument.calibration_data
+
+        placeable, coordinates = unpack_location(location)
+        coordinates = apply_calibration(
+            calibration_data,
+            placeable,
+            coordinates)
 
         # TODO: (andy) path optomization goes here
         #       now it simply just goes to the top every time
 
         def _do():
             self._driver.move(z=0)
-            self._driver.move(x=coords[0], y=coords[1])
-            self._driver.move(z=coords[2])
+            self._driver.move(x=coordinates[0], y=coordinates[1])
+            self._driver.move(z=coordinates[2])
             self._driver.wait_for_arrival()
 
-        description = "Moving head to {}".format(str(address))
+        description = "Moving head to {} {}".format(
+            str(placeable),
+            coordinates)
         self.add_command(Command(do=_do, description=description))
 
     @property

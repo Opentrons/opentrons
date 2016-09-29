@@ -3,11 +3,43 @@ import numbers
 from collections import OrderedDict
 
 
+def unpack_location(location):
+    coordinates = None
+    placeable = None
+    if isinstance(location, Placeable):
+        coordinates = location.center()
+        placeable = location
+    elif isinstance(location, tuple):
+        placeable, coordinates = location
+    else:
+        raise ValueError(
+            'Location should be (Placeable, (x, y, z)) or Placeable'
+        )
+    return (placeable, coordinates)
+
+
 class Placeable(object):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, properties=None):
         self.children = OrderedDict()
         self.parent = parent
+
+        if properties is None:
+            properties = {}
+
+        self.properties = properties
+
+        if 'radius' in properties:
+            properties['width'] = properties['radius'] * 2
+            properties['length'] = properties['radius'] * 2
+
+        if 'diameter' in properties:
+            properties['width'] = properties['diameter']
+            properties['length'] = properties['diameter']
+
+        # TODO: perhaps add checking width/length to verification
+        # assert 'width' in properties
+        # assert 'length' in properties
 
     def __getitem__(self, name):
         if isinstance(name, int):
@@ -104,6 +136,9 @@ class Placeable(object):
     def get_deck(self):
         parent = self.parent
 
+        if not parent:
+            return self
+
         found = False
         while not found:
             if parent is None:
@@ -127,52 +162,6 @@ class Placeable(object):
 
     def get_child_by_name(self, name):
         return self.children[name]['instance']
-
-
-class Deck(Placeable):
-    def containers(self) -> list:
-        containers = []
-        for slot in self:
-            for container in slot:
-                containers.append(container)
-        return containers
-
-    def has_container(self, query):
-        return query in self.containers()
-
-
-class Slot(Placeable):
-    def add(self, child, name='slot', coordinates=(0, 0, 0)):
-        super().add(child, name, coordinates)
-
-
-class Container(Placeable):
-    def well(self, name):
-        return self.get_child_by_name(name)
-
-    def wells(self):
-        return self.get_children()
-
-
-class Well(Placeable):
-    def __init__(self, properties=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if properties is None:
-            properties = {}
-
-        self.properties = properties
-
-        if 'radius' in properties:
-            properties['width'] = properties['radius'] * 2
-            properties['length'] = properties['radius'] * 2
-
-        if 'diameter' in properties:
-            properties['width'] = properties['diameter']
-            properties['length'] = properties['diameter']
-
-        assert 'width' in properties
-        assert 'length' in properties
 
     # axis_length is here to avoid confision with
     # height, width, depth
@@ -224,4 +213,34 @@ class Well(Placeable):
                     zip(coords_to_reference, coords_to_endpoint))
 
         return res
+
+
+class Deck(Placeable):
+    def containers(self) -> list:
+        containers = []
+        for slot in self:
+            for container in slot:
+                containers.append(container)
+        return containers
+
+    def has_container(self, query):
+        return query in self.containers()
+
+
+class Slot(Placeable):
+    def add(self, child, name='slot', coordinates=(0, 0, 0)):
+        super().add(child, name, coordinates)
+
+
+class Container(Placeable):
+    def well(self, name):
+        return self.get_child_by_name(name)
+
+    def wells(self):
+        return self.get_children()
+
+
+class Well(Placeable):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
