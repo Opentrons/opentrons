@@ -1,5 +1,6 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
+from opentrons_sdk.containers.calibrator import Calibrator
 
 
 class Pipette(object):
@@ -33,7 +34,11 @@ class Pipette(object):
         self.robot.add_instrument(self.axis, self)
         self.motor = self.robot.get_motor(self.axis)
 
-    def aspirate(self, volume=None, address=None):
+        self.calibration_data = {}
+
+        self.calibrator = Calibrator()
+
+    def aspirate(self, volume=None, location=None):
 
         if not volume:
             volume = self.max_volume - self.current_volume
@@ -44,8 +49,8 @@ class Pipette(object):
                 .format(self.current_volume + volume)
             )
 
-        if address:
-            self.robot.move_to(address)
+        if location:
+            self.robot.move_to(location, self)
 
         empty_pipette = False
         distance = self.plunge_distance(volume) * -1
@@ -58,13 +63,13 @@ class Pipette(object):
             self.motor.move(distance, absolute=False)
             self.motor.wait_for_arrival()
 
-        description = "Aspirating {0}uL at {1}".format(volume, str(address))
+        description = "Aspirating {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume += volume
 
         return self
 
-    def dispense(self, volume=None, address=None):
+    def dispense(self, volume=None, location=None):
 
         if not volume:
             volume = self.max_volume - self.current_volume
@@ -75,8 +80,8 @@ class Pipette(object):
                 format(self.current_volume - volume)
             )
 
-        if address:
-            self.robot.move_to(address)
+        if location:
+            self.robot.move_to(location, self)
 
         distance = self.plunge_distance(volume)
 
@@ -84,21 +89,21 @@ class Pipette(object):
             self.motor.move(distance, absolute=False)
             self.motor.wait_for_arrival()
 
-        description = "Dispensing {0}uL at {1}".format(volume, str(address))
+        description = "Dispensing {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume -= volume
 
         return self
 
-    def blow_out(self, address=None):
-        if address:
-            self.robot.move_to(address)
+    def blow_out(self, location=None):
+        if location:
+            self.robot.move_to(location, self)
 
         def _do():
             self.motor.move(self.positions['blow_out'])
             self.motor.wait_for_arrival()
 
-        description = "Blow_out at {}".format(str(address))
+        description = "Blow_out at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume = 0
 
@@ -129,16 +134,16 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
-    def drop_tip(self, address=None):
-        if address:
-            self.robot.move_to(address)
+    def drop_tip(self, location=None):
+        if location:
+            self.robot.move_to(location, self)
 
         def _do():
             self.motor.move(self.positions['drop_tip'])
             self.motor.home()
             self.motor.wait_for_arrival()
 
-        description = "Drop_tip at {}".format(str(address))
+        description = "Drop_tip at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume = 0
         return self
@@ -180,6 +185,16 @@ class Pipette(object):
             self.positions['blow_out'] = blow_out
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
+
+    def calibrate_position(self, location, current_position=None):
+        if not current_position:
+            current = self.robot._driver.get_position()['current']
+            current_position = (current['x'], current['y'], current['z'])
+
+        self.calibration_data = self.calibrator.calibrate(
+            self.calibration_data,
+            location,
+            current_position)
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume

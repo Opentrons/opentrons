@@ -1,10 +1,10 @@
 import unittest
-from unittest import mock
-from unittest.mock import call
 from opentrons_sdk import containers
 
 from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
+
+from opentrons_sdk.containers.placeable import unpack_location
 
 
 class PipetteTest(unittest.TestCase):
@@ -14,8 +14,6 @@ class PipetteTest(unittest.TestCase):
         self.robot = Robot.get_instance()
         # self.robot.connect(port='/dev/tty.usbmodem1421')
         # self.robot.home()
-
-        self.robot._driver = mock.Mock()
 
         self.trash = containers.load('point', 'A1')
         self.tiprack = containers.load('tiprack-10ul', 'B2')
@@ -33,49 +31,151 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
 
+    def test_unpack_location(self):
+
+        location = (self.plate[0], (1, 0, -1))
+        res = unpack_location(location)
+        self.assertEquals(res, (self.plate[0], (1, 0, -1)))
+
+        res = unpack_location(self.plate[0])
+        self.assertEquals(res, (self.plate[0], self.plate[0].center()))
+
+    def test_calibrate_placeable(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        expected_calibration_data = {
+            'A2': {
+                'children': {
+                    '96-flat': {
+                        'delta': (1.0, 2.0, 3.0)
+                    }}}}
+
+        self.assertDictEqual(
+            self.p200.calibration_data,
+            expected_calibration_data)
+
+    def test_aspirate_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.aspirate(100, location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 5.0}
+        )
+
+    def test_dispense_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.aspirate(100, location)
+        self.p200.dispense(100, location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 10.0}
+        )
+
+    def test_blow_out_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.blow_out(location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 12.0}
+        )
+
+    def test_drop_tip_move_to(self):
+        x, y, z = (161.0, 416.7, 3.0)
+        well = self.plate[0]
+        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
+        location = (self.plate, pos)
+
+        self.robot._driver.move(x=x, y=y, z=z)
+
+        self.p200.calibrate_position(location)
+
+        self.p200.drop_tip(location)
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_position()['current']
+
+        self.assertDictEqual(
+            current_pos,
+            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 0.0}
+        )
+
     def test_empty_aspirate(self):
 
         self.p200.aspirate(100)
 
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=10, speed=None),
-            call.move(absolute=False, b=-5, speed=None),
-            call.wait_for_arrival()
-        ]
+        current_pos = self.robot._driver.get_position()['current']
 
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 5.0}
+        )
 
     def test_non_empty_aspirate(self):
 
         self.p200.aspirate(100)
         self.p200.aspirate(20)
-
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=10, speed=None),
-            call.move(absolute=False, b=-5, speed=None),
-            call.wait_for_arrival(),
-            call.move(absolute=False, b=-1, speed=None),
-            call.wait_for_arrival()
-        ]
-
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        current_pos = self.robot._driver.get_position()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 4.0}
+        )
 
     def test_aspirate_no_args(self):
         self.p200.aspirate()
-
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=10, speed=None),
-            call.move(absolute=False, b=-10, speed=None),
-            call.wait_for_arrival()
-        ]
-
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        current_pos = self.robot._driver.get_position()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
+        )
 
     def test_invalid_aspirate(self):
         self.assertRaises(RuntimeWarning, self.p200.aspirate, 500)
@@ -87,15 +187,11 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=10, speed=None),
-            call.move(absolute=False, b=-5, speed=None),
-            call.wait_for_arrival(),
-            call.move(absolute=False, b=1, speed=None),
-            call.wait_for_arrival()
-        ]
-
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        current_pos = self.robot._driver.get_position()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 6.0}
+        )
 
     def test_dispense_no_args(self):
         self.p200.aspirate(100)
@@ -103,15 +199,11 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=10, speed=None),
-            call.move(absolute=False, b=-5, speed=None),
-            call.wait_for_arrival(),
-            call.move(absolute=False, b=5, speed=None),
-            call.wait_for_arrival()
-        ]
-
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        current_pos = self.robot._driver.get_position()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 10.0}
+        )
 
     def test_invalid_dispense(self):
         self.assertRaises(RuntimeWarning, self.p200.dispense, 1)
@@ -123,12 +215,11 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=12, speed=None),
-            call.wait_for_arrival()
-        ]
-
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        current_pos = self.robot._driver.get_position()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 12.0}
+        )
 
     def test_drop_tip(self):
 
@@ -136,33 +227,8 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        expected = [
-            call.move(absolute=True, b=13, speed=None),
-            call.home('b'),
-            call.wait_for_arrival()
-        ]
-
-        self.assertEquals(self.robot._driver.mock_calls, expected)
-
-    def test_pick_up_tip(self):
-        well = self.tiprack['A1']
-
-        self.p200.pick_up_tip(well)
-        self.robot.run()
-
-        expected = [
-            call.move(z=0),
-            call.move(y=0, x=0),
-            call.move(z=0),
-            call.wait_for_arrival(),
-            call.move(z=-6),
-            call.move(z=0),
-            call.move(z=-6),
-            call.move(z=0),
-            call.move(z=-6),
-            call.move(z=0),
-            call.wait_for_arrival(),
-            call.resume(),
-            call.home('z')
-        ]
-        self.assertEquals(self.robot._driver.mock_calls, expected)
+        current_pos = self.robot._driver.get_position()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
+        )

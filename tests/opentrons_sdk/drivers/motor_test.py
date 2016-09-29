@@ -3,7 +3,7 @@ import sys
 import time
 import unittest
 
-from opentrons_sdk.drivers.motor import OpenTrons, GCodeLogger
+from opentrons_sdk.drivers.motor import CNCDriver, GCodeLogger
 
 
 class SerialTestCase(unittest.TestCase):
@@ -45,7 +45,7 @@ class OpenTronsTest(SerialTestCase):
         # and serial handshakes to be tested
         self.smoothie_connected = True
 
-        self.motor = OpenTrons()
+        self.motor = CNCDriver()
 
         self.smoothie_connected = False
 

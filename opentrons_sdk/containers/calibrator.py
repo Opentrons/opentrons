@@ -1,5 +1,14 @@
 import copy
 
+from opentrons_sdk.containers.placeable import unpack_location
+
+
+def apply_calibration(calibration_data,
+                      placeable,
+                      coordinates=(0, 0, 0)):
+    calibrator = Calibrator()
+    return calibrator.convert(calibration_data, placeable, coordinates)
+
 
 class Calibrator(object):
     # Returns calibrated coordinates relative to deck
@@ -42,9 +51,9 @@ class Calibrator(object):
 
     def calibrate(self,
                   calibration_data,
-                  placeable,
-                  actual,
-                  expected=(0, 0, 0)):
+                  location,
+                  actual):
+        placeable, expected = unpack_location(location)
         coordinates_to_deck = placeable.coordinates(placeable.get_deck())
         expected_to_deck = tuple(
             a + b for a, b in zip(expected, coordinates_to_deck))

@@ -3,11 +3,46 @@ import numbers
 from collections import OrderedDict
 
 
+def unpack_location(location):
+    coordinates = None
+    placeable = None
+    if isinstance(location, Placeable):
+        coordinates = location.center()
+        placeable = location
+    elif isinstance(location, tuple):
+        placeable, coordinates = location
+    else:
+        raise ValueError(
+            'Location should be (Placeable, (x, y, z)) or Placeable'
+        )
+    return (placeable, coordinates)
+
+
 class Placeable(object):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, properties=None):
         self.children = OrderedDict()
         self.parent = parent
+
+        if properties is None:
+            properties = {}
+
+        self.properties = properties
+
+        if 'radius' in properties:
+            properties['width'] = properties['radius'] * 2
+            properties['length'] = properties['radius'] * 2
+
+        if 'diameter' in properties:
+            properties['width'] = properties['diameter']
+            properties['length'] = properties['diameter']
+
+        if 'depth' in properties:
+            properties['height'] = properties['depth']
+
+        for dimension in ['length', 'width', 'height']:
+            if dimension not in properties:
+                properties[dimension] = 0
 
     def __getitem__(self, name):
         if isinstance(name, int):
@@ -104,6 +139,9 @@ class Placeable(object):
     def get_deck(self):
         parent = self.parent
 
+        if not parent:
+            return self
+
         found = False
         while not found:
             if parent is None:
@@ -127,6 +165,72 @@ class Placeable(object):
 
     def get_child_by_name(self, name):
         return self.children[name]['instance']
+
+    def x_size(self):
+        return self.properties['width']
+
+    def y_size(self):
+        return self.properties['length']
+
+    def z_size(self):
+        return self.properties['height']
+
+    def get_all_children(self):
+        my_children = self.get_children_list()
+        children = []
+        children.extend(my_children)
+        for child in my_children:
+            children.extend(child.get_all_children())
+        return children
+
+    def max_dimensions(self, reference):
+        children = [(child, child.from_center(x=1, y=1, z=1, reference=reference))
+                    for child in self.get_all_children()]
+
+        return tuple([max(children, key=lambda a : a[1][axis])
+                    for axis in range(3)])
+
+    def from_polar(self, r, theta, h):
+        x = self.x_size() / 2.0
+        y = self.y_size() / 2.0
+        r = x
+        z_center = (self.z_size() / 2.0)
+
+        return (x + r * math.cos(-theta),
+                y + r * math.sin(-theta),
+                z_center + z_center * h)
+
+    def center(self, reference=None):
+        return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
+
+    def from_cartesian(self, x, y, z):
+        x_center = (self.x_size() / 2.0)
+        y_center = (self.y_size() / 2.0)
+        z_center = (self.z_size() / 2.0)
+
+        return (x_center + x_center * x,
+                y_center + y_center * y,
+                z_center + z_center * z)
+
+    def from_center(self, x=None, y=None, z=None, r=None,
+                    theta=None, h=None, reference=None):
+        coords_to_endpoint = None
+        if all([isinstance(i, numbers.Number) for i in (x, y, z)]):
+            coords_to_endpoint = self.from_cartesian(x, y, z)
+
+        if all([isinstance(i, numbers.Number) for i in (r, theta, h)]):
+            coords_to_endpoint = self.from_polar(r, theta, h)
+
+        deck = self.get_deck()
+
+        coords_to_reference = (0, 0, 0)
+        if reference:
+            coords_to_reference = self.coordinates(reference)
+
+        res = tuple(a + b for a, b in
+                    zip(coords_to_reference, coords_to_endpoint))
+
+        return res
 
 
 class Deck(Placeable):
@@ -155,73 +259,6 @@ class Container(Placeable):
 
 
 class Well(Placeable):
-    def __init__(self, properties=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if properties is None:
-            properties = {}
-
-        self.properties = properties
-
-        if 'radius' in properties:
-            properties['width'] = properties['radius'] * 2
-            properties['length'] = properties['radius'] * 2
-
-        if 'diameter' in properties:
-            properties['width'] = properties['diameter']
-            properties['length'] = properties['diameter']
-
-        assert 'width' in properties
-        assert 'length' in properties
-
-    # axis_length is here to avoid confision with
-    # height, width, depth
-    def x_length(self):
-        return self.properties['width']
-
-    # axis_length is here to avoid confision with
-    # height, width, depth
-    def y_length(self):
-        return self.properties['length']
-
-    # TODO: add support for H
-    def from_polar(self, r, theta, h):
-        x = self.x_length() / 2.0
-        y = self.y_length() / 2.0
-        r = x
-        return (x + r * math.cos(-theta),
-                y + r * math.sin(-theta),
-                h)
-
-    def center(self, reference=None):
-        return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
-
-    # TODO: add support for relative Z coordinates
-    def from_cartesian(self, x, y, z):
-        x_center = (self.x_length() / 2.0)
-        y_center = (self.y_length() / 2.0)
-
-        return (x_center + x_center * x,
-                y_center + y_center * y,
-                z)
-
-    def from_center(self, x=None, y=None, z=None, r=None,
-                    theta=None, h=None, reference=None):
-        coords_to_endpoint = None
-        if all([isinstance(i, numbers.Number) for i in (x, y, z)]):
-            coords_to_endpoint = self.from_cartesian(x, y, z)
-
-        if all([isinstance(i, numbers.Number) for i in (r, theta, h)]):
-            coords_to_endpoint = self.from_polar(r, theta, h)
-
-        deck = self.get_deck()
-
-        coords_to_reference = (0, 0, 0)
-        if reference:
-            coords_to_reference = self.coordinates(reference)
-
-        res = tuple(a + b for a, b in
-                    zip(coords_to_reference, coords_to_endpoint))
-
-        return res
 
