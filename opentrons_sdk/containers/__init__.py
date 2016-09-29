@@ -1,4 +1,4 @@
-from opentrons_sdk.protocol.robot import Robot
+from opentrons_sdk.robot.robot import Robot
 
 
 def load(container_name, slot):

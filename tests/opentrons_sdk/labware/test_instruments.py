@@ -4,8 +4,8 @@ from unittest.mock import call
 from opentrons_sdk import containers
 
 from opentrons_sdk.labware import instruments
-from opentrons_sdk.protocol import Robot
-from opentrons_sdk.protocol.command import Command
+from opentrons_sdk.robot import Robot
+from opentrons_sdk.robot.command import Command
 
 class PipetteTest(unittest.TestCase):
 

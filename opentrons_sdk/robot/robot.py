@@ -2,7 +2,7 @@ import copy
 
 import opentrons_sdk.drivers.motor as motor_drivers
 from opentrons_sdk.containers import legacy_containers, placeable
-from opentrons_sdk.protocol.command import Command
+from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
 
 
