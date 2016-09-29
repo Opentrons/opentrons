@@ -35,6 +35,7 @@ class Pipette(object):
         self.motor = self.robot.get_motor(self.axis)
 
         self.calibration_data = {}
+        self.placeables = []
 
         self.calibrator = Calibrator()
 

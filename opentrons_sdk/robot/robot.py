@@ -92,11 +92,16 @@ class Robot(object):
         setattr(self, name, commandable)
 
     def move_to(self, location, instrument=None):
+
+        placeable, coordinates = unpack_location(location)
+
         calibration_data = {}
         if instrument:
             calibration_data = instrument.calibration_data
+            # TODO: keep track of all placeables
+            # this instruments interacts with
+            instrument.placeables.append(placeable)
 
-        placeable, coordinates = unpack_location(location)
         coordinates = apply_calibration(
             calibration_data,
             placeable,
