@@ -86,6 +86,8 @@ class CNCDriver(object):
 
     serial_timeout = 0.1
 
+    robot_height = 120
+
     def list_serial_ports(self):
         """ Lists serial port names
 
@@ -250,15 +252,25 @@ class CNCDriver(object):
         if y is not None:
             args['Y'] = y
         if z is not None:
-            args['Z'] = z
+            args['Z'] = self.flip_z_axis(z, absolute)
 
         for k in kwargs:
-            args[k.upper()] = kwargs[k]
+            if k == 'z':
+                args[k.upper()] = self.flip_z_axis(z, absolute)
+            else:
+                args[k.upper()] = kwargs[k]
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
         res = self.send_command(code, **args)
         return res == b'ok'
+
+    def flip_z_axis(self, z, absolute):
+        z *= -1
+        if absolute:
+            return self.robot_height + z
+        else:
+            return z
 
     def wait_for_arrival(self):
         arrived = False
@@ -328,15 +340,16 @@ class CNCDriver(object):
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
             coords = {'target':{}, 'current':{}}
-            for letter in 'xyzab':
+            for letter in 'xyab':
                 # the lowercase axis are the "real-time" values
                 coords['current'][letter]  = response_dict.get(letter,0)
                 # the uppercase axis are the "target" values
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
 
+            coords['current']['z']  = self.robot_height - response_dict.get(letter,0)
+            coords['target']['z']  = self.robot_height - response_dict.get(letter.upper(),0)
+
         
-        # TODO (andy): travis-ci is testing on both 3.4 and 3.5
-        #              JSONDecodeError does not exist in 3.4 so the build breaks here
         except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
