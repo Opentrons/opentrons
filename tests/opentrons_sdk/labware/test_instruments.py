@@ -143,3 +143,26 @@ class PipetteTest(unittest.TestCase):
         ]
 
         self.assertEquals(self.robot._driver.mock_calls, expected)
+
+    def test_pick_up_tip(self):
+        well = self.tiprack['A1']
+
+        self.p200.pick_up_tip(well)
+        self.robot.run()
+
+        expected = [
+            call.move(z=0),
+            call.move(y=0, x=0),
+            call.move(z=0),
+            call.wait_for_arrival(),
+            call.move(z=-6),
+            call.move(z=0),
+            call.move(z=-6),
+            call.move(z=0),
+            call.move(z=-6),
+            call.move(z=0),
+            call.wait_for_arrival(),
+            call.resume(),
+            call.home('z')
+        ]
+        self.assertEquals(self.robot._driver.mock_calls, expected)

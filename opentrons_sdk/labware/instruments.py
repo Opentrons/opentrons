@@ -104,6 +104,31 @@ class Pipette(object):
 
         return self
 
+    def pick_up_tip(self, address):
+        # TODO: Calibrations needed here
+        _, _, tip_z_top = address.coordinates(reference=address.get_deck())
+
+        # TODO: actual plunge depth for picking up a tip varies based on the tip
+        # right now it's accounted for via plunge depth
+        # TODO: Need to talk about containers z positioning
+        tip_z_bottom = tip_z_top - 6
+
+        # Hover over tip
+        self.robot.move_to(address)
+
+        def _do():
+            # Dip into tip and pull it up
+            for _ in range(3):
+                self.robot.move_head(z=tip_z_bottom)
+                self.robot.move_head(z=tip_z_top)
+
+            self.motor.wait_for_arrival()
+            self.robot.home('z')
+
+        description = "Pickup up tip from {0}".format(str(address))
+        self.robot.add_command(Command(do=_do, description=description))
+        return self
+
     def drop_tip(self, address=None):
         if address:
             self.robot.move_to(address)
