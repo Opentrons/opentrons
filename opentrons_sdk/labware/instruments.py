@@ -108,6 +108,7 @@ class Pipette(object):
 
         def _do():
             self.motor.move(self._droptip)
+            self.motor.home()
             self.motor.wait_for_arrival()
 
         description = "Droptip at {}".format(str(address))

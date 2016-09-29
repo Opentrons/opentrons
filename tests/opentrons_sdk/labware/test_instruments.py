@@ -137,6 +137,7 @@ class PipetteTest(unittest.TestCase):
 
         expected = [
             call.move(absolute=True, b=self.p200._droptip, speed=None),
+            call.home('b'),
             call.wait_for_arrival()
         ]
 
