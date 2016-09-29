@@ -76,9 +76,9 @@ class Robot(object):
     def simulate(self):
         self.set_driver(motor_drivers.MoveLogger())
 
-    def home(self):
+    def home(self, *args):
         if self._driver.resume():
-            return self._driver.home()
+            return self._driver.home(*args)
         else:
             return False
 
