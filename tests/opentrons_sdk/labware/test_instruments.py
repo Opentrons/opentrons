@@ -31,6 +31,12 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
 
+    def test_placeables_reference(self):
+
+        self.p200.aspirate(100, self.plate[0])
+
+        self.assertEquals(self.p200.placeables, [self.plate[0]])
+
     def test_unpack_location(self):
 
         location = (self.plate[0], (1, 0, -1))

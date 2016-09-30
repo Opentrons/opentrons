@@ -86,7 +86,11 @@ class CNCDriver(object):
 
     serial_timeout = 0.1
 
+<<<<<<< HEAD
     ot_one_height = 120
+=======
+    robot_height = 120
+>>>>>>> master
 
     def list_serial_ports(self):
         """ Lists serial port names
@@ -252,10 +256,13 @@ class CNCDriver(object):
         if y is not None:
             args['Y'] = y
         if z is not None:
-            args['Z'] = z
+            args['Z'] = self.flip_z_axis(z, absolute)
 
         for k in kwargs:
-            args[k.upper()] = kwargs[k]
+            if k == 'z':
+                args[k.upper()] = self.flip_z_axis(z, absolute)
+            else:
+                args[k.upper()] = kwargs[k]
 
         if args.get('Z'):
             args['Z'] = self.invert_z(args['Z'])
@@ -339,7 +346,7 @@ class CNCDriver(object):
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
             coords = {'target':{}, 'current':{}}
-            for letter in 'xyzab':
+            for letter in 'xyab':
                 # the lowercase axis are the "real-time" values
                 coords['current'][letter]  = response_dict.get(letter,0)
                 # the uppercase axis are the "target" values
@@ -347,10 +354,7 @@ class CNCDriver(object):
 
             coords['current']['z'] = self.invert_z(coords['current']['z'])
             coords['target']['z'] = self.invert_z(coords['target']['z'])
-
         
-        # TODO (andy): travis-ci is testing on both 3.4 and 3.5
-        #              JSONDecodeError does not exist in 3.4 so the build breaks here
         except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
