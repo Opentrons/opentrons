@@ -41,6 +41,7 @@ class Pipette(object):
         self.calibrator = Calibrator()
 
         self.set_speed(speed)
+        self.speed = speed
 
     def go_to(self, location):
         if location:
@@ -252,11 +253,23 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
 
     def set_speed(self, rate):
+        self.speed = rate
+
         def _do():
             self.motor.speed(rate)
 
         description = "Setting speed to {}mm/second".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
+
+    def pause(self):
+        def _do():
+            print("Paused")
+
+        description = "Pausing"
+        self.robot.add_command(Command(do=_do, description=description))
+
+    def resume(self):
+        self.robot.run()
 
     @property
     def name(self):

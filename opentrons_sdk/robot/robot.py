@@ -1,4 +1,4 @@
-import copy
+import copy, time
 
 import opentrons_sdk.drivers.motor as motor_drivers
 from opentrons_sdk.containers import legacy_containers, placeable
@@ -69,7 +69,6 @@ class Robot(object):
             def speed(self, rate):
                 robot_self._driver.speed(axis, rate)
                 return self
-
 
 
         return InstrumentMotor()
@@ -147,6 +146,7 @@ class Robot(object):
         """
         while self._commands:
             command = self._commands.pop(0)
+            if command.description == "Pausing": return
             print("Executing: ", command.description)
             log.debug("Robot", command.description)
             command.do()

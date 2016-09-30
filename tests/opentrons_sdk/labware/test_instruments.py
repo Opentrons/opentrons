@@ -241,11 +241,25 @@ class PipetteTest(unittest.TestCase):
     def test_delay(self):
         self.p200.delay(1)
 
-        self.assertEquals(self.robot._commands[0].description, "Delaying 1 seconds")
+        self.assertEquals(self.robot._commands[-1].description, "Delaying 1 seconds")
 
     def test_set_speed(self):
-        self.assertEquals(self.speed, 300)
+        self.assertEquals(self.p200.speed, 300)
 
         self.p200.set_speed(100)
 
-        self.assertEquals(self.speed, 100)
+        self.assertEquals(self.p200.speed, 100)
+
+    def test_pause_and_resume(self):
+        self.p200.aspirate(100)
+        self.p200.pause()
+        self.p200.dispense()
+        self.assertEquals(len(self.robot._commands), 4)
+
+        self.robot.run()
+
+        self.assertEquals(self.robot._commands[0].description, "Dispensing 100uL at None")
+        self.assertEquals(len(self.robot._commands), 1)
+
+        self.p200.resume()
+        self.assertEquals(len(self.robot._commands), 0)

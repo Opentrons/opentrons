@@ -360,7 +360,6 @@ class CNCDriver(object):
         res = self.send_command(speed_command + axis + str(rate))
 
 
-
 class MoveLogger(CNCDriver):
 
     """
