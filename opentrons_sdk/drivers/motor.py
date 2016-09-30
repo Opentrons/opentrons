@@ -86,6 +86,8 @@ class CNCDriver(object):
 
     serial_timeout = 0.1
 
+    ot_one_height = 120
+
     def list_serial_ports(self):
         """ Lists serial port names
 
@@ -255,10 +257,19 @@ class CNCDriver(object):
         for k in kwargs:
             args[k.upper()] = kwargs[k]
 
+        if args.get('Z'):
+            args['Z'] = self.invert_z(args['Z'])
+
         log.debug("MotorDriver", "Moving: {}".format(args))
 
         res = self.send_command(code, **args)
         return res == b'ok'
+
+    def invert_z(self, z, absolute=True):
+        if absolute:
+            return self.ot_one_height - z
+        else:
+            return z * -1
 
     def wait_for_arrival(self):
         arrived = False
@@ -333,6 +344,9 @@ class CNCDriver(object):
                 coords['current'][letter]  = response_dict.get(letter,0)
                 # the uppercase axis are the "target" values
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
+
+            coords['current']['z'] = self.invert_z(coords['current']['z'])
+            coords['target']['z'] = self.invert_z(coords['target']['z'])
 
         
         # TODO (andy): travis-ci is testing on both 3.4 and 3.5
