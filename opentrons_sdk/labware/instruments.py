@@ -11,7 +11,8 @@ class Pipette(object):
             channels=1,
             min_volume=0,
             trash_container=None,
-            tip_racks=None):
+            tip_racks=None,
+            speed=300):
 
         self.positions = {
             'top': None,
@@ -38,6 +39,8 @@ class Pipette(object):
         self.placeables = []
 
         self.calibrator = Calibrator()
+
+        self.set_speed(speed)
 
     def go_to(self, location):
         if location:
@@ -246,6 +249,13 @@ class Pipette(object):
             self.motor.wait(seconds)
 
         description = "Delaying {} seconds".format(seconds)
+        self.robot.add_command(Command(do=_do, description=description))
+
+    def set_speed(self, rate):
+        def _do():
+            self.motor.speed(rate)
+
+        description = "Setting speed to {}mm/second".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
 
     @property

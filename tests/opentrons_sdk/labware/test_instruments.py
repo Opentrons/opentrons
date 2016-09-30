@@ -242,3 +242,10 @@ class PipetteTest(unittest.TestCase):
         self.p200.delay(1)
 
         self.assertEquals(self.robot._commands[0].description, "Delaying 1 seconds")
+
+    def test_set_speed(self):
+        self.assertEquals(self.speed, 300)
+
+        self.p200.set_speed(100)
+
+        self.assertEquals(self.speed, 100)

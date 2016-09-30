@@ -65,6 +65,7 @@ class CNCDriver(object):
     GET_POSITION = 'M114'
     GET_ENDSTOPS = 'M119'
     GET_SPEED = 'M199'
+    SET_SPEED = 'G0'
     ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
@@ -284,7 +285,7 @@ class CNCDriver(object):
                 """
                 smoothie not guaranteed to be EXACTLY where it's target is
                 but seems to be about +-0.05 mm from the target coordinate
-                the robot's physical resolution is found with:  1mm / config_steps_per_mm 
+                the robot's physical resolution is found with:  1mm / config_steps_per_mm
                 """
                 if abs(axis_diff) < 0.1:
                     if coords['current'][axis] == prev_coords['current'][axis]:
@@ -347,12 +348,17 @@ class CNCDriver(object):
 
             coords['current']['z'] = self.invert_z(coords['current']['z'])
             coords['target']['z'] = self.invert_z(coords['target']['z'])
-        
+
         except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
         return coords
+
+    def speed(self, axis, rate):
+        speed_command = self.SET_SPEED
+        res = self.send_command(speed_command + axis + str(rate))
+
 
 
 class MoveLogger(CNCDriver):
