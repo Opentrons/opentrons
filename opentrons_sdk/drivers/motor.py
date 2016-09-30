@@ -79,7 +79,7 @@ class CNCDriver(object):
 
     VERSION = 'version'
 
-    OT_VERSION = 'config-get sd ot_version'
+    GET_OT_VERSION = 'config-get sd ot_version'
 
     """
     Serial port connection to talk to the device.
@@ -89,6 +89,7 @@ class CNCDriver(object):
     serial_timeout = 0.1
 
     # TODO: move to config
+    ot_version = None
     ot_one_dimensions = {
         'hood':{
             'x': 300,
@@ -97,12 +98,12 @@ class CNCDriver(object):
         },
         'one_pro':{
             'x': 300,
-            'y': 120,
+            'y': 250,
             'z': 120
         },
         'one_standard':{
             'x': 300,
-            'y': 120,
+            'y': 250,
             'z': 120
         }
     }
@@ -159,6 +160,8 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         self.flush_port()
+
+        self.get_ot_version()
 
     def disconnect(self):
         if self.connection and self.connection.isOpen():
@@ -278,6 +281,8 @@ class CNCDriver(object):
 
         if 'Z' in args:
             args['Z'] = self.invert_axis('z', args['Z'], absolute=absolute)
+        if 'Y' in args:
+            args['Y'] = self.invert_axis('y', args['Y'], absolute=absolute)
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
@@ -285,8 +290,10 @@ class CNCDriver(object):
         return res == b'ok'
 
     def invert_axis(self, axis, value, absolute=True):
+        if not self.ot_version:
+            self.ot_version = 'hood'
         if absolute:
-            return self.ot_one_dimensions['hood'][axis] - value
+            return self.ot_one_dimensions[self.ot_version][axis] - value
         else:
             return value * -1
 
@@ -375,8 +382,9 @@ class CNCDriver(object):
         return coords
 
     def get_ot_version(self):
-        res = self.send_command(self.OT_VERSION)
-        return res.split(' ')[-1]
+        res = self.send_command(self.GET_OT_VERSION)
+        self.ot_version = res.decode().split(' ')[-1]
+        return self.ot_version
 
 
 class MoveLogger(CNCDriver):
