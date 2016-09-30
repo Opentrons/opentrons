@@ -86,7 +86,7 @@ class CNCDriver(object):
 
     serial_timeout = 0.1
 
-    robot_height = 120
+    ot_one_height = 120
 
     def list_serial_ports(self):
         """ Lists serial port names
@@ -252,25 +252,24 @@ class CNCDriver(object):
         if y is not None:
             args['Y'] = y
         if z is not None:
-            args['Z'] = self.flip_z_axis(z, absolute)
+            args['Z'] = z
 
         for k in kwargs:
-            if k == 'z':
-                args[k.upper()] = self.flip_z_axis(z, absolute)
-            else:
-                args[k.upper()] = kwargs[k]
+            args[k.upper()] = kwargs[k]
+
+        if args.get('Z'):
+            args['Z'] = self.invert_z(args['Z'])
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
         res = self.send_command(code, **args)
         return res == b'ok'
 
-    def flip_z_axis(self, z, absolute):
-        z *= -1
+    def invert_z(self, z, absolute=True):
         if absolute:
-            return self.robot_height + z
+            return self.ot_one_height - z
         else:
-            return z
+            return z * -1
 
     def wait_for_arrival(self):
         arrived = False
@@ -346,9 +345,8 @@ class CNCDriver(object):
                 # the uppercase axis are the "target" values
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
 
-            coords['current']['z']  = self.robot_height - response_dict.get(letter,0)
-            coords['target']['z']  = self.robot_height - response_dict.get(letter.upper(),0)
-
+            coords['current']['z'] = self.invert_z(coords['current']['z'])
+            coords['target']['z'] = self.invert_z(coords['target']['z'])
         
         except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
