@@ -10,8 +10,7 @@ from opentrons_sdk.containers.placeable import unpack_location
 class PipetteTest(unittest.TestCase):
 
     def setUp(self):
-        Robot.reset()
-        self.robot = Robot.get_instance()
+        self.robot = Robot.reset()
         # self.robot.connect(port='/dev/tty.usbmodem1421')
         # self.robot.home()
 
@@ -238,3 +237,8 @@ class PipetteTest(unittest.TestCase):
             current_pos,
             {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
         )
+
+    def test_delay(self):
+        self.p200.delay(1)
+
+        self.assertEquals(self.robot._commands[0].description, "Delaying 1 seconds")

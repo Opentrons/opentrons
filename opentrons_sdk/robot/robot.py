@@ -63,6 +63,10 @@ class Robot(object):
             def wait_for_arrival(self):
                 return robot_self._driver.wait_for_arrival()
 
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+
         return InstrumentMotor()
 
     def list_serial_ports(self):

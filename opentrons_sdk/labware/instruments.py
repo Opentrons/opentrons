@@ -241,6 +241,13 @@ class Pipette(object):
     def supports_volume(self, volume):
         return self.max_volume <= volume <= self.max_volume
 
+    def delay(self, seconds):
+        def _do():
+            self.motor.wait(seconds)
+
+        description = "Delaying {} seconds".format(seconds)
+        self.robot.add_command(Command(do=_do, description=description))
+
     @property
     def name(self):
         return self.size.lower()
