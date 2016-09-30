@@ -19,23 +19,49 @@ p200 = instruments.Pipette(
     channels=1
 )
 
-p200.calibrate_plunger(top=0, bottom=10, blow_out=11, drop_tip=12)
+p200.calibrate_plunger(top=13, bottom=10, blow_out=11, drop_tip=12)
 p200.set_max_volume(200)
 
 robot.connect('/dev/tty.usbmodem1411')
 # robot.home('z')
 # robot.home()
 
-robot.move_head(z=0)
-robot.move_head(x=20, y=-119.5)
-robot.move_head(z=-19)
+robot.move_head(b=32)
+p200.calibrate('drop_tip')
 
-p200.calibrate_position((plate, plate[0].center(plate)))
+robot.move_head(b=30)
+p200.calibrate('blow_out')
 
-for well in plate[:-2:2]:
-    p200.aspirate(10.1, well).dispense(10.1, next(well))
+robot.move_head(b=28.5)
+p200.calibrate('bottom')
 
-for well in plate[:-2:2]:
-    p200.aspirate(10.1, well).dispense(10.1, next(well))
+robot.move_head(b=13)
+p200.calibrate('top')
 
-robot.run()
+# robot.move_head(z=10)
+# robot.move_head(x=113, y=15)
+# robot.move_head(z=2)
+
+# p200.calibrate_position((tiprack, tiprack[0].center(tiprack)))
+
+# robot.home('z')
+# robot.home()
+
+# p200.pick_up_tip(tiprack[0])
+# p200.drop_tip(tiprack[0])
+
+# robot.run()
+
+# robot.move_head(z=10)
+# robot.move_head(x=20, y=-119.5)
+# robot.move_head(z=-19)
+
+# p200.calibrate_position((plate, plate[0].center(plate)))
+
+# for well in plate[:-2:2]:
+#     p200.aspirate(10.1, well).dispense(10.1, next(well))
+
+# for well in plate[:-2:2]:
+#     p200.aspirate(10.1, well).dispense(10.1, next(well))
+
+# robot.run()
