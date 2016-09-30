@@ -18,6 +18,7 @@ class RobotTest(unittest.TestCase):
 
 		self.robot.move_to((Deck(), (100,0,0)))
 		self.robot.run()
-		expected = [ call.move(z=0), call.move(x=100, y=0), call.move(z=0), call.wait_for_arrival() ]
+		print(self.robot._driver.mock_calls)
+		expected = [ call.move(z=10), call.move(x=100, y=0), call.move(z=0), call.wait_for_arrival() ]
 		self.assertEquals(self.robot._driver.mock_calls, expected)
 		
