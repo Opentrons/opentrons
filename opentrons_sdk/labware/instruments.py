@@ -39,6 +39,12 @@ class Pipette(object):
 
         self.calibrator = Calibrator()
 
+    def go_to(self, location):
+        if location:
+            self.robot.move_to(location, instrument=self, create_path=False)
+
+        return self
+
     def aspirate(self, volume=None, location=None):
 
         if not volume:

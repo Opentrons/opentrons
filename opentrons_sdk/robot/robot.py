@@ -93,14 +93,13 @@ class Robot(object):
 
     def move_head(self, *args, **kwargs):
         self._driver.move(*args, **kwargs)
+        self._driver.wait_for_arrival()
 
-    def move_to(self, location, instrument=None):
+    def move_to(self, location, instrument=None, create_path=True):
         placeable, coordinates = unpack_location(location)
         calibration_data = {}
         if instrument:
             calibration_data = instrument.calibration_data
-            # TODO: keep track of all placeables
-            # this instruments interacts with
             instrument.placeables.append(placeable)
 
         coordinates = apply_calibration(
@@ -108,13 +107,19 @@ class Robot(object):
             placeable,
             coordinates)
 
-        # TODO: (andy) path optomization goes here
-        #       now it simply just goes to the top every time
+        tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
+        tallest_z += 10
 
         def _do():
-            self._driver.move(z=0)
-            self._driver.move(x=coordinates[0], y=coordinates[1])
-            self._driver.move(z=coordinates[2])
+            if create_path:
+                self._driver.move(z=tallest_z)
+                self._driver.move(x=coordinates[0], y=coordinates[1])
+                self._driver.move(z=coordinates[2])
+            else:
+                self._driver.move(
+                    x=coordinates[0],
+                    y=coordinates[1],
+                    z=coordinates[2])
             self._driver.wait_for_arrival()
 
         description = "Moving head to {} {}".format(
@@ -133,6 +138,7 @@ class Robot(object):
         """
         while self._commands:
             command = self._commands.pop(0)
+            print("Executing: ", command.description)
             log.debug("Robot", command.description)
             command.do()
 

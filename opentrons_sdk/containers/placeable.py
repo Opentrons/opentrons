@@ -45,7 +45,7 @@ class Placeable(object):
                 properties[dimension] = 0
 
     def __getitem__(self, name):
-        if isinstance(name, int):
+        if isinstance(name, int) or isinstance(name, slice):
             return self.get_children_list()[name]
         else:
             return self.get_child_by_name(name)
@@ -191,13 +191,14 @@ class Placeable(object):
                     for axis in range(3)])
 
     def from_polar(self, r, theta, h):
-        x = self.x_size() / 2.0
-        y = self.y_size() / 2.0
-        r = x
-        z_center = (self.z_size() / 2.0)
+        x_center = self.x_size() / 2.0
+        y_center = self.y_size() / 2.0
+        z_center = self.z_size() / 2.0
 
-        return (x + r * math.cos(-theta),
-                y + r * math.sin(-theta),
+        r = r * x_center
+
+        return (x_center + r * math.cos(theta),
+                y_center + r * math.sin(theta),
                 z_center + z_center * h)
 
     def center(self, reference=None):

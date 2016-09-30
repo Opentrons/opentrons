@@ -178,7 +178,7 @@ class CNCDriver(object):
             self.connection.write(str(data).encode())
             return self.wait_for_response()
         elif max_tries > 0:
-            time.sleep(try_interval)
+            # time.sleep(try_interval)
             self.reset_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
@@ -257,8 +257,8 @@ class CNCDriver(object):
         for k in kwargs:
             args[k.upper()] = kwargs[k]
 
-        if args.get('Z'):
-            args['Z'] = self.invert_z(args['Z'])
+        if 'Z' in args:
+            args['Z'] = self.invert_z(args['Z'], absolute=absolute)
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
@@ -275,7 +275,7 @@ class CNCDriver(object):
         arrived = False
         coords = self.get_position()
         while not arrived:
-            time.sleep(self.serial_timeout)
+            # time.sleep(self.serial_timeout)
             prev_coords = dict(coords)
             coords = self.get_position()
             for axis in coords.get('target', {}):
@@ -339,7 +339,7 @@ class CNCDriver(object):
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
             coords = {'target':{}, 'current':{}}
-            for letter in 'xyab':
+            for letter in 'xyzab':
                 # the lowercase axis are the "real-time" values
                 coords['current'][letter]  = response_dict.get(letter,0)
                 # the uppercase axis are the "target" values
