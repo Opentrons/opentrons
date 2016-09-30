@@ -94,6 +94,9 @@ class Robot(object):
     def add_command(self, command):
         self._commands.append(command)
 
+    def add_command_to_beginning(self, command):
+        self._commands = [command] + self._commands
+
     def register(self, name, callback):
         def commandable():
             self.add_command(Command(do=callback))
