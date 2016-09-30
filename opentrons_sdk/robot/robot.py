@@ -75,7 +75,9 @@ class Robot(object):
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
         """
-        return self._driver.connect(device=port)
+        connection =  self._driver.connect(device=port)
+        self._driver.resume()
+        return connection
 
     def home(self, *args):
         if self._driver.resume():
@@ -128,13 +130,16 @@ class Robot(object):
 
     def run(self):
         """
-        A generator that runs each command and yields the current command
-        index and the number of total commands.
         """
         while self._commands:
             command = self._commands.pop(0)
-            log.debug("Robot", command.description)
-            command.do()
+            print("Executing:", command.description)
+            log.info("Executing:", command.description)
+            try:
+                command.do()
+            except KeyboardInterrupt as e:
+                self._driver.halt()
+                raise e
 
     def disconnect(self):
         if self._driver:
@@ -211,3 +216,7 @@ class Robot(object):
         container = legacy_containers.get_legacy_container(container_name)
         self._deck[slot].add(container, container_name)
         return container
+
+    def clear(self):
+        self._commands = []
+        print('Robot ready to enqueue and execute new commands')

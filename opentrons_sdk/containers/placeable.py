@@ -45,7 +45,7 @@ class Placeable(object):
                 properties[dimension] = 0
 
     def __getitem__(self, name):
-        if isinstance(name, int):
+        if isinstance(name, int) or isinstance(name, slice):
             return self.get_children_list()[name]
         else:
             return self.get_child_by_name(name)

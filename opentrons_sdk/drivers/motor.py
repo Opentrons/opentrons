@@ -258,7 +258,7 @@ class CNCDriver(object):
             args[k.upper()] = kwargs[k]
 
         if args.get('Z'):
-            args['Z'] = self.invert_z(args['Z'])
+            args['Z'] = self.invert_z(args['Z'], absolute=absolute)
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
@@ -339,7 +339,7 @@ class CNCDriver(object):
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
             coords = {'target':{}, 'current':{}}
-            for letter in 'xyab':
+            for letter in 'xyzab':
                 # the lowercase axis are the "real-time" values
                 coords['current'][letter]  = response_dict.get(letter,0)
                 # the uppercase axis are the "target" values
