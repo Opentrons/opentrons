@@ -86,11 +86,7 @@ class CNCDriver(object):
 
     serial_timeout = 0.1
 
-<<<<<<< HEAD
     ot_one_height = 120
-=======
-    robot_height = 120
->>>>>>> master
 
     def list_serial_ports(self):
         """ Lists serial port names
@@ -256,13 +252,10 @@ class CNCDriver(object):
         if y is not None:
             args['Y'] = y
         if z is not None:
-            args['Z'] = self.flip_z_axis(z, absolute)
+            args['Z'] = z
 
         for k in kwargs:
-            if k == 'z':
-                args[k.upper()] = self.flip_z_axis(z, absolute)
-            else:
-                args[k.upper()] = kwargs[k]
+            args[k.upper()] = kwargs[k]
 
         if args.get('Z'):
             args['Z'] = self.invert_z(args['Z'])
