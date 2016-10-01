@@ -80,6 +80,15 @@ class CNCDriver(object):
     VERSION = 'version'
 
     GET_OT_VERSION = 'config-get sd ot_version'
+    GET_STEPS_PER_MM = {
+        'x': 'config-get sd alpha_steps_per_mm',
+        'y': 'config-get sd beta_steps_per_mm'
+    }
+
+    SET_STEPS_PER_MM = {
+        'x': 'config-set sd alpha_steps_per_mm ',
+        'y': 'config-set sd beta_steps_per_mm '
+    }
 
     """
     Serial port connection to talk to the device.
@@ -385,6 +394,18 @@ class CNCDriver(object):
         res = self.send_command(self.GET_OT_VERSION)
         self.ot_version = res.decode().split(' ')[-1]
         return self.ot_version
+
+    def get_steps_per_mm(self, axis):
+        if axis in self.GET_STEPS_PER_MM:
+            res = self.send_command(self.GET_STEPS_PER_MM[axis])
+            return float(res.decode().split(' ')[-1])
+
+    def set_steps_per_mm(self, axis, value):
+        if axis in self.SET_STEPS_PER_MM:
+            command = self.SET_STEPS_PER_MM[axis]
+            command += str(value)
+            res = self.send_command(command)
+            return res.decode().split(' ')[-1] == str(value)
 
 
 class MoveLogger(CNCDriver):

@@ -136,7 +136,7 @@ class Pipette(object):
             self.motor.wait_for_arrival()
             self.robot.home('z')
 
-        description = "Pickup up tip from {0}".format(str(location))
+        description = "Picking up tip from {0}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
