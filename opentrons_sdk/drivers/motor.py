@@ -355,7 +355,7 @@ class CNCDriver(object):
 
         return coords
 
-    def speed(self, axis, rate):
+    def instrument_speed(self, axis, rate):
         speed_command = self.SET_SPEED
         res = self.send_command(speed_command + axis + str(rate))
 

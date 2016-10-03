@@ -67,7 +67,7 @@ class Robot(object):
                 robot_self._driver.wait(seconds)
 
             def speed(self, rate):
-                robot_self._driver.speed(axis, rate)
+                robot_self._driver.instrument_speed(axis, rate)
                 return self
 
 
