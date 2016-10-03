@@ -41,7 +41,6 @@ class Pipette(object):
         self.calibrator = Calibrator()
 
         self.set_speed(speed)
-        self.speed = speed
 
     def go_to(self, location):
         if location:
