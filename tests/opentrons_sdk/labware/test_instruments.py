@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 from opentrons_sdk import containers
 
 from opentrons_sdk.labware import instruments
@@ -251,3 +252,21 @@ class PipetteTest(unittest.TestCase):
         self.p200.set_speed(100)
 
         self.assertEquals(self.p200.speed, 100)
+
+    def test_transfer_no_volume(self):
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.transfer(self.plate[0], self.plate[1])
+        self.robot.run()
+
+        self.assertTrue(self.p200.aspirate.calls, [mock.call.aspirate(self.p200.max_volume, self.plate[0])])
+        self.assertTrue(self.p200.dispense.calls, [mock.call.dispense(self.p200.current_volume, self.plate[1])])
+
+    def test_transfer_with_volume(self):
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.transfer(self.plate[0], self.plate[1], 100)
+        self.robot.run()
+
+        self.assertTrue(self.p200.aspirate.calls, [mock.call.aspirate(100, self.plate[0])])
+        self.assertTrue(self.p200.dispense.calls, [mock.call.dispense(100, self.plate[1])])

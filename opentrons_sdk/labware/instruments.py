@@ -107,13 +107,13 @@ class Pipette(object):
         return self
 
     def transfer(self, source, destination, volume=None):
-        volume = volume or current_volume
+        volume = volume or self.max_volume
         self.aspirate(volume, source)
         self.dispense(volume, destination)
         return self
 
     def distribute(self, source, destinations, volume=None, extra_pull=0):
-        volume = volume or current_volume
+        volume = volume or self.max_volume
         fractional_volume = volume / len(destinations)
 
         self.aspirate(volume + extra_pull, source)
@@ -123,7 +123,7 @@ class Pipette(object):
         return self
 
     def consolidate(self, destination, sources, volume=None):
-        volume = volume or current_volume
+        volume = volume or self.max_volume
         fractional_volume = (volume) / len(sources)
 
         for well in sources:
