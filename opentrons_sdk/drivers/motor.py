@@ -391,9 +391,19 @@ class CNCDriver(object):
 
         return coords
 
-    def instrument_speed(self, axis, rate):
+    def speed(self, rate, axis=None):
         speed_command = self.SET_SPEED
-        res = self.send_command(speed_command + axis + str(rate))
+
+        if axis:
+            #AB speeds - per axis
+            res = self.send_command(speed_command + axis + str(rate))
+        else:
+            #XYZ speeds - for all axis
+            res = self.send_command(speed_command + "F" + str(rate))
+
+        return res == b'ok'
+
+
     def get_ot_version(self):
         res = self.send_command(self.GET_OT_VERSION)
         self.ot_version = res.decode().split(' ')[-1]

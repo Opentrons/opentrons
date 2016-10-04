@@ -258,9 +258,10 @@ class Pipette(object):
 
     def set_speed(self, rate):
         self.speed = rate
+        axis = self.axis
 
         def _do():
-            self.motor.speed(rate)
+            self.motor.speed(rate, axis)
 
         description = "Setting speed to {}mm/second".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
