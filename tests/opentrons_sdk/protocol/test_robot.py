@@ -24,6 +24,6 @@ class RobotTest(unittest.TestCase):
 		self.robot.pause()
 		self.robot.move_to((Deck(), (101,0,0)))
 		self.robot.run()
-		self.assertEquals(len(self.robot._commands), 1)
+		self.assertEquals(len(self.robot._commands), 2)
 		self.robot.resume()
 		self.assertEquals(len(self.robot._commands), 0)

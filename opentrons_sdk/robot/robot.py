@@ -94,7 +94,7 @@ class Robot(object):
     def add_command(self, command):
         self._commands.append(command)
 
-    def add_command_to_beginning(self, command):
+    def prepend_command(self, command):
         self._commands = [command] + self._commands
 
     def register(self, name, callback):
@@ -231,11 +231,13 @@ class Robot(object):
         return container
 
     def pause(self):
+        # This method is for API use only - in a user protocol, it will jump the
+        # queue, which is counterintuitive and not very useful.
         def _do():
             print("Paused")
 
         description = "Pausing"
-        self.add_command(Command(do=_do, description=description))
+        self.prepend_command(Command(do=_do, description=description))
 
     def resume(self):
         self.run()
