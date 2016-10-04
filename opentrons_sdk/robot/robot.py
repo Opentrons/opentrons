@@ -198,8 +198,8 @@ class Robot(object):
         robot_rows = self.get_max_robot_rows()
         row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
 
-        for col_index, col in enumerate('EDCBA'):
-            for row_index, row in enumerate(range(robot_rows, 0, -1)):
+        for col_index, col in enumerate('ABCDE'):
+            for row_index, row in enumerate(range(1, robot_rows + 1)):
                 slot = placeable.Slot()
                 slot_coordinates = (
                     (row_offset * row_index) + x_offset,

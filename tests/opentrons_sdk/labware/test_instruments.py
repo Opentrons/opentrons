@@ -61,7 +61,7 @@ class PipetteTest(unittest.TestCase):
             (self.plate[0], self.plate[0].from_center(x=0, y=0, z=1)))
 
     def test_calibrate_placeable(self):
-        x, y, z = (161.0, 416.7, 3.0)
+        x, y, z = (161.0, 31.7, 3.0)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
