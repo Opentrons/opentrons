@@ -127,7 +127,6 @@ class Pipette(object):
         fractional_volume = (volume + extra_pull) / len(sources)
 
         for well in sources:
-            print(fractional_volume, well)
             self.aspirate(fractional_volume, well)
 
         self.dispense(volume, destination)
