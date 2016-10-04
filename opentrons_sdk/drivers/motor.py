@@ -65,6 +65,7 @@ class CNCDriver(object):
     GET_POSITION = 'M114'
     GET_ENDSTOPS = 'M119'
     GET_SPEED = 'M199'
+    SET_SPEED = 'G0'
     ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
@@ -319,7 +320,7 @@ class CNCDriver(object):
                 """
                 smoothie not guaranteed to be EXACTLY where it's target is
                 but seems to be about +-0.05 mm from the target coordinate
-                the robot's physical resolution is found with:  1mm / config_steps_per_mm 
+                the robot's physical resolution is found with:  1mm / config_steps_per_mm
                 """
                 if abs(axis_diff) < 0.1:
                     if coords['current'][axis] == prev_coords['current'][axis]:
@@ -383,12 +384,25 @@ class CNCDriver(object):
             for axis in 'yz':
                 coords['current'][axis] = self.invert_axis(axis, coords['current'][axis])
                 coords['target'][axis] = self.invert_axis(axis, coords['target'][axis])
-        
+
         except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
         return coords
+
+    def speed(self, rate, axis=None):
+        speed_command = self.SET_SPEED
+
+        if axis:
+            #AB speeds - per axis
+            res = self.send_command(speed_command + axis + str(rate))
+        else:
+            #XYZ speeds - for all axis
+            res = self.send_command(speed_command + "F" + str(rate))
+
+        return res == b'ok'
+
 
     def get_ot_version(self):
         res = self.send_command(self.GET_OT_VERSION)

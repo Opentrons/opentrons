@@ -1,4 +1,4 @@
-import copy
+import copy, time
 
 import opentrons_sdk.drivers.motor as motor_drivers
 from opentrons_sdk.containers import legacy_containers, placeable
@@ -63,6 +63,14 @@ class Robot(object):
             def wait_for_arrival(self):
                 return robot_self._driver.wait_for_arrival()
 
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+            def speed(self, rate, axis):
+                robot_self._driver.speed(rate, axis)
+                return self
+
+
         return InstrumentMotor()
 
     def list_serial_ports(self):
@@ -85,6 +93,9 @@ class Robot(object):
 
     def add_command(self, command):
         self._commands.append(command)
+
+    def prepend_command(self, command):
+        self._commands = [command] + self._commands
 
     def register(self, name, callback):
         def commandable():
@@ -138,6 +149,7 @@ class Robot(object):
         """
         while self._commands:
             command = self._commands.pop(0)
+            if command.description == "Pausing": return
             print("Executing: ", command.description)
             log.debug("Robot", command.description)
             command.do()
@@ -228,3 +240,15 @@ class Robot(object):
         container = legacy_containers.get_legacy_container(container_name)
         self._deck[slot].add(container, label)
         return container
+
+    def pause(self):
+        # This method is for API use only - in a user protocol, it will jump the
+        # queue, which is counterintuitive and not very useful.
+        def _do():
+            print("Paused")
+
+        description = "Pausing"
+        self.prepend_command(Command(do=_do, description=description))
+
+    def resume(self):
+        self.run()
