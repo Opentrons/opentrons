@@ -1,6 +1,8 @@
 from opentrons_sdk.robot.robot import Robot
 
 
-def load(container_name, slot):
+def load(container_name, slot, label=None):
+    if not label:
+        label = container_name
     protocol = Robot.get_instance()
-    return protocol.add_container(slot, container_name)
+    return protocol.add_container(slot, container_name, label)

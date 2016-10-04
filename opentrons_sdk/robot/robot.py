@@ -219,15 +219,26 @@ class Robot(object):
     def deck(self):
         return self._deck
 
-    def get_instruments(self):
+    def get_instruments_by_name(self, name):
+        res = []
+        for k, v in self.get_instruments():
+            if v.name == name:
+                res.append((k, v))
+
+        return res
+
+    def get_instruments(self, name=None):
         """
         :returns: sorted list of (axis, instrument)
         """
+        if name:
+            return self.get_instruments_by_name(name)
+
         return sorted(self._instruments.items())
 
-    def add_container(self, slot, container_name):
+    def add_container(self, slot, container_name, label):
         container = legacy_containers.get_legacy_container(container_name)
-        self._deck[slot].add(container, container_name)
+        self._deck[slot].add(container, label)
         return container
 
     def pause(self):

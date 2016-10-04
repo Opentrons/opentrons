@@ -30,6 +30,18 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
 
+    def test_get_instruments_by_name(self):
+        self.p1000 = instruments.Pipette(
+            trash_container=self.trash,
+            tip_racks=[self.tiprack],
+            min_volume=10,  # These are variable
+            axis="a",
+            name="p1000",
+            channels=1
+        )
+        result = list(self.robot.get_instruments('p1000'))
+        self.assertListEqual(result, [('A', self.p1000)])
+
     def test_placeables_reference(self):
 
         self.p200.aspirate(100, self.plate[0])

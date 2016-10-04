@@ -128,7 +128,9 @@ class Placeable(object):
         if child in self.children:
             return self.children[child]['coordinates']
 
-    def add(self, child, name, coordinates):
+    def add(self, child, name=None, coordinates=(0, 0, 0)):
+        if not name:
+            name = str(child)
         if name in self.children:
             raise Exception('Child with the name {} already exists'
                             .format(name))
@@ -247,8 +249,8 @@ class Deck(Placeable):
 
 
 class Slot(Placeable):
-    def add(self, child, name='slot', coordinates=(0, 0, 0)):
-        super().add(child, name, coordinates)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class Container(Placeable):
