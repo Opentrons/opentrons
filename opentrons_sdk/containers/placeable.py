@@ -7,7 +7,7 @@ def unpack_location(location):
     coordinates = None
     placeable = None
     if isinstance(location, Placeable):
-        coordinates = location.center()
+        coordinates = location.from_center(x=0,y=0,z=1)
         placeable = location
     elif isinstance(location, tuple):
         placeable, coordinates = location

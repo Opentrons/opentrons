@@ -43,7 +43,9 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(res, (self.plate[0], (1, 0, -1)))
 
         res = unpack_location(self.plate[0])
-        self.assertEquals(res, (self.plate[0], self.plate[0].center()))
+        self.assertEquals(
+            res,
+            (self.plate[0], self.plate[0].from_center(x=0, y=0, z=1)))
 
     def test_calibrate_placeable(self):
         x, y, z = (161.0, 416.7, 3.0)
