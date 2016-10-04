@@ -229,3 +229,13 @@ class Robot(object):
         container = legacy_containers.get_legacy_container(container_name)
         self._deck[slot].add(container, container_name)
         return container
+
+    def pause(self):
+        def _do():
+            print("Paused")
+
+        description = "Pausing"
+        self.add_command(Command(do=_do, description=description))
+
+    def resume(self):
+        self.run()

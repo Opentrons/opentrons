@@ -266,16 +266,6 @@ class Pipette(object):
         description = "Setting speed to {}mm/second".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
 
-    def pause(self):
-        def _do():
-            print("Paused")
-
-        description = "Pausing"
-        self.robot.add_command(Command(do=_do, description=description))
-
-    def resume(self):
-        self.robot.run()
-
     @property
     def name(self):
         return self.size.lower()
