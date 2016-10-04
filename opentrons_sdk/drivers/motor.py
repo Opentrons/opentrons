@@ -79,6 +79,17 @@ class CNCDriver(object):
 
     VERSION = 'version'
 
+    GET_OT_VERSION = 'config-get sd ot_version'
+    GET_STEPS_PER_MM = {
+        'x': 'config-get sd alpha_steps_per_mm',
+        'y': 'config-get sd beta_steps_per_mm'
+    }
+
+    SET_STEPS_PER_MM = {
+        'x': 'config-set sd alpha_steps_per_mm ',
+        'y': 'config-set sd beta_steps_per_mm '
+    }
+
     """
     Serial port connection to talk to the device.
     """
@@ -86,7 +97,25 @@ class CNCDriver(object):
 
     serial_timeout = 0.1
 
-    ot_one_height = 120
+    # TODO: move to config
+    ot_version = None
+    ot_one_dimensions = {
+        'hood':{
+            'x': 300,
+            'y': 120,
+            'z': 120
+        },
+        'one_pro':{
+            'x': 300,
+            'y': 250,
+            'z': 120
+        },
+        'one_standard':{
+            'x': 300,
+            'y': 250,
+            'z': 120
+        }
+    }
 
     def list_serial_ports(self):
         """ Lists serial port names
@@ -140,6 +169,8 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         self.flush_port()
+
+        self.get_ot_version()
 
     def disconnect(self):
         if self.connection and self.connection.isOpen():
@@ -258,18 +289,22 @@ class CNCDriver(object):
             args[k.upper()] = kwargs[k]
 
         if 'Z' in args:
-            args['Z'] = self.invert_z(args['Z'], absolute=absolute)
+            args['Z'] = self.invert_axis('z', args['Z'], absolute=absolute)
+        if 'Y' in args:
+            args['Y'] = self.invert_axis('y', args['Y'], absolute=absolute)
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
         res = self.send_command(code, **args)
         return res == b'ok'
 
-    def invert_z(self, z, absolute=True):
+    def invert_axis(self, axis, value, absolute=True):
+        if not self.ot_version:
+            self.ot_version = 'hood'
         if absolute:
-            return self.ot_one_height - z
+            return self.ot_one_dimensions[self.ot_version][axis] - value
         else:
-            return z * -1
+            return value * -1
 
     def wait_for_arrival(self):
         arrived = False
@@ -345,14 +380,32 @@ class CNCDriver(object):
                 # the uppercase axis are the "target" values
                 coords['target'][letter]  = response_dict.get(letter.upper(),0)
 
-            coords['current']['z'] = self.invert_z(coords['current']['z'])
-            coords['target']['z'] = self.invert_z(coords['target']['z'])
+            for axis in 'yz':
+                coords['current'][axis] = self.invert_axis(axis, coords['current'][axis])
+                coords['target'][axis] = self.invert_axis(axis, coords['target'][axis])
         
         except JSON_ERROR as e:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
         return coords
+
+    def get_ot_version(self):
+        res = self.send_command(self.GET_OT_VERSION)
+        self.ot_version = res.decode().split(' ')[-1]
+        return self.ot_version
+
+    def get_steps_per_mm(self, axis):
+        if axis in self.GET_STEPS_PER_MM:
+            res = self.send_command(self.GET_STEPS_PER_MM[axis])
+            return float(res.decode().split(' ')[-1])
+
+    def set_steps_per_mm(self, axis, value):
+        if axis in self.SET_STEPS_PER_MM:
+            command = self.SET_STEPS_PER_MM[axis]
+            command += str(value)
+            res = self.send_command(command)
+            return res.decode().split(' ')[-1] == str(value)
 
 
 class MoveLogger(CNCDriver):

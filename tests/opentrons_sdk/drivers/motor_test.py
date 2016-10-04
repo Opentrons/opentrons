@@ -129,7 +129,7 @@ class OpenTronsTest(SerialTestCase):
             self.assertTrue(success)
         else:
             self.assertLastCommand('G0', 'G1')
-            self.assertLastArguments('Y100')
+            self.assertLastArguments('Y20')
 
     def test_move_z(self):
         success = self.motor.move(z=30)
