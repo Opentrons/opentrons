@@ -305,3 +305,25 @@ class PipetteTest(unittest.TestCase):
                         mock.call.dispense(fractional_volume, self.plate[3])]
                         )
         self.assertEqual(self.p200.aspirate.mock_calls, [mock.call.aspirate(volume, self.plate[0])])
+
+    def test_mix(self):
+        well = self.plate[0]
+        # It is necessary to aspirate before it is mocked out so that you have liquid
+        self.p200.current_volume = 100
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.mix()
+        self.robot.run()
+
+        print("****", len(self.p200.dispense.mock_calls))
+        print("****", self.p200.dispense.mock_calls)
+        self.assertEqual(self.p200.dispense.mock_calls,
+                        [mock.call.dispense(100),
+                        mock.call.dispense(100),
+                        mock.call.dispense(100)]
+                        )
+        self.assertEqual(self.p200.aspirate.mock_calls,
+                        [mock.call.aspirate(100),
+                        mock.call.aspirate(100),
+                        mock.call.aspirate(100)]
+                        )
