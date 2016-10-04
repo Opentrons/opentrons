@@ -1,6 +1,7 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
+import math
 
 
 class Pipette(object):
@@ -100,6 +101,68 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume -= volume
 
+        return self
+
+    def transfer(self, volume=None, source, destination):
+        aspirate(volume, source)
+        dispense(volume, source)
+        # I think this won't work because the move_to wells need to be in the command queue, not executed immediately.
+        # Actually, distribute and consolidate probably won't work either.
+        return self
+
+    def distribute(self, volume=None, source, destinations=[], extra_pull=None):
+        if len(destinations) == 0:
+            raise RuntimeWarning(
+                'Pipette cannot distribute without at least 1 destination'.
+            )
+
+        fractional_volume = volume / len(destinations)
+        if extra_pull:
+            fractional_volume += extra_pull
+
+        aspirate(volume + extra_pull, source)
+        for well in destinations:
+            dispense(fractional_volume, well)
+
+        return self
+
+    def consolidate(self, volume=None, sources=[], destination, extra_pull=None):
+        if len(sources) == 0:
+            raise RuntimeWarning(
+                'Pipette cannot consolidate without at least 1 destination'.
+            )
+
+        fractional_volume = volume / len(sources)
+        if extra_pull:
+            fractional_volume += extra_pull
+
+        for well in destinations:
+            aspirate(fractional_volume, well)
+
+        dispense(volume, source)
+        return self
+
+    def mix(self, repetitions, distance=5):
+        def _do():
+            for i in range(3):
+                self.motor.move(z=distance, absolute=False)
+                self.motor.move(z=-distance, absolute=False)
+            self.motor.wait_for_arrival()
+
+        description = "Mixing {0} times with a distance of {1}mm".format(repetitions, str(distance))
+        self.robot.add_command(Command(do=_do, description=description))
+        return self
+
+    def touch_tip(self, radians=math.pi/4):
+        def _do():
+            num_aspirates = (2 * math.pi) / (radians)
+            for i in num_aspirates:
+                dispense(current_volume / num_aspirates).from_polar(0.9, math.pi / num_aspirates, 1)
+            self.motor.wait_for_arrival()
+
+        description = "Touch_tip with intervals of {}".format(str(radians))
+        self.robot.add_command(Command(do=_do, description=description))
+        self.current_volume = 0
         return self
 
     def blow_out(self, location=None):
