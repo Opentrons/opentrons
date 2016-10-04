@@ -7,7 +7,7 @@ def unpack_location(location):
     coordinates = None
     placeable = None
     if isinstance(location, Placeable):
-        coordinates = location.center()
+        coordinates = location.from_center(x=0,y=0,z=1)
         placeable = location
     elif isinstance(location, tuple):
         placeable, coordinates = location
@@ -128,7 +128,9 @@ class Placeable(object):
         if child in self.children:
             return self.children[child]['coordinates']
 
-    def add(self, child, name, coordinates):
+    def add(self, child, name=None, coordinates=(0, 0, 0)):
+        if not name:
+            name = str(child)
         if name in self.children:
             raise Exception('Child with the name {} already exists'
                             .format(name))
@@ -191,13 +193,14 @@ class Placeable(object):
                     for axis in range(3)])
 
     def from_polar(self, r, theta, h):
-        x = self.x_size() / 2.0
-        y = self.y_size() / 2.0
-        r = x
-        z_center = (self.z_size() / 2.0)
+        x_center = self.x_size() / 2.0
+        y_center = self.y_size() / 2.0
+        z_center = self.z_size() / 2.0
 
-        return (x + r * math.cos(-theta),
-                y + r * math.sin(-theta),
+        r = r * x_center
+
+        return (x_center + r * math.cos(theta),
+                y_center + r * math.sin(theta),
                 z_center + z_center * h)
 
     def center(self, reference=None):
@@ -246,8 +249,8 @@ class Deck(Placeable):
 
 
 class Slot(Placeable):
-    def add(self, child, name='slot', coordinates=(0, 0, 0)):
-        super().add(child, name, coordinates)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class Container(Placeable):

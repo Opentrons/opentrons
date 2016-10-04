@@ -1,4 +1,4 @@
-import copy
+import copy, time
 
 import opentrons_sdk.drivers.motor as motor_drivers
 from opentrons_sdk.containers import legacy_containers, placeable
@@ -63,6 +63,14 @@ class Robot(object):
             def wait_for_arrival(self):
                 return robot_self._driver.wait_for_arrival()
 
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+            def speed(self, rate, axis):
+                robot_self._driver.speed(rate, axis)
+                return self
+
+
         return InstrumentMotor()
 
     def list_serial_ports(self):
@@ -88,6 +96,9 @@ class Robot(object):
     def add_command(self, command):
         self._commands.append(command)
 
+    def prepend_command(self, command):
+        self._commands = [command] + self._commands
+
     def register(self, name, callback):
         def commandable():
             self.add_command(Command(do=callback))
@@ -95,14 +106,13 @@ class Robot(object):
 
     def move_head(self, *args, **kwargs):
         self._driver.move(*args, **kwargs)
+        self._driver.wait_for_arrival()
 
-    def move_to(self, location, instrument=None):
+    def move_to(self, location, instrument=None, create_path=True):
         placeable, coordinates = unpack_location(location)
         calibration_data = {}
         if instrument:
             calibration_data = instrument.calibration_data
-            # TODO: keep track of all placeables
-            # this instruments interacts with
             instrument.placeables.append(placeable)
 
         coordinates = apply_calibration(
@@ -110,13 +120,19 @@ class Robot(object):
             placeable,
             coordinates)
 
-        # TODO: (andy) path optomization goes here
-        #       now it simply just goes to the top every time
+        tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
+        tallest_z += 10
 
         def _do():
-            self._driver.move(z=0)
-            self._driver.move(x=coordinates[0], y=coordinates[1])
-            self._driver.move(z=coordinates[2])
+            if create_path:
+                self._driver.move(z=tallest_z)
+                self._driver.move(x=coordinates[0], y=coordinates[1])
+                self._driver.move(z=coordinates[2])
+            else:
+                self._driver.move(
+                    x=coordinates[0],
+                    y=coordinates[1],
+                    z=coordinates[2])
             self._driver.wait_for_arrival()
 
         description = "Moving head to {} {}".format(
@@ -129,10 +145,10 @@ class Robot(object):
         return copy.deepcopy(self._commands)
 
     def run(self):
-        """
-        """
         while self._commands:
             command = self._commands.pop(0)
+            if command.description == "Pausing": return
+
             print("Executing:", command.description)
             log.info("Executing:", command.description)
             try:
@@ -206,17 +222,40 @@ class Robot(object):
     def deck(self):
         return self._deck
 
-    def get_instruments(self):
+    def get_instruments_by_name(self, name):
+        res = []
+        for k, v in self.get_instruments():
+            if v.name == name:
+                res.append((k, v))
+
+        return res
+
+    def get_instruments(self, name=None):
         """
         :returns: sorted list of (axis, instrument)
         """
+        if name:
+            return self.get_instruments_by_name(name)
+
         return sorted(self._instruments.items())
 
-    def add_container(self, slot, container_name):
+    def add_container(self, slot, container_name, label):
         container = legacy_containers.get_legacy_container(container_name)
-        self._deck[slot].add(container, container_name)
+        self._deck[slot].add(container, label)
         return container
 
     def clear(self):
         self._commands = []
         print('Robot ready to enqueue and execute new commands')
+
+    def pause(self):
+        # This method is for API use only - in a user protocol, it will jump the
+        # queue, which is counterintuitive and not very useful.
+        def _do():
+            print("Paused")
+
+        description = "Pausing"
+        self.prepend_command(Command(do=_do, description=description))
+
+    def resume(self):
+        self.run()

@@ -8,10 +8,12 @@ class Pipette(object):
     def __init__(
             self,
             axis,
+            name=None,
             channels=1,
             min_volume=0,
             trash_container=None,
-            tip_racks=None):
+            tip_racks=None,
+            speed=300):
 
         self.positions = {
             'top': None,
@@ -22,6 +24,10 @@ class Pipette(object):
 
         self.axis = axis
         self.channels = channels
+
+        if not name:
+            name = axis
+        self.name = name
 
         self.min_volume = min_volume
         self.max_volume = min_volume + 1
@@ -38,6 +44,14 @@ class Pipette(object):
         self.placeables = []
 
         self.calibrator = Calibrator()
+
+        self.set_speed(speed)
+
+    def go_to(self, location):
+        if location:
+            self.robot.move_to(location, instrument=self, create_path=False)
+
+        return self
 
     def aspirate(self, volume=None, location=None):
 
@@ -110,28 +124,27 @@ class Pipette(object):
 
         return self
 
-    def pick_up_tip(self, address):
-        # TODO: Calibrations needed here
-        _, _, tip_z_top = address.coordinates(reference=address.get_deck())
+    def pick_up_tip(self, location=None):
 
-        # TODO: actual plunge depth for picking up a tip varies based on the tip
+        if location:
+            self.robot.move_to(location, self)
+
+        # TODO: actual plunge depth for picking up a tip
+        # varies based on the tip
         # right now it's accounted for via plunge depth
         # TODO: Need to talk about containers z positioning
-        tip_z_bottom = tip_z_top - 6
-
-        # Hover over tip
-        self.robot.move_to(address)
+        tip_plunge = 6
 
         def _do():
             # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=tip_z_bottom)
-                self.robot.move_head(z=tip_z_top)
+                self.robot.move_head(z=-tip_plunge, absolute=False)
+                self.robot.move_head(z=tip_plunge, absolute=False)
 
             self.motor.wait_for_arrival()
             self.robot.home('z')
 
-        description = "Pickup up tip from {0}".format(str(address))
+        description = "Picking up tip from {0}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
@@ -148,6 +161,12 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume = 0
         return self
+
+    def calibrate(self, position):
+        current = self.robot._driver.get_position()['current'][self.axis]
+        kwargs = {}
+        kwargs[position] = current
+        self.calibrate_plunger(**kwargs)
 
     def calibrate_plunger(
             self,
@@ -235,6 +254,19 @@ class Pipette(object):
     def supports_volume(self, volume):
         return self.max_volume <= volume <= self.max_volume
 
-    @property
-    def name(self):
-        return self.size.lower()
+    def delay(self, seconds):
+        def _do():
+            self.motor.wait(seconds)
+
+        description = "Delaying {} seconds".format(seconds)
+        self.robot.add_command(Command(do=_do, description=description))
+
+    def set_speed(self, rate):
+        self.speed = rate
+        axis = self.axis
+
+        def _do():
+            self.motor.speed(rate, axis)
+
+        description = "Setting speed to {}mm/second".format(rate)
+        self.robot.add_command(Command(do=_do, description=description))

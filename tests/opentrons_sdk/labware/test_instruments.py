@@ -10,8 +10,7 @@ from opentrons_sdk.containers.placeable import unpack_location
 class PipetteTest(unittest.TestCase):
 
     def setUp(self):
-        Robot.reset()
-        self.robot = Robot.get_instance()
+        self.robot = Robot.reset()
         # self.robot.connect(port='/dev/tty.usbmodem1421')
         # self.robot.home()
 
@@ -31,6 +30,18 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
 
+    def test_get_instruments_by_name(self):
+        self.p1000 = instruments.Pipette(
+            trash_container=self.trash,
+            tip_racks=[self.tiprack],
+            min_volume=10,  # These are variable
+            axis="a",
+            name="p1000",
+            channels=1
+        )
+        result = list(self.robot.get_instruments('p1000'))
+        self.assertListEqual(result, [('A', self.p1000)])
+
     def test_placeables_reference(self):
 
         self.p200.aspirate(100, self.plate[0])
@@ -44,7 +55,9 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(res, (self.plate[0], (1, 0, -1)))
 
         res = unpack_location(self.plate[0])
-        self.assertEquals(res, (self.plate[0], self.plate[0].center()))
+        self.assertEquals(
+            res,
+            (self.plate[0], self.plate[0].from_center(x=0, y=0, z=1)))
 
     def test_calibrate_placeable(self):
         x, y, z = (161.0, 416.7, 3.0)
@@ -238,3 +251,15 @@ class PipetteTest(unittest.TestCase):
             current_pos,
             {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
         )
+
+    def test_delay(self):
+        self.p200.delay(1)
+
+        self.assertEquals(self.robot._commands[-1].description, "Delaying 1 seconds")
+
+    def test_set_speed(self):
+        self.assertEquals(self.p200.speed, 300)
+
+        self.p200.set_speed(100)
+
+        self.assertEquals(self.p200.speed, 100)

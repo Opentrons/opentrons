@@ -123,7 +123,7 @@ class PlaceableTestCase(unittest.TestCase):
             (5, 5, 0))
         self.assertEqual(
             plate['B2'].from_center(r=1.0, theta=math.pi / 2, h=0.0),
-            (5.0, 0.0, 0))
+            (5.0, 10.0, 0))
 
     def test_get_all_children(self):
         c1 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
