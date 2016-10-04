@@ -122,9 +122,9 @@ class Pipette(object):
 
         return self
 
-    def consolidate(self, destination, sources, volume=None, extra_pull=0):
+    def consolidate(self, destination, sources, volume=None):
         volume = volume or current_volume
-        fractional_volume = (volume + extra_pull) / len(sources)
+        fractional_volume = (volume) / len(sources)
 
         for well in sources:
             self.aspirate(fractional_volume, well)
@@ -133,8 +133,8 @@ class Pipette(object):
         return self
 
     def mix(self, repetitions=3):
+        volume = self.current_volume
         def _do():
-            volume = self.current_volume
             for i in range(repetitions):
                 self.dispense(volume)
                 self.aspirate(volume)
