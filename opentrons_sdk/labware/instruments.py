@@ -8,6 +8,7 @@ class Pipette(object):
     def __init__(
             self,
             axis,
+            name=None,
             channels=1,
             min_volume=0,
             trash_container=None,
@@ -22,6 +23,10 @@ class Pipette(object):
 
         self.axis = axis
         self.channels = channels
+
+        if not name:
+            name = axis
+        self.name = name
 
         self.min_volume = min_volume
         self.max_volume = min_volume + 1
@@ -245,7 +250,3 @@ class Pipette(object):
 
     def supports_volume(self, volume):
         return self.max_volume <= volume <= self.max_volume
-
-    @property
-    def name(self):
-        return self.size.lower()
