@@ -142,18 +142,6 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
-    def touch_tip(self, radians=math.pi/4):
-        def _do():
-            num_aspirates = (2 * math.pi) / (radians)
-            for i in num_aspirates:
-                dispense(current_volume / num_aspirates).from_polar(0.9, math.pi / num_aspirates, 1)
-            self.motor.wait_for_arrival()
-
-        description = "Touch_tip with intervals of {}".format(str(radians))
-        self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume = 0
-        return self
-
     def blow_out(self, location=None):
         if location:
             self.robot.move_to(location, self)
