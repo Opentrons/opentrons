@@ -47,6 +47,8 @@ class OpenTronsTest(SerialTestCase):
 
         self.motor = CNCDriver()
 
+        self.motor.ot_version = 'hood'
+
         self.smoothie_connected = False
 
         myport = ''

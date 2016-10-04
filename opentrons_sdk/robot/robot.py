@@ -8,6 +8,8 @@ from opentrons_sdk.util import log
 from opentrons_sdk.containers.placeable import unpack_location
 from opentrons_sdk.containers.calibrator import apply_calibration
 
+from opentrons_sdk.helpers import helpers
+
 
 class Robot(object):
     _commands = None  # []
@@ -64,6 +66,10 @@ class Robot(object):
                 return robot_self._driver.wait_for_arrival()
 
         return InstrumentMotor()
+
+    def flip_coordinates(self, coordinates):
+        dimensions = self._driver.get_dimensions()
+        return helpers.flip_coordinates(coordinates, dimensions)
 
     def list_serial_ports(self):
         return self._driver.list_serial_ports()
