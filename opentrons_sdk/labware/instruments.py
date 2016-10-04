@@ -103,53 +103,42 @@ class Pipette(object):
 
         return self
 
-    def transfer(self, volume=None, source, destination):
-        aspirate(volume, source)
-        dispense(volume, source)
-        # I think this won't work because the move_to wells need to be in the command queue, not executed immediately.
-        # Actually, distribute and consolidate probably won't work either.
+    def transfer(self, source, destination, volume=None):
+        volume = volume or current_volume
+        self.aspirate(volume, source)
+        self.dispense(volume, destination)
         return self
 
-    def distribute(self, volume=None, source, destinations=[], extra_pull=None):
-        if len(destinations) == 0:
-            raise RuntimeWarning(
-                'Pipette cannot distribute without at least 1 destination'.
-            )
-
+    def distribute(self, source, destinations, volume=None, extra_pull=0):
+        volume = volume or current_volume
         fractional_volume = volume / len(destinations)
-        if extra_pull:
-            fractional_volume += extra_pull
 
-        aspirate(volume + extra_pull, source)
+        self.aspirate(volume + extra_pull, source)
         for well in destinations:
-            dispense(fractional_volume, well)
+            self.dispense(fractional_volume, well)
 
         return self
 
-    def consolidate(self, volume=None, sources=[], destination, extra_pull=None):
-        if len(sources) == 0:
-            raise RuntimeWarning(
-                'Pipette cannot consolidate without at least 1 destination'.
-            )
+    def consolidate(self, destination, sources, volume=None, extra_pull=0):
+        volume = volume or current_volume
+        fractional_volume = (volume + extra_pull) / len(sources)
 
-        fractional_volume = volume / len(sources)
-        if extra_pull:
-            fractional_volume += extra_pull
+        for well in sources:
+            print(fractional_volume, well)
+            self.aspirate(fractional_volume, well)
 
-        for well in destinations:
-            aspirate(fractional_volume, well)
-
-        dispense(volume, source)
+        self.dispense(volume, destination)
         return self
 
-    def mix(self, repetitions, distance=5):
+    def mix(self, repetitions=3):
         def _do():
-            for i in range(3):
-                self.motor.move(z=distance, absolute=False)
-                self.motor.move(z=-distance, absolute=False)
+            volume = self.current_volume
+            for i in range(repetitions):
+                self.dispense(volume)
+                self.aspirate(volume)
             self.motor.wait_for_arrival()
 
-        description = "Mixing {0} times with a distance of {1}mm".format(repetitions, str(distance))
+        description = "Mixing {0} times with a volume of {1}mm".format(repetitions, str(self.current_volume))
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
