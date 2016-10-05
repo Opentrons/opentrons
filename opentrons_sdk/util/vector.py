@@ -78,12 +78,46 @@ class Vector(object):
     def __add__(self, other):
         other = Vector(other)
         return Vector(
-            [a + b for a, b in zip(self.to_tuple(), other.to_tuple())])
+            [a + b for a, b in zip(self, other)])
 
     def __sub__(self, other):
         other = Vector(other)
         return Vector(
-            [a - b for a, b in zip(self.to_tuple(), other.to_tuple())])
+            [a - b for a, b in zip(self, other)])
+
+    def __truediv__(self, other):
+        if isinstance(other, Vector):
+            return Vector(
+                [a / b for a, b in zip(self, other)])
+
+        scalar = float(other)
+        return self / Vector(scalar, scalar, scalar)
+
+    def __mul__(self, other):
+        if isinstance(other, Vector):
+            return Vector(
+                [a * b for a, b in zip(self, other)])
+
+        scalar = float(other)
+        return self * Vector(scalar, scalar, scalar)
 
     def __str__(self):
+        return "Vector{}".format(self.__repr__())
+
+    def __repr__(self):
         return str(self.to_tuple())
+
+    def __getitem__(self, index):
+        res = None
+        if isinstance(index, slice):
+            res = self.to_tuple()
+        elif isinstance(index, str):
+            res = self.to_dictionary()
+        elif isinstance(index, int):
+            res = self.to_tuple()
+        else:
+            raise IndexError('Expected slice or string as an index')
+        return res[index]
+
+    def __iter__(self):
+        return iter(self.to_tuple())

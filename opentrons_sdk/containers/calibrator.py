@@ -1,4 +1,5 @@
 import copy
+from opentrons_sdk.util.vector import Vector
 
 from opentrons_sdk.containers.placeable import unpack_location
 
@@ -15,7 +16,8 @@ class Calibrator(object):
     def convert(self,
                 calibration_data,
                 placeable,
-                coordinates=(0, 0, 0)):
+                coordinates=Vector(0, 0, 0)):
+        coordinates = Vector(coordinates)
         path = placeable.get_path()
         calibrated_placeable = self.apply_calibration(
             calibration_data,
@@ -28,8 +30,7 @@ class Calibrator(object):
         calibrated_coordinates = calibrated_placeable.coordinates(
             calibrated_deck)
 
-        return tuple(a + b for a, b in
-                     zip(coordinates, calibrated_coordinates))
+        return coordinates + calibrated_coordinates
 
     def apply_calibration(self, calibration_data, placeable):
         placeable = copy.deepcopy(placeable)
@@ -41,10 +42,7 @@ class Calibrator(object):
             child = placeable.children[name]
 
             if 'delta' in data:
-                child['coordinates'] = tuple(
-                    a + b for a, b in zip(child['coordinates'],
-                                          data['delta'])
-                )
+                child['coordinates'] = child['coordinates'] + data['delta']
             if 'children' in data:
                 self.apply_calibration_recursive(
                     data['children'], child['instance'])
@@ -53,12 +51,12 @@ class Calibrator(object):
                   calibration_data,
                   location,
                   actual):
+        actual = Vector(actual)
         placeable, expected = unpack_location(location)
         coordinates_to_deck = placeable.coordinates(placeable.get_deck())
-        expected_to_deck = tuple(
-            a + b for a, b in zip(expected, coordinates_to_deck))
+        expected_to_deck = expected + coordinates_to_deck
 
-        delta = tuple(a - b for a, b in zip(actual, expected_to_deck))
+        delta = actual - expected_to_deck
         path = placeable.get_path()
         calibration_data = copy.deepcopy(calibration_data)
 

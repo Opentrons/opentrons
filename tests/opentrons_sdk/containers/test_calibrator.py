@@ -99,6 +99,8 @@ class CalibratorTestCase(unittest.TestCase):
         tube_rack = deck['A1']['tube_rack']
         expected = tube_rack['Red'].center(tube_rack)
 
+        print(expected)
+
         new_calibration_data = my_calibrator.calibrate(
             calibration_data,
             (deck['A1']['tube_rack'], expected),
