@@ -33,8 +33,11 @@
     </div>
     <div class="wrapper">
       <aside id="step-list">
+        <router-link to="/bar">Go to Bar</router-link>
+        <router-link to="/foo">Go to Foo</router-link>
       </aside>
       <section id="task-pane">
+        <router-view></router-view>
       </section>
     </div>
   </div>
@@ -47,7 +50,7 @@
 export default {
   data () {
     return {
-      message: 'waa'
+      message: 'wooooah'
     }
   }
 }
