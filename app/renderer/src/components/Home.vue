@@ -26,15 +26,18 @@
           <a href="#" class="btn-home">ALL</a>
         </nav>
         <nav class="tabs">
-            <a href="#" class="tab active">Protocol</a>
-            <a href="#" class="tab">Debug</a>
+          <a href="#" class="tab active">Protocol</a>
+          <a href="#" class="tab">Debug</a>
         </nav>
       </header>
     </div>
     <div class="wrapper">
       <aside id="step-list">
-        <router-link to="/bar">Go to Bar</router-link>
-        <router-link to="/foo">Go to Foo</router-link>
+        <StepList>
+          <!-- generate routes dynamically in here based on protocol-->
+          <router-link to="/bar">Go to Bar</router-link>
+          <router-link to="/foo">Go to Foo</router-link>
+        </StepList>
       </aside>
       <section id="task-pane">
         <router-view></router-view>
@@ -45,7 +48,7 @@
 
 
 <script>
-// require("!css!sass!./assets/sass/main.scss");
+import StepList from './StepList.vue'
 
 export default {
   data () {
@@ -57,5 +60,5 @@ export default {
 </script>
 
 <style lang="sass">
-  @import "./assets/sass/main.scss"
+  @import "../assets/sass/main.scss"
 </style>
