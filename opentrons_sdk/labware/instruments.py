@@ -1,6 +1,7 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
+import math
 
 
 class Pipette(object):
@@ -108,6 +109,44 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         self.current_volume -= volume
 
+        return self
+
+    def transfer(self, source, destination, volume=None):
+        volume = volume or self.max_volume
+        self.aspirate(volume, source)
+        self.dispense(volume, destination)
+        return self
+
+    def distribute(self, source, destinations, volume=None, extra_pull=0):
+        volume = volume or self.max_volume
+        fractional_volume = volume / len(destinations)
+
+        self.aspirate(volume + extra_pull, source)
+        for well in destinations:
+            self.dispense(fractional_volume, well)
+
+        return self
+
+    def consolidate(self, destination, sources, volume=None):
+        volume = volume or self.max_volume
+        fractional_volume = (volume) / len(sources)
+
+        for well in sources:
+            self.aspirate(fractional_volume, well)
+
+        self.dispense(volume, destination)
+        return self
+
+    def mix(self, repetitions=3):
+        volume = self.current_volume
+        def _do():
+            for i in range(repetitions):
+                self.dispense(volume)
+                self.aspirate(volume)
+            self.motor.wait_for_arrival()
+
+        description = "Mixing {0} times with a volume of {1}mm".format(repetitions, str(self.current_volume))
+        self.robot.add_command(Command(do=_do, description=description))
         return self
 
     def blow_out(self, location=None):

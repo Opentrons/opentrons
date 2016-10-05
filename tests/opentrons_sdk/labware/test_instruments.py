@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 from opentrons_sdk import containers
 
 from opentrons_sdk.labware import instruments
@@ -263,3 +264,78 @@ class PipetteTest(unittest.TestCase):
         self.p200.set_speed(100)
 
         self.assertEquals(self.p200.speed, 100)
+
+    def test_transfer_no_volume(self):
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.transfer(self.plate[0], self.plate[1])
+        self.robot.run()
+
+        self.assertEqual(self.p200.aspirate.mock_calls, [mock.call.aspirate(self.p200.max_volume, self.plate[0])])
+        self.assertEqual(self.p200.dispense.mock_calls, [mock.call.dispense(self.p200.max_volume, self.plate[1])])
+
+    def test_transfer_with_volume(self):
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.transfer(self.plate[0], self.plate[1], 100)
+        self.robot.run()
+
+        self.assertEqual(self.p200.aspirate.mock_calls, [mock.call.aspirate(100, self.plate[0])])
+        self.assertEqual(self.p200.dispense.mock_calls, [mock.call.dispense(100, self.plate[1])])
+
+    def test_consolidate(self):
+        volume = 99
+        sources = [self.plate[1], self.plate[2], self.plate[3]]
+        destination = self.plate[0]
+        fractional_volume = volume / len(sources)
+
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.consolidate(destination, sources, volume)
+        self.robot.run()
+
+        self.assertEqual(self.p200.aspirate.mock_calls,
+                        [mock.call.aspirate(fractional_volume, self.plate[1]),
+                        mock.call.aspirate(fractional_volume, self.plate[2]),
+                        mock.call.aspirate(fractional_volume, self.plate[3])]
+                        )
+        self.assertEqual(self.p200.dispense.mock_calls, [mock.call.dispense(volume, destination)])
+
+    def test_distribute(self):
+        volume = 99
+        destinations = [self.plate[1], self.plate[2], self.plate[3]]
+        fractional_volume = volume / len(destinations)
+
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.distribute(self.plate[0], destinations, volume)
+        self.robot.run()
+
+        self.assertEqual(self.p200.dispense.mock_calls,
+                        [mock.call.dispense(fractional_volume, self.plate[1]),
+                        mock.call.dispense(fractional_volume, self.plate[2]),
+                        mock.call.dispense(fractional_volume, self.plate[3])]
+                        )
+        self.assertEqual(self.p200.aspirate.mock_calls, [mock.call.aspirate(volume, self.plate[0])])
+
+    def test_mix(self):
+        well = self.plate[0]
+        # It is necessary to aspirate before it is mocked out so that you have liquid
+        self.p200.current_volume = 100
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.mix()
+        self.robot.run()
+
+        print("****", len(self.p200.dispense.mock_calls))
+        print("****", self.p200.dispense.mock_calls)
+        self.assertEqual(self.p200.dispense.mock_calls,
+                        [mock.call.dispense(100),
+                        mock.call.dispense(100),
+                        mock.call.dispense(100)]
+                        )
+        self.assertEqual(self.p200.aspirate.mock_calls,
+                        [mock.call.aspirate(100),
+                        mock.call.aspirate(100),
+                        mock.call.aspirate(100)]
+                        )
