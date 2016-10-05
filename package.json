@@ -32,8 +32,8 @@
     "sass-loader": "^4.0.2",
     "spectron": "^3.2.6",
     "vue-loader": "^9.4.0",
-    "webpack": "^2.1.0-beta.22",
-    "webpack-dev-server": "^2.1.0-beta.0"
+    "webpack": "1.13.2",
+    "webpack-dev-server": "1.14.0"
   },
   "build": {
     "asar": true,
