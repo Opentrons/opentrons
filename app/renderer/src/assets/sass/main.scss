@@ -56,7 +56,7 @@ select {
     color: white;
     @include grid-col-air(4);
     padding-left: $gutter-width*2;
-    background-image: url(../img/caret.png);
+    // background-image: url(../img/caret.png);
     background-repeat: no-repeat;
     background-position: 95% 50%;
 }
@@ -348,9 +348,9 @@ Pipette
         input {
             text-align: center;
             @include grid-col-air(1);
-            
+
             outline: none;
-            
+
             background: lighten($primary-brand, 40%);
         }
     }
