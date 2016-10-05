@@ -1,0 +1,94 @@
+@import "vars";
+$gutter-width:5px;
+$column-width: 30px;
+$row-height: 40px;
+@mixin grid-row {
+    width: 960px;
+    display: flex;
+    margin: 0 auto;
+    //margin-bottom: $gutter-width;
+}
+
+@function num-col($n) {
+    @return ($column-width*$n)+($gutter-width*(($n - 1)*2));
+}
+
+@function num-col-full($n) {
+    @return num-col($n)+(2*$gutter-width);
+}
+
+@mixin grid-col-full($n) {
+    width: num-col-full($n);
+    flex: 0 0 num-col-full($n);
+    
+}
+
+@mixin grid-col-air($n) {
+    width: num-col($n);
+    flex: 0 0 num-col($n);
+    line-height: num-co1(1);
+    margin: $gutter-width;
+}
+
+@mixin btn-square-f($n) {
+    display: block;
+    width: num-col-full($n);
+    height: num-col-full($n);
+    line-height: num-col-full($n);
+    text-align: center;
+}
+
+@mixin btn-square-a($n) {
+    display: block;
+    width: num-col($n);
+    height: num-col($n);
+    line-height: num-col($n);
+    margin: $gutter-width;
+    text-align: center;
+}
+
+@mixin btn-col-f($n) {
+    display: block;
+    width: num-col-full($n);
+    height: num-col-full(1);
+    line-height: num-col-full(1);
+    text-align: center;
+}
+
+@mixin rect($w, $h) {
+    display: block;
+    width: num-col-full($w);
+    height: num-col-full($h);
+    line-height: num-col-full($h);
+    text-align: center;
+}
+
+@mixin btn-col-a($n) {
+    display: block;
+    width: num-col($n);
+    height: num-col(1);
+    line-height: num-col(1);
+    margin: $gutter-width;
+    text-align: center;
+}
+
+@mixin offset($l, $r) {
+    margin-left: num-col-full($l);
+    margin-right: num-col-full($r);
+}
+
+@mixin offset-air($l, $r){
+    margin-left:num-col-full($l) + $gutter-width;
+    margin-right:num-col-full($r) + $gutter-width;
+}
+
+@mixin offset-v($t, $b) {
+    margin-top: num-col-full($t);
+    margin-bottom: num-col-full($b);
+}
+
+@mixin offset-v-air($t, $b) {
+
+    margin-top: num-col-full($t) + $gutter-width;
+    margin-bottom: num-col-full($b) +$gutter-width;
+}

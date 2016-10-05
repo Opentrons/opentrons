@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+</body>
+
+</html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Connect To Robot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+    <div class="nav-full-dark">
+        <header class="brand">
+            <!-- Logo and Status Text  -->
+            <nav class="links">
+                <ul>
+                    <li> Logo</li>
+                </ul>
+            </nav>
+            <nav class="robot">
+                <span>connect to robot</span>
+                <input type="text" id="connect_port" value="/dev/tty.usbmodem1421" />
+                <a href="#" class="btn-connect" id="connect_serial">Connect Serial</a>
+            </nav>
+        </header>
+    </div>
+    <div class="nav-full-light">
+        <header class="controls">
+            <!-- Home Buttons, Speed Control Slider, Tabs  -->
+            <nav class="home">
+                <span class="label">HOME: </span>
+                <a href="#" class="btn-home">X</a>
+                <a href="#" class="btn-home">Y</a>
+                <a href="#" class="btn-home">Z</a>
+                <a href="#" class="btn-home">A</a>
+                <a href="#" class="btn-home">B</a>
+                <a href="#" class="btn-home">ALL</a>
+            </nav>
+            <nav class="tabs">
+                <a href="#" class="tab active">Protocol</a>
+                <a href="#" class="tab">Debug</a>
+            </nav>
+    </div>
+    </header>
+    </div>
+    <div class="wrapper">
+        <!-- Attach Step List Component Here-->
+        <aside id="step-list">
+            <!-- Static Placeholder for Component -->
+            <ul>
+                <li class="active">
+                    <a href="#">Connect to Robot</a>
+                    <!-- If more than 1 step in Task group, enumerate and render number of steps -->
+                    <ul>
+                        <!-- for each step in a task group -->
+                        <li class="completed"><a href="#">Power On</a></li>
+                        <li class="active"><a href="#">Connect To Serial</a></li>
+                        <li><a href="#">Optional Homing</a></li>
+                    </ul>
+                </li>
+                <li><a href="upload.html">Upload Protocol</a></li>
+                
+            </ul>
+        </aside>
+        <!-- Attach Step Pane Here -->
+        <section id="task-pane">
+            <section>
+                <h2 class="title">Connect to Robot</h2>
+                <div class="instructions">
+                    Please make sure that your computer is connected to the robot, and your machine is plugged in and turned on before continuing.
+                </div>
+                <div class="step step-connect">
+                    <ul>
+                        <li>info</li>
+                        <li>info</li>
+                        <li>info</li>
+                    </ul>
+                    <!-- We need diagrams to fill this page.  -->
+                </div>
+                <!-- Nav Will Need Prev/Next Logic -->
+                <nav>
+                    <a href="#" class="prev first">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a>
+                </nav>
+                <!-- End Nav Component -->
+            </section>
+            <!-- Info Modal Component-->
+            <div id="info" class="infoModal">
+                <div> <a href="#close" title="Close" class="close">X</a>
+                    <h2>Title</h2>
+                    <p>
+                        Images would go here along with explanation text.
+                    </p>
+                </div>
+            </div>
+            <!-- End Info Modal Component -->
+        </section>
+        <!-- End Task Pane -->
+    </div>
+</body>
+
+</html>

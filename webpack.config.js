@@ -35,13 +35,25 @@ module.exports = {
           'url?limit=10000'
         ]
       },
+      {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
+      },
+      {
+        test: /\.(woff|woff2)$/, loader: "url?limit=10000&minetype=application/font-woff"
+      }
     ]
   },
   devServer: {
     historyApiFallback: true,
     noInfo: true
   },
-  devtool: '#eval-source-map'
+  devtool: '#eval-source-map',
+  resolve: {
+    alias: {
+      vue: 'vue/dist/vue.js'
+    }
+  }
 }
 
 if (process.env.NODE_ENV === 'production') {

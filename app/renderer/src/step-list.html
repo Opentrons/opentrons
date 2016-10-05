@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+</body>
+
+</html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Connect To Robot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <!-- Attach Step List Component Here-->
+        <aside id="step-list">
+            <!-- Static Placeholder for Component -->
+            <ul>
+                <li :class="{'completed': task.completed}" v-for="task in tasks"><a href="#">{{task.title}}</a></li>
+            </ul>
+        </aside>
+        <!-- Attach Step Pane Here -->
+        <section id="task-pane">
+        </section>
+        <!-- End Task Pane -->
+    </div>
+    <script type="text/javascript" src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script>
+    <script type="text/javascript">
+    data = {
+        tasks: [{
+            title: 'connect to robot',
+            completed: true
+        }, {
+            title: 'upload a protocol',
+            completed: false
+        }, {
+            title: 'calibrate instruments',
+            completed: false
+        }, {
+            title: 'calibrate pipettes',
+            completed: false
+        }, {
+            title: 'review calibration',
+            completed: false
+        }]
+    }
+    new Vue({
+        el: "#step-list",
+        data: data
+    });
+    </script>
+</body>
+
+</html>
