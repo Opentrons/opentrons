@@ -12,7 +12,7 @@
     "release:mac": "npm run build:backend:mac && npm run build:frontend:mac",
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "NODE_ENV=development electron app/",
-    "dev": "webpack-dev-server --inline --hot --content-base ./app/renderer",
+    "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/renderer",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "devDependencies": {
@@ -31,6 +31,7 @@
     "node-sass": "^3.10.1",
     "sass-loader": "^4.0.2",
     "spectron": "^3.2.6",
+    "url-loader": "^0.5.7",
     "vue-loader": "^9.4.0",
     "webpack": "1.13.2",
     "webpack-dev-server": "1.14.0"

@@ -40,7 +40,7 @@ module.exports = {
         loaders: ["style", "css", "sass"]
       },
       {
-        test: /\.(woff|woff2)$/, loader: "url?limit=10000&minetype=application/font-woff"
+        test: /\.(woff|woff2)$/, loader: "url-loader?limit=10000&minetype=application/font-woff"
       }
     ]
   },
