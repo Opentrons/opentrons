@@ -163,7 +163,7 @@ class Pipette(object):
         return self
 
     def calibrate(self, position):
-        current = self.robot._driver.get_position()['current'][self.axis]
+        current = self.robot._driver.get_plunger_position()['current'][self.axis]
         kwargs = {}
         kwargs[position] = current
         self.calibrate_plunger(**kwargs)
@@ -206,15 +206,14 @@ class Pipette(object):
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
 
-    def calibrate_position(self, location, current_position=None):
-        if not current_position:
-            current = self.robot._driver.get_position()['current']
-            current_position = (current['x'], current['y'], current['z'])
+    def calibrate_position(self, location, current=None):
+        if not current:
+            current = self.robot._driver.get_head_position()['current']
 
         self.calibration_data = self.calibrator.calibrate(
             self.calibration_data,
             location,
-            current_position)
+            current)
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume

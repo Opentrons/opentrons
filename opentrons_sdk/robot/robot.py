@@ -87,7 +87,11 @@ class Robot(object):
 
     def home(self, *args):
         if self._driver.resume():
-            return self._driver.home(*args)
+            if not args:
+                self._driver.home('z')
+                return self._driver.home('x', 'y', 'b', 'a')
+            else:
+                return self._driver.home(*args)
         else:
             return False
 

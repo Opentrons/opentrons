@@ -6,50 +6,13 @@ import time
 import serial
 
 from opentrons_sdk.util import log
+from opentrons_sdk.util.vector import Vector
 
 JSON_ERROR = None
 if sys.version_info > (3, 4):
     JSON_ERROR = ValueError
 else:
     JSON_ERROR = json.decoder.JSONDecodeError
-
-class GCodeLogger():
-
-    """
-    GCodeLogger pretends to be a serial connection and logs all the stuff it
-    would send to the serial port instead of actually sending it to a
-    serial port.
-    """
-
-    open = False
-
-    write_buffer = None
-
-    def __init__(self):
-        self.write_buffer = []
-
-    def isOpen(self):
-        return True
-
-    def close(self):
-        self.open = False
-
-    def open(self):
-        self.open = True
-
-    def write(self, data):
-        if self.isOpen() is False:
-            raise IOError("Connection not open.")
-        log.debug('GCodeLogger', 'Writing: {}'.format(data))
-        self.write_buffer.append(data)
-
-    def read(self, data):
-        if self.isOpen() is False:
-            raise IOError("Connection not open.")
-        return None
-
-    def readline(self):
-        return b'ok'
 
 
 class CNCDriver(object):
@@ -64,19 +27,12 @@ class CNCDriver(object):
     SET_POSITION = 'G92'
     GET_POSITION = 'M114'
     GET_ENDSTOPS = 'M119'
-    GET_SPEED = 'M199'
     SET_SPEED = 'G0'
-    ACCELERATION = 'M204'
-    MOTORS_ON = 'M17'
-    MOTORS_OFF = 'M18'
     HALT = 'M112'
     CALM_DOWN = 'M999'
 
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
-
-    UNITS_TO_INCHES = 'G20'
-    UNITS_TO_MILLIMETERS = 'G22'
 
     VERSION = 'version'
 
@@ -99,23 +55,11 @@ class CNCDriver(object):
     serial_timeout = 0.1
 
     # TODO: move to config
-    ot_version = None
+    ot_version = 'hood'
     ot_one_dimensions = {
-        'hood':{
-            'x': 300,
-            'y': 120,
-            'z': 120
-        },
-        'one_pro':{
-            'x': 300,
-            'y': 250,
-            'z': 120
-        },
-        'one_standard':{
-            'x': 300,
-            'y': 250,
-            'z': 120
-        }
+        'hood': Vector(300, 120, 120),
+        'one_pro': Vector(300, 250, 120),
+        'one_standard': Vector(300, 250, 120)
     }
 
     def list_serial_ports(self):
@@ -144,14 +88,21 @@ class CNCDriver(object):
                     s.close()
                     result.append(port)
             except Exception as e:
-                log.debug("Serial", 'Exception in testing port {}'.format(port))
+                log.debug(
+                    "Serial",
+                    'Exception in testing port {}'.format(port))
                 log.debug("Serial", e)
         return result
 
     def connect(self, device=None, port=None):
         try:
-
-            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=self.serial_timeout)
+            if device or port:
+                self.connection = serial.Serial(
+                    port=device or port,
+                    baudrate=115200,
+                    timeout=self.serial_timeout)
+            else:
+                self.connection = VirtualSmoothie()
 
             # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
             # so just always swallow it ourselves
@@ -162,8 +113,10 @@ class CNCDriver(object):
             return self.resume()
 
         except serial.SerialException as e:
-            log.debug("Serial", "Error connecting to {}".format(device or port))
-            log.error("Serial",e)
+            log.debug(
+                "Serial",
+                "Error connecting to {}".format(device or port))
+            log.error("Serial", e)
             return False
 
     def reset_port(self):
@@ -263,49 +216,33 @@ class CNCDriver(object):
 
         return msg
 
-    def move(self, x=None, y=None, z=None, absolute=True, **kwargs):
+    def move(self, absolute=True, **kwargs):
 
         code = self.MOVE
-
         if absolute:
             self.send_command(self.ABSOLUTE_POSITIONING)
         else:
             self.send_command(self.RELATIVE_POSITIONING)
 
+        coordinates = self.flip_coordinates(Vector(kwargs), absolute=absolute)
+
         args = {}
 
-        """
-        Add x, y and z back to the kwargs.  They're omitted when we name them
-        as explicit keyword arguments, but it's much nicer to be able to pass
-        them as anonymous parameters when calling this method.
-        """
-        if x is not None:
-            args['X'] = x
-        if y is not None:
-            args['Y'] = y
-        if z is not None:
-            args['Z'] = z
-
-        for k in kwargs:
-            args[k.upper()] = kwargs[k]
-
-        if 'Z' in args:
-            args['Z'] = self.invert_axis('z', args['Z'], absolute=absolute)
-        if 'Y' in args:
-            args['Y'] = self.invert_axis('y', args['Y'], absolute=absolute)
+        for axis in 'xyz':
+            args[axis.upper()] = coordinates[axis]
 
         log.debug("MotorDriver", "Moving: {}".format(args))
 
         res = self.send_command(code, **args)
         return res == b'ok'
 
-    def invert_axis(self, axis, value, absolute=True):
-        if not self.ot_version:
-            self.ot_version = 'hood'
+    def flip_coordinates(self, coordinates, absolute=True):
+        coordinates = coordinates * Vector(1, -1, -1)
         if absolute:
-            return self.ot_one_dimensions[self.ot_version][axis] - value
+            offset = Vector(0, 1, 1) * self.ot_one_dimensions[self.ot_version]
+            return offset + coordinates
         else:
-            return value * -1
+            return coordinates
 
     def wait_for_arrival(self):
         arrived = False
@@ -368,24 +305,40 @@ class CNCDriver(object):
         res = self.send_command(self.SET_POSITION, **uppercase_args)
         return res == b'ok'
 
+    def get_head_position(self):
+        coords = self.get_position()
+        coords['target'] = Vector(coords['target'])
+        coords['current'] = Vector(coords['current'])
+
+        coords['target'] = self.flip_coordinates(coords['target'])
+        coords['current'] = self.flip_coordinates(coords['current'])
+
+        return coords
+
+    def get_plunger_positions(self):
+        coords = self.get_position()
+        plunger_coords = {'target': {}, 'current': {}}
+        for axis in 'ab':
+            plunger_coords['target'][axis] = coords['target'][axis]
+            plunger_coords['current'][axis] = coords['current'][axis]
+
+        return plunger_coords
+
     def get_position(self):
         res = self.send_command(self.GET_POSITION)
-        res = res.decode('utf-8')[3:] # remove the "ok " from beginning of response
+        # remove the "ok " from beginning of response
+        res = res.decode('utf-8')[3:]
         coords = {}
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
-            coords = {'target':{}, 'current':{}}
+            coords = {'target': {}, 'current': {}}
             for letter in 'xyzab':
                 # the lowercase axis are the "real-time" values
-                coords['current'][letter]  = response_dict.get(letter,0)
+                coords['current'][letter] = response_dict.get(letter, 0)
                 # the uppercase axis are the "target" values
-                coords['target'][letter]  = response_dict.get(letter.upper(),0)
+                coords['target'][letter] = response_dict.get(letter.upper(), 0)
 
-            for axis in 'yz':
-                coords['current'][axis] = self.invert_axis(axis, coords['current'][axis])
-                coords['target'][axis] = self.invert_axis(axis, coords['target'][axis])
-
-        except JSON_ERROR as e:
+        except JSON_ERROR:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
@@ -395,14 +348,13 @@ class CNCDriver(object):
         speed_command = self.SET_SPEED
 
         if axis:
-            #AB speeds - per axis
+            # AB speeds - per axis
             res = self.send_command(speed_command + axis + str(rate))
         else:
-            #XYZ speeds - for all axis
+            # XYZ speeds - for all axis
             res = self.send_command(speed_command + "F" + str(rate))
 
         return res == b'ok'
-
 
     def get_ot_version(self):
         res = self.send_command(self.GET_OT_VERSION)
@@ -420,61 +372,3 @@ class CNCDriver(object):
             command += str(value)
             res = self.send_command(command)
             return res.decode().split(' ')[-1] == str(value)
-
-
-class MoveLogger(CNCDriver):
-
-    """
-    This is one level higher than the G-code; it logs moves whereas the
-    G-code logger logs low-level serial data being written to the physical
-    motor controller.
-
-    We can use this to get a low-level movement command to send off to some
-    other theoretical motor control driver stack, or we can use it for
-    testing.
-    """
-
-    movements = []
-
-    def __init__(self):
-        self.movements = []
-        self.motor = CNCDriver()
-        self.motor.connection = GCodeLogger()
-
-        self.current_coords = {
-            'x': 0,
-            'y': 0,
-            'z': 0,
-            'a': 0,
-            'b': 0
-        }
-
-    def home(self, *axis):
-        for a in axis:
-            self.current_coords[a.lower()] = 0
-        return True
-
-    def move(self, **kwargs):
-        kwargs = dict((k.lower(), v) for k, v in kwargs.items())
-        self.movements.append(kwargs)
-
-        for axis in 'xyzab':
-            if kwargs.get(axis):
-                if kwargs.get('absolute') == False:
-                    self.current_coords[axis] += kwargs[axis]
-                else:
-                    self.current_coords[axis] = kwargs[axis]
-
-        self.motor.move(**kwargs)
-
-    def get_position(self):
-        return {
-            'current': self.current_coords,
-            'target': self.current_coords
-        }
-
-    def isOpen(self):
-        return True
-
-    def write(self, data):
-        pass
