@@ -83,7 +83,9 @@ class Robot(object):
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
         """
-        return self._driver.connect(device=port)
+        connection =  self._driver.connect(device=port)
+        self._driver.resume()
+        return connection
 
     def home(self, *args):
         if self._driver.resume():
@@ -143,16 +145,17 @@ class Robot(object):
         return copy.deepcopy(self._commands)
 
     def run(self):
-        """
-        A generator that runs each command and yields the current command
-        index and the number of total commands.
-        """
         while self._commands:
             command = self._commands.pop(0)
             if command.description == "Pausing": return
-            print("Executing: ", command.description)
-            log.debug("Robot", command.description)
-            command.do()
+
+            print("Executing:", command.description)
+            log.info("Executing:", command.description)
+            try:
+                command.do()
+            except KeyboardInterrupt as e:
+                self._driver.halt()
+                raise e
 
     def disconnect(self):
         if self._driver:
@@ -240,6 +243,10 @@ class Robot(object):
         container = legacy_containers.get_legacy_container(container_name)
         self._deck[slot].add(container, label)
         return container
+
+    def clear(self):
+        self._commands = []
+        print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
         # This method is for API use only - in a user protocol, it will jump the
