@@ -8,6 +8,8 @@ import serial
 from opentrons_sdk.util import log
 from opentrons_sdk.util.vector import Vector
 
+from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
+
 JSON_ERROR = None
 if sys.version_info > (3, 4):
     JSON_ERROR = ValueError
@@ -102,7 +104,12 @@ class CNCDriver(object):
                     baudrate=115200,
                     timeout=self.serial_timeout)
             else:
-                self.connection = VirtualSmoothie()
+                settings = {
+                    'ot_version': 'one_pro',
+                    'alpha_steps_per_mm': 80.0,
+                    'beta_steps_per_mm': 80.0
+                }
+                self.connection = VirtualSmoothie('v1.0.5', settings)
 
             # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
             # so just always swallow it ourselves
@@ -194,9 +201,14 @@ class CNCDriver(object):
         raise RuntimeWarning('no response after {} seconds'.format(timeout))
 
     def flush_port(self):
-        time.sleep(self.serial_timeout)
-        while self.readline_from_serial():
+        # if we are running a virtual smoothie
+        # we don't need a timeout for flush
+        if isinstance(self.connection, VirtualSmoothie):
+            self.readline_from_serial()
+        else:
             time.sleep(self.serial_timeout)
+            while self.readline_from_serial():
+                time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
         msg = b''
@@ -216,22 +228,39 @@ class CNCDriver(object):
 
         return msg
 
-    def move(self, absolute=True, **kwargs):
-
+    def move_plunger(self, positions, absolute=True):
         code = self.MOVE
         if absolute:
             self.send_command(self.ABSOLUTE_POSITIONING)
         else:
             self.send_command(self.RELATIVE_POSITIONING)
 
-        coordinates = self.flip_coordinates(Vector(kwargs), absolute=absolute)
+        args = {}
+
+        for axis in 'ab':
+            if axis in positions:
+                args[axis.upper()] = positions[axis]
+
+        log.debug("MotorDriver", "Moving plunger: {}".format(args))
+
+        res = self.send_command(code, **args)
+        return res == b'ok'
+
+    def move_head(self, vector, absolute=True):
+        code = self.MOVE
+        if absolute:
+            self.send_command(self.ABSOLUTE_POSITIONING)
+        else:
+            self.send_command(self.RELATIVE_POSITIONING)
+
+        coordinates = self.flip_coordinates(vector, absolute=absolute)
 
         args = {}
 
         for axis in 'xyz':
             args[axis.upper()] = coordinates[axis]
 
-        log.debug("MotorDriver", "Moving: {}".format(args))
+        log.debug("MotorDriver", "Moving head: {}".format(args))
 
         res = self.send_command(code, **args)
         return res == b'ok'

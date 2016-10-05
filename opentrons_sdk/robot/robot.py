@@ -23,7 +23,10 @@ class Robot(object):
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
 
-        self._driver = driver_instance or motor_drivers.MoveLogger()
+        if not driver_instance:
+            driver_instance = motor_drivers.CNCDriver()
+
+        self._driver = driver_instance
 
     @classmethod
     def get_instance(cls):
@@ -76,7 +79,7 @@ class Robot(object):
     def list_serial_ports(self):
         return self._driver.list_serial_ports()
 
-    def connect(self, port):
+    def connect(self, port=None):
         """
         Connects the motor to a serial port.
 

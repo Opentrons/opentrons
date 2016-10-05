@@ -1,6 +1,8 @@
 import re
 import json
 
+from opentrons_sdk.util import log
+
 
 class VirtualSmoothie(object):
     def init_coordinates(self):
@@ -19,12 +21,19 @@ class VirtualSmoothie(object):
         self.responses = []
         self.absolute = True
         self.is_open = False
-        self.speeds = {
+        self.speed = {
             'head': 0.0,
             'plunger': {
                 'a': 0.0,
                 'b': 0.0
             }
+        }
+        self.endstop = {
+            'min_x': 0,
+            'min_y': 0,
+            'min_z': 0,
+            'min_a': 0,
+            'min_b': 0
         }
         self.init_coordinates()
 
@@ -39,7 +48,7 @@ class VirtualSmoothie(object):
 
     def parse_command(self, gcode):
         parse_arguments = re.compile(r"(([XYZABSPabF])(\-?[0-9\.]*))")
-        parse_command = re.compile(r"([GM][0-9]+)")
+        parse_command = re.compile(r"([GM][0-9]*)")
 
         command = re.findall(parse_command, gcode)
         if len(command) != 1:
@@ -68,8 +77,8 @@ class VirtualSmoothie(object):
         return res
 
     def process_get_endstops(self, arguments):
-        return (r'{"M119":{"min_x":0,"min_y":0,'
-                r'"min_z":0,"min_a":0,"min_b":0}}') + '\nok'
+        res = {"M119": self.endstop}
+        return json.dumps(res) + '\nok'
 
     def process_set_position_command(self, arguments):
         for axis in 'XYZAB':
@@ -88,6 +97,7 @@ class VirtualSmoothie(object):
 
         for axis in axis_list:
             arguments[axis.upper()] = 0.0
+            self.endstop['min_' + axis] = 0
 
         self.process_set_position_command(arguments)
 
@@ -101,6 +111,13 @@ class VirtualSmoothie(object):
 
         self.process_set_position_command(arguments)
 
+        axis_hit = None
+        for axis in 'xyzab':
+            if self.coordinates['target'][axis] < 0:
+                axis_hit = 'min_' + axis
+                self.endstop[axis_hit] = 1
+                break
+
         if 'F' in arguments:
             self.speed['head'] = arguments['F']
 
@@ -108,6 +125,8 @@ class VirtualSmoothie(object):
             if axis in arguments:
                 self.speed['plunger'][axis.lower()] = arguments[axis]
 
+        if axis_hit:
+            return 'ok\n{"limit":"' + axis_hit + '"}'
         return 'ok'
 
     def process_get_position(self, arguments):
@@ -152,6 +171,9 @@ class VirtualSmoothie(object):
     def process_dwell_command(self, arguments):
         return 'ok'
 
+    def process_nop(self, arguments):
+        return 'ok'
+
     def insert_response(self, message):
         messages = message.split('\n')
         self.responses = list(reversed(messages)) + self.responses
@@ -160,6 +182,8 @@ class VirtualSmoothie(object):
         parsed_command = self.parse_command(command)
 
         command_mapping = {
+            'G': self.process_nop,
+            'M': self.process_nop,
             'G0': self.process_move_command,
             'G4': self.process_dwell_command,
             'M114': self.process_get_position,
@@ -178,19 +202,26 @@ class VirtualSmoothie(object):
             arguments = parsed_command['arguments']
             if command in command_mapping:
                 command_func = command_mapping[command]
+                log.debug(
+                    'Virtual Smoothie',
+                    'Processing {} calling {}'.format(
+                        parsed_command,
+                        command_func))
                 message = command_func(arguments)
                 self.insert_response(message)
             else:
-                print('Command {} is not supported'.format(command))
-                self.insert_response('ok')
+                log.error(
+                    'Virtual Smoothie',
+                    'Command {} is not supported'.format(command))
 
     def write(self, data):
-        command = str(data)
+        if not isinstance(data, str):
+            data = data.decode('utf-8')
         # make async later
-        self.process_command(command)
+        self.process_command(data)
 
     def readline(self):
         if len(self.responses) > 0:
-            return self.responses.pop()
+            return self.responses.pop().encode('utf-8')
         else:
-            return ''
+            return b''

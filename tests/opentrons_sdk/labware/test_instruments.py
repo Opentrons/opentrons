@@ -12,6 +12,9 @@ class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset()
+        self.robot.connect()
+        self.robot.home()
+
         # self.robot.connect(port='/dev/tty.usbmodem1421')
         # self.robot.home()
 
@@ -86,7 +89,7 @@ class PipetteTest(unittest.TestCase):
             expected_calibration_data)
 
     def test_aspirate_move_to(self):
-        x, y, z = (161.0, 416.7, 3.0)
+        x, y, z = (161.0, 116.7, 3.0)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
@@ -99,10 +102,10 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
-
+        print(current_pos)
         self.assertEquals(
             current_pos,
-            Vector({'x': 161.0, 'y': 416.7, 'z': 3.0})
+            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
         )
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
@@ -126,11 +129,18 @@ class PipetteTest(unittest.TestCase):
         self.p200.dispense(100, location)
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        driver = self.robot._driver
+
+        current_plunger_pos = driver.get_plunger_positions()['current']
+        current_head_pos = driver.get_head_position()['current']
 
         self.assertDictEqual(
-            current_pos,
-            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 10.0}
+            current_head_pos,
+            Vector({'x': 161.0, 'y': 416.7, 'z': 3.0})
+        )
+        self.assertDictEqual(
+            current_plunger_pos,
+            {'a': 0, 'b': 10.0}
         )
 
     def test_blow_out_move_to(self):
@@ -186,11 +196,11 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
 
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 5.0}
+            {'a': 0, 'b': 5.0}
         )
 
     def test_non_empty_aspirate(self):
@@ -199,20 +209,20 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate(20)
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 4.0}
+            {'a': 0, 'b': 4.0}
         )
 
     def test_aspirate_no_args(self):
         self.p200.aspirate()
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
+            {'a': 0, 'b': 0.0}
         )
 
     def test_invalid_aspirate(self):
@@ -225,10 +235,10 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 6.0}
+            {'a': 0, 'b': 6.0}
         )
 
     def test_dispense_no_args(self):
@@ -237,10 +247,10 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 10.0}
+            {'a': 0, 'b': 10.0}
         )
 
     def test_invalid_dispense(self):
@@ -253,10 +263,10 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 12.0}
+            {'a': 0, 'b': 12.0}
         )
 
     def test_drop_tip(self):
@@ -265,10 +275,10 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0.0}
+            {'a': 0, 'b': 0.0}
         )
 
     def test_delay(self):
