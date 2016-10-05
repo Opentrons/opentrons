@@ -53,7 +53,8 @@ module.exports = {
     alias: {
       vue: 'vue/dist/vue.js'
     }
-  }
+  },
+  target: "electron"
 }
 
 if (process.env.NODE_ENV === 'production') {
