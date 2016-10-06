@@ -96,36 +96,35 @@ table {
 Static Screens
 ************************/
 
-.connect,
-.upload {
-    @include grid-col-full(24);
-    flex-direction: column;
-    text-align: center;
-    ul {
-        @include rect(24, 8);
-    }
-    #uploadFile {
-        @include offset(10, 10);
-    }
-    .fileUpload {
-        @include offset(10, 10);
-        @include offset-v(1, 7);
-    }
-    nav {
-        @include offset-v(1, 1);
-        display: flex;
-        justify-content: space-between;
-        a {
-            @include btn-col-f(4);
-            font-size: 15px;
-            outline: 1px solid $primary-link;
-            &.first {
-                @include offset(20, 0);
-            }
-        }
-    }
-}
-
+// .connect,
+// .upload {
+//     @include grid-col-full(24);
+//     flex-direction: column;
+//     text-align: center;
+//     ul {
+//         @include rect(24, 8);
+//     }
+//     #uploadFile {
+//         @include offset(10, 10);
+//     }
+//     .fileUpload {
+//         @include offset(10, 10);
+//         @include offset-v(1, 7);
+//     }
+//     nav {
+//         @include offset-v(1, 1);
+//         display: flex;
+//         justify-content: space-between;
+//         a {
+//             @include btn-col-f(4);
+//             font-size: 15px;
+//             outline: 1px solid $primary-link;
+//             &.first {
+//                 @include offset(20, 0);
+//             }
+//         }
+//     }
+// }
 
 /************************
 Wizard Screens
@@ -151,8 +150,31 @@ Wizard Screens
         .step {
             display: flex;
             flex-wrap: wrap;
-            min-height: 400px;
+            min-height: 480px;
             //max-height: 400px;
+        }
+        .step-connect {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            div.connect {
+                @include rect(8, 1);
+                display: flex;
+                justify-content: center;
+                text-align: center;
+                select {
+                    background: $primary-brand;
+                    border-radius: 0px;
+                    border: none;
+                    -webkit-appearance: none;
+                    outline: none;
+                    color: white;
+                    @include btn-col-a(4);
+                    padding-left: $gutter-width*2;
+                    color: white;
+                }
+            }
         }
         .step-error,
         .step-upload {
@@ -334,9 +356,7 @@ Pipette
         input {
             text-align: center;
             @include grid-col-air(1);
-
             outline: none;
-
             background: lighten($primary-brand, 40%);
         }
     }
@@ -375,7 +395,8 @@ Pop-up Modal Styles
         @include grid-col-full(6);
         @include offset(3, 3);
     }
-    p, ul li {
+    p,
+    ul li {
         @include grid-col-full(12);
         @include offset(2, 2);
         text-align: left;

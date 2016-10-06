@@ -1,21 +1,27 @@
 <template>
-  <div>
-    <nav class="robot">
-      <span>connect to robot</span>
-      <br>
-       {{ message }}
-      <br>
-      <select v-model="selected_port">
-        <option v-for="p in ports">{{ p }}</option>
-      </select>
-      the selected port is: {{ selected_port}}
-
-      <br>
-      <br>
-      <a @click="connectToRobot" class="btn-connect">Connect!</a>
-    </nav>
+  <section>
+    <h2 class="title">Connect to Robot</h2>
+      <div class="instructions">
+          Please make sure that your computer is connected to the robot, and your machine is plugged in and turned on before continuing.
+      </div>
+      <div class="step step-connect">
+      <div class="connect">
+          <select v-model="selected_port" class="ports">
+            <option v-for="p in ports">{{ p }}</option>
+          </select>    
+       
+      <span v-show="connected">The selected port is: {{selected_port}}</span>
+      <a @click="connectToRobot" v-show="selected_port"class="btn-connect">Connect!</a>
+      </div>
+    </div>
     <!-- TODO: Add component for navigation (especially next) -->
-  </div>
+    <nav>
+        <a href="#" class="prev first">Prev</a>
+        <!-- <a href="#info" class="help">?</a> -->
+        <a href="#" class="next" v-show="connected">Next</a>
+    </nav>
+    <!-- End Nav Component -->
+  </section>
 </template>
 
 
@@ -25,7 +31,7 @@
       return {
           message: "Let's connect",
           connected: false,
-          selected_port: "",
+          selected_port: null,
           ports: []
       }
     },
