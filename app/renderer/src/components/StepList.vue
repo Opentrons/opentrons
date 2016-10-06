@@ -1,6 +1,8 @@
 <template>
   <ul>
-    <li :class="{'completed': task.completed}" v-for="task in tasks"><a href="#">{{task.title}}</a></li>
+    <li :class="{'completed': task.completed}" v-for="task in tasks">
+      <router-link v-bind:to="task.href">{{task.title}}</router-link>
+    </li>
   </ul>
 </template>
 
@@ -8,19 +10,24 @@
   function tasks() {
       return [{
           title: 'connect to robot',
-          completed: true
+          completed: true,
+          href: '/'
       }, {
           title: 'upload a protocol',
-          completed: false
+          completed: false,
+          href: '/upload'
       }, {
           title: 'calibrate instruments',
-          completed: false
+          completed: false,
+          href: '/'
       }, {
           title: 'calibrate pipettes',
-          completed: false
+          completed: false,
+          href: '/'
       }, {
           title: 'review calibration',
-          completed: false
+          completed: false,
+          href: '/'
       }]
   }
 
