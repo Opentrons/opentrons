@@ -33,14 +33,10 @@
     </div>
     <div class="wrapper">
       <aside id="step-list">
-        <StepList>
-          <!-- generate routes dynamically in here based on protocol-->
-          <router-link to="/bar">Go to Bar</router-link>
-          <router-link to="/foo">Go to Foo</router-link>
-        </StepList>
+        <StepList></StepList>
       </aside>
       <section id="task-pane">
-        <router-view></router-view>
+        <router-view name="this.$route.params.slug"></router-view>
       </section>
     </div>
   </div>
