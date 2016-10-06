@@ -45,6 +45,7 @@
 
 <script>
 import StepList from './StepList.vue'
+import Upload from './Upload.vue'
 
 export default {
   data () {
