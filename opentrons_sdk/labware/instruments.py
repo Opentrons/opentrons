@@ -177,8 +177,8 @@ class Pipette(object):
         def _do():
             # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, absolute=False)
-                self.robot.move_head(z=tip_plunge, absolute=False)
+                self.robot.move_head(z=-tip_plunge, mode='relative')
+                self.robot.move_head(z=tip_plunge, mode='relative')
 
             self.plunger.wait_for_arrival()
             self.robot.home('z')

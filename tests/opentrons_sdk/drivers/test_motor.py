@@ -84,3 +84,21 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.move_head(x=100, y=100, z=100)
         self.motor.move_head(x=0, mode='relative')
         self.motor.move_head(x=100, mode='absolute')
+
+    def test_calibrate_steps_per_mm(self):
+        self.motor.home()
+        self.motor.set_steps_per_mm('x', 80.0)
+        self.motor.set_steps_per_mm('y', 80.0)
+        self.motor.move_head(x=200, y=200)
+
+        self.motor.calibrate_steps_per_mm('x', 200, 198)
+        self.motor.calibrate_steps_per_mm('y', 200, 202)
+
+        new_x_steps = self.motor.get_steps_per_mm('x')
+        new_y_steps = self.motor.get_steps_per_mm('y')
+
+        exptected_x = round((200 / 198) * 80.0, 2)
+        exptected_y = round((200 / 202) * 80.0, 2)
+
+        self.assertEquals(exptected_x, new_x_steps)
+        self.assertEquals(exptected_y, new_y_steps)
