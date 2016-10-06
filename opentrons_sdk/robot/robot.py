@@ -85,9 +85,7 @@ class Robot(object):
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
         """
-        connection =  self._driver.connect(device=port)
-        self._driver.resume()
-        return connection
+        return self._driver.connect(device=port)
 
     def home(self, *args):
         if self._driver.calm_down():
@@ -135,7 +133,7 @@ class Robot(object):
                 self._driver.move_head(x=coordinates[0], y=coordinates[1])
                 self._driver.move_head(z=coordinates[2])
             else:
-                self._driver.move(
+                self._driver.move_head(
                     x=coordinates[0],
                     y=coordinates[1],
                     z=coordinates[2])

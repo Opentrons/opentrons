@@ -143,7 +143,7 @@ class Pipette(object):
             for i in range(repetitions):
                 self.dispense(volume)
                 self.aspirate(volume)
-            self.motor.wait_for_arrival()
+            self.plunger.wait_for_arrival()
 
         description = "Mixing {0} times with a volume of {1}mm".format(repetitions, str(self.current_volume))
         self.robot.add_command(Command(do=_do, description=description))
