@@ -6,7 +6,6 @@ config = {
     'author_email': 'info@opentrons.com',
     'url': 'http://opentrons.com',
     'version': '1.0',
-    'install_requires': ['pyyaml', 'pyserial'],
     'packages': find_packages(exclude=["tests"]),
     'package_data': {
         "opentrons_sdk": [
