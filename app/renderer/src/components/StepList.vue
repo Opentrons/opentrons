@@ -11,7 +11,7 @@
       return [{
           title: 'connect to robot',
           completed: true,
-          href: '/'
+          href: '/connect'
       }, {
           title: 'upload a protocol',
           completed: false,

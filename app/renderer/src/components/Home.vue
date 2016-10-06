@@ -7,11 +7,6 @@
             <li>{{ message }}</li>
           </ul>
         </nav>
-        <nav class="robot">
-          <span>connect to robot</span>
-          <input type="text" id="connect_port" value="/dev/tty.usbmodem1421" />
-          <a href="#" class="btn-connect" id="connect_serial">Connect Serial</a>
-        </nav>
       </header>
     </div>
     <div class="nav-full-light">
@@ -48,9 +43,6 @@ import StepList from './StepList.vue'
 import Upload from './Upload.vue'
 
 export default {
-  components: {
-    Upload
-  },
   data () {
     return {
       message: 'wooooah'
