@@ -255,24 +255,24 @@ class CNCDriver(object):
         vector = {
             axis: kwargs.get(
                 axis,
-                0 if mode == 'relative' else current['current'][axis]
+                0 if mode == 'relative' else current['target'][axis]
             )
             for axis in 'xyz'
         }
         log.debug('Motor Driver', 'Destination: {}'.format(vector))
 
-        vector = self.flip_coordinates(vector)
+        vector = self.flip_coordinates(vector, mode)
         args = {
             axis.upper(): vector[axis]
-            for axis in 'xyz'}
+            for axis in 'xyz' if axis in kwargs}
 
         log.debug("MotorDriver", "Moving head: {}".format(args))
         res = self.send_command(self.MOVE, **args)
         return res == b'ok'
 
-    def flip_coordinates(self, coordinates, absolute=True):
+    def flip_coordinates(self, coordinates, mode='absolute'):
         coordinates = Vector(coordinates) * Vector(1, -1, -1)
-        if absolute:
+        if mode == 'absolute':
             offset = Vector(0, 1, 1) * self.ot_one_dimensions[self.ot_version]
             coordinates += offset
         return coordinates
@@ -340,8 +340,8 @@ class CNCDriver(object):
 
     def get_head_position(self):
         coords = self.get_position()
-        for state in ['current', 'target']:
-            coords[state] = self.flip_coordinates(Vector(coords[state]))
+        coords['current'] = self.flip_coordinates(Vector(coords['current']))
+        coords['target'] = self.flip_coordinates(Vector(coords['target']))
 
         return coords
 
@@ -376,6 +376,12 @@ class CNCDriver(object):
 
         return coords
 
+    def calibrate_steps_per_mm(self, axis, expected_travel, actual_travel):
+        current_steps_per_mm = self.get_steps_per_mm(axis)
+        current_steps_per_mm *= (expected_travel / actual_travel)
+        current_steps_per_mm = round(current_steps_per_mm, 2)
+        return self.set_steps_per_mm(axis, current_steps_per_mm)
+
     def set_head_speed(self, rate):
         speed_command = self.SET_SPEED
         res = self.send_command(speed_command + "F" + str(rate))
@@ -388,17 +394,22 @@ class CNCDriver(object):
 
     def get_ot_version(self):
         res = self.send_command(self.GET_OT_VERSION)
-        self.ot_version = res.decode().split(' ')[-1]
+        res = res.decode().split(' ')[-1]
+        if res not in self.ot_one_dimensions:
+            raise ValueError('{} is not an ot_version'.format(res))
+        self.ot_version = res
         return self.ot_version
 
     def get_steps_per_mm(self, axis):
-        if axis in self.GET_STEPS_PER_MM:
-            res = self.send_command(self.GET_STEPS_PER_MM[axis])
-            return float(res.decode().split(' ')[-1])
+        if axis not in self.GET_STEPS_PER_MM:
+            raise ValueError('Axis {} not supported'.format(axis))
+        res = self.send_command(self.GET_STEPS_PER_MM[axis])
+        return float(res.decode().split(' ')[-1])
 
     def set_steps_per_mm(self, axis, value):
-        if axis in self.SET_STEPS_PER_MM:
-            command = self.SET_STEPS_PER_MM[axis]
-            command += str(value)
-            res = self.send_command(command)
-            return res.decode().split(' ')[-1] == str(value)
+        if axis not in self.SET_STEPS_PER_MM:
+            raise ValueError('Axis {} not supported'.format(axis))
+        command = self.SET_STEPS_PER_MM[axis]
+        command += str(value)
+        res = self.send_command(command)
+        return res.decode().split(' ')[-1] == str(value)

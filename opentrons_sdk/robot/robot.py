@@ -109,7 +109,7 @@ class Robot(object):
         setattr(self, name, commandable)
 
     def move_head(self, *args, **kwargs):
-        self._driver.move(*args, **kwargs)
+        self._driver.move_head(*args, **kwargs)
         self._driver.wait_for_arrival()
 
     def move_to(self, location, instrument=None, create_path=True):
