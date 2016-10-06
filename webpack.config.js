@@ -52,15 +52,9 @@ module.exports = {
   resolve: {
     alias: {
       vue: 'vue/dist/vue.js'
-    },
-   root: [
-     path.resolve(__dirname, 'app'),
-     path.resolve(__dirname, 'node_modules'),
-     path.resolve(__dirname, 'app', 'renderer')
-   ],
-   extensions: ['', '.js', '.scss', '.vue']
+    }
   },
-target: "electron"
+  target: "electron"
 }
 
 if (process.env.NODE_ENV === 'production') {
