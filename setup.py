@@ -12,8 +12,6 @@ config = {
         "opentrons_sdk": [
             "config/containers/**/*.yml",
             "config/containers/legacy_containers.json",
-            "compilers/data/*",
-            "compilers/templates/*"
         ]
     },
     'scripts': [
