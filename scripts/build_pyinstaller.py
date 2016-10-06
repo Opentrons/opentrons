@@ -125,16 +125,12 @@ def move_executable_folder(final_exec_dir):
 
 
 def generate_static_css():
-    old_cwd = os.getcwd()
-    server_dir = os.path.join(project_root_dir, 'server')
-    os.chdir(server_dir)
-    compass_process = subprocess.Popen(['compass', 'compile'])
-    compass_process.communicate()
-    if compass_process.returncode != 0:
-        print(script_tab + "ERROR: Compass returned with exit code: %s" %
-              compass_process.returncode)
+    webpack_process = subprocess.Popen(['webpack', '--config', 'webpack.config.js'])
+    webpack_process.communicate()
+    if webpack_process.returncode != 0:
+        print(script_tab + "ERROR: webpack returned with exit code: %s" %
+              webpack_process.returncode)
         return False
-    os.chdir(old_cwd)
     return True
 
 
