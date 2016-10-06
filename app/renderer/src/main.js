@@ -10,8 +10,7 @@ Vue.component('StepList', StepList)
 Vue.component('Upload', Upload)
 
 const routes = [
-  { path: '/uploa', component: Upload }
-  // { path: '/bar', component: Bar }
+  { path: '/upload', component: Upload }
 ]
 
 const router = new VueRouter({
