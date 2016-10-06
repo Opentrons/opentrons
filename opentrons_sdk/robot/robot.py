@@ -54,10 +54,13 @@ class Robot(object):
         robot_self = self
 
         class InstrumentMotor():
-            def move(self, value, speed=None, absolute=True):
+            def move(self, value, speed=None, mode='absolute'):
                 kwargs = {axis: value}
-                return robot_self._driver.move(
-                    speed=speed, absolute=absolute, **kwargs
+                if speed:
+                    self.speed(speed)
+
+                return robot_self._driver.move_plunger(
+                    mode=mode, **kwargs
                 )
 
             def home(self):
@@ -69,10 +72,9 @@ class Robot(object):
             def wait(self, seconds):
                 robot_self._driver.wait(seconds)
 
-            def speed(self, rate, axis):
-                robot_self._driver.speed(rate, axis)
+            def speed(self, rate):
+                robot_self._driver.set_plunger_speed(rate, axis)
                 return self
-
 
         return InstrumentMotor()
 
@@ -89,7 +91,7 @@ class Robot(object):
         return self._driver.connect(device=port)
 
     def home(self, *args):
-        if self._driver.resume():
+        if self._driver.calm_down():
             if not args:
                 self._driver.home('z')
                 return self._driver.home('x', 'y', 'b', 'a')
@@ -130,9 +132,9 @@ class Robot(object):
 
         def _do():
             if create_path:
-                self._driver.move(z=tallest_z)
-                self._driver.move(x=coordinates[0], y=coordinates[1])
-                self._driver.move(z=coordinates[2])
+                self._driver.move_head(z=tallest_z)
+                self._driver.move_head(x=coordinates[0], y=coordinates[1])
+                self._driver.move_head(z=coordinates[2])
             else:
                 self._driver.move(
                     x=coordinates[0],
@@ -211,8 +213,8 @@ class Robot(object):
         robot_rows = self.get_max_robot_rows()
         row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
 
-        for col_index, col in enumerate('EDCBA'):
-            for row_index, row in enumerate(range(robot_rows, 0, -1)):
+        for col_index, col in enumerate('ABCDE'):
+            for row_index, row in enumerate(range(1, robot_rows + 1)):
                 slot = placeable.Slot()
                 slot_coordinates = (
                     (row_offset * row_index) + x_offset,

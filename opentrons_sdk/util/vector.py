@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import math
 
 
 class Vector(object):
@@ -66,12 +67,15 @@ class Vector(object):
             raise ValueError("Expected either a dict/iterable or x, y, z")
 
     def __eq__(self, other):
-        if isinstance(other, dict):
-            return self.coordinates == Vector.coordinates_from_dict(other)
+        if isinstance(other, Vector):
+            return all(
+                [math.isclose(a, b, rel_tol=1e-5)
+                 for a, b in zip(self, other)]
+            )
+        elif isinstance(other, dict):
+            return self == Vector(other)
         elif self.is_iterable(other):
-            return self.coordinates == Vector.coordinates_from_iterable(other)
-        elif isinstance(other, Vector):
-            return self.coordinates == other.to_dictionary()
+            return self == Vector(other)
         else:
             raise ValueError("Expected operand to be dict, iterable or vector")
 

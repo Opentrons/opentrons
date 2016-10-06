@@ -5,6 +5,8 @@ from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.util.vector import Vector
 
+from opentrons_sdk.util import log
+
 from opentrons_sdk.containers.placeable import unpack_location
 
 
@@ -14,9 +16,6 @@ class PipetteTest(unittest.TestCase):
         self.robot = Robot.reset()
         self.robot.connect()
         self.robot.home()
-
-        # self.robot.connect(port='/dev/tty.usbmodem1421')
-        # self.robot.home()
 
         self.trash = containers.load('point', 'A1')
         self.tiprack = containers.load('tiprack-10ul', 'B2')
@@ -69,11 +68,10 @@ class PipetteTest(unittest.TestCase):
         location = (self.plate, pos)
 
         well_deck_coordinates = well.center(well.get_deck())
-        dest = well_deck_coordinates + Vector(1, 1, 1)
-        print('Well deck coordinates: {}'.format(well_deck_coordinates))
-        print('Destination: {}'.format(dest))
+        dest = well_deck_coordinates + Vector(1, 2, 3)
+        log.debug('Unit test', 'Destination: {}'.format(well_deck_coordinates))
 
-        self.robot._driver.move(x=dest['x'], y=dest['y'], z=dest['z'])
+        self.robot._driver.move_head(x=dest['x'], y=dest['y'], z=dest['z'])
 
         self.p200.calibrate_position(location)
 
@@ -94,7 +92,7 @@ class PipetteTest(unittest.TestCase):
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
 
-        self.robot._driver.move(x=x, y=y, z=z)
+        self.robot._driver.move_head(x=x, y=y, z=z)
 
         self.p200.calibrate_position(location)
 
@@ -116,12 +114,12 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_dispense_move_to(self):
-        x, y, z = (161.0, 416.7, 3.0)
+        x, y, z = (161.0, 116.7, 3.0)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
 
-        self.robot._driver.move(x=x, y=y, z=z)
+        self.robot._driver.move_head(x=x, y=y, z=z)
 
         self.p200.calibrate_position(location)
 
@@ -134,9 +132,9 @@ class PipetteTest(unittest.TestCase):
         current_plunger_pos = driver.get_plunger_positions()['current']
         current_head_pos = driver.get_head_position()['current']
 
-        self.assertDictEqual(
+        self.assertEquals(
             current_head_pos,
-            Vector({'x': 161.0, 'y': 416.7, 'z': 3.0})
+            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
         )
         self.assertDictEqual(
             current_plunger_pos,
@@ -144,12 +142,12 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_blow_out_move_to(self):
-        x, y, z = (161.0, 416.7, 3.0)
+        x, y, z = (161.0, 116.7, 3.0)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
 
-        self.robot._driver.move(x=x, y=y, z=z)
+        self.robot._driver.move_head(x=x, y=y, z=z)
 
         self.p200.calibrate_position(location)
 
@@ -160,7 +158,7 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEquals(
             current_pos,
-            Vector({'x': 161.0, 'y': 416.7, 'z': 3.0})
+            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
         )
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
@@ -171,23 +169,23 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_drop_tip_move_to(self):
-        x, y, z = (161.0, 416.7, 3.0)
+        x, y, z = (161.0, 116.7, 3.0)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
 
-        self.robot._driver.move(x=x, y=y, z=z)
+        self.robot._driver.move_head(x=x, y=y, z=z)
 
         self.p200.calibrate_position(location)
 
         self.p200.drop_tip(location)
         self.robot.run()
 
-        current_pos = self.robot._driver.get_position()['current']
+        current_pos = self.robot._driver.get_head_position()['current']
 
-        self.assertDictEqual(
+        self.assertEquals(
             current_pos,
-            {'x': 161.0, 'y': 416.7, 'z': 3.0, 'a': 0, 'b': 0.0}
+            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
         )
 
     def test_empty_aspirate(self):

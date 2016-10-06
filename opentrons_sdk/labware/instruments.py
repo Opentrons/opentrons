@@ -38,7 +38,7 @@ class Pipette(object):
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.motor = self.robot.get_motor(self.axis)
+        self.plunger = self.robot.get_motor(self.axis)
 
         self.calibration_data = {}
         self.placeables = []
@@ -74,9 +74,9 @@ class Pipette(object):
 
         def _do():
             if empty_pipette:
-                self.motor.move(self.positions['bottom'])
-            self.motor.move(distance, absolute=False)
-            self.motor.wait_for_arrival()
+                self.plunger.move(self.positions['bottom'])
+            self.plunger.move(distance, mode='relative')
+            self.plunger.wait_for_arrival()
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -101,8 +101,8 @@ class Pipette(object):
         distance = self.plunge_distance(volume)
 
         def _do():
-            self.motor.move(distance, absolute=False)
-            self.motor.wait_for_arrival()
+            self.plunger.move(distance, mode='relative')
+            self.plunger.wait_for_arrival()
 
         description = "Dispensing {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -115,8 +115,8 @@ class Pipette(object):
             self.robot.move_to(location, self)
 
         def _do():
-            self.motor.move(self.positions['blow_out'])
-            self.motor.wait_for_arrival()
+            self.plunger.move(self.positions['blow_out'])
+            self.plunger.wait_for_arrival()
 
         description = "Blow_out at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -141,7 +141,7 @@ class Pipette(object):
                 self.robot.move_head(z=-tip_plunge, absolute=False)
                 self.robot.move_head(z=tip_plunge, absolute=False)
 
-            self.motor.wait_for_arrival()
+            self.plunger.wait_for_arrival()
             self.robot.home('z')
 
         description = "Picking up tip from {0}".format(str(location))
@@ -153,9 +153,9 @@ class Pipette(object):
             self.robot.move_to(location, self)
 
         def _do():
-            self.motor.move(self.positions['drop_tip'])
-            self.motor.home()
-            self.motor.wait_for_arrival()
+            self.plunger.move(self.positions['drop_tip'])
+            self.plunger.home()
+            self.plunger.wait_for_arrival()
 
         description = "Drop_tip at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -255,17 +255,16 @@ class Pipette(object):
 
     def delay(self, seconds):
         def _do():
-            self.motor.wait(seconds)
+            self.plunger.wait(seconds)
 
         description = "Delaying {} seconds".format(seconds)
         self.robot.add_command(Command(do=_do, description=description))
 
     def set_speed(self, rate):
         self.speed = rate
-        axis = self.axis
 
         def _do():
-            self.motor.speed(rate, axis)
+            self.plunger.speed(rate)
 
         description = "Setting speed to {}mm/second".format(rate)
         self.robot.add_command(Command(do=_do, description=description))

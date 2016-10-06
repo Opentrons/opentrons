@@ -117,7 +117,7 @@ class CNCDriver(object):
 
             log.debug("Serial", "Connected to {}".format(device or port))
 
-            return self.resume()
+            return self.calm_down()
 
         except serial.SerialException as e:
             log.debug(
@@ -149,16 +149,9 @@ class CNCDriver(object):
         G0 X100 Y100
         """
 
-        args = []
-        for key in kwargs:
-            args.append('{0}{1}'.format(key, kwargs[key]))
-
-        command = command + " " + ' '.join(args) + "\r\n"
-
-        response = ''
-
+        args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
+        command = '{} {}\r\n'.format(command, args)
         response = self.write_to_serial(command)
-
         return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
@@ -223,55 +216,66 @@ class CNCDriver(object):
             # TODO (andy): allow this to bubble up so UI is notified
             log.debug('Serial', 'home switch hit')
             self.flush_port()
-            self.resume()
+            self.calm_down()
             raise RuntimeWarning('limit switch hit')
 
         return msg
 
-    def move_plunger(self, positions, absolute=True):
-        code = self.MOVE
-        if absolute:
+    def set_coordinate_system(self, mode):
+        if mode == 'absolute':
             self.send_command(self.ABSOLUTE_POSITIONING)
-        else:
+        elif mode == 'relative':
             self.send_command(self.RELATIVE_POSITIONING)
+        else:
+            raise ValueError('Invalid coordinate mode: ' + mode)
 
-        args = {}
+    def move_plunger(self, mode='absolute', **kwargs):
+        if 'absolute' in kwargs:
+            raise ValueError('absolute parameter is obsolete, ' +
+                             'please use mode=(absolute|relative)')
 
-        for axis in 'ab':
-            if axis in positions:
-                args[axis.upper()] = positions[axis]
+        self.set_coordinate_system(mode)
+
+        args = {axis.upper(): kwargs[axis]
+                for axis in 'ab'
+                if axis in kwargs}
 
         log.debug("MotorDriver", "Moving plunger: {}".format(args))
-
-        res = self.send_command(code, **args)
+        res = self.send_command(self.MOVE, **args)
         return res == b'ok'
 
-    def move_head(self, vector, absolute=True):
-        code = self.MOVE
-        if absolute:
-            self.send_command(self.ABSOLUTE_POSITIONING)
-        else:
-            self.send_command(self.RELATIVE_POSITIONING)
+    def move_head(self, mode='absolute', **kwargs):
+        if 'absolute' in kwargs:
+            raise ValueError('absolute parameter is obsolete, ' +
+                             'please use mode=(absolute|relative)')
 
-        coordinates = self.flip_coordinates(vector, absolute=absolute)
+        self.set_coordinate_system(mode)
+        current = self.get_head_position()
+        log.debug('Motor Driver', 'Current Head Position: {}'.format(current))
+        vector = {
+            axis: kwargs.get(
+                axis,
+                0 if mode == 'relative' else current['current'][axis]
+            )
+            for axis in 'xyz'
+        }
+        log.debug('Motor Driver', 'Destination: {}'.format(vector))
 
-        args = {}
-
-        for axis in 'xyz':
-            args[axis.upper()] = coordinates[axis]
+        vector = self.flip_coordinates(vector)
+        args = {
+            axis.upper(): vector[axis]
+            for axis in 'xyz'}
 
         log.debug("MotorDriver", "Moving head: {}".format(args))
-
-        res = self.send_command(code, **args)
+        res = self.send_command(self.MOVE, **args)
         return res == b'ok'
 
     def flip_coordinates(self, coordinates, absolute=True):
-        coordinates = coordinates * Vector(1, -1, -1)
+        coordinates = Vector(coordinates) * Vector(1, -1, -1)
         if absolute:
             offset = Vector(0, 1, 1) * self.ot_one_dimensions[self.ot_version]
-            return offset + coordinates
-        else:
-            return coordinates
+            coordinates += offset
+        return coordinates
 
     def wait_for_arrival(self):
         arrived = False
@@ -323,7 +327,7 @@ class CNCDriver(object):
         res = self.send_command(self.HALT)
         return res == b'ok Emergency Stop Requested - reset or M999 required to continue'
 
-    def resume(self):
+    def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         return res == b'ok'
 
@@ -336,20 +340,19 @@ class CNCDriver(object):
 
     def get_head_position(self):
         coords = self.get_position()
-        coords['target'] = Vector(coords['target'])
-        coords['current'] = Vector(coords['current'])
-
-        coords['target'] = self.flip_coordinates(coords['target'])
-        coords['current'] = self.flip_coordinates(coords['current'])
+        for state in ['current', 'target']:
+            coords[state] = self.flip_coordinates(Vector(coords[state]))
 
         return coords
 
     def get_plunger_positions(self):
         coords = self.get_position()
-        plunger_coords = {'target': {}, 'current': {}}
-        for axis in 'ab':
-            plunger_coords['target'][axis] = coords['target'][axis]
-            plunger_coords['current'][axis] = coords['current'][axis]
+        plunger_coords = {}
+        for state in ['current', 'target']:
+            plunger_coords[state] = {
+                axis: coords[state][axis]
+                for axis in 'ab'
+            }
 
         return plunger_coords
 
@@ -373,16 +376,14 @@ class CNCDriver(object):
 
         return coords
 
-    def speed(self, rate, axis=None):
+    def set_head_speed(self, rate):
         speed_command = self.SET_SPEED
+        res = self.send_command(speed_command + "F" + str(rate))
+        return res == b'ok'
 
-        if axis:
-            # AB speeds - per axis
-            res = self.send_command(speed_command + axis + str(rate))
-        else:
-            # XYZ speeds - for all axis
-            res = self.send_command(speed_command + "F" + str(rate))
-
+    def set_plunger_speed(self, rate, axis):
+        speed_command = self.SET_SPEED
+        res = self.send_command(speed_command + axis + str(rate))
         return res == b'ok'
 
     def get_ot_version(self):

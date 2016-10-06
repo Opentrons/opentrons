@@ -25,7 +25,7 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_get_position(self):
         self.motor.home()
-        self.motor.move(x=100)
+        self.motor.move_head(x=100)
         self.motor.wait_for_arrival()
         coords = self.motor.get_head_position()
         expected_coords = {
@@ -44,7 +44,7 @@ class OpenTronsTest(unittest.TestCase):
     def test_limit_hit_exception(self):
         self.motor.home()
         try:
-            self.motor.move(x=-100)
+            self.motor.move_head(x=-100)
             self.motor.wait_for_arrival()
         except RuntimeWarning as e:
             self.assertEqual(str(RuntimeWarning('limit switch hit')), str(e))
@@ -52,15 +52,15 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.home()
 
     def test_move_x(self):
-        success = self.motor.move(x=100)
+        success = self.motor.move_head(x=100)
         self.assertTrue(success)
 
     def test_move_y(self):
-        success = self.motor.move(y=100)
+        success = self.motor.move_head(y=100)
         self.assertTrue(success)
 
     def test_move_z(self):
-        success = self.motor.move(z=30)
+        success = self.motor.move_head(z=30)
         self.assertTrue(success)
 
     def test_send_command(self):
@@ -77,14 +77,13 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_wait_for_arrival(self):
         self.motor.home()
-        self.motor.move(x=200, y=200)
-        self.motor.move(z=30)
+        self.motor.move_head(x=200, y=200)
+        self.motor.move_head(z=30)
         success = self.motor.wait_for_arrival()
         self.assertTrue(success)
 
     def test_move_relative(self):
         self.motor.home()
-        self.motor.move(x=100, y=100, z=100)
-        self.motor.move(x=0, absolute=False)
-        self.motor.move(x=100, absolute=True)
-        print(self.motor.get_head_position())
+        self.motor.move_head(x=100, y=100, z=100)
+        self.motor.move_head(x=0, mode='relative')
+        self.motor.move_head(x=100, mode='absolute')

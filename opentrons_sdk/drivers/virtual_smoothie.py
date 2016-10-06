@@ -206,7 +206,7 @@ class VirtualSmoothie(object):
                     'Virtual Smoothie',
                     'Processing {} calling {}'.format(
                         parsed_command,
-                        command_func))
+                        command_func.__name__))
                 message = command_func(arguments)
                 self.insert_response(message)
             else:
@@ -217,7 +217,7 @@ class VirtualSmoothie(object):
     def write(self, data):
         if not isinstance(data, str):
             data = data.decode('utf-8')
-        # make async later
+        # make it async later
         self.process_command(data)
 
     def readline(self):
