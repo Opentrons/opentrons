@@ -73,6 +73,7 @@
     "babel-preset-es2016": "^6.16.0",
     "electron-debug": "^1.0.1",
     "vue": "^2.0.1",
-    "vue-router": "^2.0.0"
+    "vue-router": "^2.0.0",
+    "vue-resource": "^1.0.3"
   }
 }

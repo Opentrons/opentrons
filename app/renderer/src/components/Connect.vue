@@ -14,6 +14,7 @@
       <br>
       <a @click="connectToRobot" class="btn-connect">Connect!</a>
     </nav>
+    <!-- TODO: Add component for navigation (especially next) -->
   </div>
 </template>
 
@@ -23,31 +24,34 @@
     data:function () {
       return {
           message: "Let's connect",
+          connected: false,
           selected_port: "",
           ports: []
       }
     },
     methods: {
       getPortsList: function () {
-        this.ajaxRequest = true
-        this.$http.get('localhost:8000/ports/list/', function(data, status, request) {
-          console.log('we are getting data...')
-        })
+        this.ports = ["/dev/tty.usbmodem1421", 'B', 'C']
+
+//        this.ajaxRequest = true
+//        this.$http.get('localhost:8000/robot/ports/', function(data, status, request) {
+//          console.log('we are getting data...')
+//        })
+
       },
       connectToRobot: function() {
-          debugger
-        this.$http.get(
-          'localhost:8000/ports/connect/',
-          {port: this.selected_port},
-          function (data, status, request) {
+        let url = 'localhost:8000/robot/connect/'
+        let options = {params: {port: this.selected_port}}
+        this.$http.get(url, options, function (data, status, request) {
+          // TODO: Parse response from backend and either who connected or not connected
             console.log("Tried to connect", data, status, request)
-          })
+        })
       }
     },
     beforeMount: function () {
-        this.ports = ["/dev/tty.usbmodem1421", 'B', 'C']
+        // TODO: USE AJAX request to list of ports from the backend
+        this.getPortsList();
     }
-
   }
 </script>
 
