@@ -21,7 +21,6 @@ const router = new VueRouter({
 window.onload = function() {
   const app = new Vue({
     router,
-    el: "#app",
-    render: h => h(Home)
-  })
+      ...Home
+  }).$mount('#app')
 }

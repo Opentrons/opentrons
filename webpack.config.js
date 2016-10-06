@@ -54,7 +54,7 @@ module.exports = {
       vue: 'vue/dist/vue.js'
     }
   },
-  target: "electron"
+  target: "web"
 }
 
 if (process.env.NODE_ENV === 'production') {
