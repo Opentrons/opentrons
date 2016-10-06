@@ -15,7 +15,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  router: routes
+  routes
 })
 
 window.onload = function() {

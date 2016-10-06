@@ -36,7 +36,7 @@
         <StepList></StepList>
       </aside>
       <section id="task-pane">
-        <router-view name="this.$route.params.slug"></router-view>
+        <router-view></router-view>
       </section>
     </div>
   </div>
