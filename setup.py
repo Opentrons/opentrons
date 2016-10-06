@@ -10,7 +10,6 @@ config = {
     'packages': find_packages(exclude=["tests"]),
     'package_data': {
         "opentrons_sdk": [
-            "config/containers/**/*.yml",
             "config/containers/legacy_containers.json",
         ]
     },
