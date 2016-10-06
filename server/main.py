@@ -29,6 +29,14 @@ socketio = SocketIO(app, async_mode='gevent')
 def welcome():
     return render_template("index.html")
 
+
+@app.route('/dist/<path:filename>')
+def script_loader(filename):
+    root = get_frozen_root() or app.root_path
+    scripts_root_path = os.path.join(root, 'templates', 'dist')
+    return flask.send_from_directory(scripts_root_path, filename)
+
+
 # welcome route for uploading protocol
 @app.route("/upload/<path:path>")
 def upload(path):
