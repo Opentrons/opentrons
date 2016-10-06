@@ -99,7 +99,7 @@ class CNCDriver(object):
     serial_timeout = 0.1
 
     # TODO: move to config
-    ot_version = None
+    ot_version = 'hood'
     ot_one_dimensions = {
         'hood':{
             'x': 300,
@@ -117,6 +117,9 @@ class CNCDriver(object):
             'z': 120
         }
     }
+
+    def get_dimensions(self):
+        return self.ot_one_dimensions[self.ot_version]
 
     def list_serial_ports(self):
         """ Lists serial port names
@@ -300,8 +303,6 @@ class CNCDriver(object):
         return res == b'ok'
 
     def invert_axis(self, axis, value, absolute=True):
-        if not self.ot_version:
-            self.ot_version = 'hood'
         if absolute:
             return self.ot_one_dimensions[self.ot_version][axis] - value
         else:

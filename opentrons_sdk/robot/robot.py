@@ -8,6 +8,8 @@ from opentrons_sdk.util import log
 from opentrons_sdk.containers.placeable import unpack_location
 from opentrons_sdk.containers.calibrator import apply_calibration
 
+from opentrons_sdk.helpers import helpers
+
 
 class Robot(object):
     _commands = None  # []
@@ -72,6 +74,10 @@ class Robot(object):
 
 
         return InstrumentMotor()
+
+    def flip_coordinates(self, coordinates):
+        dimensions = self._driver.get_dimensions()
+        return helpers.flip_coordinates(coordinates, dimensions)
 
     def list_serial_ports(self):
         return self._driver.list_serial_ports()
@@ -207,8 +213,8 @@ class Robot(object):
         robot_rows = self.get_max_robot_rows()
         row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
 
-        for col_index, col in enumerate('EDCBA'):
-            for row_index, row in enumerate(range(robot_rows, 0, -1)):
+        for col_index, col in enumerate('ABCDE'):
+            for row_index, row in enumerate(range(1, robot_rows + 1)):
                 slot = placeable.Slot()
                 slot_coordinates = (
                     (row_offset * row_index) + x_offset,

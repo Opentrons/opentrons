@@ -1,21 +1,26 @@
+import os
+
 from opentrons_sdk import containers
 from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.drivers.motor import CNCDriver
 
+from helpers.calibration import import_json_calibration
+
 robot = Robot.get_instance()
 
 robot._driver = CNCDriver()
 
-plate = containers.load('96-flat', 'A2')
-trash = containers.load('point', 'A1')
-tiprack = containers.load('tiprack-10ul', 'B2')
+plate = containers.load('96-flat', 'A2', 'magbead')
+trash = containers.load('point', 'A1', 'trash')
+tiprack = containers.load('tiprack-200ul', 'B2', 'p200-rack')
 
 # tipracks need a Well height equal to the tip length
 for tip in tiprack:
     tip.properties['height'] = 80
 
 p200 = instruments.Pipette(
+    name="p200",
     trash_container=trash,
     tip_racks=[tiprack],
     min_volume=0.1,  # These are variable
@@ -24,6 +29,13 @@ p200 = instruments.Pipette(
 )
 
 p200.set_max_volume(200)
+
+json_file_path = os.path.join(
+    os.path.dirname(__file__),
+    'pipette_calibrations.json'
+)
+
+import_json_calibration(json_file_path, robot)
 
 while not robot.connect('/dev/tty.usbmodem1411'):
     print('attemping connect...')
