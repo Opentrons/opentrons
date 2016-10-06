@@ -1,4 +1,4 @@
-import copy, time
+import copy
 
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
