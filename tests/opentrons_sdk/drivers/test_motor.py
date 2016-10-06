@@ -13,10 +13,7 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor = CNCDriver()
 
-        self.smoothie_connected = False
-
         myport = ''
-        self.smoothie_connected = True
         success = self.motor.connect(myport)
         self.assertTrue(success)
 

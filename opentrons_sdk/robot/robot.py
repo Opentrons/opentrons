@@ -23,10 +23,7 @@ class Robot(object):
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
 
-        if not driver_instance:
-            driver_instance = motor_drivers.CNCDriver()
-
-        self._driver = driver_instance
+        self._driver = driver_instance or motor_drivers.CNCDriver()
 
     @classmethod
     def get_instance(cls):
@@ -92,11 +89,11 @@ class Robot(object):
 
     def home(self, *args):
         if self._driver.calm_down():
-            if not args:
+            if args:
+                return self._driver.home(*args)
+            else:
                 self._driver.home('z')
                 return self._driver.home('x', 'y', 'b', 'a')
-            else:
-                return self._driver.home(*args)
         else:
             return False
 
