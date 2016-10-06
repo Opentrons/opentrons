@@ -7,6 +7,7 @@ config = {
     'url': 'http://opentrons.com',
     'version': '1.0',
     'packages': find_packages(exclude=["tests"]),
+    'install_requires': ['pyserial==3.1.1'],
     'package_data': {
         "opentrons_sdk": [
             "config/containers/legacy_containers.json",
