@@ -47,20 +47,6 @@ table {
     }
 }
 
-select {
-    background: $primary-brand;
-    border-radius: 1px;
-    border: none;
-    -webkit-appearance: none;
-    outline: none;
-    color: white;
-    @include grid-col-air(4);
-    padding-left: $gutter-width*2;
-    // background-image: url(../img/caret.png);
-    background-repeat: no-repeat;
-    background-position: 95% 50%;
-}
-
 .coords {
     input {
         pointer-events: none;
