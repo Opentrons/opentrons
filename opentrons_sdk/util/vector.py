@@ -1,5 +1,9 @@
 from collections import OrderedDict
-import math
+
+
+# To keep Python 3.4 compatibility
+def isclose(a, b, rel_tol):
+    return abs(a - b) < rel_tol
 
 
 class Vector(object):
@@ -69,7 +73,7 @@ class Vector(object):
     def __eq__(self, other):
         if isinstance(other, Vector):
             return all(
-                [math.isclose(a, b, rel_tol=1e-5)
+                [isclose(a, b, rel_tol=1e-5)
                  for a, b in zip(self, other)]
             )
         elif isinstance(other, dict):
