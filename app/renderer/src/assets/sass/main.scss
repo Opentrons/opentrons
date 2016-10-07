@@ -93,40 +93,6 @@ table {
 
 
 /************************
-Static Screens
-************************/
-
-// .connect,
-// .upload {
-//     @include grid-col-full(24);
-//     flex-direction: column;
-//     text-align: center;
-//     ul {
-//         @include rect(24, 8);
-//     }
-//     #uploadFile {
-//         @include offset(10, 10);
-//     }
-//     .fileUpload {
-//         @include offset(10, 10);
-//         @include offset-v(1, 7);
-//     }
-//     nav {
-//         @include offset-v(1, 1);
-//         display: flex;
-//         justify-content: space-between;
-//         a {
-//             @include btn-col-f(4);
-//             font-size: 15px;
-//             outline: 1px solid $primary-link;
-//             &.first {
-//                 @include offset(20, 0);
-//             }
-//         }
-//     }
-// }
-
-/************************
 Wizard Screens
 ************************/
 
@@ -150,8 +116,7 @@ Wizard Screens
         .step {
             display: flex;
             flex-wrap: wrap;
-            min-height: 480px;
-            //max-height: 400px;
+            min-height: 440px;
         }
         .step-connect {
             flex-direction: column;
@@ -159,10 +124,8 @@ Wizard Screens
             align-items: center;
             text-align: center;
             div.connect {
-                @include rect(8, 1);
-                display: flex;
-                justify-content: center;
-                text-align: center;
+                @include rect(6, 2);
+                @include offset-v(0, 1);
                 select {
                     background: $primary-brand;
                     border-radius: 0px;
@@ -170,13 +133,24 @@ Wizard Screens
                     -webkit-appearance: none;
                     outline: none;
                     color: white;
-                    @include btn-col-a(4);
+                    @include btn-col-a(6);
                     padding-left: $gutter-width*2;
                     background-image: url("../assets/img/caret.png");
                     background-repeat: no-repeat;
                     background-position: 95% 50%;
                     color: white;
                 }
+                .btn-connect {
+                    @include btn-col-a(6);
+                    background-color: $call-to-action;
+                    color: white;
+                }
+            }
+            div.connected {
+                display: flex;
+                justify-content: center;
+                @include rect(19,2);
+                @include offset-v(0, 1);
             }
         }
         .step-error,
