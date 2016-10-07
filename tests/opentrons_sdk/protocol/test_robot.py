@@ -1,6 +1,4 @@
 import unittest
-from unittest.mock import call
-
 
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.placeable import Deck

@@ -23,7 +23,7 @@ legacy_containers_dict = json.load(
 )['containers']
 
 
-def get_legacy_container(container_name : str) -> Container:
+def get_legacy_container(container_name: str) -> Container:
     container_data = legacy_containers_dict.get(container_name)
     if not container_data:
         raise Exception(
@@ -45,7 +45,7 @@ def load_all_legacy_containers():
     return containers
 
 
-def create_container_obj_from_dict(container_data : dict) -> Container:
+def create_container_obj_from_dict(container_data: dict) -> Container:
     """
 
     Example input:

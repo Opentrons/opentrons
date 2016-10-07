@@ -89,7 +89,7 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertEqual(plate['A1'].coordinates(deck), (105, 215, 0))
 
-    def test_get_name(self):
+    def test_get_container_name(self):
         deck = Deck()
         slot = Slot()
         c = Container()
@@ -145,4 +145,3 @@ class PlaceableTestCase(unittest.TestCase):
                     ('<Well B1>', (60.0, 65.0, 50.0)),
                     ('<Container A2>', (50.0, 50.0, 50.0))]
         self.assertListEqual(actual, expected)
-

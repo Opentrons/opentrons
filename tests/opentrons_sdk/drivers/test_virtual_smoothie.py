@@ -89,7 +89,11 @@ class VirtualSmoothieTestCase(unittest.TestCase):
         response = json.loads(response.decode('utf-8'))
         expected_result = {
             "M119": {
-                "min_x":0,"min_y":0,"min_z":0,"min_a":0,"min_b":0}}
+                "min_x": 0,
+                "min_y": 0,
+                "min_z": 0,
+                "min_a": 0,
+                "min_b": 0}}
         self.assertDictEqual(
             response,
             expected_result)
@@ -225,6 +229,3 @@ class VirtualSmoothieTestCase(unittest.TestCase):
             'b': 0.0
         }}
         self.assertDictEqual(response, expected_result)
-
-
-

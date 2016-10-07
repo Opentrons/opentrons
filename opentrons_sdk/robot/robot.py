@@ -148,7 +148,8 @@ class Robot(object):
     def run(self):
         while self._commands:
             command = self._commands.pop(0)
-            if command.description == "Pausing": return
+            if command.description == "Pausing":
+                return
 
             print("Executing:", command.description)
             log.info("Executing:", command.description)
@@ -250,8 +251,9 @@ class Robot(object):
         print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
-        # This method is for API use only - in a user protocol, it will jump the
-        # queue, which is counterintuitive and not very useful.
+        # This method is for API use only - in a user protocol,
+        # it will jump the queue, which is counterintuitive
+        # and not very useful.
         def _do():
             print("Paused")
 
