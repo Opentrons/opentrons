@@ -1,5 +1,11 @@
 # Opentrons API
 
+## Quick Links
+* [Opentrons API in Jupyter]
+* [Hello World API protocol]
+* [Tips and Tricks for API Liquid Handling]
+* [Full API Documentation]
+
 ## Introduction
 Opentrons API is a versatile framework makes it incredibly easy to write protocols and command the robot. Using the API your protocols can be understood by our machines and read or modified by fellow non-programmer scientists. It's also an opportunity for you to learn a little bit Python.
 
@@ -28,7 +34,12 @@ p200.aspirate(100, plate[0].location(position.BOTTOM))
 will aspirate 100, from the bottom of a well.
 
 ## What's next?
-* Get yourself familiar with running [Opentrons API in Jupyter](running_in_jupyter.md).
-* Write your [first API protocol](first_api_protocol.md).
-* Learn some common [tips and tricks for API liquid handling](api_tips_and_tricks.md).
-* Discover [full API documentation](full_documentation.md) for advanced API protocol writing.
+* Get yourself familiar with running [Opentrons API in Jupyter].
+* Write your first [Hello World API protocol].
+* Learn some common [Tips and Tricks for API Liquid Handling].
+* Discover [Full API Documentation] for advanced API protocol writing.
+
+[Opentrons API in Jupyter]: running_in_jupyter.md
+[Hello World API protocol]: hello_world.md
+[Tips and Tricks for API Liquid Handling]: tips_and_tricks.md
+[Full API Documentation]: api_documentation.md
