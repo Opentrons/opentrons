@@ -48,10 +48,10 @@ class CalibratorTestCase(unittest.TestCase):
         my_calibrator = Calibrator()
         new_deck = my_calibrator.apply_calibration(calibration_data, deck)
 
-        self.assertEquals(
+        self.assertEqual(
             new_deck['A1']['tube_rack']['Red'].coordinates(new_deck),
             (13, 18, 3))
-        self.assertEquals(
+        self.assertEqual(
             new_deck['A1']['tube_rack']['Blue'].coordinates(new_deck),
             (24, 19, 4))
 
@@ -117,6 +117,6 @@ class CalibratorTestCase(unittest.TestCase):
 
         # apply calibration data to the original deck and get actual back
         new_deck = my_calibrator.apply_calibration(new_calibration_data, deck)
-        self.assertEquals(
+        self.assertEqual(
             new_deck['A1']['tube_rack']['Red'].center(new_deck),
             current_position)

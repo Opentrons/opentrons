@@ -1,6 +1,4 @@
 import unittest
-from unittest.mock import call
-
 
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.placeable import Deck
@@ -17,13 +15,13 @@ class RobotTest(unittest.TestCase):
         self.robot.move_to((Deck(), (100, 0, 0)))
         self.robot.run()
         position = self.robot._driver.get_head_position()['current']
-        self.assertEquals(position, (100, 0, 0))
+        self.assertEqual(position, (100, 0, 0))
 
     def test_robot_pause_and_resume(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
         self.robot.pause()
         self.robot.move_to((Deck(), (101, 0, 0)))
         self.robot.run()
-        self.assertEquals(len(self.robot._commands), 2)
+        self.assertEqual(len(self.robot._commands), 2)
         self.robot.resume()
-        self.assertEquals(len(self.robot._commands), 0)
+        self.assertEqual(len(self.robot._commands), 0)

@@ -18,8 +18,8 @@ class ProtocolTestCase(unittest.TestCase):
         containers_list = self.robot.containers()
         self.assertEqual(len(containers_list), 2)
 
-        self.assertEquals(self.robot._deck['A1']['myPlate'], plate)
-        self.assertEquals(self.robot._deck['B2']['tiprack-10ul'], tiprack)
+        self.assertEqual(self.robot._deck['A1']['myPlate'], plate)
+        self.assertEqual(self.robot._deck['B2']['tiprack-10ul'], tiprack)
 
         self.assertTrue(plate in containers_list)
         self.assertTrue(tiprack in containers_list)

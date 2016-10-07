@@ -1,7 +1,6 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
-import math
 
 
 class Pipette(object):
@@ -139,13 +138,16 @@ class Pipette(object):
 
     def mix(self, repetitions=3):
         volume = self.current_volume
+
         def _do():
             for i in range(repetitions):
                 self.dispense(volume)
                 self.aspirate(volume)
             self.plunger.wait_for_arrival()
 
-        description = "Mixing {0} times with a volume of {1}mm".format(repetitions, str(self.current_volume))
+        description = "Mixing {0} times with a volume of {1}mm".format(
+            repetitions, str(self.current_volume)
+        )
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
@@ -202,9 +204,10 @@ class Pipette(object):
         return self
 
     def calibrate(self, position):
-        current = self.robot._driver.get_plunger_position()['current'][self.axis]
+        current_position = self.robot._driver.get_plunger_position()
+        current_position = current_position['current'][self.axis]
         kwargs = {}
-        kwargs[position] = current
+        kwargs[position] = current_position
         self.calibrate_plunger(**kwargs)
 
     def calibrate_plunger(
