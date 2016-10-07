@@ -191,13 +191,13 @@ class Pipette(object):
     def touch_tip(self, location=None):
         if location:
             self.robot.move_to(location, instrument=self)
+        else:
+            location = self.placeables[-1]
 
-        last_well = self.placeables[-1]
-
-        self.go_to((last_well, last_well.from_center(x=1, y=0, z=1)))
-        self.go_to((last_well, last_well.from_center(x=-1, y=0, z=1)))
-        self.go_to((last_well, last_well.from_center(x=0, y=1, z=1)))
-        self.go_to((last_well, last_well.from_center(x=0, y=-1, z=1)))
+        self.go_to((location, location.from_center(x=1, y=0, z=1)))
+        self.go_to((location, location.from_center(x=-1, y=0, z=1)))
+        self.go_to((location, location.from_center(x=0, y=1, z=1)))
+        self.go_to((location, location.from_center(x=0, y=-1, z=1)))
 
     def pick_up_tip(self, location=None):
 
