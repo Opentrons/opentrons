@@ -12,7 +12,7 @@ If you have finished setting up Python 3 (if your computer didn't have it) and y
 ## To launch Jupyter Notebook App:
 
 1. Click on spotlight, type terminal to open a terminal window.
-2. Enter the startup folder by typing cd /some_folder_name.
+2. Create and Enter the startup folder by typing `mkdir some_folder_name && cd some_folder_name`.
 3. Type jupyter notebook to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
 
 If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
