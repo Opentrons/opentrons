@@ -199,6 +199,8 @@ class Pipette(object):
         self.go_to((location, location.from_center(x=0, y=1, z=1)))
         self.go_to((location, location.from_center(x=0, y=-1, z=1)))
 
+        return self
+
     def pick_up_tip(self, location=None):
 
         if location:
@@ -293,6 +295,7 @@ class Pipette(object):
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
+        return self
 
     def plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
@@ -335,6 +338,7 @@ class Pipette(object):
 
         description = "Delaying {} seconds".format(seconds)
         self.robot.add_command(Command(do=_do, description=description))
+        return self
 
     def set_speed(self, rate):
         self.speed = rate
@@ -344,3 +348,5 @@ class Pipette(object):
 
         description = "Setting speed to {}mm/minute".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
+
+        return self
