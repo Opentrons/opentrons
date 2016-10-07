@@ -37,21 +37,31 @@
     },
     methods: {
       getPortsList: function () {
-          // this.ports = ["/dev/tty.usbmodem1421", 'B', 'C']
+        let self = this
         this.ajaxRequest = true
-        this.$http.get('http://localhost:5000/robot/serial/list', function(data, status, request) {
-            console.log('we are getting data...')
-            this.ports = data.ports
-        })
-
+        this.$http
+            .get('http://localhost:5000/robot/serial/list')
+            .then((response) => {
+                console.log(arguments)
+                console.log('we are getting data...')
+                self.ports = response.data.ports
+            }, (response) => {
+                console.log('failed to get serial ports list', response)
+            })
       },
       connectToRobot: function() {
         let url = 'localhost:5000/robot/serial/connect'
         let options = {params: {port: this.selected_port}}
-        this.$http.get(url, options, function (data, status, request) {
-          // TODO: Parse response from backend and either who connected or not connected
-            console.log("Tried to connect", data, status, request)
-        })
+        let self = this
+        this.$http
+            .get('http://localhost:5000/robot/serial/list', options)
+            .then((response) => {
+                console.log(response)
+                console.log('successfully connected...')
+                self.connected = true
+            }, (response) => {
+                console.log('failed to connect', response)
+            })
       }
     },
     beforeMount: function () {
