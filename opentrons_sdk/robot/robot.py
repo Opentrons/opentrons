@@ -1,7 +1,7 @@
 import copy
 
-import opentrons_sdk.drivers.motor as motor_drivers
-from opentrons_sdk.containers import legacy_containers, placeable
+from opentrons_sdk import containers
+from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
 
@@ -19,13 +19,13 @@ class Robot(object):
         self._commands = []
         self._handlers = []
 
-        self._deck = placeable.Deck()
+        self._deck = containers.Deck()
         self.setup_deck()
 
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
 
-        self._driver = driver_instance or motor_drivers.MoveLogger()
+        self._driver = driver_instance or motor_drivers.CNCDriver()
 
     @classmethod
     def get_instance(cls):
@@ -53,10 +53,13 @@ class Robot(object):
         robot_self = self
 
         class InstrumentMotor():
-            def move(self, value, speed=None, absolute=True):
+            def move(self, value, speed=None, mode='absolute'):
                 kwargs = {axis: value}
-                return robot_self._driver.move(
-                    speed=speed, absolute=absolute, **kwargs
+                if speed:
+                    self.speed(speed)
+
+                return robot_self._driver.move_plunger(
+                    mode=mode, **kwargs
                 )
 
             def home(self):
@@ -64,6 +67,13 @@ class Robot(object):
 
             def wait_for_arrival(self):
                 return robot_self._driver.wait_for_arrival()
+
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+            def speed(self, rate):
+                robot_self._driver.set_plunger_speed(rate, axis)
+                return self
 
         return InstrumentMotor()
 
@@ -74,7 +84,7 @@ class Robot(object):
     def list_serial_ports(self):
         return self._driver.list_serial_ports()
 
-    def connect(self, port):
+    def connect(self, port=None):
         """
         Connects the motor to a serial port.
 
@@ -84,13 +94,20 @@ class Robot(object):
         return self._driver.connect(device=port)
 
     def home(self, *args):
-        if self._driver.resume():
-            return self._driver.home(*args)
+        if self._driver.calm_down():
+            if args:
+                return self._driver.home(*args)
+            else:
+                self._driver.home('z')
+                return self._driver.home('x', 'y', 'b', 'a')
         else:
             return False
 
     def add_command(self, command):
         self._commands.append(command)
+
+    def prepend_command(self, command):
+        self._commands = [command] + self._commands
 
     def register(self, name, callback):
         def commandable():
@@ -98,17 +115,17 @@ class Robot(object):
         setattr(self, name, commandable)
 
     def move_head(self, *args, **kwargs):
-        self._driver.move(*args, **kwargs)
+        self._driver.move_head(*args, **kwargs)
         self._driver.wait_for_arrival()
 
     def move_to(self, location, instrument=None, create_path=True):
-        placeable, coordinates = unpack_location(location)
+        placeable, coordinates = containers.unpack_location(location)
         calibration_data = {}
         if instrument:
             calibration_data = instrument.calibration_data
             instrument.placeables.append(placeable)
 
-        coordinates = apply_calibration(
+        coordinates = containers.apply_calibration(
             calibration_data,
             placeable,
             coordinates)
@@ -118,11 +135,11 @@ class Robot(object):
 
         def _do():
             if create_path:
-                self._driver.move(z=tallest_z)
-                self._driver.move(x=coordinates[0], y=coordinates[1])
-                self._driver.move(z=coordinates[2])
+                self._driver.move_head(z=tallest_z)
+                self._driver.move_head(x=coordinates[0], y=coordinates[1])
+                self._driver.move_head(z=coordinates[2])
             else:
-                self._driver.move(
+                self._driver.move_head(
                     x=coordinates[0],
                     y=coordinates[1],
                     z=coordinates[2])
@@ -138,15 +155,17 @@ class Robot(object):
         return copy.deepcopy(self._commands)
 
     def run(self):
-        """
-        A generator that runs each command and yields the current command
-        index and the number of total commands.
-        """
         while self._commands:
             command = self._commands.pop(0)
-            print("Executing: ", command.description)
-            log.debug("Robot", command.description)
-            command.do()
+            if command.description == "Pausing": return
+
+            print("Executing:", command.description)
+            log.info("Executing:", command.description)
+            try:
+                command.do()
+            except KeyboardInterrupt as e:
+                self._driver.halt()
+                raise e
 
     def disconnect(self):
         if self._driver:
@@ -200,7 +219,7 @@ class Robot(object):
 
         for col_index, col in enumerate('ABCDE'):
             for row_index, row in enumerate(range(1, robot_rows + 1)):
-                slot = placeable.Slot()
+                slot = containers.Slot()
                 slot_coordinates = (
                     (row_offset * row_index) + x_offset,
                     (col_offset * col_index) + y_offset,
@@ -231,6 +250,22 @@ class Robot(object):
         return sorted(self._instruments.items())
 
     def add_container(self, slot, container_name, label):
-        container = legacy_containers.get_legacy_container(container_name)
+        container = containers.get_legacy_container(container_name)
         self._deck[slot].add(container, label)
         return container
+
+    def clear(self):
+        self._commands = []
+        print('Robot ready to enqueue and execute new commands')
+
+    def pause(self):
+        # This method is for API use only - in a user protocol, it will jump the
+        # queue, which is counterintuitive and not very useful.
+        def _do():
+            print("Paused")
+
+        description = "Pausing"
+        self.prepend_command(Command(do=_do, description=description))
+
+    def resume(self):
+        self.run()

@@ -1,13 +1,14 @@
 import math
 import numbers
 from collections import OrderedDict
+from opentrons_sdk.util.vector import Vector
 
 
 def unpack_location(location):
     coordinates = None
     placeable = None
     if isinstance(location, Placeable):
-        coordinates = location.from_center(x=0,y=0,z=1)
+        coordinates = location.from_center(x=0, y=0, z=1)
         placeable = location
     elif isinstance(location, tuple):
         placeable, coordinates = location
@@ -15,7 +16,7 @@ def unpack_location(location):
         raise ValueError(
             'Location should be (Placeable, (x, y, z)) or Placeable'
         )
-    return (placeable, coordinates)
+    return (placeable, Vector(coordinates))
 
 
 class Placeable(object):
@@ -102,21 +103,16 @@ class Placeable(object):
         return trace
 
     def coordinates(self, reference=None):
+        if reference == self:
+            return Vector(0, 0, 0)
+
         if not self.parent:
-            return (0, 0, 0)
+            return Vector(0, 0, 0)
 
         if not reference:
             return self.parent.get_child_coordinates(self)
 
-        trace = self.get_trace(reference)
-
-        x, y, z = 0, 0, 0
-        for i in trace:
-            i_x, i_y, i_z = i.coordinates()
-            x += i_x
-            y += i_y
-            z += i_z
-        return (x, y, z)
+        return self.parent.coordinates(reference) + self.coordinates()
 
     def get_child_coordinates(self, child):
         if isinstance(child, Placeable):
@@ -128,7 +124,7 @@ class Placeable(object):
         if child in self.children:
             return self.children[child]['coordinates']
 
-    def add(self, child, name=None, coordinates=(0, 0, 0)):
+    def add(self, child, name=None, coordinates=Vector(0, 0, 0)):
         if not name:
             name = str(child)
         if name in self.children:
@@ -136,7 +132,10 @@ class Placeable(object):
                             .format(name))
 
         child.parent = self
-        self.children[name] = {'instance': child, 'coordinates': coordinates}
+        self.children[name] = {
+            'instance': child,
+            'coordinates': Vector(coordinates)
+        }
 
     def get_deck(self):
         parent = self.parent
@@ -155,7 +154,6 @@ class Placeable(object):
 
         return parent
 
-
     def remove_child(self, name):
         del self.children[name]
 
@@ -167,6 +165,13 @@ class Placeable(object):
 
     def get_child_by_name(self, name):
         return self.children[name]['instance']
+
+    def size(self):
+        return Vector(
+            self.x_size(),
+            self.y_size(),
+            self.z_size()
+        )
 
     def x_size(self):
         return self.properties['width']
@@ -186,34 +191,31 @@ class Placeable(object):
         return children
 
     def max_dimensions(self, reference):
-        children = [(child, child.from_center(x=1, y=1, z=1, reference=reference))
-                    for child in self.get_all_children()]
+        children = [
+            (
+                child,
+                child.from_center(x=1, y=1, z=1, reference=reference)
+            )
+            for child in self.get_all_children()]
 
-        return tuple([max(children, key=lambda a : a[1][axis])
-                    for axis in range(3)])
+        return [max(children, key=lambda a: a[1][axis])
+                for axis in range(3)]
 
     def from_polar(self, r, theta, h):
-        x_center = self.x_size() / 2.0
-        y_center = self.y_size() / 2.0
-        z_center = self.z_size() / 2.0
+        center = self.size() / 2.0
 
-        r = r * x_center
+        r = r * center['x']
 
-        return (x_center + r * math.cos(theta),
-                y_center + r * math.sin(theta),
-                z_center + z_center * h)
+        return center + Vector(r * math.cos(theta),
+                               r * math.sin(theta),
+                               center['z'] * h)
 
     def center(self, reference=None):
         return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
     def from_cartesian(self, x, y, z):
-        x_center = (self.x_size() / 2.0)
-        y_center = (self.y_size() / 2.0)
-        z_center = (self.z_size() / 2.0)
-
-        return (x_center + x_center * x,
-                y_center + y_center * y,
-                z_center + z_center * z)
+        center = self.size() / 2.0
+        return center + center * Vector(x, y, z)
 
     def from_center(self, x=None, y=None, z=None, r=None,
                     theta=None, h=None, reference=None):
@@ -225,15 +227,11 @@ class Placeable(object):
             coords_to_endpoint = self.from_polar(r, theta, h)
 
         deck = self.get_deck()
-
-        coords_to_reference = (0, 0, 0)
+        coords_to_reference = Vector(0, 0, 0)
         if reference:
             coords_to_reference = self.coordinates(reference)
 
-        res = tuple(a + b for a, b in
-                    zip(coords_to_reference, coords_to_endpoint))
-
-        return res
+        return coords_to_reference + coords_to_endpoint
 
 
 class Deck(Placeable):

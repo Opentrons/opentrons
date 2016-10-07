@@ -29,7 +29,7 @@ class LegacyContainersTestCase(unittest.TestCase):
 
     def test_load_all_legacy_containers(self):
         all_legacy_containers = load_all_legacy_containers()
-        self.assertEqual(len(all_legacy_containers), 21)
+        self.assertEqual(len(all_legacy_containers), 28)
 
     def test_create_container_obj_from_dict(self):
         container_data = """{

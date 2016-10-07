@@ -5,51 +5,16 @@ import time
 
 import serial
 
+from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.util import log
+from opentrons_sdk.util.vector import Vector
+
 
 JSON_ERROR = None
 if sys.version_info > (3, 4):
     JSON_ERROR = ValueError
 else:
     JSON_ERROR = json.decoder.JSONDecodeError
-
-class GCodeLogger():
-
-    """
-    GCodeLogger pretends to be a serial connection and logs all the stuff it
-    would send to the serial port instead of actually sending it to a
-    serial port.
-    """
-
-    open = False
-
-    write_buffer = None
-
-    def __init__(self):
-        self.write_buffer = []
-
-    def isOpen(self):
-        return True
-
-    def close(self):
-        self.open = False
-
-    def open(self):
-        self.open = True
-
-    def write(self, data):
-        if self.isOpen() is False:
-            raise IOError("Connection not open.")
-        log.debug('GCodeLogger', 'Writing: {}'.format(data))
-        self.write_buffer.append(data)
-
-    def read(self, data):
-        if self.isOpen() is False:
-            raise IOError("Connection not open.")
-        return None
-
-    def readline(self):
-        return b'ok'
 
 
 class CNCDriver(object):
@@ -64,18 +29,12 @@ class CNCDriver(object):
     SET_POSITION = 'G92'
     GET_POSITION = 'M114'
     GET_ENDSTOPS = 'M119'
-    GET_SPEED = 'M199'
-    ACCELERATION = 'M204'
-    MOTORS_ON = 'M17'
-    MOTORS_OFF = 'M18'
+    SET_SPEED = 'G0'
     HALT = 'M112'
     CALM_DOWN = 'M999'
 
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
-
-    UNITS_TO_INCHES = 'G20'
-    UNITS_TO_MILLIMETERS = 'G22'
 
     VERSION = 'version'
 
@@ -100,21 +59,9 @@ class CNCDriver(object):
     # TODO: move to config
     ot_version = 'hood'
     ot_one_dimensions = {
-        'hood':{
-            'x': 300,
-            'y': 120,
-            'z': 120
-        },
-        'one_pro':{
-            'x': 300,
-            'y': 250,
-            'z': 120
-        },
-        'one_standard':{
-            'x': 300,
-            'y': 250,
-            'z': 120
-        }
+        'hood': Vector(300, 120, 120),
+        'one_pro': Vector(300, 250, 120),
+        'one_standard': Vector(300, 250, 120)
     }
 
     def get_dimensions(self):
@@ -146,14 +93,26 @@ class CNCDriver(object):
                     s.close()
                     result.append(port)
             except Exception as e:
-                log.debug("Serial", 'Exception in testing port {}'.format(port))
+                log.debug(
+                    "Serial",
+                    'Exception in testing port {}'.format(port))
                 log.debug("Serial", e)
         return result
 
     def connect(self, device=None, port=None):
         try:
-
-            self.connection = serial.Serial(port=device or port, baudrate=115200, timeout=self.serial_timeout)
+            if device or port:
+                self.connection = serial.Serial(
+                    port=device or port,
+                    baudrate=115200,
+                    timeout=self.serial_timeout)
+            else:
+                settings = {
+                    'ot_version': 'one_pro',
+                    'alpha_steps_per_mm': 80.0,
+                    'beta_steps_per_mm': 80.0
+                }
+                self.connection = VirtualSmoothie('v1.0.5', settings)
 
             # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
             # so just always swallow it ourselves
@@ -161,11 +120,13 @@ class CNCDriver(object):
 
             log.debug("Serial", "Connected to {}".format(device or port))
 
-            return self.resume()
+            return self.calm_down()
 
         except serial.SerialException as e:
-            log.debug("Serial", "Error connecting to {}".format(device or port))
-            log.error("Serial",e)
+            log.debug(
+                "Serial",
+                "Error connecting to {}".format(device or port))
+            log.error("Serial", e)
             return False
 
     def reset_port(self):
@@ -191,16 +152,9 @@ class CNCDriver(object):
         G0 X100 Y100
         """
 
-        args = []
-        for key in kwargs:
-            args.append('{0}{1}'.format(key, kwargs[key]))
-
-        command = command + " " + ' '.join(args) + "\r\n"
-
-        response = ''
-
+        args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
+        command = '{} {}\r\n'.format(command, args)
         response = self.write_to_serial(command)
-
         return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
@@ -243,9 +197,14 @@ class CNCDriver(object):
         raise RuntimeWarning('no response after {} seconds'.format(timeout))
 
     def flush_port(self):
-        time.sleep(self.serial_timeout)
-        while self.readline_from_serial():
+        # if we are running a virtual smoothie
+        # we don't need a timeout for flush
+        if isinstance(self.connection, VirtualSmoothie):
+            self.readline_from_serial()
+        else:
             time.sleep(self.serial_timeout)
+            while self.readline_from_serial():
+                time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
         msg = b''
@@ -260,52 +219,66 @@ class CNCDriver(object):
             # TODO (andy): allow this to bubble up so UI is notified
             log.debug('Serial', 'home switch hit')
             self.flush_port()
-            self.resume()
+            self.calm_down()
             raise RuntimeWarning('limit switch hit')
 
         return msg
 
-    def move(self, x=None, y=None, z=None, absolute=True, **kwargs):
-
-        code = self.MOVE
-
-        if absolute:
+    def set_coordinate_system(self, mode):
+        if mode == 'absolute':
             self.send_command(self.ABSOLUTE_POSITIONING)
-        else:
+        elif mode == 'relative':
             self.send_command(self.RELATIVE_POSITIONING)
+        else:
+            raise ValueError('Invalid coordinate mode: ' + mode)
 
-        args = {}
+    def move_plunger(self, mode='absolute', **kwargs):
+        if 'absolute' in kwargs:
+            raise ValueError('absolute parameter is obsolete, ' +
+                             'please use mode=(absolute|relative)')
 
-        """
-        Add x, y and z back to the kwargs.  They're omitted when we name them
-        as explicit keyword arguments, but it's much nicer to be able to pass
-        them as anonymous parameters when calling this method.
-        """
-        if x is not None:
-            args['X'] = x
-        if y is not None:
-            args['Y'] = y
-        if z is not None:
-            args['Z'] = z
+        self.set_coordinate_system(mode)
 
-        for k in kwargs:
-            args[k.upper()] = kwargs[k]
+        args = {axis.upper(): kwargs[axis]
+                for axis in 'ab'
+                if axis in kwargs}
 
-        if 'Z' in args:
-            args['Z'] = self.invert_axis('z', args['Z'], absolute=absolute)
-        if 'Y' in args:
-            args['Y'] = self.invert_axis('y', args['Y'], absolute=absolute)
-
-        log.debug("MotorDriver", "Moving: {}".format(args))
-
-        res = self.send_command(code, **args)
+        log.debug("MotorDriver", "Moving plunger: {}".format(args))
+        res = self.send_command(self.MOVE, **args)
         return res == b'ok'
 
-    def invert_axis(self, axis, value, absolute=True):
-        if absolute:
-            return self.ot_one_dimensions[self.ot_version][axis] - value
-        else:
-            return value * -1
+    def move_head(self, mode='absolute', **kwargs):
+        if 'absolute' in kwargs:
+            raise ValueError('absolute parameter is obsolete, ' +
+                             'please use mode=(absolute|relative)')
+
+        self.set_coordinate_system(mode)
+        current = self.get_head_position()
+        log.debug('Motor Driver', 'Current Head Position: {}'.format(current))
+        vector = {
+            axis: kwargs.get(
+                axis,
+                0 if mode == 'relative' else current['target'][axis]
+            )
+            for axis in 'xyz'
+        }
+        log.debug('Motor Driver', 'Destination: {}'.format(vector))
+
+        vector = self.flip_coordinates(vector, mode)
+        args = {
+            axis.upper(): vector[axis]
+            for axis in 'xyz' if axis in kwargs}
+
+        log.debug("MotorDriver", "Moving head: {}".format(args))
+        res = self.send_command(self.MOVE, **args)
+        return res == b'ok'
+
+    def flip_coordinates(self, coordinates, mode='absolute'):
+        coordinates = Vector(coordinates) * Vector(1, -1, -1)
+        if mode == 'absolute':
+            offset = Vector(0, 1, 1) * self.ot_one_dimensions[self.ot_version]
+            coordinates += offset
+        return coordinates
 
     def wait_for_arrival(self):
         arrived = False
@@ -320,7 +293,7 @@ class CNCDriver(object):
                 """
                 smoothie not guaranteed to be EXACTLY where it's target is
                 but seems to be about +-0.05 mm from the target coordinate
-                the robot's physical resolution is found with:  1mm / config_steps_per_mm 
+                the robot's physical resolution is found with:  1mm / config_steps_per_mm
                 """
                 if abs(axis_diff) < 0.1:
                     if coords['current'][axis] == prev_coords['current'][axis]:
@@ -357,7 +330,7 @@ class CNCDriver(object):
         res = self.send_command(self.HALT)
         return res == b'ok Emergency Stop Requested - reset or M999 required to continue'
 
-    def resume(self):
+    def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         return res == b'ok'
 
@@ -368,100 +341,78 @@ class CNCDriver(object):
         res = self.send_command(self.SET_POSITION, **uppercase_args)
         return res == b'ok'
 
+    def get_head_position(self):
+        coords = self.get_position()
+        coords['current'] = self.flip_coordinates(Vector(coords['current']))
+        coords['target'] = self.flip_coordinates(Vector(coords['target']))
+
+        return coords
+
+    def get_plunger_positions(self):
+        coords = self.get_position()
+        plunger_coords = {}
+        for state in ['current', 'target']:
+            plunger_coords[state] = {
+                axis: coords[state][axis]
+                for axis in 'ab'
+            }
+
+        return plunger_coords
+
     def get_position(self):
         res = self.send_command(self.GET_POSITION)
-        res = res.decode('utf-8')[3:] # remove the "ok " from beginning of response
+        # remove the "ok " from beginning of response
+        res = res.decode('utf-8')[3:]
         coords = {}
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
-            coords = {'target':{}, 'current':{}}
+            coords = {'target': {}, 'current': {}}
             for letter in 'xyzab':
                 # the lowercase axis are the "real-time" values
-                coords['current'][letter]  = response_dict.get(letter,0)
+                coords['current'][letter] = response_dict.get(letter, 0)
                 # the uppercase axis are the "target" values
-                coords['target'][letter]  = response_dict.get(letter.upper(),0)
+                coords['target'][letter] = response_dict.get(letter.upper(), 0)
 
-            for axis in 'yz':
-                coords['current'][axis] = self.invert_axis(axis, coords['current'][axis])
-                coords['target'][axis] = self.invert_axis(axis, coords['target'][axis])
-        
-        except JSON_ERROR as e:
+        except JSON_ERROR:
             log.debug("Serial", "Error parsing JSON string:")
             log.debug("Serial", res)
 
         return coords
 
+    def calibrate_steps_per_mm(self, axis, expected_travel, actual_travel):
+        current_steps_per_mm = self.get_steps_per_mm(axis)
+        current_steps_per_mm *= (expected_travel / actual_travel)
+        current_steps_per_mm = round(current_steps_per_mm, 2)
+        return self.set_steps_per_mm(axis, current_steps_per_mm)
+
+    def set_head_speed(self, rate):
+        speed_command = self.SET_SPEED
+        res = self.send_command(speed_command + "F" + str(rate))
+        return res == b'ok'
+
+    def set_plunger_speed(self, rate, axis):
+        speed_command = self.SET_SPEED
+        res = self.send_command(speed_command + axis + str(rate))
+        return res == b'ok'
+
     def get_ot_version(self):
         res = self.send_command(self.GET_OT_VERSION)
-        self.ot_version = res.decode().split(' ')[-1]
+        res = res.decode().split(' ')[-1]
+        if res not in self.ot_one_dimensions:
+            raise ValueError('{} is not an ot_version'.format(res))
+        self.ot_version = res
         return self.ot_version
 
     def get_steps_per_mm(self, axis):
-        if axis in self.GET_STEPS_PER_MM:
-            res = self.send_command(self.GET_STEPS_PER_MM[axis])
-            return float(res.decode().split(' ')[-1])
+        if axis not in self.GET_STEPS_PER_MM:
+            raise ValueError('Axis {} not supported'.format(axis))
+        res = self.send_command(self.GET_STEPS_PER_MM[axis])
+        return float(res.decode().split(' ')[-1])
 
     def set_steps_per_mm(self, axis, value):
-        if axis in self.SET_STEPS_PER_MM:
-            command = self.SET_STEPS_PER_MM[axis]
-            command += str(value)
-            res = self.send_command(command)
-            return res.decode().split(' ')[-1] == str(value)
-
-
-class MoveLogger(CNCDriver):
-
-    """
-    This is one level higher than the G-code; it logs moves whereas the
-    G-code logger logs low-level serial data being written to the physical
-    motor controller.
-
-    We can use this to get a low-level movement command to send off to some
-    other theoretical motor control driver stack, or we can use it for
-    testing.
-    """
-
-    movements = []
-
-    def __init__(self):
-        self.movements = []
-        self.motor = CNCDriver()
-        self.motor.connection = GCodeLogger()
-
-        self.current_coords = {
-            'x': 0,
-            'y': 0,
-            'z': 0,
-            'a': 0,
-            'b': 0
-        }
-
-    def home(self, *axis):
-        for a in axis:
-            self.current_coords[a.lower()] = 0
-        return True
-
-    def move(self, **kwargs):
-        kwargs = dict((k.lower(), v) for k, v in kwargs.items())
-        self.movements.append(kwargs)
-
-        for axis in 'xyzab':
-            if kwargs.get(axis):
-                if kwargs.get('absolute') == False:
-                    self.current_coords[axis] += kwargs[axis]
-                else:
-                    self.current_coords[axis] = kwargs[axis]
-
-        self.motor.move(**kwargs)
-
-    def get_position(self):
-        return {
-            'current': self.current_coords,
-            'target': self.current_coords
-        }
-
-    def isOpen(self):
-        return True
-
-    def write(self, data):
-        pass
+        if axis not in self.SET_STEPS_PER_MM:
+            raise ValueError('Axis {} not supported'.format(axis))
+        command = self.SET_STEPS_PER_MM[axis]
+        command += str(value)
+        res = self.send_command(command)
+        return res.decode().split(' ')[-1] == str(value)
