@@ -9,7 +9,7 @@ To run Jupyter with the OpenTrons SDK you will need to ensure you have Python 3 
 If you have finished setting up Python 3 (if your computer didn't have it) and you have finished going through the Jupyter installation guide it is now time to run Jupyter.
 
 
-## To launch Jupyter Notebook App:
+## Launch Jupyter Notebook App:
 
 1. Click on spotlight, type terminal to open a terminal window.
 2. Create and Enter the startup folder by typing `mkdir some_folder_name && cd some_folder_name`.
