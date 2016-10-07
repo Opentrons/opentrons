@@ -7,7 +7,7 @@
 * [Full API Documentation]
 
 ## Introduction
-Opentrons API is a versatile framework makes it incredibly easy to write protocols and command the robot. Using the API your protocols can be understood by our machines and read or modified by fellow non-programmer scientists. It's also an opportunity for you to learn a little bit Python.
+Opentrons API is a versatile framework makes it incredibly easy to write protocols and command the robot. Using the API your protocols can be understood by our machines and read or modified by fellow non-programmer scientists. It's also an opportunity for you to learn a little bit of Python.
 
 ## Basic Principles
 **Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
