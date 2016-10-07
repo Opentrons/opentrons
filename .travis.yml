@@ -36,9 +36,6 @@ before_install:
   - pip3.4 install -r requirements.txt
   - python3.4 -m unittest
 
-  # Install compass
-  - gem install compass
-
 
 install:
   - node --version

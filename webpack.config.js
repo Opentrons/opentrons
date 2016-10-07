@@ -4,7 +4,8 @@ var webpack = require('webpack')
 module.exports = {
   entry: './app/renderer/src/main.js',
   output: {
-    path: path.resolve(__dirname, './app/renderer/dist'),
+    // path: path.resolve(__dirname, './app/renderer/dist'),
+    path: path.resolve(__dirname, './server/templates/dist'),
     publicPath: '/dist/',
     filename: 'build.js'
   },
@@ -48,6 +49,8 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
+  // headers: { "Access-Control-Allow-Origin": "*" },
+  headers: { "Access-Control-Allow-Origin": "http://localhost:5000", "Access-Control-Allow-Credentials": "true" },
   devtool: '#eval-source-map',
   resolve: {
     alias: {
