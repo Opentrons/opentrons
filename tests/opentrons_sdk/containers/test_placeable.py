@@ -25,9 +25,9 @@ class PlaceableTestCase(unittest.TestCase):
     def test_get_name(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         expected = '<Well A1>'
-        self.assertEquals(str(c['A1']), expected)
+        self.assertEqual(str(c['A1']), expected)
         expected = '<Container>'
-        self.assertEquals(str(c), expected)
+        self.assertEqual(str(c), expected)
 
     def test_iterator(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)

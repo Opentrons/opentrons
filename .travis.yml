@@ -5,6 +5,7 @@ python:
 install: 
   - python setup.py install
   - pip install pylama
-  - pylama
 
-script: nosetests
+script: 
+  - nosetests
+  - pylama

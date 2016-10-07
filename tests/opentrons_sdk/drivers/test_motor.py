@@ -100,5 +100,5 @@ class OpenTronsTest(unittest.TestCase):
         exptected_x = round((200 / 198) * 80.0, 2)
         exptected_y = round((200 / 202) * 80.0, 2)
 
-        self.assertEquals(exptected_x, new_x_steps)
-        self.assertEquals(exptected_y, new_y_steps)
+        self.assertEqual(exptected_x, new_x_steps)
+        self.assertEqual(exptected_y, new_y_steps)

@@ -17,10 +17,14 @@ legacy_containers_json_path = os.path.join(
     'legacy_containers.json'
 )
 
-legacy_containers_dict = json.load(
-    open(legacy_containers_json_path),
-    object_pairs_hook=OrderedDict
-)['containers']
+
+legacy_containers_dict = None
+
+with open(legacy_containers_json_path) as f:
+    legacy_containers_dict = json.load(
+        f,
+        object_pairs_hook=OrderedDict
+    )['containers']
 
 
 def get_legacy_container(container_name: str) -> Container:
