@@ -35,7 +35,7 @@ def import_calibration_json(json_string, robot, calibrated_top=False):
                     lambda child: child.get_name() == name,
                     children))[0]
             z_pos = -1
-            if ('tip' not in name) and calibrated_top:
+            if ('tip' not in name) and ('rack' not in name) and calibrated_top:
                 z_pos = 1
             location = (
                 container,
