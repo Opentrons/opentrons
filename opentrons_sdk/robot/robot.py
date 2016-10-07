@@ -1,12 +1,9 @@
-import copy, time
+import copy
 
-import opentrons_sdk.drivers.motor as motor_drivers
-from opentrons_sdk.containers import legacy_containers, placeable
+from opentrons_sdk import containers
+from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
-
-from opentrons_sdk.containers.placeable import unpack_location
-from opentrons_sdk.containers.calibrator import apply_calibration
 
 
 class Robot(object):
@@ -17,7 +14,7 @@ class Robot(object):
         self._commands = []
         self._handlers = []
 
-        self._deck = placeable.Deck()
+        self._deck = containers.Deck()
         self.setup_deck()
 
         self._ingredients = {}  # TODO needs to be discusses/researched
@@ -109,17 +106,17 @@ class Robot(object):
         setattr(self, name, commandable)
 
     def move_head(self, *args, **kwargs):
-        self._driver.move(*args, **kwargs)
+        self._driver.move_head(*args, **kwargs)
         self._driver.wait_for_arrival()
 
     def move_to(self, location, instrument=None, create_path=True):
-        placeable, coordinates = unpack_location(location)
+        placeable, coordinates = containers.unpack_location(location)
         calibration_data = {}
         if instrument:
             calibration_data = instrument.calibration_data
             instrument.placeables.append(placeable)
 
-        coordinates = apply_calibration(
+        coordinates = containers.apply_calibration(
             calibration_data,
             placeable,
             coordinates)
@@ -213,7 +210,7 @@ class Robot(object):
 
         for col_index, col in enumerate('ABCDE'):
             for row_index, row in enumerate(range(1, robot_rows + 1)):
-                slot = placeable.Slot()
+                slot = containers.Slot()
                 slot_coordinates = (
                     (row_offset * row_index) + x_offset,
                     (col_offset * col_index) + y_offset,
@@ -244,7 +241,7 @@ class Robot(object):
         return sorted(self._instruments.items())
 
     def add_container(self, slot, container_name, label):
-        container = legacy_containers.get_legacy_container(container_name)
+        container = containers.get_legacy_container(container_name)
         self._deck[slot].add(container, label)
         return container
 
