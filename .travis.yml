@@ -2,5 +2,9 @@ sudo: false
 language: python
 python:
   - "3.4"
-install: python setup.py install
+install: 
+  - python setup.py install
+  - pip install pylama
+  - pylama
+
 script: nosetests
