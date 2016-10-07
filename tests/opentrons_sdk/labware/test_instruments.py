@@ -50,7 +50,12 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.aspirate(100, self.plate[0])
 
-        self.assertEquals(self.p200.placeables, [self.plate[0]])
+        expected = [
+            self.plate[0],
+            self.plate[0]
+        ]
+
+        self.assertEquals(self.p200.placeables, expected)
 
     def test_unpack_location(self):
 
@@ -226,7 +231,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_invalid_aspirate(self):
         self.assertRaises(RuntimeWarning, self.p200.aspirate, 500)
-        self.assertRaises(IndexError, self.p200.aspirate, -1)
+        self.assertRaises(IndexError, self.p200.aspirate, 1)
 
     def test_dispense(self):
         self.p200.aspirate(100)

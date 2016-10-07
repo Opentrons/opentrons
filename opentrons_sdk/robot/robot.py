@@ -147,6 +147,11 @@ class Robot(object):
             coordinates)
         self.add_command(Command(do=_do, description=description))
 
+    def move_to_top(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        self.move_to(top_location, instrument, create_path)
+
     @property
     def actions(self):
         return copy.deepcopy(self._commands)
@@ -154,7 +159,8 @@ class Robot(object):
     def run(self):
         while self._commands:
             command = self._commands.pop(0)
-            if command.description == "Pausing": return
+            if command.description == "Pausing":
+                return
 
             print("Executing:", command.description)
             log.info("Executing:", command.description)
