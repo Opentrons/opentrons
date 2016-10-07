@@ -23,7 +23,7 @@ while using 0 or 1 instead of 'A1' and 'A2' will do just the same.
 or
 
 ```python
-p200.aspirate(100, plate[0].position(BOTTOM))
+p200.aspirate(100, plate[0].location(position.BOTTOM))
 ```
 will aspirate 100, from the bottom of a well.
 
