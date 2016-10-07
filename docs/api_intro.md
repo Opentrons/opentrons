@@ -1,8 +1,8 @@
 # Opentrons API
 
 ## Quick Links
-* [Opentrons API in Jupyter]
-* [Hello World API protocol]
+* [Setting up Opentrons API]
+* [Hello World API Protocol]
 * [Tips and Tricks for API Liquid Handling]
 * [Full API Documentation]
 
@@ -34,12 +34,12 @@ p200.aspirate(100, plate[0].location(position.BOTTOM))
 will aspirate 100, from the bottom of a well.
 
 ## What's next?
-* Get yourself familiar with running [Opentrons API in Jupyter].
-* Write your first [Hello World API protocol].
+* Start with [Setting up Opentrons API] in [Jupyter](http://jupyter.org/).
+* Write your first [Hello World API Protocol].
 * Learn some common [Tips and Tricks for API Liquid Handling].
 * Discover [Full API Documentation] for advanced API protocol writing.
 
-[Opentrons API in Jupyter]: running_in_jupyter.md
-[Hello World API protocol]: hello_world.md
+[Setting up Opentrons API]: setting_up_environment.md
+[Hello World API Protocol]: hello_world.md
 [Tips and Tricks for API Liquid Handling]: tips_and_tricks.md
 [Full API Documentation]: api_documentation.md
