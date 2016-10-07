@@ -26,7 +26,6 @@ class LegacyContainersTestCase(unittest.TestCase):
         self.assertEqual(well_1.coordinates(), (13.3 + 0, 17.5 + 0, 0))
         self.assertEqual(well_2.coordinates(), (13.3 + 0, 17.5 + 19.3, 0))
 
-
     def test_load_all_legacy_containers(self):
         all_legacy_containers = load_all_legacy_containers()
         self.assertEqual(len(all_legacy_containers), 28)
@@ -74,4 +73,3 @@ class LegacyContainersTestCase(unittest.TestCase):
 
         self.assertEqual(well_1.coordinates(), (13.3 + 0, 17.5 + 0, 0))
         self.assertEqual(well_2.coordinates(), (13.3 + 0, 17.5 + 19.3, 0))
-

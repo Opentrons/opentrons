@@ -62,11 +62,11 @@ class VirtualSmoothieTestCase(unittest.TestCase):
     def test_set_position(self):
         self.s.write('G92X1Y2.5Z3')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('M114')
         response = self.s.readline()
-        self.assertEquals(response[:3], b'ok ')
+        self.assertEqual(response[:3], b'ok ')
 
         response = json.loads(response[3:].decode('utf-8'))
         expected_result = {'M114': {
@@ -89,31 +89,35 @@ class VirtualSmoothieTestCase(unittest.TestCase):
         response = json.loads(response.decode('utf-8'))
         expected_result = {
             "M119": {
-                "min_x":0,"min_y":0,"min_z":0,"min_a":0,"min_b":0}}
+                "min_x": 0,
+                "min_y": 0,
+                "min_z": 0,
+                "min_a": 0,
+                "min_b": 0}}
         self.assertDictEqual(
             response,
             expected_result)
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
     def test_calm_down(self):
         self.s.write('M999')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
     def test_dwell(self):
         self.s.write('G4 S1 P200')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
     def test_home(self):
         self.s.write('G0X1Y2.5Z3')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('G28X')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         expected_result = {'M114': {
             'X': 0.0,
@@ -130,13 +134,13 @@ class VirtualSmoothieTestCase(unittest.TestCase):
 
         self.s.write('M114')
         response = self.s.readline()
-        self.assertEquals(response[:3], b'ok ')
+        self.assertEqual(response[:3], b'ok ')
 
         response = json.loads(response[3:].decode('utf-8'))
         self.assertDictEqual(response, expected_result)
         self.s.write('G28')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         expected_result = {'M114': {
             'X': 0.0,
@@ -153,7 +157,7 @@ class VirtualSmoothieTestCase(unittest.TestCase):
 
         self.s.write('M114')
         response = self.s.readline()
-        self.assertEquals(response[:3], b'ok ')
+        self.assertEqual(response[:3], b'ok ')
 
         response = json.loads(response[3:].decode('utf-8'))
         self.assertDictEqual(response, expected_result)
@@ -161,28 +165,28 @@ class VirtualSmoothieTestCase(unittest.TestCase):
     def test_limit_switch_hit(self):
         self.s.write('G90')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('G0X-100')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         response = self.s.readline()
-        self.assertEquals(response, b'{"limit":"min_x"}')
+        self.assertEqual(response, b'{"limit":"min_x"}')
 
     def test_move(self):
 
         self.s.write('G90')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('G0X1Y2.5Z3')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('M114')
         response = self.s.readline()
-        self.assertEquals(response[:3], b'ok ')
+        self.assertEqual(response[:3], b'ok ')
 
         response = json.loads(response[3:].decode('utf-8'))
         expected_result = {'M114': {
@@ -201,15 +205,15 @@ class VirtualSmoothieTestCase(unittest.TestCase):
 
         self.s.write('G91')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('G0X1Y1Z-1')
         response = self.s.readline()
-        self.assertEquals(response, b'ok')
+        self.assertEqual(response, b'ok')
 
         self.s.write('M114')
         response = self.s.readline()
-        self.assertEquals(response[:3], b'ok ')
+        self.assertEqual(response[:3], b'ok ')
 
         response = json.loads(response[3:].decode('utf-8'))
         expected_result = {'M114': {
@@ -225,6 +229,3 @@ class VirtualSmoothieTestCase(unittest.TestCase):
             'b': 0.0
         }}
         self.assertDictEqual(response, expected_result)
-
-
-

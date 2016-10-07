@@ -2,8 +2,6 @@ from opentrons_sdk import containers
 from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.drivers.motor import CNCDriver
-import math, time
-import pdb;
 
 robot = Robot.get_instance()
 

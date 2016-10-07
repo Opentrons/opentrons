@@ -226,7 +226,6 @@ class Placeable(object):
         if all([isinstance(i, numbers.Number) for i in (r, theta, h)]):
             coords_to_endpoint = self.from_polar(r, theta, h)
 
-        deck = self.get_deck()
         coords_to_reference = Vector(0, 0, 0)
         if reference:
             coords_to_reference = self.coordinates(reference)
@@ -247,8 +246,7 @@ class Deck(Placeable):
 
 
 class Slot(Placeable):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    pass
 
 
 class Container(Placeable):
@@ -260,6 +258,4 @@ class Container(Placeable):
 
 
 class Well(Placeable):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+    pass
