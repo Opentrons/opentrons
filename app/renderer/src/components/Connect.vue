@@ -37,16 +37,16 @@
     },
     methods: {
       getPortsList: function () {
-        this.ports = ["/dev/tty.usbmodem1421", 'B', 'C']
-
-//        this.ajaxRequest = true
-//        this.$http.get('localhost:8000/robot/ports/', function(data, status, request) {
-//          console.log('we are getting data...')
-//        })
+          // this.ports = ["/dev/tty.usbmodem1421", 'B', 'C']
+        this.ajaxRequest = true
+        this.$http.get('http://localhost:5000/robot/serial/list', function(data, status, request) {
+            console.log('we are getting data...')
+            this.ports = data.ports
+        })
 
       },
       connectToRobot: function() {
-        let url = 'localhost:8000/robot/connect/'
+        let url = 'localhost:5000/robot/serial/connect'
         let options = {params: {port: this.selected_port}}
         this.$http.get(url, options, function (data, status, request) {
           // TODO: Parse response from backend and either who connected or not connected

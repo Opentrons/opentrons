@@ -49,6 +49,8 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
+  // headers: { "Access-Control-Allow-Origin": "*" },
+  headers: { "Access-Control-Allow-Origin": "http://localhost:5000", "Access-Control-Allow-Credentials": "true" },
   devtool: '#eval-source-map',
   resolve: {
     alias: {

@@ -20,9 +20,9 @@ app = Flask(__name__,
             static_folder=STATIC_FOLDER,
             template_folder=TEMPLATES_FOLDER
             )
-
 app.jinja_env.autoescape = False
 socketio = SocketIO(app, async_mode='gevent')
+robot = Robot.get_instance()
 
 # welcome route for connecting to robot
 @app.route("/")
@@ -41,6 +41,31 @@ def script_loader(filename):
 @app.route("/upload/<path:path>")
 def upload(path):
     return render_template("upload.html")
+
+
+@app.route("/robot/serial/list")
+def get_serial_ports_list():
+    return flask.jsonify({
+        'ports': robot.get_serial_ports_list()
+    })
+
+@app.route("/robot/serial/connect")
+def connect_robot():
+    port = flask.request.args.get('port')
+
+    status = 'success'
+    data = None
+
+    try:
+        robot.connect(port=port)
+    except Exception as e:
+        status = 'error'
+        data = str(e)
+
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
 
 
 logging.basicConfig(
