@@ -33,6 +33,8 @@ class CNCDriver(object):
     HALT = 'M112'
     CALM_DOWN = 'M999'
 
+    DISENGAGE_FEEDBACK = 'M63'
+
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
@@ -133,6 +135,8 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         self.flush_port()
+
+        self.turn_off_feedback()
 
         self.get_ot_version()
 
@@ -378,6 +382,14 @@ class CNCDriver(object):
             log.debug("Serial", res)
 
         return coords
+
+    def turn_off_feedback(self):
+        res = self.send_command(self.DISENGAGE_FEEDBACK)
+        if res == b'feedback disengaged':
+            res = self.wait_for_response()
+            return res == b'ok'
+        else:
+            return False
 
     def calibrate_steps_per_mm(self, axis, expected_travel, actual_travel):
         current_steps_per_mm = self.get_steps_per_mm(axis)
