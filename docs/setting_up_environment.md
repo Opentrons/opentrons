@@ -20,11 +20,11 @@ If you have finished setting up Python 3 and you have finished going through the
 
 When the Jupyter Notebook App is launched on your browser, follow these steps to open a `Notebook`
 
-* Navigate towards the `New` dropdown menu button towards the top right hand side of the screen Jupyter Notebook App. Click the `New` menu button and scroll down and click `Python 3`.
+* Navigate towards the `New` dropdown menu button towards the top right hand side of the screen Jupyter Notebook App. Click the `New` menu button and scroll down and click `python [conda root]`.
 
 A new tab should open in your browser and you should have an empty text box.
 
-* Type `print('hello world')` in the text box and press *shift* + *Enter* to execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
+* Type `print('hello world')` in the text box and scroll to the top menu bar and press they `play button` to execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
 
 After running the aforementioned step a new text box will appear for you to write code in. We will use this text box to install the Opentrons API.
 
@@ -32,6 +32,6 @@ After running the aforementioned step a new text box will appear for you to writ
 
 The should execute the installation process of the Opentrons API. The last line of this installation process should say `Successfully installed opentrons-sdk-1.0`
 
-
-
 If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
+
+If you want to learn more about Jupyter Notebook Navigation [check this out](http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb):
