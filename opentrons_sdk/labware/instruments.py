@@ -187,6 +187,17 @@ class Pipette(object):
 
         return self
 
+    def touch_tip(self, location=None):
+        if location:
+            self.robot.move_to(location, instrument=self)
+
+        last_well = self.placeables[-1]
+
+        self.go_to((last_well, last_well.from_center(x=1, y=0, z=1)))
+        self.go_to((last_well, last_well.from_center(x=-1, y=0, z=1)))
+        self.go_to((last_well, last_well.from_center(x=0, y=1, z=1)))
+        self.go_to((last_well, last_well.from_center(x=0, y=-1, z=1)))
+
     def pick_up_tip(self, location=None):
 
         if location:
@@ -329,5 +340,5 @@ class Pipette(object):
         def _do():
             self.plunger.speed(rate)
 
-        description = "Setting speed to {}mm/second".format(rate)
+        description = "Setting speed to {}mm/minute".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
