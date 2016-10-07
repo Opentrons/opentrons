@@ -1,8 +1,8 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
-from opentrons_sdk import containers
 from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.containers.placeable import Placeable
+from opentrons_sdk.util.vector import Vector
 
 
 class Pipette(object):
@@ -82,6 +82,12 @@ class Pipette(object):
 
         # dip the tip into the destination (defaults to bottom of Placeable)
         if location:
+            if isinstance(location, Placeable):
+                # go all the way to the bottom
+                bottom = location.from_center(x=0, y=0, z=-1)
+                # go up 1mm to give space to aspirate
+                bottom += Vector(0, 0, 1)
+                location = (location, bottom)
             self.robot.move_to(location, instrument=self, create_path=False)
 
         # now pull the plunger upwards to aspirate
@@ -184,7 +190,7 @@ class Pipette(object):
     def pick_up_tip(self, location=None):
 
         if location:
-            self.robot.move_to(location, instrument=self)
+            self.robot.move_to_bottom(location, instrument=self)
 
         # TODO: actual plunge depth for picking up a tip
         # varies based on the tip
@@ -207,7 +213,7 @@ class Pipette(object):
 
     def drop_tip(self, location=None):
         if location:
-            self.robot.move_to(location, instrument=self)
+            self.robot.move_to_bottom(location, instrument=self)
 
         def _do():
             self.plunger.move(self.positions['drop_tip'])

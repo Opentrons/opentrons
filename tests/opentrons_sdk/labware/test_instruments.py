@@ -191,7 +191,7 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEquals(
             current_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
+            Vector({'x': 144.3, 'y': 97.0, 'z': 3.0})
         )
 
     def test_empty_aspirate(self):

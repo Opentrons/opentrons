@@ -15,7 +15,8 @@ def flip_coordinates(coordinates, dimensions):
 
     return (x, y_size - y, z_size - z)
 
-def import_calibration_json(json_string, robot):
+
+def import_calibration_json(json_string, robot, calibrated_top=False):
     pipette_calibration = json.loads(json_string)
 
     for axis, data in pipette_calibration.items():
@@ -33,12 +34,15 @@ def import_calibration_json(json_string, robot):
                 filter(
                     lambda child: child.get_name() == name,
                     children))[0]
+            z_pos = -1
+            if ('tip' not in name) and calibrated_top:
+                z_pos = 1
             location = (
                 container,
                 container[0].from_center(
                     x=0,
                     y=0,
-                    z=1,
+                    z=z_pos,
                     reference=container))
             pipette.calibrate_position(
                 location,

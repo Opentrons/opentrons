@@ -149,8 +149,13 @@ class Robot(object):
 
     def move_to_top(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
         self.move_to(top_location, instrument, create_path)
+
+    def move_to_bottom(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        self.move_to(bottom_location, instrument, create_path)
 
     @property
     def actions(self):
