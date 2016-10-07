@@ -1,0 +1,104 @@
+{
+    "a": {
+        "blowout": 21,
+        "bottom": 19,
+        "droptip": 24,
+        "resting": 0,
+        "theContainers": {
+            "magbead": {
+                "rel_x": null,
+                "rel_y": null,
+                "rel_z": null,
+                "x": 80.004,
+                "y": 80.004,
+                "z": 40.0
+            },
+            "p200-rack": {
+                "rel_x": null,
+                "rel_y": null,
+                "rel_z": null,
+                "x": 50.0,
+                "y": 220.0,
+                "z": 120.0
+            },
+            "trash": {
+                "rel_x": 190.0,
+                "rel_y": 100.0,
+                "rel_z": 0.0,
+                "x": 240.0,
+                "y": 260.0,
+                "z": 100.0
+            },
+            "trough": {
+                "rel_x": null,
+                "rel_y": null,
+                "rel_z": null,
+                "x": 50.0,
+                "y": 80.0,
+                "z": 120.0
+            }
+        },
+        "tip_rack_origin": "p201-rack",
+        "tip_racks": [
+            {
+                "container": "p201-rack"
+            }
+        ],
+        "top": 2.5,
+        "trash_container": {
+            "container": "trash"
+        },
+        "volume": 207
+    },
+    "b": {
+        "blowout": 20.2,
+        "bottom": 18.2,
+        "droptip": 22.6,
+        "resting": 0,
+        "theContainers": {
+            "magbead": {
+                "rel_x": 30.004000000000005,
+                "rel_y": -139.99599999999998,
+                "rel_z": -80.0,
+                "x": 80.004,
+                "y": 80.004,
+                "z": 40.0
+            },
+            "p200-rack": {
+                "rel_x": 0.0,
+                "rel_y": 0.0,
+                "rel_z": 0.0,
+                "x": 50.0,
+                "y": 220.0,
+                "z": 120.0
+            },
+            "trash": {
+                "rel_x": 200.0,
+                "rel_y": 60.0,
+                "rel_z": 40.001,
+                "x": 240.0,
+                "y": 260.0,
+                "z": 100.0
+            },
+            "trough": {
+                "rel_x": 0.0,
+                "rel_y": -140.0,
+                "rel_z": 0.0,
+                "x": 50.0,
+                "y": 80.0,
+                "z": 120.0
+            }
+        },
+        "tip_rack_origin": "p200-rack",
+        "tip_racks": [
+            {
+                "container": "p200-rack"
+            }
+        ],
+        "top": 1.8,
+        "trash_container": {
+            "container": "trash"
+        },
+        "volume": 206
+    }
+}

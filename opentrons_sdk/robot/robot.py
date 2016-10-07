@@ -5,6 +5,8 @@ from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
 
+from opentrons_sdk.helpers import helpers
+
 
 class Robot(object):
     _commands = None  # []
@@ -71,6 +73,10 @@ class Robot(object):
                 return self
 
         return InstrumentMotor()
+
+    def flip_coordinates(self, coordinates):
+        dimensions = self._driver.get_dimensions()
+        return helpers.flip_coordinates(coordinates, dimensions)
 
     def list_serial_ports(self):
         return self._driver.list_serial_ports()
@@ -140,6 +146,16 @@ class Robot(object):
             str(placeable),
             coordinates)
         self.add_command(Command(do=_do, description=description))
+
+    def move_to_top(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
+        self.move_to(top_location, instrument, create_path)
+
+    def move_to_bottom(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        self.move_to(bottom_location, instrument, create_path)
 
     @property
     def actions(self):
