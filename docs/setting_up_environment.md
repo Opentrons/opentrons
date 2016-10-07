@@ -24,7 +24,7 @@ When the Jupyter Notebook App is launched on your browser, follow these steps to
 
 A new tab should open in your browser and you should have an empty text box.
 
-* Type `print('hello world')` in the text box and press *shift* + *Enter* to run execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
+* Type `print('hello world')` in the text box and press *shift* + *Enter* to execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
 
 After running the aforementioned step a new text box will appear for you to write code in. We will use this text box to install the Opentrons API.
 
