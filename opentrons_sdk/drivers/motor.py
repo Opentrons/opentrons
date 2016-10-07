@@ -79,7 +79,8 @@ class CNCDriver(object):
         """
         if sys.platform.startswith('win'):
             ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        elif (sys.platform.startswith('linux') or
+              sys.platform.startswith('cygwin')):
             # this excludes your current terminal "/dev/tty"
             ports = glob.glob('/dev/tty[A-Za-z]*')
         elif sys.platform.startswith('darwin'):
@@ -269,6 +270,9 @@ class CNCDriver(object):
         log.debug('Motor Driver', 'Destination: {}'.format(vector))
 
         vector = self.flip_coordinates(vector, mode)
+
+        # vector contains every axis, however we are passing
+        # only those that were supplied in kwargs down to send_command
         args = {
             axis.upper(): vector[axis]
             for axis in 'xyz' if axis in kwargs}
@@ -297,7 +301,8 @@ class CNCDriver(object):
                 """
                 smoothie not guaranteed to be EXACTLY where it's target is
                 but seems to be about +-0.05 mm from the target coordinate
-                the robot's physical resolution is found with:  1mm / config_steps_per_mm
+                the robot's physical resolution is found with:
+                1mm / config_steps_per_mm
                 """
                 if abs(axis_diff) < 0.1:
                     if coords['current'][axis] == prev_coords['current'][axis]:
@@ -316,7 +321,8 @@ class CNCDriver(object):
                 axis_homed += ax
         res = self.send_command(home_command + axis_homed)
         if res == b'ok':
-            # the axis aren't necessarily set to 0.0 values after homing, so force it
+            # the axis aren't necessarily set to 0.0
+            # values after homing, so force it
             pos_args = {}
             for l in axis_homed:
                 pos_args[l] = 0
@@ -332,7 +338,8 @@ class CNCDriver(object):
 
     def halt(self):
         res = self.send_command(self.HALT)
-        return res == b'ok Emergency Stop Requested - reset or M999 required to continue'
+        return res == (b'ok Emergency Stop Requested - '
+                       b'reset or M999 required to continue')
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)

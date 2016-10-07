@@ -267,8 +267,9 @@ class Robot(object):
         print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
-        # This method is for API use only - in a user protocol, it will jump the
-        # queue, which is counterintuitive and not very useful.
+        # This method is for API use only - in a user protocol,
+        # it will jump the queue, which is counterintuitive
+        # and not very useful.
         def _do():
             print("Paused")
 

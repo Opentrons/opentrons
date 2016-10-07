@@ -25,9 +25,9 @@ class PlaceableTestCase(unittest.TestCase):
     def test_get_name(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         expected = '<Well A1>'
-        self.assertEquals(str(c['A1']), expected)
+        self.assertEqual(str(c['A1']), expected)
         expected = '<Container>'
-        self.assertEquals(str(c), expected)
+        self.assertEqual(str(c), expected)
 
     def test_iterator(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
@@ -89,7 +89,7 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertEqual(plate['A1'].coordinates(deck), (105, 215, 0))
 
-    def test_get_name(self):
+    def test_get_container_name(self):
         deck = Deck()
         slot = Slot()
         c = Container()
@@ -145,4 +145,3 @@ class PlaceableTestCase(unittest.TestCase):
                     ('<Well B1>', (60.0, 65.0, 50.0)),
                     ('<Container A2>', (50.0, 50.0, 50.0))]
         self.assertListEqual(actual, expected)
-

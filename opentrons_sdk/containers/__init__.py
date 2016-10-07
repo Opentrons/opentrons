@@ -8,6 +8,15 @@ from opentrons_sdk.containers.placeable import (
 )
 from opentrons_sdk.containers.calibrator import apply_calibration
 
+__all__ = [
+    get_legacy_container,
+    Deck,
+    Slot,
+    Container,
+    Well,
+    unpack_location,
+    apply_calibration]
+
 
 def load(container_name, slot, label=None):
     from opentrons_sdk.robot import Robot

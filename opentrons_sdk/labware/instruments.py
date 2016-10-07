@@ -169,7 +169,8 @@ class Pipette(object):
             self.plunger.wait_for_arrival()
 
         description = "Mixing {0} times with a volume of {1}mm".format(
-            repetitions, str(self.current_volume))
+            repetitions, str(self.current_volume)
+        )
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
@@ -237,9 +238,10 @@ class Pipette(object):
         return self
 
     def calibrate(self, position):
-        current = self.robot._driver.get_plunger_position()['current'][self.axis]
+        current_position = self.robot._driver.get_plunger_position()
+        current_position = current_position['current'][self.axis]
         kwargs = {}
-        kwargs[position] = current
+        kwargs[position] = current_position
         self.calibrate_plunger(**kwargs)
 
     def calibrate_plunger(
