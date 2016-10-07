@@ -41,5 +41,5 @@ will aspirate 100, from the bottom of a well.
 
 [Setting up Opentrons API]: setting_up_environment.md
 [Hello World API Protocol]: hello_world.md
-[Tips and Tricks for API Liquid Handling]: tips_and_tricks.md
+[Tips and Tricks for API Liquid Handling]: api_tips_and_tricks.md
 [Full API Documentation]: api_documentation.md
