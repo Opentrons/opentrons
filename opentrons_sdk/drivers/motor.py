@@ -5,10 +5,10 @@ import time
 
 import serial
 
+from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.util import log
 from opentrons_sdk.util.vector import Vector
 
-from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 
 JSON_ERROR = None
 if sys.version_info > (3, 4):
