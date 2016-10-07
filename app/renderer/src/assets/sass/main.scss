@@ -172,26 +172,34 @@ Wizard Screens
                     color: white;
                     @include btn-col-a(4);
                     padding-left: $gutter-width*2;
+                    background-image: url("../assets/img/caret.png");
+                    background-repeat: no-repeat;
+                    background-position: 95% 50%;
                     color: white;
                 }
             }
         }
         .step-error,
         .step-upload {
-            @include rect(7, 6);
-            @include offset(6, 5);
+            @include rect(7,
+            6);
+            @include offset(6,
+            5);
             flex-direction: column;
             justify-content: center;
             align-content: flex-start;
             text-align: center;
             #uploadFile {
                 @include btn-col-f(5);
-                @include offset(1, 1);
-                @include offset-v(1, 1);
+                @include offset(1,
+                1);
+                @include offset-v(1,
+                1);
             }
             .fileUpload {
                 @include btn-col-f(5);
-                @include offset(1, 1);
+                @include offset(1,
+                1);
             }
         }
         nav {
@@ -230,7 +238,8 @@ Deck|Container
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(7);
-        @include offset(0, 6);
+        @include offset(0,
+        6);
     }
     .deck {
         display: flex;
@@ -241,25 +250,29 @@ Deck|Container
 
 .save-deck {
     @include grid-col-full(8);
-    @include offset(5, 0);
+    @include offset(5,
+    0);
     .coords {
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(8);
-        @include offset-v(0, 1);
+        @include offset-v(0,
+        1);
     }
     .calibration-modal {
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(8);
         .well-img {
-            @include rect(2, 3);
+            @include rect(2,
+            3);
         }
         .update {
             display: flex;
             flex-wrap: wrap;
             @include grid-col-full(6);
-            @include offset-v-air(2, 0);
+            @include offset-v-air(2,
+            0);
             .position {
                 @include grid-col-air(2);
                 text-align: center;
@@ -275,7 +288,8 @@ Pipette
 
 .move-pipette {
     @include grid-col-full(2);
-    @include offset(1, 1);
+    @include offset(1,
+    1);
     .plunger {
         @include grid-col-full(2);
         display: flex;
@@ -284,13 +298,15 @@ Pipette
             display: flex;
             flex-wrap: wrap;
             @include grid-col-full(1);
-            @include offset(1, 0);
+            @include offset(1,
+            0);
         }
         .jog-b {
             display: flex;
             flex-wrap: wrap;
             @include grid-col-full(1);
-            @include offset(0, 1);
+            @include offset(0,
+            1);
         }
     }
     .increment {
@@ -307,7 +323,8 @@ Pipette
         @include grid-col-full(10);
     }
     .pipette-img {
-        @include rect(3, 6);
+        @include rect(3,
+        6);
     }
     .update {
         @include grid-col-full(6);
@@ -319,26 +336,31 @@ Pipette
             line-height: 40px;
         }
         .spacer {
-            @include rect(6, 1);
+            @include rect(6,
+            1);
         }
     }
     .coords {
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(8);
-        @include offset(1, 0);
-        @include offset-v(0, 1);
+        @include offset(1,
+        0);
+        @include offset-v(0,
+        1);
     }
 }
 
 .select-container {
     @include grid-col-full(12);
-    @include offset(1, 0);
+    @include offset(1,
+    0);
     .coords {
         display: flex;
         flex-wrap: wrap;
         @include grid-col-full(8);
-        @include offset-v(0, 1);
+        @include offset-v(0,
+        1);
     }
     .calibration-modal {
         display: flex;
@@ -386,19 +408,22 @@ Pop-up Modal Styles
 }
 
 .infoModal > div {
-    @include rect(16, 12);
+    @include rect(16,
+    12);
     position: relative;
     margin: 10% auto;
     padding: 15px;
     background: #fff;
     .diagram {
         @include grid-col-full(6);
-        @include offset(3, 3);
+        @include offset(3,
+        3);
     }
     p,
     ul li {
         @include grid-col-full(12);
-        @include offset(2, 2);
+        @include offset(2,
+        2);
         text-align: left;
         line-height: $baseline;
     }
