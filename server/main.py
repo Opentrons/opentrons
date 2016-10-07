@@ -46,7 +46,7 @@ def upload(path):
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
     return flask.jsonify({
-        'ports': robot.get_serial_ports_list()
+        'ports': ['aaa'] + robot.get_serial_ports_list()
     })
 
 @app.route("/robot/serial/connect")

@@ -32,33 +32,33 @@
       return {
           message: "Let's connect",
           connected: false,
-          ports: {}
+          ports: {
+              selected: null,
+              options: []
+          }
       }
     },
     methods: {
-      getPortsList: function () {
-        this.ports = {
-                      selected: null,
-                        options: [
-                          { text: 'Select a Port', value: null },
-                          { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' },
-                          { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' }
-                        ]
-                      }
-        let self = this
-        this.ajaxRequest = true
-        this.$http
-            .get('http://localhost:5000/robot/serial/list')
-            .then((response) => {
-                console.log(arguments)
-                console.log('we are getting data...')
-                self.ports = response.data.ports
-            }, (response) => {
-                console.log('failed to get serial ports list', response)
-            })
-      },
+        getPortsList: function () {
+            this.ports = {
+                selected: null,
+                options: [
+                    //Schema: { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' }
+                ]
+            }
+            let self = this
+            this.$http
+                    .get('http://localhost:5000/robot/serial/list')
+                    .then((response) => {
+                        console.log('we are getting data...', response.data)
+                        let ports = ['Select a port'].concat(response.data.ports)
+                        self.ports.selected = ports[0]
+                        self.ports.options = ports.map((port) => ({text: port, value: port}))
+                    }, (response) => {
+                        console.log('failed to get serial ports list', response)
+                    })
+        },
       connectToRobot: function() {
-        let url = 'localhost:5000/robot/serial/connect'
         let options = {params: {port: this.selected_port}}
         let self = this
         this.$http
