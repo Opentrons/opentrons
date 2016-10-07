@@ -6,12 +6,13 @@
       </div>
       <div class="step step-connect">
       <div class="connect">
-          <select v-model="selected_port" class="ports">
-            <option v-for="p in ports">{{ p }}</option>
-          </select>    
-       
-      <span v-show="connected">The selected port is: {{selected_port}}</span>
-      <a @click="connectToRobot" v-show="selected_port"class="btn-connect">Connect!</a>
+          <select v-model="ports.selected" v-show="!connected">
+            <option v-for="option in ports.options" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
+      <span v-show="connected">The selected port is: {{ports.selected}}</span>
+      <button @click="connectToRobot" v-if="ports.selected"class="btn-connect">Connect!</button>
       </div>
     </div>
     <!-- TODO: Add component for navigation (especially next) -->
@@ -31,20 +32,25 @@
       return {
           message: "Let's connect",
           connected: false,
-          selected_port: null,
-          ports: []
+          ports: {}
       }
     },
     methods: {
       getPortsList: function () {
-        this.ports = ["/dev/tty.usbmodem1421", 'B', 'C']
+        this.ports = {
+                      selected: null,
+                        options: [
+                          { text: 'Select a Port', value: null },
+                          { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' },
+                          { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' }
+                        ]
+                      }
+      },
 
-//        this.ajaxRequest = true
+      //        this.ajaxRequest = true
 //        this.$http.get('localhost:8000/robot/ports/', function(data, status, request) {
 //          console.log('we are getting data...')
 //        })
-
-      },
       connectToRobot: function() {
         let url = 'localhost:8000/robot/connect/'
         let options = {params: {port: this.selected_port}}
