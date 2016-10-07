@@ -7,7 +7,7 @@ from opentrons_sdk.labware import instruments
 from opentrons_sdk import containers
 from opentrons_sdk.robot import Robot
 
-from opentrons_sdk.helpers.calibration import import_calibration_file
+from opentrons_sdk.helpers.helpers import import_calibration_file
 
 
 class CalibrationTest(unittest.TestCase):
