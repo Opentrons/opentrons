@@ -64,7 +64,7 @@ class CNCDriver(object):
         'one_standard': Vector(300, 250, 120)
     }
 
-    def list_serial_ports(self):
+    def get_serial_ports_list(self):
         """ Lists serial port names
 
             :raises EnvironmentError:

@@ -76,7 +76,7 @@ class Robot(object):
         return InstrumentMotor()
 
     def list_serial_ports(self):
-        return self._driver.list_serial_ports()
+        return self._driver.get_serial_ports_list()
 
     def connect(self, port=None):
         """
@@ -263,3 +263,6 @@ class Robot(object):
 
     def resume(self):
         self.run()
+
+    def get_serial_ports_list(self):
+        return self._driver.get_serial_ports_list()
