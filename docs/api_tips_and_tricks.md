@@ -1,6 +1,8 @@
 # Quick Examples
 The following examples assume the containers and pipettes:
 ```python
+robot = Robot.get_instance()
+
 tiprack = containers.load('tiprack-200ul', 'A1')
 plate = containers.load('96-flat', 'B1')
 trough = containers.load('trough-12row', 'C1')
@@ -12,7 +14,38 @@ p200 = instruments.Pipette(
     channels=1
 )
 ```
-## Basic Commands
+## Robot Commands
+####Run the virtual-smoothie
+```python
+robot.connect() # creates a virtual-smoothie
+```
+
+####Run on a physical robot
+```python
+robot.list_serial_ports()
+```
+Will print out something like `['/dev/tty.usbmodem1421']`. Use that name in `.connect()` to run on a physical robot
+```
+robot.connect('/dev/tty.usbmodem1421')
+```
+
+####Home the robot
+```python
+robot.home() # homes Z first, then all other axis
+robot.home('ab') # you can also specify the axis
+```
+
+####Clear, create, then run commands
+```python
+robot.clear()        # delets all previously created commands
+
+p200.aspirate(100)   # new commands
+p200.dispense()
+
+robot.run()          # run all commands
+```
+
+## Pipette Commands
 ####Aspirate then dispense in a single well
 
 ```python
