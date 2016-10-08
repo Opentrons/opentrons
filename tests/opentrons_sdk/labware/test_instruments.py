@@ -387,9 +387,9 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(100),
-                mock.call.dispense(100),
-                mock.call.dispense(100)
+                mock.call.dispense(),
+                mock.call.dispense(),
+                mock.call.dispense()
             ]
         )
         self.assertEqual(
