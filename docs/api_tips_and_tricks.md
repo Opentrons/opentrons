@@ -109,6 +109,8 @@ p200.dispense(plate['B2'])
 ####Distribute to entire plate
 
 ```python
+robot.clear()
+
 p200.pick_up_tip(tiprack['A1'])
 
 dispense_volume = 13
@@ -119,6 +121,8 @@ for i in range(95):
   p200.dispense(dispense_volume, plate[i]).touch_tip()
 
 p200.drop_tip(trash)
+
+robot.run()
 ```
 ####Plate mapping
 
@@ -139,6 +143,8 @@ destinations = {
   'H1': {'water': 55, 'sugar': 40, 'purple': 14}
 }
 
+robot.clear()
+
 for source_well, ingredient in sources.items():
   # each ingredient has it's own tip
   p200.pick_up_tip(tiprack[source_well])
@@ -151,6 +157,8 @@ for source_well, ingredient in sources.items():
     p200.dispense(dispense_volume, plate[destination_well])
   # blow out the extra liquid, then save the tip
   p200.blow_out(trash).drop_tip(tiprack[source_well])
+  
+robot.run()
 ```
 
 ####Precision pipetting within a well
