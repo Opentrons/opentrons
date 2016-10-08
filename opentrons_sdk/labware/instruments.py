@@ -57,7 +57,9 @@ class Pipette(object):
 
     def aspirate(self, volume=None, location=None):
 
-        if not volume:
+        if not isinstance(volume, (int, float, complex)):
+            if volume and not location:
+                location = volume
             volume = self.max_volume - self.current_volume
 
         if self.current_volume + volume > self.max_volume:
@@ -106,14 +108,16 @@ class Pipette(object):
 
     def dispense(self, volume=None, location=None):
 
-        if not volume:
-            volume = self.max_volume - self.current_volume
+        if not isinstance(volume, (int, float, complex)):
+            if volume and not location:
+                location = volume
+            volume = self.current_volume
 
         if self.current_volume - volume < 0:
             raise RuntimeWarning(
-                'Pipette cannot dispense {}ul'.
-                format(self.current_volume - volume)
-            )
+                'Pipette cannot dispense {}ul from {}ul'.
+                format(self.current_volume - volume,
+                       self.current_volume))
 
         if location:
             if isinstance(location, Placeable):
