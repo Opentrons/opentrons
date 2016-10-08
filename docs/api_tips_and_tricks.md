@@ -1,5 +1,17 @@
 # Quick Examples
-
+The following examples assume the containers and pipettes:
+```python
+tiprack = containers.load('tiprack-200ul', 'A1')
+plate = containers.load('96-flat', 'B1')
+trough = containers.load('trough-12row', 'C1')
+trash = containers.load('point', 'C2')
+    
+p200 = instruments.Pipette(
+    min_volume=2,
+    axis="b",
+    channels=1
+)
+```
 ## Basic Commands
 ####Aspirate then dispense in a single well
 
