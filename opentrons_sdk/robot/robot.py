@@ -101,6 +101,8 @@ class Robot(object):
             return False
 
     def add_command(self, command):
+        print("Enqueing:", command.description)
+        log.info("Enqueing:", command.description)
         self._commands.append(command)
 
     def prepend_command(self, command):
