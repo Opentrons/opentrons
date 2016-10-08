@@ -94,7 +94,7 @@ for source_well, ingredient in sources.items():
     if p200.current_volume < dispense_volume:
      p200.aspirate(trough[source_well])
     p200.dispense(dispense_volume, plate[destination_well])
-  p200.drop_tip(tiprack[source_well])
+  p200.blow_out(trash).drop_tip(tiprack[source_well])
 ```
 
 ####Precision pipetting within a well
