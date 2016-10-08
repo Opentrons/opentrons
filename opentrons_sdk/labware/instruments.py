@@ -68,7 +68,7 @@ class Pipette(object):
                 .format(self.current_volume + volume)
             )
 
-        self.position_for_aspirate(volume, location)
+        self.position_for_aspirate(location)
 
         distance = self.plunge_distance(volume) * -1
 
@@ -111,7 +111,7 @@ class Pipette(object):
 
         return self
 
-    def position_for_aspirate(self, volume, location=None):
+    def position_for_aspirate(self, location=None):
         if location:
             self.robot.move_to_top(location, instrument=self)
 
@@ -119,7 +119,7 @@ class Pipette(object):
             def _prep_plunger():
                 self.plunger.move(self.positions['bottom'])
 
-            description = "Preparing to aspirate {0}uL".format(volume)
+            description = "Resetting plunger to bottom"
             self.robot.add_command(
                 Command(do=_prep_plunger, description=description))
 
