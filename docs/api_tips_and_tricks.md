@@ -21,10 +21,16 @@ robot.connect() # creates a virtual-smoothie
 ```
 
 ####Run on a physical robot
+List your serial ports
 ```python
-robot.list_serial_ports()
+my_ports = robot.list_serial_ports()
+print(my_ports)
 ```
-Will print out something like `['/dev/tty.usbmodem1421']`. Use that name in `.connect()` to run on a physical robot
+will print...
+```
+[ '/dev/tty.usbmodem1421' ]
+```
+Pass the port name into `.connect()` to connect to a physical robot
 ```
 robot.connect('/dev/tty.usbmodem1421')
 ```
@@ -77,13 +83,6 @@ p200.pick_up_tip(tiprack['B1']).drop_tip(trash)
 p200.aspirate(100, plate['A1']).mix(3)
 ```
 
-####Delay
-
- ```python
-p200.aspirate(110, plate['A1']).delay(2).dispense(10)
-p200.dispense(plate['B2'])
-```
-
 ####Iterating through wells
 
 ```python
@@ -98,6 +97,13 @@ p200.aspirate(100, plate['A1'])
 p200.dispense(30, plate['B1']).dispense(35, plate['B2']).dispense(45, plate['B3'])
 ```
 
+####Delay
+
+```python
+p200.aspirate(110, plate['A1']).delay(2).dispense(10)
+p200.dispense(plate['B2'])
+```
+
 ## Use Cases
 
 ####Distribute to entire plate
@@ -107,6 +113,7 @@ p200.pick_up_tip(tiprack['A1'])
 
 dispense_volume = 13
 for i in range(95):
+  # refill the tip if it's empty
   if p200.current_volume < dispense_volume:
     p200.aspirate(trough['A1])
   p200.dispense(dispense_volume, plate[i]).touch_tip()
@@ -122,23 +129,27 @@ sources = {
   'A3': 'purple'
 }
 destinations = {
-  'A1': {'water': 35, 'sugar': 10, 'sugar': 12},
-  'B1': {'water': 35, 'sugar': 20, 'sugar': 12},
-  'C1': {'water': 35, 'sugar': 30, 'sugar': 12},
-  'D1': {'water': 35, 'sugar': 40, 'sugar': 12},
-  'E1': {'water': 55, 'sugar': 10, 'sugar': 14},
-  'F1': {'water': 55, 'sugar': 20, 'sugar': 14},
-  'G1': {'water': 55, 'sugar': 30, 'sugar': 14},
-  'H1': {'water': 55, 'sugar': 40, 'sugar': 14}
+  'A1': {'water': 35, 'sugar': 10, 'purple': 12},
+  'B1': {'water': 35, 'sugar': 20, 'purple': 12},
+  'C1': {'water': 35, 'sugar': 30, 'purple': 12},
+  'D1': {'water': 35, 'sugar': 40, 'purple': 12},
+  'E1': {'water': 55, 'sugar': 10, 'purple': 14},
+  'F1': {'water': 55, 'sugar': 20, 'purple': 14},
+  'G1': {'water': 55, 'sugar': 30, 'purple': 14},
+  'H1': {'water': 55, 'sugar': 40, 'purple': 14}
 }
 
 for source_well, ingredient in sources.items():
+  # each ingredient has it's own tip
   p200.pick_up_tip(tiprack[source_well])
+  # loop through all destination wells
   for destination_well, mapping in destinations.items():
     dispense_volume = mapping[ingredient]
+    # refill this tip if it's empty
     if p200.current_volume < dispense_volume:
      p200.aspirate(trough[source_well])
     p200.dispense(dispense_volume, plate[destination_well])
+  # blow out the extra liquid, then save the tip
   p200.blow_out(trash).drop_tip(tiprack[source_well])
 ```
 
