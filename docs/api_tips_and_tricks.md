@@ -60,11 +60,11 @@ p200.dispense(30, plate['B1']).dispense(35, plate['B2']).dispense(45, plate['B3'
 ```python
 p200.pick_up_tip(tiprack['A1'])
 
-dispense_vol = 13
+dispense_volume = 13
 for i in range(95):
-  if p200.current_volume < dispense_vol:
-    p200.blow_out(trash).aspirate(trough['A1])
-  p200.dispense(dispense_vol, plate[i]).touch_tip()
+  if p200.current_volume < dispense_volume:
+    p200.aspirate(trough['A1])
+  p200.dispense(dispense_volume, plate[i]).touch_tip()
 
 p200.drop_tip(trash)
 ```
@@ -92,7 +92,7 @@ for source_well, ingredient in sources.items():
   for destination_well, mapping in destinations.items():
     dispense_volume = mapping[ingredient]
     if p200.current_volume < dispense_volume:
-     p200.blow_out(trash).aspirate(trough[source_well])
+     p200.aspirate(trough[source_well])
     p200.dispense(dispense_volume, plate[destination_well])
   p200.drop_tip(tiprack[source_well])
 ```
