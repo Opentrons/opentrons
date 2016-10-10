@@ -164,5 +164,27 @@ robot.run()
 ####Precision pipetting within a well
 
 ```python
-# 
+robot.clear()
+
+p200.pick_up_tip(tiprack[3])
+
+# aspirate from 3mm above the bottom of the well
+well_bottom = plate[0].from_center(x=0, y=0, z=-1)
+well_bottom_3mm = well_bottom + (0, 0, 3)
+source = (plate[0], well_bottom_3mm)
+p200.aspirate(source)
+
+# rotate around the edge of the well
+# dropping 10ul at a time
+theta = 0.0
+while p200.current_volume > 0:
+    # we can move around a circle with radius (r) and theta (degrees)
+    well_edge = plate[1].from_center(r=1.0, theta=theta, h=0.9)
+    destination = (plate[1], well_edge)
+    p200.dispense(10, destination)
+    theta += 0.314
+
+p200.drop_tip(tiprack[3])
+
+robot.run()
 ```
