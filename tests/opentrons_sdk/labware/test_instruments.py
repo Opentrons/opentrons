@@ -389,6 +389,7 @@ class PipetteTest(unittest.TestCase):
             [
                 mock.call.dispense(),
                 mock.call.dispense(),
+                mock.call.dispense(),
                 mock.call.dispense()
             ]
         )
