@@ -22,7 +22,9 @@ def unpack_location(location):
 class Placeable(object):
 
     def __init__(self, parent=None, properties=None):
-        self.children = OrderedDict()
+        self.children_by_name = OrderedDict()
+        self.children_by_reference = OrderedDict()
+
         self.parent = parent
 
         if properties is None:
@@ -57,10 +59,10 @@ class Placeable(object):
         return '<{} {}>'.format(self.__class__.__name__, self.get_name())
 
     def __iter__(self):
-        return iter(v['instance'] for k, v in self.children.items())
+        return iter(self.children_by_reference.keys())
 
     def __len__(self):
-        return len(self.children)
+        return len(self.children_by_name)
 
     def __bool__(self):
         return True
@@ -77,12 +79,11 @@ class Placeable(object):
         if self.parent is None:
             return None
 
-        for name, data in self.parent.children.items():
-            if data['instance'] == self:
-                return name
+        return self.parent.children_by_reference[self]['name']
 
     def get_children_list(self):
-        return list([v['instance'] for k, v in self.children.items()])
+        # TODO: refactor?
+        return list(self.children_by_reference.keys())
 
     def get_path(self, reference=None):
         return list(reversed([item.get_name()
@@ -115,25 +116,33 @@ class Placeable(object):
         return self.parent.coordinates(reference) + self.coordinates()
 
     def get_child_coordinates(self, child):
+        lookup_dict = None
         if isinstance(child, Placeable):
-            for k, v in self.children.items():
-                if v['instance'] == child:
-                    return v['coordinates']
+            lookup_dict = self.children_by_reference
+        else:
+            # if not instance of Placeable, assume name
+            lookup_dict = self.children_by_name
 
-        # if not instance of Placeable, assume name
-        if child in self.children:
-            return self.children[child]['coordinates']
+        if child not in lookup_dict:
+            raise ValueError('Child {} not found'.format(child))
+
+        return lookup_dict[child]['coordinates']
 
     def add(self, child, name=None, coordinates=Vector(0, 0, 0)):
         if not name:
             name = str(child)
-        if name in self.children:
+        if name in self.children_by_name:
             raise Exception('Child with the name {} already exists'
                             .format(name))
 
         child.parent = self
-        self.children[name] = {
+        self.children_by_name[name] = {
             'instance': child,
+            'coordinates': Vector(coordinates)
+        }
+
+        self.children_by_reference[child] = {
+            'name': name,
             'coordinates': Vector(coordinates)
         }
 
@@ -155,7 +164,9 @@ class Placeable(object):
         return parent
 
     def remove_child(self, name):
-        del self.children[name]
+        child = self.children_by_name[name]
+        del self.children_by_name[name]
+        del self.children_by_reference[child]
 
     def get_parent(self):
         return self.parent
@@ -164,7 +175,10 @@ class Placeable(object):
         return self.children
 
     def get_child_by_name(self, name):
-        return self.children[name]['instance']
+        return self.children_by_name[name]['instance']
+
+    def get_child_data(self, name):
+        return self.children_by_name[name]
 
     def size(self):
         return Vector(

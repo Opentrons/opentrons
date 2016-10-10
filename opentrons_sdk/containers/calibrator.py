@@ -39,7 +39,7 @@ class Calibrator(object):
 
     def apply_calibration_recursive(self, calibration_data, placeable):
         for name, data in calibration_data.items():
-            child = placeable.children[name]
+            child = placeable.get_child_data(name)
 
             if 'delta' in data:
                 child['coordinates'] = child['coordinates'] + data['delta']
