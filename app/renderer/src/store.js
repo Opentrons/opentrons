@@ -50,8 +50,8 @@ const actions = {
                 commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
             })
     },
-    disconnect_robot () {
-        this.$http
+    disconnect_robot ({ commit }) {
+        Vue.http
             .get('http://localhost:5000/robot/serial/disconnect')
             .then((response) => {
                 console.log(response)
@@ -60,10 +60,7 @@ const actions = {
                 } else {
                     console.log('Failed to connect', response.data)
                 }
-                commit(
-                    'UPDATE_ROBOT_CONNECTION',
-                    {'is_connected': false, 'port': null}
-                )
+                commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
             }, (response) => {
                 console.log('Failed to communicate to backend server. Failed to connect', response)
             })
