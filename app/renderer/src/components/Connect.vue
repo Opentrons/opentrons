@@ -62,13 +62,17 @@
         let options = {params: {port: this.selected_port}}
         let self = this
         this.$http
-            .get('http://localhost:5000/robot/serial/list', options)
+            .get('http://localhost:5000/robot/serial/connect', options)
             .then((response) => {
                 console.log(response)
-                console.log('successfully connected...')
-                self.connected = true
+                if (response.data.is_connected === true){
+                    self.connected = true
+                    console.log('successfully connected...')
+                } else {
+                    console.log('Failed to connect', response.data)
+                }
             }, (response) => {
-                console.log('failed to connect', response)
+                console.log('Failed to communicate to backend server. Failed to connect', response)
             })
       }
     },

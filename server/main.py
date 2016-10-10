@@ -46,8 +46,15 @@ def upload(path):
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
     return flask.jsonify({
-        'ports': ['aaa'] + robot.get_serial_ports_list()
+        'ports': robot.get_serial_ports_list()
     })
+
+@app.route("/robot/serial/is-connected")
+def is_connected():
+    return flask.jsonify({
+        'is-connected': robot.is_connected()
+    })
+
 
 @app.route("/robot/serial/connect")
 def connect_robot():
@@ -57,7 +64,7 @@ def connect_robot():
     data = None
 
     try:
-        robot.connect(port=port)
+        robot.connect(port)
     except Exception as e:
         status = 'error'
         data = str(e)
