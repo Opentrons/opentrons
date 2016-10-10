@@ -97,15 +97,17 @@ class Pipette(object):
         if location:
             self.robot.move_to(location, instrument=self)
 
-        distance = self.plunge_distance(volume)
+        if volume:
+            distance = self.plunge_distance(volume)
 
-        def _do():
-            self.plunger.move(distance, mode='relative')
-            self.plunger.wait_for_arrival()
+            def _do():
+                self.plunger.move(distance, mode='relative')
+                self.plunger.wait_for_arrival()
 
-        description = "Dispensing {0}uL at {1}".format(volume, str(location))
-        self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume -= volume
+            description = "Dispensing {0}uL at {1}".format(
+                volume, str(location))
+            self.robot.add_command(Command(do=_do, description=description))
+            self.current_volume -= volume
 
         return self
 
