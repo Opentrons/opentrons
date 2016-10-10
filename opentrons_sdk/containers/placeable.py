@@ -24,6 +24,7 @@ class Placeable(object):
     def __init__(self, parent=None, properties=None):
         self.children_by_name = OrderedDict()
         self.children_by_reference = OrderedDict()
+        self._coordinates = Vector(0, 0, 0)
 
         self.parent = parent
 
@@ -79,7 +80,7 @@ class Placeable(object):
         if self.parent is None:
             return None
 
-        return self.parent.children_by_reference[self]['name']
+        return self.parent.children_by_reference[self]
 
     def get_children_list(self):
         # TODO: refactor?
@@ -117,16 +118,17 @@ class Placeable(object):
 
     def get_child_coordinates(self, child):
         lookup_dict = None
-        if isinstance(child, Placeable):
-            lookup_dict = self.children_by_reference
-        else:
-            # if not instance of Placeable, assume name
-            lookup_dict = self.children_by_name
 
-        if child not in lookup_dict:
+        if not child.parent == self:
+            raise ValueError('{} is not a parent of {}'.format(self, child))
+
+        if isinstance(child, Placeable):
+            return child._coordinates
+
+        if child not in self.children_by_name:
             raise ValueError('Child {} not found'.format(child))
 
-        return lookup_dict[child]['coordinates']
+        return self.children_by_name[child]._coordinates
 
     def add(self, child, name=None, coordinates=Vector(0, 0, 0)):
         if not name:
@@ -135,16 +137,10 @@ class Placeable(object):
             raise Exception('Child with the name {} already exists'
                             .format(name))
 
+        child._coordinates = Vector(coordinates)
         child.parent = self
-        self.children_by_name[name] = {
-            'instance': child,
-            'coordinates': Vector(coordinates)
-        }
-
-        self.children_by_reference[child] = {
-            'name': name,
-            'coordinates': Vector(coordinates)
-        }
+        self.children_by_name[name] = child
+        self.children_by_reference[child] = name
 
     def get_deck(self):
         parent = self.parent
@@ -175,9 +171,6 @@ class Placeable(object):
         return self.children
 
     def get_child_by_name(self, name):
-        return self.children_by_name[name]['instance']
-
-    def get_child_data(self, name):
         return self.children_by_name[name]
 
     def size(self):
