@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
+import Store from './store'
 
 
 Vue.use(VueRouter)
@@ -28,6 +29,7 @@ const router = new VueRouter({
 window.onload = function() {
   const app = new Vue({
     router,
+    Store,
       ...Home
   }).$mount('#app')
 }

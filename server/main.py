@@ -49,10 +49,11 @@ def get_serial_ports_list():
         'ports': robot.get_serial_ports_list()
     })
 
-@app.route("/robot/serial/is-connected")
+@app.route("/robot/serial/is_connected")
 def is_connected():
     return flask.jsonify({
-        'is_connected': robot.is_connected()
+        'is_connected': robot.is_connected(),
+        'port': robot.get_connected_port()
     })
 
 
