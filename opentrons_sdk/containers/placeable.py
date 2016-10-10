@@ -22,7 +22,11 @@ def unpack_location(location):
 class Placeable(object):
 
     def __init__(self, parent=None, properties=None):
-        self.children = OrderedDict()
+        self.children_by_name = OrderedDict()
+        self.children_by_reference = OrderedDict()
+        self._coordinates = Vector(0, 0, 0)
+        self._max_dimensions = {}
+
         self.parent = parent
 
         if properties is None:
@@ -57,10 +61,10 @@ class Placeable(object):
         return '<{} {}>'.format(self.__class__.__name__, self.get_name())
 
     def __iter__(self):
-        return iter(v['instance'] for k, v in self.children.items())
+        return iter(self.children_by_reference.keys())
 
     def __len__(self):
-        return len(self.children)
+        return len(self.children_by_name)
 
     def __bool__(self):
         return True
@@ -77,12 +81,11 @@ class Placeable(object):
         if self.parent is None:
             return None
 
-        for name, data in self.parent.children.items():
-            if data['instance'] == self:
-                return name
+        return self.parent.children_by_reference[self]
 
     def get_children_list(self):
-        return list([v['instance'] for k, v in self.children.items()])
+        # TODO: refactor?
+        return list(self.children_by_reference.keys())
 
     def get_path(self, reference=None):
         return list(reversed([item.get_name()
@@ -115,27 +118,28 @@ class Placeable(object):
         return self.parent.coordinates(reference) + self.coordinates()
 
     def get_child_coordinates(self, child):
-        if isinstance(child, Placeable):
-            for k, v in self.children.items():
-                if v['instance'] == child:
-                    return v['coordinates']
+        if not child.parent == self:
+            raise ValueError('{} is not a parent of {}'.format(self, child))
 
-        # if not instance of Placeable, assume name
-        if child in self.children:
-            return self.children[child]['coordinates']
+        if isinstance(child, Placeable):
+            return child._coordinates
+
+        if child not in self.children_by_name:
+            raise ValueError('Child {} not found'.format(child))
+
+        return self.children_by_name[child]._coordinates
 
     def add(self, child, name=None, coordinates=Vector(0, 0, 0)):
         if not name:
             name = str(child)
-        if name in self.children:
+        if name in self.children_by_name:
             raise Exception('Child with the name {} already exists'
                             .format(name))
 
+        child._coordinates = Vector(coordinates)
         child.parent = self
-        self.children[name] = {
-            'instance': child,
-            'coordinates': Vector(coordinates)
-        }
+        self.children_by_name[name] = child
+        self.children_by_reference[child] = name
 
     def get_deck(self):
         parent = self.parent
@@ -155,7 +159,9 @@ class Placeable(object):
         return parent
 
     def remove_child(self, name):
-        del self.children[name]
+        child = self.children_by_name[name]
+        del self.children_by_name[name]
+        del self.children_by_reference[child]
 
     def get_parent(self):
         return self.parent
@@ -164,7 +170,7 @@ class Placeable(object):
         return self.children
 
     def get_child_by_name(self, name):
-        return self.children[name]['instance']
+        return self.children_by_name[name]
 
     def size(self):
         return Vector(
@@ -191,6 +197,9 @@ class Placeable(object):
         return children
 
     def max_dimensions(self, reference):
+        if reference in self._max_dimensions:
+            return self._max_dimensions[reference]
+
         children = [
             (
                 child,
@@ -198,8 +207,11 @@ class Placeable(object):
             )
             for child in self.get_all_children()]
 
-        return [max(children, key=lambda a: a[1][axis])
-                for axis in range(3)]
+        res = [max(children, key=lambda a: a[1][axis])
+               for axis in range(3)]
+        self._max_dimensions[reference] = res
+
+        return res
 
     def from_polar(self, r, theta, h):
         center = self.size() / 2.0

@@ -2,7 +2,6 @@ import json
 import os
 import unittest
 
-from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.labware import instruments
 from opentrons_sdk import containers
 from opentrons_sdk.robot import Robot
@@ -51,9 +50,8 @@ class CalibrationTest(unittest.TestCase):
         pipette_calibration = json.load(open(json_file_path))
         import_calibration_file(json_file_path, self.robot)
 
-        my_calibrator = Calibrator()
+        my_calibrator = self.robot._instruments['B'].calibrator
         res = my_calibrator.convert(
-            self.robot._instruments['B'].calibration_data,
             self.robot._deck['A1']['trash'],
             self.robot._deck['A1']['trash'].center())
 

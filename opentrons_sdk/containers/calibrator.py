@@ -12,40 +12,36 @@ def apply_calibration(calibration_data,
 
 
 class Calibrator(object):
+    def __init__(self, placeable, calibration_data):
+        self.calibrated_coordinates = {}
+        self.calibration_data = calibration_data
+        self.placeable = placeable
+        self._apply_calibration(calibration_data, placeable)
+
     # Returns calibrated coordinates relative to deck
     def convert(self,
-                calibration_data,
                 placeable,
                 coordinates=Vector(0, 0, 0)):
         coordinates = Vector(coordinates)
-        path = placeable.get_path()
-        calibrated_placeable = self.apply_calibration(
-            calibration_data,
-            placeable.get_deck())
+        path = placeable.get_trace()
 
-        for name in path:
-            calibrated_placeable = calibrated_placeable[name]
+        adjusted_coordinates = Vector(0, 0, 0)
+        for item in path:
+            c = self.calibrated_coordinates.get(item, item._coordinates)
+            adjusted_coordinates += c
 
-        calibrated_deck = calibrated_placeable.get_deck()
-        calibrated_coordinates = calibrated_placeable.coordinates(
-            calibrated_deck)
+        return coordinates + adjusted_coordinates
 
-        return coordinates + calibrated_coordinates
-
-    def apply_calibration(self, calibration_data, placeable):
-        placeable = copy.deepcopy(placeable)
-        self.apply_calibration_recursive(calibration_data, placeable)
-        return placeable
-
-    def apply_calibration_recursive(self, calibration_data, placeable):
+    def _apply_calibration(self, calibration_data, placeable):
         for name, data in calibration_data.items():
-            child = placeable.children[name]
+            child = placeable.get_child_by_name(name)
 
             if 'delta' in data:
-                child['coordinates'] = child['coordinates'] + data['delta']
+                c = child._coordinates + data['delta']
+                self.calibrated_coordinates[child] = c
             if 'children' in data:
-                self.apply_calibration_recursive(
-                    data['children'], child['instance'])
+                self._apply_calibration(
+                    data['children'], child)
 
     def calibrate(self,
                   calibration_data,
@@ -71,4 +67,8 @@ class Calibrator(object):
             current = children[name]
 
         current['delta'] = delta
+        self.calibration_data = calibration_data
+
+        self._apply_calibration(calibration_data, self.placeable)
+
         return calibration_data

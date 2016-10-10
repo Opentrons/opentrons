@@ -119,15 +119,15 @@ class Robot(object):
 
     def move_to(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
-        calibration_data = {}
-        if instrument:
-            calibration_data = instrument.calibration_data
-            instrument.placeables.append(placeable)
 
-        coordinates = containers.apply_calibration(
-            calibration_data,
-            placeable,
-            coordinates)
+        if instrument:
+            # add to the list of instument-container mappings
+            instrument.placeables.append(placeable)
+            coordinates = instrument.calibrator.convert(
+                placeable,
+                coordinates)
+        else:
+            coordinates += placeable.coordinates(placeable.get_deck())
 
         tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
         tallest_z += 10

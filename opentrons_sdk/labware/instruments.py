@@ -45,7 +45,7 @@ class Pipette(object):
         self.calibration_data = {}
         self.placeables = []
 
-        self.calibrator = Calibrator()
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
         self.set_speed(speed)
 
