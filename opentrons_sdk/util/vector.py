@@ -42,9 +42,10 @@ class Vector(object):
         return hasattr(arg, "__iter__") or hasattr(arg, "__getitem__")
 
     def __init__(self, *args, **kwargs):
-        self.coordinates = self.zero_coordinates()
+        # self.coordinates = self.zero_coordinates()
 
-        if len(args) == 1:
+        args_len = len(args)
+        if args_len == 1:
             arg = args[0]
             if isinstance(arg, dict):
                 self.coordinates = Vector.coordinates_from_dict(arg)
@@ -57,9 +58,8 @@ class Vector(object):
                     ("One argument supplied "
                      "expected to be dict or iterable, received {}")
                     .format(type(arg)))
-        elif len(args) == 3:
-            self.coordinates = Vector.coordinates_from_iterable(
-                tuple(args[:3]))
+        elif args_len == 3:
+            self.coordinates = Vector.value_type(*args)
         else:
             raise ValueError("Expected either a dict/iterable or x, y, z")
 
@@ -113,11 +113,11 @@ class Vector(object):
 
     def __getitem__(self, index):
         res = None
-        if isinstance(index, slice):
+        if isinstance(index, int):
             res = self.coordinates[index]
         elif isinstance(index, str):
             res = getattr(self.coordinates, index)
-        elif isinstance(index, int):
+        elif isinstance(index, slice):
             res = self.coordinates[index]
         else:
             raise IndexError('Expected slice or string as an index')

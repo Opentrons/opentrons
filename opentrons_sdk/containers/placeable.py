@@ -25,6 +25,7 @@ class Placeable(object):
         self.children_by_name = OrderedDict()
         self.children_by_reference = OrderedDict()
         self._coordinates = Vector(0, 0, 0)
+        self._max_dimensions = {}
 
         self.parent = parent
 
@@ -198,6 +199,9 @@ class Placeable(object):
         return children
 
     def max_dimensions(self, reference):
+        if reference in self._max_dimensions:
+            return self._max_dimensions[reference]
+
         children = [
             (
                 child,
@@ -205,8 +209,12 @@ class Placeable(object):
             )
             for child in self.get_all_children()]
 
-        return [max(children, key=lambda a: a[1][axis])
-                for axis in range(3)]
+        res = [max(children, key=lambda a: a[1][axis])
+               for axis in range(3)]
+        self._max_dimensions[reference] = res
+
+        return res
+
 
     def from_polar(self, r, theta, h):
         center = self.size() / 2.0
