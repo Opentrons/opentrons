@@ -13,9 +13,10 @@
           </select>
           <button @click="connectToRobot" v-show="ports.selected" class="btn-connect">Connect!</button>
         </div>
-        
+
         <div class="connected" v-if="connected">
-          <h1 >The selected port is: {{ports.selected}}</h1>
+          <h1 >The selected port is: {{ port }}</h1>
+          <button @click="disconnectRobot" v-show="connected" class="btn-connect">Disconnect!</button>
         </div>
     </div>
     <!-- TODO: Add component for navigation (especially next) -->
@@ -31,14 +32,20 @@
 
 <script>
   export default {
-    data:function () {
+    data: function () {
       return {
-          message: "Let's connect",
-          connected: false,
           ports: {
               selected: null,
               options: []
           }
+      }
+    },
+    computed: {
+      connected () {
+        return this.$store.state.is_connected;
+      },
+      port () {
+        return this.$store.state.port;
       }
     },
     methods: {
@@ -63,25 +70,13 @@
                     })
         },
       connectToRobot: function() {
-        let options = {params: {port: this.selected_port}}
-        let self = this
-        this.$http
-            .get('http://localhost:5000/robot/serial/connect', options)
-            .then((response) => {
-                console.log(response)
-                if (response.data.is_connected === true){
-                    self.connected = true
-                    console.log('successfully connected...')
-                } else {
-                    console.log('Failed to connect', response.data)
-                }
-            }, (response) => {
-                console.log('Failed to communicate to backend server. Failed to connect', response)
-            })
+        this.$store.dispatch('connect_robot', this.ports.selected)
+      },
+      disconnectRobot: function() {
+        this.$store.dispatch('disconnect_robot')
       }
     },
     beforeMount: function () {
-        // TODO: USE AJAX request to list of ports from the backend
         this.getPortsList();
     }
   }

@@ -75,6 +75,22 @@ def connect_robot():
         'data': data
     })
 
+@app.route("/robot/serial/disconnect")
+def disconnect_robot():
+    status = 'success'
+    data = None
+
+    try:
+        robot.disconnect()
+    except Exception as e:
+        status = 'error'
+        data = str(e)
+
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
+
 
 logging.basicConfig(
     level=logging.DEBUG,
