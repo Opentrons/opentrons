@@ -1,4 +1,5 @@
 import copy
+import os
 
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
@@ -71,9 +72,6 @@ class Robot(object):
                 return self
 
         return InstrumentMotor()
-
-    def list_serial_ports(self):
-        return self._driver.get_serial_ports_list()
 
     def connect(self, port=None):
         """
@@ -266,4 +264,10 @@ class Robot(object):
         self.run()
 
     def get_serial_ports_list(self):
-        return self._driver.get_serial_ports_list()
+        ports = []
+        # TODO: Store these settings in config
+        if os.environ.get('DEBUG', '').lower() == 'true':
+            ports = [self._driver.VIRTUAL_SMOOTHIE_PORT]
+        ports.extend(self._driver.get_serial_ports_list())
+        return ports
+
