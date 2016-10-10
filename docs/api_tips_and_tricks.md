@@ -114,7 +114,7 @@ robot.clear()
 p200.pick_up_tip(tiprack['A1'])
 
 dispense_volume = 13
-for i in range(95):
+for i in range(96):
   # refill the tip if it's empty
   if p200.current_volume < dispense_volume:
     p200.aspirate(trough['A1])
