@@ -27,7 +27,8 @@ class Calibrator(object):
 
         adjusted_coordinates = Vector(0, 0, 0)
         for item in path:
-            adjusted_coordinates += self.calibrated_coordinates.get(item, item._coordinates)
+            c = self.calibrated_coordinates.get(item, item._coordinates)
+            adjusted_coordinates += c
 
         return coordinates + adjusted_coordinates
 
@@ -36,7 +37,8 @@ class Calibrator(object):
             child = placeable.get_child_by_name(name)
 
             if 'delta' in data:
-                self.calibrated_coordinates[child] = child._coordinates + data['delta']
+                c = child._coordinates + data['delta']
+                self.calibrated_coordinates[child] = c
             if 'children' in data:
                 self._apply_calibration(
                     data['children'], child)

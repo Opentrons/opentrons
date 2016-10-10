@@ -118,8 +118,6 @@ class Placeable(object):
         return self.parent.coordinates(reference) + self.coordinates()
 
     def get_child_coordinates(self, child):
-        lookup_dict = None
-
         if not child.parent == self:
             raise ValueError('{} is not a parent of {}'.format(self, child))
 
@@ -214,7 +212,6 @@ class Placeable(object):
         self._max_dimensions[reference] = res
 
         return res
-
 
     def from_polar(self, r, theta, h):
         center = self.size() / 2.0
