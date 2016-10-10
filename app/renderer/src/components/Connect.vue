@@ -5,15 +5,18 @@
           Please make sure that your computer is connected to the robot, and your machine is plugged in and turned on before continuing.
       </div>
       <div class="step step-connect">
-      <div class="connect">
-          <select v-model="ports.selected" v-show="!connected">
+        <div class="connect" v-if="!connected">
+          <select v-model="ports.selected" >
             <option v-for="option in ports.options" v-bind:value="option.value">
               {{ option.text }}
             </option>
           </select>
-      <span v-show="connected">The selected port is: {{ports.selected}}</span>
-      <button @click="connectToRobot" v-if="ports.selected"class="btn-connect">Connect!</button>
-      </div>
+          <button @click="connectToRobot" v-show="ports.selected" class="btn-connect">Connect!</button>
+        </div>
+        
+        <div class="connected" v-if="connected">
+          <h1 >The selected port is: {{ports.selected}}</h1>
+        </div>
     </div>
     <!-- TODO: Add component for navigation (especially next) -->
     <nav>
@@ -52,8 +55,9 @@
                     .then((response) => {
                         console.log('we are getting data...', response.data)
                         let ports = ['Select a port'].concat(response.data.ports)
-                        self.ports.selected = ports[0]
+                        self.ports.selected = null
                         self.ports.options = ports.map((port) => ({text: port, value: port}))
+                        self.ports.options[0].value = null
                     }, (response) => {
                         console.log('failed to get serial ports list', response)
                     })
