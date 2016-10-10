@@ -91,10 +91,7 @@ class Pipette(object):
             volume = self.current_volume
 
         if self.current_volume - volume < 0:
-            raise RuntimeWarning(
-                'Pipette cannot dispense {}ul from {}ul'.
-                format(self.current_volume - volume,
-                       self.current_volume))
+            volume = self.current_volume
 
         if location:
             self.robot.move_to(location, instrument=self)
