@@ -175,6 +175,8 @@ class Pipette(object):
             self.dispense()
             self.aspirate(volume)
 
+        self.dispense()
+
         return self
 
     def blow_out(self, location=None):
