@@ -82,7 +82,9 @@ class Robot(object):
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
         """
-        return self._driver.connect(device=port)
+        if not port:
+            port = self._driver.VIRTUAL_SMOOTHIE_PORT
+        return self._driver.connect(port)
 
     def home(self, *args):
         if self._driver.calm_down():
