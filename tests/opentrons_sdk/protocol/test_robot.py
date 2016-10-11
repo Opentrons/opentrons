@@ -8,7 +8,7 @@ class RobotTest(unittest.TestCase):
     def setUp(self):
         Robot.reset()
         self.robot = Robot.get_instance()
-        self.robot.connect(port='Virtual Smoothie')
+        self.robot.connect()
         self.robot.home()
 
     def test_robot_move_to(self):

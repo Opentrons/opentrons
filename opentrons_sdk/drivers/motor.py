@@ -130,7 +130,7 @@ class CNCDriver(object):
         return self.calm_down()
 
     def is_connected(self):
-        return (self.connection.isOpen() if self.connection else False)
+        return self.connection and self.connection.isOpen()
 
     def connect_to_physical_smoothie(self, port):
         try:
