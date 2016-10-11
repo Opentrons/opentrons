@@ -1,6 +1,8 @@
 import logging
 import os
 import sys
+import time
+import threading
 sys.path.insert(0, os.path.abspath('..'))
 
 import flask
@@ -13,8 +15,10 @@ from server.helpers import get_frozen_root
 from server.process_manager import run_once
 
 
+
 TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
+BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
@@ -49,6 +53,7 @@ def get_serial_ports_list():
         'ports': robot.get_serial_ports_list()
     })
 
+
 @app.route("/robot/serial/is_connected")
 def is_connected():
     return flask.jsonify({
@@ -70,10 +75,39 @@ def connect_robot():
         status = 'error'
         data = str(e)
 
+    connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
+        'CONNECTION_STATE_WATCHER',
+        (None, None)
+    )
+
+    if connection_state_watcher and watcher_should_run:
+        watcher_should_run.set()
+
+    watcher_should_run = threading.Event()
+    def watch_connection_state(should_run):
+        while not should_run.is_set():
+            socketio.emit(
+                'event',
+                {'type': 'connection_status',
+                 'is_connected': robot.is_connected()
+                }
+            )
+            time.sleep(1.5)
+
+    connection_state_watcher = socketio.start_background_task(
+        watch_connection_state,
+        (watcher_should_run)
+    )
+    BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (
+        connection_state_watcher,
+        watcher_should_run
+    )
+
     return flask.jsonify({
         'status': status,
         'data': data
     })
+
 
 @app.route("/robot/serial/disconnect")
 def disconnect_robot():
@@ -82,6 +116,13 @@ def disconnect_robot():
 
     try:
         robot.disconnect()
+        # connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
+        #     'CONNECTION_STATE_WATCHER',
+        #     (None, None)
+        # )
+        # if connection_state_watcher and watcher_should_run:
+        #     watcher_should_run.set()
+        # BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (None, None)
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -90,6 +131,13 @@ def disconnect_robot():
         'status': status,
         'data': data
     })
+
+
+# NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
+# front end that a connection was established, this route does that.
+@socketio.on('connected')
+def on_connect():
+    print('connected to front end...')
 
 
 logging.basicConfig(

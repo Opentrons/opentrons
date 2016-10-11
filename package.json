@@ -72,9 +72,11 @@
   "dependencies": {
     "babel-preset-es2016": "^6.16.0",
     "electron-debug": "^1.0.1",
+    "socket.io-client": "^1.5.0",
     "vue": "^2.0.1",
-    "vue-router": "^2.0.0",
     "vue-resource": "^1.0.3",
-    "vuex": "^2.0.0"
+    "vue-router": "^2.0.0",
+    "vuex": "^2.0.0",
+    "websocket": "^1.0.23"
   }
 }

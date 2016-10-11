@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import io from 'socket.io-client'
 
 Vue.use(Vuex)
 
@@ -67,8 +68,38 @@ const actions = {
     }
 }
 
+function createWebSocketPlugin(socket) {
+  return store => {
+    socket.on('event', data => {
+      console.log(data)
+      if (data.type === 'connection_status') {
+        if (data.is_connected === false) {
+          console.log('got here')
+          store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
+        }
+      }
+    })
+  }
+}
+
+
+const socket = io.connect('ws://localhost:5000')
+
+socket.on('connect', function(){
+  console.log('WebSocket has connected.')
+  socket.emit('connected')
+});
+
+
+socket.on('disconnect', function(){
+  console.log('WebSocket has disconnected')
+})
+
+const websocketplugin = createWebSocketPlugin(socket)
+
 export default new Vuex.Store({
-    state,
-    actions,
-    mutations
+  state,
+  actions,
+  mutations,
+  plugins: [websocketplugin]
 })
