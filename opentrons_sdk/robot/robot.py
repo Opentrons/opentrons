@@ -84,6 +84,9 @@ class Robot(object):
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
         return self._driver.connect(port)
 
+    def disconnect(self):
+        self._driver.disconnect()
+
     def home(self, *args):
         if self._driver.calm_down():
             if args:
@@ -271,3 +274,8 @@ class Robot(object):
         ports.extend(self._driver.get_serial_ports_list())
         return ports
 
+    def is_connected(self):
+        return self._driver.is_connected()
+
+    def get_connected_port(self):
+        return self._driver.get_connected_port()

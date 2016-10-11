@@ -65,6 +65,17 @@ class CNCDriver(object):
     }
     VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
 
+    def get_connected_port(self):
+        """
+        Returns the port the driver is currently connected to
+        :return:
+        """
+        if not self.connection:
+            return
+        if isinstance(self.connection, VirtualSmoothie):
+            return self.VIRTUAL_SMOOTHIE_PORT
+        return self.connection.port
+
     def get_serial_ports_list(self):
         """ Lists serial port names
 
@@ -98,6 +109,11 @@ class CNCDriver(object):
                 log.debug("Serial", e)
         return result
 
+    def disconnect(self):
+        if self.is_connected():
+            self.connection.close()
+        self.connection = None
+
     def connect(self, port):
         if port == self.VIRTUAL_SMOOTHIE_PORT:
             return self.connect_to_virtual_smoothie()
@@ -112,6 +128,9 @@ class CNCDriver(object):
             }
         self.connection = VirtualSmoothie('v1.0.5', settings)
         return self.calm_down()
+
+    def is_connected(self):
+        return (self.connection.isOpen() if self.connection else False)
 
     def connect_to_physical_smoothie(self, port):
         try:
