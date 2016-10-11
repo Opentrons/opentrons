@@ -87,7 +87,7 @@ def interpret_head(robot_deck, head_dict: OrderedDict):
             axis=tool_config.pop('axis'),
             min_volume=0,
             channels=(8 if tool_config.pop('multi-channel') else 1),
-        )
+            )
         tool_instance.set_max_volume(tool_config.pop('volume'))
 
         # robot_containers = robot._deck.containers()
@@ -112,6 +112,49 @@ def interpret_head(robot_deck, head_dict: OrderedDict):
 
 
 def interpret_instructions(robot_deck, robot_head, instructions: list):
+    """
+    [
+		{
+			"tool" : "p10",
+			"groups" : [
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "plate",
+                                "location": "F1",
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "plate",
+    							"location" : "A12",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 10
+						},
+                        {
+                            "from" : {
+                                "container": "plate",
+                                "location": "D1",
+                                "touch-tip": false
+                            },
+                            "to": {
+                                "container" : "plate",
+                                "location" : "A2",
+                                "tip-offset" : 0,
+                                "delay" : 0,
+                                "touch-tip" : false
+                            },
+                                "volume" : 10
+                        }
+					]
+    :param robot_deck:
+    :param robot_head:
+    :param instructions:
+    :return:
+    """
     for instruction_dict in instructions:
         tool_name = instruction_dict.get('tool')
         tool_obj = robot_head[tool_name]['instance']
@@ -124,10 +167,12 @@ def interpret_instructions(robot_deck, robot_head, instructions: list):
         for group in instruction_dict.get('groups'):
             # We always pick up a new tip when entering a group
             tool_obj.pick_up_tip(next(tips))
-            for command, command_args in group.items():
-                handle_command(
-                    tool_obj, robot_deck, robot_head, command, command_args
-                )
+            for command_type, commands_calls in group.items():
+                handler = lambda args: handle_command(
+                        tool_obj,robot_deck, robot_head, command_type, args
+                    )
+                [handler(command_arg) for command_arg in commands_calls]
+
             # LEAVING GROUP
             tool_obj.drop_tip(trash_container)
 
@@ -148,11 +193,34 @@ def handle_command(tool_obj, robot_deck, robot_head, command, command_args):
 
 
 def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
-    print(tool_obj, robot_head, robot_deck, command_args)
+    # print(tool_obj, robot_head, robot_deck, command_args)
+    SUPPORTED_ARGS = {
+        ''
+    }
+    from_info = command_args['from']
+    from_container = robot_deck[from_info['container']]['instance']
+    from_well = from_container[from_info['location']]
+    should_touch_tip_on_from = from_info['touch-tip']
+
+    to_info = command_args['to']
+    to_container = robot_deck[to_info['container']]['instance']
+    to_well = to_container[to_info['location']]
+    should_touch_tip_on_to = to_info['touch-tip']
+
+    volume = command_args.get('volume', tool_obj.max_volume)
+
+    tool_obj.aspirate(volume, from_well)
+    if should_touch_tip_on_from:
+        tool_obj.touch_tip()
+
+    tool_obj.dispense(volume, to_well)
+    if should_touch_tip_on_to:
+        tool_obj.touch_tip()
 
 
 def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
     pass
+
 
 
 def handle_mix(tool_obj, robot_deck, robot_head, command_args):

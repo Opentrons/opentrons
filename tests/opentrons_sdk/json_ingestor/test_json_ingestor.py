@@ -1,9 +1,9 @@
 from collections import OrderedDict
 import json
+import os
 import unittest
 
 from opentrons_sdk.robot import Robot
-# from opentrons_sdk import containers
 from opentrons_sdk.json_ingestor import (
     interpret_deck,
     interpret_head,
@@ -153,7 +153,10 @@ class JSONIngestorTestCase(unittest.TestCase):
 
     def test_interpret_json_protocol(self):
         super_protocol_json = None
-        with open('super_protocol.json') as f:
+        test_file_path = os.path.join(
+            os.path.dirname(__file__),'super_protocol.json'
+        )
+        with open(test_file_path) as f:
             super_protocol_json = json.load(
                 f,
                 object_pairs_hook=OrderedDict
