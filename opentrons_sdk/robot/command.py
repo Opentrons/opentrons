@@ -13,7 +13,7 @@ class Macro(object):
         self.description = description
         self._commands = []
 
-    def add(self, command: Command):
+    def add(self, command):
         if not isinstance(command, Command):
             raise TypeError(
                 'Expected object of type Command. Got "{}"'

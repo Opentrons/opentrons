@@ -51,6 +51,7 @@ class Robot(object):
         robot_self = self
 
         class InstrumentMotor():
+
             def move(self, value, speed=None, mode='absolute'):
                 kwargs = {axis: value}
                 if speed:
@@ -101,8 +102,9 @@ class Robot(object):
             return False
 
     def add_command(self, command):
-        print("Enqueing:", command.description)
-        log.info("Enqueing:", command.description)
+        if command.description:
+            print("Enqueing:", command.description)
+            log.info("Enqueing:", command.description)
         self._commands.append(command)
 
     def prepend_command(self, command):
@@ -144,10 +146,10 @@ class Robot(object):
                     z=coordinates[2])
             self._driver.wait_for_arrival()
 
-        description = "Moving head to {} {}".format(
-            str(placeable),
-            coordinates)
-        self.add_command(Command(do=_do, description=description))
+        # description = "Moving head to {} {}".format(
+        #     str(placeable),
+        #     coordinates)
+        self.add_command(Command(do=_do))
 
     def move_to_top(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
@@ -169,8 +171,9 @@ class Robot(object):
             if command.description == "Pausing":
                 return
 
-            print("Executing:", command.description)
-            log.info("Executing:", command.description)
+            if command.description:
+                print("Executing:", command.description)
+                log.info("Executing:", command.description)
             try:
                 command.do()
             except KeyboardInterrupt as e:

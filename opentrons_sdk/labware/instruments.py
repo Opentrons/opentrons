@@ -334,9 +334,6 @@ class Pipette(object):
 
         return volume / self.max_volume
 
-    def supports_volume(self, volume):
-        return self.max_volume <= volume <= self.max_volume
-
     def delay(self, seconds):
         def _do():
             self.plunger.wait(seconds)
