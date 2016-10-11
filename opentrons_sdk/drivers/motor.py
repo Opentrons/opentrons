@@ -65,11 +65,23 @@ class CNCDriver(object):
         'one_pro': Vector(300, 250, 120),
         'one_standard': Vector(300, 250, 120)
     }
+    VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
+
+    def get_connected_port(self):
+        """
+        Returns the port the driver is currently connected to
+        :return:
+        """
+        if not self.connection:
+            return
+        if isinstance(self.connection, VirtualSmoothie):
+            return self.VIRTUAL_SMOOTHIE_PORT
+        return self.connection.port
 
     def get_dimensions(self):
         return self.ot_one_dimensions[self.ot_version]
 
-    def list_serial_ports(self):
+    def get_serial_ports_list(self):
         """ Lists serial port names
 
             :raises EnvironmentError:
@@ -102,33 +114,49 @@ class CNCDriver(object):
                 log.debug("Serial", e)
         return result
 
-    def connect(self, device=None, port=None):
+    def disconnect(self):
+        if self.is_connected():
+            self.connection.close()
+        self.connection = None
+
+    def connect(self, port):
+        if port == self.VIRTUAL_SMOOTHIE_PORT:
+            return self.connect_to_virtual_smoothie()
+        elif port:
+            return self.connect_to_physical_smoothie(port)
+
+    def connect_to_virtual_smoothie(self):
+        settings = {
+                'ot_version': 'one_pro',
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0
+            }
+        self.connection = VirtualSmoothie('v1.0.5', settings)
+        return self.calm_down()
+
+    def is_connected(self):
+        return self.connection and self.connection.isOpen()
+
+    def connect_to_physical_smoothie(self, port):
         try:
-            if device or port:
-                self.connection = serial.Serial(
-                    port=device or port,
-                    baudrate=115200,
-                    timeout=self.serial_timeout)
-            else:
-                settings = {
-                    'ot_version': 'one_pro',
-                    'alpha_steps_per_mm': 80.0,
-                    'beta_steps_per_mm': 80.0
-                }
-                self.connection = VirtualSmoothie('v1.0.5', settings)
+            self.connection = serial.Serial(
+                port=port,
+                baudrate=115200,
+                timeout=self.serial_timeout
+            )
 
             # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
             # so just always swallow it ourselves
             self.reset_port()
 
-            log.debug("Serial", "Connected to {}".format(device or port))
+            log.debug("Serial", "Connected to {}".format(port))
 
             return self.calm_down()
 
         except serial.SerialException as e:
             log.debug(
                 "Serial",
-                "Error connecting to {}".format(device or port))
+                "Error connecting to {}".format(port))
             log.error("Serial", e)
             return False
 
@@ -140,10 +168,6 @@ class CNCDriver(object):
         self.turn_off_feedback()
 
         self.get_ot_version()
-
-    def disconnect(self):
-        if self.connection and self.connection.isOpen():
-            self.connection.close()
 
     def send_command(self, command, **kwargs):
         """

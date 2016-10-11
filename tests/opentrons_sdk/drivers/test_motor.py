@@ -13,7 +13,7 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor = CNCDriver()
 
-        myport = ''
+        myport = self.motor.VIRTUAL_SMOOTHIE_PORT
         success = self.motor.connect(myport)
         self.assertTrue(success)
 

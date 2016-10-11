@@ -10,7 +10,7 @@ from opentrons_sdk.helpers.helpers import import_calibration_json
 class PerformanceTest(unittest.TestCase):
     def protocol(self):
         robot = Robot.get_instance()
-        robot.list_serial_ports()
+        robot.get_serial_ports_list()
 
         robot.connect()
         robot.home()

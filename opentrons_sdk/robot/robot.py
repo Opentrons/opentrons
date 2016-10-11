@@ -1,4 +1,5 @@
 import copy
+import os
 
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
@@ -78,9 +79,6 @@ class Robot(object):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
-    def list_serial_ports(self):
-        return self._driver.list_serial_ports()
-
     def connect(self, port=None):
         """
         Connects the motor to a serial port.
@@ -88,7 +86,9 @@ class Robot(object):
         If a device connection is set, then any dummy or alternate motor
         drivers are replaced with the serial driver.
         """
-        return self._driver.connect(device=port)
+        if not port:
+            port = self._driver.VIRTUAL_SMOOTHIE_PORT
+        return self._driver.connect(port)
 
     def home(self, *args):
         if self._driver.calm_down():
@@ -280,3 +280,17 @@ class Robot(object):
 
     def resume(self):
         self.run()
+
+    def get_serial_ports_list(self):
+        ports = []
+        # TODO: Store these settings in config
+        if os.environ.get('DEBUG', '').lower() == 'true':
+            ports = [self._driver.VIRTUAL_SMOOTHIE_PORT]
+        ports.extend(self._driver.get_serial_ports_list())
+        return ports
+
+    def is_connected(self):
+        return self._driver.is_connected()
+
+    def get_connected_port(self):
+        return self._driver.get_connected_port()
