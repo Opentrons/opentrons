@@ -45,14 +45,16 @@ class CalibratorTestCase(unittest.TestCase):
                 }
             }
         }
-        my_calibrator = Calibrator()
-        new_deck = my_calibrator.apply_calibration(calibration_data, deck)
+        my_calibrator = Calibrator(deck, calibration_data)
+
+        red = deck['A1']['tube_rack']['Red']
+        blue = deck['A1']['tube_rack']['Blue']
 
         self.assertEqual(
-            new_deck['A1']['tube_rack']['Red'].coordinates(new_deck),
+            my_calibrator.convert(red),
             (13, 18, 3))
         self.assertEqual(
-            new_deck['A1']['tube_rack']['Blue'].coordinates(new_deck),
+            my_calibrator.convert(blue),
             (24, 19, 4))
 
     def test_convert(self):
@@ -78,22 +80,20 @@ class CalibratorTestCase(unittest.TestCase):
                 }
             }
         }
-        my_calibrator = Calibrator()
+        my_calibrator = Calibrator(deck, calibration_data)
         res = my_calibrator.convert(
-            calibration_data,
             deck['A1']['tube_rack']['Blue'],
             deck['A1']['tube_rack']['Blue'].center())
         self.assertEqual(res, (29.0, 24.0, 4.0))
 
         res = my_calibrator.convert(
-            calibration_data,
             deck['A1']['tube_rack'])
         self.assertEqual(res, (7, 12, 2))
 
     def test_calibrate(self):
         deck = self.generate_deck()
-        my_calibrator = Calibrator()
         calibration_data = {}
+        my_calibrator = Calibrator(deck, calibration_data)
 
         current_position = (14, 19, -1)
         tube_rack = deck['A1']['tube_rack']
@@ -115,8 +115,7 @@ class CalibratorTestCase(unittest.TestCase):
         }
         self.assertDictEqual(new_calibration_data, expected_result)
 
-        # apply calibration data to the original deck and get actual back
-        new_deck = my_calibrator.apply_calibration(new_calibration_data, deck)
+        red = deck['A1']['tube_rack']['Red']
         self.assertEqual(
-            new_deck['A1']['tube_rack']['Red'].center(new_deck),
+            my_calibrator.convert(red) + red.center(),
             current_position)

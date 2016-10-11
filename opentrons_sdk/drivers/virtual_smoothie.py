@@ -174,6 +174,9 @@ class VirtualSmoothie(object):
     def process_nop(self, arguments):
         return 'ok'
 
+    def process_disengage_feedback(self, arguments):
+        return 'feedback disengaged\nok'
+
     def insert_response(self, message):
         messages = message.split('\n')
         self.responses = list(reversed(messages)) + self.responses
@@ -191,6 +194,7 @@ class VirtualSmoothie(object):
             'G28': self.process_home_command,
             'M119': self.process_get_endstops,
             'M999': self.process_calm_down,
+            'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
             'G91': self.process_relative_positioning,
             'version': self.process_version,

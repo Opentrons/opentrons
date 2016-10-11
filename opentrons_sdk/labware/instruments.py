@@ -1,6 +1,8 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
+from opentrons_sdk.containers.placeable import Placeable
+from opentrons_sdk.util.vector import Vector
 
 
 class Pipette(object):
@@ -43,7 +45,7 @@ class Pipette(object):
         self.calibration_data = {}
         self.placeables = []
 
-        self.calibrator = Calibrator()
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
         self.set_speed(speed)
 
@@ -55,7 +57,9 @@ class Pipette(object):
 
     def aspirate(self, volume=None, location=None):
 
-        if not volume:
+        if not isinstance(volume, (int, float, complex)):
+            if volume and not location:
+                location = volume
             volume = self.max_volume - self.current_volume
 
         if self.current_volume + volume > self.max_volume:
@@ -64,51 +68,69 @@ class Pipette(object):
                 .format(self.current_volume + volume)
             )
 
-        if location:
-            self.robot.move_to(location, self)
+        self.position_for_aspirate(location)
 
-        empty_pipette = False
         distance = self.plunge_distance(volume) * -1
-        if self.current_volume == 0:
-            empty_pipette = True
 
-        def _do():
-            if empty_pipette:
-                self.plunger.move(self.positions['bottom'])
+        def _do_aspirate():
             self.plunger.move(distance, mode='relative')
             self.plunger.wait_for_arrival()
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
-        self.robot.add_command(Command(do=_do, description=description))
+        self.robot.add_command(
+            Command(do=_do_aspirate, description=description))
         self.current_volume += volume
 
         return self
 
     def dispense(self, volume=None, location=None):
 
-        if not volume:
-            volume = self.max_volume - self.current_volume
+        if not isinstance(volume, (int, float, complex)):
+            if volume and not location:
+                location = volume
+            volume = self.current_volume
 
         if self.current_volume - volume < 0:
-            raise RuntimeWarning(
-                'Pipette cannot dispense {}ul'.
-                format(self.current_volume - volume)
-            )
+            # TODO: this should alert a Warning here, but not stop execution
+            volume = self.current_volume
 
         if location:
-            self.robot.move_to(location, self)
+            self.robot.move_to(location, instrument=self)
 
-        distance = self.plunge_distance(volume)
+        if volume:
+            distance = self.plunge_distance(volume)
 
-        def _do():
-            self.plunger.move(distance, mode='relative')
-            self.plunger.wait_for_arrival()
+            def _do():
+                self.plunger.move(distance, mode='relative')
+                self.plunger.wait_for_arrival()
 
-        description = "Dispensing {0}uL at {1}".format(volume, str(location))
-        self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume -= volume
+            description = "Dispensing {0}uL at {1}".format(
+                volume, str(location))
+            self.robot.add_command(Command(do=_do, description=description))
+            self.current_volume -= volume
 
         return self
+
+    def position_for_aspirate(self, location=None):
+        if location:
+            self.robot.move_to_top(location, instrument=self)
+
+        if self.current_volume == 0:
+            def _prep_plunger():
+                self.plunger.move(self.positions['bottom'])
+
+            description = "Resetting plunger to bottom"
+            self.robot.add_command(
+                Command(do=_prep_plunger, description=description))
+
+        if location:
+            if isinstance(location, Placeable):
+                # go all the way to the bottom
+                bottom = location.from_center(x=0, y=0, z=-1)
+                # go up 1mm to give space to aspirate
+                bottom += Vector(0, 0, 1)
+                location = (location, bottom)
+            self.robot.move_to(location, instrument=self, create_path=False)
 
     def transfer(self, source, destination, volume=None):
         volume = volume or self.max_volume
@@ -140,20 +162,26 @@ class Pipette(object):
         volume = self.current_volume
 
         def _do():
-            for i in range(repetitions):
-                self.dispense(volume)
-                self.aspirate(volume)
-            self.plunger.wait_for_arrival()
+            # plunger movements are handled w/ aspirate/dispense
+            # using Command for printing description
+            pass
 
         description = "Mixing {0} times with a volume of {1}mm".format(
             repetitions, str(self.current_volume)
         )
         self.robot.add_command(Command(do=_do, description=description))
+
+        for i in range(repetitions):
+            self.dispense()
+            self.aspirate(volume)
+
+        self.dispense()
+
         return self
 
     def blow_out(self, location=None):
         if location:
-            self.robot.move_to(location, self)
+            self.robot.move_to(location, instrument=self)
 
         def _do():
             self.plunger.move(self.positions['blow_out'])
@@ -165,10 +193,23 @@ class Pipette(object):
 
         return self
 
+    def touch_tip(self, location=None):
+        if location:
+            self.robot.move_to(location, instrument=self)
+        else:
+            location = self.placeables[-1]
+
+        self.go_to((location, location.from_center(x=1, y=0, z=1)))
+        self.go_to((location, location.from_center(x=-1, y=0, z=1)))
+        self.go_to((location, location.from_center(x=0, y=1, z=1)))
+        self.go_to((location, location.from_center(x=0, y=-1, z=1)))
+
+        return self
+
     def pick_up_tip(self, location=None):
 
         if location:
-            self.robot.move_to(location, self)
+            self.robot.move_to_bottom(location, instrument=self)
 
         # TODO: actual plunge depth for picking up a tip
         # varies based on the tip
@@ -191,7 +232,7 @@ class Pipette(object):
 
     def drop_tip(self, location=None):
         if location:
-            self.robot.move_to(location, self)
+            self.robot.move_to_bottom(location, instrument=self)
 
         def _do():
             self.plunger.move(self.positions['drop_tip'])
@@ -259,6 +300,7 @@ class Pipette(object):
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
+        return self
 
     def plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
@@ -301,6 +343,7 @@ class Pipette(object):
 
         description = "Delaying {} seconds".format(seconds)
         self.robot.add_command(Command(do=_do, description=description))
+        return self
 
     def set_speed(self, rate):
         self.speed = rate
@@ -308,5 +351,7 @@ class Pipette(object):
         def _do():
             self.plunger.speed(rate)
 
-        description = "Setting speed to {}mm/second".format(rate)
+        description = "Setting speed to {}mm/minute".format(rate)
         self.robot.add_command(Command(do=_do, description=description))
+
+        return self

@@ -6,6 +6,8 @@ from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
 
+from opentrons_sdk.helpers import helpers
+
 
 class Robot(object):
     _commands = None  # []
@@ -73,6 +75,10 @@ class Robot(object):
 
         return InstrumentMotor()
 
+    def flip_coordinates(self, coordinates):
+        dimensions = self._driver.get_dimensions()
+        return helpers.flip_coordinates(coordinates, dimensions)
+
     def connect(self, port=None):
         """
         Connects the motor to a serial port.
@@ -98,6 +104,8 @@ class Robot(object):
             return False
 
     def add_command(self, command):
+        print("Enqueing:", command.description)
+        log.info("Enqueing:", command.description)
         self._commands.append(command)
 
     def prepend_command(self, command):
@@ -114,15 +122,15 @@ class Robot(object):
 
     def move_to(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
-        calibration_data = {}
-        if instrument:
-            calibration_data = instrument.calibration_data
-            instrument.placeables.append(placeable)
 
-        coordinates = containers.apply_calibration(
-            calibration_data,
-            placeable,
-            coordinates)
+        if instrument:
+            # add to the list of instument-container mappings
+            instrument.placeables.append(placeable)
+            coordinates = instrument.calibrator.convert(
+                placeable,
+                coordinates)
+        else:
+            coordinates += placeable.coordinates(placeable.get_deck())
 
         tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
         tallest_z += 10
@@ -143,6 +151,16 @@ class Robot(object):
             str(placeable),
             coordinates)
         self.add_command(Command(do=_do, description=description))
+
+    def move_to_top(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
+        self.move_to(top_location, instrument, create_path)
+
+    def move_to_bottom(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        self.move_to(bottom_location, instrument, create_path)
 
     @property
     def actions(self):
