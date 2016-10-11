@@ -81,41 +81,32 @@ def interpret_head(head_dict):
     for tool_name, tool_config in head_dict.items():
         # Validate tool_config keys
         assert SUPPORTED_TOOL_OPTIONS >= set(tool_config.keys())
+        tool_config.pop('tool')
 
         tool_instance = instruments.Pipette(
             name=tool_name,
             axis=tool_config.pop('axis'),
             min_volume=0,
-            channels=(1 if tool_config.pop('multi-channel') else 8),
+            channels=(8 if tool_config.pop('multi-channel') else 1),
         )
+        tool_instance.set_max_volume(tool_config.pop('volume'))
 
         robot_containers = robot._deck.containers()
         tip_rack_objs = [
-            robot_containers[name]
-            for name in tool_config.pop('tip-racks')
+            robot_containers[item['container']]
+            for item in tool_config.pop('tip-racks')
         ]
         tool_config['tip-racks'] = tip_rack_objs
 
-        trash_obj = robot_containers[tool_config.pop('trash-container')]
+        trash_obj = robot_containers[
+            tool_config.pop('trash-container')['container']
+        ]
         tool_config['trash-container'] = trash_obj
+
+        tool_config['points'] = [dict(i) for i in tool_config.pop('points')]
 
         head_obj[tool_name] = {
             'instance': tool_instance,
-            'settings': tool_config
+            'settings': dict(tool_config)
         }
     return head_obj
-
-
-# def interpret_instructions(protocol, instructs_dict):
-#     referenced_tool = instructs_dict.get('tool')
-#     tool_obj = protocol.get(referenced_tool)
-#
-#     for group in instructs_dict.get('groups'):
-#         tool_obj.new_tip()
-#         for command, command_args in group:
-#             handle(command, command_args)
-#
-#             def handle_transfer(tool, args)
-#                 refs_loc = ..tool_obj
-#                 get
-#                 tool.aspirate(args.get('volume'), )

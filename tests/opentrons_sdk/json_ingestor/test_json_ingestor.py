@@ -3,6 +3,7 @@ import json
 import unittest
 
 from opentrons_sdk.robot import Robot
+from opentrons_sdk import containers
 from opentrons_sdk.json_ingestor import (
     interpret_deck,
     interpret_head
@@ -89,7 +90,52 @@ class JSONIngestorTestCase(unittest.TestCase):
             }
         }
         """
+        containers.load('tiprack-200ul', 'A1', 'p200-rack')
+        containers.load('point', 'B2', 'trash')
+
         head_dict = json.loads(head_json, object_pairs_hook=OrderedDict)
         head_res = interpret_head(head_dict)
 
+        settings = {
+            "tip-racks": [
+                self.robot._deck.containers()['p200-rack']
+            ],
+            "trash-container": self.robot._deck.containers()['trash'],
+            "down-plunger-speed": 200,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+            "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+        }
 
+        instrument = self.robot._instruments["B"]
+        head_expected = {
+            'p200': {
+                'instance': instrument,
+                'settings': settings
+            }
+        }
+        self.assertDictEqual(head_expected, head_res)
+        self.assertEqual(1, instrument.channels)
+        self.assertEqual(0, instrument.min_volume)
+        self.assertEqual(200, instrument.max_volume)
+        self.assertEqual('p200', instrument.name)
