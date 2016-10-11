@@ -70,16 +70,17 @@ class Pipette(object):
 
         self.position_for_aspirate(location)
 
-        distance = self.plunge_distance(volume) * -1
+        self.current_volume += volume
+        distance = self.plunge_distance(self.current_volume)
+        destination = self.positions['bottom'] - distance
 
         def _do_aspirate():
-            self.plunger.move(distance, mode='relative')
+            self.plunger.move(destination)
             self.plunger.wait_for_arrival()
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(
             Command(do=_do_aspirate, description=description))
-        self.current_volume += volume
 
         return self
 
@@ -98,16 +99,17 @@ class Pipette(object):
             self.robot.move_to(location, instrument=self)
 
         if volume:
-            distance = self.plunge_distance(volume)
+            self.current_volume -= volume
+            distance = self.plunge_distance(self.current_volume)
+            destination = self.positions['bottom'] - distance
 
             def _do():
-                self.plunger.move(distance, mode='relative')
+                self.plunger.move(destination)
                 self.plunger.wait_for_arrival()
 
             description = "Dispensing {0}uL at {1}".format(
                 volume, str(location))
             self.robot.add_command(Command(do=_do, description=description))
-            self.current_volume -= volume
 
         return self
 
@@ -330,7 +332,8 @@ class Pipette(object):
         if volume > self.max_volume:
             raise IndexError("{}µl exceeds maximum volume.".format(volume))
         if volume < self.min_volume:
-            raise IndexError("{}µl is too small.".format(volume))
+            # TODO: down raise exception, but notify user with a warning
+            pass
 
         return volume / self.max_volume
 

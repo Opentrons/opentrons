@@ -290,6 +290,7 @@ class CNCDriver(object):
             res = self.send_command(self.MOVE, **args)
             if not res == b'ok':
                 return False
+            # check for a PAUSE or HALT flag here
         return True
 
     def move_head(self, mode='absolute', **kwargs):
@@ -325,6 +326,7 @@ class CNCDriver(object):
             res = self.send_command(self.MOVE, **args)
             if not res == b'ok':
                 return False
+            # check for a PAUSE or HALT flag here
         return True
 
     def flip_coordinates(self, coordinates, mode='absolute'):
