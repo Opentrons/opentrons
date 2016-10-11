@@ -3,7 +3,7 @@
   "productName": "OT One App",
   "version": "1.99.99",
   "description": "OT One Robot Companion Desktop App",
-  "main": "main.js",
+  "main": "main/main.js",
   "dependencies": {
     "electron-json-storage": "^2.0.0",
     "electron-settings": "^2.1.1",

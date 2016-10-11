@@ -1,4 +1,5 @@
 @import "util";
+
 /************************
 Buttons Labels Tabs
 ************************/
@@ -17,9 +18,11 @@ Buttons Labels Tabs
     }
 }
 
-button{
-    background-color:white;
-    &:focus {outline:0;}
+button {
+    background-color: white;
+    &:focus {
+        outline: 0;
+    }
 }
 
 
@@ -39,12 +42,6 @@ button{
     &:hover {
         background: darken($primary-brand, 20%);
     }
-}
-
-.btn-connect{
-    @include btn-col-a(2);
-    background-color:$call-to-action;
-    color:white;
 }
 
 .btn-x {
@@ -84,8 +81,8 @@ button{
     &:hover {
         background: lighten($primary-brand, 30%);
     }
-    &.active{
-        background: lighten($primary-brand,20%);
+    &.active {
+        background: lighten($primary-brand, 20%);
     }
 }
 
@@ -95,10 +92,10 @@ button{
         @include rect(1, 1);
         color: $primary-text;
         outline: 1px solid lighten($primary-brand, 35%);
-        &:hover{
+        &:hover {
             background-color: lighten($primary-brand, 40%);
         }
-        &.active{
+        &.active {
             background-color: lighten($primary-brand, 30%);
         }
     }
@@ -122,22 +119,22 @@ button{
     }
 }
 
-.btn-test{
+.btn-test {
     @include btn-col-a(2);
     background-color: $call-to-action;
-    color:white;
-        &:hover {
-            background: darken($call-to-action, 10%);
-        }
+    color: white;
+    &:hover {
+        background: darken($call-to-action, 10%);
+    }
 }
 
-.btn-overwrite{
+.btn-overwrite {
     @include btn-col-a(2);
     background-color: $secondary-brand;
-    color:white;
-        &:hover {
-            background: darken($secondary-brand, 10%);
-        }
+    color: white;
+    &:hover {
+        background: darken($secondary-brand, 10%);
+    }
 }
 
 .test {
@@ -147,10 +144,10 @@ button{
     &:hover {
         background: darken($primary-brand, 10%);
     }
-    &.pick-liquid{
+    &.pick-liquid {
         @include offset-air(2, 0);
     }
-    &.eject-liquid{
+    &.eject-liquid {
         // potential color differentiation moving forward
     }
 }
@@ -166,9 +163,7 @@ button{
     }
 }
 
-.disabled{
+.disabled {
     opacity: 0.1;
     pointer-events: none;
 }
-
-

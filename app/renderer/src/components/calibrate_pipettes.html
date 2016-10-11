@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+</body>
+
+</html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Calibrate Pipettes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+    <div class="nav-full-dark">
+        <header class="brand">
+            <!-- Logo and Status Text  -->
+            <nav class="links">
+                <ul>
+                    <li> Logo</li>
+                </ul>
+            </nav>
+            <nav class="robot">
+                <span>connect to robot</span>
+                <input type="text" id="connect_port" value="/dev/tty.usbmodem1421" />
+                <a href="#" class="btn-connect" id="connect_serial">Connect Serial</a>
+            </nav>
+        </header>
+    </div>
+    <div class="nav-full-light">
+        <header class="controls">
+            <!-- Home Buttons, Speed Control Slider, Tabs  -->
+            <nav class="home">
+                <span class="label">HOME: </span>
+                <a href="#" class="btn-home">X</a>
+                <a href="#" class="btn-home">Y</a>
+                <a href="#" class="btn-home">Z</a>
+                <a href="#" class="btn-home">A</a>
+                <a href="#" class="btn-home">B</a>
+                <a href="#" class="btn-home">ALL</a>
+            </nav>
+            <nav class="tabs">
+                <a href="#" class="tab active">Protocol</a>
+                <a href="#" class="tab">Debug</a>
+            </nav>
+    </div>
+    </header>
+    </div>
+    <div class="wrapper">
+        <!-- Attach Step List Component Here-->
+        <aside id="step-list">
+            <!-- Static Placeholder for Component -->
+            <ul>
+                <li class="completed">
+                    <a href="index.html">Connect to Robot</a>
+                    <!-- If more than 1 step in Task group, enumerate and render number of steps -->
+                    <ul>
+                        <!-- for each step in a task group -->
+                        <li class="completed"><a href="#">Power On</a></li>
+                        <li class="completed"><a href="#">Connect To Serial</a></li>
+                        <li class="completed"><a href="#">Optional Homing</a></li>
+                    </ul>
+                </li>
+                <li class="completed"><a href="upload.html">Upload Protocol</a></li>
+                <li class="completed">
+                    <a href="calibrate_containers.html">Calibrate Containers</a>
+                    <!-- If more than 1 step in Task group, enumerate and render number of steps -->
+                    <ul>
+                        <!-- for each step in a task group -->
+                        <li class="completed"><a href="#">p200 Tiprack</a></li>
+                        <li class="completed"><a href="#">PCR Source</a></li>
+                        <li class="completed"><a href="#">PCR Output</a></li>
+                    </ul>
+                </li>
+                <li class="active">
+                    <a href="calibrate_pipettes.html">Calibrate Pipettes</a>
+                    <!-- If more than 1 step in Task group, enumerate and render number of steps -->
+                    <ul>
+                        <!-- for each step in a task group -->
+                        <li class="active"><a href="#">p200 Single Axis B</a></li>
+                        <li><a href="#">p200 Multi Axis A</a></li>
+                    </ul>
+                </li>
+                <li ><a href="review_calibrations.html">Review Calibrations</a></li>
+            </ul>
+        </aside>
+        <!-- Attach Step Pane Here -->
+        <section id="task-pane">
+            <section>
+                <h2 class="title">Calibrate Pipette Name</h2>
+                <div class="instructions">
+                    Pipette type, num channels, and axis specific instructions. Calibrate plunger, then calibrate max vol.
+                </div>
+                <div class="step step-calibrate">
+                    <div class="move">
+                        <h3 class="title">Jog X-Y-Z</h3>
+                        <div class="jog">
+                            <a href="#" data-axis="y" data-direction="neg" class="btn-full btn-y">Y</a>
+                            <a href="#" data-axis="z" data-direction="neg" class="btn-full btn-z">Z</a>
+                            <a href="#" data-axis="x" data-direction="neg" class="btn-full x">X</a>
+                            <a href="#" data-axis="x" data-direction="pos" class="btn-full btn-x">X</a>
+                            <a href="#" data-axis="y" data-direction="pos" class="btn-full btn-y">Y</a>
+                            <a href="#" data-axis="z" data-direction="pos" class="btn-full btn-z">Z</a>
+                        </div>
+                        <h3 class="title">Select Increment [mm]</h3>
+                        <div class="increment xyz">
+                            <button data-increment="20" class="btn-full btn-group">20</button>
+                            <button data-increment="10" class="btn-full btn-group">10</button>
+                            <button data-increment="5" class="btn-full btn-group">5</button>
+                            <button data-increment="1" class="btn-full btn-group">1</button>
+                            <button data-increment="0.5" class="btn-full btn-group">0.5</button>
+                            <button data-increment="0.1" class="btn-full btn-group">0.1</button>
+                            <button data-increment="91" class="btn-slot">&#8596; slot-x </button>
+                            <button data-increment="135" class="btn-slot">&#8597; slot-y </button>
+                        </div>
+                        <h3 class="title">Move to Slot</h3>
+                        <div class="deck">
+                            <!-- testing x,y data attributes for absolute movement, 
+            need specific coords moving forward -->
+                            <button data-x="1" data-y="2" class="btn-deck">A3</a>
+                                <button class="btn-deck">B3</button>
+                                <button class="btn-deck">C3</button>
+                                <button class="btn-deck">D3</button>
+                                <button class="btn-deck">E3</button>
+                                <button class="btn-deck">A2</button>
+                                <button class="btn-deck">B2</button>
+                                <button class="btn-deck">C2</button>
+                                <button class="btn-deck">D2</button>
+                                <button class="btn-deck">E2</button>
+                                <button class="btn-deck">A1</button>
+                                <button class="btn-deck">B1</button>
+                                <button class="btn-deck">C1</button>
+                                <button class="btn-deck">D1</button>
+                                <button class="btn-deck">E1</button>
+                        </div>
+                        <!-- End Deck -->
+                    </div>
+                    <!-- End Move -->
+                    <div class="move-pipette">
+                        <h3 class="title">Jog Plunger</h3>
+                        <div class="plunger">
+                            <div class="jog-b">
+                                <a href="#" data-axis="b" data-direction="neg" class="btn-full btn-ab">P</a>
+                                <a href="#" data-axis="b" data-direction="pos" class="btn-full btn-ab btn-down">P</a>
+                            </div>
+                        </div>
+                        <div class="increment pipette">
+                            <button data-increment="2" class="btn-full btn-group">2</button>
+                            <button data-increment="1" class="btn-full btn-group">1</button>
+                            <button data-increment="0.5" class="btn-full btn-group">0.5</button>
+                            <button data-increment="0.1" class="btn-full btn-group">0.1</button>
+                        </div>
+                    </div>
+                    <!-- End Move Pipette -->
+                    <div class="save-pipette">
+                        <h3 class="title">Current Position</h3>
+                        <div class="coords">
+                            <label class="label">X:</label>
+                            <input type="text" value="0" />
+                            <label class="label">Y:</label>
+                            <input type="text" value="0" />
+                            <label class="label">Z:</label>
+                            <input type="text" value="0" />
+                            <label class="label">A:</label>
+                            <input type="text" value="0" />
+                        </div>
+                        <h3 class="title">Pipette Name and Actuator</h3>
+                        <div class="calibration-modal mode-droptip">
+                            <div class="pipette-img">
+                                <img src="assets/img/pipette_top.png" class="top" />
+                                <img src="assets/img/pipette_bottom.png" class="bottom" />
+                                <img src="assets/img/pipette_blowout.png" class="blowout" />
+                                <img src="assets/img/pipette_droptip.png" class="droptip" />
+                            </div>
+                            <div class="update">
+                                <a href="#pipette_top" class="position top">Top</a>
+                                <button class="btn-update save top" data-save-pipette="top">Save</button>
+                                <button class="btn-update moveto ">Move</button>
+                                <div class="spacer"></div>
+                                <a href="#pipette_bottom" class="position bottom">Bottom</a>
+                                <button class="btn-update save bottom" data-save-pipette="bottom">Save</button>
+                                <button class="btn-update moveto ">Move</button>
+                                <a href="#pipette_blowout" class="position blowout">Blowout</a>
+                                <button class="btn-update save blowout" data-save-pipette="blowout">Save</button>
+                                <button class="btn-update moveto">Move</button>
+                                <a href="#pipette_droptip" class="position droptip">Drop Tip</a>
+                                <button class="btn-update save droptip" data-save-pipette="droptip">Save</button>
+                                <button class="btn-update moveto disabled">Move</button>
+                                <button class="btn-update test pick-liquid disabled">Pick Up {{data.test_volume}}</button>
+                                <button class="btn-update test eject-liquid disabled">Eject {{data.test_volume}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end save pipette -->
+                </div>
+                <!-- End Step -->
+                <!-- Nav Will Need Prev/Next Logic -->
+                <nav>
+                    <a href="#" class="prev">Prev</a><a href="#info" class="help">?</a><a href="#" class="next">Next</a>
+                </nav>
+                <!-- End Nav Component -->
+            </section>
+            <!-- Info Modal Component-->
+            <div id="info" class="infoModal">
+                <div> <a href="#close" title="Close" class="close">X</a>
+                    <h2>Title</h2>
+                    <p>
+                        Images would go here along with explanation text.
+                    </p>
+                </div>
+            </div>
+            <!-- End Info Modal Component -->
+        </section>
+        <!-- End Task Pane -->
+    </div>
+</body>
+
+</html>

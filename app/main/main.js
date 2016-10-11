@@ -9,14 +9,15 @@ const {initAutoUpdater} = require('./updater.js')
 
 
 
-let serverManager = new ServerManager()
+// let serverManager = new ServerManager()
 const mainLogger = getLogger('electron-main')
 let mainWindow
 
 
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
-  mainWindow.loadURL("http://127.0.0.1:5000/welcome/connect")
+  // TODO: use FLASK port when not in development
+  mainWindow.loadURL("http://127.0.0.1:5000")
 
   mainWindow.on('closed', function () {
     mainWindow = null
@@ -25,7 +26,7 @@ function createWindow () {
 }
 
 function startUp() {
-  serverManager.start();
+  // serverManager.start();
   setTimeout(createWindow, 2000)
   initAutoUpdater()
   process.on('uncaughtException', function(error) {
@@ -38,5 +39,5 @@ function startUp() {
 app.on('ready', startUp)
 
 app.on('quit', function(){
-    serverManager.shutdown();
+    // serverManager.shutdown();
 });

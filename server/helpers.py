@@ -31,3 +31,4 @@ def get_assets(root, kind, ext, content=False):
         else:
             assets[name] = ''
     return assets
+
