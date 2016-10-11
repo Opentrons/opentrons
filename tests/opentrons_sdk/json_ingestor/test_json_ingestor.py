@@ -6,7 +6,9 @@ from opentrons_sdk.robot import Robot
 # from opentrons_sdk import containers
 from opentrons_sdk.json_ingestor import (
     interpret_deck,
-    interpret_head
+    interpret_head,
+    interpret_instructions,
+    interpret_json_protocol
 )
 
 
@@ -134,13 +136,26 @@ class JSONIngestorTestCase(unittest.TestCase):
             }
         }
 
-        # from pprint import pprint as pp
+        from pprint import pprint as pp
         #
-        # pp(head_expected)
-        # print('------')
-        # pp(head_res)
+        pp(head_expected)
+        print('------')
+        pp(head_res)
         self.assertDictEqual(head_expected, head_res)
         self.assertEqual(1, instrument.channels)
         self.assertEqual(0, instrument.min_volume)
         self.assertEqual(200, instrument.max_volume)
         self.assertEqual('p200', instrument.name)
+
+    def test_interpret_instructions(self):
+        pass
+
+
+    def test_interpret_json_protocol(self):
+        super_protocol_json = None
+        with open('super_protocol.json') as f:
+            super_protocol_json = json.load(
+                f,
+                object_pairs_hook=OrderedDict
+            )
+        interpret_json_protocol(super_protocol_json)

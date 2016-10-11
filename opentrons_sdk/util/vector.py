@@ -106,10 +106,11 @@ class Vector(object):
         return self * Vector(scalar, scalar, scalar)
 
     def __str__(self):
-        return "Vector{}".format(self.__repr__())
-
-    def __repr__(self):
-        return str(self.to_tuple())
+        return "(x={:.2f}, y={:.2f}, z={:.2f})".format(
+            self.coordinates.x,
+            self.coordinates.y,
+            self.coordinates.z,
+        )
 
     def __getitem__(self, index):
         res = None

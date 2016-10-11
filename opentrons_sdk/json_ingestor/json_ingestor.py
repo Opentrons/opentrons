@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import itertools
 
 from opentrons_sdk import containers
 from opentrons_sdk.labware import instruments
@@ -8,6 +9,7 @@ from opentrons_sdk.robot import Robot
 def interpret_json_protocol(json_protocol: OrderedDict):
     robot_deck = interpret_deck(json_protocol['deck'])
     robot_head = interpret_head(robot_deck, json_protocol['head'])
+    interpret_instructions(robot_deck, robot_head, json_protocol['instructions'])
 
 
 def interpret_deck(deck_info: OrderedDict):
@@ -41,6 +43,7 @@ def interpret_deck(deck_info: OrderedDict):
 
 
 def interpret_head(robot_deck, head_dict: OrderedDict):
+
     """
     res example:
     { name: {
@@ -107,13 +110,54 @@ def interpret_head(robot_deck, head_dict: OrderedDict):
         }
     return head_obj
 
-def interpret_instructions(protocol, instructions: list):
+
+def interpret_instructions(robot_deck, robot_head, instructions: list):
     for instruction_dict in instructions:
         tool_name = instruction_dict.get('tool')
-        tool_obj = protocol['instruments'][tool_name]['instance']
+        tool_obj = robot_head[tool_name]['instance']
+        trash_container = robot_head[tool_name]['settings']['trash-container']
 
-        # tips = (tip for tip in protocol.)
+        tips = itertools.cycle(
+            itertools.chain(*robot_head[tool_name]['settings']['tip-racks'])
+        )
 
-        # tool_obj.pick_up_tip()
+        for group in instruction_dict.get('groups'):
+            # We always pick up a new tip when entering a group
+            tool_obj.pick_up_tip(next(tips))
+            for command, command_args in group.items():
+                handle_command(
+                    tool_obj, robot_deck, robot_head, command, command_args
+                )
+            # LEAVING GROUP
+            tool_obj.drop_tip(trash_container)
 
 
+def handle_command(tool_obj, robot_deck, robot_head, command, command_args):
+    SUPPORTED_COMMANDS = {
+        'transfer': handle_transfer,
+        'distribute': handle_distribute,
+        'mix': handle_mix,
+        'consolidate': handle_consolidate
+    }
+
+    if command not in SUPPORTED_COMMANDS:
+        raise Exception('Unsupported COMMAND "{}" encountered'.format(command))
+    return SUPPORTED_COMMANDS[command](
+        tool_obj, robot_deck, robot_head, command_args
+    )
+
+
+def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
+    print(tool_obj, robot_head, robot_deck, command_args)
+
+
+def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
+    pass
+
+
+def handle_mix(tool_obj, robot_deck, robot_head, command_args):
+    pass
+
+
+def handle_consolidate(tool_obj, robot_deck, robot_head, command_args):
+    pass
