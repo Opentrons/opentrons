@@ -19,7 +19,8 @@ Vue.component('Connect', Connect)
 
 const routes = [
   { path: '/connect', component: Connect },
-  { path: '/upload', component: Upload }
+  { path: '/upload', component: Upload },
+  { path: '*', redirect: "/connect" }
 ]
 
 const router = new VueRouter({

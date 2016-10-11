@@ -17,7 +17,7 @@ let mainWindow
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
   // TODO: use FLASK port when not in development
-  mainWindow.loadURL("http://127.0.0.1:8090")
+  mainWindow.loadURL("http://127.0.0.1:5000")
 
   mainWindow.on('closed', function () {
     mainWindow = null
