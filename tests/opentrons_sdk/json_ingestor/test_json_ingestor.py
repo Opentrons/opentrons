@@ -36,13 +36,10 @@ class JSONIngestorTestCase(unittest.TestCase):
         containers_res = interpret_deck(deck_dict)
 
         robot_deck = self.robot._deck
-        robot_containers = {c.get_name(): c
-                            for c in robot_deck.containers()}
+        robot_containers = robot_deck.containers()
 
-        containers_expected = {
-            key: {'instance': robot_containers[key]}
-            for key in deck_dict.keys()
-        }
+        containers_expected = {k: {'instance': v}
+                                   for k, v in robot_containers.items()}
         self.assertDictEqual(containers_res, containers_expected)
 
         for name, container_instance in robot_containers.items():
@@ -93,9 +90,6 @@ class JSONIngestorTestCase(unittest.TestCase):
         }
         """
         head_dict = json.loads(head_json, object_pairs_hook=OrderedDict)
-
-        print([str(i) for i in  head_dict['p200'].keys()])
-
         head_res = interpret_head(head_dict)
 
 

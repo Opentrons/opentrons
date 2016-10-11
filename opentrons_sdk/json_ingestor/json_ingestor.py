@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
 from opentrons_sdk import containers
+from opentrons_sdk.labware import instruments
+from opentrons_sdk.robot import Robot
 
 
 def interpret_json_protocol(json_protocol : OrderedDict):
@@ -42,9 +44,8 @@ def interpret_deck(deck_info : OrderedDict):
     return containers_data
 
 
-def interpret_head(protocol, head_dict):
+def interpret_head(head_dict):
     """
-
     res example:
     { name: {
         'instance': ..,
@@ -72,6 +73,38 @@ def interpret_head(protocol, head_dict):
         'distribute-percentage',
         'points'
     }
+
+
+    head_obj = {}
+    robot = Robot.get_instance()
+
+    for tool_name, tool_config in head_dict.items():
+        # Validate tool_config keys
+        assert SUPPORTED_TOOL_OPTIONS >= set(tool_config.keys())
+
+        tool_instance = instruments.Pipette(
+            name=tool_name,
+            axis=tool_config.pop('axis'),
+            min_volume=0,
+            channels=(1 if tool_config.pop('multi-channel') else 8),
+        )
+
+        robot_containers = robot._deck.containers()
+        tip_rack_objs = [
+            robot_containers[name]
+            for name in tool_config.pop('tip-racks')
+        ]
+        tool_config['tip-racks'] = tip_rack_objs
+
+        trash_obj = robot_containers[tool_config.pop('trash-container')]
+        tool_config['trash-container'] = trash_obj
+
+        head_obj[tool_name] = {
+            'instance': tool_instance,
+            'settings': tool_config
+        }
+    return head_obj
+
 
 # def interpret_instructions(protocol, instructs_dict):
 #     referenced_tool = instructs_dict.get('tool')

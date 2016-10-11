@@ -246,15 +246,15 @@ class Placeable(object):
 
 
 class Deck(Placeable):
-    def containers(self) -> list:
+    def containers(self) -> dict:
         containers = []
         for slot in self:
             for container in slot:
                 containers.append(container)
-        return containers
+        return {c.get_name(): c for c in containers}
 
     def has_container(self, query):
-        return query in self.containers()
+        return query in self.containers().values()
 
 
 class Slot(Placeable):
