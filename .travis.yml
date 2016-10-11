@@ -5,7 +5,12 @@ python:
 install: 
   - python setup.py install
   - pip install pylama
+  - pip install coverage
+  - pip install coveralls
 
 script: 
-  - nosetests
+  - nosetests --with-coverage
   - pylama
+
+after_success:
+  coveralls
