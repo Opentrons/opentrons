@@ -7,6 +7,7 @@ Vue.use(Vuex)
 const state = {
     is_connected: false,
     port: null,
+    current_protocol_name: "No File Selected"
 }
 
 
@@ -15,6 +16,9 @@ const mutations = {
         state.is_connected = payload.is_connected
         state.port = payload.port
     },
+    UPDATE_CURRENT_PROTOCOL (state, payload) {
+      state.current_protocol_name = payload.current_protocol_name
+    }
 }
 
 const actions = {
@@ -45,6 +49,16 @@ const actions = {
             }, (response) => {
                 console.log('Failed to communicate to backend server. Failed to connect', response)
             })
+    },
+    uploadProtocol ({commit}, target) {
+      Vue.http
+        .post('http://localhost:5000/upload', {file: target.result})
+        .then((response) => {
+          console.log(response)
+          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName})
+        }, (response) => {
+          console.log('failed to upload', response)
+        })
     }
 }
 
