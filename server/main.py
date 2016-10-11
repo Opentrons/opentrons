@@ -6,7 +6,7 @@ import threading
 sys.path.insert(0, os.path.abspath('..'))
 
 import flask
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 
 from opentrons_sdk.robot import Robot
@@ -33,18 +33,18 @@ robot = Robot.get_instance()
 def welcome():
     return render_template("index.html")
 
+@app.route("/upload", methods=["POST"])
+def upload():
+    print(request.data)
+    # this should eventually process the protocol for errors
+    return request.data
+
 
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
     root = get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'templates', 'dist')
     return flask.send_from_directory(scripts_root_path, filename)
-
-
-# welcome route for uploading protocol
-@app.route("/upload/<path:path>")
-def upload(path):
-    return render_template("upload.html")
 
 
 @app.route("/robot/serial/list")
