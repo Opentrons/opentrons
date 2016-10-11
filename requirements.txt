@@ -5,7 +5,7 @@ greenlet==0.4.10
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
-git+git://github.com/OpenTrons/opentrons_sdk.git@57-m-connect-to-robot#egg=opentrons_sdk
+git+git://github.com/OpenTrons/opentrons_sdk.git@master#egg=opentrons_sdk
 psutil==4.3.1
 pyinstaller==3.1.1
 pyserial==3.1.1
