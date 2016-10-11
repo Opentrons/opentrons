@@ -74,7 +74,6 @@ function createWebSocketPlugin(socket) {
       console.log(data)
       if (data.type === 'connection_status') {
         if (data.is_connected === false) {
-          console.log('got here')
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
         }
       }
