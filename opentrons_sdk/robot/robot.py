@@ -90,9 +90,6 @@ class Robot(object):
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
         return self._driver.connect(port)
 
-    def disconnect(self):
-        self._driver.disconnect()
-
     def home(self, *args):
         if self._driver.calm_down():
             if args:

@@ -169,10 +169,6 @@ class CNCDriver(object):
 
         self.get_ot_version()
 
-    def disconnect(self):
-        if self.connection and self.connection.isOpen():
-            self.connection.close()
-
     def send_command(self, command, **kwargs):
         """
         Sends a GCode command.  Keyword arguments will be automatically
