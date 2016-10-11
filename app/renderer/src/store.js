@@ -10,7 +10,6 @@ const state = {
 }
 
 
-
 const mutations = {
     UPDATE_ROBOT_CONNECTION (state, payload) {
         state.is_connected = payload.is_connected

@@ -116,13 +116,6 @@ def disconnect_robot():
 
     try:
         robot.disconnect()
-        # connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
-        #     'CONNECTION_STATE_WATCHER',
-        #     (None, None)
-        # )
-        # if connection_state_watcher and watcher_should_run:
-        #     watcher_should_run.set()
-        # BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (None, None)
     except Exception as e:
         status = 'error'
         data = str(e)
