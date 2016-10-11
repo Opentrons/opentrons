@@ -1,43 +1,9 @@
 from collections import namedtuple
-import math
 
 
 # To keep Python 3.4 compatibility
 def isclose(a, b, rel_tol):
     return abs(a - b) < rel_tol
-
-
-def path_to_steps(p1, p2, increment=5, mode='absolute'):
-    """
-    given two points p1 and p2, this returns a list of
-    incremental positions or relative steps
-    """
-    Point = Vector
-    if not isinstance(p1, Vector):
-        Point = float
-
-    distance = Point(p2)
-    if mode is 'absolute':
-        distance = p2 - p1
-
-    if isinstance(p1, Vector):
-        travel = math.sqrt(
-            pow(distance[0], 2) + pow(distance[1], 2) + pow(distance[2], 2))
-    else:
-        travel = distance
-
-    divider = max(int(travel / increment), 1)
-    step = Point(distance / divider)
-
-    res = []
-    if mode is 'absolute':
-        for i in range(divider):
-            p1 = p1 + step
-            res.append(Point(p1))
-    else:
-        for i in range(divider):
-            res.append(step)
-    return res
 
 
 class Vector(object):
