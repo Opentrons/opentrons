@@ -282,12 +282,12 @@ class CNCDriver(object):
                              'please use mode=(absolute|relative)')
 
         self.set_coordinate_system(mode)
-        current = self.get_head_position()
+        current = self.get_head_position()['target']
         log.debug('Motor Driver', 'Current Head Position: {}'.format(current))
         vector = {
             axis: kwargs.get(
                 axis,
-                0 if mode == 'relative' else current['target'][axis]
+                0 if mode == 'relative' else current[axis]
             )
             for axis in 'xyz'
         }
