@@ -19,7 +19,7 @@ def flip_coordinates(coordinates, dimensions):
     return (x, y_size - y, z_size - z)
 
 
-def increment_between(p1, p2, increment=5, mode='absolute'):
+def break_down_travel(p1, p2, increment=5, mode='absolute'):
     """
     given two points p1 and p2, this returns a list of
     incremental positions or relative steps

@@ -8,7 +8,7 @@ import serial
 from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.util import log
 from opentrons_sdk.util.vector import Vector
-from opentrons_sdk.helpers.helpers import increment_between
+from opentrons_sdk.helpers.helpers import break_down_travel
 
 
 JSON_ERROR = None
@@ -269,13 +269,28 @@ class CNCDriver(object):
 
         self.set_coordinate_system(mode)
 
-        args = {axis.upper(): kwargs[axis]
-                for axis in 'ab'
-                if axis in kwargs}
+        current = self.get_plunger_positions()['current']
 
-        log.debug("MotorDriver", "Moving plunger: {}".format(args))
-        res = self.send_command(self.MOVE, **args)
-        return res == b'ok'
+        # create Vectors out of A/B axis to calculate incremental steps
+        # this allows the A/B axis to move together and arrive at the same time
+        current_vector = Vector(current['a'], current['b'], 0)
+        target_vector = Vector(kwargs.get('a', 0), kwargs.get('b', 0), 0)
+
+        vector_list = break_down_travel(
+            current_vector, target_vector, mode=mode)
+
+        for vector in vector_list:
+
+            current_step = {'a': vector[0], 'b': vector[1]}
+            args = {axis.upper(): current_step[axis]
+                    for axis in 'ab'
+                    if axis in kwargs}
+
+            log.debug("MotorDriver", "Moving plunger: {}".format(args))
+            res = self.send_command(self.MOVE, **args)
+            if not res == b'ok':
+                return False
+        return True
 
     def move_head(self, mode='absolute', **kwargs):
         if 'absolute' in kwargs:
@@ -295,15 +310,15 @@ class CNCDriver(object):
         }
         log.debug('Motor Driver', 'Destination: {}'.format(target_point))
 
-        flipped_vector = self.flip_coordinates(target_point, mode)
-
-        vector_list = increment_between(current, flipped_vector)
+        vector_list = break_down_travel(
+            current, Vector(target_point), mode=mode)
 
         for vector in vector_list:
             # vector contains every axis, however we are passing
             # only those that were supplied in kwargs down to send_command
+            flipped_vector = self.flip_coordinates(vector, mode)
             args = {
-                axis.upper(): vector[axis]
+                axis.upper(): flipped_vector[axis]
                 for axis in 'xyz' if axis in kwargs}
 
             log.debug("MotorDriver", "Moving head: {}".format(args))
