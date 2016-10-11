@@ -3,7 +3,7 @@ import json
 import unittest
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk import containers
+# from opentrons_sdk import containers
 from opentrons_sdk.json_ingestor import (
     interpret_deck,
     interpret_head
@@ -15,8 +15,7 @@ class JSONIngestorTestCase(unittest.TestCase):
         Robot.reset()
         self.robot = Robot.get_instance()
 
-    def test_interpret_deck(self):
-
+    def load_deck(self):
         deck_json = """{
             "p200-rack": {
                 "labware": "tiprack-200ul",
@@ -31,10 +30,11 @@ class JSONIngestorTestCase(unittest.TestCase):
                 "slot" : "B2"
             }
         }"""
-
         deck_dict = json.loads(deck_json, object_pairs_hook=OrderedDict)
+        return (interpret_deck(deck_dict), deck_dict)
 
-        containers_res = interpret_deck(deck_dict)
+    def test_interpret_deck(self):
+        containers_res, deck_dict = self.load_deck()
 
         robot_deck = self.robot._deck
         robot_containers = robot_deck.containers()
@@ -90,11 +90,10 @@ class JSONIngestorTestCase(unittest.TestCase):
             }
         }
         """
-        containers.load('tiprack-200ul', 'A1', 'p200-rack')
-        containers.load('point', 'B2', 'trash')
 
+        robot_deck, _ = self.load_deck()
         head_dict = json.loads(head_json, object_pairs_hook=OrderedDict)
-        head_res = interpret_head(head_dict)
+        head_res = interpret_head(robot_deck, head_dict)
 
         settings = {
             "tip-racks": [
@@ -134,6 +133,12 @@ class JSONIngestorTestCase(unittest.TestCase):
                 'settings': settings
             }
         }
+
+        # from pprint import pprint as pp
+        #
+        # pp(head_expected)
+        # print('------')
+        # pp(head_res)
         self.assertDictEqual(head_expected, head_res)
         self.assertEqual(1, instrument.channels)
         self.assertEqual(0, instrument.min_volume)

@@ -5,16 +5,12 @@ from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 
 
-def interpret_json_protocol(json_protocol : OrderedDict):
-    protocol = {
-        'containers': {},
-        'instruments': {}
-    }
-    protocol['containers'] = interpret_deck(json_protocol['deck'])
-    protocol['head'] = interpret_head(json_protocol['head'])
+def interpret_json_protocol(json_protocol: OrderedDict):
+    robot_deck = interpret_deck(json_protocol['deck'])
+    robot_head = interpret_head(robot_deck, json_protocol['head'])
 
 
-def interpret_deck(deck_info : OrderedDict):
+def interpret_deck(deck_info: OrderedDict):
     """
     "deck": {
         "p200-rack": {
@@ -44,7 +40,7 @@ def interpret_deck(deck_info : OrderedDict):
     return containers_data
 
 
-def interpret_head(head_dict):
+def interpret_head(robot_deck, head_dict: OrderedDict):
     """
     res example:
     { name: {
@@ -91,16 +87,16 @@ def interpret_head(head_dict):
         )
         tool_instance.set_max_volume(tool_config.pop('volume'))
 
-        robot_containers = robot._deck.containers()
+        # robot_containers = robot._deck.containers()
         tip_rack_objs = [
-            robot_containers[item['container']]
+            robot_deck[item['container']]['instance']
             for item in tool_config.pop('tip-racks')
         ]
         tool_config['tip-racks'] = tip_rack_objs
 
-        trash_obj = robot_containers[
+        trash_obj = robot_deck[
             tool_config.pop('trash-container')['container']
-        ]
+        ]['instance']
         tool_config['trash-container'] = trash_obj
 
         tool_config['points'] = [dict(i) for i in tool_config.pop('points')]
@@ -110,3 +106,14 @@ def interpret_head(head_dict):
             'settings': dict(tool_config)
         }
     return head_obj
+
+def interpret_instructions(protocol, instructions: list):
+    for instruction_dict in instructions:
+        tool_name = instruction_dict.get('tool')
+        tool_obj = protocol['instruments'][tool_name]['instance']
+
+        # tips = (tip for tip in protocol.)
+
+        # tool_obj.pick_up_tip()
+
+
