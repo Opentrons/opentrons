@@ -8,6 +8,7 @@ import serial
 from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.util import log
 from opentrons_sdk.util.vector import Vector
+from opentrons_sdk.helpers.helpers import increment_between
 
 
 JSON_ERROR = None
@@ -283,27 +284,33 @@ class CNCDriver(object):
 
         self.set_coordinate_system(mode)
         current = self.get_head_position()['target']
+
         log.debug('Motor Driver', 'Current Head Position: {}'.format(current))
-        vector = {
+        target_point = {
             axis: kwargs.get(
                 axis,
                 0 if mode == 'relative' else current[axis]
             )
             for axis in 'xyz'
         }
-        log.debug('Motor Driver', 'Destination: {}'.format(vector))
+        log.debug('Motor Driver', 'Destination: {}'.format(target_point))
 
-        vector = self.flip_coordinates(vector, mode)
+        flipped_vector = self.flip_coordinates(target_point, mode)
 
-        # vector contains every axis, however we are passing
-        # only those that were supplied in kwargs down to send_command
-        args = {
-            axis.upper(): vector[axis]
-            for axis in 'xyz' if axis in kwargs}
+        vector_list = increment_between(current, flipped_vector)
 
-        log.debug("MotorDriver", "Moving head: {}".format(args))
-        res = self.send_command(self.MOVE, **args)
-        return res == b'ok'
+        for vector in vector_list:
+            # vector contains every axis, however we are passing
+            # only those that were supplied in kwargs down to send_command
+            args = {
+                axis.upper(): vector[axis]
+                for axis in 'xyz' if axis in kwargs}
+
+            log.debug("MotorDriver", "Moving head: {}".format(args))
+            res = self.send_command(self.MOVE, **args)
+            if not res == b'ok':
+                return False
+        return True
 
     def flip_coordinates(self, coordinates, mode='absolute'):
         coordinates = Vector(coordinates) * Vector(1, -1, -1)
