@@ -10,6 +10,8 @@ from opentrons_sdk.util import log
 from opentrons_sdk.util.vector import Vector
 from opentrons_sdk.helpers.helpers import break_down_travel
 
+from threading import Event
+
 
 JSON_ERROR = None
 if sys.version_info > (3, 4):
@@ -67,6 +69,11 @@ class CNCDriver(object):
         'one_standard': Vector(300, 250, 120)
     }
     VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
+
+    def __init__(self):
+        self.stopped = Event()
+        self.can_move = Event()
+        self.resume()
 
     def get_connected_port(self):
         """
@@ -169,6 +176,17 @@ class CNCDriver(object):
         self.turn_off_feedback()
 
         self.get_ot_version()
+
+    def pause(self):
+        self.can_move.clear()
+
+    def resume(self):
+        self.can_move.set()
+        self.stopped.clear()
+
+    def stop(self):
+        self.stopped.set()
+        self.can_move.set()
 
     def send_command(self, command, **kwargs):
         """
@@ -314,7 +332,14 @@ class CNCDriver(object):
         vector_list = break_down_travel(
             current, Vector(target_point), mode=mode)
 
-        for vector in vector_list:
+        vector_iter = iter(vector_list)
+        while self.can_move.wait():
+            if self.stopped.is_set():
+                return (False, 'Stopped')
+            try:
+                vector = next(vector_iter)
+            except StopIteration:
+                return (True, 'Success')
             # vector contains every axis, however we are passing
             # only those that were supplied in kwargs down to send_command
             flipped_vector = self.flip_coordinates(vector, mode)
@@ -324,10 +349,9 @@ class CNCDriver(object):
 
             log.debug("MotorDriver", "Moving head: {}".format(args))
             res = self.send_command(self.MOVE, **args)
-            if not res == b'ok':
-                return False
-            # check for a PAUSE or HALT flag here
-        return True
+            if res != b'ok':
+                return (False, 'Smoothie error')
+        return (True, 'Success')
 
     def flip_coordinates(self, coordinates, mode='absolute'):
         coordinates = Vector(coordinates) * Vector(1, -1, -1)
@@ -383,11 +407,6 @@ class CNCDriver(object):
         s = int(sec)
         res = self.send_command(self.DWELL, S=s, P=ms)
         return res == b'ok'
-
-    def halt(self):
-        res = self.send_command(self.HALT)
-        return res == (b'ok Emergency Stop Requested - '
-                       b'reset or M999 required to continue')
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)

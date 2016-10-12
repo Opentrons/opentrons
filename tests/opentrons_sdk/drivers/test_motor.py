@@ -1,3 +1,4 @@
+from threading import Thread
 import unittest
 
 from opentrons_sdk.drivers.motor import CNCDriver
@@ -19,6 +20,19 @@ class OpenTronsTest(unittest.TestCase):
 
     def tearDown(self):
         self.motor.disconnect()
+
+    def test_pause_resume(self):
+        self.motor.home()
+
+        self.motor.pause()
+
+        def _move_head():
+            self.motor.move_head(x=100)
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.resume()
 
     def test_get_position(self):
         self.motor.home()
