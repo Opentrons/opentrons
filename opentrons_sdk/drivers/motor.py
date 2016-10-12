@@ -297,19 +297,16 @@ class CNCDriver(object):
         vector_list = break_down_travel(
             current_vector, target_vector, mode=mode)
 
+        # turn the vector list into axis args
+        args_list = []
         for vector in vector_list:
-
             current_step = {'a': vector[0], 'b': vector[1]}
-            args = {axis.upper(): current_step[axis]
-                    for axis in 'ab'
-                    if axis in kwargs}
+            args_list.append(
+                {axis.upper(): current_step[axis]
+                 for axis in 'ab'
+                 if axis in kwargs})
 
-            log.debug("MotorDriver", "Moving plunger: {}".format(args))
-            res = self.send_command(self.MOVE, **args)
-            if not res == b'ok':
-                return False
-            # check for a PAUSE or HALT flag here
-        return True
+        return self.queue_move_commands(args_list)
 
     def move_head(self, mode='absolute', **kwargs):
         if 'absolute' in kwargs:
@@ -332,20 +329,25 @@ class CNCDriver(object):
         vector_list = break_down_travel(
             current, Vector(target_point), mode=mode)
 
-        vector_iter = iter(vector_list)
+        # turn the vector list into axis args
+        args_list = []
+        for vector in vector_list:
+            flipped_vector = self.flip_coordinates(vector, mode)
+            args_list.append(
+                {axis.upper(): flipped_vector[axis]
+                 for axis in 'xyz' if axis in kwargs})
+
+        return self.queue_move_commands(args_list)
+
+    def queue_move_commands(self, args_list):
+        args_iter = iter(args_list)
         while self.can_move.wait():
             if self.stopped.is_set():
                 return (False, 'Stopped')
             try:
-                vector = next(vector_iter)
+                args = next(args_iter)
             except StopIteration:
                 return (True, 'Success')
-            # vector contains every axis, however we are passing
-            # only those that were supplied in kwargs down to send_command
-            flipped_vector = self.flip_coordinates(vector, mode)
-            args = {
-                axis.upper(): flipped_vector[axis]
-                for axis in 'xyz' if axis in kwargs}
 
             log.debug("MotorDriver", "Moving head: {}".format(args))
             res = self.send_command(self.MOVE, **args)
