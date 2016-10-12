@@ -137,6 +137,8 @@ class Robot(object):
         tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
         tallest_z += 10
 
+        print(coordinates)
+
         if create_path:
             self._driver.move_head(z=tallest_z)
             self._driver.move_head(x=coordinates[0], y=coordinates[1])

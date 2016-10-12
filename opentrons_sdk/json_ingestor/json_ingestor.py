@@ -6,10 +6,24 @@ from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 
 
+# class JSONProtocolInterpreter(object):
+#
+#     def __call__(self):
+#         self.interpret_instructions()
+
+def execute_json_protocol(json_protocol):
+    deck, head, instructions_callable = interpret_json_protocol(json_protocol)
+    pass
+
+
+
 def interpret_json_protocol(json_protocol: OrderedDict):
     robot_deck = interpret_deck(json_protocol['deck'])
     robot_head = interpret_head(robot_deck, json_protocol['head'])
-    interpret_instructions(robot_deck, robot_head, json_protocol['instructions'])
+    instructions_interpreter = lambda: interpret_instructions(
+        robot_deck, robot_head, json_protocol['instructions']
+    )
+    instructions_interpreter()
 
 
 def interpret_deck(deck_info: OrderedDict):

@@ -112,6 +112,9 @@ class Vector(object):
             self.coordinates.z,
         )
 
+    def __repr__(self):
+        return str(self)
+
     def __getitem__(self, index):
         res = None
         if isinstance(index, int):

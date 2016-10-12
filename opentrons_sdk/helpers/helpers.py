@@ -1,6 +1,10 @@
 import json
 
 
+def humanize(location):
+    # TODO:
+    pass
+
 def unpack_coordinates(coordinates):
     if not isinstance(coordinates, tuple):
         coordinates = tuple([coordinates[axis] for axis in 'xyz'])

@@ -1,7 +1,8 @@
 from opentrons_sdk.robot.command import Command
+
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
-from opentrons_sdk.containers.placeable import Placeable
+from opentrons_sdk.containers.placeable import Placeable, unpack_location
 from opentrons_sdk.util.vector import Vector
 
 
@@ -82,7 +83,10 @@ class Pipette(object):
             self.plunger.wait_for_arrival()
             self.current_volume += volume
 
-        description = "Aspirating {0}uL at {1}".format(volume, str(location))
+        description = "Aspirating {0}uL at {1}".format(
+            volume,
+            (unpack_location(location) if location else 'NA')
+        )
         self.robot.add_command(
             Command(do=_do_aspirate, description=description))
 
@@ -117,7 +121,9 @@ class Pipette(object):
             self.current_volume -= volume
 
         description = "Dispensing {0}uL at {1}".format(
-                volume, str(location))
+            volume,
+            (unpack_location(location) if location else 'NA')
+        )
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
@@ -204,30 +210,34 @@ class Pipette(object):
         return self
 
     def touch_tip(self, location=None):
-        if location:
-            self.robot.move_to(location, instrument=self)
-        else:
-            location = self.placeables[-1]
+        def _do():
+            nonlocal  location
+            if location:
+                self.robot.move_to(location, instrument=self)
+            else:
+                location = self.placeables[-1]
 
-        self.go_to((location, location.from_center(x=1, y=0, z=1)))
-        self.go_to((location, location.from_center(x=-1, y=0, z=1)))
-        self.go_to((location, location.from_center(x=0, y=1, z=1)))
-        self.go_to((location, location.from_center(x=0, y=-1, z=1)))
+            self.go_to((location, location.from_center(x=1, y=0, z=1)))
+            self.go_to((location, location.from_center(x=-1, y=0, z=1)))
+            self.go_to((location, location.from_center(x=0, y=1, z=1)))
+            self.go_to((location, location.from_center(x=0, y=-1, z=1)))
+
+        description = 'Touching tip'  # TODO: expand this...
+        self.robot.add_command(Command(do=_do, description=description))
 
         return self
 
     def pick_up_tip(self, location=None):
-
-        if location:
-            self.robot.move_to_bottom(location, instrument=self)
-
-        # TODO: actual plunge depth for picking up a tip
-        # varies based on the tip
-        # right now it's accounted for via plunge depth
-        # TODO: Need to talk about containers z positioning
-        tip_plunge = 6
-
         def _do():
+            if location:
+                self.robot.move_to_bottom(location, instrument=self)
+
+            # TODO: actual plunge depth for picking up a tip
+            # varies based on the tip
+            # right now it's accounted for via plunge depth
+            # TODO: Need to talk about containers z positioning
+            tip_plunge = 6
+
             # Dip into tip and pull it up
             for _ in range(3):
                 self.robot.move_head(z=-tip_plunge, mode='relative')
@@ -235,23 +245,27 @@ class Pipette(object):
 
             self.plunger.wait_for_arrival()
             self.robot.home('z')
-
-        description = "Picking up tip from {0}".format(str(location))
+        description = "Picking up tip from {0}".format(
+            (unpack_location(location) if location else 'NA')
+        )
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
     def drop_tip(self, location=None):
-        if location:
-            self.robot.move_to_bottom(location, instrument=self)
-
         def _do():
+            nonlocal location
+            if location:
+                self.robot.move_to_bottom(location, instrument=self)
+
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
             self.plunger.wait_for_arrival()
+            self.current_volume = 0
 
-        description = "Drop_tip at {}".format(str(location))
+        description = "Drop_tip at {}".format(
+            (unpack_location(location) if location else 'NA')
+        )
         self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume = 0
         return self
 
     def calibrate(self, position):

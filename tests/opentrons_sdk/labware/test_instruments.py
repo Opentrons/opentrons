@@ -417,3 +417,6 @@ class PipetteTest(unittest.TestCase):
                 mock.call.aspirate(100)
             ]
         )
+
+
+    # TODO: TEST TOUCH_TIP
