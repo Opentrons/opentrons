@@ -7,7 +7,8 @@ Vue.use(Vuex)
 const state = {
     is_connected: false,
     port: null,
-    current_protocol_name: "No File Selected"
+    current_protocol_name: "No File Selected",
+    errors: "No errors"
 }
 
 
@@ -18,6 +19,7 @@ const mutations = {
     },
     UPDATE_CURRENT_PROTOCOL (state, payload) {
       state.current_protocol_name = payload.current_protocol_name
+      state.errors = payload.errors
     }
 }
 
@@ -52,10 +54,10 @@ const actions = {
     },
     uploadProtocol ({commit}, target) {
       Vue.http
-        .post('http://localhost:5000/upload', {file: target.result})
+        .post('http://localhost:5000/upload', {file: target.result, filename: target.fileName})
         .then((response) => {
           console.log(response)
-          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName})
+          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName, 'errors': response.body.data})
         }, (response) => {
           console.log('failed to upload', response)
         })
