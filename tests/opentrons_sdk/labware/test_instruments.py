@@ -235,8 +235,8 @@ class PipetteTest(unittest.TestCase):
         with self.assertRaises(RuntimeWarning):
             self.p200.aspirate(500)
             self.robot.run()
-        print(self.robot._runtime_warnings)
-        self.assertEqual(1, len(self.robot._runtime_warnings))
+        # print(self.robot._runtime_warnings)
+        # self.assertEqual(1, len(self.robot._runtime_warnings))
 
     def test_aspriate_invalid_min_volume(self):
         # TODO(Ahmed): This should not raise an IndexError
