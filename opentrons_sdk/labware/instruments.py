@@ -66,13 +66,18 @@ class Pipette(object):
 
             if self.current_volume + volume > self.max_volume:
                 self.robot.add_warning(
-                    'Pipette cannot hold volume {}'
-                    .format(self.current_volume + volume)
+                    'Pipette ({}) cannot hold volume {}'
+                    .format(self.name, self.current_volume + volume)
                 )
 
             self.position_for_aspirate(location)
 
-            distance = self.plunge_distance(volume) * -1
+            plunge_distance, warning = self.plunge_distance(volume)
+            if warning:
+                self.robot.add_warning(
+                    "[{}] Warning: {}".format(self.name, warning)
+                )
+            distance = plunge_distance * -1
 
             self.plunger.move(distance, mode='relative')
             self.plunger.wait_for_arrival()
@@ -85,31 +90,36 @@ class Pipette(object):
         return self
 
     def dispense(self, volume=None, location=None):
+        def _do():
+            nonlocal volume
+            nonlocal location
+            if not isinstance(volume, (int, float, complex)):
+                if volume and not location:
+                    location = volume
+                volume = self.current_volume
 
-        if not isinstance(volume, (int, float, complex)):
-            if volume and not location:
-                location = volume
-            volume = self.current_volume
+            if self.current_volume - volume < 0:
+                # TODO: this should alert a Warning here, but not stop execution
+                volume = self.current_volume
 
-        if self.current_volume - volume < 0:
-            # TODO: this should alert a Warning here, but not stop execution
-            volume = self.current_volume
+            if location:
+                self.robot.move_to(location, instrument=self)
 
-        if location:
-            self.robot.move_to(location, instrument=self)
+            if volume:
+                plunge_distance, warning = self.plunge_distance(volume)
+                if warning:
+                    self.robot.add_warning(
+                        "[{}] Warning: {}".format(self.name, warning)
+                    )
 
-        if volume:
-            distance = self.plunge_distance(volume)
-
-            def _do():
-                self.plunger.move(distance, mode='relative')
+                self.plunger.move(plunge_distance, mode='relative')
                 self.plunger.wait_for_arrival()
 
-            description = "Dispensing {0}uL at {1}".format(
-                volume, str(location))
-            self.robot.add_command(Command(do=_do, description=description))
             self.current_volume -= volume
 
+        description = "Dispensing {0}uL at {1}".format(
+                volume, str(location))
+        self.robot.add_command(Command(do=_do, description=description))
         return self
 
     def position_for_aspirate(self, location=None):
@@ -316,9 +326,9 @@ class Pipette(object):
             raise ValueError(
                 "Pipette {} not calibrated.".format(self.axis)
             )
-        percent = self._volume_percentage(volume)
+        (percent, warnings) = self._volume_percentage(volume)
         travel = self.positions['bottom'] - self.positions['top']
-        return travel * percent
+        return (travel * percent, warnings)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -326,14 +336,15 @@ class Pipette(object):
         We use this to calculate what actual position the plunger axis
         needs to be at in order to achieve the correct volume of liquid.
         """
+        warning_msg = None
         if volume < 0:
-            raise IndexError("Volume must be a positive number.")
+            warning_msg = "Volume must be a positive number."
         if volume > self.max_volume:
-            raise IndexError("{}µl exceeds maximum volume.".format(volume))
+            warning_msg = "{}µl exceeds maximum volume.".format(volume)
         if volume < self.min_volume:
-            raise IndexError("{}µl is too small.".format(volume))
+            warning_msg = "{}µl is too small.".format(volume)
 
-        return volume / self.max_volume
+        return (volume / self.max_volume, warning_msg)
 
     def supports_volume(self, volume):
         return self.max_volume <= volume <= self.max_volume

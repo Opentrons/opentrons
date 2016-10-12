@@ -48,6 +48,9 @@ class Robot(object):
         axis = axis.upper()
         self._instruments[axis] = instrument
 
+    def add_warning(self, warning_msg: str):
+        self._runtime_warnings.append(warning_msg)
+
     def get_motor(self, axis):
         robot_self = self
 
