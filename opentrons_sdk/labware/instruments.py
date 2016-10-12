@@ -77,7 +77,6 @@ class Pipette(object):
 
         def _do_aspirate():
             self.plunger.move(destination)
-            self.plunger.wait_for_arrival()
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(
@@ -106,7 +105,6 @@ class Pipette(object):
 
             def _do():
                 self.plunger.move(destination)
-                self.plunger.wait_for_arrival()
 
             description = "Dispensing {0}uL at {1}".format(
                 volume, str(location))
@@ -188,7 +186,6 @@ class Pipette(object):
 
         def _do():
             self.plunger.move(self.positions['blow_out'])
-            self.plunger.wait_for_arrival()
 
         description = "Blow_out at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -242,7 +239,6 @@ class Pipette(object):
         def _do():
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
-            self.plunger.wait_for_arrival()
 
         description = "Drop_tip at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))

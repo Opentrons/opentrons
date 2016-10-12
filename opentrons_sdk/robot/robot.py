@@ -1,5 +1,6 @@
 import copy
 import os
+from threading import Event
 
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
@@ -16,6 +17,9 @@ class Robot(object):
     def __init__(self, driver_instance=None):
         self._commands = []
         self._handlers = []
+
+        self.can_pop_command = Event()
+        self.can_pop_command.set()
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -63,9 +67,6 @@ class Robot(object):
 
             def home(self):
                 return robot_self._driver.home(axis)
-
-            def wait_for_arrival(self):
-                return robot_self._driver.wait_for_arrival()
 
             def wait(self, seconds):
                 robot_self._driver.wait(seconds)
@@ -117,7 +118,6 @@ class Robot(object):
 
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
-        self._driver.wait_for_arrival()
 
     def move_to(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
@@ -144,7 +144,6 @@ class Robot(object):
                     x=coordinates[0],
                     y=coordinates[1],
                     z=coordinates[2])
-            self._driver.wait_for_arrival()
 
         # description = "Moving head to {} {}".format(
         #     str(placeable),
@@ -166,10 +165,8 @@ class Robot(object):
         return copy.deepcopy(self._commands)
 
     def run(self):
-        while self._commands:
+        while self.can_pop_command.wait() and self._commands:
             command = self._commands.pop(0)
-            if command.description == "Pausing":
-                return
 
             if command.description:
                 print("Executing:", command.description)
@@ -269,20 +266,18 @@ class Robot(object):
 
     def clear(self):
         self._commands = []
+        self.can_pop_command.set()
+        self._driver.stop()
+        self._driver.resume()
         print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
-        # This method is for API use only - in a user protocol,
-        # it will jump the queue, which is counterintuitive
-        # and not very useful.
-        def _do():
-            print("Paused")
-
-        description = "Pausing"
-        self.prepend_command(Command(do=_do, description=description))
+        self.can_pop_command.clear()
+        self._driver.pause()
 
     def resume(self):
-        self.run()
+        self.can_pop_command.set()
+        self._driver.resume()
 
     def get_serial_ports_list(self):
         ports = []

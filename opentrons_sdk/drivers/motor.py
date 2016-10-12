@@ -1,5 +1,6 @@
 import glob
 import json
+import math
 import sys
 import time
 
@@ -74,6 +75,11 @@ class CNCDriver(object):
         self.stopped = Event()
         self.can_move = Event()
         self.resume()
+        self.head_speed = 3000  # smoothie's default speed in mm/minute
+        self.plunger_speed = {
+            'a': 300,
+            'b': 300
+        }
 
     def get_connected_port(self):
         """
@@ -210,11 +216,10 @@ class CNCDriver(object):
         if self.connection is None:
             log.warn("Serial", "No connection found.")
             return
-        if self.connection.isOpen():
+        if self.is_connected():
             self.connection.write(str(data).encode())
             return self.wait_for_response()
         elif max_tries > 0:
-            # time.sleep(try_interval)
             self.reset_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
@@ -256,7 +261,7 @@ class CNCDriver(object):
 
     def readline_from_serial(self):
         msg = b''
-        if self.connection.isOpen():
+        if self.is_connected():
             # serial.readline() returns an empty byte string if it times out
             msg = self.connection.readline().strip()
             if msg:
@@ -287,26 +292,11 @@ class CNCDriver(object):
 
         self.set_coordinate_system(mode)
 
-        current = self.get_plunger_positions()['current']
+        args = {axis.upper(): kwargs.get(axis)
+                for axis in 'ab'
+                if axis in kwargs}
 
-        # create Vectors out of A/B axis to calculate incremental steps
-        # this allows the A/B axis to move together and arrive at the same time
-        current_vector = Vector(current['a'], current['b'], 0)
-        target_vector = Vector(kwargs.get('a', 0), kwargs.get('b', 0), 0)
-
-        vector_list = break_down_travel(
-            current_vector, target_vector, mode=mode)
-
-        # turn the vector list into axis args
-        args_list = []
-        for vector in vector_list:
-            current_step = {'a': vector[0], 'b': vector[1]}
-            args_list.append(
-                {axis.upper(): current_step[axis]
-                 for axis in 'ab'
-                 if axis in kwargs})
-
-        return self.queue_move_commands(args_list)
+        return self.queue_move_commands([args], 0.1)
 
     def move_head(self, mode='absolute', **kwargs):
         if 'absolute' in kwargs:
@@ -326,8 +316,13 @@ class CNCDriver(object):
         }
         log.debug('Motor Driver', 'Destination: {}'.format(target_point))
 
+        time_interval = 0.5
+        # convert mm/min -> mm/sec,
+        # multiply by time interval to get increment in mm
+        increment = self.head_speed / 60 * time_interval
+
         vector_list = break_down_travel(
-            current, Vector(target_point), mode=mode)
+            current, Vector(target_point), mode=mode, increment=increment)
 
         # turn the vector list into axis args
         args_list = []
@@ -337,17 +332,21 @@ class CNCDriver(object):
                 {axis.upper(): flipped_vector[axis]
                  for axis in 'xyz' if axis in kwargs})
 
-        return self.queue_move_commands(args_list)
+        return self.queue_move_commands(args_list, increment)
 
-    def queue_move_commands(self, args_list):
+    def queue_move_commands(self, args_list, step):
         args_iter = iter(args_list)
+        tolerance = step * 0.5
         while self.can_move.wait():
             if self.stopped.is_set():
                 return (False, 'Stopped')
             try:
                 args = next(args_iter)
             except StopIteration:
+                self.wait_for_arrival()
                 return (True, 'Success')
+
+            self.wait_for_arrival(tolerance)
 
             log.debug("MotorDriver", "Moving head: {}".format(args))
             res = self.send_command(self.MOVE, **args)
@@ -362,28 +361,29 @@ class CNCDriver(object):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self):
+    def wait_for_arrival(self, tolerance=0.1):
         arrived = False
         coords = self.get_position()
         while not arrived:
-            # time.sleep(self.serial_timeout)
-            prev_coords = dict(coords)
             coords = self.get_position()
+            diff = {}
             for axis in coords.get('target', {}):
-                axis_diff = coords['current'][axis] - coords['target'][axis]
+                diff[axis] = coords['current'][axis] - coords['target'][axis]
 
-                """
-                smoothie not guaranteed to be EXACTLY where it's target is
-                but seems to be about +-0.05 mm from the target coordinate
-                the robot's physical resolution is found with:
-                1mm / config_steps_per_mm
-                """
-                if abs(axis_diff) < 0.1:
-                    if coords['current'][axis] == prev_coords['current'][axis]:
-                        arrived = True
-                else:
-                    arrived = False
-                    break
+            dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
+            dist_head = math.sqrt(dist)
+
+            """
+            smoothie not guaranteed to be EXACTLY where it's target is
+            but seems to be about +-0.05 mm from the target coordinate
+            the robot's physical resolution is found with:
+            1mm / config_steps_per_mm
+            """
+            if dist_head < tolerance:
+                if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
+                    arrived = True
+            else:
+                arrived = False
         return arrived
 
     def home(self, *axis):
@@ -475,11 +475,15 @@ class CNCDriver(object):
 
     def set_head_speed(self, rate):
         speed_command = self.SET_SPEED
+        self.head_speed = rate
         res = self.send_command(speed_command + "F" + str(rate))
         return res == b'ok'
 
     def set_plunger_speed(self, rate, axis):
+        if axis not in self.plunger_speed:
+            raise ValueError('Axis {} not supported'.format(axis))
         speed_command = self.SET_SPEED
+        self.plunger_speed[axis] = rate
         res = self.send_command(speed_command + axis + str(rate))
         return res == b'ok'
 
