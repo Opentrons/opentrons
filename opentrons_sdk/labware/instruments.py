@@ -56,30 +56,31 @@ class Pipette(object):
         return self
 
     def aspirate(self, volume=None, location=None):
-
-        if not isinstance(volume, (int, float, complex)):
-            if volume and not location:
-                location = volume
-            volume = self.max_volume - self.current_volume
-
-        if self.current_volume + volume > self.max_volume:
-            raise RuntimeWarning(
-                'Pipette cannot hold volume {}'
-                .format(self.current_volume + volume)
-            )
-
-        self.position_for_aspirate(location)
-
-        distance = self.plunge_distance(volume) * -1
-
         def _do_aspirate():
+            nonlocal volume
+            nonlocal location
+            if not isinstance(volume, (int, float, complex)):
+                if volume and not location:
+                    location = volume
+                volume = self.max_volume - self.current_volume
+
+            if self.current_volume + volume > self.max_volume:
+                self.robot.add_warning(
+                    'Pipette cannot hold volume {}'
+                    .format(self.current_volume + volume)
+                )
+
+            self.position_for_aspirate(location)
+
+            distance = self.plunge_distance(volume) * -1
+
             self.plunger.move(distance, mode='relative')
             self.plunger.wait_for_arrival()
+            self.current_volume += volume
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(
             Command(do=_do_aspirate, description=description))
-        self.current_volume += volume
 
         return self
 
@@ -116,12 +117,12 @@ class Pipette(object):
             self.robot.move_to_top(location, instrument=self)
 
         if self.current_volume == 0:
-            def _prep_plunger():
-                self.plunger.move(self.positions['bottom'])
+            # def _prep_plunger():
+            self.plunger.move(self.positions['bottom'])
 
-            description = "Resetting plunger to bottom"
-            self.robot.add_command(
-                Command(do=_prep_plunger, description=description))
+            # description = "Resetting plunger to bottom"
+            # self.robot.add_command(
+            #     Command(do=_prep_plunger, description=description))
 
         if location:
             if isinstance(location, Placeable):

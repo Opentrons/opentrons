@@ -16,6 +16,7 @@ class Robot(object):
     def __init__(self, driver_instance=None):
         self._commands = []
         self._handlers = []
+        self._runtime_warnings = []
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -118,6 +119,7 @@ class Robot(object):
         self._driver.wait_for_arrival()
 
     def move_to(self, location, instrument=None, create_path=True):
+        # def _do():
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -132,22 +134,19 @@ class Robot(object):
         tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
         tallest_z += 10
 
-        def _do():
-            if create_path:
-                self._driver.move_head(z=tallest_z)
-                self._driver.move_head(x=coordinates[0], y=coordinates[1])
-                self._driver.move_head(z=coordinates[2])
-            else:
-                self._driver.move_head(
-                    x=coordinates[0],
-                    y=coordinates[1],
-                    z=coordinates[2])
-            self._driver.wait_for_arrival()
+        if create_path:
+            self._driver.move_head(z=tallest_z)
+            self._driver.move_head(x=coordinates[0], y=coordinates[1])
+            self._driver.move_head(z=coordinates[2])
+        else:
+            self._driver.move_head(
+                x=coordinates[0],
+                y=coordinates[1],
+                z=coordinates[2])
+        self._driver.wait_for_arrival()
 
-        description = "Moving head to {} {}".format(
-            str(placeable),
-            coordinates)
-        self.add_command(Command(do=_do, description=description))
+        # description = "Moving head to {}".format(location)
+        # self.add_command(Command(do=_do, description=description))
 
     def move_to_top(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
@@ -164,6 +163,7 @@ class Robot(object):
         return copy.deepcopy(self._commands)
 
     def run(self):
+        self._runtime_warnings = []
         while self._commands:
             command = self._commands.pop(0)
             if command.description == "Pausing":
@@ -176,6 +176,7 @@ class Robot(object):
             except KeyboardInterrupt as e:
                 self._driver.halt()
                 raise e
+        return self._runtime_warnings
 
     def disconnect(self):
         if self._driver:

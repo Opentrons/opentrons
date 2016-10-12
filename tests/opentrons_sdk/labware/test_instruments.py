@@ -55,6 +55,8 @@ class PipetteTest(unittest.TestCase):
             self.plate[0]
         ]
 
+        self.robot.run()
+
         self.assertEquals(self.p200.placeables, expected)
 
     def test_unpack_location(self):
@@ -229,9 +231,16 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 0.0}
         )
 
-    def test_invalid_aspirate(self):
-        self.assertRaises(RuntimeWarning, self.p200.aspirate, 500)
-        self.assertRaises(IndexError, self.p200.aspirate, 1)
+    def test_aspirate_invalid_max_volume(self):
+        with self.assertRaises(RuntimeWarning):
+            self.p200.aspirate(500)
+            self.robot.run()
+
+    def test_aspriate_invalid_min_volume(self):
+        # TODO(Ahmed): This should not raise an I
+        with self.assertRaises(IndexError):
+            self.p200.aspirate(1)
+            self.robot.run()
 
     def test_dispense(self):
         self.p200.aspirate(100)
