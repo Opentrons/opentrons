@@ -339,6 +339,7 @@ class CNCDriver(object):
         tolerance = step * 0.5
         while self.can_move.wait():
             if self.stopped.is_set():
+                self.resume()
                 return (False, 'Stopped')
             try:
                 args = next(args_iter)
