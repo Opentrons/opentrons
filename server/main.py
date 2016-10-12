@@ -25,9 +25,6 @@ app = Flask(__name__,
             template_folder=TEMPLATES_FOLDER
             )
 app.jinja_env.autoescape = False
-
-# Question: Do we need to store the file in app? or just process the file once?
-# app.config['UPLOAD_FOLDER'] = 'uploads/'
 # Only allow JSON and Python files
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
@@ -37,6 +34,11 @@ robot = Robot.get_instance()
 @app.route("/")
 def welcome():
     return render_template("index.html")
+
+# Check uploaded file is allowed file type: JSON or Python
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 @app.route("/upload", methods=["POST"])
 def upload():
