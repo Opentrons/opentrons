@@ -19,24 +19,26 @@
         </div>
     </div>
     <!-- TODO: Add component for navigation (especially next) -->
-    <nav>
-        <a href="#" class="prev first">Prev</a>
-        <!-- <a href="#info" class="help">?</a> -->
-        <a href="#" class="next" v-show="connected">Next</a>
-    </nav>
+    <navigation :prev="prev" :next="next"></navigation>
     <!-- End Nav Component -->
   </section>
 </template>
 
 
 <script>
+  import Navigation from './Navigation.vue'
   export default {
+    components: {
+      Navigation
+    },
     data: function () {
       return {
-          ports: {
-              selected: null,
-              options: []
-          }
+      next: "/upload",
+      prev: "/",
+        ports: {
+            selected: null,
+            options: []
+        }
       }
     },
     computed: {
