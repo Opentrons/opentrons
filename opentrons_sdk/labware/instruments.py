@@ -18,12 +18,11 @@ class Pipette(object):
             speed=300):
 
         self.positions = {
-            'top': None,
-            'bottom': None,
-            'blow_out': None,
-            'drop_tip': None
+            'top': 0,
+            'bottom': 10,
+            'drop_tip': 12,
+            'blow_out': 13
         }
-
         self.axis = axis
         self.channels = channels
 
