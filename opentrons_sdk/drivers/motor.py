@@ -80,6 +80,7 @@ class CNCDriver(object):
             'a': 300,
             'b': 300
         }
+        self.current_commands = []
 
     def get_connected_port(self):
         """
@@ -191,8 +192,10 @@ class CNCDriver(object):
         self.stopped.clear()
 
     def stop(self):
-        self.stopped.set()
-        self.can_move.set()
+        if self.current_commands:
+            self.stopped.set()
+        else:
+            self.resume()
 
     def send_command(self, command, **kwargs):
         """
@@ -335,15 +338,15 @@ class CNCDriver(object):
         return self.queue_move_commands(args_list, increment)
 
     def queue_move_commands(self, args_list, step):
-        args_iter = iter(args_list)
         tolerance = step * 0.5
+        self.current_commands = list(args_list)
         while self.can_move.wait():
             if self.stopped.is_set():
                 self.resume()
                 return (False, 'Stopped')
-            try:
-                args = next(args_iter)
-            except StopIteration:
+            if self.current_commands:
+                args = self.current_commands.pop(0)
+            else:
                 self.wait_for_arrival()
                 return (True, 'Success')
 

@@ -268,7 +268,6 @@ class Robot(object):
         self._commands = []
         self.can_pop_command.set()
         self._driver.stop()
-        self._driver.resume()
         print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
