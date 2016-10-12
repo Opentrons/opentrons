@@ -12,24 +12,18 @@
           <input @change="onFileChange" id="uploadBtn" type="file" class="upload" />
         </div>
       </div>
-      
-      <navigation :prev="prev" :next="next"></navigation>
 
+      <navigation :prev="prev" :next="next"></navigation>
     </section>
-    <div id="info" class="infoModal">
-      <div> <a href="#close" title="Close" class="close">X</a>
-        <h2>Title</h2>
-        <p>
-          Images would go here along with explanation text.
-        </p>
-      </div>
-    </div>
+    <span>
+      ERRORS: {{errors}}
+    </span>
   </div>
 </template>
 
 <script>
 import Navigation from './Navigation.vue'
-  
+
 export default {
   name: 'Upload',
   components: {
@@ -46,7 +40,10 @@ export default {
       return this.$store.state.current_protocol_name
     },
     connected () {
-      return this.$store.state.is_connected;
+      return this.$store.state.is_connected
+    },
+    errors () {
+      return this.$store.state.errors
     }
   },
   methods: {
@@ -61,6 +58,7 @@ export default {
     },
     uploadProtocol(event) {
       var target = event.target
+      console.log(target.fileName)
       this.$store.dispatch("uploadProtocol", target)
     }
   }
