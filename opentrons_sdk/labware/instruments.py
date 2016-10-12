@@ -15,13 +15,19 @@ class Pipette(object):
             min_volume=0,
             trash_container=None,
             tip_racks=None,
-            speed=300):
+            aspirate_speed=300,
+            dispense_speed=500):
 
         self.positions = {
             'top': None,
             'bottom': None,
             'blow_out': None,
             'drop_tip': None
+        }
+
+        self.speeds = {
+            'aspirate': aspirate_speed,
+            'dispense': dispense_speed
         }
 
         self.axis = axis
@@ -47,8 +53,6 @@ class Pipette(object):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
-        self.set_speed(speed)
-
     def go_to(self, location):
         if location:
             self.robot.move_to(location, instrument=self, create_path=False)
@@ -73,6 +77,7 @@ class Pipette(object):
         distance = self.plunge_distance(volume) * -1
 
         def _do_aspirate():
+            self.plunger.speed(self.speeds['aspirate'])
             self.plunger.move(distance, mode='relative')
             self.plunger.wait_for_arrival()
 
@@ -101,6 +106,7 @@ class Pipette(object):
             distance = self.plunge_distance(volume)
 
             def _do():
+                self.plunger.speed(self.speeds['dispense'])
                 self.plunger.move(distance, mode='relative')
                 self.plunger.wait_for_arrival()
 
@@ -166,7 +172,7 @@ class Pipette(object):
             # using Command for printing description
             pass
 
-        description = "Mixing {0} times with a volume of {1}mm".format(
+        description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, str(self.current_volume)
         )
         self.robot.add_command(Command(do=_do, description=description))
@@ -289,6 +295,8 @@ class Pipette(object):
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
 
+        return self
+
     def calibrate_position(self, location, current=None):
         if not current:
             current = self.robot._driver.get_head_position()['current']
@@ -297,6 +305,7 @@ class Pipette(object):
             self.calibration_data,
             location,
             current)
+        return self
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
@@ -329,13 +338,8 @@ class Pipette(object):
             raise IndexError("Volume must be a positive number.")
         if volume > self.max_volume:
             raise IndexError("{}µl exceeds maximum volume.".format(volume))
-        if volume < self.min_volume:
-            raise IndexError("{}µl is too small.".format(volume))
 
         return volume / self.max_volume
-
-    def supports_volume(self, volume):
-        return self.max_volume <= volume <= self.max_volume
 
     def delay(self, seconds):
         def _do():
@@ -345,13 +349,11 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
-    def set_speed(self, rate):
-        self.speed = rate
-
-        def _do():
-            self.plunger.speed(rate)
-
-        description = "Setting speed to {}mm/minute".format(rate)
-        self.robot.add_command(Command(do=_do, description=description))
+    def set_speed(self, property, rate):
+        if property in self.speeds:
+            self.speeds[property] = rate
+        else:
+            raise KeyError(
+                "{} speed can not be set on the pipette".format(property))
 
         return self

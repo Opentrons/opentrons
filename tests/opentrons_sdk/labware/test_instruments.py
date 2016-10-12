@@ -231,7 +231,6 @@ class PipetteTest(unittest.TestCase):
 
     def test_invalid_aspirate(self):
         self.assertRaises(RuntimeWarning, self.p200.aspirate, 500)
-        self.assertRaises(IndexError, self.p200.aspirate, 1)
 
     def test_dispense(self):
         self.p200.aspirate(100)
@@ -293,11 +292,15 @@ class PipetteTest(unittest.TestCase):
             "Delaying 1 seconds")
 
     def test_set_speed(self):
-        self.assertEqual(self.p200.speed, 300)
 
-        self.p200.set_speed(100)
+        self.p200.set_speed('aspirate', 100)
+        self.assertEqual(self.p200.speeds['aspirate'], 100)
 
-        self.assertEqual(self.p200.speed, 100)
+        self.p200.set_speed('dispense', 100)
+        self.assertEqual(self.p200.speeds['dispense'], 100)
+
+        with self.assertRaises(KeyError):
+            self.p200.set_speed('mix', 100)
 
     def test_transfer_no_volume(self):
         self.p200.aspirate = mock.Mock()
