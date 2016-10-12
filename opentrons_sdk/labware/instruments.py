@@ -196,17 +196,16 @@ class Pipette(object):
         return self
 
     def blow_out(self, location=None):
-        if location:
-            self.robot.move_to(location, instrument=self)
-
         def _do():
+            nonlocal location
+            if location:
+                self.robot.move_to(location, instrument=self)
             self.plunger.move(self.positions['blow_out'])
             self.plunger.wait_for_arrival()
 
+            self.current_volume = 0
         description = "Blow_out at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume = 0
-
         return self
 
     def touch_tip(self, location=None):
