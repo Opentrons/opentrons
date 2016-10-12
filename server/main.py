@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 import sys
 import time
@@ -42,7 +43,7 @@ def allowed_file(filename):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    print(request.data)
+    print(json.loads(json.loads(request.data.decode('utf-8'))['file']))
     # this should eventually process the protocol for errors
     return request.data
 
