@@ -59,38 +59,6 @@ table {
     }
 }
 
-#uploadFile {
-    @include grid-col-full(4);
-    margin: 0;
-    padding: 0;
-    border: none;
-    text-align: center;
-    line-height: $baseline;
-}
-
-.fileUpload {
-    position: relative;
-    overflow: hidden;
-    @include btn-col-f(4);
-    background-color: $primary-brand;
-    color: white;
-    &:hover {
-        background: lighten($primary-brand, 20%);
-    }
-}
-
-.fileUpload input.upload {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 15px;
-    padding: 0;
-    font-size: 30px;
-    cursor: pointer;
-    opacity: 0;
-    filter: alpha(opacity=0);
-}
-
 
 /************************
 Wizard Screens
@@ -149,14 +117,16 @@ Wizard Screens
             div.connected {
                 display: flex;
                 justify-content: center;
-                @include rect(19,2);
-                @include offset-v(0, 1);
+                @include rect(19,
+                2);
+                @include offset-v(0,
+                1);
             }
         }
         .step-error,
         .step-upload {
             @include rect(7,
-            6);
+            4);
             @include offset(6,
             5);
             flex-direction: column;
@@ -169,11 +139,35 @@ Wizard Screens
                 1);
                 @include offset-v(1,
                 1);
+                margin: 0;
+                padding: 0;
+                border: none;
+                text-align: center;
+                line-height: $baseline;
             }
             .fileUpload {
                 @include btn-col-f(5);
                 @include offset(1,
                 1);
+                position: relative;
+                overflow: hidden;
+                background-color: $primary-brand;
+                color: white;
+                &:hover {
+                    background: lighten($primary-brand, 20%);
+                }
+            }
+
+            .fileUpload input.upload {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 15px;
+                padding: 0;
+                font-size: 30px;
+                cursor: pointer;
+                opacity: 0;
+                filter: alpha(opacity=0);
             }
         }
         nav {
