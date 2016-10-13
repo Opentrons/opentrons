@@ -209,14 +209,36 @@ def handle_command(tool_obj, robot_deck, robot_head, command, command_args):
 
 
 def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
-
+    # TODO: validate command args
+    volume = command_args.get('volume', tool_obj.max_volume)
     tool_settings = robot_head[tool_obj.name]['settings']
+
+    handle_transfer_from(
+        tool_obj, tool_settings, robot_deck, robot_head, command_args['from'], volume
+    )
+    handle_transfer_from(
+        tool_obj,
+        tool_settings,
+        robot_deck,
+        robot_head,
+        command_args['to'],
+        volume
+    )
+
+
+def handle_transfer_from(
+        tool_obj,
+        tool_settings,
+        robot_deck,
+        robot_head,
+        from_info,
+        volume
+):
     extra_pull_delay = tool_settings.get('extra-pull-delay', 0)
     extra_pull_volume = tool_settings.get('extra-pull-volume', 0)
 
-    volume = command_args.get('volume', tool_obj.max_volume)
 
-    from_info = command_args['from']
+    # from_info = command_args['from']
     from_container = robot_deck[from_info['container']]['instance']
     from_well = from_container[from_info['location']]
 
@@ -229,7 +251,6 @@ def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
         from_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, from_tip_offset)
     )
 
-
     tool_obj.aspirate(volume, from_location)
     tool_obj.delay(extra_pull_delay)
     tool_obj.aspirate(extra_pull_volume, from_location)
@@ -237,13 +258,16 @@ def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
         tool_obj.touch_tip()
     tool_obj.delay(from_delay)
 
-    to_info = command_args['to']
+def handle_transfer_to(
+        tool_obj, robot_deck, robot_head, to_info, volume
+):
+    # to_info = command_args['to']
     to_container = robot_deck[to_info['container']]['instance']
     to_well = to_container[to_info['location']]
     should_touch_tip_on_to = to_info.get('touch-tip', False)
     to_tip_offset = to_info.get('tip-offset', 0)
     to_delay = to_info.get('delay', 0)
-    blowout = from_info.get('blowout', False)
+    blowout = to_info.get('blowout', False)
 
     to_location = (
         to_well,
@@ -262,13 +286,20 @@ def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
 
 
 def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
-    pass
+    print('NOT YET SUPPORTED')
+    # handle_transfer_from(
+    #     tool_obj, robot_deck, robot_head, command_args['from'], volume
+    # )
+
+
 
 
 
 def handle_mix(tool_obj, robot_deck, robot_head, command_args):
+    print('NOT YET SUPPORTED')
     pass
 
 
 def handle_consolidate(tool_obj, robot_deck, robot_head, command_args):
+    print('NOT YET SUPPORTED')
     pass
