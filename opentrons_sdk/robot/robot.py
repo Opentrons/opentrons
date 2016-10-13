@@ -90,15 +90,22 @@ class Robot(object):
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
         return self._driver.connect(port)
 
-    def home(self, *args):
-        if self._driver.calm_down():
-            if args:
-                return self._driver.home(*args)
+    def home(self, *args, **kwargs):
+        def _do():
+            if self._driver.calm_down():
+                if args:
+                    return self._driver.home(*args)
+                else:
+                    self._driver.home('z')
+                    return self._driver.home('x', 'y', 'b', 'a')
             else:
-                self._driver.home('z')
-                return self._driver.home('x', 'y', 'b', 'a')
+                return False
+
+        if kwargs.get('now'):
+            return _do()
         else:
-            return False
+            description = "Homing Robot"
+            self.add_command(Command(do=_do, description=description))
 
     def add_command(self, command):
         print("Enqueing:", command.description)
