@@ -164,70 +164,86 @@ def disconnect_robot():
         'data': data
     })
 
-@app.route("/instrument/placeables")
+@app.route("/instruments/placeables")
 def get_placeables():
     data = {
         "p200": {
             "axis": "a",
-            "placeables": {
-                "tiprack200": { # user name/label
+            "placeables": [
+                {
                     "type": "tiprack", # labware definition
+                    "label": "tiprack200",
                     "x": None,
                     "y": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 },
-                "trash": { # user name/label
+                {
                     "type": "point", # labware definition
+                    "label": "trash",
                     "x": None,
                     "y": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 },
-                "plate": { # user name/label
+                {
                     "type": "plate", # labware definition
+                    "label": "plate",
                     "x": None,
                     "y": None,
                     "top": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 },
-                "tuberack": { # user name/label
+                {
                     "type": "tuberack", # labware definition
+                    "label": "tuberack",
                     "x": None,
                     "y": None,
                     "top": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 }
-            }
+            ]
         },
         "p10": {
             "axis": "a",
-            "placeables": {
-                "tiprack200": { # user name/label
+            "placeables": [
+                {
                     "type": "tiprack", # labware definition
+                    "label": "tiprack200",
                     "x": None,
                     "y": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 },
-                "trash": { # user name/label
+                {
                     "type": "point", # labware definition
+                    "label": "trash",
                     "x": None,
                     "y": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 },
-                "plate": { # user name/label
+                {
                     "type": "plate", # labware definition
+                    "label": "plate",
                     "x": None,
                     "y": None,
                     "top": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 },
-                "tuberack": { # user name/label
+                {
                     "type": "tuberack", # labware definition
+                    "label": "tuberack",
                     "x": None,
                     "y": None,
                     "top": None,
-                    "bottom": None
+                    "bottom": None,
+                    "slot": "A1"
                 }
-            }
+            ]
         }
     }
 
