@@ -8,16 +8,6 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.util import vector
 
 
-# class JSONProtocolInterpreter(object):
-#
-#     def __call__(self):
-#         self.interpret_instructions()
-
-def execute_json_protocol(json_protocol):
-    deck, head, instructions_callable = interpret_json_protocol(json_protocol)
-    pass
-
-
 
 def interpret_json_protocol(json_protocol: OrderedDict):
     robot_deck = interpret_deck(json_protocol['deck'])
