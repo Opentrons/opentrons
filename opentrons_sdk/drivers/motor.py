@@ -76,10 +76,6 @@ class CNCDriver(object):
         self.can_move = Event()
         self.resume()
         self.head_speed = 3000  # smoothie's default speed in mm/minute
-        self.plunger_speed = {
-            'a': 300,
-            'b': 300
-        }
         self.current_commands = []
 
     def get_connected_port(self):
@@ -478,17 +474,16 @@ class CNCDriver(object):
         return self.set_steps_per_mm(axis, current_steps_per_mm)
 
     def set_head_speed(self, rate):
-        speed_command = self.SET_SPEED
         self.head_speed = rate
-        res = self.send_command(speed_command + "F" + str(rate))
+        kwargs = {"F": rate}
+        res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
 
     def set_plunger_speed(self, rate, axis):
-        if axis not in self.plunger_speed:
+        if axis.lower() not in 'ab':
             raise ValueError('Axis {} not supported'.format(axis))
-        speed_command = self.SET_SPEED
-        self.plunger_speed[axis] = rate
-        res = self.send_command(speed_command + axis + str(rate))
+        kwargs = {axis.lower(): rate}
+        res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
 
     def get_ot_version(self):

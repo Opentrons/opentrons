@@ -21,6 +21,15 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_set_plunger_speed(self):
+        res = self.motor.set_plunger_speed(400, 'a')
+        self.assertEquals(res, True)
+
+    def test_set_head_speed(self):
+        res = self.motor.set_head_speed(4000)
+        self.assertEquals(res, True)
+        self.assertEquals(self.motor.head_speed, 4000)
+
     def test_pause_resume(self):
         self.motor.home()
 
