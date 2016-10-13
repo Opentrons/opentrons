@@ -184,10 +184,19 @@ def interpret_instructions(robot_deck, robot_head, instructions: list):
             # We always pick up a new tip when entering a group
             tool_obj.pick_up_tip(next(tips))
             for command_type, commands_calls in group.items():
+                # if command_type == 'distribute':
+                #     import pdb; pdb.set_trace()
                 handler = lambda args: handle_command(
                         tool_obj,robot_deck, robot_head, command_type, args
                     )
-                [handler(command_arg) for command_arg in commands_calls]
+
+                if isinstance(commands_calls, list):
+                    [handler(command_arg) for command_arg in commands_calls]
+
+                # Note: Distribute command does not have an array of calls but
+                # rather a dict with the distribute call info
+                elif isinstance(commands_calls, dict):
+                    handler(commands_calls)
 
             # LEAVING GROUP
             tool_obj.drop_tip(trash_container)
@@ -203,6 +212,8 @@ def handle_command(tool_obj, robot_deck, robot_head, command, command_args):
 
     if command not in SUPPORTED_COMMANDS:
         raise Exception('Unsupported COMMAND "{}" encountered'.format(command))
+
+
     return SUPPORTED_COMMANDS[command](
         tool_obj, robot_deck, robot_head, command_args
     )
@@ -216,9 +227,8 @@ def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
     handle_transfer_from(
         tool_obj, tool_settings, robot_deck, robot_head, command_args['from'], volume
     )
-    handle_transfer_from(
+    handle_transfer_to(
         tool_obj,
-        tool_settings,
         robot_deck,
         robot_head,
         command_args['to'],
@@ -259,7 +269,11 @@ def handle_transfer_from(
     tool_obj.delay(from_delay)
 
 def handle_transfer_to(
-        tool_obj, robot_deck, robot_head, to_info, volume
+        tool_obj,
+        robot_deck,
+        robot_head,
+        to_info,
+        volume
 ):
     # to_info = command_args['to']
     to_container = robot_deck[to_info['container']]['instance']
@@ -286,13 +300,29 @@ def handle_transfer_to(
 
 
 def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
-    print('NOT YET SUPPORTED')
-    # handle_transfer_from(
-    #     tool_obj, robot_deck, robot_head, command_args['from'], volume
-    # )
+    volume = command_args.get('volume', tool_obj.max_volume)
+    tool_settings = robot_head[tool_obj.name]['settings']
 
+    from_info = command_args['from']
+    to_info_list = command_args['to']
 
+    handle_transfer_from(
+        tool_obj,
+        tool_settings,
+        robot_deck,
+        robot_head,
+        from_info,
+        volume
+    )
 
+    for to_info in to_info_list:
+        handle_transfer_to(
+            tool_obj,
+            robot_deck,
+            robot_head,
+            to_info,
+            volume
+        )
 
 
 def handle_mix(tool_obj, robot_deck, robot_head, command_args):
