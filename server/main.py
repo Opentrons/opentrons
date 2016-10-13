@@ -48,10 +48,12 @@ def upload():
     filename = json.loads(request.data.decode('utf-8'))['filename']
     filetype = filename.rsplit('.', 1)[1]
 
-    with open(filename, 'w') as file_:
+    protocol_path = os.path.join(os.getcwd(), "protocols", filename)
+
+    with open(protocol_path, 'w') as file_:
         file_.write(file)
 
-    errors = lintProtocol(filename, filetype)
+    errors = lintProtocol(protocol_path, filetype)
     #create deepcopy, run on virtual smoothie w/
     #fake calibration data, return any errors
 
@@ -65,11 +67,11 @@ def upload():
             'data': data
         })
 
-def lintProtocol(filename, filetype):
+def lintProtocol(protocol_path, filetype):
     from pylint import epylint as lint
     if filetype == "py":
         config_file = os.path.join(os.getcwd(), "pylintrc")
-        command = '{0} --rcfile={1}'.format(filename, config_file)
+        command = '{0} --rcfile={1}'.format(protocol_path, config_file)
         (pylint_stdout, pylint_stderr) = lint.py_run(command, return_std=True)
         return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
     elif filetype == "json":
