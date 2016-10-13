@@ -159,8 +159,8 @@ class Pipette(object):
         self.dispense(volume, destination)
         return self
 
-    def mix(self, repetitions=3):
-        volume = self.current_volume
+    def mix(self, repetitions=3, volume=None):
+        volume = volume or self.current_volume
 
         def _do():
             # plunger movements are handled w/ aspirate/dispense
@@ -173,10 +173,10 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
 
         for i in range(repetitions):
-            self.dispense()
+            self.dispense(volume)
             self.aspirate(volume)
 
-        self.dispense()
+        self.dispense(volume)
 
         return self
 
