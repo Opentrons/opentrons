@@ -8,7 +8,8 @@ const state = {
     is_connected: false,
     port: null,
     current_protocol_name: "No File Selected",
-    errors: "No errors"
+    errors: "No errors",
+    tasks: []
 }
 
 
@@ -20,6 +21,9 @@ const mutations = {
     UPDATE_CURRENT_PROTOCOL (state, payload) {
       state.current_protocol_name = payload.current_protocol_name
       state.errors = payload.errors
+    },
+    UPDATE_TASK_LIST (state, payload) {
+      state.tasks = payload.tasks
     }
 }
 
@@ -58,6 +62,16 @@ const actions = {
         .then((response) => {
           console.log(response)
           commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName, 'errors': response.body.data})
+        }, (response) => {
+          console.log('failed to upload', response)
+        })
+    },
+    updateTasks ({commit}, target) {
+      Vue.http
+        .get('http://localhost:5000/instruments/placeables', {protocol: target.result})
+        .then((response) => {
+          console.log(response)
+          commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
         }, (response) => {
           console.log('failed to upload', response)
         })
