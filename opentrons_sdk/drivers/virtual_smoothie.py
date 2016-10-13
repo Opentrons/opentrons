@@ -180,6 +180,12 @@ class VirtualSmoothie(object):
     def process_mosfet_state(self, arguments):
         return 'ok'
 
+    def process_power_on(self, arguments):
+        return 'ok'
+
+    def process_power_off(self, arguments):
+        return 'ok'
+
     def insert_response(self, message):
         messages = message.split('\n')
         self.responses = list(reversed(messages)) + self.responses
@@ -212,6 +218,8 @@ class VirtualSmoothie(object):
             'M49': self.process_mosfet_state,
             'M50': self.process_mosfet_state,
             'M51': self.process_mosfet_state,
+            'M17': self.process_power_on,
+            'M18': self.process_power_off,
             'version': self.process_version,
             'config-get': self.process_config_get,
             'config-set': self.process_config_set

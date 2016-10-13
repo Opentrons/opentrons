@@ -36,6 +36,9 @@ class CNCDriver(object):
     SET_SPEED = 'G0'
     HALT = 'M112'
     CALM_DOWN = 'M999'
+    ACCELERATION = 'M204'
+    MOTORS_ON = 'M17'
+    MOTORS_OFF = 'M18'
 
     DISENGAGE_FEEDBACK = 'M63'
 
@@ -539,3 +542,11 @@ class CNCDriver(object):
         else:
             raise IndexError(
                 "Smoothie mosfet not at index {}".format(mosfet_index))
+
+    def power_on(self):
+        res = self.send_command(self.MOTORS_ON)
+        return res == b'ok'
+
+    def power_off(self):
+        res = self.send_command(self.MOTORS_OFF)
+        return res == b'ok'

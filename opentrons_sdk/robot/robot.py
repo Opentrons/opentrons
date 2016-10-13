@@ -291,3 +291,14 @@ class Robot(object):
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
+
+    def mosfet(self, mosfet_index, state, now=False):
+        def _do():
+            self._driver.set_mosfet(mosfet_index, state)
+
+        if now:
+            return _do()
+        else:
+            description = 'Setting Smoothie mosfet #{} to {}'.format(
+                mosfet_index, state)
+            self.add_command(Command(do=_do, description=description))

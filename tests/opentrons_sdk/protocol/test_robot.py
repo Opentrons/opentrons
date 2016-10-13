@@ -56,3 +56,11 @@ class RobotTest(unittest.TestCase):
         self.assertEqual(len(self.robot._commands) > 0, True)
 
         self.robot.resume()
+
+    def test_mosfet(self):
+        self.robot.mosfet(0, True)
+        self.assertEqual(len(self.robot._commands), 1)
+        self.robot.run()
+        self.assertEqual(len(self.robot._commands), 0)
+        self.robot.mosfet(0, True, now=True)
+        self.assertEqual(len(self.robot._commands), 0)

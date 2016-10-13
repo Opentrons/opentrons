@@ -170,3 +170,10 @@ class OpenTronsTest(unittest.TestCase):
         self.assertTrue(res)
 
         self.assertRaises(IndexError, self.motor.set_mosfet, 6, True)
+
+    def test_power_on_off(self):
+        res = self.motor.power_on()
+        self.assertTrue(res)
+
+        res = self.motor.power_off()
+        self.assertTrue(res)
