@@ -511,3 +511,17 @@ class CNCDriver(object):
         command += str(value)
         res = self.send_command(command)
         return res.decode().split(' ')[-1] == str(value)
+
+    def get_endstop_switches(self):
+        res = self.send_command(self.GET_ENDSTOPS)
+        ok_res = self.wait_for_response()
+        if ok_res == b'ok':
+            res = json.loads(res.decode())
+            res = res.get(self.GET_ENDSTOPS)
+            obj = {}
+            for key, value in res.items():
+                axis = key[-1]
+                obj[axis] = bool(value)
+            return obj
+        else:
+            return False

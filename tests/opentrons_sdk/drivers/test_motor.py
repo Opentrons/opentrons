@@ -136,3 +136,28 @@ class OpenTronsTest(unittest.TestCase):
 
         self.assertEqual(exptected_x, new_x_steps)
         self.assertEqual(exptected_y, new_y_steps)
+
+    def test_get_endstop_switches(self):
+        res = self.motor.get_endstop_switches()
+        expected = {
+            'x': False,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+        try:
+            self.motor.move_head(x=-100)
+            self.motor.move_head(x=-101)
+        except Exception:
+            pass
+        res = self.motor.get_endstop_switches()
+        expected = {
+            'x': True,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
