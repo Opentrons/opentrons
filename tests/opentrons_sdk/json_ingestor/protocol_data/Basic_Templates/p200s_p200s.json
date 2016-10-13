@@ -1,0 +1,152 @@
+{
+	"deck" : {
+        "p200-rack" : {
+            "labware" : "tiprack-200ul"
+        },
+        "p200-rackL" : {
+            "labware" : "tiprack-200ul"
+        },
+        "trash" : {
+            "labware" : "point"
+        },
+        "plate" : {
+            "labware" : "96-PCR-flat"
+        }
+    },
+
+	"head" : {
+        "p200" : {
+      	"tool" : "pipette",
+      	"tip-racks" : [
+        	{
+       		   	"container" : "p200-rack"
+        	}
+      	],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "b",
+            "volume": 200,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        },
+        "p200L" : {
+        "tool" : "pipette",
+        "tip-racks" : [
+            {
+                "container" : "p200-rackL"
+            }
+        ],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "a",
+            "volume": 200,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        }
+    },
+	
+	"ingredients" : {
+
+	},
+
+	"instructions" : [
+		{
+			"tool" : "p200",
+			"groups" : [
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "plate",
+                                "location": "A1",
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "plate",
+    							"location" : "A2",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 200
+						}
+					]
+				}
+			]
+		},
+        {
+            "tool" : "p200L",
+            "groups" : [
+                {
+                    "transfer" : [
+                        {
+                            "from" : {
+                                "container": "plate",
+                                "location": "A2",
+                                "touch-tip": false
+                            },
+                            "to": {
+                                "container" : "plate",
+                                "location" : "A3",
+                                "tip-offset" : 0,
+                                "delay" : 0,
+                                "touch-tip" : false
+                            },
+                                "volume" : 200
+                        }
+                    ]
+                }
+            ]
+        }
+	]
+}

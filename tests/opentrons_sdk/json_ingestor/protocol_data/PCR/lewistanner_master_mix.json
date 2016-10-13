@@ -1,0 +1,286 @@
+{
+    "info": {
+        "name": "Master Mix o' Matic (for 13 Samples)", 
+        "description": "Adapted from  online protocol for our own unit, Volumes callibrated as such and tested. Sample number is 13 this allows it to be placed on various gel sizes, this can be repeated twice for more mix. Reagents as follows: (2ml) dntp's-A3, Dtq Buffer-A2, Dtq pol-B2, Water-C2, Pr.1 - A1, Pr.2-B1, Pr.3 (optional for future) -C1, DMSO (opt)-D3, MM:D1. Primers required as 10mM stock (1/10 dilution for now) but can eb adapted to make these up fresh with water. ", 
+        "create-date": "November 20th, 2015", 
+        "version": "A1.0", 
+        "run-notes": "Run time ~10 minutes 30s, uses long p10 tips to reach taq"
+    }, 
+    "deck": {
+        "p10-rack-ST": {
+            "labware": "tiprack-10ul",
+            "slot": "B1"
+        },
+        "p200-rack": {
+            "labware": "tiprack-200ul",
+            "slot": "A2"
+        },
+        "trash": {
+            "labware": "point",
+            "slot": "B2"
+        },
+        "reagents": {
+            "labware": "tube-rack-2ml",
+            "slot": "D3"
+        },
+        "pcr-rack": {
+            "labware": "tube-rack-.75ml",
+            "slot": "D1"
+        }
+    },
+    "head": {
+        "p200": {
+            "tip-racks": [
+                {
+                    "container": "p200-rack"
+                }
+            ],
+            "tool": "pipette",
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "b",
+            "volume": 200,
+            "down-plunger-speed": 350,
+            "up-plunger-speed": 290,
+            "tip-plunge": 6,
+            "extra-pull-volume": 10,
+            "extra-pull-delay": 10,
+            "distribute-percentage": 0.1,
+            "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+        },
+        "p10": {
+            "tool": "pipette",
+            "tip-racks": [
+                {
+                    "container": "p10-rack-ST"
+                }
+            ],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": true,
+            "axis": "a",
+            "volume": 10,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 10,
+            "distribute-percentage": 0.1,
+            "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+        }
+    },
+    "ingredients": {}, 
+    "instructions": [
+        {
+            "tool": "p200", 
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "C2", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 185, 
+                            "blowout": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "A1", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 34, 
+                            "blowout": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "B1", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 34, 
+                            "blowout": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "A2", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 34, 
+                            "blowout": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "A3", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 34, 
+                            "blowout": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "D3", 
+                                "tip-offset": 0, 
+                                "delay": 5, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 20, 
+                            "blowout": true
+                        }
+                    ]
+                }
+            ]
+        },
+	{
+            "tool": "p10", 
+            "groups": [
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "B2", 
+                                "tip-offset": 0, 
+                                "delay": 5, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "reagents", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.8, 
+                            "blowout": true
+                        }
+                    ]
+                }
+            ]
+        },
+	{
+            "tool": "p200", 
+            "groups": [
+		{
+                    "mix": [
+                        {
+                            "container": "reagents", 
+                            "location": "D1", 
+                            "volume": 100, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

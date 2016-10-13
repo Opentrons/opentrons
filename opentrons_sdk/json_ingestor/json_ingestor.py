@@ -8,26 +8,25 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.util import vector
 
 
-class BaseHandler(object):
-    def validate(self):
-        raise NotImplementedError
-
-    def submit(self):
-        validation_errors = self.validate()
-        if not validation_errors:
-            self.perform()
-
-
-    def perform(self):
-        raise NotImplementedError
+# class BaseHandler(object):
+#     def validate(self):
+#         raise NotImplementedError
+#
+#     def submit(self):
+#         validation_errors = self.validate()
+#         if not validation_errors:
+#             self.perform()
+#
+#
+#     def perform(self):
+#         raise NotImplementedError
 
 def interpret_json_protocol(json_protocol: OrderedDict):
     robot_deck = interpret_deck(json_protocol['deck'])
     robot_head = interpret_head(robot_deck, json_protocol['head'])
-    instructions_interpreter = lambda: interpret_instructions(
+    interpret_instructions(
         robot_deck, robot_head, json_protocol['instructions']
     )
-    instructions_interpreter()
 
 
 def interpret_deck(deck_info: OrderedDict):
@@ -223,9 +222,16 @@ def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
     # TODO: validate command args
     volume = command_args.get('volume', tool_obj.max_volume)
     tool_settings = robot_head[tool_obj.name]['settings']
+    should_extra_pull = command_args.get('extra-pull', False)
 
     handle_transfer_from(
-        tool_obj, tool_settings, robot_deck, robot_head, command_args['from'], volume
+        tool_obj,
+        tool_settings,
+        robot_deck,
+        robot_head,
+        command_args['from'],
+        volume,
+        should_extra_pull
     )
     handle_transfer_to(
         tool_obj,
@@ -242,10 +248,19 @@ def handle_transfer_from(
         robot_deck,
         robot_head,
         from_info,
-        volume
+        volume,
+        extra_pull=False
 ):
-    extra_pull_delay = tool_settings.get('extra-pull-delay', 0)
-    extra_pull_volume = tool_settings.get('extra-pull-volume', 0)
+    extra_pull_delay = (
+        tool_settings.get('extra-pull-delay', 0)
+        if extra_pull
+        else 0
+    )
+    extra_pull_volume = (
+        tool_settings.get('extra-pull-volume', 0)
+        if extra_pull
+        else 0
+    )
 
     from_container = robot_deck[from_info['container']]['instance']
     from_well = from_container[from_info['location']]
@@ -259,9 +274,9 @@ def handle_transfer_from(
         from_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, from_tip_offset)
     )
 
-    tool_obj.aspirate(volume, from_location)
+    tool_obj.aspirate(volume + extra_pull_volume, from_location)
     tool_obj.delay(extra_pull_delay)
-    tool_obj.aspirate(extra_pull_volume, from_location)
+    tool_obj.dispense(extra_pull_volume)
     if should_touch_tip_on_from:
         tool_obj.touch_tip()
     tool_obj.delay(from_delay)
@@ -273,9 +288,9 @@ def handle_transfer_to(
         to_info,
         volume
 ):
-    # to_info = command_args['to']
     to_container = robot_deck[to_info['container']]['instance']
     to_well = to_container[to_info['location']]
+
     should_touch_tip_on_to = to_info.get('touch-tip', False)
     to_tip_offset = to_info.get('tip-offset', 0)
     to_delay = to_info.get('delay', 0)
@@ -330,7 +345,6 @@ def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
 
 def handle_mix(tool_obj, robot_deck, robot_head, command_args):
     volume = command_args.get('volume', tool_obj.max_volume)
-    tool_settings = robot_head[tool_obj.name]['settings']
     well = None
 
     tool_obj.aspirate(volume, well)

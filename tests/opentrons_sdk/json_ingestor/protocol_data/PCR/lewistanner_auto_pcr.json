@@ -1,0 +1,651 @@
+{
+    "info": {
+        "name": "PCR prep setup- Auto PCR (for 13 samples)", 
+        "description": "Adapted from the PCR protocol written online, DNA samples to be places in order in positions A-D, Row, 4, 5, 6 in the 2ml tube rack D1 (Above master mix reagents if needed). THis will dispense the master mix into 13 PCR tubes rows 1-3+4 as 24ul and add DNA to each before mixing. ", 
+        "create-date": "January 11th, 2016", 
+        "version": "A1.0", 
+        "run-notes": "Protocol taks around 32 minutes for full mixing"
+    }, 
+    "deck": {
+        "p10-rack-ST": {
+            "labware": "tiprack-10ul",
+            "slot": "B1"
+        },
+        "p200-rack": {
+            "labware": "tiprack-200ul",
+            "slot": "A2"
+        },
+        "trash": {
+            "labware": "point",
+            "slot": "B2"
+        },
+        "reagents": {
+            "labware": "tube-rack-2ml",
+            "slot": "D3"
+        },
+        "pcr-rack": {
+            "labware": "tube-rack-.75ml",
+            "slot": "D1"
+        }
+    },
+    "head": {
+        "p200": {
+            "tip-racks": [
+                {
+                    "container": "p200-rack"
+                }
+            ],
+            "tool": "pipette",
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "b",
+            "volume": 200,
+            "down-plunger-speed": 350,
+            "up-plunger-speed": 290,
+            "tip-plunge": 6,
+            "extra-pull-volume": 10,
+            "extra-pull-delay": 0,
+            "distribute-percentage": 0.1,
+            "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+        },
+        "p10": {
+            "tool": "pipette",
+            "tip-racks": [
+                {
+                    "container": "p10-rack-ST"
+                }
+            ],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": true,
+            "axis": "a",
+            "volume": 10,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 0,
+            "distribute-percentage": 0.1,
+            "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+        }
+    },
+    "ingredients": {}, 
+    "instructions": [
+        {
+            "tool": "p200", 
+            "groups": [
+                {
+                    "distribute": {
+                        "from": {
+                            "container": "reagents", 
+                            "location": "D1"
+                        }, 
+                        "to": [
+                            {
+                                "container": "pcr-rack", 
+                                "location": "A1", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "B1", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "C1", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "D1", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "A2", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "B2", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }
+                        ], 
+                        "blowout": true
+                    }
+                }, 
+		{
+                    "distribute": {
+                        "from": {
+                            "container": "reagents", 
+                            "location": "D1"
+                        }, 
+                        "to": [
+                            {
+                                "container": "pcr-rack", 
+                                "location": "C2", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "D2", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "A3", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "B3", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "C3", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "D3", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }, 
+                            {
+                                "container": "pcr-rack", 
+                                "location": "A4", 
+                                "volume": 24, 
+                                "touch-tip": false
+                            }
+                        ], 
+                        "blowout": true
+ 			}
+                } 
+            ]
+        },
+	{
+            "tool": "p10", 
+            "groups": [
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "A4", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "A1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "B4", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "B1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "C4", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "C1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "D4", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "D1", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "A5", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "A2", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "B5", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "B2", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "C5", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "C2", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "D5", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "D2", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "A6", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "A3", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "B6", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "B3", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "C6", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "C3", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "D6", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "D3", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "reagents", 
+                                "location": "C2", 
+                                "tip-offset": 0, 
+                                "delay": 1, 
+                                "liquid-tracking": false
+                            }, 
+                            "to": {
+                                "container": "pcr-rack", 
+                                "location": "A4", 
+                                "liquid-tracking": false, 
+                                "touch-tip": false
+                            }, 
+                            "volume": 1.2, 
+                            "blowout": true
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "A1", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "B1", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "C1", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "D1", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "A2", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "B2", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "C2", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "D2", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "A3", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "B3", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "C3", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "D3", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                },
+		{
+                    "mix": [
+                        {
+                            "container": "pcr-rack", 
+                            "location": "A4", 
+                            "volume": 10, 
+                            "repetitions": 3, 
+                            "blowout": false, 
+                            "liquid-tracking": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,933 @@
+{
+	"deck": {
+        "p200-rack" : {
+            "labware" : "tiprack-200ul",
+            "slot" : "A2"
+        },
+        "p10-rack" : {
+            "labware" : "tiprack-10ul",
+            "slot" : "B1"
+        },
+        "LB": {
+            "labware": "tube-rack-2ml",
+            "slot" : "D1"
+        },
+        "trash": {
+            "labware": "point",
+            "slot" : "A1"
+        },
+        "FusX Output": {
+            "labware": "96-pcr-flat",
+            "slot" : "C2"
+        },
+        "Cool Deck" : {
+            "labware" : "tube-rack-2ml",
+            "slot" : "D3"
+        },
+        "Heat Deck" : {
+            "labware" : "tube-rack-2ml",
+            "slot" : "B3"
+        }
+    },
+
+    "head" : {
+        "p200" : {
+      	"tool" : "pipette",
+      	"tip-racks" : [
+        	{
+       		   	"container" : "p200-rack"
+        	}
+      	],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "b",
+            "volume": 200,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        },
+        "p10" : {
+        "tool" : "pipette",
+        "tip-racks" : [
+            {
+                "container" : "p10-rack"
+            }
+        ],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "a",
+            "volume": 10,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        }
+    },
+
+    "ingredients" : {
+
+    },
+
+    "instructions": [
+        {
+            "tool": "p10",
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A1",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A2",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A2",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A3",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A3",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A4",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A4",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A5",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A5",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A6",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B1",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A7",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B2",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A8",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B3",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay" : 1800
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A9",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B4",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A10",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B5",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "FusX Output",
+                                "location": "A11",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "C1",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay" : 1200
+                            },
+                            "volume": 2.5,
+                            "blowout" : true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "tool": "p200",
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "A1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "A1",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "A1"
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A1",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "A2",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "A2",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "A2",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A2",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "A3",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "A3",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "A3",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A3",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "A4",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "A4",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "A4",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A4",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "A5",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "A5",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "A5",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A5",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "B1",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B1",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "B2",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "B2",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "B2",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B2",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "B3",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "B3",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "B3",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B3",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "B4",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "B4",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "B4",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B4",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "B5",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "B5",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "B5",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B5",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "Cool Deck",
+                                "location": "C1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Heat Deck",
+                                "location": "C1",
+                                "touch-tip": true,
+                                "tip-offset" : 0,
+                                "delay": 35
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        },
+                        {
+                            "from": {
+                                "container": "Heat Deck",
+                                "location": "C1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "C1",
+                                "touch-tip": true,
+                                "tip-offset" : 0
+                            },
+                            "volume": 27.5,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "A1"
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A1",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "A1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A2",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "A1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A3",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "A1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "A1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "A5",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B1",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B2",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B4",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "B1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "B5",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                },
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "LB",
+                                "location": "C1",
+                                "tip-offset" : 0
+                            },
+                            "to": {
+                                "container": "Cool Deck",
+                                "location": "C1",
+                                "tip-offset" : 0,
+                                "touch-tip": true
+                            },
+                            "volume": 200,
+                            "blowout" : true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

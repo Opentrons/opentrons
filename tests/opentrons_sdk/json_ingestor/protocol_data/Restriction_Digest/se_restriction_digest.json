@@ -1,0 +1,290 @@
+{
+    "info": {
+        "name": "Single Enzyme Restriction Digest", 
+        "description": "", 
+        "create-date": "September 3rd, 2015", 
+        "version": "1.0", 
+        "run-notes": ""
+    }, 
+    "deck": {
+        "p10-rack": {
+            "labware": "tiprack-10ul",
+            "slot" : "A1"
+        }, 
+        ".75 mL Tube Rack": {
+            "labware": "tube-rack-.75ml", 
+            "slot": "C1"
+        },
+        "trash" : {
+            "labware" : "point",
+            "slot" : "B2"
+        }
+    }, 
+    "head": {
+        "p10": {
+            "tip-racks": [
+                {
+                    "container": "p10-rack"
+                }
+            ], 
+            "tool": "pipette", 
+            "trash-container": {
+                "container": "trash"
+            }, 
+            "multi-channel": false, 
+            "axis": "b", 
+            "volume": 10, 
+            "down-plunger-speed": 300, 
+            "up-plunger-speed": 500, 
+            "tip-plunge": 6, 
+            "extra-pull-volume": 0, 
+            "extra-pull-delay": 200, 
+            "distribute-percentage": 0.1, 
+            "points": [
+                {
+                    "f1": 1, 
+                    "f2": 1
+                }, 
+                {
+                    "f1": 5, 
+                    "f2": 5
+                }, 
+                {
+                    "f1": 7, 
+                    "f2": 7
+                }, 
+                {
+                    "f1": 10, 
+                    "f2": 10
+                }
+            ]
+        }
+    }, 
+    "ingredients": {}, 
+    "instructions": [
+        {
+            "tool": "p10", 
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B1", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 3
+                        }, 
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A1", 
+                                "tip-offset": 0, 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B2", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 3, 
+                            "blowout": true, 
+                            "extra-pull": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B1", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 2
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B2", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 2
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A3", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B1", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 10
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A3", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B2", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 10
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A3", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B1", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 5
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A3", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B2", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 5
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A4", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "touch-tip": true
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B1", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 2, 
+                            "blowout": true, 
+                            "extra-pull": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A4", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "touch-tip": true
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B2", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 2, 
+                            "blowout": true, 
+                            "extra-pull": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A5", 
+                                "tip-offset": 0, 
+                                "delay": 3600000, 
+                                "touch-tip": true
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B1", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 5, 
+                            "blowout": true, 
+                            "extra-pull": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "A5", 
+                                "tip-offset": 0, 
+                                "delay": 0, 
+                                "touch-tip": true
+                            }, 
+                            "to": {
+                                "container": ".75 mL Tube Rack", 
+                                "location": "B2", 
+                                "touch-tip": true
+                            }, 
+                            "volume": 5, 
+                            "blowout": true, 
+                            "extra-pull": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
