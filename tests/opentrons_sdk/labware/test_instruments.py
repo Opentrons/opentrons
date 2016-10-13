@@ -256,10 +256,6 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 10.0}
         )
 
-    def test_invalid_dispense(self):
-        # self.assertRaises(RuntimeWarning, self.p200.dispense, 1)
-        self.assertRaises(IndexError, self.p200.dispense, -1)
-
     def test_blow_out(self):
 
         self.p200.blow_out()
