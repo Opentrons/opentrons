@@ -184,8 +184,6 @@ def interpret_instructions(robot_deck, robot_head, instructions: list):
             # We always pick up a new tip when entering a group
             tool_obj.pick_up_tip(next(tips))
             for command_type, commands_calls in group.items():
-                # if command_type == 'distribute':
-                #     import pdb; pdb.set_trace()
                 handler = lambda args: handle_command(
                         tool_obj,robot_deck, robot_head, command_type, args
                     )
@@ -247,8 +245,6 @@ def handle_transfer_from(
     extra_pull_delay = tool_settings.get('extra-pull-delay', 0)
     extra_pull_volume = tool_settings.get('extra-pull-volume', 0)
 
-
-    # from_info = command_args['from']
     from_container = robot_deck[from_info['container']]['instance']
     from_well = from_container[from_info['location']]
 
@@ -300,11 +296,16 @@ def handle_transfer_to(
 
 
 def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
-    volume = command_args.get('volume', tool_obj.max_volume)
+    # Refactor
     tool_settings = robot_head[tool_obj.name]['settings']
 
     from_info = command_args['from']
     to_info_list = command_args['to']
+
+    total_to_volume = sum(to_info['volume'] for to_info in to_info_list)
+    distribute_percent = tool_settings.get('distribute-percentage', 0)
+
+    from_volume = total_to_volume * (1 + distribute_percent)
 
     handle_transfer_from(
         tool_obj,
@@ -312,7 +313,7 @@ def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
         robot_deck,
         robot_head,
         from_info,
-        volume
+        from_volume
     )
 
     for to_info in to_info_list:
@@ -321,15 +322,46 @@ def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
             robot_deck,
             robot_head,
             to_info,
-            volume
+            to_info['volume']
         )
 
 
 def handle_mix(tool_obj, robot_deck, robot_head, command_args):
-    print('NOT YET SUPPORTED')
-    pass
+    volume = command_args.get('volume', tool_obj.max_volume)
+    tool_settings = robot_head[tool_obj.name]['settings']
+    well = None
+
+    tool_obj.aspirate(volume, well)
+    tool_obj.mix(command_args.get('repetitions', 0))
+
+    if command_args.get('blow-out'):
+        tool_obj.robot.move_to_top(well, instrument=tool_obj, create_path=False)
+        tool_obj.blow_out()
 
 
 def handle_consolidate(tool_obj, robot_deck, robot_head, command_args):
-    print('NOT YET SUPPORTED')
-    pass
+    # Refactor
+    tool_settings = robot_head[tool_obj.name]['settings']
+
+    from_info_list = command_args['from']
+    to_info = command_args['to']
+
+    total_volume = sum(from_info['volume'] for from_info in from_info_list)
+
+    for from_info in from_info_list:
+        handle_transfer_from(
+            tool_obj,
+            tool_settings,
+            robot_deck,
+            robot_head,
+            from_info,
+            from_info['volume']
+        )
+
+    handle_transfer_to(
+        tool_obj,
+        robot_deck,
+        robot_head,
+        to_info,
+        total_volume
+    )
