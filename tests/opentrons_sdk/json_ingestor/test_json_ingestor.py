@@ -141,6 +141,7 @@ class JSONIngestorTestCase(unittest.TestCase):
         pp(head_expected)
         print('------')
         pp(head_res)
+
         self.assertDictEqual(head_expected, head_res)
         self.assertEqual(1, instrument.channels)
         self.assertEqual(0, instrument.min_volume)
@@ -149,7 +150,6 @@ class JSONIngestorTestCase(unittest.TestCase):
 
     def test_interpret_instructions(self):
         pass
-
 
     def test_interpret_json_protocol(self):
         super_protocol_json = None
@@ -162,3 +162,5 @@ class JSONIngestorTestCase(unittest.TestCase):
                 object_pairs_hook=OrderedDict
             )
         interpret_json_protocol(super_protocol_json)
+
+

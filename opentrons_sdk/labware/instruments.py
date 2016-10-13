@@ -175,24 +175,28 @@ class Pipette(object):
         return self
 
     def mix(self, repetitions=3):
-        volume = self.current_volume
-
         def _do():
-            # plunger movements are handled w/ aspirate/dispense
-            # using Command for printing description
-            pass
+            volume = self.current_volume
+            for i in range(repetitions):
+                # Dispense liquid
+                plunge_distance, _ = self.plunge_distance(volume)
+                self.plunger.move(plunge_distance, mode='relative')
+                self.current_volume -= volume
+
+                # Aspirate liquid
+                plunge_distance, _ = self.plunge_distance(volume)
+                distance = plunge_distance * -1
+                self.plunger.move(distance, mode='relative')
+                self.current_volume += volume
+
+            plunge_distance, _ = self.plunge_distance(volume)
+            self.plunger.move(plunge_distance, mode='relative')
+            self.current_volume -= volume
 
         description = "Mixing {0} times with a volume of {1}mm".format(
             repetitions, str(self.current_volume)
         )
         self.robot.add_command(Command(do=_do, description=description))
-
-        for i in range(repetitions):
-            self.dispense()
-            self.aspirate(volume)
-
-        self.dispense()
-
         return self
 
     def blow_out(self, location=None):

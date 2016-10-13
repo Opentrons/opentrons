@@ -393,30 +393,38 @@ class PipetteTest(unittest.TestCase):
         # It is necessary to aspirate before it is mocked out
         # so that you have liquid
         self.p200.current_volume = 100
-        self.p200.aspirate = mock.Mock()
-        self.p200.dispense = mock.Mock()
         self.p200.mix()
         self.robot.run()
 
-        print("****", len(self.p200.dispense.mock_calls))
-        print("****", self.p200.dispense.mock_calls)
-        self.assertEqual(
-            self.p200.dispense.mock_calls,
-            [
-                mock.call.dispense(),
-                mock.call.dispense(),
-                mock.call.dispense(),
-                mock.call.dispense()
-            ]
+        current_pos = self.robot._driver.get_plunger_positions()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'a': 0, 'b': 6.0}
         )
-        self.assertEqual(
-            self.p200.aspirate.mock_calls,
-            [
-                mock.call.aspirate(100),
-                mock.call.aspirate(100),
-                mock.call.aspirate(100)
-            ]
-        )
+        # self.p200.aspirate = mock.Mock()
+        # self.p200.dispense = mock.Mock()
+        # self.p200.mix()
+        # self.robot.run()
+        #
+        # print("****", len(self.p200.dispense.mock_calls))
+        # print("****", self.p200.dispense.mock_calls)
+        # self.assertEqual(
+        #     self.p200.dispense.mock_calls,
+        #     [
+        #         mock.call.dispense(),
+        #         mock.call.dispense(),
+        #         mock.call.dispense(),
+        #         mock.call.dispense()
+        #     ]
+        # )
+        # self.assertEqual(
+        #     self.p200.aspirate.mock_calls,
+        #     [
+        #         mock.call.aspirate(100),
+        #         mock.call.aspirate(100),
+        #         mock.call.aspirate(100)
+        #     ]
+        # )
 
 
     # TODO: TEST TOUCH_TIP

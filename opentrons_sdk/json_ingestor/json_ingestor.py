@@ -8,6 +8,18 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.util import vector
 
 
+class BaseHandler(object):
+    def validate(self):
+        raise NotImplementedError
+
+    def submit(self):
+        validation_errors = self.validate()
+        if not validation_errors:
+            self.perform()
+
+
+    def perform(self):
+        raise NotImplementedError
 
 def interpret_json_protocol(json_protocol: OrderedDict):
     robot_deck = interpret_deck(json_protocol['deck'])
