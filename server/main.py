@@ -49,8 +49,9 @@ def upload():
     filetype = filename.rsplit('.', 1)[1]
 
     protocol_path = os.path.join(os.getcwd(), "protocols", filename)
-
+    header = "from opentrons_sdk import containers\nfrom opentrons_sdk.labware import instruments\n"
     with open(protocol_path, 'w') as file_:
+        file_.write(header)
         file_.write(file)
 
     errors = lintProtocol(protocol_path, filetype)
