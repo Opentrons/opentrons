@@ -164,6 +164,78 @@ def disconnect_robot():
         'data': data
     })
 
+@app.route("/instrument/placeables")
+def get_placeables():
+    data = {
+        "p200": {
+            "axis": "a",
+            "placeables": {
+                "tiprack200": { # user name/label
+                    "type": "tiprack", # labware definition
+                    "x": None,
+                    "y": None,
+                    "bottom": None
+                },
+                "trash": { # user name/label
+                    "type": "point", # labware definition
+                    "x": None,
+                    "y": None,
+                    "bottom": None
+                },
+                "plate": { # user name/label
+                    "type": "plate", # labware definition
+                    "x": None,
+                    "y": None,
+                    "top": None,
+                    "bottom": None
+                },
+                "tuberack": { # user name/label
+                    "type": "tuberack", # labware definition
+                    "x": None,
+                    "y": None,
+                    "top": None,
+                    "bottom": None
+                }
+            }
+        },
+        "p10": {
+            "axis": "a",
+            "placeables": {
+                "tiprack200": { # user name/label
+                    "type": "tiprack", # labware definition
+                    "x": None,
+                    "y": None,
+                    "bottom": None
+                },
+                "trash": { # user name/label
+                    "type": "point", # labware definition
+                    "x": None,
+                    "y": None,
+                    "bottom": None
+                },
+                "plate": { # user name/label
+                    "type": "plate", # labware definition
+                    "x": None,
+                    "y": None,
+                    "top": None,
+                    "bottom": None
+                },
+                "tuberack": { # user name/label
+                    "type": "tuberack", # labware definition
+                    "x": None,
+                    "y": None,
+                    "top": None,
+                    "bottom": None
+                }
+            }
+        }
+    }
+
+    return flask.jsonify({
+        'status': 200,
+        'data': data
+    })
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
