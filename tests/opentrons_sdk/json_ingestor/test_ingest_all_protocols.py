@@ -27,6 +27,7 @@ class AllProtocolsTestCase(unittest.TestCase):
                 try:
                     yield self.read_protocol(root, protocol_name)
                 except Exception as e:
+                    print('Failed to read JSON for {}'.format(root, protocol_name))
                     continue
 
     def read_protocol(self, root, protocol_name):

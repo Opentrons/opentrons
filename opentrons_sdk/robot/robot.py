@@ -105,7 +105,7 @@ class Robot(object):
             return False
 
     def add_command(self, command):
-        print("Enqueing:", command.description)
+        # print("Enqueing:", command.description)
         log.info("Enqueing:", command.description)
         self._commands.append(command)
 
@@ -122,7 +122,6 @@ class Robot(object):
         self._driver.wait_for_arrival()
 
     def move_to(self, location, instrument=None, create_path=True):
-        # def _do():
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -150,9 +149,6 @@ class Robot(object):
                 z=coordinates[2])
         self._driver.wait_for_arrival()
 
-        # description = "Moving head to {}".format(location)
-        # self.add_command(Command(do=_do, description=description))
-
     def move_to_top(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
         top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
@@ -174,7 +170,7 @@ class Robot(object):
             if command.description == "Pausing":
                 return
 
-            print("Executing:", command.description)
+            # print("Executing:", command.description)
             log.info("Executing:", command.description)
             try:
                 command.do()
@@ -272,14 +268,15 @@ class Robot(object):
 
     def clear(self):
         self._commands = []
-        print('Robot ready to enqueue and execute new commands')
+        # print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
         # This method is for API use only - in a user protocol,
         # it will jump the queue, which is counterintuitive
         # and not very useful.
         def _do():
-            print("Paused")
+            pass
+            # print("Paused")
 
         description = "Pausing"
         self.prepend_command(Command(do=_do, description=description))

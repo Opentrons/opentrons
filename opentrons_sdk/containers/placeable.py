@@ -18,6 +18,11 @@ def unpack_location(location):
         )
     return (placeable, Vector(coordinates))
 
+def humanize(location):
+    # TODO:
+    pass
+
+
 
 class Placeable(object):
 
