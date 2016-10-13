@@ -525,9 +525,8 @@ class CNCDriver(object):
             res = json.loads(first_line.decode())
             res = res.get(self.GET_ENDSTOPS)
             obj = {}
-            for key, value in res.items():
-                axis = key[-1]
-                obj[axis] = bool(value)
+            for axis in 'xyzab':
+                obj[axis] = bool(res.get('min_' + axis))
             return obj
         else:
             return False

@@ -292,6 +292,9 @@ class Robot(object):
     def get_connected_port(self):
         return self._driver.get_connected_port()
 
+    def switches(self):
+        return self._driver.get_endstop_switches()
+
     def mosfet(self, mosfet_index, state, now=False):
         def _do():
             self._driver.set_mosfet(mosfet_index, state)

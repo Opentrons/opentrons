@@ -64,3 +64,28 @@ class RobotTest(unittest.TestCase):
         self.assertEqual(len(self.robot._commands), 0)
         self.robot.mosfet(0, True, now=True)
         self.assertEqual(len(self.robot._commands), 0)
+
+    def test_switches(self):
+        res = self.robot.switches()
+        expected = {
+            'x': False,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+        try:
+            self.robot.move_head(x=-199)
+            self.robot.move_head(x=-199)
+        except Exception:
+            pass
+        res = self.robot.switches()
+        expected = {
+            'x': True,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
