@@ -44,17 +44,12 @@ def allowed_file(filename):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    # pp.pprint(json.loads(request.data.read()decode('utf-8'))['file'])
     file = json.loads(request.data.decode('utf-8'))['file']
     filename = json.loads(request.data.decode('utf-8'))['filename']
     filetype = filename.rsplit('.', 1)[1]
 
     with open(filename, 'w') as file_:
         file_.write(file)
-
-    pp.pprint(filename)
-    pp.pprint(filetype)
-    pp.pprint(file)
 
     errors = lintProtocol(filename, filetype)
     #create deepcopy, run on virtual smoothie w/
@@ -70,6 +65,16 @@ def upload():
             'data': data
         })
 
+def lintProtocol(filename, filetype):
+    from pylint import epylint as lint
+    if filetype == "py":
+        config_file = os.path.join(os.getcwd(), "pylintrc")
+        command = '{0} --rcfile={1}'.format(filename, config_file)
+        (pylint_stdout, pylint_stderr) = lint.py_run(command, return_std=True)
+        return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
+    elif filetype == "json":
+        #lint, convert to python, lint again
+        pass
 
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
@@ -155,17 +160,6 @@ def disconnect_robot():
         'status': status,
         'data': data
     })
-
-def lintProtocol(filename, filetype):
-    from pylint import epylint as lint
-    print("*****",filetype)
-    if filetype == "py":
-        (pylint_stdout, pylint_stderr) = lint.py_run(filename, return_std=True)
-        print("passed the linting")
-        return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
-    elif filetype == "json":
-        #lint, convert to python, lint again
-        pass
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
