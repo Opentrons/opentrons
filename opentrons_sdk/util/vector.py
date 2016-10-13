@@ -1,3 +1,5 @@
+import math
+
 from collections import namedtuple
 
 
@@ -40,6 +42,13 @@ class Vector(object):
 
     def is_iterable(self, arg):
         return hasattr(arg, "__iter__") or hasattr(arg, "__getitem__")
+
+    def length(self):
+        return math.sqrt(
+            pow(self.coordinates.x, 2) +
+            pow(self.coordinates.y, 2) +
+            pow(self.coordinates.z, 2)
+        )
 
     def __init__(self, *args, **kwargs):
         # self.coordinates = self.zero_coordinates()

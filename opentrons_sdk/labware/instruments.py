@@ -1,3 +1,4 @@
+from opentrons_sdk import containers
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
@@ -70,16 +71,16 @@ class Pipette(object):
 
         self.position_for_aspirate(location)
 
-        distance = self.plunge_distance(volume) * -1
+        self.current_volume += volume
+        distance = self.plunge_distance(self.current_volume)
+        destination = self.positions['bottom'] - distance
 
         def _do_aspirate():
-            self.plunger.move(distance, mode='relative')
-            self.plunger.wait_for_arrival()
+            self.plunger.move(destination)
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
         self.robot.add_command(
             Command(do=_do_aspirate, description=description))
-        self.current_volume += volume
 
         return self
 
@@ -98,16 +99,16 @@ class Pipette(object):
             self.robot.move_to(location, instrument=self)
 
         if volume:
-            distance = self.plunge_distance(volume)
+            self.current_volume -= volume
+            distance = self.plunge_distance(self.current_volume)
+            destination = self.positions['bottom'] - distance
 
             def _do():
-                self.plunger.move(distance, mode='relative')
-                self.plunger.wait_for_arrival()
+                self.plunger.move(destination)
 
             description = "Dispensing {0}uL at {1}".format(
                 volume, str(location))
             self.robot.add_command(Command(do=_do, description=description))
-            self.current_volume -= volume
 
         return self
 
@@ -185,7 +186,6 @@ class Pipette(object):
 
         def _do():
             self.plunger.move(self.positions['blow_out'])
-            self.plunger.wait_for_arrival()
 
         description = "Blow_out at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -206,10 +206,7 @@ class Pipette(object):
 
         return self
 
-    def pick_up_tip(self, location=None):
-
-        if location:
-            self.robot.move_to_bottom(location, instrument=self)
+    def pick_up_tip(self, location):
 
         # TODO: actual plunge depth for picking up a tip
         # varies based on the tip
@@ -217,14 +214,19 @@ class Pipette(object):
         # TODO: Need to talk about containers z positioning
         tip_plunge = 6
 
+        placeable, coordinates = containers.unpack_location(location)
+        if isinstance(location, Placeable):
+            coordinates = placeable.from_center(x=0, y=0, z=-1)
+        pressed_into_tip = coordinates + (0, 0, -tip_plunge)
+
+        self.robot.move_to((placeable, coordinates))
+        for _ in range(3):
+            self.go_to((placeable, pressed_into_tip))
+            self.go_to((placeable, coordinates))
+
         def _do():
             # Dip into tip and pull it up
-            for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, mode='relative')
-                self.robot.move_head(z=tip_plunge, mode='relative')
-
-            self.plunger.wait_for_arrival()
-            self.robot.home('z')
+            pass
 
         description = "Picking up tip from {0}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -237,7 +239,6 @@ class Pipette(object):
         def _do():
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
-            self.plunger.wait_for_arrival()
 
         description = "Drop_tip at {}".format(str(location))
         self.robot.add_command(Command(do=_do, description=description))
@@ -330,12 +331,10 @@ class Pipette(object):
         if volume > self.max_volume:
             raise IndexError("{}µl exceeds maximum volume.".format(volume))
         if volume < self.min_volume:
-            raise IndexError("{}µl is too small.".format(volume))
+            # TODO: down raise exception, but notify user with a warning
+            pass
 
         return volume / self.max_volume
-
-    def supports_volume(self, volume):
-        return self.max_volume <= volume <= self.max_volume
 
     def delay(self, seconds):
         def _do():

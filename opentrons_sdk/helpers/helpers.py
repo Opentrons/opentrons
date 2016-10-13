@@ -1,5 +1,7 @@
 import json
 
+from opentrons_sdk.util.vector import Vector
+
 
 def unpack_coordinates(coordinates):
     if not isinstance(coordinates, tuple):
@@ -14,6 +16,39 @@ def flip_coordinates(coordinates, dimensions):
     x_size, y_size, z_size = unpack_coordinates(dimensions)
 
     return (x, y_size - y, z_size - z)
+
+
+def break_down_travel(p1, p2=Vector(0, 0, 0), increment=5, mode='absolute'):
+    """
+    given two points p1 and p2, this returns a list of
+    incremental positions or relative steps
+    """
+
+    heading = p2 - p1
+    if mode == 'relative':
+        heading = p1
+    length = heading.length()
+
+    length_steps = length / increment
+    length_remainder = length % increment
+
+    vector_step = Vector(0, 0, 0)
+    if length_steps > 0:
+        vector_step = heading / length_steps
+    vector_remainder = vector_step * (length_remainder / increment)
+
+    res = []
+    if mode is 'absolute':
+        for i in range(int(length_steps)):
+            p1 = p1 + vector_step
+            res.append(p1)
+        p1 = p1 + vector_remainder
+        res.append(p1)
+    else:
+        for i in range(int(length_steps)):
+            res.append(vector_step)
+        res.append(vector_remainder)
+    return res
 
 
 def import_calibration_json(json_string, robot, calibrated_top=False):

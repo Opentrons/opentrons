@@ -1,3 +1,4 @@
+from threading import (Thread, Event)
 import unittest
 
 from opentrons_sdk.drivers.motor import CNCDriver
@@ -20,10 +21,43 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_set_plunger_speed(self):
+        res = self.motor.set_plunger_speed(400, 'a')
+        self.assertEquals(res, True)
+
+    def test_set_head_speed(self):
+        res = self.motor.set_head_speed(4000)
+        self.assertEquals(res, True)
+        self.assertEquals(self.motor.head_speed, 4000)
+
+    def test_pause_resume(self):
+        self.motor.home()
+
+        self.motor.resume()
+
+        done = Event()
+        done.clear()
+
+        def _move_head():
+            self.motor.move_head(x=100, y=0, z=0)
+            done.set()
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.resume()
+        done.wait()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
     def test_get_position(self):
         self.motor.home()
         self.motor.move_head(x=100)
-        self.motor.wait_for_arrival()
         coords = self.motor.get_head_position()
         expected_coords = {
             'target': (100, 250, 120),
