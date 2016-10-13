@@ -30,7 +30,7 @@ class OpenTronsTest(unittest.TestCase):
         done.clear()
 
         def _move_head():
-            self.motor.move_head(x=100)
+            self.motor.move_head(x=100, y=0, z=0)
             done.set()
 
         thread = Thread(target=_move_head)
@@ -38,6 +38,13 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor.resume()
         done.wait()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
 
     def test_get_position(self):
         self.motor.home()
