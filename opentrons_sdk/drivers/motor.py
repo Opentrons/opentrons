@@ -55,6 +55,9 @@ class CNCDriver(object):
         'y': 'config-set sd beta_steps_per_mm '
     }
 
+    MOSFET_ON = ['M41', 'M43', 'M45', 'M47', 'M49', 'M51']
+    MOSFET_OFF = ['M40', 'M42', 'M44', 'M46', 'M48', 'M50']
+
     """
     Serial port connection to talk to the device.
     """
@@ -513,10 +516,10 @@ class CNCDriver(object):
         return res.decode().split(' ')[-1] == str(value)
 
     def get_endstop_switches(self):
-        res = self.send_command(self.GET_ENDSTOPS)
-        ok_res = self.wait_for_response()
-        if ok_res == b'ok':
-            res = json.loads(res.decode())
+        first_line = self.send_command(self.GET_ENDSTOPS)
+        second_line = self.wait_for_response()
+        if second_line == b'ok':
+            res = json.loads(first_line.decode())
             res = res.get(self.GET_ENDSTOPS)
             obj = {}
             for key, value in res.items():
@@ -525,3 +528,14 @@ class CNCDriver(object):
             return obj
         else:
             return False
+
+    def set_mosfet(self, mosfet_index, state):
+        if mosfet_index < len(self.MOSFET_OFF):
+            command = self.MOSFET_OFF[mosfet_index]
+            if state:
+                command = self.MOSFET_ON[mosfet_index]
+            res = self.send_command(command)
+            return res == b'ok'
+        else:
+            raise IndexError(
+                "Smoothie mosfet not at index {}".format(mosfet_index))

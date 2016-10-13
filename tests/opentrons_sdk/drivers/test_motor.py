@@ -161,3 +161,12 @@ class OpenTronsTest(unittest.TestCase):
             'b': False
         }
         self.assertEquals(res, expected)
+
+    def test_set_mosfet(self):
+        res = self.motor.set_mosfet(0, True)
+        self.assertTrue(res)
+
+        res = self.motor.set_mosfet(5, False)
+        self.assertTrue(res)
+
+        self.assertRaises(IndexError, self.motor.set_mosfet, 6, True)
