@@ -78,6 +78,10 @@ class CNCDriver(object):
         self.head_speed = 3000  # smoothie's default speed in mm/minute
         self.current_commands = []
 
+        self.SMOOTHIE_SUCCESS = 'Succes'
+        self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
+        self.STOPPED = 'Received a STOP signal and exited from movements'
+
     def get_connected_port(self):
         """
         Returns the port the driver is currently connected to
@@ -295,7 +299,7 @@ class CNCDriver(object):
                 for axis in 'ab'
                 if axis in kwargs}
 
-        return self.queue_move_commands([args], 0.1)
+        return self.consume_move_commands([args], 0.1)
 
     def move_head(self, mode='absolute', **kwargs):
         if 'absolute' in kwargs:
@@ -331,28 +335,28 @@ class CNCDriver(object):
                 {axis.upper(): flipped_vector[axis]
                  for axis in 'xyz' if axis in kwargs})
 
-        return self.queue_move_commands(args_list, increment)
+        return self.consume_move_commands(args_list, increment)
 
-    def queue_move_commands(self, args_list, step):
+    def consume_move_commands(self, args_list, step):
         tolerance = step * 0.5
         self.current_commands = list(args_list)
         while self.can_move.wait():
             if self.stopped.is_set():
                 self.resume()
-                return (False, 'Stopped')
+                return (False, self.STOPPED)
             if self.current_commands:
                 args = self.current_commands.pop(0)
             else:
                 self.wait_for_arrival()
-                return (True, 'Success')
+                break
 
             self.wait_for_arrival(tolerance)
 
             log.debug("MotorDriver", "Moving head: {}".format(args))
             res = self.send_command(self.MOVE, **args)
             if res != b'ok':
-                return (False, 'Smoothie error')
-        return (True, 'Success')
+                return (False, self.SMOOTHIE_ERROR)
+        return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
         coordinates = Vector(coordinates) * Vector(1, -1, -1)
