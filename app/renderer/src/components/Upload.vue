@@ -60,6 +60,7 @@ export default {
       var target = event.target
       console.log(target.fileName)
       this.$store.dispatch("uploadProtocol", target)
+      this.$store.dispatch("updateTasks", target)
     }
   }
 }
