@@ -83,3 +83,13 @@ class RobotTest(unittest.TestCase):
             'b': False
         }
         self.assertEquals(res, expected)
+
+    def test_version(self):
+        versions = self.robot.versions()
+        expected = {
+            'software': '2.0.0',
+            'config': 'v1.0.3',
+            'firmware': 'v1.0.5',
+            'model': 'one_pro'
+        }
+        self.assertDictEqual(versions, expected)

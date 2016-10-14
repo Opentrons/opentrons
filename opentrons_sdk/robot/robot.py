@@ -295,6 +295,17 @@ class Robot(object):
     def switches(self):
         return self._driver.get_endstop_switches()
 
+    def versions(self):
+        """
+        Returns the software, firmware, config, and robot versions
+        """
+        return {
+            'software': '2.0.0',
+            'firmware': self._driver.get_firmware_version(),
+            'config': self._driver.get_config_version(),
+            'model': self._driver.get_ot_version(),
+        }
+
     def mosfet(self, mosfet_index, state, now=False):
         def _do():
             self._driver.set_mosfet(mosfet_index, state)

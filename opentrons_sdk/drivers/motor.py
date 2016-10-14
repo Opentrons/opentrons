@@ -45,9 +45,9 @@ class CNCDriver(object):
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
-    VERSION = 'version'
-
     GET_OT_VERSION = 'config-get sd ot_version'
+    GET_FIRMWARE_VERSION = 'version'
+    GET_CONFIG_VERSION = 'config-get sd version'
     GET_STEPS_PER_MM = {
         'x': 'config-get sd alpha_steps_per_mm',
         'y': 'config-get sd beta_steps_per_mm'
@@ -154,10 +154,11 @@ class CNCDriver(object):
 
     def connect_to_virtual_smoothie(self):
         settings = {
-                'ot_version': 'one_pro',
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
+            'ot_version': 'one_pro',
+            'version': 'v1.0.3',        # config version
+            'alpha_steps_per_mm': 80.0,
+            'beta_steps_per_mm': 80.0
+        }
         self.connection = VirtualSmoothie('v1.0.5', settings)
         return self.calm_down()
 
@@ -509,6 +510,21 @@ class CNCDriver(object):
             raise ValueError('{} is not an ot_version'.format(res))
         self.ot_version = res
         return self.ot_version
+
+    def get_firmware_version(self):
+        res = self.send_command(self.GET_FIRMWARE_VERSION)
+        res = res.decode().split(' ')[-1]
+        # the version is returned as a JSON dict, the version is a string
+        # but not wrapped in double-quotes as JSON requires...
+        # aka --> {"version":v1.0.5}
+        self.firmware_version = res.split(':')[-1][:-1]
+        return self.firmware_version
+
+    def get_config_version(self):
+        res = self.send_command(self.GET_CONFIG_VERSION)
+        res = res.decode().split(' ')[-1]
+        self.config_version = res
+        return self.config_version
 
     def get_steps_per_mm(self, axis):
         if axis not in self.GET_STEPS_PER_MM:
