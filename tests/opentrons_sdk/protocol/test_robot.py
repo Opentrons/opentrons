@@ -27,7 +27,6 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             self.robot.run()
-            self.assertEqual(len(self.robot._commands), 0)
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -44,7 +43,6 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             self.robot.run()
-            self.assertEqual(len(self.robot._commands), 0)
 
         self.robot.pause()
 
