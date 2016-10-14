@@ -10,7 +10,7 @@ class RobotTest(unittest.TestCase):
         Robot.reset()
         self.robot = Robot.get_instance()
         self.robot.connect()
-        self.robot.home()
+        self.robot.home(now=True)
         self.robot.clear()
 
     def test_disconnect(self):
@@ -82,3 +82,69 @@ class RobotTest(unittest.TestCase):
 
         thread.join(1)
         self.assertEqual(len(self.robot._commands), 0)
+
+    def test_mosfet(self):
+        self.robot.mosfet(0, True)
+        self.assertEqual(len(self.robot._commands), 1)
+        self.robot.run()
+        self.assertEqual(len(self.robot._commands), 0)
+        self.robot.mosfet(0, True, now=True)
+        self.assertEqual(len(self.robot._commands), 0)
+
+    def test_versions(self):
+        res = self.robot.versions()
+        expected = {
+            'config': 'v1.0.3',
+            'firmware': 'v1.0.5',
+            'robot': 'one_pro'
+        }
+        self.assertDictEqual(res, expected)
+
+    def test_diagnostics(self):
+        res = self.robot.diagnostics()
+        expected = {
+            'axis_homed': {
+                'x': True, 'y': True, 'z': True, 'a': True, 'b': True
+            },
+            'switches': {
+                'x': False,
+                'y': False,
+                'z': False,
+                'a': False,
+                'b': False
+            }
+        }
+        self.assertDictEqual(res, expected)
+
+        self.robot.connect()
+        self.assertRaises(RuntimeWarning, self.robot.move_head, x=-199)
+        res = self.robot.diagnostics()
+        expected = {
+            'axis_homed': {
+                'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+            },
+            'switches': {
+                'x': True,
+                'y': False,
+                'z': False,
+                'a': False,
+                'b': False
+            }
+        }
+        self.assertDictEqual(res, expected)
+
+        self.robot.home('x', now=True)
+        res = self.robot.diagnostics()
+        expected = {
+            'axis_homed': {
+                'x': True, 'y': False, 'z': False, 'a': False, 'b': False
+            },
+            'switches': {
+                'x': False,
+                'y': False,
+                'z': False,
+                'a': False,
+                'b': False
+            }
+        }
+        self.assertDictEqual(res, expected)

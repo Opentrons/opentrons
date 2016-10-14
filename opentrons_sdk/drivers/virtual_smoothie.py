@@ -97,7 +97,7 @@ class VirtualSmoothie(object):
 
         for axis in axis_list:
             arguments[axis.upper()] = 0.0
-            self.endstop['min_' + axis] = 0
+            self.endstop['min_' + axis.lower()] = 0
 
         self.process_set_position_command(arguments)
 
@@ -177,6 +177,15 @@ class VirtualSmoothie(object):
     def process_disengage_feedback(self, arguments):
         return 'feedback disengaged\nok'
 
+    def process_mosfet_state(self, arguments):
+        return 'ok'
+
+    def process_power_on(self, arguments):
+        return 'ok'
+
+    def process_power_off(self, arguments):
+        return 'ok'
+
     def insert_response(self, message):
         messages = message.split('\n')
         self.responses = list(reversed(messages)) + self.responses
@@ -197,6 +206,20 @@ class VirtualSmoothie(object):
             'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
             'G91': self.process_relative_positioning,
+            'M40': self.process_mosfet_state,
+            'M41': self.process_mosfet_state,
+            'M42': self.process_mosfet_state,
+            'M43': self.process_mosfet_state,
+            'M44': self.process_mosfet_state,
+            'M45': self.process_mosfet_state,
+            'M46': self.process_mosfet_state,
+            'M47': self.process_mosfet_state,
+            'M48': self.process_mosfet_state,
+            'M49': self.process_mosfet_state,
+            'M50': self.process_mosfet_state,
+            'M51': self.process_mosfet_state,
+            'M17': self.process_power_on,
+            'M18': self.process_power_off,
             'version': self.process_version,
             'config-get': self.process_config_get,
             'config-set': self.process_config_set

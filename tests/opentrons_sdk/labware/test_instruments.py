@@ -51,10 +51,14 @@ class PipetteTest(unittest.TestCase):
     def test_placeables_reference(self):
 
         self.p200.aspirate(100, self.plate[0])
+        self.p200.dispense(100, self.plate[0])
+        self.p200.aspirate(100, self.plate[20])
+        self.p200.aspirate(100, self.plate[1])
 
         expected = [
             self.plate[0],
-            self.plate[0]
+            self.plate[20],
+            self.plate[1]
         ]
 
         self.assertEquals(self.p200.placeables, expected)
@@ -302,7 +306,6 @@ class PipetteTest(unittest.TestCase):
             "Delaying 1 seconds")
 
     def test_set_speed(self):
-
         self.p200.set_speed(aspirate=100)
         self.assertEqual(self.p200.speeds['aspirate'], 100)
 
@@ -392,15 +395,13 @@ class PipetteTest(unittest.TestCase):
         self.p200.mix()
         self.robot.run()
 
-        print("****", len(self.p200.dispense.mock_calls))
-        print("****", self.p200.dispense.mock_calls)
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(),
-                mock.call.dispense(),
-                mock.call.dispense(),
-                mock.call.dispense()
+                mock.call.dispense(100),
+                mock.call.dispense(100),
+                mock.call.dispense(100),
+                mock.call.dispense(100)
             ]
         )
         self.assertEqual(
@@ -411,3 +412,26 @@ class PipetteTest(unittest.TestCase):
                 mock.call.aspirate(100)
             ]
         )
+
+        def test_mix_with_args(self):
+            self.p200.current_volume = 100
+            self.p200.aspirate = mock.Mock()
+            self.p200.dispense = mock.Mock()
+            self.p200.mix(volume=50, repetitions=2)
+            self.robot.run()
+
+            self.assertEqual(
+                self.p200.dispense.mock_calls,
+                [
+                    mock.call.dispense(50),
+                    mock.call.dispense(50),
+                    mock.call.dispense(50)
+                ]
+            )
+            self.assertEqual(
+                self.p200.aspirate.mock_calls,
+                [
+                    mock.call.aspirate(50),
+                    mock.call.aspirate(50)
+                ]
+            )

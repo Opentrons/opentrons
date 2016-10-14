@@ -174,6 +174,21 @@ class VirtualSmoothieTestCase(unittest.TestCase):
         response = self.s.readline()
         self.assertEqual(response, b'{"limit":"min_x"}')
 
+    def test_mosfet_state(self):
+        for i in range(12):
+            self.s.write('M{}'.format(i + 40))
+            response = self.s.readline()
+            self.assertEqual(response, b'ok')
+
+    def test_power_on_off(self):
+        self.s.write('M17')
+        response = self.s.readline()
+        self.assertEqual(response, b'ok')
+
+        self.s.write('M18')
+        response = self.s.readline()
+        self.assertEqual(response, b'ok')
+
     def test_move(self):
 
         self.s.write('G90')

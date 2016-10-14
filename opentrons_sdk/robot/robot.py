@@ -124,12 +124,10 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
-    def move_to(self, location, instrument=None, create_path=True):
+    def move_to(self, location, instrument=None, create_path=True, now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
-            # add to the list of instument-container mappings
-            instrument.placeables.append(placeable)
             coordinates = instrument.calibrator.convert(
                 placeable,
                 coordinates)
@@ -150,20 +148,10 @@ class Robot(object):
                     y=coordinates[1],
                     z=coordinates[2])
 
-        # description = "Moving head to {} {}".format(
-        #     str(placeable),
-        #     coordinates)
-        self.add_command(Command(do=_do))
-
-    def move_to_top(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        self.move_to(top_location, instrument, create_path)
-
-    def move_to_bottom(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        self.move_to(bottom_location, instrument, create_path)
+        if now:
+            _do()
+        else:
+            self.add_command(Command(do=_do))
 
     @property
     def actions(self):
@@ -296,3 +284,29 @@ class Robot(object):
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
+
+    def versions(self):
+        # TODO: Store these versions in config
+        return {
+            'firmware': self._driver.get_firmware_version(),
+            'config': self._driver.get_config_version(),
+            'robot': self._driver.get_ot_version(),
+        }
+
+    def diagnostics(self):
+        # TODO: Store these versions in config
+        return {
+            'axis_homed': self._driver.axis_homed,
+            'switches': self._driver.get_endstop_switches()
+        }
+
+    def mosfet(self, mosfet_index, state, now=False):
+        def _do():
+            self._driver.set_mosfet(mosfet_index, state)
+
+        if now:
+            return _do()
+        else:
+            description = 'Setting Smoothie mosfet #{} to {}'.format(
+                mosfet_index, state)
+            self.add_command(Command(do=_do, description=description))
