@@ -292,18 +292,19 @@ class Robot(object):
     def get_connected_port(self):
         return self._driver.get_connected_port()
 
+    def versions(self):
+        # TODO: Store these versions in config
+        return {
+            'firmware': self._driver.get_firmware_version(),
+            'config': self._driver.get_config_version(),
+            'robot': self._driver.get_ot_version(),
+        }
+
     def diagnostics(self):
         # TODO: Store these versions in config
         return {
-            'version': {
-                'firmware': self._driver.get_firmware_version(),
-                'config': self._driver.get_config_version(),
-                'robot': self._driver.get_ot_version(),
-            },
-            'state': {
-                'axis_homed': self._driver.axis_homed,
-                'switches': self._driver.get_endstop_switches()
-            }
+            'axis_homed': self._driver.axis_homed,
+            'switches': self._driver.get_endstop_switches()
         }
 
     def mosfet(self, mosfet_index, state, now=False):
