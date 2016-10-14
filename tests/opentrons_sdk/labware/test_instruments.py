@@ -50,10 +50,14 @@ class PipetteTest(unittest.TestCase):
     def test_placeables_reference(self):
 
         self.p200.aspirate(100, self.plate[0])
+        self.p200.dispense(100, self.plate[0])
+        self.p200.aspirate(100, self.plate[20])
+        self.p200.aspirate(100, self.plate[1])
 
         expected = [
             self.plate[0],
-            self.plate[0]
+            self.plate[20],
+            self.plate[1]
         ]
 
         self.assertEquals(self.p200.placeables, expected)

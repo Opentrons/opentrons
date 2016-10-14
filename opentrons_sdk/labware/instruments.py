@@ -50,39 +50,36 @@ class Pipette(object):
 
         self.set_speed(speed)
 
-    def associate_location(self, location):
+    def associate_placeable(self, location):
         placeable, _ = containers.unpack_location(location)
-        self.placeables.append(placeable)
+        if not self.placeables or (placeable != self.placeables[-1]):
+            self.placeables.append(placeable)
 
     def move_to(self, location, create_path=True):
         if location:
-            self.associate_location(location)
+            self.associate_placeable(location)
             self.robot.move_to(location, instrument=self)
 
         return self
 
-    def move_to_top(self, location):
-        placeable, coordinates = containers.unpack_location(location)
+    def move_to_top(self, location, create_path=True):
+        placeable, _ = containers.unpack_location(location)
         top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        return self.move_to(top_location)
+        return self.move_to(top_location, create_path)
 
-    def move_to_bottom(self, location):
-        placeable, coordinates = containers.unpack_location(location)
+    def move_to_bottom(self, location, create_path=True):
+        placeable, _ = containers.unpack_location(location)
         bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        return self.move_to(bottom_location)
+        return self.move_to(bottom_location, create_path)
 
     def go_to(self, location):
         return self.move_to(location, create_path=False)
 
-    def go_to_top(self, location):
-        placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        return self.go_to(top_location)
+    def go_to_top(self, location, offset=None):
+        return self.move_to_top(location, create_path=False)
 
     def go_to_bottom(self, location):
-        placeable, coordinates = containers.unpack_location(location)
-        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        return self.go_to(bottom_location)
+        return self.move_to_bottom(location, create_path=False)
 
     def aspirate(self, volume=None, location=None):
 
@@ -226,8 +223,10 @@ class Pipette(object):
     def touch_tip(self, location=None):
         if location:
             self.move_to(location)
-        else:
+        elif self.placeables:
             location = self.placeables[-1]
+        else:
+            raise IndexError("Pipette does not know where it is")
 
         self.go_to((location, location.from_center(x=1, y=0, z=1)))
         self.go_to((location, location.from_center(x=-1, y=0, z=1)))

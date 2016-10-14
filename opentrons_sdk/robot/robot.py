@@ -126,7 +126,7 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
-    def move_to(self, location, instrument=None, create_path=True):
+    def move_to(self, location, instrument=None, create_path=True, now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -150,10 +150,10 @@ class Robot(object):
                     y=coordinates[1],
                     z=coordinates[2])
 
-        # description = "Moving head to {} {}".format(
-        #     str(placeable),
-        #     coordinates)
-        self.add_command(Command(do=_do))
+        if now:
+            _do()
+        else:
+            self.add_command(Command(do=_do))
 
     @property
     def actions(self):
