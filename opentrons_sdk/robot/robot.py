@@ -56,8 +56,10 @@ class Robot(object):
 
         class InstrumentMotor():
 
-            def move(self, value, mode='absolute'):
+            def move(self, value, speed=None, mode='absolute'):
                 kwargs = {axis: value}
+                if speed:
+                    self.speed(speed)
 
                 return robot_self._driver.move_plunger(
                     mode=mode, **kwargs
