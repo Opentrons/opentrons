@@ -71,10 +71,12 @@ def upload():
 def lintProtocol(protocol_path, filetype):
     from pylint import epylint as lint
     if filetype == "py":
+        # this is where the virtual smoothie gets run w/ fake calibration data
+        # this stuff beneath is for pylint
         config_file = os.path.join(os.getcwd(), "pylintrc")
-        command = '{0} --rcfile={1}'.format(protocol_path, config_file)
-        (pylint_stdout, pylint_stderr) = lint.py_run(command, return_std=True)
-        return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
+        # command = '{0} --rcfile={1}'.format(protocol_path, config_file)
+        # (pylint_stdout, pylint_stderr) = lint.py_run(command, return_std=True)
+        # return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
     elif filetype == "json":
         #lint, convert to python, lint again
         pass
@@ -131,7 +133,7 @@ def connect_robot():
                  'is_connected': robot.is_connected()
                 }
             )
-            time.sleep(1.5)
+            socketio.sleep(1.5)
 
     connection_state_watcher = socketio.start_background_task(
         watch_connection_state,
