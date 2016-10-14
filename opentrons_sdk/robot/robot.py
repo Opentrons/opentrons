@@ -293,6 +293,7 @@ class Robot(object):
         return self._driver.get_connected_port()
 
     def diagnostics(self):
+        # TODO: Store these versions in config
         return {
             'version': {
                 'firmware': self._driver.get_firmware_version(),

@@ -212,6 +212,7 @@ class CNCDriver(object):
     def stop(self):
         if self.current_commands:
             self.stopped.set()
+            self.can_move.set()
         else:
             self.resume()
 
@@ -307,9 +308,6 @@ class CNCDriver(object):
             raise ValueError('Invalid coordinate mode: ' + mode)
 
     def move_plunger(self, mode='absolute', **kwargs):
-        if 'absolute' in kwargs:
-            raise ValueError('absolute parameter is obsolete, ' +
-                             'please use mode=(absolute|relative)')
 
         self.set_coordinate_system(mode)
 
@@ -320,9 +318,6 @@ class CNCDriver(object):
         return self.consume_move_commands([args], 0.1)
 
     def move_head(self, mode='absolute', **kwargs):
-        if 'absolute' in kwargs:
-            raise ValueError('absolute parameter is obsolete, ' +
-                             'please use mode=(absolute|relative)')
 
         self.set_coordinate_system(mode)
         current = self.get_head_position()['target']
