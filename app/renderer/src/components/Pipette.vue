@@ -1,5 +1,7 @@
 <template>
-  <div>*******Pipette*******</div>
+  <div>
+    Calibrate {{ $route.params.pipette }}
+  </div>
 </template>
 
 <script>
