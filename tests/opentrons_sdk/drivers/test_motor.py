@@ -21,9 +21,14 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_message_timeout(self):
+        self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
+
     def test_set_plunger_speed(self):
         res = self.motor.set_plunger_speed(400, 'a')
         self.assertEquals(res, True)
+
+        self.assertRaises(ValueError, self.motor.set_plunger_speed, 400, 'x')
 
     def test_set_head_speed(self):
         res = self.motor.set_head_speed(4000)
@@ -136,3 +141,47 @@ class OpenTronsTest(unittest.TestCase):
 
         self.assertEqual(exptected_x, new_x_steps)
         self.assertEqual(exptected_y, new_y_steps)
+
+        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'z')
+        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'z', 80.0)
+
+    def test_get_endstop_switches(self):
+        res = self.motor.get_endstop_switches()
+        expected = {
+            'x': False,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+        try:
+            self.motor.move_head(x=-100)
+            self.motor.move_head(x=-101)
+        except Exception:
+            pass
+        res = self.motor.get_endstop_switches()
+        expected = {
+            'x': True,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+
+    def test_set_mosfet(self):
+        res = self.motor.set_mosfet(0, True)
+        self.assertTrue(res)
+
+        res = self.motor.set_mosfet(5, False)
+        self.assertTrue(res)
+
+        self.assertRaises(IndexError, self.motor.set_mosfet, 6, True)
+
+    def test_power_on_off(self):
+        res = self.motor.power_on()
+        self.assertTrue(res)
+
+        res = self.motor.power_off()
+        self.assertTrue(res)

@@ -27,7 +27,6 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             self.robot.run()
-            self.assertEqual(len(self.robot._commands), 0)
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -44,7 +43,6 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             self.robot.run()
-            self.assertEqual(len(self.robot._commands), 0)
 
         self.robot.pause()
 
@@ -56,3 +54,32 @@ class RobotTest(unittest.TestCase):
         self.assertEqual(len(self.robot._commands) > 0, True)
 
         self.robot.resume()
+
+    def test_mosfet(self):
+        self.robot.mosfet(0, True)
+        self.assertEqual(len(self.robot._commands), 1)
+        self.robot.run()
+        self.assertEqual(len(self.robot._commands), 0)
+        self.robot.mosfet(0, True, now=True)
+        self.assertEqual(len(self.robot._commands), 0)
+
+    def test_switches(self):
+        res = self.robot.switches()
+        expected = {
+            'x': False,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+        self.assertRaises(RuntimeWarning, self.robot.move_head, x=-199)
+        res = self.robot.switches()
+        expected = {
+            'x': True,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)

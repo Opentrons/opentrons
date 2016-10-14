@@ -36,6 +36,9 @@ class CNCDriver(object):
     SET_SPEED = 'G0'
     HALT = 'M112'
     CALM_DOWN = 'M999'
+    ACCELERATION = 'M204'
+    MOTORS_ON = 'M17'
+    MOTORS_OFF = 'M18'
 
     DISENGAGE_FEEDBACK = 'M63'
 
@@ -54,6 +57,15 @@ class CNCDriver(object):
         'x': 'config-set sd alpha_steps_per_mm ',
         'y': 'config-set sd beta_steps_per_mm '
     }
+
+    MOSFET = [
+        {True: 'M41', False: 'M40'},
+        {True: 'M43', False: 'M42'},
+        {True: 'M45', False: 'M44'},
+        {True: 'M47', False: 'M46'},
+        {True: 'M49', False: 'M48'},
+        {True: 'M51', False: 'M50'}
+    ]
 
     """
     Serial port connection to talk to the device.
@@ -511,3 +523,33 @@ class CNCDriver(object):
         command += str(value)
         res = self.send_command(command)
         return res.decode().split(' ')[-1] == str(value)
+
+    def get_endstop_switches(self):
+        first_line = self.send_command(self.GET_ENDSTOPS)
+        second_line = self.wait_for_response()
+        if second_line == b'ok':
+            res = json.loads(first_line.decode())
+            res = res.get(self.GET_ENDSTOPS)
+            obj = {}
+            for axis in 'xyzab':
+                obj[axis] = bool(res.get('min_' + axis))
+            return obj
+        else:
+            return False
+
+    def set_mosfet(self, mosfet_index, state):
+        try:
+            command = self.MOSFET[mosfet_index][bool(state)]
+            res = self.send_command(command)
+            return res == b'ok'
+        except IndexError:
+            raise IndexError(
+                "Smoothie mosfet not at index {}".format(mosfet_index))
+
+    def power_on(self):
+        res = self.send_command(self.MOTORS_ON)
+        return res == b'ok'
+
+    def power_off(self):
+        res = self.send_command(self.MOTORS_OFF)
+        return res == b'ok'
