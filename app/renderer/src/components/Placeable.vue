@@ -2,7 +2,9 @@
   <div>
     Calibrate {{ $route.params.instrument }}
     to well A1 of {{ $route.params.placeable }}
-    {{calibration}}
+    Current calibration
+    <br>
+    <pre>{{ JSON.stringify(calibration[0], null, 4) }}</pre>
   </div>
 </template>
 

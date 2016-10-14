@@ -1,9 +1,9 @@
 <template>
   <div>
     Calibrate {{ $route.params.instrument }}
-    Current calibration (test)
+    Current calibration
     <br>
-    <pre>{{ JSON.stringify(calibration[0]) }}</pre>
+    <pre>{{ JSON.stringify(calibration[0], null, 4) }}</pre>
   </div>
 </template>
 
