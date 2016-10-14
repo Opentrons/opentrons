@@ -3,12 +3,19 @@
     <li v-for="task in default_tasks">
       <router-link v-bind:to="task.href">{{task.title}}</router-link>
     </li>
+    <hr>
+
     <span v-for="instrument in tasks">
       <li v-for="placeable in instrument.placeables">
-        {{$data.tasks}}
-        <router-link v-bind:to="'instrument/' + placeable.label">Calibrate {{placeable.label}}</router-link>
+        <router-link v-bind:to="'calibrate/' + instrument.axis + '/' + placeable.label">Calibrate {{placeable.label}}</router-link>
       </li>
-    <span/>
+    </span>
+
+    <hr>
+
+    <li v-for="instrument in tasks">
+      <router-link v-bind:to="'calibrate' + instrument.axis">Calibrate {{instrument.label}}</router-link>
+    </li>
   </ul>
 </template>
 
