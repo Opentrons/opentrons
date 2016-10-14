@@ -50,11 +50,39 @@ class Pipette(object):
 
         self.set_speed(speed)
 
-    def go_to(self, location):
+    def associate_location(self, location):
+        placeable, _ = containers.unpack_location(location)
+        self.placeables.append(placeable)
+
+    def move_to(self, location, create_path=True):
         if location:
-            self.robot.move_to(location, instrument=self, create_path=False)
+            self.associate_location(location)
+            self.robot.move_to(location, instrument=self)
 
         return self
+
+    def move_to_top(self, location):
+        placeable, coordinates = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
+        return self.move_to(top_location)
+
+    def move_to_bottom(self, location):
+        placeable, coordinates = containers.unpack_location(location)
+        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        return self.move_to(bottom_location)
+
+    def go_to(self, location):
+        return self.move_to(location, create_path=False)
+
+    def go_to_top(self, location):
+        placeable, coordinates = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
+        return self.go_to(top_location)
+
+    def go_to_bottom(self, location):
+        placeable, coordinates = containers.unpack_location(location)
+        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        return self.go_to(bottom_location)
 
     def aspirate(self, volume=None, location=None):
 
@@ -96,7 +124,7 @@ class Pipette(object):
             volume = self.current_volume
 
         if location:
-            self.robot.move_to(location, instrument=self)
+            self.move_to(location)
 
         if volume:
             self.current_volume -= volume
@@ -114,7 +142,7 @@ class Pipette(object):
 
     def position_for_aspirate(self, location=None):
         if location:
-            self.robot.move_to_top(location, instrument=self)
+            self.move_to_top(location)
 
         if self.current_volume == 0:
             def _prep_plunger():
@@ -131,7 +159,7 @@ class Pipette(object):
                 # go up 1mm to give space to aspirate
                 bottom += Vector(0, 0, 1)
                 location = (location, bottom)
-            self.robot.move_to(location, instrument=self, create_path=False)
+            self.go_to(location)
 
     def transfer(self, source, destination, volume=None):
         volume = volume or self.max_volume
@@ -182,7 +210,7 @@ class Pipette(object):
 
     def blow_out(self, location=None):
         if location:
-            self.robot.move_to(location, instrument=self)
+            self.move_to(location)
 
         def _do():
             self.plunger.move(self.positions['blow_out'])
@@ -195,7 +223,7 @@ class Pipette(object):
 
     def touch_tip(self, location=None):
         if location:
-            self.robot.move_to(location, instrument=self)
+            self.move_to(location)
         else:
             location = self.placeables[-1]
 
@@ -219,7 +247,7 @@ class Pipette(object):
             coordinates = placeable.from_center(x=0, y=0, z=-1)
         pressed_into_tip = coordinates + (0, 0, -tip_plunge)
 
-        self.robot.move_to((placeable, coordinates))
+        self.move_to((placeable, coordinates))
         for _ in range(3):
             self.go_to((placeable, pressed_into_tip))
             self.go_to((placeable, coordinates))
@@ -234,7 +262,7 @@ class Pipette(object):
 
     def drop_tip(self, location=None):
         if location:
-            self.robot.move_to_bottom(location, instrument=self)
+            self.move_to_bottom(location)
 
         def _do():
             self.plunger.move(self.positions['drop_tip'])
