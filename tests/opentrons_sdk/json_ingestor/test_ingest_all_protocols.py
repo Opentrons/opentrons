@@ -24,10 +24,17 @@ class AllProtocolsTestCase(unittest.TestCase):
     def get_protocols(self):
         for root, dirs, files in os.walk(self.get_protocol_dir_path()):
             for protocol_name in files:
+                # Skip README's
+                if not protocol_name.lower().endswith('.json'):
+                    continue
                 try:
                     yield self.read_protocol(root, protocol_name)
-                except Exception as e:
-                    print('Failed to read JSON for {}'.format(root, protocol_name))
+                except ValueError:
+                    print(
+                        'JSON parsing failed for {} ...'.format(
+                            os.path.join(root, protocol_name),
+                        )
+                    )
                     continue
 
     def read_protocol(self, root, protocol_name):
@@ -48,11 +55,11 @@ class AllProtocolsTestCase(unittest.TestCase):
                 interpret_json_protocol(protocol_dict)
             except Exception as e:
                 failures.append(
-                    (protocol_path, str(e))
+                    (protocol_path, e, str(e))
                 )
 
         if failures:
             print('The following protocols failed to parse')
-            for path, reason in failures:
-                print("[{}]. Reason: {}".format(path, reason))
+            for path, exc, reason in failures:
+                print("[{}]. Reason: {} - {}".format(path, exc, reason))
             assert False
