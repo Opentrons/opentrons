@@ -15,9 +15,9 @@
 
       <navigation :prev="prev" :next="next"></navigation>
     </section>
-    <span>
+    <!-- <span>
       ERRORS: {{errors}}
-    </span>
+    </span> -->
   </div>
 </template>
 
