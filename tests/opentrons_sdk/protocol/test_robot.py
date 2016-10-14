@@ -75,11 +75,7 @@ class RobotTest(unittest.TestCase):
             'b': False
         }
         self.assertEquals(res, expected)
-        try:
-            self.robot.move_head(x=-199)
-            self.robot.move_head(x=-199)
-        except Exception:
-            pass
+        self.assertRaises(RuntimeWarning, self.robot.move_head, x=-199)
         res = self.robot.switches()
         expected = {
             'x': True,
