@@ -58,8 +58,14 @@ class CNCDriver(object):
         'y': 'config-set sd beta_steps_per_mm '
     }
 
-    MOSFET_ON = ['M41', 'M43', 'M45', 'M47', 'M49', 'M51']
-    MOSFET_OFF = ['M40', 'M42', 'M44', 'M46', 'M48', 'M50']
+    MOSFET = [
+        {True: 'M41', False: 'M40'},
+        {True: 'M43', False: 'M42'},
+        {True: 'M45', False: 'M44'},
+        {True: 'M47', False: 'M46'},
+        {True: 'M49', False: 'M48'},
+        {True: 'M51', False: 'M50'}
+    ]
 
     """
     Serial port connection to talk to the device.
@@ -532,13 +538,11 @@ class CNCDriver(object):
             return False
 
     def set_mosfet(self, mosfet_index, state):
-        if mosfet_index < len(self.MOSFET_OFF):
-            command = self.MOSFET_OFF[mosfet_index]
-            if state:
-                command = self.MOSFET_ON[mosfet_index]
+        try:
+            command = self.MOSFET[mosfet_index][bool(state)]
             res = self.send_command(command)
             return res == b'ok'
-        else:
+        except IndexError:
             raise IndexError(
                 "Smoothie mosfet not at index {}".format(mosfet_index))
 
