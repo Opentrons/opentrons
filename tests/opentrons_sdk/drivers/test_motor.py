@@ -35,6 +35,13 @@ class OpenTronsTest(unittest.TestCase):
         self.assertEquals(res, True)
         self.assertEquals(self.motor.head_speed, 4000)
 
+    def test_get_connected_port(self):
+        res = self.motor.get_connected_port()
+        self.assertEquals(res, self.motor.VIRTUAL_SMOOTHIE_PORT)
+        self.motor.disconnect()
+        res = self.motor.get_connected_port()
+        self.assertEquals(res, None)
+
     def test_pause_resume(self):
         self.motor.home()
 
@@ -60,6 +67,39 @@ class OpenTronsTest(unittest.TestCase):
         }
         self.assertDictEqual(coords, expected_coords)
 
+    def test_stop(self):
+        self.motor.home()
+
+        self.motor.pause()
+
+        done = Event()
+        done.clear()
+
+        def _move_head():
+            self.motor.move_head(x=100, y=0, z=0)
+            done.set()
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.stop()
+        done.wait()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (0, 250, 120),
+            'current': (0, 250, 120)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
+        self.motor.move_head(x=100, y=0, z=0)
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
     def test_get_position(self):
         self.motor.home()
         self.motor.move_head(x=100)
@@ -71,11 +111,20 @@ class OpenTronsTest(unittest.TestCase):
         self.assertDictEqual(coords, expected_coords)
 
     def test_home(self):
+
+        expected = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+        self.assertDictEqual(self.motor.axis_homed, expected)
+
         success = self.motor.home('x', 'y')
         self.assertTrue(success)
 
         success = self.motor.home('ba')
         self.assertTrue(success)
+
+        expected = {
+            'x': True, 'y': True, 'z': False, 'a': True, 'b': True}
+        self.assertDictEqual(self.motor.axis_homed, expected)
 
     def test_limit_hit_exception(self):
         self.motor.home()

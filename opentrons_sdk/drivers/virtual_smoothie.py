@@ -97,7 +97,7 @@ class VirtualSmoothie(object):
 
         for axis in axis_list:
             arguments[axis.upper()] = 0.0
-            self.endstop['min_' + axis] = 0
+            self.endstop['min_' + axis.lower()] = 0
 
         self.process_set_position_command(arguments)
 

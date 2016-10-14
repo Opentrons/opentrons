@@ -63,23 +63,60 @@ class RobotTest(unittest.TestCase):
         self.robot.mosfet(0, True, now=True)
         self.assertEqual(len(self.robot._commands), 0)
 
-    def test_switches(self):
-        res = self.robot.switches()
+    def test_versions(self):
+        res = self.robot.versions()
         expected = {
-            'x': False,
-            'y': False,
-            'z': False,
-            'a': False,
-            'b': False
+            'config': 'v1.0.3',
+            'firmware': 'v1.0.5',
+            'robot': 'one_pro'
         }
-        self.assertEquals(res, expected)
+        self.assertDictEqual(res, expected)
+
+    def test_diagnostics(self):
+        res = self.robot.diagnostics()
+        expected = {
+            'axis_homed': {
+                'x': True, 'y': True, 'z': True, 'a': True, 'b': True
+            },
+            'switches': {
+                'x': False,
+                'y': False,
+                'z': False,
+                'a': False,
+                'b': False
+            }
+        }
+        self.assertDictEqual(res, expected)
+
+        self.robot.connect()
         self.assertRaises(RuntimeWarning, self.robot.move_head, x=-199)
-        res = self.robot.switches()
+        res = self.robot.diagnostics()
         expected = {
-            'x': True,
-            'y': False,
-            'z': False,
-            'a': False,
-            'b': False
+            'axis_homed': {
+                'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+            },
+            'switches': {
+                'x': True,
+                'y': False,
+                'z': False,
+                'a': False,
+                'b': False
+            }
         }
-        self.assertEquals(res, expected)
+        self.assertDictEqual(res, expected)
+
+        self.robot.home('x')
+        res = self.robot.diagnostics()
+        expected = {
+            'axis_homed': {
+                'x': True, 'y': False, 'z': False, 'a': False, 'b': False
+            },
+            'switches': {
+                'x': False,
+                'y': False,
+                'z': False,
+                'a': False,
+                'b': False
+            }
+        }
+        self.assertDictEqual(res, expected)
