@@ -132,12 +132,7 @@ class Pipette(object):
             self.robot.move_to_top(location, instrument=self)
 
         if self.current_volume == 0:
-            # def _prep_plunger():
             self.plunger.move(self.positions['bottom'])
-
-            # description = "Resetting plunger to bottom"
-            # self.robot.add_command(
-            #     Command(do=_prep_plunger, description=description))
 
         if location:
             if isinstance(location, Placeable):

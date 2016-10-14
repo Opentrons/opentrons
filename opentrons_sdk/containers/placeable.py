@@ -18,9 +18,10 @@ def unpack_location(location):
         )
     return (placeable, Vector(coordinates))
 
+
 def humanize(location):
-    # TODO:
-    pass
+    well, _ = unpack_location(location)
+    return str(well)
 
 
 
