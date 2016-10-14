@@ -2,7 +2,7 @@ from opentrons_sdk.robot.command import Command
 
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
-from opentrons_sdk.containers.placeable import Placeable, unpack_location
+from opentrons_sdk.containers.placeable import Placeable, humanize_location
 from opentrons_sdk.util.vector import Vector
 
 
@@ -85,7 +85,7 @@ class Pipette(object):
 
         description = "Aspirating {0}uL at {1}".format(
             volume,
-            (unpack_location(location) if location else 'NA')
+            (humanize_location(location) if location else '<In Place>')
         )
         self.robot.add_command(
             Command(do=_do_aspirate, description=description))
@@ -239,7 +239,7 @@ class Pipette(object):
             self.plunger.wait_for_arrival()
             self.robot.home('z')
         description = "Picking up tip from {0}".format(
-            (unpack_location(location) if location else 'NA')
+            (humanize_location(location) if location else '<In Place>')
         )
         self.robot.add_command(Command(do=_do, description=description))
         return self
@@ -256,7 +256,7 @@ class Pipette(object):
             self.current_volume = 0
 
         description = "Drop_tip at {}".format(
-            (unpack_location(location) if location else 'NA')
+            (humanize_location(location) if location else '<In Place>')
         )
         self.robot.add_command(Command(do=_do, description=description))
         return self

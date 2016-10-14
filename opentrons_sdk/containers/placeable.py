@@ -19,7 +19,7 @@ def unpack_location(location):
     return (placeable, Vector(coordinates))
 
 
-def humanize(location):
+def humanize_location(location):
     well, _ = unpack_location(location)
     return str(well)
 
