@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store'
-import {Home, StepList, Upload, Connect, Container, Pipette} from './components/export.js'
+import {Home, StepList, Upload, Connect, Placeable, Instrument} from './components/export.js'
 
 
 Vue.use(VueRouter)
@@ -14,8 +14,8 @@ Vue.component('Connect', Connect)
 const routes = [
   { path: '/connect', component: Connect },
   { path: '/upload', component: Upload },
-  { path: '/calibrate/:pipette/:container', component: Container },
-  { path: '/calibrate/:pipette', component: Pipette },
+  { path: '/calibrate/:instrument', component: Instrument },
+  { path: '/calibrate/:instrument/:placeable', component: Placeable },
   { path: '*', redirect: "/connect" },
 ]
 
