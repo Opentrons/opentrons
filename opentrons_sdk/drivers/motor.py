@@ -409,24 +409,22 @@ class CNCDriver(object):
         return arrived
 
     def home(self, *axis):
-        home_command = self.HOME
         axis_to_home = ''
         for a in axis:
             ax = ''.join(sorted(a)).upper()
             if ax in 'ABXYZ':
                 axis_to_home += ax
-        if axis_to_home:
-            res = self.send_command(home_command + axis_to_home)
-            if res == b'ok':
-                # the axis aren't necessarily set to 0.0
-                # values after homing, so force it
-                pos_args = {}
-                for l in axis_to_home:
-                    self.axis_homed[l.lower()] = True
-                    pos_args[l] = 0
-                return self.set_position(**pos_args)
-            else:
-                return False
+        if not axis_to_home:
+            axis_to_home = 'ABXYZ'
+        res = self.send_command(self.HOME + axis_to_home)
+        if res == b'ok':
+            # the axis aren't necessarily set to 0.0
+            # values after homing, so force it
+            pos_args = {}
+            for l in axis_to_home:
+                self.axis_homed[l.lower()] = True
+                pos_args[l] = 0
+            return self.set_position(**pos_args)
         else:
             return False
 
