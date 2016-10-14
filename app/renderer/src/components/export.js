@@ -1,0 +1,6 @@
+export {default as Home} from './Home.vue'
+export {default as Connect} from './Connect.vue'
+export {default as StepList} from './StepList.vue'
+export {default as Upload} from './Upload.vue'
+export {default as Container} from './Container.vue'
+export {default as Pipette} from './Pipette.vue'
