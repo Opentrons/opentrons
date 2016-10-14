@@ -168,50 +168,60 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def get_placeables():
-    data = {
-        "p200": {
-            "axis": "a",
-            "label": "p200",
-            "placeables": [
-                {
-                    "type": "tiprack", # labware definition
-                    "label": "tiprack200",
-                    "x": None,
-                    "y": None,
-                    "bottom": None,
-                    "slot": "A1"
-                },
-                {
-                    "type": "point", # labware definition
-                    "label": "trash",
-                    "x": None,
-                    "y": None,
-                    "bottom": None,
-                    "slot": "A1"
-                },
-                {
-                    "type": "plate", # labware definition
-                    "label": "plate",
-                    "x": None,
-                    "y": None,
-                    "top": None,
-                    "bottom": None,
-                    "slot": "A1"
-                },
-                {
-                    "type": "tuberack", # labware definition
-                    "label": "tuberack",
-                    "x": None,
-                    "y": None,
-                    "top": None,
-                    "bottom": None,
-                    "slot": "A1"
-                }
-            ]
-        },
-        "p10": {
+    data = [
+             {
+                "axis": "a",
+                "label": "p200",
+                "top": 10,
+                "bottom": 20,
+                "blowout": 25,
+                "droptip": 26,
+                "max_volume": 100,
+                "placeables": [
+                    {
+                        "type": "tiprack", # labware definition
+                        "label": "tiprack200",
+                        "x": None,
+                        "y": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    },
+                    {
+                        "type": "point", # labware definition
+                        "label": "trash",
+                        "x": None,
+                        "y": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    },
+                    {
+                        "type": "plate", # labware definition
+                        "label": "plate",
+                        "x": None,
+                        "y": None,
+                        "top": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    },
+                    {
+                        "type": "tuberack", # labware definition
+                        "label": "tuberack",
+                        "x": None,
+                        "y": None,
+                        "top": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    }
+                ]
+            },
+            {
             "axis": "b",
             "label": "p10",
+            "top": None,
+            "bottom": None,
+            "blowout": None,
+            "droptip": None,
+            "max_volume": None,
             "placeables": [
                 {
                     "type": "tiprack", # labware definition
@@ -249,7 +259,7 @@ def get_placeables():
                 }
             ]
         }
-    }
+    ]
 
     return flask.jsonify({
         'status': 200,
