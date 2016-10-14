@@ -92,15 +92,22 @@ class Robot(object):
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
         return self._driver.connect(port)
 
-    def home(self, *args):
-        if self._driver.calm_down():
-            if args:
-                return self._driver.home(*args)
+    def home(self, *args, **kwargs):
+        def _do():
+            if self._driver.calm_down():
+                if args:
+                    return self._driver.home(*args)
+                else:
+                    self._driver.home('z')
+                    return self._driver.home('x', 'y', 'b', 'a')
             else:
-                self._driver.home('z')
-                return self._driver.home('x', 'y', 'b', 'a')
+                return False
+
+        if kwargs.get('now'):
+            return _do()
         else:
-            return False
+            description = "Homing Robot"
+            self.add_command(Command(do=_do, description=description))
 
     def add_command(self, command):
         if command.description:
@@ -119,12 +126,10 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
-    def move_to(self, location, instrument=None, create_path=True):
+    def move_to(self, location, instrument=None, create_path=True, now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
-            # add to the list of instument-container mappings
-            instrument.placeables.append(placeable)
             coordinates = instrument.calibrator.convert(
                 placeable,
                 coordinates)
@@ -145,20 +150,10 @@ class Robot(object):
                     y=coordinates[1],
                     z=coordinates[2])
 
-        # description = "Moving head to {} {}".format(
-        #     str(placeable),
-        #     coordinates)
-        self.add_command(Command(do=_do))
-
-    def move_to_top(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        self.move_to(top_location, instrument, create_path)
-
-    def move_to_bottom(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        self.move_to(bottom_location, instrument, create_path)
+        if now:
+            _do()
+        else:
+            self.add_command(Command(do=_do))
 
     @property
     def actions(self):
