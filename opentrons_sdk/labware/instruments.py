@@ -58,7 +58,7 @@ class Pipette(object):
     def move_to(self, location, create_path=True):
         if location:
             self.associate_placeable(location)
-            self.robot.move_to(location, instrument=self)
+            self.robot.move_to(location, instrument=self, create_path=create_path)
 
         return self
 
@@ -75,7 +75,7 @@ class Pipette(object):
     def go_to(self, location):
         return self.move_to(location, create_path=False)
 
-    def go_to_top(self, location, offset=None):
+    def go_to_top(self, location):
         return self.move_to_top(location, create_path=False)
 
     def go_to_bottom(self, location):
