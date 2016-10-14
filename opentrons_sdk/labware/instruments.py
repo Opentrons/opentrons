@@ -58,7 +58,10 @@ class Pipette(object):
     def move_to(self, location, create_path=True):
         if location:
             self.associate_placeable(location)
-            self.robot.move_to(location, instrument=self, create_path=create_path)
+            self.robot.move_to(
+                location,
+                instrument=self,
+                create_path=create_path)
 
         return self
 
