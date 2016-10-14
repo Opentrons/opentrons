@@ -122,3 +122,5 @@ target/
 # Electron build`
 releases/*
 out/
+
+server/protocols/*
