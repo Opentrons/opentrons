@@ -71,11 +71,20 @@ class OpenTronsTest(unittest.TestCase):
         self.assertDictEqual(coords, expected_coords)
 
     def test_home(self):
+
+        expected = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+        self.assertDictEqual(self.motor.axis_homed, expected)
+
         success = self.motor.home('x', 'y')
         self.assertTrue(success)
 
         success = self.motor.home('ba')
         self.assertTrue(success)
+
+        expected = {
+            'x': True, 'y': True, 'z': False, 'a': True, 'b': True}
+        self.assertDictEqual(self.motor.axis_homed, expected)
 
     def test_limit_hit_exception(self):
         self.motor.home()

@@ -90,6 +90,9 @@ class CNCDriver(object):
         self.head_speed = 3000  # smoothie's default speed in mm/minute
         self.current_commands = []
 
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
         self.SMOOTHIE_SUCCESS = 'Succes'
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
         self.STOPPED = 'Received a STOP signal and exited from movements'
@@ -189,6 +192,8 @@ class CNCDriver(object):
             return False
 
     def reset_port(self):
+        for axis in 'xyzab':
+            self.axis_homed[axis.lower()] = False
         self.connection.close()
         self.connection.open()
         self.flush_port()
@@ -405,19 +410,23 @@ class CNCDriver(object):
 
     def home(self, *axis):
         home_command = self.HOME
-        axis_homed = ''
+        axis_to_home = ''
         for a in axis:
             ax = ''.join(sorted(a)).upper()
             if ax in 'ABXYZ':
-                axis_homed += ax
-        res = self.send_command(home_command + axis_homed)
-        if res == b'ok':
-            # the axis aren't necessarily set to 0.0
-            # values after homing, so force it
-            pos_args = {}
-            for l in axis_homed:
-                pos_args[l] = 0
-            return self.set_position(**pos_args)
+                axis_to_home += ax
+        if axis_to_home:
+            res = self.send_command(home_command + axis_to_home)
+            if res == b'ok':
+                # the axis aren't necessarily set to 0.0
+                # values after homing, so force it
+                pos_args = {}
+                for l in axis_to_home:
+                    self.axis_homed[l.lower()] = True
+                    pos_args[l] = 0
+                return self.set_position(**pos_args)
+            else:
+                return False
         else:
             return False
 
