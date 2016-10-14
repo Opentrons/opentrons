@@ -10,7 +10,7 @@ class RobotTest(unittest.TestCase):
         Robot.reset()
         self.robot = Robot.get_instance()
         self.robot.connect()
-        self.robot.home()
+        self.robot.home(now=True)
         self.robot.clear()
 
     def test_disconnect(self):
@@ -130,7 +130,7 @@ class RobotTest(unittest.TestCase):
         }
         self.assertDictEqual(res, expected)
 
-        self.robot.home('x')
+        self.robot.home('x', now=True)
         res = self.robot.diagnostics()
         expected = {
             'axis_homed': {
