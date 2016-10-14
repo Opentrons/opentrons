@@ -171,6 +171,7 @@ def get_placeables():
     data = {
         "p200": {
             "axis": "a",
+            "label": "p200",
             "placeables": [
                 {
                     "type": "tiprack", # labware definition
@@ -209,7 +210,8 @@ def get_placeables():
             ]
         },
         "p10": {
-            "axis": "a",
+            "axis": "b",
+            "label": "p10",
             "placeables": [
                 {
                     "type": "tiprack", # labware definition
