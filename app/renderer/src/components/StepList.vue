@@ -24,7 +24,7 @@
     <hr v-if="tasks.length > 0">
  -->
     <li v-for="instrument in tasks">
-      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.completed}">
+      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.completed}" exact>
         Calibrate {{instrument.label}}
       </router-link>
     </li>

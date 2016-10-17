@@ -21,7 +21,7 @@ Step List Styles
 
 #step-list li a.router-link-active {
     background: lighten($primary-brand, 40%);
-    border-left: 5px solid $primary-brand;
+    border-left: 15px solid $primary-brand;
 }
 
 #step-list li li a.router-link-active {
