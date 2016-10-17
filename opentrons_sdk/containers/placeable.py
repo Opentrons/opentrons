@@ -178,6 +178,9 @@ class Placeable(object):
     def get_child_by_name(self, name):
         return self.children_by_name[name]
 
+    def has_children(self):
+        return len(self.children_by_reference) > 0
+
     def size(self):
         return Vector(
             self.x_size(),

@@ -136,12 +136,6 @@ class JSONIngestorTestCase(unittest.TestCase):
             }
         }
 
-        from pprint import pprint as pp
-        #
-        pp(head_expected)
-        print('------')
-        pp(head_res)
-
         self.assertDictEqual(head_expected, head_res)
         self.assertEqual(1, instrument.channels)
         self.assertEqual(0, instrument.min_volume)

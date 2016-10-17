@@ -66,7 +66,7 @@ class JSONProtocolProcessor(object):
         try:
             self.process_deck()
         except JSONProcessorRuntimeError as e:
-            self.errors.extend(
+            self.errors.append(
                 'Failed to process protocol "deck". Error: {}'
                 .format(str(e))
             )
@@ -74,7 +74,7 @@ class JSONProtocolProcessor(object):
         try:
                 self.process_head()
         except JSONProcessorRuntimeError as e:
-            self.errors.extend(
+            self.errors.append(
                 'Failed to process protocol "head". Error: {}'
                 .format(str(e))
             )
@@ -82,10 +82,27 @@ class JSONProtocolProcessor(object):
         try:
             self.process_instructions()
         except JSONProcessorRuntimeError as e:
-            self.errors.extend(
+            self.errors.append(
                 'Failed to process protocol "instructions". Error: {}'
                 .format(str(e))
             )
+
+        if self.errors:
+            raise JSONProcessorRuntimeError(
+                'Encountered error processing JSON'
+            )
+
+    def get_unallocated_slot(self):
+        """
+        :return: str name of a slot without any children (first occurence)
+        """
+        robot = Robot.get_instance()
+        for slot in robot._deck.get_children_list():
+            if not slot.has_children():
+                return slot.get_name()
+        raise JSONProcessorRuntimeError(
+            'Unable to find any unallocated slots in robot deck'
+        )
 
     def process_deck(self):
         """
@@ -114,12 +131,21 @@ class JSONProtocolProcessor(object):
         for container_label, definition in deck_info.items():
             try:
                 container_type = definition.get('labware')
-                slot = definition.get('slot')
             except KeyError:
                 raise JSONProcessorRuntimeError(
                     'Labware and Slot are required items for "{}" container definition'
                     .format(container_label)
                 )
+
+            slot = definition.get('slot')
+            if not slot:
+                slot = self.get_unallocated_slot()
+                self.warnings.append(
+                    'No SLOT was associated with container "{}", auto '
+                    'assigning container to slot {}'
+                    .format(container_label, slot)
+                )
+
             container_obj = containers.load(
                 container_type, slot, container_label
             )
@@ -207,6 +233,19 @@ class JSONProtocolProcessor(object):
 
         self.head = head_obj
 
+    def validate_instructions(self, instructions):
+        nonexistent_tools = []
+        for instruction_dict in instructions:
+            tool_name = instruction_dict.get('tool')
+            if tool_name not in self.head:
+                nonexistent_tools.append(tool_name)
+
+        if nonexistent_tools:
+            raise JSONProcessorRuntimeError(
+                'The following tools have not been defined in the "head" section'
+                ' but are being called for usage in instructions: {}'
+                .format(str(nonexistent_tools))
+            )
 
     def process_instructions(self):
         """
@@ -254,6 +293,8 @@ class JSONProtocolProcessor(object):
         """
 
         instructions = self.protocol['instructions']
+
+        self.validate_instructions(instructions)
 
         for instruction_dict in instructions:
             tool_name = instruction_dict.get('tool')

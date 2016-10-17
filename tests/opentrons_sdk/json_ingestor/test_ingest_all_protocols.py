@@ -7,7 +7,6 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.json_ingestor import JSONProtocolProcessor
 
 
-
 class AllProtocolsTestCase(unittest.TestCase):
 
     def get_protocol_dir_path(self):
@@ -47,17 +46,14 @@ class AllProtocolsTestCase(unittest.TestCase):
             Robot.reset()
             Robot.get_instance()
             try:
-                # if protocol_path.endswith('lewistanner_auto_pcr.json'):
-                #     import pdb; pdb.set_trace()
                 jpp = JSONProtocolProcessor(protocol_dict)
                 jpp.process()
             except Exception as e:
                 failures.append(
-                    (protocol_path, e, str(e))
+                    (protocol_path, e, jpp.errors)
                 )
-
         if failures:
             print('The following protocols failed to parse')
             for path, exc, reason in failures:
-                print("[{}]. Reason: {} - {}".format(path, exc, reason))
+                print("[{}]. Reason: {}".format(path, exc))
             assert False
