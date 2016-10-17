@@ -10,16 +10,16 @@
 
     <span v-for="instrument in tasks">
       <li v-for="placeable in instrument.placeables">
-        <router-link v-bind:to="'/calibrate/' + instrument.axis + '/' + placeable.label" :class="{'completed': placeable.completed}">
-           {{placeable.label}}
-        </router-link>
+        <router-link v-bind:to="placeable.href" :class="{'completed': placeable.completed}">
+          {{placeable.label}}
+       </router-link>
       </li>
     </span>
 
     <hr v-if="tasks.length > 0">
 
     <li v-for="instrument in tasks">
-      <router-link v-bind:to="'/calibrate/' + instrument.axis" :class="{'completed': instrument.completed}">
+      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.completed}">
         Calibrate {{instrument.label}}
       </router-link>
     </li>

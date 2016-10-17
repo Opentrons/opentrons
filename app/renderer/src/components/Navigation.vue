@@ -1,8 +1,8 @@
 <template>
   <nav>
-    <router-link :to="prev" class="prev"  v-show="connected">Prev</router-link>
-    <!-- <router-link to="#info" class="help">?</router-link> -->
-    <router-link :to="next" class="next"  v-show="connected">Next</router-link>
+    <router-link :to="prev" class="prev">Prev</router-link>
+    <!-- <a href="#info" class="help">?</a> -->
+    <router-link :to="next" class="next">Next</router-link>
   </nav>
 </template>
 
