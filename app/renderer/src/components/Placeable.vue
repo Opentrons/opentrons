@@ -1,9 +1,11 @@
 <template>
   <div class="step step-calibrate">
-    <div>
-      Calibrate {{ instrument[0].label }}
+   <h2 class="title">Calibrate {{ $route.params.placeable }}</h2>
+      <div class="instructions">Calibrate {{ instrument[0].label }}
       to well A1 of {{ $route.params.placeable }}
-      <br>
+      </div>
+    <div>
+
       Current calibration:
       <br>
       <pre>{{ JSON.stringify(calibration[0], null, 4) }}</pre>
