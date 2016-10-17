@@ -9,7 +9,7 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.util import vector
 
 
-class JSONCompilerValidationError(Exception):
+class JSONProcessorValidationError(Exception):
     pass
 
 
@@ -29,7 +29,11 @@ class BaseHandler(object):
         return self.perform()
 
 
-class JSONPCompiler(BaseHandler):
+class JSONDeckProcessor(BaseHandler):
+    pass
+
+
+class JSONProtocolProcessor(BaseHandler):
     def __init__(self, protocol: (str, OrderedDict)):
         super().__init__()
         self._protocol_input = protocol
@@ -71,11 +75,17 @@ class JSONPCompiler(BaseHandler):
         self.errors.extend(errors)
 
         if errors:
-            raise JSONCompilerValidationError('Errors encountered compiling JSON')
+            raise JSONProcessorValidationError('Errors encountered compiling JSON')
 
 
     def perform(self):
-        pass
+        # deck, head, instructions = None
+        # try:
+        #     deck_processor = JSONDeckProcessor(self.protocol['deck'])
+        #     deck = deck_processor.submit()
+        # except JSONProcessorValidationError:
+        #     self.errors.extend(deck_processor.errors)
+        #     self.warnings.extend(deck_processor.warnings)
 
 
     # def interpret_json_protocol(json_protocol: OrderedDict):
