@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client'
+import {instrumentHref, placeableHref} from './util'
 
 Vue.use(Vuex)
 
@@ -11,7 +12,6 @@ const state = {
     errors: "No errors",
     tasks: []
 }
-
 
 const mutations = {
     UPDATE_ROBOT_CONNECTION (state, payload) {
@@ -71,6 +71,12 @@ const actions = {
         .get('http://localhost:5000/instruments/placeables', {protocol: target.result})
         .then((response) => {
           console.log(response)
+          let tasks = response.body.data.map((instrument) => {
+            instrument.href = instrumentHref(instrument)
+            instrument.placeables.map((placeable) => {
+              placeable.href = placeableHref(placeable, instrument)
+            })
+          })
           commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
         }, (response) => {
           console.log('failed to upload', response)
@@ -81,7 +87,6 @@ const actions = {
 function createWebSocketPlugin(socket) {
   return store => {
     socket.on('event', data => {
-      console.log(data)
       if (data.type === 'connection_status') {
         if (data.is_connected === false) {
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})

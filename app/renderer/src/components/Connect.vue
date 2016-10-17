@@ -35,9 +35,9 @@
       return {
       next: "/upload",
       prev: "/",
-        ports: {
-            selected: null,
-            options: []
+      ports: {
+          selected: null,
+          options: []
         }
       }
     },
