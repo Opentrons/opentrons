@@ -6,8 +6,13 @@ from opentrons_sdk import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.helpers.helpers import import_calibration_json
 
+from opentrons_sdk.util.trace import EventBroker
+
 
 class PerformanceTest(unittest.TestCase):
+    def setUp(self):
+        self.events = []
+
     def protocol(self):
         robot = Robot.get_instance()
         robot.get_serial_ports_list()
@@ -122,7 +127,11 @@ class PerformanceTest(unittest.TestCase):
         # TODO: optimize robot.run()
         # robot.run()
 
+    def log(self, info):
+        self.events.append(info)
+
     def test_performance(self):
+        EventBroker.get_instance().add(self.log)
         start = time.process_time()
         self.protocol()
         finish = time.process_time()
