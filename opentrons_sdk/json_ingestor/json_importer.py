@@ -310,11 +310,7 @@ class JSONProtocolProcessor(object):
             volume,
             should_extra_pull
         )
-        self.handle_transfer_to(
-            tool_obj,
-            command_args['to'],
-            volume
-        )
+        self.handle_transfer_to(tool_obj, command_args['to'], volume)
 
     def handle_transfer_from(
             self,
@@ -354,12 +350,7 @@ class JSONProtocolProcessor(object):
             tool_obj.touch_tip()
         tool_obj.delay(from_delay)
 
-    def handle_transfer_to(
-            self,
-            tool_obj,
-            to_info,
-            volume
-    ):
+    def handle_transfer_to(self, tool_obj, to_info, volume):
         to_container = self.deck[to_info['container']]['instance']
         to_well = to_container[to_info['location']]
 
@@ -403,13 +394,9 @@ class JSONProtocolProcessor(object):
         )
 
         for to_info in to_info_list:
-            self.handle_transfer_to(
-                tool_obj,
-                to_info,
-                to_info['volume']
-            )
+            self.handle_transfer_to(tool_obj, to_info, to_info['volume'])
 
-    def handle_mix(tool_obj, robot_deck, robot_head, command_args):
+    def handle_mix(self, tool_obj, command_args):
         volume = command_args.get('volume', tool_obj.max_volume)
         well = None
 
@@ -422,7 +409,6 @@ class JSONProtocolProcessor(object):
 
 
     def handle_consolidate(self, tool_obj, command_args):
-        # Refactor
         tool_settings = self.head[tool_obj.name]['settings']
 
         from_info_list = command_args['from']
@@ -437,9 +423,4 @@ class JSONProtocolProcessor(object):
                 from_info,
                 from_info['volume']
             )
-
-        self.handle_transfer_to(
-            tool_obj,
-            to_info,
-            total_volume
-        )
+        self.handle_transfer_to(tool_obj, to_info, total_volume)
