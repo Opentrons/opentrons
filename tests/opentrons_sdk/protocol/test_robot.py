@@ -80,6 +80,9 @@ class RobotTest(unittest.TestCase):
 
         self.robot.resume()
 
+        thread.join(1)
+        self.assertEqual(len(self.robot._commands), 0)
+
     def test_versions(self):
         res = self.robot.versions()
         expected = {

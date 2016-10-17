@@ -16,13 +16,19 @@ class Pipette(object):
             min_volume=0,
             trash_container=None,
             tip_racks=None,
-            speed=300):
+            aspirate_speed=300,
+            dispense_speed=500):
 
         self.positions = {
             'top': None,
             'bottom': None,
             'blow_out': None,
             'drop_tip': None
+        }
+
+        self.speeds = {
+            'aspirate': aspirate_speed,
+            'dispense': dispense_speed
         }
 
         self.axis = axis
@@ -47,8 +53,6 @@ class Pipette(object):
         self.placeables = []
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
-
-        self.set_speed(speed)
 
     def associate_placeable(self, location):
         placeable, _ = containers.unpack_location(location)
@@ -84,7 +88,7 @@ class Pipette(object):
     def go_to_bottom(self, location):
         return self.move_to_bottom(location, create_path=False)
 
-    def aspirate(self, volume=None, location=None):
+    def aspirate(self, volume=None, location=None, rate=1.0):
 
         if not isinstance(volume, (int, float, complex)):
             if volume and not location:
@@ -103,8 +107,10 @@ class Pipette(object):
         distance = self.plunge_distance(self.current_volume)
         destination = self.positions['bottom'] - distance
 
+        speed = self.speeds['aspirate'] * rate
+
         def _do_aspirate():
-            self.plunger.speed(self.speed)
+            self.plunger.speed(speed)
             self.plunger.move(destination)
 
         description = "Aspirating {0}uL at {1}".format(volume, str(location))
@@ -113,7 +119,7 @@ class Pipette(object):
 
         return self
 
-    def dispense(self, volume=None, location=None):
+    def dispense(self, volume=None, location=None, rate=1.0):
 
         if not isinstance(volume, (int, float, complex)):
             if volume and not location:
@@ -132,8 +138,10 @@ class Pipette(object):
             distance = self.plunge_distance(self.current_volume)
             destination = self.positions['bottom'] - distance
 
+            speed = self.speeds['dispense'] * rate
+
             def _do():
-                self.plunger.speed(self.speed)
+                self.plunger.speed(speed)
                 self.plunger.move(destination)
 
             description = "Dispensing {0}uL at {1}".format(
@@ -381,13 +389,9 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
-    def set_speed(self, rate):
-        self.speed = rate
-
-        def _do():
-            self.plunger.speed(rate)
-
-        description = "Setting speed to {}mm/minute".format(rate)
-        self.robot.add_command(Command(do=_do, description=description))
+    def set_speed(self, **kwargs):
+        keys = {'head', 'aspirate', 'dispense'} & kwargs.keys()
+        for key in keys:
+            self.speeds[key] = kwargs.get(key)
 
         return self
