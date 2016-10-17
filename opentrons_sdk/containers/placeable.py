@@ -263,7 +263,6 @@ class Deck(Placeable):
 class Well(Placeable):
     pass
 
-
 class Slot(Placeable):
     pass
 
