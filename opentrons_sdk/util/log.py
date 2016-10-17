@@ -50,7 +50,7 @@ def set_log_file(filename):
                   'level': logging.WARNING},
             },
         root = {
-            'handlers': ['testing'],
+            'handlers': ['debug'],
             # 'level': logging.DEBUG,
             },
     )
