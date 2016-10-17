@@ -404,7 +404,9 @@ class JSONProtocolProcessor(object):
         tool_obj.mix(command_args.get('repetitions', 0))
 
         if command_args.get('blow-out'):
-            tool_obj.robot.move_to_top(well, instrument=tool_obj, create_path=False)
+            tool_obj.robot.move_to_top(
+                well, instrument=tool_obj, create_path=False
+            )
             tool_obj.blow_out()
 
 

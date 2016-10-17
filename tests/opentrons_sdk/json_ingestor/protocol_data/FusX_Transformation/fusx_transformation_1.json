@@ -17,7 +17,7 @@
             "slot" : "A1"
         },
         "FusX Output": {
-            "labware": "96-pcr-flat",
+            "labware": "96-PCR-flat",
             "slot" : "C2"
         },
         "Cool Deck" : {
