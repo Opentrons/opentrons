@@ -13,6 +13,10 @@ class JSONProcessorValidationError(Exception):
     pass
 
 
+class JSONProcessorRuntimeError(Exception):
+    pass
+
+
 class BaseHandler(object):
     def __init__(self):
         self.errors = []
@@ -29,15 +33,14 @@ class BaseHandler(object):
         return self.perform()
 
 
-class JSONDeckProcessor(BaseHandler):
-    pass
-
-
 class JSONProtocolProcessor(BaseHandler):
     def __init__(self, protocol: (str, OrderedDict)):
         super().__init__()
         self._protocol_input = protocol
         self.protocol = self.read_protocol(protocol)
+
+        self.head = None
+        self.deck = None
 
     def get_protocol_from_file(self, path):
         with open(path) as f:
@@ -79,6 +82,8 @@ class JSONProtocolProcessor(BaseHandler):
 
 
     def perform(self):
+        self.process_deck()
+
         # deck, head, instructions = None
         # try:
         #     deck_processor = JSONDeckProcessor(self.protocol['deck'])
@@ -87,388 +92,359 @@ class JSONProtocolProcessor(BaseHandler):
         #     self.errors.extend(deck_processor.errors)
         #     self.warnings.extend(deck_processor.warnings)
 
-
-    # def interpret_json_protocol(json_protocol: OrderedDict):
-    #     robot_deck = interpret_deck(json_protocol['deck'])
-    #     robot_head = interpret_head(robot_deck, json_protocol['head'])
-    #     interpret_instructions(
-    #         robot_deck, robot_head, json_protocol['instructions']
-    #     )
-
-
-
-
-
-# class BaseHandler(object):
-#     def validate(self):
-#         raise NotImplementedError
-#
-#     def submit(self):
-#         validation_errors = self.validate()
-#         if not validation_errors:
-#             self.perform()
-#
-#
-#     def perform(self):
-#         raise NotImplementedError
-
-def interpret_json_protocol(json_protocol: OrderedDict):
-    robot_deck = interpret_deck(json_protocol['deck'])
-    robot_head = interpret_head(robot_deck, json_protocol['head'])
-    interpret_instructions(
-        robot_deck, robot_head, json_protocol['instructions']
-    )
-
-
-def interpret_deck(deck_info: OrderedDict):
-    """
-    "deck": {
-        "p200-rack": {
-            "labware": "tiprack-200ul",
-            "slot" : "A1"
-        },
-        ".75 mL Tube Rack": {
-            "labware": "tube-rack-.75ml",
-            "slot" : "C1"
-        },
-        "trash": {
-            "labware": "point",
-            "slot" : "B2"
+    def process_deck(self):
+        """
+        "deck": {
+            "p200-rack": {
+                "labware": "tiprack-200ul",
+                "slot" : "A1"
+            },
+            ".75 mL Tube Rack": {
+                "labware": "tube-rack-.75ml",
+                "slot" : "C1"
+            },
+            "trash": {
+                "labware": "point",
+                "slot" : "B2"
+            }
         }
-    }
-    :param protocol:
-    :param deck_info:
-    :return:
-    """
+        :param protocol:
+        :param deck_info:
+        :return:
+        """
 
-    containers_data = {}
-    for name, definition in deck_info.items():
-        container_type = definition.get('labware')
-        slot = definition.get('slot')
-        container_obj = containers.load(container_type, slot, name)
-        containers_data[name] = {'instance': container_obj}
-    return containers_data
+        deck_info = self.protocol['deck']
 
-
-def interpret_head(robot_deck, head_dict: OrderedDict):
-
-    """
-    res example:
-    { name: {
-        'instance': ..,
-        'settings': {'down-plunger-speed', '
-        }
-    }
-
-    :param protocol:
-    :param head_dict:
-    :return:
-    """
-
-    SUPPORTED_TOOL_OPTIONS = {
-        'tool',
-        'tip-racks',
-        'trash-container',
-        'multi-channel',
-        'axis',
-        'volume',
-        'down-plunger-speed',
-        'up-plunger-speed',
-        'tip-plunge',
-        'extra-pull-volume',
-        'extra-pull-delay',
-        'distribute-percentage',
-        'points'
-    }
-
-
-    head_obj = {}
-    robot = Robot.get_instance()
-
-    for tool_name, tool_config in head_dict.items():
-        # Validate tool_config keys
-        assert SUPPORTED_TOOL_OPTIONS >= set(tool_config.keys())
-        tool_config.pop('tool')
-
-        tool_instance = instruments.Pipette(
-            name=tool_name,
-            axis=tool_config.pop('axis'),
-            min_volume=0,
-            channels=(8 if tool_config.pop('multi-channel') else 1),
+        deck_data = {}
+        for container_label, definition in deck_info.items():
+            try:
+                container_type = definition.get('labware')
+                slot = definition.get('slot')
+            except KeyError:
+                raise JSONProcessorRuntimeError(
+                    'Labware and Slot are required items for "{}" container definition'
+                    .format(container_label)
+                )
+            container_obj = containers.load(
+                container_type, slot, container_label
             )
-        tool_instance.set_max_volume(tool_config.pop('volume'))
+            deck_data[container_label] = {'instance': container_obj}
+        self.deck = deck_data
 
-        # robot_containers = robot._deck.containers()
-        tip_rack_objs = [
-            robot_deck[item['container']]['instance']
-            for item in tool_config.pop('tip-racks')
-        ]
-        tool_config['tip-racks'] = tip_rack_objs
 
-        trash_obj = robot_deck[
-            tool_config.pop('trash-container')['container']
-        ]['instance']
-        tool_config['trash-container'] = trash_obj
+    def process_head(self):
 
-        tool_config['points'] = [dict(i) for i in tool_config.pop('points')]
-
-        head_obj[tool_name] = {
-            'instance': tool_instance,
-            'settings': dict(tool_config)
+        """
+        res example:
+        { name: {
+            'instance': ..,
+            'settings': {'down-plunger-speed', '
+            }
         }
-    return head_obj
+
+        :param protocol:
+        :param head_dict:
+        :return:
+        """
+
+        head_dict = self.protocol['head']
+
+        SUPPORTED_TOOL_OPTIONS = {
+            'tool',
+            'tip-racks',
+            'trash-container',
+            'multi-channel',
+            'axis',
+            'volume',
+            'down-plunger-speed',
+            'up-plunger-speed',
+            'tip-plunge',
+            'extra-pull-volume',
+            'extra-pull-delay',
+            'distribute-percentage',
+            'points'
+        }
 
 
-def interpret_instructions(robot_deck, robot_head, instructions: list):
-    """
-    [
-		{
-			"tool" : "p10",
-			"groups" : [
-				{
-					"transfer" : [
-    					{
-    						"from" : {
-    							"container": "plate",
-                                "location": "F1",
-                                "touch-tip": false
-    						},
-    						"to": {
-                            	"container" : "plate",
-    							"location" : "A12",
-    							"tip-offset" : 0,
-    							"delay" : 0,
-    							"touch-tip" : false
+        head_obj = {}
+        robot = Robot.get_instance()
+
+        for tool_name, tool_config in head_dict.items():
+            # Validate tool_config keys
+            # Create a warning if unknown keys are detected
+            user_provided_tool_options = set(tool_config.keys())
+            if not (SUPPORTED_TOOL_OPTIONS >= user_provided_tool_options):
+                invalid_options = (
+                    user_provided_tool_options - SUPPORTED_TOOL_OPTIONS
+                )
+                self.warnings.append(
+                    'Encountered unsupported tool options for "{}": {}'
+                    .format(tool_name, ', '.join(invalid_options))
+                )
+
+            tool_config.pop('tool')
+            tool_instance = instruments.Pipette(
+                name=tool_name,
+                axis=tool_config.pop('axis'),
+                min_volume=0,
+                channels=(8 if tool_config.pop('multi-channel') else 1),
+                )
+            tool_instance.set_max_volume(tool_config.pop('volume'))
+
+            # robot_containers = robot._deck.containers()
+            tip_rack_objs = [
+                self.deck[item['container']]['instance']
+                for item in tool_config.pop('tip-racks')
+            ]
+            tool_config['tip-racks'] = tip_rack_objs
+
+            trash_obj = self.deck[
+                tool_config.pop('trash-container')['container']
+            ]['instance']
+            tool_config['trash-container'] = trash_obj
+
+            tool_config['points'] = [dict(i) for i in tool_config.pop('points')]
+
+            head_obj[tool_name] = {
+                'instance': tool_instance,
+                'settings': dict(tool_config)
+            }
+
+        self.head = head_obj
+
+
+    def process_instructions(self):
+        """
+        [
+            {
+                "tool" : "p10",
+                "groups" : [
+                    {
+                        "transfer" : [
+                            {
+                                "from" : {
+                                    "container": "plate",
+                                    "location": "F1",
+                                    "touch-tip": false
+                                },
+                                "to": {
+                                    "container" : "plate",
+                                    "location" : "A12",
+                                    "tip-offset" : 0,
+                                    "delay" : 0,
+                                    "touch-tip" : false
+                                },
+                                    "volume" : 10
                             },
-                            	"volume" : 10
-						},
-                        {
-                            "from" : {
-                                "container": "plate",
-                                "location": "D1",
-                                "touch-tip": false
-                            },
-                            "to": {
-                                "container" : "plate",
-                                "location" : "A2",
-                                "tip-offset" : 0,
-                                "delay" : 0,
-                                "touch-tip" : false
-                            },
-                                "volume" : 10
-                        }
-					]
-    :param robot_deck:
-    :param robot_head:
-    :param instructions:
-    :return:
-    """
-    for instruction_dict in instructions:
-        tool_name = instruction_dict.get('tool')
-        tool_obj = robot_head[tool_name]['instance']
-        trash_container = robot_head[tool_name]['settings']['trash-container']
+                            {
+                                "from" : {
+                                    "container": "plate",
+                                    "location": "D1",
+                                    "touch-tip": false
+                                },
+                                "to": {
+                                    "container" : "plate",
+                                    "location" : "A2",
+                                    "tip-offset" : 0,
+                                    "delay" : 0,
+                                    "touch-tip" : false
+                                },
+                                    "volume" : 10
+                            }
+                        ]
+        :param robot_deck:
+        :param robot_head:
+        :param instructions:
+        :return:
+        """
 
-        tips = itertools.cycle(
-            itertools.chain(*robot_head[tool_name]['settings']['tip-racks'])
-        )
+        instructions = self.protocol['instructions']
 
-        for group in instruction_dict.get('groups'):
-            # We always pick up a new tip when entering a group
-            tool_obj.pick_up_tip(next(tips))
-            for command_type, commands_calls in group.items():
-                handler = lambda args: handle_command(
-                        tool_obj,robot_deck, robot_head, command_type, args
+        for instruction_dict in instructions:
+            tool_name = instruction_dict.get('tool')
+            tool_obj = self.head[tool_name]['instance']
+            trash_container = self.head[tool_name]['settings']['trash-container']
+
+            tips = itertools.cycle(
+                itertools.chain(*self.head[tool_name]['settings']['tip-racks'])
+            )
+
+            for group in instruction_dict.get('groups'):
+                # We always pick up a new tip when entering a group
+                tool_obj.pick_up_tip(next(tips))
+
+                for command_type, commands_calls in group.items():
+                    handler_ftn = lambda command_args: self.process_command(
+                            tool_obj, command_type, command_args
                     )
 
-                if isinstance(commands_calls, list):
-                    [handler(command_arg) for command_arg in commands_calls]
+                    if isinstance(commands_calls, list):
+                        [handler_ftn(command_arg) for command_arg in commands_calls]
 
-                # Note: Distribute command does not have an array of calls but
-                # rather a dict with the distribute call info
-                elif isinstance(commands_calls, dict):
-                    handler(commands_calls)
+                    # Note: Distribute command does not have an array of calls but
+                    # rather a dict with the distribute call info
+                    elif isinstance(commands_calls, dict):
+                        handler_ftn(commands_calls)
 
-            # LEAVING GROUP
-            tool_obj.drop_tip(trash_container)
+                # LEAVING GROUP
+                tool_obj.drop_tip(trash_container)
 
+    def process_command(self, tool_obj, command, command_args):
+        SUPPORTED_COMMANDS = {
+            'transfer': self.handle_transfer,
+            'distribute': self.handle_distribute,
+            'mix': self.handle_mix,
+            'consolidate': self.handle_consolidate
+        }
+        if command not in SUPPORTED_COMMANDS:
+            raise JSONProcessorRuntimeError(
+                'Unsupported COMMAND "{}" encountered'.format(command)
+            )
+        return SUPPORTED_COMMANDS[command](tool_obj, command_args)
 
-def handle_command(tool_obj, robot_deck, robot_head, command, command_args):
-    SUPPORTED_COMMANDS = {
-        'transfer': handle_transfer,
-        'distribute': handle_distribute,
-        'mix': handle_mix,
-        'consolidate': handle_consolidate
-    }
+    def handle_transfer(self, tool_obj, command_args):
+        # TODO: validate command args
+        volume = command_args.get('volume', tool_obj.max_volume)
+        tool_settings = self.head[tool_obj.name]['settings']
+        should_extra_pull = command_args.get('extra-pull', False)
 
-    if command not in SUPPORTED_COMMANDS:
-        raise Exception('Unsupported COMMAND "{}" encountered'.format(command))
-
-
-    return SUPPORTED_COMMANDS[command](
-        tool_obj, robot_deck, robot_head, command_args
-    )
-
-
-def handle_transfer(tool_obj, robot_deck, robot_head, command_args):
-    # TODO: validate command args
-    volume = command_args.get('volume', tool_obj.max_volume)
-    tool_settings = robot_head[tool_obj.name]['settings']
-    should_extra_pull = command_args.get('extra-pull', False)
-
-    handle_transfer_from(
-        tool_obj,
-        tool_settings,
-        robot_deck,
-        robot_head,
-        command_args['from'],
-        volume,
-        should_extra_pull
-    )
-    handle_transfer_to(
-        tool_obj,
-        robot_deck,
-        robot_head,
-        command_args['to'],
-        volume
-    )
-
-
-def handle_transfer_from(
-        tool_obj,
-        tool_settings,
-        robot_deck,
-        robot_head,
-        from_info,
-        volume,
-        extra_pull=False
-):
-    extra_pull_delay = (
-        tool_settings.get('extra-pull-delay', 0)
-        if extra_pull
-        else 0
-    )
-    extra_pull_volume = (
-        tool_settings.get('extra-pull-volume', 0)
-        if extra_pull
-        else 0
-    )
-
-    from_container = robot_deck[from_info['container']]['instance']
-    from_well = from_container[from_info['location']]
-
-    should_touch_tip_on_from = from_info.get('touch-tip', False)
-    from_tip_offset = from_info.get('tip-offset', 0)
-    from_delay = from_info.get('delay', 0)
-
-    from_location = (
-        from_well,
-        from_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, from_tip_offset)
-    )
-
-    tool_obj.aspirate(volume + extra_pull_volume, from_location)
-    tool_obj.delay(extra_pull_delay)
-    tool_obj.dispense(extra_pull_volume)
-    if should_touch_tip_on_from:
-        tool_obj.touch_tip()
-    tool_obj.delay(from_delay)
-
-def handle_transfer_to(
-        tool_obj,
-        robot_deck,
-        robot_head,
-        to_info,
-        volume
-):
-    to_container = robot_deck[to_info['container']]['instance']
-    to_well = to_container[to_info['location']]
-
-    should_touch_tip_on_to = to_info.get('touch-tip', False)
-    to_tip_offset = to_info.get('tip-offset', 0)
-    to_delay = to_info.get('delay', 0)
-    blowout = to_info.get('blowout', False)
-
-    to_location = (
-        to_well,
-        to_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, to_tip_offset)
-    )
-
-    tool_obj.dispense(volume, to_location)
-    if blowout:
-        tool_obj.blow_out(to_location)
-
-    if should_touch_tip_on_to:
-        tool_obj.touch_tip()
-
-    if to_delay is not None:
-        tool_obj.delay(to_delay)
-
-
-def handle_distribute(tool_obj, robot_deck, robot_head, command_args):
-    # Refactor
-    tool_settings = robot_head[tool_obj.name]['settings']
-
-    from_info = command_args['from']
-    to_info_list = command_args['to']
-
-    total_to_volume = sum(to_info['volume'] for to_info in to_info_list)
-    distribute_percent = tool_settings.get('distribute-percentage', 0)
-
-    from_volume = total_to_volume * (1 + distribute_percent)
-
-    handle_transfer_from(
-        tool_obj,
-        tool_settings,
-        robot_deck,
-        robot_head,
-        from_info,
-        from_volume
-    )
-
-    for to_info in to_info_list:
-        handle_transfer_to(
-            tool_obj,
-            robot_deck,
-            robot_head,
-            to_info,
-            to_info['volume']
-        )
-
-
-def handle_mix(tool_obj, robot_deck, robot_head, command_args):
-    volume = command_args.get('volume', tool_obj.max_volume)
-    well = None
-
-    tool_obj.aspirate(volume, well)
-    tool_obj.mix(command_args.get('repetitions', 0))
-
-    if command_args.get('blow-out'):
-        tool_obj.robot.move_to_top(well, instrument=tool_obj, create_path=False)
-        tool_obj.blow_out()
-
-
-def handle_consolidate(tool_obj, robot_deck, robot_head, command_args):
-    # Refactor
-    tool_settings = robot_head[tool_obj.name]['settings']
-
-    from_info_list = command_args['from']
-    to_info = command_args['to']
-
-    total_volume = sum(from_info['volume'] for from_info in from_info_list)
-
-    for from_info in from_info_list:
-        handle_transfer_from(
+        self.handle_transfer_from(
             tool_obj,
             tool_settings,
-            robot_deck,
-            robot_head,
-            from_info,
-            from_info['volume']
+            command_args['from'],
+            volume,
+            should_extra_pull
+        )
+        self.handle_transfer_to(
+            tool_obj,
+            command_args['to'],
+            volume
         )
 
-    handle_transfer_to(
-        tool_obj,
-        robot_deck,
-        robot_head,
-        to_info,
-        total_volume
-    )
+    def handle_transfer_from(
+            self,
+            tool_obj,
+            tool_settings,
+            from_info,
+            volume,
+            extra_pull=False
+    ):
+        extra_pull_delay = (
+            tool_settings.get('extra-pull-delay', 0)
+            if extra_pull
+            else 0
+        )
+        extra_pull_volume = (
+            tool_settings.get('extra-pull-volume', 0)
+            if extra_pull
+            else 0
+        )
+
+        from_container = self.deck[from_info['container']]['instance']
+        from_well = from_container[from_info['location']]
+
+        should_touch_tip_on_from = from_info.get('touch-tip', False)
+        from_tip_offset = from_info.get('tip-offset', 0)
+        from_delay = from_info.get('delay', 0)
+
+        from_location = (
+            from_well,
+            from_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, from_tip_offset)
+        )
+
+        tool_obj.aspirate(volume + extra_pull_volume, from_location)
+        tool_obj.delay(extra_pull_delay)
+        tool_obj.dispense(extra_pull_volume)
+        if should_touch_tip_on_from:
+            tool_obj.touch_tip()
+        tool_obj.delay(from_delay)
+
+    def handle_transfer_to(
+            self,
+            tool_obj,
+            to_info,
+            volume
+    ):
+        to_container = self.deck[to_info['container']]['instance']
+        to_well = to_container[to_info['location']]
+
+        should_touch_tip_on_to = to_info.get('touch-tip', False)
+        to_tip_offset = to_info.get('tip-offset', 0)
+        to_delay = to_info.get('delay', 0)
+        blowout = to_info.get('blowout', False)
+
+        to_location = (
+            to_well,
+            to_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, to_tip_offset)
+        )
+
+        tool_obj.dispense(volume, to_location)
+        if blowout:
+            tool_obj.blow_out(to_location)
+
+        if should_touch_tip_on_to:
+            tool_obj.touch_tip()
+
+        if to_delay is not None:
+            tool_obj.delay(to_delay)
+
+
+    def handle_distribute(self, tool_obj, command_args):
+        tool_settings = self.deck[tool_obj.name]['settings']
+
+        from_info = command_args['from']
+        to_info_list = command_args['to']
+
+        total_to_volume = sum(to_info['volume'] for to_info in to_info_list)
+        distribute_percent = tool_settings.get('distribute-percentage', 0)
+
+        from_volume = total_to_volume * (1 + distribute_percent)
+
+        self.handle_transfer_from(
+            tool_obj,
+            tool_settings,
+            from_info,
+            from_volume
+        )
+
+        for to_info in to_info_list:
+            self.handle_transfer_to(
+                tool_obj,
+                to_info,
+                to_info['volume']
+            )
+
+    def handle_mix(tool_obj, robot_deck, robot_head, command_args):
+        volume = command_args.get('volume', tool_obj.max_volume)
+        well = None
+
+        tool_obj.aspirate(volume, well)
+        tool_obj.mix(command_args.get('repetitions', 0))
+
+        if command_args.get('blow-out'):
+            tool_obj.robot.move_to_top(well, instrument=tool_obj, create_path=False)
+            tool_obj.blow_out()
+
+
+    def handle_consolidate(self, tool_obj, command_args):
+        # Refactor
+        tool_settings = self.head[tool_obj.name]['settings']
+
+        from_info_list = command_args['from']
+        to_info = command_args['to']
+
+        total_volume = sum(from_info['volume'] for from_info in from_info_list)
+
+        for from_info in from_info_list:
+            self.handle_transfer_from(
+                tool_obj,
+                tool_settings,
+                from_info,
+                from_info['volume']
+            )
+
+        self.handle_transfer_to(
+            tool_obj,
+            to_info,
+            total_volume
+        )
