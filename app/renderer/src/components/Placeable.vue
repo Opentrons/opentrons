@@ -8,9 +8,9 @@
     <section>
       <div class="step step-calibrate">       
           <div>
-            Current calibration:
+           <!--  Current calibration:
             <br>
-            <pre>{{ JSON.stringify(calibration, null, 4) }}</pre>
+            <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> -->
             <jog></jog>
           </div>
       </div>

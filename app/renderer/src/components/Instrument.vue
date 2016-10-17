@@ -1,15 +1,25 @@
 <template>
+
   <div>
+      <h2 class="title">Calibrate {{ $route.params.instrument }} pipette</h2>
+        <div class="instructions">Calibrate {{ calibration.label }}'s plunger. Be sure to save top, bottom, blowout, and droptip. Enter max volume.</div>
+  
     <section>
-    Calibrate {{ $route.params.instrument }}
-    Current calibration
-    <br>
-    <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> 
 
-    <Navigation :prev="prev" :next="next"></Navigation>
+    <div class="step step-calibrate">       
+          <div>
+           <!--  Current calibration:
+            <br>
+            <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> -->
+            <jog></jog>
+          </div>
+      </div>
 
+      <navigation :prev="prev" :next="next"></navigation>
     </section>
+
   </div>
+
 </template>
 
 <script>
