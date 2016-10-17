@@ -56,6 +56,7 @@ class OpenTronsTest(unittest.TestCase):
 
         thread = Thread(target=_move_head)
         thread.start()
+        thread.join()
 
         self.motor.resume()
         done.wait()
@@ -81,6 +82,7 @@ class OpenTronsTest(unittest.TestCase):
 
         thread = Thread(target=_move_head)
         thread.start()
+        thread.join()
 
         self.motor.stop()
         done.wait()
