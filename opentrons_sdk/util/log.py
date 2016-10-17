@@ -11,6 +11,7 @@ def set_log_file(filename):
     logging.basicConfig can always be used on its own to specify any logging
     conditions desired.
     """
+    
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(asctime)s %(levelname)-8s %(message)s',

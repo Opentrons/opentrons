@@ -122,7 +122,7 @@ class Pipette(object):
 
         description = "Dispensing {0}uL at {1}".format(
             volume,
-            (unpack_location(location) if location else 'NA')
+            (humanize_location(location) if location else '<In Place>')
         )
         self.robot.add_command(Command(do=_do, description=description))
         return self

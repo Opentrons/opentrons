@@ -1,3 +1,5 @@
+from opentrons_sdk.json_ingestor.json_importer import JSONProtocolProcessor
+
 from opentrons_sdk.json_ingestor.json_ingestor import (
     interpret_json_protocol,
     interpret_deck,

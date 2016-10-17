@@ -4,12 +4,7 @@ import os
 import unittest
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.json_ingestor import (
-    interpret_deck,
-    interpret_head,
-    interpret_instructions,
-    interpret_json_protocol
-)
+from opentrons_sdk.json_ingestor import JSONProtocolProcessor
 
 
 
@@ -52,7 +47,8 @@ class AllProtocolsTestCase(unittest.TestCase):
             Robot.reset()
             Robot.get_instance()
             try:
-                interpret_json_protocol(protocol_dict)
+                jpp = JSONProtocolProcessor(protocol_dict)
+                jpp.process()
             except Exception as e:
                 failures.append(
                     (protocol_path, e, str(e))
