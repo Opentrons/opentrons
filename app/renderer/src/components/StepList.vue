@@ -11,7 +11,7 @@
     <span v-for="instrument in tasks">
       <li v-for="placeable in instrument.placeables">
         <router-link v-bind:to="'/calibrate/' + instrument.axis + '/' + placeable.label" :class="{'completed': placeable.completed}">
-          Calibrate {{placeable.label}}
+           {{placeable.label}}
         </router-link>
       </li>
     </span>

@@ -1,7 +1,7 @@
 <template>
   <div class="step step-calibrate">
     <div>
-      Calibrate {{ $route.params.instrument }}
+      Calibrate {{ calibration[0].label }}
       to well A1 of {{ $route.params.placeable }}
       Current calibration
       <br>
@@ -39,7 +39,7 @@ import Jog from './Jog.vue'
         let tasks = this.$store.state.tasks
         let instrument = this.currentInstrument(tasks)
         let placeable = this.currentPlaceable(instrument)
-        return placeable
+        return placeable, instrument
       }
     }
   }
