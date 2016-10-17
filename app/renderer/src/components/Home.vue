@@ -4,7 +4,7 @@
       <header class="brand">
         <nav class="links">
           <ul>
-            <li>{{ message }}</li>
+            <li>OT App</li>
           </ul>
         </nav>
       </header>

@@ -4,13 +4,12 @@ import os
 import sys
 import time
 import threading
-import pprint
-pp = pprint.PrettyPrinter(indent=2)
 sys.path.insert(0, os.path.abspath('..'))
 
 import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
+from flask_cors import CORS, cross_origin
 
 from opentrons_sdk.robot import Robot
 
@@ -26,6 +25,7 @@ app = Flask(__name__,
             static_folder=STATIC_FOLDER,
             template_folder=TEMPLATES_FOLDER
             )
+CORS(app)
 app.jinja_env.autoescape = False
 # Only allow JSON and Python files
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
