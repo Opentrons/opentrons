@@ -6,6 +6,41 @@ from opentrons_sdk.containers.placeable import Placeable
 from opentrons_sdk.util.vector import Vector
 
 
+class Magbead(object):
+
+    def __init__(self, mosfet=0, container=None):
+        self.mosfet = mosfet
+
+        self.robot = Robot.get_instance()
+        self.robot.add_instrument('M{}'.format(self.mosfet), self)
+        self.mosfet = self.robot.get_mosfet(self.mosfet)
+
+        # a reference to the placeable set ontop the magbead module
+        self.container = container
+
+    def engage(self):
+        def _do():
+            self.mosfet.engage()
+
+        description = "Engaging Magbead at mosfet #{}".format(
+            self.mosfet)
+        self.robot.add_command(
+            Command(do=_do, description=description))
+
+        return self
+
+    def disengage(self):
+        def _do():
+            self.mosfet.disengage()
+
+        description = "Engaging Magbead at mosfet #{}".format(
+            self.mosfet)
+        self.robot.add_command(
+            Command(do=_do, description=description))
+
+        return self
+
+
 class Pipette(object):
 
     def __init__(
