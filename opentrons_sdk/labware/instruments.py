@@ -40,6 +40,16 @@ class Magbead(object):
 
         return self
 
+    def delay(self, seconds):
+        def _do():
+            self.mosfet.wait(seconds)
+
+        description = "Delaying Magbead for {} seconds".format(seconds)
+        self.robot.add_command(
+            Command(do=_do, description=description))
+
+        return self
+
 
 class Pipette(object):
 

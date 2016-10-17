@@ -62,6 +62,9 @@ class Robot(object):
             def disengage(self):
                 robot_self._driver.set_mosfet(mosfet_index, False)
 
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
         return InstrumentMosfet()
 
     def get_motor(self, axis):

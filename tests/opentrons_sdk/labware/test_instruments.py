@@ -22,6 +22,7 @@ class MagbeadTest(unittest.TestCase):
         self.magbead = instruments.Magbead(mosfet=0, container=self.plate)
 
         self.robot._driver.set_mosfet = mock.Mock()
+        self.robot._driver.wait = mock.Mock()
 
     def test_magbead_engage(self):
         self.magbead.engage()
@@ -38,6 +39,20 @@ class MagbeadTest(unittest.TestCase):
 
         calls = self.robot._driver.set_mosfet.mock_calls
         expected = [mock.call(0, True), mock.call(0, False)]
+        self.assertEquals(calls, expected)
+
+    def test_magbead_delay(self):
+        self.magbead.engage()
+        self.magbead.delay(2.2)
+        self.magbead.disengage()
+        self.robot.run()
+
+        calls = self.robot._driver.set_mosfet.mock_calls
+        expected = [mock.call(0, True), mock.call(0, False)]
+        self.assertEquals(calls, expected)
+
+        calls = self.robot._driver.wait.mock_calls
+        expected = [mock.call(2.2)]
         self.assertEquals(calls, expected)
 
 
