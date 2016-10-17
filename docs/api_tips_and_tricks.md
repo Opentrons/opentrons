@@ -124,6 +124,25 @@ p200.drop_tip(trash)
 
 robot.run()
 ```
+####Serial Dilution
+```python
+# Here we assume a 96-well plate with 12 rows and 8 columns
+# A trough has 8 wells, with liquids corresponding to plates columns
+# We are replacing tips for each liquid / column
+for t, col in enumerate(plate.cols):
+    p200.pick_up_tip(tiprack[t])  # Use one tip per column
+
+    p200.aspirate(120, trough[t]) # aspirate from a drough
+    p200.dispense(col[0])         # dispense everythig into a first well
+
+    # zip(col[:-1], col[1:]) returns pairs of
+    # (A1, A2), (A2, A3), (A3, A4), etc
+    for well, next_well in zip(col[:-1], col[1:]):
+        p200.aspirate(10, well)
+        p200.dispense(10, next_well).mix(3)
+
+    p200.drop_tip(trash)
+```
 ####Plate mapping
 
 ```python
