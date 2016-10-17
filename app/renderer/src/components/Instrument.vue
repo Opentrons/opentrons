@@ -1,10 +1,14 @@
 <template>
   <div>
+    <section>
     Calibrate {{ $route.params.instrument }}
     Current calibration
     <br>
-    <pre>{{ JSON.stringify(calibration, null, 4) }}</pre>
+    <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> 
+
     <Navigation :prev="prev" :next="next"></Navigation>
+
+    </section>
   </div>
 </template>
 
