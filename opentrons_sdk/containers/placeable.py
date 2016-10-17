@@ -3,6 +3,8 @@ import numbers
 from collections import OrderedDict
 from opentrons_sdk.util.vector import Vector
 
+import re
+
 
 def unpack_location(location):
     coordinates = None
@@ -58,7 +60,8 @@ class Placeable(object):
     def __str__(self):
         if not self.parent:
             return '<{}>'.format(self.__class__.__name__)
-        return '<{} {}>'.format(self.__class__.__name__, self.get_name())
+        return '<{} {}>'.format(
+            self.__class__.__name__, self.get_name())
 
     def __iter__(self):
         return iter(self.children_by_reference.keys())
@@ -257,11 +260,81 @@ class Deck(Placeable):
         return query in self.containers()
 
 
+class Well(Placeable):
+    pass
+
+
 class Slot(Placeable):
     pass
 
 
 class Container(Placeable):
+    def __init__(self, *args, **kwargs):
+        super(Container, self).__init__(*args, **kwargs)
+        self.grid = None
+        self.grid_transposed = None
+
+    def invalidate_grid(self):
+        self.grid = None
+        self.grid_transposed = None
+
+    def calculate_grid(self):
+        if self.grid is None:
+            self.grid = self.get_wellseries(self.get_grid())
+
+        if self.grid_transposed is None:
+            self.grid_transposed = self.get_wellseries(
+                self.transpose(
+                    self.get_grid()))
+
+    def get_grid(self):
+        rows = OrderedDict()
+        index_pattern = r'^([A-Za-z]+)([0-9]+)$'
+        for name in self.children_by_name:
+            match = re.match(index_pattern, name)
+            if match:
+                col, row = match.groups(0)
+                if row not in rows:
+                    rows[row] = OrderedDict()
+                rows[row][col] = (row, col)
+
+        return rows
+
+    def transpose(self, rows):
+        res = OrderedDict()
+        for row, cols in rows.items():
+            for col, cell in cols.items():
+                if col not in res:
+                    res[col] = OrderedDict()
+                res[col][row] = cell
+        return res
+
+    def get_wellseries(self, matrix):
+        res = OrderedDict()
+        for row, cells in matrix.items():
+            if row not in res:
+                res[row] = OrderedDict()
+            for col, cell in cells.items():
+                res[row][col] = self.children_by_name[
+                    ''.join(reversed(cell))
+                ]
+            res[row] = WellSeries(res[row])
+        return WellSeries(res)
+
+    @property
+    def rows(self):
+        self.calculate_grid()
+        return self.grid
+
+    @property
+    def columns(self):
+        self.calculate_grid()
+        return self.grid_transposed
+
+    @property
+    def cols(self):
+        return self.columns
+
     def well(self, name):
         return self.get_child_by_name(name)
 
@@ -269,5 +342,27 @@ class Container(Placeable):
         return self.get_children()
 
 
-class Well(Placeable):
-    pass
+class WellSeries(Placeable):
+    def __init__(self, items):
+        self.items = items
+        self.values = list(self.items.values())
+        self.offset = 0
+
+    def set_offset(self, offset):
+        self.offset = offset
+
+    def __iter__(self):
+        return iter(self.values)
+
+    def __str__(self):
+        return '<Series: {}>'.format(
+            ' '.join([str(well) for well in self.values]))
+
+    def __getitem__(self, index):
+        if isinstance(index, str):
+            return self.items[index]
+        else:
+            return list(self.values)[index]
+
+    def __getattr__(self, name):
+        return getattr(self.values[self.offset], name)
