@@ -47,6 +47,8 @@ class AllProtocolsTestCase(unittest.TestCase):
             Robot.reset()
             Robot.get_instance()
             try:
+                # if protocol_path.endswith('lewistanner_auto_pcr.json'):
+                #     import pdb; pdb.set_trace()
                 jpp = JSONProtocolProcessor(protocol_dict)
                 jpp.process()
             except Exception as e:

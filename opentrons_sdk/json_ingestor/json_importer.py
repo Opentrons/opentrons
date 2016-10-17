@@ -374,9 +374,8 @@ class JSONProtocolProcessor(object):
         if to_delay is not None:
             tool_obj.delay(to_delay)
 
-
     def handle_distribute(self, tool_obj, command_args):
-        tool_settings = self.deck[tool_obj.name]['settings']
+        tool_settings = self.head[tool_obj.name]['settings']
 
         from_info = command_args['from']
         to_info_list = command_args['to']
