@@ -261,9 +261,7 @@ class Deck(Placeable):
 
 
 class Well(Placeable):
-    def __repr__(self):
-        return __str__(self)
-
+    pass
 
 class Slot(Placeable):
     pass
