@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 from opentrons_sdk import containers
 
-from opentrons_sdk.labware import instruments
+from opentrons_sdk import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.util.vector import Vector
 
@@ -41,7 +41,9 @@ class PipetteTest(unittest.TestCase):
             min_volume=10,  # These are variable
             axis="a",
             name="p1000",
-            channels=1
+            channels=1,
+            aspirate_speed=300,
+            dispense_speed=500
         )
         result = list(self.robot.get_instruments('p1000'))
         self.assertListEqual(result, [('A', self.p1000)])
@@ -49,10 +51,14 @@ class PipetteTest(unittest.TestCase):
     def test_placeables_reference(self):
 
         self.p200.aspirate(100, self.plate[0])
+        self.p200.dispense(100, self.plate[0])
+        self.p200.aspirate(100, self.plate[20])
+        self.p200.aspirate(100, self.plate[1])
 
         expected = [
             self.plate[0],
-            self.plate[0]
+            self.plate[20],
+            self.plate[1]
         ]
 
         self.assertEquals(self.p200.placeables, expected)
@@ -91,6 +97,18 @@ class PipetteTest(unittest.TestCase):
         self.assertDictEqual(
             self.p200.calibration_data,
             expected_calibration_data)
+
+    def test_aspirate_rate(self):
+        self.p200.set_speed(aspirate=300, dispense=500)
+        self.robot.clear()
+        self.p200.plunger.speed = mock.Mock()
+        self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
+        self.robot.run()
+        expected = [
+            mock.call(600.0),
+            mock.call(250.0)
+        ]
+        self.assertEquals(self.p200.plunger.speed.mock_calls, expected)
 
     def test_aspirate_move_to(self):
         x, y, z = (161.0, 116.7, 3.0)
@@ -288,11 +306,11 @@ class PipetteTest(unittest.TestCase):
             "Delaying 1 seconds")
 
     def test_set_speed(self):
-        self.assertEqual(self.p200.speed, 300)
+        self.p200.set_speed(aspirate=100)
+        self.assertEqual(self.p200.speeds['aspirate'], 100)
 
-        self.p200.set_speed(100)
-
-        self.assertEqual(self.p200.speed, 100)
+        self.p200.set_speed(dispense=100)
+        self.assertEqual(self.p200.speeds['dispense'], 100)
 
     def test_transfer_no_volume(self):
         self.p200.aspirate = mock.Mock()

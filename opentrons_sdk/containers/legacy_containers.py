@@ -8,6 +8,17 @@ import pkg_resources
 from opentrons_sdk.containers.placeable import Container, Well
 
 
+legacy_containers_dict = {}
+
+
+def load_legacy_containers_from_file_path(file_path):
+    with open(file_path) as f:
+        legacy_containers_dict.update(json.load(
+            f,
+            object_pairs_hook=OrderedDict
+        )['containers'])
+
+
 containers_dir_path = pkg_resources.resource_filename(
     'opentrons_sdk.config',
     'containers'
@@ -16,15 +27,7 @@ legacy_containers_json_path = os.path.join(
     containers_dir_path,
     'legacy_containers.json'
 )
-
-
-legacy_containers_dict = None
-
-with open(legacy_containers_json_path) as f:
-    legacy_containers_dict = json.load(
-        f,
-        object_pairs_hook=OrderedDict
-    )['containers']
+load_legacy_containers_from_file_path(legacy_containers_json_path)
 
 
 def get_legacy_container(container_name: str) -> Container:

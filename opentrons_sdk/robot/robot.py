@@ -51,15 +51,29 @@ class Robot(object):
         axis = axis.upper()
         self._instruments[axis] = instrument
 
+    def get_mosfet(self, mosfet_index):
+        robot_self = self
+
+        class InstrumentMosfet():
+
+            def engage(self):
+                robot_self._driver.set_mosfet(mosfet_index, True)
+
+            def disengage(self):
+                robot_self._driver.set_mosfet(mosfet_index, False)
+
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+        return InstrumentMosfet()
+
     def get_motor(self, axis):
         robot_self = self
 
         class InstrumentMotor():
 
-            def move(self, value, speed=None, mode='absolute'):
+            def move(self, value, mode='absolute'):
                 kwargs = {axis: value}
-                if speed:
-                    self.speed(speed)
 
                 return robot_self._driver.move_plunger(
                     mode=mode, **kwargs
@@ -92,15 +106,22 @@ class Robot(object):
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
         return self._driver.connect(port)
 
-    def home(self, *args):
-        if self._driver.calm_down():
-            if args:
-                return self._driver.home(*args)
+    def home(self, *args, **kwargs):
+        def _do():
+            if self._driver.calm_down():
+                if args:
+                    return self._driver.home(*args)
+                else:
+                    self._driver.home('z')
+                    return self._driver.home('x', 'y', 'b', 'a')
             else:
-                self._driver.home('z')
-                return self._driver.home('x', 'y', 'b', 'a')
+                return False
+
+        if kwargs.get('now'):
+            return _do()
         else:
-            return False
+            description = "Homing Robot"
+            self.add_command(Command(do=_do, description=description))
 
     def add_command(self, command):
         if command.description:
@@ -119,12 +140,10 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
-    def move_to(self, location, instrument=None, create_path=True):
+    def move_to(self, location, instrument=None, create_path=True, now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
-            # add to the list of instument-container mappings
-            instrument.placeables.append(placeable)
             coordinates = instrument.calibrator.convert(
                 placeable,
                 coordinates)
@@ -145,20 +164,10 @@ class Robot(object):
                     y=coordinates[1],
                     z=coordinates[2])
 
-        # description = "Moving head to {} {}".format(
-        #     str(placeable),
-        #     coordinates)
-        self.add_command(Command(do=_do))
-
-    def move_to_top(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        self.move_to(top_location, instrument, create_path)
-
-    def move_to_bottom(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        self.move_to(bottom_location, instrument, create_path)
+        if now:
+            _do()
+        else:
+            self.add_command(Command(do=_do))
 
     @property
     def actions(self):
@@ -291,3 +300,18 @@ class Robot(object):
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
+
+    def versions(self):
+        # TODO: Store these versions in config
+        return {
+            'firmware': self._driver.get_firmware_version(),
+            'config': self._driver.get_config_version(),
+            'robot': self._driver.get_ot_version(),
+        }
+
+    def diagnostics(self):
+        # TODO: Store these versions in config
+        return {
+            'axis_homed': self._driver.axis_homed,
+            'switches': self._driver.get_endstop_switches()
+        }
