@@ -5,7 +5,8 @@
         {{task.title}}
       </router-link>
     </li>
-    <hr>
+
+    <hr v-if="tasks.length > 0">
 
     <span v-for="instrument in tasks">
       <li v-for="placeable in instrument.placeables">
@@ -15,7 +16,7 @@
       </li>
     </span>
 
-    <hr>
+    <hr v-if="tasks.length > 0">
 
     <li v-for="instrument in tasks">
       <router-link v-bind:to="'/calibrate/' + instrument.axis" :class="{'completed': instrument.completed}">
