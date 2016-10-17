@@ -42,7 +42,8 @@ class PipetteTest(unittest.TestCase):
             axis="a",
             name="p1000",
             channels=1,
-            speed=300
+            aspirate_speed=300,
+            dispense_speed=500
         )
         result = list(self.robot.get_instruments('p1000'))
         self.assertListEqual(result, [('A', self.p1000)])
@@ -98,14 +99,14 @@ class PipetteTest(unittest.TestCase):
             expected_calibration_data)
 
     def test_aspirate_rate(self):
-        self.p200.set_speed(500)
+        self.p200.set_speed(aspirate=300, dispense=500)
         self.robot.clear()
         self.p200.plunger.speed = mock.Mock()
-        self.p200.aspirate(100).dispense()
+        self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
         self.robot.run()
         expected = [
-            mock.call(500.0),
-            mock.call(500.0)
+            mock.call(600.0),
+            mock.call(250.0)
         ]
         self.assertEquals(self.p200.plunger.speed.mock_calls, expected)
 
@@ -305,9 +306,11 @@ class PipetteTest(unittest.TestCase):
             "Delaying 1 seconds")
 
     def test_set_speed(self):
+        self.p200.set_speed(aspirate=100)
+        self.assertEqual(self.p200.speeds['aspirate'], 100)
 
-        self.p200.set_speed(100)
-        self.assertEqual(self.p200.speed, 100)
+        self.p200.set_speed(dispense=100)
+        self.assertEqual(self.p200.speeds['dispense'], 100)
 
     def test_transfer_no_volume(self):
         self.p200.aspirate = mock.Mock()
