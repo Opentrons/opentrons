@@ -1,3 +1,4 @@
+from threading import (Thread, Event)
 import unittest
 
 from opentrons_sdk.drivers.motor import CNCDriver
@@ -20,10 +21,88 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_message_timeout(self):
+        self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
+
+    def test_set_plunger_speed(self):
+        res = self.motor.set_plunger_speed(400, 'a')
+        self.assertEquals(res, True)
+
+        self.assertRaises(ValueError, self.motor.set_plunger_speed, 400, 'x')
+
+    def test_set_head_speed(self):
+        res = self.motor.set_head_speed(4000)
+        self.assertEquals(res, True)
+        self.assertEquals(self.motor.head_speed, 4000)
+
+    def test_get_connected_port(self):
+        res = self.motor.get_connected_port()
+        self.assertEquals(res, self.motor.VIRTUAL_SMOOTHIE_PORT)
+        self.motor.disconnect()
+        res = self.motor.get_connected_port()
+        self.assertEquals(res, None)
+
+    def test_pause_resume(self):
+        self.motor.home()
+
+        self.motor.resume()
+
+        done = Event()
+        done.clear()
+
+        def _move_head():
+            self.motor.move_head(x=100, y=0, z=0)
+            done.set()
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.resume()
+        done.wait()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
+    def test_stop(self):
+        self.motor.home()
+
+        self.motor.pause()
+
+        done = Event()
+        done.clear()
+
+        def _move_head():
+            self.motor.move_head(x=100, y=0, z=0)
+            done.set()
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.stop()
+        done.wait()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (0, 250, 120),
+            'current': (0, 250, 120)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
+        self.motor.move_head(x=100, y=0, z=0)
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
     def test_get_position(self):
         self.motor.home()
         self.motor.move_head(x=100)
-        self.motor.wait_for_arrival()
         coords = self.motor.get_head_position()
         expected_coords = {
             'target': (100, 250, 120),
@@ -32,11 +111,20 @@ class OpenTronsTest(unittest.TestCase):
         self.assertDictEqual(coords, expected_coords)
 
     def test_home(self):
+
+        expected = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+        self.assertDictEqual(self.motor.axis_homed, expected)
+
         success = self.motor.home('x', 'y')
         self.assertTrue(success)
 
         success = self.motor.home('ba')
         self.assertTrue(success)
+
+        expected = {
+            'x': True, 'y': True, 'z': False, 'a': True, 'b': True}
+        self.assertDictEqual(self.motor.axis_homed, expected)
 
     def test_limit_hit_exception(self):
         self.motor.home()
@@ -102,3 +190,47 @@ class OpenTronsTest(unittest.TestCase):
 
         self.assertEqual(exptected_x, new_x_steps)
         self.assertEqual(exptected_y, new_y_steps)
+
+        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'z')
+        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'z', 80.0)
+
+    def test_get_endstop_switches(self):
+        res = self.motor.get_endstop_switches()
+        expected = {
+            'x': False,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+        try:
+            self.motor.move_head(x=-100)
+            self.motor.move_head(x=-101)
+        except Exception:
+            pass
+        res = self.motor.get_endstop_switches()
+        expected = {
+            'x': True,
+            'y': False,
+            'z': False,
+            'a': False,
+            'b': False
+        }
+        self.assertEquals(res, expected)
+
+    def test_set_mosfet(self):
+        res = self.motor.set_mosfet(0, True)
+        self.assertTrue(res)
+
+        res = self.motor.set_mosfet(5, False)
+        self.assertTrue(res)
+
+        self.assertRaises(IndexError, self.motor.set_mosfet, 6, True)
+
+    def test_power_on_off(self):
+        res = self.motor.power_on()
+        self.assertTrue(res)
+
+        res = self.motor.power_off()
+        self.assertTrue(res)

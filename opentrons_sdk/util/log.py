@@ -3,6 +3,27 @@ from logging.config import dictConfig
 import os
 
 import opentrons_sdk
+logging_config = dict(
+        version = 1,
+        formatters = {
+            'basic': {'format':
+                  '%(asctime)s %(name)s %(levelname)-8s %(message)s'}
+            },
+        handlers = {
+            'debug': {'class': 'logging.StreamHandler',
+                  'formatter': 'basic',
+                  'level': logging.DEBUG},
+            'testing': {'class': 'logging.StreamHandler',
+                  'formatter': 'basic',
+                  'level': logging.WARNING},
+            },
+        root = {
+            'handlers': ['testing'],
+            'level': logging.ERROR,
+            },
+    )
+dictConfig(logging_config)
+
 
 
 def set_log_file(filename):

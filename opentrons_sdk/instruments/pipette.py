@@ -1,3 +1,4 @@
+from opentrons_sdk import containers
 from opentrons_sdk.robot.command import Command
 
 from opentrons_sdk.robot.robot import Robot
@@ -16,7 +17,8 @@ class Pipette(object):
             min_volume=0,
             trash_container=None,
             tip_racks=None,
-            speed=300):
+            aspirate_speed=300,
+            dispense_speed=500):
 
         self.positions = {
             'top': 0,
@@ -24,6 +26,12 @@ class Pipette(object):
             'drop_tip': 12,
             'blow_out': 13
         }
+
+        self.speeds = {
+            'aspirate': aspirate_speed,
+            'dispense': dispense_speed
+        }
+
         self.axis = axis
         self.channels = channels
 
@@ -47,15 +55,41 @@ class Pipette(object):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
-        self.set_speed(speed)
+    def associate_placeable(self, location):
+        placeable, _ = containers.unpack_location(location)
+        if not self.placeables or (placeable != self.placeables[-1]):
+            self.placeables.append(placeable)
 
-    def go_to(self, location):
+    def move_to(self, location, create_path=True):
         if location:
-            self.robot.move_to(location, instrument=self, create_path=False)
+            self.associate_placeable(location)
+            self.robot.move_to(
+                location,
+                instrument=self,
+                create_path=create_path)
 
         return self
 
-    def aspirate(self, volume=None, location=None):
+    def move_to_top(self, location, create_path=True):
+        placeable, _ = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
+        return self.move_to(top_location, create_path)
+
+    def move_to_bottom(self, location, create_path=True):
+        placeable, _ = containers.unpack_location(location)
+        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
+        return self.move_to(bottom_location, create_path)
+
+    def go_to(self, location):
+        return self.move_to(location, create_path=False)
+
+    def go_to_top(self, location):
+        return self.move_to_top(location, create_path=False)
+
+    def go_to_bottom(self, location):
+        return self.move_to_bottom(location, create_path=False)
+
+    def aspirate(self, volume=None, location=None, rate=1.0):
         def _do_aspirate():
             nonlocal volume
             nonlocal location
@@ -65,23 +99,21 @@ class Pipette(object):
                 volume = self.max_volume - self.current_volume
 
             if self.current_volume + volume > self.max_volume:
-                self.robot.add_warning(
-                    'Pipette ({}) cannot hold volume {}'
-                    .format(self.name, self.current_volume + volume)
+                raise RuntimeWarning(
+                    'Pipette cannot hold volume {}'
+                    .format(self.current_volume + volume)
                 )
 
             self.position_for_aspirate(location)
 
-            plunge_distance, warning = self.plunge_distance(volume)
-            if warning:
-                self.robot.add_warning(
-                    "[{}] Warning: {}".format(self.name, warning)
-                )
-            distance = plunge_distance * -1
-
-            self.plunger.move(distance, mode='relative')
-            self.plunger.wait_for_arrival()
             self.current_volume += volume
+            distance, _ = self.plunge_distance(self.current_volume)
+            destination = self.positions['bottom'] - distance
+
+            speed = self.speeds['aspirate'] * rate
+
+            self.plunger.speed(speed)
+            self.plunger.move(destination)
 
         description = "Aspirating {0}uL at {1}".format(
             volume,
@@ -92,10 +124,10 @@ class Pipette(object):
 
         return self
 
-    def dispense(self, volume=None, location=None):
+    def dispense(self, volume=None, location=None, rate=1.0):
         def _do():
-            nonlocal volume
             nonlocal location
+            nonlocal volume
             if not isinstance(volume, (int, float, complex)):
                 if volume and not location:
                     location = volume
@@ -106,19 +138,17 @@ class Pipette(object):
                 volume = self.current_volume
 
             if location:
-                self.robot.move_to(location, instrument=self)
+                self.move_to(location)
 
             if volume:
-                plunge_distance, warning = self.plunge_distance(volume)
-                if warning:
-                    self.robot.add_warning(
-                        "[{}] Warning: {}".format(self.name, warning)
-                    )
+                self.current_volume -= volume
+                distance, _ = self.plunge_distance(self.current_volume)
+                destination = self.positions['bottom'] - distance
 
-                self.plunger.move(plunge_distance, mode='relative')
-                self.plunger.wait_for_arrival()
+                speed = self.speeds['dispense'] * rate
 
-            self.current_volume -= volume
+                self.plunger.speed(speed)
+                self.plunger.move(destination)
 
         description = "Dispensing {0}uL at {1}".format(
             volume,
@@ -129,7 +159,7 @@ class Pipette(object):
 
     def position_for_aspirate(self, location=None):
         if location:
-            self.robot.move_to_top(location, instrument=self)
+            self.move_to_top(location)
 
         if self.current_volume == 0:
             self.plunger.move(self.positions['bottom'])
@@ -141,7 +171,7 @@ class Pipette(object):
                 # go up 1mm to give space to aspirate
                 bottom += Vector(0, 0, 1)
                 location = (location, bottom)
-            self.robot.move_to(location, instrument=self, create_path=False)
+            self.go_to(location)
 
     def transfer(self, source, destination, volume=None):
         volume = volume or self.max_volume
@@ -175,17 +205,16 @@ class Pipette(object):
             # using Command for printing description
             pass
 
-        description = "Mixing {0} times with a volume of {1}mm".format(
+        description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, str(self.current_volume)
         )
         self.robot.add_command(Command(do=_do, description=description))
 
         self.aspirate(location=location, volume=volume)
         for i in range(repetitions - 1):
-            self.dispense()
+            self.dispense(volume)
             self.aspirate(volume)
-
-        self.dispense()
+        self.dispense(volume)
 
         return self
 
@@ -193,12 +222,12 @@ class Pipette(object):
         def _do():
             nonlocal location
             if location:
-                self.robot.move_to(location, instrument=self)
+                self.move_to(location)
             self.plunger.move(self.positions['blow_out'])
-            self.plunger.wait_for_arrival()
-
             self.current_volume = 0
-        description = "Blow_out at {}".format(str(location))
+        description = "Blow_out at {}".format(
+            humanize_location(location) if location else '<In Place>'
+        )
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
@@ -206,7 +235,7 @@ class Pipette(object):
         def _do():
             nonlocal  location
             if location:
-                self.robot.move_to(location, instrument=self)
+                self.move_to(location)
             else:
                 location = self.placeables[-1]
 
@@ -215,15 +244,16 @@ class Pipette(object):
             self.go_to((location, location.from_center(x=0, y=1, z=1)))
             self.go_to((location, location.from_center(x=0, y=-1, z=1)))
 
-        description = 'Touching tip'  # TODO: expand this...
+        description = 'Touching tip'
         self.robot.add_command(Command(do=_do, description=description))
 
         return self
 
     def pick_up_tip(self, location=None):
         def _do():
+            nonlocal location
             if location:
-                self.robot.move_to_bottom(location, instrument=self)
+                self.go_to_bottom(location)
 
             # TODO: actual plunge depth for picking up a tip
             # varies based on the tip
@@ -248,11 +278,10 @@ class Pipette(object):
         def _do():
             nonlocal location
             if location:
-                self.robot.move_to_bottom(location, instrument=self)
+                self.go_to_bottom(location)
 
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
-            self.plunger.wait_for_arrival()
             self.current_volume = 0
 
         description = "Drop_tip at {}".format(
@@ -306,6 +335,8 @@ class Pipette(object):
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
 
+        return self
+
     def calibrate_position(self, location, current=None):
         if not current:
             current = self.robot._driver.get_head_position()['current']
@@ -314,6 +345,7 @@ class Pipette(object):
             self.calibration_data,
             location,
             current)
+        return self
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
@@ -352,9 +384,6 @@ class Pipette(object):
 
         return (volume / self.max_volume, warning_msg)
 
-    def supports_volume(self, volume):
-        return self.max_volume <= volume <= self.max_volume
-
     def delay(self, seconds):
         def _do():
             self.plunger.wait(seconds)
@@ -363,13 +392,9 @@ class Pipette(object):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
-    def set_speed(self, rate):
-        self.speed = rate
-
-        def _do():
-            self.plunger.speed(rate)
-
-        description = "Setting speed to {}mm/minute".format(rate)
-        self.robot.add_command(Command(do=_do, description=description))
+    def set_speed(self, **kwargs):
+        keys = {'head', 'aspirate', 'dispense'} & kwargs.keys()
+        for key in keys:
+            self.speeds[key] = kwargs.get(key)
 
         return self

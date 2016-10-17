@@ -1,5 +1,6 @@
 import copy
 import os
+from threading import Event
 
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
@@ -17,6 +18,9 @@ class Robot(object):
         self._commands = []
         self._handlers = []
         self._runtime_warnings = []
+
+        self.can_pop_command = Event()
+        self.can_pop_command.set()
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -51,14 +55,29 @@ class Robot(object):
     def add_warning(self, warning_msg: str):
         self._runtime_warnings.append(warning_msg)
 
+    def get_mosfet(self, mosfet_index):
+        robot_self = self
+
+        class InstrumentMosfet():
+
+            def engage(self):
+                robot_self._driver.set_mosfet(mosfet_index, True)
+
+            def disengage(self):
+                robot_self._driver.set_mosfet(mosfet_index, False)
+
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+        return InstrumentMosfet()
+
     def get_motor(self, axis):
         robot_self = self
 
         class InstrumentMotor():
-            def move(self, value, speed=None, mode='absolute'):
+
+            def move(self, value, mode='absolute'):
                 kwargs = {axis: value}
-                if speed:
-                    self.speed(speed)
 
                 return robot_self._driver.move_plunger(
                     mode=mode, **kwargs
@@ -66,9 +85,6 @@ class Robot(object):
 
             def home(self):
                 return robot_self._driver.home(axis)
-
-            def wait_for_arrival(self):
-                return robot_self._driver.wait_for_arrival()
 
             def wait(self, seconds):
                 robot_self._driver.wait(seconds)
@@ -94,19 +110,27 @@ class Robot(object):
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
         return self._driver.connect(port)
 
-    def home(self, *args):
-        if self._driver.calm_down():
-            if args:
-                return self._driver.home(*args)
+    def home(self, *args, **kwargs):
+        def _do():
+            if self._driver.calm_down():
+                if args:
+                    return self._driver.home(*args)
+                else:
+                    self._driver.home('z')
+                    return self._driver.home('x', 'y', 'b', 'a')
             else:
-                self._driver.home('z')
-                return self._driver.home('x', 'y', 'b', 'a')
+                return False
+
+        if kwargs.get('now'):
+            return _do()
         else:
-            return False
+            description = "Homing Robot"
+            self.add_command(Command(do=_do, description=description))
 
     def add_command(self, command):
-        # print("Enqueing:", command.description)
-        # log.info("Enqueing:", command.description)
+        if command.description:
+            print("Enqueing:", command.description)
+            log.info("Enqueing:", command.description)
         self._commands.append(command)
 
     def prepend_command(self, command):
@@ -119,14 +143,11 @@ class Robot(object):
 
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
-        self._driver.wait_for_arrival()
 
-    def move_to(self, location, instrument=None, create_path=True):
+    def move_to(self, location, instrument=None, create_path=True, now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
-            # add to the list of instument-container mappings
-            instrument.placeables.append(placeable)
             coordinates = instrument.calibrator.convert(
                 placeable,
                 coordinates)
@@ -136,28 +157,29 @@ class Robot(object):
         tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
         tallest_z += 10
 
-        print(coordinates)
+        def _do():
+            if create_path:
+                self._driver.move_head(z=tallest_z)
+                self._driver.move_head(x=coordinates[0], y=coordinates[1])
+                self._driver.move_head(z=coordinates[2])
+            else:
+                self._driver.move_head(
+                    x=coordinates[0],
+                    y=coordinates[1],
+                    z=coordinates[2]
+                )
 
-        if create_path:
-            self._driver.move_head(z=tallest_z)
-            self._driver.move_head(x=coordinates[0], y=coordinates[1])
-            self._driver.move_head(z=coordinates[2])
+        if now:
+            _do()
         else:
-            self._driver.move_head(
-                x=coordinates[0],
-                y=coordinates[1],
-                z=coordinates[2])
-        self._driver.wait_for_arrival()
+            self.add_command(Command(do=_do))
+
 
     def move_to_top(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
         top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
         self.move_to(top_location, instrument, create_path)
 
-    def move_to_bottom(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        self.move_to(bottom_location, instrument, create_path)
 
     @property
     def actions(self):
@@ -165,13 +187,14 @@ class Robot(object):
 
     def run(self):
         self._runtime_warnings = []
-        while self._commands:
+        while self.can_pop_command.wait() and self._commands:
             command = self._commands.pop(0)
-            if command.description == "Pausing":
-                return
 
             # print("Executing:", command.description)
             log.info("Executing:", command.description)
+            if command.description:
+                print("Executing:", command.description)
+                log.info("Executing:", command.description)
             try:
                 command.do()
             except KeyboardInterrupt as e:
@@ -268,7 +291,6 @@ class Robot(object):
 
     def clear(self):
         self._commands = []
-        # print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
         # This method is for API use only - in a user protocol,
@@ -280,9 +302,17 @@ class Robot(object):
 
         description = "Pausing"
         self.prepend_command(Command(do=_do, description=description))
+        self.can_pop_command.set()
+        self._driver.stop()
+        print('Robot ready to enqueue and execute new commands')
+
+    def pause(self):
+        self.can_pop_command.clear()
+        self._driver.pause()
 
     def resume(self):
-        self.run()
+        self.can_pop_command.set()
+        self._driver.resume()
 
     def get_serial_ports_list(self):
         ports = []
@@ -297,3 +327,18 @@ class Robot(object):
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
+
+    def versions(self):
+        # TODO: Store these versions in config
+        return {
+            'firmware': self._driver.get_firmware_version(),
+            'config': self._driver.get_config_version(),
+            'robot': self._driver.get_ot_version(),
+        }
+
+    def diagnostics(self):
+        # TODO: Store these versions in config
+        return {
+            'axis_homed': self._driver.axis_homed,
+            'switches': self._driver.get_endstop_switches()
+        }

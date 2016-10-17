@@ -4,7 +4,7 @@ import json
 import os
 
 from opentrons_sdk import containers
-from opentrons_sdk.labware import instruments
+from opentrons_sdk import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.util import vector
 

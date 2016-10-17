@@ -1,6 +1,6 @@
 # OpenTrons Software Development Kit
 
-[![Build Status](https://travis-ci.org/OpenTrons/opentrons_sdk.svg?branch=master)](https://travis-ci.org/OpenTrons/opentrons_sdk)
+[![Build Status](https://travis-ci.org/OpenTrons/opentrons_sdk.svg?branch=master)](https://travis-ci.org/OpenTrons/opentrons_sdk) [![Coverage Status](https://coveralls.io/repos/github/OpenTrons/opentrons_sdk/badge.svg?branch=master)](https://coveralls.io/github/OpenTrons/opentrons_sdk?branch=master)
 
 The point of this repository is to provide a software equivalent to
 an operating OpenTrons machine, including all related deck modules
