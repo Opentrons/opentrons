@@ -2,7 +2,7 @@ import unittest
 import time
 
 from opentrons_sdk import containers
-from opentrons_sdk.labware import instruments
+from opentrons_sdk import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.helpers.helpers import import_calibration_json
 

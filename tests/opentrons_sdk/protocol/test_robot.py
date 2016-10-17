@@ -83,14 +83,6 @@ class RobotTest(unittest.TestCase):
         thread.join(1)
         self.assertEqual(len(self.robot._commands), 0)
 
-    def test_mosfet(self):
-        self.robot.mosfet(0, True)
-        self.assertEqual(len(self.robot._commands), 1)
-        self.robot.run()
-        self.assertEqual(len(self.robot._commands), 0)
-        self.robot.mosfet(0, True, now=True)
-        self.assertEqual(len(self.robot._commands), 0)
-
     def test_versions(self):
         res = self.robot.versions()
         expected = {

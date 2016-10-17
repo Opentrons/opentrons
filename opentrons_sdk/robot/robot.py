@@ -51,6 +51,22 @@ class Robot(object):
         axis = axis.upper()
         self._instruments[axis] = instrument
 
+    def get_mosfet(self, mosfet_index):
+        robot_self = self
+
+        class InstrumentMosfet():
+
+            def engage(self):
+                robot_self._driver.set_mosfet(mosfet_index, True)
+
+            def disengage(self):
+                robot_self._driver.set_mosfet(mosfet_index, False)
+
+            def wait(self, seconds):
+                robot_self._driver.wait(seconds)
+
+        return InstrumentMosfet()
+
     def get_motor(self, axis):
         robot_self = self
 
@@ -299,14 +315,3 @@ class Robot(object):
             'axis_homed': self._driver.axis_homed,
             'switches': self._driver.get_endstop_switches()
         }
-
-    def mosfet(self, mosfet_index, state, now=False):
-        def _do():
-            self._driver.set_mosfet(mosfet_index, state)
-
-        if now:
-            return _do()
-        else:
-            description = 'Setting Smoothie mosfet #{} to {}'.format(
-                mosfet_index, state)
-            self.add_command(Command(do=_do, description=description))
