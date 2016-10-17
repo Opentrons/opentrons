@@ -27,7 +27,7 @@ legacy_containers_json_path = os.path.join(
     containers_dir_path,
     'legacy_containers.json'
 )
-load_legacy_from_file_path(legacy_containers_json_path)
+load_legacy_containers_from_file(legacy_containers_json_path)
 
 
 def get_legacy_container(container_name: str) -> Container:
