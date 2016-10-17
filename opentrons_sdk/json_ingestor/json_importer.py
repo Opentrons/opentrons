@@ -17,30 +17,13 @@ class JSONProcessorRuntimeError(Exception):
     pass
 
 
-class BaseHandler(object):
-    def __init__(self):
+class JSONProtocolProcessor(object):
+    def __init__(self, protocol: (str, OrderedDict)):
         self.errors = []
         self.warnings = []
-
-    def validate(self):
-        raise NotImplementedError
-
-    def perform(self):
-        raise NotImplementedError
-
-    def submit(self):
-        self.validate()
-        return self.perform()
-
-
-class JSONProtocolProcessor(BaseHandler):
-    def __init__(self, protocol: (str, OrderedDict)):
-        super().__init__()
-        self._protocol_input = protocol
-        self.protocol = self.read_protocol(protocol)
-
-        self.head = None
         self.deck = None
+        self.head = None
+        self.protocol = self.read_protocol(protocol)
 
     def get_protocol_from_file(self, path):
         with open(path) as f:
@@ -54,7 +37,6 @@ class JSONProtocolProcessor(BaseHandler):
         elif isinstance(protocol, OrderedDict):
             return protocol
         raise Exception('Protocol must be a file, json string, or OrderedDict')
-
 
     def validate(self):
         errors = []
@@ -80,17 +62,30 @@ class JSONProtocolProcessor(BaseHandler):
         if errors:
             raise JSONProcessorValidationError('Errors encountered compiling JSON')
 
+    def process(self):
+        try:
+            self.process_deck()
+        except JSONProcessorRuntimeError as e:
+            self.errors.extend(
+                'Failed to process protocol "deck". Error: {}'
+                .format(str(e))
+            )
 
-    def perform(self):
-        self.process_deck()
+        try:
+                self.process_head()
+        except JSONProcessorRuntimeError as e:
+            self.errors.extend(
+                'Failed to process protocol "head". Error: {}'
+                .format(str(e))
+            )
 
-        # deck, head, instructions = None
-        # try:
-        #     deck_processor = JSONDeckProcessor(self.protocol['deck'])
-        #     deck = deck_processor.submit()
-        # except JSONProcessorValidationError:
-        #     self.errors.extend(deck_processor.errors)
-        #     self.warnings.extend(deck_processor.warnings)
+        try:
+            self.process_instructions()
+        except JSONProcessorRuntimeError as e:
+            self.errors.extend(
+                'Failed to process protocol "instructions". Error: {}'
+                .format(str(e))
+            )
 
     def process_deck(self):
         """
