@@ -2,13 +2,8 @@ import unittest
 from unittest import mock
 from opentrons_sdk import containers
 
-from opentrons_sdk.labware import instruments
+from opentrons_sdk import instruments
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.util.vector import Vector
-
-from opentrons_sdk.util import log
-
-from opentrons_sdk.containers.placeable import unpack_location
 
 
 class MagbeadTest(unittest.TestCase):
