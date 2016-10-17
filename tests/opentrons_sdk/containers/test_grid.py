@@ -1,6 +1,6 @@
 import unittest
 
-import opentrons_sdk.containers as containers
+from opentrons_sdk import containers
 from opentrons_sdk.labware import instruments
 from opentrons_sdk.robot import Robot
 
