@@ -6,18 +6,23 @@
       </router-link>
     </li>
 
-    <hr v-if="tasks.length > 0">
-
+<!--     <hr v-if="tasks.length > 0">
+ -->
     <span v-for="instrument in tasks">
+
       <li v-for="placeable in instrument.placeables">
-        <router-link v-bind:to="placeable.href" :class="{'completed': placeable.completed}">
-          {{placeable.label}}
-       </router-link>
+        <ul>
+          <li>
+            <router-link v-bind:to="placeable.href" :class="{'completed': placeable.completed}" exact>
+              {{placeable.label}}
+           </router-link>
+          </li>
+        </ul>
       </li>
     </span>
-
+<!-- 
     <hr v-if="tasks.length > 0">
-
+ -->
     <li v-for="instrument in tasks">
       <router-link v-bind:to="instrument.href" :class="{'completed': instrument.completed}">
         Calibrate {{instrument.label}}
