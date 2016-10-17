@@ -34,27 +34,7 @@ def set_log_file(filename):
     logging.basicConfig can always be used on its own to specify any logging
     conditions desired.
     """
-
-    logging_config = dict(
-        version = 1,
-        formatters = {
-            'basic': {'format':
-                  '%(asctime)s %(name)s %(levelname)-8s %(message)s'}
-            },
-        handlers = {
-            'debug': {'class': 'logging.StreamHandler',
-                  'formatter': 'basic',
-                  'level': logging.DEBUG},
-            'testing': {'class': 'logging.StreamHandler',
-                  'formatter': 'basic',
-                  'level': logging.WARNING},
-            },
-        root = {
-            'handlers': ['debug'],
-            # 'level': logging.DEBUG,
-            },
-    )
-    dictConfig(logging_config)
+    pass
 
 
     # logging.basicConfig(
