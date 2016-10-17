@@ -11,7 +11,7 @@ from opentrons_sdk.containers.placeable import Container, Well
 legacy_containers_dict = {}
 
 
-def load_legacy_containers_from_file(file_path):
+def load_legacy_containers_from_file_path(file_path):
     with open(file_path) as f:
         legacy_containers_dict.update(json.load(
             f,
@@ -27,7 +27,7 @@ legacy_containers_json_path = os.path.join(
     containers_dir_path,
     'legacy_containers.json'
 )
-load_legacy_containers_from_file(legacy_containers_json_path)
+load_legacy_containers_from_file_path(legacy_containers_json_path)
 
 
 def get_legacy_container(container_name: str) -> Container:
