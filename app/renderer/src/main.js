@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store'
-import {Home, StepList, Upload, Connect, Placeable, Instrument, Jog} from './components/export'
+import {Home, StepList, Upload, Connect, Placeable, Instrument, Jog, Increment} from './components/export'
 
 
 Vue.use(VueRouter)
