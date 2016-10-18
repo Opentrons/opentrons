@@ -6,14 +6,15 @@ from opentrons_sdk.containers.placeable import (
     Well,
     Deck,
     Slot)
+from opentrons_sdk.util.vector import Vector
 
 
 class PlaceableTestCase(unittest.TestCase):
-    def generate_plate(self, wells, cols, spacing, offset, radius):
+    def generate_plate(self, wells, cols, spacing, offset, radius, height=0):
         c = Container()
 
         for i in range(0, wells):
-            well = Well(properties={'radius': radius})
+            well = Well(properties={'radius': radius, 'height': height})
             row, col = divmod(i, cols)
             name = chr(row + ord('A')) + str(1 + col)
             coordinates = (col * spacing[0] + offset[0],
@@ -145,3 +146,24 @@ class PlaceableTestCase(unittest.TestCase):
                     ('<Well B1>', (60.0, 65.0, 50.0)),
                     ('<Container A2>', (50.0, 50.0, 50.0))]
         self.assertListEqual(actual, expected)
+
+    def test_top_bottom(self):
+        deck = Deck()
+        slot = Slot()
+        plate = self.generate_plate(
+            wells=4,
+            cols=2,
+            spacing=(10, 10),
+            offset=(0, 0),
+            radius=5,
+            height=10
+        )
+        deck.add(slot, 'A1', (0, 0, 0))
+        slot.add(plate)
+
+        self.assertEqual(
+            plate['A1'].bottom(10),
+            (plate['A1'], Vector(5, 5, 10)))
+        self.assertEqual(
+            plate['A1'].top(10),
+            (plate['A1'], Vector(5, 5, 20)))
