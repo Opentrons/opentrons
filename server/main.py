@@ -73,32 +73,10 @@ def upload():
             'data': '{} is not a valid extension. Expected .py or .json'.format(extension)
         })
 
-
-    # errors = lintProtocol(protocol_path, mimetype)
-    # #create deepcopy, run on virtual smoothie w/
-    # #fake calibration data, return any errors
-
-    # if errors:
-    #     data = errors
-    # else:
-    #     data = "No errors :)"
-
     return flask.jsonify({
             'status': 'success'
         })
 
-def lintProtocol(protocol_path, filetype):
-    from pylint import epylint as lint
-    if filetype == "py":
-        # this is where the virtual smoothie gets run w/ fake calibration data
-        # this stuff beneath is for pylint
-        config_file = os.path.join(os.getcwd(), "pylintrc")
-        # command = '{0} --rcfile={1}'.format(protocol_path, config_file)
-        # (pylint_stdout, pylint_stderr) = lint.py_run(command, return_std=True)
-        # return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
-    elif filetype == "json":
-        #lint, convert to python, lint again
-        pass
 
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
