@@ -10,7 +10,17 @@ class MagbeadTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset()
-        self.robot.connect()
+        options = {
+            'limit_switches': False,
+            'firmware': 'v1.0.5',
+            'config': {
+                'ot_version': 'one_pro',
+                'version': 'v1.0.3',        # config version
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0
+            }
+        }
+        self.robot.connect(options=options)
         self.robot.home()
 
         self.plate = containers.load('96-flat', 'A2')
