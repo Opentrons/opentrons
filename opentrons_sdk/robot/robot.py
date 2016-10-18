@@ -8,6 +8,7 @@ from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util import log
 
 from opentrons_sdk.helpers import helpers
+from opentrons_sdk.util.trace import traceable
 
 
 class Robot(object):
@@ -144,6 +145,7 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
+    @traceable('move-to')
     def move_to(self, location, instrument=None, create_path=True, now=False):
         placeable, coordinates = containers.unpack_location(location)
 

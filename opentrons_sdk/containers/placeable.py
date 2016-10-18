@@ -62,6 +62,9 @@ class Placeable(object):
         else:
             return self.get_child_by_name(name)
 
+    def __repr__(self):
+        return '/'.join([str(i) for i in reversed(self.get_trace())])
+
     def __str__(self):
         if not self.parent:
             return '<{}>'.format(self.__class__.__name__)
