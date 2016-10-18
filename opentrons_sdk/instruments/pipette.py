@@ -239,10 +239,14 @@ class Pipette(object):
             else:
                 location = self.placeables[-1]
 
-            self.go_to((location, location.from_center(x=1, y=0, z=1)), now=True)
-            self.go_to((location, location.from_center(x=-1, y=0, z=1)), now=True)
-            self.go_to((location, location.from_center(x=0, y=1, z=1)), now=True)
-            self.go_to((location, location.from_center(x=0, y=-1, z=1)), now=True)
+            self.go_to(
+                (location, location.from_center(x=1, y=0, z=1)), now=True)
+            self.go_to(
+                (location, location.from_center(x=-1, y=0, z=1)), now=True)
+            self.go_to(
+                (location, location.from_center(x=0, y=1, z=1)), now=True)
+            self.go_to(
+                (location, location.from_center(x=0, y=-1, z=1)), now=True)
 
         description = 'Touching tip'
         self.robot.add_command(Command(do=_do, description=description))
