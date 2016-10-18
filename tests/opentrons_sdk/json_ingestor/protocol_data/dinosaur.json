@@ -1,0 +1,831 @@
+{
+    "info": {
+        "name": "Dinosaur", 
+        "description": "protocol description", 
+        "create-date": "Jan 21, 2016", 
+        "version": "1.0", 
+        "run-notes": "none"
+    }, 
+    "deck": {
+        "p200-rack": {
+            "labware": "tiprack-200ul",
+            "slot" : "B1"
+        }, 
+        "trash": {
+            "labware": "point",
+            "slot" : "B2"
+        }, 
+        "canvas": {
+            "labware": "96-PCR-flat",
+            "slot" : "C2"
+        }, 
+        "paint": {
+            "labware": "tube-rack-2ml",
+            "slot" : "D1"
+        }
+    }, 
+    "head": {
+        "p200": {
+            "tool": "pipette", 
+            "tip-racks": [
+                {
+                    "container": "p200-rack"
+                }
+            ], 
+            "trash-container": {
+                "container": "trash"
+            }, 
+            "multi-channel": false, 
+            "axis": "a", 
+            "volume": 200, 
+            "down-plunger-speed": 300, 
+            "up-plunger-speed": 500, 
+            "tip-plunge": 6, 
+            "extra-pull-volume": 0, 
+            "extra-pull-delay": 200, 
+            "distribute-percentage": 0.1, 
+            "points": [
+                {
+                    "f1": 1, 
+                    "f2": 1
+                }, 
+                {
+                    "f1": 5, 
+                    "f2": 5
+                }, 
+                {
+                    "f1": 7, 
+                    "f2": 7
+                }, 
+                {
+                    "f1": 10, 
+                    "f2": 10
+                }
+            ]
+        }
+    }, 
+    "ingredients": {}, 
+    "instructions": [
+        {
+            "tool": "p200", 
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D2", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E2", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D3", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E3", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F3", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G3", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "H3", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "H4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C6", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D6", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E6", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F6", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G6", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D8", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E8", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F8", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G8", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "H8", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E9", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F9", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G9", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "H9", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F10", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G11", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "H12", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C3", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "B4", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "A5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "B5", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "B6", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "A7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "B7", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C8", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "C9", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "D9", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E10", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "E11", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "F11", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }, 
+                        {
+                            "from": {
+                                "container": "paint", 
+                                "location": "A2", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "canvas", 
+                                "location": "G12", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

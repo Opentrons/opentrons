@@ -1,8 +1,9 @@
 from opentrons_sdk import containers
 from opentrons_sdk.robot.command import Command
+
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
-from opentrons_sdk.containers.placeable import Placeable
+from opentrons_sdk.containers.placeable import Placeable, humanize_location
 from opentrons_sdk.util.vector import Vector
 
 
@@ -20,10 +21,10 @@ class Pipette(object):
             dispense_speed=500):
 
         self.positions = {
-            'top': None,
-            'bottom': None,
-            'blow_out': None,
-            'drop_tip': None
+            'top': 0,
+            'bottom': 10,
+            'drop_tip': 12,
+            'blow_out': 13
         }
 
         self.speeds = {
@@ -89,65 +90,70 @@ class Pipette(object):
         return self.move_to_bottom(location, create_path=False)
 
     def aspirate(self, volume=None, location=None, rate=1.0):
-
-        if not isinstance(volume, (int, float, complex)):
-            if volume and not location:
-                location = volume
-            volume = self.max_volume - self.current_volume
-
-        if self.current_volume + volume > self.max_volume:
-            raise RuntimeWarning(
-                'Pipette cannot hold volume {}'
-                .format(self.current_volume + volume)
-            )
-
-        self.position_for_aspirate(location)
-
-        self.current_volume += volume
-        distance = self.plunge_distance(self.current_volume)
-        destination = self.positions['bottom'] - distance
-
-        speed = self.speeds['aspirate'] * rate
-
         def _do_aspirate():
+            nonlocal volume
+            nonlocal location
+            if not isinstance(volume, (int, float, complex)):
+                if volume and not location:
+                    location = volume
+                volume = self.max_volume - self.current_volume
+
+            if self.current_volume + volume > self.max_volume:
+                raise RuntimeWarning(
+                    'Pipette cannot hold volume {}'
+                    .format(self.current_volume + volume)
+                )
+
+            self.position_for_aspirate(location)
+
+            self.current_volume += volume
+            distance, _ = self.plunge_distance(self.current_volume)
+            destination = self.positions['bottom'] - distance
+
+            speed = self.speeds['aspirate'] * rate
+
             self.plunger.speed(speed)
             self.plunger.move(destination)
 
-        description = "Aspirating {0}uL at {1}".format(volume, str(location))
+        description = "Aspirating {0}uL at {1}".format(
+            volume,
+            (humanize_location(location) if location else '<In Place>')
+        )
         self.robot.add_command(
             Command(do=_do_aspirate, description=description))
 
         return self
 
     def dispense(self, volume=None, location=None, rate=1.0):
+        def _do():
+            nonlocal location
+            nonlocal volume
+            if not isinstance(volume, (int, float, complex)):
+                if volume and not location:
+                    location = volume
+                volume = self.current_volume
 
-        if not isinstance(volume, (int, float, complex)):
-            if volume and not location:
-                location = volume
-            volume = self.current_volume
+            if self.current_volume - volume < 0:
+                volume = self.current_volume
 
-        if self.current_volume - volume < 0:
-            # TODO: this should alert a Warning here, but not stop execution
-            volume = self.current_volume
+            if location:
+                self.move_to(location)
 
-        if location:
-            self.move_to(location)
+            if volume:
+                self.current_volume -= volume
+                distance, _ = self.plunge_distance(self.current_volume)
+                destination = self.positions['bottom'] - distance
 
-        if volume:
-            self.current_volume -= volume
-            distance = self.plunge_distance(self.current_volume)
-            destination = self.positions['bottom'] - distance
+                speed = self.speeds['dispense'] * rate
 
-            speed = self.speeds['dispense'] * rate
-
-            def _do():
                 self.plunger.speed(speed)
                 self.plunger.move(destination)
 
-            description = "Dispensing {0}uL at {1}".format(
-                volume, str(location))
-            self.robot.add_command(Command(do=_do, description=description))
-
+        description = "Dispensing {0}uL at {1}".format(
+            volume,
+            (humanize_location(location) if location else '<In Place>')
+        )
+        self.robot.add_command(Command(do=_do, description=description))
         return self
 
     def position_for_aspirate(self, location=None):
@@ -155,12 +161,7 @@ class Pipette(object):
             self.move_to_top(location)
 
         if self.current_volume == 0:
-            def _prep_plunger():
-                self.plunger.move(self.positions['bottom'])
-
-            description = "Resetting plunger to bottom"
-            self.robot.add_command(
-                Command(do=_prep_plunger, description=description))
+            self.plunger.move(self.positions['bottom'])
 
         if location:
             if isinstance(location, Placeable):
@@ -197,9 +198,7 @@ class Pipette(object):
         self.dispense(volume, destination)
         return self
 
-    def mix(self, repetitions=3, volume=None):
-        volume = volume or self.current_volume
-
+    def mix(self, volume=None, location=None, repetitions=3):
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
@@ -210,81 +209,84 @@ class Pipette(object):
         )
         self.robot.add_command(Command(do=_do, description=description))
 
-        for i in range(repetitions):
+        self.aspirate(location=location, volume=volume)
+        for i in range(repetitions - 1):
             self.dispense(volume)
             self.aspirate(volume)
-
         self.dispense(volume)
 
         return self
 
     def blow_out(self, location=None):
-        if location:
-            self.move_to(location)
-
         def _do():
+            nonlocal location
+            if location:
+                self.move_to(location)
             self.plunger.move(self.positions['blow_out'])
-
-        description = "Blow_out at {}".format(str(location))
+            self.current_volume = 0
+        description = "Blow_out at {}".format(
+            humanize_location(location) if location else '<In Place>'
+        )
         self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume = 0
-
         return self
 
     def touch_tip(self, location=None):
-        if location:
-            self.move_to(location)
-        elif self.placeables:
-            location = self.placeables[-1]
-        else:
-            raise IndexError("Pipette does not know where it is")
+        def _do():
+            nonlocal location
+            if location:
+                self.move_to(location)
+            else:
+                location = self.placeables[-1]
 
-        self.go_to((location, location.from_center(x=1, y=0, z=1)))
-        self.go_to((location, location.from_center(x=-1, y=0, z=1)))
-        self.go_to((location, location.from_center(x=0, y=1, z=1)))
-        self.go_to((location, location.from_center(x=0, y=-1, z=1)))
+            self.go_to((location, location.from_center(x=1, y=0, z=1)))
+            self.go_to((location, location.from_center(x=-1, y=0, z=1)))
+            self.go_to((location, location.from_center(x=0, y=1, z=1)))
+            self.go_to((location, location.from_center(x=0, y=-1, z=1)))
+
+        description = 'Touching tip'
+        self.robot.add_command(Command(do=_do, description=description))
 
         return self
 
-    def pick_up_tip(self, location):
-
+    def pick_up_tip(self, location=None):
         def _do():
+            nonlocal location
+            if location:
+                self.go_to_bottom(location)
+
+            # TODO: actual plunge depth for picking up a tip
+            # varies based on the tip
+            # right now it's accounted for via plunge depth
+            # TODO: Need to talk about containers z positioning
+            tip_plunge = 6
+
             # Dip into tip and pull it up
-            pass
+            for _ in range(3):
+                self.robot.move_head(z=-tip_plunge, mode='relative')
+                self.robot.move_head(z=tip_plunge, mode='relative')
 
-        description = "Picking up tip from {0}".format(str(location))
+            self.plunger.wait_for_arrival()
+            self.robot.home('z')
+        description = "Picking up tip from {0}".format(
+            (humanize_location(location) if location else '<In Place>')
+        )
         self.robot.add_command(Command(do=_do, description=description))
-
-        # TODO: actual plunge depth for picking up a tip
-        # varies based on the tip
-        # right now it's accounted for via plunge depth
-        # TODO: Need to talk about containers z positioning
-
-        tip_plunge = 6
-
-        placeable, coordinates = containers.unpack_location(location)
-        if isinstance(location, Placeable):
-            coordinates = placeable.from_center(x=0, y=0, z=-1)
-        pressed_into_tip = coordinates + (0, 0, -tip_plunge)
-
-        self.move_to((placeable, coordinates))
-        for _ in range(3):
-            self.go_to((placeable, pressed_into_tip))
-            self.go_to((placeable, coordinates))
-
         return self
 
     def drop_tip(self, location=None):
-        if location:
-            self.move_to_bottom(location)
-
         def _do():
+            nonlocal location
+            if location:
+                self.go_to_bottom(location)
+
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
+            self.current_volume = 0
 
-        description = "Drop_tip at {}".format(str(location))
+        description = "Drop_tip at {}".format(
+            (humanize_location(location) if location else '<In Place>')
+        )
         self.robot.add_command(Command(do=_do, description=description))
-        self.current_volume = 0
         return self
 
     def calibrate(self, position):
@@ -361,9 +363,9 @@ class Pipette(object):
             raise ValueError(
                 "Pipette {} not calibrated.".format(self.axis)
             )
-        percent = self._volume_percentage(volume)
+        (percent, warnings) = self._volume_percentage(volume)
         travel = self.positions['bottom'] - self.positions['top']
-        return travel * percent
+        return (travel * percent, warnings)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -371,15 +373,15 @@ class Pipette(object):
         We use this to calculate what actual position the plunger axis
         needs to be at in order to achieve the correct volume of liquid.
         """
+        warning_msg = None
         if volume < 0:
-            raise IndexError("Volume must be a positive number.")
+            warning_msg = "Volume must be a positive number."
         if volume > self.max_volume:
-            raise IndexError("{}µl exceeds maximum volume.".format(volume))
+            warning_msg = "{}µl exceeds maximum volume.".format(volume)
         if volume < self.min_volume:
-            # TODO: down raise exception, but notify user with a warning
-            pass
+            warning_msg = "{}µl is too small.".format(volume)
 
-        return volume / self.max_volume
+        return (volume / self.max_volume, warning_msg)
 
     def delay(self, seconds):
         def _do():

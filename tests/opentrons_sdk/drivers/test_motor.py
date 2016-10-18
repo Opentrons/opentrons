@@ -1,4 +1,4 @@
-from threading import (Thread, Event)
+from threading import Thread
 import unittest
 
 from opentrons_sdk.drivers.motor import CNCDriver
@@ -45,20 +45,16 @@ class OpenTronsTest(unittest.TestCase):
     def test_pause_resume(self):
         self.motor.home()
 
-        self.motor.resume()
-
-        done = Event()
-        done.clear()
+        self.motor.pause()
 
         def _move_head():
             self.motor.move_head(x=100, y=0, z=0)
-            done.set()
 
         thread = Thread(target=_move_head)
         thread.start()
 
         self.motor.resume()
-        done.wait()
+        thread.join()
 
         coords = self.motor.get_head_position()
         expected_coords = {
@@ -72,18 +68,15 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor.pause()
 
-        done = Event()
-        done.clear()
-
         def _move_head():
             self.motor.move_head(x=100, y=0, z=0)
-            done.set()
 
         thread = Thread(target=_move_head)
         thread.start()
 
         self.motor.stop()
-        done.wait()
+
+        thread.join()
 
         coords = self.motor.get_head_position()
         expected_coords = {

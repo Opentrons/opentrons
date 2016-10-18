@@ -61,6 +61,8 @@ class PipetteTest(unittest.TestCase):
             self.plate[1]
         ]
 
+        self.robot.run()
+
         self.assertEquals(self.p200.placeables, expected)
 
     def test_unpack_location(self):
@@ -247,13 +249,15 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 0.0}
         )
 
-    def test_invalid_aspirate(self):
-        self.assertRaises(RuntimeWarning, self.p200.aspirate, 500)
+    def test_aspirate_invalid_max_volume(self):
+        with self.assertRaises(RuntimeWarning):
+            self.p200.aspirate(500)
+            self.robot.run()
 
     def test_dispense(self):
         self.p200.aspirate(100)
         self.p200.dispense(20)
-
+        #
         self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
@@ -275,9 +279,7 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_blow_out(self):
-
         self.p200.blow_out()
-
         self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
@@ -389,16 +391,14 @@ class PipetteTest(unittest.TestCase):
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
         # so that you have liquid
-        self.p200.current_volume = 100
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
-        self.p200.mix()
+        self.p200.mix(100, self.plate[1], 3)
         self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(100),
                 mock.call.dispense(100),
                 mock.call.dispense(100),
                 mock.call.dispense(100)
@@ -407,31 +407,30 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(100),
+                mock.call.aspirate(volume=100, location=self.plate[1]),
                 mock.call.aspirate(100),
                 mock.call.aspirate(100)
             ]
         )
 
-        def test_mix_with_args(self):
-            self.p200.current_volume = 100
-            self.p200.aspirate = mock.Mock()
-            self.p200.dispense = mock.Mock()
-            self.p200.mix(volume=50, repetitions=2)
-            self.robot.run()
+    def test_mix_with_args(self):
+        self.p200.current_volume = 100
+        self.p200.aspirate = mock.Mock()
+        self.p200.dispense = mock.Mock()
+        self.p200.mix(volume=50, repetitions=2)
+        self.robot.run()
 
-            self.assertEqual(
-                self.p200.dispense.mock_calls,
-                [
-                    mock.call.dispense(50),
-                    mock.call.dispense(50),
-                    mock.call.dispense(50)
-                ]
-            )
-            self.assertEqual(
-                self.p200.aspirate.mock_calls,
-                [
-                    mock.call.aspirate(50),
-                    mock.call.aspirate(50)
-                ]
-            )
+        self.assertEqual(
+            self.p200.dispense.mock_calls,
+            [
+                mock.call.dispense(50),
+                mock.call.dispense(50)
+            ]
+        )
+        self.assertEqual(
+            self.p200.aspirate.mock_calls,
+            [
+                mock.call.aspirate(volume=50, location=None),
+                mock.call.aspirate(50)
+            ]
+        )

@@ -21,6 +21,11 @@ def unpack_location(location):
     return (placeable, Vector(coordinates))
 
 
+def humanize_location(location):
+    well, _ = unpack_location(location)
+    return str(well)
+
+
 class Placeable(object):
 
     def __init__(self, parent=None, properties=None):
@@ -178,6 +183,9 @@ class Placeable(object):
     def get_child_by_name(self, name):
         return self.children_by_name[name]
 
+    def has_children(self):
+        return len(self.children_by_reference) > 0
+
     def size(self):
         return Vector(
             self.x_size(),
@@ -252,15 +260,15 @@ class Placeable(object):
 
 
 class Deck(Placeable):
-    def containers(self) -> list:
+    def containers(self) -> dict:
         containers = []
         for slot in self:
             for container in slot:
                 containers.append(container)
-        return containers
+        return {c.get_name(): c for c in containers}
 
     def has_container(self, query):
-        return query in self.containers()
+        return query in self.containers().values()
 
 
 class Well(Placeable):

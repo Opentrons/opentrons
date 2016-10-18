@@ -1,0 +1,317 @@
+{
+	"info": {
+		"name" : "8 Sample PCR",
+		"description" : "8 PCRs from the same DNA sample",
+		"create-date" : "August 20th, 2015",
+		"version" : "1.0",
+		"run-notes" : "Master Mix (Micro_Tube_Rack A1), DNA (Micro_Tube_Rack B1), Taq (Micro_Tube_rack C1), PCR samples (PCR_plate A1-H1)"
+	},
+
+	"deck": {
+        "p10-rack" : {
+            "labware" : "tiprack-10ul",
+            "slot" : "C2"
+        },
+        "p200-rack" : {
+        	"labware" : "tiprack-200ul",
+        	"slot" : "A1"
+        },
+        "PCR_plate" : {
+            "labware" : "96-PCR-tall",
+            "slot" : "C1"
+        },
+        "Micro_Tube_Rack" : {
+            "labware": "tube-rack-2ml",
+            "slot" :  "E1"
+        },
+        "trash" : {
+        	"labware" : "point",
+        	"slot" : "B2"
+		}
+	},
+
+	"head" : {
+        "p200": {
+            "tool": "pipette", 
+            "tip-racks": [
+                {
+                    "container": "p200-rack"
+                }
+            ], 
+            "trash-container": {
+                "container": "trash"
+            }, 
+            "multi-channel": false, 
+            "axis": "b", 
+            "volume": 200, 
+            "down-plunger-speed": 300, 
+            "up-plunger-speed": 500, 
+            "tip-plunge": 6, 
+            "extra-pull-volume": 0, 
+            "extra-pull-delay": 200, 
+            "distribute-percentage": 0.1, 
+            "points": [
+                {
+                    "f1": 1, 
+                    "f2": 1
+                }, 
+                {
+                    "f1": 5, 
+                    "f2": 5
+                }, 
+                {
+                    "f1": 7, 
+                    "f2": 7
+                }, 
+                {
+                    "f1": 10, 
+                    "f2": 10
+                }
+            ]
+        },
+        
+		"p10" : {
+			"tool" : "pipette",
+			"tip-racks" : [
+				{
+					"container" : "p10-rack"
+				}
+			],
+
+			"trash-container" : {
+				"container" : "trash"
+			},
+			"multi-channel" : false,
+			"axis" : "a",
+			"volume" : 10,
+			"down-plunger-speed" : 300,
+			"up-plunger-speed" : 500,
+			"tip-plunge" : 7,
+			"extra-pull-volume" : 0,
+			"extra-pull-delay" : 200,
+			"distribute-percentage" : 0.1,
+			"points" : [
+				{
+					"f1" : 1,
+					"f2" : 1
+				},
+				{
+					"f1" : 5,
+					"f2" : 5
+				},
+				{
+					"f1" : 7,
+					"f2" : 7
+				},
+				{
+					"f1" : 10,
+					"f2" : 10
+				}
+			]
+		}
+	},
+
+	"ingredients" : {
+	},
+	
+	"instructions" : [
+		{
+			"tool" : "p200",
+			"groups": [
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "A1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "B1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "C1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "D1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "E1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "F1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "G1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						},
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "A1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "H1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 23,"blowout" : true
+						}
+					]
+				}
+			]
+		},
+        {
+            "tool" : "p10",
+            "groups" : [
+                {
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "A1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "B1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "C1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "D1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "E1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "F1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "G1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "B1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "H1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "A1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "B1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "C1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "D1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "E1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "F1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "G1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				},
+				{
+					"transfer" : [
+						{
+							"from" : {"container" : "Micro_Tube_Rack","location": "C1","tip-offset" : 0,"delay" : 0,"liquid-tracking" : true},
+							"to" : {"container" : "PCR_plate","location" : "H1","liquid-tracking" : false,"touch-tip" : false},
+							"volume" : 1,"blowout" : true
+						}
+					]
+				}
+			]
+		}
+	]
+}

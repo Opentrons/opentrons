@@ -18,6 +18,7 @@ class Robot(object):
     def __init__(self, driver_instance=None):
         self._commands = []
         self._handlers = []
+        self._runtime_warnings = []
 
         self.can_pop_command = Event()
         self.can_pop_command.set()
@@ -51,6 +52,9 @@ class Robot(object):
     def add_instrument(self, axis, instrument):
         axis = axis.upper()
         self._instruments[axis] = instrument
+
+    def add_warning(self, warning_msg: str):
+        self._runtime_warnings.append(warning_msg)
 
     def get_mosfet(self, mosfet_index):
         robot_self = self
@@ -164,21 +168,30 @@ class Robot(object):
                 self._driver.move_head(
                     x=coordinates[0],
                     y=coordinates[1],
-                    z=coordinates[2])
+                    z=coordinates[2]
+                )
 
         if now:
             _do()
         else:
             self.add_command(Command(do=_do))
 
+    def move_to_top(self, location, instrument=None, create_path=True):
+        placeable, coordinates = containers.unpack_location(location)
+        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
+        self.move_to(top_location, instrument, create_path)
+
     @property
     def actions(self):
         return copy.deepcopy(self._commands)
 
     def run(self):
+        self._runtime_warnings = []
         while self.can_pop_command.wait() and self._commands:
             command = self._commands.pop(0)
 
+            # print("Executing:", command.description)
+            log.info("Executing:", command.description)
             if command.description:
                 print("Executing:", command.description)
                 log.info("Executing:", command.description)
@@ -187,6 +200,7 @@ class Robot(object):
             except KeyboardInterrupt as e:
                 self._driver.halt()
                 raise e
+        return self._runtime_warnings
 
     def disconnect(self):
         if self._driver:
@@ -277,9 +291,6 @@ class Robot(object):
 
     def clear(self):
         self._commands = []
-        self.can_pop_command.set()
-        self._driver.stop()
-        print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
         self.can_pop_command.clear()

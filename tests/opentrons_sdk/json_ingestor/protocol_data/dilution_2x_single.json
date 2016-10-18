@@ -1,0 +1,352 @@
+{
+    "info": {
+        "name": "2 X Serial Dilution", 
+        "description": "", 
+        "create-date": "September 3, 2015", 
+        "version": "1.0", 
+        "run-notes": ""
+    }, 
+    "deck": {
+        "p200-rackL": {
+            "labware": "tiprack-200ul",
+            "slot" : "A1"
+        },
+        "p200-rack": {
+            "labware": "tiprack-200ul",
+            "slot" : "A2"
+        },
+        "standards": {
+            "labware": "96-PCR-flat",
+            "slot" : "C1"
+        }, 
+        "trough": {
+            "labware": "trough-12row",
+            "slot" : "C3"
+        }, 
+        "trash": {
+            "labware": "point",
+            "slot" : "B2"
+        }, 
+        "initial": {
+            "labware": "tube-rack-.75ml",
+            "slot" : "E1"
+        }
+    }, 
+    "head" : {
+        "p200" : {
+        "tool" : "pipette",
+        "tip-racks" : [
+            {
+                "container" : "p200-rack"
+            }
+        ],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": true,
+            "axis": "a",
+            "volume": 200,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        },
+        "p200L" : {
+        "tool" : "pipette",
+        "tip-racks" : [
+            {
+                "container" : "p200-rackL"
+            }
+        ],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "b",
+            "volume": 200,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 500,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        }
+    },
+    
+    "ingredients": {
+
+    },
+
+    "instructions": [
+        {
+            "tool": "p200", 
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "trough", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "B1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "tool": "p200L", 
+            "groups": [
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "initial", 
+                                "location": "A1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "B1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "B1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "standards", 
+                                "location": "B1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "C1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "C1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "standards", 
+                                "location": "C1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "D1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "D1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "standards", 
+                                "location": "D1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "E1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "E1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "standards", 
+                                "location": "E1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "F1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "F1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "standards", 
+                                "location": "F1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "G1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "G1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }, 
+                {
+                    "transfer": [
+                        {
+                            "from": {
+                                "container": "standards", 
+                                "location": "G1", 
+                                "touch-tip": false
+                            }, 
+                            "to": {
+                                "container": "standards", 
+                                "location": "H1", 
+                                "touch-tip": false
+                            }, 
+                            "volume": 50
+                        }
+                    ]
+                }, 
+                {
+                    "mix": [
+                        {
+                            "container": "standards", 
+                            "location": "H1", 
+                            "volume": 30, 
+                            "repititions": 5, 
+                            "blowout": true, 
+                            "liquid-tracking": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "deck" : {
+        "trash" : {
+            "labware" : "point",
+            "slot" : "B2"
+        }
+    },
+
+    "head" : {
+        
+    },
+    
+    "ingredients" : {
+
+    },
+
+    "instructions" : [
+        {
+            
+        }
+    ]
+}
