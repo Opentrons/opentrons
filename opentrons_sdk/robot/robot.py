@@ -130,7 +130,6 @@ class Robot(object):
 
     def add_command(self, command):
         if command.description:
-            print("Enqueing:", command.description)
             log.info("Enqueing:", command.description)
         self._commands.append(command)
 
@@ -190,10 +189,8 @@ class Robot(object):
         while self.can_pop_command.wait() and self._commands:
             command = self._commands.pop(0)
 
-            # print("Executing:", command.description)
             log.info("Executing:", command.description)
             if command.description:
-                print("Executing:", command.description)
                 log.info("Executing:", command.description)
             try:
                 command.do()
