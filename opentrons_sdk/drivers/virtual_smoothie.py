@@ -15,9 +15,10 @@ class VirtualSmoothie(object):
             self.coordinates['current'][axis] = 0.0
             self.coordinates['target'][axis] = 0.0
 
-    def __init__(self, version, settings):
-        self.settings = settings
-        self.version = version
+    def __init__(self, settings):
+        self.limit_switches = settings['limit_switches']
+        self.config = settings['config']
+        self.version = settings['firmware']
         self.responses = []
         self.absolute = True
         self.is_open = False
@@ -104,6 +105,7 @@ class VirtualSmoothie(object):
         return 'ok'
 
     def process_move_command(self, arguments):
+        # import pdb; pdb.set_trace()
 
         if not self.absolute:
             for axis in arguments.keys():
@@ -113,7 +115,7 @@ class VirtualSmoothie(object):
 
         axis_hit = None
         for axis in 'xyzab':
-            if self.coordinates['target'][axis] < 0:
+            if self.coordinates['target'][axis] < 0 and self.limit_switches:
                 axis_hit = 'min_' + axis
                 self.endstop[axis_hit] = 1
                 break
@@ -125,7 +127,7 @@ class VirtualSmoothie(object):
             if axis in arguments:
                 self.speed['plunger'][axis.lower()] = arguments[axis]
 
-        if axis_hit:
+        if axis_hit and self.limit_switches:
             return 'ok\n{"limit":"' + axis_hit + '"}'
         return 'ok'
 
@@ -154,8 +156,8 @@ class VirtualSmoothie(object):
     def process_config_get(self, arguments):
         folder = arguments[0]
         setting = arguments[1]
-        if setting in self.settings:
-            value = self.settings[setting]
+        if setting in self.config:
+            value = self.config[setting]
             return '{0}: {1} is set to {2}'.format(folder, setting, value)
         else:
             return '{0}: {1} is not in config'.format(folder, setting)
@@ -164,7 +166,7 @@ class VirtualSmoothie(object):
         folder = arguments[0]
         setting = arguments[1]
         value = arguments[2]
-        self.settings[setting] = value
+        self.config[setting] = value
         return '{0}: {1} has been set to {2}'.format(
             folder, setting, value)
 

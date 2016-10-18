@@ -18,15 +18,15 @@ def flip_coordinates(coordinates, dimensions):
     return (x, y_size - y, z_size - z)
 
 
-def break_down_travel(p1, p2=Vector(0, 0, 0), increment=5, mode='absolute'):
+def break_down_travel(p1, target, increment=5, mode='absolute'):
     """
-    given two points p1 and p2, this returns a list of
+    given two points p1 and target, this returns a list of
     incremental positions or relative steps
     """
 
-    heading = p2 - p1
+    heading = target - p1
     if mode == 'relative':
-        heading = p1
+        heading = target
     length = heading.length()
 
     length_steps = length / increment

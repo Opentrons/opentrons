@@ -14,8 +14,19 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor = CNCDriver()
 
+        settings = {
+            'limit_switches': True,
+            'firmware': 'v1.0.5',
+            'config': {
+                'ot_version': 'one_pro',
+                'version': 'v1.0.3',        # config version
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0
+            }
+        }
+
         myport = self.motor.VIRTUAL_SMOOTHIE_PORT
-        success = self.motor.connect(myport)
+        success = self.motor.connect(myport, settings)
         self.assertTrue(success)
 
     def tearDown(self):
