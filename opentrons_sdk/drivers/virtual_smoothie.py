@@ -105,7 +105,6 @@ class VirtualSmoothie(object):
         return 'ok'
 
     def process_move_command(self, arguments):
-        # import pdb; pdb.set_trace()
 
         if not self.absolute:
             for axis in arguments.keys():
