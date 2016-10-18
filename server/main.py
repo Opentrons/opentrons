@@ -220,6 +220,15 @@ def get_placeables():
         'data': data
     })
 
+@app.route('/home/<axis>')
+def home(axis):
+    result = robot.home(axis)
+    return flask.jsonify({
+        'status': 200,
+        'data': result
+    })
+
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')

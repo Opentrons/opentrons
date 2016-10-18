@@ -32,7 +32,8 @@ button {
     color: $primary-black;
     &:hover {
         background-color: lighten($primary-brand, 30%);
-    }
+    };
+    cursor: pointer;
 }
 
 .btn-full {
@@ -167,5 +168,3 @@ button {
     opacity: 0.1;
     pointer-events: none;
 }
-
-

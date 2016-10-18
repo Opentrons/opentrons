@@ -31,7 +31,6 @@ export default {
   },
   data: function () {
     return {
-    next: "/",
     prev: "/connect"
     }
   },
@@ -44,6 +43,13 @@ export default {
     },
     errors () {
       return this.$store.state.errors
+    },
+    next (){
+      if ( this.$store.state.tasks[0]){
+        return this.$store.state.tasks[0].placeables[0].href
+      }else{
+        return '/'
+      }
     }
   },
   methods: {
@@ -58,10 +64,10 @@ export default {
     },
     uploadProtocol(event) {
       var target = event.target
-      console.log(target.fileName)
       this.$store.dispatch("uploadProtocol", target)
       this.$store.dispatch("updateTasks", target)
-    }
+      }
+  
   }
 }
 </script>
