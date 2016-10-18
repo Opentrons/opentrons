@@ -13,7 +13,7 @@ class JSONIngestorTestCase(unittest.TestCase):
         self.protocol = None
 
     def get_protocol(self):
-        protocol =  """{
+        protocol = """{
             "deck": {
                 "p200-rack": {
                     "labware": "tiprack-200ul",

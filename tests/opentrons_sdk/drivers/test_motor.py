@@ -1,4 +1,4 @@
-from threading import (Thread, Event)
+from threading import Thread
 import unittest
 
 from opentrons_sdk.drivers.motor import CNCDriver
@@ -54,7 +54,6 @@ class OpenTronsTest(unittest.TestCase):
         thread.start()
 
         self.motor.resume()
-        
         thread.join()
 
         coords = self.motor.get_head_position()

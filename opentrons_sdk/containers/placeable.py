@@ -26,7 +26,6 @@ def humanize_location(location):
     return str(well)
 
 
-
 class Placeable(object):
 
     def __init__(self, parent=None, properties=None):

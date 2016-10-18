@@ -174,12 +174,10 @@ class Robot(object):
         else:
             self.add_command(Command(do=_do))
 
-
     def move_to_top(self, location, instrument=None, create_path=True):
         placeable, coordinates = containers.unpack_location(location)
         top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
         self.move_to(top_location, instrument, create_path)
-
 
     @property
     def actions(self):
@@ -291,20 +289,6 @@ class Robot(object):
 
     def clear(self):
         self._commands = []
-
-    def pause(self):
-        # This method is for API use only - in a user protocol,
-        # it will jump the queue, which is counterintuitive
-        # and not very useful.
-        def _do():
-            pass
-            # print("Paused")
-
-        description = "Pausing"
-        self.prepend_command(Command(do=_do, description=description))
-        self.can_pop_command.set()
-        self._driver.stop()
-        print('Robot ready to enqueue and execute new commands')
 
     def pause(self):
         self.can_pop_command.clear()

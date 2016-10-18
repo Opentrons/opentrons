@@ -60,7 +60,9 @@ class JSONProtocolProcessor(object):
         self.errors.extend(errors)
 
         if errors:
-            raise JSONProcessorValidationError('Errors encountered compiling JSON')
+            raise JSONProcessorValidationError(
+                'Errors encountered compiling JSON'
+            )
 
     def process(self):
         try:
@@ -133,8 +135,8 @@ class JSONProtocolProcessor(object):
                 container_type = definition.get('labware')
             except KeyError:
                 raise JSONProcessorRuntimeError(
-                    'Labware and Slot are required items for "{}" container definition'
-                    .format(container_label)
+                    'Labware and Slot are required items for "{}" container '
+                    'definition'.format(container_label)
                 )
 
             slot = definition.get('slot')
