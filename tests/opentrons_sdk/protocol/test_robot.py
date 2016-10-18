@@ -9,7 +9,18 @@ class RobotTest(unittest.TestCase):
     def setUp(self):
         Robot.reset()
         self.robot = Robot.get_instance()
-        self.robot.connect()
+
+        options = {
+            'limit_switches': True,
+            'firmware': 'v1.0.5',
+            'config': {
+                'ot_version': 'one_pro',
+                'version': 'v1.0.3',        # config version
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0
+            }
+        }
+        self.robot.connect(options=options)
         self.robot.home(now=True)
         self.robot.clear()
 

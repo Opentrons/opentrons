@@ -15,7 +15,7 @@ class HelpersTest(unittest.TestCase):
         self.assertEquals(len(res), 5)
 
         p1 = Vector(10, -12, 14)
-        res = break_down_travel(p1, mode='relative')
+        res = break_down_travel(Vector(0, 0, 0), p1, mode='relative')
         expected = Vector(
             0.46537410754407676,
             -0.5584489290528921,

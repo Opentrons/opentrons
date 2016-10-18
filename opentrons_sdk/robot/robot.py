@@ -100,7 +100,7 @@ class Robot(object):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
-    def connect(self, port=None):
+    def connect(self, port=None, options=None):
         """
         Connects the motor to a serial port.
 
@@ -109,7 +109,7 @@ class Robot(object):
         """
         if not port:
             port = self._driver.VIRTUAL_SMOOTHIE_PORT
-        return self._driver.connect(port)
+        return self._driver.connect(port, options)
 
     def home(self, *args, **kwargs):
         def _do():
@@ -283,6 +283,7 @@ class Robot(object):
 
     def add_container(self, slot, container_name, label):
         container = containers.get_legacy_container(container_name)
+        container.properties['type'] = container_name
         self._deck[slot].add(container, label)
         return container
 

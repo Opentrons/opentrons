@@ -9,10 +9,16 @@ class VirtualSmoothieTestCase(unittest.TestCase):
 
     def setUp(self):
         settings = {
-            'ot_version': 'one_pro',
-            'alpha_steps_per_mm': 80.0
+            'limit_switches': True,
+            'firmware': 'v1.0.5',
+            'config': {
+                'ot_version': 'one_pro',
+                'version': 'v1.0.3',        # config version
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0
+            }
         }
-        self.s = VirtualSmoothie('v1.0.5', settings)
+        self.s = VirtualSmoothie(settings)
 
     def test_version(self):
         self.s.write('version')
