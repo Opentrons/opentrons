@@ -13,12 +13,12 @@
       <header class="controls">
         <nav class="home">
           <span class="label">HOME: </span>
-          <a href="#" class="btn-home">X</a>
-          <a href="#" class="btn-home">Y</a>
-          <a href="#" class="btn-home">Z</a>
-          <a href="#" class="btn-home">A</a>
-          <a href="#" class="btn-home">B</a>
-          <a href="#" class="btn-home">ALL</a>
+          <span @click="home('x')" class="btn-home">X</span>
+          <span @click="home('y')" class="btn-home">Y</span>
+          <span @click="home('z')" class="btn-home">Z</span>
+          <span @click="home('a')" class="btn-home">A</span>
+          <span @click="home('b')" class="btn-home">B</span>
+          <span @click="home('\'\'')" class="btn-home">ALL</span>
         </nav>
         <nav class="tabs">
           <a href="#" class="tab active">Protocol</a>
@@ -45,6 +45,18 @@ export default {
   data () {
     return {
       message: 'Opentrons App'
+    }
+  },
+  methods: {
+    home(axis) {
+      // console.log(typeof(axis))
+      this.$http
+          .get(`/home/${axis}`)
+          .then((response) => {
+              console.log(`Homing ${axis}`)
+          }, (response) => {
+              console.log('failed to home', response)
+          })
     }
   }
 }
