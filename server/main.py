@@ -267,7 +267,7 @@ def get_placeables():
     })
 
 @app.route('/home/<axis>')
-def whatever():
+def home(axis):
     result = robot.home(axis)
     return flask.jsonify({
         'status': 200,
