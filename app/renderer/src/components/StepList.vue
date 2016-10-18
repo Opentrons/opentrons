@@ -1,40 +1,63 @@
 <template>
   <ul>
-    <li :class="{'completed': task.completed}" v-for="task in tasks">
-      <router-link v-bind:to="task.href">{{task.title}}</router-link>
+    <li v-for="task in default_tasks">
+      <router-link v-bind:to="task.href" :class="{'completed': task.completed}">
+        {{task.title}}
+      </router-link>
+    </li>
+
+<!--     <hr v-if="tasks.length > 0">
+ -->
+    <span v-for="instrument in tasks">
+
+      <li v-for="placeable in instrument.placeables">
+        <ul>
+          <li>
+            <router-link v-bind:to="placeable.href" :class="{'completed': placeable.completed}" exact>
+              {{placeable.label}}
+           </router-link>
+          </li>
+        </ul>
+      </li>
+    </span>
+<!-- 
+    <hr v-if="tasks.length > 0">
+ -->
+    <li v-for="instrument in tasks">
+      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.completed}" exact>
+        Calibrate {{instrument.label}}
+      </router-link>
     </li>
   </ul>
 </template>
 
 <script>
-  function tasks() {
-      return [{
-          title: 'connect to robot',
-          completed: true,
-          href: '/connect'
-      }, {
-          title: 'upload a protocol',
-          completed: false,
-          href: '/upload'
-      }, {
-          title: 'calibrate instruments',
-          completed: false,
-          href: '/'
-      }, {
-          title: 'calibrate pipettes',
-          completed: false,
-          href: '/'
-      }, {
-          title: 'review calibration',
-          completed: false,
-          href: '/'
-      }]
-  }
-
   export default {
     name: 'StepList',
-    data() {
-      return { tasks: tasks() }
+    data: function() {
+      return {
+        default_tasks: [
+          {
+            title: 'connect to robot',
+            completed: false,
+            href: '/connect'
+          },
+          {
+            title: 'upload a protocol',
+            completed: false,
+            href: '/upload'
+          }
+        ]
+      }
+    },
+    computed: {
+      tasks() {
+        return this.$store.state.tasks
+      },
+      completed(task){
+        // check if the component is calibrated in the store
+        return "nothing, for now"
+      }
     }
   }
 </script>

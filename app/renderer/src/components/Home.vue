@@ -4,7 +4,7 @@
       <header class="brand">
         <nav class="links">
           <ul>
-            <li>{{ message }}</li>
+            <li>OT App</li>
           </ul>
         </nav>
       </header>
@@ -39,13 +39,12 @@
 
 
 <script>
-import StepList from './StepList.vue'
-import Upload from './Upload.vue'
+import {StepList, Upload} from './export.js'
 
 export default {
   data () {
     return {
-      message: 'wooooah'
+      message: 'Opentrons App'
     }
   }
 }

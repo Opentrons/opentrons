@@ -18,16 +18,13 @@ Step List Styles
     border-left: 5px solid lighten($primary-brand,30%);
 }
 
-#step-list li.active > a:first-child {
-    font-style: italic;
-}
 
-#step-list li.active a {
+#step-list li a.router-link-active {
     background: lighten($primary-brand, 40%);
-    border-left: 5px solid $primary-brand;
+    border-left: 15px solid $primary-brand;
 }
 
-#step-list li li.active a {
+#step-list li li a.router-link-active {
     border-left: 15px solid $primary-brand;
     font-style: italic;
 }
@@ -41,5 +38,5 @@ Step List Styles
 #step-list a:hover,
 #step-list a:focus {
     background: lighten($primary-brand, 40%);
-   
+
 }

@@ -1,0 +1,7 @@
+export {default as Home} from './Home.vue'
+export {default as Connect} from './Connect.vue'
+export {default as StepList} from './StepList.vue'
+export {default as Upload} from './Upload.vue'
+export {default as Placeable} from './Placeable.vue'
+export {default as Instrument} from './Instrument.vue'
+export {default as Jog} from './Jog.vue'

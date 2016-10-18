@@ -12,47 +12,64 @@
           <input @change="onFileChange" id="uploadBtn" type="file" class="upload" />
         </div>
       </div>
-      <nav>
-        <router-link to="/" class="prev">Prev</router-link>
-        <router-link to="#info" class="help">?</router-link>
-        <router-link to="/" class="next">Next</router-link>
-      </nav>
+
+      <navigation :prev="prev" :next="next"></navigation>
     </section>
-    <div id="info" class="infoModal">
-      <div> <a href="#close" title="Close" class="close">X</a>
-        <h2>Title</h2>
-        <p>
-          Images would go here along with explanation text.
-        </p>
-      </div>
-    </div>
+    <!-- <span>
+      ERRORS: {{errors}}
+    </span> -->
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'Upload',
-    computed: {
-      fileName () {
-        return this.$store.state.current_protocol_name
-      }
+import Navigation from './Navigation.vue'
+
+export default {
+  name: 'Upload',
+  components: {
+    Navigation
+  },
+  data: function () {
+    return {
+    prev: "/connect"
+    }
+  },
+  computed: {
+    fileName () {
+      return this.$store.state.current_protocol_name
     },
-    methods: {
-      onFileChange(e) {
-        var files = e.target.files || e.dataTransfer.files
-        if (!files.length)
-          return;
-        var reader = new FileReader();
-        reader.fileName = files[0].name
-        reader.onload = this.uploadProtocol
-        reader.readAsText(files[0], 'UTF-8');
-      },
-      uploadProtocol(event) {
-        var target = event.target
-        this.$store.dispatch("uploadProtocol", target)
+    connected () {
+      return this.$store.state.is_connected
+    },
+    errors () {
+      return this.$store.state.errors
+    },
+    next (){
+      if ( this.$store.state.tasks[0]){
+        return this.$store.state.tasks[0].placeables[0].href
+      }else{
+        return '/'
       }
     }
+  },
+  methods: {
+    onFileChange(e) {
+      var files = e.target.files || e.dataTransfer.files
+      if (!files.length)
+        return;
+      var reader = new FileReader();
+      reader.fileName = files[0].name
+      reader.onload = this.uploadProtocol
+      reader.readAsText(files[0], 'UTF-8');
+    },
+    uploadProtocol(event) {
+      var target = event.target
+      this.$store.dispatch("uploadProtocol", target)
+      this.$store.dispatch("updateTasks", target)
+      }
+  
   }
+}
 </script>
 
 <style>

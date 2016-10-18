@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 import sys
 import time
@@ -8,12 +9,12 @@ sys.path.insert(0, os.path.abspath('..'))
 import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
+from flask_cors import CORS, cross_origin
 
 from opentrons_sdk.robot import Robot
 
 from server.helpers import get_frozen_root
 from server.process_manager import run_once
-
 
 
 TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
@@ -24,7 +25,10 @@ app = Flask(__name__,
             static_folder=STATIC_FOLDER,
             template_folder=TEMPLATES_FOLDER
             )
+CORS(app)
 app.jinja_env.autoescape = False
+# Only allow JSON and Python files
+app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
 
@@ -33,12 +37,49 @@ robot = Robot.get_instance()
 def welcome():
     return render_template("index.html")
 
+# Check uploaded file is allowed file type: JSON or Python
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
 @app.route("/upload", methods=["POST"])
 def upload():
-    print(request.data)
-    # this should eventually process the protocol for errors
-    return request.data
+    file = json.loads(request.data.decode('utf-8'))['file']
+    filename = json.loads(request.data.decode('utf-8'))['filename']
+    filetype = filename.rsplit('.', 1)[1]
 
+    protocol_path = os.path.join(os.getcwd(), "protocols", filename)
+    header = "from opentrons_sdk import containers\nfrom opentrons_sdk.labware import instruments\n"
+    with open(protocol_path, 'w') as file_:
+        file_.write(header)
+        file_.write(file)
+
+    errors = lintProtocol(protocol_path, filetype)
+    #create deepcopy, run on virtual smoothie w/
+    #fake calibration data, return any errors
+
+    if errors:
+        data = errors
+    else:
+        data = "No errors :)"
+
+    return flask.jsonify({
+            'status': 200,
+            'data': data
+        })
+
+def lintProtocol(protocol_path, filetype):
+    from pylint import epylint as lint
+    if filetype == "py":
+        # this is where the virtual smoothie gets run w/ fake calibration data
+        # this stuff beneath is for pylint
+        config_file = os.path.join(os.getcwd(), "pylintrc")
+        # command = '{0} --rcfile={1}'.format(protocol_path, config_file)
+        # (pylint_stdout, pylint_stderr) = lint.py_run(command, return_std=True)
+        # return(pylint_stdout.getvalue(), pylint_stderr.getvalue())
+    elif filetype == "json":
+        #lint, convert to python, lint again
+        pass
 
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
@@ -92,7 +133,7 @@ def connect_robot():
                  'is_connected': robot.is_connected()
                 }
             )
-            time.sleep(1.5)
+            socketio.sleep(1.5)
 
     connection_state_watcher = socketio.start_background_task(
         watch_connection_state,
@@ -123,6 +164,114 @@ def disconnect_robot():
     return flask.jsonify({
         'status': status,
         'data': data
+    })
+
+@app.route("/instruments/placeables")
+def get_placeables():
+    data = [
+             {
+                "axis": "a",
+                "label": "p200",
+                "top": 10,
+                "bottom": 20,
+                "blowout": 25,
+                "droptip": 26,
+                "max_volume": 100,
+                "placeables": [
+                    {
+                        "type": "tiprack", # labware definition
+                        "label": "tiprack200",
+                        "x": None,
+                        "y": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    },
+                    {
+                        "type": "point", # labware definition
+                        "label": "trash",
+                        "x": None,
+                        "y": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    },
+                    {
+                        "type": "plate", # labware definition
+                        "label": "plate",
+                        "x": None,
+                        "y": None,
+                        "top": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    },
+                    {
+                        "type": "tuberack", # labware definition
+                        "label": "tuberack",
+                        "x": None,
+                        "y": None,
+                        "top": None,
+                        "bottom": None,
+                        "slot": "A1"
+                    }
+                ]
+            },
+            {
+            "axis": "b",
+            "label": "p10",
+            "top": None,
+            "bottom": None,
+            "blowout": None,
+            "droptip": None,
+            "max_volume": None,
+            "placeables": [
+                {
+                    "type": "tiprack", # labware definition
+                    "label": "tiprack200",
+                    "x": None,
+                    "y": None,
+                    "bottom": None,
+                    "slot": "A1"
+                },
+                {
+                    "type": "point", # labware definition
+                    "label": "trash",
+                    "x": None,
+                    "y": None,
+                    "bottom": None,
+                    "slot": "A1"
+                },
+                {
+                    "type": "plate", # labware definition
+                    "label": "plate",
+                    "x": None,
+                    "y": None,
+                    "top": None,
+                    "bottom": None,
+                    "slot": "A1"
+                },
+                {
+                    "type": "tuberack", # labware definition
+                    "label": "tuberack",
+                    "x": None,
+                    "y": None,
+                    "top": None,
+                    "bottom": None,
+                    "slot": "A1"
+                }
+            ]
+        }
+    ]
+
+    return flask.jsonify({
+        'status': 200,
+        'data': data
+    })
+
+@app.route('/home/<axis>')
+def whatever():
+    result = robot.home(axis)
+    return flask.jsonify({
+        'status': 200,
+        'data': result
     })
 
 

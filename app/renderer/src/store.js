@@ -1,15 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client'
+import {instrumentHref, placeableHref} from './util'
 
 Vue.use(Vuex)
 
 const state = {
     is_connected: false,
     port: null,
-    current_protocol_name: "No File Selected"
+    current_protocol_name: "No File Selected",
+    errors: "No errors",
+    tasks: []
 }
-
 
 const mutations = {
     UPDATE_ROBOT_CONNECTION (state, payload) {
@@ -18,6 +20,10 @@ const mutations = {
     },
     UPDATE_CURRENT_PROTOCOL (state, payload) {
       state.current_protocol_name = payload.current_protocol_name
+      state.errors = payload.errors
+    },
+    UPDATE_TASK_LIST (state, payload) {
+      state.tasks = payload.tasks
     }
 }
 
@@ -52,10 +58,26 @@ const actions = {
     },
     uploadProtocol ({commit}, target) {
       Vue.http
-        .post('http://localhost:5000/upload', {file: target.result})
+        .post('http://localhost:5000/upload', {file: target.result, filename: target.fileName})
         .then((response) => {
           console.log(response)
-          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName})
+          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName, 'errors': response.body.data})
+        }, (response) => {
+          console.log('failed to upload', response)
+        })
+    },
+    updateTasks ({commit}, target) {
+      Vue.http
+        .get('http://localhost:5000/instruments/placeables', {protocol: target.result})
+        .then((response) => {
+          console.log(response)
+          let tasks = response.body.data.map((instrument) => {
+            instrument.href = instrumentHref(instrument)
+            instrument.placeables.map((placeable) => {
+              placeable.href = placeableHref(placeable, instrument)
+            })
+          })
+          commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
         }, (response) => {
           console.log('failed to upload', response)
         })
@@ -65,7 +87,6 @@ const actions = {
 function createWebSocketPlugin(socket) {
   return store => {
     socket.on('event', data => {
-      console.log(data)
       if (data.type === 'connection_status') {
         if (data.is_connected === false) {
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
