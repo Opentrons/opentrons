@@ -1,16 +1,9 @@
 from collections import OrderedDict
 import json
-import os
 import unittest
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.json_ingestor import (
-    interpret_deck,
-    interpret_head,
-    interpret_instructions,
-    interpret_json_protocol,
-    JSONProtocolProcessor
-)
+from opentrons_sdk.json_ingestor import JSONProtocolProcessor
 
 
 class JSONIngestorTestCase(unittest.TestCase):
@@ -18,9 +11,6 @@ class JSONIngestorTestCase(unittest.TestCase):
         Robot.reset()
         self.robot = Robot.get_instance()
         self.protocol = None
-
-    def load_deck(self):
-        pass
 
     def get_protocol(self):
         protocol =  """{
@@ -57,113 +47,3 @@ class JSONIngestorTestCase(unittest.TestCase):
         for name, container_instance in robot_containers.items():
             self.assertEqual(
                 robot_deck[deck_dict[name]['slot']][0], container_instance)
-
-
-    # def test_interpret_head(self):
-    #     head_json = """{
-    #         "p200": {
-    #             "tool": "pipette",
-    #             "tip-racks": [
-    #                 {
-    #                     "container": "p200-rack"
-    #                 }
-    #             ],
-    #             "trash-container": {
-    #                 "container": "trash"
-    #             },
-    #             "multi-channel": false,
-    #             "axis": "b",
-    #             "volume": 200,
-    #             "down-plunger-speed": 200,
-    #             "up-plunger-speed": 500,
-    #             "tip-plunge": 6,
-    #             "extra-pull-volume": 0,
-    #             "extra-pull-delay": 200,
-    #             "distribute-percentage": 0.1,
-    #             "points": [
-    #                 {
-    #                     "f1": 1,
-    #                     "f2": 1
-    #                 },
-    #                 {
-    #                     "f1": 5,
-    #                     "f2": 5
-    #                 },
-    #                 {
-    #                     "f1": 7,
-    #                     "f2": 7
-    #                 },
-    #                 {
-    #                     "f1": 10,
-    #                     "f2": 10
-    #                 }
-    #             ]
-    #         }
-    #     }
-    #     """
-    #
-    #     robot_deck, _ = self.load_deck()
-    #     head_dict = json.loads(head_json, object_pairs_hook=OrderedDict)
-    #     head_res = interpret_head(robot_deck, head_dict)
-    #
-    #     settings = {
-    #         "tip-racks": [
-    #             self.robot._deck.containers()['p200-rack']
-    #         ],
-    #         "trash-container": self.robot._deck.containers()['trash'],
-    #         "down-plunger-speed": 200,
-    #         "up-plunger-speed": 500,
-    #         "tip-plunge": 6,
-    #         "extra-pull-volume": 0,
-    #         "extra-pull-delay": 200,
-    #         "distribute-percentage": 0.1,
-    #         "points": [
-    #             {
-    #                 "f1": 1,
-    #                 "f2": 1
-    #             },
-    #             {
-    #                 "f1": 5,
-    #                 "f2": 5
-    #             },
-    #             {
-    #                 "f1": 7,
-    #                 "f2": 7
-    #             },
-    #             {
-    #                 "f1": 10,
-    #                 "f2": 10
-    #             }
-    #         ]
-    #     }
-    #
-    #     instrument = self.robot._instruments["B"]
-    #     head_expected = {
-    #         'p200': {
-    #             'instance': instrument,
-    #             'settings': settings
-    #         }
-    #     }
-    #
-    #     self.assertDictEqual(head_expected, head_res)
-    #     self.assertEqual(1, instrument.channels)
-    #     self.assertEqual(0, instrument.min_volume)
-    #     self.assertEqual(200, instrument.max_volume)
-    #     self.assertEqual('p200', instrument.name)
-    #
-    # def test_interpret_instructions(self):
-    #     pass
-    #
-    # def test_interpret_json_protocol(self):
-    #     super_protocol_json = None
-    #     test_file_path = os.path.join(
-    #         os.path.dirname(__file__),'super_protocol.json'
-    #     )
-    #     with open(test_file_path) as f:
-    #         super_protocol_json = json.load(
-    #             f,
-    #             object_pairs_hook=OrderedDict
-    #         )
-    #     interpret_json_protocol(super_protocol_json)
-    #
-

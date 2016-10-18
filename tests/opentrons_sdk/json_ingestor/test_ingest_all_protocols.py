@@ -34,7 +34,7 @@ class AllProtocolsTestCase(unittest.TestCase):
     def read_protocol(self, root, protocol_name):
         protocol_path = os.path.join(root, protocol_name)
         with open(protocol_path) as f:
-            protocol_dict =  json.load(
+            protocol_dict = json.load(
                 f,
                 object_pairs_hook=OrderedDict
             )
