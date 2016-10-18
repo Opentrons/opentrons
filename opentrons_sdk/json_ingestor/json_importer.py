@@ -25,6 +25,7 @@ class JSONProtocolProcessor(object):
         self.head = None
         self.protocol = self.read_protocol(protocol)
 
+    @staticmethod
     def get_protocol_from_file(self, path):
         with open(path) as f:
             return json.load(f, object_pairs_hook=OrderedDict)
@@ -122,8 +123,6 @@ class JSONProtocolProcessor(object):
                 "slot" : "B2"
             }
         }
-        :param protocol:
-        :param deck_info:
         :return:
         """
 
@@ -154,9 +153,7 @@ class JSONProtocolProcessor(object):
             deck_data[container_label] = {'instance': container_obj}
         self.deck = deck_data
 
-
     def process_head(self):
-
         """
         res example:
         { name: {
@@ -164,9 +161,6 @@ class JSONProtocolProcessor(object):
             'settings': {'down-plunger-speed', '
             }
         }
-
-        :param protocol:
-        :param head_dict:
         :return:
         """
 
@@ -188,9 +182,7 @@ class JSONProtocolProcessor(object):
             'points'
         }
 
-
         head_obj = {}
-        robot = Robot.get_instance()
 
         for tool_name, tool_config in head_dict.items():
             # Validate tool_config keys
@@ -226,7 +218,9 @@ class JSONProtocolProcessor(object):
             ]['instance']
             tool_config['trash-container'] = trash_obj
 
-            tool_config['points'] = [dict(i) for i in tool_config.pop('points')]
+            tool_config['points'] = [
+                dict(i) for i in tool_config.pop('points')
+            ]
 
             head_obj[tool_name] = {
                 'instance': tool_instance,
@@ -244,8 +238,8 @@ class JSONProtocolProcessor(object):
 
         if nonexistent_tools:
             raise JSONProcessorRuntimeError(
-                'The following tools have not been defined in the "head" section'
-                ' but are being called for usage in instructions: {}'
+                'The following tools have not been defined in the "head" '
+                'section but are being called for usage in instructions: {}'
                 .format(str(nonexistent_tools))
             )
 
@@ -301,7 +295,9 @@ class JSONProtocolProcessor(object):
         for instruction_dict in instructions:
             tool_name = instruction_dict.get('tool')
             tool_obj = self.head[tool_name]['instance']
-            trash_container = self.head[tool_name]['settings']['trash-container']
+            trash_container = (
+                self.head[tool_name]['settings']['trash-container']
+            )
 
             tips = itertools.cycle(
                 itertools.chain(*self.head[tool_name]['settings']['tip-racks'])
@@ -312,15 +308,17 @@ class JSONProtocolProcessor(object):
                 tool_obj.pick_up_tip(next(tips))
 
                 for command_type, commands_calls in group.items():
-                    handler_ftn = lambda command_args: self.process_command(
+                    def handler_ftn(command_args):
+                        return self.process_command(
                             tool_obj, command_type, command_args
-                    )
+                        )
 
                     if isinstance(commands_calls, list):
-                        [handler_ftn(command_arg) for command_arg in commands_calls]
+                        [handler_ftn(command_arg)
+                         for command_arg in commands_calls]
 
-                    # Note: Distribute command does not have an array of calls but
-                    # rather a dict with the distribute call info
+                    # Note: Distribute command does not have an array of calls
+                    # but rather a dict with the distribute call info
                     elif isinstance(commands_calls, dict):
                         handler_ftn(commands_calls)
 
@@ -383,7 +381,8 @@ class JSONProtocolProcessor(object):
 
         from_location = (
             from_well,
-            from_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, from_tip_offset)
+            from_well.from_center(x=0, y=0, z=-1) +
+            vector.Vector(0, 0, from_tip_offset)
         )
 
         tool_obj.aspirate(volume + extra_pull_volume, from_location)
@@ -404,7 +403,8 @@ class JSONProtocolProcessor(object):
 
         to_location = (
             to_well,
-            to_well.from_center(x=0, y=0, z=-1) + vector.Vector(0, 0, to_tip_offset)
+            to_well.from_center(x=0, y=0, z=-1) +
+            vector.Vector(0, 0, to_tip_offset)
         )
 
         tool_obj.dispense(volume, to_location)
@@ -450,7 +450,6 @@ class JSONProtocolProcessor(object):
                 well, instrument=tool_obj, create_path=False
             )
             tool_obj.blow_out()
-
 
     def handle_consolidate(self, tool_obj, command_args):
         tool_settings = self.head[tool_obj.name]['settings']

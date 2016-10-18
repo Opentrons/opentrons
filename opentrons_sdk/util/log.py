@@ -6,12 +6,12 @@ import opentrons_sdk
 
 
 logging_config = dict(
-    version = 1,
-    formatters = {
-        'basic': {'format':
-                      '%(asctime)s %(name)s %(levelname)-8s %(message)s'}
+    version=1,
+    formatters={
+        'basic': {
+            'format': '%(asctime)s %(name)s %(levelname)-8s %(message)s'}
     },
-    handlers = {
+    handlers={
         'debug': {'class': 'logging.StreamHandler',
                   'formatter': 'basic',
                   'level': logging.DEBUG},
@@ -19,7 +19,7 @@ logging_config = dict(
                     'formatter': 'basic',
                     'level': logging.WARNING},
         },
-    root = {
+    root={
         'handlers': ['testing'],
         'level': logging.ERROR,
         },

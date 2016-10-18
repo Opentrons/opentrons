@@ -134,7 +134,6 @@ class Pipette(object):
                 volume = self.current_volume
 
             if self.current_volume - volume < 0:
-                # TODO: this should alert a Warning here, but not stop execution
                 volume = self.current_volume
 
             if location:
@@ -233,7 +232,7 @@ class Pipette(object):
 
     def touch_tip(self, location=None):
         def _do():
-            nonlocal  location
+            nonlocal location
             if location:
                 self.move_to(location)
             else:
