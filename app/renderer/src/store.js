@@ -10,7 +10,8 @@ const state = {
     port: null,
     current_protocol_name: "No File Selected",
     errors: "No errors",
-    tasks: []
+    tasks: [],
+    current_increment_placeable: 5
 }
 
 const mutations = {
@@ -24,6 +25,9 @@ const mutations = {
     },
     UPDATE_TASK_LIST (state, payload) {
       state.tasks = payload.tasks
+    },
+    UPDATE_PLACEABLE_INCREMENT (state, payload) {
+      state.current_increment_placeable = payload.current_increment_placeable
     }
 }
 
@@ -81,6 +85,10 @@ const actions = {
         }, (response) => {
           console.log('failed to upload', response)
         })
+    },
+    selectPlaceableIncrement ({commit}, inc) {
+      console.log("updating increment to " + inc)
+      commit('UPDATE_PLACEABLE_INCREMENT', {'current_increment_placeable': inc })
     }
 }
 
