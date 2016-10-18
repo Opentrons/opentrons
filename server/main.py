@@ -2,9 +2,7 @@ import logging
 import json
 import os
 import sys
-import time
 import threading
-sys.path.insert(0, os.path.abspath('..'))
 
 import flask
 from flask import Flask, render_template, request
@@ -12,10 +10,32 @@ from flask_socketio import SocketIO
 from flask_cors import CORS, cross_origin
 
 from opentrons_sdk.robot import Robot
+from opentrons_sdk.containers.placeable import Container
 
+sys.path.insert(0, os.path.abspath('..'))
 from server.helpers import get_frozen_root
 from server.process_manager import run_once
 
+class DictDiffer(object):
+    """
+    Calculate the difference between two dictionaries as:
+    (1) items added
+    (2) items removed
+    (3) keys same in both but changed values
+    (4) keys same in both and unchanged values
+    """
+    def __init__(self, current_dict, past_dict):
+        self.current_dict, self.past_dict = current_dict, past_dict
+        self.set_current, self.set_past = set(current_dict.keys()), set(past_dict.keys())
+        self.intersect = self.set_current.intersection(self.set_past)
+    def added(self):
+        return self.set_current - self.intersect 
+    def removed(self):
+        return self.set_past - self.intersect 
+    def changed(self):
+        return set(o for o in self.intersect if self.past_dict[o] != self.current_dict[o])
+    def unchanged(self):
+        return set(o for o in self.intersect if self.past_dict[o] == self.current_dict[o])
 
 TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
@@ -42,30 +62,50 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
+def load_python(stream):
+    code = ''.join([line.decode() for line in stream])
+    global robot
+    robot = robot.reset()
+    exec(code, globals(), locals())
+    robot.connect(options={'limit_switches':False})
+    robot.run()
+
+def load_json(stream):
+    pass
+
 @app.route("/upload", methods=["POST"])
 def upload():
-    file = json.loads(request.data.decode('utf-8'))['file']
-    filename = json.loads(request.data.decode('utf-8'))['filename']
-    filetype = filename.rsplit('.', 1)[1]
+    file = request.files.get('file')
+    if not file:
+        return flask.jsonify({
+            'status': 'error',
+            'data': 'File expected'
+        })
 
-    protocol_path = os.path.join(os.getcwd(), "protocols", filename)
-    header = "from opentrons_sdk import containers\nfrom opentrons_sdk.labware import instruments\n"
-    with open(protocol_path, 'w') as file_:
-        file_.write(header)
-        file_.write(file)
+    extension = file.filename.split('.')[-1].lower()
 
-    errors = lintProtocol(protocol_path, filetype)
-    #create deepcopy, run on virtual smoothie w/
-    #fake calibration data, return any errors
-
-    if errors:
-        data = errors
+    if extension == 'py':
+        load_python(file.stream)
+    elif extension == 'json':
+        load_json(file.stream)
     else:
-        data = "No errors :)"
+        return flask.jsonify({
+            'status': 'error',
+            'data': '{} is not a valid extension. Expected .py or .json'.format(extension)
+        })
+
+
+    # errors = lintProtocol(protocol_path, mimetype)
+    # #create deepcopy, run on virtual smoothie w/
+    # #fake calibration data, return any errors
+
+    # if errors:
+    #     data = errors
+    # else:
+    #     data = "No errors :)"
 
     return flask.jsonify({
-            'status': 200,
-            'data': data
+            'status': 'success'
         })
 
 def lintProtocol(protocol_path, filetype):
@@ -91,15 +131,15 @@ def script_loader(filename):
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
     return flask.jsonify({
-        'ports': robot.get_serial_ports_list()
+        'ports': Robot.get_instance().get_serial_ports_list()
     })
 
 
 @app.route("/robot/serial/is_connected")
 def is_connected():
     return flask.jsonify({
-        'is_connected': robot.is_connected(),
-        'port': robot.get_connected_port()
+        'is_connected': Robot.get_instance().is_connected(),
+        'port': Robot.get_instance().get_connected_port()
     })
 
 
@@ -111,7 +151,7 @@ def connect_robot():
     data = None
 
     try:
-        robot.connect(port)
+        Robot.get_instance().connect(port)
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -130,7 +170,7 @@ def connect_robot():
             socketio.emit(
                 'event',
                 {'type': 'connection_status',
-                 'is_connected': robot.is_connected()
+                 'is_connected': Robot.get_instance().is_connected()
                 }
             )
             socketio.sleep(1.5)
@@ -156,7 +196,7 @@ def disconnect_robot():
     data = None
 
     try:
-        robot.disconnect()
+        Robot.get_instance().disconnect()
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -168,98 +208,33 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def get_placeables():
-    data = [
-             {
-                "axis": "a",
-                "label": "p200",
-                "top": 10,
-                "bottom": 20,
-                "blowout": 25,
-                "droptip": 26,
-                "max_volume": 100,
-                "placeables": [
-                    {
-                        "type": "tiprack", # labware definition
-                        "label": "tiprack200",
-                        "x": None,
-                        "y": None,
-                        "bottom": None,
-                        "slot": "A1"
-                    },
-                    {
-                        "type": "point", # labware definition
-                        "label": "trash",
-                        "x": None,
-                        "y": None,
-                        "bottom": None,
-                        "slot": "A1"
-                    },
-                    {
-                        "type": "plate", # labware definition
-                        "label": "plate",
-                        "x": None,
-                        "y": None,
-                        "top": None,
-                        "bottom": None,
-                        "slot": "A1"
-                    },
-                    {
-                        "type": "tuberack", # labware definition
-                        "label": "tuberack",
-                        "x": None,
-                        "y": None,
-                        "top": None,
-                        "bottom": None,
-                        "slot": "A1"
-                    }
-                ]
-            },
+
+    def get_containers(instrument):
+        unique_containers = set()
+
+        for placeable in instrument.placeables:
+            containers = [c for c in placeable.get_trace() if isinstance(c, Container)]
+            unique_containers.add(containers[0])
+        return list(unique_containers)
+
+    data = [{
+        'axis': instrument.axis,
+        'label': instrument.name,
+        'top': instrument.positions['top'],
+        'bottom': instrument.positions['bottom'],
+        'blow_out': instrument.positions['blow_out'],
+        'drop_tip': instrument.positions['drop_tip'],
+        'max_volume': instrument.max_volume,
+        'placeables': [
             {
-            "axis": "b",
-            "label": "p10",
-            "top": None,
-            "bottom": None,
-            "blowout": None,
-            "droptip": None,
-            "max_volume": None,
-            "placeables": [
-                {
-                    "type": "tiprack", # labware definition
-                    "label": "tiprack200",
-                    "x": None,
-                    "y": None,
-                    "bottom": None,
-                    "slot": "A1"
-                },
-                {
-                    "type": "point", # labware definition
-                    "label": "trash",
-                    "x": None,
-                    "y": None,
-                    "bottom": None,
-                    "slot": "A1"
-                },
-                {
-                    "type": "plate", # labware definition
-                    "label": "plate",
-                    "x": None,
-                    "y": None,
-                    "top": None,
-                    "bottom": None,
-                    "slot": "A1"
-                },
-                {
-                    "type": "tuberack", # labware definition
-                    "label": "tuberack",
-                    "x": None,
-                    "y": None,
-                    "top": None,
-                    "bottom": None,
-                    "slot": "A1"
-                }
-            ]
-        }
-    ]
+                'type': placeable.properties['type'],
+                'label': placeable.get_name(),
+                'slot': placeable.get_parent().get_name(),
+                'calibrated': False
+            }
+            for placeable in get_containers(instrument)
+        ]
+    } for _, instrument in Robot.get_instance().get_instruments()]
 
     return flask.jsonify({
         'status': 200,
