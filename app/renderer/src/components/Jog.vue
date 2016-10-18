@@ -12,27 +12,19 @@
   </div>
 
   <h3 class="title">Select Increment [mm]</h3>
-  <div class="increment xyz">
-    <button data-increment="20" class="btn-full btn-group">20</button>
-    <button data-increment="10" class="btn-full btn-group">10</button>
-    <button data-increment="5" class="btn-full btn-group">5</button>
-    <button data-increment="1" class="btn-full btn-group">1</button>
-    <button data-increment="0.5" class="btn-full btn-group">0.5</button>
-    <button data-increment="0.1" class="btn-full btn-group">0.1</button>
-    <button data-increment="91" class="btn-slot">&#8596; slot-x </button>
-    <button data-increment="135" class="btn-slot">&#8597; slot-y </button>
-  </div>    
+
+    <increment></increment>
+  </div> 
 </div><!-- End Move -->
   
 </template>
 
 <script>
+import Increment from './Increment.vue'
 export default {
   name: 'Jog',
-  data: function () {
-    return {
-      increment: 1
-    }
+  components: {
+    Increment
   }
 }
 </script>
