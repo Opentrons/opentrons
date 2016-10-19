@@ -8,10 +8,13 @@ from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.robot.command import Command
-from opentrons_sdk.util import log
+from opentrons_sdk.util.log import get_logger
 
 from opentrons_sdk.helpers import helpers
 from opentrons_sdk.util.trace import traceable
+
+
+log = get_logger(__name__)
 
 
 class Robot(object):
@@ -132,9 +135,8 @@ class Robot(object):
             return device
         except serial.SerialException as e:
             log.debug(
-                "Robot",
                 "Error connecting to {}".format(port))
-            log.error("Serial", e)
+            log.error(e)
 
         return None
 
@@ -191,7 +193,7 @@ class Robot(object):
 
     def add_command(self, command):
         if command.description:
-            log.info("Enqueing:", command.description)
+            log.info("Enqueing: {}".format(command.description))
         self._commands.append(command)
 
     def prepend_command(self, command):
@@ -261,11 +263,8 @@ class Robot(object):
                     if self.stopped_event.is_set():
                         self.resume()
                         break
-                    # print("Executing:", command.description)
-                    log.info("Executing:", command.description)
                     if command.description:
-                        print("Executing:", command.description)
-                        log.info("Executing:", command.description)
+                        log.info("Executing: {}".format(command.description))
                     command.do()
                 except KeyboardInterrupt as e:
                     self._driver.halt()

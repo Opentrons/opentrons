@@ -3,6 +3,8 @@ import json
 
 from opentrons_sdk.util import log
 
+log = log.get_logger(__name__)
+
 
 class VirtualSmoothie(object):
     def init_coordinates(self):
@@ -232,7 +234,6 @@ class VirtualSmoothie(object):
             if command in command_mapping:
                 command_func = command_mapping[command]
                 log.debug(
-                    'Virtual Smoothie',
                     'Processing {} calling {}'.format(
                         parsed_command,
                         command_func.__name__))
@@ -240,7 +241,6 @@ class VirtualSmoothie(object):
                 self.insert_response(message)
             else:
                 log.error(
-                    'Virtual Smoothie',
                     'Command {} is not supported'.format(command))
 
     def write(self, data):
