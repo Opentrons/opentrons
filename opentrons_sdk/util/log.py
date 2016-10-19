@@ -25,5 +25,6 @@ logging_config = dict(
 )
 dictConfig(logging_config)
 
+
 def get_logger(name=None):
     return logging.getLogger(name)
