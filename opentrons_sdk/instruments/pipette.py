@@ -254,7 +254,6 @@ class Pipette(object):
         return self
 
     def pick_up_tip(self, location=None):
-
         def _do():
             nonlocal location
             if location:
@@ -280,7 +279,7 @@ class Pipette(object):
 
     def drop_tip(self, location=None):
         def _do():
-            # nonlocal location
+            nonlocal location
             if location:
                 self.go_to_bottom(location, now=True)
 

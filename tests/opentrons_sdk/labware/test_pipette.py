@@ -136,7 +136,6 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
-        print(current_pos)
         self.assertEqual(
             current_pos,
             Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
@@ -298,10 +297,17 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 12.0}
         )
 
+    def test_pick_up_tip(self):
+        last_well = self.tiprack[-1]
+        _, _, starting_z = self.robot._driver.get_head_position()['current']
+        well_x, well_y, _ = last_well.center(reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertTrue(current_pos == (well_x, well_y, starting_z))
+
     def test_drop_tip(self):
-
         self.p200.drop_tip()
-
         self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
