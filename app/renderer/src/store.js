@@ -55,38 +55,22 @@ const actions = {
                 console.log('Failed to communicate to backend server. Failed to connect', response)
             })
     },
-    updateTasks ({commit}) {
-      Vue.http
-        .get('http://localhost:5000/instruments/placeables')
-        .then((response) => {
-          console.log(response)
-          let tasks = response.body.data.map((instrument) => {
-            instrument.href = instrumentHref(instrument)
-            instrument.placeables.map((placeable) => {
-              placeable.href = placeableHref(placeable, instrument)
-            })
-          })
-          commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
-        }, (response) => {
-          console.log('failed to upload', response)
-        })
-    },
     updateFilename ({commit}, fileName) {
       commit('UPDATE_FILE_NAME', {'fileName': fileName})
     },
     uploadProtocol ({commit}, formData) {
-      console.log(formData.get('file'))
       Vue.http
         .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
-          let tasks = response.body.data.map((instrument) => {
+          var tasks = response.body.data.calibrations
+          tasks.map((instrument) => {
             instrument.href = instrumentHref(instrument)
             instrument.placeables.map((placeable) => {
               placeable.href = placeableHref(placeable, instrument)
             })
           })
-          commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
+          commit('UPDATE_TASK_LIST', {'tasks': tasks})
         }, (response) => {
           console.log('failed to upload', response)
         })
