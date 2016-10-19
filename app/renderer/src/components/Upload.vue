@@ -1,23 +1,19 @@
 <template>
   <div>
     <section>
-      <h2 class="title center">Upload a Protocol</h2>
-      <div class="instructions center">
+      <h2 class="title">Upload a Protocol</h2>
+      <div class="instructions">
         Upload a valid JSON or Python Protocol. Errors will display below.
       </div>
-      <div class="step step-upload">
-        <input id="uploadFile" disabled="disabled">{{fileName}}</input>
+      <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step step-upload">
         <div class="fileUpload">
-          <span>Upload</span>
-          <input @change="onFileChange" id="uploadBtn" type="file" class="upload" />
+          <span>{{fileName}}</span>
+          <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
         </div>
-      </div>
+      </form>
 
       <navigation :prev="prev" :next="next"></navigation>
     </section>
-    <!-- <span>
-      ERRORS: {{errors}}
-    </span> -->
   </div>
 </template>
 
@@ -36,7 +32,7 @@ export default {
   },
   computed: {
     fileName () {
-      return this.$store.state.current_protocol_name
+      return this.$store.state.fileName
     },
     connected () {
       return this.$store.state.is_connected
@@ -44,30 +40,31 @@ export default {
     errors () {
       return this.$store.state.errors
     },
-    next (){
-      if ( this.$store.state.tasks[0]){
+    next () {
+      if (this.$store.state.tasks[0]) {
         return this.$store.state.tasks[0].placeables[0].href
-      }else{
+      } else {
         return '/'
       }
     }
   },
   methods: {
-    onFileChange(e) {
+    fileChange(e) {
       var files = e.target.files || e.dataTransfer.files
       if (!files.length)
         return;
-      var reader = new FileReader();
-      reader.fileName = files[0].name
-      reader.onload = this.uploadProtocol
-      reader.readAsText(files[0], 'UTF-8');
+      var fileName = files[0].name
+      this.$store.dispatch("updateFilename", fileName)
+      this.uploadProtocol()
     },
-    uploadProtocol(event) {
-      var target = event.target
-      this.$store.dispatch("uploadProtocol", target)
-      this.$store.dispatch("updateTasks", target)
-      }
-  
+    uploadProtocol() {
+      let formData = new FormData();
+      formData.append("file", this.$refs.form.file.files[0])
+      // let file = this.$refs.form.file.files[0]
+      // debugger;
+      this.$store.dispatch("uploadProtocol", formData)
+      return false
+    }
   }
 }
 </script>
