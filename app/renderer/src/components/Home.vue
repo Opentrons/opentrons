@@ -53,6 +53,7 @@ export default {
       this.$http
           .get(`/home/${axis}`)
           .then((response) => {
+              console.log(response)
               console.log(`Homing ${axis}`)
           }, (response) => {
               console.log('failed to home', response)

@@ -67,7 +67,6 @@ def load_json(stream):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    # import pdb; pdb.set_trace()
     file = request.files.get('file')
 
     if not file:
@@ -234,7 +233,17 @@ def get_placeables():
 
 @app.route('/home/<axis>')
 def home(axis):
-    result = robot.home(axis)
+    result = robot.home(axis, now=True)
+    return flask.jsonify({
+        'status': 200,
+        'data': result
+    })
+
+
+@app.route('/jog', methods=["POST"])
+def jog():
+    coords = request.json
+    result = robot.move_head(mode="relative", **coords)
     return flask.jsonify({
         'status': 200,
         'data': result

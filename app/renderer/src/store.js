@@ -44,7 +44,12 @@ const actions = {
             .then((response) => {
                 console.log('successfully connected...')
                 console.log('committing with payload:', payload)
-                commit('UPDATE_ROBOT_CONNECTION', payload)
+                if (response.data.status === "success") {
+                  commit('UPDATE_ROBOT_CONNECTION', payload)
+                } else {
+                  alert('Failed to connect to robot', response.data.status)
+                }
+
             }, (response) => {
                 console.log('failed to connect', response)
             })
@@ -93,6 +98,16 @@ const actions = {
         'current_increment': data.inc,
         'type': data.type
       })
+    },
+    jog ({commit}, coords) {
+      console.log(coords)
+      Vue.http
+          .post('http://localhost:5000/jog', JSON.stringify(coords), {emulateJSON: true})
+          .then((response) => {
+            console.log("success", response)
+          }, (response) => {
+              console.log('failed', response)
+          })
     }
 }
 

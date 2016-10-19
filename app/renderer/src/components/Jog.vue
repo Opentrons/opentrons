@@ -1,25 +1,21 @@
 <template>
-
-<div class="move">
-  <h3 class="title">Jog X-Y-Z</h3>
-  <div class="jog">
-    <a href="#" data-axis="y" data-direction="neg" class="btn-full btn-y">Y</a>
-    <a href="#" data-axis="z" data-direction="neg" class="btn-full btn-z">Z</a>
-    <a href="#" data-axis="x" data-direction="neg" class="btn-full x">X</a>
-    <a href="#" data-axis="x" data-direction="pos" class="btn-full btn-x">X</a>
-    <a href="#" data-axis="y" data-direction="pos" class="btn-full btn-y">Y</a>
-    <a href="#" data-axis="z" data-direction="pos" class="btn-full btn-z">Z</a>
-  </div>
-  <h3 class="title">Select Increment [mm]</h3>
-    <div class="increment" >
-      <increment :increments="placeable_increments" :placeable="placeable"></increment>
-      <increment :increments="slot_increments" :placeable="placeable"></increment>
+  <div class="move">
+    <h3 class="title">Jog X-Y-Z</h3>
+    <div class="jog">
+      <button @click="jog('y', 1)" class="btn-full btn-y">Y</button>
+      <button @click="jog('z', 1)" class="btn-full btn-z">Z</button>
+      <button @click="jog('x', -1)" class="btn-full x">X</button>
+      <button @click="jog('x', 1)" class="btn-full btn-x">X</button>
+      <button @click="jog('y', -1)" class="btn-full btn-y">Y</button>
+      <button @click="jog('z', -1)" class="btn-full btn-z">Z</button>
     </div>
-  </div> 
-
-  
-</div><!-- End Move -->
-  
+    <h3 class="title">Select Increment [mm]</h3>
+      <div class="increment" >
+        <increment :increments="placeable_increments" :placeable="placeable"></increment>
+        <increment :increments="slot_increments" :placeable="placeable"></increment>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -31,14 +27,25 @@ export default {
       placeable_increments: [20,10,5,1,0.5,0.1],
       slot_increments: [91,135],
       placeable: true
-    }   
+    }
   },
   components: {
     Increment
   },
-  computed: {
-    current_increment_placeable(){
-      return this.$store.state.current_increment_placeable
+  methods: {
+    jog(axis, multiplier) {
+      let inc = this.$store.state.current_increment_placeable
+      inc *= multiplier
+      let coords = {}
+      switch(axis) {
+        case "x":
+          coords.x = inc
+        case "y":
+          coords.y = inc
+        case "z":
+          coords.z = inc
+      }
+      this.$store.dispatch("jog", coords)
     }
   }
 
