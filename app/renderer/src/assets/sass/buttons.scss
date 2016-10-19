@@ -80,9 +80,11 @@ button {
     background-color: lighten($primary-brand, 35%);
     color: $primary-text;
     &:hover {
+        outline: 1px solid white;
         background: lighten($primary-brand, 30%);
     }
     &.active {
+        outline: 1px solid white;
         background: lighten($primary-brand, 20%);
     }
 }

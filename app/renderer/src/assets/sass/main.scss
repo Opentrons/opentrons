@@ -202,11 +202,13 @@ Deck|Container
         @include grid-col-full(6);
     }
     .increment {
-        display: flex;
-        flex-wrap: wrap;
-        @include grid-col-full(7);
-        @include offset(0,
-        6);
+        span {
+            display: flex;
+            flex-wrap: wrap;
+            @include grid-col-full(7);
+            @include offset(0,
+            6);
+        }
     }
     .deck {
         display: flex;
