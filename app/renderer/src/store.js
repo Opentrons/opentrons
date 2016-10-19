@@ -11,7 +11,8 @@ const state = {
     current_protocol_name: "No File Selected",
     errors: "No errors",
     tasks: [],
-    current_increment_placeable: 5
+    current_increment_placeable: 5,
+    current_increment_plunger: 1
 }
 
 const mutations = {
@@ -26,8 +27,12 @@ const mutations = {
     UPDATE_TASK_LIST (state, payload) {
       state.tasks = payload.tasks
     },
-    UPDATE_PLACEABLE_INCREMENT (state, payload) {
-      state.current_increment_placeable = payload.current_increment_placeable
+    UPDATE_INCREMENT (state, payload) {
+      if (payload.type == "placeable") {
+        state.current_increment_placeable = payload.current_increment
+      } else {
+        state.current_increment_plunger = payload.current_increment
+      }
     }
 }
 
@@ -86,9 +91,9 @@ const actions = {
           console.log('failed to upload', response)
         })
     },
-    selectPlaceableIncrement ({commit}, inc) {
-      console.log("updating increment to " + inc)
-      commit('UPDATE_PLACEABLE_INCREMENT', {'current_increment_placeable': inc })
+    selectIncrement ({commit}, data) {
+      console.log("updating increment to " + data.inc + " for" + data.type)
+      commit('UPDATE_INCREMENT', {'current_increment': data.inc, 'type': data.type })
     }
 }
 
