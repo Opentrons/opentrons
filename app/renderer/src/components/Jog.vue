@@ -39,11 +39,11 @@ export default {
       let coords = {}
       switch(axis) {
         case "x":
-          coords.x = inc
+          coords.x = increment
         case "y":
-          coords.y = inc
+          coords.y = increment
         case "z":
-          coords.z = inc
+          coords.z = increment
       }
       this.$store.dispatch("jog", coords)
     }
