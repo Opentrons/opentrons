@@ -2,17 +2,17 @@
 
 Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.
 
-## Install Anaconda and Python 3
+## 1 - Install Anaconda and Python 3
 
 To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install [Anaconda](https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
-## Install Jupyter
+## 2 - Install Jupyter
 
 After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](http://jupyter.readthedocs.io/en/latest/install.html).
 
 If you have finished setting up Python 3 and you have finished going through the Jupyter installation guide it is now time to run Jupyter.
 
-## Launch Jupyter Notebook App:
+## 3 - Launch Jupyter Notebook App:
 
 #### With GUI -- *Reccomended for Beginners*
 1. Install and open the Anaconda Navagator App you just downloaded.
@@ -24,16 +24,19 @@ If you have finished setting up Python 3 and you have finished going through the
 2. Create and Enter the startup folder by typing `mkdir some_folder_name && cd some_folder_name`.
 3. Type `jupyter notebook` to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
 
-
-## Programming in Jupyter Notebook: Hello World!
+## 4 - Programming in Jupyter Notebook: Hello World!
 
 When the Jupyter Notebook App is launched on your browser, follow these steps to open a `Notebook`
 
-* Navigate towards the `New` dropdown menu button towards the top right hand side of the screen Jupyter Notebook App. Click the `New` menu button and scroll down and click `python [conda root]`.
+1. Navigate towards the `New` dropdown menu button towards the top right hand side of the screen Jupyter Notebook App. 
+2. Click the `New` menu button and scroll down and click `python [conda root]`.
 
 A new tab should open in your browser and you should have an empty text box.
 
-* Type `print('hello world')` in the text box and scroll to the top menu bar and press they `play button >| ` to execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
+3. Type `print('hello world')` in the text box. 
+4. Scroll to the top menu bar and press they `play button >| ` to execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
+
+## 5 - Install Opentrons API
 
 After running the aforementioned step a new text box will appear for you to write code in. We will use this text box to install the Opentrons API.
 
