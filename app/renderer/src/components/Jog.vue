@@ -13,7 +13,8 @@
 
   <h3 class="title">Select Increment [mm]</h3>
 
-    <increment></increment>
+    <increment :increments="placeable_increments"></increment>
+
   </div> 
 </div><!-- End Move -->
   
@@ -23,8 +24,14 @@
 import Increment from './Increment.vue'
 export default {
   name: 'Jog',
+  data: function(){
+    return {
+      placeable_increments: [20,10,5,1,0.5,0.1]
+    }
+  },
   components: {
     Increment
   }
+
 }
 </script>
