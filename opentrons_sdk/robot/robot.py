@@ -248,14 +248,7 @@ class Robot(object):
 
     def run(self, mode='simulate'):
 
-        if mode == 'simulate':
-            self._driver.connect(self.connections['simulate'])
-        elif mode == 'live':
-            self._driver.connect(self.connections['live'])
-        else:
-            raise ValueError(
-                'mode expected to be "live" or "simulate", '
-                '{} provided'.format(mode))
+        self.set_connection(mode)
 
         self._runtime_warnings = []
 
@@ -279,12 +272,22 @@ class Robot(object):
                     self._driver.halt()
                     raise e
         finally:
+            self.set_connection('live')
+
+        return self._runtime_warnings
+
+    def set_connection(self, mode):
+        if mode == 'simulate':
+            self._driver.connect(self.connections['simulate'])
+        elif mode == 'live':
             if self.connections['live']:
                 self._driver.connect(self.connections['live'])
             else:
                 self._driver.disconnect()
-
-        return self._runtime_warnings
+        else:
+            raise ValueError(
+                'mode expected to be "live" or "simulate", '
+                '{} provided'.format(mode))
 
     def disconnect(self):
         if self._driver:
