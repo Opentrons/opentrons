@@ -130,7 +130,7 @@ class Robot(object):
             device = serial.Serial(
                 port=port,
                 baudrate=115200,
-                timeout=self.serial_timeout
+                timeout=self._driver.serial_timeout
             )
             return device
         except serial.SerialException as e:
