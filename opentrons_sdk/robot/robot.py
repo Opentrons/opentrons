@@ -191,7 +191,6 @@ class Robot(object):
 
     def add_command(self, command):
         if command.description:
-            # print("Enqueing:", command.description)
             log.info("Enqueing:", command.description)
         self._commands.append(command)
 

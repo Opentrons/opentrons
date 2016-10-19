@@ -239,6 +239,14 @@ class Placeable(object):
     def center(self, reference=None):
         return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
+    def bottom(self, z=0):
+        coordinates = self.from_center(x=0, y=0, z=-1)
+        return (self, coordinates + (0, 0, z))
+
+    def top(self, z=0):
+        coordinates = self.from_center(x=0, y=0, z=1)
+        return (self, coordinates + (0, 0, z))
+
     def from_cartesian(self, x, y, z):
         center = self.size() / 2.0
         return center + center * Vector(x, y, z)
