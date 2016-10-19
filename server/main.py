@@ -47,18 +47,18 @@ def load_python(stream):
     global robot
 
     code = ''.join([line.decode() for line in stream])
-    response = {'error': None, 'warnings': []}
+    api_response = {'error': None, 'warnings': []}
 
     robot.reset()
     try:
         exec(code, globals(), locals())
         robot.run()
     except Exception as e:
-        response['error'] = str(e)
+        api_response['error'] = str(e)
 
-    response['warnings'] = robot.get_warnings()
+    api_response['warnings'] = robot.get_warnings()
 
-    return response
+    return api_response
 
 
 def load_json(stream):
@@ -67,7 +67,9 @@ def load_json(stream):
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    # import pdb; pdb.set_trace()
     file = request.files.get('file')
+
     if not file:
         return flask.jsonify({
             'status': 'error',
@@ -76,10 +78,11 @@ def upload():
 
     extension = file.filename.split('.')[-1].lower()
 
+    api_response = None
     if extension == 'py':
-        response = load_python(file.stream)
+        api_response = load_python(file.stream)
     elif extension == 'json':
-        load_json(file.stream)
+        api_response = load_json(file.stream)
     else:
         return flask.jsonify({
             'status': 'error',
@@ -87,9 +90,15 @@ def upload():
             '.py or .json'.format(extension)
         })
 
+    calibrations = get_placeables()
+
     return flask.jsonify({
         'status': 'success',
-        'data': response
+        'data': {
+            'error': api_response['error'],
+            'warnings': api_response['warnings'],
+            'calibrations': calibrations
+        }
     })
 
 
@@ -182,6 +191,14 @@ def disconnect_robot():
 
 
 @app.route("/instruments/placeables")
+def placeables():
+    data = get_placeables()
+    return flask.jsonify({
+        'status': 200,
+        'data': data
+    })
+
+
 def get_placeables():
 
     def get_containers(instrument):
@@ -212,10 +229,7 @@ def get_placeables():
         ]
     } for _, instrument in Robot.get_instance().get_instruments()]
 
-    return flask.jsonify({
-        'status': 200,
-        'data': data
-    })
+    return data
 
 
 @app.route('/home/<axis>')

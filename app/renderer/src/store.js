@@ -8,22 +8,21 @@ Vue.use(Vuex)
 const state = {
     is_connected: false,
     port: null,
-    current_protocol_name: "No File Selected",
+    fileName: "Select Protocol",
     errors: "No errors",
     tasks: []
 }
 
 const mutations = {
     UPDATE_ROBOT_CONNECTION (state, payload) {
-        state.is_connected = payload.is_connected
-        state.port = payload.port
-    },
-    UPDATE_CURRENT_PROTOCOL (state, payload) {
-      state.current_protocol_name = payload.current_protocol_name
-      state.errors = payload.errors
+      state.is_connected = payload.is_connected
+      state.port = payload.port
     },
     UPDATE_TASK_LIST (state, payload) {
       state.tasks = payload.tasks
+    },
+    UPDATE_FILE_NAME (state, payload) {
+      state.fileName = payload.fileName
     }
 }
 
@@ -56,19 +55,29 @@ const actions = {
                 console.log('Failed to communicate to backend server. Failed to connect', response)
             })
     },
-    uploadProtocol ({commit}, target) {
+    updateTasks ({commit}) {
       Vue.http
-        .post('http://localhost:5000/upload', {file: target.result, filename: target.fileName})
+        .get('http://localhost:5000/instruments/placeables')
         .then((response) => {
           console.log(response)
-          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName, 'errors': response.body.data})
+          let tasks = response.body.data.map((instrument) => {
+            instrument.href = instrumentHref(instrument)
+            instrument.placeables.map((placeable) => {
+              placeable.href = placeableHref(placeable, instrument)
+            })
+          })
+          commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
         }, (response) => {
           console.log('failed to upload', response)
         })
     },
-    updateTasks ({commit}, target) {
+    updateFilename ({commit}, fileName) {
+      commit('UPDATE_FILE_NAME', {'fileName': fileName})
+    },
+    uploadProtocol ({commit}, formData) {
+      console.log(formData.get('file'))
       Vue.http
-        .get('http://localhost:5000/instruments/placeables', {protocol: target.result})
+        .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
           let tasks = response.body.data.map((instrument) => {
