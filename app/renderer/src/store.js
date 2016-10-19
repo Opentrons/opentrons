@@ -8,7 +8,7 @@ Vue.use(Vuex)
 const state = {
     is_connected: false,
     port: null,
-    current_protocol_name: "No File Selected",
+    fileName: "Select Protocol",
     errors: "No errors",
     tasks: [],
     current_increment_placeable: 5
@@ -16,18 +16,17 @@ const state = {
 
 const mutations = {
     UPDATE_ROBOT_CONNECTION (state, payload) {
-        state.is_connected = payload.is_connected
-        state.port = payload.port
-    },
-    UPDATE_CURRENT_PROTOCOL (state, payload) {
-      state.current_protocol_name = payload.current_protocol_name
-      state.errors = payload.errors
+      state.is_connected = payload.is_connected
+      state.port = payload.port
     },
     UPDATE_TASK_LIST (state, payload) {
       state.tasks = payload.tasks
     },
     UPDATE_PLACEABLE_INCREMENT (state, payload) {
       state.current_increment_placeable = payload.current_increment_placeable
+    },
+    UPDATE_FILE_NAME (state, payload) {
+      state.fileName = payload.fileName
     }
 }
 
@@ -60,28 +59,22 @@ const actions = {
                 console.log('Failed to communicate to backend server. Failed to connect', response)
             })
     },
-    uploadProtocol ({commit}, target) {
-      Vue.http
-        .post('http://localhost:5000/upload', {file: target.result, filename: target.fileName})
-        .then((response) => {
-          console.log(response)
-          commit('UPDATE_CURRENT_PROTOCOL', {'current_protocol_name': target.fileName, 'errors': response.body.data})
-        }, (response) => {
-          console.log('failed to upload', response)
-        })
+    updateFilename ({commit}, fileName) {
+      commit('UPDATE_FILE_NAME', {'fileName': fileName})
     },
-    updateTasks ({commit}, target) {
+    uploadProtocol ({commit}, formData) {
       Vue.http
-        .get('http://localhost:5000/instruments/placeables', {protocol: target.result})
+        .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
-          let tasks = response.body.data.map((instrument) => {
+          var tasks = response.body.data.calibrations
+          tasks.map((instrument) => {
             instrument.href = instrumentHref(instrument)
             instrument.placeables.map((placeable) => {
               placeable.href = placeableHref(placeable, instrument)
             })
           })
-          commit('UPDATE_TASK_LIST', {'tasks': response.body.data})
+          commit('UPDATE_TASK_LIST', {'tasks': tasks})
         }, (response) => {
           console.log('failed to upload', response)
         })

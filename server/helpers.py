@@ -12,7 +12,8 @@ def get_frozen_root():
 
 def get_assets(root, kind, ext, content=False):
     """
-    Searches for html/js assets in an 'assets' folder start from the <root> dir.
+    Searches for html/js assets in an 'assets'
+    folder start from the <root> dir.
 
     :param root: dir to start search from
     :param kind: html | js
@@ -31,4 +32,3 @@ def get_assets(root, kind, ext, content=False):
         else:
             assets[name] = ''
     return assets
-

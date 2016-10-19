@@ -149,6 +149,7 @@ Wizard Screens
                 @include btn-col-f(5);
                 @include offset(1,
                 1);
+                @include offset-v(4,4);
                 position: relative;
                 overflow: hidden;
                 background-color: $primary-brand;
