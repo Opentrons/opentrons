@@ -1,9 +1,6 @@
 import unittest
 import json
 import os
-import subprocess
-import time
-from pprint import pprint
 
 from opentrons_sdk.robot import Robot
 
@@ -22,7 +19,7 @@ class UploadTestCase(unittest.TestCase):
     def test_upload_valid_python(self):
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
-            })
+        })
 
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
@@ -30,7 +27,7 @@ class UploadTestCase(unittest.TestCase):
     def test_get_instrument_placeables(self):
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
-            })
+        })
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
@@ -72,8 +69,9 @@ class UploadTestCase(unittest.TestCase):
                             'type': 'point'
                         }
                     ],
-                    'top': 0}
-                ],
+                    'top': 0
+                }
+            ],
             'status': 200
         }
 
@@ -87,7 +85,6 @@ class UploadTestCase(unittest.TestCase):
                 for placeable in value:
                     self.assertTrue(placeable in response_data['placeables'])
 
-
     def test_upload_invalid_python(self):
         pass
 
@@ -96,4 +93,3 @@ class UploadTestCase(unittest.TestCase):
 
     def test_upload_invalid_json(self):
         pass
-
