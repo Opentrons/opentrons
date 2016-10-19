@@ -386,13 +386,13 @@ class JSONProtocolProcessor(object):
         )
 
         tool_obj.aspirate(volume + extra_pull_volume, from_location)
-        if extra_pull_delay:
+        if extra_pull_delay > 0:
             tool_obj.delay(extra_pull_delay)
-        if extra_pull_volume:
+        if extra_pull_volume > 0:
             tool_obj.dispense(extra_pull_volume)
         if should_touch_tip_on_from:
             tool_obj.touch_tip()
-        if from_delay:
+        if from_delay > 0:
             tool_obj.delay(from_delay)
 
     def handle_transfer_to(self, tool_obj, to_info, volume):

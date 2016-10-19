@@ -280,7 +280,7 @@ class Pipette(object):
 
     def drop_tip(self, location=None):
         def _do():
-            nonlocal location
+            # nonlocal location
             if location:
                 self.go_to_bottom(location, now=True)
 

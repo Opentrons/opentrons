@@ -238,7 +238,13 @@ class JSONIngestorTestCase(unittest.TestCase):
         self.robot.run()
 
         instrument = self.robot._instruments["B"]
-        wells_referenced = [str(i) for i in instrument.placeables]
-        print(wells_referenced)
-
-
+        wells_referenced = [(i.get_parent().get_name(), i.get_name()) for i in instrument.placeables]
+        wells_referenced_expected = [
+            ('p200-rack', 'A1'),  # Location of first tip in tiprack
+            ('.75 mL Tube Rack', 'A1'),  # 1st transfer
+            ('.75 mL Tube Rack', 'C1'),  # 1st transfer
+            ('.75 mL Tube Rack', 'A1'),  # 2nd transfer
+            ('.75 mL Tube Rack', 'C1'),  # 2nd transfer
+            ('B2', 'trash') # Location of tiprack in trash
+        ]
+        self.assertEqual(wells_referenced, wells_referenced_expected)
