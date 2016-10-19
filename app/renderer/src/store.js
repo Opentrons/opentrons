@@ -10,7 +10,9 @@ const state = {
     port: null,
     fileName: "Select Protocol",
     errors: "No errors",
-    tasks: []
+    tasks: [],
+    current_increment_placeable: 5,
+    current_increment_plunger: 1
 }
 
 const mutations = {
@@ -23,6 +25,13 @@ const mutations = {
     },
     UPDATE_FILE_NAME (state, payload) {
       state.fileName = payload.fileName
+    },
+    UPDATE_INCREMENT (state, payload) {
+      if (payload.type == "placeable") {
+        state.current_increment_placeable = payload.current_increment
+      } else {
+        state.current_increment_plunger = payload.current_increment
+      }
     }
 }
 
@@ -46,13 +55,16 @@ const actions = {
             .then((response) => {
                 console.log(response)
                 if (response.data.is_connected === true){
-                    console.log('successfully connected...')
+                    console.log('Successfully disconnected...')
                 } else {
-                    console.log('Failed to connect', response.data)
+                    console.log('Failed to disconnect', response.data)
                 }
-                commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
+                commit('UPDATE_ROBOT_CONNECTION', {
+                  'is_connected': false,
+                  'port': null
+                })
             }, (response) => {
-                console.log('Failed to communicate to backend server. Failed to connect', response)
+                console.log('Failed to communicate to server', response)
             })
     },
     updateFilename ({commit}, fileName) {
@@ -74,6 +86,13 @@ const actions = {
         }, (response) => {
           console.log('failed to upload', response)
         })
+    },
+    selectIncrement ({commit}, data) {
+      console.log("updating increment to " + data.inc + " for " + data.type)
+      commit('UPDATE_INCREMENT', {
+        'current_increment': data.inc,
+        'type': data.type
+      })
     }
 }
 

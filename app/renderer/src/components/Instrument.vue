@@ -1,36 +1,33 @@
 <template>
+<div>
 
-  <div>
-      <h2 class="title">Calibrate {{ $route.params.instrument }} pipette</h2>
-        <div class="instructions">Calibrate {{ calibration.label }}'s plunger. Be sure to save top, bottom, blowout, and droptip. Enter max volume.</div>
+  <h2 class="title">Calibrate {{ $route.params.instrument }} pipette</h2>
+  <div class="instructions">Calibrate {{ calibration.label }}'s plunger. Be sure to save top, bottom, blowout, and droptip. Enter max volume.</div>
   
-    <section>
-
+  <section>
     <div class="step step-calibrate">       
-          <div>
-           <!--  Current calibration:
-            <br>
-            <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> -->
-            <jog></jog>
-          </div>
-      </div>
+        <jog></jog>
+        <JogPlunger></JogPlunger>
 
-      <navigation :prev="prev" :next="next"></navigation>
-    </section>
+    </div>
 
-  </div>
+    <navigation :prev="prev" :next="next"></navigation>
+  </section>
 
+</div>
 </template>
 
 <script>
   import Navigation from './Navigation.vue'
   import Jog from './Jog.vue'
+  import JogPlunger from './JogPlunger.vue'
 
   export default {
     name: "Instrument",
     components: {
       Navigation,
-      Jog
+      Jog, 
+      JogPlunger
     },
     methods: {
       currentInstrument(tasks) {

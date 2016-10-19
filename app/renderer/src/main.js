@@ -2,15 +2,19 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store'
-import {Home, StepList, Upload, Connect, Placeable, Instrument, Jog} from './components/export'
+import {
+  Home,
+  StepList,
+  Upload,
+  Connect,
+  Placeable,
+  Instrument
+} from './components/export'
 
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.component('StepList', StepList)
-Vue.component('Upload', Upload)
-Vue.component('Connect', Connect)
-Vue.component('Placeable', Placeable)
 
 const routes = [
   { path: '/connect', component: Connect },
