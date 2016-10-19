@@ -55,13 +55,16 @@ const actions = {
             .then((response) => {
                 console.log(response)
                 if (response.data.is_connected === true){
-                    console.log('successfully connected...')
+                    console.log('Successfully disconnected...')
                 } else {
-                    console.log('Failed to connect', response.data)
+                    console.log('Failed to disconnect', response.data)
                 }
-                commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
+                commit('UPDATE_ROBOT_CONNECTION', {
+                  'is_connected': false,
+                  'port': null
+                })
             }, (response) => {
-                console.log('Failed to communicate to backend server. Failed to connect', response)
+                console.log('Failed to communicate to server', response)
             })
     },
     updateFilename ({commit}, fileName) {
@@ -85,8 +88,11 @@ const actions = {
         })
     },
     selectIncrement ({commit}, data) {
-      console.log("updating increment to " + data.inc + " for" + data.type)
-      commit('UPDATE_INCREMENT', {'current_increment': data.inc, 'type': data.type })
+      console.log("updating increment to " + data.inc + " for " + data.type)
+      commit('UPDATE_INCREMENT', {
+        'current_increment': data.inc,
+        'type': data.type
+      })
     }
 }
 
