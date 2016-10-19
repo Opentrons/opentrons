@@ -176,6 +176,15 @@ def disconnect_robot():
     })
 
 
+@app.route("/instruments/placeables")
+def placeables():
+    data = get_placeables()
+    return flask.jsonify({
+        'status': 200,
+        'data': data
+    })
+
+
 def get_placeables():
 
     def get_containers(instrument):
