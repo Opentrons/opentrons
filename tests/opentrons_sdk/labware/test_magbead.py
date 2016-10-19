@@ -9,7 +9,7 @@ from opentrons_sdk.robot import Robot
 class MagbeadTest(unittest.TestCase):
 
     def setUp(self):
-        self.robot = Robot.reset()
+        self.robot = Robot.reset_for_tests()
         options = {
             'limit_switches': False,
             'firmware': 'v1.0.5',

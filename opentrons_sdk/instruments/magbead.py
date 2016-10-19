@@ -14,6 +14,9 @@ class Magbead(object):
         # a reference to the placeable set ontop the magbead module
         self.container = container
 
+    def reset(self):
+        pass
+
     def engage(self):
         def _do():
             self.mosfet.engage()

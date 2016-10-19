@@ -16,7 +16,7 @@ def get_name_from_closure(ftn):
 
 class JSONIngestorTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.reset()
+        Robot.reset_for_tests()
         self.robot = Robot.get_instance()
         self.robot.connect()
         self.protocol = None

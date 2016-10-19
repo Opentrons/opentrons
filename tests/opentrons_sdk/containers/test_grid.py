@@ -7,7 +7,7 @@ from opentrons_sdk.robot import Robot
 
 class GridTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.reset()
+        Robot.reset_for_tests()
         self.plate = containers.load('96-flat', 'A2')
 
     def test_rows_cols(self):

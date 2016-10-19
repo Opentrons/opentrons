@@ -55,6 +55,10 @@ class Pipette(object):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
+    def reset(self):
+        self.placeables = []
+        self.current_volume = 0
+
     def associate_placeable(self, location):
         placeable, _ = containers.unpack_location(location)
         if not self.placeables or (placeable != self.placeables[-1]):

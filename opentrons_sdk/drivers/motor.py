@@ -81,7 +81,6 @@ class CNCDriver(object):
         'one_pro': Vector(300, 250, 120),
         'one_standard': Vector(300, 250, 120)
     }
-    VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
 
     def __init__(self):
         self.stopped = Event()
@@ -104,8 +103,6 @@ class CNCDriver(object):
         """
         if not self.connection:
             return
-        if isinstance(self.connection, VirtualSmoothie):
-            return self.VIRTUAL_SMOOTHIE_PORT
         return self.connection.port
 
     def get_dimensions(self):
@@ -149,54 +146,14 @@ class CNCDriver(object):
             self.connection.close()
         self.connection = None
 
-    def connect(self, port, options=None):
-        if port == self.VIRTUAL_SMOOTHIE_PORT:
-            return self.connect_to_virtual_smoothie(options)
-        elif port:
-            return self.connect_to_physical_smoothie(port, options)
-
-    def connect_to_virtual_smoothie(self, options=None):
-        default_options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
-        }
-        if not options:
-            options = {}
-        default_options.update(options)
-        self.connection = VirtualSmoothie(default_options)
+    def connect(self, device):
+        self.connection = device
+        self.reset_port()
+        log.debug("Driver", "Connected to {}".format(device))
         return self.calm_down()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
-
-    def connect_to_physical_smoothie(self, port, options=None):
-        try:
-            self.connection = serial.Serial(
-                port=port,
-                baudrate=115200,
-                timeout=self.serial_timeout
-            )
-
-            # sometimes pyserial swallows the initial b"Smoothie\r\nok\r\n"
-            # so just always swallow it ourselves
-            self.reset_port()
-
-            log.debug("Serial", "Connected to {}".format(port))
-
-            return self.calm_down()
-
-        except serial.SerialException as e:
-            log.debug(
-                "Serial",
-                "Error connecting to {}".format(port))
-            log.error("Serial", e)
-            return False
 
     def reset_port(self):
         for axis in 'xyzab':
