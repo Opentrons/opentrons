@@ -1,4 +1,0 @@
-JSON parsing failed for /Users/ahmed/Code/open-trons/opentrons_sdk/tests/opentrons_sdk/json_ingestor/protocol_data/p10s_p10m.json ...
-The following protocols failed to parse
-[/Users/ahmed/Code/open-trons/opentrons_sdk/tests/opentrons_sdk/json_ingestor/protocol_data/starter.json]. Reason: Encountered error processing JSON
-[('p200-rack', 'A1'), ('.75 mL Tube Rack', 'A1'), ('.75 mL Tube Rack', 'C1'), ('.75 mL Tube Rack', 'A1'), ('.75 mL Tube Rack', 'C1'), ('trash', 'A1')]
