@@ -247,7 +247,7 @@ class Robot(object):
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def run(self, mode='simulate'):
+    def run(self, mode='live'):
 
         self.set_connection(mode)
 
