@@ -144,7 +144,6 @@ class JSONIngestorTestCase(unittest.TestCase):
 
     def test_process_head(self):
         protocol = self.get_protocol()
-        head_dict = protocol['head']
         jpp = JSONProtocolProcessor(protocol)
         jpp.process_deck()
         jpp.process_head()
@@ -207,7 +206,7 @@ class JSONIngestorTestCase(unittest.TestCase):
         for cmd in ['consolidate', 'distribute', 'mix', 'transfer']:
             getattr(jpp, "handle_{}".format(cmd), mock.Mock()).called
 
-        with self.assertRaises(JSONProcessorRuntimeError) as e:
+        with self.assertRaises(JSONProcessorRuntimeError):
             jpp.process_command(None, 'foo', None)
 
     def test_process_instructions(self):
@@ -216,7 +215,6 @@ class JSONIngestorTestCase(unittest.TestCase):
         jpp.process_deck()
         jpp.process_head()
         jpp.process_instructions()
-
 
         api_calls = [
             get_name_from_closure(cmd.do)
@@ -238,13 +236,16 @@ class JSONIngestorTestCase(unittest.TestCase):
         self.robot.run()
 
         instrument = self.robot._instruments["B"]
-        wells_referenced = [(i.get_parent().get_name(), i.get_name()) for i in instrument.placeables]
+        wells_referenced = [
+            (i.get_parent().get_name(), i.get_name())
+            for i in instrument.placeables
+        ]
         wells_referenced_expected = [
             ('p200-rack', 'A1'),  # Location of first tip in tiprack
             ('.75 mL Tube Rack', 'A1'),  # 1st transfer
             ('.75 mL Tube Rack', 'C1'),  # 1st transfer
             ('.75 mL Tube Rack', 'A1'),  # 2nd transfer
             ('.75 mL Tube Rack', 'C1'),  # 2nd transfer
-            ('B2', 'trash') # Location of tiprack in trash
+            ('B2', 'trash')  # Location of tiprack in trash
         ]
         self.assertEqual(wells_referenced, wells_referenced_expected)
