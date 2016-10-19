@@ -11,9 +11,15 @@ If you have finished setting up Python 3 and you have finished going through the
 
 ## Launch Jupyter Notebook App:
 
+### With GUI *Reccomended for Beginners*
+1. Install and open the Anaconda Navagator App you just downloaded.
+2. Click 'Launch' under Jupyter Notebook.
+3. A new Jupyter Notebook will open in a new browser window. 
+
+### In Terminal
 1. Click on spotlight, type `terminal` to open a terminal window.
 2. Create and Enter the startup folder by typing `mkdir some_folder_name && cd some_folder_name`.
-3. Type jupyter notebook to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
+3. Type `jupyter notebook` to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
 
 
 ## Programming in Jupyter Notebook: Hello World!
