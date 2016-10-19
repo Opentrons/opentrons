@@ -7,7 +7,7 @@ from opentrons_sdk.containers.placeable import Deck
 
 class RobotTest(unittest.TestCase):
     def setUp(self):
-        Robot.reset()
+        Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
         options = {
@@ -31,11 +31,11 @@ class RobotTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.robot.get_connected_port()
-        self.assertEquals(res, self.robot._driver.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, self.robot.VIRTUAL_SMOOTHIE_PORT)
 
     def test_robot_move_to(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.run()
+        self.robot.run(mode='live')
         position = self.robot._driver.get_head_position()['current']
         self.assertEqual(position, (100, 0, 0))
 
@@ -48,7 +48,7 @@ class RobotTest(unittest.TestCase):
         self.robot.clear()
         self.robot.home()
         self.assertEquals(len(self.robot._commands), 1)
-        self.robot.run()
+        self.robot.run(mode='live')
 
         self.robot.clear()
         self.robot.home(now=True)
@@ -62,7 +62,7 @@ class RobotTest(unittest.TestCase):
         self.robot.pause()
 
         def _run():
-            self.robot.run()
+            self.robot.run(mode='live')
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -70,15 +70,16 @@ class RobotTest(unittest.TestCase):
         thread.join(0.5)
 
         self.assertEquals(thread.is_alive(), False)
-        self.assertEqual(len(self.robot._commands), 0)
+        self.assertEqual(len(self.robot._commands), 2)
 
         self.robot.clear()
+        self.assertEqual(len(self.robot._commands), 0)
 
         self.robot.move_to((Deck(), (100, 0, 0)))
         self.robot.move_to((Deck(), (101, 0, 0)))
 
         def _run():
-            self.robot.run()
+            self.robot.run(mode='live')
 
         self.robot.pause()
 
@@ -92,7 +93,7 @@ class RobotTest(unittest.TestCase):
         self.robot.resume()
 
         thread.join(1)
-        self.assertEqual(len(self.robot._commands), 0)
+        self.assertEqual(len(self.robot._commands), 2)
 
     def test_versions(self):
         res = self.robot.versions()

@@ -8,7 +8,7 @@ from opentrons_sdk.json_ingestor import JSONProtocolProcessor
 
 class JSONIngestorTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.reset()
+        Robot.reset_for_tests()
         self.robot = Robot.get_instance()
         self.protocol = None
 

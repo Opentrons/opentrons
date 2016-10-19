@@ -43,7 +43,7 @@ class AllProtocolsTestCase(unittest.TestCase):
     def test_all(self):
         failures = []
         for protocol_path, protocol_dict in self.get_protocols():
-            Robot.reset()
+            Robot.reset_for_tests()
             Robot.get_instance()
             try:
                 jpp = JSONProtocolProcessor(protocol_dict)
