@@ -263,11 +263,6 @@ class PipetteTest(unittest.TestCase):
             self.p200.aspirate(500)
             self.robot.run()
 
-    def test_dispense_invalid_max_volume(self):
-        with self.assertRaises(RuntimeWarning):
-            self.p200.dispense(500)
-            self.robot.run()
-
     def test_dispense(self):
         self.p200.aspirate(100)
         self.p200.dispense(20)
