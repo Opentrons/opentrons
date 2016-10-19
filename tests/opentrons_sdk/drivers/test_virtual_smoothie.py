@@ -8,7 +8,7 @@ from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 class VirtualSmoothieTestCase(unittest.TestCase):
 
     def setUp(self):
-        settings = {
+        options = {
             'limit_switches': True,
             'firmware': 'v1.0.5',
             'config': {
@@ -18,7 +18,7 @@ class VirtualSmoothieTestCase(unittest.TestCase):
                 'beta_steps_per_mm': 80.0
             }
         }
-        self.s = VirtualSmoothie(settings)
+        self.s = VirtualSmoothie(port=None, options=options)
 
     def test_version(self):
         self.s.write('version')

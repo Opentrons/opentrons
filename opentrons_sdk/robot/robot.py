@@ -2,37 +2,46 @@ import copy
 import os
 from threading import Event
 
+import serial
+
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
+from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.robot.command import Command
-from opentrons_sdk.util import log as logging
+from opentrons_sdk.util.log import get_logger
 
 from opentrons_sdk.helpers import helpers
 from opentrons_sdk.util.trace import traceable
 
 
-log = logging.get_logger(__name__)
+log = get_logger(__name__)
 
 
 class Robot(object):
     _commands = None  # []
     _instance = None
 
-    def __init__(self, driver_instance=None):
-        self._commands = []
-        self._handlers = []
-        self._runtime_warnings = []
+    VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
 
+    def __init__(self):
         self.can_pop_command = Event()
+        self.stopped_event = Event()
+
         self.can_pop_command.set()
+        self.stopped_event.clear()
 
-        self._deck = containers.Deck()
-        self.setup_deck()
+        self.connections = {
+            'live': None,
+            'simulate': self.get_virtual_device(
+                {'limit_switches': False}
+            ),
+            'simulate_switches': self.get_virtual_device(
+                {'limit_switches': True}
+            )
+        }
 
-        self._ingredients = {}  # TODO needs to be discusses/researched
-        self._instruments = {}
-
-        self._driver = driver_instance or motor_drivers.CNCDriver()
+        self._driver = motor_drivers.CNCDriver()
+        self.reset()
 
     @classmethod
     def get_instance(cls):
@@ -41,13 +50,23 @@ class Robot(object):
         return cls._instance
 
     @classmethod
-    def reset(cls):
-        """
-        Use this for testing
-        :return:
-        """
-        Robot._instance = None
-        return Robot.get_instance()
+    def reset_for_tests(cls):
+        robot = Robot.get_instance()
+        robot.reset()
+        return robot
+
+    def reset(self):
+        self._commands = []
+        self._handlers = []
+        self._runtime_warnings = []
+
+        self._deck = containers.Deck()
+        self.setup_deck()
+
+        self._ingredients = {}  # TODO needs to be discusses/researched
+        self._instruments = {}
+
+        return self
 
     def set_driver(self, driver):
         self._driver = driver
@@ -56,8 +75,11 @@ class Robot(object):
         axis = axis.upper()
         self._instruments[axis] = instrument
 
-    def add_warning(self, warning_msg: str):
+    def add_warning(self, warning_msg):
         self._runtime_warnings.append(warning_msg)
+
+    def get_warnings(self):
+        return list(self._runtime_warnings)
 
     def get_mosfet(self, mosfet_index):
         robot_self = self
@@ -103,16 +125,54 @@ class Robot(object):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
+    def get_serial_device(self, port):
+        try:
+            device = serial.Serial(
+                port=port,
+                baudrate=115200,
+                timeout=self.serial_timeout
+            )
+            return device
+        except serial.SerialException as e:
+            log.debug(
+                "Error connecting to {}".format(port))
+            log.error(e)
+
+        return None
+
+    def get_virtual_device(self, port=None, options=None):
+        default_options = {
+            'limit_switches': True,
+            'firmware': 'v1.0.5',
+            'config': {
+                'ot_version': 'one_pro',
+                'version': 'v1.0.3',        # config version
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0
+            }
+        }
+        if not options:
+            options = {}
+        default_options.update(options)
+        return VirtualSmoothie(port=port, options=default_options)
+
     def connect(self, port=None, options=None):
         """
         Connects the motor to a serial port.
-
-        If a device connection is set, then any dummy or alternate motor
-        drivers are replaced with the serial driver.
         """
-        if not port:
-            port = self._driver.VIRTUAL_SMOOTHIE_PORT
-        return self._driver.connect(port, options)
+        device = None
+        if not port or port == self.VIRTUAL_SMOOTHIE_PORT:
+            device = self.get_virtual_device(
+                port=self.VIRTUAL_SMOOTHIE_PORT, options=options)
+        else:
+            device = self.get_serial_device(port)
+
+        res = self._driver.connect(device)
+
+        if res:
+            self.connections['live'] = device
+
+        return res
 
     def home(self, *args, **kwargs):
         def _do():
@@ -133,7 +193,7 @@ class Robot(object):
 
     def add_command(self, command):
         if command.description:
-            log.info(command.description)
+            log.info("Enqueing: {}".format(command.description))
         self._commands.append(command)
 
     def prepend_command(self, command):
@@ -187,18 +247,45 @@ class Robot(object):
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def run(self):
+    def run(self, mode='simulate'):
+
+        self.set_connection(mode)
+
         self._runtime_warnings = []
-        while self.can_pop_command.wait() and self._commands:
-            command = self._commands.pop(0)
-            if command.description:
-                log.info("Executing: {}".format(command.description))
-            try:
-                command.do()
-            except KeyboardInterrupt as e:
-                self._driver.halt()
-                raise e
+
+        for instrument in self._instruments.values():
+            instrument.reset()
+
+        try:
+            for command in self._commands:
+                try:
+                    self.can_pop_command.wait()
+                    if self.stopped_event.is_set():
+                        self.resume()
+                        break
+                    if command.description:
+                        log.info("Executing: {}".format(command.description))
+                    command.do()
+                except KeyboardInterrupt as e:
+                    self._driver.halt()
+                    raise e
+        finally:
+            self.set_connection('live')
+
         return self._runtime_warnings
+
+    def set_connection(self, mode):
+        if mode == 'simulate':
+            self._driver.connect(self.connections['simulate'])
+        elif mode == 'live':
+            if self.connections['live']:
+                self._driver.connect(self.connections['live'])
+            else:
+                self._driver.disconnect()
+        else:
+            raise ValueError(
+                'mode expected to be "live" or "simulate", '
+                '{} provided'.format(mode))
 
     def disconnect(self):
         if self._driver:
@@ -293,9 +380,16 @@ class Robot(object):
 
     def pause(self):
         self.can_pop_command.clear()
+        self.stopped_event.clear()
         self._driver.pause()
 
+    def stop(self):
+        self.stopped_event.set()
+        self.can_pop_command.set()
+        self._driver.stop()
+
     def resume(self):
+        self.stopped_event.clear()
         self.can_pop_command.set()
         self._driver.resume()
 
@@ -303,7 +397,7 @@ class Robot(object):
         ports = []
         # TODO: Store these settings in config
         if os.environ.get('DEBUG', '').lower() == 'true':
-            ports = [self._driver.VIRTUAL_SMOOTHIE_PORT]
+            ports = [self.VIRTUAL_SMOOTHIE_PORT]
         ports.extend(self._driver.get_serial_ports_list())
         return ports
 

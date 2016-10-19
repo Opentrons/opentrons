@@ -10,7 +10,7 @@
         },
         "trash" : {
             "labware" : "point",
-            "slot" : "B2",
+            "slot" : "B2"
         },
         "plate" : {
             "labware" : "96-PCR-flat",

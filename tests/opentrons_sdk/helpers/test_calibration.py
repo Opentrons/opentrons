@@ -12,7 +12,7 @@ from opentrons_sdk.helpers.helpers import import_calibration_file
 class CalibrationTest(unittest.TestCase):
 
     def setUp(self):
-        Robot.reset()
+        Robot.reset_for_tests()
         self.robot = Robot.get_instance()
         # self.robot.connect(port='/dev/tty.usbmodem1421')
         # self.robot.home()

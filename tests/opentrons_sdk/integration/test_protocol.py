@@ -8,7 +8,7 @@ from opentrons_sdk import instruments
 
 class ProtocolTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.reset()
+        Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
     def test_protocol_container_setup(self):

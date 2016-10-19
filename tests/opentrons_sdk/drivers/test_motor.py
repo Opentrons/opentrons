@@ -1,32 +1,27 @@
 from threading import Thread
 import unittest
 
-from opentrons_sdk.drivers.motor import CNCDriver
+from opentrons_sdk.robot import Robot
 
 
 class OpenTronsTest(unittest.TestCase):
 
     def setUp(self):
 
+        self.robot = Robot.get_instance()
+
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
         # and serial handshakes to be tested
 
-        self.motor = CNCDriver()
+        self.motor = self.robot._driver
 
-        settings = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
+        options = {
+            'limit_switches': True
         }
 
-        myport = self.motor.VIRTUAL_SMOOTHIE_PORT
-        success = self.motor.connect(myport, settings)
+        myport = self.robot.VIRTUAL_SMOOTHIE_PORT
+        success = self.robot.connect(port=myport, options=options)
         self.assertTrue(success)
 
     def tearDown(self):
@@ -48,7 +43,7 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.motor.get_connected_port()
-        self.assertEquals(res, self.motor.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, self.robot.VIRTUAL_SMOOTHIE_PORT)
         self.motor.disconnect()
         res = self.motor.get_connected_port()
         self.assertEquals(res, None)

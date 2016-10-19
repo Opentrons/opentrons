@@ -4,7 +4,7 @@ import os
 import unittest
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.json_ingestor import JSONProtocolProcessor
+from opentrons_sdk.json_importer import JSONProtocolProcessor
 
 
 class AllProtocolsTestCase(unittest.TestCase):
@@ -43,8 +43,7 @@ class AllProtocolsTestCase(unittest.TestCase):
     def test_all(self):
         failures = []
         for protocol_path, protocol_dict in self.get_protocols():
-            Robot.reset()
-            Robot.get_instance()
+            Robot.reset_for_tests()
             try:
                 jpp = JSONProtocolProcessor(protocol_dict)
                 jpp.process()
@@ -56,4 +55,4 @@ class AllProtocolsTestCase(unittest.TestCase):
             print('The following protocols failed to parse')
             for path, exc, reason in failures:
                 print("[{}]. Reason: {}".format(path, exc))
-            # assert False
+            assert False
