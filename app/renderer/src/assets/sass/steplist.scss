@@ -18,6 +18,9 @@ Step List Styles
     border-left: 5px solid lighten($primary-brand,30%);
 }
 
+#step-list ul li ul{
+    box-shadow: inset  0  1px 0px 0px lighten($primary-brand, 40%), inset  0 -1px 0px 0px lighten($primary-brand, 40%);
+}
 
 #step-list li a.router-link-active {
     background: lighten($primary-brand, 40%);
