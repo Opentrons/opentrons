@@ -280,8 +280,11 @@ Pipette
         }
     }
     .increment {
-        display: flex;
-        flex-wrap: wrap;
+        @include grid-col-full(2);
+        span {
+            display: flex;
+            flex-wrap: wrap;
+        }
     }
 }
 

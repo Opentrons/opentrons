@@ -1,24 +1,30 @@
 <template>
   <span>
-    <button v-for="i in increments" @click="selectPlaceableIncrement(i)" :class="['btn-full btn-group', { 'active': active(i)} , { 'btn-slot': isSlot(i)}  ]">{{i}}</button>
-    <!-- <button @click="selectPlaceableIncrement(91)" :class="['btn-slot', { 'active': active(91)}]">&#8596; slot-x </button>
-    <button @click="selectPlaceableIncrement(135)" :class="['btn-slot', { 'active': active(135)}]">&#8597; slot-y </button> -->
+    <button v-for="i in increments" @click="selectIncrement(i)" :class="['btn-full btn-group', { 'active': active(i)} , { 'btn-slot': isSlot(i)}]" >{{i}}</button>
   </span>
 </template>
 
 <script>
 export default {
   name: 'Increment',
-  props: ['increments'],
+  props: ['increments', 'placeable'],
   methods: {
     active(i) {
-      return this.$store.state.current_increment_placeable === i
+      if (this.placeable) {
+        return this.$store.state.current_increment_placeable === i        
+      } else {
+        return this.$store.state.current_increment_plunger === i
+      }
     },
     isSlot(i) {
       return i === 91 || i === 135
     },
-    selectPlaceableIncrement(i){
-      this.$store.dispatch("selectPlaceableIncrement", i)
+    selectIncrement(i) {
+      let type = "plunger"
+      if (this.placeable) {
+        type = "placeable"
+      }     
+      this.$store.dispatch("selectIncrement", {inc: i, type: type})
     }
   }
 }

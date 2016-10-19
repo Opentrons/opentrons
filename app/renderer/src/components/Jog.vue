@@ -12,8 +12,8 @@
   </div>
   <h3 class="title">Select Increment [mm]</h3>
     <div class="increment" >
-      <increment :increments="placeable_increments"></increment>
-      <increment :increments="slot_increments"></increment>
+      <increment :increments="placeable_increments" :placeable="placeable"></increment>
+      <increment :increments="slot_increments" :placeable="placeable"></increment>
     </div>
   </div> 
 
@@ -29,9 +29,8 @@ export default {
   data: function(){
     return {
       placeable_increments: [20,10,5,1,0.5,0.1],
-      pipette_increments: [5,1,0.5,0.1],
       slot_increments: [91,135],
-
+      placeable: true
     }   
   },
   components: {
