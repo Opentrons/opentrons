@@ -34,8 +34,8 @@ export default {
   },
   methods: {
     jog(axis, multiplier) {
-      let inc = this.$store.state.current_increment_placeable
-      inc *= multiplier
+      let increment = this.$store.state.current_increment_placeable
+      increment *= multiplier
       let coords = {}
       switch(axis) {
         case "x":
