@@ -7,7 +7,7 @@ import time
 import serial
 
 from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
-from opentrons_sdk.util import log
+from opentrons_sdk.util.log import get_logger
 from opentrons_sdk.util.vector import Vector
 from opentrons_sdk.helpers.helpers import break_down_travel
 
@@ -19,6 +19,9 @@ if sys.version_info > (3, 4):
     JSON_ERROR = ValueError
 else:
     JSON_ERROR = json.decoder.JSONDecodeError
+
+
+log = get_logger(__name__)
 
 
 class CNCDriver(object):
@@ -139,9 +142,8 @@ class CNCDriver(object):
                     result.append(port)
             except Exception as e:
                 log.debug(
-                    "Serial",
                     'Exception in testing port {}'.format(port))
-                log.debug("Serial", e)
+                log.debug(e)
         return result
 
     def disconnect(self):
@@ -187,15 +189,14 @@ class CNCDriver(object):
             # so just always swallow it ourselves
             self.reset_port()
 
-            log.debug("Serial", "Connected to {}".format(port))
+            log.debug("Connected to {}".format(port))
 
             return self.calm_down()
 
         except serial.SerialException as e:
             log.debug(
-                "Serial",
                 "Error connecting to {}".format(port))
-            log.error("Serial", e)
+            log.error(e)
             return False
 
     def reset_port(self):
@@ -241,9 +242,9 @@ class CNCDriver(object):
         return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
-        log.debug("Serial", "Write: {}".format(str(data).encode()))
+        log.debug("Write: {}".format(str(data).encode()))
         if self.connection is None:
-            log.warn("Serial", "No connection found.")
+            log.warn("No connection found.")
             return
         if self.is_connected():
             self.connection.write(str(data).encode())
@@ -254,7 +255,7 @@ class CNCDriver(object):
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
         else:
-            log.error("Serial", "Cannot connect to serial port.")
+            log.error("Cannot connect to serial port.")
             return b''
 
     def wait_for_response(self, timeout=20.0):
@@ -265,7 +266,6 @@ class CNCDriver(object):
             out = self.readline_from_serial()
             if out:
                 log.debug(
-                    "Serial",
                     "Waited {} lines for response {}.".format(count, out)
                 )
                 return out
@@ -273,7 +273,6 @@ class CNCDriver(object):
                 if count == 1 or count % 10 == 0:
                     # Don't log all the time; gets spammy.
                     log.debug(
-                        "Serial",
                         "Waiting {} lines for response.".format(count)
                     )
         raise RuntimeWarning('no response after {} seconds'.format(timeout))
@@ -294,12 +293,12 @@ class CNCDriver(object):
             # serial.readline() returns an empty byte string if it times out
             msg = self.connection.readline().strip()
             if msg:
-                log.debug("Serial", "Read: {}".format(msg))
+                log.debug("Read: {}".format(msg))
 
         # detect if it hit a home switch
         if b'!!' in msg or b'limit' in msg:
             # TODO (andy): allow this to bubble up so UI is notified
-            log.debug('Serial', 'home switch hit')
+            log.debug('home switch hit. {}'.format(msg))
             self.flush_port()
             self.calm_down()
             raise RuntimeWarning('limit switch hit')
@@ -329,7 +328,7 @@ class CNCDriver(object):
         self.set_coordinate_system(mode)
         current = self.get_head_position()['target']
 
-        log.debug('Motor Driver', 'Current Head Position: {}'.format(current))
+        log.debug('Current Head Position: {}'.format(current))
         target_point = {
             axis: kwargs.get(
                 axis,
@@ -337,7 +336,7 @@ class CNCDriver(object):
             )
             for axis in 'xyz'
         }
-        log.debug('Motor Driver', 'Destination: {}'.format(target_point))
+        log.debug('Destination: {}'.format(target_point))
 
         time_interval = 0.5
         # convert mm/min -> mm/sec,
@@ -372,7 +371,7 @@ class CNCDriver(object):
 
             self.wait_for_arrival(tolerance)
 
-            log.debug("MotorDriver", "Moving head: {}".format(args))
+            log.debug("Moving head: {}".format(args))
             res = self.send_command(self.MOVE, **args)
             if res != b'ok':
                 return (False, self.SMOOTHIE_ERROR)
@@ -480,8 +479,8 @@ class CNCDriver(object):
                 coords['target'][letter] = response_dict.get(letter.upper(), 0)
 
         except JSON_ERROR:
-            log.debug("Serial", "Error parsing JSON string:")
-            log.debug("Serial", res)
+            log.debug("Error parsing JSON string:")
+            log.debug(res)
 
         return coords
 

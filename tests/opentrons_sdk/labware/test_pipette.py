@@ -6,8 +6,6 @@ from opentrons_sdk import instruments
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.util.vector import Vector
 
-from opentrons_sdk.util import log
-
 from opentrons_sdk.containers.placeable import unpack_location
 
 
@@ -93,7 +91,6 @@ class PipetteTest(unittest.TestCase):
 
         well_deck_coordinates = well.center(well.get_deck())
         dest = well_deck_coordinates + Vector(1, 2, 3)
-        log.debug('Unit test', 'Destination: {}'.format(well_deck_coordinates))
 
         self.robot._driver.move_head(x=dest['x'], y=dest['y'], z=dest['z'])
 

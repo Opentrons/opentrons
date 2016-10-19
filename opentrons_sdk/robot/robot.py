@@ -5,10 +5,13 @@ from threading import Event
 from opentrons_sdk import containers
 from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.robot.command import Command
-from opentrons_sdk.util import log
+from opentrons_sdk.util import log as logging
 
 from opentrons_sdk.helpers import helpers
 from opentrons_sdk.util.trace import traceable
+
+
+log = logging.get_logger(__name__)
 
 
 class Robot(object):
@@ -130,8 +133,7 @@ class Robot(object):
 
     def add_command(self, command):
         if command.description:
-            # print("Enqueing:", command.description)
-            log.info("Enqueing:", command.description)
+            log.info(command.description)
         self._commands.append(command)
 
     def prepend_command(self, command):
@@ -189,12 +191,8 @@ class Robot(object):
         self._runtime_warnings = []
         while self.can_pop_command.wait() and self._commands:
             command = self._commands.pop(0)
-
-            # print("Executing:", command.description)
-            log.info("Executing:", command.description)
             if command.description:
-                print("Executing:", command.description)
-                log.info("Executing:", command.description)
+                log.info("Executing: {}".format(command.description))
             try:
                 command.do()
             except KeyboardInterrupt as e:
