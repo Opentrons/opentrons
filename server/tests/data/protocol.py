@@ -37,14 +37,21 @@ p200 = instruments.Pipette(
 p200.set_max_volume(200)
 p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
 
-for t, col in enumerate(plate.cols):
-    p200.pick_up_tip(tiprack[t])
+p200.pick_up_tip(tiprack[0])
 
-    p200.aspirate(10, trough[t])
-    p200.dispense(10, col[0])
+p200.aspirate(10, trough[0])
+p200.dispense(10, plate[0])
 
-    for well, next_well in zip(col[:-1], col[1:]):
-        p200.aspirate(10, well)
-        p200.dispense(10, next_well).mix(3)
+p200.drop_tip(trash)
 
-    p200.drop_tip(trash)
+# for t, col in enumerate(plate.cols):
+#     p200.pick_up_tip(tiprack[t])
+
+#     p200.aspirate(10, trough[t])
+#     p200.dispense(10, col[0])
+
+#     for well, next_well in zip(col[:-1], col[1:]):
+#         p200.aspirate(10, well)
+#         p200.dispense(10, next_well).mix(3)
+
+#     p200.drop_tip(trash)

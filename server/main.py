@@ -1,5 +1,4 @@
 import logging
-import json
 import os
 import sys
 import threading
@@ -7,7 +6,7 @@ import threading
 import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
@@ -31,29 +30,35 @@ app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
 
+
 # welcome route for connecting to robot
 @app.route("/")
 def welcome():
     return render_template("index.html")
+
 
 # Check uploaded file is allowed file type: JSON or Python
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
+
 def load_python(stream):
     code = ''.join([line.decode() for line in stream])
     global robot
     robot = robot.reset()
     exec(code, globals(), locals())
-    robot.connect(options={'limit_switches':False})
+    robot.connect(options={'limit_switches': False})
     robot.run()
+
 
 def load_json(stream):
     pass
 
+
 @app.route("/upload", methods=["POST"])
 def upload():
+    # import pdb; pdb.set_trace()
     file = request.files.get('file')
 
     if not file:
@@ -71,7 +76,8 @@ def upload():
     else:
         return flask.jsonify({
             'status': 'error',
-            'data': '{} is not a valid extension. Expected .py or .json'.format(extension)
+            'data': '{} is not a valid extension. Expected'
+            '.py or .json'.format(extension)
         })
 
     placeables = get_placeables()
@@ -126,12 +132,14 @@ def connect_robot():
         watcher_should_run.set()
 
     watcher_should_run = threading.Event()
+
     def watch_connection_state(should_run):
         while not should_run.is_set():
             socketio.emit(
                 'event',
-                {'type': 'connection_status',
-                 'is_connected': Robot.get_instance().is_connected()
+                {
+                    'type': 'connection_status',
+                    'is_connected': Robot.get_instance().is_connected()
                 }
             )
             socketio.sleep(1.5)
@@ -167,14 +175,15 @@ def disconnect_robot():
         'data': data
     })
 
-# @app.route("/instruments/placeables")
+
 def get_placeables():
 
     def get_containers(instrument):
         unique_containers = set()
 
         for placeable in instrument.placeables:
-            containers = [c for c in placeable.get_trace() if isinstance(c, Container)]
+            containers = [c for c in placeable.get_trace() if isinstance(
+                c, Container)]
             unique_containers.add(containers[0])
         return list(unique_containers)
 
@@ -198,6 +207,7 @@ def get_placeables():
     } for _, instrument in Robot.get_instance().get_instruments()]
 
     return data
+
 
 @app.route('/home/<axis>')
 def home(axis):
