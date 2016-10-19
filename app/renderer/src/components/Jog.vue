@@ -12,9 +12,9 @@
   </div>
 
   <h3 class="title">Select Increment [mm]</h3>
-
-    <increment :increments="placeable_increments"></increment>
-
+    <div class="increment" >
+      <increment :increments="placeable_increments"></increment>
+    </div>
   </div> 
 </div><!-- End Move -->
   

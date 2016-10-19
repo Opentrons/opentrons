@@ -1,7 +1,7 @@
 <template>
-  <div class="increment xyz" >
+  <span>
     <button v-for="i in increments" @click="selectPlaceableIncrement(i)" :class="['btn-full btn-group', { 'active': active(i)} ]">{{i}}</button>
-    </div>
+  </span>
 </template>
 
 <script>
