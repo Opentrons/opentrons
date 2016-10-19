@@ -1,4 +1,4 @@
-from opentrons_sdk.json_ingestor.json_importer import (
+from opentrons_sdk.json_importer.json_importer import (
     JSONProtocolProcessor,
     JSONProcessorRuntimeError
 )

@@ -4,7 +4,7 @@ import os
 import unittest
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.json_ingestor import JSONProtocolProcessor
+from opentrons_sdk.json_importer import JSONProtocolProcessor
 
 
 class AllProtocolsTestCase(unittest.TestCase):
