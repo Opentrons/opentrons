@@ -36,14 +36,20 @@ export default {
     jog(axis, multiplier) {
       let increment = this.$store.state.current_increment_placeable
       increment *= multiplier
-      let coords = {}
+      var coords = {}
       switch(axis) {
         case "x":
+          console.log("x")
           coords.x = increment
+          break;
         case "y":
+          console.log("y")
           coords.y = increment
+          break;
         case "z":
+          console.log("z")
           coords.z = increment
+          break;
       }
       this.$store.dispatch("jog", coords)
     }
