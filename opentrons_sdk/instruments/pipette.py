@@ -254,7 +254,6 @@ class Pipette(object):
         return self
 
     def pick_up_tip(self, location=None):
-
         def _do():
             nonlocal location
             if location:
