@@ -11,7 +11,7 @@ If you have finished setting up Python 3 and you have finished going through the
 
 ## Launch Jupyter Notebook App:
 
-### With GUI *Reccomended for Beginners*
+### With GUI -- *Reccomended for Beginners*
 1. Install and open the Anaconda Navagator App you just downloaded.
 2. Click 'Launch' under Jupyter Notebook.
 3. A new Jupyter Notebook will open in a new browser window. 
