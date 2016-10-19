@@ -55,6 +55,7 @@ def load_json(stream):
 @app.route("/upload", methods=["POST"])
 def upload():
     file = request.files.get('file')
+
     if not file:
         return flask.jsonify({
             'status': 'error',
@@ -73,8 +74,11 @@ def upload():
             'data': '{} is not a valid extension. Expected .py or .json'.format(extension)
         })
 
+    placeables = get_placeables()
+
     return flask.jsonify({
-            'status': 'success'
+            'status': 'success',
+            'data': placeables
         })
 
 
@@ -163,7 +167,7 @@ def disconnect_robot():
         'data': data
     })
 
-@app.route("/instruments/placeables")
+# @app.route("/instruments/placeables")
 def get_placeables():
 
     def get_containers(instrument):
@@ -193,10 +197,7 @@ def get_placeables():
         ]
     } for _, instrument in Robot.get_instance().get_instruments()]
 
-    return flask.jsonify({
-        'status': 200,
-        'data': data
-    })
+    return data
 
 @app.route('/home/<axis>')
 def home(axis):
