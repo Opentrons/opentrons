@@ -44,12 +44,21 @@ def allowed_file(filename):
 
 
 def load_python(stream):
-    code = ''.join([line.decode() for line in stream])
     global robot
-    robot = robot.reset()
-    exec(code, globals(), locals())
-    robot.connect(options={'limit_switches': False})
-    robot.run()
+
+    code = ''.join([line.decode() for line in stream])
+    response = {'error': None, 'warnings': []}
+
+    robot.reset()
+    try:
+        exec(code, globals(), locals())
+        robot.run()
+    except Exception as e:
+        response['error'] = str(e)
+
+    response['warnings'] = robot.get_warnings()
+
+    return response
 
 
 def load_json(stream):
@@ -68,7 +77,7 @@ def upload():
     extension = file.filename.split('.')[-1].lower()
 
     if extension == 'py':
-        load_python(file.stream)
+        response = load_python(file.stream)
     elif extension == 'json':
         load_json(file.stream)
     else:
@@ -79,7 +88,8 @@ def upload():
         })
 
     return flask.jsonify({
-        'status': 'success'
+        'status': 'success',
+        'data': response
     })
 
 
