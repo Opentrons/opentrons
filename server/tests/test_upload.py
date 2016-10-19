@@ -28,11 +28,8 @@ class UploadTestCase(unittest.TestCase):
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
         })
-        status = json.loads(response.data.decode())['status']
-        self.assertEqual(status, 'success')
-
-        response = self.app.get('/instruments/placeables')
         response = json.loads(response.data.decode())
+        self.assertEquals(response['status'], 'success')
 
         expected_data = {
             'data': [
@@ -75,9 +72,7 @@ class UploadTestCase(unittest.TestCase):
             'status': 200
         }
 
-        self.assertEquals(response['status'], 200)
-
-        response_data = response['data'][0]
+        response_data = response['data']['calibrations'][0]
         for key, value in expected_data['data'][0].items():
             if key != 'placeables':
                 self.assertEquals(value, response_data[key])
