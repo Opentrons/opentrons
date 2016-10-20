@@ -118,6 +118,9 @@ const actions = {
           }, (response) => {
               console.log('failed', response)
           })
+    },
+    jogToSlot ({commit}, data) {
+      console.log(data)
     }
 }
 
