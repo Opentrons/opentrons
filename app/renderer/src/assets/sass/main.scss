@@ -149,7 +149,8 @@ Wizard Screens
                 @include btn-col-f(5);
                 @include offset(1,
                 1);
-                @include offset-v(4,4);
+                @include offset-v(4,
+                4);
                 position: relative;
                 overflow: hidden;
                 background-color: $primary-brand;
@@ -200,21 +201,22 @@ Deck|Container
     .jog {
         display: flex;
         flex-wrap: wrap;
-        @include grid-col-full(6);
     }
     .increment {
+        @include grid-col-full(7);
+        @include offset(0,
+        6);
         span {
             display: flex;
             flex-wrap: wrap;
-            @include grid-col-full(7);
-            @include offset(0,
-            6);
         }
     }
     .deck {
-        display: flex;
-        flex-wrap: wrap;
         @include grid-col-full(5);
+        span {
+            display: flex;
+            flex-wrap: wrap;
+        }
     }
 }
 
