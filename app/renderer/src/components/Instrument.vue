@@ -6,9 +6,9 @@
   
   <section>
     <div class="step step-calibrate">       
-        <jog></jog>
+        <jog :instrument="calibration.axis"></jog>
         <JogPlunger :axis="calibration.axis"></JogPlunger>
-
+        
     </div>
     <navigation :prev="prev" :next="next"></navigation>
   </section>

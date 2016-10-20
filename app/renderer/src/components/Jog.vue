@@ -10,27 +10,38 @@
       <button @click="jog('z', -1)" class="btn-full btn-z">Z</button>
     </div>
     <h3 class="title">Select Increment [mm]</h3>
-      <div class="increment" >
-        <increment :increments="placeable_increments" :placeable="placeable"></increment>
-        <increment :increments="slot_increments" :placeable="placeable"></increment>
-      </div>
+    <div class="increment" >
+      <increment :increments="placeable_increments" :placeable="placeable"></increment>
+      <increment :increments="slot_increments" :placeable="placeable"></increment>
+    </div>
+    <h3 class="title">Move to Slot</h3>
+    <div class="deck">
+    <!-- :axis="instrument" -->
+      <DeckSlot :slots="slots" :axis="instrument"></DeckSlot>
     </div>
   </div>
 </template>
 
 <script>
 import Increment from './Increment.vue'
+import DeckSlot from './DeckSlot.vue'
+
 export default {
   name: 'Jog',
+  props: ['instrument'],
   data: function(){
     return {
       placeable_increments: [20,10,5,1,0.5,0.1],
       slot_increments: [91,135],
-      placeable: true
+      placeable: true,
+      slots: ['A3','B3','C3','D3','E3',
+              'A2','B2','C2','D2','E2',
+              'A1','B1','C1','D1','E1'],
     }
   },
   components: {
-    Increment
+    Increment,
+    DeckSlot
   },
   methods: {
     jog(axis, multiplier) {

@@ -11,7 +11,7 @@
            <!--  Current calibration:
             <br>
             <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> -->
-            <jog></jog>
+            <jog :instrument="instrument.axis"></jog>
           </div>
       </div>
       <navigation :prev="prev" :next="next"></navigation>
