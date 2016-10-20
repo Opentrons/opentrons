@@ -8,7 +8,7 @@
       </div>
       <div v-else="axis === 'b'" class="jog-b">
         <a @click="jogPlunger('b', 1)" class="btn-full btn-ab">P</a>
-        <a @click="jogPlunger('a', -1)" class="btn-full btn-ab btn-down">P</a>
+        <a @click="jogPlunger('b', -1)" class="btn-full btn-ab btn-down">P</a>
       </div>
     </div>
     <div class="increment">
