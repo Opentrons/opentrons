@@ -7,10 +7,9 @@
   <section>
     <div class="step step-calibrate">       
         <jog></jog>
-        <JogPlunger></JogPlunger>
+        <JogPlunger :axis="calibration.axis"></JogPlunger>
 
     </div>
-
     <navigation :prev="prev" :next="next"></navigation>
   </section>
 
