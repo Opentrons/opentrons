@@ -23,7 +23,9 @@
 ###Setup and Usage (NOTE: This is an unfinished Beta project - use at your own risk)
 ---
 ####macOS
+
 Setup:
+
 `git clone https://github.com/OpenTrons/robot_frontend_v2.git`
 
 `cd robot_frontend_v2`
