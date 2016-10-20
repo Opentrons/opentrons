@@ -120,6 +120,7 @@ const actions = {
           })
     },
     jogToSlot ({commit}, data) {
+      // TODO - implement jogToSlot Post
       console.log(data)
     }
 }
