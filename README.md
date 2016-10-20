@@ -47,6 +47,7 @@
 
 This starts Webpack in order to compile and watch assets (SASS, HTML, ES6, Vue)
 Next, execute the following in a new terminal session:
+
 `cd server`
 
 You will need to activate your Virtualenv or Pyenv here - refer to the above comment in setup for instructions on how to do so.
