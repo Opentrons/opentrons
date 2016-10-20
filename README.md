@@ -1,7 +1,7 @@
 #OT App
 
 ##Goals
----
+
 - [x] Connect to Robot (or Virtual Smoothie)
 - [x] Protocol Ingestion/Verification
 - [x] Task List Generation
@@ -20,8 +20,9 @@
 - [ ] Preferences Screen
 - [ ] Packaging/Distribution for macOS, Windows, and Linux
 
-##Setup and Usage (NOTE: This is an unfinished Beta project - use at your own risk)
----
+##Setup and Usage 
+(NOTE: This is an unfinished Beta project - use at your own risk)
+
 ###macOS
 
 ####Setup:
