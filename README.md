@@ -1,6 +1,6 @@
 #OT App
 
-###Goals
+##Goals
 ---
 - [x] Connect to Robot (or Virtual Smoothie)
 - [x] Protocol Ingestion/Verification
@@ -20,11 +20,11 @@
 - [ ] Preferences Screen
 - [ ] Packaging/Distribution for macOS, Windows, and Linux
 
-###Setup and Usage (NOTE: This is an unfinished Beta project - use at your own risk)
+##Setup and Usage (NOTE: This is an unfinished Beta project - use at your own risk)
 ---
-####macOS
+###macOS
 
-Setup:
+####Setup:
 
 `git clone https://github.com/OpenTrons/robot_frontend_v2.git`
 
@@ -41,7 +41,7 @@ Setup:
 `pip install -r requirements.txt`
 
 
-Usage:
+####Usage:
 `webpack --watch`
 
 This starts Webpack in order to compile and watch assets (SASS, HTML, ES6, Vue)
