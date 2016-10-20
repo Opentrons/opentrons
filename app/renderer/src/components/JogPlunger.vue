@@ -3,12 +3,12 @@
     <h3 class="title">Jog Plunger</h3>
     <div class="plunger">
       <div v-if="axis === 'a'" class="jog-a">
-        <a href="#" class="btn-full btn-ab">P</a>
-        <a href="#" class="btn-full btn-ab btn-down">P</a>
+        <a @click="jogPlunger('a', 1)" class="btn-full btn-ab">P</a>
+        <a @click="jogPlunger('a', -1)" class="btn-full btn-ab btn-down">P</a>
       </div>
       <div v-else="axis === 'b'" class="jog-b">
-        <a href="#" class="btn-full btn-ab">P</a>
-        <a href="#" class="btn-full btn-ab btn-down">P</a>
+        <a @click="jogPlunger('b', 1)" class="btn-full btn-ab">P</a>
+        <a @click="jogPlunger('a', -1)" class="btn-full btn-ab btn-down">P</a>
       </div>
     </div>
     <div class="increment">
@@ -31,11 +31,21 @@ export default {
   components: {
     Increment
   },
-  computed: {
-    current_increment_plunger() {
-      return this.$store.state.current_increment_plunger
-    },
-
+  methods: {
+    jogPlunger(axis, multiplier) {
+      let increment = this.$store.state.current_increment_plunger
+      increment *= multiplier
+      var coords = {}
+      if(axis === "a"){
+        console.log("a")
+        coords.a = increment
+      }else{
+        console.log("b")
+        coords.b = increment
+      }
+      this.$store.dispatch("jogPlunger", coords)
+    }
   }
 }
+
 </script>

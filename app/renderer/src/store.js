@@ -108,6 +108,16 @@ const actions = {
           }, (response) => {
               console.log('failed', response)
           })
+    },
+    jogPlunger ({commit}, coords) {
+      console.log(coords)
+      Vue.http
+          .post('http://localhost:5000/jogplunger', JSON.stringify(coords), {emulateJSON: true})
+          .then((response) => {
+            console.log("success", response)
+          }, (response) => {
+              console.log('failed', response)
+          })
     }
 }
 
