@@ -344,8 +344,8 @@ class Robot(object):
             for row_index, row in enumerate(range(1, robot_rows + 1)):
                 slot = containers.Slot()
                 slot_coordinates = (
-                    (col_offset * col_index) + x_offset,
-                    (row_offset * row_index) + y_offset,
+                    (row_offset * row_index) + x_offset,
+                    (col_offset * col_index) + y_offset,
                     0  # TODO: should z always be zero?
                 )
                 slot_name = "{}{}".format(col, row)

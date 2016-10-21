@@ -42,6 +42,9 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
+        self.robot.home(now=True)
+        _, _, starting_z = self.robot._driver.get_head_position()['current']
+        print(starting_z)
 
     def test_get_instruments_by_name(self):
         self.p1000 = instruments.Pipette(
@@ -155,6 +158,8 @@ class PipetteTest(unittest.TestCase):
         self.robot._driver.move_head(x=x, y=y, z=z)
 
         self.p200.calibrate_position(location)
+
+        self.robot.home(now=True)
 
         self.p200.aspirate(100, location)
         self.p200.dispense(100, location)

@@ -83,16 +83,16 @@ class Pipette(object):
     def move_to_bottom(self, location, create_path=True, now=False):
         placeable, _ = containers.unpack_location(location)
         bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        return self.move_to(bottom_location, create_path)
+        return self.move_to(bottom_location, create_path, now=now)
 
     def go_to(self, location, now=False):
-        return self.move_to(location, create_path=False, now=False)
+        return self.move_to(location, create_path=False, now=now)
 
     def go_to_top(self, location, now=False):
-        return self.move_to_top(location, create_path=False, now=False)
+        return self.move_to_top(location, create_path=False, now=now)
 
     def go_to_bottom(self, location, now=False):
-        return self.move_to_bottom(location, create_path=False, now=False)
+        return self.move_to_bottom(location, create_path=False, now=now)
 
     def aspirate(self, volume=None, location=None, rate=1.0):
         def _do_aspirate():
@@ -163,8 +163,8 @@ class Pipette(object):
         return self
 
     def position_for_aspirate(self, location=None):
-        if location:
-            self.move_to_top(location, now=True)
+        # if location:
+        #     self.move_to_top(location, now=True)
 
         if self.current_volume == 0:
             self.plunger.move(self.positions['bottom'])
