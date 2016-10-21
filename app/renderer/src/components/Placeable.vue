@@ -10,6 +10,10 @@
         <div>
           <Jog :instrument="instrument.axis"></Jog>
         </div>
+        <div class="save-deck">
+          <h3 class="title">Deck Position</h3>
+          <coordinates :placeable="placeable"></coordinates>
+        </div>
       </div>
       <Navigation :prev="prev" :next="next"></Navigation>
     </section>
@@ -19,6 +23,7 @@
 <script>
   import Navigation from './Navigation.vue'
   import Jog from './Jog.vue'
+  import Coordinates from './Coordinates.vue'
 
   export default {
     name: "Placeable",
@@ -29,7 +34,8 @@
     },
     components: {
       Navigation,
-      Jog
+      Jog,
+      Coordinates
     },
     methods: {
       currentInstrument(tasks) {

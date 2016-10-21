@@ -9,6 +9,10 @@
       <div class="step step-calibrate">
         <Jog :instrument="calibration.axis"></Jog>
         <JogPlunger :axis="calibration.axis"></JogPlunger>
+        <div class="save-pipette">
+            <h3 class="title">Current Position</h3>
+            <coordinates :instrument="instrument" :axis="calibration.axis.toUpperCase()"></coordinates>
+        </div>
       </div>
       <Navigation :prev="prev" :next="next"></Navigation>
     </section>
@@ -19,13 +23,20 @@
   import Navigation from './Navigation.vue'
   import Jog from './Jog.vue'
   import JogPlunger from './JogPlunger.vue'
+  import Coordinates from './Coordinates.vue'
 
   export default {
     name: "Instrument",
+    data: function() {
+      return {
+        instrument: true
+      }
+    },
     components: {
       Navigation,
       Jog,
-      JogPlunger
+      JogPlunger,
+      Coordinates
     },
     methods: {
       currentInstrument(tasks) {
