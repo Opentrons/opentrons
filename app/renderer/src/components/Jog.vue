@@ -16,7 +16,6 @@
     </div>
     <h3 class="title">Move to Slot</h3>
     <div class="deck">
-    <!-- :axis="instrument" -->
       <DeckSlot :slots="slots" :axis="instrument"></DeckSlot>
     </div>
   </div>

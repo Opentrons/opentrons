@@ -243,24 +243,16 @@ def home(axis):
 @app.route('/jog', methods=["POST"])
 def jog():
     coords = request.json
-    result = robot.move_head(mode="relative", **coords)
-    return flask.jsonify({
-        'status': 200,
-        'data': result
-    })
+    if coords.get("a") or coords.get("b"):
+        result = robot.move_plunger(mode="relative", **coords)
+    else:
+        result = robot.move_head(mode="relative", **coords)
 
-# TODO: We should discuss jog routes 
-# Do we combine into 1 route with a conditional call to robot 
-# based on if is plunger? Leaving this here for now. 
-# Maybe rename routes to head and plunger to reflect driver
-@app.route('/jogplunger', methods=["POST"])
-def jogplunger():
-    coords = request.json
-    result = robot.move_plunger(mode="relative", **coords)
     return flask.jsonify({
         'status': 200,
         'data': result
     })
+    
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.

@@ -36,14 +36,14 @@ export default {
       let increment = this.$store.state.current_increment_plunger
       increment *= multiplier
       var coords = {}
-      if(axis === "a"){
+      if(axis === "a") {
         console.log("a")
         coords.a = increment
-      }else{
+      } else {
         console.log("b")
         coords.b = increment
       }
-      this.$store.dispatch("jogPlunger", coords)
+      this.$store.dispatch("jog", coords)
     }
   }
 }
