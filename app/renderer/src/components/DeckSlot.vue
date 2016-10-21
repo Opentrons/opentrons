@@ -5,13 +5,13 @@
 </template>
 
 <script>
-export default {
-  name: 'DeckSlot',
-  props: ['slots', 'axis'],
-  methods: {
-    jogToSlot(slot, axis) {
-      this.$store.dispatch("jogToSlot", {slot: slot, axis: axis})
+  export default {
+    name: 'DeckSlot',
+    props: ['slots', 'axis'],
+    methods: {
+      jogToSlot(slot, axis) {
+        this.$store.dispatch("jogToSlot", {slot: slot, axis: axis})
+      }
     }
   }
-}
 </script>

@@ -22,45 +22,43 @@
 </template>
 
 <script>
-import Increment from './Increment.vue'
-import DeckSlot from './DeckSlot.vue'
+  import {Increment, DeckSlot} from './export'
 
-export default {
-  name: 'Jog',
-  props: ['instrument'],
-  data: function(){
-    return {
-      placeable_increments: [20,10,5,1,0.5,0.1],
-      slot_increments: [91,135],
-      placeable: true,
-      slots: ['A3','B3','C3','D3','E3',
-              'A2','B2','C2','D2','E2',
-              'A1','B1','C1','D1','E1']
-    }
-  },
-  components: {
-    Increment,
-    DeckSlot
-  },
-  methods: {
-    jog(axis, multiplier) {
-      let increment = this.$store.state.current_increment_placeable
-      increment *= multiplier
-      var coords = {}
-      switch(axis) {
-        case "x":
-          coords.x = increment
-          break;
-        case "y":
-          coords.y = increment
-          break;
-        case "z":
-          coords.z = increment
-          break;
+  export default {
+    name: 'Jog',
+    props: ['instrument'],
+    data: function () {
+      return {
+        placeable_increments: [20,10,5,1,0.5,0.1],
+        slot_increments: [91,135],
+        placeable: true,
+        slots: ['A3','B3','C3','D3','E3',
+                'A2','B2','C2','D2','E2',
+                'A1','B1','C1','D1','E1']
       }
-      this.$store.dispatch("jog", coords)
+    },
+    components: {
+      Increment,
+      DeckSlot
+    },
+    methods: {
+      jog(axis, multiplier) {
+        let increment = this.$store.state.current_increment_placeable
+        increment *= multiplier
+        var coords = {}
+        switch(axis) {
+          case "x":
+            coords.x = increment
+            break;
+          case "y":
+            coords.y = increment
+            break;
+          case "z":
+            coords.z = increment
+            break;
+        }
+        this.$store.dispatch("jog", coords)
+      }
     }
   }
-
-}
 </script>

@@ -12,17 +12,17 @@
       </div>
     </div>
     <div class="increment">
-        <increment :increments="plunger_increments" :placeable="placeable"></increment>
+      <increment :increments="plunger_increments" :placeable="placeable"></increment>
     </div>
   </div>
 </template>
 
 <script>
-  import Increment from './Increment.vue'
+  import Increment from './export'
   export default {
     name: 'JogPlunger',
     props: ['axis'],
-    data: function(){
+    data: function () {
       return {
         plunger_increments: [2,1,0.5,0.1],
         placeable: false

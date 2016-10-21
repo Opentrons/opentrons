@@ -20,7 +20,6 @@
     </div>
     <!-- TODO: Add component for navigation (especially next) -->
     <navigation :prev="prev" :next="next"></navigation>
-    <!-- End Nav Component -->
   </section>
 </template>
 
@@ -78,10 +77,7 @@
       }
     },
     beforeMount: function () {
-        this.getPortsList();
+      this.getPortsList();
     }
   }
 </script>
-
-<style lang="sass">
-</style>

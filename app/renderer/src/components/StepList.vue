@@ -44,7 +44,6 @@
     methods: {
       completed(task) {
         if (task.href === "/upload") {
-          // debugger
           return this.$store.state.tasks[0] && !this.$store.state.error
         } else if (task.href === "/connect") {
           return this.$store.state.is_connected

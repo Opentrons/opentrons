@@ -140,14 +140,12 @@ function createWebSocketPlugin(socket) {
   }
 }
 
-
 const socket = io.connect('ws://localhost:5000')
 
 socket.on('connect', function(){
   console.log('WebSocket has connected.')
   socket.emit('connected')
 });
-
 
 socket.on('disconnect', function(){
   console.log('WebSocket has disconnected')

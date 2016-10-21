@@ -15,66 +15,57 @@
           <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
         </div>
       </form>
-
       <navigation :prev="prev" :next="next"></navigation>
     </section>
   </div>
 </template>
 
 <script>
-import Navigation from './Navigation.vue'
+  import Navigation from './export'
 
-export default {
-  name: 'Upload',
-  components: {
-    Navigation
-  },
-  data: function () {
-    return {
-    prev: "/connect"
-    }
-  },
-  computed: {
-    fileName () {
-      return this.$store.state.fileName
+  export default {
+    name: 'Upload',
+    components: {
+      Navigation
     },
-    connected () {
-      return this.$store.state.is_connected
+    data: function () {
+      return {
+      prev: "/connect"
+      }
     },
-    error () {
-      return this.$store.state.error
+    computed: {
+      fileName () {
+        return this.$store.state.fileName
+      },
+      connected () {
+        return this.$store.state.is_connected
+      },
+      error () {
+        return this.$store.state.error
+      },
+      next () {
+        if (this.$store.state.tasks[0]) {
+          return this.$store.state.tasks[0].placeables[0].href
+        } else {
+          return '/'
+        }
+      }
     },
-    next () {
-      if (this.$store.state.tasks[0]) {
-        return this.$store.state.tasks[0].placeables[0].href
-      } else {
-        return '/'
+    methods: {
+      fileChange(e) {
+        var files = e.target.files || e.dataTransfer.files
+        if (!files.length)
+          return;
+        var fileName = files[0].name
+        this.$store.dispatch("updateFilename", fileName)
+        this.uploadProtocol()
+      },
+      uploadProtocol() {
+        let formData = new FormData();
+        formData.append("file", this.$refs.form.file.files[0])
+        this.$store.dispatch("uploadProtocol", formData)
+        return false
       }
     }
-  },
-  methods: {
-    fileChange(e) {
-      var files = e.target.files || e.dataTransfer.files
-      if (!files.length)
-        return;
-      var fileName = files[0].name
-      this.$store.dispatch("updateFilename", fileName)
-      this.uploadProtocol()
-    },
-    uploadProtocol() {
-      let formData = new FormData();
-      formData.append("file", this.$refs.form.file.files[0])
-      // let file = this.$refs.form.file.files[0]
-      // debugger;
-      this.$store.dispatch("uploadProtocol", formData)
-      return false
-    }
   }
-}
 </script>
-
-<style>
-  .center {
-    text-align: center;
-  }
-</style>
