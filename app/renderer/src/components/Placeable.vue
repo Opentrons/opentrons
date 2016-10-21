@@ -8,16 +8,17 @@
     <section>
       <div class="step step-calibrate">
         <div>
-          <jog :instrument="instrument.axis"></jog>
+          <Jog :instrument="instrument.axis"></Jog>
         </div>
       </div>
-      <navigation :prev="prev" :next="next"></navigation>
+      <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
 </template>
 
 <script>
-  import {Navigation, Jog} from './export'
+  import Navigation from './Navigation.vue'
+  import Jog from './Jog.vue'
 
   export default {
     name: "Placeable",

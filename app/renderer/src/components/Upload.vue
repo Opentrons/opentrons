@@ -15,13 +15,13 @@
           <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
         </div>
       </form>
-      <navigation :prev="prev" :next="next"></navigation>
+      <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
 </template>
 
 <script>
-  import Navigation from './export'
+  import Navigation from './Navigation.vue'
 
   export default {
     name: 'Upload',

@@ -18,8 +18,7 @@
           <button @click="disconnectRobot" v-show="connected" class="btn-connect">Disconnect!</button>
         </div>
     </div>
-    <!-- TODO: Add component for navigation (especially next) -->
-    <navigation :prev="prev" :next="next"></navigation>
+    <Navigation :prev="prev" :next="next"></Navigation>
   </section>
 </template>
 

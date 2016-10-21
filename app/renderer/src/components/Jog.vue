@@ -22,7 +22,8 @@
 </template>
 
 <script>
-  import {Increment, DeckSlot} from './export'
+  import Increment from './Increment.vue'
+  import DeckSlot from './DeckSlot.vue'
 
   export default {
     name: 'Jog',

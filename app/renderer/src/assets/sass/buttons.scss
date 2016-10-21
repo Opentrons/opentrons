@@ -38,6 +38,7 @@ button {
 
 .btn-full {
     @include btn-square-f(1);
+    cursor: pointer;
     background-color: $primary-brand;
     color: white;
     &:hover {
