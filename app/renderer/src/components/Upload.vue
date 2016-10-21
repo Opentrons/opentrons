@@ -5,6 +5,10 @@
       <div class="instructions">
         Upload a valid JSON or Python Protocol. Errors will display below.
       </div>
+      <div v-if="error" class="error">
+        Errors:
+        {{error}}
+      </div>
       <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step step-upload">
         <div class="fileUpload">
           <span>{{fileName}}</span>
@@ -37,8 +41,8 @@ export default {
     connected () {
       return this.$store.state.is_connected
     },
-    errors () {
-      return this.$store.state.errors
+    error () {
+      return this.$store.state.error
     },
     next () {
       if (this.$store.state.tasks[0]) {
