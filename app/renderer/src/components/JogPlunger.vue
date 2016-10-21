@@ -3,12 +3,12 @@
     <h3 class="title">Jog Plunger</h3>
     <div class="plunger">
       <div v-if="axis === 'a'" class="jog-a">
-        <a @click="jog('a', 1)" class="btn-full btn-ab">P</a>
-        <a @click="jog('a', -1)" class="btn-full btn-ab btn-down">P</a>
+        <a @click="jog('a', -1)" class="btn-full btn-ab">P</a>
+        <a @click="jog('a', 1)" class="btn-full btn-ab btn-down">P</a>
       </div>
       <div v-else="axis === 'b'" class="jog-b">
-        <a @click="jog('b', 1)" class="btn-full btn-ab">P</a>
-        <a @click="jog('b', -1)" class="btn-full btn-ab btn-down">P</a>
+        <a @click="jog('b', -1)" class="btn-full btn-ab">P</a>
+        <a @click="jog('b', 1)" class="btn-full btn-ab btn-down">P</a>
       </div>
     </div>
     <div class="increment">
@@ -18,7 +18,8 @@
 </template>
 
 <script>
-  import Increment from './export'
+  import Increment from './Increment.vue'
+
   export default {
     name: 'JogPlunger',
     props: ['axis'],

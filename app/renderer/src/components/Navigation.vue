@@ -4,3 +4,10 @@
     <router-link :to="next" class="next">Next</router-link>
   </nav>
 </template>
+
+<script>
+   export default {
+     name: "Navigation",
+     props: ['prev', 'next']
+   }
+</script>

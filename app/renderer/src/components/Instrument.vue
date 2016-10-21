@@ -7,16 +7,18 @@
 
     <section>
       <div class="step step-calibrate">
-        <jog :instrument="calibration.axis"></jog>
+        <Jog :instrument="calibration.axis"></Jog>
         <JogPlunger :axis="calibration.axis"></JogPlunger>
       </div>
-      <navigation :prev="prev" :next="next"></navigation>
+      <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
 </template>
 
 <script>
-  import {Navigation, Jog, JogPLunger} from './export'
+  import Navigation from './Navigation.vue'
+  import Jog from './Jog.vue'
+  import JogPlunger from './JogPlunger.vue'
 
   export default {
     name: "Instrument",
