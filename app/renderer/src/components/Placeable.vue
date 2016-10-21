@@ -25,6 +25,11 @@
 
   export default {
     name: "Placeable",
+    data: function() {
+      return {
+        placeable: true
+      }
+    },
     components: {
       Navigation,
       Jog
