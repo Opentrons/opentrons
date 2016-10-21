@@ -244,7 +244,7 @@ def home(axis):
 def jog():
     coords = request.json
     if coords.get("a") or coords.get("b"):
-        result = robot.move_plunger(mode="relative", **coords)
+        result = robot._driver.move_plunger(mode="relative", **coords)
     else:
         result = robot.move_head(mode="relative", **coords)
 
@@ -252,7 +252,20 @@ def jog():
         'status': 200,
         'data': result
     })
-    
+
+
+@app.route('/move_to_slot', methods=["POST"])
+def move_to_slot():
+    slot = request.json.get("slot")
+    instrument = request.json.get("instrument")
+    location = robot._deck[slot].top(200)
+    result = robot.move_to(location, instrument=instrument)
+
+    return flask.jsonify({
+        'status': 200,
+        'data': result
+    })
+
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.

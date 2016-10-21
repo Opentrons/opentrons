@@ -110,8 +110,13 @@ const actions = {
           })
     },
     jogToSlot ({commit}, data) {
-      // TODO - implement jogToSlot Post
-      console.log(data)
+      Vue.http
+          .post('http://localhost:5000/move_to_slot', JSON.stringify(data), {emulateJSON: true})
+          .then((response) => {
+            console.log("success", response)
+          }, (response) => {
+              console.log('failed', response)
+          })
     }
 }
 

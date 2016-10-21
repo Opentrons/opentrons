@@ -35,7 +35,7 @@ export default {
       placeable: true,
       slots: ['A3','B3','C3','D3','E3',
               'A2','B2','C2','D2','E2',
-              'A1','B1','C1','D1','E1'],
+              'A1','B1','C1','D1','E1']
     }
   },
   components: {
@@ -49,15 +49,12 @@ export default {
       var coords = {}
       switch(axis) {
         case "x":
-          console.log("x")
           coords.x = increment
           break;
         case "y":
-          console.log("y")
           coords.y = increment
           break;
         case "z":
-          console.log("z")
           coords.z = increment
           break;
       }
