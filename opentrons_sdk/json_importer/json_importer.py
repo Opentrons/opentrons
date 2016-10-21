@@ -26,7 +26,7 @@ class JSONProtocolProcessor(object):
         self.protocol = self.read_protocol(protocol)
 
     @staticmethod
-    def get_protocol_from_file(self, path):
+    def get_protocol_from_file(path):
         with open(path) as f:
             return json.load(f, object_pairs_hook=OrderedDict)
 
@@ -372,8 +372,13 @@ class JSONProtocolProcessor(object):
             else 0
         )
 
+
         from_container = self.deck[from_info['container']]['instance']
         from_well = from_container[from_info['location']]
+
+        # if from_info['container'] == 'rack_large' and from_well.get_name() == 'C1':
+        #     import pdb; pdb.set_trace()
+
 
         should_touch_tip_on_from = from_info.get('touch-tip', False)
         from_tip_offset = from_info.get('tip-offset', 0)
@@ -443,14 +448,18 @@ class JSONProtocolProcessor(object):
 
     def handle_mix(self, tool_obj, command_args):
         volume = command_args.get('volume', tool_obj.max_volume)
-        well = None
+        from_container = self.deck[command_args['container']]['instance']
+        from_well = from_container[command_args['location']]
 
-        tool_obj.aspirate(volume, well)
-        tool_obj.mix(command_args.get('repetitions', 0))
+        repetitions = command_args.get('repetitions', 0)
+
+        tool_obj.mix(
+            volume=volume, repetitions=repetitions, location=from_well
+        )
 
         if command_args.get('blow-out'):
             tool_obj.robot.move_to_top(
-                well, instrument=tool_obj, create_path=False
+                from_well, instrument=tool_obj, create_path=False
             )
             tool_obj.blow_out()
 
@@ -470,3 +479,7 @@ class JSONProtocolProcessor(object):
                 from_info['volume']
             )
         self.handle_transfer_to(tool_obj, to_info, total_volume)
+
+        from_container = self.deck[from_info['container']]['instance']
+        from_well = from_container[from_info['location']]
+

@@ -33,10 +33,10 @@ class Robot(object):
         self.connections = {
             'live': None,
             'simulate': self.get_virtual_device(
-                {'limit_switches': False}
+                options={'limit_switches': False}
             ),
             'simulate_switches': self.get_virtual_device(
-                {'limit_switches': True}
+                options={'limit_switches': True}
             )
         }
 
@@ -186,6 +186,7 @@ class Robot(object):
                 return False
 
         if kwargs.get('now'):
+            log.info('Executing: Home now')
             return _do()
         else:
             description = "Homing Robot"
@@ -282,6 +283,8 @@ class Robot(object):
                 self._driver.connect(self.connections['live'])
             else:
                 self._driver.disconnect()
+        elif mode == 'simulate_switches':
+            self._driver.connect(self.connections['simulate_switches'])
         else:
             raise ValueError(
                 'mode expected to be "live" or "simulate", '

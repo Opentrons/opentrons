@@ -408,7 +408,7 @@ class PipetteTest(unittest.TestCase):
         # so that you have liquid
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
-        self.p200.mix(100, self.plate[1], 3)
+        self.p200.mix(100, 3, self.plate[1])
         self.robot.run(mode='live')
 
         self.assertEqual(
@@ -428,7 +428,7 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
-    def test_mix_with_args(self):
+    def test_mix_with_named_args(self):
         self.p200.current_volume = 100
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()

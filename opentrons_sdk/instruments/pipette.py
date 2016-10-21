@@ -104,6 +104,7 @@ class Pipette(object):
                 volume = self.max_volume - self.current_volume
 
             if self.current_volume + volume > self.max_volume:
+                print('********', volume, location, self.max_volume)
                 raise RuntimeWarning(
                     'Pipette cannot hold volume {}'
                     .format(self.current_volume + volume)
@@ -203,7 +204,7 @@ class Pipette(object):
         self.dispense(volume, destination)
         return self
 
-    def mix(self, volume=None, location=None, repetitions=3):
+    def mix(self, volume, repetitions, location=None):
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
@@ -274,7 +275,7 @@ class Pipette(object):
                 self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
 
-            self.robot.home('z')
+            self.robot.home('z', now=True)
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
