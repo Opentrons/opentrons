@@ -302,7 +302,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip(last_well)
         self.robot.run(mode='live')
         current_pos = self.robot._driver.get_head_position()['current']
-        self.assertTrue(current_pos == (well_x, well_y, starting_z))
+        self.assertEqual(current_pos, (well_x, well_y, starting_z))
 
     def test_drop_tip(self):
         self.p200.drop_tip()

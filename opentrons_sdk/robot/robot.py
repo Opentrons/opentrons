@@ -344,12 +344,12 @@ class Robot(object):
             for row_index, row in enumerate(range(1, robot_rows + 1)):
                 slot = containers.Slot()
                 slot_coordinates = (
-                    (row_offset * row_index) + x_offset,
-                    (col_offset * col_index) + y_offset,
+                    (col_offset * col_index) + x_offset,
+                    (row_offset * row_index) + y_offset,
                     0  # TODO: should z always be zero?
                 )
                 slot_name = "{}{}".format(col, row)
-                self._deck.add(slot, slot_name, (slot_coordinates))
+                self._deck.add(slot, slot_name, slot_coordinates)
 
     @property
     def deck(self):
