@@ -1,21 +1,21 @@
 <template>
   <ul>
     <li v-for="task in default_tasks">
-      <router-link v-bind:to="task.href" :class="{'completed': task.completed}">
+      <router-link v-bind:to="task.href" :class="{'completed': completed(task)}">
         {{task.title}}
       </router-link>
     </li>
     <li v-for="instrument in tasks">
       <ul>
         <li v-for="placeable in instrument.placeables">
-          <router-link v-bind:to="placeable.href" :class="{'completed': placeable.completed}" exact>
+          <router-link v-bind:to="placeable.href" :class="{'completed': placeable.calibrated}" exact>
             {{placeable.label}} [{{placeable.slot}}]
          </router-link>
         </li>
       </ul>
     </li>
     <li v-for="instrument in tasks">
-      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.completed}" exact>
+      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}" exact>
         Calibrate {{instrument.label}}
       </router-link>
     </li>
@@ -41,13 +41,19 @@
         ]
       }
     },
+    methods: {
+      completed(task) {
+        if (task.href === "/upload") {
+          // debugger
+          return this.$store.state.tasks[0] && !this.$store.state.error
+        } else if (task.href === "/connect") {
+          return this.$store.state.is_connected
+        }
+      }
+    },
     computed: {
       tasks() {
         return this.$store.state.tasks
-      },
-      completed(task){
-        // check if the component is calibrated in the store
-        return "nothing, for now"
       }
     }
   }

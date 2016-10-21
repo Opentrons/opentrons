@@ -9,7 +9,7 @@ const state = {
     is_connected: false,
     port: null,
     fileName: "Select Protocol",
-    error: null,
+    error: false,
     tasks: [],
     current_increment_placeable: 5,
     current_increment_plunger: 1
@@ -93,6 +93,7 @@ const actions = {
                 placeable.href = placeableHref(placeable, instrument)
               })
             })
+            commit('UPDATE_ERROR', {error: null})
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
           }
         }, (response) => {
