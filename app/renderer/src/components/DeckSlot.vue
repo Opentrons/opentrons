@@ -1,17 +1,17 @@
 <template>
   <span>
-    <button v-for="s in slots" @click="jogToSlot(s,axis)"class="btn-deck" >{{s}}</button>
+    <button v-for="slot in slots" @click="jogToSlot(slot, axis)"class="btn-deck">{{slot}}</button>
   </span>
 </template>
 
 <script>
-export default {
-  name: 'DeckSlot',
-  props: ['slots', 'axis'],
-  methods: {
-    jogToSlot(s, axis) {    
-      this.$store.dispatch("jogToSlot", {slot: s, axis: axis})
+  export default {
+    name: 'DeckSlot',
+    props: ['slots', 'axis'],
+    methods: {
+      jogToSlot(slot, axis) {
+        this.$store.dispatch("jogToSlot", {slot: slot, axis: axis})
+      }
     }
   }
-}
 </script>

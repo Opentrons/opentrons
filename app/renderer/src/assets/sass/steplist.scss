@@ -32,7 +32,7 @@ Step List Styles
     font-style: italic;
 }
 
-#step-list li.completed a:after {
+#step-list li a.completed:after {
     content: "\2713";
     float: right;
     padding-right: 10px;
