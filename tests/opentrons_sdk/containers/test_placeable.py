@@ -141,11 +141,9 @@ class PlaceableTestCase(unittest.TestCase):
         deck.add(c1, "A1", (0, 0, 0))
         deck.add(c2, "A2", (50, 50, 50))
 
-        actual = [(str(i), j) for i, j in deck.max_dimensions(deck)]
-        expected = [('<Well A2>', (65.0, 60.0, 50.0)),
-                    ('<Well B1>', (60.0, 65.0, 50.0)),
-                    ('<Container A2>', (50.0, 50.0, 50.0))]
-        self.assertListEqual(actual, expected)
+        actual = deck.max_dimensions(deck)
+        expected = (65.0, 65.0, 50.0)
+        self.assertEqual(actual, expected)
 
     def test_top_bottom(self):
         deck = Deck()
