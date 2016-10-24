@@ -64,7 +64,7 @@ class Pipette(object):
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, create_path=True, now=True):
+    def move_to(self, location, create_path=True, now=False):
         if location:
             self.associate_placeable(location)
             self.robot.move_to(
