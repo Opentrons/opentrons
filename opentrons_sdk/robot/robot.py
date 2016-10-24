@@ -222,7 +222,7 @@ class Robot(object):
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 
-        tallest_z = self._deck.max_dimensions(self._deck)[2][1][2]
+        _, _, tallest_z = self._deck.max_dimensions(self._deck)
         tallest_z += 10
 
         def _do():
