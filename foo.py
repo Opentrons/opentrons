@@ -1,4 +1,5 @@
 from opentrons_sdk.json_importer import JSONProtocolProcessor
+from opentrons_sdk.helpers.helpers import import_calibration_json
 from opentrons_sdk.robot import Robot
 
 robo = Robot.get_instance()
@@ -25,10 +26,7 @@ robo = Robot.get_instance()
 #         'handlers': ['debug'],
 #     },
 # )
-# 
 # from logging.config import dictConfig
-
-from opentrons_sdk.helpers.helpers import import_calibration_json
 
 calibration_data = """
 {
@@ -145,17 +143,12 @@ calibration_data = """
 """
 import_calibration_json(calibration_data, robo, True)
 
-jpp = JSONProtocolProcessor('/Users/ahmed/Downloads/otone_data-5/protocol.json')
+jpp = JSONProtocolProcessor(
+    '/Users/ahmed/Downloads/otone_data-5/protocol.json')
 
 jpp.process()
 
 cmds = [i.description for i in robo._commands]
 
-from pprint import pprint as pp
-
-
 robo.connect()
 robo.run(mode='simulate_switches')
-
-# pp(cmds)
-# import pdb; pdb.set_trace()
