@@ -91,7 +91,7 @@ class Placeable(object):
         elif isinstance(name, str):
             return self.get_child_by_name(name)
         else:
-            raise TypeError('Expected int, sice or str')
+            raise TypeError('Expected int, slice or str')
 
     def __repr__(self):
         """
@@ -349,21 +349,21 @@ class Placeable(object):
         corresponds to the bottom of a :Placeable:
 
         If :reference: :Placeable: is provided, returns
-        the :Vector: within :reference: coordiante system
+        the :Vector: within :reference: coordinate system
         """
         coordinates = self.from_center(x=0, y=0, z=-1, reference=reference)
         return (self, coordinates + (0, 0, z))
 
-    def top(self, z=0):
+    def top(self, z=0, reference=None):
         """
         Returns (:Placeable, :Vector:) tuple where :Vector:
         corresponds to the top of a :Placeable:
 
         If :reference: :Placeable: is provided, returns
-        the :Vector: within :reference: coordiante system
+        the :Vector: within :reference: coordinate system
         """
 
-        coordinates = self.from_center(x=0, y=0, z=1)
+        coordinates = self.from_center(x=0, y=0, z=1, reference=reference)
         return (self, coordinates + (0, 0, z))
 
     def from_center(self, x=None, y=None, z=None, r=None,
