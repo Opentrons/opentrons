@@ -19,7 +19,7 @@ logging_config = dict(
             'formatter': 'basic',
             'level': logging.WARNING},
         'file': {
-            'class' : 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'basic',
             'filename': 'sdk.log',
             'maxBytes': 5000000,

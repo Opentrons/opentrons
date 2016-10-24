@@ -372,13 +372,12 @@ class JSONProtocolProcessor(object):
             else 0
         )
 
-
         from_container = self.deck[from_info['container']]['instance']
         from_well = from_container[from_info['location']]
 
-        # if from_info['container'] == 'rack_large' and from_well.get_name() == 'C1':
-        #     import pdb; pdb.set_trace()
-
+        # if from_info['container'] == 'rack_large':
+        #     if from_well.get_name() == 'C1':
+        #         import pdb; pdb.set_trace()
 
         should_touch_tip_on_from = from_info.get('touch-tip', False)
         from_tip_offset = from_info.get('tip-offset', 0)
@@ -480,6 +479,5 @@ class JSONProtocolProcessor(object):
             )
         self.handle_transfer_to(tool_obj, to_info, total_volume)
 
-        from_container = self.deck[from_info['container']]['instance']
-        from_well = from_container[from_info['location']]
-
+        # from_container = self.deck[from_info['container']]['instance']
+        # from_well = from_container[from_info['location']]

@@ -4,7 +4,6 @@ from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.containers.placeable import Placeable, humanize_location
-from opentrons_sdk.util.vector import Vector
 
 
 class Pipette(object):
