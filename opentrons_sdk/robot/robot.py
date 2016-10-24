@@ -208,6 +208,9 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
+    def head_speed(self, rate):
+        self._driver.set_head_speed(rate)
+
     @traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', now=False):
         placeable, coordinates = containers.unpack_location(location)

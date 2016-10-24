@@ -111,7 +111,8 @@ class VirtualSmoothie(object):
 
         if not self.absolute:
             for axis in arguments.keys():
-                arguments[axis] += self.coordinates['target'][axis.lower()]
+                if axis.lower() in 'xyzab':
+                    arguments[axis] += self.coordinates['target'][axis.lower()]
 
         self.process_set_position_command(arguments)
 
