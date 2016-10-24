@@ -353,6 +353,35 @@ class JSONProtocolProcessor(object):
         )
         self.handle_transfer_to(tool_obj, command_args['to'], volume)
 
+    def get_well_obj(self, info_dict):
+        try:
+            container_name = info_dict['container']
+        except KeyError:
+            raise JSONProcessorRuntimeError(
+                'No container was specified for "transfer" command. "{}"'
+                .format(str(info_dict))
+            )
+
+        try:
+            container_obj = self.deck[container_name]['instance']
+        except KeyError:
+            raise JSONProcessorRuntimeError(
+                'JSON Protocol references a container that has not been '
+                'defined in the "deck" section: "{}"'.format(container_name)
+            )
+
+        well_name = None
+        try:
+            well_name = info_dict['location']
+            well_obj = container_obj[well_name]
+        except KeyError:
+            raise JSONProcessorRuntimeError(
+                'JSON Protocol references a well that does not exist in '
+                'container: {}:{}'
+                .format(container_obj.get_name(), well_name)
+            )
+        return well_obj
+
     def handle_transfer_from(
             self,
             tool_obj,
@@ -372,12 +401,7 @@ class JSONProtocolProcessor(object):
             else 0
         )
 
-        from_container = self.deck[from_info['container']]['instance']
-        from_well = from_container[from_info['location']]
-
-        # if from_info['container'] == 'rack_large':
-        #     if from_well.get_name() == 'C1':
-        #         import pdb; pdb.set_trace()
+        from_well = self.get_well_obj(from_info)
 
         should_touch_tip_on_from = from_info.get('touch-tip', False)
         from_tip_offset = from_info.get('tip-offset', 0)
@@ -400,8 +424,7 @@ class JSONProtocolProcessor(object):
             tool_obj.delay(from_delay)
 
     def handle_transfer_to(self, tool_obj, to_info, volume):
-        to_container = self.deck[to_info['container']]['instance']
-        to_well = to_container[to_info['location']]
+        to_well = self.get_well_obj(to_info)
 
         should_touch_tip_on_to = to_info.get('touch-tip', False)
         to_tip_offset = to_info.get('tip-offset', 0)
