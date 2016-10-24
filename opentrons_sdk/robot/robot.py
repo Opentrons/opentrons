@@ -209,7 +209,7 @@ class Robot(object):
         self._driver.move_head(*args, **kwargs)
 
     @traceable('move-to')
-    def move_to(self, location, instrument=None, strategy='avoid', now=False):
+    def move_to(self, location, instrument=None, strategy='arc', now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -223,7 +223,7 @@ class Robot(object):
         tallest_z += 10
 
         def _do():
-            if strategy == 'avoid':
+            if strategy == 'arc':
                 self._driver.move_head(z=tallest_z)
                 self._driver.move_head(x=coordinates[0], y=coordinates[1])
                 self._driver.move_head(z=coordinates[2])

@@ -64,7 +64,7 @@ class Pipette(object):
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='avoid', now=False):
+    def move_to(self, location, strategy='arc', now=False):
         if location:
             self.associate_placeable(location)
             self.robot.move_to(
@@ -124,7 +124,7 @@ class Pipette(object):
                 volume = self.current_volume
 
             if location:
-                self.move_to(location, strategy='avoid', now=True)
+                self.move_to(location, strategy='arc', now=True)
 
             if volume:
                 self.current_volume -= volume
@@ -148,7 +148,7 @@ class Pipette(object):
         # first go to the destination
         if location:
             placeable, _ = containers.unpack_location(location)
-            self.move_to(placeable.top(), strategy='avoid', now=True)
+            self.move_to(placeable.top(), strategy='arc', now=True)
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
@@ -209,7 +209,7 @@ class Pipette(object):
         def _do():
             nonlocal location
             if location:
-                self.move_to(location, strategy='avoid', now=True)
+                self.move_to(location, strategy='arc', now=True)
             self.plunger.move(self.positions['blow_out'])
             self.current_volume = 0
         description = "Blow_out at {}".format(
@@ -222,7 +222,7 @@ class Pipette(object):
         def _do():
             nonlocal location
             if location:
-                self.move_to(location, strategy='avoid', now=True)
+                self.move_to(location, strategy='arc', now=True)
             else:
                 location = self.placeables[-1]
 
