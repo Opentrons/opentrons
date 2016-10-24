@@ -97,10 +97,10 @@ button {
         color: $primary-text;
         outline: 1px solid lighten($primary-brand, 35%);
         &:hover {
-            background-color: lighten($primary-brand, 40%);
-        }
-        &.active {
             background-color: lighten($primary-brand, 30%);
+        }
+        &:active {
+            background-color: lighten($primary-brand, 20%);
         }
     }
     @include offset-v(0, 1);
