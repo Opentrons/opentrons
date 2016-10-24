@@ -91,7 +91,7 @@ def upload():
     return flask.jsonify({
         'status': 'success',
         'data': {
-            'error': api_response['error'],
+            'errors': api_response['errors'],
             'warnings': api_response['warnings'],
             'calibrations': calibrations
         }
