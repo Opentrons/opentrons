@@ -5,11 +5,14 @@ from opentrons_sdk.robot.robot import Robot
 class Magbead(object):
 
     def __init__(self, mosfet=0, container=None):
-        self.mosfet = mosfet
+        self.axis = 'M{}'.format(mosfet)
 
         self.robot = Robot.get_instance()
-        self.robot.add_instrument('M{}'.format(self.mosfet), self)
-        self.mosfet = self.robot.get_mosfet(self.mosfet)
+        self.robot.add_instrument(self.axis, self)
+        self.mosfet = self.robot.get_mosfet(mosfet)
+
+        # all instruments should hold calibration data, even if not used
+        self.calibration_data = {}
 
         # a reference to the placeable set ontop the magbead module
         self.container = container
