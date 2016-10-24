@@ -501,6 +501,3 @@ class JSONProtocolProcessor(object):
                 from_info['volume']
             )
         self.handle_transfer_to(tool_obj, to_info, total_volume)
-
-        # from_container = self.deck[from_info['container']]['instance']
-        # from_well = from_container[from_info['location']]
