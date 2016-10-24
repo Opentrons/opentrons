@@ -70,7 +70,7 @@ class Pipette(object):
             self.robot.move_to(
                 location,
                 instrument=self,
-                create_path=True,
+                create_path=create_path,
                 now=now)
 
         return self
