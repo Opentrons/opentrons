@@ -109,10 +109,9 @@ class VirtualSmoothie(object):
 
     def process_move_command(self, arguments):
 
-        if not self.absolute:
-            for axis in arguments.keys():
-                if axis.lower() in 'xyzab':
-                    arguments[axis] += self.coordinates['target'][axis.lower()]
+        for axis in arguments.keys():
+            if axis.lower() in 'xyzab' and not self.absolute:
+                arguments[axis] += self.coordinates['target'][axis.lower()]
 
         self.process_set_position_command(arguments)
 
