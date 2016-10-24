@@ -9,7 +9,7 @@ const state = {
     is_connected: false,
     port: null,
     fileName: "Select Protocol",
-    error: false,
+    errors: [],
     tasks: [],
     current_increment_placeable: 5,
     current_increment_plunger: 1
@@ -34,7 +34,7 @@ const mutations = {
       }
     },
     UPDATE_ERROR (state, payload) {
-      state.error = payload.error
+      state.errors = payload.errors
     }
 }
 
@@ -83,8 +83,8 @@ const actions = {
         .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
-          if (response.body.data.error) {
-            commit('UPDATE_ERROR', {error: response.body.data.error})
+          if (response.body.data.errors) {
+            commit('UPDATE_ERROR', {errors: response.body.data.errors})
           } else {
             var tasks = response.body.data.calibrations
             tasks.map((instrument) => {
@@ -93,7 +93,7 @@ const actions = {
                 placeable.href = placeableHref(placeable, instrument)
               })
             })
-            commit('UPDATE_ERROR', {error: null})
+            commit('UPDATE_ERROR', {errors: []})
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
           }
         }, (response) => {

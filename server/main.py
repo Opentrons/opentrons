@@ -55,8 +55,7 @@ def load_python(stream):
         exec(code, globals(), locals())
         robot.simulate()
     except Exception as e:
-        api_response['error'] = str(e)
-        api_response['error'] = str(e)
+        api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings()
 

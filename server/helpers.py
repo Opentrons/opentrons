@@ -49,7 +49,7 @@ def load_json(json_byte_stream):
     if robot.get_warnings():
         warnings.extend(robot.get_warnings())
 
-    api_response['error'] = errors
+    api_response['errors'] = errors
     api_response['warnings'] = warnings
     return api_response
 
