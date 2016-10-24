@@ -257,9 +257,13 @@ def jog():
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
     slot = request.json.get("slot")
-    instrument = request.json.get("instrument")
-    location = robot._deck[slot].top(200)
-    result = robot.move_to(location, instrument=instrument)
+    axis = request.json.get("axis")
+    location = robot._deck[slot]
+    result = robot.move_to(
+        location,
+        now=True,
+        instrument=robot._instruments[axis.upper()]
+    )
 
     return flask.jsonify({
         'status': 200,
