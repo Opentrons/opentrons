@@ -1,9 +1,20 @@
+import io
 import unittest
 import os
 
 from opentrons_sdk.robot import Robot
 
 from server import helpers
+
+
+class MiscHelpersTestCase(unittest.TestCase):
+    def test_convert_bytes_stream_to_str(self):
+        text = ['line 1', 'line 2', 'foo bar']
+        bytes_stream = io.BytesIO()
+        [bytes_stream.write(i.encode()) for i in text]
+        bytes_stream.seek(0)
+        text_res = helpers.convert_byte_stream_to_str(bytes_stream)
+        self.assertEqual(''.join(text), text_res)
 
 
 class LoadJSONTestCase(unittest.TestCase):

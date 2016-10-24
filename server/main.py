@@ -47,7 +47,7 @@ def allowed_file(filename):
 def load_python(stream):
     global robot
 
-    code = ''.join([line.decode() for line in stream])
+    code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'error': None, 'warnings': []}
 
     robot.reset()
