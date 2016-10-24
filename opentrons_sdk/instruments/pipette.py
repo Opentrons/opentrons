@@ -15,6 +15,7 @@ class Pipette(object):
             name=None,
             channels=1,
             min_volume=0,
+            max_volume=1,
             trash_container=None,
             tip_racks=None,
             aspirate_speed=300,
@@ -40,7 +41,7 @@ class Pipette(object):
         self.name = name
 
         self.min_volume = min_volume
-        self.max_volume = min_volume + 1
+        self.max_volume = max_volume
         self.current_volume = 0
 
         self.trash_container = trash_container
