@@ -2,6 +2,9 @@ from pathlib import Path
 import os
 import sys
 
+from opentrons_sdk.json_importer import JSONProtocolProcessor
+from opentrons_sdk.robot import Robot
+
 
 def get_frozen_root():
     """
@@ -10,25 +13,30 @@ def get_frozen_root():
     return sys._MEIPASS if getattr(sys, 'frozen', False) else None
 
 
-def get_assets(root, kind, ext, content=False):
-    """
-    Searches for html/js assets in an 'assets'
-    folder start from the <root> dir.
+def convert_byte_stream_str(stream):
+    return ''.join([line.decode() for line in stream])
 
-    :param root: dir to start search from
-    :param kind: html | js
-    :param ext: extension type for the <kind> specified
-    :param content: boolean, returns asset content as str else empty str
-    :return: dict of asset name and content
-    """
-    assets = {}
-    assets_path = os.path.join(root, 'assets')
-    p = Path(os.path.join(assets_path, kind))
-    for path in p.glob('**/*.{}'.format(ext)):
-        name = str(path.relative_to(assets_path))
-        if content:
-            with open(str(path), encoding='utf8') as data:
-                assets[name] = data.read()
-        else:
-            assets[name] = ''
-    return assets
+
+def load_json(json_byte_stream):
+    json_str = convert_byte_stream_str(json_byte_stream)
+
+    api_response = {'error': None, 'warnings': []}
+
+    robot = Robot.get_instance()
+    robot.reset()
+
+    jpp = None
+    try:
+        jpp = JSONProtocolProcessor(json_str)
+        jpp.process()
+        robot.simulate()
+    except Exception as e:
+        api_response['error'] = str(e)
+    api_response['warnings'] = robot.get_warnings()
+
+
+    from pprint import pprint as pp
+    pp([i.description for i in robot._commands])
+
+    return api_response
+

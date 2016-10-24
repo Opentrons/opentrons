@@ -12,11 +12,12 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
 
 sys.path.insert(0, os.path.abspath('..'))
-from server.helpers import get_frozen_root
+from server import helpers  # import get_frozen_root
 from server.process_manager import run_once
 
-TEMPLATES_FOLDER = os.path.join(get_frozen_root() or '', 'templates')
-STATIC_FOLDER = os.path.join(get_frozen_root() or '', 'static')
+
+TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
+STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'static')
 BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
@@ -52,17 +53,13 @@ def load_python(stream):
     robot.reset()
     try:
         exec(code, globals(), locals())
-        robot.run()
+        robot.simulate()
     except Exception as e:
         api_response['error'] = str(e)
 
     api_response['warnings'] = robot.get_warnings()
 
     return api_response
-
-
-def load_json(stream):
-    pass
 
 
 @app.route("/upload", methods=["POST"])
@@ -81,7 +78,7 @@ def upload():
     if extension == 'py':
         api_response = load_python(file.stream)
     elif extension == 'json':
-        api_response = load_json(file.stream)
+        api_response = helpers.load_json(file.stream)
     else:
         return flask.jsonify({
             'status': 'error',
@@ -103,7 +100,7 @@ def upload():
 
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
-    root = get_frozen_root() or app.root_path
+    root = helpers.get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'templates', 'dist')
     return flask.send_from_directory(scripts_root_path, filename)
 
