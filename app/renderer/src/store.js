@@ -89,7 +89,7 @@ const actions = {
           console.log(response)
           if (response.body.data.error) {
             commit('UPDATE_ERROR', {error: response.body.data.error})
-          } else if (response.body.data.warnings) {
+          } else if (response.body.data.warnings.length > 0) {
             commit('UPDATE_WARNINGS', {warnings: response.body.data.warnings})
           } else {
             var tasks = response.body.data.calibrations
@@ -141,6 +141,9 @@ function createWebSocketPlugin(socket) {
         if (data.is_connected === false) {
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
         }
+      }
+      if (data.type === 'position') {
+        store.commit('UPDATE_POSITION', data.coords)
       }
     })
   }
