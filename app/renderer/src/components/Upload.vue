@@ -5,7 +5,7 @@
       <div class="instructions">
         Upload a valid JSON or Python Protocol. Errors will display below.
       </div>
-      <div v-if="error" class="error">
+      <div v-show="error" class="error">
         Errors:
         {{error}}
       </div>
