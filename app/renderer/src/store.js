@@ -10,6 +10,7 @@ const state = {
     port: null,
     fileName: "Select Protocol",
     error: false,
+    warnings: false,
     tasks: [],
     current_increment_placeable: 5,
     current_increment_plunger: 1
@@ -35,6 +36,9 @@ const mutations = {
     },
     UPDATE_ERROR (state, payload) {
       state.error = payload.error
+    },
+    UPDATE_WARNINGS (state, payload) {
+      state.warnings = payload.warnings
     }
 }
 
@@ -85,6 +89,8 @@ const actions = {
           console.log(response)
           if (response.body.data.error) {
             commit('UPDATE_ERROR', {error: response.body.data.error})
+          } else if (response.body.data.warnings) {
+            commit('UPDATE_WARNINGS', {warnings: response.body.data.warnings})
           } else {
             var tasks = response.body.data.calibrations
             tasks.map((instrument) => {

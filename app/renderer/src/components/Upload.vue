@@ -10,6 +10,10 @@
           <span class="error">!</span>
           Error: {{error}}
         </div>
+        <div v-show="warnings" >
+          <span class="error">!</span>
+          Warnings: {{warning}}
+        </div>
       </div>
       <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step step-upload">
         <div class="fileUpload">
@@ -44,6 +48,9 @@
       },
       error () {
         return this.$store.state.error
+      },
+      warnings () {
+        return this.$store.state.warnings
       },
       next () {
         if (this.$store.state.tasks[0]) {
