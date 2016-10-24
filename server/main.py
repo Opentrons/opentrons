@@ -140,7 +140,7 @@ def connect_robot():
     data = None
 
     try:
-        Robot.get_instance().connect(port)
+        Robot.get_instance().connect(port, options={'limit_switches': False})
     except Exception as e:
         status = 'error'
         data = str(e)

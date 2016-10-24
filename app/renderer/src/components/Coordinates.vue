@@ -1,15 +1,13 @@
 <template>
 	<div class="coords">
-		<label class="label">X: {{coords.x}}</label>
-	  <!-- <input type="text" v-bind:value="coords['x']" /> -->
-	  <label class="label">Y: {{coords.y}}</label>
-	  <!-- <input type="text" v-bind:value="coords['y']" /> -->
-	  <label class="label">Z: {{coords.z}}</label>
-	  <!-- <input type="text" v-bind:value="coords['z']" /> -->
-	  <label class="label" v-if="instrument">
-			{{axis}}: {{coords[axis.toLowerCase()]}}
-		</label>
-		<!-- <input type="text" v-bind:value="coords[axis]" v-if="instrument"/> -->
+		<label class="label">X: </label>
+	  <input type="text" v-bind:value="coords.x" />
+	  <label class="label">Y: </label>
+	  <input type="text" v-bind:value="coords.y" />
+	  <label class="label">Z: </label>
+	  <input type="text" v-bind:value="coords.z" />
+	  <label class="label" v-if="instrument">{{axis}}: </label>
+		<input type="text" v-bind:value="coords[axis.toLowerCase()]" v-if="instrument"/>
 	</div>
 </template>
 
