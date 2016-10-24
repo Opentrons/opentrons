@@ -52,7 +52,10 @@ def load_python(stream):
     robot.reset()
     try:
         exec(code, globals(), locals())
-        robot.run()
+        robot.simulate()
+        if len(robot._commands) == 0:
+            error = "This protocol does not contain any commands for the robot."
+            api_response['error'] = error
     except Exception as e:
         api_response['error'] = str(e)
 
@@ -120,6 +123,12 @@ def is_connected():
     return flask.jsonify({
         'is_connected': Robot.get_instance().is_connected(),
         'port': Robot.get_instance().get_connected_port()
+    })
+
+@app.route("/robot/get_coordinates")
+def get_coordinates():
+    return flask.jsonify({
+        'coords': Robot._driver.get_position().get("target")
     })
 
 
@@ -270,6 +279,51 @@ def move_to_slot():
         'data': result
     })
 
+@app.route("/robot/coordinates")
+def coordinates():
+    status = 'success'
+    data = None
+
+    try:
+        data = Robot._driver.get_head_position().get("current")
+    except Exception as e:
+        status = 'error'
+        data = str(e)
+
+    coordinates_watcher, watcher_should_run = BACKGROUND_TASKS.get(
+        'COORDINATES_WATCHER',
+        (None, None)
+    )
+
+    if coordinates_watcher and watcher_should_run:
+        watcher_should_run.set()
+
+    watcher_should_run = threading.Event()
+
+    def watch_coordinates(should_run):
+        while not should_run.is_set():
+            socketio.emit(
+                'event',
+                {
+                    'type': 'coordinates',
+                    'coords': data
+                }
+            )
+            socketio.sleep(1.5)
+
+    coordinates_watcher = socketio.start_background_task(
+        watch_connection_state,
+        (watcher_should_run)
+    )
+    BACKGROUND_TASKS['COORDINATES_WATCHER'] = (
+        coordinates_watcher,
+        watcher_should_run
+    )
+
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
