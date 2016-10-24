@@ -209,7 +209,7 @@ class Robot(object):
         self._driver.move_head(*args, **kwargs)
 
     @traceable('move-to')
-    def move_to(self, location, instrument=None, create_path=True, now=False):
+    def move_to(self, location, instrument=None, strategy='avoid', now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -223,26 +223,24 @@ class Robot(object):
         tallest_z += 10
 
         def _do():
-            if create_path:
+            if strategy == 'avoid':
                 self._driver.move_head(z=tallest_z)
                 self._driver.move_head(x=coordinates[0], y=coordinates[1])
                 self._driver.move_head(z=coordinates[2])
-            else:
+            elif strategy == 'direct':
                 self._driver.move_head(
                     x=coordinates[0],
                     y=coordinates[1],
                     z=coordinates[2]
                 )
+            else:
+                raise RuntimeError(
+                    'Unknown move strategy: {}'.format(strategy))
 
         if now:
             _do()
         else:
             self.add_command(Command(do=_do))
-
-    def move_to_top(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        self.move_to(top_location, instrument, create_path)
 
     @property
     def actions(self):
