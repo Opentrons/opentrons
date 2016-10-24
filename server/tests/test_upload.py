@@ -34,6 +34,41 @@ class UploadTestCase(unittest.TestCase):
         expected_data = {
             'data': [
                 {
+                    'axis': 'a',
+                    'blow_out': 13,
+                    'bottom': 11,
+                    'drop_tip': 14,
+                    'label': 'p10',
+                    'max_volume': 10,
+                    'placeables': [
+                        {
+                            'calibrated': False,
+                            'label': 'tiprack',
+                            'slot': 'A1',
+                            'type': 'tiprack-200ul'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'trough',
+                            'slot': 'B1',
+                            'type': 'trough-12row'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'plate',
+                            'slot': 'B2',
+                            'type': '96-flat'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'trash',
+                            'slot': 'A2',
+                            'type': 'point'
+                        }
+                    ],
+                    'top': 0
+                },
+                {
                     'axis': 'b',
                     'blow_out': 12,
                     'bottom': 10,
