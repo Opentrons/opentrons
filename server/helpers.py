@@ -26,17 +26,22 @@ def load_json(json_byte_stream):
     robot.reset()
 
     jpp = None
+    errors, warnings = [], []
     try:
         jpp = JSONProtocolProcessor(json_str)
         jpp.process()
         robot.simulate()
     except Exception as e:
-        api_response['error'] = str(e)
-    api_response['warnings'] = robot.get_warnings()
+        errors = [str(e)]
 
+    if jpp:
+        errors.extend(jpp.errors)
+        warnings.extend(jpp.warnings)
 
-    from pprint import pprint as pp
-    pp([i.description for i in robot._commands])
+    if robot.get_warnings():
+        warnings.extend(robot.get_warnings())
 
+    api_response['error'] = errors
+    api_response['warnings'] = warnings
     return api_response
 

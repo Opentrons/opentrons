@@ -1,0 +1,2597 @@
+{
+    "info": {
+        "name": "NiNTA purification using p1000 (1 prep)", 
+        "description": "protocol description", 
+        "create-date": "Oct 19 2016", 
+        "version": "0.1", 
+        "run-notes": "1.5mL rack= A1:lysate, A2:Ni FT, A3: Ni eluate; A4:Strep FT; A5: Strep eluate; Large_rack: A1:Ni slurry; A2:Ni slurry used; A3: Ni wash buffer; A4: Ni elution buffer; B1:Strep slurry; B2:strep slurry used; B3:Strep wash buffer; B4:Strep elution buffer; C1:Urea wash"
+    		}, 
+    
+	"deck" : {
+        "p1000-rack" : {
+            "labware" : "tiprack-1000ul",
+            "slot" : "A1"
+        },
+        "trash" : {
+            "labware" : "point",
+            "slot" : "B1"
+        },    
+        "liquid_waste" : {
+            "labware" : "point",
+            "slot" : "B3"
+        },
+        "rack_small" : {
+            "labware" : "96-PCR-flat",
+            "slot" : "B2"
+        },
+       "rack_large" : {
+            "labware" : "tube-rack-2ml",
+            "slot" : "B3"
+        }
+    },
+
+	"head" : {
+        "p1000" : {
+      	"tool" : "pipette",
+      	"tip-racks" : [
+        	{
+       		   	"container" : "p1000-rack"
+        	}
+      	],
+            "trash-container": {
+                "container": "trash"
+            },
+            "multi-channel": false,
+            "axis": "b",
+            "volume": 1000,
+            "down-plunger-speed": 300,
+            "up-plunger-speed": 200,
+            "tip-plunge": 6,
+            "extra-pull-volume": 0,
+            "extra-pull-delay": 200,
+            "distribute-percentage": 0.1,
+             "points": [
+                {
+                    "f1": 1,
+                    "f2": 1
+                },
+                {
+                    "f1": 5,
+                    "f2": 5
+                },
+                {
+                    "f1": 7,
+                    "f2": 7
+                },
+                {
+                    "f1": 10,
+                    "f2": 10
+                }
+            ]
+            
+        }
+    },
+	
+	"ingredients" : {
+
+	},
+
+	"instructions" : [
+		{
+			"tool" : "p1000",
+			"groups" : [			
+                {
+                    "mix": [
+                        {
+                            "container": "rack_large", 
+                            "location": "A1", 
+                            "volume": 1000, 
+                            "repetitions": 5,
+                            "tip-offset" : 10, 
+                            "blowout": false
+                        }
+                    		]
+                },
+                {
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A1",
+                                "tip-offset" : 10,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 300
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"blowout": false,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+					]
+				},
+{
+                    "mix": [
+                        {
+                            "container": "rack_large", 
+                            "location": "A1", 
+                            "volume": 1000, 
+                            "repetitions": 5,
+                            "tip-offset" : 10, 
+                            "blowout": false
+                        }
+                    		]
+                },
+                {
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A1",
+                                "tip-offset" : 10,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 300
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 30,
+    							"blowout": false,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+					]
+				},				
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 140,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A2",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},				
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 370,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B2",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "C1",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "C1",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+		{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "C1",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 15,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 100
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A1",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 15,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 100
+						}								
+								]
+				},						
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 900
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 900
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},				
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},				
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+				},								
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},								
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"tip-offset" : 0,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 140,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 5,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A6",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 20
+						}
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 100,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 5,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B6",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" :20
+						}
+								]
+				},
+				{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}								
+								]
+				},
+				{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}								
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 6.5,
+                                "delay" : 160,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 15,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}												
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 6.5,
+                                "delay" : 80,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 15,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}												
+								]
+				},
+				{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A1",
+                                "tip-offset" : 1,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_large",
+    							"location" : "A2",
+    							"tip-offset" : 15,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 900
+						}												
+								]
+				},
+				{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "A4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 5,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B1",
+    							"tip-offset" : 5,
+    							"delay" : 20,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B1",
+                                "tip-offset" : 1,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_large",
+    							"location" : "A2",
+    							"tip-offset" : 15,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 900
+						}												
+								]
+				},
+				{
+                    "mix": [
+                        {
+                            "container": "rack_large", 
+                            "location": "B1", 
+                            "volume": 1000, 
+                            "repetitions": 5,
+                            "tip-offset" : 10, 
+                            "blowout": false
+                        }
+                    		]
+                },
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B1",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            }, 
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}												
+								]
+				},
+				{
+                    "mix": [
+                        {
+                            "container": "rack_large", 
+                            "location": "B1", 
+                            "volume": 1000, 
+                            "repetitions": 5,
+                            "tip-offset" : 10, 
+                            "blowout": false
+                        }
+                    		]
+                },
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B1",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 30,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}												
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 100,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A4",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A4",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 240,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B4",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B4",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}								
+								]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+]
+						}, 
+{
+					"transfer" : [
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+							]
+					}, 
+						{
+					"transfer" : [
+{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+							]
+					},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+]
+						}, 
+						{
+					"transfer" : [
+{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+							]
+					}, 
+						{
+					"transfer" : [
+{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+							]
+					},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+]
+						},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+]
+						},
+{
+					"transfer" : [ 
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+							]
+					}, 
+						{
+					"transfer" : [
+{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "liquid_waste",
+    							"location" : "A1",
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}
+							]
+					},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}
+]
+					},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}
+]
+					},
+{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+ },
+                            	"volume" : 500
+						}
+                            
+]
+				},
+{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                         },
+                            	"volume" : 500
+						}
+
+]	
+				},
+						{
+					"transfer" : [	
+				{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A5",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}									
+								]
+				},
+						{
+					"transfer" : [	
+				{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B5",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}									
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}
+]
+					},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B4",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}
+]
+					},
+{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+ },
+                            	"volume" : 500
+						}
+                            
+]
+				},
+{
+					"transfer" : [								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                         },
+                            	"volume" : 500
+						}
+
+]	
+				},
+						{
+					"transfer" : [	
+				{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 13,
+                                "delay" : 150,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A5",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}									
+								]
+				},
+						{
+					"transfer" : [	
+				{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 13,
+                                "delay" : 60,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B5",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						}									
+								]
+				},
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "A3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 1,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_large",
+    							"location" : "B2",
+    							"tip-offset" : 1,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+						    "from" : {
+    							"container": "rack_small",
+                                "location": "A3",
+                                "tip-offset" : 1,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_large",
+    							"location" : "B2",
+    							"tip-offset" : 1,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}										
+								]
+				},
+
+				{
+					"transfer" : [
+    					{
+    						"from" : {
+    							"container": "rack_large",
+                                "location": "B3",
+                                "tip-offset" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},								
+    					{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 10,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_small",
+    							"location" : "B3",
+    							"tip-offset" : 10,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 500
+						},
+						{
+    						"from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 1,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_large",
+    							"location" : "B2",
+    							"tip-offset" : 1,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						},
+						{
+						    "from" : {
+    							"container": "rack_small",
+                                "location": "B3",
+                                "tip-offset" : 1,
+                                "delay" : 0,
+                                "touch-tip": false
+    						},
+    						"to": {
+                            	"container" : "rack_large",
+    							"location" : "B2",
+    							"tip-offset" : 1,
+    							"delay" : 0,
+    							"touch-tip" : false
+                            },
+                            	"volume" : 1000
+						}										
+								]
+				}																						
+			]
+		}
+	]
+}

@@ -12,7 +12,7 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
 
 sys.path.insert(0, os.path.abspath('..'))
-from server import helpers  # import get_frozen_root
+from server import helpers
 from server.process_manager import run_once
 
 
@@ -55,6 +55,7 @@ def load_python(stream):
         exec(code, globals(), locals())
         robot.simulate()
     except Exception as e:
+        api_response['error'] = str(e)
         api_response['error'] = str(e)
 
     api_response['warnings'] = robot.get_warnings()
