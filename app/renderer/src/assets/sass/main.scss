@@ -47,7 +47,31 @@ table {
     }
 }
 
-.coords {
+div.error {
+  @include offset-v(2, 1);
+  font-size: 18px;
+  font-weight: 600;  
+  text-align: center;
+  height:40px;
+  div{
+    display:flex;
+    justify-content:center;
+    span{
+        font-weight: 200;
+        background:rgba(140, 0, 110, 1);
+        border-radius: 50%;
+        width:20px;
+        height:20px;
+        margin:10px;
+        color:white;
+        line-height: 20px;
+    }
+    line-height: 40px;
+    color: rgba(140, 0, 110, 1);
+    }
+}
+
+.coords{
     input {
         pointer-events: none;
         text-align: center;
@@ -56,6 +80,7 @@ table {
         margin: 0;
         padding: 0;
         background: lighten($primary-brand, 40%);
+        line-height: 40px;
     }
 }
 
@@ -149,7 +174,8 @@ Wizard Screens
                 @include btn-col-f(5);
                 @include offset(1,
                 1);
-                @include offset-v(4,4);
+                @include offset-v(1,
+                4);
                 position: relative;
                 overflow: hidden;
                 background-color: $primary-brand;
@@ -200,21 +226,22 @@ Deck|Container
     .jog {
         display: flex;
         flex-wrap: wrap;
-        @include grid-col-full(6);
     }
     .increment {
+        @include grid-col-full(7);
+        @include offset(0,
+        6);
         span {
             display: flex;
             flex-wrap: wrap;
-            @include grid-col-full(7);
-            @include offset(0,
-            6);
         }
     }
     .deck {
-        display: flex;
-        flex-wrap: wrap;
         @include grid-col-full(5);
+        span {
+            display: flex;
+            flex-wrap: wrap;
+        }
     }
 }
 

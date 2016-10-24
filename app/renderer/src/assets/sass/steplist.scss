@@ -19,7 +19,7 @@ Step List Styles
 }
 
 #step-list ul li ul{
-    box-shadow: inset  0  1px 0px 0px lighten($primary-brand, 40%), inset  0 -1px 0px 0px lighten($primary-brand, 40%);
+    box-shadow: inset  0  1px 0px 0px lighten($primary-brand, 30%), inset  0 -1px 0px 0px lighten($primary-brand, 30%);
 }
 
 #step-list li a.router-link-active {
@@ -32,7 +32,7 @@ Step List Styles
     font-style: italic;
 }
 
-#step-list li.completed a:after {
+#step-list li a.completed:after {
     content: "\2713";
     float: right;
     padding-right: 10px;

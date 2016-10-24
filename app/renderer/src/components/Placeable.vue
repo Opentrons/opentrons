@@ -1,20 +1,21 @@
 <template>
   <div>
-      <h2 class="title">Calibrate {{ $route.params.placeable }}</h2>
-        <div class="instructions">Calibrate {{ instrument.label }}
-        to well A1 of {{ $route.params.placeable }}
-        </div>
-  
+    <h2 class="title">Calibrate {{ $route.params.placeable }}</h2>
+    <div class="instructions">Calibrate {{ instrument.label }}
+    to well A1 of {{ $route.params.placeable }}
+    </div>
+
     <section>
-      <div class="step step-calibrate">       
-          <div>
-           <!--  Current calibration:
-            <br>
-            <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> -->
-            <jog></jog>
-          </div>
+      <div class="step step-calibrate">
+        <div>
+          <Jog :instrument="instrument.axis"></Jog>
+        </div>
+        <div class="save-deck">
+          <h3 class="title">Deck Position</h3>
+          <coordinates :placeable="placeable"></coordinates>
+        </div>
       </div>
-      <navigation :prev="prev" :next="next"></navigation>
+      <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
 </template>
@@ -22,12 +23,19 @@
 <script>
   import Navigation from './Navigation.vue'
   import Jog from './Jog.vue'
+  import Coordinates from './Coordinates.vue'
 
   export default {
     name: "Placeable",
+    data: function() {
+      return {
+        placeable: true
+      }
+    },
     components: {
       Navigation,
-      Jog
+      Jog,
+      Coordinates
     },
     methods: {
       currentInstrument(tasks) {
@@ -50,8 +58,7 @@
       },
       instrument() {
         let tasks = this.$store.state.tasks
-        let instrument = this.currentInstrument(tasks)
-        return instrument
+        return this.currentInstrument(tasks)
       },
       next() {
         let tasks = this.$store.state.tasks

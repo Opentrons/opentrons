@@ -9,7 +9,7 @@ const state = {
     is_connected: false,
     port: null,
     fileName: "Select Protocol",
-    errors: "No errors",
+    error: false,
     tasks: [],
     current_increment_placeable: 5,
     current_increment_plunger: 1
@@ -32,6 +32,9 @@ const mutations = {
       } else {
         state.current_increment_plunger = payload.current_increment
       }
+    },
+    UPDATE_ERROR (state, payload) {
+      state.error = payload.error
     }
 }
 
@@ -44,7 +47,12 @@ const actions = {
             .then((response) => {
                 console.log('successfully connected...')
                 console.log('committing with payload:', payload)
-                commit('UPDATE_ROBOT_CONNECTION', payload)
+                if (response.data.status === "success") {
+                  commit('UPDATE_ROBOT_CONNECTION', payload)
+                } else {
+                  alert('Failed to connect to robot', response.data.status)
+                }
+
             }, (response) => {
                 console.log('failed to connect', response)
             })
@@ -75,14 +83,19 @@ const actions = {
         .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
-          var tasks = response.body.data.calibrations
-          tasks.map((instrument) => {
-            instrument.href = instrumentHref(instrument)
-            instrument.placeables.map((placeable) => {
-              placeable.href = placeableHref(placeable, instrument)
+          if (response.body.data.error) {
+            commit('UPDATE_ERROR', {error: response.body.data.error})
+          } else {
+            var tasks = response.body.data.calibrations
+            tasks.map((instrument) => {
+              instrument.href = instrumentHref(instrument)
+              instrument.placeables.map((placeable) => {
+                placeable.href = placeableHref(placeable, instrument)
+              })
             })
-          })
-          commit('UPDATE_TASK_LIST', {'tasks': tasks})
+            commit('UPDATE_ERROR', {error: null})
+            commit('UPDATE_TASK_LIST', {'tasks': tasks})
+          }
         }, (response) => {
           console.log('failed to upload', response)
         })
@@ -93,6 +106,25 @@ const actions = {
         'current_increment': data.inc,
         'type': data.type
       })
+    },
+    jog ({commit}, coords) {
+      console.log(coords)
+      Vue.http
+          .post('http://localhost:5000/jog', JSON.stringify(coords), {emulateJSON: true})
+          .then((response) => {
+            console.log("success", response)
+          }, (response) => {
+              console.log('failed', response)
+          })
+    },
+    jogToSlot ({commit}, data) {
+      Vue.http
+          .post('http://localhost:5000/move_to_slot', JSON.stringify(data), {emulateJSON: true})
+          .then((response) => {
+            console.log("success", response)
+          }, (response) => {
+              console.log('failed', response)
+          })
     }
 }
 
@@ -108,14 +140,12 @@ function createWebSocketPlugin(socket) {
   }
 }
 
-
 const socket = io.connect('ws://localhost:5000')
 
 socket.on('connect', function(){
   console.log('WebSocket has connected.')
   socket.emit('connected')
 });
-
 
 socket.on('disconnect', function(){
   console.log('WebSocket has disconnected')

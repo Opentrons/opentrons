@@ -67,7 +67,6 @@ def load_json(stream):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    # import pdb; pdb.set_trace()
     file = request.files.get('file')
 
     if not file:
@@ -234,7 +233,38 @@ def get_placeables():
 
 @app.route('/home/<axis>')
 def home(axis):
-    result = robot.home(axis)
+    result = robot.home(axis, now=True)
+    return flask.jsonify({
+        'status': 200,
+        'data': result
+    })
+
+
+@app.route('/jog', methods=["POST"])
+def jog():
+    coords = request.json
+    if coords.get("a") or coords.get("b"):
+        result = robot._driver.move_plunger(mode="relative", **coords)
+    else:
+        result = robot.move_head(mode="relative", **coords)
+
+    return flask.jsonify({
+        'status': 200,
+        'data': result
+    })
+
+
+@app.route('/move_to_slot', methods=["POST"])
+def move_to_slot():
+    slot = request.json.get("slot")
+    axis = request.json.get("axis")
+    location = robot._deck[slot]
+    result = robot.move_to(
+        location,
+        now=True,
+        instrument=robot._instruments[axis.upper()]
+    )
+
     return flask.jsonify({
         'status': 200,
         'data': result
