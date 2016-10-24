@@ -5,9 +5,11 @@
       <div class="instructions">
         Upload a valid JSON or Python Protocol. Errors will display below.
       </div>
-      <div v-show="error" class="error">
-        Errors:
-        {{error}}
+      <div class="error">
+        <div v-show="error" >
+          <span class="error">!</span>
+          Error: {{error}}
+        </div>
       </div>
       <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step step-upload">
         <div class="fileUpload">
