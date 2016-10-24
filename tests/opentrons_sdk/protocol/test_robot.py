@@ -35,7 +35,7 @@ class RobotTest(unittest.TestCase):
 
     def test_robot_move_to(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.run(mode='live')
+        self.robot.run()
         position = self.robot._driver.get_head_position()['current']
         self.assertEqual(position, (100, 0, 0))
 
@@ -48,7 +48,7 @@ class RobotTest(unittest.TestCase):
         self.robot.clear()
         self.robot.home()
         self.assertEquals(len(self.robot._commands), 1)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         self.robot.clear()
         self.robot.home(now=True)
@@ -62,7 +62,7 @@ class RobotTest(unittest.TestCase):
         self.robot.pause()
 
         def _run():
-            self.robot.run(mode='live')
+            self.robot.run()
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -79,7 +79,7 @@ class RobotTest(unittest.TestCase):
         self.robot.move_to((Deck(), (101, 0, 0)))
 
         def _run():
-            self.robot.run(mode='live')
+            self.robot.run()
 
         self.robot.pause()
 

@@ -248,43 +248,53 @@ class Robot(object):
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def run(self, mode='simulate'):
-
-        self.set_connection(mode)
-
+    def consume_commands(self):
         self._runtime_warnings = []
 
         for instrument in self._instruments.values():
             instrument.reset()
 
-        try:
-            for command in self._commands:
-                try:
-                    self.can_pop_command.wait()
-                    if self.stopped_event.is_set():
-                        self.resume()
-                        break
-                    if command.description:
-                        log.info("Executing: {}".format(command.description))
-                    command.do()
-                except KeyboardInterrupt as e:
-                    self._driver.halt()
-                    raise e
-        finally:
-            self.set_connection('live')
+        for command in self._commands:
+            try:
+                self.can_pop_command.wait()
+                if self.stopped_event.is_set():
+                    self.resume()
+                    break
+                if command.description:
+                    log.info("Executing: {}".format(command.description))
+                command.do()
+            except KeyboardInterrupt as e:
+                self._driver.halt()
+                raise e
 
         return self._runtime_warnings
 
+    def run(self):
+
+        res = self.consume_commands()
+
+        return res
+
+    def simulate(self, switches=False):
+        if switches:
+            self.set_connection('simulate_switches')
+        else:
+            self.set_connection('simulate')
+
+        res = self.consume_commands()
+
+        self.set_connection('live')
+
+        return res
+
     def set_connection(self, mode):
-        if mode == 'simulate':
-            self._driver.connect(self.connections['simulate'])
-        elif mode == 'live':
-            if self.connections['live']:
-                self._driver.connect(self.connections['live'])
+
+        if mode in self.connections:
+            connection = self.connections[mode]
+            if connection:
+                self._driver.connect(connection)
             else:
-                self._driver.disconnect()
-        elif mode == 'simulate_switches':
-            self._driver.connect(self.connections['simulate_switches'])
+                raise RuntimeWarning('Please connect to the robot')
         else:
             raise ValueError(
                 'mode expected to be "live" or "simulate", '
