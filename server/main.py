@@ -128,7 +128,7 @@ def is_connected():
 @app.route("/robot/get_coordinates")
 def get_coordinates():
     return flask.jsonify({
-        'coords': Robot._driver.get_position().get("target")
+        'coords': robot._driver.get_position().get("target")
     })
 
 
@@ -285,40 +285,32 @@ def coordinates():
     data = None
 
     try:
-        data = Robot._driver.get_head_position().get("current")
+        data = robot._driver.get_position().get("current")
     except Exception as e:
         status = 'error'
         data = str(e)
 
-    coordinates_watcher, watcher_should_run = BACKGROUND_TASKS.get(
-        'COORDINATES_WATCHER',
-        (None, None)
-    )
+    coordinates_watcher = BACKGROUND_TASKS.get('COORDINATES_WATCHER')
 
-    if coordinates_watcher and watcher_should_run:
-        watcher_should_run.set()
+    if coordinates_watcher:
+        return flask.jsonify({
+            'status': status,
+            'data': data
+        })
 
-    watcher_should_run = threading.Event()
-
-    def watch_coordinates(should_run):
-        while not should_run.is_set():
+    def watch_coordinates():
+        while True:
             socketio.emit(
                 'event',
                 {
                     'type': 'coordinates',
-                    'coords': data
+                    'coordinates': robot._driver.get_position().get("current")
                 }
             )
-            socketio.sleep(1.5)
+            socketio.sleep(0.5)
 
-    coordinates_watcher = socketio.start_background_task(
-        watch_connection_state,
-        (watcher_should_run)
-    )
-    BACKGROUND_TASKS['COORDINATES_WATCHER'] = (
-        coordinates_watcher,
-        watcher_should_run
-    )
+    coordinates_watcher = socketio.start_background_task(watch_coordinates)
+    BACKGROUND_TASKS['COORDINATES_WATCHER'] = coordinates_watcher
 
     return flask.jsonify({
         'status': status,

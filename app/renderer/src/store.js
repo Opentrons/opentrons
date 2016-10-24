@@ -13,7 +13,8 @@ const state = {
     warnings: false,
     tasks: [],
     current_increment_placeable: 5,
-    current_increment_plunger: 1
+    current_increment_plunger: 1,
+    coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0}
 }
 
 const mutations = {
@@ -39,6 +40,9 @@ const mutations = {
     },
     UPDATE_WARNINGS (state, payload) {
       state.warnings = payload.warnings
+    },
+    UPDATE_POSITION (state, payload) {
+      state.coordinates = payload
     }
 }
 
@@ -99,6 +103,9 @@ const actions = {
                 placeable.href = placeableHref(placeable, instrument)
               })
             })
+            Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
+              console.log(response)
+            })
             commit('UPDATE_ERROR', {error: null})
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
           }
@@ -142,8 +149,14 @@ function createWebSocketPlugin(socket) {
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
         }
       }
-      if (data.type === 'position') {
-        store.commit('UPDATE_POSITION', data.coords)
+      if (data.type === 'coordinates') {
+        store.commit('UPDATE_POSITION', {
+          x: data.coordinates.x,
+          y: data.coordinates.y,
+          z: data.coordinates.z,
+          a: data.coordinates.a,
+          b: data.coordinates.b
+        })
       }
     })
   }
