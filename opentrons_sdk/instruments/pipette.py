@@ -163,12 +163,16 @@ class Pipette(object):
         return self
 
     def position_for_aspirate(self, location=None):
-        # if location:
-        #     self.move_to_top(location, now=True)
 
+        # first go to the destination
+        if location:
+            self.move_to_top(location, now=True)
+
+        # setup the plunger above the liquid
         if self.current_volume == 0:
             self.plunger.move(self.positions['bottom'])
 
+        # then go inside the location
         if location:
             if isinstance(location, Placeable):
                 # go all the way to the bottom

@@ -139,7 +139,7 @@ class PipetteTest(unittest.TestCase):
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(
             current_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
+            Vector({'x': 144.30, 'y': 97.00, 'z': 3.0})
         )
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
@@ -172,7 +172,7 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEqual(
             current_head_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
+            Vector({'x': 144.30, 'y': 97.00, 'z': 3.0})
         )
         self.assertDictEqual(
             current_plunger_pos,
