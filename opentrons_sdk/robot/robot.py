@@ -248,7 +248,7 @@ class Robot(object):
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def consume_commands(self):
+    def run(self):
         self._runtime_warnings = []
 
         for instrument in self._instruments.values():
@@ -269,26 +269,16 @@ class Robot(object):
 
         return self._runtime_warnings
 
-    def run(self):
-
-        res = self.consume_commands()
-
-        return res
-
     def simulate(self, switches=False):
         if switches:
             self.set_connection('simulate_switches')
         else:
             self.set_connection('simulate')
-
-        res = self.consume_commands()
-
+        res = self.run()
         self.set_connection('live')
-
         return res
 
     def set_connection(self, mode):
-
         if mode in self.connections:
             connection = self.connections[mode]
             if connection:
