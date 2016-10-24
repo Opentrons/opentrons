@@ -1,9 +1,15 @@
-from pathlib import Path
-import os
+import json
 import sys
 
 from opentrons_sdk.json_importer import JSONProtocolProcessor
 from opentrons_sdk.robot import Robot
+
+
+JSON_ERROR = None
+if sys.version_info > (3, 4):
+    JSON_ERROR = ValueError
+else:
+    JSON_ERROR = json.decoder.JSONDecodeError
 
 
 def get_frozen_root():
@@ -31,8 +37,10 @@ def load_json(json_byte_stream):
         jpp = JSONProtocolProcessor(json_str)
         jpp.process()
         robot.simulate()
+    except JSON_ERROR:
+        errors.append('Cannot parse invalid JSON')
     except Exception as e:
-        errors = [str(e)]
+        errors.append(str(e))
 
     if jpp:
         errors.extend(jpp.errors)

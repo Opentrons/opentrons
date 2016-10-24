@@ -42,5 +42,5 @@ class LoadJSONTestCase(unittest.TestCase):
     def test_load_json_with_invalid_protocol(self):
         stream = self.get_invalid_json_protocol_stream()
         api_resp_result = helpers.load_json(stream)
-        self.assertEqual(len(api_resp_result['error']), 2)
-        self.assertEqual(len(api_resp_result['warnings']), 0)
+        self.assertEqual(len(api_resp_result['error']), 1)
+        self.assertEqual(api_resp_result['error'][0], 'Cannot parse invalid JSON')
