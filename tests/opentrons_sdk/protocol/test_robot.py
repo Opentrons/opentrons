@@ -3,7 +3,7 @@ import unittest
 
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.placeable import Deck
-from opentrons_sdk import containers, instruments
+from opentrons_sdk import instruments
 
 
 class RobotTest(unittest.TestCase):
