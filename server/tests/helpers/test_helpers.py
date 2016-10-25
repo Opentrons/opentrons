@@ -47,7 +47,7 @@ class LoadJSONTestCase(unittest.TestCase):
     def test_load_json_with_bad_protocol(self):
         stream = self.get_bad_json_protocol_stream()
         api_resp_result = helpers.load_json(stream)
-        self.assertEqual(len(api_resp_result['errors']), 2)
+        self.assertEqual(len(api_resp_result['errors']), 1)
         self.assertEqual(len(api_resp_result['warnings']), 0)
 
     def test_load_json_with_invalid_protocol(self):
