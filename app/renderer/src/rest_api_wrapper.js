@@ -4,8 +4,8 @@ import Vue from 'vue'
 class OpenTrons {
   constructor(base_url) {
     this.base_url = base_url || 'http://localhost:5000'
-    this.connect_url = base_url + '/robot/serial/connect'
-    this.disconnect_url = base_url + '/robot/serial/disconnect'
+    this.connect_url = this.base_url + '/robot/serial/connect'
+    this.disconnect_url = this.base_url + '/robot/serial/disconnect'
   }
 
   connect(port) {
@@ -28,14 +28,11 @@ class OpenTrons {
     Vue.http
       .get(this.disconnect_url)
       .then((response) => {
-        console.log(response)
-        // TODO: WTF??
-        if (response.data.is_connected === true){
-          console.log('Successfully disconnected...')
+        if (response.data.status === "success") {
+          return true
         } else {
-          console.log('Failed to disconnect', response.data)
+          return false
         }
-        return true
       }, (response) => {
         console.log('Failed to communicate to server', response)
       })

@@ -20,6 +20,7 @@ const actions = {
       }
     })
   },
+
   updateFilename ({commit}, fileName) {
     commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
   },
