@@ -314,6 +314,52 @@ def coordinates():
         'data': data
     })
 
+
+def _calibrate_placeable(container_name, axis_name):
+
+    deck = robot._deck
+    containers = deck.containers()
+
+    print(containers)
+    
+    if container_name not in containers:
+        raise ValueError('Container {} is not definied'.format(container_name))
+
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    container = containers[container_name]
+
+    well = container[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=container)
+    location = (container, pos)
+    
+    instrument.calibrate_position(location)
+
+
+@app.route("/calibrate_placeable", methods=["POST"])
+def calibrate_placeable():
+    print(request.data)
+    name = request.json.get("label")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_placeable(name, axis)
+    except Exception as e:
+        return flask.jsonify({
+                'status': 'error',
+                'data': str(e)
+            })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'name': name,
+            'axis': axis
+        }
+    })
+
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
