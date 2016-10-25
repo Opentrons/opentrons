@@ -82,6 +82,7 @@ def import_calibration_json(json_string, robot, calibrated_top=False):
                         y=0,
                         z=z_pos,
                         reference=container))
+
                 pipette.calibrate_position(
                     location,
                     robot.flip_coordinates(coordinates))

@@ -4,9 +4,10 @@ from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.containers.placeable import Placeable, humanize_location
+from opentrons_sdk.instruments.instrument import Instrument
 
 
-class Pipette(object):
+class Pipette(Instrument):
 
     def __init__(
             self,
@@ -54,6 +55,8 @@ class Pipette(object):
         self.placeables = []
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+
+        self.setup_calibrations()
 
     def reset(self):
         self.placeables = []
@@ -335,6 +338,8 @@ class Pipette(object):
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
 
+        self.save_calibrations()
+
         return self
 
     def calibrate_position(self, location, current=None):
@@ -345,10 +350,16 @@ class Pipette(object):
             self.calibration_data,
             location,
             current)
+
+        self.save_calibrations()
+
         return self
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
+
+        self.save_calibrations()
+
         return self
 
     def plunge_distance(self, volume):

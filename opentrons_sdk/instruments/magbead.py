@@ -1,15 +1,20 @@
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
+from opentrons_sdk.instruments.instrument import Instrument
 
 
-class Magbead(object):
+class Magbead(Instrument):
 
-    def __init__(self, mosfet=0, container=None):
+    def __init__(self, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
         self.mosfet = self.robot.get_mosfet(mosfet)
+
+        if not name:
+            name = self.axis
+        self.name = name
 
         # all instruments should hold calibration data, even if not used
         self.calibration_data = {}
