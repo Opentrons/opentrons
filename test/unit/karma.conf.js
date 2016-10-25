@@ -6,7 +6,7 @@
 var path = require('path')
 var merge = require('webpack-merge')
 var baseConfig = require('../../webpack.config.js')
-var projectRoot = path.resolve(__dirname, '../../')
+var projectRoot = path.resolve(__dirname, '../../app')
 
 var webpackConfig = merge(baseConfig, {
   // use inline sourcemap for karma-sourcemap-loader
@@ -18,13 +18,15 @@ var webpackConfig = merge(baseConfig, {
   }
 })
 
-// make sure isparta loader is applied before eslint
-webpackConfig.module.preLoaders.unshift({
-  test: /\.js$/,
-  loader: 'isparta',
-  include: projectRoot,
-  exclude: /test\/unit|node_modules/
-})
+webpackConfig = baseConfig
+
+// // make sure isparta loader is applied before eslint
+// webpackConfig.module.preLoaders.unshift({
+//   test: /\.js$/,
+//   loader: 'isparta',
+//   include: projectRoot,
+//   exclude: /test\/unit|node_modules/
+// })
 
 // only apply babel for test files when using isparta
 webpackConfig.module.loaders.some(function (loader, i) {
@@ -41,7 +43,7 @@ module.exports = function (config) {
     //    http://karma-runner.github.io/0.13/config/browsers.html
     // 2. add it to the `browsers` array below.
     browsers: ['Electron'],
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine'],  // ['jasmine'],
     reporters: ['spec', 'coverage'],
     files: ['./index.js'],
     preprocessors: {
