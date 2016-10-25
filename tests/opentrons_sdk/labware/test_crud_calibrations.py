@@ -40,5 +40,7 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         }
 
         self.assertTrue('A1' in self.p200.calibration_data)
-        self.assertTrue('plate' in self.p200.calibration_data['A1']['children'])
-        self.assertEquals(expected_delta, self.p200.calibration_data['A1']['children']['plate'])
+        actual = self.p200.calibration_data['A1']['children']
+        self.assertTrue('plate' in actual)
+        actual = self.p200.calibration_data['A1']['children']['plate']
+        self.assertEquals(expected_delta, actual)
