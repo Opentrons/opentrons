@@ -2,43 +2,23 @@ import Vue from 'vue'
 
 import * as types from './mutation-types'
 
+import OpenTrons from '../rest_api_wrapper'
+
+
 
 const actions = {
   connect_robot ({ commit }, port) {
     const payload = {is_connected: true, 'port': port}
-    let options = {params: {'port': port}}
-    Vue.http
-      .get('http://localhost:5000/robot/serial/connect', options)
-      .then((response) => {
-        console.log('successfully connected...')
-        console.log('committing with payload:', payload)
-        if (response.data.status === "success") {
-          commit(types.UPDATE_ROBOT_CONNECTION, payload)
-        } else {
-          alert('Failed to connect to robot', response.data.status)
-        }
-
-      }, (response) => {
-        console.log('failed to connect', response)
-      })
+    OpenTrons.connect(port).then((was_successful) => {
+      if (was_successful) commit(types.UPDATE_ROBOT_CONNECTION, payload)
+    })
   },
   disconnect_robot ({ commit }) {
-    Vue.http
-      .get('http://localhost:5000/robot/serial/disconnect')
-      .then((response) => {
-        console.log(response)
-        if (response.data.is_connected === true){
-          console.log('Successfully disconnected...')
-        } else {
-          console.log('Failed to disconnect', response.data)
-        }
-        commit(types.UPDATE_ROBOT_CONNECTION, {
-          'is_connected': false,
-          'port': null
-        })
-      }, (response) => {
-        console.log('Failed to communicate to server', response)
-      })
+    OpenTrons.connect(port).then((was_successful) => {
+      if (was_successful) {
+        commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
+      }
+    })
   },
   updateFilename ({commit}, fileName) {
     commit(types.UPDATE_FILE_NAME, {'fileName': fileName})

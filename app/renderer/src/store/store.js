@@ -10,7 +10,6 @@ import app_actions from './actions'
 const { actions } = app_actions
 
 
-
 Vue.use(Vuex)
 
 
