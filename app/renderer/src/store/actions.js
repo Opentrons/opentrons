@@ -26,32 +26,24 @@ const actions = {
     commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
   },
   uploadProtocol ({commit}, formData) {
-    Vue.http
-      .post('http://localhost:5000/upload', formData)
-      .then((response) => {
-        console.log(response)
-        if (response.body.data.errors.length > 0) {
-          commit('UPDATE_TASK_LIST', {tasks: []})
-          commit('UPDATE_ERROR', {errors: response.body.data.errors})
-        } else if (response.body.data.warnings.length > 0) {
-          commit('UPDATE_WARNINGS', {warnings: response.body.data.warnings})
-        } else {
-          var tasks = response.body.data.calibrations
-          tasks.map((instrument) => {
-            instrument.href = instrumentHref(instrument)
-            instrument.placeables.map((placeable) => {
-              placeable.href = placeableHref(placeable, instrument)
-            })
+    OpenTrons.uploadProtocol(formData).then((result) =>{
+      if (result.success) {
+        let tasks = result.data.calibrations
+        tasks.map((instrument) => {
+          instrument.href = instrumentHref(instrument)
+          instrument.placeables.map((placeable) => {
+            placeable.href = placeableHref(placeable, instrument)
           })
-          commit('UPDATE_ERROR', {errors: []})
-          Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
-            console.log(response)
-          })
-          commit('UPDATE_TASK_LIST', {'tasks': tasks})
-        }
-      }, (response) => {
-        console.log('failed to upload', response)
-      })
+        })
+        commit('UPDATE_TASK_LIST', {'tasks': tasks})
+      } else {
+        commit('UPDATE_TASK_LIST', {tasks: []})
+      }
+      commit('UPDATE_WARNINGS', {warning: result.warnings})
+      commit('UPDATE_ERROR', {errors: result.errors})
+
+    })
+
   },
   selectIncrement ({commit}, data) {
     console.log("updating increment to " + data.inc + " for " + data.type)
