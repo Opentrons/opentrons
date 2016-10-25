@@ -105,9 +105,9 @@ const actions = {
               })
             })
             commit('UPDATE_ERROR', {errors: []})
-            Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
-              console.log(response)
-            })
+            // Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
+            //   console.log(response)
+            // })
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
           }
         }, (response) => {
@@ -150,13 +150,15 @@ function createWebSocketPlugin(socket) {
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
         }
       }
-      if (data.type === 'coordinates') {
+      if (data.name === 'move-finished') {
+        console.log(data)
         store.commit('UPDATE_POSITION', {
-          x: data.coordinates.x,
-          y: data.coordinates.y,
-          z: data.coordinates.z,
-          a: data.coordinates.a,
-          b: data.coordinates.b
+          x: data.position.head.x,
+          y: data.position.head.y,
+          z: data.position.head.z,
+
+          a: data.position.plunger.a,
+          b: data.position.plunger.b,
         })
       }
     })
@@ -173,6 +175,11 @@ socket.on('connect', function(){
 socket.on('disconnect', function(){
   console.log('WebSocket has disconnected')
 })
+
+socket.on('event', function(e){
+  console.log('got back', e)
+})
+
 
 const websocketplugin = createWebSocketPlugin(socket)
 

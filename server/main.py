@@ -9,7 +9,8 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.containers.placeable import Container
+from opentrons_sdk.instruments import Pipette
+from opentrons_sdk.containers import placeable
 from opentrons_sdk.util import trace
 from opentrons_sdk.util import vector
 
@@ -40,12 +41,15 @@ class VectorEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, vector.Vector):
             return dict(zip('xyz', obj))
-        return json.JSONEncoder.default(self, obj)
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except:
+            return str(obj)
 
 
 def notify(info):
-    s = json.dumps({'info': info}, cls=VectorEncoder)
-    socketio.emit('event', s)
+    s = json.dumps(info, cls=VectorEncoder)
+    socketio.emit('event', json.loads(s))
 
 
 trace.EventBroker.get_instance().add(notify)
@@ -228,9 +232,9 @@ def get_placeables():
     def get_containers(instrument):
         unique_containers = set()
 
-        for placeable in instrument.placeables:
-            containers = [c for c in placeable.get_trace() if isinstance(
-                c, Container)]
+        for placeable_inst in instrument.placeables:
+            containers = [c for c in placeable_inst.get_trace() if isinstance(
+                c, placeable.Container)]
             unique_containers.add(containers[0])
         return list(unique_containers)
 
