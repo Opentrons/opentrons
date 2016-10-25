@@ -378,6 +378,7 @@ class CNCDriver(object):
                 arrived = False
         return arrived
 
+    @trace.traceable('home')
     def home(self, *axis):
         axis_to_home = ''
         for a in axis:
