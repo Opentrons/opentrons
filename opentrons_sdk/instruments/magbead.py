@@ -13,7 +13,7 @@ class Magbead(Instrument):
         self.mosfet = self.robot.get_mosfet(mosfet)
 
         if not name:
-            name = self.axis
+            name = self.__class__.__name__
         self.name = name
 
         # all instruments should hold calibration data, even if not used

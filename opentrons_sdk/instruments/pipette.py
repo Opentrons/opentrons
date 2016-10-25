@@ -24,7 +24,7 @@ class Pipette(Instrument):
         self.channels = channels
 
         if not name:
-            name = axis
+            name = self.__class__.__name__
         self.name = name
 
         self.calibration_data = {}
