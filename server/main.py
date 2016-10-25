@@ -10,7 +10,10 @@ from flask_cors import CORS
 
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
-from opentrons_sdk.util.trace import (EventBroker, traceable)
+from opentrons_sdk.util import trace
+from opentrons_sdk.util import vector
+
+import json
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
@@ -33,11 +36,19 @@ socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
 
 
+class VectorEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, vector.Vector):
+            return dict(zip('xyz', obj))
+        return json.JSONEncoder.default(self, obj)
+
+
 def notify(info):
-    socketio.emit('event', {'info': info})
+    s = json.dumps({'info': info}, cls=VectorEncoder)
+    socketio.emit('event', s)
 
 
-EventBroker.get_instance().add(notify)
+trace.EventBroker.get_instance().add(notify)
 
 
 # welcome route for connecting to robot
