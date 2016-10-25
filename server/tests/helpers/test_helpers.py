@@ -41,17 +41,19 @@ class LoadJSONTestCase(unittest.TestCase):
     def test_load_json_with_good_protocol(self):
         stream = self.get_good_json_protocol_stream()
         api_resp_result = helpers.load_json(stream)
-        api_resp_expected = {'error': [], 'warnings': []}
+        api_resp_expected = {'errors': [], 'warnings': []}
         self.assertDictEqual(api_resp_expected, api_resp_result)
 
     def test_load_json_with_bad_protocol(self):
         stream = self.get_bad_json_protocol_stream()
         api_resp_result = helpers.load_json(stream)
-        self.assertEqual(len(api_resp_result['error']), 2)
+        self.assertEqual(len(api_resp_result['errors']), 2)
         self.assertEqual(len(api_resp_result['warnings']), 0)
 
     def test_load_json_with_invalid_protocol(self):
         stream = self.get_invalid_json_protocol_stream()
         api_resp_result = helpers.load_json(stream)
-        self.assertEqual(len(api_resp_result['error']), 1)
-        self.assertEqual(api_resp_result['error'][0], 'Cannot parse invalid JSON')
+        self.assertEqual(len(api_resp_result['errors']), 1)
+        self.assertEqual(
+            api_resp_result['errors'][0], 'Cannot parse invalid JSON'
+        )

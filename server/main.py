@@ -11,7 +11,7 @@ from flask_cors import CORS
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
 
@@ -48,7 +48,7 @@ def load_python(stream):
     global robot
 
     code = helpers.convert_byte_stream_to_str(stream)
-    api_response = {'error': None, 'warnings': []}
+    api_response = {'errors': None, 'warnings': []}
 
     robot.reset()
     try:

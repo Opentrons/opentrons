@@ -83,7 +83,6 @@ class UploadTestCase(unittest.TestCase):
     def test_upload_invalid_python(self):
         pass
 
-
     def test_upload_valid_json(self):
         response = self.app.post('/upload', data={
             'file': (
