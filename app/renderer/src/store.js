@@ -83,7 +83,8 @@ const actions = {
         .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
-          if (response.body.data.errors) {
+          if (response.body.data.errors.length > 0) {
+            commit('UPDATE_TASK_LIST', {tasks: []})
             commit('UPDATE_ERROR', {errors: response.body.data.errors})
           } else {
             var tasks = response.body.data.calibrations
