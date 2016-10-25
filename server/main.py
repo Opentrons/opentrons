@@ -34,7 +34,7 @@ robot = Robot.get_instance()
 
 
 def notify(info):
-    print(info)
+    socketio.emit('event', {'info': info})
 
 
 EventBroker.get_instance().add(notify)
@@ -284,43 +284,6 @@ def move_to_slot():
         'data': result
     })
 
-@app.route("/robot/coordinates")
-def coordinates():
-    status = 'success'
-    data = None
-
-    try:
-        data = robot._driver.get_position().get("current")
-    except Exception as e:
-        status = 'error'
-        data = str(e)
-
-    coordinates_watcher = BACKGROUND_TASKS.get('COORDINATES_WATCHER')
-
-    if coordinates_watcher:
-        return flask.jsonify({
-            'status': status,
-            'data': data
-        })
-
-    def watch_coordinates():
-        while True:
-            socketio.emit(
-                'event',
-                {
-                    'type': 'coordinates',
-                    'coordinates': robot._driver.get_position().get("current")
-                }
-            )
-            socketio.sleep(0.5)
-
-    coordinates_watcher = socketio.start_background_task(watch_coordinates)
-    BACKGROUND_TASKS['COORDINATES_WATCHER'] = coordinates_watcher
-
-    return flask.jsonify({
-        'status': status,
-        'data': data
-    })
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
