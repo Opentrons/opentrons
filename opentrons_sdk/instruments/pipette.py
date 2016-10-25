@@ -58,8 +58,6 @@ class Pipette(Instrument):
 
         self.setup_calibrations()
 
-        self.save_calibrations()
-
     def reset(self):
         self.placeables = []
         self.current_volume = 0
