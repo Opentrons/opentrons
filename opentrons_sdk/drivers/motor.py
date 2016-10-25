@@ -3,6 +3,7 @@ import json
 import math
 import sys
 import time
+from threading import Event
 
 import serial
 
@@ -11,7 +12,7 @@ from opentrons_sdk.util.log import get_logger
 from opentrons_sdk.util.vector import Vector
 from opentrons_sdk.helpers.helpers import break_down_travel
 
-from threading import Event
+from opentrons_sdk.util import trace
 
 
 JSON_ERROR = None
@@ -333,6 +334,16 @@ class CNCDriver(object):
             res = self.send_command(self.MOVE, **args)
             if res != b'ok':
                 return (False, self.SMOOTHIE_ERROR)
+
+        arguments = {
+            'name': 'move-finished',
+            'position': {
+                'head': self.get_head_position()["current"],
+                'plunger': self.get_plunger_positions()["current"]
+            },
+            'class': type(self.connection).__name__
+        }
+        trace.EventBroker.get_instance().notify(arguments)
         return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
