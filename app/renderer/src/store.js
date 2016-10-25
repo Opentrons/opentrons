@@ -105,10 +105,8 @@ const actions = {
               })
             })
             commit('UPDATE_ERROR', {errors: []})
-            // Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
-            //   console.log(response)
-            // })
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
+            commit('UPDATE_POSITION', {"x":0, "y":0, "z":0, "a":0, "b":0})
           }
         }, (response) => {
           console.log('failed to upload', response)
@@ -161,6 +159,10 @@ function createWebSocketPlugin(socket) {
           b: data.position.plunger.b,
         })
       }
+      if (data.name === 'home') {
+        console.log(data)
+        store.commit('UPDATE_POSITION', {"x":0, "y":0, "z":0, "a":0, "b":0})
+      }
     })
   }
 }
@@ -174,10 +176,6 @@ socket.on('connect', function(){
 
 socket.on('disconnect', function(){
   console.log('WebSocket has disconnected')
-})
-
-socket.on('event', function(e){
-  console.log('got back', e)
 })
 
 
