@@ -7,7 +7,7 @@
       </div>
       <div class="step">
         <div class="error">
-          <div v-show="error" >
+          <div v-for="error in errors" >
             <span class="error">!</span>
             Error: {{error}}
           </div>
@@ -48,8 +48,8 @@
       connected () {
         return this.$store.state.is_connected
       },
-      error () {
-        return this.$store.state.error
+      errors () {
+        return this.$store.state.errors
       },
       warnings () {
         return this.$store.state.warnings

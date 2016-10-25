@@ -119,7 +119,21 @@ class UploadTestCase(unittest.TestCase):
         pass
 
     def test_upload_valid_json(self):
-        pass
+        response = self.app.post('/upload', data={
+            'file': (
+                open(self.data_path + 'good_json_protocol.json', 'rb'),
+                'good_json_protocol.json'
+            )
+        })
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
 
     def test_upload_invalid_json(self):
-        pass
+        response = self.app.post('/upload', data={
+            'file': (
+                open(self.data_path + 'invalid_json_protocol.json', 'rb'),
+                'good_json_protocol.json'
+            )
+        })
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')

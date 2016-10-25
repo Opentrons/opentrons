@@ -9,7 +9,7 @@ const state = {
     is_connected: false,
     port: null,
     fileName: "Select Protocol",
-    error: false,
+    errors: [],
     warnings: false,
     tasks: [],
     current_increment_placeable: 5,
@@ -36,7 +36,7 @@ const mutations = {
       }
     },
     UPDATE_ERROR (state, payload) {
-      state.error = payload.error
+      state.errors = payload.errors
     },
     UPDATE_WARNINGS (state, payload) {
       state.warnings = payload.warnings
@@ -91,8 +91,9 @@ const actions = {
         .post('http://localhost:5000/upload', formData)
         .then((response) => {
           console.log(response)
-          if (response.body.data.error) {
-            commit('UPDATE_ERROR', {error: response.body.data.error})
+          if (response.body.data.errors.length > 0) {
+            commit('UPDATE_TASK_LIST', {tasks: []})
+            commit('UPDATE_ERROR', {errors: response.body.data.errors})
           } else if (response.body.data.warnings.length > 0) {
             commit('UPDATE_WARNINGS', {warnings: response.body.data.warnings})
           } else {
@@ -103,10 +104,10 @@ const actions = {
                 placeable.href = placeableHref(placeable, instrument)
               })
             })
+            commit('UPDATE_ERROR', {errors: []})
             Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
               console.log(response)
             })
-            commit('UPDATE_ERROR', {error: null})
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
           }
         }, (response) => {

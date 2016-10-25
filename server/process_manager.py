@@ -21,8 +21,6 @@ def get_pid_from_file(pid_file_path):
 def check_is_running(pid_dir):
     pid_file_path = os.path.join(pid_dir, PID_FILENAME)
 
-    current_pid = os.getpid()
-
     # If the file doesn't exist, write the current process ID to the file
     if not os.path.exists(pid_file_path):
         write_pid_file(pid_file_path)
@@ -34,7 +32,6 @@ def check_is_running(pid_dir):
     except ValueError:
         last_pid = None
         os.remove(pid_file_path)
-
 
     if last_pid and psutil.pid_exists(last_pid):
         return True
@@ -51,7 +48,6 @@ def run_once(pid_dir):
     :pid_dir: path to store PID file
     :return: None
     """
-
     if check_is_running(pid_dir):
         print('Silently exiting due to previous running process')
         sys.exit()
