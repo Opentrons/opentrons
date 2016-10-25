@@ -15,9 +15,13 @@
       </ul>
     </li>
     <li v-for="instrument in tasks">
-      <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}" exact>
-        Calibrate {{instrument.label}}
-      </router-link>
+      <ul>
+      <li>
+          <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}" exact>
+            Calibrate {{instrument.label}}
+          </router-link>
+        </li>
+      </ul>
     </li>
   </ul>
 </template>
