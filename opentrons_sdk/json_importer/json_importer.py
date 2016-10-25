@@ -70,7 +70,7 @@ class JSONProtocolProcessor(object):
             self.process_deck()
         except JSONProcessorRuntimeError as e:
             self.errors.append(
-                'Failed to process protocol "deck". Error: {}'
+                'Failed to process protocol "deck". {}'
                 .format(str(e))
             )
 
@@ -78,7 +78,7 @@ class JSONProtocolProcessor(object):
                 self.process_head()
         except JSONProcessorRuntimeError as e:
             self.errors.append(
-                'Failed to process protocol "head". Error: {}'
+                'Failed to process protocol "head". {}'
                 .format(str(e))
             )
 
@@ -86,7 +86,7 @@ class JSONProtocolProcessor(object):
             self.process_instructions()
         except JSONProcessorRuntimeError as e:
             self.errors.append(
-                'Failed to process protocol "instructions". Error: {}'
+                'Failed to process protocol "instructions". {}'
                 .format(str(e))
             )
 

@@ -437,8 +437,8 @@ class CNCDriver(object):
                 coords['target'][letter] = response_dict.get(letter.upper(), 0)
 
         except JSON_ERROR:
-            log.debug("Error parsing JSON string:")
-            log.debug(res)
+            log.critical("Error parsing JSON string from smoothie board:")
+            log.critical(res)
 
         return coords
 
