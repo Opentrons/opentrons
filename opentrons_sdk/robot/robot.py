@@ -33,10 +33,10 @@ class Robot(object):
         self.connections = {
             'live': None,
             'simulate': self.get_virtual_device(
-                {'limit_switches': False}
+                options={'limit_switches': False}
             ),
             'simulate_switches': self.get_virtual_device(
-                {'limit_switches': True}
+                options={'limit_switches': True}
             )
         }
 
@@ -186,6 +186,7 @@ class Robot(object):
                 return False
 
         if kwargs.get('now'):
+            log.info('Executing: Home now')
             return _do()
         else:
             description = "Homing Robot"
@@ -207,8 +208,11 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
+    def head_speed(self, rate):
+        self._driver.set_head_speed(rate)
+
     @traceable('move-to')
-    def move_to(self, location, instrument=None, create_path=True, now=False):
+    def move_to(self, location, instrument=None, strategy='arc', now=False):
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -222,66 +226,68 @@ class Robot(object):
         tallest_z += 10
 
         def _do():
-            if create_path:
+            if strategy == 'arc':
                 self._driver.move_head(z=tallest_z)
                 self._driver.move_head(x=coordinates[0], y=coordinates[1])
                 self._driver.move_head(z=coordinates[2])
-            else:
+            elif strategy == 'direct':
                 self._driver.move_head(
                     x=coordinates[0],
                     y=coordinates[1],
                     z=coordinates[2]
                 )
+            else:
+                raise RuntimeError(
+                    'Unknown move strategy: {}'.format(strategy))
 
         if now:
             _do()
         else:
             self.add_command(Command(do=_do))
 
-    def move_to_top(self, location, instrument=None, create_path=True):
-        placeable, coordinates = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        self.move_to(top_location, instrument, create_path)
-
     @property
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def run(self, mode='simulate'):
+    def run(self):
 
-        self.set_connection(mode)
+        if not self._driver.connection:
+            raise RuntimeWarning('Please connect to the robot')
 
         self._runtime_warnings = []
 
         for instrument in self._instruments.values():
             instrument.reset()
 
-        try:
-            for command in self._commands:
-                try:
-                    self.can_pop_command.wait()
-                    if self.stopped_event.is_set():
-                        self.resume()
-                        break
-                    if command.description:
-                        log.info("Executing: {}".format(command.description))
-                    command.do()
-                except KeyboardInterrupt as e:
-                    self._driver.halt()
-                    raise e
-        finally:
-            self.set_connection('live')
+        for command in self._commands:
+            try:
+                self.can_pop_command.wait()
+                if self.stopped_event.is_set():
+                    self.resume()
+                    break
+                if command.description:
+                    log.info("Executing: {}".format(command.description))
+                command.do()
+            except KeyboardInterrupt as e:
+                self._driver.halt()
+                raise e
 
         return self._runtime_warnings
 
+    def simulate(self, switches=False):
+        if switches:
+            self.set_connection('simulate_switches')
+        else:
+            self.set_connection('simulate')
+        res = self.run()
+        self.set_connection('live')
+        return res
+
     def set_connection(self, mode):
-        if mode == 'simulate':
-            self._driver.connect(self.connections['simulate'])
-        elif mode == 'live':
-            if self.connections['live']:
-                self._driver.connect(self.connections['live'])
-            else:
-                self._driver.disconnect()
+        if mode in self.connections:
+            connection = self.connections[mode]
+            if connection:
+                self._driver.connect(connection)
         else:
             raise ValueError(
                 'mode expected to be "live" or "simulate", '
@@ -290,6 +296,8 @@ class Robot(object):
     def disconnect(self):
         if self._driver:
             self._driver.disconnect()
+
+        self.connections['live'] = None
 
     def containers(self):
         return self._deck.containers()
@@ -346,7 +354,7 @@ class Robot(object):
                     0  # TODO: should z always be zero?
                 )
                 slot_name = "{}{}".format(col, row)
-                self._deck.add(slot, slot_name, (slot_coordinates))
+                self._deck.add(slot, slot_name, slot_coordinates)
 
     @property
     def deck(self):

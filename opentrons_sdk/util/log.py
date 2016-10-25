@@ -18,9 +18,18 @@ logging_config = dict(
             'class': 'logging.StreamHandler',
             'formatter': 'basic',
             'level': logging.WARNING},
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'basic',
+            'filename': 'sdk.log',
+            'maxBytes': 5000000,
+            'level': logging.INFO,
+            'backupCount': 3
+        },
     },
     root={
-        'handlers': ['development'],
+        'handlers': ['file'],
+        'level': logging.DEBUG
     },
 )
 dictConfig(logging_config)

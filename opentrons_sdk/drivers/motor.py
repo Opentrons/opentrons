@@ -283,6 +283,7 @@ class CNCDriver(object):
     def move_head(self, mode='absolute', **kwargs):
 
         self.set_coordinate_system(mode)
+        self.set_head_speed()
         current = self.get_head_position()['target']
 
         log.debug('Current Head Position: {}'.format(current))
@@ -455,9 +456,10 @@ class CNCDriver(object):
         current_steps_per_mm = round(current_steps_per_mm, 2)
         return self.set_steps_per_mm(axis, current_steps_per_mm)
 
-    def set_head_speed(self, rate):
-        self.head_speed = rate
-        kwargs = {"F": rate}
+    def set_head_speed(self, rate=None):
+        if rate:
+            self.head_speed = rate
+        kwargs = {"F": self.head_speed}
         res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
 

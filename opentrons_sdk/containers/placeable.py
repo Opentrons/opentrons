@@ -29,7 +29,7 @@ def unpack_location(location):
 
 def humanize_location(location):
     well, _ = unpack_location(location)
-    return str(well)
+    return repr(well)
 
 
 class Placeable(object):

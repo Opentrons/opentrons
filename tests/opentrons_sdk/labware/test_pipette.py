@@ -43,6 +43,9 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
+        self.robot.home(now=True)
+        _, _, starting_z = self.robot._driver.get_head_position()['current']
+        print(starting_z)
 
     def test_get_instruments_by_name(self):
         self.p1000 = instruments.Pipette(
@@ -132,7 +135,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_position(location)
 
         self.p200.aspirate(100, location)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(
@@ -157,9 +160,11 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_position(location)
 
+        self.robot.home(now=True)
+
         self.p200.aspirate(100, location)
         self.p200.dispense(100, location)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         driver = self.robot._driver
 
@@ -186,7 +191,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_position(location)
 
         self.p200.blow_out(location)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
 
@@ -213,7 +218,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_position(location)
 
         self.p200.drop_tip(location)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
 
@@ -226,7 +231,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.aspirate(100)
 
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
 
@@ -239,7 +244,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.aspirate(100)
         self.p200.aspirate(20)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -249,7 +254,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_aspirate_no_args(self):
         self.p200.aspirate()
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -260,13 +265,13 @@ class PipetteTest(unittest.TestCase):
     def test_aspirate_invalid_max_volume(self):
         with self.assertRaises(RuntimeWarning):
             self.p200.aspirate(500)
-            self.robot.run(mode='live')
+            self.robot.run()
 
     def test_dispense(self):
         self.p200.aspirate(100)
         self.p200.dispense(20)
         #
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -278,7 +283,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate(100)
         self.p200.dispense()
 
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -288,7 +293,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_blow_out(self):
         self.p200.blow_out()
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -301,14 +306,14 @@ class PipetteTest(unittest.TestCase):
         _, _, starting_z = self.robot._driver.get_head_position()['current']
         well_x, well_y, _ = last_well.center(reference=self.robot._deck)
         self.p200.pick_up_tip(last_well)
-        self.robot.run(mode='live')
+        self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
-        self.assertTrue(current_pos == (well_x, well_y, starting_z))
+        self.assertEqual(current_pos, (well_x, well_y, starting_z))
 
     def test_drop_tip(self):
         self.p200.drop_tip()
 
-        self.robot.run(mode='live')
+        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -334,7 +339,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.transfer(self.plate[0], self.plate[1])
-        self.robot.run(mode='live')
+        self.robot.run()
 
         self.assertEqual(
             self.p200.aspirate.mock_calls,
@@ -347,7 +352,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.transfer(self.plate[0], self.plate[1], 100)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         self.assertEqual(
             self.p200.aspirate.mock_calls,
@@ -365,7 +370,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.consolidate(destination, sources, volume)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         self.assertEqual(
             self.p200.aspirate.mock_calls,
@@ -388,7 +393,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.distribute(self.plate[0], destinations, volume)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
@@ -409,8 +414,8 @@ class PipetteTest(unittest.TestCase):
         # so that you have liquid
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
-        self.p200.mix(100, self.plate[1], 3)
-        self.robot.run(mode='live')
+        self.p200.mix(100, 3, self.plate[1])
+        self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
@@ -429,12 +434,12 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
-    def test_mix_with_args(self):
+    def test_mix_with_named_args(self):
         self.p200.current_volume = 100
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.mix(volume=50, repetitions=2)
-        self.robot.run(mode='live')
+        self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,

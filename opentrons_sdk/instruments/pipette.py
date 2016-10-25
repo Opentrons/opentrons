@@ -4,7 +4,6 @@ from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.containers.placeable import Placeable, humanize_location
-from opentrons_sdk.util.vector import Vector
 
 import itertools
 
@@ -17,6 +16,7 @@ class Pipette(object):
             name=None,
             channels=1,
             min_volume=0,
+            max_volume=1,
             trash_container=None,
             tip_racks=None,
             aspirate_speed=300,
@@ -42,7 +42,7 @@ class Pipette(object):
         self.name = name
 
         self.min_volume = min_volume
-        self.max_volume = min_volume + 1
+        self.max_volume = max_volume
         self.current_volume = 0
 
         self.trash_container = trash_container
@@ -83,35 +83,16 @@ class Pipette(object):
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, create_path=True, now=False):
+    def move_to(self, location, strategy='arc', now=False):
         if location:
             self.associate_placeable(location)
             self.robot.move_to(
                 location,
                 instrument=self,
-                create_path=create_path,
+                strategy=strategy,
                 now=now)
 
         return self
-
-    def move_to_top(self, location, create_path=True, now=False):
-        placeable, _ = containers.unpack_location(location)
-        top_location = (placeable, placeable.from_center(x=0, y=0, z=1))
-        return self.move_to(top_location, create_path)
-
-    def move_to_bottom(self, location, create_path=True, now=False):
-        placeable, _ = containers.unpack_location(location)
-        bottom_location = (placeable, placeable.from_center(x=0, y=0, z=-1))
-        return self.move_to(bottom_location, create_path)
-
-    def go_to(self, location, now=False):
-        return self.move_to(location, create_path=False, now=False)
-
-    def go_to_top(self, location, now=False):
-        return self.move_to_top(location, create_path=False, now=False)
-
-    def go_to_bottom(self, location, now=False):
-        return self.move_to_bottom(location, create_path=False, now=False)
 
     def aspirate(self, volume=None, location=None, rate=1.0):
         def _do_aspirate():
@@ -123,6 +104,7 @@ class Pipette(object):
                 volume = self.max_volume - self.current_volume
 
             if self.current_volume + volume > self.max_volume:
+                print('********', volume, location, self.max_volume)
                 raise RuntimeWarning(
                     'Pipette cannot hold volume {}'
                     .format(self.current_volume + volume)
@@ -161,7 +143,7 @@ class Pipette(object):
                 volume = self.current_volume
 
             if location:
-                self.move_to(location, now=True)
+                self.move_to(location, strategy='arc', now=True)
 
             if volume:
                 self.current_volume -= volume
@@ -181,20 +163,21 @@ class Pipette(object):
         return self
 
     def position_for_aspirate(self, location=None):
-        if location:
-            self.move_to_top(location, now=True)
 
+        # first go to the destination
+        if location:
+            placeable, _ = containers.unpack_location(location)
+            self.move_to(placeable.top(), strategy='arc', now=True)
+
+        # setup the plunger above the liquid
         if self.current_volume == 0:
             self.plunger.move(self.positions['bottom'])
 
+        # then go inside the location
         if location:
             if isinstance(location, Placeable):
-                # go all the way to the bottom
-                bottom = location.from_center(x=0, y=0, z=-1)
-                # go up 1mm to give space to aspirate
-                bottom += Vector(0, 0, 1)
-                location = (location, bottom)
-            self.go_to(location, now=True)
+                location = location.bottom(1)
+            self.move_to(location, strategy='direct', now=True)
 
     def transfer(self, source, destination, volume=None):
         volume = volume or self.max_volume
@@ -222,7 +205,7 @@ class Pipette(object):
         self.dispense(volume, destination)
         return self
 
-    def mix(self, volume=None, location=None, repetitions=3):
+    def mix(self, volume, repetitions, location=None):
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
@@ -245,7 +228,7 @@ class Pipette(object):
         def _do():
             nonlocal location
             if location:
-                self.move_to(location, now=True)
+                self.move_to(location, strategy='arc', now=True)
             self.plunger.move(self.positions['blow_out'])
             self.current_volume = 0
         description = "Blow_out at {}".format(
@@ -258,18 +241,26 @@ class Pipette(object):
         def _do():
             nonlocal location
             if location:
-                self.move_to(location, now=True)
+                self.move_to(location, strategy='arc', now=True)
             else:
                 location = self.placeables[-1]
 
-            self.go_to(
-                (location, location.from_center(x=1, y=0, z=1)), now=True)
-            self.go_to(
-                (location, location.from_center(x=-1, y=0, z=1)), now=True)
-            self.go_to(
-                (location, location.from_center(x=0, y=1, z=1)), now=True)
-            self.go_to(
-                (location, location.from_center(x=0, y=-1, z=1)), now=True)
+            self.move_to(
+                (location, location.from_center(x=1, y=0, z=1)),
+                strategy='direct',
+                now=True)
+            self.move_to(
+                (location, location.from_center(x=-1, y=0, z=1)),
+                strategy='direct',
+                now=True)
+            self.move_to(
+                (location, location.from_center(x=0, y=1, z=1)),
+                strategy='direct',
+                now=True)
+            self.move_to(
+                (location, location.from_center(x=0, y=-1, z=1)),
+                strategy='direct',
+                now=True)
 
         description = 'Touching tip'
         self.robot.add_command(Command(do=_do, description=description))
@@ -295,7 +286,8 @@ class Pipette(object):
                 location = next(self.tip_rack_iter)
 
             if location:
-                self.go_to_bottom(location, now=True)
+                placeable, _ = containers.unpack_location(location)
+                self.move_to(placeable.bottom(), strategy='direct', now=True)
 
             self.current_tip_home_well = location
 
@@ -310,7 +302,7 @@ class Pipette(object):
                 self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
 
-            self.robot.home('z')
+            self.robot.home('z', now=True)
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
@@ -324,7 +316,8 @@ class Pipette(object):
                 location = self.trash_container
 
             if location:
-                self.go_to_bottom(location, now=True)
+                placeable, _ = containers.unpack_location(location)
+                self.move_to(placeable.bottom(), strategy='direct', now=True)
 
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
