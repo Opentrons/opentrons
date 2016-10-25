@@ -10,6 +10,7 @@ from flask_cors import CORS
 
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
+from opentrons_sdk.util.trace import (EventBroker, traceable)
 
 sys.path.insert(0, os.path.abspath('..'))
 from server.helpers import get_frozen_root
@@ -29,6 +30,13 @@ app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
+
+
+def notify(info):
+    print(info)
+
+
+EventBroker.get_instance().add(notify)
 
 
 # welcome route for connecting to robot
