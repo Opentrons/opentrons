@@ -56,7 +56,8 @@ class Pipette(Instrument):
             'blow_out': 13
         }
 
-        self.setup_calibrations()
+        self.init_calibrations()
+        self.load_persisted_data()
 
     def reset(self):
         self.placeables = []
@@ -338,7 +339,7 @@ class Pipette(Instrument):
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
 
-        self.save_calibrations()
+        self.update_calibrations()
 
         return self
 
@@ -351,14 +352,14 @@ class Pipette(Instrument):
             location,
             current)
 
-        self.save_calibrations()
+        self.update_calibrations()
 
         return self
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
 
-        self.save_calibrations()
+        self.update_calibrations()
 
         return self
 
