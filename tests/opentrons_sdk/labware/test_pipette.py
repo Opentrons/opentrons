@@ -457,39 +457,75 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_tip_tarcking_simple(self):
-        self.p200.go_to_bottom = mock.Mock()
+        self.p200.move_to = mock.Mock()
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
-        self.robot.run(mode='live')
+        self.robot.simulate()
 
         self.assertEqual(
-            self.p200.go_to_bottom.mock_calls,
+            self.p200.move_to.mock_calls,
             [
-                mock.call.go_to_bottom(self.tiprack1[0], now=True),
-                mock.call.go_to_bottom(self.tiprack1[1], now=True)
+                self.build_move_to_bottom(self.tiprack1[0]),
+                self.build_move_to_bottom(self.tiprack1[1])
             ]
         )
 
     def test_tip_tarcking_chain(self):
-        self.p200.go_to_bottom = mock.Mock()
+        self.p200.move_to = mock.Mock()
 
         for _ in range(0, 96 * 4):
             self.p200.pick_up_tip()
 
         expected = []
         for i in range(0, 96):
-            expected.append(mock.call.go_to_bottom(self.tiprack1[i], now=True))
+            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
         for i in range(0, 96):
-            expected.append(mock.call.go_to_bottom(self.tiprack2[i], now=True))
+            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
         for i in range(0, 96):
-            expected.append(mock.call.go_to_bottom(self.tiprack1[i], now=True))
+            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
         for i in range(0, 96):
-            expected.append(mock.call.go_to_bottom(self.tiprack2[i], now=True))
+            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
 
-        self.robot.run(mode='live')
+        self.robot.simulate()
 
         self.assertEqual(
-            self.p200.go_to_bottom.mock_calls,
+            self.p200.move_to.mock_calls,
+            expected
+        )
+
+    def test_tip_tarcking_chain_multi_channel(self):
+        p200_multi = instruments.Pipette(
+            trash_container=self.trash,
+            tip_racks=[self.tiprack1, self.tiprack2],
+            min_volume=10,  # These are variable
+            axis="b",
+            channels=8
+        )
+
+        p200_multi.calibrate_plunger(
+            top=0, bottom=10, blow_out=12, drop_tip=13)
+        p200_multi.set_max_volume(200)
+        p200_multi.move_to = mock.Mock()
+
+        for _ in range(0, 12 * 4):
+            p200_multi.pick_up_tip()
+
+        expected = []
+        for i in range(0, 12):
+            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
+        for i in range(0, 12):
+            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
+        for i in range(0, 12):
+            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
+        for i in range(0, 12):
+            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
+
+        self.robot.simulate()
+
+        print(p200_multi.move_to.mock_calls)
+
+        self.assertEqual(
+            p200_multi.move_to.mock_calls,
             expected
         )
 
@@ -502,7 +538,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.return_tip()
 
-        self.robot.run(mode='live')
+        self.robot.simulate()
 
         self.assertEqual(
             self.p200.drop_tip.mock_calls,
@@ -512,17 +548,22 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
+    def build_move_to_bottom(self, well):
+        return mock.call.move_to(
+            well.bottom(), strategy='direct', now=True)
+
     def test_drop_tip_to_trash(self):
-        self.p200.go_to_bottom = mock.Mock()
+        self.p200.move_to = mock.Mock()
 
         self.p200.pick_up_tip()
         self.p200.drop_tip()
 
-        self.robot.run(mode='live')
+        self.robot.simulate()
+
         self.assertEqual(
-            self.p200.go_to_bottom.mock_calls,
+            self.p200.move_to.mock_calls,
             [
-                mock.call.go_to_bottom(self.tiprack1[0], now=True),
-                mock.call.go_to_bottom(self.trash, now=True)
+                self.build_move_to_bottom(self.tiprack1[0]),
+                self.build_move_to_bottom(self.trash)
             ]
         )

@@ -69,8 +69,15 @@ class Pipette(object):
         self.tip_rack_iter = iter([])
 
         if self.has_tip_rack():
+            iterables = self.tip_racks
+
+            if self.channels > 1:
+                iterables = []
+                for rack in self.tip_racks:
+                    iterables.append(rack.rows)
+
             self.tip_rack_iter = itertools.cycle(
-                itertools.chain(*self.tip_racks)
+                itertools.chain(*iterables)
             )
 
     def reset(self):
