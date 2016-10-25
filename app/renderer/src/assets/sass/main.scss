@@ -109,9 +109,9 @@ Wizard Screens
         .step {
             display: flex;
             flex-wrap: wrap;
-            min-height: 440px;
+            min-height: 440px;          
         }
-        .step-connect {
+        .step-connect {          
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -153,10 +153,8 @@ Wizard Screens
         }
         .step-error,
         .step-upload {
-            @include rect(7,
-            4);
-            @include offset(6,
-            5);
+            @include rect(7,4);
+            @include offset(6,5);
             flex-direction: column;
             justify-content: center;
             align-content: flex-start;
