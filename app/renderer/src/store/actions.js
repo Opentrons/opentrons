@@ -28,7 +28,7 @@ const actions = {
   uploadProtocol ({commit}, formData) {
     OpenTrons.uploadProtocol(formData).then((result) =>{
       if (result.success) {
-        let tasks = result.data.calibrations
+        let tasks = result.calibrations
         tasks.map((instrument) => {
           instrument.href = instrumentHref(instrument)
           instrument.placeables.map((placeable) => {

@@ -62,16 +62,18 @@ class OpenTrons {
       })
   }
   uploadProtocol (formData) {
-    Vue.http
+    return Vue.http
       .post('http://localhost:5000/upload', formData)
       .then((response) => {
-        let returnVal = {success: true, errors: [], warnings: []}
-        returnVal.errors = data.errors
-        returnVal.warnings = data.warnings
-        if (response.body.data.errors.length > 0) {
-          returnVal.success = false
+        let result = {success: true, errors: [], warnings: [], calibrations: []}
+        let data = response.body.data
+        result.errors = data.errors
+        result.warnings = data.warnings
+        result.calibrations = data.calibrations || []
+        if (data.errors.length > 0) {
+          result.success = false
         }
-        return returnVal
+        return result
       }, (response) => {
         console.log('Failed to upload protocol', response)
       })
