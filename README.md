@@ -8,10 +8,10 @@
 - [x] Dynamic Routing
 - [x] Previous/Next buttons
 - [x] XYZAB Jogging
-- [ ] Move to Slot
+- [x] Move to Slot
 - [ ] Calibrate Container
 - [ ] Calibrate Pipette
-- [ ] Protocol Error Reporting
+- [x] Protocol Error Reporting
 - [ ] Review Saved Positions
 - [ ] Run Protocol on Robot
 - [ ] Auto Updating (software and firmware)
