@@ -5,7 +5,6 @@ import * as types from './mutation-types'
 import OpenTrons from '../rest_api_wrapper'
 
 
-
 const actions = {
   connect_robot ({ commit }, port) {
     const payload = {is_connected: true, 'port': port}
@@ -29,8 +28,11 @@ const actions = {
       .post('http://localhost:5000/upload', formData)
       .then((response) => {
         console.log(response)
-        if (response.body.data.errors) {
-          commit(types.UPDATE_ERROR, {errors: response.body.data.errors})
+        if (response.body.data.errors.length > 0) {
+          commit('UPDATE_TASK_LIST', {tasks: []})
+          commit('UPDATE_ERROR', {errors: response.body.data.errors})
+        } else if (response.body.data.warnings.length > 0) {
+          commit('UPDATE_WARNINGS', {warnings: response.body.data.warnings})
         } else {
           var tasks = response.body.data.calibrations
           tasks.map((instrument) => {
@@ -39,8 +41,11 @@ const actions = {
               placeable.href = placeableHref(placeable, instrument)
             })
           })
-          commit(types.UPDATE_ERROR, {errors: []})
-          commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
+          commit('UPDATE_ERROR', {errors: []})
+          Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
+            console.log(response)
+          })
+          commit('UPDATE_TASK_LIST', {'tasks': tasks})
         }
       }, (response) => {
         console.log('failed to upload', response)
@@ -49,28 +54,14 @@ const actions = {
   selectIncrement ({commit}, data) {
     console.log("updating increment to " + data.inc + " for " + data.type)
     commit(types.UPDATE_INCREMENT, {
-      'current_increment': data.inc,
-      'type': data.type
-    })
+      'current_increment': data.inc, 'type': data.type })
   },
   jog ({commit}, coords) {
     console.log(coords)
-    Vue.http
-      .post('http://localhost:5000/jog', JSON.stringify(coords), {emulateJSON: true})
-      .then((response) => {
-        console.log("success", response)
-      }, (response) => {
-        console.log('failed', response)
-      })
+    OpenTrons.jog(coords)
   },
   jogToSlot ({commit}, data) {
-    Vue.http
-      .post('http://localhost:5000/move_to_slot', JSON.stringify(data), {emulateJSON: true})
-      .then((response) => {
-        console.log("success", response)
-      }, (response) => {
-        console.log('failed', response)
-      })
+    OpenTrons.jogToSlot(data)
   }
 }
 

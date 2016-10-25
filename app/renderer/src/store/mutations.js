@@ -2,13 +2,15 @@ import * as types from './mutation-types'
 
 
 const state = {
-    is_connected: false,
-    port: null,
-    fileName: "Select Protocol",
-    errors: [],
-    tasks: [],
-    current_increment_placeable: 5,
-    current_increment_plunger: 1
+  is_connected: false,
+  port: null,
+  fileName: "Select Protocol",
+  errors: [],
+  warnings: false,
+  tasks: [],
+  current_increment_placeable: 5,
+  current_increment_plunger: 1,
+  coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0}
 }
 
 
@@ -32,6 +34,12 @@ const mutations = {
   },
   [types.UPDATE_ERROR] (state, payload) {
     state.errors = payload.errors
+  },
+  [types.UPDATE_WARNINGS] (state, payload) {
+    state.warnings = payload.warnings
+  },
+  [types.UPDATE_POSITION] (state, payload) {
+    state.coordinates = payload
   }
 }
 

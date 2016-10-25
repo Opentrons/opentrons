@@ -11,7 +11,7 @@ from flask_cors import CORS
 from opentrons_sdk.robot import Robot
 from opentrons_sdk.containers.placeable import Container
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
 
@@ -48,16 +48,19 @@ def load_python(stream):
     global robot
 
     code = helpers.convert_byte_stream_to_str(stream)
-    api_response = {'error': None, 'warnings': []}
+    api_response = {'errors': [], 'warnings': []}
 
     robot.reset()
     try:
         exec(code, globals(), locals())
         robot.simulate()
+        if len(robot._commands) == 0:
+            error = "This protocol does not contain any commands for the robot."
+            api_response['errors'] = error
     except Exception as e:
         api_response['errors'] = [str(e)]
 
-    api_response['warnings'] = robot.get_warnings()
+    api_response['warnings'] = robot.get_warnings() or []
 
     return api_response
 
@@ -119,6 +122,12 @@ def is_connected():
         'port': Robot.get_instance().get_connected_port()
     })
 
+@app.route("/robot/get_coordinates")
+def get_coordinates():
+    return flask.jsonify({
+        'coords': robot._driver.get_position().get("target")
+    })
+
 
 @app.route("/robot/serial/connect")
 def connect_robot():
@@ -128,7 +137,7 @@ def connect_robot():
     data = None
 
     try:
-        Robot.get_instance().connect(port)
+        Robot.get_instance().connect(port, options={'limit_switches': False})
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -267,6 +276,43 @@ def move_to_slot():
         'data': result
     })
 
+@app.route("/robot/coordinates")
+def coordinates():
+    status = 'success'
+    data = None
+
+    try:
+        data = robot._driver.get_position().get("current")
+    except Exception as e:
+        status = 'error'
+        data = str(e)
+
+    coordinates_watcher = BACKGROUND_TASKS.get('COORDINATES_WATCHER')
+
+    if coordinates_watcher:
+        return flask.jsonify({
+            'status': status,
+            'data': data
+        })
+
+    def watch_coordinates():
+        while True:
+            socketio.emit(
+                'event',
+                {
+                    'type': 'coordinates',
+                    'coordinates': robot._driver.get_position().get("current")
+                }
+            )
+            socketio.sleep(0.5)
+
+    coordinates_watcher = socketio.start_background_task(watch_coordinates)
+    BACKGROUND_TASKS['COORDINATES_WATCHER'] = coordinates_watcher
+
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.

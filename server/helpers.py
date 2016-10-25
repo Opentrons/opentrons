@@ -26,7 +26,7 @@ def convert_byte_stream_to_str(stream):
 def load_json(json_byte_stream):
     json_str = convert_byte_stream_to_str(json_byte_stream)
 
-    api_response = {'error': None, 'warnings': []}
+    api_response = {'errors': None, 'warnings': []}
 
     robot = Robot.get_instance()
     robot.reset()
@@ -52,4 +52,3 @@ def load_json(json_byte_stream):
     api_response['errors'] = errors
     api_response['warnings'] = warnings
     return api_response
-

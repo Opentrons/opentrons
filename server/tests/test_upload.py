@@ -34,6 +34,41 @@ class UploadTestCase(unittest.TestCase):
         expected_data = {
             'data': [
                 {
+                    'axis': 'a',
+                    'blow_out': 13,
+                    'bottom': 11,
+                    'drop_tip': 14,
+                    'label': 'p10',
+                    'max_volume': 10,
+                    'placeables': [
+                        {
+                            'calibrated': False,
+                            'label': 'tiprack',
+                            'slot': 'A1',
+                            'type': 'tiprack-200ul'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'trough',
+                            'slot': 'B1',
+                            'type': 'trough-12row'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'plate',
+                            'slot': 'B2',
+                            'type': '96-flat'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'trash',
+                            'slot': 'A2',
+                            'type': 'point'
+                        }
+                    ],
+                    'top': 0
+                },
+                {
                     'axis': 'b',
                     'blow_out': 12,
                     'bottom': 10,
@@ -82,7 +117,6 @@ class UploadTestCase(unittest.TestCase):
 
     def test_upload_invalid_python(self):
         pass
-
 
     def test_upload_valid_json(self):
         response = self.app.post('/upload', data={

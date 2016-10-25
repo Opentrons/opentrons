@@ -26,7 +26,7 @@ trash = containers.load(
     'trash'
 )
 
-p200 = instruments.Pipette(
+p200s = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack],

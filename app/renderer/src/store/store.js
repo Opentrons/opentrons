@@ -21,6 +21,15 @@ function createWebSocketPlugin(socket) {
           store.commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
         }
       }
+      if (data.type === 'coordinates') {
+        store.commit('UPDATE_POSITION', {
+          x: data.coordinates.x,
+          y: data.coordinates.y,
+          z: data.coordinates.z,
+          a: data.coordinates.a,
+          b: data.coordinates.b
+        })
+      }
     })
   }
 }

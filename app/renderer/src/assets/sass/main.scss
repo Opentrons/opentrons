@@ -48,30 +48,32 @@ table {
 }
 
 div.error {
-  @include offset-v(2, 1);
-  font-size: 18px;
-  font-weight: 600;  
-  text-align: center;
-  height:40px;
-  div{
-    display:flex;
-    justify-content:center;
-    span{
-        font-weight: 200;
-        background:rgba(140, 0, 110, 1);
-        border-radius: 50%;
-        width:20px;
-        height:20px;
-        margin:10px;
-        color:white;
-        line-height: 20px;
-    }
-    line-height: 40px;
-    color: rgba(140, 0, 110, 1);
+    @include rect(19,3);
+    @include offset-v(1,0);
+    overflow:scroll;
+    font-size: 16px;
+    font-weight: 600;
+    //text-align: center;
+    height: 40px;
+    div {
+        display: flex;
+        justify-content: center;
+        span {
+            font-weight: 200;
+            border: 1px solid rgba(140, 0, 110, 1);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            margin: 10px;
+            color: rgba(140, 0, 110, 1);
+            line-height: 18px;
+        }
+        line-height: 40px;
+        color: rgba(140, 0, 110, 1);
     }
 }
 
-.coords{
+.coords {
     input {
         pointer-events: none;
         text-align: center;
@@ -109,9 +111,9 @@ Wizard Screens
         .step {
             display: flex;
             flex-wrap: wrap;
-            min-height: 440px;
+            min-height: 440px;          
         }
-        .step-connect {
+        .step-connect {          
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -133,27 +135,28 @@ Wizard Screens
                     background-position: 95% 50%;
                     color: white;
                 }
-                .btn-connect {
-                    @include btn-col-a(6);
-                    background-color: $call-to-action;
-                    color: white;
-                }
             }
             div.connected {
                 display: flex;
                 justify-content: center;
-                @include rect(19,
-                2);
-                @include offset-v(0,
-                1);
+
+
+                @include rect(10,1);
+                @include offset-v(0,2);
+                .btn-connect{
+                    @include offset(2,2);
+                }
+                p{
+                    line-height: 40px;
+                    font-size: 16px;
+                    padding:0;
+                }
             }
         }
         .step-error,
         .step-upload {
-            @include rect(7,
-            4);
-            @include offset(6,
-            5);
+            @include rect(7,4);
+            @include offset(6,5);
             flex-direction: column;
             justify-content: center;
             align-content: flex-start;
