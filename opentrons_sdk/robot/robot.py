@@ -250,6 +250,10 @@ class Robot(object):
         return copy.deepcopy(self._commands)
 
     def run(self):
+
+        if not self._driver.connection:
+            raise RuntimeWarning('Please connect to the robot')
+
         self._runtime_warnings = []
 
         for instrument in self._instruments.values():
@@ -284,8 +288,6 @@ class Robot(object):
             connection = self.connections[mode]
             if connection:
                 self._driver.connect(connection)
-            else:
-                raise RuntimeWarning('Please connect to the robot')
         else:
             raise ValueError(
                 'mode expected to be "live" or "simulate", '
@@ -294,6 +296,8 @@ class Robot(object):
     def disconnect(self):
         if self._driver:
             self._driver.disconnect()
+
+        self.connections['live'] = None
 
     def containers(self):
         return self._deck.containers()
