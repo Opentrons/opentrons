@@ -14,7 +14,7 @@
           <button @click="connectToRobot" v-show="ports.selected" class="btn-connect">Connect!</button>
         </div>
         <div class="connected" v-if="connected">
-          <h1 >The selected port is: {{ port }}</h1>
+          <p>The selected port is: {{ port }}</p>
           <button @click="disconnectRobot" v-show="connected" class="btn-connect">Disconnect!</button>
         </div>
     </div>

@@ -10,9 +10,11 @@ const state = {
     port: null,
     fileName: "Select Protocol",
     errors: [],
+    warnings: false,
     tasks: [],
     current_increment_placeable: 5,
-    current_increment_plunger: 1
+    current_increment_plunger: 1,
+    coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0}
 }
 
 const mutations = {
@@ -35,6 +37,12 @@ const mutations = {
     },
     UPDATE_ERROR (state, payload) {
       state.errors = payload.errors
+    },
+    UPDATE_WARNINGS (state, payload) {
+      state.warnings = payload.warnings
+    },
+    UPDATE_POSITION (state, payload) {
+      state.coordinates = payload
     }
 }
 
@@ -86,6 +94,8 @@ const actions = {
           if (response.body.data.errors.length > 0) {
             commit('UPDATE_TASK_LIST', {tasks: []})
             commit('UPDATE_ERROR', {errors: response.body.data.errors})
+          } else if (response.body.data.warnings.length > 0) {
+            commit('UPDATE_WARNINGS', {warnings: response.body.data.warnings})
           } else {
             var tasks = response.body.data.calibrations
             tasks.map((instrument) => {
@@ -95,6 +105,9 @@ const actions = {
               })
             })
             commit('UPDATE_ERROR', {errors: []})
+            Vue.http.get('http://localhost:5000/robot/coordinates').then((response) => {
+              console.log(response)
+            })
             commit('UPDATE_TASK_LIST', {'tasks': tasks})
           }
         }, (response) => {
@@ -136,6 +149,15 @@ function createWebSocketPlugin(socket) {
         if (data.is_connected === false) {
           store.commit('UPDATE_ROBOT_CONNECTION', {'is_connected': false, 'port': null})
         }
+      }
+      if (data.type === 'coordinates') {
+        store.commit('UPDATE_POSITION', {
+          x: data.coordinates.x,
+          y: data.coordinates.y,
+          z: data.coordinates.z,
+          a: data.coordinates.a,
+          b: data.coordinates.b
+        })
       }
     })
   }
