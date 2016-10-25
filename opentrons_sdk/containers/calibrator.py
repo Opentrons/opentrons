@@ -15,7 +15,7 @@ class Calibrator(object):
     def __init__(self, placeable, calibration_data):
         self.calibrated_coordinates = {}
         self.calibration_data = calibration_data
-        self.placeable = placeable
+        self.root_placeable = placeable
         self._apply_calibration(calibration_data, placeable)
 
     # Returns calibrated coordinates relative to deck
@@ -35,13 +35,13 @@ class Calibrator(object):
     def _apply_calibration(self, calibration_data, placeable):
         for name, data in calibration_data.items():
             child = placeable.get_child_by_name(name)
-
-            if 'delta' in data:
-                c = child._coordinates + data['delta']
-                self.calibrated_coordinates[child] = c
-            if 'children' in data:
-                self._apply_calibration(
-                    data['children'], child)
+            if child:
+                if 'delta' in data:
+                    c = child._coordinates + data['delta']
+                    self.calibrated_coordinates[child] = c
+                if 'children' in data:
+                    self._apply_calibration(
+                        data['children'], child)
 
     def calibrate(self,
                   calibration_data,
@@ -69,6 +69,6 @@ class Calibrator(object):
         current['delta'] = delta
         self.calibration_data = calibration_data
 
-        self._apply_calibration(calibration_data, self.placeable)
+        self._apply_calibration(calibration_data, self.root_placeable)
 
         return calibration_data

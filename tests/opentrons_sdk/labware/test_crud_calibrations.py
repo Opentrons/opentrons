@@ -34,15 +34,11 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.assertDictEqual(self.p200.calibration_data, {})
 
         self.p200 = instruments.Pipette(name="p200", axis="b")
-        expected_calibration_data = {
-            'A1': {
-                'children': {
-                    'plate': {
-                        'delta': (1.0, 2.0, 3.0)
-                    }
-                }
-            }
+
+        expected_delta = {
+            'delta': (1.0, 2.0, 3.0)
         }
-        self.assertDictEqual(
-            self.p200.calibration_data,
-            expected_calibration_data)
+
+        self.assertTrue('A1' in self.p200.calibration_data)
+        self.assertTrue('plate' in self.p200.calibration_data['A1']['children'])
+        self.assertEquals(expected_delta, self.p200.calibration_data['A1']['children']['plate'])

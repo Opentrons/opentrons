@@ -228,7 +228,7 @@ class Placeable(object):
         """
         Retrieves child by name
         """
-        return self.children_by_name[name]
+        return self.children_by_name.get(name)
 
     def has_children(self):
         """

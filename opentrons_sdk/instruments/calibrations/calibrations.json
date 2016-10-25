@@ -1,0 +1,311 @@
+{
+    "a:p10": {
+        "calibration_data": {},
+        "max_volume": 10,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:p10": {
+        "calibration_data": {},
+        "max_volume": 10,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "a:p200L": {
+        "calibration_data": {},
+        "max_volume": 10,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:p200": {
+        "calibration_data": {
+            "C2": {
+                "children": {
+                    "trash": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 89.89999999999998,
+                                "z": 62.3,
+                                "y": -123.805
+                            }
+                        ]
+                    }
+                }
+            },
+            "B2": {
+                "children": {
+                    "trough": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": -157.80100000000002,
+                                "z": -36.099000000000004,
+                                "y": -129.853
+                            }
+                        ]
+                    },
+                    "p200-rack": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": -95.05000000000001,
+                                "z": 0.0,
+                                "y": -78.0
+                            }
+                        ]
+                    }
+                }
+            },
+            "A2": {
+                "children": {
+                    "magbead": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": -79.996,
+                                "z": 80.0,
+                                "y": 140.296
+                            }
+                        ]
+                    }
+                }
+            },
+            "B1": {
+                "children": {
+                    "plate": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 175.495,
+                                "z": -16.200000000000003,
+                                "y": -246.25399999999996
+                            }
+                        ]
+                    }
+                }
+            },
+            "A1": {
+                "children": {
+                    "plate": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 1.0000000000000036,
+                                "z": 3.0,
+                                "y": 2.0000000000000178
+                            }
+                        ]
+                    },
+                    "trash": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 230.0,
+                                "z": 20.0,
+                                "y": -20.0
+                            }
+                        ]
+                    },
+                    "tiprack": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 8.748999999999999,
+                                "z": 3.9009999999999962,
+                                "y": -131.353
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "max_volume": 200,
+        "positions": {
+            "drop_tip": 32.0,
+            "blow_out": 28.0,
+            "bottom": 26.0,
+            "top": 13.0
+        }
+    },
+    "b:p200L": {
+        "calibration_data": {},
+        "max_volume": 10,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:myPipette": {
+        "calibration_data": {},
+        "max_volume": 1,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:p1000": {
+        "calibration_data": {},
+        "max_volume": 1000,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:b": {
+        "calibration_data": {
+            "A2": {
+                "children": {
+                    "96-flat": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 1.0,
+                                "z": 3.000000000000014,
+                                "y": 86.99999999999999
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "max_volume": 200,
+        "positions": {
+            "drop_tip": 13,
+            "blow_out": 12,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "a:p10L": {
+        "calibration_data": {},
+        "max_volume": 10,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:p10L": {
+        "calibration_data": {},
+        "max_volume": 10,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "a:p1000": {
+        "calibration_data": {
+            "B2": {
+                "children": {
+                    "trough": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": -128.3,
+                                "z": 0.0,
+                                "y": 59.75
+                            }
+                        ]
+                    },
+                    "p200-rack": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": -95.05000000000001,
+                                "z": 0.0,
+                                "y": -78.0
+                            }
+                        ]
+                    }
+                }
+            },
+            "A2": {
+                "children": {
+                    "magbead": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": -79.996,
+                                "z": 80.0,
+                                "y": 140.296
+                            }
+                        ]
+                    }
+                }
+            },
+            "A1": {
+                "children": {
+                    "trash": {
+                        "delta": [
+                            "vector",
+                            {
+                                "x": 230.0,
+                                "z": 20.0,
+                                "y": -20.0
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "max_volume": 1000,
+        "positions": {
+            "drop_tip": 24,
+            "blow_out": 21,
+            "bottom": 19,
+            "top": 2.5
+        }
+    },
+    "a:p200": {
+        "calibration_data": {},
+        "max_volume": 200,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "b:p200-diff": {
+        "calibration_data": {},
+        "max_volume": 1,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    },
+    "a:p1000L": {
+        "calibration_data": {},
+        "max_volume": 1000,
+        "positions": {
+            "drop_tip": 12,
+            "blow_out": 13,
+            "bottom": 10,
+            "top": 0
+        }
+    }
+}

@@ -12,12 +12,12 @@ CALIBRATIONS_FILE = 'calibrations.json'
 class Instrument(object):
 
     def __init__(self):
-        # parameters saved with persistent calibrations
-        self.calibration_data = {}
         self.name = None
-        self.positions = {}
         self.axis = None
-        self.min_volume = None
+
+        self.calibration_data = {}
+
+        self.positions = {}
         self.max_volume = None
 
         self.setup_calibrations()
@@ -90,7 +90,6 @@ def get_instrument_calibration(instrument):
 def build_calibration_data_from_instrument(instrument):
     calibration = {}
     calibration['positions'] = copy.copy(instrument.positions)
-    calibration['min_volume'] = instrument.min_volume
     calibration['max_volume'] = instrument.max_volume
     calibration['calibration_data'] = instrument.calibration_data
     return calibration

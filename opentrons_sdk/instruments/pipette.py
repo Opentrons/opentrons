@@ -15,23 +15,10 @@ class Pipette(Instrument):
             name=None,
             channels=1,
             min_volume=0,
-            max_volume=1,
             trash_container=None,
             tip_racks=None,
             aspirate_speed=300,
             dispense_speed=500):
-
-        self.positions = {
-            'top': 0,
-            'bottom': 10,
-            'drop_tip': 12,
-            'blow_out': 13
-        }
-
-        self.speeds = {
-            'aspirate': aspirate_speed,
-            'dispense': dispense_speed
-        }
 
         self.axis = axis
         self.channels = channels
@@ -40,9 +27,7 @@ class Pipette(Instrument):
             name = axis
         self.name = name
 
-        self.min_volume = min_volume
-        self.max_volume = max_volume
-        self.current_volume = 0
+        self.calibration_data = {}
 
         self.trash_container = trash_container
         self.tip_racks = tip_racks
@@ -51,12 +36,29 @@ class Pipette(Instrument):
         self.robot.add_instrument(self.axis, self)
         self.plunger = self.robot.get_motor(self.axis)
 
-        self.calibration_data = {}
         self.placeables = []
+        self.current_volume = 0
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
+        self.speeds = {
+            'aspirate': aspirate_speed,
+            'dispense': dispense_speed
+        }
+
+        self.min_volume = min_volume
+        self.max_volume = self.min_volume + 1
+
+        self.positions = {
+            'top': 0,
+            'bottom': 10,
+            'drop_tip': 12,
+            'blow_out': 13
+        }
+
         self.setup_calibrations()
+
+        self.save_calibrations()
 
     def reset(self):
         self.placeables = []
