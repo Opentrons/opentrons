@@ -129,7 +129,7 @@ def get_coordinates():
     })
 
 
-@app.route("/robot/serial/connect")
+@app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
     port = flask.request.args.get('port')
 

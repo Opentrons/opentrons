@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client'
 
-import {instrumentHref, placeableHref} from '../util'
 import app_mutations from './mutations'
 const { mutations, state } = app_mutations
 

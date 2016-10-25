@@ -4,6 +4,8 @@ import * as types from './mutation-types'
 
 import OpenTrons from '../rest_api_wrapper'
 
+import {instrumentHref, placeableHref} from '../util'
+
 
 const actions = {
   connect_robot ({ commit }, port) {
@@ -13,7 +15,7 @@ const actions = {
     })
   },
   disconnect_robot ({ commit }) {
-    OpenTrons.connect(port).then((was_successful) => {
+    OpenTrons.disconnect().then((was_successful) => {
       if (was_successful) {
         commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
       }

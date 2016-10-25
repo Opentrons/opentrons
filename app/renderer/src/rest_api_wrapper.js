@@ -13,7 +13,7 @@ class OpenTrons {
   connect(port) {
     let options = {params: {'port': port}}
     return Vue.http
-      .get(this.connectUrl, options)
+      .post(this.connectUrl, options)
       .then((response) => {
         console.log('successfully connected...')
         if (response.data.status === "success") {
@@ -27,7 +27,7 @@ class OpenTrons {
   }
 
   disconnect () {
-    Vue.http
+    return Vue.http
       .get(this.disconnectUrl)
       .then((response) => {
         if (response.data.status === "success") {
@@ -41,7 +41,7 @@ class OpenTrons {
   }
 
   jog (coords) {
-    Vue.http
+    return Vue.http
       .post(this.jogUrl, JSON.stringify(coords), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
@@ -53,7 +53,7 @@ class OpenTrons {
   }
 
   jogToSlot() {
-    Vue.http
+    return Vue.http
       .post(this.jogToSlotUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
