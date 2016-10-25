@@ -28,13 +28,14 @@ class PipetteTest(unittest.TestCase):
         self.robot.home()
 
         self.trash = containers.load('point', 'A1')
-        self.tiprack = containers.load('tiprack-10ul', 'B2')
+        self.tiprack1 = containers.load('tiprack-10ul', 'B2')
+        self.tiprack2 = containers.load('tiprack-10ul', 'B3')
 
         self.plate = containers.load('96-flat', 'A2')
 
         self.p200 = instruments.Pipette(
             trash_container=self.trash,
-            tip_racks=[self.tiprack],
+            tip_racks=[self.tiprack1, self.tiprack2],
             min_volume=10,  # These are variable
             axis="b",
             channels=1
@@ -46,7 +47,7 @@ class PipetteTest(unittest.TestCase):
     def test_get_instruments_by_name(self):
         self.p1000 = instruments.Pipette(
             trash_container=self.trash,
-            tip_racks=[self.tiprack],
+            tip_racks=[self.tiprack1],
             min_volume=10,  # These are variable
             axis="a",
             name="p1000",
@@ -296,7 +297,7 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_pick_up_tip(self):
-        last_well = self.tiprack[-1]
+        last_well = self.tiprack1[-1]
         _, _, starting_z = self.robot._driver.get_head_position()['current']
         well_x, well_y, _ = last_well.center(reference=self.robot._deck)
         self.p200.pick_up_tip(last_well)
@@ -447,5 +448,76 @@ class PipetteTest(unittest.TestCase):
             [
                 mock.call.aspirate(volume=50, location=None),
                 mock.call.aspirate(50)
+            ]
+        )
+
+    def test_tip_tarcking_simple(self):
+        self.p200.go_to_bottom = mock.Mock()
+        self.p200.pick_up_tip()
+        self.p200.pick_up_tip()
+        self.robot.run(mode='live')
+
+        self.assertEqual(
+            self.p200.go_to_bottom.mock_calls,
+            [
+                mock.call.go_to_bottom(self.tiprack1[0], now=True),
+                mock.call.go_to_bottom(self.tiprack1[1], now=True)
+            ]
+        )
+
+    def test_tip_tarcking_chain(self):
+        self.p200.go_to_bottom = mock.Mock()
+
+        for _ in range(0, 96 * 4):
+            self.p200.pick_up_tip()
+
+        expected = []
+        for i in range(0, 96):
+            expected.append(mock.call.go_to_bottom(self.tiprack1[i], now=True))
+        for i in range(0, 96):
+            expected.append(mock.call.go_to_bottom(self.tiprack2[i], now=True))
+        for i in range(0, 96):
+            expected.append(mock.call.go_to_bottom(self.tiprack1[i], now=True))
+        for i in range(0, 96):
+            expected.append(mock.call.go_to_bottom(self.tiprack2[i], now=True))
+
+        self.robot.run(mode='live')
+
+        self.assertEqual(
+            self.p200.go_to_bottom.mock_calls,
+            expected
+        )
+
+    def test_tip_tarcking_return(self):
+        self.p200.drop_tip = mock.Mock()
+
+        self.p200.pick_up_tip()
+        self.p200.return_tip()
+
+        self.p200.pick_up_tip()
+        self.p200.return_tip()
+
+        self.robot.run(mode='live')
+
+        self.assertEqual(
+            self.p200.drop_tip.mock_calls,
+            [
+                mock.call.drop_tip(self.tiprack1[0]),
+                mock.call.drop_tip(self.tiprack1[1])
+            ]
+        )
+
+    def test_drop_tip_to_trash(self):
+        self.p200.go_to_bottom = mock.Mock()
+
+        self.p200.pick_up_tip()
+        self.p200.drop_tip()
+
+        self.robot.run(mode='live')
+        self.assertEqual(
+            self.p200.go_to_bottom.mock_calls,
+            [
+                mock.call.go_to_bottom(self.tiprack1[0], now=True),
+                mock.call.go_to_bottom(self.trash, now=True)
             ]
         )
