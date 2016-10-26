@@ -10,14 +10,14 @@ config = {
     'packages': find_packages(exclude=["tests"]),
     'install_requires': ['pyserial==3.1.1'],
     'package_data': {
-        "opentrons_sdk": [
+        "opentrons": [
             "config/containers/legacy_containers.json",
         ]
     },
     'scripts': [
-        'bin/opentrons_sdk-compile'
+        'bin/opentrons-compile'
     ],
-    'name': 'opentrons_sdk',
+    'name': 'opentrons',
     'test_suite': 'nose.collector',
     'zip_safe': False
 }

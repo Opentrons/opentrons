@@ -6,7 +6,7 @@ compiler modules in this directory.
 
 For example, you can do:
 
-    opentrons_sdk-compile pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
+    opentrons-compile pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
 
 It works because there's a pfusx.py file with a compile method.
 
@@ -15,11 +15,11 @@ JSON file, which will then be printed to the console.
 
 To save a protocol to a file, you can do something like this:
 
-    opentrons_sdk-compile my_compiler some_input > filename.json
+    opentrons-compile my_compiler some_input > filename.json
 
 You can read from a file and output to another file like this:
 
-    input.txt | opentrons_sdk-compile my_compiler > filename.json
+    input.txt | opentrons-compile my_compiler > filename.json
 
 """
 
@@ -42,7 +42,7 @@ def compile(compiler, data, **kwargs):
         raise ImportError("Invalid compiler name.")
 
     try:
-        mod = __import__("opentrons_sdk.compilers." + compiler, fromlist=[''])
+        mod = __import__("opentrons.compilers." + compiler, fromlist=[''])
     except ImportError:
         raise ImportError("Unsupported compiler: " + compiler)
 
@@ -73,8 +73,8 @@ if __name__ == "__main__":
 
     compiler = sys.argv[1]
 
-    # stdin is like `foo.txt | opentrons_sdk-compile`
-    # or `opentrons_sdk-compile < foo.txt`
+    # stdin is like `foo.txt | opentrons-compile`
+    # or `opentrons-compile < foo.txt`
     if not sys.stdin.isatty():
         data = sys.stdin.read().split('\n')
         data.remove('')  # Strip empty lines.

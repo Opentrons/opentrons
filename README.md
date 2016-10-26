@@ -1,6 +1,6 @@
 # Opentrons API
 
-[![Build Status](https://travis-ci.org/OpenTrons/opentrons_sdk.svg?branch=master)](https://travis-ci.org/OpenTrons/opentrons_sdk) [![Coverage Status](https://coveralls.io/repos/github/OpenTrons/opentrons_sdk/badge.svg?branch=master)](https://coveralls.io/github/OpenTrons/opentrons_sdk?branch=master)
+[![Build Status](https://travis-ci.org/OpenTrons/opentrons.svg?branch=master)](https://travis-ci.org/OpenTrons/opentrons) [![Coverage Status](https://coveralls.io/repos/github/OpenTrons/opentrons/badge.svg?branch=master)](https://coveralls.io/github/OpenTrons/opentrons?branch=master)
 
 ## Quick Links
 * [Setting up Opentrons API]
