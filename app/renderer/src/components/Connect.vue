@@ -50,7 +50,8 @@
     methods: {
         getPortsList: function () {
             this.ports = {
-              selected: null
+              selected: null,
+              options: []
             }
             let self = this
             this.$http
