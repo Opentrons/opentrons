@@ -51,7 +51,6 @@ const actions = {
     Vue.http
     .post('http://localhost:5000/calibrate_placeable', JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
-      console.log("success", response.body.data.calibration)
       let tasks = response.body.data.calibration
       addHrefs(tasks)
       commit('UPDATE_TASK_LIST', {'tasks': tasks})
