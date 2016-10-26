@@ -364,13 +364,14 @@ def calibrate_placeable():
             'data': str(e)
         })
 
-    data = json.dumps(data, cls=vector.VectorEncoder)
+    # data = json.dumps(data, cls=vector.VectorEncoder)
+    calibration = get_placeables()
     return flask.jsonify({
         'status': 'success',
         'data': {
             'name': name,
             'axis': axis,
-            'calibration_data': json.loads(data)
+            'calibration': calibration
         }
     })
 
