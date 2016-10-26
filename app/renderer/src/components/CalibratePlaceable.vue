@@ -1,7 +1,6 @@
 <template>
 
 <div class="calibration-modal">
-	
 	<!-- Show Images based on container type. -->
 	<div class="well-img">
 		<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" /> 
@@ -13,15 +12,15 @@
 	<div class="update bottom" v-show="placeableType('default') || placeableType('point')">
 		<span class="position bottom">Bottom</span>
 		<button class="btn-update save bottom" @click="calibratePlaceable(placeable,instrument)" >Save </button>
-		<button class="btn-update moveto">Move To </button>
+		<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}">Move To </button>
 	</div>
 
 	<!-- Calibrate to top for tiprack, toggle pick up tip button -->
 	<div class="update top" v-show="placeableType('tiprack')">
 		<span class="position top">Tiprack</span>
 		<button class="btn-update save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
-		<button class="btn-update moveto">Move To </button>
-		<button class="pick-tip">Pick Up Tip</button>
+		<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}">Move To </button>
+		<button class="pick-tip" :class="{'disabled': !placeable.calibrated}">Pick Up Tip</button>
 	</div>
 
 </div>
