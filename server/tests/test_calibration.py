@@ -34,4 +34,25 @@ class CalibrationTestCase(unittest.TestCase):
             data=json.dumps(dict(arguments)),
             content_type='application/json')
 
-        print(response.data)
+        actual = json.loads(response.data.decode())
+        expected = {
+            'data': {
+                'name': 'plate',
+                'axis': 'b',
+                'calibration_data': {
+                    'B2': {
+                        'children': {
+                            'plate': {
+                                'delta': {
+                                    'x': -160.0,
+                                    'z': 120.0,
+                                    'y': 124.05
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            'status': 'success'
+        }
+        self.assertDictEqual(actual, expected)

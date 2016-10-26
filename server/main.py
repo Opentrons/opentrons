@@ -14,6 +14,8 @@ from opentrons_sdk.containers.placeable import Container
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
+import json
+from opentrons_sdk.util import vector
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
@@ -343,22 +345,23 @@ def _calibrate_placeable(container_name, axis_name):
 
 @app.route("/calibrate_placeable", methods=["POST"])
 def calibrate_placeable():
-    print(request.data)
     name = request.json.get("label")
     axis = request.json.get("axis")
     try:
-        _calibrate_placeable(name, axis)
+        data = _calibrate_placeable(name, axis)
     except Exception as e:
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
         })
 
+    data = json.dumps(data, cls=vector.VectorEncoder)
     return flask.jsonify({
         'status': 'success',
         'data': {
             'name': name,
             'axis': axis,
+            'calibration_data': json.loads(data)
         }
     })
 
