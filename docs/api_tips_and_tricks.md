@@ -11,10 +11,6 @@ trash = containers.load('point', 'C2')
 p200 = instruments.Pipette(axis="b")
 ```
 ## Robot Commands
-####Run the virtual-smoothie
-```python
-robot.simulate()
-```
 
 ####Run on a physical robot
 List your serial ports
