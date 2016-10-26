@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="title">Calibrate {{ $route.params.instrument }} pipette</h2>
+    <h2 class="title">Calibrate {{ calibration.label }} pipette</h2>
     <div class="instructions">
       Calibrate {{ calibration.label }}'s plunger. Be sure to save top, bottom, blowout, and droptip. Enter max volume.
     </div>

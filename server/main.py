@@ -152,7 +152,7 @@ def get_coordinates():
     })
 
 
-@app.route("/robot/serial/connect")
+@app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
     port = flask.request.args.get('port')
 
@@ -222,7 +222,7 @@ def disconnect_robot():
 def placeables():
     data = get_placeables()
     return flask.jsonify({
-        'status': 200,
+        'status': 'success',
         'data': data
     })
 
@@ -238,6 +238,15 @@ def get_placeables():
             unique_containers.add(containers[0])
         return list(unique_containers)
 
+    def check_if_calibrated(instrument, placeable):
+        slot = placeable.get_parent().get_name()
+        label = placeable.get_name()
+        data = instrument.calibration_data
+        if slot in data:
+            if label in data[slot].get('children'):
+                return True
+        return False
+
     data = [{
         'axis': instrument.axis,
         'label': instrument.name,
@@ -251,7 +260,7 @@ def get_placeables():
                 'type': placeable.properties['type'],
                 'label': placeable.get_name(),
                 'slot': placeable.get_parent().get_name(),
-                'calibrated': False
+                'calibrated': check_if_calibrated(instrument, placeable)
             }
             for placeable in get_containers(instrument)
         ]
