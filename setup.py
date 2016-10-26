@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 config = {
     'description':
         "A suite of tools for portable automated scientific protocols.",
-    'author': "OpenTrons",
+    'author': "Opentrons",
     'author_email': 'engineering@opentrons.com',
     'url': 'http://opentrons.com',
     'version': '1.0',
