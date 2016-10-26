@@ -5,10 +5,6 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk import containers, instruments
 
 robot = Robot.get_instance()
-robot.get_serial_ports_list()
-
-# robot.connect('/dev/tty.usbmodem1421')
-# robot.home(now=True)
 
 tiprack = containers.load(
     'tiprack-200ul',  # container type
@@ -37,6 +33,9 @@ p200.drop_tip(tiprack[0])
 
 robot.simulate()
 
+# To run on a real robot, uncomment these lines
+# robot.connect('/dev/tty.usbmodem1421')
+# robot.home(now=True)
 # robot.run()      # run on connected robot (if already calibrated)
 
 ```
