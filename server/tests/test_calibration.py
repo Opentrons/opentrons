@@ -25,7 +25,7 @@ class CalibrationTestCase(unittest.TestCase):
         self.assertEqual(status, 'success')
 
         arguments = {
-            'label': 'plate',
+            'label': 'plate-for-frontend-test',
             'axis': 'b'
         }
 
@@ -35,24 +35,12 @@ class CalibrationTestCase(unittest.TestCase):
             content_type='application/json')
 
         actual = json.loads(response.data.decode())
-        expected = {
-            'data': {
-                'name': 'plate',
-                'axis': 'b',
-                'calibration_data': {
-                    'B2': {
-                        'children': {
-                            'plate': {
-                                'delta': {
-                                    'x': -160.0,
-                                    'z': 120.0,
-                                    'y': 124.05
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            'status': 'success'
-        }
-        self.assertDictEqual(actual, expected)
+        name = actual['data']['name']
+        axis = actual['data']['axis']
+        step_list = actual['data']['calibrations']
+        status = actual['status']
+
+        self.assertEqual(name, 'plate-for-frontend-test')
+        self.assertEqual(axis, 'b')
+        self.assertTrue(bool(step_list))
+        self.assertEqual(status, 'success')
