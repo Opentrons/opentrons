@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import threading
+import json
 
 import flask
 from flask import Flask, render_template, request
@@ -9,7 +10,10 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons_sdk.robot import Robot
-from opentrons_sdk.containers.placeable import Container
+from opentrons_sdk.instruments import Pipette
+from opentrons_sdk.containers import placeable
+from opentrons_sdk.util import trace
+from opentrons_sdk.util.vector import VectorEncoder
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
@@ -28,22 +32,21 @@ app = Flask(__name__,
             )
 CORS(app)
 app.jinja_env.autoescape = False
-# Only allow JSON and Python files
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
 
 
-# welcome route for connecting to robot
+def notify(info):
+    s = json.dumps(info, cls=VectorEncoder)
+    socketio.emit('event', json.loads(s))
+
+
+trace.EventBroker.get_instance().add(notify)
+
 @app.route("/")
 def welcome():
     return render_template("index.html")
-
-
-# Check uploaded file is allowed file type: JSON or Python
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 
 def load_python(stream):
@@ -209,13 +212,12 @@ def placeables():
 
 
 def get_placeables():
-
     def get_containers(instrument):
         unique_containers = set()
 
-        for placeable in instrument.placeables:
-            containers = [c for c in placeable.get_trace() if isinstance(
-                c, Container)]
+        for placeable_inst in instrument.placeables:
+            containers = [c for c in placeable_inst.get_trace() if isinstance(
+                c, placeable.Container)]
             unique_containers.add(containers[0])
         return list(unique_containers)
 
@@ -287,45 +289,6 @@ def move_to_slot():
     return flask.jsonify({
         'status': 200,
         'data': result
-    })
-
-
-@app.route("/robot/coordinates")
-def coordinates():
-    status = 'success'
-    data = None
-
-    try:
-        data = robot._driver.get_position().get("current")
-    except Exception as e:
-        status = 'error'
-        data = str(e)
-
-    coordinates_watcher = BACKGROUND_TASKS.get('COORDINATES_WATCHER')
-
-    if coordinates_watcher:
-        return flask.jsonify({
-            'status': status,
-            'data': data
-        })
-
-    def watch_coordinates():
-        while True:
-            socketio.emit(
-                'event',
-                {
-                    'type': 'coordinates',
-                    'coordinates': robot._driver.get_position().get("current")
-                }
-            )
-            socketio.sleep(0.5)
-
-    coordinates_watcher = socketio.start_background_task(watch_coordinates)
-    BACKGROUND_TASKS['COORDINATES_WATCHER'] = coordinates_watcher
-
-    return flask.jsonify({
-        'status': status,
-        'data': data
     })
 
 

@@ -10,6 +10,7 @@ server/static/css
 logs
 *.log
 logfile.txt
+server/*.log
 
 # Runtime data
 pids
