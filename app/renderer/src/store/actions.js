@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import * as types from './mutation-types'
 import OpenTrons from '../rest_api_wrapper'
-import {instrumentHref, placeableHref} from '../util'
+import {addHrefs} from '../util'
 
 
 const actions = {
@@ -26,12 +26,7 @@ const actions = {
     OpenTrons.uploadProtocol(formData).then((result) =>{
       if (result.success) {
         let tasks = result.calibrations
-        tasks.map((instrument) => {
-          instrument.href = instrumentHref(instrument)
-          instrument.placeables.map((placeable) => {
-            placeable.href = placeableHref(placeable, instrument)
-          })
-        })
+        addHrefs(tasks)
         commit('UPDATE_TASK_LIST', {'tasks': tasks})
       } else {
         commit('UPDATE_TASK_LIST', {tasks: []})
@@ -43,19 +38,16 @@ const actions = {
 
   },
   selectIncrement ({commit}, data) {
-    console.log("updating increment to " + data.inc + " for " + data.type)
     commit(types.UPDATE_INCREMENT, {
       'current_increment': data.inc, 'type': data.type })
   },
   jog ({commit}, coords) {
-    console.log(coords)
     OpenTrons.jog(coords)
   },
   jogToSlot ({commit}, data) {
     OpenTrons.jogToSlot(data)
   }
 }
-
 
 export default {
   actions

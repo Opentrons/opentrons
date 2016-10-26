@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 
 class OpenTrons {
-  constructor(base_url) {
+  constructor (base_url) {
     this.base_url = base_url || 'http://localhost:5000'
     this.connectUrl = this.base_url + '/robot/serial/connect'
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
@@ -10,7 +10,7 @@ class OpenTrons {
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
   }
 
-  connect(port) {
+  connect (port) {
     let options = {params: {'port': port}}
     return Vue.http
       .post(this.connectUrl, options)
@@ -52,7 +52,7 @@ class OpenTrons {
       })
   }
 
-  jogToSlot(data) {
+  jogToSlot (data) {
     return Vue.http
       .post(this.jogToSlotUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {

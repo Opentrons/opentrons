@@ -1,16 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client'
-
+import * as types from './mutation-types'
 import app_mutations from './mutations'
-const { mutations, state } = app_mutations
-
 import app_actions from './actions'
+
+
+const { mutations, state } = app_mutations
 const { actions } = app_actions
-
-
 Vue.use(Vuex)
-
 
 function createWebSocketPlugin(socket) {
   return store => {
@@ -21,7 +19,7 @@ function createWebSocketPlugin(socket) {
         }
       }
       if (data.name === 'move-finished') {
-        store.commit('UPDATE_POSITION', {
+        store.commit(types.UPDATE_POSITION, {
           x: data.position.head.x,
           y: data.position.head.y,
           z: data.position.head.z,
@@ -30,7 +28,7 @@ function createWebSocketPlugin(socket) {
         })
       }
       if (data.name === "home") {
-        store.commit('UPDATE_POSITION', {'x':  0, 'y': 0, 'z': 0, 'a': 0, 'b': 0})
+        store.commit(types.UPDATE_POSITION, {x: 0, y: 0, z: 0, a: 0, b: 0})
       }
     })
   }
