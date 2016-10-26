@@ -33,7 +33,7 @@ for i in range(95):
     p200.aspirate(100, plate[i])
     p200.dispense(plate[i + 1]).blow_out().touch_tip()
 
-p200.return_tip()
+p200.drop_tip(tiprack[0])
 
 robot.simulate()
 
