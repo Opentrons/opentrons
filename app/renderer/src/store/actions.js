@@ -4,7 +4,7 @@ import * as types from './mutation-types'
 
 import OpenTrons from '../rest_api_wrapper'
 
-import {instrumentHref, placeableHref} from '../util'
+import {instrumentHref, placeableHref, mapRoutes} from '../util'
 
 
 const actions = {
@@ -29,12 +29,7 @@ const actions = {
     OpenTrons.uploadProtocol(formData).then((result) =>{
       if (result.success) {
         let tasks = result.calibrations
-        tasks.map((instrument) => {
-          instrument.href = instrumentHref(instrument)
-          instrument.placeables.map((placeable) => {
-            placeable.href = placeableHref(placeable, instrument)
-          })
-        })
+        let _tasks = mapRoutes(tasks)
         commit('UPDATE_TASK_LIST', {'tasks': tasks})
       } else {
         commit('UPDATE_TASK_LIST', {tasks: []})
@@ -56,6 +51,18 @@ const actions = {
   },
   jogToSlot ({commit}, data) {
     OpenTrons.jogToSlot(data)
+  },
+  calibratePlaceable({commit}, data) {
+    Vue.http
+    .post('http://localhost:5000/calibrate_placeable', JSON.stringify(data), {emulateJSON: true})
+    .then((response) => {
+      console.log("success", response.body.data.calibration)
+      let tasks = response.body.data.calibration
+      let _tasks = mapRoutes(tasks)
+      commit('UPDATE_TASK_LIST', {'tasks': tasks})
+    }, (response) => {
+        console.log('failed', response)
+    })
   }
 }
 
