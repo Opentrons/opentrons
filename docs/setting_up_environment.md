@@ -40,7 +40,7 @@ A new tab should open in your browser and you should have an empty text box.
 
 After running the aforementioned step a new text box will appear for you to write code in. We will use this text box to install the Opentrons API.
 
-* Copy paste this statement into the new text box `!pip install --upgrade git+https://github.com/OpenTrons/opentrons_sdk.git@master#egg=opentrons`
+* Copy paste this statement into the new text box `!pip install --upgrade git+https://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons`
 
 The should execute the installation process of the Opentrons API. The last line of this installation process should say `Successfully installed opentrons-sdk-1.0`
 
