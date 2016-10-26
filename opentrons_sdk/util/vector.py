@@ -13,7 +13,10 @@ class VectorEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Vector):
             return dict(zip('xyz', obj))
-        return json.JSONEncoder.default(self, obj)
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except:
+            return str(obj)
 
 
 class Vector(object):

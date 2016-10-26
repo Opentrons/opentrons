@@ -378,7 +378,6 @@ class CNCDriver(object):
                 arrived = False
         return arrived
 
-    @trace.traceable('home')
     def home(self, *axis):
         axis_to_home = ''
         for a in axis:
@@ -395,6 +394,9 @@ class CNCDriver(object):
             for l in axis_to_home:
                 self.axis_homed[l.lower()] = True
                 pos_args[l] = 0
+
+            arguments = {'name': 'home', 'axis': axis_to_home}
+            trace.EventBroker.get_instance().notify(arguments)
             return self.set_position(**pos_args)
         else:
             return False
