@@ -196,9 +196,9 @@ p200.dispense(0, plate[1].top(-1))
 
 # you can also simple move somewhere using Pipette.move_to()
 # 'arc' will move the head up, then over, then down
-p200.move_to(plate[95).top(10), strategy='arc')
+p200.move_to(plate[95].top(10), strategy='arc')
 # 'direct' will move the head in a straight line to the destination
-p200.move_to(plate[95).bottom(), strategy='direct')
+p200.move_to(plate[95].bottom(), strategy='direct')
 
 # rotate around the edge of the well
 # dropping 10ul at a time
