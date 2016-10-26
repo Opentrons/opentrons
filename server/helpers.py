@@ -1,8 +1,8 @@
 import json
 import sys
 
-from opentrons_sdk.json_importer import JSONProtocolProcessor
-from opentrons_sdk.robot import Robot
+from opentrons.json_importer import JSONProtocolProcessor
+from opentrons.robot import Robot
 
 
 JSON_ERROR = None

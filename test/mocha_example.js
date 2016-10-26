@@ -11,6 +11,7 @@ describe('application launch', function () {
     this.app = new Application({
       path: 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
     })
+    process.env.DEBUG = 'true'
     return this.app.start()
   })
 
@@ -20,7 +21,7 @@ describe('application launch', function () {
 
   afterEach(function () {
     if (this.app && this.app.isRunning()) {
-      return this.app.stop()
+      // return this.app.stop()
     }
   })
 

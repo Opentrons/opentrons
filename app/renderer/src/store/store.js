@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import io from 'socket.io-client'
+import io from 'socket.io-client'
 
 import {instrumentHref, placeableHref} from '../util'
 import app_mutations from './mutations'
@@ -13,34 +13,34 @@ const { actions } = app_actions
 Vue.use(Vuex)
 
 
-// function createWebSocketPlugin(socket) {
-//   return store => {
-//     socket.on('event', data => {
-//       if (data.type === 'connection_status') {
-//         if (data.is_connected === false) {
-//           store.commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
-//         }
-//       }
-//     })
-//   }
-// }
+function createWebSocketPlugin(socket) {
+  return store => {
+    socket.on('event', data => {
+      if (data.type === 'connection_status') {
+        if (data.is_connected === false) {
+          store.commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
+        }
+      }
+    })
+  }
+}
 
-// const socket = io.connect('ws://localhost:5000')
-//
-// socket.on('connect', function(){
-//   console.log('WebSocket has connected.')
-//   socket.emit('connected')
-// });
-//
-// socket.on('disconnect', function(){
-//   console.log('WebSocket has disconnected')
-// })
+const socket = io.connect('ws://localhost:5000')
 
-// const websocketplugin = createWebSocketPlugin(socket)
+socket.on('connect', function(){
+  console.log('WebSocket has connected.')
+  socket.emit('connected')
+});
+
+socket.on('disconnect', function(){
+  console.log('WebSocket has disconnected')
+})
+
+const websocketplugin = createWebSocketPlugin(socket)
 
 export default new Vuex.Store({
   state,
   actions,
-  mutations  //,
-  // plugins: [websocketplugin]
+  mutations,
+  plugins: [websocketplugin]
 })

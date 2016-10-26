@@ -2,7 +2,7 @@ import io
 import unittest
 import os
 
-from opentrons_sdk.robot import Robot
+from opentrons.robot import Robot
 
 from server import helpers
 

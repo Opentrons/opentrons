@@ -8,8 +8,8 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons_sdk.robot import Robot
-from opentrons_sdk.containers.placeable import Container
+from opentrons.robot import Robot
+from opentrons.containers.placeable import Container
 
 sys.path.insert(0, os.path.abspath('..'))
 from server import helpers
