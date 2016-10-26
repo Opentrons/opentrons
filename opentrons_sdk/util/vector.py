@@ -1,11 +1,19 @@
 import math
 
 from collections import namedtuple
+import json
 
 
 # To keep Python 3.4 compatibility
 def isclose(a, b, rel_tol):
     return abs(a - b) < rel_tol
+
+
+class VectorEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Vector):
+            return dict(zip('xyz', obj))
+        return json.JSONEncoder.default(self, obj)
 
 
 class Vector(object):
