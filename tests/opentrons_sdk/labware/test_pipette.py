@@ -474,25 +474,25 @@ class PipetteTest(unittest.TestCase):
     def test_tip_tracking_chain(self):
         self.p200.move_to = mock.Mock()
 
-        # for _ in range(0, 96 * 4):
-        #     self.p200.pick_up_tip()
+        for _ in range(0, 96 * 4):
+            self.p200.pick_up_tip()
 
-        # expected = []
-        # for i in range(0, 96):
-        #     expected.append(self.build_move_to_bottom(self.tiprack1[i]))
-        # for i in range(0, 96):
-        #     expected.append(self.build_move_to_bottom(self.tiprack2[i]))
-        # for i in range(0, 96):
-        #     expected.append(self.build_move_to_bottom(self.tiprack1[i]))
-        # for i in range(0, 96):
-        #     expected.append(self.build_move_to_bottom(self.tiprack2[i]))
+        expected = []
+        for i in range(0, 96):
+            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+        for i in range(0, 96):
+            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
+        for i in range(0, 96):
+            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+        for i in range(0, 96):
+            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
 
-        # self.robot.simulate()
+        self.robot.simulate()
 
-        # self.assertEqual(
-        #     self.p200.move_to.mock_calls,
-        #     expected
-        # )
+        self.assertEqual(
+            self.p200.move_to.mock_calls,
+            expected
+        )
 
     def test_tip_tracking_chain_multi_channel(self):
         p200_multi = instruments.Pipette(
