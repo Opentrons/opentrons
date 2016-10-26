@@ -20,14 +20,17 @@ function createWebSocketPlugin(socket) {
           store.commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
         }
       }
-      if (data.type === 'coordinates') {
+      if (data.name === 'move-finished') {
         store.commit('UPDATE_POSITION', {
-          x: data.coordinates.x,
-          y: data.coordinates.y,
-          z: data.coordinates.z,
-          a: data.coordinates.a,
-          b: data.coordinates.b
+          x: data.position.head.x,
+          y: data.position.head.y,
+          z: data.position.head.z,
+          a: data.position.plunger.a,
+          b: data.position.plunger.b
         })
+      }
+      if (data.name === "home") {
+        store.commit('UPDATE_POSITION', {'x':  0, 'y': 0, 'z': 0, 'a': 0, 'b': 0})
       }
     })
   }

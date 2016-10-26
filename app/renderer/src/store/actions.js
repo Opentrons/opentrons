@@ -1,9 +1,6 @@
 import Vue from 'vue'
-
 import * as types from './mutation-types'
-
 import OpenTrons from '../rest_api_wrapper'
-
 import {instrumentHref, placeableHref} from '../util'
 
 

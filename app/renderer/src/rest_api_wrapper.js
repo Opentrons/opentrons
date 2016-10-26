@@ -52,7 +52,7 @@ class OpenTrons {
       })
   }
 
-  jogToSlot() {
+  jogToSlot(data) {
     return Vue.http
       .post(this.jogToSlotUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {
