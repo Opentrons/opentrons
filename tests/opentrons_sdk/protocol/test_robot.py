@@ -3,6 +3,7 @@ import unittest
 
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.placeable import Deck
+from opentrons_sdk import instruments
 
 
 class RobotTest(unittest.TestCase):
@@ -23,6 +24,14 @@ class RobotTest(unittest.TestCase):
         self.robot.connect(options=options)
         self.robot.home(now=True)
         self.robot.clear()
+
+    def test_simulate(self):
+        self.robot.disconnect()
+        p200 = instruments.Pipette('b')
+        p200.aspirate().dispense()
+        self.robot.simulate()
+        self.assertEquals(len(self.robot._commands), 2)
+        self.assertEquals(self.robot.connections['live'], None)
 
     def test_disconnect(self):
         self.robot.disconnect()

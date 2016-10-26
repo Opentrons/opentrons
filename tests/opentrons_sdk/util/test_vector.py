@@ -1,6 +1,7 @@
 import unittest
 
-from opentrons_sdk.util.vector import Vector
+from opentrons_sdk.util.vector import (Vector, VectorEncoder)
+import json
 
 
 class VectorTestCase(unittest.TestCase):
@@ -57,3 +58,9 @@ class VectorTestCase(unittest.TestCase):
 
         res = v1 * Vector(-1.0, -1.0, -1.0)
         self.assertEqual(res, Vector(-2.0, -4.0, -6.0))
+
+    def test_json_encoder(self):
+        v1 = Vector(1.0, 2.0, 3.0)
+        s = json.dumps(v1, cls=VectorEncoder)
+        v2 = json.loads(s)
+        self.assertEqual(v1, v2)
