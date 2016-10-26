@@ -144,7 +144,7 @@ const actions = {
         Vue.http
           .post('http://localhost:5000/calibrate_placeable', JSON.stringify(data), {emulateJSON: true})
           .then((response) => {
-            console.log("success", response.body.data.axis)
+            console.log("success", response.body.data)
           }, (response) => {
               console.log('failed', response)
           })
