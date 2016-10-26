@@ -50,16 +50,13 @@
     methods: {
         getPortsList: function () {
             this.ports = {
-                selected: null,
-                options: [
-                    //Schema: { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' }
-                ]
+              selected: null,
+              options: []
             }
             let self = this
             this.$http
                     .get('http://localhost:5000/robot/serial/list')
                     .then((response) => {
-                        console.log('we are getting data...', response.data)
                         let ports = ['Select a port'].concat(response.data.ports)
                         self.ports.selected = null
                         self.ports.options = ports.map((port) => ({text: port, value: port}))
@@ -75,7 +72,7 @@
         this.$store.dispatch('disconnect_robot')
       }
     },
-    beforeMount: function () {
+    beforeMount: function() {
       this.getPortsList();
     }
   }
