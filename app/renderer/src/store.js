@@ -141,14 +141,17 @@ const actions = {
           })
     },
     calibratePlaceable({commit}, data) {
-      console.log(data);
+      let axis = data.axis;
+      let slot = data.slot;
+      let label = data.label;
         Vue.http
           .post('http://localhost:5000/calibrate_placeable', JSON.stringify(data), {emulateJSON: true})
           .then((response) => {
-            console.log("success", response)
+            console.log("success", response.body.data.axis)
           }, (response) => {
               console.log('failed', response)
           })
+      }
     }
 }
 
