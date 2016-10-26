@@ -14,7 +14,8 @@
     "release:mac": "npm run build:backend:mac && npm run build:frontend:mac",
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "NODE_ENV=development electron app/",
-    "unit": "karma start test/unit/karma.conf.js --single-run"
+    "unit": "karma start test/unit/karma.conf.js --single-run",
+    "integration": "echo 'foo'"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",

@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import Vue from 'vue'
 // import Hello from 'app/components/Hello'
 
