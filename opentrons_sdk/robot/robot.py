@@ -9,7 +9,6 @@ from opentrons_sdk.drivers import motor as motor_drivers
 from opentrons_sdk.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons_sdk.robot.command import Command
 from opentrons_sdk.util.log import get_logger
-
 from opentrons_sdk.helpers import helpers
 from opentrons_sdk.util.trace import traceable
 

@@ -4,11 +4,12 @@ from opentrons_sdk.robot.command import Command
 from opentrons_sdk.robot.robot import Robot
 from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.containers.placeable import Placeable, humanize_location
+from opentrons_sdk.instruments.instrument import Instrument
 
 import itertools
 
 
-class Pipette(object):
+class Pipette(Instrument):
 
     def __init__(
             self,
@@ -16,34 +17,19 @@ class Pipette(object):
             name=None,
             channels=1,
             min_volume=0,
-            max_volume=1,
             trash_container=None,
             tip_racks=None,
             aspirate_speed=300,
             dispense_speed=500):
 
-        self.positions = {
-            'top': 0,
-            'bottom': 10,
-            'drop_tip': 12,
-            'blow_out': 13
-        }
-
-        self.speeds = {
-            'aspirate': aspirate_speed,
-            'dispense': dispense_speed
-        }
-
         self.axis = axis
         self.channels = channels
 
         if not name:
-            name = axis
+            name = self.__class__.__name__
         self.name = name
 
-        self.min_volume = min_volume
-        self.max_volume = max_volume
-        self.current_volume = 0
+        self.calibration_data = {}
 
         self.trash_container = trash_container
         self.tip_racks = tip_racks
@@ -54,10 +40,33 @@ class Pipette(object):
         self.robot.add_instrument(self.axis, self)
         self.plunger = self.robot.get_motor(self.axis)
 
-        self.calibration_data = {}
         self.placeables = []
+        self.current_volume = 0
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+
+        self.speeds = {
+            'aspirate': aspirate_speed,
+            'dispense': dispense_speed
+        }
+
+        self.min_volume = min_volume
+        self.max_volume = self.min_volume + 1
+
+        self.positions = {
+            'top': 0,
+            'bottom': 10,
+            'drop_tip': 12,
+            'blow_out': 13
+        }
+
+        self.init_calibrations()
+        self.load_persisted_data()
+
+    def reset(self):
+        self.placeables = []
+        self.current_volume = 0
+        self.reset_tip_tracking()
 
     def has_tip_rack(self):
         return (self.tip_racks is not None and
@@ -79,11 +88,6 @@ class Pipette(object):
             self.tip_rack_iter = itertools.cycle(
                 itertools.chain(*iterables)
             )
-
-    def reset(self):
-        self.placeables = []
-        self.current_volume = 0
-        self.reset_tip_tracking()
 
     def associate_placeable(self, location):
         placeable, _ = containers.unpack_location(location)
@@ -381,6 +385,8 @@ class Pipette(object):
         if drop_tip is not None:
             self.positions['drop_tip'] = drop_tip
 
+        self.update_calibrations()
+
         return self
 
     def calibrate_position(self, location, current=None):
@@ -391,10 +397,16 @@ class Pipette(object):
             self.calibration_data,
             location,
             current)
+
+        self.update_calibrations()
+
         return self
 
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
+
+        self.update_calibrations()
+
         return self
 
     def plunge_distance(self, volume):
