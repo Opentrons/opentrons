@@ -31,6 +31,19 @@ class UploadTestCase(unittest.TestCase):
         response = json.loads(response.data.decode())
         self.assertEquals(response['status'], 'success')
 
+        robot = Robot.get_instance()
+        location = robot._deck['A1'].get_child_by_name('tiprack')
+        rel_vector = location[0].from_center(
+            x=0, y=0, z=-1, reference=location)
+        location = (location, rel_vector)
+
+        pipette = robot._instruments['A']
+        pipette.calibrate_position(location)
+
+        response = self.app.get('/instruments/placeables')
+        response = json.loads(response.data.decode())
+        self.assertEquals(response['status'], 'success')
+
         expected_data = {
             'data': [
                 {
@@ -42,7 +55,7 @@ class UploadTestCase(unittest.TestCase):
                     'max_volume': 10,
                     'placeables': [
                         {
-                            'calibrated': False,
+                            'calibrated': True,
                             'label': 'tiprack',
                             'slot': 'A1',
                             'type': 'tiprack-200ul'
@@ -107,7 +120,7 @@ class UploadTestCase(unittest.TestCase):
             'status': 200
         }
 
-        response_data = response['data']['calibrations'][0]
+        response_data = response['data'][0]
         for key, value in expected_data['data'][0].items():
             if key != 'placeables':
                 self.assertEquals(value, response_data[key])
