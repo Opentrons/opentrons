@@ -10,5 +10,7 @@ testsContext.keys().forEach(testsContext)
 // require all src files except main.js for coverage.
 // you can also change this to match only the subset of files that
 // you want coverage for.
-var srcContext = require.context('../../app', true, /^\.\/(?!(background|main)(\.js)?$)/)
+
+// NOTE(Ahmed): we're conly considering renderer files -- need to add main process files as well..
+var srcContext = require.context('../../app/renderer/src', true, /^\.\/(?!(background|main)(\.js)?$)/)
 srcContext.keys().forEach(srcContext)

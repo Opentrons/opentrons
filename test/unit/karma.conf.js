@@ -18,15 +18,14 @@ var webpackConfig = merge(baseConfig, {
   }
 })
 
-webpackConfig = baseConfig
-
-// // make sure isparta loader is applied before eslint
-// webpackConfig.module.preLoaders.unshift({
-//   test: /\.js$/,
-//   loader: 'isparta',
-//   include: projectRoot,
-//   exclude: /test\/unit|node_modules/
-// })
+// make sure isparta loader is applied before eslint
+webpackConfig.module.preLoaders = webpackConfig.module.preLoaders || []
+webpackConfig.module.preLoaders.unshift({
+  test: /\.js$/,
+  loader: 'isparta',
+  include: projectRoot,
+  exclude: /test\/unit|node_modules/
+})
 
 // only apply babel for test files when using isparta
 webpackConfig.module.loaders.some(function (loader, i) {
@@ -35,6 +34,8 @@ webpackConfig.module.loaders.some(function (loader, i) {
     return true
   }
 })
+
+delete webpackConfig.entry
 
 module.exports = function (config) {
   config.set({
@@ -45,7 +46,11 @@ module.exports = function (config) {
     browsers: ['Electron'],
     frameworks: ['jasmine'],  // ['jasmine'],
     reporters: ['spec', 'coverage'],
-    files: ['./index.js'],
+    files: [
+      './index.js',
+      '../../app/*',
+      '../../server/templates/dist/*',
+    ],
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']
     },
