@@ -9,7 +9,7 @@ chai.use(chaiAsPromised)
 describe('application launch', function () {
   beforeEach(function () {
     this.app = new Application({
-      path: '../dist/mac/OpenTrons.app/MacOS/OpenTrons'
+      path: 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
     })
     return this.app.start()
   })
@@ -25,7 +25,7 @@ describe('application launch', function () {
   })
 
   it('opens a window', function () {
-    return this.app.client.waitUntilWindowLoaded()
+    return this.app.client.waitUntilWindowLoaded(5000)
       .getWindowCount().should.eventually.equal(1)
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false

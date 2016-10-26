@@ -9,7 +9,7 @@ const {initAutoUpdater} = require('./updater.js')
 
 
 
-// let serverManager = new ServerManager()
+let serverManager = new ServerManager()
 const mainLogger = getLogger('electron-main')
 let mainWindow
 
@@ -26,7 +26,7 @@ function createWindow () {
 }
 
 function startUp() {
-  // serverManager.start();
+  serverManager.start();
   setTimeout(createWindow, 2000)
   initAutoUpdater()
   process.on('uncaughtException', function(error) {
@@ -39,5 +39,5 @@ function startUp() {
 app.on('ready', startUp)
 
 app.on('quit', function(){
-    // serverManager.shutdown();
+    serverManager.shutdown();
 });
