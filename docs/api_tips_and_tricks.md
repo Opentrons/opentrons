@@ -8,47 +8,48 @@ plate = containers.load('96-flat', 'B1')
 trough = containers.load('trough-12row', 'C1')
 trash = containers.load('point', 'C2')
     
-p200 = instruments.Pipette(
-    min_volume=2,
-    axis="b",
-    channels=1
-)
+p200 = instruments.Pipette(axis="b")
 ```
 ## Robot Commands
-####Run the virtual-smoothie
+
+####Clear, create, then simulate commands
 ```python
-robot.connect() # creates a virtual-smoothie
+robot.clear()        # delets all previously created commands
+
+p200.aspirate()      # add new commands to queue
+p200.dispense()
+
+robot.simulate()     # simulate all commands
+# robot.run()        # run on physical robot if connected
 ```
 
 ####Run on a physical robot
 List your serial ports
 ```python
-my_ports = robot.list_serial_ports()
+my_ports = robot.get_serial_ports_list()
 print(my_ports)
 ```
-will print...
+will print on OSX something like...
 ```
 [ '/dev/tty.usbmodem1421' ]
 ```
-Pass the port name into `.connect()` to connect to a physical robot
+on Windows...
+```
+[ 'COM3' ]
+```
+Pass the port name string into `.connect()` to connect to a physical robot
 ```
 robot.connect('/dev/tty.usbmodem1421')
 ```
 
 ####Home the robot
 ```python
-robot.home() # homes Z first, then all other axis
-robot.home('ab') # you can also specify the axis
-```
+robot.clear()
 
-####Clear, create, then run commands
-```python
-robot.clear()        # delets all previously created commands
+robot.home()          # by default homes Z first, then all other axis
+robot.home('ab')      # you can also specify the axis
 
-p200.aspirate(100)   # new commands
-p200.dispense()
-
-robot.run()          # run all commands
+robot.run()
 ```
 
 ## Pipette Commands
@@ -73,21 +74,21 @@ p200.pick_up_tip(tiprack['A1']).drop_tip()
 ####Pick up then drop tip somewhere else
 
 ```python
-p200.pick_up_tip(tiprack['A1']).drop_tip('B1')
+p200.pick_up_tip(tiprack['A1']).drop_tip(tiprack['B1'])
 p200.pick_up_tip(tiprack['B1']).drop_tip(trash)
 ```
 
 ####Mixing at a well
 
  ```python
-p200.aspirate(100, plate['A1']).mix(3)
+p200.mix(100, 3, plate[0])   # arguments are (volume, repetitions, location)
 ```
 
 ####Iterating through wells
 
 ```python
 for i in range(96):
-  p200.aspirate(100, plate[i]).mix(3)
+  p200.mix(100, 3, plate[i])
 ```
 
 ####Distribute to multiple wells
@@ -187,11 +188,17 @@ robot.clear()
 
 p200.pick_up_tip(tiprack[3])
 
-# aspirate from 3mm above the bottom of the well
-well_bottom = plate[0].from_center(x=0, y=0, z=-1)
-well_bottom_3mm = well_bottom + (0, 0, 3)
-source = (plate[0], well_bottom_3mm)
-p200.aspirate(source).dispense(0, plate[1])
+# aspirate from 3mm above the bottom of a well
+p200.aspirate(plate[0].bottom(3))
+
+# dispense from 1mm below the top of a well
+p200.dispense(0, plate[1].top(-1))
+
+# you can also simple move somewhere using Pipette.move_to()
+# 'arc' will move the head up, then over, then down
+p200.move_to(plate[95].top(10), strategy='arc')
+# 'direct' will move the head in a straight line to the destination
+p200.move_to(plate[95].bottom(), strategy='direct')
 
 # rotate around the edge of the well
 # dropping 10ul at a time
@@ -199,8 +206,12 @@ theta = 0.0
 while p200.current_volume > 0:
     # we can move around a circle with radius (r) and theta (degrees)
     well_edge = plate[1].from_center(r=1.0, theta=theta, h=0.9)
+    
+    # combine a Well with a Vector in a tuple
     destination = (plate[1], well_edge)
-    p200.go_to(destination).dispense(10)
+    p200.move_to(destination, strategy='direct')  # move straight there
+    p200.dispense(10)
+    
     theta += 0.314
 
 p200.drop_tip(tiprack[3])

@@ -6,6 +6,8 @@ from opentrons_sdk.containers.calibrator import Calibrator
 from opentrons_sdk.containers.placeable import Placeable, humanize_location
 from opentrons_sdk.instruments.instrument import Instrument
 
+import itertools
+
 
 class Pipette(Instrument):
 
@@ -31,6 +33,8 @@ class Pipette(Instrument):
 
         self.trash_container = trash_container
         self.tip_racks = tip_racks
+
+        self.reset_tip_tracking()
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
@@ -62,6 +66,28 @@ class Pipette(Instrument):
     def reset(self):
         self.placeables = []
         self.current_volume = 0
+        self.reset_tip_tracking()
+
+    def has_tip_rack(self):
+        return (self.tip_racks is not None and
+                isinstance(self.tip_racks, list) and
+                len(self.tip_racks) > 0)
+
+    def reset_tip_tracking(self):
+        self.current_tip_home_well = None
+        self.tip_rack_iter = iter([])
+
+        if self.has_tip_rack():
+            iterables = self.tip_racks
+
+            if self.channels > 1:
+                iterables = []
+                for rack in self.tip_racks:
+                    iterables.append(rack.rows)
+
+            self.tip_rack_iter = itertools.cycle(
+                itertools.chain(*iterables)
+            )
 
     def associate_placeable(self, location):
         placeable, _ = containers.unpack_location(location)
@@ -252,12 +278,29 @@ class Pipette(Instrument):
 
         return self
 
+    def return_tip(self):
+        def _do():
+            if not self.current_tip_home_well:
+                return
+
+            self.drop_tip(self.current_tip_home_well)
+
+        description = "Returning tip"
+        self.robot.add_command(Command(do=_do, description=description))
+        return self
+
     def pick_up_tip(self, location=None):
         def _do():
             nonlocal location
+
+            if not location and self.has_tip_rack():
+                location = next(self.tip_rack_iter)
+
             if location:
                 placeable, _ = containers.unpack_location(location)
                 self.move_to(placeable.bottom(), strategy='direct', now=True)
+
+            self.current_tip_home_well = location
 
             # TODO: actual plunge depth for picking up a tip
             # varies based on the tip
@@ -280,6 +323,9 @@ class Pipette(Instrument):
     def drop_tip(self, location=None):
         def _do():
             nonlocal location
+            if not location and self.trash_container:
+                location = self.trash_container
+
             if location:
                 placeable, _ = containers.unpack_location(location)
                 self.move_to(placeable.bottom(), strategy='direct', now=True)
