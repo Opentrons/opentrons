@@ -12,6 +12,17 @@ p200 = instruments.Pipette(axis="b")
 ```
 ## Robot Commands
 
+####Clear, create, then simulate commands
+```python
+robot.clear()        # delets all previously created commands
+
+p200.aspirate()      # add new commands to queue
+p200.dispense()
+
+robot.simulate()     # simulate all commands
+# robot.run()        # run on physical robot if connected
+```
+
 ####Run on a physical robot
 List your serial ports
 ```python
@@ -29,16 +40,6 @@ on Windows...
 Pass the port name string into `.connect()` to connect to a physical robot
 ```
 robot.connect('/dev/tty.usbmodem1421')
-```
-
-####Clear, create, then run commands
-```python
-robot.clear()        # delets all previously created commands
-
-p200.aspirate(100)   # add new commands to queue
-p200.dispense()
-
-robot.run()          # run all commands
 ```
 
 ####Home the robot
