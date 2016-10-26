@@ -13,7 +13,7 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.instruments import Pipette
 from opentrons_sdk.containers import placeable
 from opentrons_sdk.util import trace
-from opentrons_sdk.util import (vector, VectorEncoder)
+from opentrons_sdk.util.vector import VectorEncoder
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
