@@ -248,8 +248,7 @@ class Robot(object):
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def run(self):
-
+    def prepare_for_run(self):
         if not self._driver.connection:
             raise RuntimeWarning('Please connect to the robot')
 
@@ -262,6 +261,10 @@ class Robot(object):
 
         for instrument in self._instruments.values():
             instrument.reset()
+
+    def run(self):
+
+        self.prepare_for_run()
 
         for command in self._commands:
             try:

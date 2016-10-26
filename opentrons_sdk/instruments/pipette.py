@@ -478,7 +478,7 @@ class Pipette(Instrument):
         if volume > self.max_volume:
             raise RuntimeError(
                 "{0}µl exceeds pipette's maximum volume ({1}ul).".format(
-                    volume, max_volume))
+                    volume, self.max_volume))
         if volume < self.min_volume:
             self.robot.add_warning(
                 "{0}µl is less than pipette's min_volume ({1}ul).".format(
