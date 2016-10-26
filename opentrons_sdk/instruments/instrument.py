@@ -125,10 +125,12 @@ class Instrument(object):
     def restore_vector(self, obj, root=True):
         obj = (copy.deepcopy(obj) if root else obj)
         for key, val in obj.items():
-            try:
-                res = Vector(json.loads(val))
-                obj[key] = res
-            except TypeError:
-                if isinstance(val, dict):
-                    self.restore_vector(val, root=False)
+            if isinstance(val, dict):
+                self.restore_vector(val, root=False)
+            elif isinstance(val, str):
+                try:
+                    res = Vector(json.loads(val))
+                    obj[key] = res
+                except JSON_ERROR:
+                    pass
         return obj
