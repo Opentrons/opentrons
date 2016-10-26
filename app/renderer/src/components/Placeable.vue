@@ -31,11 +31,6 @@
 
   export default {
     name: "Placeable",
-    data: function() {
-      return {
-        
-      }
-    },
     components: {
       Navigation,
       Jog,
