@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import threading
+import json
 
 import flask
 from flask import Flask, render_template, request
@@ -12,9 +13,7 @@ from opentrons_sdk.robot import Robot
 from opentrons_sdk.instruments import Pipette
 from opentrons_sdk.containers import placeable
 from opentrons_sdk.util import trace
-from opentrons_sdk.util import vector
-
-import json
+from opentrons_sdk.util import (vector, VectorEncoder)
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
@@ -31,20 +30,9 @@ app = Flask(__name__,
             )
 CORS(app)
 app.jinja_env.autoescape = False
-# Only allow JSON and Python files
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
-
-
-class VectorEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, vector.Vector):
-            return dict(zip('xyz', obj))
-        try:
-            return json.JSONEncoder.default(self, obj)
-        except:
-            return str(obj)
 
 
 def notify(info):
@@ -54,17 +42,9 @@ def notify(info):
 
 trace.EventBroker.get_instance().add(notify)
 
-
-# welcome route for connecting to robot
 @app.route("/")
 def welcome():
     return render_template("index.html")
-
-
-# Check uploaded file is allowed file type: JSON or Python
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 
 def load_python(stream):
@@ -228,7 +208,6 @@ def placeables():
 
 
 def get_placeables():
-
     def get_containers(instrument):
         unique_containers = set()
 
