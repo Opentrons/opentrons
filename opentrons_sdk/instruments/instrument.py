@@ -1,9 +1,17 @@
 import copy
 import json
 import os
+import sys
 import pkg_resources
 
-from opentrons_sdk.util import vector
+from opentrons_sdk.util.vector import (Vector, VectorEncoder)
+
+
+JSON_ERROR = None
+if sys.version_info > (3, 4):
+    JSON_ERROR = ValueError
+else:
+    JSON_ERROR = json.decoder.JSONDecodeError
 
 
 CALIBRATIONS_FOLDER = pkg_resources.resource_filename(
@@ -106,8 +114,8 @@ class Instrument(object):
     def strip_vector(self, obj, root=True):
         obj = (copy.deepcopy(obj) if root else obj)
         for key, val in obj.items():
-            if isinstance(val, vector.Vector):
-                res = ['vector', dict(zip(['x', 'y', 'z'], val))]
+            if isinstance(val, Vector):
+                res = json.dumps(val, cls=VectorEncoder)
                 obj[key] = res
             elif isinstance(val, dict):
                 self.strip_vector(val, root=False)
@@ -117,9 +125,10 @@ class Instrument(object):
     def restore_vector(self, obj, root=True):
         obj = (copy.deepcopy(obj) if root else obj)
         for key, val in obj.items():
-            if isinstance(val, list) and val[0] == 'vector':
-                res = vector.Vector(val[1])
+            try:
+                res = Vector(json.loads(val))
                 obj[key] = res
-            elif isinstance(val, dict):
-                self.restore_vector(val, root=False)
+            except TypeError:
+                if isinstance(val, dict):
+                    self.restore_vector(val, root=False)
         return obj
