@@ -16,7 +16,7 @@
           <h3 class="title">Deck Position</h3>
           <coordinates></coordinates>
           <!-- props - calibration, instrument, placeable type -->
-          <h3 class="title">{{ calibration.label }} {{ calibration.slot }} {{ type }}</h3>
+          <h3 class="title">Calibrate {{ calibration.label }} </h3>
           <CalibratePlaceable :placeable="calibration" :type="type" :instrument="instrument"></CalibratePlaceable>
         </div>
       </div>

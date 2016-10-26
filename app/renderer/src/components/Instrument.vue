@@ -12,6 +12,7 @@
         <div class="save-pipette">
             <h3 class="title">Current Position</h3>
             <coordinates :instrument="calibration" :axis="calibration.axis.toUpperCase()"></coordinates>
+            <h3 class="title">Calibrate {{ calibration.label }} axis {{calibration.axis.toUpperCase() }}</h3>
             <CalibrateInstrument :instrument="calibration"></CalibrateInstrument>
         </div>
       </div>
