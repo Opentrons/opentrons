@@ -1,3 +1,5 @@
+import copy
+
 from opentrons_sdk import containers
 from opentrons_sdk.robot.command import Command
 
@@ -54,11 +56,12 @@ class Pipette(Instrument):
         self.max_volume = self.min_volume + 1
 
         self.positions = {
-            'top': 0,
-            'bottom': 10,
-            'drop_tip': 12,
-            'blow_out': 13
+            'top': None,
+            'bottom': None,
+            'blow_out': None,
+            'drop_tip': None
         }
+        self.calibrated_positions = copy.deepcopy(self.positions)
 
         self.init_calibrations()
         self.load_persisted_data()
@@ -67,6 +70,16 @@ class Pipette(Instrument):
         self.placeables = []
         self.current_volume = 0
         self.reset_tip_tracking()
+
+    def set_plunger_defaults(self):
+        self.calibrated_positions = copy.deepcopy(self.positions)
+        self.positions['top'] = 0
+        self.positions['bottom'] = 10
+        self.positions['blow_out'] = 12
+        self.positions['drop_tip'] = 14
+
+    def restore_plunger_positions(self):
+        self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
         return (self.tip_racks is not None and
@@ -124,8 +137,9 @@ class Pipette(Instrument):
             self.position_for_aspirate(location)
 
             self.current_volume += volume
-            distance, _ = self.plunge_distance(self.current_volume)
-            destination = self.positions['bottom'] - distance
+            distance = self.plunge_distance(self.current_volume)
+            bottom = self.positions['bottom'] or 0
+            destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
 
@@ -158,8 +172,9 @@ class Pipette(Instrument):
 
             if volume:
                 self.current_volume -= volume
-                distance, _ = self.plunge_distance(self.current_volume)
-                destination = self.positions['bottom'] - distance
+                distance = self.plunge_distance(self.current_volume)
+                bottom = self.positions['bottom'] or 0
+                destination = bottom - distance
 
                 speed = self.speeds['dispense'] * rate
 
@@ -182,7 +197,7 @@ class Pipette(Instrument):
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.plunger.move(self.positions['bottom'])
+            self.plunger.move(self.positions['bottom'] or 0)
 
         # then go inside the location
         if location:
@@ -190,33 +205,7 @@ class Pipette(Instrument):
                 location = location.bottom(1)
             self.move_to(location, strategy='direct', now=True)
 
-    def transfer(self, source, destination, volume=None):
-        volume = volume or self.max_volume
-        self.aspirate(volume, source)
-        self.dispense(volume, destination)
-        return self
-
-    def distribute(self, source, destinations, volume=None, extra_pull=0):
-        volume = volume or self.max_volume
-        fractional_volume = volume / len(destinations)
-
-        self.aspirate(volume + extra_pull, source)
-        for well in destinations:
-            self.dispense(fractional_volume, well)
-
-        return self
-
-    def consolidate(self, destination, sources, volume=None):
-        volume = volume or self.max_volume
-        fractional_volume = (volume) / len(sources)
-
-        for well in sources:
-            self.aspirate(fractional_volume, well)
-
-        self.dispense(volume, destination)
-        return self
-
-    def mix(self, volume, repetitions, location=None):
+    def mix(self, volume, repetitions=1, location=None):
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
@@ -281,6 +270,7 @@ class Pipette(Instrument):
     def return_tip(self):
         def _do():
             if not self.current_tip_home_well:
+                self.robot.add_warning('Pipette has no tip to return')
                 return
 
             self.drop_tip(self.current_tip_home_well)
@@ -293,8 +283,13 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
 
-            if not location and self.has_tip_rack():
-                location = next(self.tip_rack_iter)
+            if not location:
+                if self.has_tip_rack():
+                    # TODO: raise warning/exception if looped back to first tip
+                    location = next(self.tip_rack_iter)
+                else:
+                    self.robot.warning(
+                        'pick_up_tip called with no reference to a tip')
 
             if location:
                 placeable, _ = containers.unpack_location(location)
@@ -305,7 +300,6 @@ class Pipette(Instrument):
             # TODO: actual plunge depth for picking up a tip
             # varies based on the tip
             # right now it's accounted for via plunge depth
-            # TODO: Need to talk about containers z positioning
             tip_plunge = 6
 
             # Dip into tip and pull it up
@@ -313,7 +307,6 @@ class Pipette(Instrument):
                 self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
 
-            self.robot.home('z', now=True)
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
@@ -340,9 +333,49 @@ class Pipette(Instrument):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
+    def home(self):
+        def _do():
+            self.plunger.home()
+            self.current_volume = 0
+
+        description = "Homing pipette plunger on axis {}".format(self.axis)
+        self.robot.add_command(Command(do=_do, description=description))
+        return self
+
+    def transfer(self, volume, source, destination=None):
+        if not isinstance(volume, (int, float, complex)):
+            if volume and not destination:
+                destination = source
+                source = volume
+            volume = None
+
+        self.aspirate(volume, source)
+        self.dispense(volume, destination)
+        return self
+
+    def distribute(self, volume, source, destinations):
+        volume = volume or self.max_volume
+        fractional_volume = volume / len(destinations)
+
+        self.aspirate(volume, source)
+        for well in destinations:
+            self.dispense(fractional_volume, well)
+
+        return self
+
+    def consolidate(self, volume, sources, destination):
+        volume = volume or self.max_volume
+        fractional_volume = (volume) / len(sources)
+
+        for well in sources:
+            self.aspirate(fractional_volume, well)
+
+        self.dispense(volume, destination)
+        return self
+
     def calibrate(self, position):
         current_position = self.robot._driver.get_plunger_position()
-        current_position = current_position['current'][self.axis]
+        current_position = current_position['target'][self.axis]
         kwargs = {}
         kwargs[position] = current_position
         self.calibrate_plunger(**kwargs)
@@ -405,6 +438,12 @@ class Pipette(Instrument):
     def set_max_volume(self, max_volume):
         self.max_volume = max_volume
 
+        if self.max_volume <= self.min_volume:
+            raise RuntimeError(
+                'Pipette max volume is less than '
+                'min volume ({0} < {1})'.format(
+                    self.max_volume, self.min_volume))
+
         self.update_calibrations()
 
         return self
@@ -418,13 +457,13 @@ class Pipette(Instrument):
         Calibration of the top and bottom positions are necessary for
         these calculations to work.
         """
-        if self.positions['bottom'] is None or self.positions['top'] is None:
-            raise ValueError(
-                "Pipette {} not calibrated.".format(self.axis)
-            )
-        (percent, warnings) = self._volume_percentage(volume)
-        travel = self.positions['bottom'] - self.positions['top']
-        return (travel * percent, warnings)
+        percent = self._volume_percentage(volume)
+        top = self.positions['top'] or 0
+        bottom = self.positions['bottom'] or 0
+        travel = bottom - top
+        if travel <= 0:
+            self.robot.add_warning('Plunger calibrated incorrectly')
+        return travel * percent
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -432,15 +471,20 @@ class Pipette(Instrument):
         We use this to calculate what actual position the plunger axis
         needs to be at in order to achieve the correct volume of liquid.
         """
-        warning_msg = None
         if volume < 0:
-            warning_msg = "Volume must be a positive number."
+            raise RuntimeError(
+                "Volume must be a positive number, got {}.".format(volume))
+            volume = 0
         if volume > self.max_volume:
-            warning_msg = "{}µl exceeds maximum volume.".format(volume)
+            raise RuntimeError(
+                "{0}µl exceeds pipette's maximum volume ({1}ul).".format(
+                    volume, self.max_volume))
         if volume < self.min_volume:
-            warning_msg = "{}µl is too small.".format(volume)
+            self.robot.add_warning(
+                "{0}µl is less than pipette's min_volume ({1}ul).".format(
+                    volume, self.min_volume))
 
-        return (volume / self.max_volume, warning_msg)
+        return volume / self.max_volume
 
     def delay(self, seconds):
         def _do():

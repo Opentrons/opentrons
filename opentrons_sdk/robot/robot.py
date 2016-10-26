@@ -248,15 +248,23 @@ class Robot(object):
     def actions(self):
         return copy.deepcopy(self._commands)
 
-    def run(self):
-
+    def prepare_for_run(self):
         if not self._driver.connection:
             raise RuntimeWarning('Please connect to the robot')
 
         self._runtime_warnings = []
 
+        if not self._instruments:
+            self.add_warning('No instruments added to robot')
+        if not self._commands:
+            self.add_warning('No commands added to robot')
+
         for instrument in self._instruments.values():
             instrument.reset()
+
+    def run(self):
+
+        self.prepare_for_run()
 
         for command in self._commands:
             try:
@@ -278,8 +286,17 @@ class Robot(object):
             self.set_connection('simulate_switches')
         else:
             self.set_connection('simulate')
+
+        for instrument in self._instruments.values():
+            instrument.set_plunger_defaults()
+
         res = self.run()
+
         self.set_connection('live')
+
+        for instrument in self._instruments.values():
+            instrument.restore_plunger_positions()
+
         return res
 
     def set_connection(self, mode):
@@ -287,6 +304,8 @@ class Robot(object):
             connection = self.connections[mode]
             if connection:
                 self._driver.connect(connection)
+            else:
+                self._driver.disconnect()
         else:
             raise ValueError(
                 'mode expected to be "live" or "simulate", '
