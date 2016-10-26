@@ -14,7 +14,7 @@
           <button @click="connectToRobot" v-show="ports.selected" class="btn-connect">Connect!</button>
         </div>
         <div class="connected" v-if="connected">
-          <h1 >The selected port is: {{ port }}</h1>
+          <p>The selected port is: {{ port }}</p>
           <button @click="disconnectRobot" v-show="connected" class="btn-connect">Disconnect!</button>
         </div>
     </div>
@@ -50,16 +50,13 @@
     methods: {
         getPortsList: function () {
             this.ports = {
-                selected: null,
-                options: [
-                    //Schema: { text: '/dev/tty.usbmodem1421', value: '/dev/tty.usbmodem1421' }
-                ]
+              selected: null,
+              options: []
             }
             let self = this
             this.$http
                     .get('http://localhost:5000/robot/serial/list')
                     .then((response) => {
-                        console.log('we are getting data...', response.data)
                         let ports = ['Select a port'].concat(response.data.ports)
                         self.ports.selected = null
                         self.ports.options = ports.map((port) => ({text: port, value: port}))
@@ -75,7 +72,7 @@
         this.$store.dispatch('disconnect_robot')
       }
     },
-    beforeMount: function () {
+    beforeMount: function() {
       this.getPortsList();
     }
   }

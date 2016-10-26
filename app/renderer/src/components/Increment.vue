@@ -21,9 +21,7 @@
       },
       selectIncrement(i) {
         let type = "plunger"
-        if (this.placeable) {
-          type = "placeable"
-        }
+        if (this.placeable) { type = "placeable" }
         this.$store.dispatch("selectIncrement", {inc: i, type: type})
       }
     }

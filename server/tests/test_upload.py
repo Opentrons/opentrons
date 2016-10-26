@@ -31,48 +31,110 @@ class UploadTestCase(unittest.TestCase):
         response = json.loads(response.data.decode())
         self.assertEquals(response['status'], 'success')
 
+        robot = Robot.get_instance()
+        location = robot._deck['A1'].get_child_by_name(
+            'tiprack-for-frontend-test')
+        rel_vector = location[0].from_center(
+            x=0, y=0, z=-1, reference=location)
+        location = (location, rel_vector)
+
+        robot._instruments['A'].positions = {
+            'top': 0,
+            'bottom': 1,
+            'blow_out': 2,
+            'drop_tip': None
+        }
+        robot._instruments['B'].positions = {
+            'top': None,
+            'bottom': None,
+            'blow_out': None,
+            'drop_tip': None
+        }
+
+        pipette = robot._instruments['A']
+        pipette.calibrate_position(location)
+
+        response = self.app.get('/instruments/placeables')
+        response = json.loads(response.data.decode())
+        self.assertEquals(response['status'], 'success')
+
         expected_data = {
             'data': [
                 {
-                    'axis': 'b',
-                    'blow_out': 12,
-                    'bottom': 10,
-                    'drop_tip': 13,
-                    'label': 'p200',
-                    'max_volume': 200,
+                    'axis': 'a',
+                    'blow_out': 2,
+                    'bottom': 1,
+                    'drop_tip': None,
+                    'label': 'p10',
+                    'max_volume': 10,
                     'placeables': [
                         {
-                            'calibrated': False,
-                            'label': 'tiprack',
+                            'calibrated': True,
+                            'label': 'tiprack-for-frontend-test',
                             'slot': 'A1',
                             'type': 'tiprack-200ul'
                         },
                         {
                             'calibrated': False,
-                            'label': 'trough',
+                            'label': 'trough-for-frontend-test',
                             'slot': 'B1',
                             'type': 'trough-12row'
                         },
                         {
                             'calibrated': False,
-                            'label': 'plate',
+                            'label': 'plate-for-frontend-test',
                             'slot': 'B2',
                             'type': '96-flat'
                         },
                         {
                             'calibrated': False,
-                            'label': 'trash',
+                            'label': 'trash-for-frontend-test',
                             'slot': 'A2',
                             'type': 'point'
                         }
                     ],
                     'top': 0
+                },
+                {
+                    'axis': 'b',
+                    'blow_out': None,
+                    'bottom': None,
+                    'drop_tip': None,
+                    'label': 'p200',
+                    'max_volume': 200,
+                    'placeables': [
+                        {
+                            'calibrated': False,
+                            'label': 'tiprack-for-frontend-test',
+                            'slot': 'A1',
+                            'type': 'tiprack-200ul'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'trough-for-frontend-test',
+                            'slot': 'B1',
+                            'type': 'trough-12row'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'plate-for-frontend-test',
+                            'slot': 'B2',
+                            'type': '96-flat'
+                        },
+                        {
+                            'calibrated': False,
+                            'label': 'trash-for-frontend-test',
+                            'slot': 'A2',
+                            'type': 'point'
+                        }
+                    ],
+                    'top': None
                 }
             ],
             'status': 200
         }
 
-        response_data = response['data']['calibrations'][0]
+        response_data = response['data'][0]
         for key, value in expected_data['data'][0].items():
             if key != 'placeables':
                 self.assertEquals(value, response_data[key])
@@ -82,7 +144,6 @@ class UploadTestCase(unittest.TestCase):
 
     def test_upload_invalid_python(self):
         pass
-
 
     def test_upload_valid_json(self):
         response = self.app.post('/upload', data={

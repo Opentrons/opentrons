@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2 class="title">Calibrate {{ $route.params.placeable }}</h2>
-    <div class="instructions">Calibrate {{ instrument.label }}
-    to well A1 of {{ $route.params.placeable }}
+    <h2 class="title">Calibrate {{ calibration.label }}</h2>
+    <div class="instructions">Calibrate the {{ instrument.label }} pipette
+    to well A1 of {{ calibration.label }}
     </div>
 
     <section>

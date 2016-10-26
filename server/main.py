@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import threading
+import json
 
 import flask
 from flask import Flask, render_template, request
@@ -9,9 +10,11 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons.robot import Robot
-from opentrons.containers.placeable import Container
+from opentrons.containers import placeable
+from opentrons.util import trace
+from opentrons.util.vector import VectorEncoder
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
 
@@ -26,38 +29,41 @@ app = Flask(__name__,
             )
 CORS(app)
 app.jinja_env.autoescape = False
-# Only allow JSON and Python files
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
 
 
-# welcome route for connecting to robot
+def notify(info):
+    s = json.dumps(info, cls=VectorEncoder)
+    socketio.emit('event', json.loads(s))
+
+trace.EventBroker.get_instance().add(notify)
+
 @app.route("/")
 def welcome():
     return render_template("index.html")
-
-
-# Check uploaded file is allowed file type: JSON or Python
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 
 def load_python(stream):
     global robot
 
     code = helpers.convert_byte_stream_to_str(stream)
-    api_response = {'error': None, 'warnings': []}
+    api_response = {'errors': [], 'warnings': []}
 
     robot.reset()
     try:
         exec(code, globals(), locals())
         robot.simulate()
+        if len(robot._commands) == 0:
+            error = (
+                "This protocol does not contain any commands for the robot."
+            )
+            api_response['errors'] = error
     except Exception as e:
         api_response['errors'] = [str(e)]
 
-    api_response['warnings'] = robot.get_warnings()
+    api_response['warnings'] = robot.get_warnings() or []
 
     return api_response
 
@@ -119,8 +125,14 @@ def is_connected():
         'port': Robot.get_instance().get_connected_port()
     })
 
+@app.route("/robot/get_coordinates")
+def get_coordinates():
+    return flask.jsonify({
+        'coords': robot._driver.get_position().get("target")
+    })
 
-@app.route("/robot/serial/connect")
+
+@app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
     port = flask.request.args.get('port')
 
@@ -128,7 +140,7 @@ def connect_robot():
     data = None
 
     try:
-        Robot.get_instance().connect(port)
+        Robot.get_instance().connect(port, options={'limit_switches': False})
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -190,21 +202,29 @@ def disconnect_robot():
 def placeables():
     data = get_placeables()
     return flask.jsonify({
-        'status': 200,
+        'status': 'success',
         'data': data
     })
 
 
 def get_placeables():
-
     def get_containers(instrument):
         unique_containers = set()
 
-        for placeable in instrument.placeables:
-            containers = [c for c in placeable.get_trace() if isinstance(
-                c, Container)]
+        for placeable_inst in instrument.placeables:
+            containers = [c for c in placeable_inst.get_trace() if isinstance(
+                c, placeable.Container)]
             unique_containers.add(containers[0])
         return list(unique_containers)
+
+    def check_if_calibrated(instrument, placeable):
+        slot = placeable.get_parent().get_name()
+        label = placeable.get_name()
+        data = instrument.calibration_data
+        if slot in data:
+            if label in data[slot].get('children'):
+                return True
+        return False
 
     data = [{
         'axis': instrument.axis,
@@ -219,7 +239,7 @@ def get_placeables():
                 'type': placeable.properties['type'],
                 'label': placeable.get_name(),
                 'slot': placeable.get_parent().get_name(),
-                'calibrated': False
+                'calibrated': check_if_calibrated(instrument, placeable)
             }
             for placeable in get_containers(instrument)
         ]

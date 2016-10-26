@@ -5,18 +5,22 @@
       <div class="instructions">
         Upload a valid JSON or Python Protocol. Errors will display below.
       </div>
-      <div class="error">
-        <div v-for="error in errors" >
-          <span class="error">!</span>
-          Error: {{ error }}
+      <div class="step">
+        <div class="error">
+          <div v-for="error in errors" >
+            Error: {{error}}
+          </div>
+          <div v-show="warnings" >
+            Warnings: {{warnings}}
+          </div>
         </div>
+        <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step-upload">
+          <div class="fileUpload">
+            <span>{{fileName}}</span>
+            <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
+          </div>
+        </form>
       </div>
-      <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step step-upload">
-        <div class="fileUpload">
-          <span>{{fileName}}</span>
-          <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
-        </div>
-      </form>
       <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
@@ -44,6 +48,9 @@
       },
       errors () {
         return this.$store.state.errors
+      },
+      warnings () {
+        return this.$store.state.warnings
       },
       next () {
         if (this.$store.state.tasks[0]) {

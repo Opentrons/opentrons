@@ -1,6 +1,8 @@
 <template>
   <span>
-    <button v-for="slot in slots" @click="jogToSlot(slot, axis)"class="btn-deck">{{slot}}</button>
+    <button v-for="slot in slots" @click="jogToSlot(slot, axis)"class="btn-deck">
+      {{slot}}
+    </button>
   </span>
 </template>
 
