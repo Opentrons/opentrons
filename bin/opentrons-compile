@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+
+"""
+Allows you to use the command line to compile scripts for any of the
+compiler modules in this directory.
+
+For example, you can do:
+
+    opentrons-compile pfusx NI NG NI HD HD NN NG HD NG NG NI NG NG NG NI
+
+It works because there's a pfusx.py file with a compile method.
+
+Compilers are designed to take a list of inputs (or lines) and output a
+JSON file, which will then be printed to the console.
+
+To save a protocol to a file, you can do something like this:
+
+    opentrons-compile my_compiler some_input > filename.json
+
+You can read from a file and output to another file like this:
+
+    input.txt | opentrons-compile my_compiler > filename.json
+
+"""
+
+import sys
+import re
+import inspect
+
+
+def compile(compiler, data, **kwargs):
+    """
+    Send provided arguments to the designated compiler and outputs a JSON
+    protocol file that can run on the OT-One machine.
+
+    This is a dynamic import; the compiler module is based on the compiler
+    name passed in.
+    """
+
+    # Don't even leave an opening for weird stuff.
+    if re.search(r'[^\w\d]', compiler):
+        raise ImportError("Invalid compiler name.")
+
+    try:
+        mod = __import__("opentrons.compilers." + compiler, fromlist=[''])
+    except ImportError:
+        raise ImportError("Unsupported compiler: " + compiler)
+
+    # Check to see if all passed options are recognized by the compiler.
+    sig = inspect.getfullargspec(mod.compile)
+    arg_names = sig.kwonlyargs
+    for field in kwargs:
+        if field not in arg_names:
+            raise ValueError("Unknown option: " + field)
+
+    return mod.compile(*data, **kwargs)
+
+
+if __name__ == "__main__":
+    """
+    Accepts comma and line separated values, assumes anything else is a
+    single input value.
+
+    Otherwise, it just leaves the arguments alone, since the compiler
+    is going to be in charge of figuring out what to do with the input
+    list.
+
+    For example, in the case of FusX, each list item is a separate
+    RVD sequence.
+
+    In other cases, each list item might be a line in a file.
+    """
+
+    compiler = sys.argv[1]
+
+    # stdin is like `foo.txt | opentrons-compile`
+    # or `opentrons-compile < foo.txt`
+    if not sys.stdin.isatty():
+        data = sys.stdin.read().split('\n')
+        data.remove('')  # Strip empty lines.
+    else:
+        data = ' '.join(sys.argv[2:])
+
+    if '\n' in data:
+        data = data.split('\n')
+    elif ',' in data:
+        data = data.split(',')
+    else:
+        data = [data]
+
+    try:
+        print(compile(compiler, data))
+    except Exception as e:
+        print(e)
