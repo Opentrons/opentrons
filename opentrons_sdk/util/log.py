@@ -29,7 +29,7 @@ logging_config = dict(
     },
     root={
         'handlers': ['file'],
-        'level': logging.DEBUG
+        'level': logging.CRITICAL
     },
 )
 dictConfig(logging_config)
