@@ -1,8 +1,10 @@
 <template>
   <div>
     <h2 class="title">Calibrate {{ calibration.label }}</h2>
+
     <div class="instructions">Calibrate the {{ instrument.label }} pipette (axis {{instrument.axis}})
     to well A1 of {{ calibration.label }}.
+
     </div>
 
     <section>
