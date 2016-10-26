@@ -48,15 +48,15 @@ module.exports = function (config) {
     reporters: ['spec', 'coverage'],
     files: [
       './index.js',
-      '../../app/*',
-      '../../server/templates/dist/*',
+      // '../../app/*',
+      // '../../server/templates/dist/*',
     ],
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']
     },
     webpack: webpackConfig,
     webpackMiddleware: {
-      noInfo: true
+      noInfo: false
     },
     coverageReporter: {
       dir: './coverage',
