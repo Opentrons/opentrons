@@ -456,7 +456,7 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
-    def test_tip_tarcking_simple(self):
+    def test_tip_tracking_simple(self):
         self.p200.move_to = mock.Mock()
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
@@ -470,7 +470,7 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
-    def test_tip_tarcking_chain(self):
+    def test_tip_tracking_chain(self):
         self.p200.move_to = mock.Mock()
 
         for _ in range(0, 96 * 4):
@@ -493,7 +493,7 @@ class PipetteTest(unittest.TestCase):
             expected
         )
 
-    def test_tip_tarcking_chain_multi_channel(self):
+    def test_tip_tracking_chain_multi_channel(self):
         p200_multi = instruments.Pipette(
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
@@ -529,7 +529,7 @@ class PipetteTest(unittest.TestCase):
             expected
         )
 
-    def test_tip_tarcking_return(self):
+    def test_tip_tracking_return(self):
         self.p200.drop_tip = mock.Mock()
 
         self.p200.pick_up_tip()
