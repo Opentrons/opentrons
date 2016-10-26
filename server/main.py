@@ -55,7 +55,8 @@ def load_python(stream):
         exec(code, globals(), locals())
         robot.simulate()
         if len(robot._commands) == 0:
-            error = "This protocol does not contain any commands for the robot."
+            error = ("This protocol does not contain "
+                     "any commands for the robot.")
             api_response['errors'] = error
     except Exception as e:
         api_response['errors'] = [str(e)]
@@ -121,6 +122,7 @@ def is_connected():
         'is_connected': Robot.get_instance().is_connected(),
         'port': Robot.get_instance().get_connected_port()
     })
+
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
@@ -276,6 +278,7 @@ def move_to_slot():
         'data': result
     })
 
+
 @app.route("/robot/coordinates")
 def coordinates():
     status = 'success'
@@ -319,9 +322,8 @@ def _calibrate_placeable(container_name, axis_name):
 
     deck = robot._deck
     containers = deck.containers()
+    axis_name = axis_name.upper()
 
-    print(containers)
-    
     if container_name not in containers:
         raise ValueError('Container {} is not definied'.format(container_name))
 
@@ -334,8 +336,9 @@ def _calibrate_placeable(container_name, axis_name):
     well = container[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=container)
     location = (container, pos)
-    
+
     instrument.calibrate_position(location)
+    return instrument.calibration_data
 
 
 @app.route("/calibrate_placeable", methods=["POST"])
@@ -347,15 +350,15 @@ def calibrate_placeable():
         _calibrate_placeable(name, axis)
     except Exception as e:
         return flask.jsonify({
-                'status': 'error',
-                'data': str(e)
-            })
+            'status': 'error',
+            'data': str(e)
+        })
 
     return flask.jsonify({
         'status': 'success',
         'data': {
             'name': name,
-            'axis': axis
+            'axis': axis,
         }
     })
 

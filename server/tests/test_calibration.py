@@ -24,9 +24,14 @@ class CalibrationTestCase(unittest.TestCase):
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
-        response = self.app.post('/calibrate_placeable', data={
+        arguments = {
             'label': 'plate',
             'axis': 'b'
-        })
+        }
+
+        response = self.app.post(
+            '/calibrate_placeable',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
 
         print(response.data)
