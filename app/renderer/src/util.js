@@ -1,6 +1,4 @@
-module.exports = {
-  addhrefs
-}
+module.exports = {addHrefs}
 
 function addHrefs(tasks) {
   tasks.map((instrument) => {

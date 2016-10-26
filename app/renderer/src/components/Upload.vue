@@ -8,11 +8,9 @@
       <div class="step">
         <div class="error">
           <div v-for="error in errors" >
-            <!-- <span class="error">!</span> -->
             Error: {{error}}
           </div>
           <div v-show="warnings" >
-            <!-- <span class="error">!</span> -->
             Warnings: {{warnings}}
           </div>
         </div>

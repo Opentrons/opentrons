@@ -80,5 +80,4 @@ class OpenTrons {
   }
 }
 
-
 export default new OpenTrons('http://localhost:5000')
