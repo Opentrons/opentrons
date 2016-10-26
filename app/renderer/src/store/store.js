@@ -27,8 +27,18 @@ function createWebSocketPlugin(socket) {
           b: data.position.plunger.b
         })
       }
-      if (data.name === "home") {
-        store.commit(types.UPDATE_POSITION, {x: 0, y: 0, z: 0, a: 0, b: 0})
+      if (data.name === "home" && data.axis) {
+        let axis_homed = data.axis.split('').map((axis) => {
+          return axis.toLowerCase()
+        })
+        let {x, y, z, a, b} = store._options.state.coordinates
+        let current_coordinates = {x, y, z, a, b}
+        axis_homed.forEach((axis) => {
+          current_coordinates[axis] = 0
+          if (axis === "y") { current_coordinates[axis] = 250 }
+          if (axis === "z") { current_coordinates[axis] = 120 }
+        })
+        store.commit(types.UPDATE_POSITION, current_coordinates)
       }
     })
   }
