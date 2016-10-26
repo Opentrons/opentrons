@@ -220,7 +220,7 @@ def get_placeables():
         label = placeable.get_name()
         data = instrument.calibration_data
         if slot in data:
-            if label in data[slot]['children']:
+            if label in data[slot].get('children'):
                 return True
         return False
 
