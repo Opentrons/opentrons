@@ -50,10 +50,10 @@ table {
 div.error {
     @include rect(19,3);
     @include offset-v(1,0);
-    overflow:scroll;
+    overflow-y:scroll;
     font-size: 16px;
     font-weight: 600;
-    //text-align: center;
+    
     height: 40px;
     div {
         display: flex;
