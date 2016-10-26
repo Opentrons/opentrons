@@ -255,6 +255,11 @@ class Robot(object):
 
         self._runtime_warnings = []
 
+        if not self._instruments:
+            self.add_warning('No instruments added to robot')
+        if not self._commands:
+            self.add_warning('No commands added to robot')
+
         for instrument in self._instruments.values():
             instrument.reset()
 
@@ -287,6 +292,8 @@ class Robot(object):
             connection = self.connections[mode]
             if connection:
                 self._driver.connect(connection)
+            else:
+                self._driver.disconnect()
         else:
             raise ValueError(
                 'mode expected to be "live" or "simulate", '
