@@ -1,3 +1,5 @@
+import copy
+
 from opentrons_sdk import containers
 from opentrons_sdk.robot.command import Command
 
@@ -54,11 +56,12 @@ class Pipette(Instrument):
         self.max_volume = self.min_volume + 1
 
         self.positions = {
-            'top': 0,
-            'bottom': 10,
-            'drop_tip': 12,
-            'blow_out': 13
+            'top': None,
+            'bottom': None,
+            'blow_out': None,
+            'drop_tip': None
         }
+        self.calibrated_positions = copy.deepcopy(self.positions)
 
         self.init_calibrations()
         self.load_persisted_data()
@@ -67,6 +70,16 @@ class Pipette(Instrument):
         self.placeables = []
         self.current_volume = 0
         self.reset_tip_tracking()
+
+    def set_plunger_defaults(self):
+        self.calibrated_positions = copy.deepcopy(self.positions)
+        self.positions['top'] = 0
+        self.positions['bottom'] = 10
+        self.positions['blow_out'] = 12
+        self.positions['drop_tip'] = 14
+
+    def restore_plunger_positions(self):
+        self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
         return (self.tip_racks is not None and
@@ -125,7 +138,8 @@ class Pipette(Instrument):
 
             self.current_volume += volume
             distance = self.plunge_distance(self.current_volume)
-            destination = self.positions['bottom'] - distance
+            bottom = self.positions['bottom'] or 0
+            destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
 
@@ -159,7 +173,8 @@ class Pipette(Instrument):
             if volume:
                 self.current_volume -= volume
                 distance = self.plunge_distance(self.current_volume)
-                destination = self.positions['bottom'] - distance
+                bottom = self.positions['bottom'] or 0
+                destination = bottom - distance
 
                 speed = self.speeds['dispense'] * rate
 
@@ -182,7 +197,7 @@ class Pipette(Instrument):
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.plunger.move(self.positions['bottom'])
+            self.plunger.move(self.positions['bottom'] or 0)
 
         # then go inside the location
         if location:
@@ -443,12 +458,11 @@ class Pipette(Instrument):
         these calculations to work.
         """
         percent = self._volume_percentage(volume)
-        travel = self.positions['bottom'] - self.positions['top']
-        if (travel < 0 or
-            not (self.positions['bottom'] <
-                 self.positions['blow_out'] <
-                 self.positions['drop_tip'])):
-            raise RuntimeError('Plunger calibrated incorrectly')
+        top = self.positions['top'] or 0
+        bottom = self.positions['bottom'] or 0
+        travel = bottom - top
+        if travel <= 0:
+            self.robot.add_warning('Plunger calibrated incorrectly')
         return travel * percent
 
     def _volume_percentage(self, volume):

@@ -283,8 +283,17 @@ class Robot(object):
             self.set_connection('simulate_switches')
         else:
             self.set_connection('simulate')
+
+        for instrument in self._instruments.values():
+            instrument.set_plunger_defaults()
+
         res = self.run()
+
         self.set_connection('live')
+
+        for instrument in self._instruments.values():
+            instrument.restore_plunger_positions()
+
         return res
 
     def set_connection(self, mode):

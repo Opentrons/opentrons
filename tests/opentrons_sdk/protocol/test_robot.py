@@ -27,7 +27,7 @@ class RobotTest(unittest.TestCase):
 
     def test_simulate(self):
         self.robot.disconnect()
-        p200 = instruments.Pipette('b')
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
         p200.aspirate().dispense()
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
