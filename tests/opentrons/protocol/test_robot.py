@@ -115,13 +115,17 @@ class RobotTest(unittest.TestCase):
     def test_versions(self):
         res = self.robot.versions()
         expected = {
-            'config': 'v1.0.3b',
-            'firmware': 'v1.0.5',
-            'robot': 'one_pro',
-            'compatible': {
-                'firmware': True,
-                'config': True,
-                'ot_version': True
+            'config': {
+                'version': 'v1.0.3b',
+                'compatible': True
+            },
+            'firmware': {
+                'version': 'v1.0.5',
+                'compatible': True
+            },
+            'ot_version': {
+                'version': 'one_pro',
+                'compatible': True
             }
         }
         self.assertDictEqual(res, expected)

@@ -452,11 +452,20 @@ class Robot(object):
 
     def versions(self):
         # TODO: Store these versions in config
+        compatible = self._driver.versions_compatible()
         return {
-            'firmware': self._driver.get_firmware_version(),
-            'config': self._driver.get_config_version(),
-            'robot': self._driver.get_ot_version(),
-            'compatible': self._driver.versions_compatible()
+            'firmware': {
+                'version': self._driver.get_firmware_version(),
+                'compatible': compatible['firmware']
+            },
+            'config': {
+                'version': self._driver.get_config_version(),
+                'compatible': compatible['config']
+            },
+            'ot_version': {
+                'version': self._driver.get_ot_version(),
+                'compatible': compatible['ot_version']
+            }
         }
 
     def diagnostics(self):
