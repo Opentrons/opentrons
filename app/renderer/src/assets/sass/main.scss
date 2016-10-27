@@ -2,7 +2,7 @@
 @import "header";
 @import "steplist";
 @import "buttons";
-@import "modals";
+
 nav {
     display: flex;
 }
@@ -50,10 +50,10 @@ table {
 div.error {
     @include rect(19,3);
     @include offset-v(1,0);
-    overflow:scroll;
+    overflow-y:scroll;
     font-size: 16px;
     font-weight: 600;
-    //text-align: center;
+    
     height: 40px;
     div {
         display: flex;
@@ -264,15 +264,18 @@ Deck|Container
         flex-wrap: wrap;
         @include grid-col-full(8);
         .well-img {
-            @include rect(2,
-            3);
+            @include rect(2,3);
         }
         .update {
             display: flex;
             flex-wrap: wrap;
             @include grid-col-full(6);
-            @include offset-v-air(2,
-            0);
+            &.bottom{
+                @include offset-v-air(3,0);
+            }
+            &.top{
+                @include offset-v-air(2,0);
+            }
             .position {
                 @include grid-col-air(2);
                 text-align: center;

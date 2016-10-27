@@ -32,11 +32,6 @@ class UploadTestCase(unittest.TestCase):
         self.assertEquals(response['status'], 'success')
 
         robot = Robot.get_instance()
-        location = robot._deck['A1'].get_child_by_name(
-            'tiprack-for-frontend-test')
-        rel_vector = location[0].from_center(
-            x=0, y=0, z=-1, reference=location)
-        location = (location, rel_vector)
 
         robot._instruments['A'].positions = {
             'top': 0,
@@ -50,6 +45,16 @@ class UploadTestCase(unittest.TestCase):
             'blow_out': None,
             'drop_tip': None
         }
+
+        for instrument in robot._instruments.values():
+            instrument.calibration_data = {}
+            instrument.update_calibrations()
+
+        location = robot._deck['A1'].get_child_by_name(
+            'tiprack-for-frontend-test')
+        rel_vector = location[0].from_center(
+            x=0, y=0, z=-1, reference=location)
+        location = (location, rel_vector)
 
         pipette = robot._instruments['A']
         pipette.calibrate_position(location)

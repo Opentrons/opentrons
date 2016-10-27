@@ -11,7 +11,9 @@
         <JogPlunger :axis="calibration.axis"></JogPlunger>
         <div class="save-pipette">
             <h3 class="title">Current Position</h3>
-            <coordinates :instrument="instrument" :axis="calibration.axis.toUpperCase()"></coordinates>
+            <coordinates :instrument="calibration" :axis="calibration.axis.toUpperCase()"></coordinates>
+            <h3 class="title">Calibrate {{ calibration.label }} axis {{calibration.axis.toUpperCase() }}</h3>
+            <CalibrateInstrument :instrument="calibration"></CalibrateInstrument>
         </div>
       </div>
       <Navigation :prev="prev" :next="next"></Navigation>
@@ -24,19 +26,19 @@
   import Jog from './Jog.vue'
   import JogPlunger from './JogPlunger.vue'
   import Coordinates from './Coordinates.vue'
+  import CalibrateInstrument from './CalibrateInstrument.vue'
 
   export default {
     name: "Instrument",
     data: function() {
-      return {
-        instrument: true
-      }
+      return {}
     },
     components: {
       Navigation,
       Jog,
       JogPlunger,
-      Coordinates
+      Coordinates,
+      CalibrateInstrument
     },
     methods: {
       currentInstrument(tasks) {
