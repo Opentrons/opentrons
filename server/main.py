@@ -340,6 +340,43 @@ def calibrate_placeable():
     })
 
 
+def _calibrate_plunger(position, axis_name):
+    axis_name = axis_name.upper()
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    if position not in instrument.positions:
+        raise ValueError('Position {} is not on the plunger'.format(position))
+
+    instrument.calibrate(position)
+
+
+@app.route("/calibrate_plunger", methods=["POST"])
+def calibrate_plunger():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_plunger(position, axis)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'position': position,
+            'axis': axis,
+            'calibrations': calibrations
+        }
+    })
+
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
