@@ -43,6 +43,7 @@ install:
   - npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
   - npm run unit
   - npm run release:mac
+  - mocha --timeout 15000 test/integration_test.js
   - ls dist/mac
   - ls releases
 
