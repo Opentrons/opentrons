@@ -27,6 +27,30 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_version_compatible(self):
+        self.robot.disconnect()
+        self.robot.connect()
+        res = self.motor.versions_compatible()
+        self.assertEquals(res, {
+            'firmware': True,
+            'config': True,
+            'ot_version': True
+        })
+        self.robot.disconnect()
+        self.robot.connect(options={
+            'firmware': 'v2.0.0',
+            'config': {
+                'version': 'v3.1.2',
+                'ot_version': 'hoodie'
+            }
+        })
+        res = self.motor.versions_compatible()
+        self.assertEquals(res, {
+            'firmware': False,
+            'config': False,
+            'ot_version': False
+        })
+
     def test_message_timeout(self):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
 

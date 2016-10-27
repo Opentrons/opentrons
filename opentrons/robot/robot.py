@@ -145,7 +145,7 @@ class Robot(object):
             'firmware': 'v1.0.5',
             'config': {
                 'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
+                'version': 'v1.0.3b',        # config version
                 'alpha_steps_per_mm': 80.0,
                 'beta_steps_per_mm': 80.0
             }
@@ -439,11 +439,16 @@ class Robot(object):
             'firmware': self._driver.get_firmware_version(),
             'config': self._driver.get_config_version(),
             'robot': self._driver.get_ot_version(),
+            'compatible': self._driver.versions_compatible()
         }
 
     def diagnostics(self):
         # TODO: Store these versions in config
         return {
             'axis_homed': self._driver.axis_homed,
-            'switches': self._driver.get_endstop_switches()
+            'switches': self._driver.get_endstop_switches(),
+            'steps_per_mm': {
+                'x': self._driver.get_steps_per_mm('x'),
+                'y': self._driver.get_steps_per_mm('y')
+            }
         }

@@ -11,17 +11,7 @@ class RobotTest(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
-        options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
-        }
-        self.robot.connect(options=options)
+        self.robot.connect()
         self.robot.home(now=True)
         self.robot.clear()
 
@@ -107,9 +97,14 @@ class RobotTest(unittest.TestCase):
     def test_versions(self):
         res = self.robot.versions()
         expected = {
-            'config': 'v1.0.3',
+            'config': 'v1.0.3b',
             'firmware': 'v1.0.5',
-            'robot': 'one_pro'
+            'robot': 'one_pro',
+            'compatible': {
+                'firmware': True,
+                'config': True,
+                'ot_version': True
+            }
         }
         self.assertDictEqual(res, expected)
 
@@ -125,6 +120,10 @@ class RobotTest(unittest.TestCase):
                 'z': False,
                 'a': False,
                 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0,
+                'y': 80.0
             }
         }
         self.assertDictEqual(res, expected)
@@ -142,6 +141,10 @@ class RobotTest(unittest.TestCase):
                 'z': False,
                 'a': False,
                 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0,
+                'y': 80.0
             }
         }
         self.assertDictEqual(res, expected)
@@ -158,6 +161,10 @@ class RobotTest(unittest.TestCase):
                 'z': False,
                 'a': False,
                 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0,
+                'y': 80.0
             }
         }
         self.assertDictEqual(res, expected)

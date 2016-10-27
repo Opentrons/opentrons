@@ -78,7 +78,12 @@ class CNCDriver(object):
     serial_timeout = 0.1
 
     # TODO: move to config
-    ot_version = 'hood'
+    COMPATIBLE_FIRMARE = ['v1.0.5']
+    COMPATIBLE_CONFIG = ['v1.0.3b']
+    firmware_version = None
+    config_version = None
+
+    ot_version = None
     ot_one_dimensions = {
         'hood': Vector(300, 120, 120),
         'one_pro': Vector(300, 250, 120),
@@ -152,6 +157,8 @@ class CNCDriver(object):
         self.connection = device
         self.reset_port()
         log.debug("Connected to {}".format(device))
+        self.calm_down()
+        self.get_ot_version()
         return self.calm_down()
 
     def is_connected(self):
@@ -165,8 +172,6 @@ class CNCDriver(object):
         self.flush_port()
 
         self.turn_off_feedback()
-
-        self.get_ot_version()
 
     def pause(self):
         self.can_move.clear()
@@ -484,12 +489,32 @@ class CNCDriver(object):
         res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
 
+    def versions_compatible(self):
+        self.get_ot_version()
+        self.get_firmware_version()
+        self.get_config_version()
+        res = {
+            'firmware': True,
+            'config': True,
+            'ot_version': True
+        }
+        if self.firmware_version not in self.COMPATIBLE_FIRMARE:
+            res['firmware'] = False
+        if self.config_version not in self.COMPATIBLE_CONFIG:
+            res['config'] = False
+        if not self.ot_version:
+            res['ot_version'] = False
+        return res
+
     def get_ot_version(self):
         res = self.send_command(self.GET_OT_VERSION)
         res = res.decode().split(' ')[-1]
+        self.ot_version = None
         if res not in self.ot_one_dimensions:
-            raise ValueError('{} is not an ot_version'.format(res))
+            log.debug('{} is not an ot_version'.format(res))
+            return None
         self.ot_version = res
+        log.debug('Read ot_version {}'.format(res))
         return self.ot_version
 
     def get_firmware_version(self):
