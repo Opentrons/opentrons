@@ -69,6 +69,7 @@ install:
 
   - npm install
   - npm run release:win
+  - mocha --timeout 15000 test/integration_test.js
 
 build: off
 
