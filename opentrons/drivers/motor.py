@@ -152,10 +152,12 @@ class CNCDriver(object):
 
     def connect(self, device):
         self.connection = device
-        self.reset_port()
-        log.debug("Connected to {}".format(device))
-        compatible = self.versions_compatible()
-        return all(compatible.values())
+        if self.reset_port():
+            log.debug("Connected to {}".format(device))
+            compatible = self.versions_compatible()
+            return all(compatible.values())
+        else:
+            return False
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
