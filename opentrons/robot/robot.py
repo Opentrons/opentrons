@@ -31,15 +31,21 @@ class Robot(object, metaclass=Singleton):
 
     Notes
     -----
-    Opentrons protocols are composed in two stages. First you enqueue the
-    commands, then you :func:`simulate` or :func:`run` them on a real robot.
+    Each Opentrons protocol is a Python script which when evaluated creates 
+    an execution plan which stored as a list of commands in Robot's command queue.
 
-    1. Using Python script and Opentrons API define your :class:`Deck`,
-    instruments (see :class:`Pipette`), put instructions into execution
-    queue by calling instrument's functions to move between wells,
-    aspirating and dispensing liquids controlled by loops,
-    if statements or simple one-line instructions.
-    2. After commands have been enqueued, you can :func:`simulate`
+    First you write the protocol in Python then you :func:`simulate` it against a
+    virtual robot or :func:`run` it on a real robot.
+
+    Using a Python script and the Opentrons API load your containers and
+    instruments (see :class:`Pipette`). Then write your instructions which 
+    will get converted into an execution plan. 
+
+    Example protocol: 
+    ::
+
+
+    After commands have been enqueued, you can :func:`simulate`
     or :func:`run` on a robot.
 
     See :class:`Pipette` for the list of supported instructions.
@@ -51,6 +57,7 @@ class Robot(object, metaclass=Singleton):
     >>> robot = Robot()
     >>> plate = robot.add_container('A1', '96-flat', 'plate')
     >>> p200 = instruments.Pipette(axis='b')
+    >>> p200.aspirate(200, plate[0])
     >>> robot.commands()
     ['Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>']
     >>> robot.simulate()
