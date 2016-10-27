@@ -107,6 +107,39 @@ def upload():
     })
 
 
+def _run_commands():
+    global robot
+
+    api_response = {'errors': [], 'warnings': []}
+
+    try:
+        robot.run()
+        if len(robot._commands) == 0:
+            error = ("This protocol does not contain "
+                     "any commands for the robot.")
+            api_response['errors'] = error
+    except Exception as e:
+        api_response['errors'] = [str(e)]
+
+    api_response['warnings'] = robot.get_warnings() or []
+
+    return api_response
+
+
+@app.route("/run", methods=["GET"])
+def run():
+
+    api_response = _run_commands()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'errors': api_response['errors'],
+            'warnings': api_response['warnings']
+        }
+    })
+
+
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path
