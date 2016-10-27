@@ -13,18 +13,8 @@ class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset_for_tests()
-        options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
-        }
         myport = self.robot.VIRTUAL_SMOOTHIE_PORT
-        self.robot.connect(port=myport, options=options)
+        self.robot.connect(port=myport)
         self.robot.home()
 
         self.trash = containers.load('point', 'A1')

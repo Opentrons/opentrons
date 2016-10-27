@@ -37,13 +37,17 @@ class OpenTronsTest(unittest.TestCase):
             'ot_version': True
         })
         self.robot.disconnect()
-        self.robot.connect(options={
-            'firmware': 'v2.0.0',
-            'config': {
-                'version': 'v3.1.2',
-                'ot_version': 'hoodie'
+
+        kwargs = {
+            'options': {
+                'firmware': 'v2.0.0',
+                'config': {
+                    'version': 'v3.1.2',
+                    'ot_version': 'hoodie'
+                }
             }
-        })
+        }
+        self.assertRaises(RuntimeError, self.robot.connect, **kwargs)
         res = self.motor.versions_compatible()
         self.assertEquals(res, {
             'firmware': False,
