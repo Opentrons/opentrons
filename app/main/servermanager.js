@@ -14,12 +14,12 @@ class ServerManager {
   start () {
     const userDataPath = app.getPath('userData');
     console.log('User Data Path', userDataPath)
-
+    let backend_path
     if (process.platform == "darwin") {
-      var backend_path = app.getAppPath() + "/backend-dist/mac/otone_server";
+      backend_path = app.getAppPath() + "/backend-dist/mac/otone_server";
       this.execFile(backend_path, [userDataPath]);
     } else if (process.platform == "win32") {
-      var backend_path = app.getAppPath() + "\\backend-dist\\win\\otone_server.exe";
+      backend_path = app.getAppPath() + "\\backend-dist\\win\\otone_server.exe";
       this.execFile(backend_path, [userDataPath]);
     } else{
       console.log('\n\n\n\nunknown OS: '+process.platform+'\n\n\n\n');
