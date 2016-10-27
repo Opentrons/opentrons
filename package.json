@@ -5,7 +5,7 @@
     "build:backend": "python3 scripts/build_pyinstaller.py",
     "build:frontend": "python scripts/build_electron_app_with_builder.py",
     "release": "npm run build:backend && npm run build:frontend",
-    "build:backend:mac": "python3 scripts/build_pyinstaller.py",
+    "build:backend:mac": "python3.4 scripts/build_pyinstaller.py",
     "build:backend:win": "C:\\Python34\\python scripts\\build_pyinstaller.py",
     "build:frontend:mac": "python3 scripts/build_electron_app_with_builder.py",
     "build:frontend:win": "C:\\Python34\\python scripts\\build_electron_app_with_builder.py",
