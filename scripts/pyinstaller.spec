@@ -2,7 +2,7 @@
 
 import os
 
-import opentrons_sdk
+import opentrons
 
 block_cipher = None
 
