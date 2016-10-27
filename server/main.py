@@ -328,7 +328,7 @@ def move_to_slot():
 @app.route('/move_to_container', methods=["POST"])
 def move_to_container():
     slot = request.json.get("slot")
-    name = request.json.get("name")
+    name = request.json.get("label")
     axis = request.json.get("axis")
     try:
         instrument = robot._instruments[axis.upper()]

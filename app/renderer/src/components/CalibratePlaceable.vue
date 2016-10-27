@@ -12,14 +12,14 @@
 	<div class="update bottom" v-show="placeableType('default') || placeableType('point')">
 		<span class="position bottom">Bottom</span>
 		<button class="btn-update save bottom" @click="calibratePlaceable(placeable,instrument)" >Save </button>
-		<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}">Move To </button>
+		<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
 	</div>
 
 	<!-- Calibrate to top for tiprack, toggle pick up tip button -->
 	<div class="update top" v-show="placeableType('tiprack')">
 		<span class="position top">Tiprack</span>
 		<button class="btn-update save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
-		<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}">Move To </button>
+		<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
 		<button class="pick-tip" :class="{'disabled': !placeable.calibrated}">Pick Up Tip</button>
 	</div>
 
@@ -41,7 +41,13 @@
 				let label = placeable.label
 				let axis = instrument.axis
 				this.$store.dispatch("calibratePlaceable", {slot: slot, label: label, axis: axis})
-			}
+			},
+			moveToPlaceable(placeable,instrument){
+        let slot = placeable.slot
+        let label = placeable.label
+        let axis = instrument.axis
+        this.$store.dispatch("moveToPlaceable", {slot: slot, label: label, axis: axis})
+      }
     },
     computed: { 
     	currentType(){

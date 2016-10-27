@@ -55,7 +55,16 @@ const actions = {
       addHrefs(tasks)
       commit('UPDATE_TASK_LIST', {'tasks': tasks})
     }, (response) => {
-        console.log('failed', response)
+       console.log('failed', response)
+    })
+  },
+  moveToPlaceable({commit}, data) {
+    Vue.http
+    .post('http://localhost:5000/move_to_container', JSON.stringify(data), {emulateJSON: true})
+    .then((response) => {
+       console.log('success',response)
+    }, (response) => {
+       console.log('failed', response)
     })
   }
 }
