@@ -203,6 +203,20 @@ def get_coordinates():
     })
 
 
+@app.route("/robot/diagnostics")
+def get_diagnostics():
+    return flask.jsonify({
+        'diagnostics': robot.diagnostics()
+    })
+
+
+@app.route("/robot/versions")
+def get_versions():
+    return flask.jsonify({
+        'versions': robot.versions()
+    })
+
+
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
     port = request.json.get('port')

@@ -58,3 +58,48 @@ class ConnectDiagnosticsTestCase(unittest.TestCase):
         response = json.loads(response.data.decode())
         self.assertTrue(response['is_connected'])
         self.assertEquals(response['port'], 'Virtual Smoothie')
+
+    def test_diagnostics(self):
+        self.robot.disconnect()
+        self.robot.connect()
+
+        response = self.app.get(
+            '/robot/diagnostics',
+            content_type='application/json')
+        response = json.loads(response.data.decode())
+        expected = {
+            'axis_homed': {
+                'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+            },
+            'switches': {
+                'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0, 'y': 80.0
+            }
+        }
+        self.assertEqual(response['diagnostics'], expected)
+
+    def test_versions(self):
+        self.robot.disconnect()
+        self.robot.connect()
+
+        response = self.app.get(
+            '/robot/versions',
+            content_type='application/json')
+        response = json.loads(response.data.decode())
+        expected = {
+            'firmware': {
+                'version': 'v1.0.5',
+                'compatible': True
+            },
+            'config': {
+                'version': 'v1.0.3b',
+                'compatible': True
+            },
+            'ot_version': {
+                'version': 'one_pro',
+                'compatible': True
+            }
+        }
+        self.assertEqual(response['versions'], expected)
