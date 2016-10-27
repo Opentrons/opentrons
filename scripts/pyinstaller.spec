@@ -11,11 +11,11 @@ a = Analysis(['../server/main.py'],
              binaries=None,
              datas=[
                  ('../server/templates/', 'templates'),
-                 (os.path.join(opentrons_sdk.__path__[0], 'config'), 'opentrons_sdk/config')
+                 (os.path.join(opentrons.__path__[0], 'config'), 'opentrons/config')
              ],
              hiddenimports=[
                  'engineio.async_gevent',
-                 'opentrons_sdk.config',
+                 'opentrons.config',
              ],
              hookspath=[],
              runtime_hooks=[],
