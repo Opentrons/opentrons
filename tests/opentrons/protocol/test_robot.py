@@ -11,17 +11,7 @@ class RobotTest(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
-        options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
-        }
-        self.robot.connect(options=options)
+        self.robot.connect()
         self.robot.home(now=True)
         self.robot.clear()
 
@@ -54,14 +44,32 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(current, (100, 0, 20))
 
     def test_home(self):
+
+        self.robot.disconnect()
+        self.robot.connect()
+
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+        })
+
         self.robot.clear()
-        self.robot.home()
+        self.robot.home('xa')
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+        })
         self.assertEquals(len(self.robot._commands), 1)
         self.robot.run()
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': True, 'y': False, 'z': False, 'a': True, 'b': False
+        })
 
         self.robot.clear()
         self.robot.home(now=True)
         self.assertEquals(len(self.robot._commands), 0)
+
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': True, 'y': True, 'z': True, 'a': True, 'b': True
+        })
 
     def test_robot_pause_and_resume(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
@@ -107,9 +115,18 @@ class RobotTest(unittest.TestCase):
     def test_versions(self):
         res = self.robot.versions()
         expected = {
-            'config': 'v1.0.3',
-            'firmware': 'v1.0.5',
-            'robot': 'one_pro'
+            'config': {
+                'version': 'v1.0.3b',
+                'compatible': True
+            },
+            'firmware': {
+                'version': 'v1.0.5',
+                'compatible': True
+            },
+            'ot_version': {
+                'version': 'one_pro',
+                'compatible': True
+            }
         }
         self.assertDictEqual(res, expected)
 
@@ -125,10 +142,15 @@ class RobotTest(unittest.TestCase):
                 'z': False,
                 'a': False,
                 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0,
+                'y': 80.0
             }
         }
         self.assertDictEqual(res, expected)
 
+        self.robot.disconnect()
         self.robot.connect()
         self.assertRaises(RuntimeWarning, self.robot.move_head, x=-199)
         res = self.robot.diagnostics()
@@ -142,6 +164,10 @@ class RobotTest(unittest.TestCase):
                 'z': False,
                 'a': False,
                 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0,
+                'y': 80.0
             }
         }
         self.assertDictEqual(res, expected)
@@ -158,6 +184,10 @@ class RobotTest(unittest.TestCase):
                 'z': False,
                 'a': False,
                 'b': False
+            },
+            'steps_per_mm': {
+                'x': 80.0,
+                'y': 80.0
             }
         }
         self.assertDictEqual(res, expected)

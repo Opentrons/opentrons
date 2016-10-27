@@ -27,6 +27,30 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_version_compatible(self):
+        self.robot.disconnect()
+        self.robot.connect()
+        res = self.motor.versions_compatible()
+        self.assertEquals(res, {
+            'firmware': True,
+            'config': True,
+            'ot_version': True
+        })
+        self.robot.disconnect()
+        self.robot.connect(options={
+            'firmware': 'v2.0.0',
+            'config': {
+                'version': 'v3.1.2',
+                'ot_version': 'hoodie'
+            }
+        })
+        res = self.motor.versions_compatible()
+        self.assertEquals(res, {
+            'firmware': False,
+            'config': False,
+            'ot_version': False
+        })
+
     def test_message_timeout(self):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
 
@@ -111,19 +135,11 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_home(self):
 
-        expected = {
-            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-        self.assertDictEqual(self.motor.axis_homed, expected)
-
         success = self.motor.home('x', 'y')
         self.assertTrue(success)
 
         success = self.motor.home('ba')
         self.assertTrue(success)
-
-        expected = {
-            'x': True, 'y': True, 'z': False, 'a': True, 'b': True}
-        self.assertDictEqual(self.motor.axis_homed, expected)
 
     def test_limit_hit_exception(self):
         self.motor.home()
