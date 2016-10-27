@@ -11,7 +11,7 @@ cache:
 
 before_install:
   # OS extra info
-  - export $HOMEBREW_CACHE=$HOME/.cache/our-brew
+  - export HOMEBREW_CACHE=$HOME/.cache/our-brew
   - uname -a
   - python --version
   - python -c "import struct; print(struct.calcsize('P') * 8)"
