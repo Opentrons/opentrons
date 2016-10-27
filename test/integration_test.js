@@ -21,47 +21,48 @@ describe('application launch', function () {
 
   afterEach(function () {
     if (this.app && this.app.isRunning()) {
-      // return this.app.stop()
+      return this.app.stop()
     }
+  })
+
+  it('opens a window', function () {
+    return this.app.client.waitUntilWindowLoaded(5000)
+      .getWindowCount().should.eventually.equal(1)
+      .browserWindow.isMinimized().should.eventually.be.false
+      .browserWindow.isDevToolsOpened().should.eventually.be.false
+      .browserWindow.isVisible().should.eventually.be.true
+      .browserWindow.isFocused().should.eventually.be.true
+      .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
+      .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
   })
 
   it('runs a protocol', function () {
     var file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
+    var pauseTime = process.env.PAUSE_TIME || 0
     return this.app.client.waitUntilWindowLoaded(5000)
       .click('//*[@id="connections"]/option[2]')
-      .pause(500)
+      .pause(pauseTime)
       .click('.btn-connect')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .chooseFile('//*[@id="task-pane"]/div/section/div[2]/form/div/input', file)
       .pause(1000)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
       .click('.next')
-      .pause(500)
+      .pause(pauseTime)
   })
-
-  // it('opens a window', function () {
-  //   return this.app.client.waitUntilWindowLoaded(5000)
-  //     .getWindowCount().should.eventually.equal(1)
-  //     .browserWindow.isMinimized().should.eventually.be.false
-  //     .browserWindow.isDevToolsOpened().should.eventually.be.false
-  //     .browserWindow.isVisible().should.eventually.be.true
-  //     .browserWindow.isFocused().should.eventually.be.true
-  //     .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
-  //     .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
-  // })
 })
