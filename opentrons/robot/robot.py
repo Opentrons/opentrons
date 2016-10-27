@@ -29,6 +29,9 @@ class Robot(object):
         self.can_pop_command.set()
         self.stopped_event.clear()
 
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
         self.connections = {
             'live': None,
             'simulate': self.get_virtual_device(
@@ -64,6 +67,9 @@ class Robot(object):
 
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
+
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
         return self
 
@@ -173,12 +179,20 @@ class Robot(object):
 
         return res
 
+    def _update_axis_homed(self, *args):
+        for a in args:
+            for letter in a:
+                if letter.lower() in self.axis_homed:
+                    self.axis_homed[letter.lower()] = True
+
     def home(self, *args, **kwargs):
         def _do():
             if self._driver.calm_down():
                 if args:
+                    self._update_axis_homed(*args)
                     return self._driver.home(*args)
                 else:
+                    self._update_axis_homed('xyzab')
                     self._driver.home('z')
                     return self._driver.home('x', 'y', 'b', 'a')
             else:
@@ -315,6 +329,9 @@ class Robot(object):
         if self._driver:
             self._driver.disconnect()
 
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
         self.connections['live'] = None
 
     def containers(self):
@@ -445,7 +462,7 @@ class Robot(object):
     def diagnostics(self):
         # TODO: Store these versions in config
         return {
-            'axis_homed': self._driver.axis_homed,
+            'axis_homed': self.axis_homed,
             'switches': self._driver.get_endstop_switches(),
             'steps_per_mm': {
                 'x': self._driver.get_steps_per_mm('x'),

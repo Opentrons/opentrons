@@ -44,14 +44,32 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(current, (100, 0, 20))
 
     def test_home(self):
+
+        self.robot.disconnect()
+        self.robot.connect()
+
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+        })
+
         self.robot.clear()
-        self.robot.home()
+        self.robot.home('xa')
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+        })
         self.assertEquals(len(self.robot._commands), 1)
         self.robot.run()
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': True, 'y': False, 'z': False, 'a': True, 'b': False
+        })
 
         self.robot.clear()
         self.robot.home(now=True)
         self.assertEquals(len(self.robot._commands), 0)
+
+        self.assertDictEqual(self.robot.axis_homed, {
+            'x': True, 'y': True, 'z': True, 'a': True, 'b': True
+        })
 
     def test_robot_pause_and_resume(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
@@ -128,6 +146,7 @@ class RobotTest(unittest.TestCase):
         }
         self.assertDictEqual(res, expected)
 
+        self.robot.disconnect()
         self.robot.connect()
         self.assertRaises(RuntimeWarning, self.robot.move_head, x=-199)
         res = self.robot.diagnostics()
