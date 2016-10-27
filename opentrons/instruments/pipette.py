@@ -374,7 +374,7 @@ class Pipette(Instrument):
         return self
 
     def calibrate(self, position):
-        current_position = self.robot._driver.get_plunger_position()
+        current_position = self.robot._driver.get_plunger_positions()
         current_position = current_position['target'][self.axis]
         kwargs = {}
         kwargs[position] = current_position
