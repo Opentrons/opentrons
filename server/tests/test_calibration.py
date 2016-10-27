@@ -2,7 +2,7 @@ import unittest
 import json
 import os
 
-from opentrons_sdk.robot import Robot
+from opentrons.robot import Robot
 
 
 class CalibrationTestCase(unittest.TestCase):
