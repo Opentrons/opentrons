@@ -346,6 +346,25 @@ def move_to_container():
     })
 
 
+@app.route('/move_to_plunger_position', methods=["POST"])
+def move_to_plunger_position():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.plunger.move(instrument.positions[position])
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
 def _calibrate_placeable(container_name, axis_name):
 
     deck = robot._deck

@@ -16,6 +16,34 @@ class CalibrationTestCase(unittest.TestCase):
         )
 
         self.robot = Robot.get_instance()
+        self.robot.connect()
+
+    def test_move_to_plunger_position(self):
+
+        response = self.app.post('/upload', data={
+            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
+        })
+
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        self.robot._instruments['B'].plunger.move(12)
+        self.robot._instruments['B'].calibrate('bottom')
+        self.robot._instruments['B'].plunger.move(2)
+        current_pos = self.robot._driver.get_plunger_positions()['target']
+        self.assertEquals(current_pos['b'], 2)
+
+        arguments = {
+            'position': 'bottom',
+            'axis': 'b'
+        }
+        response = self.app.post(
+            '/move_to_plunger_position',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+        self.assertEqual(status, 'success')
+        current_pos = self.robot._driver.get_plunger_positions()['target']
+        self.assertEquals(current_pos['b'], 12)
 
     def test_move_to_container(self):
         response = self.app.post('/upload', data={
@@ -28,7 +56,7 @@ class CalibrationTestCase(unittest.TestCase):
         self.robot.move_to = mock.Mock()
 
         arguments = {
-            'name': 'plate-for-frontend-test',
+            'label': 'plate-for-frontend-test',
             'slot': 'B2',
             'axis': 'b'
         }
