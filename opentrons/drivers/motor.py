@@ -154,9 +154,8 @@ class CNCDriver(object):
         self.connection = device
         self.reset_port()
         log.debug("Connected to {}".format(device))
-        self.calm_down()
-        self.get_ot_version()
-        return self.calm_down()
+        compatible = self.versions_compatible()
+        return all(compatible.values())
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
@@ -167,6 +166,8 @@ class CNCDriver(object):
         self.flush_port()
 
         self.turn_off_feedback()
+
+        return self.calm_down()
 
     def pause(self):
         self.can_move.clear()
