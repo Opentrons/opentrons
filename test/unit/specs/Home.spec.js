@@ -1,16 +1,15 @@
 import { expect } from 'chai'
 
 import Vue from 'vue'
-// import Hello from 'app/components/Hello'
+import Home from '../../../app/renderer/src/components/Home.vue'
 
-describe('Hello.vue', () => {
-  it('should render correct contents', () => {
-    // const vm = new Vue({
-    //   template: '<div><hello></hello></div>',
-    //   components: { Hello }
-    // }).$mount()
-    // expect(vm.$el.querySelector('.hello h1').textContent).toBe('Hello World!')
-    expect(1).toBe(1)
+describe('Home.vue', () => {
+  it('should render home page with title', () => {
+    const vm = new Vue({
+      ...Home
+    }).$mount('#app')
+    expect(vm.$el.querySelector('#app-title').textContent).to.equal('OT App')
+    expect(1).to.equal(1)
   })
 })
 
