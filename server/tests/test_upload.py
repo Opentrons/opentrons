@@ -16,6 +16,23 @@ class UploadTestCase(unittest.TestCase):
 
         self.robot = Robot.get_instance()
 
+    def test_upload_and_run(self):
+        response = self.app.post('/upload', data={
+            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
+        })
+
+        self.robot.connect(None, options={'limit_switches': False})
+
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        response = self.app.get('/run')
+
+        response = json.loads(response.data.decode())
+        self.assertEqual(response['status'], 'success')
+        self.assertTrue('errors' in response['data'])
+        self.assertTrue('warnings' in response['data'])
+
     def test_upload_valid_python(self):
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
