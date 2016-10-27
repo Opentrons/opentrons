@@ -48,8 +48,6 @@ module.exports = function (config) {
     reporters: ['spec', 'coverage'],
     files: [
       './index.js',
-      // '../../app/*',
-      // '../../server/templates/dist/*',
     ],
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']
