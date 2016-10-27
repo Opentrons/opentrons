@@ -9,17 +9,17 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons_sdk.robot import Robot
-from opentrons_sdk.instruments import Pipette
-from opentrons_sdk.containers import placeable
-from opentrons_sdk.util import trace
-from opentrons_sdk.util.vector import VectorEncoder
+from opentrons.robot import Robot
+from opentrons.instruments import Pipette
+from opentrons.containers import placeable
+from opentrons.util import trace
+from opentrons.util.vector import VectorEncoder
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
 import json
-from opentrons_sdk.util import vector
+from opentrons.util import vector
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
