@@ -155,7 +155,18 @@ class CNCDriver(object):
         self.reset_port()
         log.debug("Connected to {}".format(device))
         compatible = self.versions_compatible()
-        return all(compatible.values())
+        if not all(compatible.values()):
+            raise RuntimeError(
+                'This Robot\'s versions are incompatible with the API: '
+                'firmware={firmware}, '
+                'config={config}, '
+                'ot_version={ot_version}'.format(
+                    firmware=self.firmware_version,
+                    config=self.config_version,
+                    ot_version=self.ot_version
+                )
+            )
+        return self.calm_down()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
@@ -166,8 +177,6 @@ class CNCDriver(object):
         self.flush_port()
 
         self.turn_off_feedback()
-
-        return self.calm_down()
 
     def pause(self):
         self.can_move.clear()
