@@ -320,8 +320,29 @@ def move_to_slot():
     )
 
     return flask.jsonify({
-        'status': 200,
+        'status': 'success',
         'data': result
+    })
+
+
+@app.route('/move_to_container', methods=["POST"])
+def move_to_container():
+    slot = request.json.get("slot")
+    name = request.json.get("name")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        container = robot._deck[slot].get_child_by_name(name)
+        instrument.move_to(container[0].bottom(), now=True)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
     })
 
 

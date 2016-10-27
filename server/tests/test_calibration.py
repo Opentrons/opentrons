@@ -1,5 +1,6 @@
 import unittest
 import json
+from unittest import mock
 import os
 
 from opentrons.robot import Robot
@@ -15,6 +16,42 @@ class CalibrationTestCase(unittest.TestCase):
         )
 
         self.robot = Robot.get_instance()
+
+    def test_move_to_container(self):
+        response = self.app.post('/upload', data={
+            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
+        })
+
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        self.robot.move_to = mock.Mock()
+
+        arguments = {
+            'name': 'plate-for-frontend-test',
+            'slot': 'B2',
+            'axis': 'b'
+        }
+
+        response = self.app.post(
+            '/move_to_container',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        container = self.robot._deck['B2'].get_child_by_name(
+            'plate-for-frontend-test')
+        instrument = self.robot._instruments['B']
+        expected = [
+            mock.call(
+                container[0].bottom(),
+                instrument=instrument,
+                strategy='arc',
+                now=True)
+        ]
+        self.assertEquals(self.robot.move_to.mock_calls, expected)
 
     def test_calibrate_placeable(self):
         response = self.app.post('/upload', data={
