@@ -106,6 +106,73 @@ def upload():
     })
 
 
+def _run_commands():
+    global robot
+
+    api_response = {'errors': [], 'warnings': []}
+
+    try:
+        robot.resume()
+        robot.run()
+        if len(robot._commands) == 0:
+            error = ("This protocol does not contain "
+                     "any commands for the robot.")
+            api_response['errors'] = error
+    except Exception as e:
+        api_response['errors'] = [str(e)]
+
+    api_response['warnings'] = robot.get_warnings() or []
+
+    return api_response
+
+
+@app.route("/run", methods=["GET"])
+def run():
+
+    api_response = _run_commands()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'errors': api_response['errors'],
+            'warnings': api_response['warnings']
+        }
+    })
+
+
+@app.route("/pause", methods=["GET"])
+def pause():
+
+    robot.pause()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/resume", methods=["GET"])
+def resume():
+
+    robot.resume()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/stop", methods=["GET"])
+def stop():
+
+    robot.stop()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path
@@ -286,8 +353,48 @@ def move_to_slot():
     )
 
     return flask.jsonify({
-        'status': 200,
+        'status': 'success',
         'data': result
+    })
+
+
+@app.route('/move_to_container', methods=["POST"])
+def move_to_container():
+    slot = request.json.get("slot")
+    name = request.json.get("label")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        container = robot._deck[slot].get_child_by_name(name)
+        instrument.move_to(container[0].bottom(), now=True)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/move_to_plunger_position', methods=["POST"])
+def move_to_plunger_position():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.plunger.move(instrument.positions[position])
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
     })
 
 
@@ -333,6 +440,43 @@ def calibrate_placeable():
         'status': 'success',
         'data': {
             'name': name,
+            'axis': axis,
+            'calibrations': calibrations
+        }
+    })
+
+
+def _calibrate_plunger(position, axis_name):
+    axis_name = axis_name.upper()
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    if position not in instrument.positions:
+        raise ValueError('Position {} is not on the plunger'.format(position))
+
+    instrument.calibrate(position)
+
+
+@app.route("/calibrate_plunger", methods=["POST"])
+def calibrate_plunger():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_plunger(position, axis)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'position': position,
             'axis': axis,
             'calibrations': calibrations
         }
