@@ -9,15 +9,17 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons_sdk.robot import Robot
-from opentrons_sdk.instruments import Pipette
-from opentrons_sdk.containers import placeable
-from opentrons_sdk.util import trace
-from opentrons_sdk.util.vector import VectorEncoder
+from opentrons.robot import Robot
+from opentrons.instruments import Pipette
+from opentrons.containers import placeable
+from opentrons.util import trace
+from opentrons.util.vector import VectorEncoder
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
+import json
+from opentrons.util import vector
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
@@ -58,7 +60,8 @@ def load_python(stream):
         exec(code, globals(), locals())
         robot.simulate()
         if len(robot._commands) == 0:
-            error = "This protocol does not contain any commands for the robot."
+            error = ("This protocol does not contain "
+                     "any commands for the robot.")
             api_response['errors'] = error
     except Exception as e:
         api_response['errors'] = [str(e)]
@@ -92,7 +95,7 @@ def upload():
             '.py or .json'.format(extension)
         })
 
-    calibrations = get_placeables()
+    calibrations = get_step_list()
 
     return flask.jsonify({
         'status': 'success',
@@ -124,6 +127,7 @@ def is_connected():
         'is_connected': Robot.get_instance().is_connected(),
         'port': Robot.get_instance().get_connected_port()
     })
+
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
@@ -200,14 +204,14 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def placeables():
-    data = get_placeables()
+    data = get_step_list()
     return flask.jsonify({
         'status': 'success',
         'data': data
     })
 
 
-def get_placeables():
+def get_step_list():
     def get_containers(instrument):
         unique_containers = set()
 
@@ -285,6 +289,54 @@ def move_to_slot():
     return flask.jsonify({
         'status': 200,
         'data': result
+    })
+
+
+def _calibrate_placeable(container_name, axis_name):
+
+    deck = robot._deck
+    containers = deck.containers()
+    axis_name = axis_name.upper()
+
+    if container_name not in containers:
+        raise ValueError('Container {} is not defined'.format(container_name))
+
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    container = containers[container_name]
+
+    well = container[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=container)
+    location = (container, pos)
+
+    instrument.calibrate_position(location)
+    return instrument.calibration_data
+
+
+@app.route("/calibrate_placeable", methods=["POST"])
+def calibrate_placeable():
+    name = request.json.get("label")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_placeable(name, axis)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'name': name,
+            'axis': axis,
+            'calibrations': calibrations
+        }
     })
 
 

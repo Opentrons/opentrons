@@ -8,9 +8,9 @@ settings.on('create', pathToSettings => {
     buttons: ["Yes", "No"]
   });
 
-  if (result == 0) {
+  if (result === 0) {
     settings.setSync('autoUpdate', true);
-  } else if (result == 1) {
+  } else if (result === 1) {
     settings.setSync('autoUpdate', false);
   }
 })
