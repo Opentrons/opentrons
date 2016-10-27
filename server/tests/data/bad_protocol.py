@@ -5,28 +5,28 @@ from opentrons import instruments
 plate = containers.load(
     '96-flat',
     'B2',
-    'plate-for-frontend-test'
+    'plate'
 )
 
 tiprack = containers.load(
     'tiprack-200ul',  # container type from library
     'A1',             # slot on deck
-    'tiprack-for-frontend-test'
+    'tiprack'         # calibration reference for 1.2 compatibility
 )
 
 trough = containers.load(
     'trough-12row',
     'B1',
-    'trough-for-frontend-test'
+    'trough'
 )
 
 trash = containers.load(
     'point',
     'A2',
-    'trash-for-frontend-test'
+    'trash'
 )
 
-p200 = instruments.Pipette(
+p200s = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack],

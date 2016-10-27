@@ -1,46 +1,65 @@
 <template>
-
-<div class="move">
-  <h3 class="title">Jog X-Y-Z</h3>
-  <div class="jog">
-    <a href="#" data-axis="y" data-direction="neg" class="btn-full btn-y">Y</a>
-    <a href="#" data-axis="z" data-direction="neg" class="btn-full btn-z">Z</a>
-    <a href="#" data-axis="x" data-direction="neg" class="btn-full x">X</a>
-    <a href="#" data-axis="x" data-direction="pos" class="btn-full btn-x">X</a>
-    <a href="#" data-axis="y" data-direction="pos" class="btn-full btn-y">Y</a>
-    <a href="#" data-axis="z" data-direction="pos" class="btn-full btn-z">Z</a>
-  </div>
-  <h3 class="title">Select Increment [mm]</h3>
+  <div class="move">
+    <h3 class="title">Jog X-Y-Z</h3>
+    <div class="jog">
+      <button @click="jog('y', 1)" class="btn-full btn-y">Y</button>
+      <button @click="jog('z', 1)" class="btn-full btn-z">Z</button>
+      <button @click="jog('x', -1)" class="btn-full x">X</button>
+      <button @click="jog('x', 1)" class="btn-full btn-x">X</button>
+      <button @click="jog('y', -1)" class="btn-full btn-y">Y</button>
+      <button @click="jog('z', -1)" class="btn-full btn-z">Z</button>
+    </div>
+    <h3 class="title">Select Increment [mm]</h3>
     <div class="increment" >
       <increment :increments="placeable_increments" :placeable="placeable"></increment>
       <increment :increments="slot_increments" :placeable="placeable"></increment>
     </div>
-  </div> 
-
-  
-</div><!-- End Move -->
-  
+    <h3 class="title">Move to Slot</h3>
+    <div class="deck">
+      <DeckSlot :slots="slots" :axis="instrument"></DeckSlot>
+    </div>
+  </div>
 </template>
 
 <script>
-import Increment from './Increment.vue'
-export default {
-  name: 'Jog',
-  data: function(){
-    return {
-      placeable_increments: [20,10,5,1,0.5,0.1],
-      slot_increments: [91,135],
-      placeable: true
-    }   
-  },
-  components: {
-    Increment
-  },
-  computed: {
-    current_increment_placeable(){
-      return this.$store.state.current_increment_placeable
+  import Increment from './Increment.vue'
+  import DeckSlot from './DeckSlot.vue'
+
+  export default {
+    name: 'Jog',
+    props: ['instrument'],
+    data: function () {
+      return {
+        placeable_increments: [20,10,5,1,0.5,0.1],
+        slot_increments: [91,135],
+        placeable: true,
+        slots: ['A3','B3','C3','D3','E3',
+                'A2','B2','C2','D2','E2',
+                'A1','B1','C1','D1','E1']
+      }
+    },
+    components: {
+      Increment,
+      DeckSlot
+    },
+    methods: {
+      jog(axis, multiplier) {
+        let increment = this.$store.state.current_increment_placeable
+        increment *= multiplier
+        var coords = {}
+        switch(axis) {
+          case "x":
+            coords.x = increment
+            break;
+          case "y":
+            coords.y = increment
+            break;
+          case "z":
+            coords.z = increment
+            break;
+        }
+        this.$store.dispatch("jog", coords)
+      }
     }
   }
-
-}
 </script>

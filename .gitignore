@@ -1,3 +1,4 @@
+flip
 server/static/css
 .sass-cache
 .DS_Store
@@ -10,6 +11,7 @@ server/static/css
 logs
 *.log
 logfile.txt
+server/*.log
 
 # Runtime data
 pids

@@ -9,9 +9,9 @@
 - [x] Previous/Next buttons
 - [x] XYZAB Jogging
 - [x] Move to Slot
+- [x] Protocol Error Reporting
 - [ ] Calibrate Container
 - [ ] Calibrate Pipette
-- [x] Protocol Error Reporting
 - [ ] Review Saved Positions
 - [ ] Run Protocol on Robot
 - [ ] Auto Updating (software and firmware)

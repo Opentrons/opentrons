@@ -1,20 +1,26 @@
 <template>
   <div>
-      <h2 class="title">Calibrate {{ $route.params.placeable }}</h2>
-        <div class="instructions">Calibrate {{ instrument.label }}
-        to well A1 of {{ $route.params.placeable }}
-        </div>
-  
+    <h2 class="title">Calibrate {{ calibration.label }}</h2>
+
+    <div class="instructions">Calibrate the {{ instrument.label }} pipette (axis {{instrument.axis}})
+    to well A1 of {{ calibration.label }}.
+
+    </div>
+
     <section>
-      <div class="step step-calibrate">       
-          <div>
-           <!--  Current calibration:
-            <br>
-            <pre>{{ JSON.stringify(calibration, null, 4) }}</pre> -->
-            <jog></jog>
-          </div>
+      <div class="step step-calibrate">
+        <div>
+          <Jog :instrument="instrument.axis"></Jog>
+        </div>
+        <div class="save-deck">
+          <h3 class="title">Deck Position</h3>
+          <coordinates></coordinates>
+          <!-- props - calibration, instrument, placeable type -->
+          <h3 class="title">Calibrate {{ calibration.label }} </h3>
+          <CalibratePlaceable :placeable="calibration" :type="type" :instrument="instrument"></CalibratePlaceable>
+        </div>
       </div>
-      <navigation :prev="prev" :next="next"></navigation>
+      <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
 </template>
@@ -22,12 +28,16 @@
 <script>
   import Navigation from './Navigation.vue'
   import Jog from './Jog.vue'
+  import Coordinates from './Coordinates.vue'
+  import CalibratePlaceable from './CalibratePlaceable.vue'
 
   export default {
     name: "Placeable",
     components: {
       Navigation,
-      Jog
+      Jog,
+      Coordinates,
+      CalibratePlaceable
     },
     methods: {
       currentInstrument(tasks) {
@@ -39,6 +49,16 @@
         return instrument.placeables.filter((placeable) => {
           return placeable.label ==  this.$route.params.placeable
         })[0]
+      },
+      containerType(type){
+        if (type === "point"){
+          return "point"
+        } else if (type.includes("tiprack")){
+          return "tiprack"
+        }
+        else {
+          return "default"
+        }
       }
     },
     computed: {
@@ -50,8 +70,14 @@
       },
       instrument() {
         let tasks = this.$store.state.tasks
+        return this.currentInstrument(tasks)
+      },
+      type(){
+        let tasks = this.$store.state.tasks
         let instrument = this.currentInstrument(tasks)
-        return instrument
+        let placeable = this.currentPlaceable(instrument)
+        let type = this.containerType(placeable.type) 
+        return type
       },
       next() {
         let tasks = this.$store.state.tasks

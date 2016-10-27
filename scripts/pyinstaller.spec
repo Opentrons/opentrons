@@ -10,8 +10,6 @@ a = Analysis(['../server/main.py'],
              pathex=[],
              binaries=None,
              datas=[
-                 ('../server/assets/', 'assets'),
-                 ('../server/static/', 'static'),
                  ('../server/templates/', 'templates'),
                  (os.path.join(opentrons_sdk.__path__[0], 'config'), 'opentrons_sdk/config')
              ],

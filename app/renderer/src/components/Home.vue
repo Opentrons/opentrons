@@ -39,27 +39,27 @@
 
 
 <script>
-import {StepList, Upload} from './export.js'
+  import {StepList, Upload} from './export'
 
-export default {
-  data () {
-    return {
-      message: 'Opentrons App'
-    }
-  },
-  methods: {
-    home(axis) {
-      // console.log(typeof(axis))
-      this.$http
-          .get(`/home/${axis}`)
-          .then((response) => {
-              console.log(`Homing ${axis}`)
-          }, (response) => {
-              console.log('failed to home', response)
-          })
+  export default {
+    data () {
+      return {
+        message: 'Opentrons App'
+      }
+    },
+    methods: {
+      home(axis) {
+        this.$http
+            .get(`/home/${axis}`)
+            .then((response) => {
+                console.log(response)
+                console.log(`Homing ${axis}`)
+            }, (response) => {
+                console.log('failed to home', response)
+            })
+      }
     }
   }
-}
 </script>
 
 <style lang="sass">
