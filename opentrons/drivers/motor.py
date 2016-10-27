@@ -152,7 +152,7 @@ class CNCDriver(object):
 
     def connect(self, device):
         self.connection = device
-        self.reset_port():
+        self.reset_port()
         log.debug("Connected to {}".format(device))
         compatible = self.versions_compatible()
         return all(compatible.values())
