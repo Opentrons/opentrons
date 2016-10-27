@@ -235,6 +235,13 @@ def connect_robot():
         status = 'error'
         data = str(e)
 
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
+
+
+def _start_connection_watcher():
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -264,11 +271,6 @@ def connect_robot():
         connection_state_watcher,
         watcher_should_run
     )
-
-    return flask.jsonify({
-        'status': status,
-        'data': data
-    })
 
 
 @app.route("/robot/serial/disconnect")
@@ -526,6 +528,8 @@ if __name__ == "__main__":
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
+
+    _start_connection_watcher()
 
     socketio.run(
         app,
