@@ -17,6 +17,8 @@ from opentrons.util.vector import VectorEncoder
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
+import json
+from opentrons.util import vector
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
@@ -92,7 +94,7 @@ def upload():
             '.py or .json'.format(extension)
         })
 
-    calibrations = get_placeables()
+    calibrations = get_step_list()
 
     return flask.jsonify({
         'status': 'success',
@@ -101,6 +103,73 @@ def upload():
             'warnings': api_response['warnings'],
             'calibrations': calibrations
         }
+    })
+
+
+def _run_commands():
+    global robot
+
+    api_response = {'errors': [], 'warnings': []}
+
+    try:
+        robot.resume()
+        robot.run()
+        if len(robot._commands) == 0:
+            error = ("This protocol does not contain "
+                     "any commands for the robot.")
+            api_response['errors'] = error
+    except Exception as e:
+        api_response['errors'] = [str(e)]
+
+    api_response['warnings'] = robot.get_warnings() or []
+
+    return api_response
+
+
+@app.route("/run", methods=["GET"])
+def run():
+
+    api_response = _run_commands()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'errors': api_response['errors'],
+            'warnings': api_response['warnings']
+        }
+    })
+
+
+@app.route("/pause", methods=["GET"])
+def pause():
+
+    robot.pause()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/resume", methods=["GET"])
+def resume():
+
+    robot.resume()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/stop", methods=["GET"])
+def stop():
+
+    robot.stop()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
     })
 
 
@@ -124,6 +193,7 @@ def is_connected():
         'is_connected': Robot.get_instance().is_connected(),
         'port': Robot.get_instance().get_connected_port()
     })
+
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
@@ -200,14 +270,14 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def placeables():
-    data = get_placeables()
+    data = get_step_list()
     return flask.jsonify({
         'status': 'success',
         'data': data
     })
 
 
-def get_placeables():
+def get_step_list():
     def get_containers(instrument):
         unique_containers = set()
 
@@ -283,8 +353,133 @@ def move_to_slot():
     )
 
     return flask.jsonify({
-        'status': 200,
+        'status': 'success',
         'data': result
+    })
+
+
+@app.route('/move_to_container', methods=["POST"])
+def move_to_container():
+    slot = request.json.get("slot")
+    name = request.json.get("label")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        container = robot._deck[slot].get_child_by_name(name)
+        instrument.move_to(container[0].bottom(), now=True)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/move_to_plunger_position', methods=["POST"])
+def move_to_plunger_position():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.plunger.move(instrument.positions[position])
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+def _calibrate_placeable(container_name, axis_name):
+
+    deck = robot._deck
+    containers = deck.containers()
+    axis_name = axis_name.upper()
+
+    if container_name not in containers:
+        raise ValueError('Container {} is not defined'.format(container_name))
+
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    container = containers[container_name]
+
+    well = container[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=container)
+    location = (container, pos)
+
+    instrument.calibrate_position(location)
+    return instrument.calibration_data
+
+
+@app.route("/calibrate_placeable", methods=["POST"])
+def calibrate_placeable():
+    name = request.json.get("label")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_placeable(name, axis)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'name': name,
+            'axis': axis,
+            'calibrations': calibrations
+        }
+    })
+
+
+def _calibrate_plunger(position, axis_name):
+    axis_name = axis_name.upper()
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    if position not in instrument.positions:
+        raise ValueError('Position {} is not on the plunger'.format(position))
+
+    instrument.calibrate(position)
+
+
+@app.route("/calibrate_plunger", methods=["POST"])
+def calibrate_plunger():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_plunger(position, axis)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'position': position,
+            'axis': axis,
+            'calibrations': calibrations
+        }
     })
 
 
