@@ -113,6 +113,7 @@ def _run_commands():
     api_response = {'errors': [], 'warnings': []}
 
     try:
+        robot.resume()
         robot.run()
         if len(robot._commands) == 0:
             error = ("This protocol does not contain "
@@ -137,6 +138,39 @@ def run():
             'errors': api_response['errors'],
             'warnings': api_response['warnings']
         }
+    })
+
+
+@app.route("/pause", methods=["GET"])
+def pause():
+
+    robot.pause()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/resume", methods=["GET"])
+def resume():
+
+    robot.resume()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/stop", methods=["GET"])
+def stop():
+
+    robot.stop()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
     })
 
 
