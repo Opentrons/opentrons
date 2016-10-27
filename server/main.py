@@ -205,14 +205,19 @@ def get_coordinates():
 
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
-    port = flask.request.args.get('port')
+    port = request.json.get('port')
+    options = request.json.get('options', {'limit_switches': False})
 
     status = 'success'
     data = None
 
     try:
-        Robot.get_instance().connect(port, options={'limit_switches': False})
+        robot = Robot.get_instance()
+        robot.connect(
+            port, options=options)
     except Exception as e:
+        # any robot version incompatibility will be caught here
+        robot.disconnect()
         status = 'error'
         data = str(e)
 
