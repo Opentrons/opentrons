@@ -1,6 +1,6 @@
-from opentrons_sdk import containers
-from opentrons_sdk import instruments
-#  from opentrons_sdk.robot import Robot
+from opentrons import containers
+from opentrons import instruments
+#  from opentrons.robot import Robot
 
 plate = containers.load(
     '96-flat',

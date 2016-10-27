@@ -95,7 +95,7 @@ def upload():
             '.py or .json'.format(extension)
         })
 
-    calibrations = get_placeables()
+    calibrations = get_step_list()
 
     return flask.jsonify({
         'status': 'success',
@@ -204,14 +204,14 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def placeables():
-    data = get_placeables()
+    data = get_step_list()
     return flask.jsonify({
         'status': 'success',
         'data': data
     })
 
 
-def get_placeables():
+def get_step_list():
     def get_containers(instrument):
         unique_containers = set()
 
@@ -299,7 +299,7 @@ def _calibrate_placeable(container_name, axis_name):
     axis_name = axis_name.upper()
 
     if container_name not in containers:
-        raise ValueError('Container {} is not definied'.format(container_name))
+        raise ValueError('Container {} is not defined'.format(container_name))
 
     if axis_name not in robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
@@ -320,21 +320,22 @@ def calibrate_placeable():
     name = request.json.get("label")
     axis = request.json.get("axis")
     try:
-        data = _calibrate_placeable(name, axis)
+        _calibrate_placeable(name, axis)
     except Exception as e:
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
         })
 
-    # data = json.dumps(data, cls=vector.VectorEncoder)
-    calibration = get_placeables()
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
     return flask.jsonify({
         'status': 'success',
         'data': {
             'name': name,
             'axis': axis,
-            'calibration': calibration
+            'calibrations': calibrations
         }
     })
 
