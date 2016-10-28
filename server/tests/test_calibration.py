@@ -56,7 +56,7 @@ class CalibrationTestCase(unittest.TestCase):
         self.robot.move_to = mock.Mock()
 
         arguments = {
-            'label': 'plate-for-frontend-test',
+            'label': 'test-plate',
             'slot': 'B2',
             'axis': 'b'
         }
@@ -70,7 +70,7 @@ class CalibrationTestCase(unittest.TestCase):
         self.assertEqual(status, 'success')
 
         container = self.robot._deck['B2'].get_child_by_name(
-            'plate-for-frontend-test')
+            'test-plate')
         instrument = self.robot._instruments['B']
         expected = [
             mock.call(
@@ -90,7 +90,7 @@ class CalibrationTestCase(unittest.TestCase):
         self.assertEqual(status, 'success')
 
         arguments = {
-            'label': 'plate-for-frontend-test',
+            'label': 'test-plate',
             'axis': 'b'
         }
 
@@ -105,7 +105,7 @@ class CalibrationTestCase(unittest.TestCase):
         step_list = actual['data']['calibrations']
         status = actual['status']
 
-        self.assertEqual(name, 'plate-for-frontend-test')
+        self.assertEqual(name, 'test-plate')
         self.assertEqual(axis, 'b')
         self.assertTrue(bool(step_list))
         self.assertEqual(status, 'success')
