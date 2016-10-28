@@ -8,21 +8,20 @@
 		</div>
 		<div class="update">
 		  <span class="position top">Top</span>
-		  <button class="btn-update save top" data-save-pipette="top">Save</button>
-		  <button class="btn-update moveto ">Move</button>
+		  <button class="btn-update save top" @click="calibrateInstrument(instrument, 'top')">Save</button>
+		  <button class="btn-update moveto " @click="moveToPlungerPosition(instrument, 'top')">Move</button>
 		  <div class="spacer"></div>
 		  <span class="position bottom">Bottom</span>
-		  <button class="btn-update save bottom" data-save-pipette="bottom">Save</button>
-		  <button class="btn-update moveto ">Move</button>
+		  <button class="btn-update save bottom" @click="calibrateInstrument(instrument, 'bottom')">Save</button>
+		  <button class="btn-update moveto " @click="moveToPlungerPosition(instrument, 'bottom')">Move</button>
 		  <span class="position blowout">Blowout</span>
-		  <button class="btn-update save blowout" data-save-pipette="blowout">Save</button>
-		  <button class="btn-update moveto">Move</button>
+		  <button class="btn-update save blowout" @click="calibrateInstrument(instrument, 'blow_out')">Save</button>
+		  <button class="btn-update moveto" @click="moveToPlungerPosition(instrument, 'blow_out')">Move</button>
 		  <span class="position droptip">Drop Tip</span>
-		  <button class="btn-update save droptip" data-save-pipette="droptip">Save</button>
-		  <button class="btn-update moveto disabled">Move</button>
-		  <button class="btn-update test pick-liquid disabled">Pick Up</button>
-		  <button class="btn-update test eject-liquid disabled">Eject</button>
-		</div>
+		  <button class="btn-update save droptip" @click="calibrateInstrument(instrument, 'drop_tip')">Save</button>
+		  <button class="btn-update moveto " @click="moveToPlungerPosition(instrument, 'drop_tip')">Move</button>
+		  <button class="btn-update test pick-liquid">Pick Up</button>
+		  <button class="btn-update test eject-liquid">Eject</button>
 		</div>
 	</div>
 </template>
@@ -32,19 +31,18 @@
     name: 'CalibrateInstrument',
     props: ['instrument'],
     data: function() {
-      return {
-
-      }
+      return {}
     },
     methods: {
-    	calibrateInstrument(instrument){
+    	calibrateInstrument(instrument, position){
     		let axis = instrument.axis
-    		let position = instrumant.postion
     		this.$store.dispatch("calibrateInstrument", {axis: axis, position: position})
-    	}
+    	},
+      moveToPlungerPosition(instrument, position){
+        let axis = instrument.axis
+        this.$store.dispatch("moveToPlungerPosition", {axis: axis, position: position})
+      }
     },
-    computed: {
-
-    }
+    computed: {}
   }
 </script>
