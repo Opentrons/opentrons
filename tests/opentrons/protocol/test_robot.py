@@ -55,7 +55,7 @@ class RobotTest(unittest.TestCase):
 
     def test_home(self):
         self.robot.clear()
-        self.robot.home()
+        self.robot.home(enqueue=True)
         self.assertEquals(len(self.robot._commands), 1)
         self.robot.run()
 
@@ -64,8 +64,8 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(len(self.robot._commands), 0)
 
     def test_robot_pause_and_resume(self):
-        self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.move_to((Deck(), (101, 0, 0)))
+        self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
+        self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
         self.assertEqual(len(self.robot._commands), 2)
 
         self.robot.pause()
@@ -84,8 +84,8 @@ class RobotTest(unittest.TestCase):
         self.robot.clear()
         self.assertEqual(len(self.robot._commands), 0)
 
-        self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.move_to((Deck(), (101, 0, 0)))
+        self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
+        self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
 
         def _run():
             self.robot.run()

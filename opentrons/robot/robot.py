@@ -22,28 +22,27 @@ class Robot(object, metaclass=Singleton):
     This class is the main interface to the robot.
 
     Through this class you can can:
-    * define your :class:`Deck`
-    * :func:`simulate` the protocol run
-    * connect to Opentrons physical robot
-    * :func:`run` the protocol on a robot
-    * :func:`home` axis, move head (:func:`move_head`)
-    * :func:`pause` and :func:`resume` the protocol run
+        * define your :class:`opentrons.Deck`
+        * :meth:`simulate` the protocol run
+        * :meth:`connect` to Opentrons physical robot
+        * :meth:`run` the protocol on a robot
+        * :meth:`home` axis, move head (:meth:`move_head`)
+        * :meth:`pause` and :func:`resume` the protocol run
 
     Notes
     -----
-    Each Opentrons protocol is a Python script which when evaluated creates 
-    an execution plan which stored as a list of commands in Robot's command queue.
+    Each Opentrons protocol is a Python script which when evaluated creates
+    an execution plan which stored as a list of commands in
+    Robot's command queue.
 
-    First you write the protocol in Python then you :func:`simulate` it against a
-    virtual robot or :func:`run` it on a real robot.
+    First you write the protocol in Python then you :func:`simulate`
+    it against a virtual robot or :func:`run` it on a real robot.
 
     Using a Python script and the Opentrons API load your containers and
-    instruments (see :class:`Pipette`). Then write your instructions which 
-    will get converted into an execution plan. 
+    instruments (see :class:`Pipette`). Then write your instructions which
+    will get converted into an execution plan.
 
-    Example protocol: 
-    ::
-
+    Example protocol:
 
     After commands have been enqueued, you can :func:`simulate`
     or :func:`run` on a robot.
@@ -52,17 +51,19 @@ class Robot(object, metaclass=Singleton):
 
     Examples
     --------
-    >>> from opentrons.instruments.pipette import Pipette
     >>> from opentrons.robot import Robot
+    >>> from opentrons.instruments.pipette import Pipette
     >>> robot = Robot()
     >>> plate = robot.add_container('A1', '96-flat', 'plate')
-    >>> p200 = instruments.Pipette(axis='b')
-    >>> p200.aspirate(200, plate[0])
+    >>> p200 = Pipette(axis='b')
+    >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
+    <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
     ['Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>']
     >>> robot.simulate()
     []
     """
+
     _commands = None  # []
     _instance = None
 
@@ -125,10 +126,10 @@ class Robot(object, metaclass=Singleton):
     def reset(self):
         """
         Resets the state of the robot and clears:
-        * Deck
-        * Instruments
-        * Command queue
-        * Runtime warnings
+            * Deck
+            * Instruments
+            * Command queue
+            * Runtime warnings
         """
         self._commands = []
         self._handlers = []
@@ -156,7 +157,9 @@ class Robot(object, metaclass=Singleton):
         Notes
         -----
         A canonical way to add to add a Pipette to a robot is:
-        .. ipython:: python
+
+        ::
+
             from opentrons.instruments.pipette import Pipette
             p200 = Pipette(axis='a')
 
@@ -339,17 +342,20 @@ class Robot(object, metaclass=Singleton):
             Options to be passed to :class:`VirtualSmoothie`.
 
             Default:
+
             ::
+
                 default_options = {
-                'limit_switches': True,
-                'firmware': 'v1.0.5',
-                'config': {
-                    'ot_version': 'one_pro',
-                    'version': 'v1.0.3',        # config version
-                    'alpha_steps_per_mm': 80.0,
-                    'beta_steps_per_mm': 80.0
+                    'limit_switches': True,
+                    'firmware': 'v1.0.5',
+                    'config': {
+                        'ot_version': 'one_pro',
+                        'version': 'v1.0.3',        # config version
+                        'alpha_steps_per_mm': 80.0,
+                        'beta_steps_per_mm': 80.0
+                    }
                 }
-            }
+
         """
         default_options = {
             'limit_switches': True,
@@ -370,10 +376,12 @@ class Robot(object, metaclass=Singleton):
         """
         Connects the robot to a serial port.
 
+        Parameters
+        ----------
         port : str
-            OS-specific port name or ``Virtual Smoothie``
+            OS-specific port name or ``'Virtual Smoothie'``
         options : dict
-            if :param:`port` is set to ``Virtual Smoothie``, provide
+            if :attr:`port` is set to ``'Virtual Smoothie'``, provide
             the list of options to be passed to :func:`get_virtual_device`
 
         Returns
@@ -401,7 +409,7 @@ class Robot(object, metaclass=Singleton):
         Parameters
         ----------
         *args :
-            A string with axes to home. For example ``xyz`` or ``ab``.
+            A string with axes to home. For example ``'xyz'`` or ``'ab'``.
 
             If no arguments provided home Z-axis then X, Y, B, A
 
@@ -420,7 +428,9 @@ class Robot(object, metaclass=Singleton):
         --------
         >>> from opentrons.robot import Robot
         >>> robot.connect('Virtual Smoothie')
+        True
         >>> robot.home()
+        True
         """
         def _do():
             if self._driver.calm_down():
@@ -432,8 +442,9 @@ class Robot(object, metaclass=Singleton):
             else:
                 return False
 
-        if 'now' in kwargs:
-            raise ValueError('now argument is deprecated, use enqueue instead')
+        # TODO: uncomment and get rid of now argument refs
+        # if 'now' in kwargs:
+        #     raise ValueError('now argument is deprecated, use enqueue instead')
 
         if kwargs.get('enqueue'):
             description = "Homing Robot"
@@ -488,6 +499,8 @@ class Robot(object, metaclass=Singleton):
         Examples
         --------
         >>> from opentrons.robot import Robot
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
         True
         >>> robot.home()
@@ -574,6 +587,8 @@ class Robot(object, metaclass=Singleton):
         --------
         >>> from opentrons.robot import Robot
         >>> from opentrons.instruments.pipette import Pipette
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
         True
         >>> robot.home()
@@ -581,7 +596,7 @@ class Robot(object, metaclass=Singleton):
         >>> plate = robot.add_container('A1', '96-flat', 'plate')
         >>> p200 = Pipette(axis='a')
         >>> robot.move_to(plate[0])
-        >>> robot.move_to(plate[0].top())   
+        >>> robot.move_to(plate[0].top())
         """
         self.prepare_for_run()
 

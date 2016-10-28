@@ -9,6 +9,9 @@ config = {
     'version': '2.0',
     'packages': find_packages(exclude=["tests"]),
     'install_requires': ['pyserial==3.1.1'],
+    'extras_require': {
+        'docs': ['numpydoc==0.6.0', 'Sphinx==1.4.8']
+    },
     'package_data': {
         "opentrons": [
             "config/containers/legacy_containers.json",
