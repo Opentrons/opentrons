@@ -107,21 +107,37 @@ class Robot(object):
 
         class InstrumentMotor():
 
-            def move(self, value, mode='absolute'):
-                kwargs = {axis: value}
+            def __init__(self):
+                self.motor_driver = robot_self._driver
 
-                return robot_self._driver.move_plunger(
-                    mode=mode, **kwargs
-                )
+            def simulate(self):
+                self.motor_driver = None
+
+            def live(self):
+                self.motor_driver = robot_self._driver
+
+            def move(self, value, mode='absolute'):
+                if self.motor_driver:
+                    kwargs = {axis: value}
+                    return self.motor_driver.move_plunger(
+                        mode=mode, **kwargs
+                    )
+                else:
+                    return True
 
             def home(self):
-                return robot_self._driver.home(axis)
+                if self.motor_driver:
+                    return self.motor_driver.home(axis)
+                else:
+                    return True
 
             def wait(self, seconds):
-                robot_self._driver.wait(seconds)
+                if self.motor_driver:
+                    self.motor_driver.wait(seconds)
 
             def speed(self, rate):
-                robot_self._driver.set_plunger_speed(rate, axis)
+                if self.motor_driver:
+                    self.motor_driver.set_plunger_speed(rate, axis)
                 return self
 
         return InstrumentMotor()
@@ -300,7 +316,7 @@ class Robot(object):
             self.set_connection('simulate')
 
         for instrument in self._instruments.values():
-            instrument.setup_simulate()
+            instrument.setup_simulate(mode='use_driver')
 
         res = self.run()
 
