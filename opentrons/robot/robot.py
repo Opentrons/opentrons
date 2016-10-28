@@ -89,8 +89,19 @@ class Robot(object):
 
     def get_mosfet(self, mosfet_index):
         robot_self = self
+        driver_mock = mock.Mock()
 
         class InstrumentMosfet():
+
+            def is_simulating(self):
+                return isinstance(
+                    self.motor_driver, mock.Mock)
+
+            def simulate(self):
+                self.motor_driver = driver_mock
+
+            def live(self):
+                self.motor_driver = robot_self._driver
 
             def engage(self):
                 robot_self._driver.set_mosfet(mosfet_index, True)
