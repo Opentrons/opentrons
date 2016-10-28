@@ -294,10 +294,13 @@ def get_step_list():
         return False
 
     def check_if_instrument_calibrated(instrument):
-        pos = instrument.positions
-        if pos["top"] and pos["bottom"] and pos["blow_out"] and pos["drop_tip"]:
-            return True
-        return False
+        positions = instrument.positions
+        for p in positions:
+            if positions.get(p) is None:
+                return False
+
+        return True
+
 
     data = [{
         'axis': instrument.axis,
