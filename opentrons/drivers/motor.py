@@ -85,9 +85,9 @@ class CNCDriver(object):
 
     ot_version = None
     ot_one_dimensions = {
-        'hood': Vector(300, 120, 120),
-        'one_pro': Vector(300, 250, 120),
-        'one_standard': Vector(300, 250, 120)
+        'hood': Vector(400, 250, 120),
+        'one_pro': Vector(400, 400, 120),
+        'one_standard': Vector(400, 400, 120)
     }
 
     def __init__(self):
@@ -259,7 +259,12 @@ class CNCDriver(object):
             log.debug('home switch hit')
             self.flush_port()
             self.calm_down()
-            raise RuntimeWarning('limit switch hit')
+            msg = msg.decode()
+            axis = ''
+            for ax in 'xyzab':
+                if ('min_' + ax) in msg:
+                    axis = ax
+            raise RuntimeWarning('{} limit switch hit'.format(axis.upper()))
 
         return msg
 
@@ -387,7 +392,8 @@ class CNCDriver(object):
             if ax in 'ABXYZ':
                 axis_to_home += ax
         if not axis_to_home:
-            axis_to_home = 'ABXYZ'
+            return
+
         res = self.send_command(self.HOME + axis_to_home)
         if res == b'ok':
             # the axis aren't necessarily set to 0.0

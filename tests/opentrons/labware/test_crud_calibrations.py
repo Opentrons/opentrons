@@ -14,6 +14,8 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.plate = containers.load('96-flat', 'A1', 'plate')
         self.p200 = instruments.Pipette(name="p200", axis="b")
 
+        self.p200.delete_calibration_data()
+
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=0, reference=self.plate)
         self.location = (self.plate, pos)
@@ -22,10 +24,9 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         dest = well_deck_coordinates + Vector(1, 2, 3)
 
         self.robot.move_head(x=dest['x'], y=dest['y'], z=dest['z'])
+        self.p200.calibrate_position(self.location)
 
     def test_save_load_calibration_data(self):
-
-        self.p200.calibrate_position(self.location)
 
         self.p200 = instruments.Pipette(name="p200-diff", axis="b")
         self.assertDictEqual(self.p200.calibration_data, {})
@@ -44,3 +45,26 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.assertTrue('plate' in actual)
         actual = self.p200.calibration_data['A1']['children']['plate']
         self.assertEquals(expected_delta, actual)
+
+    def test_delete_calibrations_data(self):
+
+        self.p200 = instruments.Pipette(name="p200", axis="b")
+
+        expected_delta = {
+            'delta': (1.0, 2.0, 3.0)
+        }
+
+        self.assertTrue('A1' in self.p200.calibration_data)
+        actual = self.p200.calibration_data['A1']['children']
+        self.assertTrue('plate' in actual)
+        actual = self.p200.calibration_data['A1']['children']['plate']
+        self.assertEquals(expected_delta, actual)
+
+        self.p200.delete_calibration_data()
+        self.assertDictEqual(self.p200.calibration_data, {})
+
+        self.p200 = instruments.Pipette(name="p200", axis="b")
+        self.assertDictEqual(self.p200.calibration_data, {})
+        self.assertDictEqual(self.p200.positions, {
+            'top': None, 'bottom': None, 'blow_out': None, 'drop_tip': None
+        })

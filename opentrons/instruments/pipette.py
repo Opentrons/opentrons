@@ -310,12 +310,12 @@ class Pipette(Instrument):
                     # TODO: raise warning/exception if looped back to first tip
                     location = next(self.tip_rack_iter)
                 else:
-                    self.robot.warning(
+                    self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')
 
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='direct', now=True)
+                self.move_to(placeable.bottom(), strategy='arc', now=True)
 
             self.current_tip_home_well = location
 
@@ -344,7 +344,7 @@ class Pipette(Instrument):
 
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='direct', now=True)
+                self.move_to(placeable.bottom(), strategy='arc', now=True)
 
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()

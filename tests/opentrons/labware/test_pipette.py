@@ -590,7 +590,7 @@ class PipetteTest(unittest.TestCase):
 
     def build_move_to_bottom(self, well):
         return mock.call(
-            well.bottom(), strategy='direct', now=True)
+            well.bottom(), strategy='arc', now=True)
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()

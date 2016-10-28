@@ -94,6 +94,14 @@ class Instrument(object):
         calibration['calibration_data'] = self.calibration_data
         return calibration
 
+    def delete_calibration_data(self):
+        self.calibration_data = {}
+        self.max_volume = self.min_volume + 1
+        for key in self.positions.keys():
+            self.positions[key] = None
+
+        self.update_calibrations()
+
     def read_calibrations(self):
         """
         Reads calibration data from file system.
