@@ -8,17 +8,16 @@
 
 		<div class="update bottom" v-show="placeableType('default') || placeableType('point')">
 			<span class="position bottom">Bottom</span>
-			<button class="btn-update save bottom" @click="calibratePlaceable(placeable,instrument)" >Save </button>
-			<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
+			<button class="btn-placeable save bottom" @click="calibratePlaceable(placeable,instrument)">Save </button>
+			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
 		</div>
 
 		<div class="update top" v-show="placeableType('tiprack')">
 			<span class="position top">Tiprack</span>
-			<button class="btn-update save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
-			<button class="btn-update moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
+			<button class="btn-placeable save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
+			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
 			<button class="pick-tip" :class="{'disabled': !placeable.calibrated}">Pick Up Tip</button>
 		</div>
-
 	</div>
 </template>
 
@@ -42,12 +41,14 @@
         let axis = instrument.axis
         this.$store.dispatch("moveToPosition", {slot: slot, label: label, axis: axis})
       }
+<<<<<<< HEAD
     },
     computed: {
     	currentType(){
     		return placeableType(this.type);
     	}
+=======
+>>>>>>> master
     }
-
   }
 </script>
