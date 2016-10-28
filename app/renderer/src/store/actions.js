@@ -35,8 +35,8 @@ const actions = {
     })
   },
   selectIncrement ({commit}, data) {
-    commit(types.UPDATE_INCREMENT, {
-      'current_increment': data.inc, 'type': data.type })
+    let {inc, type} = data
+    commit(types.UPDATE_INCREMENT, { 'current_increment': inc, 'type': type })
   },
   jog ({commit}, coords) {
     OpenTrons.jog(coords)

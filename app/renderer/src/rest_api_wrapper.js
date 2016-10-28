@@ -83,7 +83,7 @@ class OpenTrons {
 
   calibrate(data, type) {
     Vue.http
-    .post(`http://localhost:5000/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
+    .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
       let tasks = response.body.data.calibrations
       addHrefs(tasks)
