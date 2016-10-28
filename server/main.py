@@ -342,13 +342,18 @@ def get_step_list():
 
 @app.route('/home/<axis>')
 def home(axis):
+    status = 'success'
     result = ''
-    if axis == 'undefined' or axis == '' or axis.lower() == 'all':
-        result = robot.home(now=True)
-    else:
-        result = robot.home(axis, now=True)
+    try:
+        if axis == 'undefined' or axis == '' or axis.lower() == 'all':
+            result = robot.home(now=True)
+        else:
+            result = robot.home(axis, now=True)
+    except Exception as e:
+        result = str(e)
+        status = 'error'
     return flask.jsonify({
-        'status': 200,
+        'status': status,
         'data': result
     })
 
