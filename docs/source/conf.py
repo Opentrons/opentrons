@@ -37,9 +37,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
-    'numpydoc',
-    'ipython_sphinxext.ipython_directive',
-    'ipython_sphinxext.ipython_console_highlighting'
+    'numpydoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
