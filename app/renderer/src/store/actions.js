@@ -18,7 +18,6 @@ const actions = {
       }
     })
   },
-
   updateFilename ({commit}, fileName) {
     commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
   },
@@ -65,6 +64,11 @@ const actions = {
        console.log('success',response)
     }, (response) => {
        console.log('failed', response)
+    })
+  },
+  getRunPlan({ commit }) {
+    OpenTrons.getRunPlan().then((results) => {
+      commit(types.UPDATE_RUN_PLAN, results)
     })
   }
 }

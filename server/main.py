@@ -484,6 +484,15 @@ def calibrate_plunger():
     })
 
 
+@app.route("/run-plan")
+def get_run_plan():
+    global robot
+    return flask.jsonify({
+        'status': 'success',
+        'data': [i.description for i in robot._commands]
+    })
+
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')

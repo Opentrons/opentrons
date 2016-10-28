@@ -8,6 +8,7 @@ class OpenTrons {
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
     this.jogUrl = this.base_url + '/jog'
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
+    this.runPlanUrl = this.base_url + '/run-plan'
   }
 
   connect (port) {
@@ -76,6 +77,19 @@ class OpenTrons {
         return result
       }, (response) => {
         console.log('Failed to upload protocol', response)
+      })
+  }
+  getRunPlan (data) {
+    return Vue.http
+      .get(this.runPlanUrl)
+      .then((response) => {
+        let result = response.body.data
+        if (result.status == 'success') {
+          return result.data || []
+        }
+        return response.data || []
+      }, (response) => {
+        console.log('failed', response)
       })
   }
 }
