@@ -1,6 +1,7 @@
 import copy
 import os
 from threading import Event
+from unittest import mock
 
 import serial
 
@@ -110,35 +111,30 @@ class Robot(object):
             def __init__(self):
                 self.motor_driver = robot_self._driver
 
+            def is_simulating(self):
+                return isinstance(
+                    self.motor_driver, mock.Mock)
+
             def simulate(self):
-                self.motor_driver = None
+                self.motor_driver = mock.Mock()
 
             def live(self):
                 self.motor_driver = robot_self._driver
 
             def move(self, value, mode='absolute'):
-                if self.motor_driver:
-                    kwargs = {axis: value}
-                    return self.motor_driver.move_plunger(
-                        mode=mode, **kwargs
-                    )
-                else:
-                    return True
+                kwargs = {axis: value}
+                return self.motor_driver.move_plunger(
+                    mode=mode, **kwargs
+                )
 
             def home(self):
-                if self.motor_driver:
-                    return self.motor_driver.home(axis)
-                else:
-                    return True
+                self.motor_driver.home(axis)
 
             def wait(self, seconds):
-                if self.motor_driver:
-                    self.motor_driver.wait(seconds)
+                self.motor_driver.wait(seconds)
 
             def speed(self, rate):
-                if self.motor_driver:
-                    self.motor_driver.set_plunger_speed(rate, axis)
-                return self
+                self.motor_driver.set_plunger_speed(rate, axis)
 
         return InstrumentMotor()
 

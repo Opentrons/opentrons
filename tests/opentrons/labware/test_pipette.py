@@ -468,20 +468,22 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_simulate_plunger_while_enqueing(self):
-        # self.p200.aspirate = mock.Mock()
 
         self.p200.pick_up_tip()
-
         self.assertEquals(self.p200.current_volume, 0)
+
         self.p200.aspirate(200)
         self.assertEquals(self.p200.current_volume, 200)
 
         self.p200.dispense(20)
         self.assertEquals(self.p200.current_volume, 180)
+
         self.p200.dispense(20)
         self.assertEquals(self.p200.current_volume, 160)
+
         self.p200.dispense(60)
         self.assertEquals(self.p200.current_volume, 100)
+
         self.p200.dispense(100)
         self.assertEquals(self.p200.current_volume, 0)
 

@@ -126,7 +126,7 @@ class Pipette(Instrument):
         self.associate_placeable(location)
         if location:
             self.associate_placeable(location)
-            if self.plunger.motor_driver:
+            if not self.plunger.is_simulating():
                 self.robot.move_to(
                     location,
                     instrument=self,
