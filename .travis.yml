@@ -3,12 +3,11 @@ language: objective-c
 osx_image: beta-xcode6.3
 
 cache:
-  pip
   directories:
     - node_modules
     - app/node_modules
     - $HOME/.electron
-    - $HOME/.cache/pip
+    - pip
     - $HOME/.cache/our-brew
 
 before_install:
