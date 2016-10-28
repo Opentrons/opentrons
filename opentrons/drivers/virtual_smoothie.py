@@ -9,8 +9,8 @@ log = log.get_logger(__name__)
 class VirtualSmoothie(object):
     def init_coordinates(self):
         self.coordinates = {
-            'current': {},
-            'target': {}
+            'current': {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0},
+            'target': {'x': 0, 'y': 0, 'z': 0, 'a': 0, 'b': 0}
         }
 
         for axis in 'xyzab':
