@@ -30,7 +30,7 @@
   export default {
     name: 'CalibrateInstrument',
     props: ['instrument'],
-    data: function () {
+    data: function() {
       return {
         currentMode : 'droptip'
       }
@@ -38,21 +38,18 @@
     methods: {
     	calibrateInstrument(instrument, position) {
     		let axis = instrument.axis
-    		this.$store.dispatch("calibrateInstrument", {axis: axis, position: position})
+    		this.$store.dispatch("calibrate", {axis, position})
     	},
       moveToPlungerPosition(instrument, position) {
 				// TODO - test if this moves the robot if the class disabled is on the given position
         let axis = instrument.axis
-        this.$store.dispatch("moveToPlungerPosition", {axis: axis, position: position})
+        this.$store.dispatch("moveToPosition", {axis, position})
       },
 			disabled(instrument, position) {
-				console.log("***********", instrument[position])
-				if (instrument[position] == undefined) {
-					return true
-				}
+				if (instrument[position] == undefined) { return true }
 			},
       toggleMode(mode){
-        this.currentMode =  mode;
+        this.currentMode = mode
       }
     }
   }

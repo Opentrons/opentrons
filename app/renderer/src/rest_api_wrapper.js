@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import {addHrefs} from './util'
 
 
 class OpenTrons {
@@ -8,6 +9,8 @@ class OpenTrons {
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
     this.jogUrl = this.base_url + '/jog'
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
+    this.jogToContainerUrl = this.base_url + '/move_to_container'
+    this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
   }
 
   connect (port) {
@@ -15,7 +18,6 @@ class OpenTrons {
     return Vue.http
       .post(this.connectUrl, options)
       .then((response) => {
-        console.log(response.data)
         if (response.data.status === "success") {
           console.log('successfully connected...')
           return true
@@ -39,6 +41,21 @@ class OpenTrons {
         }
       }, (response) => {
         console.log('Failed to communicate to server', response)
+      })
+  }
+
+  moveToPosition(data, type) {
+    let url = this.jogToContainerUrl
+    if (type == "plunger") { url = this.jogToPlungerUrl }
+
+    return Vue.http
+      .post(url, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+        return true
+      }, (response) => {
+        console.log('failed', response)
+        return false
       })
   }
 
@@ -66,6 +83,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+
   uploadProtocol (formData) {
     return Vue.http
       .post('http://localhost:5000/upload', formData)
@@ -81,6 +99,19 @@ class OpenTrons {
         return result
       }, (response) => {
         console.log('Failed to upload protocol', response)
+      })
+  }
+
+  calibrate(data, type) {
+    return Vue.http
+      .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        let tasks = response.body.data.calibrations
+        addHrefs(tasks)
+        return tasks
+      }, (response) => {
+         console.log('failed', response)
+         return false
       })
   }
 }
