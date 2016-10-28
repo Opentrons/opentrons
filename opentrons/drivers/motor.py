@@ -85,9 +85,9 @@ class CNCDriver(object):
 
     ot_version = None
     ot_one_dimensions = {
-        'hood': Vector(300, 120, 120),
-        'one_pro': Vector(300, 250, 120),
-        'one_standard': Vector(300, 250, 120)
+        'hood': Vector(400, 250, 120),
+        'one_pro': Vector(400, 400, 120),
+        'one_standard': Vector(400, 400, 120)
     }
 
     def __init__(self):
