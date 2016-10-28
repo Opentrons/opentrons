@@ -203,19 +203,45 @@ def get_coordinates():
     })
 
 
+@app.route("/robot/diagnostics")
+def get_diagnostics():
+    return flask.jsonify({
+        'diagnostics': robot.diagnostics()
+    })
+
+
+@app.route("/robot/versions")
+def get_versions():
+    return flask.jsonify({
+        'versions': robot.versions()
+    })
+
+
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
-    port = flask.request.args.get('port')
+    port = request.json.get('port')
+    options = request.json.get('options', {'limit_switches': False})
 
     status = 'success'
     data = None
 
     try:
-        Robot.get_instance().connect(port, options={'limit_switches': False})
+        robot = Robot.get_instance()
+        robot.connect(
+            port, options=options)
     except Exception as e:
+        # any robot version incompatibility will be caught here
+        robot.disconnect()
         status = 'error'
         data = str(e)
 
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
+
+
+def _start_connection_watcher():
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -245,11 +271,6 @@ def connect_robot():
         connection_state_watcher,
         watcher_should_run
     )
-
-    return flask.jsonify({
-        'status': status,
-        'data': data
-    })
 
 
 @app.route("/robot/serial/disconnect")
@@ -507,6 +528,8 @@ if __name__ == "__main__":
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
+
+    _start_connection_watcher()
 
     socketio.run(
         app,
