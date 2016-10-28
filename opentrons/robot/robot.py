@@ -105,6 +105,7 @@ class Robot(object):
 
     def get_motor(self, axis):
         robot_self = self
+        driver_mock = mock.Mock()
 
         class InstrumentMotor():
 
@@ -116,7 +117,7 @@ class Robot(object):
                     self.motor_driver, mock.Mock)
 
             def simulate(self):
-                self.motor_driver = mock.Mock()
+                self.motor_driver = driver_mock
 
             def live(self):
                 self.motor_driver = robot_self._driver
