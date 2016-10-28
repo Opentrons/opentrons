@@ -7,10 +7,10 @@ import serial
 from opentrons import containers
 from opentrons.drivers import motor as motor_drivers
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
-from opentrons.robot.command import Command
-from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
-from opentrons.util.trace import traceable
+from opentrons.robot.command import Command
+from opentrons.util import trace
+from opentrons.util.log import get_logger
 
 
 log = get_logger(__name__)
@@ -224,7 +224,7 @@ class Robot(object):
     def head_speed(self, rate):
         self._driver.set_head_speed(rate)
 
-    @traceable('move-to')
+    @trace.traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', now=False):
         placeable, coordinates = containers.unpack_location(location)
 
@@ -277,10 +277,12 @@ class Robot(object):
             instrument.reset()
 
     def run(self):
-
         self.prepare_for_run()
-
-        for command in self._commands:
+        for i, command in enumerate(self._commands):
+            cmd_run_event = {
+                'command_description': command.description,
+                'command_index': i
+            }
             try:
                 self.can_pop_command.wait()
                 if self.stopped_event.is_set():
@@ -289,8 +291,14 @@ class Robot(object):
                 if command.description:
                     log.info("Executing: {}".format(command.description))
                 command.do()
+                # emit command was done...
+                cmd_run_event['name'] =  'command-run',
+                trace.EventBroker.get_instance().notify(cmd_run_event)
             except KeyboardInterrupt as e:
                 self._driver.halt()
+                cmd_run_event['name'] =  'command-failed',
+                cmd_run_event['error'] =  str(e),
+                trace.EventBroker.get_instance().notify(cmd_run_event)
                 raise e
 
         return self._runtime_warnings
@@ -300,7 +308,6 @@ class Robot(object):
             self.set_connection('simulate_switches')
         else:
             self.set_connection('simulate')
-
         for instrument in self._instruments.values():
             instrument.set_plunger_defaults()
 
