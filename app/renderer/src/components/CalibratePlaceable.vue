@@ -3,7 +3,7 @@
 <div class="calibration-modal">
 	<!-- Show Images based on container type. -->
 	<div class="well-img">
-		<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" /> 
+		<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
 		<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
 		<img src="../assets/img/point_top.png" v-show="placeableType('point')"/>
 	</div>
@@ -25,7 +25,7 @@
 
 </div>
 <!-- End Calibration Modal -->
-	
+
 </template>
 
 <script>
@@ -40,7 +40,7 @@
 				let slot = placeable.slot
 				let label = placeable.label
 				let axis = instrument.axis
-				this.$store.dispatch("calibratePlaceable", {slot: slot, label: label, axis: axis})
+				this.$store.dispatch("calibrate", {slot: slot, label: label, axis: axis})
 			},
 			moveToPlaceable(placeable,instrument){
         let slot = placeable.slot
@@ -49,7 +49,7 @@
         this.$store.dispatch("moveToPlaceable", {slot: slot, label: label, axis: axis})
       }
     },
-    computed: { 
+    computed: {
     	currentType(){
     		return placeableType(this.type);
     	}

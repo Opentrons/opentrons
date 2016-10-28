@@ -15,7 +15,6 @@ class OpenTrons {
     return Vue.http
       .post(this.connectUrl, options)
       .then((response) => {
-        console.log(response.data)
         if (response.data.status === "success") {
           console.log('successfully connected...')
           return true
@@ -63,6 +62,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+
   uploadProtocol (formData) {
     return Vue.http
       .post('http://localhost:5000/upload', formData)
@@ -79,6 +79,18 @@ class OpenTrons {
       }, (response) => {
         console.log('Failed to upload protocol', response)
       })
+  }
+
+  calibrate(data, type) {
+    Vue.http
+    .post(`http://localhost:5000/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
+    .then((response) => {
+      let tasks = response.body.data.calibrations
+      addHrefs(tasks)
+      commit('UPDATE_TASK_LIST', {'tasks': tasks})
+    }, (response) => {
+       console.log('failed', response)
+    })
   }
 }
 
