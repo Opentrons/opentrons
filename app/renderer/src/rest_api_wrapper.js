@@ -92,10 +92,27 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
-
   runProtocol () {
     return Vue.http
       .get(this.runProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+  pauseProtocol () {
+    return Vue.http
+      .get(this.pauseProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+  resumeProtocol () {
+    return Vue.http
+      .get(this.resumeProtocolUrl)
       .then((response) => {
         console.log("success", response)
       }, (response) => {

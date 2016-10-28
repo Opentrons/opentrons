@@ -10,9 +10,11 @@ const state = {
   tasks: [],
   current_increment_placeable: 5,
   current_increment_plunger: 1,
-  coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0}
+  coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
+  run_state: "ready",
+  progress: 0.3
 }
-
+//Note: Ahmed, the run_states I need returned for the toggling are "ready","running", and "paused"
 
 const mutations = {
   [types.UPDATE_ROBOT_CONNECTION] (state, payload) {

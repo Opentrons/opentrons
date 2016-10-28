@@ -70,7 +70,23 @@ const actions = {
     OpenTrons.getRunPlan().then((results) => {
       commit(types.UPDATE_RUN_PLAN, results)
     })
+  },
+  runProtocol({ commit }) {
+    OpenTrons.runProtocol().then((results) => {
+      commit(types.UPDATE_RUN_STATE, results)
+    })
+  },
+  pauseProtocol({ commit }) {
+    OpenTrons.pauseProtocol().then((results) => {
+      commit(types.UPDATE_RUN_STATE, results)
+    })
+  },
+  resumeProtocol({ commit }) {
+    OpenTrons.pauseProtocol().then((results) => {
+      commit(types.UPDATE_RUN_STATE, results)
+    })
   }
+
 }
 
 export default {
