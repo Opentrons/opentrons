@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import {addHrefs} from './util'
 
 
 class OpenTrons {
@@ -45,7 +46,7 @@ class OpenTrons {
 
   moveToPosition(data, type) {
     let url = this.jogToContainerUrl
-    if type == "plunger" { url = this.jogToPlungerUrl }
+    if (type == "plunger") { url = this.jogToPlungerUrl }
 
     return Vue.http
       .post(url, JSON.stringify(data), {emulateJSON: true})
@@ -99,15 +100,16 @@ class OpenTrons {
   }
 
   calibrate(data, type) {
-    Vue.http
-    .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
-    .then((response) => {
-      let tasks = response.body.data.calibrations
-      addHrefs(tasks)
-      commit('UPDATE_TASK_LIST', {'tasks': tasks})
-    }, (response) => {
-       console.log('failed', response)
-    })
+    return Vue.http
+      .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        let tasks = response.body.data.calibrations
+        addHrefs(tasks)
+        return tasks
+      }, (response) => {
+         console.log('failed', response)
+         return false
+      })
   }
 }
 

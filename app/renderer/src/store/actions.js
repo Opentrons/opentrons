@@ -44,12 +44,16 @@ const actions = {
   jogToSlot ({commit}, data) {
     OpenTrons.jogToSlot(data)
   },
-  calibrate({commit}, data) {
-    let type = "instrument"
+  calibrate ({commit}, data) {
+    let type = "plunger"
     if (data.slot) { type = "placeable"}
-    OpenTrons.calibrate(data, type)
+    OpenTrons.calibrate(data, type).then((tasks) => {
+      if (tasks) {
+        commit('UPDATE_TASK_LIST', {'tasks': tasks})
+      }
+    })
   },
-  moveToPosition({commit} data) {
+  moveToPosition ({commit}, data) {
     let type = "plunger"
     if (data.slot) { type = "placeable" }
     OpenTrons.moveToPosition(data, type)
