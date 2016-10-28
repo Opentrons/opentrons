@@ -93,6 +93,9 @@ class Robot(object):
 
         class InstrumentMosfet():
 
+            def __init__(self):
+                self.motor_driver = robot_self._driver
+
             def is_simulating(self):
                 return isinstance(
                     self.motor_driver, mock.Mock)
@@ -104,13 +107,13 @@ class Robot(object):
                 self.motor_driver = robot_self._driver
 
             def engage(self):
-                robot_self._driver.set_mosfet(mosfet_index, True)
+                self.motor_driver.set_mosfet(mosfet_index, True)
 
             def disengage(self):
-                robot_self._driver.set_mosfet(mosfet_index, False)
+                self.motor_driver.set_mosfet(mosfet_index, False)
 
             def wait(self, seconds):
-                robot_self._driver.wait(seconds)
+                self.motor_driver.wait(seconds)
 
         return InstrumentMosfet()
 

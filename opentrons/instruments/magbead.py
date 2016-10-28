@@ -25,14 +25,32 @@ class Magbead(Instrument):
     def reset(self):
         pass
 
+    def setup_simulate(self, mode='use_driver'):
+        if mode == 'skip_driver':
+            self.mosfet.simulate()
+        elif mode == 'use_driver':
+            self.mosfet.live()
+
+    def teardown_simulate(self):
+        self.mosfet.live()
+
+    def create_command(self, do, description=None):
+
+        self.robot.set_connection('simulate')
+        self.setup_simulate(mode='skip_driver')
+        do()
+        self.teardown_simulate()
+        self.robot.set_connection('live')
+
+        self.robot.add_command(Command(do=do, description=description))
+
     def engage(self):
         def _do():
             self.mosfet.engage()
 
         description = "Engaging Magbead at mosfet #{}".format(
             self.mosfet)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        self.create_command(_do, description)
 
         return self
 
@@ -42,8 +60,7 @@ class Magbead(Instrument):
 
         description = "Engaging Magbead at mosfet #{}".format(
             self.mosfet)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        self.create_command(_do, description)
 
         return self
 
@@ -52,7 +69,6 @@ class Magbead(Instrument):
             self.mosfet.wait(seconds)
 
         description = "Delaying Magbead for {} seconds".format(seconds)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        self.create_command(_do, description)
 
         return self
