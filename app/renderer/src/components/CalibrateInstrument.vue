@@ -36,7 +36,7 @@
     		this.$store.dispatch("calibrateInstrument", {axis: axis, position: position})
     	},
       moveToPlungerPosition(instrument, position) {
-				// TODO - disable this if the class disabled is on the given position
+				// TODO - test if this moves the robot if the class disabled is on the given position
         let axis = instrument.axis
         this.$store.dispatch("moveToPlungerPosition", {axis: axis, position: position})
       },
