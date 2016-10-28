@@ -13,7 +13,6 @@ install:
 script: 
   - nosetests --with-coverage
   - pylama
-  - pip install .[docs]
   - cd docs && make doctest html
 
 after_success:
