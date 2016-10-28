@@ -66,6 +66,15 @@ const actions = {
     }, (response) => {
        console.log('failed', response)
     })
+  },
+  calibrateInstrument({commit}, data) {
+    Vue.http
+    .post('http://localhost:5000/calibrate_plunger', JSON.stringify(data), {emulateJSON: true})
+    .then((response) => {
+      console.log('success',response.body.data)
+    }, (response) => {
+       console.log('failed', response)
+    })
   }
 }
 
