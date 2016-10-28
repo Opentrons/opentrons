@@ -177,3 +177,31 @@ button {
     opacity: 0.2;
     pointer-events: none;
 }
+
+// TODO: mode modal styles into modal.scss after plunger UI is merged.
+.run-modal {
+    &.ready {
+        .run-controls.run {
+            display: block;
+        }
+    }
+    &.running {
+        .run-controls.pause {
+            display: block;
+        }
+    },
+    &.paused {
+        .run-controls.resume {
+            display: block;
+        }
+    }
+    .run-controls.run, .run-controls.pause, .run-controls.resume{
+        display:none;
+    }
+}
+
+.run-controls{
+    @include btn-col-f(5);
+    background-color: $primary-brand;
+    color: white;
+}
