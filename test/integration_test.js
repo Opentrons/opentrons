@@ -7,7 +7,9 @@ var glob = require('glob-fs')({ gitignore: true });
 var isWin = /^win/.test(process.platform);
 var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
 if (isWin) {
-  appExecutablePath = glob.readdirSync('releases/*.exe')[0];
+  var detectedExes = glob.readdirSync('releases\\*.exe');
+  appExecutablePath = detectedExes[0];
+  console.log('App exes on windows', detectedExes, appExecutablePath)
 }
 process.env.DEBUG = 'true'
 
