@@ -1,7 +1,6 @@
 import copy
 import os
 from threading import Event
-from unittest import mock
 
 import serial
 
