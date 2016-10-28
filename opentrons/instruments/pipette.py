@@ -45,8 +45,6 @@ class Pipette(Instrument):
         self.placeables = []
         self.current_volume = 0
 
-        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
-
         self.speeds = {
             'aspirate': aspirate_speed,
             'dispense': dispense_speed
@@ -65,6 +63,8 @@ class Pipette(Instrument):
 
         self.init_calibrations()
         self.load_persisted_data()
+
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
     def reset(self):
         self.placeables = []
