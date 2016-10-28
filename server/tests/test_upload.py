@@ -42,6 +42,7 @@ class UploadTestCase(unittest.TestCase):
         self.assertEqual(status, 'success')
 
     def test_get_instrument_placeables(self):
+        self.robot.connect(None, options={'limit_switches': False})
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
         })

@@ -15,10 +15,12 @@ class OpenTrons {
     return Vue.http
       .post(this.connectUrl, options)
       .then((response) => {
-        console.log('successfully connected...')
+        console.log(response.data)
         if (response.data.status === "success") {
+          console.log('successfully connected...')
           return true
         } else {
+          console.log('connection failed...')
           return false
         }
       }, (response) => {
