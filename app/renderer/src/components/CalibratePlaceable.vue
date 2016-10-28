@@ -41,14 +41,6 @@
         let axis = instrument.axis
         this.$store.dispatch("moveToPosition", {slot: slot, label: label, axis: axis})
       }
-<<<<<<< HEAD
-    },
-    computed: {
-    	currentType(){
-    		return placeableType(this.type);
-    	}
-=======
->>>>>>> master
     }
   }
 </script>
