@@ -129,7 +129,6 @@ def _run_commands():
 
 @app.route("/run", methods=["GET"])
 def run():
-
     api_response = _run_commands()
 
     return flask.jsonify({
@@ -143,7 +142,6 @@ def run():
 
 @app.route("/pause", methods=["GET"])
 def pause():
-
     robot.pause()
 
     return flask.jsonify({
@@ -154,7 +152,6 @@ def pause():
 
 @app.route("/resume", methods=["GET"])
 def resume():
-
     robot.resume()
 
     return flask.jsonify({
@@ -165,7 +162,6 @@ def resume():
 
 @app.route("/stop", methods=["GET"])
 def stop():
-
     robot.stop()
 
     return flask.jsonify({
@@ -318,6 +314,15 @@ def get_step_list():
                 return True
         return False
 
+    def check_if_instrument_calibrated(instrument):
+        positions = instrument.positions
+        for p in positions:
+            if positions.get(p) is None:
+                return False
+
+        return True
+
+
     data = [{
         'axis': instrument.axis,
         'label': instrument.name,
@@ -326,6 +331,7 @@ def get_step_list():
         'blow_out': instrument.positions['blow_out'],
         'drop_tip': instrument.positions['drop_tip'],
         'max_volume': instrument.max_volume,
+        'calibrated': check_if_instrument_calibrated(instrument),
         'placeables': [
             {
                 'type': placeable.properties['type'],

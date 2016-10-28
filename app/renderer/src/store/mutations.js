@@ -13,7 +13,6 @@ const state = {
   coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0}
 }
 
-
 const mutations = {
   [types.UPDATE_ROBOT_CONNECTION] (state, payload) {
     state.is_connected = payload.is_connected
