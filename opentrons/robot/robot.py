@@ -300,14 +300,14 @@ class Robot(object):
             self.set_connection('simulate')
 
         for instrument in self._instruments.values():
-            instrument.set_plunger_defaults()
+            instrument.setup_simulate()
 
         res = self.run()
 
         self.set_connection('live')
 
         for instrument in self._instruments.values():
-            instrument.restore_plunger_positions()
+            instrument.teardown_simulate()
 
         return res
 

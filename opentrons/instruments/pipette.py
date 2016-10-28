@@ -66,21 +66,23 @@ class Pipette(Instrument):
         self.init_calibrations()
         self.load_persisted_data()
 
-        self.simulating = False
+        self.execute_movements = False
 
     def reset(self):
         self.placeables = []
         self.current_volume = 0
         self.reset_tip_tracking()
 
-    def set_plunger_defaults(self):
+    def setup_simulate(self, execute_movements=True):
+        self.execute_movements = execute_movements
         self.calibrated_positions = copy.deepcopy(self.positions)
         self.positions['top'] = 0
         self.positions['bottom'] = 10
         self.positions['blow_out'] = 12
         self.positions['drop_tip'] = 14
 
-    def restore_plunger_positions(self):
+    def teardown_simulate(self):
+        self.execute_movements = True
         self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
@@ -112,11 +114,9 @@ class Pipette(Instrument):
     def create_command(self, do, description=None):
 
         self.robot.set_connection('simulate')
-        self.set_plunger_defaults()
-        self.simulating = True
+        self.setup_simulate(execute_movements=False)
         do()
-        self.simulating = False
-        self.restore_plunger_positions()
+        self.teardown_simulate()
         self.robot.set_connection('live')
 
         self.robot.add_command(Command(do=do, description=description))
@@ -125,7 +125,7 @@ class Pipette(Instrument):
         self.associate_placeable(location)
         if location:
             self.associate_placeable(location)
-            if not self.simulating:
+            if self.execute_movements:
                 self.robot.move_to(
                     location,
                     instrument=self,
@@ -159,8 +159,9 @@ class Pipette(Instrument):
 
             speed = self.speeds['aspirate'] * rate
 
-            self.plunger.speed(speed)
-            self.plunger.move(destination)
+            if self.execute_movements:
+                self.plunger.speed(speed)
+                self.plunger.move(destination)
 
         description = "Aspirating {0}uL at {1}".format(
             volume,
@@ -194,8 +195,9 @@ class Pipette(Instrument):
 
                 speed = self.speeds['dispense'] * rate
 
-                self.plunger.speed(speed)
-                self.plunger.move(destination)
+                if self.execute_movements:
+                    self.plunger.speed(speed)
+                    self.plunger.move(destination)
 
         description = "Dispensing {0}uL at {1}".format(
             volume,
@@ -212,7 +214,7 @@ class Pipette(Instrument):
             self.move_to(placeable.top(), strategy='arc', now=True)
 
         # setup the plunger above the liquid
-        if self.current_volume == 0:
+        if self.current_volume == 0 and self.execute_movements:
             self.plunger.move(self.positions['bottom'] or 0)
 
         # then go inside the location
@@ -247,7 +249,8 @@ class Pipette(Instrument):
             nonlocal location
             if location:
                 self.move_to(location, strategy='arc', now=True)
-            self.plunger.move(self.positions['blow_out'])
+            if self.execute_movements:
+                self.plunger.move(self.positions['blow_out'])
             self.current_volume = 0
         description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
@@ -324,9 +327,10 @@ class Pipette(Instrument):
             tip_plunge = 6
 
             # Dip into tip and pull it up
-            for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, mode='relative')
-                self.robot.move_head(z=tip_plunge, mode='relative')
+            if self.execute_movements:
+                for _ in range(3):
+                    self.robot.move_head(z=-tip_plunge, mode='relative')
+                    self.robot.move_head(z=tip_plunge, mode='relative')
 
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
@@ -345,8 +349,9 @@ class Pipette(Instrument):
                 placeable, _ = containers.unpack_location(location)
                 self.move_to(placeable.bottom(), strategy='direct', now=True)
 
-            self.plunger.move(self.positions['drop_tip'])
-            self.plunger.home()
+            if self.execute_movements:
+                self.plunger.move(self.positions['drop_tip'])
+                self.plunger.home()
             self.current_volume = 0
 
         description = "Drop_tip at {}".format(
@@ -358,7 +363,8 @@ class Pipette(Instrument):
     # QUEUEABLE
     def home(self):
         def _do():
-            self.plunger.home()
+            if self.execute_movements:
+                self.plunger.home()
             self.current_volume = 0
 
         description = "Homing pipette plunger on axis {}".format(self.axis)
@@ -402,7 +408,8 @@ class Pipette(Instrument):
     # QUEUEABLE
     def delay(self, seconds):
         def _do():
-            self.plunger.wait(seconds)
+            if self.execute_movements:
+                self.plunger.wait(seconds)
 
         description = "Delaying {} seconds".format(seconds)
         self.create_command(_do, description)

@@ -112,13 +112,6 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear()
         self.p200.plunger.speed = mock.Mock()
         self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
-        expected = [
-            mock.call(600.0),
-            mock.call(250.0)
-        ]
-        self.assertEquals(self.p200.plunger.speed.mock_calls, expected)
-
-        self.p200.plunger.speed = mock.Mock()
         self.robot.run()
         expected = [
             mock.call(600.0),
