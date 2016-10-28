@@ -442,10 +442,6 @@ class Robot(object, metaclass=Singleton):
             else:
                 return False
 
-        # TODO: uncomment and get rid of now argument refs
-        # if 'now' in kwargs:
-        #     raise ValueError('now argument is deprecated, use enqueue instead')
-
         if kwargs.get('enqueue'):
             description = "Homing Robot"
             self.add_command(Command(do=_do, description=description))

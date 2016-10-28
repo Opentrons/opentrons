@@ -7,6 +7,8 @@ install:
   - pip install pylama
   - pip install coverage
   - pip install coveralls
+  - pip install Sphinx==1.4.8
+  - pip install numpydoc==0.6.0
 
 script: 
   - nosetests --with-coverage
