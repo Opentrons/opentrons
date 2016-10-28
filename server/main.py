@@ -342,7 +342,11 @@ def get_step_list():
 
 @app.route('/home/<axis>')
 def home(axis):
-    result = robot.home(axis, now=True)
+    result = ''
+    if axis == 'undefined' or axis == '' or axis.lower() == 'all':
+        result = robot.home(now=True)
+    else:
+        result = robot.home(axis, now=True)
     return flask.jsonify({
         'status': 200,
         'data': result
@@ -352,13 +356,24 @@ def home(axis):
 @app.route('/jog', methods=["POST"])
 def jog():
     coords = request.json
+
+    status = 'success'
+    result = ''
     if coords.get("a") or coords.get("b"):
-        result = robot._driver.move_plunger(mode="relative", **coords)
+        try:
+            result = robot._driver.move_plunger(mode="relative", **coords)
+        except Exception as e:
+            result = str(e)
+            status = 'error'
     else:
-        result = robot.move_head(mode="relative", **coords)
+        try:
+            result = robot.move_head(mode="relative", **coords)
+        except Exception as e:
+            result = str(e)
+            status = 'error'
 
     return flask.jsonify({
-        'status': 200,
+        'status': status,
         'data': result
     })
 
