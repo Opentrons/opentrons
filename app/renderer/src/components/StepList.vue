@@ -23,6 +23,11 @@
       </li>
       </ul>
     </li>
+    <li v-for="task in run_tasks">
+      <router-link v-bind:to="task.href">
+        {{task.title}}
+      </router-link>
+    </li>
   </ul>
 </template>
 
@@ -42,6 +47,13 @@
             completed: false,
             href: '/upload'
           }
+        ],
+        run_tasks: [
+          {
+            title: 'Verify and Run',
+            completed: false,
+            href: '/run'
+          },
         ]
       }
     },
