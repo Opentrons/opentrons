@@ -113,7 +113,7 @@ def _run_commands():
 
     try:
         robot.resume()
-        robot.run()
+        robot.run(caller='ui')
         if len(robot._commands) == 0:
             error = ("This protocol does not contain "
                      "any commands for the robot.")

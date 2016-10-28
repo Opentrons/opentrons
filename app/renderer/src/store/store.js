@@ -41,8 +41,10 @@ function createWebSocketPlugin(socket) {
         store.commit(types.UPDATE_POSITION, current_coordinates)
       }
       if (data.name == 'command-run') {
-        // store.commit(types.)
         console.log(data)
+        if (data.caller === 'ui') {
+          store.commit(types.UPDATE_RUN_LOG, data)
+        }
       }
     })
   }
