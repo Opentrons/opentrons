@@ -10,7 +10,6 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons.robot import Robot
-from opentrons.instruments import Pipette
 from opentrons.containers import placeable
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
@@ -41,7 +40,6 @@ def notify(info):
     s = json.dumps(info, cls=VectorEncoder)
     socketio.emit('event', json.loads(s))
 
-
 trace.EventBroker.get_instance().add(notify)
 
 @app.route("/")
@@ -60,8 +58,9 @@ def load_python(stream):
         exec(code, globals(), locals())
         robot.simulate()
         if len(robot._commands) == 0:
-            error = ("This protocol does not contain "
-                     "any commands for the robot.")
+            error = (
+                "This protocol does not contain any commands for the robot."
+            )
             api_response['errors'] = error
     except Exception as e:
         api_response['errors'] = [str(e)]

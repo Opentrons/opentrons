@@ -2,7 +2,6 @@ flip
 server/static/css
 .sass-cache
 .DS_Store
-
 ~/
 .env
 .DS_Store
