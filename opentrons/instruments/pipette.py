@@ -66,6 +66,8 @@ class Pipette(Instrument):
         self.init_calibrations()
         self.load_persisted_data()
 
+        self.simulating = False
+
     def reset(self):
         self.placeables = []
         self.current_volume = 0
@@ -107,17 +109,32 @@ class Pipette(Instrument):
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
+    def create_command(self, do, description=None):
+
+        self.robot.set_connection('simulate')
+        self.set_plunger_defaults()
+        self.simulating = True
+        do()
+        self.simulating = False
+        self.restore_plunger_positions()
+        self.robot.set_connection('live')
+
+        self.robot.add_command(Command(do=do, description=description))
+
     def move_to(self, location, strategy='arc', now=False):
+        self.associate_placeable(location)
         if location:
             self.associate_placeable(location)
-            self.robot.move_to(
-                location,
-                instrument=self,
-                strategy=strategy,
-                now=now)
+            if not self.simulating:
+                self.robot.move_to(
+                    location,
+                    instrument=self,
+                    strategy=strategy,
+                    now=now)
 
         return self
 
+    # QUEUEABLE
     def aspirate(self, volume=None, location=None, rate=1.0):
         def _do_aspirate():
             nonlocal volume
@@ -128,13 +145,12 @@ class Pipette(Instrument):
                 volume = self.max_volume - self.current_volume
 
             if self.current_volume + volume > self.max_volume:
-                print('********', volume, location, self.max_volume)
                 raise RuntimeWarning(
                     'Pipette cannot hold volume {}'
                     .format(self.current_volume + volume)
                 )
 
-            self.position_for_aspirate(location)
+            self._position_for_aspirate(location)
 
             self.current_volume += volume
             distance = self.plunge_distance(self.current_volume)
@@ -150,11 +166,11 @@ class Pipette(Instrument):
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(
-            Command(do=_do_aspirate, description=description))
+        self.create_command(_do_aspirate, description)
 
         return self
 
+    # QUEUEABLE
     def dispense(self, volume=None, location=None, rate=1.0):
         def _do():
             nonlocal location
@@ -164,7 +180,7 @@ class Pipette(Instrument):
                     location = volume
                 volume = self.current_volume
 
-            if self.current_volume - volume < 0:
+            if not volume or (self.current_volume - volume < 0):
                 volume = self.current_volume
 
             if location:
@@ -185,10 +201,10 @@ class Pipette(Instrument):
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
         return self
 
-    def position_for_aspirate(self, location=None):
+    def _position_for_aspirate(self, location=None):
 
         # first go to the destination
         if location:
@@ -205,6 +221,7 @@ class Pipette(Instrument):
                 location = location.bottom(1)
             self.move_to(location, strategy='direct', now=True)
 
+    # QUEUEABLE
     def mix(self, volume, repetitions=1, location=None):
         def _do():
             # plunger movements are handled w/ aspirate/dispense
@@ -214,7 +231,7 @@ class Pipette(Instrument):
         description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, str(self.current_volume)
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
 
         self.aspirate(location=location, volume=volume)
         for i in range(repetitions - 1):
@@ -224,6 +241,7 @@ class Pipette(Instrument):
 
         return self
 
+    # QUEUEABLE
     def blow_out(self, location=None):
         def _do():
             nonlocal location
@@ -234,9 +252,10 @@ class Pipette(Instrument):
         description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
         return self
 
+    # QUEUEABLE
     def touch_tip(self, location=None):
         def _do():
             nonlocal location
@@ -263,10 +282,11 @@ class Pipette(Instrument):
                 now=True)
 
         description = 'Touching tip'
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
 
         return self
 
+    # QUEUEABLE
     def return_tip(self):
         def _do():
             if not self.current_tip_home_well:
@@ -276,9 +296,10 @@ class Pipette(Instrument):
             self.drop_tip(self.current_tip_home_well)
 
         description = "Returning tip"
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
         return self
 
+    # QUEUEABLE
     def pick_up_tip(self, location=None):
         def _do():
             nonlocal location
@@ -310,9 +331,10 @@ class Pipette(Instrument):
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
         return self
 
+    # QUEUEABLE
     def drop_tip(self, location=None):
         def _do():
             nonlocal location
@@ -330,18 +352,20 @@ class Pipette(Instrument):
         description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
         return self
 
+    # QUEUEABLE
     def home(self):
         def _do():
             self.plunger.home()
             self.current_volume = 0
 
         description = "Homing pipette plunger on axis {}".format(self.axis)
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(_do, description)
         return self
 
+    # QUEUEABLE
     def transfer(self, volume, source, destination=None):
         if not isinstance(volume, (int, float, complex)):
             if volume and not destination:
@@ -353,6 +377,7 @@ class Pipette(Instrument):
         self.dispense(volume, destination)
         return self
 
+    # QUEUEABLE
     def distribute(self, volume, source, destinations):
         volume = volume or self.max_volume
         fractional_volume = volume / len(destinations)
@@ -363,6 +388,7 @@ class Pipette(Instrument):
 
         return self
 
+    # QUEUEABLE
     def consolidate(self, volume, sources, destination):
         volume = volume or self.max_volume
         fractional_volume = (volume) / len(sources)
@@ -371,6 +397,15 @@ class Pipette(Instrument):
             self.aspirate(fractional_volume, well)
 
         self.dispense(volume, destination)
+        return self
+
+    # QUEUEABLE
+    def delay(self, seconds):
+        def _do():
+            self.plunger.wait(seconds)
+
+        description = "Delaying {} seconds".format(seconds)
+        self.create_command(_do, description)
         return self
 
     def calibrate(self, position):
@@ -485,14 +520,6 @@ class Pipette(Instrument):
                     volume, self.min_volume))
 
         return volume / self.max_volume
-
-    def delay(self, seconds):
-        def _do():
-            self.plunger.wait(seconds)
-
-        description = "Delaying {} seconds".format(seconds)
-        self.robot.add_command(Command(do=_do, description=description))
-        return self
 
     def set_speed(self, **kwargs):
         keys = {'head', 'aspirate', 'dispense'} & kwargs.keys()

@@ -112,6 +112,13 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear()
         self.p200.plunger.speed = mock.Mock()
         self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
+        expected = [
+            mock.call(600.0),
+            mock.call(250.0)
+        ]
+        self.assertEquals(self.p200.plunger.speed.mock_calls, expected)
+
+        self.p200.plunger.speed = mock.Mock()
         self.robot.run()
         expected = [
             mock.call(600.0),
@@ -456,7 +463,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.move_to = mock.Mock()
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
-        self.robot.simulate()
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
@@ -465,6 +471,26 @@ class PipetteTest(unittest.TestCase):
                 self.build_move_to_bottom(self.tiprack1[1])
             ]
         )
+
+    def test_simulate_plunger_while_enqueing(self):
+        # self.p200.aspirate = mock.Mock()
+
+        self.p200.pick_up_tip()
+
+        self.assertEquals(self.p200.current_volume, 0)
+        self.p200.aspirate(200)
+        self.assertEquals(self.p200.current_volume, 200)
+
+        self.p200.dispense(20)
+        self.assertEquals(self.p200.current_volume, 180)
+        self.p200.dispense(20)
+        self.assertEquals(self.p200.current_volume, 160)
+        self.p200.dispense(60)
+        self.assertEquals(self.p200.current_volume, 100)
+        self.p200.dispense(100)
+        self.assertEquals(self.p200.current_volume, 0)
+
+        self.p200.drop_tip()
 
     def test_tip_tracking_chain(self):
 
@@ -500,8 +526,6 @@ class PipetteTest(unittest.TestCase):
 
         for _ in range(0, total_tips_per_plate * 4):
             self.p200.pick_up_tip()
-
-        self.robot.simulate()
 
         expected = []
         for i in range(0, total_tips_per_plate):
@@ -545,8 +569,6 @@ class PipetteTest(unittest.TestCase):
         for i in range(0, 12):
             expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
 
-        self.robot.simulate()
-
         self.assertEqual(
             p200_multi.move_to.mock_calls,
             expected
@@ -560,8 +582,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.pick_up_tip()
         self.p200.return_tip()
-
-        self.robot.simulate()
 
         self.assertEqual(
             self.p200.drop_tip.mock_calls,
@@ -580,10 +600,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.pick_up_tip()
         self.p200.drop_tip()
-
-        self.robot.simulate()
-
-        print(self.p200.move_to.mock_calls)
 
         self.assertEqual(
             self.p200.move_to.mock_calls,

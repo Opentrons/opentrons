@@ -1,6 +1,7 @@
 import copy
 import os
 from threading import Event
+from unittest import mock
 
 import serial
 
@@ -206,12 +207,10 @@ class Robot(object):
             self.add_command(Command(do=_do, description=description))
 
     def add_command(self, command):
+
         if command.description:
             log.info("Enqueing: {}".format(command.description))
         self._commands.append(command)
-
-    def prepend_command(self, command):
-        self._commands = [command] + self._commands
 
     def register(self, name, callback):
         def commandable():
@@ -317,7 +316,7 @@ class Robot(object):
         if mode in self.connections:
             connection = self.connections[mode]
             if connection:
-                self._driver.connect(connection)
+                self._driver.connection = connection
             else:
                 self._driver.disconnect()
         else:

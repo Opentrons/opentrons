@@ -14,8 +14,7 @@ class CalibrationTest(unittest.TestCase):
     def setUp(self):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
-        # self.robot.connect(port='/dev/tty.usbmodem1421')
-        # self.robot.home()
+        self.robot.connect()
 
         self.trash = containers.load('point', 'A1', 'trash')
         self.tiprack = containers.load('tiprack-200ul', 'B2', 'p200-rack')
