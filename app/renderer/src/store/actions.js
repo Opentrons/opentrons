@@ -49,25 +49,11 @@ const actions = {
     if (data.slot) { type = "placeable"}
     OpenTrons.calibrate(data, type)
   },
-  moveToPlaceable({commit}, data) {
-    Vue.http
-    .post('http://localhost:5000/move_to_container', JSON.stringify(data), {emulateJSON: true})
-    .then((response) => {
-       console.log('success',response)
-    }, (response) => {
-       console.log('failed', response)
-    })
-  },
-  moveToPlungerPosition({commit}, data){
-    Vue.http
-    .post('http://localhost:5000/move_to_plunger_position', JSON.stringify(data), {emulateJSON: true})
-    .then((response) => {
-       console.log('success',response)
-    }, (response) => {
-       console.log('failed', response)
-    })
+  moveToPosition({commit} data) {
+    let type = "plunger"
+    if (data.slot) { type = "placeable" }
+    OpenTrons.moveToPosition(data, type)
   }
-
 }
 
 export default {
