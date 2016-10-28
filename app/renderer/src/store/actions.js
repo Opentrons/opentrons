@@ -72,10 +72,27 @@ const actions = {
     .post('http://localhost:5000/calibrate_plunger', JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
       console.log('success',response.body.data)
+      let tasks = response.body.data.calibrations
+      let axis = response.body.data.axis
+      let instrument = tasks.filter((instrument) => {
+          return instrument.axis == axis
+        })[0]
+      addHrefs(tasks)
+      commit('UPDATE_TASK_LIST', {'tasks': tasks})
+    }, (response) => {
+       console.log('failed', response)
+    })
+  },
+  moveToPlungerPosition({commit}, data){
+    Vue.http
+    .post('http://localhost:5000/move_to_plunger_position', JSON.stringify(data), {emulateJSON: true})
+    .then((response) => {
+       console.log('success',response)
     }, (response) => {
        console.log('failed', response)
     })
   }
+  
 }
 
 export default {
