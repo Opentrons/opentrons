@@ -42,12 +42,10 @@ p10 = instruments.Pipette(
     channels=1
 )
 
-p1000.calibration_data = {}
-for key in p1000.positions.keys():
-    p1000.positions[key] = None
-p1000.update_calibrations()
-p1000.set_max_volume(200)
+p1000.delete_calibration_data()
+p10.delete_calibration_data()
 
+p1000.set_max_volume(200)
 p10.set_max_volume(10)
 
 p1000.pick_up_tip(tiprack[0])
