@@ -45,7 +45,7 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         actual = self.p200.calibration_data['A1']['children']['plate']
         self.assertEquals(expected_delta, actual)
 
-    def test_delte_calibrations_data(self):
+    def test_delete_calibrations_data(self):
 
         self.p200 = instruments.Pipette(name="p200", axis="b")
 
