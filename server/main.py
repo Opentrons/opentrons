@@ -359,18 +359,14 @@ def jog():
 
     status = 'success'
     result = ''
-    if coords.get("a") or coords.get("b"):
-        try:
+    try:
+        if coords.get("a") or coords.get("b"):
             result = robot._driver.move_plunger(mode="relative", **coords)
-        except Exception as e:
-            result = str(e)
-            status = 'error'
-    else:
-        try:
+        else:
             result = robot.move_head(mode="relative", **coords)
-        except Exception as e:
-            result = str(e)
-            status = 'error'
+    except Exception as e:
+        result = str(e)
+        status = 'error'
 
     return flask.jsonify({
         'status': status,
