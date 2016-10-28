@@ -52,7 +52,7 @@
 				}
 			},
       toggleMode(mode){
-        this.currentMode =  mode;
+        this.currentMode = mode
       }
     }
   }
