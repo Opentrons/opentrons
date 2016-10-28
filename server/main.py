@@ -129,9 +129,7 @@ def _run_commands():
 
 @app.route("/run", methods=["GET"])
 def run():
-
     api_response = _run_commands()
-
     return flask.jsonify({
         'status': 'success',
         'data': {

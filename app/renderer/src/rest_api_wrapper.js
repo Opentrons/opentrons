@@ -79,7 +79,7 @@ class OpenTrons {
         console.log('Failed to upload protocol', response)
       })
   }
-  getRunPlan (data) {
+  getRunPlan () {
     return Vue.http
       .get(this.runPlanUrl)
       .then((response) => {
@@ -88,6 +88,16 @@ class OpenTrons {
           return result.data || []
         }
         return response.data || []
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
+  runProtocol () {
+    return Vue.http
+      .get(this.runProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
       }, (response) => {
         console.log('failed', response)
       })
