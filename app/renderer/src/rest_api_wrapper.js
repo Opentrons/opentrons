@@ -11,7 +11,7 @@ class OpenTrons {
   }
 
   connect (port) {
-    let options = {params: {'port': port}}
+    let options = {'port': port}
     return Vue.http
       .post(this.connectUrl, options)
       .then((response) => {
@@ -47,6 +47,9 @@ class OpenTrons {
       .post(this.jogUrl, JSON.stringify(coords), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
+        if (response.body.status == 'error') {
+          console.log("Error in Jog: " + response.body.data)
+        }
         return true
       }, (response) => {
         console.log('failed', response)
