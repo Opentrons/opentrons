@@ -2,6 +2,15 @@ var Application = require('spectron').Application
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 var path = require('path')
+var glob = require('glob-fs')({ gitignore: true });
+
+var isWin = /^win/.test(process.platform);
+var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
+if (isWin) {
+  appExecutablePath = glob.readdirSync('releases/*.exe')[0];
+}
+process.env.DEBUG = 'true'
+
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -9,9 +18,8 @@ chai.use(chaiAsPromised)
 describe('application launch', function () {
   beforeEach(function () {
     this.app = new Application({
-      path: 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
+      path: appExecutablePath
     })
-    process.env.DEBUG = 'true'
     return this.app.start()
   })
 
