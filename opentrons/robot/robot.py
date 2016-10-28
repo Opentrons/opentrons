@@ -338,7 +338,7 @@ class Robot(object):
         return self._deck.containers()
 
     def get_deck_slot_types(self):
-        return 'acrylic_slots'
+        return 'slots'
 
     def get_slot_offsets(self):
         """
@@ -351,13 +351,13 @@ class Robot(object):
         TODO: figure out actual X and Y offsets (from origin)
         """
         SLOT_OFFSETS = {
-            '3d_printed_slots': {
+            'slots': {
                 'x_offset': 10,
                 'y_offset': 10,
                 'col_offset': 91,
                 'row_offset': 134.5
             },
-            'acrylic_slots': {
+            'slots_legacy': {
                 'x_offset': 10,
                 'y_offset': 10,
                 'col_offset': 96.25,
