@@ -26,16 +26,16 @@
     name: 'CalibratePlaceable',
     props: ['instrument', 'placeable', 'type'],
     methods: {
-			placeableType(type){
+			placeableType(type) {
 				return this.type === type
 			},
-			calibratePlaceable(placeable, instrument){
+			calibratePlaceable(placeable, instrument) {
 				let slot = placeable.slot
 				let label = placeable.label
 				let axis = instrument.axis
 				this.$store.dispatch("calibrate", {slot: slot, label: label, axis: axis})
 			},
-			moveToPlaceable(placeable,instrument){
+			moveToPlaceable(placeable,instrument) {
         let slot = placeable.slot
         let label = placeable.label
         let axis = instrument.axis
