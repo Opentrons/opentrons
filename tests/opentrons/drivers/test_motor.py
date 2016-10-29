@@ -114,8 +114,8 @@ class OpenTronsTest(unittest.TestCase):
 
         coords = self.motor.get_head_position()
         expected_coords = {
-            'target': (0, 400, 120),
-            'current': (0, 400, 120)
+            'target': (0, 400, 100),
+            'current': (0, 400, 100)
         }
         self.assertDictEqual(coords, expected_coords)
 
@@ -132,8 +132,8 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.move_head(x=100)
         coords = self.motor.get_head_position()
         expected_coords = {
-            'target': (100, 400, 120),
-            'current': (100, 400, 120)
+            'target': (100, 400, 100),
+            'current': (100, 400, 100)
         }
         self.assertDictEqual(coords, expected_coords)
 
