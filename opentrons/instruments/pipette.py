@@ -123,7 +123,6 @@ class Pipette(Instrument):
         self.robot.add_command(Command(do=do, description=description))
 
     def move_to(self, location, strategy='arc', now=False):
-        self.associate_placeable(location)
         if location:
             self.associate_placeable(location)
             if not self.plunger.is_simulating():
