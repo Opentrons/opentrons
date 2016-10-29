@@ -389,7 +389,9 @@ def jog():
 def move_to_slot():
     slot = request.json.get("slot")
     axis = request.json.get("axis")
-    location = robot._deck[slot]
+    slot = robot._deck[slot]
+    _, _, tallest_z = slot.max_dimensions(slot)
+    location = slot.top(tallest_z + 10)
     result = robot.move_to(
         location,
         now=True,
