@@ -13,7 +13,15 @@ install:
 script: 
   - nosetests --with-coverage
   - pylama
-  - cd docs && make doctest html
+  - cd docs && make doctest html && cd ..
+
+deploy:
+  - scripts/
+
+env:
+  global:
+    - ENCRYPTION_LABEL: "c6cefc96bb2c"
+    - COMMIT_AUTHOR_EMAIL: "sphinx@opentrons.com"
 
 after_success:
   coveralls
