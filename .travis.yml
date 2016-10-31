@@ -41,6 +41,7 @@ install:
   - node --version
   - npm --version
   - npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
+  - npm run unit
   - npm run release:mac
   - ls dist/mac
   - ls releases
@@ -56,7 +57,7 @@ deploy:
   upload-dir: mac
   acl: public_read
   on:
-    repo: OpenTrons/robot_frontend_v2
+    repo: OpenTrons/opentrons-app
     all_branches: true
 
 notifications:
