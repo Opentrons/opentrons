@@ -9,7 +9,7 @@
 
         <div class="run-info">
           <div class="current-command">Current Command Here</div>
-          <div class="progress" v-bind:style="{ width: runPercent + '%' }">% Complete</div>   
+          <div class="progress" v-bind:style="{ width: runPercent + '%' }">{{runPercent}}%</div>   
         </div>
         <!-- We will need to update store to have the current run state to toggle appropriate buttons, the run-state does nothing for now-->
         <div class="run-modal" v-bind:class="runState">
