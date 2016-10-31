@@ -10,7 +10,6 @@ import serial
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
-from opentrons.helpers.helpers import break_down_travel
 
 from opentrons.util import trace
 
@@ -318,7 +317,7 @@ class CNCDriver(object):
         increment = self.head_speed / 60 * time_interval
 
         target_vector = Vector(target_point)
-        
+
         flipped_vector = self.flip_coordinates(target_vector, mode)
         args_list = []
         args_list.append(
