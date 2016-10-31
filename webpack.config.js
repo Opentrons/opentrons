@@ -4,7 +4,6 @@ var webpack = require('webpack')
 module.exports = {
   entry: './app/renderer/src/main.js',
   output: {
-    // path: path.resolve(__dirname, './app/renderer/dist'),
     path: path.resolve(__dirname, './server/templates/dist'),
     publicPath: '/dist/',
     filename: 'build.js'
@@ -16,7 +15,7 @@ module.exports = {
     loaders: [
       {
         test: /\.vue$/,
-        loader: 'vue',
+        loader: 'vue'
       },
       {
         test: /\.js$/,
@@ -38,10 +37,11 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loaders: ["style", "css", "sass"]
+        loaders: ["style", "css", 'resolve-url', "sass?sourceMap"]
       },
       {
-        test: /\.(woff|woff2)$/, loader: "url-loader?limit=10000&minetype=application/font-woff"
+        test: /\.(woff|woff2)$/,
+        loader: "url-loader?limit=10000&minetype=application/font-woff"
       }
     ]
   },

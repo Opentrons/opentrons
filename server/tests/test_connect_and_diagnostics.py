@@ -102,4 +102,6 @@ class ConnectDiagnosticsTestCase(unittest.TestCase):
                 'compatible': True
             }
         }
-        self.assertEqual(response['versions'], expected)
+        self.assertListEqual(
+            list(response['versions'].keys()), list(expected.keys())
+        )
