@@ -4,7 +4,6 @@ var webpack = require('webpack')
 module.exports = {
   entry: './app/renderer/src/main.js',
   output: {
-    // path: path.resolve(__dirname, './app/renderer/dist'),
     path: path.resolve(__dirname, './server/templates/dist'),
     publicPath: '/dist/',
     filename: 'build.js'
@@ -16,19 +15,11 @@ module.exports = {
     loaders: [
       {
         test: /\.vue$/,
-        loader: 'vue',
-        include: [
-          path.join(__dirname, 'app'),
-          path.join(__dirname, 'test')
-        ]
+        loader: 'vue'
       },
       {
         test: /\.js$/,
         loader: 'babel',
-        include: [
-          path.join(__dirname, 'app'),
-          path.join(__dirname, 'test')
-        ],
         exclude: /node_modules/
       },
       {
@@ -36,36 +27,21 @@ module.exports = {
         loader: 'file',
         query: {
           name: '[name].[ext]?[hash]'
-        },
-        include: [
-          path.join(__dirname, 'app'),
-          path.join(__dirname, 'test')
-        ],
+        }
       },
       {
         test: /\.(svg|jpg)$/,
         loaders: [
           'url?limit=10000'
-        ],
-        include: [
-          path.join(__dirname, 'app'),
-          path.join(__dirname, 'test')
-        ],
+        ]
       },
       {
         test: /\.scss$/,
-        loaders: ["style", "css", "sass"],
-        include: [
-          path.join(__dirname, 'app'),
-          path.join(__dirname, 'test')
-        ],
+        loaders: ["style", "css", "sass"]
       },
       {
-        test: /\.(woff|woff2)$/, loader: "url-loader?limit=10000&minetype=application/font-woff",
-        include: [
-          path.join(__dirname, 'app'),
-          path.join(__dirname, 'test')
-        ]
+        test: /\.(woff|woff2)$/,
+        loader: "url-loader?limit=10000&minetype=application/font-woff"
       }
     ]
   },
