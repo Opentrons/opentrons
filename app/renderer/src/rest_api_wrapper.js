@@ -9,6 +9,7 @@ class OpenTrons {
     this.jogUrl = this.base_url + '/jog'
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
     this.runPlanUrl = this.base_url + '/run-plan'
+    this.runProtocolUrl = this.base_url + '/run'
   }
 
   connect (port) {
@@ -83,11 +84,10 @@ class OpenTrons {
     return Vue.http
       .get(this.runPlanUrl)
       .then((response) => {
-        let result = response.body.data
-        if (result.status == 'success') {
-          return result.data || []
+        if (response.body.status == 'success') {
+          return response.body.data || []
         }
-        return response.data || []
+        return []
       }, (response) => {
         console.log('failed', response)
       })
@@ -96,9 +96,9 @@ class OpenTrons {
     return Vue.http
       .get(this.runProtocolUrl)
       .then((response) => {
-        console.log("success", response)
+        console.log("Protocol run successfully initiated", response)
       }, (response) => {
-        console.log('failed', response)
+        console.log("Protocol run failed to execute", response)
       })
   }
   pauseProtocol () {

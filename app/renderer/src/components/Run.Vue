@@ -2,14 +2,12 @@
   <div>
   <section>
     <h2 class="title">Verify and Run</h2>
-
     <div class="instructions">Run screen instructions.</div>
-
       <div class="step step-run">
-
         <div class="run-info">
-          <div class="current-command">Current Command Here</div>
-          <div class="progress" v-bind:style="{ width: runPercent + '%' }">{{runPercent}}%</div>   
+
+          <!-- <div class="current-command">Current Command Here</div> -->
+          <div class="progress" v-bind:style="{ width: runPercent + '%' }">{{ runPercent }}%</div>   
         </div>
         <!-- We will need to update store to have the current run state to toggle appropriate buttons, the run-state does nothing for now-->
         <div class="run-modal" v-bind:class="runState">
@@ -49,8 +47,7 @@ export default {
       return this.$store.state.run_state
     },
     runPercent(){
-      let progress = this.$store.state.progress *100
-      return progress
+      return (this.$store.state.run_log.length / this.$store.state.run_plan.length) * 100
     }
   }
 }

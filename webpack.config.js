@@ -16,7 +16,7 @@ module.exports = {
     loaders: [
       {
         test: /\.vue$/,
-        loader: 'vue'
+        loader: 'vue',
       },
       {
         test: /\.js$/,
@@ -49,7 +49,6 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
-  // headers: { "Access-Control-Allow-Origin": "*" },
   headers: { "Access-Control-Allow-Origin": "http://localhost:5000", "Access-Control-Allow-Credentials": "true" },
   devtool: '#eval-source-map',
   resolve: {
@@ -57,7 +56,7 @@ module.exports = {
       vue: 'vue/dist/vue.js'
     }
   },
-  target: "web"
+  target: "electron"
 }
 
 if (process.env.NODE_ENV === 'production') {

@@ -4,7 +4,7 @@
       <header class="brand">
         <nav class="links">
           <ul>
-            <li>OT App</li>
+            <li id="app-title">OT App</lii>
           </ul>
         </nav>
       </header>

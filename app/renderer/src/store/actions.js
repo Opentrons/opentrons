@@ -34,7 +34,9 @@ const actions = {
       commit('UPDATE_ERROR', {errors: result.errors})
 
     })
-
+    OpenTrons.getRunPlan().then((plan) => {
+      commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
+    })
   },
   selectIncrement ({commit}, data) {
     commit(types.UPDATE_INCREMENT, {
@@ -72,8 +74,9 @@ const actions = {
     })
   },
   runProtocol({ commit }) {
+    commit(types.RESET_RUN_LOG)
     OpenTrons.runProtocol().then((results) => {
-      commit(types.UPDATE_RUN_STATE, results)
+      // commit(types.UPDATE_RUN_STATE, results)
     })
   },
   pauseProtocol({ commit }) {

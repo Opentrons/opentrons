@@ -1,4 +1,4 @@
-os: Visual Studio 2015
+os: unstable
 
 environment:
   matrix:
@@ -68,7 +68,9 @@ install:
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
   - npm install
+  - npm install -g mocha@3.1.2
   - npm run release:win
+  - mocha --timeout 60000 test/integration_test.js
 
 build: off
 
