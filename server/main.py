@@ -294,13 +294,21 @@ def placeables():
 
 
 def get_step_list():
-    def get_containers(instrument):
-        unique_containers = set()
 
-        for placeable_inst in instrument.placeables:
-            containers = [c for c in placeable_inst.get_trace() if isinstance(
-                c, placeable.Container)]
-            unique_containers.add(containers[0])
+    def get_containers(instrument):
+
+        unique_containers = list()
+        for slot in Robot.get_instance()._deck:
+            if slot.has_children():
+                container = slot.get_children_list()[0]
+                unique_containers.append(container)
+
+        # unique_containers = set()
+        # for location in instrument.placeables:
+        #     containers = [c for c in location.get_trace() if isinstance(
+        #         c, placeable.Container)]
+        #     unique_containers.add(containers[0])
+
         return list(unique_containers)
 
     def check_if_calibrated(instrument, placeable):
@@ -385,16 +393,23 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
-    slot = request.json.get("slot")
-    axis = request.json.get("axis")
-    slot = robot._deck[slot]
-    _, _, tallest_z = slot.max_dimensions(slot)
-    location = slot.top(tallest_z + 10)
-    result = robot.move_to(
-        location,
-        now=True,
-        instrument=robot._instruments[axis.upper()]
-    )
+    try:
+        slot = request.json.get("slot")
+        axis = request.json.get("axis")
+        slot = robot._deck[slot]
+
+        _, _, tallest_z = slot.max_dimensions(slot)
+        relative_coord = slot.from_center(x=-1.0, y=0, z=1)
+        relative_coord += (0, 0, tallest_z + 10)
+        location = (slot, relative_coord)
+
+        result = robot.move_to(
+            location,
+            now=True,
+            instrument=robot._instruments[axis.upper()]
+        )
+    except Exception as e:
+        print(e)
 
     return flask.jsonify({
         'status': 'success',
