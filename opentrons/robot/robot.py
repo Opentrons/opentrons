@@ -62,6 +62,8 @@ class Robot(object):
         self._handlers = []
         self._runtime_warnings = []
 
+        self._previous_container = None
+
         self._deck = containers.Deck()
         self.setup_deck()
 
@@ -235,14 +237,11 @@ class Robot(object):
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 
-        _, _, tallest_z = self._deck.max_dimensions(self._deck)
-        tallest_z += 10
-
         def _do():
             if strategy == 'arc':
-                self._driver.move_head(z=tallest_z)
-                self._driver.move_head(x=coordinates[0], y=coordinates[1])
-                self._driver.move_head(z=coordinates[2])
+                arc_coords = self._create_arc(coordinates, placeable)
+                for coord in arc_coords:
+                    self._driver.move_head(**coord)
             elif strategy == 'direct':
                 self._driver.move_head(
                     x=coordinates[0],
@@ -257,6 +256,29 @@ class Robot(object):
             _do()
         else:
             self.add_command(Command(do=_do))
+
+    def _create_arc(self, coordinates, placeable):
+        this_container = None
+        if isinstance(placeable, containers.Well):
+            this_container = placeable.get_parent()
+        elif isinstance(placeable, containers.WellSeries):
+            this_container = placeable.get_parent()
+        elif isinstance(placeable, containers.Container):
+            this_container = placeable
+
+        tallest_z = 0
+        if this_container and (self._previous_container == this_container):
+            _, _, tallest_z = this_container.max_dimensions(self._deck)
+        else:
+            _, _, tallest_z = self._deck.max_dimensions(self._deck)
+
+        self._previous_container = this_container
+
+        return [
+            {'z': tallest_z},
+            {'x': coordinates[0], 'y': coordinates[1]},
+            {'z': coordinates[2]}
+        ]
 
     @property
     def actions(self):
@@ -382,10 +404,15 @@ class Robot(object):
 
         for col_index, col in enumerate('ABCDE'):
             for row_index, row in enumerate(range(1, robot_rows + 1)):
-                slot = containers.Slot()
+                properties = {
+                    'width': col_offset,
+                    'length': row_offset,
+                    'height': 0
+                }
+                slot = containers.Slot(properties=properties)
                 slot_coordinates = (
-                    (row_offset * row_index) + x_offset,
-                    (col_offset * col_index) + y_offset,
+                    (col_offset * col_index) + x_offset,
+                    (row_offset * row_index) + y_offset,
                     0  # TODO: should z always be zero?
                 )
                 slot_name = "{}{}".format(col, row)
@@ -419,6 +446,7 @@ class Robot(object):
         return container
 
     def clear(self):
+        self._previous_container = None
         self._commands = []
 
     def pause(self):
