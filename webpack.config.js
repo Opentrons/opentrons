@@ -17,10 +17,18 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue',
+        include: [
+          path.join(__dirname, 'app'),
+          path.join(__dirname, 'test')
+        ]
       },
       {
         test: /\.js$/,
         loader: 'babel',
+        include: [
+          path.join(__dirname, 'app'),
+          path.join(__dirname, 'test')
+        ],
         exclude: /node_modules/
       },
       {
@@ -28,20 +36,36 @@ module.exports = {
         loader: 'file',
         query: {
           name: '[name].[ext]?[hash]'
-        }
+        },
+        include: [
+          path.join(__dirname, 'app'),
+          path.join(__dirname, 'test')
+        ],
       },
       {
         test: /\.(svg|jpg)$/,
         loaders: [
           'url?limit=10000'
-        ]
+        ],
+        include: [
+          path.join(__dirname, 'app'),
+          path.join(__dirname, 'test')
+        ],
       },
       {
         test: /\.scss$/,
-        loaders: ["style", "css", "sass"]
+        loaders: ["style", "css", "sass"],
+        include: [
+          path.join(__dirname, 'app'),
+          path.join(__dirname, 'test')
+        ],
       },
       {
-        test: /\.(woff|woff2)$/, loader: "url-loader?limit=10000&minetype=application/font-woff"
+        test: /\.(woff|woff2)$/, loader: "url-loader?limit=10000&minetype=application/font-woff",
+        include: [
+          path.join(__dirname, 'app'),
+          path.join(__dirname, 'test')
+        ]
       }
     ]
   },
