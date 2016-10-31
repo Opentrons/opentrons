@@ -13,8 +13,7 @@ const state = {
   coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
   run_state: "ready",
   run_log: [],
-  run_plan: [],
-  progress: 0.3
+  run_plan: []
 }
 //Note: Ahmed, the run_states I need returned for the toggling are "ready","running", and "paused"
 
