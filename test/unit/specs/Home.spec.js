@@ -8,7 +8,7 @@ describe('Home.vue', () => {
     const vm = new Vue({
       ...Home
     }).$mount('#app')
-    expect(vm.$el.querySelector('#app-title').textContent).to.equal('OT App')
+    expect(vm.$el.querySelector('#app-title').textContent).to.equal('Logo')
     expect(1).to.equal(1)
   })
 })
