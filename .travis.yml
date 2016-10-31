@@ -1,6 +1,4 @@
 # We are using the iOS build system to create Mac OS X python builds
-language: objective-c
-# osx_image: beta-xcode6.3
 os:
   - osx
 
@@ -61,7 +59,7 @@ deploy:
   upload-dir: mac
   acl: public_read
   on:
-    repo: OpenTrons/robot_frontend_v2
+    repo: OpenTrons/opentrons-app
     all_branches: true
 
 notifications:
