@@ -212,7 +212,7 @@ Wizard Screens
                 @include rect(10,5);
                 //display: flex;
                 justify-content: left;
-                
+
                 .current-command, .progress{
                     @include rect(10,1);
                     @include offset-v(1,0)
@@ -226,7 +226,7 @@ Wizard Screens
             .run-modal {
                 @include grid-col-full(5);
                 //@include offset-v(2,2);
-               
+
             }
         }
         nav {
