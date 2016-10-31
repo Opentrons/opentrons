@@ -317,16 +317,24 @@ class CNCDriver(object):
         # multiply by time interval to get increment in mm
         increment = self.head_speed / 60 * time_interval
 
-        vector_list = break_down_travel(
-            current, Vector(target_point), mode=mode, increment=increment)
-
-        # turn the vector list into axis args
+        target_vector = Vector(target_point)
+        
+        flipped_vector = self.flip_coordinates(target_vector, mode)
         args_list = []
-        for vector in vector_list:
-            flipped_vector = self.flip_coordinates(vector, mode)
-            args_list.append(
-                {axis.upper(): flipped_vector[axis]
-                 for axis in 'xyz' if axis in kwargs})
+        args_list.append(
+            {axis.upper(): flipped_vector[axis]
+             for axis in 'xyz' if axis in kwargs}
+        )
+
+        # vector_list = break_down_travel(
+        #     current, target_vector, mode=mode, increment=increment)
+
+        # # turn the vector list into axis args
+        # for vector in vector_list:
+        #     flipped_vector = self.flip_coordinates(vector, mode)
+        #     args_list.append(
+        #         {axis.upper(): flipped_vector[axis]
+        #          for axis in 'xyz' if axis in kwargs})
 
         return self.consume_move_commands(args_list, increment)
 
