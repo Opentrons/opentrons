@@ -4,7 +4,6 @@ var webpack = require('webpack')
 module.exports = {
   entry: './app/renderer/src/main.js',
   output: {
-    // path: path.resolve(__dirname, './app/renderer/dist'),
     path: path.resolve(__dirname, './server/templates/dist'),
     publicPath: '/dist/',
     filename: 'build.js'
@@ -41,7 +40,8 @@ module.exports = {
         loaders: ["style", "css", "sass"]
       },
       {
-        test: /\.(woff|woff2)$/, loader: "url-loader?limit=10000&minetype=application/font-woff"
+        test: /\.(woff|woff2)$/,
+        loader: "url-loader?limit=10000&minetype=application/font-woff"
       }
     ]
   },
@@ -49,7 +49,6 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
-  // headers: { "Access-Control-Allow-Origin": "*" },
   headers: { "Access-Control-Allow-Origin": "http://localhost:5000", "Access-Control-Allow-Credentials": "true" },
   devtool: '#eval-source-map',
   resolve: {
@@ -57,7 +56,7 @@ module.exports = {
       vue: 'vue/dist/vue.js'
     }
   },
-  target: "web"
+  target: "electron"
 }
 
 if (process.env.NODE_ENV === 'production') {

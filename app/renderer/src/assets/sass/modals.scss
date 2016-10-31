@@ -6,6 +6,10 @@
             opacity: 1;
             cursor: pointer;
             pointer-events: all;
+            &.disabled{
+              opacity: 0.1;
+              pointer-events: none;
+            }
         }
         img.top{
             display:block;
@@ -16,6 +20,10 @@
             opacity: 1;
             cursor: pointer;
             pointer-events: all;
+            &.disabled{
+              opacity: 0.1;
+              pointer-events: none;
+            }
         }
         img.bottom{
             display:block;
@@ -26,6 +34,10 @@
             opacity: 1;
             cursor: pointer;
             pointer-events: all;
+            &.disabled{
+              opacity: 0.1;
+              pointer-events: none;
+            }
         }
         img.blowout{
             display:block;
@@ -36,6 +48,10 @@
             opacity: 1;
             cursor: pointer;
             pointer-events: all;
+            &.disabled{
+              opacity: 0.1;
+              pointer-events: none;
+            }
         }
         img.droptip{
             display:block;
@@ -49,7 +65,12 @@
             opacity: 1;
             cursor: pointer;
             pointer-events: all;
+            &.disabled{
+              opacity: 0.1;
+              pointer-events: none;
+            }
         }
+
     }
 
     .pipette-img{

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import io from 'socket.io-client'
+import io from 'socket.io-client/socket.io'
 import * as types from './mutation-types'
 import app_mutations from './mutations'
 import app_actions from './actions'
