@@ -15,7 +15,7 @@
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "NODE_ENV=development electron app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
-    "integration": "echo 'foo'"
+    "integration": "mocha --timeout 15000 test/integration_test.js"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
