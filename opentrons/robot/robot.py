@@ -12,6 +12,8 @@ from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.log import get_logger
 
+from opentrons.drivers import virtual_smoothie
+
 
 log = get_logger(__name__)
 
@@ -276,13 +278,24 @@ class Robot(object):
         for instrument in self._instruments.values():
             instrument.reset()
 
-    def run(self):
+    def run(self, **kwargs):
         self.prepare_for_run()
+
+        cmd_run_event = {}
+        cmd_run_event.update(kwargs)
+
+        mode = 'live'
+        if isinstance(
+                self._driver.connection, virtual_smoothie.VirtualSmoothie
+        ):
+            mode = 'simulate'
+
+        cmd_run_event['mode'] = mode
         for i, command in enumerate(self._commands):
-            cmd_run_event = {
+            cmd_run_event.update({
                 'command_description': command.description,
                 'command_index': i
-            }
+            })
             try:
                 self.can_pop_command.wait()
                 if self.stopped_event.is_set():
