@@ -78,7 +78,7 @@ class CNCDriver(object):
 
     # TODO: move to config
     COMPATIBLE_FIRMARE = ['v1.0.5']
-    COMPATIBLE_CONFIG = ['v1.0.3b']
+    COMPATIBLE_CONFIG = ['v1.2.0']
     firmware_version = None
     config_version = None
 
