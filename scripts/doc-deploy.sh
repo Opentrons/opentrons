@@ -25,6 +25,7 @@ cd ..
 # Clean out existing contents
 rm -rf out/* || exit 0
 cp -r ../docs/build/html/* out/
+touch out/.nojekyll
 
 # Now let's go have some fun with the cloned repo
 cd out
@@ -39,8 +40,8 @@ fi
 
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
-ls
 git add -A .
+git add .nojekyll
 git commit -m "Deploy to GitHub Pages: ${SHA} [ci skip]"
 
 # Get the deploy key by using Travis's stored variables to decrypt deploy_key.enc
