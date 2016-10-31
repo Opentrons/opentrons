@@ -15,6 +15,9 @@ REPO=`git config remote.origin.url`
 SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 SHA=`git rev-parse --verify HEAD`
 
+# Move to the home level
+cd ..
+
 # Clone the existing gh-pages for this repo into out/
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy)
 git clone $REPO out
@@ -25,7 +28,6 @@ cd ..
 # Clean out existing contents
 rm -rf out/**/* || exit 0
 
-ls
 cp -r docs/build/html/* out/
 
 # Now let's go have some fun with the cloned repo
