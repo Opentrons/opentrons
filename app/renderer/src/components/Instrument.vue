@@ -68,13 +68,22 @@
         let tasks = this.$store.state.tasks
         let instrument = this.currentInstrument(tasks)
         let currentInstrumentIndex = tasks.indexOf(instrument)
+        
         let prevInstrument = tasks[currentInstrumentIndex - 1]
         let prevPlaceables = tasks[tasks.length - 1].placeables
         let prevPlaceable = prevPlaceables[prevPlaceables.length - 1]
 
+        if(!prevPlaceable){
+          prevPlaceables = tasks[currentInstrumentIndex].placeables
+          prevPlaceable = prevPlaceables[prevPlaceables.length-1]
+          
+        }
+
         if(prevInstrument) {
           return prevInstrument.href
-        } else {
+        } 
+
+        else {
           return prevPlaceable.href
         }
       }
