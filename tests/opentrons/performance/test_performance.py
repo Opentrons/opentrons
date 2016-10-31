@@ -16,18 +16,7 @@ class PerformanceTest(unittest.TestCase):
     def protocol(self):
         robot = Robot.get_instance()
         robot.get_serial_ports_list()
-
-        options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
-        }
-        robot.connect(options=options)
+        robot.connect()
         robot.home()
 
         tiprack = containers.load(

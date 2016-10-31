@@ -6,25 +6,15 @@ from opentrons import instruments
 from opentrons.robot import Robot
 from opentrons.util.vector import Vector
 
-from opentrons.containers.placeable import unpack_location
+from opentrons.containers.placeable import unpack_location, Container, Well
 
 
 class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset_for_tests()
-        options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
-            }
-        }
         myport = self.robot.VIRTUAL_SMOOTHIE_PORT
-        self.robot.connect(port=myport, options=options)
+        self.robot.connect(port=myport)
         self.robot.home()
 
         self.trash = containers.load('point', 'A1')
@@ -45,7 +35,12 @@ class PipetteTest(unittest.TestCase):
         self.p200.set_max_volume(200)
         self.robot.home(now=True)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
-        print(starting_z)
+
+    def test_calibrate_by_position_name(self):
+
+        self.p200.plunger.move(9)
+        self.p200.calibrate('bottom')
+        self.assertEquals(self.p200.positions['bottom'], 9)
 
     def test_get_instruments_by_name(self):
         self.p1000 = instruments.Pipette(
@@ -90,6 +85,7 @@ class PipetteTest(unittest.TestCase):
             (self.plate[0], self.plate[0].from_center(x=0, y=0, z=1)))
 
     def test_calibrate_placeable(self):
+        self.p200.delete_calibration_data()
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=0, reference=self.plate)
         location = (self.plate, pos)
@@ -472,22 +468,51 @@ class PipetteTest(unittest.TestCase):
         )
 
     def test_tip_tracking_chain(self):
+
+        total_tips_per_plate = 4
+
+        def generate_plate(wells, cols, spacing, offset, radius):
+            c = Container()
+
+            for i in range(0, wells):
+                well = Well(properties={'radius': radius})
+                row, col = divmod(i, cols)
+                name = chr(row + ord('A')) + str(1 + col)
+                coordinates = (col * spacing[0] + offset[0],
+                               row * spacing[1] + offset[1],
+                               0)
+                c.add(well, name, coordinates)
+            return c
+
+        self.tiprack1 = generate_plate(
+            total_tips_per_plate, 2, (5, 5), (0, 0), 5)
+        self.tiprack2 = generate_plate(
+            total_tips_per_plate, 2, (5, 5), (0, 0), 5)
+        self.robot._deck['A1'].add(self.tiprack1, 'tiprack1')
+        self.robot._deck['B1'].add(self.tiprack2, 'tiprack2')
+
+        self.p200 = instruments.Pipette(
+            axis='b',
+            tip_racks=[self.tiprack1, self.tiprack2],
+            trash_container=self.tiprack1
+        )
+
         self.p200.move_to = mock.Mock()
 
-        for _ in range(0, 96 * 4):
+        for _ in range(0, total_tips_per_plate * 4):
             self.p200.pick_up_tip()
 
-        expected = []
-        for i in range(0, 96):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
-        for i in range(0, 96):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
-        for i in range(0, 96):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
-        for i in range(0, 96):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
-
         self.robot.simulate()
+
+        expected = []
+        for i in range(0, total_tips_per_plate):
+            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+        for i in range(0, total_tips_per_plate):
+            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
+        for i in range(0, total_tips_per_plate):
+            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+        for i in range(0, total_tips_per_plate):
+            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
@@ -523,8 +548,6 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.simulate()
 
-        print(p200_multi.move_to.mock_calls)
-
         self.assertEqual(
             p200_multi.move_to.mock_calls,
             expected
@@ -550,8 +573,8 @@ class PipetteTest(unittest.TestCase):
         )
 
     def build_move_to_bottom(self, well):
-        return mock.call.move_to(
-            well.bottom(), strategy='direct', now=True)
+        return mock.call(
+            well.bottom(), strategy='arc', now=True)
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()

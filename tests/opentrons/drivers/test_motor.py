@@ -27,6 +27,34 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_version_compatible(self):
+        self.robot.disconnect()
+        self.robot.connect()
+        res = self.motor.versions_compatible()
+        self.assertEquals(res, {
+            'firmware': True,
+            'config': True,
+            'ot_version': True
+        })
+        self.robot.disconnect()
+
+        kwargs = {
+            'options': {
+                'firmware': 'v2.0.0',
+                'config': {
+                    'version': 'v3.1.2',
+                    'ot_version': 'hoodie'
+                }
+            }
+        }
+        self.assertRaises(RuntimeError, self.robot.connect, **kwargs)
+        res = self.motor.versions_compatible()
+        self.assertEquals(res, {
+            'firmware': False,
+            'config': False,
+            'ot_version': False
+        })
+
     def test_message_timeout(self):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
 
@@ -86,8 +114,8 @@ class OpenTronsTest(unittest.TestCase):
 
         coords = self.motor.get_head_position()
         expected_coords = {
-            'target': (0, 250, 120),
-            'current': (0, 250, 120)
+            'target': (0, 400, 100),
+            'current': (0, 400, 100)
         }
         self.assertDictEqual(coords, expected_coords)
 
@@ -104,16 +132,12 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.move_head(x=100)
         coords = self.motor.get_head_position()
         expected_coords = {
-            'target': (100, 250, 120),
-            'current': (100, 250, 120)
+            'target': (100, 400, 100),
+            'current': (100, 400, 100)
         }
         self.assertDictEqual(coords, expected_coords)
 
     def test_home(self):
-
-        expected = {
-            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-        self.assertDictEqual(self.motor.axis_homed, expected)
 
         success = self.motor.home('x', 'y')
         self.assertTrue(success)
@@ -121,17 +145,13 @@ class OpenTronsTest(unittest.TestCase):
         success = self.motor.home('ba')
         self.assertTrue(success)
 
-        expected = {
-            'x': True, 'y': True, 'z': False, 'a': True, 'b': True}
-        self.assertDictEqual(self.motor.axis_homed, expected)
-
     def test_limit_hit_exception(self):
         self.motor.home()
         try:
             self.motor.move_head(x=-100)
             self.motor.wait_for_arrival()
         except RuntimeWarning as e:
-            self.assertEqual(str(RuntimeWarning('limit switch hit')), str(e))
+            self.assertEqual(str(RuntimeWarning('X limit switch hit')), str(e))
 
         self.motor.home()
 

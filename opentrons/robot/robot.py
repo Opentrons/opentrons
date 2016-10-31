@@ -85,6 +85,9 @@ class Robot(object, metaclass=Singleton):
         self.can_pop_command.set()
         self.stopped_event.clear()
 
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
         self.connections = {
             'live': None,
             'simulate': self.get_virtual_device(
@@ -135,11 +138,16 @@ class Robot(object, metaclass=Singleton):
         self._handlers = []
         self._runtime_warnings = []
 
+        self._previous_container = None
+
         self._deck = containers.Deck()
         self.setup_deck()
 
         self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
+
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
         return self
 
@@ -362,7 +370,7 @@ class Robot(object, metaclass=Singleton):
             'firmware': 'v1.0.5',
             'config': {
                 'ot_version': 'one_pro',
-                'version': 'v1.0.3',        # config version
+                'version': 'v1.2.0',        # config version
                 'alpha_steps_per_mm': 80.0,
                 'beta_steps_per_mm': 80.0
             }
@@ -402,6 +410,12 @@ class Robot(object, metaclass=Singleton):
 
         return res
 
+    def _update_axis_homed(self, *args):
+        for a in args:
+            for letter in a:
+                if letter.lower() in self.axis_homed:
+                    self.axis_homed[letter.lower()] = True
+
     def home(self, *args, **kwargs):
         """
         Home robot's head and plunger motors.
@@ -435,8 +449,10 @@ class Robot(object, metaclass=Singleton):
         def _do():
             if self._driver.calm_down():
                 if args:
+                    self._update_axis_homed(*args)
                     return self._driver.home(*args)
                 else:
+                    self._update_axis_homed('xyzab')
                     self._driver.home('z')
                     return self._driver.home('x', 'y', 'b', 'a')
             else:
@@ -523,14 +539,11 @@ class Robot(object, metaclass=Singleton):
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 
-        _, _, tallest_z = self._deck.max_dimensions(self._deck)
-        tallest_z += 10
-
         def _do():
             if strategy == 'arc':
-                self._driver.move_head(z=tallest_z)
-                self._driver.move_head(x=coordinates[0], y=coordinates[1])
-                self._driver.move_head(z=coordinates[2])
+                arc_coords = self._create_arc(coordinates, placeable)
+                for coord in arc_coords:
+                    self._driver.move_head(**coord)
             elif strategy == 'direct':
                 self._driver.move_head(
                     x=coordinates[0],
@@ -545,6 +558,29 @@ class Robot(object, metaclass=Singleton):
             _do()
         else:
             self.add_command(Command(do=_do))
+
+    def _create_arc(self, coordinates, placeable):
+        this_container = None
+        if isinstance(placeable, containers.Well):
+            this_container = placeable.get_parent()
+        elif isinstance(placeable, containers.WellSeries):
+            this_container = placeable.get_parent()
+        elif isinstance(placeable, containers.Container):
+            this_container = placeable
+
+        tallest_z = 0
+        if this_container and (self._previous_container == this_container):
+            _, _, tallest_z = this_container.max_dimensions(self._deck)
+        else:
+            _, _, tallest_z = self._deck.max_dimensions(self._deck)
+
+        self._previous_container = this_container
+
+        return [
+            {'z': tallest_z},
+            {'x': coordinates[0], 'y': coordinates[1]},
+            {'z': coordinates[2]}
+        ]
 
     @property
     def actions(self):
@@ -645,13 +681,16 @@ class Robot(object, metaclass=Singleton):
         if self._driver:
             self._driver.disconnect()
 
+        self.axis_homed = {
+            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
         self.connections['live'] = None
 
     def containers(self):
         return self._deck.containers()
 
     def get_deck_slot_types(self):
-        return 'acrylic_slots'
+        return 'slots'
 
     def get_slot_offsets(self):
         """
@@ -664,13 +703,13 @@ class Robot(object, metaclass=Singleton):
         TODO: figure out actual X and Y offsets (from origin)
         """
         SLOT_OFFSETS = {
-            '3d_printed_slots': {
+            'slots': {
                 'x_offset': 10,
                 'y_offset': 10,
                 'col_offset': 91,
                 'row_offset': 134.5
             },
-            'acrylic_slots': {
+            'slots_legacy': {
                 'x_offset': 10,
                 'y_offset': 10,
                 'col_offset': 96.25,
@@ -695,10 +734,15 @@ class Robot(object, metaclass=Singleton):
 
         for col_index, col in enumerate('ABCDE'):
             for row_index, row in enumerate(range(1, robot_rows + 1)):
-                slot = containers.Slot()
+                properties = {
+                    'width': col_offset,
+                    'length': row_offset,
+                    'height': 0
+                }
+                slot = containers.Slot(properties=properties)
                 slot_coordinates = (
-                    (row_offset * row_index) + x_offset,
-                    (col_offset * col_index) + y_offset,
+                    (col_offset * col_index) + x_offset,
+                    (row_offset * row_index) + y_offset,
                     0  # TODO: should z always be zero?
                 )
                 slot_name = "{}{}".format(col, row)
@@ -732,6 +776,7 @@ class Robot(object, metaclass=Singleton):
         return container
 
     def clear(self):
+        self._previous_container = None
         self._commands = []
 
     def pause(self):
@@ -765,17 +810,31 @@ class Robot(object, metaclass=Singleton):
 
     def versions(self):
         # TODO: Store these versions in config
+        compatible = self._driver.versions_compatible()
         return {
-            'firmware': self._driver.get_firmware_version(),
-            'config': self._driver.get_config_version(),
-            'robot': self._driver.get_ot_version(),
+            'firmware': {
+                'version': self._driver.get_firmware_version(),
+                'compatible': compatible['firmware']
+            },
+            'config': {
+                'version': self._driver.get_config_version(),
+                'compatible': compatible['config']
+            },
+            'ot_version': {
+                'version': self._driver.get_ot_version(),
+                'compatible': compatible['ot_version']
+            }
         }
 
     def diagnostics(self):
         # TODO: Store these versions in config
         return {
-            'axis_homed': self._driver.axis_homed,
-            'switches': self._driver.get_endstop_switches()
+            'axis_homed': self.axis_homed,
+            'switches': self._driver.get_endstop_switches(),
+            'steps_per_mm': {
+                'x': self._driver.get_steps_per_mm('x'),
+                'y': self._driver.get_steps_per_mm('y')
+            }
         }
 
     def commands(self):

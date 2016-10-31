@@ -45,8 +45,6 @@ class Pipette(Instrument):
         self.placeables = []
         self.current_volume = 0
 
-        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
-
         self.speeds = {
             'aspirate': aspirate_speed,
             'dispense': dispense_speed
@@ -65,6 +63,8 @@ class Pipette(Instrument):
 
         self.init_calibrations()
         self.load_persisted_data()
+
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
     def reset(self):
         self.placeables = []
@@ -288,12 +288,12 @@ class Pipette(Instrument):
                     # TODO: raise warning/exception if looped back to first tip
                     location = next(self.tip_rack_iter)
                 else:
-                    self.robot.warning(
+                    self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')
 
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='direct', now=True)
+                self.move_to(placeable.bottom(), strategy='arc', now=True)
 
             self.current_tip_home_well = location
 
@@ -321,7 +321,7 @@ class Pipette(Instrument):
 
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='direct', now=True)
+                self.move_to(placeable.bottom(), strategy='arc', now=True)
 
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
@@ -374,7 +374,7 @@ class Pipette(Instrument):
         return self
 
     def calibrate(self, position):
-        current_position = self.robot._driver.get_plunger_position()
+        current_position = self.robot._driver.get_plunger_positions()
         current_position = current_position['target'][self.axis]
         kwargs = {}
         kwargs[position] = current_position
