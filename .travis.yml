@@ -31,19 +31,20 @@ before_install:
   - npm install
 
   # Install Python 2 and 3 with pip and check versions
-  - brew tap drolando/homebrew-deadsnakes
-  - brew install python34
-  - brew link --overwrite python34
-  - python3.4 --version
-  - python3.4 -c "import struct; print(struct.calcsize('P') * 8)"
+#  - brew tap drolando/homebrew-deadsnakes
+#  - brew install python34
+#  - brew link --overwrite python34
+  - brew install python3
+  - python3 --version
+  - python3 -c "import struct; print(struct.calcsize('P') * 8)"
   - python --version
   - echo $PATH
 
   # Install Python packages (built with Python 3)
-  - pip3.4 install pyinstaller
+  - pip3 install pyinstaller
   - pyinstaller --version
-  - pip3.4 install -r requirements.txt
-  - python3.4 -m unittest
+  - pip3 install -r requirements.txt
+  - python3 -m unittest
 
 
 install:
