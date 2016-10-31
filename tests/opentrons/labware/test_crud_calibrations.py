@@ -32,6 +32,7 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.assertDictEqual(self.p200.calibration_data, {})
 
         self.p200 = instruments.Pipette(name="p200", axis="a")
+        self.p200.delete_calibration_data()
         self.assertDictEqual(self.p200.calibration_data, {})
 
         self.p200 = instruments.Pipette(name="p200", axis="b")

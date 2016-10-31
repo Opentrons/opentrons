@@ -288,6 +288,9 @@ class Placeable(object):
         if reference in self._max_dimensions:
             return self._max_dimensions[reference]
 
+        if not self.has_children():
+            return (0, 0, 0)
+
         # Collect all furthermost child coordinates
         child_coordinates = [
             child.from_center(x=1, y=1, z=1, reference=reference)
