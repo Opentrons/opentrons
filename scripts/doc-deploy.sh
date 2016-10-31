@@ -25,6 +25,7 @@ cd ..
 # Clean out existing contents
 rm -rf out/**/* || exit 0
 
+ls
 cp -r docs/build/html/* out/
 
 # Now let's go have some fun with the cloned repo
