@@ -18,7 +18,6 @@ const actions = {
       }
     })
   },
-
   updateFilename ({commit}, fileName) {
     commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
   },
@@ -33,13 +32,11 @@ const actions = {
       }
       commit('UPDATE_WARNINGS', {warning: result.warnings})
       commit('UPDATE_ERROR', {errors: result.errors})
-
     })
-
   },
   selectIncrement ({commit}, data) {
-    commit(types.UPDATE_INCREMENT, {
-      'current_increment': data.inc, 'type': data.type })
+    let {inc, type} = data
+    commit(types.UPDATE_INCREMENT, { 'current_increment': inc, 'type': type })
   },
   jog ({commit}, coords) {
     OpenTrons.jog(coords)
@@ -47,16 +44,19 @@ const actions = {
   jogToSlot ({commit}, data) {
     OpenTrons.jogToSlot(data)
   },
-  calibratePlaceable({commit}, data) {
-    Vue.http
-    .post('http://localhost:5000/calibrate_placeable', JSON.stringify(data), {emulateJSON: true})
-    .then((response) => {
-      let tasks = response.body.data.calibration
-      addHrefs(tasks)
-      commit('UPDATE_TASK_LIST', {'tasks': tasks})
-    }, (response) => {
-        console.log('failed', response)
+  calibrate ({commit}, data) {
+    let type = "plunger"
+    if (data.slot) { type = "placeable"}
+    OpenTrons.calibrate(data, type).then((tasks) => {
+      if (tasks) {
+        commit('UPDATE_TASK_LIST', {'tasks': tasks})
+      }
     })
+  },
+  moveToPosition ({commit}, data) {
+    let type = "plunger"
+    if (data.slot) { type = "placeable" }
+    OpenTrons.moveToPosition(data, type)
   }
 }
 

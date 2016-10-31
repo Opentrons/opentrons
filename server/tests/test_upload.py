@@ -16,6 +16,23 @@ class UploadTestCase(unittest.TestCase):
 
         self.robot = Robot.get_instance()
 
+    def test_upload_and_run(self):
+        response = self.app.post('/upload', data={
+            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
+        })
+
+        self.robot.connect(None, options={'limit_switches': False})
+
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        response = self.app.get('/run')
+
+        response = json.loads(response.data.decode())
+        self.assertEqual(response['status'], 'success')
+        self.assertTrue('errors' in response['data'])
+        self.assertTrue('warnings' in response['data'])
+
     def test_upload_valid_python(self):
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
@@ -25,6 +42,7 @@ class UploadTestCase(unittest.TestCase):
         self.assertEqual(status, 'success')
 
     def test_get_instrument_placeables(self):
+        self.robot.connect(None, options={'limit_switches': False})
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
         })
@@ -51,7 +69,7 @@ class UploadTestCase(unittest.TestCase):
             instrument.update_calibrations()
 
         location = robot._deck['A1'].get_child_by_name(
-            'tiprack-for-frontend-test')
+            'test-tiprack')
         rel_vector = location[0].from_center(
             x=0, y=0, z=-1, reference=location)
         location = (location, rel_vector)
@@ -75,25 +93,25 @@ class UploadTestCase(unittest.TestCase):
                     'placeables': [
                         {
                             'calibrated': True,
-                            'label': 'tiprack-for-frontend-test',
+                            'label': 'test-tiprack',
                             'slot': 'A1',
                             'type': 'tiprack-200ul'
                         },
                         {
                             'calibrated': False,
-                            'label': 'trough-for-frontend-test',
+                            'label': 'test-trough',
                             'slot': 'B1',
                             'type': 'trough-12row'
                         },
                         {
                             'calibrated': False,
-                            'label': 'plate-for-frontend-test',
+                            'label': 'test-plate',
                             'slot': 'B2',
                             'type': '96-flat'
                         },
                         {
                             'calibrated': False,
-                            'label': 'trash-for-frontend-test',
+                            'label': 'test-trash',
                             'slot': 'A2',
                             'type': 'point'
                         }
@@ -110,25 +128,25 @@ class UploadTestCase(unittest.TestCase):
                     'placeables': [
                         {
                             'calibrated': False,
-                            'label': 'tiprack-for-frontend-test',
+                            'label': 'test-tiprack',
                             'slot': 'A1',
                             'type': 'tiprack-200ul'
                         },
                         {
                             'calibrated': False,
-                            'label': 'trough-for-frontend-test',
+                            'label': 'test-trough',
                             'slot': 'B1',
                             'type': 'trough-12row'
                         },
                         {
                             'calibrated': False,
-                            'label': 'plate-for-frontend-test',
+                            'label': 'test-plate',
                             'slot': 'B2',
                             'type': '96-flat'
                         },
                         {
                             'calibrated': False,
-                            'label': 'trash-for-frontend-test',
+                            'label': 'test-trash',
                             'slot': 'A2',
                             'type': 'point'
                         }

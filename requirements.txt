@@ -6,7 +6,7 @@ greenlet==0.4.10
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
-git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons-api
+git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
 psutil==4.3.1
 pyinstaller==3.1.1
 pylint==1.6.4

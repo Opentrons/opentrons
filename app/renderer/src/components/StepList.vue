@@ -18,7 +18,7 @@
       <ul>
       <li>
         <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}" exact>
-          Calibrate {{instrument.label}}
+          calibrate {{instrument.label}}
         </router-link>
       </li>
       </ul>

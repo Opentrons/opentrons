@@ -107,6 +107,69 @@ def upload():
     })
 
 
+def _run_commands():
+    global robot
+
+    api_response = {'errors': [], 'warnings': []}
+
+    try:
+        robot.resume()
+        robot.run()
+        if len(robot._commands) == 0:
+            error = ("This protocol does not contain "
+                     "any commands for the robot.")
+            api_response['errors'] = error
+    except Exception as e:
+        api_response['errors'] = [str(e)]
+
+    api_response['warnings'] = robot.get_warnings() or []
+
+    return api_response
+
+
+@app.route("/run", methods=["GET"])
+def run():
+    api_response = _run_commands()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'errors': api_response['errors'],
+            'warnings': api_response['warnings']
+        }
+    })
+
+
+@app.route("/pause", methods=["GET"])
+def pause():
+    robot.pause()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/resume", methods=["GET"])
+def resume():
+    robot.resume()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route("/stop", methods=["GET"])
+def stop():
+    robot.stop()
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path
@@ -136,19 +199,45 @@ def get_coordinates():
     })
 
 
+@app.route("/robot/diagnostics")
+def get_diagnostics():
+    return flask.jsonify({
+        'diagnostics': robot.diagnostics()
+    })
+
+
+@app.route("/robot/versions")
+def get_versions():
+    return flask.jsonify({
+        'versions': robot.versions()
+    })
+
+
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
-    port = flask.request.args.get('port')
+    port = request.json.get('port')
+    options = request.json.get('options', {'limit_switches': False})
 
     status = 'success'
     data = None
 
     try:
-        Robot.get_instance().connect(port, options={'limit_switches': False})
+        robot = Robot.get_instance()
+        robot.connect(
+            port, options=options)
     except Exception as e:
+        # any robot version incompatibility will be caught here
+        robot.disconnect()
         status = 'error'
         data = str(e)
 
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
+
+
+def _start_connection_watcher():
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -178,11 +267,6 @@ def connect_robot():
         connection_state_watcher,
         watcher_should_run
     )
-
-    return flask.jsonify({
-        'status': status,
-        'data': data
-    })
 
 
 @app.route("/robot/serial/disconnect")
@@ -230,6 +314,15 @@ def get_step_list():
                 return True
         return False
 
+    def check_if_instrument_calibrated(instrument):
+        positions = instrument.positions
+        for p in positions:
+            if positions.get(p) is None:
+                return False
+
+        return True
+
+
     data = [{
         'axis': instrument.axis,
         'label': instrument.name,
@@ -238,6 +331,7 @@ def get_step_list():
         'blow_out': instrument.positions['blow_out'],
         'drop_tip': instrument.positions['drop_tip'],
         'max_volume': instrument.max_volume,
+        'calibrated': check_if_instrument_calibrated(instrument),
         'placeables': [
             {
                 'type': placeable.properties['type'],
@@ -254,9 +348,18 @@ def get_step_list():
 
 @app.route('/home/<axis>')
 def home(axis):
-    result = robot.home(axis, now=True)
+    status = 'success'
+    result = ''
+    try:
+        if axis == 'undefined' or axis == '' or axis.lower() == 'all':
+            result = robot.home(now=True)
+        else:
+            result = robot.home(axis, now=True)
+    except Exception as e:
+        result = str(e)
+        status = 'error'
     return flask.jsonify({
-        'status': 200,
+        'status': status,
         'data': result
     })
 
@@ -264,13 +367,20 @@ def home(axis):
 @app.route('/jog', methods=["POST"])
 def jog():
     coords = request.json
-    if coords.get("a") or coords.get("b"):
-        result = robot._driver.move_plunger(mode="relative", **coords)
-    else:
-        result = robot.move_head(mode="relative", **coords)
+
+    status = 'success'
+    result = ''
+    try:
+        if coords.get("a") or coords.get("b"):
+            result = robot._driver.move_plunger(mode="relative", **coords)
+        else:
+            result = robot.move_head(mode="relative", **coords)
+    except Exception as e:
+        result = str(e)
+        status = 'error'
 
     return flask.jsonify({
-        'status': 200,
+        'status': status,
         'data': result
     })
 
@@ -279,7 +389,9 @@ def jog():
 def move_to_slot():
     slot = request.json.get("slot")
     axis = request.json.get("axis")
-    location = robot._deck[slot]
+    slot = robot._deck[slot]
+    _, _, tallest_z = slot.max_dimensions(slot)
+    location = slot.top(tallest_z + 10)
     result = robot.move_to(
         location,
         now=True,
@@ -287,8 +399,48 @@ def move_to_slot():
     )
 
     return flask.jsonify({
-        'status': 200,
+        'status': 'success',
         'data': result
+    })
+
+
+@app.route('/move_to_container', methods=["POST"])
+def move_to_container():
+    slot = request.json.get("slot")
+    name = request.json.get("label")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        container = robot._deck[slot].get_child_by_name(name)
+        instrument.move_to(container[0].bottom(), now=True)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/move_to_plunger_position', methods=["POST"])
+def move_to_plunger_position():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.plunger.move(instrument.positions[position])
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
     })
 
 
@@ -340,6 +492,43 @@ def calibrate_placeable():
     })
 
 
+def _calibrate_plunger(position, axis_name):
+    axis_name = axis_name.upper()
+    if axis_name not in robot._instruments:
+        raise ValueError('Axis {} is not initialized'.format(axis_name))
+
+    instrument = robot._instruments[axis_name]
+    if position not in instrument.positions:
+        raise ValueError('Position {} is not on the plunger'.format(position))
+
+    instrument.calibrate(position)
+
+
+@app.route("/calibrate_plunger", methods=["POST"])
+def calibrate_plunger():
+    position = request.json.get("position")
+    axis = request.json.get("axis")
+    try:
+        _calibrate_plunger(position, axis)
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    calibrations = get_step_list()
+
+    # TODO change calibration key to steplist
+    return flask.jsonify({
+        'status': 'success',
+        'data': {
+            'position': position,
+            'axis': axis,
+            'calibrations': calibrations
+        }
+    })
+
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
@@ -363,6 +552,8 @@ if __name__ == "__main__":
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
+
+    _start_connection_watcher()
 
     socketio.run(
         app,

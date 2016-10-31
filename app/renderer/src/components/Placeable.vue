@@ -91,7 +91,7 @@
 
         if(nextPlaceable) {
           return instrument.placeables[currentIndex + 1].href
-        } else if(!nextPlaceable && nextInstrument) {
+        } else if(!nextPlaceable && nextInstrument && nextInstrument.placeables[0]) {
           return nextInstrument.placeables[0].href
         } else {
           return tasks[0].href

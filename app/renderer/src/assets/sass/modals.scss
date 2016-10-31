@@ -1,0 +1,64 @@
+@import "util";
+
+.calibration-modal {
+    &.top {
+        .btn-update.top {
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.top{
+            display:block;
+        }
+    }
+    &.bottom {
+        .btn-update.bottom {
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.bottom{
+            display:block;
+        }
+    }
+    &.blowout {
+        .btn-update.blowout{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.blowout{
+            display:block;
+        }
+    }
+    &.droptip {
+        .btn-update.droptip{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        img.droptip{
+            display:block;
+        }
+    }
+
+    .btn-update {
+        opacity: 0.1;
+        pointer-events: none;
+        &.test{
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+    }
+
+    .pipette-img{
+        img{
+            display:none;
+        }
+    }
+
+    a.position{
+        text-decoration: underline;
+    }
+}

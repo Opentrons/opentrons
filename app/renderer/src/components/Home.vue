@@ -4,7 +4,7 @@
       <header class="brand">
         <nav class="links">
           <ul>
-            <li>OT App</li>
+            <li>Logo</li>
           </ul>
         </nav>
       </header>
@@ -18,7 +18,7 @@
           <span @click="home('z')" class="btn-home">Z</span>
           <span @click="home('a')" class="btn-home">A</span>
           <span @click="home('b')" class="btn-home">B</span>
-          <span @click="home('\'\'')" class="btn-home">ALL</span>
+          <span @click="home('all')" class="btn-home">ALL</span>
         </nav>
         <nav class="tabs">
           <a href="#" class="tab active">Protocol</a>
