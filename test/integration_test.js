@@ -32,7 +32,7 @@ describe('application launch', function () {
 
   afterEach(function () {
     if (this.app && this.app.isRunning()) {
-      // return this.app.stop()
+      return this.app.stop()
     }
   })
 
@@ -50,6 +50,7 @@ describe('application launch', function () {
   it('runs a protocol', function () {
     var file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
     var pauseTime = process.env.PAUSE_TIME || 0
+    console.log('TEST GOT HERE...')
     return this.app.client.waitUntilWindowLoaded(5000)
       .click('//*[@id="connections"]/option[2]')
       .pause(pauseTime)
@@ -80,6 +81,7 @@ describe('application launch', function () {
       .click('.next')
       .pause(pauseTime)
       .click('.next')
-      .pause(5000000)
+      .pause(pauseTime)
+      .click('//*[@id="task-pane"]/div/section/div[2]/div[2]/button[1]')
   })
 })
