@@ -129,6 +129,23 @@ button {
     }
 }
 
+.btn-placeable {
+    @include btn-col-a(2);
+    color: white;
+    &.save {
+        background-color: $call-to-action;
+        &:hover {
+            background: darken($call-to-action, 10%);
+        }
+    }
+    &.moveto {
+        background-color: $secondary-brand;
+        &:hover {
+            background: darken($secondary-brand, 10%);
+        }
+    }
+}
+
 .btn-test {
     @include btn-col-a(2);
     background-color: $call-to-action;
