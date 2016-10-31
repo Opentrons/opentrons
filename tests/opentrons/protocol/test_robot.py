@@ -116,7 +116,7 @@ class RobotTest(unittest.TestCase):
         res = self.robot.versions()
         expected = {
             'config': {
-                'version': 'v1.0.3b',
+                'version': 'v1.2.0',
                 'compatible': True
             },
             'firmware': {
