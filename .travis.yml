@@ -1,6 +1,6 @@
 # We are using the iOS build system to create Mac OS X python builds
-language: objective-c
-osx_image: beta-xcode6.3
+os:
+  - osx
 
 cache:
   directories:
