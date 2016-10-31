@@ -23,7 +23,7 @@
       </li>
       </ul>
     </li>
-    <li v-for="task in run_tasks" v-show="tasks.length > 1">
+    <li v-for="task in run_tasks" v-show="tasks.length > 0">
       <router-link v-bind:to="task.href">
         {{task.title}}
       </router-link>
