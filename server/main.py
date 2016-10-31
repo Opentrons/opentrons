@@ -140,7 +140,6 @@ def run():
 
 @app.route("/pause", methods=["GET"])
 def pause():
-
     robot.pause()
 
     return flask.jsonify({
@@ -151,7 +150,6 @@ def pause():
 
 @app.route("/resume", methods=["GET"])
 def resume():
-
     robot.resume()
 
     return flask.jsonify({
@@ -162,7 +160,6 @@ def resume():
 
 @app.route("/stop", methods=["GET"])
 def stop():
-
     robot.stop()
 
     return flask.jsonify({
@@ -200,19 +197,45 @@ def get_coordinates():
     })
 
 
+@app.route("/robot/diagnostics")
+def get_diagnostics():
+    return flask.jsonify({
+        'diagnostics': robot.diagnostics()
+    })
+
+
+@app.route("/robot/versions")
+def get_versions():
+    return flask.jsonify({
+        'versions': robot.versions()
+    })
+
+
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
-    port = flask.request.args.get('port')
+    port = request.json.get('port')
+    options = request.json.get('options', {'limit_switches': False})
 
     status = 'success'
     data = None
 
     try:
-        Robot.get_instance().connect(port, options={'limit_switches': False})
+        robot = Robot.get_instance()
+        robot.connect(
+            port, options=options)
     except Exception as e:
+        # any robot version incompatibility will be caught here
+        robot.disconnect()
         status = 'error'
         data = str(e)
 
+    return flask.jsonify({
+        'status': status,
+        'data': data
+    })
+
+
+def _start_connection_watcher():
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -242,11 +265,6 @@ def connect_robot():
         connection_state_watcher,
         watcher_should_run
     )
-
-    return flask.jsonify({
-        'status': status,
-        'data': data
-    })
 
 
 @app.route("/robot/serial/disconnect")
@@ -294,6 +312,15 @@ def get_step_list():
                 return True
         return False
 
+    def check_if_instrument_calibrated(instrument):
+        positions = instrument.positions
+        for p in positions:
+            if positions.get(p) is None:
+                return False
+
+        return True
+
+
     data = [{
         'axis': instrument.axis,
         'label': instrument.name,
@@ -302,6 +329,7 @@ def get_step_list():
         'blow_out': instrument.positions['blow_out'],
         'drop_tip': instrument.positions['drop_tip'],
         'max_volume': instrument.max_volume,
+        'calibrated': check_if_instrument_calibrated(instrument),
         'placeables': [
             {
                 'type': placeable.properties['type'],
@@ -318,9 +346,18 @@ def get_step_list():
 
 @app.route('/home/<axis>')
 def home(axis):
-    result = robot.home(axis, now=True)
+    status = 'success'
+    result = ''
+    try:
+        if axis == 'undefined' or axis == '' or axis.lower() == 'all':
+            result = robot.home(now=True)
+        else:
+            result = robot.home(axis, now=True)
+    except Exception as e:
+        result = str(e)
+        status = 'error'
     return flask.jsonify({
-        'status': 200,
+        'status': status,
         'data': result
     })
 
@@ -328,13 +365,20 @@ def home(axis):
 @app.route('/jog', methods=["POST"])
 def jog():
     coords = request.json
-    if coords.get("a") or coords.get("b"):
-        result = robot._driver.move_plunger(mode="relative", **coords)
-    else:
-        result = robot.move_head(mode="relative", **coords)
+
+    status = 'success'
+    result = ''
+    try:
+        if coords.get("a") or coords.get("b"):
+            result = robot._driver.move_plunger(mode="relative", **coords)
+        else:
+            result = robot.move_head(mode="relative", **coords)
+    except Exception as e:
+        result = str(e)
+        status = 'error'
 
     return flask.jsonify({
-        'status': 200,
+        'status': status,
         'data': result
     })
 
@@ -343,7 +387,9 @@ def jog():
 def move_to_slot():
     slot = request.json.get("slot")
     axis = request.json.get("axis")
-    location = robot._deck[slot]
+    slot = robot._deck[slot]
+    _, _, tallest_z = slot.max_dimensions(slot)
+    location = slot.top(tallest_z + 10)
     result = robot.move_to(
         location,
         now=True,
@@ -513,6 +559,8 @@ if __name__ == "__main__":
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
+
+    _start_connection_watcher()
 
     socketio.run(
         app,

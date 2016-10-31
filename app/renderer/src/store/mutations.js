@@ -15,7 +15,6 @@ const state = {
   run_log: [],
   run_plan: []
 }
-//Note: Ahmed, the run_states I need returned for the toggling are "ready","running", and "paused"
 
 const mutations = {
   [types.UPDATE_ROBOT_CONNECTION] (state, payload) {
