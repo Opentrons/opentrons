@@ -5,13 +5,32 @@ var path = require('path')
 var glob = require("glob")
 
 
-var isWin = /^win/.test(process.platform);
-var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
-if (isWin) {
-  var detectedExes = glob.sync('releases\\*.exe');
-  appExecutablePath = detectedExes[0];
-  console.log('App exes on windows', detectedExes, appExecutablePath)
+// var isWin = /^win/.test(process.platform);
+// var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
+// if (isWin) {
+//   var detectedExes = glob.sync('releases\\*.exe');
+//   appExecutablePath = detectedExes[0];
+//   console.log('App exes on windows', detectedExes, appExecutablePath)
+// }
+
+let appPath;
+if (process.platform === 'win32') {
+  appPath = path.resolve(
+    __dirname,
+    '../node_modules/electron-prebuilt/dist/Electron.exe'
+  );
+} else if (process.platform === 'darwin') {
+  appPath = path.resolve(
+    __dirname,
+    '../node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron'
+  );
+} else {
+  appPath = path.resolve(
+    __dirname,
+    '../node_modules/electron/dist/electron'
+  );
 }
+
 process.env.DEBUG = 'true'
 
 
@@ -21,7 +40,8 @@ chai.use(chaiAsPromised)
 describe('application launch', function () {
   beforeEach(function () {
     this.app = new Application({
-      path: appExecutablePath
+      path: appPath,  // appExecutablePath
+      args: ['./app']
     })
     return this.app.start()
   })
