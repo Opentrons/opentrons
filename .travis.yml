@@ -1,7 +1,9 @@
 sudo: false
 language: python
+
 python:
   - "3.4"
+
 install: 
   - python setup.py install
   - pip install pylama
@@ -14,14 +16,12 @@ script:
   - nosetests --with-coverage
   - pylama
   - cd docs && make doctest html && cd ..
-
-deploy:
-  - scripts/
+  - cd scripts && doc-deploy.sh && cd ..
 
 env:
   global:
-    - ENCRYPTION_LABEL: "c6cefc96bb2c"
-    - COMMIT_AUTHOR_EMAIL: "sphinx@opentrons.com"
+    - ENCRYPTION_LABEL: c6cefc96bb2c
+    - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
 
 after_success:
   coveralls
