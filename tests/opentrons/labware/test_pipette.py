@@ -85,6 +85,7 @@ class PipetteTest(unittest.TestCase):
             (self.plate[0], self.plate[0].from_center(x=0, y=0, z=1)))
 
     def test_calibrate_placeable(self):
+        self.p200.delete_calibration_data()
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=0, reference=self.plate)
         location = (self.plate, pos)
@@ -573,7 +574,7 @@ class PipetteTest(unittest.TestCase):
 
     def build_move_to_bottom(self, well):
         return mock.call(
-            well.bottom(), strategy='direct', now=True)
+            well.bottom(), strategy='arc', now=True)
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()
