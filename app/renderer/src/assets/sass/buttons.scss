@@ -179,7 +179,7 @@ button {
     }
 }
 
-.pick-tip {
+.pick-tip, .drop-tip {
     @include btn-col-a(4);
     @include offset-air(2, 0);
     color: white;
