@@ -173,9 +173,11 @@ button {
     }
     &.pick-liquid {
         @include offset-air(2, 0);
+        display:none //hiding buttons until in use
     }
     &.eject-liquid {
         // potential color differentiation moving forward
+        display:none //hiding buttons until in use
     }
 }
 

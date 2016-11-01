@@ -275,7 +275,7 @@ Deck|Container
                 @include offset-v-air(3,0);
             }
             &.top{
-                @include offset-v-air(2,0);
+                @include offset-v-air(1,0);
             }
             .position {
                 @include grid-col-air(2);
