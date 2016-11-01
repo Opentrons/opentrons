@@ -11,6 +11,11 @@ let serverManager = new ServerManager()
 const mainLogger = getLogger('electron-main')
 let mainWindow
 
+
+if (process.env.NODE_ENV == 'development'){
+  require('electron-debug')({showDevTools: true});
+}
+
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
   // TODO: use FLASK port when not in development
