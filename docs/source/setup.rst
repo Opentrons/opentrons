@@ -8,7 +8,7 @@ Jupyter is an interactive programming environment that runs in the browser. Jupy
 Install Anaconda and Python 3
 -----------------------------
 
-To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install [Anaconda](https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
+To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install Anaconda_: (https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
 Install Jupyter
 ---------------
