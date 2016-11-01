@@ -475,9 +475,9 @@ def drop_tip():
         kwargs[axis] = drop_tip_pos
         robot._driver.move_plunger(**kwargs)
 
-        top_tip_pos = instrument.positions['top']
+        blow_out_pos = instrument.positions['blow_out']
         kwargs = {}
-        kwargs[axis] = top_tip_pos
+        kwargs[axis] = blow_out_pos
         robot._driver.move_plunger(**kwargs)
 
     except Exception as e:
