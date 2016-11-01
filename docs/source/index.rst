@@ -3,13 +3,38 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Opentrons API: the ultimate way to design and run protocols
+Opentrons API: Simple Biology Lab Protocol Coding
 ===========================================================
 
 Introduction
 ------------
 
-The Opentrons API is a versatile framework that makes it incredibly easy to write protocols and command the robot. Using the API your protocols can be understood by our machines and read or modified by fellow non-programmer scientists. It's also an opportunity for you to learn a little bit of Python.
+The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy. 
+
+We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you can write your automated protocols in a similar way to how you'd already write them in your lab notebook. 
+
+.. testsetup:: main
+   
+   pipette.aspirate(tube-1).dispense(tube-2)
+
+That is how you tell the Opentrons robot to aspirate its full volume from tube-1 and dispense it into tube-2. 
+
+To create your own automated protocols, you just have to string together commands for the robot to do for you. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into four different wells.
+
+  ::
+   
+   p200.aspirate(trough)
+   p200.dispense(50, well-1).dispense(50, well-2).dispense(50, well-3).dispense(50, well-4)
+
+If you wanted to do this 96 times, you could write it like this:
+
+.. testsetup:: main
+   
+   p200.aspirate(trough)
+   
+    for i in range(95):
+      p200.aspirate(100, plate[i])
+      p200.dispense(plate[i + 1]).blow_out().touch_tip()
 
 Hello World
 -----------
