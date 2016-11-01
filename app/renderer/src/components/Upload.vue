@@ -14,7 +14,7 @@
             Warnings: {{warnings}}
           </div>
         </div>
-        <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class="step-upload">
+        <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" :class="['step-upload', classObject]">
           <div class="fileUpload">
             <span>{{fileName}}</span>
             <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
@@ -57,6 +57,11 @@
           return this.$store.state.tasks[0].placeables[0].href
         } else {
           return '/'
+        }
+      },
+      classObject: function () {
+        return {
+          'disabled': this.$store.state.busy
         }
       }
     },

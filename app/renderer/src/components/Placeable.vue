@@ -10,14 +10,14 @@
     <section>
       <div class="step step-calibrate">
         <div>
-          <Jog :instrument="instrument.axis"></Jog>
+          <Jog :instrument="instrument.axis" :disabled="classObject"></Jog>
         </div>
         <div class="save-deck">
           <h3 class="title">Deck Position</h3>
           <coordinates></coordinates>
           <!-- props - calibration, instrument, placeable type -->
           <h3 class="title">Calibrate {{ calibration.label }} </h3>
-          <CalibratePlaceable :placeable="calibration" :type="type" :instrument="instrument"></CalibratePlaceable>
+          <CalibratePlaceable :placeable="calibration" :type="type" :instrument="instrument" :disabled="classObject"></CalibratePlaceable>
         </div>
       </div>
       <Navigation :prev="prev" :next="next"></Navigation>
@@ -76,7 +76,7 @@
         let tasks = this.$store.state.tasks
         let instrument = this.currentInstrument(tasks)
         let placeable = this.currentPlaceable(instrument)
-        let type = this.containerType(placeable.type) 
+        let type = this.containerType(placeable.type)
         return type
       },
       next() {
@@ -114,6 +114,11 @@
           return prevPlaceables[prevPlaceables.length - 1].href
         } else {
           return '/upload'
+        }
+      },
+      classObject: function () {
+        return {
+          'disabled': this.$store.state.busy
         }
       }
     }

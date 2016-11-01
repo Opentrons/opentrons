@@ -179,6 +179,16 @@ class OpenTrons {
       })
   }
 
+  home (axis) {
+    return Vue.http
+        .get(`/home/${axis}`)
+        .then((response) => {
+            console.log(response)
+            console.log(`Homing ${axis}`)
+        }, (response) => {
+            console.log('failed to home', response)
+        })
+  }
 }
 
 export default new OpenTrons('http://localhost:5000')

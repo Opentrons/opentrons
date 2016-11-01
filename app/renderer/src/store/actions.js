@@ -22,16 +22,18 @@ const actions = {
     commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
   },
   uploadProtocol ({commit}, formData) {
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.uploadProtocol(formData).then((result) =>{
       if (result.success) {
         let tasks = result.calibrations
         addHrefs(tasks)
-        commit('UPDATE_TASK_LIST', {'tasks': tasks})
+        commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
       } else {
-        commit('UPDATE_TASK_LIST', {tasks: []})
+        commit(types.UPDATE_TASK_LIST, {tasks: []})
       }
-      commit('UPDATE_WARNINGS', {warning: result.warnings})
-      commit('UPDATE_ERROR', {errors: result.errors})
+      commit(types.UPDATE_WARNINGS, {warning: result.warnings})
+      commit(types.UPDATE_ERROR, {errors: result.errors})
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     }),
     OpenTrons.getRunPlan().then((plan) => {
       commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
@@ -42,10 +44,16 @@ const actions = {
     commit(types.UPDATE_INCREMENT, { 'current_increment': inc, 'type': type })
   },
   jog ({commit}, coords) {
-    OpenTrons.jog(coords)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    OpenTrons.jog(coords).then((result) => {
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+    })
   },
   jogToSlot ({commit}, data) {
-    OpenTrons.jogToSlot(data)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    OpenTrons.jogToSlot(data).then(() => {
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+    })
   },
   calibrate ({commit}, data) {
     let type = "plunger"
@@ -57,11 +65,14 @@ const actions = {
     })
   },
   moveToPlaceable({commit}, data) {
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     Vue.http
     .post('http://localhost:5000/move_to_container', JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
+       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
        console.log('success',response)
     }, (response) => {
+       commit(types.UPDATE_ROBOT_STATE, {'busy': true})
        console.log('failed', response)
     })
   },
@@ -72,7 +83,9 @@ const actions = {
   },
   runProtocol({ commit }) {
     commit(types.RESET_RUN_LOG)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.runProtocol().then((results) => {
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
       // commit(types.UPDATE_RUN_STATE, results)
     })
   },
@@ -91,13 +104,25 @@ const actions = {
   moveToPosition ({commit}, data) {
     let type = "plunger"
     if (data.slot) { type = "placeable" }
-    OpenTrons.moveToPosition(data, type)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    OpenTrons.moveToPosition(data, type).then(() => {
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+    })
   },
   pickUpTip ({commit}, data) {
-    OpenTrons.pickUpTip(data)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    OpenTrons.pickUpTip(data).then(() => {
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+    })
   },
   dropTip ({commit}, data) {
     OpenTrons.dropTip(data)
+  },
+  home ({commit}, data) {
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    OpenTrons.home(data.axis).then(() => {
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+    })
   }
 }
 

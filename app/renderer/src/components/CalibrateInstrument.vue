@@ -6,7 +6,7 @@
 		  <img src="../assets/img/pipette_blowout.png" class="blowout" />
 		  <img src="../assets/img/pipette_droptip.png" class="droptip" />
 		</div>
-		<div class="update">
+		<div :class="['update', busy]">
 		  <a @click="toggleMode('top')"class="position top">Top</a>
 		  <button class="btn-update save top" @click="calibrateInstrument(instrument, 'top')">Save</button>
 		  <button @click="moveToPlungerPosition(instrument, 'top')" :class="[{'disabled': disabled(instrument, 'top')}, 'btn-update', 'moveto', 'top']">Move</button>
@@ -31,7 +31,7 @@
 
   export default {
     name: 'CalibrateInstrument',
-    props: ['instrument'],
+    props: ['instrument', 'busy'],
     data: function() {
       return {
         currentMode : 'droptip'

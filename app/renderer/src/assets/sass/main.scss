@@ -487,3 +487,8 @@ Pop-up Modal Styles
     background: $primary-link;
     color: white;
 }
+
+.disabled{
+  opacity: 0.1;
+  pointer-events: none;
+}
