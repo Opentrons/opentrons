@@ -122,19 +122,18 @@ def _run_commands():
         api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings() or []
-
-    return api_response
+    api_response['name'] = 'run exited'
+    socketio.emit('event', api_response)
 
 
 @app.route("/run", methods=["GET"])
 def run():
-    api_response = _run_commands()
+    thread = threading.Thread(_run_commands())
+    thread.start()
+
     return flask.jsonify({
         'status': 'success',
-        'data': {
-            'errors': api_response['errors'],
-            'warnings': api_response['warnings']
-        }
+        'data': ''
     })
 
 
