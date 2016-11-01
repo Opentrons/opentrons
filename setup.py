@@ -6,7 +6,7 @@ config = {
     'author': "Opentrons",
     'author_email': 'engineering@opentrons.com',
     'url': 'http://opentrons.com',
-    'version': '1.0',
+    'version': '2.0',
     'packages': find_packages(exclude=["tests"]),
     'install_requires': ['pyserial==3.1.1'],
     'package_data': {

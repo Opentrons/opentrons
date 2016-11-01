@@ -1,17 +1,29 @@
 sudo: false
 language: python
+
 python:
   - "3.4"
+
 install: 
   - python setup.py install
   - pip install pylama
   - pip install coverage
   - pip install coveralls
+  - pip install Sphinx==1.4.8
+  - pip install numpydoc==0.6.0
 
 script: 
   - nosetests --with-coverage
   - pylama
+  - cd docs && make doctest html && cd ..
+  - cd scripts && ./doc-deploy.sh && cd ..
+
+env:
+  global:
+    - ENCRYPTION_LABEL: c6cefc96bb2c
+    - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
 
 after_success:
   coveralls
+
   
