@@ -437,6 +437,60 @@ def move_to_container():
     })
 
 
+@app.route('/pick_up_tip', methods=["POST"])
+def pick_up_tip():
+    axis = request.json.get("axis")
+
+    try:
+        # TODO: use actual Pipette.pick_up_tip() method
+        #       not doing this now because pick_up_tip() enqueues
+        robot = Robot.get_instance()
+        for i in range(3):
+            robot.move_head(z=10, mode='relative')
+            robot.move_head(z=-10, mode='relative')
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/drop_tip', methods=["POST"])
+def drop_tip():
+    axis = request.json.get("axis")
+
+    try:
+        # TODO: use actual Pipette.drop_tip() method
+        #       not doing this now because drop_tip() enqueues
+        robot = Robot.get_instance()
+        instrument = robot._instruments[axis.upper()]
+
+        drop_tip_pos = instrument.positions['drop_tip']
+        kwargs = {}
+        kwargs[axis] = drop_tip_pos
+        robot._driver.move_plunger(**kwargs)
+
+        top_tip_pos = instrument.positions['top']
+        kwargs = {}
+        kwargs[axis] = top_tip_pos
+        robot._driver.move_plunger(**kwargs)
+
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
 @app.route('/move_to_plunger_position', methods=["POST"])
 def move_to_plunger_position():
     position = request.json.get("position")

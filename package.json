@@ -1,12 +1,13 @@
 {
   "scripts": {
     "postinstall": "install-app-deps",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "clean": "rm -rf ./out && rm -rf ./releases/*",
+    "build:backend": "python3 scripts/build_pyinstaller.py",
     "build:frontend": "python scripts/build_electron_app_with_builder.py",
-    "build:backend": "python3.4 scripts/build_pyinstaller.py",
-    "build:backend:mac": "python3.4 scripts/build_pyinstaller.py",
+    "release": "npm run build:backend && npm run build:frontend",
+    "build:backend:mac": "python3 scripts/build_pyinstaller.py",
     "build:backend:win": "C:\\Python34\\python scripts\\build_pyinstaller.py",
-    "build:frontend:mac": "python3.4 scripts/build_electron_app_with_builder.py",
+    "build:frontend:mac": "python3 scripts/build_electron_app_with_builder.py",
     "build:frontend:win": "C:\\Python34\\python scripts\\build_electron_app_with_builder.py",
     "clean": "rm -rf ./out && rm -rf ./releases/*",
     "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/renderer",
@@ -15,7 +16,7 @@
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "NODE_ENV=development electron app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
-    "integration": "echo 'foo'"
+    "integration": "mocha --timeout 15000 test/integration_test.js"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
