@@ -623,6 +623,7 @@ if __name__ == "__main__":
         data_dir = sys.argv[1]
     else:
         data_dir = os.getcwd()
+    os.environ['APP_DATA_DIR'] = data_dir
 
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
