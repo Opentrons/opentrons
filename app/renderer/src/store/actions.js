@@ -57,6 +57,12 @@ const actions = {
     let type = "plunger"
     if (data.slot) { type = "placeable" }
     OpenTrons.moveToPosition(data, type)
+  },
+  pickUpTip ({commit}, data) {
+    OpenTrons.pickUpTip(data)
+  },
+  dropTip ({commit}, data) {
+    OpenTrons.dropTip(data, type)
   }
 }
 
