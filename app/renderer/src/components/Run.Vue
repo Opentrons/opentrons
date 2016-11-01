@@ -48,8 +48,8 @@
       runPercent() {
         let finished_tasks_length = this.$store.state.run_log.length
         let all_tasks_length = this.$store.state.run_plan.length
-        let percent = ((finished_tasks_length / all_tasks_length) * 100) + 20
-        return Math.floor(percent * 100) / 100
+        let percent = Math.round((finished_tasks_length / all_tasks_length) * 100) + 20
+        return percent
       },
       runString() {
         return `${this.$store.state.run_log.length} / ${this.$store.state.run_plan.length}`
