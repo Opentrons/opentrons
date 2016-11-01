@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e # Exit with nonzero exit code if anything fails
 
-SOURCE_BRANCH="master"
+SOURCE_BRANCH="171-l-documentation-update"
 TARGET_BRANCH="gh-pages"
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify

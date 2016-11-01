@@ -125,10 +125,11 @@ Further Reading
 ---------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    api
    tips_and_tricks
+   setup
 
 Indices and tables
 ==================
