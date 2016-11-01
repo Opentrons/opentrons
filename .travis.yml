@@ -1,9 +1,20 @@
 # We are using the iOS build system to create Mac OS X python builds
 language: objective-c
-osx_image: beta-xcode6.3
+
+os:
+  - osx
+
+cache:
+  directories:
+    - node_modules
+    - app/node_modules
+    - $HOME/.electron
+    - pip
+    - $HOME/.cache/our-brew
 
 before_install:
   # OS extra info
+  - export HOMEBREW_CACHE=$HOME/.cache/our-brew
   - uname -a
   - python --version
   - python -c "import struct; print(struct.calcsize('P') * 8)"
@@ -13,7 +24,7 @@ before_install:
 
   # Install node.js
   - brew install nvm
-  - mkdir ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
+  - mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
   - echo "$(brew --prefix nvm)/nvm.sh" >> ~/.bashrc
   - nvm install 6.0.0
   - nvm use 6.0.0
@@ -21,21 +32,17 @@ before_install:
   - npm --version
   - npm install
 
-  # Install Python 2 and 3 with pip and check versions
-  - brew tap drolando/homebrew-deadsnakes
-  - brew install python34
-  - brew link --overwrite python34
-  - python3.4 --version
-  - python3.4 -c "import struct; print(struct.calcsize('P') * 8)"
+  - brew install python3
+  - python3 --version
+  - python3 -c "import struct; print(struct.calcsize('P') * 8)"
   - python --version
   - echo $PATH
 
   # Install Python packages (built with Python 3)
-  - pip3.4 install pyinstaller
+  - pip3 install pyinstaller
   - pyinstaller --version
-  - pip3.4 install -r requirements.txt
-  - python3.4 -m unittest
-
+  - pip3 install -r requirements.txt
+  - cd server && nosetests -s --logging-level WARNING && cd ..
 
 install:
   - node --version
