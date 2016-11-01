@@ -7,10 +7,10 @@
         <div class="run-info">
 
           <!-- <div class="current-command">Current Command Here</div> -->
-          <div class="progress" v-bind:style="{ width: runPercent + '%' }">{{ runPercent }}%</div>   
+          <div class="progress" v-bind:style="{ width: runPercent + '%' }">{{ runString }}({{runPercent - 20}}%)</div>
         </div>
         <!-- We will need to update store to have the current run state to toggle appropriate buttons, the run-state does nothing for now-->
-        <div class="run-modal" v-bind:class="runState">
+        <div class="run-modal">
           <button class="run-controls run" @click="runProtocol()">Run</button>
           <button class="run-controls pause" @click="pauseProtocol()">Pause</button>
           <button class="run-controls resume" @click="resumeProtocol()">Resume</button>
@@ -23,32 +23,37 @@
 </template>
 
 <script>
-import Navigation from './Navigation.vue'
+  import Navigation from './Navigation.vue'
 
-
-export default {
-  name: "Placeable",
-  components: {
-    Navigation
-  },
-  methods: {
-    runProtocol(){
-      this.$store.dispatch("runProtocol")
+  export default {
+    name: "Placeable",
+    components: {
+      Navigation
     },
-    pauseProtocol(){
-      this.$store.dispatch("pauseProtocol")
+    methods: {
+      runProtocol(){
+        this.$store.dispatch("runProtocol")
+      },
+      pauseProtocol(){
+        this.$store.dispatch("pauseProtocol")
+      },
+      resumeProtocol(){
+        this.$store.dispatch("resumeProtocol")
+      },
     },
-    resumeProtocol(){
-      this.$store.dispatch("resumeProtocol")
-    },
-  },
-  computed: {
-    runState(){
-      return this.$store.state.run_state
-    },
-    runPercent(){
-      return (this.$store.state.run_log.length / this.$store.state.run_plan.length) * 100
+    computed: {
+      runState() {
+        return this.$store.state.run_state
+      },
+      runPercent() {
+        let finished_tasks_length = this.$store.state.run_log.length
+        let all_tasks_length = this.$store.state.run_plan.length
+        let percent = ((finished_tasks_length / all_tasks_length) * 100) + 20
+        return Math.floor(percent * 100) / 100
+      },
+      runString() {
+        return `${this.$store.state.run_log.length} / ${this.$store.state.run_plan.length}`
+      }
     }
   }
-}
 </script>

@@ -78,12 +78,14 @@ const actions = {
   },
   pauseProtocol({ commit }) {
     OpenTrons.pauseProtocol().then((results) => {
-      commit(types.UPDATE_RUN_STATE, results)
+      console.log(results)
+      // commit(types.UPDATE_RUN_STATE, results)
     })
   },
   resumeProtocol({ commit }) {
     OpenTrons.pauseProtocol().then((results) => {
-      commit(types.UPDATE_RUN_STATE, results)
+      console.log(results)
+      // commit(types.UPDATE_RUN_STATE, results)
     })
   },
   moveToPosition ({commit}, data) {
