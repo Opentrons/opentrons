@@ -16,7 +16,8 @@
 			<span class="position top">Tiprack</span>
 			<button class="btn-placeable save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
 			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
-			<button class="pick-tip" :class="{'disabled': !placeable.calibrated}">Pick Up Tip</button>
+			<button class="pick-tip" :class="{'disabled': !placeable.calibrated}" @click="pickUpTip(intrument.axis)">Pick Up Tip</button>
+			<button class="drop-tip" :class="{'disabled': !placeable.calibrated}" @click="dropTip(intrument.axis)">Drop Tip</button>
 		</div>
 	</div>
 </template>
@@ -40,6 +41,14 @@
         let label = placeable.label
         let axis = instrument.axis
         this.$store.dispatch("moveToPosition", {slot: slot, label: label, axis: axis})
+      },
+      pickUpTip(instrument) {
+        let axis = instrument.axis
+        this.$store.dispatch("pickUpTip", { axis: axis })
+      },
+      dropTip(instrument) {
+        let axis = instrument.axis
+        this.$store.dispatch("dropTip", { axis: axis })
       }
     }
   }

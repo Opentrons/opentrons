@@ -13,6 +13,8 @@ class OpenTrons {
     this.runProtocolUrl = this.base_url + '/run'
     this.jogToContainerUrl = this.base_url + '/move_to_container'
     this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
+    this.pickUpTipUrl = this.base_url + '/pick_up_tip'
+    this.dropTipUrl = this.base_url + '/drop_tip'
   }
 
   connect (port) {
@@ -154,6 +156,27 @@ class OpenTrons {
          return false
       })
   }
+
+  pickUpTip (data) {
+    return Vue.http
+      .post(this.pickUpTipUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
+  dropTip (data) {
+    return Vue.http
+      .post(this.dropTipUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
 }
 
 export default new OpenTrons('http://localhost:5000')

@@ -9,7 +9,7 @@
       <ul>
         <li v-for="placeable in instrument.placeables">
           <router-link v-bind:to="placeable.href" :class="{'completed': placeable.calibrated}" exact>
-            {{placeable.label}} [{{placeable.slot}}]
+            <span class="clip">{{placeable.label}} [{{placeable.slot}}]<span class="clip">
          </router-link>
         </li>
       </ul>
@@ -17,8 +17,8 @@
     <li v-for="instrument in tasks">
       <ul>
       <li>
-        <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}" exact>
-          calibrate {{instrument.label}}
+        <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}"  exact>
+          <span class="clip">calibrate {{instrument.label}}</span>
         </router-link>
       </li>
       </ul>
