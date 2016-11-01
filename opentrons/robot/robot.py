@@ -7,7 +7,6 @@ import serial
 from opentrons import containers
 from opentrons.drivers import motor as motor_drivers
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
-from opentrons.helpers import helpers
 from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.log import get_logger
@@ -487,7 +486,6 @@ class Robot(object, metaclass=Singleton):
     def head_speed(self, rate):
         self._driver.set_head_speed(rate)
 
-
     @traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
@@ -661,12 +659,12 @@ class Robot(object, metaclass=Singleton):
                     log.info("Executing: {}".format(command.description))
                 command.do()
                 # emit command was done...
-                cmd_run_event['name'] =  'command-run',
+                cmd_run_event['name'] = 'command-run',
                 trace.EventBroker.get_instance().notify(cmd_run_event)
             except KeyboardInterrupt as e:
                 self._driver.halt()
-                cmd_run_event['name'] =  'command-failed',
-                cmd_run_event['error'] =  str(e),
+                cmd_run_event['name'] = 'command-failed',
+                cmd_run_event['error'] = str(e),
                 trace.EventBroker.get_instance().notify(cmd_run_event)
                 raise e
 
