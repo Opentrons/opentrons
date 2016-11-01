@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
+    'sphinx.ext.napoleon',
     'numpydoc'
 ]
 
@@ -329,6 +330,8 @@ texinfo_documents = [
      author, 'OpentronsAPI', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+numpydoc_show_class_members = False
 
 # Documents to append as an appendix to all manuals.
 #

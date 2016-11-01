@@ -26,26 +26,24 @@ class Robot(object, metaclass=Singleton):
         * :meth:`simulate` the protocol run
         * :meth:`connect` to Opentrons physical robot
         * :meth:`run` the protocol on a robot
-        * :meth:`home` axis, move head (:meth:`move_head`)
+        * :meth:`home` axis, move head (:meth:`move_to`)
         * :meth:`pause` and :func:`resume` the protocol run
 
-    Notes
-    -----
-    Each Opentrons protocol is a Python script which when evaluated creates
-    an execution plan which stored as a list of commands in
+    Each Opentrons protocol is a Python script. When evaluated the script
+    creates an execution plan which is stored as a list of commands in
     Robot's command queue.
 
-    First you write the protocol in Python then you :func:`simulate`
-    it against a virtual robot or :func:`run` it on a real robot.
-
-    Using a Python script and the Opentrons API load your containers and
-    instruments (see :class:`Pipette`). Then write your instructions which
-    will get converted into an execution plan.
-
-    Example protocol:
-
-    After commands have been enqueued, you can :func:`simulate`
-    or :func:`run` on a robot.
+    Here are the typical steps of writing the protocol:
+        * Using a Python script and the Opentrons API load your
+          containers and define instruments
+          (see :class:`~opentrons.instruments.pipette.Pipette`).
+        * Call :meth:`reset` to reset the robot's state and command queue.
+        * Write your instructions which will get converted
+          into an execution plan.
+        * Review the list of commands in the robot's queue by running
+          :meth:`commands`.
+        * Call :func:`simulate` to run the protocol it against a virtual robot.
+        * :meth:`connect` to the robot and call :func:`run` it on a real robot.
 
     See :class:`Pipette` for the list of supported instructions.
 
@@ -54,6 +52,8 @@ class Robot(object, metaclass=Singleton):
     >>> from opentrons.robot import Robot
     >>> from opentrons.instruments.pipette import Pipette
     >>> robot = Robot()
+    >>> robot.reset() # doctest: +ELLIPSIS
+    <opentrons.robot.robot.Robot object at ...>
     >>> plate = robot.add_container('A1', '96-flat', 'plate')
     >>> p200 = Pipette(axis='b')
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
@@ -617,6 +617,7 @@ class Robot(object, metaclass=Singleton):
 
         Examples
         --------
+        ..
         >>> from opentrons.robot import Robot
         >>> from opentrons.instruments.pipette import Pipette
         >>> robot.reset() # doctest: +ELLIPSIS
@@ -648,6 +649,18 @@ class Robot(object, metaclass=Singleton):
         return self._runtime_warnings
 
     def simulate(self, switches=False):
+        """
+        Simulate a protocol run on a virtual robot.
+
+        It is recommended to call this method before running the
+        protocol on a real robot.
+
+        Parameters
+        ----------
+        switches : bool
+            If ``True`` tells the robot to stop
+            execution and throw an error if limit switch was hit.
+        """
         if switches:
             self.set_connection('simulate_switches')
         else:
@@ -678,6 +691,9 @@ class Robot(object, metaclass=Singleton):
                 '{} provided'.format(mode))
 
     def disconnect(self):
+        """
+        Disconnects from the robot.
+        """
         if self._driver:
             self._driver.disconnect()
 
@@ -687,6 +703,9 @@ class Robot(object, metaclass=Singleton):
         self.connections['live'] = None
 
     def containers(self):
+        """
+        Returns the list of the containers on the deck.
+        """
         return self._deck.containers()
 
     def get_deck_slot_types(self):
@@ -776,20 +795,32 @@ class Robot(object, metaclass=Singleton):
         return container
 
     def clear(self):
+        """
+        Clear Robot's command queue.
+        """
         self._previous_container = None
         self._commands = []
 
     def pause(self):
+        """
+        Pauses execution of the protocol. Use :meth:`resume` to resume
+        """
         self.can_pop_command.clear()
         self.stopped_event.clear()
         self._driver.pause()
 
     def stop(self):
+        """
+        Stops execution of the protocol.
+        """
         self.stopped_event.set()
         self.can_pop_command.set()
         self._driver.stop()
 
     def resume(self):
+        """
+        Resume execution of the protocol after :meth:`pause`
+        """
         self.stopped_event.clear()
         self.can_pop_command.set()
         self._driver.resume()
@@ -827,6 +858,17 @@ class Robot(object, metaclass=Singleton):
         }
 
     def diagnostics(self):
+        """
+        Access diagnostics information for the robot.
+
+        Returns
+        -------
+        Dictionary with the following keys:
+            * ``axis_homed`` — axis that are currently in home position.
+            * ``switches`` — end stop switches currently hit.
+            * ``steps_per_mm`` — steps per millimeter calibration
+            values for ``x`` and ``y`` axis.
+        """
         # TODO: Store these versions in config
         return {
             'axis_homed': self.axis_homed,
@@ -838,4 +880,13 @@ class Robot(object, metaclass=Singleton):
         }
 
     def commands(self):
+        """
+        Access the human-readable list of commands in the robot's queue.
+
+        Returns
+        -------
+        A list of string values for each command in the queue, for example:
+
+        ``'Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>'``
+        """
         return [c.description for c in self._commands]

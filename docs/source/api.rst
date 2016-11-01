@@ -5,17 +5,18 @@ Developer Interface
 
 .. module:: opentrons
 
-If you are reading this, you might be looking for detailed explanation of the API
-which would allow you to build more sophisticated protocols and control the robot
-with more precession.
+If you are reading this, you are probably looking for an in-depth explanation of API classes and methods to fully master your protocol development skills. 
 
-Main Interface
---------------
+Robot
+-----
 
 All protocols are set up, simulated and executed using a Robot class.
 
 .. autoclass:: Robot
-   :inherited-members:
+   :members: connect, home, reset, run, simulate, commands, move_to, containers, actions, disconnect, pause, resume, stop, diagnostics, get_warnings, add_instrument, get_mosfet, get_motor
+
+Protocol Commands
+-----------------
 
 The actual protocol is written by issuing commands to instruments, such as ``Move To``,
 ``Pick Up Tip``, ``Aspirate`` or ``Dispense``.

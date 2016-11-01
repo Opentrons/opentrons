@@ -14,12 +14,13 @@ The Opentrons API is a versatile framework that makes it incredibly easy to writ
 Hello World
 -----------
 
-.. doctest::
+.. testsetup:: main
 
   from opentrons.robot import Robot
   from opentrons import containers, instruments
 
-  robot = Rodbot()
+  robot = Robot()
+  robot.reset()             # clear robot's state first
 
   tiprack = containers.load(
       'tiprack-200ul',  # container type
@@ -33,8 +34,38 @@ Hello World
   )
 
   p200.set_max_volume(200)  # volume calibration, can be called whenever you want
-  robot.clear()             # clear robot's state first
 
+.. testsetup:: long
+  
+  from opentrons.robot import Robot
+  Robot().reset()
+
+Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
+
+.. testcode:: long
+
+  # First, import opentrons API modules
+  from opentrons.robot import Robot
+  from opentrons import containers, instruments
+
+  # Initialized Robot variable
+  robot = Robot()
+
+  # Load a tip rack and assign it to a variable
+  tiprack = containers.load(
+      'tiprack-200ul',  # container type
+      'A1',             # slot
+      'tiprack'         # user-defined name
+  )
+  # Load a plate
+  plate = containers.load('96-flat', 'B1', 'plate')
+  
+  # Initialize a pipette    
+  p200 = instruments.Pipette(
+      axis="b"
+  )
+
+  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
   p200.pick_up_tip(tiprack[0])  # pick up tip from position 0 in a tip rack
 
   # loop through 95 wells, transferring to the next
@@ -42,14 +73,19 @@ Hello World
       p200.aspirate(100, plate[i])
       p200.dispense(plate[i + 1]).blow_out().touch_tip()
 
-  p200.drop_tip(tiprack[0])
+  # return tip to back to position 0 in a tip rack
+  p200.return_tip()
+  # simulate a protocol run on a virtual robot
+  robot.simulate()
+  # robot.connect('/dev/tty.usbserialNNNN')  # connect to the robot
+  # robot.run()                              # to run on a physical robot
 
 Basic Principles
 ----------------
 
 **Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
 
-::
+.. testcode:: main
 
   p200.aspirate(100, plate['A1']).dispense(plate['A2'])
 
@@ -61,7 +97,7 @@ Is exactly what you think it would do:
 **Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
 For example:
 
-::
+.. testcode:: main
 
   p200.aspirate(100, plate[0]).dispense(plate[1])
 
@@ -69,19 +105,30 @@ while using 0 or 1 instead of 'A1' and 'A2' will do just the same.
 
 or
 
-::
+.. testcode:: main
 
   p200.aspirate(100, plate[0].bottom())
 
 will aspirate 100, from the bottom of a well.
 
-API Reference
--------------
+Installing Opentrons API
+------------------------
+If you are just starting with Python it is recommended to install Jupyter notebook to run Opentrons API. Please refer to :ref:`setup` for detailed instructions.
+
+If you are familiar with python and comfortable running ``pip``, you can install Opentrons API by running:
+
+.. code-block:: bash
+
+  pip install opentrons
+
+Further Reading
+---------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    api
+   tips_and_tricks
 
 Indices and tables
 ==================
