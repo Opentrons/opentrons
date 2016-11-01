@@ -297,15 +297,11 @@ class Pipette(Instrument):
 
             self.current_tip_home_well = location
 
-            # TODO: actual plunge depth for picking up a tip
-            # varies based on the tip
-            # right now it's accounted for via plunge depth
-            tip_plunge = 6
+            tip_plunge = 10
 
-            # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
+                self.robot.move_head(z=-tip_plunge, mode='relative')
 
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
