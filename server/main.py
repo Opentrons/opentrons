@@ -128,32 +128,32 @@ def _run_commands():
 
 @app.route("/run", methods=["GET"])
 def run():
-    thread = threading.Thread(_run_commands())
+    thread = threading.Thread(target=_run_commands)
     thread.start()
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': 'hiiiii'
     })
 
 
 @app.route("/pause", methods=["GET"])
 def pause():
-    robot.pause()
+    result = robot.pause()
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 
 @app.route("/resume", methods=["GET"])
 def resume():
-    robot.resume()
+    result = robot.resume()
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 

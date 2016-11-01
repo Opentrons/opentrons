@@ -20,13 +20,15 @@
 		  <a @click="toggleMode('droptip')" class="position droptip">Drop Tip</a>
 		  <button class="btn-update save droptip" @click="calibrateInstrument(instrument, 'drop_tip')">Save</button>
 		  <button @click="moveToPlungerPosition(instrument, 'drop_tip')" :class="[{'disabled': disabled(instrument, 'drop_tip')}, 'btn-update', 'moveto', 'droptip']">Move</button>
-		  <button class="btn-update test pick-liquid">Pick Up</button>
-		  <button class="btn-update test eject-liquid">Eject</button>
+		  <button @click="pickUpTip(instrument)" class="btn-update test pick-liquid">Pick Up</button>
+		  <button @click="dropTip(instrument)" class="btn-update test eject-liquid">Eject</button>
 		</div>
 	</div>
 </template>
 
 <script>
+	import tipManipulation from '../util'
+
   export default {
     name: 'CalibrateInstrument',
     props: ['instrument'],
@@ -41,7 +43,6 @@
     		this.$store.dispatch("calibrate", {axis, position})
     	},
       moveToPlungerPosition(instrument, position) {
-				// TODO - test if this moves the robot if the class disabled is on the given position
         let axis = instrument.axis
         this.$store.dispatch("moveToPosition", {axis, position})
       },
@@ -50,7 +51,15 @@
 			},
       toggleMode(mode){
         this.currentMode = mode
-      }
+      },
+			pickUpTip(instrument) {
+		    let axis = instrument.axis
+		    this.$store.dispatch("pickUpTip", { axis: axis })
+		  },
+		  dropTip(instrument) {
+		    let axis = instrument.axis
+		    this.$store.dispatch("dropTip", { axis: axis })
+		  }
     }
   }
 </script>

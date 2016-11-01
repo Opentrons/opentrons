@@ -15,6 +15,8 @@ class OpenTrons {
     this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
     this.pickUpTipUrl = this.base_url + '/pick_up_tip'
     this.dropTipUrl = this.base_url + '/drop_tip'
+    this.pauseProtocolUrl = this.base_url + '/pause'
+    this.resumeProtocolUrl = this.base_url + '/resume'
   }
 
   connect (port) {

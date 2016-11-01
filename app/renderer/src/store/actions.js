@@ -83,7 +83,7 @@ const actions = {
     })
   },
   resumeProtocol({ commit }) {
-    OpenTrons.pauseProtocol().then((results) => {
+    OpenTrons.resumeProtocol().then((results) => {
       console.log(results)
       // commit(types.UPDATE_RUN_STATE, results)
     })
@@ -97,7 +97,7 @@ const actions = {
     OpenTrons.pickUpTip(data)
   },
   dropTip ({commit}, data) {
-    OpenTrons.dropTip(data, type)
+    OpenTrons.dropTip(data)
   }
 }
 
