@@ -268,12 +268,13 @@ class Pipette(Instrument):
         return self
 
     def return_tip(self):
+
         def _do():
             if not self.current_tip_home_well:
                 self.robot.add_warning('Pipette has no tip to return')
                 return
 
-            self.drop_tip(self.current_tip_home_well)
+            self.drop_tip(self.current_tip_home_well, now=True)
 
         description = "Returning tip"
         self.robot.add_command(Command(do=_do, description=description))
@@ -297,15 +298,11 @@ class Pipette(Instrument):
 
             self.current_tip_home_well = location
 
-            # TODO: actual plunge depth for picking up a tip
-            # varies based on the tip
-            # right now it's accounted for via plunge depth
-            tip_plunge = 6
+            tip_plunge = 10
 
-            # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
+                self.robot.move_head(z=-tip_plunge, mode='relative')
 
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
@@ -313,7 +310,7 @@ class Pipette(Instrument):
         self.robot.add_command(Command(do=_do, description=description))
         return self
 
-    def drop_tip(self, location=None):
+    def drop_tip(self, location=None, now=False):
         def _do():
             nonlocal location
             if not location and self.trash_container:
@@ -330,7 +327,10 @@ class Pipette(Instrument):
         description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        if now:
+            _do()
+        else:
+            self.robot.add_command(Command(do=_do, description=description))
         return self
 
     def home(self):

@@ -8,7 +8,9 @@ from opentrons import containers
 from opentrons.drivers import motor as motor_drivers
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons.robot.command import Command
+from opentrons.util import trace
 from opentrons.util.log import get_logger
+from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
@@ -606,7 +608,7 @@ class Robot(object, metaclass=Singleton):
         for instrument in self._instruments.values():
             instrument.reset()
 
-    def run(self):
+    def run(self, **kwargs):
         """
         Run the command queue on a device provided in :func:`connect`.
 
@@ -633,7 +635,21 @@ class Robot(object, metaclass=Singleton):
         """
         self.prepare_for_run()
 
-        for command in self._commands:
+        cmd_run_event = {}
+        cmd_run_event.update(kwargs)
+
+        mode = 'live'
+        if isinstance(
+                self._driver.connection, virtual_smoothie.VirtualSmoothie
+        ):
+            mode = 'simulate'
+
+        cmd_run_event['mode'] = mode
+        for i, command in enumerate(self._commands):
+            cmd_run_event.update({
+                'command_description': command.description,
+                'command_index': i
+            })
             try:
                 self.can_pop_command.wait()
                 if self.stopped_event.is_set():
@@ -642,8 +658,13 @@ class Robot(object, metaclass=Singleton):
                 if command.description:
                     log.info("Executing: {}".format(command.description))
                 command.do()
-            except KeyboardInterrupt as e:
-                self._driver.halt()
+                # emit command was done...
+                cmd_run_event['name'] = 'command-run',
+                trace.EventBroker.get_instance().notify(cmd_run_event)
+            except Exception as e:
+                cmd_run_event['name'] = 'command-failed',
+                cmd_run_event['error'] = str(e),
+                trace.EventBroker.get_instance().notify(cmd_run_event)
                 raise e
 
         return self._runtime_warnings
@@ -665,7 +686,6 @@ class Robot(object, metaclass=Singleton):
             self.set_connection('simulate_switches')
         else:
             self.set_connection('simulate')
-
         for instrument in self._instruments.values():
             instrument.set_plunger_defaults()
 
