@@ -20,8 +20,8 @@
 		  <a @click="toggleMode('droptip')" class="position droptip">Drop Tip</a>
 		  <button class="btn-update save droptip" @click="calibrateInstrument(instrument, 'drop_tip')">Save</button>
 		  <button @click="moveToPlungerPosition(instrument, 'drop_tip')" :class="[{'disabled': disabled(instrument, 'drop_tip')}, 'btn-update', 'moveto', 'droptip']">Move</button>
-		  <button class="btn-update test pick-liquid">Pick Up</button>
-		  <button class="btn-update test eject-liquid">Eject</button>
+		  <button class="btn-update test pick-liquid">Pick Up Tip</button>
+		  <button class="btn-update test eject-liquid">Drop Tip</button>
 		</div>
 	</div>
 </template>

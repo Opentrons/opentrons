@@ -21,8 +21,8 @@
           <span @click="home('all')" class="btn-home">ALL</span>
         </nav>
         <nav class="tabs">
-          <a href="#" class="tab active">Protocol</a>
-          <a href="#" class="tab">Debug</a>
+          <!-- <a href="#" class="tab active">Protocol</a> -->
+          <!-- <a href="#" class="tab">Debug</a> -->
         </nav>
       </header>
     </div>
