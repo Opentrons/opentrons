@@ -9,7 +9,7 @@
       <ul>
         <li v-for="placeable in instrument.placeables">
           <router-link v-bind:to="placeable.href" :class="{'completed': placeable.calibrated}" exact>
-            {{placeable.label}} [{{placeable.slot}}]
+            <span class="clip">{{placeable.label}} [{{placeable.slot}}]<span class="clip">
          </router-link>
         </li>
       </ul>
@@ -17,11 +17,16 @@
     <li v-for="instrument in tasks">
       <ul>
       <li>
-        <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}" exact>
-          calibrate {{instrument.label}}
+        <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}"  exact>
+          <span class="clip">calibrate {{instrument.label}}</span>
         </router-link>
       </li>
       </ul>
+    </li>
+    <li v-for="task in run_tasks" v-show="tasks.length > 0">
+      <router-link v-bind:to="task.href">
+        {{task.title}}
+      </router-link>
     </li>
   </ul>
 </template>
@@ -42,6 +47,13 @@
             completed: false,
             href: '/upload'
           }
+        ],
+        run_tasks: [
+          {
+            title: 'Verify and Run',
+            completed: false,
+            href: '/run'
+          },
         ]
       }
     },

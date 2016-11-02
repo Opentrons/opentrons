@@ -10,7 +10,11 @@ const state = {
   tasks: [],
   current_increment_placeable: 5,
   current_increment_plunger: 1,
-  coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0}
+  coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
+  run_state: "ready",
+  run_log: [],
+  run_plan: [],
+  busy: false
 }
 
 const mutations = {
@@ -37,8 +41,20 @@ const mutations = {
   [types.UPDATE_WARNINGS] (state, payload) {
     state.warnings = payload.warnings
   },
+  [types.RESET_RUN_LOG] (state) {
+    state.run_log = []
+  },
+  [types.UPDATE_RUN_LOG] (state, payload) {
+    state.run_log.push(payload)
+  },
+  [types.UPDATE_RUN_PLAN] (state, payload) {
+    state.run_plan = payload.run_plan
+  },
   [types.UPDATE_POSITION] (state, payload) {
     state.coordinates = payload
+  },
+  [types.UPDATE_ROBOT_STATE] (state, payload) {
+    state.busy = payload.busy
   }
 }
 

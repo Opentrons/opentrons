@@ -1,7 +1,7 @@
 <template>
   <div class="move-pipette">
     <h3 class="title">Jog Plunger</h3>
-    <div class="plunger">
+    <div :class="['plunger', disabled]">
       <div v-if="axis === 'a'" class="jog-a">
         <a @click="jog('a', -1)" class="btn-full btn-ab">P</a>
         <a @click="jog('a', 1)" class="btn-full btn-ab btn-down">P</a>
@@ -22,7 +22,7 @@
 
   export default {
     name: 'JogPlunger',
-    props: ['axis'],
+    props: ['axis', 'disabled'],
     data: function () {
       return {
         plunger_increments: [2,1,0.5,0.1],

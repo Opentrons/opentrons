@@ -8,7 +8,8 @@ import {
   Upload,
   Connect,
   Placeable,
-  Instrument
+  Instrument,
+  Run
 } from './components/export'
 
 
@@ -21,6 +22,7 @@ const routes = [
   { path: '/upload', component: Upload },
   { path: '/calibrate/:instrument', component: Instrument },
   { path: '/calibrate/:instrument/:placeable', component: Placeable },
+  { path: '/run', component: Run },
   { path: '*', redirect: "/connect" },
 ]
 

@@ -6,7 +6,7 @@
       </div>
       <div class="step step-connect">
         <div class="connect" v-if="!connected">
-          <select v-model="ports.selected" >
+          <select v-model="ports.selected" id="connections">
             <option v-for="option in ports.options" v-bind:value="option.value">
               {{ option.text }}
             </option>

@@ -49,12 +49,11 @@ table {
 }
 
 div.error {
-    @include rect(19,3);
-    @include offset-v(1,0);
-    overflow-y:scroll;
+    @include rect(19, 3);
+    @include offset-v(1, 0);
+    overflow-y: scroll;
     font-size: 16px;
     font-weight: 600;
-
     height: 40px;
     div {
         display: flex;
@@ -140,24 +139,27 @@ Wizard Screens
             div.connected {
                 display: flex;
                 justify-content: center;
-
-
-                @include rect(10,1);
-                @include offset-v(0,2);
-                .btn-connect{
-                    @include offset(2,2);
+                @include rect(10,
+                1);
+                @include offset-v(0,
+                2);
+                .btn-connect {
+                    @include offset(2,
+                    2);
                 }
-                p{
+                p {
                     line-height: 40px;
                     font-size: 16px;
-                    padding:0;
+                    padding: 0;
                 }
             }
         }
         .step-error,
         .step-upload {
-            @include rect(7,4);
-            @include offset(6,5);
+            @include rect(7,
+            4);
+            @include offset(6,
+            5);
             flex-direction: column;
             justify-content: center;
             align-content: flex-start;
@@ -198,6 +200,33 @@ Wizard Screens
                 cursor: pointer;
                 opacity: 0;
                 filter: alpha(opacity=0);
+            }
+        }
+        .step-run {
+            width:100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            .run-info {
+                @include rect(10,5);
+                //display: flex;
+                justify-content: left;
+
+                .current-command, .progress{
+                    @include rect(10,1);
+                    @include offset-v(1,0)
+                }
+
+                .progress{
+                    background-color: $secondary-brand;
+                    color:white;
+                }
+            }
+            .run-modal {
+                @include grid-col-full(5);
+                //@include offset-v(2,2);
+
             }
         }
         nav {
@@ -265,17 +294,19 @@ Deck|Container
         flex-wrap: wrap;
         @include grid-col-full(8);
         .well-img {
-            @include rect(2,3);
+            @include rect(2,
+            3);
         }
         .update {
             display: flex;
             flex-wrap: wrap;
             @include grid-col-full(6);
-            &.bottom{
-                @include offset-v-air(3,0);
+            &.bottom {
+                @include offset-v-air(3,
+                0);
             }
             &.top{
-                @include offset-v-air(2,0);
+                @include offset-v-air(1,0);
             }
             .position {
                 @include grid-col-air(2);
@@ -393,6 +424,11 @@ Pipette
 
 
 /************************
+Run Scren Styles
+************************/
+
+
+/************************
 Pop-up Modal Styles
 ************************/
 
@@ -450,4 +486,9 @@ Pop-up Modal Styles
 .close:hover {
     background: $primary-link;
     color: white;
+}
+
+.disabled{
+  opacity: 0.1;
+  pointer-events: none;
 }

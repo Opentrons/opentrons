@@ -9,8 +9,14 @@ class OpenTrons {
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
     this.jogUrl = this.base_url + '/jog'
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
+    this.runPlanUrl = this.base_url + '/run-plan'
+    this.runProtocolUrl = this.base_url + '/run'
     this.jogToContainerUrl = this.base_url + '/move_to_container'
     this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
+    this.pickUpTipUrl = this.base_url + '/pick_up_tip'
+    this.dropTipUrl = this.base_url + '/drop_tip'
+    this.pauseProtocolUrl = this.base_url + '/pause'
+    this.resumeProtocolUrl = this.base_url + '/resume'
   }
 
   connect (port) {
@@ -101,7 +107,45 @@ class OpenTrons {
         console.log('Failed to upload protocol', response)
       })
   }
-
+  getRunPlan () {
+    return Vue.http
+      .get(this.runPlanUrl)
+      .then((response) => {
+        if (response.body.status == 'success') {
+          return response.body.data || []
+        }
+        return []
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+  runProtocol () {
+    return Vue.http
+      .get(this.runProtocolUrl)
+      .then((response) => {
+        console.log("Protocol run successfully initiated", response)
+      }, (response) => {
+        console.log("Protocol run failed to execute", response)
+      })
+  }
+  pauseProtocol () {
+    return Vue.http
+      .get(this.pauseProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+  resumeProtocol () {
+    return Vue.http
+      .get(this.resumeProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
   calibrate(data, type) {
     return Vue.http
       .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
@@ -113,6 +157,37 @@ class OpenTrons {
          console.log('failed', response)
          return false
       })
+  }
+
+  pickUpTip (data) {
+    return Vue.http
+      .post(this.pickUpTipUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
+  dropTip (data) {
+    return Vue.http
+      .post(this.dropTipUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
+  home (axis) {
+    return Vue.http
+        .get(`/home/${axis}`)
+        .then((response) => {
+            console.log(response)
+            console.log(`Homing ${axis}`)
+        }, (response) => {
+            console.log('failed to home', response)
+        })
   }
 }
 

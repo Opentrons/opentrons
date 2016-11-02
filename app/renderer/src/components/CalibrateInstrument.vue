@@ -6,7 +6,7 @@
 		  <img src="../assets/img/pipette_blowout.png" class="blowout" />
 		  <img src="../assets/img/pipette_droptip.png" class="droptip" />
 		</div>
-		<div class="update">
+		<div :class="['update', busy]">
 		  <a @click="toggleMode('top')"class="position top">Top</a>
 		  <button class="btn-update save top" @click="calibrateInstrument(instrument, 'top')">Save</button>
 		  <button @click="moveToPlungerPosition(instrument, 'top')" :class="[{'disabled': disabled(instrument, 'top')}, 'btn-update', 'moveto', 'top']">Move</button>
@@ -20,8 +20,8 @@
 		  <a @click="toggleMode('droptip')" class="position droptip">Drop Tip</a>
 		  <button class="btn-update save droptip" @click="calibrateInstrument(instrument, 'drop_tip')">Save</button>
 		  <button @click="moveToPlungerPosition(instrument, 'drop_tip')" :class="[{'disabled': disabled(instrument, 'drop_tip')}, 'btn-update', 'moveto', 'droptip']">Move</button>
-		  <button class="btn-update test pick-liquid">Pick Up</button>
-		  <button class="btn-update test eject-liquid">Eject</button>
+		  <button @click="pickUpTip(instrument)" class="btn-update test pick-liquid">Pick Up Tip</button>
+		  <button @click="dropTip(instrument)" class="btn-update test eject-liquid">Drop Tip</button>
 		</div>
 	</div>
 </template>
@@ -29,7 +29,7 @@
 <script>
   export default {
     name: 'CalibrateInstrument',
-    props: ['instrument'],
+    props: ['instrument', 'busy'],
     data: function() {
       return {
         currentMode : 'droptip'
@@ -41,7 +41,6 @@
     		this.$store.dispatch("calibrate", {axis, position})
     	},
       moveToPlungerPosition(instrument, position) {
-				// TODO - test if this moves the robot if the class disabled is on the given position
         let axis = instrument.axis
         this.$store.dispatch("moveToPosition", {axis, position})
       },
@@ -50,7 +49,15 @@
 			},
       toggleMode(mode){
         this.currentMode = mode
-      }
+      },
+			pickUpTip(instrument) {
+		    let axis = instrument.axis
+		    this.$store.dispatch("pickUpTip", { axis: axis })
+		  },
+		  dropTip(instrument) {
+		    let axis = instrument.axis
+		    this.$store.dispatch("dropTip", { axis: axis })
+		  }
     }
   }
 </script>

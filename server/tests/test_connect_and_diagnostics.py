@@ -103,5 +103,5 @@ class ConnectDiagnosticsTestCase(unittest.TestCase):
             }
         }
         self.assertListEqual(
-            list(response['versions'].keys()), list(expected.keys())
+            sorted(list(response['versions'].keys())), sorted(list(expected.keys()))
         )

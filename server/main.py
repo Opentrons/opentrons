@@ -113,7 +113,7 @@ def _run_commands():
 
     try:
         robot.resume()
-        robot.run()
+        robot.run(caller='ui')
         if len(robot._commands) == 0:
             error = ("This protocol does not contain "
                      "any commands for the robot.")
@@ -122,40 +122,38 @@ def _run_commands():
         api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings() or []
-
-    return api_response
+    api_response['name'] = 'run exited'
+    socketio.emit('event', api_response)
 
 
 @app.route("/run", methods=["GET"])
 def run():
-    api_response = _run_commands()
+    thread = threading.Thread(target=_run_commands)
+    thread.start()
 
     return flask.jsonify({
         'status': 'success',
-        'data': {
-            'errors': api_response['errors'],
-            'warnings': api_response['warnings']
-        }
+        'data': {}
     })
 
 
 @app.route("/pause", methods=["GET"])
 def pause():
-    robot.pause()
+    result = robot.pause()
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 
 @app.route("/resume", methods=["GET"])
 def resume():
-    robot.resume()
+    result = robot.resume()
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 
@@ -410,6 +408,7 @@ def move_to_slot():
             instrument=robot._instruments[axis.upper()]
         )
     except Exception as e:
+        result = e
         print(e)
 
     return flask.jsonify({
@@ -438,6 +437,60 @@ def move_to_container():
         'data': ''
     })
 
+
+@app.route('/pick_up_tip', methods=["POST"])
+def pick_up_tip():
+    axis = request.json.get("axis")
+
+    try:
+        # TODO: use actual Pipette.pick_up_tip() method
+        #       not doing this now because pick_up_tip() enqueues
+        robot = Robot.get_instance()
+        for i in range(3):
+            robot.move_head(z=10, mode='relative')
+            robot.move_head(z=-10, mode='relative')
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/drop_tip', methods=["POST"])
+def drop_tip():
+    axis = request.json.get("axis")
+
+    try:
+        # TODO: use actual Pipette.drop_tip() method
+        #       not doing this now because drop_tip() enqueues
+        robot = Robot.get_instance()
+        instrument = robot._instruments[axis.upper()]
+
+        drop_tip_pos = instrument.positions['drop_tip']
+        kwargs = {}
+        kwargs[axis] = drop_tip_pos
+        robot._driver.move_plunger(**kwargs)
+
+        blow_out_pos = instrument.positions['blow_out']
+        kwargs = {}
+        kwargs[axis] = blow_out_pos
+        robot._driver.move_plunger(**kwargs)
+
+    except Exception as e:
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
 
 @app.route('/move_to_plunger_position', methods=["POST"])
 def move_to_plunger_position():
@@ -543,6 +596,15 @@ def calibrate_plunger():
     })
 
 
+@app.route("/run-plan")
+def get_run_plan():
+    global robot
+    return flask.jsonify({
+        'status': 'success',
+        'data': [i.description for i in robot._commands]
+    })
+
+
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
@@ -562,6 +624,7 @@ if __name__ == "__main__":
         data_dir = sys.argv[1]
     else:
         data_dir = os.getcwd()
+    os.environ['APP_DATA_DIR'] = data_dir
 
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:

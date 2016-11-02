@@ -1,6 +1,4 @@
 # We are using the iOS build system to create Mac OS X python builds
-language: objective-c
-
 os:
   - osx
 
@@ -48,8 +46,10 @@ install:
   - node --version
   - npm --version
   - npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
+  - npm i -g mocha
   - npm run unit
   - npm run release:mac
+  - npm run integration
   - ls dist/mac
   - ls releases
 

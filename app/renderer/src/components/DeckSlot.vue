@@ -1,6 +1,6 @@
 <template>
   <span>
-    <button v-for="slot in slots" @click="jogToSlot(slot, axis)"class="btn-deck">
+    <button v-for="slot in slots" @click="jogToSlot(slot, axis)" :class="['btn-deck', disabled]">
       {{slot}}
     </button>
   </span>
@@ -9,7 +9,7 @@
 <script>
   export default {
     name: 'DeckSlot',
-    props: ['slots', 'axis'],
+    props: ['slots', 'axis', 'disabled'],
     methods: {
       jogToSlot(slot, axis) {
         this.$store.dispatch("jogToSlot", {slot: slot, axis: axis})

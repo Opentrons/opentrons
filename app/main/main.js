@@ -8,8 +8,12 @@ const {initAutoUpdater} = require('./updater.js')
 
 
 let serverManager = new ServerManager()
-const mainLogger = getLogger('electron-main')
 let mainWindow
+
+
+if (process.env.NODE_ENV == 'development'){
+  require('electron-debug')({showDevTools: true});
+}
 
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
@@ -23,6 +27,8 @@ function createWindow () {
 }
 
 function startUp() {
+  const mainLogger = getLogger('electron-main')
+
   serverManager.start();
   setTimeout(createWindow, 2000)
   initAutoUpdater()
