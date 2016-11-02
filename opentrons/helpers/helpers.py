@@ -73,7 +73,10 @@ def import_calibration_json(json_string, robot, calibrated_top=False):
                         children))[0]
                 z_pos = -1
                 if calibrated_top:
-                    if ('tip' not in name.lower()) and ('rack' not in name.lower()):
+                    if (
+                        ('tip' not in name.lower()) and
+                        ('rack' not in name.lower())
+                    ):
                         z_pos = 1
                 location = (
                     container,
