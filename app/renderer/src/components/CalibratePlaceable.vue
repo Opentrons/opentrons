@@ -23,8 +23,6 @@
 </template>
 
 <script>
-	import tipManipulation from '../util'
-
   export default {
     name: 'CalibratePlaceable',
     props: ['instrument', 'placeable', 'type', 'disabled'],
