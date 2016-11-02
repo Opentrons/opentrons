@@ -13,12 +13,12 @@
       <header class="controls">
         <nav class="home">
           <span class="label">HOME: </span>
-          <span @click="home('x')" class="btn-home">X</span>
-          <span @click="home('y')" class="btn-home">Y</span>
-          <span @click="home('z')" class="btn-home">Z</span>
-          <span @click="home('a')" class="btn-home">A</span>
-          <span @click="home('b')" class="btn-home">B</span>
-          <span @click="home('all')" class="btn-home">ALL</span>
+          <span @click="home('x')" :class="['btn-home', classObject]">X</span>
+          <span @click="home('y')" :class="['btn-home', classObject]">Y</span>
+          <span @click="home('z')" :class="['btn-home', classObject]">Z</span>
+          <span @click="home('a')" :class="['btn-home', classObject]">A</span>
+          <span @click="home('b')" :class="['btn-home', classObject]">B</span>
+          <span @click="home('all')" :class="['btn-home', classObject]">ALL</span>
         </nav>
         <nav class="tabs">
           <a href="#" class="tab active">Protocol</a>
@@ -49,14 +49,14 @@
     },
     methods: {
       home(axis) {
-        this.$http
-            .get(`/home/${axis}`)
-            .then((response) => {
-                console.log(response)
-                console.log(`Homing ${axis}`)
-            }, (response) => {
-                console.log('failed to home', response)
-            })
+        this.$store.dispatch('home', {axis: axis})
+      }
+    },
+    computed: {
+      classObject: function () {
+        return {
+          'disabled': this.$store.state.busy
+        }
       }
     }
   }

@@ -408,6 +408,7 @@ def move_to_slot():
             instrument=robot._instruments[axis.upper()]
         )
     except Exception as e:
+        result = e
         print(e)
 
     return flask.jsonify({

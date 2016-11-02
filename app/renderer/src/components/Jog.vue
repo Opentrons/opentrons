@@ -1,7 +1,7 @@
 <template>
   <div class="move">
     <h3 class="title">Jog X-Y-Z</h3>
-    <div class="jog">
+    <div :class="['jog', disabled]">
       <button @click="jog('y', 1)" class="btn-full btn-y">Y</button>
       <button @click="jog('z', 1)" class="btn-full btn-z">Z</button>
       <button @click="jog('x', -1)" class="btn-full x">X</button>
@@ -16,7 +16,7 @@
     </div>
     <h3 class="title">Move to Slot</h3>
     <div class="deck">
-      <DeckSlot :slots="slots" :axis="instrument"></DeckSlot>
+      <DeckSlot :slots="slots" :axis="instrument" :disabled="disabled"></DeckSlot>
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@
 
   export default {
     name: 'Jog',
-    props: ['instrument'],
+    props: ['instrument', 'disabled'],
     data: function () {
       return {
         placeable_increments: [20,10,5,1,0.5,0.1],

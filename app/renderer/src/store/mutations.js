@@ -13,7 +13,8 @@ const state = {
   coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
   run_state: "ready",
   run_log: [],
-  run_plan: []
+  run_plan: [],
+  busy: false
 }
 
 const mutations = {
@@ -51,6 +52,9 @@ const mutations = {
   },
   [types.UPDATE_POSITION] (state, payload) {
     state.coordinates = payload
+  },
+  [types.UPDATE_ROBOT_STATE] (state, payload) {
+    state.busy = payload.busy
   }
 }
 

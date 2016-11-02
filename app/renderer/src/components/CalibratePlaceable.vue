@@ -6,13 +6,13 @@
 			<img src="../assets/img/point_top.png" v-show="placeableType('point')"/>
 		</div>
 
-		<div class="update bottom" v-show="placeableType('default') || placeableType('point')">
+		<div :class="['update bottom', disabled]" v-show="placeableType('default') || placeableType('point')">
 			<span class="position bottom">Bottom</span>
 			<button class="btn-placeable save bottom" @click="calibratePlaceable(placeable,instrument)">Save </button>
 			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
 		</div>
 
-		<div class="update top" v-show="placeableType('tiprack')">
+		<div :class="['update top', disabled]" v-show="placeableType('tiprack')">
 			<span class="position top">Tiprack</span>
 			<button class="btn-placeable save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
 			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
@@ -27,7 +27,7 @@
 
   export default {
     name: 'CalibratePlaceable',
-    props: ['instrument', 'placeable', 'type'],
+    props: ['instrument', 'placeable', 'type', 'disabled'],
     methods: {
 			placeableType(type) {
 				return this.type === type
