@@ -27,8 +27,6 @@
 </template>
 
 <script>
-	import tipManipulation from '../util'
-
   export default {
     name: 'CalibrateInstrument',
     props: ['instrument', 'busy'],
