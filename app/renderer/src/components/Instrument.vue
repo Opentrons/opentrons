@@ -7,13 +7,13 @@
 
     <section>
       <div class="step step-calibrate">
-        <Jog :instrument="instrument.axis" :disabled="classObject"></Jog>
-        <JogPlunger :axis="instrument.axis" :disabled="classObject"></JogPlunger>
+        <Jog :instrument="instrument.axis" :disabled="busy"></Jog>
+        <JogPlunger :axis="instrument.axis" :disabled="busy"></JogPlunger>
         <div class="save-pipette">
             <h3 class="title">Current Position</h3>
             <coordinates :instrument="instrument" :axis="instrument.axis.toUpperCase()"></coordinates>
             <h3 class="title">Calibrate {{ instrument.label }} axis {{instrument.axis.toUpperCase() }}</h3>
-            <CalibrateInstrument :instrument="instrument" :busy="classObject"></CalibrateInstrument>
+            <CalibrateInstrument :instrument="instrument" :busy="busy"></CalibrateInstrument>
         </div>
       </div>
       <Navigation :prev="prev" :next="next"></Navigation>
@@ -87,7 +87,7 @@
           return prevPlaceable.href
         }
       },
-      classObject: function () {
+      busy: function () {
         return {
           'disabled': this.$store.state.busy
         }
