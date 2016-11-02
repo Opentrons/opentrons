@@ -567,8 +567,8 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.drop_tip.mock_calls,
             [
-                mock.call.drop_tip(self.tiprack1[0]),
-                mock.call.drop_tip(self.tiprack1[1])
+                mock.call(self.tiprack1[0], now=True),
+                mock.call(self.tiprack1[1], now=True)
             ]
         )
 
