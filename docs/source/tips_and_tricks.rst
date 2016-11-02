@@ -68,7 +68,7 @@ List your serial ports:
 .. testoutput:: main
   :hide:
 
-  ['Virtual Smoothie']
+  []
 
 Sample output on OS X / Linux:
 
