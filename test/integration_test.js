@@ -68,7 +68,6 @@ describe('application launch', function () {
   it('runs a protocol', function () {
     var file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
     var pauseTime = process.env.PAUSE_TIME || 0
-    console.log('TEST GOT HERE...')
     return this.app.client.waitUntilWindowLoaded(5000)
       .click('//*[@id="connections"]/option[2]')
       .pause(pauseTime)

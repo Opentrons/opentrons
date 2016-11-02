@@ -49,7 +49,7 @@ install:
   - npm i -g mocha
   - npm run unit
   - npm run release:mac
-  - mocha --timeout 60000 test/integration_test.js
+  - ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/integration_test.js
   - ls dist/mac
   - ls releases
 

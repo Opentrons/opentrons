@@ -14,7 +14,7 @@
     "release": "npm run build:backend && npm run build:frontend",
     "release:mac": "npm run build:backend:mac && npm run build:frontend:mac",
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
-    "start": "NODE_ENV=development electron app/",
+    "start": "ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "integration": "mocha --timeout 15000 test/integration_test.js"
   },
