@@ -417,7 +417,14 @@ class CNCDriver(object):
             for l in axis_to_home:
                 pos_args[l] = 0
 
-            arguments = {'name': 'home', 'axis': axis_to_home}
+            arguments = {
+                'name': 'home',
+                'axis': axis_to_home,
+                'position': {
+                    'head': self.get_head_position()["current"],
+                    'plunger': self.get_plunger_positions()["current"]
+                }
+            }
             trace.EventBroker.get_instance().notify(arguments)
             return self.set_position(**pos_args)
         else:
