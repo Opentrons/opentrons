@@ -5,13 +5,16 @@ var path = require('path')
 var glob = require("glob")
 
 
-// var isWin = /^win/.test(process.platform);
-// var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
-// if (isWin) {
-//   var detectedExes = glob.sync('releases\\*.exe');
-//   appExecutablePath = detectedExes[0];
-//   console.log('App exes on windows', detectedExes, appExecutablePath)
-// }
+var isWin = /^win/.test(process.platform);
+var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
+if (isWin) {
+  var detectedExes = glob.sync('releases\\*.exe');
+  appExecutablePath = detectedExes[0];
+  console.log('App exes on windows', detectedExes, appExecutablePath)
+  var ChildProcess = require('child_process')
+  ChildProcess.spawn(appExecutablePath)
+}
+
 
 let appPath;
 if (process.platform === 'win32') {
