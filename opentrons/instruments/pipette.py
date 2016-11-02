@@ -13,6 +13,38 @@ import itertools
 
 class Pipette(Instrument):
 
+    """
+    This class is the pipette
+
+    Through this class you can can:
+        * Attach your pipette to an `axis` on an Opentrons robot
+        * Handle liquids with :meth:`aspirate`, :meth:`dispense`, :meth:`mix`, and :meth:`blow_out`
+        * Handle tips with :meth:'pick_up_tip', :meth:'drop_tip', and :meth:'return_tip'
+
+    Each Pipette has an axis.
+
+    Here are the typical steps of using the Pipette:
+        * Instantiate a pipette, attaching it to an axis (`a` or `b`)
+        * Optionally attach a list of tip racks, trash, number of channels, and plunger speeds
+        * Set the maximum volume of this pipette (found after calibration)
+
+    Examples
+    --------
+    >>> from opentrons import instruments, containers
+    >>> p1000 = instruments.Pipette(axis='a')
+    >>> p1000.set_max_volume(1000)
+    >>> tip_rack_200ul = containers.load('tiprack-200ul', 'A1')
+    >>> p200 = instruments.Pipette(
+    >>>      axis='b',
+    >>>      name='my_favorite_pipette',
+    >>>      tip_racks=[tip_rack_200ul],
+    >>>      channels=8,
+    >>>      aspirate_speed=300,
+    >>>      dispense_speed=500
+    >>> )
+    >>> p200.set_max_volume(200)
+    """
+
     def __init__(
             self,
             axis,
@@ -119,6 +151,26 @@ class Pipette(Instrument):
         return self
 
     def aspirate(self, volume=None, location=None, rate=1.0):
+        """
+        Aspirate a volume (in microliters/uL) using this pipette
+
+        Notes
+        -----
+        If no `location` is passed, the pipette will aspirate in place.
+        If no `volume` is passed, `aspirate` will default to it's `max_volume` (see :any:`set_max_volume`)
+
+        Examples
+        --------
+        ..
+        >>> from opentrons.robot import Robot
+        >>> from opentrons.instruments.pipette import Pipette
+        >>> plate = robot.add_container('A1', '96-flat', 'plate')
+        >>> p200 = Pipette(axis='a')
+        >>> p200.set_max_volume(200)
+        >>> p200.aspirate(100, plate[0])
+        >>> p200.aspirate(20)
+        >>> p200.aspirate(plate[1])
+        """
         def _do_aspirate():
             nonlocal volume
             nonlocal location

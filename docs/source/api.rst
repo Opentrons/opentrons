@@ -15,14 +15,14 @@ All protocols are set up, simulated and executed using a Robot class.
 .. autoclass:: Robot
    :members: connect, home, reset, run, simulate, commands, move_to, containers, actions, disconnect, pause, resume, stop, diagnostics, get_warnings, add_instrument, get_mosfet, get_motor
 
-Protocol Commands
+Pipette
 -----------------
 
 The actual protocol is written by issuing commands to instruments, such as ``Move To``,
 ``Pick Up Tip``, ``Aspirate`` or ``Dispense``.
 
-.. module:: opentrons.instruments.pipette
+.. module:: opentrons.instruments
 
 .. autoclass:: Pipette
-   :inherited-members:
+   :members: aspirate, dispense
 
