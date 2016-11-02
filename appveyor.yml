@@ -70,7 +70,7 @@ install:
   - npm install
   - npm install -g mocha@3.1.2
   - npm run release:win
-  - mocha --timeout 6000000 test/integration_test.js
+  - mocha --timeout 60000 test/integration_test.js
 
 build: off
 
