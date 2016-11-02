@@ -12,7 +12,11 @@ if (isWin) {
   appExecutablePath = detectedExes[0];
   console.log('App exes on windows', detectedExes, appExecutablePath)
   var ChildProcess = require('child_process')
-  ChildProcess.spawn(appExecutablePath)
+  ChildProcess.exec(appExecutablePath, function(err, stdout, stderr) {
+    if (err) throw err;
+    console.log('out..', stdout)
+    console.log('err..', stderr)
+  })
 }
 
 
