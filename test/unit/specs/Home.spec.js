@@ -10,7 +10,6 @@ describe('Home.vue', () => {
       store,
       ...Home
     }).$mount('#app')
-    console.log(vm)
     expect(vm.$el.querySelector('#app-title').textContent).to.equal('Logo')
     expect(1).to.equal(1)
   })
