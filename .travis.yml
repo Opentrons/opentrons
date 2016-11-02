@@ -51,6 +51,7 @@ install:
   - npm run release:mac
   # - mocha --timeout 60000 test/integration_test.js
   - ls dist/mac
+  - ./dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons
   - ls releases
 
 # Deploy the build version in an S3 bucket
