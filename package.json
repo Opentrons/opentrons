@@ -16,7 +16,7 @@
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
-    "integration": "mocha --timeout 15000 test/integration_test.js"
+    "integration": "ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/integration_test.js"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
