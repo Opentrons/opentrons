@@ -3,17 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Opentrons API: the ultimate way to design and run protocols
-===========================================================
-
-Introduction
-------------
-
-The Opentrons API is a versatile framework that makes it incredibly easy to write protocols and command the robot. Using the API your protocols can be understood by our machines and read or modified by fellow non-programmer scientists. It's also an opportunity for you to learn a little bit of Python.
-
-Hello World
------------
-
 .. testsetup:: main
 
   from opentrons.robot import Robot
@@ -28,17 +17,63 @@ Hello World
       'tiprack'         # user-defined name
   )
   plate = containers.load('96-flat', 'B1', 'plate')
+  trough = containers.load('trough-12row', 'B2', 'trough')
+
+  tube_1 = plate[0]
+  tube_2 = plate[1]
+
+  well_1 = plate[0]
+  well_2 = plate[1]
+  well_3 = plate[2]
+  well_4 = plate[3]
       
   p200 = instruments.Pipette(
       axis="b"
   )
 
   p200.set_max_volume(200)  # volume calibration, can be called whenever you want
+  pipette = p200
 
 .. testsetup:: long
   
   from opentrons.robot import Robot
   Robot().reset()
+
+Opentrons API: Simple Biology Lab Protocol Coding
+===========================================================
+
+Introduction
+------------
+
+The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy. 
+
+We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you can write your automated protocols in a similar way to how you'd already write them in your lab notebook. 
+
+.. testcode:: main
+   
+   pipette.aspirate(tube_1).dispense(tube_2)
+
+That is how you tell the Opentrons robot to aspirate its full volume from tube-1 and dispense it into tube-2. 
+
+To create your own automated protocols, you just have to string together commands for the robot to do for you. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into four different wells.
+
+.. testcode:: main
+   
+   p200.aspirate(trough)
+   p200.dispense(50, well_1).dispense(50, well_2).dispense(50, well_3).dispense(50, well_4)
+
+If you wanted to do this 96 times, you could write it like this:
+
+.. testsetup:: main
+   
+  p200.aspirate(trough)
+   
+  for i in range(95):
+      p200.aspirate(100, plate[i])
+      p200.dispense(plate[i + 1]).blow_out().touch_tip()
+
+Hello World
+-----------
 
 Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
 

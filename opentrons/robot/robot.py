@@ -661,8 +661,7 @@ class Robot(object, metaclass=Singleton):
                 # emit command was done...
                 cmd_run_event['name'] = 'command-run',
                 trace.EventBroker.get_instance().notify(cmd_run_event)
-            except KeyboardInterrupt as e:
-                self._driver.halt()
+            except Exception as e:
                 cmd_run_event['name'] = 'command-failed',
                 cmd_run_event['error'] = str(e),
                 trace.EventBroker.get_instance().notify(cmd_run_event)
