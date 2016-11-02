@@ -133,7 +133,7 @@ def run():
 
     return flask.jsonify({
         'status': 'success',
-        'data': 'hiiiii'
+        'data': {}
     })
 
 
