@@ -73,7 +73,7 @@ def import_calibration_json(json_string, robot, calibrated_top=False):
                         children))[0]
                 z_pos = -1
                 if calibrated_top:
-                    if ('tip' not in name) and ('rack' not in name):
+                    if ('tip' not in name.lower()) and ('rack' not in name.lower()):
                         z_pos = 1
                 location = (
                     container,
@@ -82,7 +82,10 @@ def import_calibration_json(json_string, robot, calibrated_top=False):
                         y=0,
                         z=z_pos,
                         reference=container))
-
+                # If calibration data is null for x, y, z then skip this
+                # container
+                if not all([coordinates[c] for c in 'xyz']):
+                    continue
                 pipette.calibrate_position(
                     location,
                     robot.flip_coordinates(coordinates))
