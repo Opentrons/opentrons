@@ -8,7 +8,6 @@ const {initAutoUpdater} = require('./updater.js')
 
 
 let serverManager = new ServerManager()
-const mainLogger = getLogger('electron-main')
 let mainWindow
 
 
@@ -28,6 +27,8 @@ function createWindow () {
 }
 
 function startUp() {
+  const mainLogger = getLogger('electron-main')
+
   serverManager.start();
   setTimeout(createWindow, 2000)
   initAutoUpdater()
