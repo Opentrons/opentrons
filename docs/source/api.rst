@@ -18,11 +18,8 @@ All protocols are set up, simulated and executed using a Robot class.
 Pipette
 -----------------
 
-The actual protocol is written by issuing commands to instruments, such as ``Move To``,
-``Pick Up Tip``, ``Aspirate`` or ``Dispense``.
-
 .. module:: opentrons.instruments
 
 .. autoclass:: Pipette
-   :members: aspirate, dispense
+   :members: aspirate, dispense, mix, delay, drop_tip, blow_out, touch_tip, pick_up_tip, return_tip, calibrate, calibrate_position, move_to, home, set_speed, set_max_volume
 
