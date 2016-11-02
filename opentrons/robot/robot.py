@@ -848,7 +848,7 @@ class Robot(object, metaclass=Singleton):
     def get_serial_ports_list(self):
         ports = []
         # TODO: Store these settings in config
-        if os.environ.get('DEBUG', '').lower() == 'true':
+        if os.environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             ports = [self.VIRTUAL_SMOOTHIE_PORT]
         ports.extend(self._driver.get_serial_ports_list())
         return ports

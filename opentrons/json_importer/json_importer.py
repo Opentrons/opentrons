@@ -458,6 +458,8 @@ class JSONProtocolProcessor(object):
 
         from_volume = total_to_volume * (1 + distribute_percent)
 
+        from_volume = min(from_volume, tool_obj.max_volume)
+
         self.handle_transfer_from(
             tool_obj,
             tool_settings,
