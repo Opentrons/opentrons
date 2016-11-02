@@ -1,4 +1,5 @@
 const child_process = require('child_process')
+const fs = require('fs')
 const http = require('http')
 const path = require('path')
 
@@ -34,10 +35,9 @@ function createAndSetAppDataDir() {
     throw Error("Attempting to create otone_data dir when app is not ready")
   }
   const appDataDir = path.join(app.getPath('userData'), 'otone_data')
-  try {
+
+  if (!fs.existsSync(appDataDir)) {
     fs.mkdirSync(appDataDir)
-  } catch (e) {
-    // file exists..
   }
   process.env['APP_DATA_DIR'] = appDataDir
 }
