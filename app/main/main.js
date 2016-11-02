@@ -1,6 +1,9 @@
-const http = require('http')
 const child_process = require('child_process')
+const http = require('http')
+const path = require('path')
+
 const electron = require('electron')
+
 const {app, BrowserWindow} = electron
 const {ServerManager} = require('./servermanager.js')
 const {getLogger} = require('./logging.js')
@@ -26,12 +29,26 @@ function createWindow () {
   })
 }
 
-function startUp() {
-  const mainLogger = getLogger('electron-main')
+function createAndSetAppDataDir() {
+  if (!app.isReady()) {
+    throw Error("Attempting to create otone_data dir when app is not ready")
+  }
+  const appDataDir = path.join(app.getPath('userData'), 'otone_data')
+  try {
+    fs.mkdirSync(appDataDir)
+  } catch (e) {
+    // file exists..
+  }
+  process.env['APP_DATA_DIR'] = appDataDir
+}
 
+function startUp() {
+  createAndSetAppDataDir()
   serverManager.start();
   setTimeout(createWindow, 2000)
   initAutoUpdater()
+
+  const mainLogger = getLogger('electron-main')
   process.on('uncaughtException', (error) => {
     if (process.listeners("uncaughtException").length > 1) {
       mainLogger.info(error)

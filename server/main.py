@@ -620,11 +620,7 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        data_dir = sys.argv[1]
-    else:
-        data_dir = os.getcwd()
-    os.environ['APP_DATA_DIR'] = data_dir
+    data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
 
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:

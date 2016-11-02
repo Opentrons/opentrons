@@ -28,13 +28,7 @@ function createLogger(path, name) {
 }
 
 function getLogger(name) {
-  const logDir = path.join(app.getPath('userData'), 'otone_data')
-  try {
-    fs.mkdirSync(logDir)
-  } catch (e) {
-    // file exists..
-  }
-
+  const logDir = process.env.APP_DATA_DIR
   const loggerPath = path.join(logDir, name.concat('.log'))
   return createLogger(loggerPath, name)
 }
