@@ -31,14 +31,13 @@ function createWebSocketPlugin(socket) {
         let axis_homed = data.axis.split('').map((axis) => {
           return axis.toLowerCase()
         })
-        let {x, y, z, a, b} = store._options.state.coordinates
-        let current_coordinates = {x, y, z, a, b}
-        axis_homed.forEach((axis) => {
-          current_coordinates[axis] = 0
-          if (axis === "y") { current_coordinates[axis] = 250 }
-          if (axis === "z") { current_coordinates[axis] = 120 }
+        store.commit(types.UPDATE_POSITION, {
+          x: data.position.head.x,
+          y: data.position.head.y,
+          z: data.position.head.z,
+          a: data.position.plunger.a,
+          b: data.position.plunger.b
         })
-        store.commit(types.UPDATE_POSITION, current_coordinates)
       }
       if (data.name == 'command-run') {
         console.log(data)

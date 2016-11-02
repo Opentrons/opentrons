@@ -28,11 +28,14 @@ function createLogger(path, name) {
 }
 
 function getLogger(name) {
-  const loggerPath = path.join(
-    app.getPath('userData'),
-    'otone_data',
-    name.concat('.log')
-  )
+  const logDir = path.join(app.getPath('userData'), 'otone_data')
+  try {
+    fs.mkdirSync(logDir)
+  } catch (e) {
+    // file exists..
+  }
+
+  const loggerPath = path.join(logDir, name.concat('.log'))
   return createLogger(loggerPath, name)
 }
 
