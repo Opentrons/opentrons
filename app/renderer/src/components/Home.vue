@@ -13,12 +13,12 @@
       <header class="controls">
         <nav class="home">
           <span class="label">HOME: </span>
-          <span @click="home('x')" :class="['btn-home', classObject]">X</span>
-          <span @click="home('y')" :class="['btn-home', classObject]">Y</span>
-          <span @click="home('z')" :class="['btn-home', classObject]">Z</span>
-          <span @click="home('a')" :class="['btn-home', classObject]">A</span>
-          <span @click="home('b')" :class="['btn-home', classObject]">B</span>
-          <span @click="home('all')" :class="['btn-home', classObject]">ALL</span>
+          <span @click="home('x')" :class="['btn-home', busy]">X</span>
+          <span @click="home('y')" :class="['btn-home', busy]">Y</span>
+          <span @click="home('z')" :class="['btn-home', busy]">Z</span>
+          <span @click="home('a')" :class="['btn-home', busy]">A</span>
+          <span @click="home('b')" :class="['btn-home', busy]">B</span>
+          <span @click="home('all')" :class="['btn-home', busy]">ALL</span>
         </nav>
         <nav class="tabs">
           <a href="#" class="tab active">Protocol</a>
@@ -53,7 +53,7 @@
       }
     },
     computed: {
-      classObject: function () {
+      busy: function () {
         return {
           'disabled': this.$store.state.busy
         }
