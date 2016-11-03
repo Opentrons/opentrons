@@ -16,7 +16,7 @@ let mainWindow
 
 
 if (process.env.NODE_ENV == 'development'){
-  require('electron-debug')({showDevTools: true});
+  require('electron-debug')({showDevTools: 'undocked'});
 }
 
 function createWindow () {
@@ -54,6 +54,7 @@ function startUp() {
       mainLogger.info(error)
     }
   })
+  // require('vue-devtools').install()
 }
 
 app.on('ready', startUp)

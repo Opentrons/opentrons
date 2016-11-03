@@ -47,6 +47,7 @@
     "sass-loader": "^4.0.2",
     "spectron": "^3.2.6",
     "url-loader": "^0.5.7",
+    "vue-devtools": "^2.0.4",
     "vue-loader": "^9.4.0",
     "webpack": "1.13.2",
     "webpack-dev-server": "1.14.0",
