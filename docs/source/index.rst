@@ -72,10 +72,10 @@ If you wanted to do enough times ti fill a 96 well plate, you could write it lik
    #define how much volume to dispense in each well
    dispense_vol = 50
    
-   for i in range(:96):
-      if p200.current_volume() < dispense_vol:
+   for i in range(96):
+      if p200.current_volume < dispense_vol:
          p200.aspirate(trough[1])
-      p200.dispense(dispense_vol, current_well)
+      p200.dispense(dispense_vol, plate[i])
         
 .. testsetup:: main
    
