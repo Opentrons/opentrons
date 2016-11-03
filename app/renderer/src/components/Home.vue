@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <toast position="n"></toast>
     <div class="nav-full-dark">
       <header class="brand">
         <nav class="links">
@@ -39,7 +40,8 @@
 
 
 <script>
-  import {StepList, Upload} from './export'
+  import { StepList, Upload } from './export'
+  import { ADD_TOAST_MESSAGE } from 'vuex-toast'
 
   export default {
     data () {
@@ -50,6 +52,9 @@
     methods: {
       home(axis) {
         this.$store.dispatch('home', {axis: axis})
+      },
+      sendNotification(text, type) {
+        this.$store.dispatch(ADD_TOAST_MESSAGE, {text, type})
       }
     },
     computed: {
@@ -63,5 +68,6 @@
 </script>
 
 <style lang="sass">
-  @import "../assets/sass/main.scss"
+  @import "../assets/sass/main.scss";
+  @import "../../../../node_modules/vuex-toast/dist/vuex-toast.css";
 </style>

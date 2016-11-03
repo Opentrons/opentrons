@@ -4,6 +4,7 @@ import io from 'socket.io-client/socket.io'
 import * as types from './mutation-types'
 import app_mutations from './mutations'
 import app_actions from './actions'
+import { createModule } from 'vuex-toast'
 
 
 const { mutations, state } = app_mutations
@@ -61,10 +62,12 @@ socket.on('disconnect', function(){
 })
 
 const websocketplugin = createWebSocketPlugin(socket)
+const toast = createModule({dismissInterval: 8000})
 
 export default new Vuex.Store({
   state,
   actions,
   mutations,
-  plugins: [websocketplugin]
+  plugins: [websocketplugin],
+  modules: {toast}
 })

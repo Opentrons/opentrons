@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
+import { Toast } from 'vuex-toast'
 import store from './store/store'
 import {
   Home,
@@ -16,6 +17,7 @@ import {
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.component('StepList', StepList)
+Vue.component('Toast', Toast)
 
 const routes = [
   { path: '/connect', component: Connect },

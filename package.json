@@ -93,6 +93,7 @@
     "vue-resource": "^1.0.3",
     "vue-router": "^2.0.0",
     "vuex": "^2.0.0",
+    "vuex-toast": "0.0.2",
     "websocket": "^1.0.23"
   }
 }
