@@ -40,6 +40,32 @@ class RobotTest(unittest.TestCase):
         expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
         self.assertEquals(res, expected)
 
+    def test_create_arc(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        plate = containers.load('96-flat', 'A1')
+        plate2 = containers.load('96-flat', 'B1')
+
+        self.robot.move_head(x=10, y=10, z=10)
+        p200.calibrate_position((plate, Vector(0, 0, 0)))
+        self.robot.move_head(x=10, y=10, z=100)
+        p200.calibrate_position((plate2, Vector(0, 0, 0)))
+
+        res = self.robot._create_arc((0, 0, 0), plate[0])
+        expected = [
+            {'z': 110.5 + 5},
+            {'x': 0, 'y': 0},
+            {'z': 0}
+        ]
+        self.assertEquals(res, expected)
+
+        res = self.robot._create_arc((0, 0, 0), plate[0])
+        expected = [
+            {'z': 20.5 + 5},
+            {'x': 0, 'y': 0},
+            {'z': 0}
+        ]
+        self.assertEquals(res, expected)
+
     def test_disconnect(self):
         self.robot.disconnect()
         res = self.robot.is_connected()
