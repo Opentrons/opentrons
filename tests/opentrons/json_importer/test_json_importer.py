@@ -233,7 +233,7 @@ class JSONIngestorTestCase(unittest.TestCase):
 
         self.assertEqual(api_calls, api_calls_expected)
 
-        self.robot.run()
+        # self.robot.run()
 
         instrument = self.robot._instruments["B"]
         wells_referenced = [

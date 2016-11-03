@@ -70,11 +70,7 @@ class Pipette(Instrument):
         self.current_volume = 0
         self.reset_tip_tracking()
 
-    def setup_simulate(self, mode='use_driver'):
-        if mode == 'skip_driver':
-            self.motor.simulate()
-        elif mode == 'use_driver':
-            self.motor.live()
+    def setup_simulate(self, **kwargs):
         self.calibrated_positions = copy.deepcopy(self.positions)
         self.positions['top'] = 0
         self.positions['bottom'] = 10
@@ -82,7 +78,6 @@ class Pipette(Instrument):
         self.positions['drop_tip'] = 14
 
     def teardown_simulate(self):
-        self.motor.live()
         self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
@@ -107,6 +102,9 @@ class Pipette(Instrument):
             )
 
     def _associate_placeable(self, location):
+        if not location:
+            return
+
         placeable, _ = containers.unpack_location(location)
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
@@ -115,22 +113,21 @@ class Pipette(Instrument):
         if not location:
             return self
 
-        self._associate_placeable(location)
-
-        if not self.motor.is_simulating():
-            self.robot.move_to(
-                location,
-                instrument=self,
-                strategy=strategy,
-                enqueue=enqueue)
+        self.robot.move_to(
+            location,
+            instrument=self,
+            strategy=strategy,
+            enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
     def aspirate(self, volume=None, location=None, rate=1.0, enqueue=True):
-        def _do_aspirate():
+
+        def _setup():
             nonlocal volume
             nonlocal location
+            nonlocal rate
             if not isinstance(volume, (int, float, complex)):
                 if volume and not location:
                     location = volume
@@ -143,8 +140,16 @@ class Pipette(Instrument):
                 )
 
             self.current_volume += volume
+
+            self._associate_placeable(location)
+
+        def _do():
+            nonlocal volume
+            nonlocal location
+            nonlocal rate
+
             distance = self.plunge_distance(self.current_volume)
-            bottom = self.positions['bottom'] or 0
+            bottom = self.positions['bottom']
             destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
@@ -154,19 +159,25 @@ class Pipette(Instrument):
             self.motor.speed(speed)
             self.motor.move(destination)
 
-        description = "Aspirating {0}uL at {1}".format(
+        _description = "Aspirating {0}uL at {1}".format(
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do_aspirate, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
     def dispense(self, volume=None, location=None, rate=1.0, enqueue=True):
-        def _do():
+        def _setup():
             nonlocal location
             nonlocal volume
+            nonlocal rate
+
             if not isinstance(volume, (int, float, complex)):
                 if volume and not location:
                     location = volume
@@ -175,25 +186,35 @@ class Pipette(Instrument):
             if not volume or (self.current_volume - volume < 0):
                 volume = self.current_volume
 
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
+            self.current_volume -= volume
 
-            if volume:
-                self.current_volume -= volume
-                distance = self.plunge_distance(self.current_volume)
-                bottom = self.positions['bottom'] or 0
-                destination = bottom - distance
+            self._associate_placeable(location)
 
-                speed = self.speeds['dispense'] * rate
+        def _do():
+            nonlocal location
+            nonlocal volume
+            nonlocal rate
 
-                self.motor.speed(speed)
-                self.motor.move(destination)
+            self.move_to(location, strategy='arc', enqueue=False)
 
-        description = "Dispensing {0}uL at {1}".format(
+            distance = self.plunge_distance(self.current_volume)
+            bottom = self.positions['bottom'] or 0
+            destination = bottom - distance
+
+            speed = self.speeds['dispense'] * rate
+
+            self.motor.speed(speed)
+            self.motor.move(destination)
+
+        _description = "Dispensing {0}uL at {1}".format(
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     def _position_for_aspirate(self, location=None):
@@ -215,15 +236,22 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def mix(self, volume, repetitions=1, location=None, enqueue=True):
+        def _setup():
+            pass
+
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
             pass
 
-        description = "Mixing {0} times with a volume of {1}ul".format(
+        _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, str(self.current_volume)
         )
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         self.aspirate(location=location, volume=volume, enqueue=enqueue)
         for i in range(repetitions - 1):
@@ -235,22 +263,37 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def blow_out(self, location=None, enqueue=True):
+        def _setup():
+            nonlocal location
+            self.current_volume = 0
+            self._associate_placeable(location)
+
         def _do():
             nonlocal location
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
+            self.move_to(location, strategy='arc', enqueue=False)
             self.motor.move(self.positions['blow_out'])
-            self.current_volume = 0
-        description = "Blow_out at {}".format(
+
+        _description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
         )
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     # QUEUEABLE
     def touch_tip(self, location=None, enqueue=True):
+        def _setup():
+            nonlocal location
+            self._associate_placeable(location)
+
         def _do():
             nonlocal location
+
+            # if no location specified, use the previously
+            # associated placeable to get Well dimensions
             if location:
                 self.move_to(location, strategy='arc', enqueue=False)
             else:
@@ -273,19 +316,30 @@ class Pipette(Instrument):
                 strategy='direct',
                 enqueue=False)
 
-        description = 'Touching tip'
-        self.create_command(_do, description, enqueue=enqueue)
+        _description = 'Touching tip'
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
     def return_tip(self, enqueue=True):
 
+        def _setup():
+            self.current_volume = 0
+
         def _do():
             pass
 
-        description = "Returning tip"
-        self.create_command(_do, description, enqueue=enqueue)
+        _description = "Returning tip"
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         if not self.current_tip_home_well:
             self.robot.add_warning('Pipette has no tip to return')
@@ -297,11 +351,8 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def pick_up_tip(self, location=None, enqueue=True):
-        def _do():
+        def _setup():
             nonlocal location
-
-            self.motor.move(self.positions['blow_out'])
-
             if not location:
                 if self.has_tip_rack():
                     # TODO: raise warning/exception if looped back to first tip
@@ -309,12 +360,20 @@ class Pipette(Instrument):
                 else:
                     self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')
-
-            if location:
-                placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
-
+            self._associate_placeable(location)
             self.current_tip_home_well = location
+
+            self.current_volume = 0
+
+        def _do():
+            nonlocal location
+
+            self.motor.move(self.positions['blow_out'])
+
+            if self.current_tip_home_well:
+                placeable, _ = containers.unpack_location(
+                    self.current_tip_home_well)
+                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
 
             tip_plunge = 6
 
@@ -322,18 +381,29 @@ class Pipette(Instrument):
                 self.robot.move_head(z=tip_plunge, mode='relative')
                 self.robot.move_head(z=-tip_plunge, mode='relative')
 
-        description = "Picking up tip from {0}".format(
+        _description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     # QUEUEABLE
     def drop_tip(self, location=None, enqueue=True):
-        def _do():
+        def _setup():
             nonlocal location
             if not location and self.trash_container:
                 location = self.trash_container
+
+            self._associate_placeable(location)
+
+            self.current_volume = 0
+
+        def _do():
+            nonlocal location
 
             if location:
                 placeable, _ = containers.unpack_location(location)
@@ -341,23 +411,33 @@ class Pipette(Instrument):
 
             self.motor.move(self.positions['drop_tip'])
             self.motor.home()
-            self.current_volume = 0
 
-        description = "Drop_tip at {}".format(
+        _description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
 
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     # QUEUEABLE
     def home(self, enqueue=True):
-        def _do():
-            self.motor.home()
+
+        def _setup():
             self.current_volume = 0
 
-        description = "Homing pipette plunger on axis {}".format(self.axis)
-        self.create_command(_do, description, enqueue=enqueue)
+        def _do():
+            self.motor.home()
+
+        _description = "Homing pipette plunger on axis {}".format(self.axis)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     # QUEUEABLE
@@ -396,11 +476,19 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def delay(self, seconds, enqueue=True):
+
+        def _setup():
+            pass
+
         def _do():
             self.motor.wait(seconds)
 
-        description = "Delaying {} seconds".format(seconds)
-        self.create_command(_do, description, enqueue=enqueue)
+        _description = "Delaying {} seconds".format(seconds)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     def calibrate(self, position):

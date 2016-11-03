@@ -41,19 +41,14 @@ class Instrument(object):
     def teardown_simulate(self):
         self.motor.live()
 
-    def create_command(self, do, description=None, enqueue=True):
+    def create_command(self, do, setup=None, description=None, enqueue=True):
+
+        command = Command(do=do, setup=setup, description=description)
 
         if enqueue:
-            self.robot.set_connection('simulate')
-            self.setup_simulate(mode='skip_driver')
-            do()
-            self.teardown_simulate()
-            self.robot.set_connection('live')
-
-            self.robot.add_command(Command(do=do, description=description))
-
+            self.robot.add_command(command)
         else:
-            do()
+            command()
 
     def get_calibration_dir(self):
         DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
