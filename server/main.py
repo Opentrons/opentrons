@@ -404,7 +404,7 @@ def move_to_slot():
 
         result = robot.move_to(
             location,
-            now=True,
+            enqueue=False,
             instrument=robot._instruments[axis.upper()]
         )
     except Exception as e:
@@ -425,7 +425,7 @@ def move_to_container():
     try:
         instrument = robot._instruments[axis.upper()]
         container = robot._deck[slot].get_child_by_name(name)
-        instrument.move_to(container[0].bottom(), now=True)
+        instrument.move_to(container[0].bottom(), enqueue=False)
     except Exception as e:
         return flask.jsonify({
             'status': 'error',
@@ -443,12 +443,10 @@ def pick_up_tip():
     axis = request.json.get("axis")
 
     try:
-        # TODO: use actual Pipette.pick_up_tip() method
-        #       not doing this now because pick_up_tip() enqueues
         robot = Robot.get_instance()
-        for i in range(3):
-            robot.move_head(z=10, mode='relative')
-            robot.move_head(z=-10, mode='relative')
+        instrument = robot._instruments[axis.upper()]
+        instrument.reset_tip_tracking()
+        instrument.pick_up_tip(enqueue=False)
     except Exception as e:
         return flask.jsonify({
             'status': 'error',
@@ -466,20 +464,9 @@ def drop_tip():
     axis = request.json.get("axis")
 
     try:
-        # TODO: use actual Pipette.drop_tip() method
-        #       not doing this now because drop_tip() enqueues
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
-
-        drop_tip_pos = instrument.positions['drop_tip']
-        kwargs = {}
-        kwargs[axis] = drop_tip_pos
-        robot._driver.move_plunger(**kwargs)
-
-        blow_out_pos = instrument.positions['blow_out']
-        kwargs = {}
-        kwargs[axis] = blow_out_pos
-        robot._driver.move_plunger(**kwargs)
+        instrument.drop_tip(enqueue=False)
 
     except Exception as e:
         return flask.jsonify({
