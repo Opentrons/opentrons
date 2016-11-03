@@ -571,6 +571,32 @@ class Robot(object, metaclass=Singleton):
         else:
             _do()
 
+    def _get_calibrated_max_dimension(self, container=None):
+        if container:
+            containers_list = [container]
+        else:
+            containers_list = self.containers().values()
+
+        container_max_coords = []
+        for instrument in self._instruments.values():
+            container_max_coords += [
+                instrument.calibrator.convert(
+                    container,
+                    container.max_dimensions(container))
+                for container in containers_list]
+
+        if not container_max_coords:
+            return (0, 0, 0)
+
+        res = tuple([
+            max(
+                container_max_coords,
+                key=lambda coordinates: coordinates[axis]
+            )[axis]
+            for axis in range(3)])
+
+        return res
+
     def _create_arc(self, coordinates, placeable):
         this_container = None
         if isinstance(placeable, containers.Well):
@@ -580,16 +606,16 @@ class Robot(object, metaclass=Singleton):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        tallest_z = 0
+        ref_container = None
         if this_container and (self._previous_container == this_container):
-            _, _, tallest_z = this_container.max_dimensions(self._deck)
-        else:
-            _, _, tallest_z = self._deck.max_dimensions(self._deck)
+            ref_container = this_container
+
+        _, _, tallest_z = self._get_calibrated_max_dimension(ref_container)
 
         self._previous_container = this_container
 
         return [
-            {'z': tallest_z},
+            {'z': tallest_z + 5},
             {'x': coordinates[0], 'y': coordinates[1]},
             {'z': coordinates[2]}
         ]
