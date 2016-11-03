@@ -67,6 +67,7 @@ If you wanted to do this 96 times, you could write it like this:
 .. testsetup:: main
    
   p200.aspirate(trough)
+  p200.dispense(plate[0])
    
   for i in range(95):
       p200.aspirate(100, plate[i])
