@@ -1,12 +1,13 @@
 .. _getting_started:
-
+================================
 Getting Started
 ================================
 
 Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to :ref:`setup` for detailed instructions.
 
+
 Import Opentrons API
-================================
+-------------------------------
 
 Before running any code, you need to install the Opentrons API in your jupyter notebook by running the cell below.  This only needs to be done the first time you use jupyter, so feel free to comment it out after it successfully installs.
 
@@ -30,7 +31,7 @@ Now that you have imported the opentrons modules, you need to declare a new robo
 
 
 Deck Set Up
-================================
+-----------------------------
 
 Now that you have a robot to run commands on, you need to tell it what containers and pipettes to use.
 
@@ -40,7 +41,7 @@ Now that you have a robot to run commands on, you need to tell it what container
 
 
 Containers
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For each container you want to use on the deck, you need to load it into your file by telling the robot what it is, where it is, and what to label it. The label you give the container is what will appear in the app when you start calibrating.
 
@@ -82,7 +83,7 @@ The example below declares 3 different containers and assigns them to the approp
 	
 
 Pipettes
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 	
@@ -128,37 +129,37 @@ Once you load your pipette, you should assign the maximum volume.
 
 
 Commands 
-================================
+-----------------------------
 
 Aspirate
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Dispense
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Mix
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Chaining Commands
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
 
 Command Attributes
-================================
+-----------------------------
 
 Touch Tip
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Blow Out
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Delay
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Dispensing Positions
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 

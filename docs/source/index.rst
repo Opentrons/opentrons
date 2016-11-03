@@ -167,9 +167,12 @@ Further Reading
 .. toctree::
    :maxdepth: 2
 
+   setup
+   getting_started
    api
    tips_and_tricks
-   setup
+
+
 
 Indices and tables
 ==================
