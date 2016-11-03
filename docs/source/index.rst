@@ -67,13 +67,11 @@ You string these commands into full protocols that anyone with Opentrons can run
 
 If you wanted to do this 96 times, you could write it like this:
 
-
-
-.. testsetup:: main
+.. testcode:: main
    
   p200.aspirate(trough)
   p200.dispense(plate[0])
-  
+
   for i in range(95):
       p200.aspirate(100, plate[i])
       p200.dispense(plate[i + 1]).blow_out().touch_tip()
