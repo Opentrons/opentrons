@@ -1,11 +1,17 @@
 class Command(object):
-    def __init__(self, do, description=None):
+    def __init__(self, do=None, setup=None, description=None):
         assert callable(do)
+        self.setup = setup
         self.do = do
         self.description = description
 
     def __call__(self):
+        if self.setup:
+            self.setup()
         self.do()
+
+    def __str__(self):
+        return self.description or ''
 
 
 class Macro(object):

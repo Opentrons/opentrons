@@ -212,7 +212,6 @@ class Robot(object, metaclass=Singleton):
         Instance of :class:`InstrumentMosfet`.
         """
         robot_self = self
-        driver_mock = mock.Mock()
 
         class InstrumentMosfet():
             """
@@ -220,16 +219,6 @@ class Robot(object, metaclass=Singleton):
             """
 
             def __init__(self):
-                self.motor_driver = robot_self._driver
-
-            def is_simulating(self):
-                return isinstance(
-                    self.motor_driver, mock.Mock)
-
-            def simulate(self):
-                self.motor_driver = driver_mock
-
-            def live(self):
                 self.motor_driver = robot_self._driver
 
             def engage(self):
@@ -267,7 +256,6 @@ class Robot(object, metaclass=Singleton):
             Axis name. Please check stickers on robot's gantry for the name.
         """
         robot_self = self
-        driver_mock = mock.Mock()
 
         class InstrumentMotor():
 
@@ -276,16 +264,6 @@ class Robot(object, metaclass=Singleton):
             """
 
             def __init__(self):
-                self.motor_driver = robot_self._driver
-
-            def is_simulating(self):
-                return isinstance(
-                    self.motor_driver, mock.Mock)
-
-            def simulate(self):
-                self.motor_driver = driver_mock
-
-            def live(self):
                 self.motor_driver = robot_self._driver
 
             def move(self, value, mode='absolute'):
@@ -501,6 +479,8 @@ class Robot(object, metaclass=Singleton):
 
         if command.description:
             log.info("Enqueuing: {}".format(command.description))
+        if command.setup:
+            command.setup()
         self._commands.append(command)
 
     def register(self, name, callback):
@@ -683,7 +663,7 @@ class Robot(object, metaclass=Singleton):
                     break
                 if command.description:
                     log.info("Executing: {}".format(command.description))
-                command.do()
+                command()
                 # emit command was done...
                 cmd_run_event['name'] = 'command-run',
                 trace.EventBroker.get_instance().notify(cmd_run_event)
@@ -713,7 +693,7 @@ class Robot(object, metaclass=Singleton):
         else:
             self.set_connection('simulate')
         for instrument in self._instruments.values():
-            instrument.setup_simulate(mode='use_driver')
+            instrument.setup_simulate()
 
         res = self.run()
 

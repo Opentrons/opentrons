@@ -116,8 +116,6 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
         expected = [
             mock.call(600.0),
-            mock.call(250.0),
-            mock.call(600.0),
             mock.call(250.0)
         ]
         self.assertEquals(self.p200.motor.speed.mock_calls, expected)
@@ -485,6 +483,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
 
+        self.robot.simulate()
+
         self.assertEqual(
             self.p200.move_to.mock_calls,
             [
@@ -550,6 +550,8 @@ class PipetteTest(unittest.TestCase):
         for _ in range(0, total_tips_per_plate * 4):
             self.p200.pick_up_tip()
 
+        self.robot.simulate()
+
         expected = []
         for i in range(0, total_tips_per_plate):
             expected.append(self.build_move_to_bottom(self.tiprack1[i]))
@@ -581,6 +583,8 @@ class PipetteTest(unittest.TestCase):
 
         for _ in range(0, 12 * 4):
             p200_multi.pick_up_tip()
+
+        self.robot.simulate()
 
         expected = []
         for i in range(0, 12):
@@ -623,6 +627,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.pick_up_tip()
         self.p200.drop_tip()
+        self.robot.simulate()
 
         self.assertEqual(
             self.p200.move_to.mock_calls,

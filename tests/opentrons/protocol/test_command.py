@@ -9,13 +9,17 @@ class CommandTest(unittest.TestCase):
         pass
 
     def test_command(self):
-        expected = None
+        expected = ''
+
+        def _setup():
+            nonlocal expected
+            expected = 'hello'
 
         def _do():
             nonlocal expected
-            expected = 'test'
-        description = 'test'
-        command = Command(do=_do, description=description)
+            expected += ' world'
+        description = 'hello world'
+        command = Command(do=_do, setup=_setup, description=description)
         command()
         self.assertEquals(expected, command.description)
 

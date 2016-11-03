@@ -21,31 +21,54 @@ class Magbead(Instrument):
         # a reference to the placeable set ontop the magbead module
         self.container = container
 
+        self.engaged = False
+
     def engage(self, enqueue=True):
+        def _setup():
+            self.engaged = True
+
         def _do():
             self.motor.engage()
 
-        description = "Engaging Magbead at mosfet #{}".format(
+        _description = "Engaging Magbead at mosfet #{}".format(
             self.motor)
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
     def disengage(self, enqueue=True):
+        def _setup():
+            self.engaged = False
+
         def _do():
             self.motor.disengage()
 
-        description = "Engaging Magbead at mosfet #{}".format(
+        _description = "Engaging Magbead at mosfet #{}".format(
             self.motor)
-        self.create_command(_do, description, enqueue=enqueue)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
     def delay(self, seconds, enqueue=True):
+        def _setup():
+            pass
+
         def _do():
             self.motor.wait(seconds)
 
-        description = "Delaying Magbead for {} seconds".format(seconds)
-        self.create_command(_do, description, enqueue=enqueue)
+        _description = "Delaying Magbead for {} seconds".format(seconds)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
