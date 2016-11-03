@@ -31,7 +31,7 @@
       axis="b"
   )
 
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
+  p200.set_max_volume(1000)  # volume calibration, can be called whenever you want
   pipette = p200
 
 .. testsetup:: long
@@ -72,7 +72,8 @@ If you wanted to do this 96 times, you could write it like this:
 .. testsetup:: main
    
   p200.aspirate(trough)
-   
+  p200.dispense(plate[0])
+  
   for i in range(95):
       p200.aspirate(100, plate[i])
       p200.dispense(plate[i + 1]).blow_out().touch_tip()
