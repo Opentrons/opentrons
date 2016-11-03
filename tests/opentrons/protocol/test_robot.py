@@ -12,8 +12,8 @@ class RobotTest(unittest.TestCase):
         self.robot = Robot.get_instance()
 
         self.robot.connect()
-        self.robot.home(now=True)
-        self.robot.clear()
+        self.robot.home(enqueue=False)
+        self.robot.clear_commands()
 
     def test_simulate(self):
         self.robot.disconnect()
@@ -52,7 +52,7 @@ class RobotTest(unittest.TestCase):
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False
         })
 
-        self.robot.clear()
+        self.robot.clear_commands()
         self.robot.home('xa', enqueue=True)
         self.assertDictEqual(self.robot.axis_homed, {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False
@@ -63,8 +63,8 @@ class RobotTest(unittest.TestCase):
             'x': True, 'y': False, 'z': False, 'a': True, 'b': False
         })
 
-        self.robot.clear()
-        self.robot.home(now=True)
+        self.robot.clear_commands()
+        self.robot.home(enqueue=False)
         self.assertEquals(len(self.robot._commands), 0)
 
         self.assertDictEqual(self.robot.axis_homed, {
@@ -89,7 +89,7 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(thread.is_alive(), False)
         self.assertEqual(len(self.robot._commands), 2)
 
-        self.robot.clear()
+        self.robot.clear_commands()
         self.assertEqual(len(self.robot._commands), 0)
 
         self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
@@ -172,7 +172,7 @@ class RobotTest(unittest.TestCase):
         }
         self.assertDictEqual(res, expected)
 
-        self.robot.home('x', now=True)
+        self.robot.home('x', enqueue=False)
         res = self.robot.diagnostics()
         expected = {
             'axis_homed': {

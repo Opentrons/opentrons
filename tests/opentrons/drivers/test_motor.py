@@ -48,12 +48,6 @@ class OpenTronsTest(unittest.TestCase):
             }
         }
         self.assertRaises(RuntimeError, self.robot.connect, **kwargs)
-        res = self.motor.versions_compatible()
-        self.assertEquals(res, {
-            'firmware': False,
-            'config': False,
-            'ot_version': False
-        })
 
     def test_message_timeout(self):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)

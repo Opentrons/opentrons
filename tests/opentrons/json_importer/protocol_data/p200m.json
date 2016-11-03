@@ -27,7 +27,7 @@
             },
             "multi-channel": true,
             "axis": "a",
-            "volume": 10,
+            "volume": 200,
             "down-plunger-speed": 300,
             "up-plunger-speed": 500,
             "tip-plunge": 6,

@@ -109,7 +109,7 @@ class PerformanceTest(unittest.TestCase):
 
         import_calibration_json(calibration_data, robot, True)
 
-        robot.clear()
+        robot.clear_commands()
 
         # distribute
         p200.pick_up_tip(tiprack[0])

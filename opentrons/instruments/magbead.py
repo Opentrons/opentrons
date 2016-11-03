@@ -1,4 +1,3 @@
-from opentrons.robot.command import Command
 from opentrons.robot.robot import Robot
 from opentrons.instruments.instrument import Instrument
 
@@ -10,7 +9,7 @@ class Magbead(Instrument):
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.mosfet = self.robot.get_mosfet(mosfet)
+        self.motor = self.robot.get_mosfet(mosfet)
 
         if not name:
             name = self.__class__.__name__
@@ -22,37 +21,31 @@ class Magbead(Instrument):
         # a reference to the placeable set ontop the magbead module
         self.container = container
 
-    def reset(self):
-        pass
-
-    def engage(self):
+    def engage(self, enqueue=True):
         def _do():
-            self.mosfet.engage()
+            self.motor.engage()
 
         description = "Engaging Magbead at mosfet #{}".format(
-            self.mosfet)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+            self.motor)
+        self.create_command(_do, description, enqueue=enqueue)
 
         return self
 
-    def disengage(self):
+    def disengage(self, enqueue=True):
         def _do():
-            self.mosfet.disengage()
+            self.motor.disengage()
 
         description = "Engaging Magbead at mosfet #{}".format(
-            self.mosfet)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+            self.motor)
+        self.create_command(_do, description, enqueue=enqueue)
 
         return self
 
-    def delay(self, seconds):
+    def delay(self, seconds, enqueue=True):
         def _do():
-            self.mosfet.wait(seconds)
+            self.motor.wait(seconds)
 
         description = "Delaying Magbead for {} seconds".format(seconds)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        self.create_command(_do, description, enqueue=enqueue)
 
         return self

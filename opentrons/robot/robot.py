@@ -1,6 +1,7 @@
 import copy
 import os
 from threading import Event
+from unittest import mock
 
 import serial
 
@@ -211,23 +212,37 @@ class Robot(object, metaclass=Singleton):
         Instance of :class:`InstrumentMosfet`.
         """
         robot_self = self
+        driver_mock = mock.Mock()
 
         class InstrumentMosfet():
             """
             Provides access to MagBead's MOSFET.
             """
 
+            def __init__(self):
+                self.motor_driver = robot_self._driver
+
+            def is_simulating(self):
+                return isinstance(
+                    self.motor_driver, mock.Mock)
+
+            def simulate(self):
+                self.motor_driver = driver_mock
+
+            def live(self):
+                self.motor_driver = robot_self._driver
+
             def engage(self):
                 """
                 Engages the MOSFET.
                 """
-                robot_self._driver.set_mosfet(mosfet_index, True)
+                self.motor_driver.set_mosfet(mosfet_index, True)
 
             def disengage(self):
                 """
                 Disengages the MOSFET.
                 """
-                robot_self._driver.set_mosfet(mosfet_index, False)
+                self.motor_driver.set_mosfet(mosfet_index, False)
 
             def wait(self, seconds):
                 """
@@ -238,7 +253,7 @@ class Robot(object, metaclass=Singleton):
                 seconds : int
                     Number of seconds to pause for.
                 """
-                robot_self._driver.wait(seconds)
+                self.motor_driver.wait(seconds)
 
         return InstrumentMosfet()
 
@@ -252,11 +267,27 @@ class Robot(object, metaclass=Singleton):
             Axis name. Please check stickers on robot's gantry for the name.
         """
         robot_self = self
+        driver_mock = mock.Mock()
 
         class InstrumentMotor():
+
             """
             Provides access to Robot's head motor.
             """
+
+            def __init__(self):
+                self.motor_driver = robot_self._driver
+
+            def is_simulating(self):
+                return isinstance(
+                    self.motor_driver, mock.Mock)
+
+            def simulate(self):
+                self.motor_driver = driver_mock
+
+            def live(self):
+                self.motor_driver = robot_self._driver
+
             def move(self, value, mode='absolute'):
                 """
                 Move plunger motor.
@@ -268,8 +299,7 @@ class Robot(object, metaclass=Singleton):
                 mode : {'absolute', 'relative'}
                 """
                 kwargs = {axis: value}
-
-                return robot_self._driver.move_plunger(
+                return self.motor_driver.move_plunger(
                     mode=mode, **kwargs
                 )
 
@@ -277,7 +307,7 @@ class Robot(object, metaclass=Singleton):
                 """
                 Home plunger motor.
                 """
-                return robot_self._driver.home(axis)
+                return self.motor_driver.home(axis)
 
             def wait(self, seconds):
                 """
@@ -288,7 +318,7 @@ class Robot(object, metaclass=Singleton):
                 seconds : int
                     Number of seconds to pause for.
                 """
-                robot_self._driver.wait(seconds)
+                self.motor_driver.wait(seconds)
 
             def speed(self, rate):
                 """
@@ -298,7 +328,7 @@ class Robot(object, metaclass=Singleton):
                 ----------
                 rate : int
                 """
-                robot_self._driver.set_plunger_speed(rate, axis)
+                self.motor_driver.set_plunger_speed(rate, axis)
                 return self
 
         return InstrumentMotor()
@@ -468,12 +498,10 @@ class Robot(object, metaclass=Singleton):
             return _do()
 
     def add_command(self, command):
+
         if command.description:
             log.info("Enqueuing: {}".format(command.description))
         self._commands.append(command)
-
-    def prepend_command(self, command):
-        self._commands = [command] + self._commands
 
     def register(self, name, callback):
         def commandable():
@@ -503,7 +531,7 @@ class Robot(object, metaclass=Singleton):
             within object's coordinate system.
         instrument :
             Instrument to move relative to. If ``None``, move relative to the
-            center of a gantry.
+            center ofd a gantry.
         strategy : {'arc', 'direct'}
             ``arc`` : move to the point using arc trajectory
             avoiding obstacles.
@@ -524,13 +552,11 @@ class Robot(object, metaclass=Singleton):
         >>> robot.move_to(plate[0].top())
         """
 
+        enqueue = kwargs.get('enqueue', False)
         # Adding this for backwards compatibility with old move_to(now=False)
         # convention.
-        now = False
-        if 'now' not in kwargs:
-            now = not kwargs.get('enqueue')
-        else:
-            now = kwargs.get('now')
+        if 'now' in kwargs:
+            enqueue = not kwargs.get('now')
 
         placeable, coordinates = containers.unpack_location(location)
 
@@ -556,10 +582,10 @@ class Robot(object, metaclass=Singleton):
                 raise RuntimeError(
                     'Unknown move strategy: {}'.format(strategy))
 
-        if now:
-            _do()
-        else:
+        if enqueue:
             self.add_command(Command(do=_do))
+        else:
+            _do()
 
     def _create_arc(self, coordinates, placeable):
         this_container = None
@@ -687,14 +713,14 @@ class Robot(object, metaclass=Singleton):
         else:
             self.set_connection('simulate')
         for instrument in self._instruments.values():
-            instrument.set_plunger_defaults()
+            instrument.setup_simulate(mode='use_driver')
 
         res = self.run()
 
         self.set_connection('live')
 
         for instrument in self._instruments.values():
-            instrument.restore_plunger_positions()
+            instrument.teardown_simulate()
 
         return res
 
@@ -702,7 +728,7 @@ class Robot(object, metaclass=Singleton):
         if mode in self.connections:
             connection = self.connections[mode]
             if connection:
-                self._driver.connect(connection)
+                self._driver.connection = connection
             else:
                 self._driver.disconnect()
         else:
@@ -814,7 +840,7 @@ class Robot(object, metaclass=Singleton):
         self._deck[slot].add(container, label)
         return container
 
-    def clear(self):
+    def clear_commands(self):
         """
         Clear Robot's command queue.
         """

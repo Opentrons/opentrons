@@ -4,6 +4,7 @@ import os
 import sys
 
 from opentrons.util.vector import (Vector, VectorEncoder)
+from opentrons.robot.command import Command
 
 
 JSON_ERROR = None
@@ -27,6 +28,32 @@ class Instrument(object):
 
         self.positions = {}
         self.max_volume = None
+
+    def reset(self):
+        pass
+
+    def setup_simulate(self, mode='use_driver'):
+        if mode == 'skip_driver':
+            self.motor.simulate()
+        elif mode == 'use_driver':
+            self.motor.live()
+
+    def teardown_simulate(self):
+        self.motor.live()
+
+    def create_command(self, do, description=None, enqueue=True):
+
+        if enqueue:
+            self.robot.set_connection('simulate')
+            self.setup_simulate(mode='skip_driver')
+            do()
+            self.teardown_simulate()
+            self.robot.set_connection('live')
+
+            self.robot.add_command(Command(do=do, description=description))
+
+        else:
+            do()
 
     def get_calibration_dir(self):
         DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
