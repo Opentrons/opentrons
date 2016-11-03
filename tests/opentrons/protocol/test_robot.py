@@ -25,6 +25,11 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(self.robot.connections['live'], None)
 
     def test_get_calibrated_max_dimension(self):
+
+        expected = self.robot._deck.max_dimensions(self.robot._deck)
+        res = self.robot._get_calibrated_max_dimension()
+        self.assertEquals(res, expected)
+
         p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
         plate = containers.load('96-flat', 'A1')
         self.robot.move_head(x=10, y=10, z=10)

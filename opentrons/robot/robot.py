@@ -586,7 +586,7 @@ class Robot(object, metaclass=Singleton):
                 for container in containers_list]
 
         if not container_max_coords:
-            return (0, 0, 0)
+            return self._deck.max_dimensions(self._deck)
 
         res = tuple([
             max(
