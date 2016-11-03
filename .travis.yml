@@ -1,4 +1,5 @@
 # We are using the iOS build system to create Mac OS X python builds
+language: objective-c
 os:
   - osx
 
