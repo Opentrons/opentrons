@@ -104,7 +104,7 @@ Home
 .. testcode:: main
 
   robot.home('xy', enqueue=True)
-  robot.run()
+  #robot.run()
 
 Aspirate then dispense in a single well
 ---------------------------------------
