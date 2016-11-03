@@ -300,6 +300,8 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
 
+            self.motor.move(self.positions['blow_out'])
+
             if not location:
                 if self.has_tip_rack():
                     # TODO: raise warning/exception if looped back to first tip
