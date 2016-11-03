@@ -552,13 +552,11 @@ class Robot(object, metaclass=Singleton):
         >>> robot.move_to(plate[0].top())
         """
 
+        enqueue = kwargs.get('enqueue', False)
         # Adding this for backwards compatibility with old move_to(now=False)
         # convention.
-        now = False
-        if 'now' not in kwargs:
-            now = not kwargs.get('enqueue')
-        else:
-            now = kwargs.get('now')
+        if 'now' in kwargs:
+            enqueue = not kwargs.get('now')
 
         placeable, coordinates = containers.unpack_location(location)
 
@@ -584,10 +582,10 @@ class Robot(object, metaclass=Singleton):
                 raise RuntimeError(
                     'Unknown move strategy: {}'.format(strategy))
 
-        if now:
-            _do()
-        else:
+        if enqueue:
             self.add_command(Command(do=_do))
+        else:
+            _do()
 
     def _create_arc(self, coordinates, placeable):
         this_container = None

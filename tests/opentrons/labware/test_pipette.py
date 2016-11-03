@@ -33,7 +33,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
-        self.robot.home(now=True)
+        self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
 
     def test_calibrate_by_position_name(self):
@@ -158,7 +158,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_position(location)
 
-        self.robot.home(now=True)
+        self.robot.home(enqueue=False)
 
         self.p200.aspirate(100, location)
         self.p200.dispense(100, location)
@@ -584,14 +584,14 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.drop_tip.mock_calls,
             [
-                mock.call(self.tiprack1[0], now=True),
-                mock.call(self.tiprack1[1], now=True)
+                mock.call(self.tiprack1[0], enqueue=False),
+                mock.call(self.tiprack1[1], enqueue=False)
             ]
         )
 
     def build_move_to_bottom(self, well):
         return mock.call(
-            well.bottom(), strategy='arc', now=True)
+            well.bottom(), strategy='arc', enqueue=False)
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()

@@ -122,7 +122,7 @@ class Pipette(Instrument):
 
         self.robot.add_command(Command(do=do, description=description))
 
-    def move_to(self, location, strategy='arc', now=False):
+    def move_to(self, location, strategy='arc', enqueue=True):
         if location:
             self.associate_placeable(location)
             if not self.plunger.is_simulating():
@@ -130,7 +130,7 @@ class Pipette(Instrument):
                     location,
                     instrument=self,
                     strategy=strategy,
-                    now=now)
+                    enqueue=enqueue)
 
         return self
 
@@ -184,7 +184,7 @@ class Pipette(Instrument):
                 volume = self.current_volume
 
             if location:
-                self.move_to(location, strategy='arc', now=True)
+                self.move_to(location, strategy='arc', enqueue=False)
 
             if volume:
                 self.current_volume -= volume
@@ -209,7 +209,7 @@ class Pipette(Instrument):
         # first go to the destination
         if location:
             placeable, _ = containers.unpack_location(location)
-            self.move_to(placeable.top(), strategy='arc', now=True)
+            self.move_to(placeable.top(), strategy='arc', enqueue=False)
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
@@ -219,7 +219,7 @@ class Pipette(Instrument):
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(1)
-            self.move_to(location, strategy='direct', now=True)
+            self.move_to(location, strategy='direct', enqueue=False)
 
     # QUEUEABLE
     def mix(self, volume, repetitions=1, location=None):
@@ -246,7 +246,7 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
             if location:
-                self.move_to(location, strategy='arc', now=True)
+                self.move_to(location, strategy='arc', enqueue=False)
             self.plunger.move(self.positions['blow_out'])
             self.current_volume = 0
         description = "Blow_out at {}".format(
@@ -260,26 +260,26 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
             if location:
-                self.move_to(location, strategy='arc', now=True)
+                self.move_to(location, strategy='arc', enqueue=False)
             else:
                 location = self.placeables[-1]
 
             self.move_to(
                 (location, location.from_center(x=1, y=0, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
             self.move_to(
                 (location, location.from_center(x=-1, y=0, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
             self.move_to(
                 (location, location.from_center(x=0, y=1, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
             self.move_to(
                 (location, location.from_center(x=0, y=-1, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
 
         description = 'Touching tip'
         self.create_command(_do, description)
@@ -294,7 +294,7 @@ class Pipette(Instrument):
                 self.robot.add_warning('Pipette has no tip to return')
                 return
 
-            self.drop_tip(self.current_tip_home_well, now=True)
+            self.drop_tip(self.current_tip_home_well, enqueue=False)
 
         description = "Returning tip"
         self.create_command(_do, description)
@@ -315,7 +315,7 @@ class Pipette(Instrument):
 
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='arc', now=True)
+                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
 
             self.current_tip_home_well = location
 
@@ -332,7 +332,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def drop_tip(self, location=None, now=False):
+    def drop_tip(self, location=None, enqueue=True):
         def _do():
             nonlocal location
             if not location and self.trash_container:
@@ -340,7 +340,7 @@ class Pipette(Instrument):
 
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='arc', now=True)
+                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
 
             self.plunger.move(self.positions['drop_tip'])
             self.plunger.home()
@@ -349,7 +349,7 @@ class Pipette(Instrument):
         description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        if now:
+        if not enqueue:
             _do()
         else:
             self.create_command(_do, description)

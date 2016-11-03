@@ -12,7 +12,7 @@ class RobotTest(unittest.TestCase):
         self.robot = Robot.get_instance()
 
         self.robot.connect()
-        self.robot.home(now=True)
+        self.robot.home(enqueue=False)
         self.robot.clear()
 
     def test_simulate(self):
@@ -64,7 +64,7 @@ class RobotTest(unittest.TestCase):
         })
 
         self.robot.clear()
-        self.robot.home(now=True)
+        self.robot.home(enqueue=False)
         self.assertEquals(len(self.robot._commands), 0)
 
         self.assertDictEqual(self.robot.axis_homed, {
@@ -172,7 +172,7 @@ class RobotTest(unittest.TestCase):
         }
         self.assertDictEqual(res, expected)
 
-        self.robot.home('x', now=True)
+        self.robot.home('x', enqueue=False)
         res = self.robot.diagnostics()
         expected = {
             'axis_homed': {
