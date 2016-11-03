@@ -52,12 +52,13 @@ class Robot(object, metaclass=Singleton):
     Examples
     --------
     >>> from opentrons.robot import Robot
-    >>> from opentrons.instruments.pipette import Pipette
+    >>> from opentrons import instruments, containers
     >>> robot = Robot()
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> plate = robot.add_container('A1', '96-flat', 'plate')
-    >>> p200 = Pipette(axis='b')
+    >>> plate = containers.load('96-flat', 'A1', 'plate')
+    >>> p200 = instruments.Pipette(axis='b')
+    >>> p200.set_max_volume(200)
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
