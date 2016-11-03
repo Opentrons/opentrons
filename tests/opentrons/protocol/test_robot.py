@@ -35,7 +35,6 @@ class RobotTest(unittest.TestCase):
         expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
         self.assertEquals(res, expected)
 
-
     def test_disconnect(self):
         self.robot.disconnect()
         res = self.robot.is_connected()
