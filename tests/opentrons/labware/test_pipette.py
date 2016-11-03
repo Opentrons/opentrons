@@ -38,7 +38,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_calibrate_by_position_name(self):
 
-        self.p200.plunger.move(9)
+        self.p200.motor.move(9)
         self.p200.calibrate('bottom')
         self.assertEquals(self.p200.positions['bottom'], 9)
 
@@ -110,8 +110,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_aspirate_rate(self):
         self.p200.set_speed(aspirate=300, dispense=500)
-        self.robot.clear()
-        self.p200.plunger.speed = mock.Mock()
+        self.robot.clear_commands()
+        self.p200.motor.speed = mock.Mock()
         self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
         self.robot.run()
         expected = [
@@ -120,7 +120,7 @@ class PipetteTest(unittest.TestCase):
             mock.call(600.0),
             mock.call(250.0)
         ]
-        self.assertEquals(self.p200.plunger.speed.mock_calls, expected)
+        self.assertEquals(self.p200.motor.speed.mock_calls, expected)
 
     def test_aspirate_move_to(self):
         x, y, z = (161.0, 116.7, 3.0)

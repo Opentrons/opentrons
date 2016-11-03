@@ -531,7 +531,7 @@ class Robot(object, metaclass=Singleton):
             within object's coordinate system.
         instrument :
             Instrument to move relative to. If ``None``, move relative to the
-            center of a gantry.
+            center ofd a gantry.
         strategy : {'arc', 'direct'}
             ``arc`` : move to the point using arc trajectory
             avoiding obstacles.
@@ -840,7 +840,7 @@ class Robot(object, metaclass=Singleton):
         self._deck[slot].add(container, label)
         return container
 
-    def clear(self):
+    def clear_commands(self):
         """
         Clear Robot's command queue.
         """

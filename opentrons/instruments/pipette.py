@@ -1,7 +1,6 @@
 import copy
 
 from opentrons import containers
-from opentrons.robot.command import Command
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.calibrator import Calibrator
@@ -40,7 +39,7 @@ class Pipette(Instrument):
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.plunger = self.robot.get_motor(self.axis)
+        self.motor = self.robot.get_motor(self.axis)
 
         self.placeables = []
         self.current_volume = 0
@@ -73,9 +72,9 @@ class Pipette(Instrument):
 
     def setup_simulate(self, mode='use_driver'):
         if mode == 'skip_driver':
-            self.plunger.simulate()
+            self.motor.simulate()
         elif mode == 'use_driver':
-            self.plunger.live()
+            self.motor.live()
         self.calibrated_positions = copy.deepcopy(self.positions)
         self.positions['top'] = 0
         self.positions['bottom'] = 10
@@ -83,7 +82,7 @@ class Pipette(Instrument):
         self.positions['drop_tip'] = 14
 
     def teardown_simulate(self):
-        self.plunger.live()
+        self.motor.live()
         self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
@@ -107,30 +106,23 @@ class Pipette(Instrument):
                 itertools.chain(*iterables)
             )
 
-    def associate_placeable(self, location):
+    def _associate_placeable(self, location):
         placeable, _ = containers.unpack_location(location)
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def create_command(self, do, description=None):
-
-        self.robot.set_connection('simulate')
-        self.setup_simulate(mode='skip_driver')
-        do()
-        self.teardown_simulate()
-        self.robot.set_connection('live')
-
-        self.robot.add_command(Command(do=do, description=description))
-
     def move_to(self, location, strategy='arc', enqueue=True):
-        if location:
-            self.associate_placeable(location)
-            if not self.plunger.is_simulating():
-                self.robot.move_to(
-                    location,
-                    instrument=self,
-                    strategy=strategy,
-                    enqueue=enqueue)
+        if not location:
+            return self
+
+        self._associate_placeable(location)
+
+        if not self.motor.is_simulating():
+            self.robot.move_to(
+                location,
+                instrument=self,
+                strategy=strategy,
+                enqueue=enqueue)
 
         return self
 
@@ -150,8 +142,6 @@ class Pipette(Instrument):
                     .format(self.current_volume + volume)
                 )
 
-            self._position_for_aspirate(location)
-
             self.current_volume += volume
             distance = self.plunge_distance(self.current_volume)
             bottom = self.positions['bottom'] or 0
@@ -159,8 +149,10 @@ class Pipette(Instrument):
 
             speed = self.speeds['aspirate'] * rate
 
-            self.plunger.speed(speed)
-            self.plunger.move(destination)
+            self._position_for_aspirate(location)
+
+            self.motor.speed(speed)
+            self.motor.move(destination)
 
         description = "Aspirating {0}uL at {1}".format(
             volume,
@@ -194,8 +186,8 @@ class Pipette(Instrument):
 
                 speed = self.speeds['dispense'] * rate
 
-                self.plunger.speed(speed)
-                self.plunger.move(destination)
+                self.motor.speed(speed)
+                self.motor.move(destination)
 
         description = "Dispensing {0}uL at {1}".format(
             volume,
@@ -213,7 +205,7 @@ class Pipette(Instrument):
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.plunger.move(self.positions['bottom'] or 0)
+            self.motor.move(self.positions['bottom'] or 0)
 
         # then go inside the location
         if location:
@@ -247,7 +239,7 @@ class Pipette(Instrument):
             nonlocal location
             if location:
                 self.move_to(location, strategy='arc', enqueue=False)
-            self.plunger.move(self.positions['blow_out'])
+            self.motor.move(self.positions['blow_out'])
             self.current_volume = 0
         description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
@@ -342,23 +334,21 @@ class Pipette(Instrument):
                 placeable, _ = containers.unpack_location(location)
                 self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
 
-            self.plunger.move(self.positions['drop_tip'])
-            self.plunger.home()
+            self.motor.move(self.positions['drop_tip'])
+            self.motor.home()
             self.current_volume = 0
 
         description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        if not enqueue:
-            _do()
-        else:
-            self.create_command(_do, description)
+
+        self.create_command(_do, description, enqueue=enqueue)
         return self
 
     # QUEUEABLE
     def home(self):
         def _do():
-            self.plunger.home()
+            self.motor.home()
             self.current_volume = 0
 
         description = "Homing pipette plunger on axis {}".format(self.axis)
@@ -402,7 +392,7 @@ class Pipette(Instrument):
     # QUEUEABLE
     def delay(self, seconds):
         def _do():
-            self.plunger.wait(seconds)
+            self.motor.wait(seconds)
 
         description = "Delaying {} seconds".format(seconds)
         self.create_command(_do, description)
