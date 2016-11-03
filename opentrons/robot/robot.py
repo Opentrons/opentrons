@@ -776,14 +776,7 @@ class Robot(object, metaclass=Singleton):
                 'y_offset': 10,
                 'col_offset': 91,
                 'row_offset': 134.5
-            },
-            'slots_legacy': {
-                'x_offset': 10,
-                'y_offset': 10,
-                'col_offset': 96.25,
-                'row_offset': 133.3
             }
-
         }
         slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
         row_offset = slot_settings.get('row_offset')
@@ -838,7 +831,7 @@ class Robot(object, metaclass=Singleton):
         return sorted(self._instruments.items())
 
     def add_container(self, slot, container_name, label):
-        container = containers.get_legacy_container(container_name)
+        container = containers.get_persisted_container(container_name)
         container.properties['type'] = container_name
         self._deck[slot].add(container, label)
         return container
