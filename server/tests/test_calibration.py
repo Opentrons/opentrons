@@ -27,9 +27,9 @@ class CalibrationTestCase(unittest.TestCase):
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
-        self.robot._instruments['B'].plunger.move(12)
+        self.robot._instruments['B'].motor.move(12)
         self.robot._instruments['B'].calibrate('bottom')
-        self.robot._instruments['B'].plunger.move(2)
+        self.robot._instruments['B'].motor.move(2)
         current_pos = self.robot._driver.get_plunger_positions()['target']
         self.assertEquals(current_pos['b'], 2)
 
@@ -77,7 +77,7 @@ class CalibrationTestCase(unittest.TestCase):
                 container[0].bottom(),
                 instrument=instrument,
                 strategy='arc',
-                now=True)
+                enqueue=False)
         ]
         self.assertEquals(self.robot.move_to.mock_calls, expected)
 
@@ -117,7 +117,7 @@ class CalibrationTestCase(unittest.TestCase):
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
-        self.robot._instruments['B'].plunger.move(2)
+        self.robot._instruments['B'].motor.move(2)
         arguments = {'position': 'top', 'axis': 'b'}
         response = self.app.post(
             '/calibrate_plunger',
@@ -129,7 +129,7 @@ class CalibrationTestCase(unittest.TestCase):
         saved_pos = self.robot._instruments['B'].positions['top']
         self.assertEquals(saved_pos, 2)
 
-        self.robot._instruments['B'].plunger.move(3)
+        self.robot._instruments['B'].motor.move(3)
         arguments = {'position': 'bottom', 'axis': 'b'}
         response = self.app.post(
             '/calibrate_plunger',
@@ -141,7 +141,7 @@ class CalibrationTestCase(unittest.TestCase):
         saved_pos = self.robot._instruments['B'].positions['bottom']
         self.assertEquals(saved_pos, 3)
 
-        self.robot._instruments['B'].plunger.move(4)
+        self.robot._instruments['B'].motor.move(4)
         arguments = {'position': 'blow_out', 'axis': 'b'}
         response = self.app.post(
             '/calibrate_plunger',
@@ -153,7 +153,7 @@ class CalibrationTestCase(unittest.TestCase):
         saved_pos = self.robot._instruments['B'].positions['blow_out']
         self.assertEquals(saved_pos, 4)
 
-        self.robot._instruments['B'].plunger.move(5)
+        self.robot._instruments['B'].motor.move(5)
         arguments = {'position': 'drop_tip', 'axis': 'b'}
         response = self.app.post(
             '/calibrate_plunger',
