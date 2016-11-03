@@ -465,9 +465,8 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
-    axis = request.json.get("axis")
-
     try:
+        axis = request.json.get("axis")
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.reset_tip_tracking()
@@ -487,13 +486,11 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
-    axis = request.json.get("axis")
-
     try:
+        axis = request.json.get("axis")
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.drop_tip(enqueue=False)
-
     except Exception as e:
         emit_notifications([e], 'danger')
         return flask.jsonify({

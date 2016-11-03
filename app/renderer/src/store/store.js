@@ -41,13 +41,11 @@ function createWebSocketPlugin(socket) {
         })
       }
       if (data.name == 'command-run') {
-        console.log(data)
         if (data.caller === 'ui') {
           store.commit(types.UPDATE_RUN_LOG, data)
         }
       }
       if (data.name == 'notification') {
-        console.log(data)
         if (data.text.length > 0){
           let {text, type} = data
           text = `${type.toUpperCase()}: ${text}`
