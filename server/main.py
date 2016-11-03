@@ -357,9 +357,9 @@ def home(axis):
     result = ''
     try:
         if axis == 'undefined' or axis == '' or axis.lower() == 'all':
-            result = robot.home(now=True)
+            result = robot.home(enqueue=False)
         else:
-            result = robot.home(axis, now=True)
+            result = robot.home(axis, enqueue=False)
     except Exception as e:
         result = str(e)
         status = 'error'
