@@ -31,7 +31,7 @@
       axis="b"
   )
 
-  p200.set_max_volume(1000)  # volume calibration, can be called whenever you want
+  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
   pipette = p200
 
 .. testsetup:: long
@@ -65,16 +65,17 @@ You string these commands into full protocols that anyone with Opentrons can run
    p200.dispense(50, plate[2])
    p200.dispense(50, plate[3])
 
-If you wanted to do this 96 times, you could write it like this:
+If you wanted to do enough times to fill a 96 well plate, you could write it like this:
 
 .. testcode:: main
    
-  p200.aspirate(trough)
-  p200.dispense(plate[0])
-
-  for i in range(95):
-      p200.aspirate(100, plate[i])
-      p200.dispense(plate[i + 1]).blow_out().touch_tip()
+   #define how much volume to dispense in each well
+   dispense_vol = 50
+   
+   for i in range(96):
+      if p200.current_volume < dispense_vol:
+         p200.aspirate(trough[1])
+      p200.dispense(dispense_vol, plate[i])
 
 Hello World
 -----------
