@@ -127,7 +127,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def aspirate(self, volume=None, location=None, rate=1.0):
+    def aspirate(self, volume=None, location=None, rate=1.0, enqueue=True):
         def _do_aspirate():
             nonlocal volume
             nonlocal location
@@ -158,12 +158,12 @@ class Pipette(Instrument):
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do_aspirate, description)
+        self.create_command(_do_aspirate, description, enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
-    def dispense(self, volume=None, location=None, rate=1.0):
+    def dispense(self, volume=None, location=None, rate=1.0, enqueue=True):
         def _do():
             nonlocal location
             nonlocal volume
@@ -193,7 +193,7 @@ class Pipette(Instrument):
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
         return self
 
     def _position_for_aspirate(self, location=None):
@@ -214,7 +214,7 @@ class Pipette(Instrument):
             self.move_to(location, strategy='direct', enqueue=False)
 
     # QUEUEABLE
-    def mix(self, volume, repetitions=1, location=None):
+    def mix(self, volume, repetitions=1, location=None, enqueue=True):
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
@@ -223,18 +223,18 @@ class Pipette(Instrument):
         description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, str(self.current_volume)
         )
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
 
-        self.aspirate(location=location, volume=volume)
+        self.aspirate(location=location, volume=volume, enqueue=enqueue)
         for i in range(repetitions - 1):
-            self.dispense(volume)
-            self.aspirate(volume)
-        self.dispense(volume)
+            self.dispense(volume, enqueue=enqueue)
+            self.aspirate(volume, enqueue=enqueue)
+        self.dispense(volume, enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
-    def blow_out(self, location=None):
+    def blow_out(self, location=None, enqueue=True):
         def _do():
             nonlocal location
             if location:
@@ -244,11 +244,11 @@ class Pipette(Instrument):
         description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
         )
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
         return self
 
     # QUEUEABLE
-    def touch_tip(self, location=None):
+    def touch_tip(self, location=None, enqueue=True):
         def _do():
             nonlocal location
             if location:
@@ -274,26 +274,29 @@ class Pipette(Instrument):
                 enqueue=False)
 
         description = 'Touching tip'
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
-    def return_tip(self):
+    def return_tip(self, enqueue=True):
 
         def _do():
-            if not self.current_tip_home_well:
-                self.robot.add_warning('Pipette has no tip to return')
-                return
-
-            self.drop_tip(self.current_tip_home_well, enqueue=False)
+            pass
 
         description = "Returning tip"
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
+
+        if not self.current_tip_home_well:
+            self.robot.add_warning('Pipette has no tip to return')
+            return
+
+        self.drop_tip(self.current_tip_home_well, enqueue=enqueue)
+
         return self
 
     # QUEUEABLE
-    def pick_up_tip(self, location=None):
+    def pick_up_tip(self, location=None, enqueue=True):
         def _do():
             nonlocal location
 
@@ -311,7 +314,7 @@ class Pipette(Instrument):
 
             self.current_tip_home_well = location
 
-            tip_plunge = 10
+            tip_plunge = 6
 
             for _ in range(3):
                 self.robot.move_head(z=tip_plunge, mode='relative')
@@ -320,7 +323,7 @@ class Pipette(Instrument):
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
         return self
 
     # QUEUEABLE
@@ -346,56 +349,56 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def home(self):
+    def home(self, enqueue=True):
         def _do():
             self.motor.home()
             self.current_volume = 0
 
         description = "Homing pipette plunger on axis {}".format(self.axis)
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
         return self
 
     # QUEUEABLE
-    def transfer(self, volume, source, destination=None):
+    def transfer(self, volume, source, destination=None, enqueue=True):
         if not isinstance(volume, (int, float, complex)):
             if volume and not destination:
                 destination = source
                 source = volume
             volume = None
 
-        self.aspirate(volume, source)
-        self.dispense(volume, destination)
+        self.aspirate(volume, source, enqueue=enqueue)
+        self.dispense(volume, destination, enqueue=enqueue)
         return self
 
     # QUEUEABLE
-    def distribute(self, volume, source, destinations):
+    def distribute(self, volume, source, destinations, enqueue=True):
         volume = volume or self.max_volume
         fractional_volume = volume / len(destinations)
 
-        self.aspirate(volume, source)
+        self.aspirate(volume, source, enqueue=enqueue)
         for well in destinations:
-            self.dispense(fractional_volume, well)
+            self.dispense(fractional_volume, well, enqueue=enqueue)
 
         return self
 
     # QUEUEABLE
-    def consolidate(self, volume, sources, destination):
+    def consolidate(self, volume, sources, destination, enqueue=True):
         volume = volume or self.max_volume
         fractional_volume = (volume) / len(sources)
 
         for well in sources:
-            self.aspirate(fractional_volume, well)
+            self.aspirate(fractional_volume, well, enqueue=enqueue)
 
-        self.dispense(volume, destination)
+        self.dispense(volume, destination, enqueue=enqueue)
         return self
 
     # QUEUEABLE
-    def delay(self, seconds):
+    def delay(self, seconds, enqueue=True):
         def _do():
             self.motor.wait(seconds)
 
         description = "Delaying {} seconds".format(seconds)
-        self.create_command(_do, description)
+        self.create_command(_do, description, enqueue=enqueue)
         return self
 
     def calibrate(self, position):
