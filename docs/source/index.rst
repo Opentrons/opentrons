@@ -65,7 +65,7 @@ You string these commands into full protocols that anyone with Opentrons can run
    p200.dispense(50, plate[2])
    p200.dispense(50, plate[3])
 
-If you wanted to do enough times ti fill a 96 well plate, you could write it like this:
+If you wanted to do enough times to fill a 96 well plate, you could write it like this:
 
 .. testcode:: main
    
@@ -76,15 +76,6 @@ If you wanted to do enough times ti fill a 96 well plate, you could write it lik
       if p200.current_volume < dispense_vol:
          p200.aspirate(trough[1])
       p200.dispense(dispense_vol, plate[i])
-        
-.. testsetup:: main
-   
-  p200.aspirate(trough)
-  p200.dispense(plate[0])
-   
-  for i in range(95):
-      p200.aspirate(100, plate[i])
-      p200.dispense(plate[i + 1]).blow_out().touch_tip()
 
 Hello World
 -----------
