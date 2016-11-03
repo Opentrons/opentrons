@@ -47,27 +47,39 @@ Introduction
 
 The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy. 
 
-We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you can write your automated protocols in a similar way to how you'd already write them in your lab notebook. 
+We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook. 
 
 .. testcode:: main
    
    pipette.aspirate(tube_1).dispense(tube_2)
 
-That is how you tell the Opentrons robot to aspirate its full volume from tube-1 and dispense it into tube-2. 
+That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one. 
 
-To create your own automated protocols, you just have to string together commands for the robot to do for you. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into four different wells.
+You string these commands into full protocols that anyone with Opentrons can run. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into the first four wells in a 96 well plate called 'plate.'
 
 .. testcode:: main
    
-   p200.aspirate(trough)
-   p200.dispense(50, well_1).dispense(50, well_2).dispense(50, well_3).dispense(50, well_4)
+   p200.aspirate(trough[1])
+   p200.dispense(50, plate[0])
+   p200.dispense(50, plate[1])
+   p200.dispense(50, plate[2])
+   p200.dispense(50, plate[3])
 
-If you wanted to do this 96 times, you could write it like this:
+If you wanted to do enough times ti fill a 96 well plate, you could write it like this:
 
+.. testcode:: main
+   
+   #define how much volume to dispense in each well
+   dispense_vol = 50
+   
+   for i in range(:96):
+      if p200.current_volume() < dispense_vol:
+         p200.aspirate(trough[1])
+      p200.dispense(dispense_vol, current_well)
+        
 .. testsetup:: main
    
   p200.aspirate(trough)
-  p200.dispense(plate[0])
    
   for i in range(95):
       p200.aspirate(100, plate[i])

@@ -135,6 +135,7 @@ class Robot(object, metaclass=Singleton):
             * Instruments
             * Command queue
             * Runtime warnings
+
         """
         self._commands = []
         self._handlers = []
@@ -508,9 +509,11 @@ class Robot(object, metaclass=Singleton):
             system.
             3. (:class:`Placeable`, :class:`Vector`) move to a given coordinate
             within object's coordinate system.
+
         instrument :
             Instrument to move relative to. If ``None``, move relative to the
-            center ofd a gantry.
+            center of a gantry.
+
         strategy : {'arc', 'direct'}
             ``arc`` : move to the point using arc trajectory
             avoiding obstacles.
