@@ -1,4 +1,3 @@
-from opentrons.robot.command import Command
 from opentrons.robot.robot import Robot
 from opentrons.instruments.instrument import Instrument
 

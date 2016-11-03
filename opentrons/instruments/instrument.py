@@ -29,13 +29,6 @@ class Instrument(object):
         self.positions = {}
         self.max_volume = None
 
-    def get_calibration_dir(self):
-        DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
-        return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
-
-    def get_calibration_file_path(self):
-        return os.path.join(self.get_calibration_dir(), CALIBRATIONS_FILE)
-
     def reset(self):
         pass
 
@@ -61,6 +54,13 @@ class Instrument(object):
 
         else:
             do()
+
+    def get_calibration_dir(self):
+        DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
+        return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
+
+    def get_calibration_file_path(self):
+        return os.path.join(self.get_calibration_dir(), CALIBRATIONS_FILE)
 
     def init_calibrations(self):
         """
