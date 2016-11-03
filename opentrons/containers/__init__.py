@@ -4,6 +4,7 @@ from opentrons.containers.placeable import (
     Slot,
     Container,
     Well,
+    WellSeries,
     unpack_location
 )
 from opentrons.containers.calibrator import apply_calibration
@@ -14,6 +15,7 @@ __all__ = [
     Slot,
     Container,
     Well,
+    WellSeries,
     unpack_location,
     apply_calibration]
 

@@ -53,7 +53,7 @@ class RobotTest(unittest.TestCase):
         })
 
         self.robot.clear()
-        self.robot.home('xa')
+        self.robot.home('xa', enqueue=True)
         self.assertDictEqual(self.robot.axis_homed, {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False
         })
@@ -72,8 +72,8 @@ class RobotTest(unittest.TestCase):
         })
 
     def test_robot_pause_and_resume(self):
-        self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.move_to((Deck(), (101, 0, 0)))
+        self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
+        self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
         self.assertEqual(len(self.robot._commands), 2)
 
         self.robot.pause()
@@ -92,8 +92,8 @@ class RobotTest(unittest.TestCase):
         self.robot.clear()
         self.assertEqual(len(self.robot._commands), 0)
 
-        self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.move_to((Deck(), (101, 0, 0)))
+        self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
+        self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
 
         def _run():
             self.robot.run()
@@ -116,7 +116,7 @@ class RobotTest(unittest.TestCase):
         res = self.robot.versions()
         expected = {
             'config': {
-                'version': 'v1.0.3b',
+                'version': 'v1.2.0',
                 'compatible': True
             },
             'firmware': {

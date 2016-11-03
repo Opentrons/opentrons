@@ -71,7 +71,7 @@ target/
 sample_protocol.py
 
 # Local Calibration Data
-opentrons/config/calibrations/
+calibrations/
 
 # SDK logs
 *.log

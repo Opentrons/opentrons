@@ -10,7 +10,6 @@ import serial
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
-from opentrons.helpers.helpers import break_down_travel
 
 from opentrons.util import trace
 
@@ -79,15 +78,15 @@ class CNCDriver(object):
 
     # TODO: move to config
     COMPATIBLE_FIRMARE = ['v1.0.5']
-    COMPATIBLE_CONFIG = ['v1.0.3b']
+    COMPATIBLE_CONFIG = ['v1.2.0']
     firmware_version = None
     config_version = None
 
     ot_version = None
     ot_one_dimensions = {
-        'hood': Vector(400, 250, 120),
-        'one_pro': Vector(400, 400, 120),
-        'one_standard': Vector(400, 400, 120)
+        'hood': Vector(400, 250, 100),
+        'one_pro': Vector(400, 400, 100),
+        'one_standard': Vector(400, 400, 100)
     }
 
     def __init__(self):
@@ -307,16 +306,24 @@ class CNCDriver(object):
         # multiply by time interval to get increment in mm
         increment = self.head_speed / 60 * time_interval
 
-        vector_list = break_down_travel(
-            current, Vector(target_point), mode=mode, increment=increment)
+        target_vector = Vector(target_point)
 
-        # turn the vector list into axis args
+        flipped_vector = self.flip_coordinates(target_vector, mode)
         args_list = []
-        for vector in vector_list:
-            flipped_vector = self.flip_coordinates(vector, mode)
-            args_list.append(
-                {axis.upper(): flipped_vector[axis]
-                 for axis in 'xyz' if axis in kwargs})
+        args_list.append(
+            {axis.upper(): flipped_vector[axis]
+             for axis in 'xyz' if axis in kwargs}
+        )
+
+        # vector_list = break_down_travel(
+        #     current, target_vector, mode=mode, increment=increment)
+
+        # # turn the vector list into axis args
+        # for vector in vector_list:
+        #     flipped_vector = self.flip_coordinates(vector, mode)
+        #     args_list.append(
+        #         {axis.upper(): flipped_vector[axis]
+        #          for axis in 'xyz' if axis in kwargs})
 
         return self.consume_move_commands(args_list, increment)
 
@@ -402,7 +409,14 @@ class CNCDriver(object):
             for l in axis_to_home:
                 pos_args[l] = 0
 
-            arguments = {'name': 'home', 'axis': axis_to_home}
+            arguments = {
+                'name': 'home',
+                'axis': axis_to_home,
+                'position': {
+                    'head': self.get_head_position()["current"],
+                    'plunger': self.get_plunger_positions()["current"]
+                }
+            }
             trace.EventBroker.get_instance().notify(arguments)
             return self.set_position(**pos_args)
         else:

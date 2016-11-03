@@ -45,8 +45,6 @@ class Pipette(Instrument):
         self.placeables = []
         self.current_volume = 0
 
-        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
-
         self.speeds = {
             'aspirate': aspirate_speed,
             'dispense': dispense_speed
@@ -65,6 +63,8 @@ class Pipette(Instrument):
 
         self.init_calibrations()
         self.load_persisted_data()
+
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
     def reset(self):
         self.placeables = []
@@ -288,12 +288,13 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def return_tip(self):
+
         def _do():
             if not self.current_tip_home_well:
                 self.robot.add_warning('Pipette has no tip to return')
                 return
 
-            self.drop_tip(self.current_tip_home_well)
+            self.drop_tip(self.current_tip_home_well, now=True)
 
         description = "Returning tip"
         self.create_command(_do, description)
@@ -318,15 +319,11 @@ class Pipette(Instrument):
 
             self.current_tip_home_well = location
 
-            # TODO: actual plunge depth for picking up a tip
-            # varies based on the tip
-            # right now it's accounted for via plunge depth
-            tip_plunge = 6
+            tip_plunge = 10
 
-            # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
+                self.robot.move_head(z=-tip_plunge, mode='relative')
 
         description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
@@ -335,7 +332,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def drop_tip(self, location=None):
+    def drop_tip(self, location=None, now=False):
         def _do():
             nonlocal location
             if not location and self.trash_container:
@@ -352,7 +349,10 @@ class Pipette(Instrument):
         description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.create_command(_do, description)
+        if now:
+            _do()
+        else:
+            self.create_command(_do, description)
         return self
 
     # QUEUEABLE
