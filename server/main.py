@@ -485,7 +485,7 @@ def move_to_plunger_position():
     axis = request.json.get("axis")
     try:
         instrument = robot._instruments[axis.upper()]
-        instrument.plunger.move(instrument.positions[position])
+        instrument.motor.move(instrument.positions[position])
     except Exception as e:
         return flask.jsonify({
             'status': 'error',
