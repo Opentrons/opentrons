@@ -373,9 +373,21 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(fractional_volume, self.plate[1], enqueue=True),
-                mock.call.aspirate(fractional_volume, self.plate[2], enqueue=True),
-                mock.call.aspirate(fractional_volume, self.plate[3], enqueue=True)
+                mock.call.aspirate(
+                    fractional_volume,
+                    self.plate[1],
+                    enqueue=True
+                ),
+                mock.call.aspirate(
+                    fractional_volume,
+                    self.plate[2],
+                    enqueue=True
+                ),
+                mock.call.aspirate(
+                    fractional_volume,
+                    self.plate[3],
+                    enqueue=True
+                )
             ]
         )
         self.assertEqual(
@@ -395,9 +407,22 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(fractional_volume, self.plate[1], enqueue=True),
-                mock.call.dispense(fractional_volume, self.plate[2], enqueue=True),
-                mock.call.dispense(fractional_volume, self.plate[3], enqueue=True)]
+                mock.call.dispense(
+                    fractional_volume,
+                    self.plate[1],
+                    enqueue=True
+                ),
+                mock.call.dispense(
+                    fractional_volume,
+                    self.plate[2],
+                    enqueue=True
+                ),
+                mock.call.dispense(
+                    fractional_volume,
+                    self.plate[3],
+                    enqueue=True
+                )
+            ]
         )
         self.assertEqual(
             self.p200.aspirate.mock_calls,
@@ -424,7 +449,10 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(volume=100, location=self.plate[1], enqueue=True),
+                mock.call.aspirate(
+                    volume=100,
+                    location=self.plate[1],
+                    enqueue=True),
                 mock.call.aspirate(100, enqueue=True),
                 mock.call.aspirate(100, enqueue=True)
             ]
