@@ -63,7 +63,9 @@ def load_python(stream):
             )
             api_response['errors'] = error
     except Exception as e:
+        print(e)
         api_response['errors'] = [str(e)]
+
 
     api_response['warnings'] = robot.get_warnings() or []
 
@@ -95,6 +97,8 @@ def upload():
         })
 
     calibrations = get_step_list()
+    emit_notifications(api_response['errors'], 'danger')
+    emit_notifications(api_response['warnings'], 'warning')
 
     return flask.jsonify({
         'status': 'success',
@@ -104,6 +108,15 @@ def upload():
             'calibrations': calibrations
         }
     })
+
+
+def emit_notifications(notifications, _type):
+    for notification in notifications:
+        socketio.emit('event', {
+            'name': 'notification',
+            'text': notification,
+            'type': _type
+        })
 
 
 def _run_commands():
@@ -123,7 +136,8 @@ def _run_commands():
 
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
-    socketio.emit('event', api_response)
+    emit_notifications(api_response['warnings'], 'warning')
+    emit_notifications(api_response['errors'], 'danger')
 
 
 @app.route("/run", methods=["GET"])
@@ -227,6 +241,7 @@ def connect_robot():
         robot.disconnect()
         status = 'error'
         data = str(e)
+        emit_notifications([data], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -276,6 +291,7 @@ def disconnect_robot():
     except Exception as e:
         status = 'error'
         data = str(e)
+        emit_notifications([data], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -285,7 +301,11 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def placeables():
-    data = get_step_list()
+    try:
+        data = get_step_list()
+    except Exception as e:
+        emit_notifications([e], 'danger')
+
     return flask.jsonify({
         'status': 'success',
         'data': data
@@ -363,6 +383,8 @@ def home(axis):
     except Exception as e:
         result = str(e)
         status = 'error'
+        emit_notifications([result], 'danger')
+
     return flask.jsonify({
         'status': status,
         'data': result
@@ -383,6 +405,7 @@ def jog():
     except Exception as e:
         result = str(e)
         status = 'error'
+        emit_notifications([result], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -409,7 +432,8 @@ def move_to_slot():
         )
     except Exception as e:
         result = e
-        print(e)
+        emit_notifications([result], 'danger')
+
 
     return flask.jsonify({
         'status': 'success',
@@ -427,6 +451,7 @@ def move_to_container():
         container = robot._deck[slot].get_child_by_name(name)
         instrument.move_to(container[0].bottom(), enqueue=False)
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -448,6 +473,7 @@ def pick_up_tip():
         instrument.reset_tip_tracking()
         instrument.pick_up_tip(enqueue=False)
     except Exception as e:
+        emit_notifications([e], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -469,6 +495,7 @@ def drop_tip():
         instrument.drop_tip(enqueue=False)
 
     except Exception as e:
+        emit_notifications([e], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -487,6 +514,7 @@ def move_to_plunger_position():
         instrument = robot._instruments[axis.upper()]
         instrument.motor.move(instrument.positions[position])
     except Exception as e:
+        emit_notifications([e], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -528,6 +556,7 @@ def calibrate_placeable():
     try:
         _calibrate_placeable(name, axis)
     except Exception as e:
+        emit_notifications([e], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -565,6 +594,7 @@ def calibrate_plunger():
     try:
         _calibrate_plunger(position, axis)
     except Exception as e:
+        emit_notifications([e], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)

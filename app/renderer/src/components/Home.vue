@@ -41,7 +41,6 @@
 
 <script>
   import { StepList, Upload } from './export'
-  import { ADD_TOAST_MESSAGE } from 'vuex-toast'
 
   export default {
     data () {
@@ -52,9 +51,6 @@
     methods: {
       home(axis) {
         this.$store.dispatch('home', {axis: axis})
-      },
-      sendNotification(text, type) {
-        this.$store.dispatch(ADD_TOAST_MESSAGE, {text, type})
       }
     },
     computed: {

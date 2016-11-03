@@ -4,7 +4,7 @@ import io from 'socket.io-client/socket.io'
 import * as types from './mutation-types'
 import app_mutations from './mutations'
 import app_actions from './actions'
-import { createModule } from 'vuex-toast'
+import { createModule, ADD_TOAST_MESSAGE } from 'vuex-toast'
 
 
 const { mutations, state } = app_mutations
@@ -44,6 +44,14 @@ function createWebSocketPlugin(socket) {
         console.log(data)
         if (data.caller === 'ui') {
           store.commit(types.UPDATE_RUN_LOG, data)
+        }
+      }
+      if (data.name == 'notification') {
+        console.log(data)
+        if (data.text.length > 0){
+          let {text, type} = data
+          text = `${type.toUpperCase()}: ${text}`
+          store.dispatch(ADD_TOAST_MESSAGE, {text, type})
         }
       }
     })
