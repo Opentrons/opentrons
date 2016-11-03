@@ -572,6 +572,9 @@ class Robot(object, metaclass=Singleton):
             _do()
 
     def _get_calibrated_max_dimension(self, container=None):
+        """
+        Returns a tuple containing the maximum XYZ calibrated placeable
+        """
         if container:
             containers_list = [container]
         else:
@@ -597,7 +600,10 @@ class Robot(object, metaclass=Singleton):
 
         return res
 
-    def _create_arc(self, coordinates, placeable):
+    def _create_arc(self, destination, placeable):
+        """
+        Returns a list of coordinates to arrive to the destination coordinate
+        """
         this_container = None
         if isinstance(placeable, containers.Well):
             this_container = placeable.get_parent()
@@ -616,8 +622,8 @@ class Robot(object, metaclass=Singleton):
 
         return [
             {'z': tallest_z + 5},
-            {'x': coordinates[0], 'y': coordinates[1]},
-            {'z': coordinates[2]}
+            {'x': destination[0], 'y': destination[1]},
+            {'z': destination[2]}
         ]
 
     @property
