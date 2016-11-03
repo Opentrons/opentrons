@@ -58,7 +58,8 @@ class Robot(object, metaclass=Singleton):
     <opentrons.robot.robot.Robot object at ...>
     >>> plate = containers.load('96-flat', 'A1', 'plate')
     >>> p200 = instruments.Pipette(axis='b')
-    >>> p200.set_max_volume(200)
+    >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+    <opentrons.instruments.pipette.Pipette object at ...>
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
