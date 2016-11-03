@@ -80,6 +80,7 @@ If you wanted to do enough times ti fill a 96 well plate, you could write it lik
 .. testsetup:: main
    
   p200.aspirate(trough)
+  p200.dispense(plate[0])
    
   for i in range(95):
       p200.aspirate(100, plate[i])
