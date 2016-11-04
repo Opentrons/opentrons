@@ -45,7 +45,7 @@ describe('application launch', function () {
       return this.app.stop()
     }
   })
-
+  
   it('opens a window', function () {
     return this.app.client.waitUntilWindowLoaded(5000)
       .getWindowCount().should.eventually.equal(1)
