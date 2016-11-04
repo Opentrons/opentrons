@@ -113,6 +113,7 @@ def _run_commands():
 
     try:
         robot.resume()
+        robot.home()
         robot.run(caller='ui')
         if len(robot._commands) == 0:
             error = ("This protocol does not contain "
@@ -222,6 +223,10 @@ def connect_robot():
         robot = Robot.get_instance()
         robot.connect(
             port, options=options)
+
+        for i in range(3):
+            robot.move_head(z=2, mode='relative')
+            robot.move_head(z=-2, mode='relative')
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
