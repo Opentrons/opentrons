@@ -3,16 +3,16 @@ import json
 from collections import OrderedDict
 
 from opentrons.containers.placeable import Container, Well
-from opentrons.containers.legacy_containers import (
+from opentrons.containers.persisted_containers import (
     create_container_obj_from_dict,
-    get_legacy_container,
-    load_all_legacy_containers
+    get_persisted_container,
+    load_all_persisted_containers
 )
 
 
-class LegacyContainersTestCase(unittest.TestCase):
-    def test_load_legacy_container(self):
-        plate = get_legacy_container("24-plate")
+class PersistedContainersTestCase(unittest.TestCase):
+    def test_load_persisted_container(self):
+        plate = get_persisted_container("24-plate")
         self.assertIsInstance(plate, Container)
 
         self.assertIsInstance(plate, Container)
@@ -26,9 +26,9 @@ class LegacyContainersTestCase(unittest.TestCase):
         self.assertEqual(well_1.coordinates(), (13.3 + 0, 17.5 + 0, 0))
         self.assertEqual(well_2.coordinates(), (13.3 + 0, 17.5 + 19.3, 0))
 
-    def test_load_all_legacy_containers(self):
-        all_legacy_containers = load_all_legacy_containers()
-        self.assertEqual(len(all_legacy_containers), 31)
+    def test_load_all_persisted_containers(self):
+        all_persisted_containers = load_all_persisted_containers()
+        self.assertEqual(len(all_persisted_containers), 31)
 
     def test_create_container_obj_from_dict(self):
         container_data = """{

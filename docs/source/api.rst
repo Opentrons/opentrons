@@ -25,4 +25,3 @@ The actual protocol is written by issuing commands to instruments, such as ``Mov
 
 .. autoclass:: Pipette
    :inherited-members:
-

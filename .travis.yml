@@ -15,7 +15,7 @@ install:
 script: 
   - nosetests --with-coverage
   - pylama
-  - cd docs && make doctest html && cd ..
+  - cd docs && make html && cd ..
   - cd scripts && ./doc-deploy.sh && cd ..
 
 env:
