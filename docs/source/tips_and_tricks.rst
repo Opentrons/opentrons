@@ -47,7 +47,7 @@ Simple Transfer
 
 .. testcode:: main
 
-  robot.clear()        # deletes all previously created commands
+  robot.clear_commands()        # deletes all previously created commands
 
   p200.aspirate(plate[0])      # add new commands to queue
   p200.dispense(plate[0])
@@ -93,7 +93,7 @@ Home
 
 .. testcode:: main
 
-  robot.clear()
+  robot.clear_commands()
 
   # these will be executed immediately
   robot.home()          # by default homes Z first, then all other axis
@@ -192,7 +192,7 @@ Distribute to entire plate
 
 .. testcode:: main
 
-  robot.clear()
+  robot.clear_commands()
 
   p200.pick_up_tip(tiprack['A1'])
 
@@ -204,7 +204,7 @@ Distribute to entire plate
       p200.dispense(dispense_volume, plate[i]).touch_tip()
 
   p200.drop_tip(trash)
-  robot.run()
+  robot.simulate()
 
 Serial Dilution
 ---------------
@@ -249,7 +249,7 @@ Plate Mapping
       'H1': {'water': 55, 'sugar': 40, 'purple': 14}
   }
 
-  robot.clear()
+  robot.clear_commands()
 
   for source_well, ingredient in sources.items():
       # each ingredient has it's own tip
@@ -264,14 +264,14 @@ Plate Mapping
       # blow out the extra liquid, then save the tip
       p200.blow_out(trash).drop_tip(tiprack[source_well])
     
-  robot.run()
+  robot.simulate()
 
 Precision pipetting within a well
 ---------------------------------
 
 .. testcode:: main
 
-  robot.clear()
+  robot.clear_commands()
 
   p200.pick_up_tip(tiprack[3])
 
@@ -303,4 +303,4 @@ Precision pipetting within a well
 
   p200.drop_tip(tiprack[3])
 
-  robot.run()
+  robot.simulate()

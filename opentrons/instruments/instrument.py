@@ -2,9 +2,9 @@ import copy
 import json
 import os
 import sys
-import pkg_resources
 
 from opentrons.util.vector import (Vector, VectorEncoder)
+from opentrons.robot.command import Command
 
 
 JSON_ERROR = None
@@ -14,14 +14,8 @@ else:
     JSON_ERROR = json.decoder.JSONDecodeError
 
 
-CALIBRATIONS_FOLDER = pkg_resources.resource_filename(
-    'opentrons.config',
-    'calibrations'
-)
-CALIBRATIONS_FILE = os.path.join(
-    CALIBRATIONS_FOLDER,
-    'calibrations.json'
-)
+CALIBRATIONS_FOLDER = 'calibrations'
+CALIBRATIONS_FILE = 'calibrations.json'
 
 
 class Instrument(object):
@@ -35,11 +29,29 @@ class Instrument(object):
         self.positions = {}
         self.max_volume = None
 
+    def reset(self):
+        pass
+
+    def setup_simulate(self, mode='use_driver'):
+        if mode == 'skip_driver':
+            self.motor.simulate()
+        elif mode == 'use_driver':
+            self.motor.live()
+
+    def teardown_simulate(self):
+        self.motor.live()
+
+    def create_command(self, do, setup=None, description=None, enqueue=True):
+
+        command = Command(do=do, setup=setup, description=description)
+
+        if enqueue:
+            self.robot.add_command(command)
+        else:
+            command()
+
     def get_calibration_dir(self):
-        DATA_DIR = os.environ.get('APP_DATA_DIR')
-        if not DATA_DIR:
-            DATA_DIR = os.path.dirname(os.path.abspath(__file__))
-            # raise Exception('APP_DATA_DIR has not been set')
+        DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
         return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
 
     def get_calibration_file_path(self):

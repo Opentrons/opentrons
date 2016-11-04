@@ -3,7 +3,8 @@ import unittest
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.placeable import Deck
-from opentrons import instruments
+from opentrons import instruments, containers
+from opentrons.util.vector import Vector
 
 
 class RobotTest(unittest.TestCase):
@@ -11,9 +12,9 @@ class RobotTest(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
+        self.robot.reset()
         self.robot.connect()
-        self.robot.home(now=True)
-        self.robot.clear()
+        self.robot.home(enqueue=False)
 
     def test_simulate(self):
         self.robot.disconnect()
@@ -22,6 +23,48 @@ class RobotTest(unittest.TestCase):
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
         self.assertEquals(self.robot.connections['live'], None)
+
+    def test_calibrated_max_dimension(self):
+
+        expected = self.robot._deck.max_dimensions(self.robot._deck)
+        res = self.robot._calibrated_max_dimension()
+        self.assertEquals(res, expected)
+
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        plate = containers.load('96-flat', 'A1')
+        self.robot.move_head(x=10, y=10, z=10)
+        p200.calibrate_position((plate, Vector(0, 0, 0)))
+
+        res = self.robot._calibrated_max_dimension()
+
+        expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
+        self.assertEquals(res, expected)
+
+    def test_create_arc(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        plate = containers.load('96-flat', 'A1')
+        plate2 = containers.load('96-flat', 'B1')
+
+        self.robot.move_head(x=10, y=10, z=10)
+        p200.calibrate_position((plate, Vector(0, 0, 0)))
+        self.robot.move_head(x=10, y=10, z=100)
+        p200.calibrate_position((plate2, Vector(0, 0, 0)))
+
+        res = self.robot._create_arc((0, 0, 0), plate[0])
+        expected = [
+            {'z': 95 + 5},
+            {'x': 0, 'y': 0},
+            {'z': 0}
+        ]
+        self.assertEquals(res, expected)
+
+        res = self.robot._create_arc((0, 0, 0), plate[0])
+        expected = [
+            {'z': 15.5 + 5},
+            {'x': 0, 'y': 0},
+            {'z': 0}
+        ]
+        self.assertEquals(res, expected)
 
     def test_disconnect(self):
         self.robot.disconnect()
@@ -52,7 +95,7 @@ class RobotTest(unittest.TestCase):
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False
         })
 
-        self.robot.clear()
+        self.robot.clear_commands()
         self.robot.home('xa', enqueue=True)
         self.assertDictEqual(self.robot.axis_homed, {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False
@@ -63,8 +106,8 @@ class RobotTest(unittest.TestCase):
             'x': True, 'y': False, 'z': False, 'a': True, 'b': False
         })
 
-        self.robot.clear()
-        self.robot.home(now=True)
+        self.robot.clear_commands()
+        self.robot.home(enqueue=False)
         self.assertEquals(len(self.robot._commands), 0)
 
         self.assertDictEqual(self.robot.axis_homed, {
@@ -89,7 +132,7 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(thread.is_alive(), False)
         self.assertEqual(len(self.robot._commands), 2)
 
-        self.robot.clear()
+        self.robot.clear_commands()
         self.assertEqual(len(self.robot._commands), 0)
 
         self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
@@ -172,7 +215,7 @@ class RobotTest(unittest.TestCase):
         }
         self.assertDictEqual(res, expected)
 
-        self.robot.home('x', now=True)
+        self.robot.home('x', enqueue=False)
         res = self.robot.diagnostics()
         expected = {
             'axis_homed': {

@@ -8,7 +8,10 @@ from opentrons import containers
 from opentrons.drivers import motor as motor_drivers
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons.robot.command import Command
+from opentrons.util import trace
+from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
+from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
@@ -50,12 +53,14 @@ class Robot(object, metaclass=Singleton):
     Examples
     --------
     >>> from opentrons.robot import Robot
-    >>> from opentrons.instruments.pipette import Pipette
+    >>> from opentrons import instruments, containers
     >>> robot = Robot()
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> plate = robot.add_container('A1', '96-flat', 'plate')
-    >>> p200 = Pipette(axis='b')
+    >>> plate = containers.load('96-flat', 'A1', 'plate')
+    >>> p200 = instruments.Pipette(axis='b')
+    >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+    <opentrons.instruments.pipette.Pipette object at ...>
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
@@ -133,6 +138,7 @@ class Robot(object, metaclass=Singleton):
             * Instruments
             * Command queue
             * Runtime warnings
+
         """
         self._commands = []
         self._handlers = []
@@ -215,17 +221,20 @@ class Robot(object, metaclass=Singleton):
             Provides access to MagBead's MOSFET.
             """
 
+            def __init__(self):
+                self.motor_driver = robot_self._driver
+
             def engage(self):
                 """
                 Engages the MOSFET.
                 """
-                robot_self._driver.set_mosfet(mosfet_index, True)
+                self.motor_driver.set_mosfet(mosfet_index, True)
 
             def disengage(self):
                 """
                 Disengages the MOSFET.
                 """
-                robot_self._driver.set_mosfet(mosfet_index, False)
+                self.motor_driver.set_mosfet(mosfet_index, False)
 
             def wait(self, seconds):
                 """
@@ -236,7 +245,7 @@ class Robot(object, metaclass=Singleton):
                 seconds : int
                     Number of seconds to pause for.
                 """
-                robot_self._driver.wait(seconds)
+                self.motor_driver.wait(seconds)
 
         return InstrumentMosfet()
 
@@ -252,9 +261,14 @@ class Robot(object, metaclass=Singleton):
         robot_self = self
 
         class InstrumentMotor():
+
             """
             Provides access to Robot's head motor.
             """
+
+            def __init__(self):
+                self.motor_driver = robot_self._driver
+
             def move(self, value, mode='absolute'):
                 """
                 Move plunger motor.
@@ -266,8 +280,7 @@ class Robot(object, metaclass=Singleton):
                 mode : {'absolute', 'relative'}
                 """
                 kwargs = {axis: value}
-
-                return robot_self._driver.move_plunger(
+                return self.motor_driver.move_plunger(
                     mode=mode, **kwargs
                 )
 
@@ -275,7 +288,7 @@ class Robot(object, metaclass=Singleton):
                 """
                 Home plunger motor.
                 """
-                return robot_self._driver.home(axis)
+                return self.motor_driver.home(axis)
 
             def wait(self, seconds):
                 """
@@ -286,7 +299,7 @@ class Robot(object, metaclass=Singleton):
                 seconds : int
                     Number of seconds to pause for.
                 """
-                robot_self._driver.wait(seconds)
+                self.motor_driver.wait(seconds)
 
             def speed(self, rate):
                 """
@@ -296,7 +309,7 @@ class Robot(object, metaclass=Singleton):
                 ----------
                 rate : int
                 """
-                robot_self._driver.set_plunger_speed(rate, axis)
+                self.motor_driver.set_plunger_speed(rate, axis)
                 return self
 
         return InstrumentMotor()
@@ -466,12 +479,12 @@ class Robot(object, metaclass=Singleton):
             return _do()
 
     def add_command(self, command):
+
         if command.description:
             log.info("Enqueuing: {}".format(command.description))
+        if command.setup:
+            command.setup()
         self._commands.append(command)
-
-    def prepend_command(self, command):
-        self._commands = [command] + self._commands
 
     def register(self, name, callback):
         def commandable():
@@ -502,9 +515,11 @@ class Robot(object, metaclass=Singleton):
             system.
             3. (:class:`Placeable`, :class:`Vector`) move to a given coordinate
             within object's coordinate system.
+
         instrument :
             Instrument to move relative to. If ``None``, move relative to the
             center of a gantry.
+
         strategy : {'arc', 'direct'}
             ``arc`` : move to the point using arc trajectory
             avoiding obstacles.
@@ -525,13 +540,11 @@ class Robot(object, metaclass=Singleton):
         >>> robot.move_to(plate[0].top())
         """
 
+        enqueue = kwargs.get('enqueue', False)
         # Adding this for backwards compatibility with old move_to(now=False)
         # convention.
-        now = False
-        if 'now' not in kwargs:
-            now = not kwargs.get('enqueue')
-        else:
-            now = kwargs.get('now')
+        if 'now' in kwargs:
+            enqueue = not kwargs.get('now')
 
         placeable, coordinates = containers.unpack_location(location)
 
@@ -557,12 +570,55 @@ class Robot(object, metaclass=Singleton):
                 raise RuntimeError(
                     'Unknown move strategy: {}'.format(strategy))
 
-        if now:
-            _do()
-        else:
+        if enqueue:
             self.add_command(Command(do=_do))
+        else:
+            _do()
 
-    def _create_arc(self, coordinates, placeable):
+    def _calibrated_max_dimension(self, container=None):
+        """
+        Returns a Vector, each axis being the calibrated maximum
+        for all instruments
+        """
+        if not self._instruments or not self.containers():
+            if container:
+                return container.max_dimensions(self._deck)
+            return self._deck.max_dimensions(self._deck)
+
+        def _max_per_instrument(placeable):
+            """
+            Returns list of Vectors, one for each Instrument's farthest
+            calibrated coordinate for the supplied placeable
+            """
+            return [
+                instrument.calibrator.convert(
+                    placeable,
+                    placeable.max_dimensions(placeable)
+                )
+                for instrument in self._instruments.values()
+            ]
+
+        container_max_coords = []
+        if container:
+            container_max_coords = _max_per_instrument(container)
+        else:
+            for c in self.containers().values():
+                container_max_coords += _max_per_instrument(c)
+
+        max_coords = [
+            max(
+                container_max_coords,
+                key=lambda coordinates: coordinates[axis]
+            )[axis]
+            for axis in range(3)
+        ]
+
+        return Vector(max_coords)
+
+    def _create_arc(self, destination, placeable=None):
+        """
+        Returns a list of coordinates to arrive to the destination coordinate
+        """
         this_container = None
         if isinstance(placeable, containers.Well):
             this_container = placeable.get_parent()
@@ -571,18 +627,20 @@ class Robot(object, metaclass=Singleton):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        tallest_z = 0
+        ref_container = None
         if this_container and (self._previous_container == this_container):
-            _, _, tallest_z = this_container.max_dimensions(self._deck)
-        else:
-            _, _, tallest_z = self._deck.max_dimensions(self._deck)
+            ref_container = this_container
+
+        _, _, tallest_z = self._calibrated_max_dimension(ref_container)
+        _, _, robot_max_z = self._driver.get_dimensions()
+        arc_top = min(tallest_z, robot_max_z)
 
         self._previous_container = this_container
 
         return [
-            {'z': tallest_z},
-            {'x': coordinates[0], 'y': coordinates[1]},
-            {'z': coordinates[2]}
+            {'z': arc_top},
+            {'x': destination[0], 'y': destination[1]},
+            {'z': destination[2]}
         ]
 
     @property
@@ -609,7 +667,7 @@ class Robot(object, metaclass=Singleton):
         for instrument in self._instruments.values():
             instrument.reset()
 
-    def run(self):
+    def run(self, **kwargs):
         """
         Run the command queue on a device provided in :func:`connect`.
 
@@ -636,7 +694,21 @@ class Robot(object, metaclass=Singleton):
         """
         self.prepare_for_run()
 
-        for command in self._commands:
+        cmd_run_event = {}
+        cmd_run_event.update(kwargs)
+
+        mode = 'live'
+        if isinstance(
+                self._driver.connection, virtual_smoothie.VirtualSmoothie
+        ):
+            mode = 'simulate'
+
+        cmd_run_event['mode'] = mode
+        for i, command in enumerate(self._commands):
+            cmd_run_event.update({
+                'command_description': command.description,
+                'command_index': i
+            })
             try:
                 self.can_pop_command.wait()
                 if self.stopped_event.is_set():
@@ -644,9 +716,14 @@ class Robot(object, metaclass=Singleton):
                     break
                 if command.description:
                     log.info("Executing: {}".format(command.description))
-                command.do()
-            except KeyboardInterrupt as e:
-                self._driver.halt()
+                command()
+                # emit command was done...
+                cmd_run_event['name'] = 'command-run',
+                trace.EventBroker.get_instance().notify(cmd_run_event)
+            except Exception as e:
+                cmd_run_event['name'] = 'command-failed',
+                cmd_run_event['error'] = str(e),
+                trace.EventBroker.get_instance().notify(cmd_run_event)
                 raise e
 
         return self._runtime_warnings
@@ -668,16 +745,15 @@ class Robot(object, metaclass=Singleton):
             self.set_connection('simulate_switches')
         else:
             self.set_connection('simulate')
-
         for instrument in self._instruments.values():
-            instrument.set_plunger_defaults()
+            instrument.setup_simulate()
 
         res = self.run()
 
         self.set_connection('live')
 
         for instrument in self._instruments.values():
-            instrument.restore_plunger_positions()
+            instrument.teardown_simulate()
 
         return res
 
@@ -685,7 +761,7 @@ class Robot(object, metaclass=Singleton):
         if mode in self.connections:
             connection = self.connections[mode]
             if connection:
-                self._driver.connect(connection)
+                self._driver.connection = connection
             else:
                 self._driver.disconnect()
         else:
@@ -730,14 +806,7 @@ class Robot(object, metaclass=Singleton):
                 'y_offset': 10,
                 'col_offset': 91,
                 'row_offset': 134.5
-            },
-            'slots_legacy': {
-                'x_offset': 10,
-                'y_offset': 10,
-                'col_offset': 96.25,
-                'row_offset': 133.3
             }
-
         }
         slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
         row_offset = slot_settings.get('row_offset')
@@ -792,12 +861,12 @@ class Robot(object, metaclass=Singleton):
         return sorted(self._instruments.items())
 
     def add_container(self, slot, container_name, label):
-        container = containers.get_legacy_container(container_name)
+        container = containers.get_persisted_container(container_name)
         container.properties['type'] = container_name
         self._deck[slot].add(container, label)
         return container
 
-    def clear(self):
+    def clear_commands(self):
         """
         Clear Robot's command queue.
         """
@@ -831,7 +900,7 @@ class Robot(object, metaclass=Singleton):
     def get_serial_ports_list(self):
         ports = []
         # TODO: Store these settings in config
-        if os.environ.get('DEBUG', '').lower() == 'true':
+        if os.environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             ports = [self.VIRTUAL_SMOOTHIE_PORT]
         ports.extend(self._driver.get_serial_ports_list())
         return ports

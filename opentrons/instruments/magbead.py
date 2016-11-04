@@ -1,4 +1,3 @@
-from opentrons.robot.command import Command
 from opentrons.robot.robot import Robot
 from opentrons.instruments.instrument import Instrument
 
@@ -10,7 +9,7 @@ class Magbead(Instrument):
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.mosfet = self.robot.get_mosfet(mosfet)
+        self.motor = self.robot.get_mosfet(mosfet)
 
         if not name:
             name = self.__class__.__name__
@@ -22,37 +21,54 @@ class Magbead(Instrument):
         # a reference to the placeable set ontop the magbead module
         self.container = container
 
-    def reset(self):
-        pass
+        self.engaged = False
 
-    def engage(self):
+    def engage(self, enqueue=True):
+        def _setup():
+            self.engaged = True
+
         def _do():
-            self.mosfet.engage()
+            self.motor.engage()
 
-        description = "Engaging Magbead at mosfet #{}".format(
-            self.mosfet)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        _description = "Engaging Magbead at mosfet #{}".format(
+            self.motor)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
-    def disengage(self):
-        def _do():
-            self.mosfet.disengage()
+    def disengage(self, enqueue=True):
+        def _setup():
+            self.engaged = False
 
-        description = "Engaging Magbead at mosfet #{}".format(
-            self.mosfet)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        def _do():
+            self.motor.disengage()
+
+        _description = "Engaging Magbead at mosfet #{}".format(
+            self.motor)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
-    def delay(self, seconds):
-        def _do():
-            self.mosfet.wait(seconds)
+    def delay(self, seconds, enqueue=True):
+        def _setup():
+            pass
 
-        description = "Delaying Magbead for {} seconds".format(seconds)
-        self.robot.add_command(
-            Command(do=_do, description=description))
+        def _do():
+            self.motor.wait(seconds)
+
+        _description = "Delaying Magbead for {} seconds".format(seconds)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self

@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import itertools
 import json
 import os
 
@@ -198,13 +197,6 @@ class JSONProtocolProcessor(object):
                 )
 
             tool_config.pop('tool')
-            tool_instance = instruments.Pipette(
-                name=tool_name,
-                axis=tool_config.pop('axis'),
-                min_volume=0,
-                channels=(8 if tool_config.pop('multi-channel') else 1),
-                )
-            tool_instance.set_max_volume(tool_config.pop('volume'))
 
             # robot_containers = robot._deck.containers()
             tip_rack_objs = [
@@ -221,6 +213,16 @@ class JSONProtocolProcessor(object):
             tool_config['points'] = [
                 dict(i) for i in tool_config.pop('points')
             ]
+
+            tool_instance = instruments.Pipette(
+                name=tool_name,
+                axis=tool_config.pop('axis'),
+                min_volume=0,
+                channels=(8 if tool_config.pop('multi-channel') else 1),
+                tip_racks=tip_rack_objs,
+                trash_container=trash_obj
+            )
+            tool_instance.set_max_volume(tool_config.pop('volume'))
 
             head_obj[tool_name] = {
                 'instance': tool_instance,
@@ -295,17 +297,10 @@ class JSONProtocolProcessor(object):
         for instruction_dict in instructions:
             tool_name = instruction_dict.get('tool')
             tool_obj = self.head[tool_name]['instance']
-            trash_container = (
-                self.head[tool_name]['settings']['trash-container']
-            )
-
-            tips = itertools.cycle(
-                itertools.chain(*self.head[tool_name]['settings']['tip-racks'])
-            )
 
             for group in instruction_dict.get('groups'):
                 # We always pick up a new tip when entering a group
-                tool_obj.pick_up_tip(next(tips))
+                tool_obj.pick_up_tip()
 
                 for command_type, commands_calls in group.items():
                     def handler_ftn(command_args):
@@ -323,7 +318,7 @@ class JSONProtocolProcessor(object):
                         handler_ftn(commands_calls)
 
                 # LEAVING GROUP
-                tool_obj.drop_tip(trash_container)
+                tool_obj.drop_tip()
 
     def process_command(self, tool_obj, command, command_args):
         SUPPORTED_COMMANDS = {
@@ -457,6 +452,8 @@ class JSONProtocolProcessor(object):
         distribute_percent = tool_settings.get('distribute-percentage', 0)
 
         from_volume = total_to_volume * (1 + distribute_percent)
+
+        from_volume = min(from_volume, tool_obj.max_volume)
 
         self.handle_transfer_from(
             tool_obj,

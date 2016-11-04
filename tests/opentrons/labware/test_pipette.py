@@ -33,12 +33,12 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.p200.set_max_volume(200)
-        self.robot.home(now=True)
+        self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
 
     def test_calibrate_by_position_name(self):
 
-        self.p200.plunger.move(9)
+        self.p200.motor.move(9)
         self.p200.calibrate('bottom')
         self.assertEquals(self.p200.positions['bottom'], 9)
 
@@ -110,15 +110,15 @@ class PipetteTest(unittest.TestCase):
 
     def test_aspirate_rate(self):
         self.p200.set_speed(aspirate=300, dispense=500)
-        self.robot.clear()
-        self.p200.plunger.speed = mock.Mock()
+        self.robot.clear_commands()
+        self.p200.motor.speed = mock.Mock()
         self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
         self.robot.run()
         expected = [
             mock.call(600.0),
             mock.call(250.0)
         ]
-        self.assertEquals(self.p200.plunger.speed.mock_calls, expected)
+        self.assertEquals(self.p200.motor.speed.mock_calls, expected)
 
     def test_aspirate_move_to(self):
         x, y, z = (161.0, 116.7, 3.0)
@@ -156,7 +156,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_position(location)
 
-        self.robot.home(now=True)
+        self.robot.home(enqueue=False)
 
         self.p200.aspirate(100, location)
         self.p200.dispense(100, location)
@@ -340,10 +340,10 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEqual(
             self.p200.aspirate.mock_calls,
-            [mock.call.aspirate(None, self.plate[0])])
+            [mock.call.aspirate(None, self.plate[0], enqueue=True)])
         self.assertEqual(
             self.p200.dispense.mock_calls,
-            [mock.call.dispense(None, self.plate[1])])
+            [mock.call.dispense(None, self.plate[1], enqueue=True)])
 
     def test_transfer_with_volume(self):
         self.p200.aspirate = mock.Mock()
@@ -353,10 +353,10 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEqual(
             self.p200.aspirate.mock_calls,
-            [mock.call.aspirate(100, self.plate[0])])
+            [mock.call.aspirate(100, self.plate[0], enqueue=True)])
         self.assertEqual(
             self.p200.dispense.mock_calls,
-            [mock.call.dispense(100, self.plate[1])])
+            [mock.call.dispense(100, self.plate[1], enqueue=True)])
 
     def test_consolidate(self):
         volume = 99
@@ -367,19 +367,30 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.consolidate(volume, sources, destination)
-        self.robot.run()
 
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(fractional_volume, self.plate[1]),
-                mock.call.aspirate(fractional_volume, self.plate[2]),
-                mock.call.aspirate(fractional_volume, self.plate[3])
+                mock.call.aspirate(
+                    fractional_volume,
+                    self.plate[1],
+                    enqueue=True
+                ),
+                mock.call.aspirate(
+                    fractional_volume,
+                    self.plate[2],
+                    enqueue=True
+                ),
+                mock.call.aspirate(
+                    fractional_volume,
+                    self.plate[3],
+                    enqueue=True
+                )
             ]
         )
         self.assertEqual(
             self.p200.dispense.mock_calls,
-            [mock.call.dispense(volume, destination)]
+            [mock.call.dispense(volume, destination, enqueue=True)]
         )
 
     def test_distribute(self):
@@ -390,19 +401,31 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.distribute(volume, self.plate[0], destinations)
-        self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(fractional_volume, self.plate[1]),
-                mock.call.dispense(fractional_volume, self.plate[2]),
-                mock.call.dispense(fractional_volume, self.plate[3])]
+                mock.call.dispense(
+                    fractional_volume,
+                    self.plate[1],
+                    enqueue=True
+                ),
+                mock.call.dispense(
+                    fractional_volume,
+                    self.plate[2],
+                    enqueue=True
+                ),
+                mock.call.dispense(
+                    fractional_volume,
+                    self.plate[3],
+                    enqueue=True
+                )
+            ]
         )
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(volume, self.plate[0])
+                mock.call.aspirate(volume, self.plate[0], enqueue=True)
             ]
         )
 
@@ -412,22 +435,24 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.mix(100, 3, self.plate[1])
-        self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(100),
-                mock.call.dispense(100),
-                mock.call.dispense(100)
+                mock.call.dispense(100, enqueue=True),
+                mock.call.dispense(100, enqueue=True),
+                mock.call.dispense(100, enqueue=True)
             ]
         )
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(volume=100, location=self.plate[1]),
-                mock.call.aspirate(100),
-                mock.call.aspirate(100)
+                mock.call.aspirate(
+                    volume=100,
+                    location=self.plate[1],
+                    enqueue=True),
+                mock.call.aspirate(100, enqueue=True),
+                mock.call.aspirate(100, enqueue=True)
             ]
         )
 
@@ -441,15 +466,15 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(50),
-                mock.call.dispense(50)
+                mock.call.dispense(50, enqueue=True),
+                mock.call.dispense(50, enqueue=True)
             ]
         )
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(volume=50, location=None),
-                mock.call.aspirate(50)
+                mock.call.aspirate(volume=50, location=None, enqueue=True),
+                mock.call.aspirate(50, enqueue=True)
             ]
         )
 
@@ -457,6 +482,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.move_to = mock.Mock()
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
+
         self.robot.simulate()
 
         self.assertEqual(
@@ -466,6 +492,28 @@ class PipetteTest(unittest.TestCase):
                 self.build_move_to_bottom(self.tiprack1[1])
             ]
         )
+
+    def test_simulate_plunger_while_enqueing(self):
+
+        self.p200.pick_up_tip()
+        self.assertEquals(self.p200.current_volume, 0)
+
+        self.p200.aspirate(200)
+        self.assertEquals(self.p200.current_volume, 200)
+
+        self.p200.dispense(20)
+        self.assertEquals(self.p200.current_volume, 180)
+
+        self.p200.dispense(20)
+        self.assertEquals(self.p200.current_volume, 160)
+
+        self.p200.dispense(60)
+        self.assertEquals(self.p200.current_volume, 100)
+
+        self.p200.dispense(100)
+        self.assertEquals(self.p200.current_volume, 0)
+
+        self.p200.drop_tip()
 
     def test_tip_tracking_chain(self):
 
@@ -536,6 +584,8 @@ class PipetteTest(unittest.TestCase):
         for _ in range(0, 12 * 4):
             p200_multi.pick_up_tip()
 
+        self.robot.simulate()
+
         expected = []
         for i in range(0, 12):
             expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
@@ -545,8 +595,6 @@ class PipetteTest(unittest.TestCase):
             expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
         for i in range(0, 12):
             expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
-
-        self.robot.simulate()
 
         self.assertEqual(
             p200_multi.move_to.mock_calls,
@@ -562,29 +610,24 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.return_tip()
 
-        self.robot.simulate()
-
         self.assertEqual(
             self.p200.drop_tip.mock_calls,
             [
-                mock.call.drop_tip(self.tiprack1[0]),
-                mock.call.drop_tip(self.tiprack1[1])
+                mock.call(self.tiprack1[0], enqueue=True),
+                mock.call(self.tiprack1[1], enqueue=True)
             ]
         )
 
     def build_move_to_bottom(self, well):
         return mock.call(
-            well.bottom(), strategy='arc', now=True)
+            well.bottom(), strategy='arc', enqueue=False)
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()
 
         self.p200.pick_up_tip()
         self.p200.drop_tip()
-
         self.robot.simulate()
-
-        print(self.p200.move_to.mock_calls)
 
         self.assertEqual(
             self.p200.move_to.mock_calls,

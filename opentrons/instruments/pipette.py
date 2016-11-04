@@ -1,7 +1,6 @@
 import copy
 
 from opentrons import containers
-from opentrons.robot.command import Command
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.calibrator import Calibrator
@@ -95,7 +94,7 @@ class Pipette(Instrument):
 
         self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.plunger = self.robot.get_motor(self.axis)
+        self.motor = self.robot.get_motor(self.axis)
 
         self.placeables = []
         self.current_volume = 0
@@ -126,14 +125,14 @@ class Pipette(Instrument):
         self.current_volume = 0
         self.reset_tip_tracking()
 
-    def set_plunger_defaults(self):
+    def setup_simulate(self, **kwargs):
         self.calibrated_positions = copy.deepcopy(self.positions)
         self.positions['top'] = 0
         self.positions['bottom'] = 10
         self.positions['blow_out'] = 12
         self.positions['drop_tip'] = 14
 
-    def restore_plunger_positions(self):
+    def teardown_simulate(self):
         self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
@@ -157,23 +156,28 @@ class Pipette(Instrument):
                 itertools.chain(*iterables)
             )
 
-    def associate_placeable(self, location):
+    def _associate_placeable(self, location):
+        if not location:
+            return
+
         placeable, _ = containers.unpack_location(location)
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='arc', now=False):
-        if location:
-            self.associate_placeable(location)
-            self.robot.move_to(
-                location,
-                instrument=self,
-                strategy=strategy,
-                now=now)
+    def move_to(self, location, strategy='arc', enqueue=True):
+        if not location:
+            return self
+
+        self.robot.move_to(
+            location,
+            instrument=self,
+            strategy=strategy,
+            enqueue=enqueue)
 
         return self
 
-    def aspirate(self, volume=None, location=None, rate=1.0):
+    # QUEUEABLE
+    def aspirate(self, volume=None, location=None, rate=1.0, enqueue=True):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
 
@@ -218,43 +222,55 @@ class Pipette(Instrument):
         >>> # aspirate the pipette's remaining volume (80uL in this case) from a Well
         >>> p200.aspirate(plate[2])
         """
-        def _do_aspirate():
+        def _setup():
             nonlocal volume
             nonlocal location
+            nonlocal rate
             if not isinstance(volume, (int, float, complex)):
                 if volume and not location:
                     location = volume
                 volume = self.max_volume - self.current_volume
 
             if self.current_volume + volume > self.max_volume:
-                print('********', volume, location, self.max_volume)
                 raise RuntimeWarning(
                     'Pipette cannot hold volume {}'
                     .format(self.current_volume + volume)
                 )
 
-            self.position_for_aspirate(location)
-
             self.current_volume += volume
+
+            self._associate_placeable(location)
+
+        def _do():
+            nonlocal volume
+            nonlocal location
+            nonlocal rate
+
             distance = self.plunge_distance(self.current_volume)
-            bottom = self.positions['bottom'] or 0
+            bottom = self.positions['bottom']
             destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
 
-            self.plunger.speed(speed)
-            self.plunger.move(destination)
+            self._position_for_aspirate(location)
 
-        description = "Aspirating {0}uL at {1}".format(
+            self.motor.speed(speed)
+            self.motor.move(destination)
+
+        _description = "Aspirating {0}uL at {1}".format(
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(
-            Command(do=_do_aspirate, description=description))
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
-    def dispense(self, volume=None, location=None, rate=1.0):
+    # QUEUEABLE
+    def dispense(self, volume=None, location=None, rate=1.0, enqueue=True):
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
 
@@ -298,56 +314,69 @@ class Pipette(Instrument):
         >>> # dispense the pipette's remaining volume (80uL in this case) to a Well
         >>> p200.dispense(plate[2])
         """
-        def _do():
+        def _setup():
             nonlocal location
             nonlocal volume
+            nonlocal rate
+
             if not isinstance(volume, (int, float, complex)):
                 if volume and not location:
                     location = volume
                 volume = self.current_volume
 
-            if self.current_volume - volume < 0:
+            if not volume or (self.current_volume - volume < 0):
                 volume = self.current_volume
 
-            if location:
-                self.move_to(location, strategy='arc', now=True)
+            self.current_volume -= volume
 
-            if volume:
-                self.current_volume -= volume
-                distance = self.plunge_distance(self.current_volume)
-                bottom = self.positions['bottom'] or 0
-                destination = bottom - distance
+            self._associate_placeable(location)
 
-                speed = self.speeds['dispense'] * rate
+        def _do():
+            nonlocal location
+            nonlocal volume
+            nonlocal rate
 
-                self.plunger.speed(speed)
-                self.plunger.move(destination)
+            self.move_to(location, strategy='arc', enqueue=False)
 
-        description = "Dispensing {0}uL at {1}".format(
+            distance = self.plunge_distance(self.current_volume)
+            bottom = self.positions['bottom'] or 0
+            destination = bottom - distance
+
+            speed = self.speeds['dispense'] * rate
+
+            self.motor.speed(speed)
+            self.motor.move(destination)
+
+        _description = "Dispensing {0}uL at {1}".format(
             volume,
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
-    def position_for_aspirate(self, location=None):
+    def _position_for_aspirate(self, location=None):
 
         # first go to the destination
         if location:
             placeable, _ = containers.unpack_location(location)
-            self.move_to(placeable.top(), strategy='arc', now=True)
+            self.move_to(placeable.top(), strategy='arc', enqueue=False)
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.plunger.move(self.positions['bottom'] or 0)
+            self.motor.move(self.positions['bottom'] or 0)
 
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(1)
-            self.move_to(location, strategy='direct', now=True)
+            self.move_to(location, strategy='direct', enqueue=False)
 
-    def mix(self, volume, repetitions=1, location=None):
+    # QUEUEABLE
+    def mix(self, volume, repetitions=1, location=None, enqueue=True):
         """
         Mix a volume of liquid (in microliters/uL) using this pipette
 
@@ -383,25 +412,33 @@ class Pipette(Instrument):
         >>> # mix three times the pipette's maximum volume in it's current position
         >>> p200.mix(rate=3)
         """
+        def _setup():
+            pass
+
         def _do():
             # plunger movements are handled w/ aspirate/dispense
             # using Command for printing description
             pass
 
-        description = "Mixing {0} times with a volume of {1}ul".format(
+        _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, str(self.current_volume)
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
-        self.aspirate(location=location, volume=volume)
+        self.aspirate(location=location, volume=volume, enqueue=enqueue)
         for i in range(repetitions - 1):
-            self.dispense(volume)
-            self.aspirate(volume)
-        self.dispense(volume)
+            self.dispense(volume, enqueue=enqueue)
+            self.aspirate(volume, enqueue=enqueue)
+        self.dispense(volume, enqueue=enqueue)
 
         return self
 
-    def blow_out(self, location=None):
+    # QUEUEABLE
+    def blow_out(self, location=None, enqueue=True):
         """
         Force any remaining liquid to dispense, by moving this pipette's plunger to the calibrated `blow_out` position
 
@@ -427,19 +464,28 @@ class Pipette(Instrument):
         >>> p200.set_max_volume(200)
         >>> p200.aspirate(50).dispense().blow_out()
         """
+        def _setup():
+            nonlocal location
+            self.current_volume = 0
+            self._associate_placeable(location)
+
         def _do():
             nonlocal location
-            if location:
-                self.move_to(location, strategy='arc', now=True)
-            self.plunger.move(self.positions['blow_out'])
-            self.current_volume = 0
-        description = "Blow_out at {}".format(
+            self.move_to(location, strategy='arc', enqueue=False)
+            self.motor.move(self.positions['blow_out'])
+
+        _description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
-    def touch_tip(self, location=None):
+    # QUEUEABLE
+    def touch_tip(self, location=None, enqueue=True):
         """
         Helper method for touching the tip to the sides of a well, removing left-over droplets
 
@@ -467,36 +513,48 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[1])
         >>> p200.touch_tip()
         """
+        def _setup():
+            nonlocal location
+            self._associate_placeable(location)
+
         def _do():
             nonlocal location
+
+            # if no location specified, use the previously
+            # associated placeable to get Well dimensions
             if location:
-                self.move_to(location, strategy='arc', now=True)
+                self.move_to(location, strategy='arc', enqueue=False)
             else:
                 location = self.placeables[-1]
 
             self.move_to(
                 (location, location.from_center(x=1, y=0, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
             self.move_to(
                 (location, location.from_center(x=-1, y=0, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
             self.move_to(
                 (location, location.from_center(x=0, y=1, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
             self.move_to(
                 (location, location.from_center(x=0, y=-1, z=1)),
                 strategy='direct',
-                now=True)
+                enqueue=False)
 
-        description = 'Touching tip'
-        self.robot.add_command(Command(do=_do, description=description))
+        _description = 'Touching tip'
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
         return self
 
-    def return_tip(self):
+    # QUEUEABLE
+    def return_tip(self, enqueue=True):
         """
         Drop the pipette's current tip to it's originating tip rack
 
@@ -519,18 +577,30 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[1])
         >>> p200.return_tip()
         """
+
+        def _setup():
+            self.current_volume = 0
+
         def _do():
-            if not self.current_tip_home_well:
-                self.robot.add_warning('Pipette has no tip to return')
-                return
+            pass
 
-            self.drop_tip(self.current_tip_home_well)
+        _description = "Returning tip"
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
 
-        description = "Returning tip"
-        self.robot.add_command(Command(do=_do, description=description))
+        if not self.current_tip_home_well:
+            self.robot.add_warning('Pipette has no tip to return')
+            return
+
+        self.drop_tip(self.current_tip_home_well, enqueue=enqueue)
+
         return self
 
-    def pick_up_tip(self, location=None):
+    # QUEUEABLE
+    def pick_up_tip(self, location=None, enqueue=True):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -559,9 +629,8 @@ class Pipette(Instrument):
         >>> p200.pick_up_tip()    # will default to tiprack[1]
         >>> p200.return_tip()
         """
-        def _do():
+        def _setup():
             nonlocal location
-
             if not location:
                 if self.has_tip_rack():
                     # TODO: raise warning/exception if looped back to first tip
@@ -569,30 +638,39 @@ class Pipette(Instrument):
                 else:
                     self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')
-
-            if location:
-                placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='arc', now=True)
-
+            self._associate_placeable(location)
             self.current_tip_home_well = location
 
-            # TODO: actual plunge depth for picking up a tip
-            # varies based on the tip
-            # right now it's accounted for via plunge depth
+            self.current_volume = 0
+
+        def _do():
+            nonlocal location
+
+            self.motor.move(self.positions['blow_out'])
+
+            if self.current_tip_home_well:
+                placeable, _ = containers.unpack_location(
+                    self.current_tip_home_well)
+                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
+
             tip_plunge = 6
 
-            # Dip into tip and pull it up
             for _ in range(3):
-                self.robot.move_head(z=-tip_plunge, mode='relative')
                 self.robot.move_head(z=tip_plunge, mode='relative')
+                self.robot.move_head(z=-tip_plunge, mode='relative')
 
-        description = "Picking up tip from {0}".format(
+        _description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
-    def drop_tip(self, location=None):
+    # QUEUEABLE
+    def drop_tip(self, location=None, enqueue=True):
         """
         Drop the pipette's current tip
 
@@ -622,26 +700,39 @@ class Pipette(Instrument):
         >>> p200.pick_up_tip(tiprack[1])
         >>> p200.drop_tip(tiprack[1])  # drops the tip back at its tip rack
         """
-        def _do():
+        def _setup():
             nonlocal location
             if not location and self.trash_container:
                 location = self.trash_container
 
-            if location:
-                placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='arc', now=True)
+            self._associate_placeable(location)
 
-            self.plunger.move(self.positions['drop_tip'])
-            self.plunger.home()
             self.current_volume = 0
 
-        description = "Drop_tip at {}".format(
+        def _do():
+            nonlocal location
+
+            if location:
+                placeable, _ = containers.unpack_location(location)
+                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
+
+            self.motor.move(self.positions['drop_tip'])
+            self.motor.home()
+
+        _description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')
         )
-        self.robot.add_command(Command(do=_do, description=description))
+
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
-    def home(self):
+    # QUEUEABLE
+    def home(self, enqueue=True):
+
         """
         Home the pipette's plunger axis during a protocol run
 
@@ -660,15 +751,22 @@ class Pipette(Instrument):
         >>> p200 = instruments.Pipette(axis='a')
         >>> p200.home()
         """
-        def _do():
-            self.plunger.home()
+
+        def _setup():
             self.current_volume = 0
 
-        description = "Homing pipette plunger on axis {}".format(self.axis)
-        self.robot.add_command(Command(do=_do, description=description))
+        def _do():
+            self.motor.home()
+
+        _description = "Homing pipette plunger on axis {}".format(self.axis)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
-    def transfer(self, volume, source, destination=None):
+    def transfer(self, volume, source, destination=None, enqueue=True):
         """
         transfer
         """
@@ -678,24 +776,26 @@ class Pipette(Instrument):
                 source = volume
             volume = None
 
-        self.aspirate(volume, source)
-        self.dispense(volume, destination)
+        self.aspirate(volume, source, enqueue=enqueue)
+        self.dispense(volume, destination, enqueue=enqueue)
         return self
 
-    def distribute(self, volume, source, destinations):
+    # QUEUEABLE
+    def distribute(self, volume, source, destinations, enqueue=True):
         """
         distribute
         """
         volume = volume or self.max_volume
         fractional_volume = volume / len(destinations)
 
-        self.aspirate(volume, source)
+        self.aspirate(volume, source, enqueue=enqueue)
         for well in destinations:
-            self.dispense(fractional_volume, well)
+            self.dispense(fractional_volume, well, enqueue=enqueue)
 
         return self
 
-    def consolidate(self, volume, sources, destination):
+    # QUEUEABLE
+    def consolidate(self, volume, sources, destination, enqueue=True):
         """
         consolidate
         """
@@ -703,9 +803,28 @@ class Pipette(Instrument):
         fractional_volume = (volume) / len(sources)
 
         for well in sources:
-            self.aspirate(fractional_volume, well)
+            self.aspirate(fractional_volume, well, enqueue=enqueue)
 
-        self.dispense(volume, destination)
+        self.dispense(volume, destination, enqueue=enqueue)
+        return self
+
+    # QUEUEABLE
+    def delay(self, seconds, enqueue=True):
+        """
+        delay
+        """
+        def _setup():
+            pass
+
+        def _do():
+            self.motor.wait(seconds)
+
+        _description = "Delaying {} seconds".format(seconds)
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
         return self
 
     def calibrate(self, position):
@@ -880,17 +999,6 @@ class Pipette(Instrument):
                     volume, self.min_volume))
 
         return volume / self.max_volume
-
-    def delay(self, seconds):
-        """
-        delay
-        """
-        def _do():
-            self.plunger.wait(seconds)
-
-        description = "Delaying {} seconds".format(seconds)
-        self.robot.add_command(Command(do=_do, description=description))
-        return self
 
     def set_speed(self, **kwargs):
         """

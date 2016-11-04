@@ -110,6 +110,8 @@ class CNCDriver(object):
         return self.connection.port
 
     def get_dimensions(self):
+        if not self.ot_version:
+            self.get_ot_version()
         return self.ot_one_dimensions[self.ot_version]
 
     def get_serial_ports_list(self):
@@ -153,18 +155,7 @@ class CNCDriver(object):
         self.connection = device
         self.reset_port()
         log.debug("Connected to {}".format(device))
-        compatible = self.versions_compatible()
-        if not all(compatible.values()):
-            raise RuntimeError(
-                'This Robot\'s versions are incompatible with the API: '
-                'firmware={firmware}, '
-                'config={config}, '
-                'ot_version={ot_version}'.format(
-                    firmware=self.firmware_version,
-                    config=self.config_version,
-                    ot_version=self.ot_version
-                )
-            )
+        self.versions_compatible()
         return self.calm_down()
 
     def is_connected(self):
@@ -369,6 +360,8 @@ class CNCDriver(object):
         return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
+        if not self.ot_version:
+            self.get_ot_version()
         coordinates = Vector(coordinates) * Vector(1, -1, -1)
         if mode == 'absolute':
             offset = Vector(0, 1, 1) * self.ot_one_dimensions[self.ot_version]
@@ -417,7 +410,14 @@ class CNCDriver(object):
             for l in axis_to_home:
                 pos_args[l] = 0
 
-            arguments = {'name': 'home', 'axis': axis_to_home}
+            arguments = {
+                'name': 'home',
+                'axis': axis_to_home,
+                'position': {
+                    'head': self.get_head_position()["current"],
+                    'plunger': self.get_plunger_positions()["current"]
+                }
+            }
             trace.EventBroker.get_instance().notify(arguments)
             return self.set_position(**pos_args)
         else:
@@ -521,6 +521,18 @@ class CNCDriver(object):
             res['config'] = False
         if not self.ot_version:
             res['ot_version'] = False
+
+        if not all(res.values()):
+            raise RuntimeError(
+                'This Robot\'s versions are incompatible with the API: '
+                'firmware={firmware}, '
+                'config={config}, '
+                'ot_version={ot_version}'.format(
+                    firmware=self.firmware_version,
+                    config=self.config_version,
+                    ot_version=self.ot_version
+                )
+            )
         return res
 
     def get_ot_version(self):
