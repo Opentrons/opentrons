@@ -577,7 +577,7 @@ class Robot(object, metaclass=Singleton):
         Returns a Vector, each axis being the calibrated maximum
         for all instruments
         """
-        if not self._instruments:
+        if not self._instruments or not self.containers():
             if container:
                 return container.max_dimensions(self._deck)
             return self._deck.max_dimensions(self._deck)
