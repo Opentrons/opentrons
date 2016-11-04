@@ -295,15 +295,36 @@ def placeables():
 
 def get_step_list():
 
+    def _sort_containers(container_list):
+        """
+        Returns the passed container list, sorted with tipracks first
+        then alphabetically by name
+        """
+        _tipracks = []
+        _other = []
+        for c in container_list:
+            _type = c.properties['type'].lower()
+            if 'tip' in _type:
+                _tipracks.append(c)
+            else:
+                _other.append(c)
+
+        return sorted(
+            _tipracks + _other,
+            key=lambda c: c.get_name().lower()
+        )
+
     def _get_all_containers():
         """
         Returns all containers currently on the deck
         """
-        unique_containers = list()
+        all_containers = list()
         for slot in Robot.get_instance()._deck:
             if slot.has_children():
                 container = slot.get_children_list()[0]
-                unique_containers.append(container)
+                all_containers.append(container)
+
+        return _sort_containers(all_containers)
 
     def _get_unique_containers(instrument):
         """
@@ -315,7 +336,7 @@ def get_step_list():
                 c, placeable.Container)]
             unique_containers.add(containers[0])
 
-        return list(unique_containers)
+        return _sort_containers(list(unique_containers))
 
     def _check_if_calibrated(instrument, container):
         """
