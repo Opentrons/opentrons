@@ -60,8 +60,10 @@ describe('application launch', function () {
   it('runs a protocol', function () {
     var file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
     var pauseTime = process.env.PAUSE_TIME || 0
-    var tiprackXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[3]/button[1]"
-    var plateXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[2]/button[1]"
+    // var tiprackXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[3]/button[1]"
+    // var plateXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[2]/button[1]"
+    var tiprackXpath = '.save'
+    var plateXpath = '.save'
     var top = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[1]'
     var topSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[1]'
     var bottom = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[2]'
