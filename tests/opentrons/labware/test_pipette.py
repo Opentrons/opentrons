@@ -434,14 +434,14 @@ class PipetteTest(unittest.TestCase):
         # so that you have liquid
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
-        self.p200.mix(100, 3, self.plate[1])
+        self.p200.mix(100, self.plate[1], 3)
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(100, enqueue=True),
-                mock.call.dispense(100, enqueue=True),
-                mock.call.dispense(100, enqueue=True)
+                mock.call.dispense(100, rate=1.0, enqueue=True),
+                mock.call.dispense(100, rate=1.0, enqueue=True),
+                mock.call.dispense(100, rate=1.0, enqueue=True)
             ]
         )
         self.assertEqual(
@@ -450,9 +450,10 @@ class PipetteTest(unittest.TestCase):
                 mock.call.aspirate(
                     volume=100,
                     location=self.plate[1],
+                    rate=1.0,
                     enqueue=True),
-                mock.call.aspirate(100, enqueue=True),
-                mock.call.aspirate(100, enqueue=True)
+                mock.call.aspirate(100, rate=1.0, enqueue=True),
+                mock.call.aspirate(100, rate=1.0, enqueue=True)
             ]
         )
 
@@ -466,15 +467,18 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(50, enqueue=True),
-                mock.call.dispense(50, enqueue=True)
+                mock.call.dispense(50, rate=1.0, enqueue=True),
+                mock.call.dispense(50, rate=1.0, enqueue=True)
             ]
         )
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(volume=50, location=None, enqueue=True),
-                mock.call.aspirate(50, enqueue=True)
+                mock.call.aspirate(volume=50,
+                                   location=None,
+                                   rate=1.0,
+                                   enqueue=True),
+                mock.call.aspirate(50, rate=1.0, enqueue=True)
             ]
         )
 

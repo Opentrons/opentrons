@@ -186,7 +186,10 @@ class Pipette(Instrument):
             self.placeables.append(placeable)
 
     # QUEUEABLE
-    def move_to(self, location, strategy='arc', enqueue=True):
+    def move_to(self,
+                location,
+                strategy='arc',
+                enqueue=True):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -230,7 +233,11 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def aspirate(self, volume=None, location=None, rate=1.0, enqueue=True):
+    def aspirate(self,
+                 volume=None,
+                 location=None,
+                 rate=1.0,
+                 enqueue=True):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
 
@@ -338,7 +345,11 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def dispense(self, volume=None, location=None, rate=1.0, enqueue=True):
+    def dispense(self,
+                 volume=None,
+                 location=None,
+                 rate=1.0,
+                 enqueue=True):
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
 
@@ -465,7 +476,12 @@ class Pipette(Instrument):
             self.move_to(location, strategy='direct', enqueue=False)
 
     # QUEUEABLE
-    def mix(self, volume=None, repetitions=1, location=None, enqueue=True):
+    def mix(self,
+            volume=None,
+            location=None,
+            repetitions=1,
+            rate=1.0,
+            enqueue=True):
         """
         Mix a volume of liquid (in microliters/uL) using this pipette
 
@@ -479,12 +495,19 @@ class Pipette(Instrument):
         ----------
         volume : int or float
             The number of microliters to mix (Default: self.max_volume)
-        repetitions: int
-            How many times the pipette should mix (Default: 1)
+
+        rate : float
+            Set plunger speed for this mix, where
+            speed = rate * (aspirate_speed or dispense_speed)
+            (see :meth:`set_speed`)
+
         location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
             The :any:`Placeable` (:any:`Well`) to perform the mix.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
+
+        repetitions: int
+            How many times the pipette should mix (Default: 1)
 
         enqueue : bool
             If set to `True` (default), the method will be appended
@@ -505,7 +528,7 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # mix 50uL in a Well, three times
-        >>> p200.mix(50, 3, plate[0]) # doctest: +ELLIPSIS
+        >>> p200.mix(50, plate[0], 3) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # mix 3x with the pipette's max volume, from current position
@@ -513,7 +536,19 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
-            pass
+            nonlocal volume
+            nonlocal location
+            nonlocal repetitions
+
+            if not isinstance(volume, (int, float, complex)):
+                if volume:
+                    if not location:
+                        location = volume
+                    elif not repetitions and isinstance(location,
+                                                        (int, float, complex)):
+                        repetitions = location
+                        location = volume
+                volume = None
 
         def _do():
             # plunger movements are handled w/ aspirate/dispense
@@ -529,11 +564,14 @@ class Pipette(Instrument):
             description=_description,
             enqueue=enqueue)
 
-        self.aspirate(location=location, volume=volume, enqueue=enqueue)
+        self.aspirate(location=location,
+                      volume=volume,
+                      rate=rate,
+                      enqueue=enqueue)
         for i in range(repetitions - 1):
-            self.dispense(volume, enqueue=enqueue)
-            self.aspirate(volume, enqueue=enqueue)
-        self.dispense(volume, enqueue=enqueue)
+            self.dispense(volume, rate=rate, enqueue=enqueue)
+            self.aspirate(volume, rate=rate, enqueue=enqueue)
+        self.dispense(volume, rate=rate, enqueue=enqueue)
 
         return self
 
@@ -598,12 +636,12 @@ class Pipette(Instrument):
     # QUEUEABLE
     def touch_tip(self, location=None, enqueue=True):
         """
-        Helper method for touching the tip to the sides of a well,
-        removing left-over droplets
+        Touch the :any:`Pipette` tip to the sides of a well,
+        with the intent of removing left-over droplets
 
         Notes
         -----
-        If no `location` is passed, the pipette will blow_out
+        If no `location` is passed, the pipette will touch_tip
         from it's current position.
 
         Parameters
