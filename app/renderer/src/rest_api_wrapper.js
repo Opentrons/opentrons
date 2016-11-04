@@ -17,6 +17,17 @@ class OpenTrons {
     this.dropTipUrl = this.base_url + '/drop_tip'
     this.pauseProtocolUrl = this.base_url + '/pause'
     this.resumeProtocolUrl = this.base_url + '/resume'
+    this.getPortsListUrl = this.base_url + '/robot/serial/list'
+  }
+
+  getPortsList() {
+    return Vue.http
+      .get(this.getPortsListUrl)
+      .then((response) => {
+        return response.data.ports || []
+      }, (response) => {
+        console.log('failed to get serial ports list', response)
+      })
   }
 
   connect (port) {
