@@ -17,8 +17,6 @@ from opentrons.util.vector import VectorEncoder
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
 from server.process_manager import run_once
-import json
-from opentrons.util import vector
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
@@ -40,7 +38,9 @@ def notify(info):
     s = json.dumps(info, cls=VectorEncoder)
     socketio.emit('event', json.loads(s))
 
+
 trace.EventBroker.get_instance().add(notify)
+
 
 @app.route("/")
 def welcome():
@@ -293,49 +293,81 @@ def placeables():
     })
 
 
+def _sort_containers(container_list):
+    """
+    Returns the passed container list, sorted with tipracks first
+    then alphabetically by name
+    """
+    _tipracks = []
+    _other = []
+    for c in container_list:
+        _type = c.properties['type'].lower()
+        if 'tip' in _type:
+            _tipracks.append(c)
+        else:
+            _other.append(c)
+
+    _tipracks = sorted(
+        _tipracks,
+        key=lambda c: c.get_name().lower()
+    )
+    _other = sorted(
+        _other,
+        key=lambda c: c.get_name().lower()
+    )
+
+    return _tipracks + _other
+
+
+def _get_all_containers():
+    """
+    Returns all containers currently on the deck
+    """
+    all_containers = list()
+    for slot in Robot.get_instance()._deck:
+        if slot.has_children():
+            container = slot.get_children_list()[0]
+            all_containers.append(container)
+
+    return _sort_containers(all_containers)
+
+
+def _get_unique_containers(instrument):
+    """
+    Returns all associated containers for an instrument
+    """
+    unique_containers = set()
+    for location in instrument.placeables:
+        containers = [c for c in location.get_trace() if isinstance(
+            c, placeable.Container)]
+        unique_containers.add(containers[0])
+
+    return _sort_containers(list(unique_containers))
+
+
+def _check_if_calibrated(instrument, container):
+    """
+    Returns True if instrument holds calibration data for a Container
+    """
+    slot = container.get_parent().get_name()
+    label = container.get_name()
+    data = instrument.calibration_data
+    if slot in data:
+        if label in data[slot].get('children'):
+            return True
+    return False
+
+
+def _check_if_instrument_calibrated(instrument):
+    positions = instrument.positions
+    for p in positions:
+        if positions.get(p) is None:
+            return False
+
+    return True
+
+
 def get_step_list():
-
-    def _get_all_containers():
-        """
-        Returns all containers currently on the deck
-        """
-        unique_containers = list()
-        for slot in Robot.get_instance()._deck:
-            if slot.has_children():
-                container = slot.get_children_list()[0]
-                unique_containers.append(container)
-
-    def _get_unique_containers(instrument):
-        """
-        Returns all associated containers for an instrument
-        """
-        unique_containers = set()
-        for location in instrument.placeables:
-            containers = [c for c in location.get_trace() if isinstance(
-                c, placeable.Container)]
-            unique_containers.add(containers[0])
-
-        return list(unique_containers)
-
-    def _check_if_calibrated(instrument, container):
-        """
-        Returns True if instrument holds calibration data for a Container
-        """
-        slot = container.get_parent().get_name()
-        label = container.get_name()
-        data = instrument.calibration_data
-        if slot in data:
-            if label in data[slot].get('children'):
-                return True
-        return False
-
-    def _check_if_instrument_calibrated(instrument):
-        positions = instrument.positions
-        for p in positions:
-            if positions.get(p) is None:
-                return False
-
-        return True
 
     data = [{
         'axis': instrument.axis,
@@ -490,6 +522,7 @@ def drop_tip():
         'status': 'success',
         'data': ''
     })
+
 
 @app.route('/move_to_plunger_position', methods=["POST"])
 def move_to_plunger_position():
