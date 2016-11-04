@@ -11,7 +11,7 @@ config = {
     'install_requires': ['pyserial==3.1.1'],
     'package_data': {
         "opentrons": [
-            "config/containers/legacy_containers.json",
+            "config/containers/default-containers.json",
         ]
     },
     'scripts': [
