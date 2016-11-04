@@ -1,8 +1,8 @@
-var Application = require('spectron').Application
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
-var path = require('path')
-var glob = require("glob")
+let Application = require('spectron').Application
+let chai = require('chai')
+let chaiAsPromised = require('chai-as-promised')
+let path = require('path')
+let glob = require("glob")
 
 
 let appPath;
@@ -58,20 +58,18 @@ describe('application launch', function () {
   })
 
   it('runs a protocol', function () {
-    var file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
-    var pauseTime = process.env.PAUSE_TIME || 0
-    // var tiprackXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[3]/button[1]"
-    // var plateXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[2]/button[1]"
-    var tiprackXpath = '.save'
-    var plateXpath = '.save'
-    var top = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[1]'
-    var topSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[1]'
-    var bottom = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[2]'
-    var bottomSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[3]'
-    var blowOut = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[3]'
-    var blowOutSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[5]'
-    var dropTip = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[4]'
-    var dropTipSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[7]'
+    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
+    let pauseTime = process.env.PAUSE_TIME || 0
+    let tiprackXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[3]/button[1]"
+    let plateXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[2]/button[1]"
+    let top = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[1]'
+    let topSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[1]'
+    let bottom = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[2]'
+    let bottomSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[3]'
+    let blowOut = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[3]'
+    let blowOutSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[5]'
+    let dropTip = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[4]'
+    let dropTipSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[7]'
 
     return this.app.client.waitUntilWindowLoaded(5000)
       .click('//*[@id="connections"]/option[2]')
