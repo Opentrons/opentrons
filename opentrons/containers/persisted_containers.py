@@ -5,8 +5,6 @@ import numbers
 import os
 import pkg_resources
 
-import itertools
-
 from opentrons.containers.placeable import Container, Well
 from opentrons.util import environment
 
