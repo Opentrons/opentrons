@@ -9,6 +9,7 @@ from opentrons.drivers import motor as motor_drivers
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons.robot.command import Command
 from opentrons.util import trace
+from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
@@ -571,34 +572,45 @@ class Robot(object, metaclass=Singleton):
         else:
             _do()
 
-    def _get_calibrated_max_dimension(self, container=None):
+    def _calibrated_max_dimension(self, container=None):
         """
-        Returns a tuple containing the maximum XYZ calibrated placeable
+        Returns a Vector, each axis being the calibrated maximum
+        for all instruments
         """
-        if container:
-            containers_list = [container]
-        else:
-            containers_list = self.containers().values()
-
-        container_max_coords = []
-        for instrument in self._instruments.values():
-            container_max_coords += [
-                instrument.calibrator.convert(
-                    container,
-                    container.max_dimensions(container))
-                for container in containers_list]
-
-        if not container_max_coords:
+        if not self._instruments:
+            if container:
+                return container.max_dimensions(self._deck)
             return self._deck.max_dimensions(self._deck)
 
-        res = tuple([
+        def _calibrated_max_coords(placeable):
+            """
+            Returns list of Vectors, one for each Instrument's farthest
+            calibrated coordinate for the supplied placeable
+            """
+            return [
+                instrument.calibrator.convert(
+                    placeable,
+                    placeable.max_dimensions(placeable)
+                )
+                for instrument in self._instruments.values()
+            ]
+
+        container_max_coords = []
+        if container:
+            container_max_coords = _calibrated_max_coords(container)
+        else:
+            for c in self.containers().values():
+                container_max_coords += _calibrated_max_coords(c)
+
+        max_coords = [
             max(
                 container_max_coords,
                 key=lambda coordinates: coordinates[axis]
             )[axis]
-            for axis in range(3)])
+            for axis in range(3)
+        ]
 
-        return res
+        return Vector(max_coords)
 
     def _create_arc(self, destination, placeable):
         """
@@ -616,7 +628,7 @@ class Robot(object, metaclass=Singleton):
         if this_container and (self._previous_container == this_container):
             ref_container = this_container
 
-        _, _, tallest_z = self._get_calibrated_max_dimension(ref_container)
+        _, _, tallest_z = self._calibrated_max_dimension(ref_container)
 
         self._previous_container = this_container
 

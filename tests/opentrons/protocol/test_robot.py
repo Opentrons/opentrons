@@ -24,10 +24,10 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(len(self.robot._commands), 2)
         self.assertEquals(self.robot.connections['live'], None)
 
-    def test_get_calibrated_max_dimension(self):
+    def test_calibrated_max_dimension(self):
 
         expected = self.robot._deck.max_dimensions(self.robot._deck)
-        res = self.robot._get_calibrated_max_dimension()
+        res = self.robot._calibrated_max_dimension()
         self.assertEquals(res, expected)
 
         p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
@@ -35,7 +35,7 @@ class RobotTest(unittest.TestCase):
         self.robot.move_head(x=10, y=10, z=10)
         p200.calibrate_position((plate, Vector(0, 0, 0)))
 
-        res = self.robot._get_calibrated_max_dimension()
+        res = self.robot._calibrated_max_dimension()
 
         expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
         self.assertEquals(res, expected)
