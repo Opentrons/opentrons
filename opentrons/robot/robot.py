@@ -582,7 +582,7 @@ class Robot(object, metaclass=Singleton):
                 return container.max_dimensions(self._deck)
             return self._deck.max_dimensions(self._deck)
 
-        def _calibrated_max_coords(placeable):
+        def _max_per_instrument(placeable):
             """
             Returns list of Vectors, one for each Instrument's farthest
             calibrated coordinate for the supplied placeable
@@ -597,10 +597,10 @@ class Robot(object, metaclass=Singleton):
 
         container_max_coords = []
         if container:
-            container_max_coords = _calibrated_max_coords(container)
+            container_max_coords = _max_per_instrument(container)
         else:
             for c in self.containers().values():
-                container_max_coords += _calibrated_max_coords(c)
+                container_max_coords += _max_per_instrument(c)
 
         max_coords = [
             max(
