@@ -612,7 +612,7 @@ class Robot(object, metaclass=Singleton):
 
         return Vector(max_coords)
 
-    def _create_arc(self, destination, placeable):
+    def _create_arc(self, destination, placeable=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -629,11 +629,13 @@ class Robot(object, metaclass=Singleton):
             ref_container = this_container
 
         _, _, tallest_z = self._calibrated_max_dimension(ref_container)
+        _, _, robot_max_z = self._driver.get_dimensions()
+        arc_top = min(tallest_z, robot_max_z)
 
         self._previous_container = this_container
 
         return [
-            {'z': tallest_z + 5},
+            {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
             {'z': destination[2]}
         ]
