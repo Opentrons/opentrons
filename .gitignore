@@ -11,6 +11,7 @@ server/calibrations
 # Logs
 logs
 *.log
+*.log.*
 logfile.txt
 server/*.log
 

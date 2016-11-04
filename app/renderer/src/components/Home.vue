@@ -40,9 +40,14 @@
 
 
 <script>
-  import { StepList, Upload } from './export'
+  import { Toast } from 'vuex-toast'
+  import { StepList } from './StepList.vue'
 
   export default {
+    components: {
+      Toast,
+      StepList
+    },
     data () {
       return {
         message: 'Opentrons App'

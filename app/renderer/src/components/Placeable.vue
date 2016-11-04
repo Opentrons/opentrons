@@ -4,7 +4,6 @@
 
     <div class="instructions">Calibrate the {{ instrument.label }} pipette (axis {{instrument.axis}})
     to well A1 of {{ calibration.label }}.
-
     </div>
 
     <section>
@@ -15,7 +14,6 @@
         <div class="save-deck">
           <h3 class="title">Deck Position</h3>
           <coordinates></coordinates>
-          <!-- props - calibration, instrument, placeable type -->
           <h3 class="title">Calibrate {{ calibration.label }} </h3>
           <CalibratePlaceable :placeable="calibration" :type="type" :instrument="instrument" :disabled="busy"></CalibratePlaceable>
         </div>
@@ -26,10 +24,12 @@
 </template>
 
 <script>
-  import Navigation from './Navigation.vue'
-  import Jog from './Jog.vue'
-  import Coordinates from './Coordinates.vue'
-  import CalibratePlaceable from './CalibratePlaceable.vue'
+  import {
+    Navigation,
+    Jog,
+    Coordinates,
+    CalibratePlaceable
+  } from './export'
 
   export default {
     name: "Placeable",
