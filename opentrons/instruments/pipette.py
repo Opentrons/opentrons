@@ -60,17 +60,12 @@ class Pipette(Instrument):
     --------
     >>> from opentrons import instruments, containers
     >>> p1000 = instruments.Pipette(axis='a')
-    >>> p1000.set_max_volume(1000)
+    >>> p1000.set_max_volume(1000) # doctest: +ELLIPSIS
+    <opentrons.instruments.pipette.Pipette object at ...>
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'A1')
-    >>> p200 = instruments.Pipette(
-    >>>      axis='b',
-    >>>      name='my_favorite_pipette',
-    >>>      tip_racks=[tip_rack_200ul],
-    >>>      channels=8,
-    >>>      aspirate_speed=300,
-    >>>      dispense_speed=500
-    >>> )
-    >>> p200.set_max_volume(200)
+    >>> p200 = instruments.Pipette(axis='b', tip_racks=[tip_rack_200ul])
+    >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+    <opentrons.instruments.pipette.Pipette object at ...>
     """
 
     def __init__(
@@ -127,11 +122,19 @@ class Pipette(Instrument):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
     def reset(self):
+        """
+        Resets the state of this pipette, removing associated placeables,
+        setting current volume to zero, and resetting tip tracking
+        """
         self.placeables = []
         self.current_volume = 0
         self.reset_tip_tracking()
 
     def setup_simulate(self, **kwargs):
+        """
+        Overwrites :any:`Instrument` method, setting the plunger positions
+        to simulation defaults
+        """
         self.calibrated_positions = copy.deepcopy(self.positions)
         self.positions['top'] = 0
         self.positions['bottom'] = 10
@@ -139,14 +142,23 @@ class Pipette(Instrument):
         self.positions['drop_tip'] = 14
 
     def teardown_simulate(self):
+        """
+        Re-assigns any previously-calibrated plunger positions
+        """
         self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
+        """
+        Returns True of this :any:`Pipette` was instantiated with tip_racks
+        """
         return (self.tip_racks is not None and
                 isinstance(self.tip_racks, list) and
                 len(self.tip_racks) > 0)
 
     def reset_tip_tracking(self):
+        """
+        Resets the :any:`Pipette` tip tracking, "refilling" the tip racks
+        """
         self.current_tip_home_well = None
         self.tip_rack_iter = iter([])
 
@@ -163,6 +175,9 @@ class Pipette(Instrument):
             )
 
     def _associate_placeable(self, location):
+        """
+        Saves a reference to a placeable
+        """
         if not location:
             return
 
@@ -170,7 +185,39 @@ class Pipette(Instrument):
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
+    # QUEUEABLE
     def move_to(self, location, strategy='arc', enqueue=True):
+        """
+        Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
+
+        Notes
+        -----
+        Until obstacle-avoidance algorithms are in place,
+        :any:`Robot` and :any:`Pipette` :meth:`move_to` use either an
+        "arc" or "direct"
+
+        Parameters
+        ----------
+        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
+            The destination to arrive at
+
+        strategy : "arc" or "direct"
+            "arc" strategies (default) will pick the head up on Z axis, then
+            over to the XY destination, then finally down to the Z destination.
+            "direct" strategies will simply move in a straight line from
+            the current position
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
+        Returns
+        -------
+
+        This instance of :class:`Pipette`.
+        """
         if not location:
             return self
 
@@ -208,6 +255,12 @@ class Pipette(Instrument):
             Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed (see :meth:`set_speed`)
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -217,20 +270,25 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200)
-
+        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        
         >>> # aspirate 50uL from a Well
-        >>> p200.aspirate(50, plate[0])
+        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate 50uL from the center of a well
         >>> relative_vector = plate[1].center()
-        >>> p200.aspirate(50, (plate[1], relative_vector))
+        >>> p200.aspirate(50, (plate[1], relative_vector)) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate 20uL in place, twice as fast
-        >>> p200.aspirate(20, rate=2.0)
+        >>> p200.aspirate(20, rate=2.0) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate the pipette's remaining volume (80uL) from a Well
-        >>> p200.aspirate(plate[2])
+        >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             nonlocal volume
@@ -256,7 +314,7 @@ class Pipette(Instrument):
             nonlocal location
             nonlocal rate
 
-            distance = self.plunge_distance(self.current_volume)
+            distance = self._plunge_distance(self.current_volume)
             bottom = self.positions['bottom']
             destination = bottom - distance
 
@@ -303,6 +361,12 @@ class Pipette(Instrument):
             Set plunger speed for this dispense, where
             speed = rate * dispense_speed (see :meth:`set_speed`)
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -312,21 +376,28 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200)
-        >>> p200.aspirate(plate[0])  # fill the pipette with liquid (200uL)
+        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> # fill the pipette with liquid (200uL)
+        >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # dispense 50uL to a Well
-        >>> p200.dispense(50, plate[0])
+        >>> p200.dispense(50, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # dispense 50uL to the center of a well
         >>> relative_vector = plate[1].center()
-        >>> p200.dispense(50, (plate[1], relative_vector))
+        >>> p200.dispense(50, (plate[1], relative_vector)) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # dispense 20uL in place, at half the speed
-        >>> p200.dispense(20, rate=0.5)
+        >>> p200.dispense(20, rate=0.5) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # dispense the pipette's remaining volume (80uL) to a Well
-        >>> p200.dispense(plate[2])
+        >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             nonlocal location
@@ -352,7 +423,7 @@ class Pipette(Instrument):
 
             self.move_to(location, strategy='arc', enqueue=False)
 
-            distance = self.plunge_distance(self.current_volume)
+            distance = self._plunge_distance(self.current_volume)
             bottom = self.positions['bottom'] or 0
             destination = bottom - distance
 
@@ -373,6 +444,10 @@ class Pipette(Instrument):
         return self
 
     def _position_for_aspirate(self, location=None):
+        """
+        Position this :any:`Pipette` for an aspiration,
+        given it's current state
+        """
 
         # first go to the destination
         if location:
@@ -390,7 +465,7 @@ class Pipette(Instrument):
             self.move_to(location, strategy='direct', enqueue=False)
 
     # QUEUEABLE
-    def mix(self, volume, repetitions=1, location=None, enqueue=True):
+    def mix(self, volume=None, repetitions=1, location=None, enqueue=True):
         """
         Mix a volume of liquid (in microliters/uL) using this pipette
 
@@ -411,6 +486,12 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -420,13 +501,16 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200)
+        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # mix 50uL in a Well, three times
-        >>> p200.mix(50, 3, plate[0])
+        >>> p200.mix(50, 3, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
 
-        >>> # mix 3x pipette's max volume, from current position
-        >>> p200.mix(rate=3)
+        >>> # mix 3x with the pipette's max volume, from current position
+        >>> p200.mix(repetitions=3) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             pass
@@ -471,6 +555,12 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -480,8 +570,10 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200)
-        >>> p200.aspirate(50).dispense().blow_out()
+        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             nonlocal location
@@ -521,6 +613,12 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -530,10 +628,12 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200)
-        >>> p200.aspirate(50, plate[0])
-        >>> p200.dispense(plate[1])
-        >>> p200.touch_tip()
+        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             nonlocal location
@@ -585,6 +685,14 @@ class Pipette(Instrument):
         This method requires one or more tip-rack :any:`Container`
         to be in this Pipette's `tip_racks` list (see :any:`Pipette`)
 
+        Parameters
+        ----------
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -595,10 +703,14 @@ class Pipette(Instrument):
         ..
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
-        >>> p200.pick_up_tip()
-        >>> p200.aspirate(50, plate[0])
-        >>> p200.dispense(plate[1])
-        >>> p200.return_tip()
+        >>> p200.pick_up_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.dispense(plate[1]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.return_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
 
         def _setup():
@@ -640,6 +752,12 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -650,10 +768,15 @@ class Pipette(Instrument):
         ..
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
-        >>> p200.pick_up_tip(tiprack[0])
-        >>> p200.return_tip()
-        >>> p200.pick_up_tip()    # will default to tiprack[1]
-        >>> p200.return_tip()
+        >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.return_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> # `pick_up_tip` will automatically go to tiprack[1]
+        >>> p200.pick_up_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.return_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             nonlocal location
@@ -712,6 +835,12 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -723,10 +852,16 @@ class Pipette(Instrument):
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> trash = containers.load('point', 'A1')
         >>> p200 = instruments.Pipette(axis='a', trash_container=trash)
-        >>> p200.pick_up_tip(tiprack[0])
-        >>> p200.drop_tip()  # drops the tip in the trash
-        >>> p200.pick_up_tip(tiprack[1])
-        >>> p200.drop_tip(tiprack[1])  # drops the tip back at its tip rack
+        >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> # drops the tip in the trash
+        >>> p200.drop_tip() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.pick_up_tip(tiprack[1]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> # drops the tip back at its tip rack
+        >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
             nonlocal location
@@ -769,6 +904,14 @@ class Pipette(Instrument):
         `Pipette.home()` enqueues to `Robot` commands
         (see :any:`run` and :any:`simulate`)
 
+        Parameters
+        ----------
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
         Returns
         -------
 
@@ -778,7 +921,8 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.home()
+        >>> p200.home() # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
 
         def _setup():
@@ -840,7 +984,17 @@ class Pipette(Instrument):
     # QUEUEABLE
     def delay(self, seconds, enqueue=True):
         """
-        delay
+        Parameters
+        ----------
+
+        seconds: float
+            The number of seconds to freeeze in place.
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
         """
         def _setup():
             pass
@@ -881,7 +1035,9 @@ class Pipette(Instrument):
         >>> robot = Robot()
         >>> p200 = instruments.Pipette(axis='a')
         >>> robot.move_plunger(**{'a': 10})
-        >>> p200.calibrate('top')  # 'top' is now saved to position 10
+        >>> # save plunger 'top' to coordinate 10
+        >>> p200.calibrate('top') # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         current_position = self.robot._driver.get_plunger_positions()
         current_position = current_position['target'][self.axis]
@@ -963,9 +1119,10 @@ class Pipette(Instrument):
         ..
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a')
-        >>> robot.move_head(Vector(100, 100, 100))
+        >>> robot.move_head(x=100, y=100, z=100)
         >>> rel_pos = tiprack[0].from_center(x=0, y=0, z=-1, reference=tiprack)
-        >>> p200.calibrate_position((tiprack, rel_pos))
+        >>> p200.calibrate_position((tiprack, rel_pos)) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
         """
         if not current:
             current = self.robot._driver.get_head_position()['current']
@@ -983,6 +1140,13 @@ class Pipette(Instrument):
         """
         Set this pipette's maximum volume, equal to the number of
         microliters drawn when aspirating with the plunger's full range
+
+        Parameters
+        ----------
+        max_volume: int or float
+            The maximum number of microliters this :any:`Pipette` can hold.
+            Must be calculated and set after plunger calibrations to ensure
+            accuracy
         """
         self.max_volume = max_volume
 
@@ -996,7 +1160,7 @@ class Pipette(Instrument):
 
         return self
 
-    def plunge_distance(self, volume):
+    def _plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
@@ -1036,9 +1200,16 @@ class Pipette(Instrument):
 
     def set_speed(self, **kwargs):
         """
-        set_speed
+        Set the speed (mm/minute) the :any:`Pipette` plunger will move
+        during :meth:`aspirate` and :meth:`dispense`
+
+        Parameters
+        ----------
+        kwargs: Dict
+            A dictionary who's keys are either "aspirate" or "dispense",
+            and who's values are int or float (Example: `{"aspirate": 300}`)
         """
-        keys = {'head', 'aspirate', 'dispense'} & kwargs.keys()
+        keys = {'aspirate', 'dispense'} & kwargs.keys()
         for key in keys:
             self.speeds[key] = kwargs.get(key)
 
