@@ -309,10 +309,16 @@ def get_step_list():
             else:
                 _other.append(c)
 
-        return sorted(
-            _tipracks + _other,
+        _tipracks = sorted(
+            _tipracks,
             key=lambda c: c.get_name().lower()
         )
+        _other = sorted(
+            _other,
+            key=lambda c: c.get_name().lower()
+        )
+
+        return _tipracks + _other
 
     def _get_all_containers():
         """
