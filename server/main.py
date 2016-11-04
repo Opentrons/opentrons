@@ -3,6 +3,7 @@ import os
 import sys
 import threading
 import json
+import time
 
 import flask
 from flask import Flask, render_template, request
@@ -120,6 +121,7 @@ def emit_notifications(notifications, _type):
 
 
 def _run_commands():
+    start_time = time.time()
     global robot
 
     api_response = {'errors': [], 'warnings': []}
@@ -135,8 +137,15 @@ def _run_commands():
 
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
+    end_time = time.time()
     emit_notifications(api_response['warnings'], 'warning')
     emit_notifications(api_response['errors'], 'danger')
+    seconds = end_time - start_time
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    run_time = "%d:%02d:%02d" % (hours, minutes, seconds)
+    result = "Run complete in {}".format(run_time)
+    emit_notifications([result], 'success')
 
 
 @app.route("/run", methods=["GET"])
