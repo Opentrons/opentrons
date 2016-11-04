@@ -223,10 +223,6 @@ def connect_robot():
         robot = Robot.get_instance()
         robot.connect(
             port, options=options)
-
-        for i in range(3):
-            robot.move_head(z=2, mode='relative')
-            robot.move_head(z=-2, mode='relative')
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
