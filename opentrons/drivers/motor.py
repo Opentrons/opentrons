@@ -110,7 +110,8 @@ class CNCDriver(object):
         return self.connection.port
 
     def get_dimensions(self):
-        self.get_ot_version()
+        if not self.ot_version:
+            self.get_ot_version()
         return self.ot_one_dimensions[self.ot_version]
 
     def get_serial_ports_list(self):

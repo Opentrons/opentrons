@@ -117,7 +117,7 @@ class VirtualSmoothie(object):
 
         axis_hit = None
         for axis in 'xyzab':
-            if self.coordinates['target'][axis] < 0 and self.limit_switches:
+            if self.coordinates['target'][axis] < -3 and self.limit_switches:
                 axis_hit = 'min_' + axis
                 self.endstop[axis_hit] = 1
                 break
