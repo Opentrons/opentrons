@@ -5,6 +5,7 @@ server/static/css
 ~/
 .env
 .DS_Store
+calibrations
 server/calibrations
 
 # Logs
