@@ -57,7 +57,6 @@ function startUp() {
   if (process.env.NODE_ENV == 'development') {
     require('vue-devtools').install()
   }
-
 }
 
 app.on('ready', startUp)
