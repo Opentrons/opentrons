@@ -1,5 +1,5 @@
-import copy
 from collections import OrderedDict
+import copy
 import json
 import numbers
 import os

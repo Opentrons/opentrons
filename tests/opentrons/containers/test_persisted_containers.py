@@ -1,10 +1,11 @@
-import unittest
-import json
 from collections import OrderedDict
+import json
 import os
-from opentrons.containers.placeable import Container, Well
-from opentrons.containers import persisted_containers
 import shutil
+import unittest
+
+from opentrons.containers import persisted_containers
+from opentrons.containers.placeable import Container, Well
 from opentrons.util import environment
 
 

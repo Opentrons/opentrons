@@ -4,7 +4,7 @@ import unittest
 from opentrons.util import environment
 
 
-class EnvironmentCase(unittest.TestCase):
+class EnvironmentTestCase(unittest.TestCase):
 
     def test_get_path(self):
         app_data = environment.get_path('APP_DATA_DIR')
