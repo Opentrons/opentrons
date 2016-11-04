@@ -7,6 +7,8 @@
     <div class="step step-connect">
       <div class="connect" v-if="!connected">
         <select v-model="ports.selected" id="connections" @change="searchIfNecessary()">
+          <option value="default">Select a port</option>
+          <option value="refresh-list">&#8635 refresh</option>
           <option v-for="option in ports.options" v-bind:value="option.value">
             {{ option.text }}
           </option>
@@ -35,7 +37,7 @@
         next: "/upload",
         prev: "/",
         ports: {
-          selected: null,
+          selected: "default",
           options: []
         }
       }
@@ -51,25 +53,23 @@
     methods: {
       getPortsList: function () {
         this.ports = {
-          selected: null,
+          selected: "default",
           options: []
         }
         let self = this
         this.$http
           .get('http://localhost:5000/robot/serial/list')
           .then((response) => {
-            let ports = ['Select a port', 'Refresh'].concat(response.data.ports)
-            self.ports.selected = null
-            self.ports.options = ports.map((port) => ({text: port, value: port}))
-            self.ports.options[0].value = null
+            self.ports.options = response.data.ports.map((port) => ({text: port, value: port}))
           }, (response) => {
             console.log('failed to get serial ports list', response)
           })
       },
       searchIfNecessary: function () {
-        if (this.ports.selected === "Refresh") {
+        let selected = this.ports.selected
+        if ( selected === "refresh-list" || selected === null) {
           this.getPortsList()
-          this.ports.selected = null
+          this.ports.selected = "default"
         }
       },
       connectToRobot: function() {
