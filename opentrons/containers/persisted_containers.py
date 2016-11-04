@@ -8,12 +8,12 @@ import pkg_resources
 from opentrons.containers.placeable import Container, Well
 
 
-legacy_containers_dict = {}
+persisted_containers_dict = {}
 
 
-def load_legacy_containers_from_file_path(file_path):
+def load_persisted_containers_from_file_path(file_path):
     with open(file_path) as f:
-        legacy_containers_dict.update(json.load(
+        persisted_containers_dict.update(json.load(
             f,
             object_pairs_hook=OrderedDict
         )['containers'])
@@ -23,25 +23,26 @@ containers_dir_path = pkg_resources.resource_filename(
     'opentrons.config',
     'containers'
 )
-legacy_containers_json_path = os.path.join(
+persisted_containers_json_path = os.path.join(
     containers_dir_path,
-    'legacy_containers.json'
+    'default-containers.json'
 )
-load_legacy_containers_from_file_path(legacy_containers_json_path)
+load_persisted_containers_from_file_path(persisted_containers_json_path)
 
 
-def get_legacy_container(container_name: str) -> Container:
-    container_data = legacy_containers_dict.get(container_name)
+def get_persisted_container(container_name: str) -> Container:
+    container_data = persisted_containers_dict.get(container_name)
     if not container_data:
         raise Exception(
-            'Legacy container "{}" does not exist'.format(container_name)
+            ('Container type "{}" not found in file {}')
+            .format(container_name, persisted_containers_json_path)
         )
     return create_container_obj_from_dict(container_data)
 
 
-def load_all_legacy_containers():
+def load_all_persisted_containers():
     containers = []
-    for container_name, container_data in legacy_containers_dict.items():
+    for container_name, container_data in persisted_containers_dict.items():
         try:
             containers.append(
                 create_container_obj_from_dict(container_data)
