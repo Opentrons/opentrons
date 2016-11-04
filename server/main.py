@@ -128,6 +128,7 @@ def _run_commands():
 
     try:
         robot.resume()
+        robot.home()
         robot.run(caller='ui')
         if len(robot._commands) == 0:
             error = "This protocol does not contain any commands for the robot."
@@ -322,39 +323,47 @@ def placeables():
 
 def get_step_list():
 
-    def get_containers(instrument):
-
+    def _get_all_containers():
+        """
+        Returns all containers currently on the deck
+        """
         unique_containers = list()
         for slot in Robot.get_instance()._deck:
             if slot.has_children():
                 container = slot.get_children_list()[0]
                 unique_containers.append(container)
 
-        # unique_containers = set()
-        # for location in instrument.placeables:
-        #     containers = [c for c in location.get_trace() if isinstance(
-        #         c, placeable.Container)]
-        #     unique_containers.add(containers[0])
+    def _get_unique_containers(instrument):
+        """
+        Returns all associated containers for an instrument
+        """
+        unique_containers = set()
+        for location in instrument.placeables:
+            containers = [c for c in location.get_trace() if isinstance(
+                c, placeable.Container)]
+            unique_containers.add(containers[0])
 
         return list(unique_containers)
 
-    def check_if_calibrated(instrument, placeable):
-        slot = placeable.get_parent().get_name()
-        label = placeable.get_name()
+    def _check_if_calibrated(instrument, container):
+        """
+        Returns True if instrument holds calibration data for a Container
+        """
+        slot = container.get_parent().get_name()
+        label = container.get_name()
         data = instrument.calibration_data
         if slot in data:
             if label in data[slot].get('children'):
                 return True
         return False
 
-    def check_if_instrument_calibrated(instrument):
+    def _check_if_instrument_calibrated(instrument):
         positions = instrument.positions
         for p in positions:
             if positions.get(p) is None:
                 return False
 
         return True
-
 
     data = [{
         'axis': instrument.axis,
@@ -364,15 +373,15 @@ def get_step_list():
         'blow_out': instrument.positions['blow_out'],
         'drop_tip': instrument.positions['drop_tip'],
         'max_volume': instrument.max_volume,
-        'calibrated': check_if_instrument_calibrated(instrument),
+        'calibrated': _check_if_instrument_calibrated(instrument),
         'placeables': [
             {
-                'type': placeable.properties['type'],
-                'label': placeable.get_name(),
-                'slot': placeable.get_parent().get_name(),
-                'calibrated': check_if_calibrated(instrument, placeable)
+                'type': container.properties['type'],
+                'label': container.get_name(),
+                'slot': container.get_parent().get_name(),
+                'calibrated': _check_if_calibrated(instrument, container)
             }
-            for placeable in get_containers(instrument)
+            for container in _get_unique_containers(instrument)
         ]
     } for _, instrument in Robot.get_instance().get_instruments()]
 
@@ -424,28 +433,32 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
+    status = 'success'
     try:
         slot = request.json.get("slot")
         axis = request.json.get("axis")
         slot = robot._deck[slot]
 
+        instrument = robot._instruments.get(axis.upper())
+
+        relative_coord = slot.from_center(x=-1.0, y=0, z=0)
         _, _, tallest_z = slot.max_dimensions(slot)
-        relative_coord = slot.from_center(x=-1.0, y=0, z=1)
-        relative_coord += (0, 0, tallest_z + 10)
+        relative_coord += (0, 0, tallest_z)
         location = (slot, relative_coord)
 
         result = robot.move_to(
             location,
             enqueue=False,
-            instrument=robot._instruments[axis.upper()]
+            instrument=instrument
         )
     except Exception as e:
         result = str(e)
+        status = 'error'
         emit_notifications([result], 'danger')
 
 
     return flask.jsonify({
-        'status': 'success',
+        'status': status,
         'data': result
     })
 
