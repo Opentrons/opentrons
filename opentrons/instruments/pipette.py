@@ -272,7 +272,7 @@ class Pipette(Instrument):
         >>> p200 = instruments.Pipette(axis='a')
         >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
-        
+
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -701,6 +701,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
@@ -766,6 +768,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
         >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
@@ -849,6 +853,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> trash = containers.load('point', 'A1')
         >>> p200 = instruments.Pipette(axis='a', trash_container=trash)
@@ -1117,6 +1123,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a')
         >>> robot.move_head(x=100, y=100, z=100)
