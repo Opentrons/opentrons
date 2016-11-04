@@ -20,7 +20,7 @@ p200 = instruments.Pipette(
 
 p200.set_max_volume(200)  # volume calibration, can be called whenever you want
 
-robot.clear()
+robot.clear_commands()
 
 p200.pick_up_tip(tiprack[0])
 

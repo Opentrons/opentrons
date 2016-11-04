@@ -14,7 +14,7 @@ p200 = instruments.Pipette(axis="b")
 
 ####Clear, create, then simulate commands
 ```python
-robot.clear()        # delets all previously created commands
+robot.clear_commands()        # delets all previously created commands
 
 p200.aspirate()      # add new commands to queue
 p200.dispense()
@@ -44,7 +44,7 @@ robot.connect('/dev/tty.usbmodem1421')
 
 ####Home the robot
 ```python
-robot.clear()
+robot.clear_commands()
 
 robot.home()          # by default homes Z first, then all other axis
 robot.home('ab')      # you can also specify the axis
@@ -110,7 +110,7 @@ p200.dispense(plate['B2'])
 ####Distribute to entire plate
 
 ```python
-robot.clear()
+robot.clear_commands()
 
 p200.pick_up_tip(tiprack['A1'])
 
@@ -163,7 +163,7 @@ destinations = {
   'H1': {'water': 55, 'sugar': 40, 'purple': 14}
 }
 
-robot.clear()
+robot.clear_commands()
 
 for source_well, ingredient in sources.items():
   # each ingredient has it's own tip
@@ -184,7 +184,7 @@ robot.run()
 ####Precision pipetting within a well
 
 ```python
-robot.clear()
+robot.clear_commands()
 
 p200.pick_up_tip(tiprack[3])
 
