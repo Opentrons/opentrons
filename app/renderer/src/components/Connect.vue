@@ -27,11 +27,13 @@
 
 <script>
   import Navigation from './Navigation.vue'
+  import OpenTrons from '../rest_api_wrapper'
+
   export default {
+    name: "connect",
     components: {
       Navigation
     },
-    name: "connect",
     data: function () {
       return {
         next: "/upload",
@@ -56,14 +58,9 @@
           selected: "default",
           options: []
         }
-        let self = this
-        this.$http
-          .get('http://localhost:5000/robot/serial/list')
-          .then((response) => {
-            self.ports.options = response.data.ports.map((port) => ({text: port, value: port}))
-          }, (response) => {
-            console.log('failed to get serial ports list', response)
-          })
+        OpenTrons.getPortsList().then((ports) => {
+          this.ports.options = ports.map((port) => ({text: port, value: port}))
+        })
       },
       searchIfNecessary: function () {
         let selected = this.ports.selected
