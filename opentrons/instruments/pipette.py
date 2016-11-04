@@ -496,11 +496,6 @@ class Pipette(Instrument):
         volume : int or float
             The number of microliters to mix (Default: self.max_volume)
 
-        rate : float
-            Set plunger speed for this mix, where
-            speed = rate * (aspirate_speed or dispense_speed)
-            (see :meth:`set_speed`)
-
         location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
             The :any:`Placeable` (:any:`Well`) to perform the mix.
             Can also be a tuple with first item :any:`Placeable`,
@@ -508,6 +503,11 @@ class Pipette(Instrument):
 
         repetitions: int
             How many times the pipette should mix (Default: 1)
+
+        rate : float
+            Set plunger speed for this mix, where
+            speed = rate * (aspirate_speed or dispense_speed)
+            (see :meth:`set_speed`)
 
         enqueue : bool
             If set to `True` (default), the method will be appended
