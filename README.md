@@ -10,10 +10,10 @@
 - [x] XYZAB Jogging
 - [x] Move to Slot
 - [x] Protocol Error Reporting
-- [ ] Calibrate Container
-- [ ] Calibrate Pipette
+- [x] Calibrate Container
+- [x] Calibrate Pipette
+- [x] Run Protocol on Robot
 - [ ] Review Saved Positions
-- [ ] Run Protocol on Robot
 - [ ] Auto Updating (software and firmware)
 - [ ] Logging/Crash Reporting
 - [ ] Diagnostics Screen
