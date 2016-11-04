@@ -39,8 +39,6 @@ class TraceTestCase(unittest.TestCase):
             'function': 'TraceTestCase.MyClass.event_A',
             'result': 100
         })
-        print(expected_results[-1])
-        print(self.events[-1])
         self.assertDictEqual(expected_results[-1], self.events[-1])
 
         # Test named args
