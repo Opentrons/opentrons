@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import itertools
 import json
 import os
 
@@ -298,9 +297,6 @@ class JSONProtocolProcessor(object):
         for instruction_dict in instructions:
             tool_name = instruction_dict.get('tool')
             tool_obj = self.head[tool_name]['instance']
-            trash_container = (
-                self.head[tool_name]['settings']['trash-container']
-            )
 
             for group in instruction_dict.get('groups'):
                 # We always pick up a new tip when entering a group
