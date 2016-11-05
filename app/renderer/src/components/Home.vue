@@ -41,7 +41,7 @@
 
 <script>
   import { Toast } from 'vuex-toast'
-  import { StepList } from './StepList.vue'
+  import StepList from './StepList.vue'
 
   export default {
     components: {
