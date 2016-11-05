@@ -25,13 +25,11 @@
 </template>
 
 <script>
-  import {
-    Navigation,
-    Jog,
-    JogPlunger,
-    Coordinates,
-    CalibrateInstrument
-  } from './export'
+  import Navigation from "./Navigation.vue"
+  import Jog from "./Jog.vue"
+  import JogPlunger from "./JogPlunger.vue"
+  import Coordinates from "./Coordinates.vue"
+  import CalibrateInstrument from "./CalibrateInstrument.vue"
 
   export default {
     name: "Instrument",

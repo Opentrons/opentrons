@@ -24,12 +24,10 @@
 </template>
 
 <script>
-  import {
-    Navigation,
-    Jog,
-    Coordinates,
-    CalibratePlaceable
-  } from './export'
+  import Navigation from './Navigation.vue'
+  import Jog from './Jog.vue'
+  import Coordinates from './Coordinates.vue'
+  import CalibratePlaceable from './CalibratePlaceable.vue'
 
   export default {
     name: "Placeable",
