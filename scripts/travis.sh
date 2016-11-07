@@ -2,6 +2,11 @@
 
 run_install ()
 {
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+  nvm install 6.0.0
+  nvm use 6.0.0
   node --version
   npm --version
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
