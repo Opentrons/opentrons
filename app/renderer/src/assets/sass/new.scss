@@ -372,6 +372,8 @@ aside#step-list {
                 display: block;
                 line-height: $baseline;
                 padding-left: 30px;
+                text-decoration: none;
+                color: $primary-black;
                 // not in use yet but will need to truncate longer container names
                 span.clip {
                     display: block;
@@ -409,6 +411,14 @@ section#task {
     height: 270px;
     padding:30px;
     background-color: $well-bg;
+    .well-img {
+      width: 100px;
+      margin-top: 20px;
+      img{
+        width:100%;
+        height:auto;
+      }
+    }
 }
 
 

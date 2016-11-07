@@ -21,19 +21,25 @@
 		</div>
 	</div> -->
 	<section id="task">
-		<h1 class="title">Calibrate the p10 pipette to the center of your trash container</h1>
+		<h1 class="title">Calibrate the {{currentInstrument(this.$store.state.tasks).label}}
+			pipette to the center of your {{currentPlaceable(this.$store.state.tasks).label}} container</h1>
 		<button class="btn-calibrate save">SAVE</button>
 		<button class="btn-calibrate move-to">MOVE TO</button>
 		<button class="btn-calibrate move-to">PICK UP TIP</button>
 		<button class="btn-calibrate move-to">DROP TIP</button>
+		<div class="well-img">
+			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
+			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
+			<img src="../assets/img/point_top.png" v-show="placeableType('point')"/>
+		</div>
 	</section>
 </template>
 
 <script>
   export default {
     name: 'CalibratePlaceable',
-    props: ['instrument', 'placeable', 'type', 'disabled'],
     methods: {
+
 			placeableType(type) {
 				return this.type === type
 			},
@@ -56,7 +62,44 @@
 		  dropTip(instrument) {
 		    let axis = instrument.axis
 		    this.$store.dispatch("dropTip", { axis: axis })
-		  }
-    }
+		  },
+			currentInstrument(tasks) {
+				return tasks.filter((instrument) => {
+					return instrument.axis == this.$route.params.instrument
+				})[0]
+			},
+			currentPlaceable(tasks) {
+				return this.currentInstrument(tasks).placeables.filter((placeable) => {
+					return placeable.label ==  this.$route.params.placeable
+				})[0]
+			},
+			containerType(type){
+				if (type === "point"){
+					return "point"
+				} else if (type.includes("tiprack")){
+					return "tiprack"
+				}
+				else {
+					return "default"
+				}
+			}
+    },
+		computed: {
+			calibration() {
+				let tasks = this.$store.state.tasks
+				let placeable = this.currentPlaceable(tasks)
+				return placeable
+			},
+			instrument() {
+				let tasks = this.$store.state.tasks
+				return this.currentInstrument(tasks)
+			},
+			type(){
+				let tasks = this.$store.state.tasks
+				let placeable = this.currentPlaceable(tasks)
+				let type = this.containerType(placeable.type)
+				return type
+			}
+		}
   }
 </script>
