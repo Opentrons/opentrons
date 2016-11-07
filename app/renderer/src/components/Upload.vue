@@ -14,7 +14,7 @@
             Warnings: {{warnings}}
           </div>
         </div>
-        <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" :class="['step-upload', busy]">
+        <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:31950/upload" method="POST" enctype="multipart/form-data" :class="['step-upload', busy]">
           <div class="fileUpload">
             <span>{{fileName}}</span>
             <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
