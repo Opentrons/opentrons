@@ -2,7 +2,6 @@
   <div class="connect">
     <select @change="searchIfNecessary()" v-model="ports.selected" id="connections">
       <option value="default">Select a port</option>
-      <!-- <option v-if="connected" value="default">{{port}}</option> -->
       <option value="refresh-list">&#8635 refresh</option>
       <option v-for="option in ports.options" v-bind:value="option.value">
         {{ option.text }}
