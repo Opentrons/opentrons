@@ -6,7 +6,7 @@ VARS
 
 @font-face {
     font-family: "trons";
-    src: url("../fonts/Geogtq-Rg-webfont.woff2");
+    src: url("../assets/fonts/Geogtq-Rg-webfont.woff2");
     font-weight: normal;
     font-style: normal;
 }
@@ -42,7 +42,7 @@ $secondary-btn: lighten( $secondary-brand,15%);
 	}@else{
 		@return $btn-size*$n +$gutter-width;
 	}
-    
+
 }
 
 @function num-col-full($n) {
@@ -111,7 +111,8 @@ header#home-connect {
 			border-radius: 6px;
 			text-align: center;
 			color:white;
-		}	
+      cursor:pointer;
+		}
     }
     div.logo{
     	width:124px;
@@ -137,14 +138,14 @@ header#home-connect {
 		    height:$btn-size;
 		    width: 6*$btn-size;
 		    padding-left: 10px;
-		    background-image: url("../img/caret.png");
+		    background-image: url("../assets/img/caret.png");
 		    background-repeat: no-repeat;
 		    background-position: 95% 50%;
 		    color: $btn-jog;
-		   
+
 		}
     }
-	
+
 }
 
 
@@ -169,7 +170,7 @@ section#protocol {
                 height:15px;
                 padding:24px 0;
                 position: relative;
-                overflow: hidden;        
+                overflow: hidden;
                 color:#888;
                 border-radius: 6px;
                 border: 2px dashed darken($well-bg,10%);
@@ -214,7 +215,7 @@ aside#jog {
     height: 400px;
     padding:15px;
     border-radius: 6px;
-	
+
     background-color: $well-bg;
     h2#xy{
 			width:145px;
@@ -222,12 +223,12 @@ aside#jog {
 	h2#z{
 			width:65px;
 	}
-	
+
     #jog-controls{
 		width:270px;
 		display: flex;
         flex-wrap: wrap;
-		
+
 		justify-content:space-around;
 		margin-bottom: 15px;
 		.btn{
@@ -241,7 +242,7 @@ aside#jog {
 			flex: 0 0 102px;
 			display:flex;
 			flex-wrap: wrap;
-					
+
 	    }
 	    span.z, span.p{
 	    	width: 36px;
@@ -317,7 +318,7 @@ aside#jog {
     			line-height: 40px;
     			background-color: none;
     			&:focus, &.active {
-			        box-shadow: inset 5px 5px 0px 0px $primary-brand,inset -5px -5px 0px 0px $primary-brand; ;			       
+			        box-shadow: inset 5px 5px 0px 0px $primary-brand,inset -5px -5px 0px 0px $primary-brand; ;
 			    }
     		}
     	}
@@ -373,7 +374,7 @@ aside#step-list {
                 display: block;
                 line-height: $baseline;
                 padding-left: 30px;
-                // not in use yet but will need to truncate longer container names 
+                // not in use yet but will need to truncate longer container names
                 span.clip {
                     display: block;
                     width: 80px;
@@ -432,7 +433,7 @@ Buttons
     line-height: $btn-size;
     padding:0px 15px;
     margin: 2 * $gutter-width;
-    text-align: center;    
+    text-align: center;
     border-radius: 6px;
     text-align: center;
 	color:white;

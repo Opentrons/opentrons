@@ -400,10 +400,12 @@ def home(axis):
         if axis == 'undefined' or axis == '' or axis.lower() == 'all':
             result = robot.home(enqueue=False)
         else:
+            import pdb; pdb.set_trace()
             result = robot.home(axis, enqueue=False)
     except Exception as e:
         result = str(e)
         status = 'error'
+
     return flask.jsonify({
         'status': status,
         'data': result

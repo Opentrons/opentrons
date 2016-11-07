@@ -52,6 +52,7 @@ class OpenTrons {
       .get(this.disconnectUrl)
       .then((response) => {
         if (response.data.status === "success") {
+          console.log("disconnected from robot")
           return true
         } else {
           return false
