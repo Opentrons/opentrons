@@ -1,13 +1,15 @@
-sudo: required
-dist: trusty
-
-language: python
-pytnon:
-  - "3.4"
-
-os:
-  - osx
-#  - linux
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: python
+      pytnon: "3.4"
+      env: OPENTRONS_APP_UPLOAD_DIR=linux
+    - os: osx
+      language: python
+      pytnon: "3.4"
+      env: OPENTRONS_APP_UPLOAD_DIR=mac
 
 cache:
   apt: true
@@ -24,7 +26,6 @@ before_install:
 
 install:
   - ./scripts/travis.sh install
-  - export OPENTRONS_APP_UPLOAD_DIR=$(if [ "$TRAVIS_OS_NAME" == "linux" ]; then echo "linux"; else echo "mac"; fi)
 
 script: echo "No python test scripts to run"
 
