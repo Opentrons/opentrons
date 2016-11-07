@@ -1,4 +1,6 @@
-sudo: true
+sudo: required
+dist: trusty
+
 language: python
 pytnon:
   - "3.5"
