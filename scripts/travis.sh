@@ -5,6 +5,9 @@ run_install ()
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
+  export DISPLAY=':99.0'
+  Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  
   nvm install 6.0.0
   nvm use 6.0.0
   node --version
@@ -12,10 +15,10 @@ run_install ()
 
   sudo pip3 install -r requirements.txt
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
-  # npm i -g mocha
-  # npm run unit
+  npm i -g mocha
+  npm run unit
   npm run release:posix
-  # npm run integration
+  npm run integration
   ls dist/$1
   ls releases
 }
@@ -77,6 +80,7 @@ execute_linux ()
     sudo pip3 install pyinstaller
     sudo apt-get install icnsutils # electron-builder dependency
     sudo apt-get install graphicsmagick # electron-builder dependency
+    sudo apt-get install xvfb
 
     npm install
     export PATH=$PATH:$(pwd)/node_modules/.bin/

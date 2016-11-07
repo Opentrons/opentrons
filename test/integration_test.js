@@ -27,7 +27,7 @@ if (process.platform === 'win32') {
 } else {
   appPath = path.resolve(
     __dirname,
-    '../node_modules/electron/dist/electron'
+    '../node_modules/electron-prebuilt/dist/electron'
   );
 }
 
