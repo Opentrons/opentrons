@@ -3,7 +3,7 @@
     <aside id="step-list">
       <StepList></StepList>
     </aside>
-    <router-view><router-view>
+    <router-view></router-view>
   </section>
 </template>
 

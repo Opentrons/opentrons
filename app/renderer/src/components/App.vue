@@ -17,7 +17,7 @@
       <Jog></Jog>
       <TaskPane>
     </main>
-    <router-link to="calibrate/p10/test-plate">LINK</router-link>
+    <router-link to="/calibrate/p10/test-plate">LINK</router-link>
   <div>
 </template>
 

@@ -20,10 +20,7 @@
     },
     methods: {
       fileChange(e) {
-        var files = e.target.files || e.dataTransfer.files
-        if (!files.length)
-          return;
-        var fileName = files[0].name
+        let files = e.target.files || e.dataTransfer.files
         this.uploadProtocol()
       },
       uploadProtocol() {
