@@ -6,7 +6,7 @@ VARS
 
 @font-face {
     font-family: "trons";
-    src: url("../assets/fonts/Geogtq-Rg-webfont.woff2");
+    src: url("../fonts/Geogtq-Rg-webfont.woff2");
     font-weight: normal;
     font-style: normal;
 }
@@ -37,12 +37,12 @@ $primary-btn: lighten( $primary-brand,15%);
 $secondary-btn: lighten( $secondary-brand,15%);
 
 @function num-col-air($n) {
-	@if $n > 0{
-		@return ($btn-size*$n)+($gutter-width*(($n - 1)*2));
-	}@else{
-		@return $btn-size*$n +$gutter-width;
-	}
-
+    @if $n > 0{
+        @return ($btn-size*$n)+($gutter-width*(($n - 1)*2));
+    }@else{
+        @return $btn-size*$n +$gutter-width;
+    }
+    
 }
 
 @function num-col-full($n) {
@@ -50,8 +50,8 @@ $secondary-btn: lighten( $secondary-brand,15%);
 }
 
 @mixin offset-h-air($l,$r){
-	margin-left: num-col-full($l)+ $gutter-width;;
-	margin-right: num-col-full($r)+ $gutter-width;;
+    margin-left: num-col-full($l)+ $gutter-width;;
+    margin-right: num-col-full($r)+ $gutter-width;;
 }
 
 @mixin btn-square-full($n) {
@@ -98,54 +98,53 @@ header#home-connect {
     border-radius: 6px;
     background-color: $well-bg;
     nav.home{
-    	width:280px;
-    	display:flex;
-    	justify-content:space-between;
-    	.btn-home{
-			flex:0 0;
-			height: $btn-size;
-			line-height: 30px;
-			padding:0px 12px;
-			text-align: center;
-			background-color: $primary-brand;
-			border-radius: 6px;
-			text-align: center;
-			color:white;
-      cursor:pointer;
-		}
+        width:280px;
+        display:flex;
+        justify-content:space-between;
+        .btn-home{
+            flex:0 0;
+            height: $btn-size;
+            line-height: 30px;
+            padding:0px 12px;
+            text-align: center;
+            background-color: $primary-brand;
+            border-radius: 6px;
+            text-align: center;
+            color:white;
+        }   
     }
     div.logo{
-    	width:124px;
-    	height:30px;
-    	flex:0 0 124px;
-    	img{
-    		width:100%;
-    		height:auto;
-    	}
+        width:124px;
+        height:30px;
+        flex:0 0 124px;
+        img{
+            width:100%;
+            height:auto;
+        }
     }
 
     nav.connect{
-    	width:280px;
-    	display:flex;
-    	justify-content:flex-end;
-		select {
-		    background: white;
-		    border-radius: 6px;
-		    border: 2px solid lighten($btn-jog, 15%);
-		    -webkit-appearance: none;
-		    outline: none;
-		    color: white;
-		    height:$btn-size;
-		    width: 6*$btn-size;
-		    padding-left: 10px;
-		    background-image: url("../assets/img/caret.png");
-		    background-repeat: no-repeat;
-		    background-position: 95% 50%;
-		    color: $btn-jog;
-
-		}
+        width:280px;
+        display:flex;
+        justify-content:flex-end;
+        select {
+            background: white;
+            border-radius: 6px;
+            border: 2px solid lighten($btn-jog, 15%);
+            -webkit-appearance: none;
+            outline: none;
+            color: white;
+            height:$btn-size;
+            width: 6*$btn-size;
+            padding-left: 10px;
+            background-image: url("../img/caret.png");
+            background-repeat: no-repeat;
+            background-position: 95% 50%;
+            color: $btn-jog;
+           
+        }
     }
-
+    
 }
 
 
@@ -162,38 +161,95 @@ section#protocol {
     flex-direction: row;
     border-radius: 6px;
     background-color: $well-bg;
+    justify-content:space-between;
     form.upload{
-    	width: 270px;
+        width: 270px;
+        .fileUpload {
+            width: 270px;
+            height:15px;
+            padding:24px 0;
+            position: relative;
+            overflow: hidden;        
+            color:#888;
+            border-radius: 6px;
+            border: 2px dashed darken($well-bg,10%);
+            text-align: center;
+            justify-items:center;
 
-            .fileUpload {
-                width: 270px;
-                height:15px;
-                padding:24px 0;
-                position: relative;
-                overflow: hidden;
-                color:#888;
-                border-radius: 6px;
-                border: 2px dashed darken($well-bg,10%);
-                text-align: center;
-                justify-items:center;
-
-                &:hover {
-                   background-color: darken($well-bg,10%);
-                }
+            &:hover {
+               background-color: darken($well-bg,10%);
             }
-            .fileUpload input.upload {
-                position: absolute;
-                top: 0;
-                right: 0;
-                margin: 0px;
-                padding: 15px;
-                font-size: 30px;
-                cursor: pointer;
-                opacity: 0;
-                filter: alpha(opacity=0);
-            }
+        }
+        .fileUpload input.upload {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0px;
+            padding: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
     }
+    div#protocol-info{
+        margin-left: 20px;
+        flex: 0 0 242px;
+        display: flex;
+        flex-direction:row;
+        flex-wrap:wrap;
+        height: 45px;
+        padding:10px;
+        span{      
+            font-size: 14px;   
+            text-align: left;
+            height: 22px;
+            line-height: 22px;   
+            flex:0 0 121px;
+            &.title{
+                font-weight: 800;
+            }
+        }
+    }
+    div#progress{
+        flex:0 0 256px;
+        padding:10px 0;
+        span{      
+            font-size: 14px;   
+            text-align: left;
+            height: 22px;
+            line-height: 22px;   
+            flex:0 0 121px;
+            &.title{
+                font-weight: 800;
+            }
+        }
+        #progress-bar-total{
+            width:100%;
+            margin-top: 7px;
+            height:12px;
+            background-color: #BBB;
+            #percent-complete{
+                width:20%;
+                height:12px;
+                background-color: $call-to-action;
+            }
+        }
 
+    }
+    div#run{
+        min-width:$btn-size*3;
+        flex:0 0 $btn-size*3;
+        height:65px;
+         padding:0 40px;
+        div.controls{
+            width:$btn-size*3;
+            flex:0 0 $btn-size*3;
+            display:flex;
+            flex-direction:row;
+            justify-content:space-between;
+        }
+    }
 }
 
 //main content wrapper
@@ -215,111 +271,113 @@ aside#jog {
     height: 400px;
     padding:15px;
     border-radius: 6px;
-
+    
     background-color: $well-bg;
     h2#xy{
-			width:145px;
-	}
-	h2#z{
-			width:65px;
-	}
-
+            width:145px;
+    }
+    h2#z{
+            width:65px;
+    }
+    
     #jog-controls{
-		width:270px;
-		display: flex;
+        width:270px;
+        display: flex;
         flex-wrap: wrap;
+        
+        justify-content:space-around;
+        margin-bottom: 15px;
+        .btn{
+                background-color: $btn-jog;
+                &.y.up{
+                margin: $gutter-width 36px;
+                }
+            }
+        span.xy{
+            width: 102px;
+            flex: 0 0 102px;
+            display:flex;
+            flex-wrap: wrap;
+                    
+        }
+        span.z, span.p{
+            width: 36px;
+            flex: 0 0 36px;
+            display:flex;
+            flex-wrap: wrap;
 
-		justify-content:space-around;
-		margin-bottom: 15px;
-		.btn{
-				background-color: $btn-jog;
-				&.y.up{
-				margin: $gutter-width 36px;
-				}
-			}
-		span.xy{
-			width: 102px;
-			flex: 0 0 102px;
-			display:flex;
-			flex-wrap: wrap;
-
-	    }
-	    span.z, span.p{
-	    	width: 36px;
-			flex: 0 0 36px;
-			display:flex;
-			flex-wrap: wrap;
-
-	    }
-	}
+        }
+    }
     #increment{
-		width:270px;
-		display: flex;
+        width:270px;
+        display: flex;
         flex-wrap: wrap;
         position:relative;
         justify-content:space-around;
         margin-bottom: 15px;
         div{
-        	height:30px;
-        	flex:0 0 20px;
-        	padding:5px;
-        	text-align: center;
+            height:30px;
+            flex:0 0 20px;
+            padding:5px;
+            text-align: center;
         }
         input[type="radio"] {
-		    display:none;
-		}
-		input[type="radio"] + label{
-			padding-left:3px;
-		}
-		input[type="radio"] + label span {
-		    display:inline-block;
-		    width:15px;
-		    height:15px;
-		    margin:0 4px 10px 0;
-		    vertical-align:middle;
-		    cursor:pointer;
-		    -moz-border-radius:  50%;
-		    border-radius:  50%;
-		}
+            display:none;
+        }
+        input[type="radio"] + label{
+            padding-left:3px;
+        }
+        input[type="radio"] + label span {
+            display:inline-block;
+            width:15px;
+            height:15px;
+            margin:0 4px 10px 0;
+            vertical-align:middle;
+            cursor:pointer;
+            -moz-border-radius:  50%;
+            border-radius:  50%;
+        }
 
 
-		input[type="radio"] + label span {
-			border: 2px solid #999;
-		     background-color:#999;
-		}
+        input[type="radio"] + label span {
+            border: 2px solid #999;
+             background-color:#999;
+        }
 
-		input[type="radio"]:checked + label span{
-			border: 2px solid #999;
-		     background-color:$primary-brand;
-		}
+        input[type="radio"]:checked + label span{
+            border: 2px solid #999;
+             background-color:$primary-brand;
+        }
 
-		input[type="radio"] + label span,
-		input[type="radio"]:checked + label span {
-		  -webkit-transition:background-color 0.4s linear;
-		  -o-transition:background-color 0.4s linear;
-		  -moz-transition:background-color 0.4s linear;
-		  transition:background-color 0.4s linear;
-		}
+        input[type="radio"] + label span,
+        input[type="radio"]:checked + label span {
+          -webkit-transition:background-color 0.4s linear;
+          -o-transition:background-color 0.4s linear;
+          -moz-transition:background-color 0.4s linear;
+          transition:background-color 0.4s linear;
+        }
     }
     #deck{
-    	display: flex;
-    	justify-content:center;
-    	.deck{
-    		width:140px;
-			display: flex;
-        	flex-wrap: wrap;
-        	border-left:1px solid #999;
-    		button{
-    			width:28px;
-    			height:40px;
-    			border-right:1px solid #999;
-    			line-height: 40px;
-    			background-color: none;
-    			&:focus, &.active {
-			        box-shadow: inset 5px 5px 0px 0px $primary-brand,inset -5px -5px 0px 0px $primary-brand; ;
-			    }
-    		}
-    	}
+        display: flex;
+        justify-content:center;
+        .deck{
+            width:140px;
+            display: flex;
+            flex-wrap: wrap;
+            border-left:1px solid #999;
+            border-right:1px solid #999;
+            button{
+                width:28px;
+                height:40px;
+                border-left:1px solid #999;
+                border-right:1px solid #999;
+                line-height: 40px;
+                background-color: none;
+                &:focus, &.active {
+                    box-shadow: inset 5px 5px 0px 0px $primary-brand,inset -5px -5px 0px 0px $primary-brand; ;                 
+                }
+            }
+        }
 
     }
 
@@ -330,16 +388,19 @@ aside#jog {
 Task Pane
 ******************************/
 
-section#task-pane {
-    width: 710px;
-    flex: 0 0 710px;
-    margin-left: 10px;
-    height: 426px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    border: 2px solid $well-bg;
-    border-radius: 6px;
+section#task {
+    width: 510px;
+    height: 270px;
+    padding:30px;
+    background-color: $well-bg;
+    .well-img {
+      width: 100px;
+      margin-top: 20px;
+      img{
+        width:100%;
+        height:auto;
+      }
+    }
 }
 
 
@@ -366,15 +427,13 @@ aside#step-list {
             padding: 0;
             margin:0;
             li{
-            	position:relative;
+                position:relative;
             }
             a {
                 display: block;
                 line-height: $baseline;
                 padding-left: 30px;
-                text-decoration: none;
-                color: $primary-black;
-                // not in use yet but will need to truncate longer container names
+                // not in use yet but will need to truncate longer container names 
                 span.clip {
                     display: block;
                     width: 80px;
@@ -385,7 +444,7 @@ aside#step-list {
                 }
             }
             a.router-link-active {
-            	background-color: $well-bg;
+                background-color: $well-bg;
             }
             a.completed:before {
                 content: "\2713";
@@ -411,14 +470,6 @@ section#task {
     height: 270px;
     padding:30px;
     background-color: $well-bg;
-    .well-img {
-      width: 100px;
-      margin-top: 20px;
-      img{
-        width:100%;
-        height:auto;
-      }
-    }
 }
 
 
@@ -427,42 +478,68 @@ Buttons
 ******************************/
 
 .btn{
-	border-radius: 6px;
-	@include btn-square-air(1);
-	text-align: center;
-	color:white;
+    border-radius: 6px;
+    @include btn-square-air(1);
+    text-align: center;
+    color:white;
+}
+
+.btn-run{
+    min-width:$btn-size*3;
+    width:98px;
+    height: $btn-size;
+    margin:$gutter-width;
+    line-height: $btn-size;
+    padding:0px 15px;
+    text-align: center;    
+    border-radius: 6px;
+    text-align: center;
+    color:white;
+    background-color: $primary-brand;
+}
+
+.btn-play, .btn-pause, .btn-clear{
+    flex:0 0;
+    height: $btn-size;
+    line-height: 30px;
+    padding:0px 12px;
+    text-align: center;
+    background-color: $primary-brand;
+    border-radius: 6px;
+    text-align: center;
+    color:white;
 }
 
 
 .btn-calibrate{
-	flex:0 0;
+    flex:0 0;
     min-width: $btn-size;
     height: $btn-size;
     line-height: $btn-size;
     padding:0px 15px;
     margin: 2 * $gutter-width;
-    text-align: center;
+    text-align: center;    
     border-radius: 6px;
     text-align: center;
-	color:white;
+    color:white;
 }
 
 
 
 .save{
-	background-color: $call-to-action;
+    background-color: $call-to-action;
 }
 
 .move-to, .pick-tip{
-	background-color: $primary-brand;
+    background-color: $primary-brand;
 }
 
 
 
 
 button{
-	background-color: $well-bg;
-	&:focus {
+    background-color: $well-bg;
+    &:focus {
         outline: 0;
     }
 }
@@ -474,7 +551,7 @@ button{
 Typography
 ******************************/
 h1.title{
-	font-size: 16px;
+    font-size: 16px;
     font-weight: 800;
     line-height: $baseline;
 }
@@ -486,14 +563,14 @@ h3.title {
 }
 
 h2.title{
-	font-size: 14px;
+    font-size: 14px;
     font-weight: 800;
     line-height: $baseline;
     display:inline-block;
 }
 
 .label{
-	font-size: 14px;
+    font-size: 14px;
     font-weight: 800;
     line-height: 30px;
     width:40px;
@@ -501,6 +578,6 @@ h2.title{
 }
 
 hr{
-	color: #FFF;
-	margin-bottom:15px;
+    color: #FFF;
+    margin-bottom:15px;
 }
