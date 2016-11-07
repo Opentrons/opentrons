@@ -3,7 +3,7 @@ dist: trusty
 
 language: python
 pytnon:
-  - "3.5"
+  - "3.4"
 
 os:
 #  - osx

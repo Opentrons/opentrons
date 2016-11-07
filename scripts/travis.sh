@@ -5,8 +5,10 @@ run_install ()
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
-  export DISPLAY=':99.0'
-  Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  if [ "$1" == "linux" ]; then
+    export DISPLAY=':99.0'
+    Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  fi
 
   nvm install 6.0.0
   nvm use 6.0.0
@@ -18,6 +20,9 @@ run_install ()
   mkdir -p $HOME/.cache/pip3
   pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
+
+  cd server && nosetests -s --logging-level WARNING && cd ..
+
   npm i -g mocha
   npm run unit
   npm run release:posix
@@ -56,8 +61,6 @@ execute_mac ()
     # Install Python packages (built with Python 3)
     pip3 install pyinstaller
     pyinstaller --version
-    pip3 install -r requirements.txt
-    cd server && nosetests -s --logging-level WARNING && cd ..
   fi
 
   if [ "$1" == "install" ]; then
