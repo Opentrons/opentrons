@@ -4,7 +4,7 @@
     <header id="home-connect">
       <Home></Home>
       <div class="logo">
-        <img src="assets/img/logo_rgb_transparent.png" />
+        <img src="../assets/img/logo_rgb_transparent.png" />
       </div>
       <nav class="connect">
         <Connect></Connect>
