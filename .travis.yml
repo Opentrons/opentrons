@@ -1,14 +1,14 @@
+language: python
+
 matrix:
   include:
     - os: linux
       sudo: required
       dist: trusty
-      language: python
       pytnon: "3.4"
       env: OPENTRONS_APP_UPLOAD_DIR=linux
     - os: osx
-      language: python
-      pytnon: "3.4"
+      language: generic
       env: OPENTRONS_APP_UPLOAD_DIR=mac
 
 cache:
