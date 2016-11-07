@@ -68,6 +68,9 @@ execute_linux ()
     sudo apt install icnsutils # electron-builder dependency
     sudo apt-get install graphicsmagick # electron-builder dependency
     export PATH=$PATH:$(pwd)/node_modules/.bin/
+
+    sudo apt-get install g++
+    sudo apt-get install gcc
   fi
 
   if [ "$1" == "install" ]; then
