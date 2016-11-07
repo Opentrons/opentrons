@@ -63,14 +63,15 @@ execute_linux ()
     nvm use 6.0.0
     node --version
     npm --version
-    npm install
-    pip3 install pyinstaller
-    sudo apt install icnsutils # electron-builder dependency
-    sudo apt-get install graphicsmagick # electron-builder dependency
-    export PATH=$PATH:$(pwd)/node_modules/.bin/
 
     sudo apt-get install g++
     sudo apt-get install gcc
+
+    sudo npm install
+    sudo pip3 install pyinstaller
+    sudo apt install icnsutils # electron-builder dependency
+    sudo apt-get install graphicsmagick # electron-builder dependency
+    export PATH=$PATH:$(pwd)/node_modules/.bin/
   fi
 
   if [ "$1" == "install" ]; then
