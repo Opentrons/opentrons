@@ -20,7 +20,6 @@ matrix:
           packages: &common_packages
             - g++
             - gcc
-            - python3-pip
             - icnsutils # electron-builder dependency
             - graphicsmagick # electron-builder dependency
             - xvfb  
