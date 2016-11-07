@@ -40,6 +40,10 @@ module.exports = {
         loaders: ["style", "css", 'resolve-url', "sass?sourceMap"]
       },
       {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+      },
+      {
         test: /\.(woff|woff2)$/,
         loader: "url-loader?limit=10000&minetype=application/font-woff"
       }

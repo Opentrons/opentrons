@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <toast position="n"></toast>
     <div class="nav-full-dark">
       <header class="brand">
         <nav class="links">
@@ -39,9 +40,14 @@
 
 
 <script>
-  import {StepList, Upload} from './export'
+  import { Toast } from 'vuex-toast'
+  import StepList from './StepList.vue'
 
   export default {
+    components: {
+      Toast,
+      StepList
+    },
     data () {
       return {
         message: 'Opentrons App'
@@ -63,5 +69,6 @@
 </script>
 
 <style lang="sass">
-  @import "../assets/sass/main.scss"
+  @import "../assets/sass/main.scss";
+  @import "../../../../node_modules/vuex-toast/dist/vuex-toast.css";
 </style>
