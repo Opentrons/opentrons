@@ -19,7 +19,7 @@
         return percent || 0
       },
       percentClass() {
-        return `width:${this.runPercent() + 20}%;`
+        return `width:${this.runPercent}%;`
       }
     }
   }
