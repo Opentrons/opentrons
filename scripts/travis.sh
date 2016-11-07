@@ -16,7 +16,7 @@ run_install ()
   sudo -H pip3 install pip --upgrade 
   pip3 --version
   mkdir -p $HOME/.cache/pip3
-  sudo -H pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
+  pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
   npm i -g mocha
   npm run unit

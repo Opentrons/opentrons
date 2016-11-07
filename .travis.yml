@@ -10,6 +10,7 @@ os:
   - linux
 
 cache:
+  apt: true
   directories:
     - node_modules
     - app/node_modules
@@ -23,6 +24,7 @@ before_install:
 
 install:
   - ./scripts/travis.sh install
+  - export
 
 script: echo ""
 
