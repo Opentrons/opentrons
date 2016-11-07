@@ -20,9 +20,11 @@
         <button class="btn p down">&darr;</button>
       </span>
     </section>
+    
     <h2 class="title">Select Increment [mm]</h2>
     <hr>
     <Increment :increments="placeable_increments"></Increment>
+
     <h2 class="title">Move to Slot</h2>
     <hr>
     <DeckSlot></DeckSlot>

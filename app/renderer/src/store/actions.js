@@ -26,8 +26,10 @@ const actions = {
     OpenTrons.uploadProtocol(formData).then((result) => {
       if (result.success) {
         let tasks = result.calibrations
+        let fileName = result.fileName
         addHrefs(tasks)
         commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
+        commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
       } else {
         commit(types.UPDATE_TASK_LIST, {tasks: []})
       }

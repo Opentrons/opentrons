@@ -98,6 +98,8 @@ def upload():
         })
 
     calibrations = get_step_list()
+    if len(api_response['errors']) == 0:
+        emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
     emit_notifications(api_response['errors'], 'danger')
     emit_notifications(api_response['warnings'], 'warning')
 
@@ -106,7 +108,8 @@ def upload():
         'data': {
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
-            'calibrations': calibrations
+            'calibrations': calibrations,
+            'fileName': file.filename
         }
     })
 

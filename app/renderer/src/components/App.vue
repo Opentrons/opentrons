@@ -11,13 +11,7 @@
       </nav>
     </header>
     <section id="protocol">
-      <!-- <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" :class="['step-upload', classObject]"> -->
-      <form class="upload">
-        <div class="fileUpload">
-          <span>Click or Drag to Upload</span>
-          <input ref="input" type="file" name="file" class="upload" />
-        </div>
-      </form>
+      <Upload></Upload>
     </section>
     <main id="container">
       <Jog></Jog>
@@ -63,6 +57,7 @@
   import Connect from './Connect.vue'
   import Home from './Home.vue'
   import Jog from './Jog.vue'
+  import Upload from './Upload.vue'
   import { Toast } from 'vuex-toast'
 
   export default {
@@ -70,7 +65,8 @@
       Toast,
       Connect,
       Home,
-      Jog
+      Jog,
+      Upload
     }
   }
 </script>

@@ -114,6 +114,8 @@ class OpenTrons {
         if (data.errors.length > 0) {
           result.success = false
         }
+        console.log(data.fileName)
+        result.fileName = data.fileName
         return result
       }, (response) => {
         console.log('Failed to upload protocol', response)

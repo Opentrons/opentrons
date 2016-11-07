@@ -1,68 +1,21 @@
 <template>
   <div>
-    <section>
-      <h2 class="title">Upload a Protocol</h2>
-      <div class="instructions">
-        Upload a valid JSON or Python Protocol. Errors will display below.
+    <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class='upload'>
+      <div class="fileUpload">
+        <span v-if="!fileName">Click or Drag to Upload </span>
+        <span>{{fileName}}</span>
+        <input ref="input" @change="fileChange" type="file" name="file" class="upload" />
       </div>
-      <div class="step">
-        <div class="error">
-          <!-- <div v-for="error in errors" >
-            Error: {{error}}
-          </div>
-          <div v-show="warnings" >
-            Warnings: {{warnings}}
-          </div> -->
-        </div>
-        <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" :class="['step-upload', busy]">
-          <div class="fileUpload">
-            <span>{{fileName}}</span>
-            <input ref="input" @change="fileChange" type="file" name="file" class="upload"/>
-          </div>
-        </form>
-      </div>
-      <Navigation :prev="prev" :next="next"></Navigation>
-    </section>
+    </form>
   </div>
 </template>
 
 <script>
-  import Navigation from './Navigation.vue'
-
   export default {
     name: 'Upload',
-    components: {
-      Navigation
-    },
-    data: function () {
-      return {
-      prev: "/connect"
-      }
-    },
     computed: {
       fileName () {
         return this.$store.state.fileName
-      },
-      connected () {
-        return this.$store.state.is_connected
-      },
-      errors () {
-        return this.$store.state.errors
-      },
-      warnings () {
-        return this.$store.state.warnings
-      },
-      next () {
-        if (this.$store.state.tasks[0]) {
-          return this.$store.state.tasks[0].placeables[0].href
-        } else {
-          return '/'
-        }
-      },
-      busy: function () {
-        return {
-          'disabled': this.$store.state.busy
-        }
       }
     },
     methods: {
@@ -71,7 +24,6 @@
         if (!files.length)
           return;
         var fileName = files[0].name
-        this.$store.dispatch("updateFilename", fileName)
         this.uploadProtocol()
       },
       uploadProtocol() {
