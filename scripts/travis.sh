@@ -9,6 +9,8 @@ run_install ()
   nvm use 6.0.0
   node --version
   npm --version
+
+  sudo pip3 install -r requirements.txt
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
   # npm i -g mocha
   # npm run unit
