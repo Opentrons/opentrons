@@ -1,14 +1,32 @@
-import copy
 from collections import OrderedDict
+import copy
 import json
 import numbers
 import os
 import pkg_resources
 
 from opentrons.containers.placeable import Container, Well
+from opentrons.util import environment
 
 
 persisted_containers_dict = {}
+persisted_containers_file_list = []
+
+
+def load_persisted_containers_from_file_list(file_list):
+    for file_name in file_list:
+        load_persisted_containers_from_file_path(file_name)
+
+
+def load_all_persisted_containers_from_disk():
+    persisted_containers_file_list.clear()
+    persisted_containers_file_list.extend(
+        [persisted_containers_json_path] + get_custom_container_files()
+    )
+
+    load_persisted_containers_from_file_list(
+        persisted_containers_file_list
+    )
 
 
 def load_persisted_containers_from_file_path(file_path):
@@ -23,19 +41,43 @@ containers_dir_path = pkg_resources.resource_filename(
     'opentrons.config',
     'containers'
 )
+
 persisted_containers_json_path = os.path.join(
     containers_dir_path,
     'default-containers.json'
 )
-load_persisted_containers_from_file_path(persisted_containers_json_path)
+
+
+def get_custom_container_files():
+    """
+    Traverses environment.get_path('CONTAINERS_DIR') to retrieve
+    all .json files
+    """
+    def is_special_file(name):
+        return name.startswith('.')
+
+    res = []
+
+    top = environment.get_path('CONTAINERS_DIR')
+    for root, dirnames, files in os.walk(top):
+        for name in filter(is_special_file, dirnames):
+            dirnames.remove(name)
+
+        res.extend(
+            [
+                os.path.join(root, name) for name in files
+                if not is_special_file(name) and name.endswith('.json')
+            ])
+
+    return res
 
 
 def get_persisted_container(container_name: str) -> Container:
     container_data = persisted_containers_dict.get(container_name)
     if not container_data:
-        raise Exception(
-            ('Container type "{}" not found in file {}')
-            .format(container_name, persisted_containers_json_path)
+        raise ValueError(
+            ('Container type "{}" not found in files: {}')
+            .format(container_name, persisted_containers_file_list)
         )
     return create_container_obj_from_dict(container_data)
 
@@ -146,3 +188,8 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         container.add(well, well_name, well_coordinates)
 
     return container
+
+
+# Load default persisted containers from API distribution
+# and whatever containers we find in environment.get_path('CONTAINERS_DIR')
+load_all_persisted_containers_from_disk()
