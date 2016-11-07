@@ -5,12 +5,12 @@
     "build:backend": "python3 scripts/build_pyinstaller.py",
     "build:frontend": "python scripts/build_electron_app_with_builder.py",
     "release": "npm run build:backend && npm run build:frontend",
-    "build:backend:mac": "python3 scripts/build_pyinstaller.py",
+    "build:backend:posix": "./scripts/build_pyinstaller.py",
     "build:backend:win": "C:\\Python34\\python scripts\\build_pyinstaller.py",
-    "build:frontend:mac": "python3 scripts/build_electron_app_with_builder.py",
+    "build:frontend:posix": "./scripts/build_electron_app_with_builder.py",
     "build:frontend:win": "C:\\Python34\\python scripts\\build_electron_app_with_builder.py",
     "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/renderer",
-    "release:mac": "npm run build:backend:mac && npm run build:frontend:mac",
+    "release:posix": "npm run build:backend:posix && npm run build:frontend:posix",
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
@@ -81,10 +81,14 @@
         "dmg",
         "zip"
       ]
+    },
+    "win": {
+      "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
+    },
+    "linux": {
+      "category": "Science",
+      "target": "deb" 
     }
-  },
-  "win": {
-    "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
   },
   "dependencies": {
     "babel-preset-es2016": "^6.16.0",

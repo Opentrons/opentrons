@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
+
 import os
-import sys
 import shutil
 import platform
 import subprocess
+
+
+import util
 
 
 script_tag = "[OT-App Backend build] "
@@ -31,32 +35,11 @@ def remove_directory(dir_to_remove):
         print(script_tab + "Directory %s was not found." % dir_to_remove)
 
 
-def get_os():
-    """
-    Gets the OS to based on the command line argument of the platform info.
-    Only possibilities are: "windows", "mac", "linux"
-    """
-
-    valid_os = ["win", "linux", "mac"]
-
-    os_found = platform.system().lower()
-    if os_found == "windows":
-        os_found = "win"
-        print(script_tab + "OS found is: %s" % os_found)
-        return os_found
-    elif os_found == "darwin":
-        os_found = "mac"
-        print(script_tab + "OS found is: %s" % os_found)
-        return os_found
-    else:
-        raise SystemExit("Exit: OS data found is invalid '%s'" % os_found)
-
-
 def get_spec_coll_name():
-    os_type = get_os()
+    os_type = util.get_os()
     if os_type == 'win':
         return "otone_server.exe"
-    elif os_type == 'mac':
+    elif os_type in ['mac', 'linux']:
         return "otone_server"
     raise SystemExit(
         'Unable to determine pyinstaller.spec COLL name for OS: {}'.format(
@@ -145,7 +128,7 @@ def generate_static_assets():
 def build_ot_python_backend_executable():
     print(script_tag + "Build procedure started.")
     print(script_tag + "Checking for OS.")
-    os_type = get_os()
+    os_type = util.get_os()
     print(script_tag + "Building OT-App Backend for %s." % os_type)
 
     print(script_tag + "Project directory is:     %s" % project_root_dir)
@@ -171,7 +154,7 @@ def build_ot_python_backend_executable():
 
     print(script_tag + "Removing old OT-App Backend executable directory.")
     backend_exec_path = os.path.join(
-        exec_folder_name, get_os(), get_spec_coll_name()
+        exec_folder_name, util.get_os(), get_spec_coll_name()
     )
     if os.path.isfile(backend_exec_path):
         os.remove(backend_exec_path)
