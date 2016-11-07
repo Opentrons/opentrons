@@ -45,7 +45,7 @@ describe('application launch', function () {
       return this.app.stop()
     }
   })
-  
+
   it('opens a window', function () {
     return this.app.client.waitUntilWindowLoaded(5000)
       .getWindowCount().should.eventually.equal(1)
@@ -72,7 +72,7 @@ describe('application launch', function () {
     let dropTipSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[7]'
 
     return this.app.client.waitUntilWindowLoaded(5000)
-      .click('//*[@id="connections"]/option[2]')
+      .click('//*[@id="connections"]/option[3]')
       .pause(pauseTime)
       .click('.btn-connect')
       .pause(pauseTime)
@@ -137,6 +137,6 @@ describe('application launch', function () {
       .pause(pauseTime)
       .click('//*[@id="task-pane"]/div/section/div[2]/div[2]/button[1]')
       .pause(2000)
-      .click('//*[@id="app"]/div[1]/div/div[2]')
+      .waitForText(".toast-message-text", "Success")
   })
 })
