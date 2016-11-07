@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 run_install ()
 {
   node --version
