@@ -4,7 +4,6 @@ import VueResource from 'vue-resource'
 import store from './store/store'
 import {
   Home,
-  StepList,
   Upload,
   Connect,
   Placeable,
@@ -15,7 +14,6 @@ import {
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
-Vue.component('StepList', StepList)
 
 const routes = [
   { path: '/connect', component: Connect },

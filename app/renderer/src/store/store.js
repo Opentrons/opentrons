@@ -4,6 +4,7 @@ import io from 'socket.io-client/socket.io'
 import * as types from './mutation-types'
 import app_mutations from './mutations'
 import app_actions from './actions'
+import { createModule, ADD_TOAST_MESSAGE } from 'vuex-toast'
 
 
 const { mutations, state } = app_mutations
@@ -40,9 +41,15 @@ function createWebSocketPlugin(socket) {
         })
       }
       if (data.name == 'command-run') {
-        console.log(data)
         if (data.caller === 'ui') {
           store.commit(types.UPDATE_RUN_LOG, data)
+        }
+      }
+      if (data.name == 'notification') {
+        if (data.text.length > 0){
+          let {text, type} = data
+          text = `${type.toUpperCase()}: ${text}`
+          store.dispatch(ADD_TOAST_MESSAGE, {text, type})
         }
       }
     })
@@ -61,10 +68,12 @@ socket.on('disconnect', function(){
 })
 
 const websocketplugin = createWebSocketPlugin(socket)
+const toast = createModule({dismissInterval: 8000})
 
 export default new Vuex.Store({
   state,
   actions,
   mutations,
-  plugins: [websocketplugin]
+  plugins: [websocketplugin],
+  modules: {toast}
 })

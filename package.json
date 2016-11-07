@@ -14,7 +14,8 @@
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
-    "integration": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/integration_test.js"
+    "integration": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/integration_test.js",
+    "test": "npm run unit; npm run integration; nosetests"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
@@ -95,6 +96,7 @@
     "vue-resource": "^1.0.3",
     "vue-router": "^2.0.0",
     "vuex": "^2.0.0",
+    "vuex-toast": "0.0.2",
     "websocket": "^1.0.23"
   }
 }

@@ -5,10 +5,13 @@ server/static/css
 ~/
 .env
 .DS_Store
+calibrations
+server/calibrations
 
 # Logs
 logs
 *.log
+*.log.*
 logfile.txt
 server/*.log
 

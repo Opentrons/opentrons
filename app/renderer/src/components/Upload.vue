@@ -7,12 +7,12 @@
       </div>
       <div class="step">
         <div class="error">
-          <div v-for="error in errors" >
+          <!-- <div v-for="error in errors" >
             Error: {{error}}
           </div>
           <div v-show="warnings" >
             Warnings: {{warnings}}
-          </div>
+          </div> -->
         </div>
         <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:31950/upload" method="POST" enctype="multipart/form-data" :class="['step-upload', busy]">
           <div class="fileUpload">
