@@ -59,18 +59,8 @@ build_script:
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% python setup.py nosetests --with-coverage"
+  - "%CMD_IN_ENV% python setup.py nosetests"
 
-after_test:
-  # If tests are successful, create binary packages for the project.
-  - "%CMD_IN_ENV% python setup.py bdist_wheel"
-  - "%CMD_IN_ENV% python setup.py bdist_wininst"
-  - "%CMD_IN_ENV% python setup.py bdist_msi"
-  - ps: "ls dist"
-
-artifacts:
-  # Archive the generated packages in the ci.appveyor.com build report.
-  - path: dist\*
 
 #on_success:
 #  - TODO: upload the content of dist/*.whl to a public wheelhouse
