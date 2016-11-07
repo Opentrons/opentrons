@@ -398,21 +398,7 @@ section#task-pane {
     flex-direction: row;
     align-items: center;
     border: 2px solid $well-bg;
-    border-radius: 6px;
-    section#task {
-    width: 510px;
-    height: 270px;
-    padding:30px;
-    background-color: $well-bg;
-    .well-img {
-        width: 100px;
-        margin-top: 20px;
-          img{
-            width:100%;
-            height:auto;
-            }
-        }
-    }
+    border-radius: 6px;   
 }
 
 
@@ -484,6 +470,53 @@ section#task {
     height: 270px;
     padding:30px;
     background-color: $well-bg;
+    .well-img {
+        width: 100px;
+        margin-top: 20px;
+    img{
+        width:100%;
+        height:auto;
+    }
+}
+
+
+/******************************
+Task Pipette
+******************************/
+section#task-pipette {
+    width: 510px;
+    height: 270px;
+    padding:30px;
+    background-color: $well-bg;
+    div.calibrate-pipette{
+        width:300px;
+        display:flex;
+        flex-direction:column;
+        .calibrate{
+            width:300px;
+            display:flex;
+            flex-direction:row;
+            justify-content:flex-end;
+            &.top{
+                margin-bottom:40px;
+            }
+            span.title{
+                flex: 0 0 100px;
+                font-size: 14px;
+                font-weight: 800;
+                line-height: 40px;
+                text-align: right;
+            } 
+        }
+    }
+    .calibrate.tips{
+        width:200px;
+        padding-left:130px;
+        display:flex;
+        flex-direction:row;
+        justify-content:flex-end;
+    }
+
 }
 
 
@@ -527,15 +560,18 @@ Buttons
 
 .btn-calibrate{
     flex:0 0;
-    min-width: $btn-size;
+    min-width: $btn-size*2;
     height: $btn-size;
     line-height: $btn-size;
     padding:0px 15px;
     margin: 2 * $gutter-width;
-    text-align: center;
+    text-align: center;    
     border-radius: 6px;
     text-align: center;
     color:white;
+    &.move-to{
+        min-width: $btn-size*3;
+    }
 }
 
 
