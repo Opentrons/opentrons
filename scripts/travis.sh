@@ -97,12 +97,10 @@ execute_linux ()
 os="$(uname)"
 
 if [ "$os" = "Darwin" ]; then
-  export OPENTRONS_APP_UPLOAD_DIR=mac
   execute_mac $1
 fi
 
 if [ "$os" = "Linux" ]; then
-    export OPENTRONS_APP_UPLOAD_DIR=linux
     execute_linux $1
 fi
 

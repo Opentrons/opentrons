@@ -24,9 +24,13 @@ before_install:
 
 install:
   - ./scripts/travis.sh install
-  - export
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      export OPENTRONS_APP_UPLOAD_DIR=linux
+    elif [ "$TRAVIS_OS_NAME" == "osx" ];
+      export OPENTRONS_APP_UPLOAD_DIR=mac
+    fi
 
-script: echo ""
+script: exit 0
 
 # Deploy the build version in an S3 bucket
 deploy:
