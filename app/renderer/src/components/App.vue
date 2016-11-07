@@ -1,5 +1,6 @@
 <template>
   <div>
+    <toast position="n"></toast>
     <header id="home-connect">
         <Home></Home>
         <div class="logo">
@@ -19,82 +20,7 @@
         </form>
     </section>
     <main id="container">
-        <aside id="jog">
-            <h2 class="title" id="xy">Jog [XY]</h2>
-            <h2 class="title" id="z">Jog [Z]</h2>
-            <h2 class="title" id="p">Plunger</h2>
-            <hr>
-            <section id="jog-controls">
-                <span class="xy">
-
-                    <button class="btn y up">&uarr;</button>
-                    <button class="btn x left">&larr;</button>
-                    <button class="btn y down">&darr;</button>
-                    <button class="btn x right">&rarr;</button>
-                </span>
-                <span class="z">
-                    <button class="btn z up">&uarr;</button>
-                    <button class="btn z down">&darr;</button>
-                </span>
-                <span class="p">
-                    <button class="btn p up">&uarr;</button>
-                    <button class="btn p down">&darr;</button>
-                </span>
-            </section>
-            <h2 class="title">Select Increment [mm]</h2>
-            <hr>
-            <section id="increment">
-                <div>
-                    <input type="radio" id="50" name="increment" value="50" />
-                    <label for="50"><span></span>50</label>
-                </div>
-                <div>
-                    <input type="radio" id="20" name="increment" value="20" />
-                    <label for="20"><span></span>20</label>
-                </div>
-                <div>
-                    <input type="radio" id="10" name="increment" value="10" />
-                    <label for="10"><span></span>10</label>
-                </div>
-                <div>
-                    <input type="radio" id="1" name="increment" value="1" />
-                    <label for="1"><span></span>1</label>
-                </div>
-                <div>
-                    <input type="radio" id="0.5" name="increment" value="0.5" />
-                    <label for="0.5"><span></span>0.5</label>
-                </div>
-                <div>
-                    <input type="radio" id="0.1" name="increment" value="0.1" />
-                    <label for="0.1"><span></span>0.1</label>
-                </div>
-                <div>
-                    <input type="radio" id="slot" name="increment" value="slot" />
-                    <label for="slot"><span></span>SLOT</label>
-                </div>
-            </section>
-            <h2 class="title">Move to Slot</h2>
-            <hr>
-            <section id="deck">
-                <div class="deck">
-                    <button>A3</button>
-                    <button>B3</button>
-                    <button>C3</button>
-                    <button>D3</button>
-                    <button>E3</button>
-                    <button>A2</button>
-                    <button>B2</button>
-                    <button>C2</button>
-                    <button>D2</button>
-                    <button>E2</button>
-                    <button>A1</button>
-                    <button>B1</button>
-                    <button>C1</button>
-                    <button>D1</button>
-                    <button>E1</button>
-                </div>
-            </section>
-        </aside>
+      <Jog></Jog>
         <section id="task-pane">
             <aside id="step-list">
                 <div class="instrument">
@@ -136,15 +62,20 @@
 <script>
   import Connect from './Connect.vue'
   import Home from './Home.vue'
+  import Jog from './Jog.vue'
+  import { Toast } from 'vuex-toast'
 
   export default {
     components: {
+      Toast,
       Connect,
-      Home
+      Home,
+      Jog
     }
   }
 </script>
 
 <style lang="sass">
-  @import "../assets/sass/new.scss"
+  @import "../assets/sass/new.scss";
+  @import "../../../../node_modules/vuex-toast/dist/vuex-toast.css";
 </style>

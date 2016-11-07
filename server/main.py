@@ -245,6 +245,8 @@ def connect_robot():
         robot = Robot.get_instance()
         robot.connect(
             port, options=options)
+        emit_notifications(["Successfully connected"], 'info')
+
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -297,6 +299,7 @@ def disconnect_robot():
 
     try:
         Robot.get_instance().disconnect()
+        emit_notifications(["Successfully disconnected"], 'info')
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -428,9 +431,8 @@ def home(axis):
         if axis == 'undefined' or axis == '' or axis.lower() == 'all':
             result = robot.home(enqueue=False)
         else:
-            import pdb; pdb.set_trace()
             result = robot.home(axis, enqueue=False)
-
+        emit_notifications(["Successfully homed"], 'info')
     except Exception as e:
         result = str(e)
         status = 'error'

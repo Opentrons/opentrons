@@ -1,24 +1,32 @@
 <template>
-  <div class="move">
-    <h3 class="title">Jog X-Y-Z</h3>
-    <div :class="['jog', disabled]">
-      <button @click="jog('y', 1)" class="btn-full btn-y">Y</button>
-      <button @click="jog('z', 1)" class="btn-full btn-z">Z</button>
-      <button @click="jog('x', -1)" class="btn-full x">X</button>
-      <button @click="jog('x', 1)" class="btn-full btn-x">X</button>
-      <button @click="jog('y', -1)" class="btn-full btn-y">Y</button>
-      <button @click="jog('z', -1)" class="btn-full btn-z">Z</button>
-    </div>
-    <h3 class="title">Select Increment [mm]</h3>
-    <div class="increment" >
-      <increment :increments="placeable_increments" :placeable="placeable"></increment>
-      <increment :increments="slot_increments" :placeable="placeable"></increment>
-    </div>
-    <h3 class="title">Move to Slot</h3>
-    <div class="deck">
-      <DeckSlot :slots="slots" :axis="instrument" :disabled="disabled"></DeckSlot>
-    </div>
-  </div>
+  <aside id="jog">
+    <h2 class="title" id="xy">Jog [XY]</h2>
+    <h2 class="title" id="z">Jog [Z]</h2>
+    <h2 class="title" id="p">Plunger</h2>
+    <hr>
+    <section id="jog-controls">
+      <span class="xy">
+        <button @click="jog('y', 1)" class="btn y up">&uarr;</button>
+        <button @click="jog('x', -1)" class="btn x left">&larr;</button>
+        <button @click="jog('y', -1)" class="btn y down">&darr;</button>
+        <button @click="jog('x', 1)" class="btn x right">&rarr;</button>
+      </span>
+      <span class="z">
+        <button @click="jog('z', 1)" class="btn z up">&uarr;</button>
+        <button @click="jog('z', -1)" class="btn z down">&darr;</button>
+      </span>
+      <span class="p">
+        <button class="btn p up">&uarr;</button>
+        <button class="btn p down">&darr;</button>
+      </span>
+    </section>
+    <h2 class="title">Select Increment [mm]</h2>
+    <hr>
+    <Increment :increments="placeable_increments"><Increment>
+    <h2 class="title">Move to Slot</h2>
+    <hr>
+    <DeckSlot :slots="slots"></DeckSlot>
+  </aside>
 </template>
 
 <script>
@@ -30,8 +38,7 @@
     props: ['instrument', 'disabled'],
     data: function () {
       return {
-        placeable_increments: [20,10,5,1,0.5,0.1],
-        slot_increments: [91,135],
+        placeable_increments: [50, 20,10,1,0.5,0.1, "SLOT"],
         placeable: true,
         slots: ['A3','B3','C3','D3','E3',
                 'A2','B2','C2','D2','E2',

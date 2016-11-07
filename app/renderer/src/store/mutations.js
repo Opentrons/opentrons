@@ -29,11 +29,8 @@ const mutations = {
     state.fileName = payload.fileName
   },
   [types.UPDATE_INCREMENT] (state, payload) {
-    if (payload.type == "placeable") {
-      state.current_increment_placeable = payload.current_increment
-    } else {
-      state.current_increment_plunger = payload.current_increment
-    }
+    state.current_increment_placeable = payload.current_increment
+    state.current_increment_plunger = payload.current_increment
   },
   [types.UPDATE_ERROR] (state, payload) {
     state.errors = payload.errors

@@ -40,8 +40,7 @@ const actions = {
     })
   },
   selectIncrement ({commit}, data) {
-    let {inc, type} = data
-    commit(types.UPDATE_INCREMENT, { 'current_increment': inc, 'type': type })
+    commit(types.UPDATE_INCREMENT, { 'current_increment': data.inc })
   },
   jog ({commit}, coords) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
