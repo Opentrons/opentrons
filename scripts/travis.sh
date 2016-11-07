@@ -86,13 +86,12 @@ execute_linux ()
     node --version
     npm --version
 
-    sudo apt-get install g++
-    sudo apt-get install gcc
-    sudo apt-get install python3-pip
-    sudo pip3 install pyinstaller
-    sudo apt-get install icnsutils # electron-builder dependency
-    sudo apt-get install graphicsmagick # electron-builder dependency
-    sudo apt-get install xvfb
+    # sudo apt-get install g++
+    # sudo apt-get install gcc
+    # sudo apt-get install python3-pip
+    # sudo apt-get install icnsutils # electron-builder dependency
+    # sudo apt-get install graphicsmagick # electron-builder dependency
+    # sudo apt-get install xvfb
 
     export PATH=$PATH:$(pwd)/node_modules/.bin/
   fi
