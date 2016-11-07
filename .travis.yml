@@ -26,7 +26,7 @@ install:
   - ./scripts/travis.sh install
   - export OPENTRONS_APP_UPLOAD_DIR=$(if [ "$TRAVIS_OS_NAME" == "linux" ]; then echo "linux"; else echo "mac"; fi)
 
-script: exit 0
+script: echo "No python test scripts to run"
 
 # Deploy the build version in an S3 bucket
 deploy:
