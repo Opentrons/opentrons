@@ -21,12 +21,12 @@
 		</div>
 	</div> -->
 	<section id="task">
-		<h1 class="title">Calibrate the {{currentInstrument(this.$store.state.tasks).label}}
-			pipette to the center of your {{currentPlaceable(this.$store.state.tasks).label}} container</h1>
-		<button class="btn-calibrate save">SAVE</button>
-		<button class="btn-calibrate move-to">MOVE TO</button>
-		<button class="btn-calibrate move-to">PICK UP TIP</button>
-		<button class="btn-calibrate move-to">DROP TIP</button>
+		<h1 class="title">Calibrate the {{this.instrument.label}}
+			pipette to the center of the {{this.placeable.slot}} position of your {{this.placeable.label}} container</h1>
+		<button class="btn-calibrate save" @click="calibratePlaceable(this.placeable, this.instrument)">SAVE</button>
+		<button class="btn-calibrate move-to" @click="moveToPlaceable(this.placeable, this.instrument)">MOVE TO</button>
+		<button class="btn-calibrate move-to" @click="pickUpTip(this.instrument)">PICK UP TIP</button>
+		<button class="btn-calibrate move-to" @click="dropTip(this.instrument)">DROP TIP</button>
 		<div class="well-img">
 			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
 			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
@@ -94,7 +94,11 @@
 				let tasks = this.$store.state.tasks
 				return this.currentInstrument(tasks)
 			},
-			type(){
+			placeable() {
+				let tasks = this.$store.state.tasks
+				return this.currentPlaceable(tasks)
+			},
+			type() {
 				let tasks = this.$store.state.tasks
 				let placeable = this.currentPlaceable(tasks)
 				let type = this.containerType(placeable.type)
