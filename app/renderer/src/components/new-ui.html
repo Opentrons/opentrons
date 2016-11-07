@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>OT-App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../assets/css/new.css">
+    <link rel="stylesheet" href="assets/css/new.css">
 </head>
 
 <body>
@@ -36,6 +36,29 @@
                 <input ref="input" @change="fileChange" type="file" name="file" class="upload" />
             </div>
         </form>
+
+        <div id="protocol-info">
+            <span class="title">File Name: </span>
+            <span class="info">8 Channel PCR</span>
+            <span class="title">Date Created: </span>
+            <span class="info">10/10/16</span>
+        </div>
+
+        <div id="progress">
+            <span class="title">Progress: </span><span class="info"> 20%</span>
+            <div id="progress-bar-total">
+                <div id="percent-complete"></div>
+            </div>
+        </div>
+
+        <div id="run">
+            <button class="btn-run">Run Job</button>
+            <div class="controls">
+                <button class="btn btn-play">P</button>
+                <button class="btn btn-pause">P</button>
+                <button class="btn btn-clear">X</button>
+            </div>
+        </div>
     </section>
     <main id="container">
         <aside id="jog">
