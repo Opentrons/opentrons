@@ -1,5 +1,5 @@
 <template>
-	<div class="calibration-modal">
+	<!-- <div class="calibration-modal">
 		<div class="well-img">
 			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
 			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
@@ -19,7 +19,14 @@
 			<button class="pick-tip" :class="{'disabled': !placeable.calibrated}" @click="pickUpTip(instrument)">Pick Up Tip</button>
 			<button class="drop-tip" :class="{'disabled': !placeable.calibrated}" @click="dropTip(instrument)">Drop Tip</button>
 		</div>
-	</div>
+	</div> -->
+	<section id="task">
+		<h1 class="title">Calibrate the p10 pipette to the center of your trash container</h1>
+		<button class="btn-calibrate save">SAVE</button>
+		<button class="btn-calibrate move-to">MOVE TO</button>
+		<button class="btn-calibrate move-to">PICK UP TIP</button>
+		<button class="btn-calibrate move-to">DROP TIP</button>
+	</section>
 </template>
 
 <script>

@@ -1,40 +1,18 @@
 <template>
   <section id="task-pane">
     <aside id="step-list">
-      <div class="instrument">
-        <h3 class="title">p200</h3>
-        <ul>
-          <li><a class="completed">[A1] tiprack200</a></li>
-          <!-- router link active class automatically applied
-  by router, this is just for demo purposed here -->
-          <li><a class="router-link-active">[B2] trash</a></li>
-          <li><a>[C1] plate</a></li>
-          <li><a>[C2] tuberack</a></li>
-          <li><a>Pipette</a></li>
-        </ul>
-        </div>
-        <div class="instrument">
-          <h3 class="title">p10</h3>
-          <ul>
-            <li><a>[A1] tiprack10</a></li>
-            <li><a>[B2] trash</a></li>
-            <li><a>[C1] plate</a></li>
-            <li><a>[C2] tuberack</a></li>
-            <li><a>Pipette</a></li>
-          </ul>
-        </div>
-      </aside>
-    <section id="task">
-      <h1 class="title">Calibrate the p10 pipette to the center of your trash container</h1>
-      <button class="btn-calibrate save">SAVE</button>
-      <button class="btn-calibrate move-to">MOVE TO</button>
-      <button class="btn-calibrate move-to">PICK UP TIP</button>
-      <button class="btn-calibrate move-to">DROP TIP</button>
-    </section>
+      <StepList></StepList>
+    </aside>
+    <router-view><router-view>
   </section>
 </template>
 
 <script>
+  import StepList from './StepList.vue'
+
   export default {
+    components: {
+      StepList
+    }
   }
 </script>

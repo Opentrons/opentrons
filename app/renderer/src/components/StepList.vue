@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <!-- <ul>
     <li v-for="task in default_tasks">
       <router-link v-bind:to="task.href" :class="{'completed': completed(task)}">
         {{task.title}}
@@ -28,7 +28,28 @@
         {{task.title}}
       </router-link>
     </li>
-  </ul>
+  </ul> -->
+  <div class="instrument">
+    <h3 class="title">p200</h3>
+    <ul>
+      <li><a class="completed">[A1] tiprack200</a></li>
+      <li><a class="router-link-active">[B2] trash</a></li>
+      <li><a>[C1] plate</a></li>
+      <li><a>[C2] tuberack</a></li>
+      <li><a>Pipette</a></li>
+    </ul>
+    </div>
+    <div class="instrument">
+      <h3 class="title">p10</h3>
+      <ul>
+        <li><a>[A1] tiprack10</a></li>
+        <li><a>[B2] trash</a></li>
+        <li><a>[C1] plate</a></li>
+        <li><a>[C2] tuberack</a></li>
+        <li><a>Pipette</a></li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>
