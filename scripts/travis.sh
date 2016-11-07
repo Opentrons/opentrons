@@ -13,9 +13,10 @@ run_install ()
   node --version
   npm --version
 
-  sudo pip3 install pip --upgrade 
+  sudo -H pip3 install pip --upgrade 
   pip3 --version
-  sudo pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
+  mkdir -p $HOME/.cache/pip3
+  sudo -H pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
   npm i -g mocha
   npm run unit
@@ -96,12 +97,12 @@ execute_linux ()
 os="$(uname)"
 
 if [ "$os" = "Darwin" ]; then
-  export OPENTRONS_APP_UPLOAD_DIR="mac"
+  export OPENTRONS_APP_UPLOAD_DIR=mac
   execute_mac $1
 fi
 
 if [ "$os" = "Linux" ]; then
-    export OPENTRONS_APP_UPLOAD_DIR="linux"
+    export OPENTRONS_APP_UPLOAD_DIR=linux
     execute_linux $1
 fi
 
