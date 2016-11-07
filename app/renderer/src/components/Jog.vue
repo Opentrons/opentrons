@@ -22,7 +22,7 @@
     </section>
     <h2 class="title">Select Increment [mm]</h2>
     <hr>
-    <Increment :increments="placeable_increments"><Increment>
+    <Increment :increments="placeable_increments"></Increment>
     <h2 class="title">Move to Slot</h2>
     <hr>
     <DeckSlot></DeckSlot>
@@ -39,7 +39,6 @@
     data: function () {
       return {
         placeable_increments: [50, 20,10,1,0.5,0.1, "SLOT"],
-        placeable: true
       }
     },
     components: {
@@ -50,7 +49,7 @@
       jog(axis, multiplier) {
         let increment = this.$store.state.current_increment_placeable
         increment *= multiplier
-        var coords = {}
+        let coords = {}
         switch(axis) {
           case "x":
             coords.x = increment
