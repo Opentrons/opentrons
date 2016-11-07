@@ -1,16 +1,8 @@
-var Application = require('spectron').Application
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
-var path = require('path')
-var glob = require("glob")
-
-
-// var isWin = /^win/.test(process.platform);
-// var appExecutablePath = 'dist/mac/OpenTrons.app/Contents/MacOS/OpenTrons'
-// if (isWin) {
-//   var detectedExes = glob.sync('releases\\*.exe');
-//   appExecutablePath = detectedExes[0];
-// }
+let Application = require('spectron').Application
+let chai = require('chai')
+let chaiAsPromised = require('chai-as-promised')
+let path = require('path')
+let glob = require("glob")
 
 
 let appPath;
@@ -38,7 +30,7 @@ chai.use(chaiAsPromised)
 describe('application launch', function () {
   beforeEach(function () {
     this.app = new Application({
-      path: appPath,  // appExecutablePath
+      path: appPath,
       args: ['./app']
     })
     return this.app.start()
@@ -66,10 +58,21 @@ describe('application launch', function () {
   })
 
   it('runs a protocol', function () {
-    var file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
-    var pauseTime = process.env.PAUSE_TIME || 0
+    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
+    let pauseTime = process.env.PAUSE_TIME || 0
+    let tiprackXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[3]/button[1]"
+    let plateXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[2]/button[1]"
+    let top = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[1]'
+    let topSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[1]'
+    let bottom = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[2]'
+    let bottomSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[3]'
+    let blowOut = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[3]'
+    let blowOutSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[5]'
+    let dropTip = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[4]'
+    let dropTipSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[7]'
+
     return this.app.client.waitUntilWindowLoaded(5000)
-      .click('//*[@id="connections"]/option[2]')
+      .click('//*[@id="connections"]/option[3]')
       .pause(pauseTime)
       .click('.btn-connect')
       .pause(pauseTime)
@@ -79,26 +82,61 @@ describe('application launch', function () {
       .pause(1000)
       .click('.next')
       .pause(pauseTime)
-      .click('.next')
+      .click(tiprackXpath)
       .pause(pauseTime)
       .click('.next')
       .pause(pauseTime)
-      .click('.next')
+      .click(plateXpath)
       .pause(pauseTime)
       .click('.next')
       .pause(pauseTime)
-      .click('.next')
+      .click(plateXpath)
       .pause(pauseTime)
       .click('.next')
       .pause(pauseTime)
-      .click('.next')
+      .click(plateXpath)
       .pause(pauseTime)
       .click('.next')
       .pause(pauseTime)
+      .click(tiprackXpath)
+      .pause(pauseTime)
       .click('.next')
+      .pause(pauseTime)
+      .click(plateXpath)
+      .pause(pauseTime)
+      .click('.next')
+      .pause(pauseTime)
+      .click(plateXpath)
+      .pause(pauseTime)
+      .click('.next')
+      .pause(pauseTime)
+      .click(plateXpath)
+      .pause(pauseTime)
+      .click('.next')
+      .pause(pauseTime)
+      .click(top)
+      .click(topSave)
+      .click(bottom)
+      .click(bottomSave)
+      .click(blowOut)
+      .click(blowOutSave)
+      .click(dropTip)
+      .click(dropTipSave)
+      .pause(pauseTime)
+      .click('.next')
+      .click(top)
+      .click(topSave)
+      .click(bottom)
+      .click(bottomSave)
+      .click(blowOut)
+      .click(blowOutSave)
+      .click(dropTip)
+      .click(dropTipSave)
       .pause(pauseTime)
       .click('.next')
       .pause(pauseTime)
       .click('//*[@id="task-pane"]/div/section/div[2]/div[2]/button[1]')
+      .pause(2000)
+      .waitForText(".toast-message-text", "Success")
   })
 })

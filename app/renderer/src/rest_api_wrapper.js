@@ -117,6 +117,7 @@ class OpenTrons {
         return result
       }, (response) => {
         console.log('Failed to upload protocol', response)
+        return {success: false}
       })
   }
   getRunPlan () {

@@ -2,7 +2,8 @@
   <div>
     <h2 class="title">Calibrate {{ instrument.label }} pipette</h2>
     <div class="instructions">
-      Calibrate {{ instrument.label }}'s plunger. Be sure to save top, bottom, blowout, and droptip. Enter max volume.
+      Calibrate {{ instrument.label }}'s plunger.
+      Be sure to save top, bottom, blowout, and droptip. Enter max volume.
     </div>
 
     <section>
@@ -10,10 +11,12 @@
         <Jog :instrument="instrument.axis" :disabled="busy"></Jog>
         <JogPlunger :axis="instrument.axis" :disabled="busy"></JogPlunger>
         <div class="save-pipette">
-            <h3 class="title">Current Position</h3>
-            <coordinates :instrument="instrument" :axis="instrument.axis.toUpperCase()"></coordinates>
-            <h3 class="title">Calibrate {{ instrument.label }} axis {{instrument.axis.toUpperCase() }}</h3>
-            <CalibrateInstrument :instrument="instrument" :busy="busy"></CalibrateInstrument>
+          <h3 class="title">Current Position</h3>
+          <coordinates :instrument="instrument" :axis="instrument.axis.toUpperCase()"></coordinates>
+          <h3 class="title">
+            Calibrate {{ instrument.label }} axis {{ instrument.axis.toUpperCase() }}
+          </h3>
+          <CalibrateInstrument :instrument="instrument" :busy="busy"></CalibrateInstrument>
         </div>
       </div>
       <Navigation :prev="prev" :next="next"></Navigation>
@@ -22,17 +25,14 @@
 </template>
 
 <script>
-  import Navigation from './Navigation.vue'
-  import Jog from './Jog.vue'
-  import JogPlunger from './JogPlunger.vue'
-  import Coordinates from './Coordinates.vue'
-  import CalibrateInstrument from './CalibrateInstrument.vue'
+  import Navigation from "./Navigation.vue"
+  import Jog from "./Jog.vue"
+  import JogPlunger from "./JogPlunger.vue"
+  import Coordinates from "./Coordinates.vue"
+  import CalibrateInstrument from "./CalibrateInstrument.vue"
 
   export default {
     name: "Instrument",
-    data: function() {
-      return {}
-    },
     components: {
       Navigation,
       Jog,

@@ -3,6 +3,7 @@ import os
 import sys
 import threading
 import json
+import time
 
 import flask
 from flask import Flask, render_template, request
@@ -63,7 +64,9 @@ def load_python(stream):
             )
             api_response['errors'] = error
     except Exception as e:
+        print(e)
         api_response['errors'] = [str(e)]
+
 
     api_response['warnings'] = robot.get_warnings() or []
 
@@ -95,6 +98,8 @@ def upload():
         })
 
     calibrations = get_step_list()
+    emit_notifications(api_response['errors'], 'danger')
+    emit_notifications(api_response['warnings'], 'warning')
 
     return flask.jsonify({
         'status': 'success',
@@ -106,7 +111,17 @@ def upload():
     })
 
 
+def emit_notifications(notifications, _type):
+    for notification in notifications:
+        socketio.emit('event', {
+            'name': 'notification',
+            'text': notification,
+            'type': _type
+        })
+
+
 def _run_commands():
+    start_time = time.time()
     global robot
 
     api_response = {'errors': [], 'warnings': []}
@@ -116,15 +131,22 @@ def _run_commands():
         robot.home()
         robot.run(caller='ui')
         if len(robot._commands) == 0:
-            error = ("This protocol does not contain "
-                     "any commands for the robot.")
-            api_response['errors'] = error
+            error = "This protocol does not contain any commands for the robot."
+            api_response['errors'] = [error]
     except Exception as e:
         api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
-    socketio.emit('event', api_response)
+    end_time = time.time()
+    emit_notifications(api_response['warnings'], 'warning')
+    emit_notifications(api_response['errors'], 'danger')
+    seconds = end_time - start_time
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    run_time = "%d:%02d:%02d" % (hours, minutes, seconds)
+    result = "Run complete in {}".format(run_time)
+    emit_notifications([result], 'success')
 
 
 @app.route("/run", methods=["GET"])
@@ -228,6 +250,7 @@ def connect_robot():
         robot.disconnect()
         status = 'error'
         data = str(e)
+        emit_notifications([data], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -277,6 +300,7 @@ def disconnect_robot():
     except Exception as e:
         status = 'error'
         data = str(e)
+        emit_notifications([data], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -286,7 +310,11 @@ def disconnect_robot():
 
 @app.route("/instruments/placeables")
 def placeables():
-    data = get_step_list()
+    try:
+        data = get_step_list()
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+
     return flask.jsonify({
         'status': 'success',
         'data': data
@@ -402,9 +430,11 @@ def home(axis):
         else:
             import pdb; pdb.set_trace()
             result = robot.home(axis, enqueue=False)
+
     except Exception as e:
         result = str(e)
         status = 'error'
+        emit_notifications([result], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -426,6 +456,7 @@ def jog():
     except Exception as e:
         result = str(e)
         status = 'error'
+        emit_notifications([result], 'danger')
 
     return flask.jsonify({
         'status': status,
@@ -454,8 +485,10 @@ def move_to_slot():
             instrument=instrument
         )
     except Exception as e:
-        result = e
+        result = str(e)
         status = 'error'
+        emit_notifications([result], 'danger')
+
 
     return flask.jsonify({
         'status': status,
@@ -473,6 +506,7 @@ def move_to_container():
         container = robot._deck[slot].get_child_by_name(name)
         instrument.move_to(container[0].bottom(), enqueue=False)
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -486,14 +520,14 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
-    axis = request.json.get("axis")
-
     try:
+        axis = request.json.get("axis")
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.reset_tip_tracking()
         instrument.pick_up_tip(enqueue=False)
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -507,14 +541,13 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
-    axis = request.json.get("axis")
-
     try:
+        axis = request.json.get("axis")
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.drop_tip(enqueue=False)
-
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -534,6 +567,7 @@ def move_to_plunger_position():
         instrument = robot._instruments[axis.upper()]
         instrument.motor.move(instrument.positions[position])
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -575,6 +609,7 @@ def calibrate_placeable():
     try:
         _calibrate_placeable(name, axis)
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
@@ -612,6 +647,7 @@ def calibrate_plunger():
     try:
         _calibrate_plunger(position, axis)
     except Exception as e:
+        emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)

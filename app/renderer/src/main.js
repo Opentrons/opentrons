@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store/store'
 import {
-  StepList,
   Placeable,
   Instrument,
   App
@@ -12,6 +11,7 @@ import {
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
+
 
 const router = new VueRouter({
   routes: [
