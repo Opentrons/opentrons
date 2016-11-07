@@ -1,4 +1,4 @@
-# We are using the iOS build system to create Mac OS X python builds
+sudo: true
 language: python
 pytnon:
   - "3.5"
