@@ -22,12 +22,27 @@ run_install ()
   node --version
   npm --version
 
-  pip3 install --user pip --upgrade 
+  # We are running in container environment for Linux
+  # Install into user's home dir
+  if [ "$1" == "linux" ]; then
+    pip3 install --user pip --upgrade 
+  else
+    pip3 install pip --upgrade 
+  fi
+
   which pip
   which pip3
   pip3 --version
   mkdir -p $HOME/.cache/pip3
-  pip3 install --user -r requirements.txt --cache-dir $HOME/.cache/pip3
+
+  # We are running in container environment for Linux
+  # Install into user's home dir
+  if [ "$1" == "linux" ]; then
+    pip3 install --user -r requirements.txt --cache-dir $HOME/.cache/pip3
+  else
+    pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
+  fi
+
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
 
   cd server && python3 -m nose -s --logging-level WARNING && cd ..
