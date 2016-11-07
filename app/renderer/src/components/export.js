@@ -1,6 +1,5 @@
 export {default as StepList} from './StepList.vue'
 export {default as Upload} from './Upload.vue'
-export {default as Placeable} from './Placeable.vue'
 export {default as CalibratePlaceable} from './CalibratePlaceable.vue'
 export {default as Instrument} from './Instrument.vue'
 export {default as CalibrateInstrument} from './CalibrateInstrument.vue'

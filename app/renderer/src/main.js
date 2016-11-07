@@ -12,7 +12,6 @@ import {
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
-
 const router = new VueRouter({
   routes: [
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
