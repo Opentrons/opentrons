@@ -15,6 +15,7 @@ cache:
     - app/node_modules
     - $HOME/.electron
     - pip
+    - $HOME/.cache/pip3
     - $HOME/.cache/our-brew
 
 before_install:
@@ -33,7 +34,7 @@ deploy:
   bucket: ot-app-builds
   skip_cleanup: true
   local-dir: releases
-  upload-dir: mac
+  upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
     repo: OpenTrons/opentrons-app

@@ -7,13 +7,13 @@ run_install ()
 
   export DISPLAY=':99.0'
   Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-  
+
   nvm install 6.0.0
   nvm use 6.0.0
   node --version
   npm --version
 
-  sudo pip3 install -r requirements.txt
+  sudo pip3 install --cache-dir $HOME/.cache/pip3 -r requirements.txt
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
   npm i -g mocha
   npm run unit
@@ -94,10 +94,12 @@ execute_linux ()
 os="$(uname)"
 
 if [ "$os" = "Darwin" ]; then
+  export OPENTRONS_APP_UPLOAD_DIR="mac"
   execute_mac $1
 fi
 
 if [ "$os" = "Linux" ]; then
-  execute_linux $1
+    export OPENTRONS_APP_UPLOAD_DIR="linux"
+    execute_linux $1
 fi
 
