@@ -24,14 +24,7 @@ before_install:
 
 install:
   - ./scripts/travis.sh install
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      export OPENTRONS_APP_UPLOAD_DIR=linux
-    elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
-      export OPENTRONS_APP_UPLOAD_DIR=mac
-    else
-      echo "Unsupported OS $TRAVIS_OS_NAME"
-      exit 1
-    fi
+  - export OPENTRONS_APP_UPLOAD_DIR=$(if [ "$TRAVIS_OS_NAME" == "linux" ]; then echo "linux"; else echo "mac"; fi)
 
 script: exit 0
 
