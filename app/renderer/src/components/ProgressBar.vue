@@ -1,6 +1,6 @@
 <template>
   <div id="progress">
-    <span class="title">Progress: </span><span class="info"> 20%</span>
+    <span class="title">Progress: </span><span class="info"> {{runPercent}}%</span>
     <div id="progress-bar-total">
       <div id="percent-complete"></div>
     </div>
@@ -15,10 +15,7 @@
         let finished_tasks_length = this.$store.state.run_log.length
         let all_tasks_length = this.$store.state.run_plan.length
         let percent = Math.round((finished_tasks_length / all_tasks_length) * 100) + 20
-        return percent
-      },
-      runString() {
-        return `${this.$store.state.run_log.length} / ${this.$store.state.run_plan.length}`
+        return percent || 0
       }
     }
   }
