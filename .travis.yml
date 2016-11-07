@@ -1,58 +1,50 @@
-# We are using the iOS build system to create Mac OS X python builds
-language: objective-c
-os:
-  - osx
+language: python
+
+matrix:
+  # Set fast_finish to false to wait for OSX build to finish
+  # We need both builds when we want to push an app update
+  # Otherwise with fast_finish: true 
+  # the success of Linux build is enough for CI purposes
+  fast_finish: true
+  include:
+    - os: linux
+      # Trying container environment  
+      sudo: false
+      # sudo: required
+      # dist: trusty
+      pytnon: "3.4"
+      env: OPENTRONS_APP_UPLOAD_DIR=linux
+      addons:
+        apt:
+          sources: &common_sources
+          packages: &common_packages
+            - g++
+            - gcc
+            - icnsutils # electron-builder dependency
+            - graphicsmagick # electron-builder dependency
+            - xvfb  
+  allow_failures:
+    - os: osx
+      language: generic
+      env: OPENTRONS_APP_UPLOAD_DIR=mac
 
 cache:
+  apt: true
   directories:
     - node_modules
     - app/node_modules
     - $HOME/.electron
     - pip
+    - $HOME/.cache/pip3
     - $HOME/.cache/our-brew
 
 before_install:
-  # OS extra info
-  - export HOMEBREW_CACHE=$HOME/.cache/our-brew
-  - uname -a
-  - python --version
-  - python -c "import struct; print(struct.calcsize('P') * 8)"
-
-  # Update brew
-  - brew update
-
-  # Install node.js
-  - brew install nvm
-  - mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
-  - echo "$(brew --prefix nvm)/nvm.sh" >> ~/.bashrc
-  - nvm install 6.0.0
-  - nvm use 6.0.0
-  - node --version
-  - npm --version
-  - npm install
-
-  - brew install python3
-  - python3 --version
-  - python3 -c "import struct; print(struct.calcsize('P') * 8)"
-  - python --version
-  - echo $PATH
-
-  # Install Python packages (built with Python 3)
-  - pip3 install pyinstaller
-  - pyinstaller --version
-  - pip3 install -r requirements.txt
-  - cd server && nosetests -s --logging-level WARNING && cd ..
+  - ./scripts/travis.sh pre-install
 
 install:
-  - node --version
-  - npm --version
-  - npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
-  - npm i -g mocha
-  - npm run unit
-  - npm run release:mac
-  - npm run integration
-  - ls dist/mac
-  - ls releases
+  - ./scripts/travis.sh install
+
+script: echo "No python test scripts to run"
 
 # Deploy the build version in an S3 bucket
 deploy:
@@ -62,7 +54,7 @@ deploy:
   bucket: ot-app-builds
   skip_cleanup: true
   local-dir: releases
-  upload-dir: mac
+  upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
     repo: OpenTrons/opentrons-app
