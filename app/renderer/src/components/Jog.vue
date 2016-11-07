@@ -25,7 +25,7 @@
     <Increment :increments="placeable_increments"><Increment>
     <h2 class="title">Move to Slot</h2>
     <hr>
-    <DeckSlot :slots="slots"></DeckSlot>
+    <DeckSlot></DeckSlot>
   </aside>
 </template>
 
@@ -35,14 +35,11 @@
 
   export default {
     name: 'Jog',
-    props: ['instrument', 'disabled'],
+    props: ['instrument'],
     data: function () {
       return {
         placeable_increments: [50, 20,10,1,0.5,0.1, "SLOT"],
-        placeable: true,
-        slots: ['A3','B3','C3','D3','E3',
-                'A2','B2','C2','D2','E2',
-                'A1','B1','C1','D1','E1']
+        placeable: true
       }
     },
     components: {
