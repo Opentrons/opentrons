@@ -1,0 +1,5 @@
+coveralls
+coverage==4.2
+numpydoc==0.6.0
+pylama
+Sphinx==1.4.8
