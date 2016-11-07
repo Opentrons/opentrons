@@ -6,8 +6,8 @@ pytnon:
   - "3.4"
 
 os:
-#  - osx
-  - linux
+  - osx
+#  - linux
 
 cache:
   apt: true
