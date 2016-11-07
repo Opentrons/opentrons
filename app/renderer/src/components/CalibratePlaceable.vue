@@ -1,25 +1,4 @@
 <template>
-	<!-- <div class="calibration-modal">
-		<div class="well-img">
-			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
-			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
-			<img src="../assets/img/point_top.png" v-show="placeableType('point')"/>
-		</div>
-
-		<div :class="['update bottom', disabled]" v-show="placeableType('default') || placeableType('point')">
-			<span class="position bottom">Bottom</span>
-			<button class="btn-placeable save bottom" @click="calibratePlaceable(placeable,instrument)">Save </button>
-			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
-		</div>
-
-		<div :class="['update top', disabled]" v-show="placeableType('tiprack')">
-			<span class="position top">Tiprack</span>
-			<button class="btn-placeable save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
-			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
-			<button class="pick-tip" :class="{'disabled': !placeable.calibrated}" @click="pickUpTip(instrument)">Pick Up Tip</button>
-			<button class="drop-tip" :class="{'disabled': !placeable.calibrated}" @click="dropTip(instrument)">Drop Tip</button>
-		</div>
-	</div> -->
 	<section id="task">
 		<h1 class="title">Calibrate the {{this.instrument.label}}
 			pipette to the center of the {{this.placeable.slot}} position of your {{this.placeable.label}} container</h1>
@@ -39,7 +18,6 @@
   export default {
     name: 'CalibratePlaceable',
     methods: {
-
 			placeableType(type) {
 				return this.type === type
 			},
