@@ -16,11 +16,11 @@
         <button @click="jog('z', -1)" class="btn z down">&darr;</button>
       </span>
       <span class="p">
-        <button class="btn p up">&uarr;</button>
-        <button class="btn p down">&darr;</button>
+        <button @click="jog(currentAxis(), -1)"class="btn p up">&uarr;</button>
+        <button @click="jog(currentAxis(), 1)" class="btn p down">&darr;</button>
       </span>
     </section>
-    
+
     <h2 class="title">Select Increment [mm]</h2>
     <hr>
     <Increment :increments="placeable_increments"></Increment>
@@ -37,7 +37,6 @@
 
   export default {
     name: 'Jog',
-    props: ['instrument'],
     data: function () {
       return {
         placeable_increments: [50, 20,10,1,0.5,0.1, "SLOT"],
@@ -62,8 +61,18 @@
           case "z":
             coords.z = increment
             break;
+          case "a":
+            coords.a = increment
+            break;
+          case "b":
+            coords.b = increment
+            break;
         }
+        console.log(coords)
         this.$store.dispatch("jog", coords)
+      },
+      currentAxis() {
+        return this.$route.params.instrument
       }
     }
   }
