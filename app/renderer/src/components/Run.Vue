@@ -17,19 +17,13 @@
         </div>
 
       </div>
-      <!-- <Navigation :prev="prev" :next="next"></Navigation> -->
     </section>
   </div>
 </template>
 
 <script>
-  import Navigation from './Navigation.vue'
-
   export default {
     name: "Placeable",
-    components: {
-      Navigation
-    },
     methods: {
       runProtocol(){
         this.$store.dispatch("runProtocol")

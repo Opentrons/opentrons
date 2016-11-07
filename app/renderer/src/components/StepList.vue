@@ -18,26 +18,6 @@
       </div>
     </span>
   </div>
-  <!-- <div class="instrument">
-    <h3 class="title">p200</h3>
-    <ul>
-      <li><a class="completed">[A1] tiprack200</a></li>
-      <li><a class="router-link-active">[B2] trash</a></li>
-      <li><a>[C1] plate</a></li>
-      <li><a>[C2] tuberack</a></li>
-      <li><a>Pipette</a></li>
-    </ul>
-  </div>
-  <div class="instrument">
-    <h3 class="title">p10</h3>
-    <ul>
-      <li><a>[A1] tiprack10</a></li>
-      <li><a>[B2] trash</a></li>
-      <li><a>[C1] plate</a></li>
-      <li><a>[C2] tuberack</a></li>
-      <li><a>Pipette</a></li>
-    </ul>
-  </div> -->
 </template>
 
 <script>

@@ -20,7 +20,6 @@
     },
     methods: {
       jogToSlot(slot) {
-        //TODO - get actual axis for move to slot
         this.$store.dispatch("jogToSlot", {slot: slot, axis: "a"})
       }
     }

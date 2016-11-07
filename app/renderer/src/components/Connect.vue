@@ -10,7 +10,6 @@
   </div>
 </template>
 
-
 <script>
   import OpenTrons from '../rest_api_wrapper'
 

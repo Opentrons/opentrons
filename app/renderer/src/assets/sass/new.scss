@@ -388,18 +388,29 @@ aside#jog {
 Task Pane
 ******************************/
 
-section#task {
+section#task-pane {
+    width: 710px;
+    flex: 0 0 710px;
+    margin-left: 10px;
+    height: 426px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 2px solid $well-bg;
+    border-radius: 6px;
+    section#task {
     width: 510px;
     height: 270px;
     padding:30px;
     background-color: $well-bg;
     .well-img {
-      width: 100px;
-      margin-top: 20px;
-      img{
-        width:100%;
-        height:auto;
-      }
+        width: 100px;
+        margin-top: 20px;
+          img{
+            width:100%;
+            height:auto;
+            }
+        }
     }
 }
 

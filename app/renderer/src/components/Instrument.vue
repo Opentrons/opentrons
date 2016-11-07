@@ -19,13 +19,11 @@
           <CalibrateInstrument :instrument="instrument" :busy="busy"></CalibrateInstrument>
         </div>
       </div>
-      <Navigation :prev="prev" :next="next"></Navigation>
     </section>
   </div>
 </template>
 
 <script>
-  import Navigation from "./Navigation.vue"
   import Jog from "./Jog.vue"
   import JogPlunger from "./JogPlunger.vue"
   import Coordinates from "./Coordinates.vue"
@@ -34,7 +32,6 @@
   export default {
     name: "Instrument",
     components: {
-      Navigation,
       Jog,
       JogPlunger,
       Coordinates,
