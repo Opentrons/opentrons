@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
+set -e
+
 run_install ()
 {
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+  if [ "$1" == "linux" ]; then
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+  else
+    mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
+    echo "$(brew --prefix nvm)/nvm.sh" >> ~/.bashrc    
+  fi
 
   if [ "$1" == "linux" ]; then
     export DISPLAY=':99.0'
@@ -15,13 +22,13 @@ run_install ()
   node --version
   npm --version
 
-  sudo -H pip3 install pip --upgrade 
+  pip3 install pip --upgrade 
   pip3 --version
   mkdir -p $HOME/.cache/pip3
   pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
 
-  cd server && nosetests -s --logging-level WARNING && cd ..
+  cd server && python3 -m nosetests -s --logging-level WARNING && cd ..
 
   npm i -g mocha
   npm run unit
@@ -50,7 +57,6 @@ execute_mac ()
     nvm use 6.0.0
     node --version
     npm --version
-    npm install
 
     brew install python3
     python3 --version
@@ -88,7 +94,6 @@ execute_linux ()
     sudo apt-get install graphicsmagick # electron-builder dependency
     sudo apt-get install xvfb
 
-    npm install
     export PATH=$PATH:$(pwd)/node_modules/.bin/
   fi
 
