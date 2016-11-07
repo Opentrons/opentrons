@@ -66,11 +66,12 @@ execute_linux ()
 
     sudo apt-get install g++
     sudo apt-get install gcc
-
-    sudo npm install
+    sudo apt-get install python3-pip
     sudo pip3 install pyinstaller
-    sudo apt install icnsutils # electron-builder dependency
+    sudo apt-get install icnsutils # electron-builder dependency
     sudo apt-get install graphicsmagick # electron-builder dependency
+
+    npm install
     export PATH=$PATH:$(pwd)/node_modules/.bin/
   fi
 
