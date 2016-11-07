@@ -23,6 +23,8 @@ before_install:
 install:
   - ./scripts/travis.sh install
 
+script: echo ""
+
 # Deploy the build version in an S3 bucket
 deploy:
   provider: s3
