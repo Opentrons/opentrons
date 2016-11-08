@@ -14,6 +14,7 @@ const {initAutoUpdater} = require('./updater.js')
 let serverManager = new ServerManager()
 let mainWindow
 
+fs.rmdirSync(path.join(app.getPath("userData"), "Cache"))
 
 if (process.env.NODE_ENV == 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
