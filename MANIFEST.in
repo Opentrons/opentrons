@@ -1,0 +1,3 @@
+include versioneer.py
+include opentrons/_version.py
+include opentrons/config/containers/default-containers.json
