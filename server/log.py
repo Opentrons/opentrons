@@ -1,3 +1,4 @@
+import logging
 from logging.config import dictConfig
 import os
 
@@ -36,16 +37,26 @@ logging_config = dict(
             'maxBytes': 5000000,
             'backupCount': 3
         },
-    },
-    root={
-        'handlers': [],
+        'opentrons': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'basic',
+            'filename': os.path.join(LOG_FILE_DIR, 'opentrons.log'),
+            'maxBytes': 5000000,
+            'backupCount': 3
+        },
     },
     loggers={
         'opentrons-app': {
          'handlers': ['opentrons-app'],
+         'level': logging.INFO,
         },
-        'socketio': {
-         'handlers': ['socketio'],
+        # 'socketio': {
+        #  'handlers': ['socketio'],
+        #  'level': logging.INFO,
+        # },
+        'opentrons': {
+         'handlers': ['opentrons'],
+         'level': logging.INFO,
         }
     }
 )

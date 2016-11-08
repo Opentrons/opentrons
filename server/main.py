@@ -702,16 +702,19 @@ if __name__ == "__main__":
 
     _start_connection_watcher()
 
+    app.logger.info('Initializing')
     import log  # NOQA
     lg = logging.getLogger(app.logger_name)
     lg.info('Starting Flask Server')
 
+    print(logging.Logger.manager.loggerDict)
+
     socketio.run(
         app,
-        debug=True,
+        debug=False,
+        logger=False,
         use_reloader=False,
         log_output=False,
         engineio_logger=False,
         port=31950
     )
-
