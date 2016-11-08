@@ -1,4 +1,4 @@
-#!/bin/env python2.7
+#!/usr/bin/env python
 
 import glob
 import json
@@ -6,9 +6,11 @@ import os
 import platform
 import re
 import shutil
-import struct
 import subprocess
 import time
+
+
+import util
 
 
 script_tag = "[OT-App frontend build] "
@@ -55,7 +57,7 @@ def get_build_tag(os_type):
 
     ci_tag = None
 
-    if os_type == "mac":
+    if os_type in {"mac", "linux"}:
         print(script_tag + "Checking Travis-CI environment variables for tag:")
         ci_tag = tag_from_ci_env_vars(
             ci_name='Travis-CI',
@@ -118,44 +120,31 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
 
     return None
 
+
 def which(pgm):
-    path=os.getenv('PATH')
+    path = os.getenv('PATH')
     for p in path.split(os.path.pathsep):
-        p=os.path.join(p,pgm)
-        if os.path.exists(p) and os.access(p,os.X_OK):
+        p = os.path.join(p, pgm)
+        if os.path.exists(p) and os.access(p, os.X_OK):
             return p
 
-def get_arch():
-    # Note: forcing arch to be 64 bit
-    cpu_word_size = 64  # struct.calcsize('P') * 8
-    if cpu_word_size == 64:
-        return 'x64'
-    if cpu_word_size == 32:
-        return 'ia32'
-
-def get_platform():
-    os_type = platform.system()
-    if os_type  == 'Windows':
-        return 'win'
-    elif os_type == 'Darwin':
-        return 'mac'
-    else:
-        raise SystemExit(script_tab + 'Unsupported OS {}'.format(os_type))
 
 def build_electron_app():
     print(script_tag + "Running electron-builder process.")
 
-    platform_type = get_platform()
+    platform_type = util.get_os()
     process_args = [
         which("build"),
         os.path.join(project_root_dir, "app"),
         "--{}".format(platform_type),
-        "--{}".format(get_arch()),
+        "--{}".format(util.get_arch()),
     ]
 
-    if platform_type == "mac":
+    print(process_args)
+
+    if platform_type in {'mac'}:
         electron_builder_process = subprocess.Popen(process_args)
-    elif platform_type == "win":
+    elif platform_type in {'win', 'linux'}:
         electron_builder_process = subprocess.Popen(process_args, shell=True)
 
     electron_builder_process.communicate()
@@ -176,7 +165,7 @@ def clean_build_dist(build_tag):
     :return:
     """
 
-    platform_type = get_platform()
+    platform_type = util.get_os()
 
     electron_builder_dist = os.path.join(project_root_dir, "dist", platform_type)
 
@@ -193,6 +182,8 @@ def clean_build_dist(build_tag):
         build_artifacts_globs = ["RELEASES", "*.nupkg", "*.exe"]
     elif platform_type == "mac":
         build_artifacts_globs = ["*.dmg", "*.zip"]
+    elif platform_type == "linux":
+        build_artifacts_globs = ["../*.deb"]
 
     found_build_artifacts = []  # Holds tuples of (filepath, ext)
 
@@ -237,5 +228,5 @@ def clean_build_dist(build_tag):
 
 if __name__ == '__main__':
     build_electron_app()
-    build_tag = get_build_tag(get_platform())
+    build_tag = get_build_tag(util.get_os())
     clean_build_dist(build_tag)

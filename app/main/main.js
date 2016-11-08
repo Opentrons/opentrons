@@ -22,7 +22,7 @@ if (process.env.NODE_ENV == 'development'){
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
   // TODO: use FLASK port when not in development
-  mainWindow.loadURL("http://127.0.0.1:5000")
+  mainWindow.loadURL("http://127.0.0.1:31950")
 
   mainWindow.on('closed', function () {
     mainWindow = null

@@ -709,5 +709,5 @@ if __name__ == "__main__":
     socketio.run(
         app,
         debug=IS_DEBUG,
-        port=5000
+        port=31950
     )

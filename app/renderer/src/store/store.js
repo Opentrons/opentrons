@@ -56,7 +56,7 @@ function createWebSocketPlugin(socket) {
   }
 }
 
-const socket = io.connect('ws://localhost:5000')
+const socket = io.connect('ws://localhost:31950')
 
 socket.on('connect', function(){
   console.log('WebSocket has connected.')

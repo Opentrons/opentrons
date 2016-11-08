@@ -4,7 +4,7 @@ import {addHrefs} from './util'
 
 class OpenTrons {
   constructor (base_url) {
-    this.base_url = base_url || 'http://localhost:5000'
+    this.base_url = base_url || 'http://localhost:31950'
     this.connectUrl = this.base_url + '/robot/serial/connect'
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
     this.jogUrl = this.base_url + '/jog'
@@ -106,7 +106,7 @@ class OpenTrons {
 
   uploadProtocol (formData) {
     return Vue.http
-      .post('http://localhost:5000/upload', formData)
+      .post('http://localhost:31950/upload', formData)
       .then((response) => {
         let result = {success: true, errors: [], warnings: [], calibrations: []}
         let data = response.body.data
@@ -226,4 +226,4 @@ class OpenTrons {
   }
 }
 
-export default new OpenTrons('http://localhost:5000')
+export default new OpenTrons('http://localhost:31950')
