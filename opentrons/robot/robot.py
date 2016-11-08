@@ -741,16 +741,16 @@ class Robot(object, metaclass=Singleton):
 
         res = None
         try:
-            res = self.run()
+            self.run()
         except Exception as e:
-            res = "Run exited with {}".format(e)
+            self.add_warning("Run exited with {}".format(e))
 
         self.set_connection('live')
 
         for instrument in self._instruments.values():
             instrument.teardown_simulate()
 
-        return res
+        return self._runtime_warnings
 
     def set_connection(self, mode):
         if mode in self.connections:
