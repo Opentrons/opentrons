@@ -23,10 +23,10 @@ matrix:
   #           - icnsutils # electron-builder dependency
   #           - graphicsmagick # electron-builder dependency
   #           - xvfb  
-  # allow_failures:
-  - os: osx
-    language: generic
-    env: OPENTRONS_APP_UPLOAD_DIR=mac
+  allow_failures:
+    - os: osx
+      language: generic
+      env: OPENTRONS_APP_UPLOAD_DIR=mac
 
 cache:
   apt: true
