@@ -2,7 +2,7 @@
   <div>
     <toast position="n"></toast>
     <header id="home-connect">
-      <Home></Home>
+      <Home :busy="robot_busy"></Home>
       <div class="logo">
         <img src="../assets/img/logo_rgb_transparent.png" />
       </div>
@@ -17,7 +17,7 @@
       <Run></Run>
     </section>
     <main id="container">
-      <Jog></Jog>
+      <Jog :busy="robot_busy"></Jog>
       <TaskPane>
     </main>
   <div>
@@ -46,6 +46,11 @@
       Run,
       Protocol,
       ProgressBar
+    },
+    computed: {
+      robot_busy() {
+        return this.$store.state.busy
+      }
     }
   }
 </script>

@@ -4,7 +4,7 @@
     <h2 class="title" id="z">Jog [Z]</h2>
     <h2 class="title" id="p">Plunger</h2>
     <hr>
-    <section id="jog-controls">
+    <section id="jog-controls" :class="{'disabled': busy}">
       <span class="xy">
         <button @click="jog('y', 1)" class="btn y up">&uarr;</button>
         <button @click="jog('x', -1)" class="btn x left">&larr;</button>
@@ -27,7 +27,7 @@
 
     <h2 class="title">Move to Slot</h2>
     <hr>
-    <DeckSlot></DeckSlot>
+    <DeckSlot :busy="busy"></DeckSlot>
   </aside>
 </template>
 
@@ -37,6 +37,7 @@
 
   export default {
     name: 'Jog',
+    props: ["busy"],
     data: function () {
       return {
         placeable_increments: [50, 20,10,1,0.5,0.1, "SLOT"],
@@ -72,7 +73,7 @@
         this.$store.dispatch("jog", coords)
       },
       currentAxis() {
-        return this.$route.params.instrument
+        return this.$route.params.instrument || "b"
       }
     }
   }

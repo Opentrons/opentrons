@@ -1,5 +1,5 @@
 <template>
-  <section id="deck">
+  <section id="deck" :class="{'disabled': busy}">
     <div class="deck">
       <button v-for="slot in slots" @click="jogToSlot(slot)">
         {{slot}}
@@ -11,6 +11,7 @@
 <script>
   export default {
     name: 'DeckSlot',
+    props: ["busy"],
     data: function() {
       return {
         slots: ['A3','B3','C3','D3','E3',

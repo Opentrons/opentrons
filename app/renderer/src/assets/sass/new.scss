@@ -466,7 +466,7 @@ section#task {
     background-color: $well-bg;
     .well-img {
         width: 100px;
-        margin-top: 20px;
+        margin-top: 15px;
     img{
         width:100%;
         height:auto;
@@ -507,7 +507,7 @@ section#task-pipette {
                 font-weight: 800;
                 line-height: 40px;
                 text-align: right;
-                } 
+                }
             }
         }
             div.pipette-diagrams{
@@ -616,6 +616,10 @@ button{
     &:focus {
         outline: 0;
     }
+}
+
+.disabled {
+    pointer-events: none;
 }
 
 
