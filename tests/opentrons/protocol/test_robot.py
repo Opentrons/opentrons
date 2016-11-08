@@ -24,6 +24,23 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(len(self.robot._commands), 2)
         self.assertEquals(self.robot.connections['live'], None)
 
+    def test_stop_run(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
+
+        for i in range(1000):
+            p200.aspirate().dispense()
+
+        def _run():
+            self.assertRaises(RuntimeWarning, self.robot.run)
+
+        thread = threading.Thread(target=_run)
+        thread.start()
+
+        self.robot.stop()
+
+        thread.join()
+
     def test_calibrated_max_dimension(self):
 
         expected = self.robot._deck.max_dimensions(self.robot._deck)

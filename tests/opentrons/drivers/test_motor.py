@@ -97,7 +97,11 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.pause()
 
         def _move_head():
-            self.motor.move_head(x=100, y=0, z=0)
+            self.assertRaises(
+                RuntimeWarning,
+                self.motor.move_head,
+                **{'x': 100, 'y': 0, 'z': 0}
+            )
 
         thread = Thread(target=_move_head)
         thread.start()
