@@ -30,6 +30,7 @@ class Instrument(object):
         self.max_volume = None
 
     def reset(self):
+<<<<<<< Updated upstream
         pass
 
     def setup_simulate(self, mode='use_driver'):
@@ -40,8 +41,64 @@ class Instrument(object):
 
     def teardown_simulate(self):
         self.motor.live()
+=======
+        """
+        Placeholder for instruments to reset their state between runs
+        """
+        pass
+
+    def setup_simulate(self, *args, **kwargs):
+        """
+        Placeholder for instruments to prepare their state for simulation
+        """
+        pass
+
+    def teardown_simulate(self, *args, **kwargs):
+        """
+        Placeholder for instruments to reverse :meth:`setup_simulate`
+        """
+        pass
+>>>>>>> Stashed changes
 
     def create_command(self, do, setup=None, description=None, enqueue=True):
+        """
+        Creates an instance of Command to be appended to the
+        :any:`Robot` run queue.
+
+        Parameters
+        ----------
+        do : callable
+            The method to execute on the robot. This usually includes
+            moving an instrument's motors, or the robot head
+
+        setup : callable
+            The method to execute just before `do()`, which includes
+            updating the instrument's state
+
+        description : str
+            Human-readable description of the action taking place
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+
+        Examples
+        --------
+        ..
+        >>> instrument = Instrument()
+        >>> def setup():
+        >>>     print('hello')
+        >>> def do():
+        >>>     print(' world')
+        >>> description = 'printing "hello world"'
+        >>> instrument.create_command(do, setup, description)
+        >>> robot.simulate()
+        hello world
+        >>> instrument.create_command(do, setup, description, enqueue=False)
+        hello world
+        """
 
         command = Command(do=do, setup=setup, description=description)
 
@@ -50,6 +107,7 @@ class Instrument(object):
         else:
             command()
 
+<<<<<<< Updated upstream
     def get_calibration_dir(self):
         DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
         return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
@@ -58,12 +116,31 @@ class Instrument(object):
         return os.path.join(self.get_calibration_dir(), CALIBRATIONS_FILE)
 
     def init_calibrations(self):
+=======
+    def init_calibrations(self, key, attributes=None):
+>>>>>>> Stashed changes
         """
-        Creates empty calibrations data if not already present. Idempotent
-        :return:
+        Creates empty calibrations data if not already present
+
+        Parameters
+        ----------
+        key : str
+            The unique string to save this instrument's calibation data
+
+        attributes : list
+            The method to execute just before `do()`, which includes
+            updating the instrument's state
         """
+<<<<<<< Updated upstream
         if not os.path.isdir(self.get_calibration_dir()):
             os.mkdir(self.get_calibration_dir())
+=======
+        self.calibration_key = key
+        if isinstance(attributes, list):
+            self.persisted_attributes = attributes
+            for key in attributes:
+                self.persisted_defaults[key] = copy.copy(getattr(self, key))
+>>>>>>> Stashed changes
 
         file_path = self.get_calibration_file_path()
         if not os.path.isfile(file_path):
