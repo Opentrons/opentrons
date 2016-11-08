@@ -5,18 +5,13 @@ python:
 before_install:
 - openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
 install:
-- python setup.py install
-- pip install pylama
-- pip install coverage
-- pip install coveralls
-- pip install Sphinx==1.4.8
-- pip install numpydoc==0.6.0
+  - python setup.py install
+  - pip install -r requirements.txt
 script:
 - nosetests --with-coverage
 - pylama
 - cd docs && make html && cd ..
 - cd scripts && ./doc-deploy.sh && cd ..
-- python setup.py sdist bdist_wheel
 deploy:
   provider: script
   script:
