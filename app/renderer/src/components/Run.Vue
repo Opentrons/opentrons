@@ -3,8 +3,8 @@
     <button @click="runProtocol()" class="btn-run">Run Job</button>
     <div class="controls">
       <button @click="pauseProtocol()" class="btn btn-pause"></button>
-      <button @click="resumeProtocol()" class="btn btn-play">P</button> 
-      <button class="btn btn-clear">X</button>
+      <button @click="resumeProtocol()" class="btn btn-play"></button> 
+      <button class="btn btn-clear"></button>
     </div>
   </div>
 </template>
