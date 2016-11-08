@@ -28,8 +28,11 @@
 			</section>
 		</div>
 		<div class="pipette-diagrams" v-bind:class="currentMode">
-            <img src="../assets/img/pipette_top.png"/>
-        </div>
+      <img src="../assets/img/pipette_top.png" class="top"/>
+      <img src="../assets/img/pipette_bottom.png" class="bottom"/>
+      <img src="../assets/img/pipette_blowout.png" class="blow-out"/>
+      <img src="../assets/img/pipette_droptip.png" class="drop-tip"/>
+    </div>
 		</span>
 		<section class="calibrate tips">
 		<button @click="pickUpTip(currentAxis())" class="btn-calibrate move-to">PICK UP TIP</button>
