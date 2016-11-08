@@ -510,12 +510,34 @@ section#task-pipette {
                 }
             }
         }
-            div.pipette-diagrams{
+        div.pipette-diagrams{
             width:220px;
             flex:0 0 220px;
             img{
-                width:100%;
-                height:auto;
+                display:none;
+            }
+            &.top{
+                img.top{
+                  display:block; 
+                }
+            }
+
+            &.bottom{
+                img.bottom{
+                  display:block; 
+                }
+            }
+
+            &.blow-out{
+                img.blow-out{
+                  display:block; 
+                }
+            }
+
+            &.drop-tip{
+                img.drop-tip{
+                  display:block; 
+                }
             }
         }
 
