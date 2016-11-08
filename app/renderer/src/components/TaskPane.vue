@@ -3,7 +3,7 @@
     <aside id="step-list">
       <StepList></StepList>
     </aside>
-    <router-view></router-view>
+    <router-view :class="{'disabled': busy}"></router-view>
   </section>
 </template>
 
@@ -11,6 +11,7 @@
   import StepList from './StepList.vue'
 
   export default {
+    props: ["busy"],
     components: {
       StepList
     }

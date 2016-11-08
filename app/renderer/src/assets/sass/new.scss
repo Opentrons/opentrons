@@ -533,25 +533,25 @@ section#task-pipette {
             }
             &.top{
                 img.top{
-                  display:block; 
+                  display:block;
                 }
             }
 
             &.bottom{
                 img.bottom{
-                  display:block; 
+                  display:block;
                 }
             }
 
             &.blow-out{
                 img.blow-out{
-                  display:block; 
+                  display:block;
                 }
             }
 
             &.drop-tip{
                 img.drop-tip{
-                  display:block; 
+                  display:block;
                 }
             }
         }
@@ -655,10 +655,14 @@ button{
     }
 }
 
-.disabled {
+.disabled{
+  .btn, .btn-calibrate, .btn-home, button, .btn-jog, .pick-tip, .move-to, .save{
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.7;
+  }
 }
+
+
 
 
 

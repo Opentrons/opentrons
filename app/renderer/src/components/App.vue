@@ -18,7 +18,7 @@
     </section>
     <main id="container">
       <Jog :busy="robot_busy"></Jog>
-      <TaskPane>
+      <TaskPane :busy="robot_busy">
     </main>
   <div>
 </template>
