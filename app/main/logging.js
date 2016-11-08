@@ -2,7 +2,6 @@ const electron = require('electron')
 const fs = require('fs')
 const path = require('path')
 
-const {app} = electron
 const winston = require('winston')
 
 
@@ -11,6 +10,7 @@ function createLogger(path, name) {
 
   return new (winston.Logger)({
       transports: [
+          new (winston.transports.Console)(),
           new (winston.transports.File)({
               level: 'verbose',
               name: name,
