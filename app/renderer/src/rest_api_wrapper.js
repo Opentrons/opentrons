@@ -17,6 +17,7 @@ class OpenTrons {
     this.dropTipUrl = this.base_url + '/drop_tip'
     this.pauseProtocolUrl = this.base_url + '/pause'
     this.resumeProtocolUrl = this.base_url + '/resume'
+    this.cancelProtocolUrl = this.base_url + '/cancel'
     this.getPortsListUrl = this.base_url + '/robot/serial/list'
   }
 
@@ -154,6 +155,15 @@ class OpenTrons {
   resumeProtocol () {
     return Vue.http
       .get(this.resumeProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+  cancelProtocol () {
+    return Vue.http
+      .get(this.cancelProtocolUrl)
       .then((response) => {
         console.log("success", response)
       }, (response) => {

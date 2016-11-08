@@ -69,7 +69,6 @@
             coords.b = increment
             break;
         }
-        console.log(coords)
         this.$store.dispatch("jog", coords)
       },
       currentAxis() {
