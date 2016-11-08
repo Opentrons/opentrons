@@ -117,12 +117,14 @@ class Pipette(Instrument):
         self.calibration_data = {}
 
         # Pipette properties to persist between sessions
-        saved_attributes = ['calibration_data', 'positions', 'max_volume']
+        persisted_attributes = ['calibration_data', 'positions', 'max_volume']
         persisted_key = '{axis}:{name}'.format(
             axis=self.axis,
             name=self.name)
 
-        self.init_calibrations(key=persisted_key, attributes=saved_attributes)
+        self.init_calibrations(
+            key=persisted_key,
+            attributes=persisted_attributes)
         self.load_persisted_data()
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)

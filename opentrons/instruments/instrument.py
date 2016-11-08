@@ -96,13 +96,6 @@ class Instrument(object):
         else:
             command()
 
-    def get_calibration_dir(self):
-        DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
-        return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
-
-    def get_calibration_file_path(self):
-        return os.path.join(self.get_calibration_dir(), CALIBRATIONS_FILE)
-
     def init_calibrations(self, key, attributes=None):
         """
         Creates empty calibrations data if not already present
@@ -113,8 +106,7 @@ class Instrument(object):
             The unique string to save this instrument's calibation data
 
         attributes : list
-            The method to execute just before `do()`, which includes
-            updating the instrument's state
+            A list of this instrument's attribute names to be saved
         """
         self.calibration_key = key
         if isinstance(attributes, list):
@@ -131,6 +123,9 @@ class Instrument(object):
                 f.write(json.dumps({}))
 
     def update_calibrations(self):
+        """
+        Saves the instrument's peristed attributes to file
+        """
         last_persisted_data = self._read_calibrations()
 
         last_persisted_data[self.calibration_key] = (
@@ -144,6 +139,9 @@ class Instrument(object):
             f.write(json.dumps(last_persisted_data, indent=4))
 
     def load_persisted_data(self):
+        """
+        Loads and sets the instrument's peristed attributes from file
+        """
         last_persisted_data = self._get_calibration()
         if last_persisted_data:
             last_persisted_data = self._restore_vector(last_persisted_data)
@@ -152,29 +150,44 @@ class Instrument(object):
 
     def delete_calibration_data(self):
         """
-        Set the instrument's properties to their defaults,
-        and save those defaults to file
+        Set the instrument's properties to their initialized values,
+        and saves those initialized values to file
         """
         for key, val in self.persisted_defaults.items():
             setattr(self, key, val)
         self.update_calibrations()
 
     def delete_calibration_file(self):
+        """
+        Deletes the entire calibrations file
+        """
         file_path = self._get_calibration_file_path()
         if os.path.exists(file_path):
             os.remove(file_path)
 
     def _get_calibration_dir(self):
+        """
+        :return: the directory to save calibration data
+        """
         DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
         return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
 
     def _get_calibration_file_path(self):
+        """
+        :return: the absolute file path of the calibration file
+        """
         return os.path.join(self._get_calibration_dir(), CALIBRATIONS_FILE)
 
     def _get_calibration(self):
+        """
+        :return: this instrument's saved calibrations data
+        """
         return self._read_calibrations().get(self.calibration_key)
 
     def _build_calibration_data(self):
+        """
+        :return: copy of this instrument's persisted attributes
+        """
         calibration = {}
         for attr in self.persisted_attributes:
             calibration[attr] = copy.copy(getattr(self, attr))
@@ -193,6 +206,11 @@ class Instrument(object):
             return self._restore_vector(loaded_json)
 
     def _strip_vector(self, obj, root=True):
+        """
+        Iterates through a dictionary, converting Vector classes
+        to serializable dictionaries
+        :return: json of calibration data
+        """
         obj = (copy.deepcopy(obj) if root else obj)
         for key, val in obj.items():
             if isinstance(val, Vector):
@@ -204,6 +222,11 @@ class Instrument(object):
         return obj
 
     def _restore_vector(self, obj, root=True):
+        """
+        Iterates through a dictionary, converting serializable
+        Vector dictionaries to Vector classes
+        :return: json of calibration data
+        """
         obj = (copy.deepcopy(obj) if root else obj)
         for key, val in obj.items():
             if isinstance(val, dict):

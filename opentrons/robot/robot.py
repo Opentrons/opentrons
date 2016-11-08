@@ -718,7 +718,8 @@ class Robot(object, metaclass=Singleton):
                 cmd_run_event['name'] = 'command-failed',
                 cmd_run_event['error'] = str(e),
                 trace.EventBroker.get_instance().notify(cmd_run_event)
-                raise e
+                self.add_warning(str(e))
+                break
 
         return self._runtime_warnings
 
@@ -742,18 +743,14 @@ class Robot(object, metaclass=Singleton):
         for instrument in self._instruments.values():
             instrument.setup_simulate()
 
-        res = None
-        try:
-            res = self.run()
-        except Exception as e:
-            res = "Run exited with {}".format(e)
+        self.run()
 
         self.set_connection('live')
 
         for instrument in self._instruments.values():
             instrument.teardown_simulate()
 
-        return res
+        return self._runtime_warnings
 
     def set_connection(self, mode):
         if mode in self.connections:
