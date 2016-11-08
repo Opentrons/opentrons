@@ -30,7 +30,7 @@
 		<div class="pipette-diagrams">
             <img src="../assets/img/pipette_droptip.png"/>
         </div>
-		<span>
+		</span>
 		<section class="calibrate tips">
 		<button @click="pickUpTip(currentAxis())" class="btn-calibrate move-to">PICK UP TIP</button>
 		<button @click="dropTip(currentAxis())" class="btn-calibrate move-to">DROP TIP</button>

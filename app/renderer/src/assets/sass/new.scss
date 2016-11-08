@@ -480,7 +480,7 @@ Task Pipette
 ******************************/
 section#task-pipette {
     width: 510px;
-    height: 270px;
+    height: 290px;
     padding:30px;
     background-color: $well-bg;
     span{
@@ -522,6 +522,7 @@ section#task-pipette {
     }
     .calibrate.tips{
         width:200px;
+        height:10px;
         padding-left:120px;
         display:flex;
         flex-direction:row;
