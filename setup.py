@@ -34,7 +34,6 @@ TEST_SUITE = 'nose.collector'
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-print(PACKAGES)
 
 def read(*parts):
     """
