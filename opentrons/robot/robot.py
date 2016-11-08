@@ -492,6 +492,9 @@ class Robot(object, metaclass=Singleton):
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
+    def move_plunger(self, *args, **kwargs):
+        self._driver.move_plunger(*args, **kwargs)
+
     def head_speed(self, rate):
         self._driver.set_head_speed(rate)
 
