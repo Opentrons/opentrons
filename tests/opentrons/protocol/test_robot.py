@@ -16,6 +16,10 @@ class RobotTest(unittest.TestCase):
         self.robot.connect()
         self.robot.home(enqueue=False)
 
+    def test_home_after_disconnect(self):
+        self.robot.disconnect()
+        self.assertRaises(RuntimeError, self.robot.home)
+
     def test_simulate(self):
         self.robot.disconnect()
         p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
