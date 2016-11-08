@@ -39,13 +39,13 @@ function addMenu() {
           click() { openContainersFolder() }
         },
         {
-          label: `Auto Update this App`,
+          label: `Enable Auto Updating this App`,
           type: "checkbox",
           checked: getSetting("autoUpdate"),
           click() { toggleSetting("autoUpdate") }
         },
         {
-          label: `Anonymously Report Crashes`,
+          label: `Enable Anonymous Crash Reporting`,
           type: "checkbox",
           checked: getSetting("crashReport"),
           click() { toggleSetting("crashReport") }
@@ -68,8 +68,8 @@ function downloadLogs() {
 }
 
 function openContainersFolder() {
-  const containersFolderDir = app.getUserContainersPath();
-  shell.showItemInFolder(containersFolderDir);
+  const containersFolderDir = path.join(process.env.APP_DATA_DIR, 'containers');
+  shell.openItem(containersFolderDir);
 }
 
 function zip(source, destination) {
