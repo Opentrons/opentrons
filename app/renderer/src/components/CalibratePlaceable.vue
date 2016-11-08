@@ -2,8 +2,8 @@
 	<section id="task">
 		<h1 class="title">
 			Calibrate the {{this.instrument ? this.instrument.label : ""}}
-			pipette to the center of the {{this.placeable ? this.placeable.slot : ""}}
-			position of your {{this.placeable ? this.placeable.label : ""}} container
+			pipette to the center of the A1 well
+			of your {{this.placeable ? this.placeable.label : ""}} container
 		</h1>
 		<button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
 		<button class="btn-calibrate move-to" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
