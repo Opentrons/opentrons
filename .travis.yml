@@ -15,9 +15,7 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script:
-    - python setup.py sdist bdist_wheel
-    - twine upload dist/*
+  script: python setup.py sdist bdist_wheel && twine upload dist/*
   on:
     tags: true
 env:
