@@ -624,6 +624,7 @@ def calibrate_placeable():
         })
 
     calibrations = get_step_list()
+    emit_notifications(['Saved {}'.format(axis)], 'success')
 
     # TODO change calibration key to steplist
     return flask.jsonify({
@@ -662,6 +663,7 @@ def calibrate_plunger():
         })
 
     calibrations = get_step_list()
+    emit_notifications(['Saved {}'.format(axis)], 'success')
 
     # TODO change calibration key to steplist
     return flask.jsonify({
