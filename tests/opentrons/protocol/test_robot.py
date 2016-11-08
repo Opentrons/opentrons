@@ -78,7 +78,7 @@ class RobotTest(unittest.TestCase):
 
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 95 + 5},
+            {'z': 100},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]
@@ -86,7 +86,7 @@ class RobotTest(unittest.TestCase):
 
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 15.5 + 5},
+            {'z': 20.5 + 5},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]

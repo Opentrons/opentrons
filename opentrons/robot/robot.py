@@ -630,6 +630,8 @@ class Robot(object, metaclass=Singleton):
             ref_container = this_container
 
         _, _, tallest_z = self._calibrated_max_dimension(ref_container)
+        tallest_z += 5
+
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(tallest_z, robot_max_z)
 
