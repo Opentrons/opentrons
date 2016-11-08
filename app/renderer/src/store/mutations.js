@@ -4,7 +4,7 @@ import * as types from './mutation-types'
 const state = {
   is_connected: false,
   port: null,
-  fileName: "Select Protocol",
+  fileName: "",
   errors: [],
   warnings: false,
   tasks: [],

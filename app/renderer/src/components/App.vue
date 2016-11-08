@@ -10,8 +10,11 @@
         <Connect></Connect>
       </nav>
     </header>
-    <section id="protocol">
+    <section class="protocol">
       <Upload></Upload>
+      <Protocol></Protocol>
+      <ProgressBar></ProgressBar>
+      <Run></Run>
     </section>
     <main id="container">
       <Jog></Jog>
@@ -27,6 +30,9 @@
   import Jog from './Jog.vue'
   import Upload from './Upload.vue'
   import TaskPane from './TaskPane.vue'
+  import Run from './Run.vue'
+  import Protocol from './Protocol.vue'
+  import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
 
   export default {
@@ -36,7 +42,10 @@
       Home,
       Jog,
       Upload,
-      TaskPane
+      TaskPane,
+      Run,
+      Protocol,
+      ProgressBar
     }
   }
 </script>
