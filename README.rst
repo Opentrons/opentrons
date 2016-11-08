@@ -30,7 +30,7 @@ The Opentrons API is a simple framework designed to make writing automated biolo
 
 We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook. 
 
-.. code-block:: pycon
+.. code-block:: python
    
    pipette.aspirate(tube_1).dispense(tube_2)
 
@@ -38,7 +38,7 @@ That is how you tell the Opentrons robot to aspirate its the maximum volume of t
 
 You string these commands into full protocols that anyone with Opentrons can run. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into the first four wells in a 96 well plate called 'plate.'
 
-.. code-block:: pycon
+.. code-block:: python
    
    p200.aspirate(trough[1])
    p200.dispense(50, plate[0])
@@ -48,7 +48,7 @@ You string these commands into full protocols that anyone with Opentrons can run
 
 If you wanted to do enough times to fill a 96 well plate, you could write it like this:
 
-.. code-block:: pycon
+.. code-block:: python
    
    #define how much volume to dispense in each well
    dispense_vol = 50
@@ -63,7 +63,7 @@ Hello World
 
 Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
 
-.. code-block:: pycon
+.. code-block:: python
 
   # First, import opentrons API modules
   from opentrons.robot import Robot
@@ -106,7 +106,7 @@ Basic Principles
 
 **Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
 
-.. code-block:: pycon
+.. code-block:: python
 
   p200.aspirate(100, plate['A1']).dispense(plate['A2'])
 
@@ -118,7 +118,7 @@ Is exactly what you think it would do:
 **Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
 For example:
 
-.. code-block:: pycon
+.. code-block:: python
 
   p200.aspirate(100, plate[0]).dispense(plate[1])
 
@@ -126,7 +126,7 @@ while using 0 or 1 instead of 'A1' and 'A2' will do just the same.
 
 or
 
-.. code-block:: pycon
+.. code-block:: python
 
   p200.aspirate(100, plate[0].bottom())
 
@@ -142,7 +142,7 @@ If you are familiar with python and comfortable running ``pip``, you can install
 
   pip install opentrons
 
-## What's next?
+What's next?
 ---------------
 * Start with `Setting up Opentrons API`_ in `Jupyter <http://jupyter.org/>`_.
 * Write your first `Hello World API Protocol`_.
