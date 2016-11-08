@@ -507,7 +507,7 @@ section#task-pipette {
                 font-weight: 800;
                 line-height: 40px;
                 text-align: right;
-                } 
+                }
             }
         }
             div.pipette-diagrams{
@@ -608,6 +608,10 @@ button{
     &:focus {
         outline: 0;
     }
+}
+
+.disabled {
+    pointer-events: none;
 }
 
 

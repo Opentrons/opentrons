@@ -1,5 +1,5 @@
 <template>
-  <nav class="home">
+  <nav class="home" :class="{'disabled': busy}">
     <span class="label">HOME: </span>
     <span @click="home('x')" :class="['btn-home', busy]">X</span>
     <span @click="home('y')" :class="['btn-home', busy]">Y</span>
@@ -13,17 +13,11 @@
 <script>
   export default {
     name: "Home",
+    props: ["busy"],
     methods: {
       home(axis) {
         console.log(axis)
         this.$store.dispatch('home', {axis: axis})
-      }
-    },
-    computed: {
-      busy: function () {
-        return {
-          'disabled': this.$store.state.busy
-        }
       }
     }
   }
