@@ -7,8 +7,8 @@
 		</h1>
 		<button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
 		<button class="btn-calibrate move-to" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
-		<button class="btn-calibrate move-to" @click="pickUpTip(instrument)">PICK UP TIP</button>
-		<button class="btn-calibrate move-to" @click="dropTip(instrument)">DROP TIP</button>
+		<button v-show="placeableType('tiprack')" class="btn-calibrate move-to" @click="pickUpTip(instrument)">PICK UP TIP</button>
+		<button v-show="placeableType('tiprack')" class="btn-calibrate move-to" @click="dropTip(instrument)">DROP TIP</button>
 		<div class="well-img">
 			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
 			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>

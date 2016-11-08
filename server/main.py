@@ -616,6 +616,8 @@ def calibrate_placeable():
     axis = request.json.get("axis")
     try:
         _calibrate_placeable(name, axis)
+        calibrations = get_step_list()
+        emit_notifications(['Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -623,8 +625,6 @@ def calibrate_placeable():
             'data': str(e)
         })
 
-    calibrations = get_step_list()
-    emit_notifications(['Saved {}'.format(axis)], 'success')
 
     # TODO change calibration key to steplist
     return flask.jsonify({
@@ -655,6 +655,7 @@ def calibrate_plunger():
     axis = request.json.get("axis")
     try:
         _calibrate_plunger(position, axis)
+        emit_notifications(['Saved {0} on the {1} pipette'.format(position, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -663,7 +664,6 @@ def calibrate_plunger():
         })
 
     calibrations = get_step_list()
-    emit_notifications(['Saved {}'.format(axis)], 'success')
 
     # TODO change calibration key to steplist
     return flask.jsonify({
