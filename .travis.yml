@@ -14,7 +14,7 @@ install:
 script:
 - nosetests --with-coverage
 - pylama
-- cd docs && make html && make doctest && cd ..
+- cd docs && make html && cd ..
 - cd scripts && ./doc-deploy.sh && cd ..
 - python setup.py sdist bdist_wheel
 deploy:
