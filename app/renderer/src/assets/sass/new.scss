@@ -71,12 +71,6 @@ $secondary-btn: lighten( $secondary-brand,15%);
     text-align: center;
 }
 
-
-
-
-
-
-
 body {
     font-size: $basesize;
     font-family: $stack-sans;
@@ -489,12 +483,18 @@ section#task-pipette {
     height: 270px;
     padding:30px;
     background-color: $well-bg;
-    div.calibrate-pipette{
+    span{
+        width: 510px;
+        height: 220px;
+        display:flex;
+        flex-directon:row;
+        div.calibrate-pipette{
         width:300px;
         display:flex;
         flex-direction:column;
+        flex:0 0 300px;
         .calibrate{
-            width:300px;
+            width:290px;
             display:flex;
             flex-direction:row;
             justify-content:flex-end;
@@ -507,17 +507,26 @@ section#task-pipette {
                 font-weight: 800;
                 line-height: 40px;
                 text-align: right;
+                } 
             }
         }
+            div.pipette-diagrams{
+            width:220px;
+            flex:0 0 220px;
+            img{
+                width:100%;
+                height:auto;
+            }
+        }
+
     }
     .calibrate.tips{
         width:200px;
-        padding-left:130px;
+        padding-left:120px;
         display:flex;
         flex-direction:row;
         justify-content:flex-end;
     }
-
 }
 
 

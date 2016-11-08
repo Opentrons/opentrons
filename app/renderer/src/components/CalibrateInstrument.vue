@@ -1,6 +1,7 @@
 <template>
 	<section id="task-pipette">
 		<h1 class="title">Calibrate the p10 pipette</h1>
+		<span>
 		<div class="calibrate-pipette">
 			<section class="calibrate top">
 				<span class="title">TOP</span>
@@ -26,6 +27,10 @@
 				<button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
 			</section>
 		</div>
+		<div class="pipette-diagrams">
+            <img src="../assets/img/pipette_droptip.png"/>
+        </div>
+		<span>
 		<section class="calibrate tips">
 		<button @click="pickUpTip(currentAxis())" class="btn-calibrate move-to">PICK UP TIP</button>
 		<button @click="dropTip(currentAxis())" class="btn-calibrate move-to">DROP TIP</button>
