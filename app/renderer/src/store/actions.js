@@ -104,6 +104,12 @@ const actions = {
       // commit(types.UPDATE_RUN_STATE, results)
     })
   },
+  cancelProtocol({ commit }) {
+    OpenTrons.cancelProtocol().then((results) => {
+      console.log(results)
+      // commit(types.UPDATE_RUN_STATE, results)
+    })
+  },
   moveToPosition ({commit}, data) {
     let type = "plunger"
     if (data.slot) { type = "placeable" }

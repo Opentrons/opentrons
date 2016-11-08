@@ -166,6 +166,7 @@ def run():
 @app.route("/pause", methods=["GET"])
 def pause():
     result = robot.pause()
+    emit_notifications(['Protocol paused'], 'info')
 
     return flask.jsonify({
         'status': 'success',
@@ -176,6 +177,7 @@ def pause():
 @app.route("/resume", methods=["GET"])
 def resume():
     result = robot.resume()
+    emit_notifications(['Protocol resumed'], 'info')
 
     return flask.jsonify({
         'status': 'success',
@@ -183,13 +185,14 @@ def resume():
     })
 
 
-@app.route("/stop", methods=["GET"])
+@app.route("/cancel", methods=["GET"])
 def stop():
-    robot.stop()
+    result = robot.stop()
+    emit_notifications(['Protocol stopped'], 'info')
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 
