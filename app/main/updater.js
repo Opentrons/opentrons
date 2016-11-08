@@ -3,11 +3,12 @@ const {app, dialog, autoUpdater} = electron;
 const {getSetting} = require('./preferences')
 const {getLogger} = require('./logging.js')
 
-const mainLogger = getLogger('electron-main')
 var UPDATE_SERVER_URL =  'http://ot-app-releases.herokuapp.com';
 
 
 function initAutoUpdater () {
+  const mainLogger = getLogger('electron-main')
+
   autoUpdater.on(
     'error',
     (err) => mainLogger.log(`Update error: ${err.message}`)
