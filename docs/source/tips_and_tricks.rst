@@ -20,7 +20,7 @@ The following examples assume the containers and pipettes:
       
   p200 = instruments.Pipette(axis="b")
 
-.. testcode:: long
+.. testsetup:: long
   
   from opentrons.robot import Robot
   Robot().reset()
