@@ -8,7 +8,13 @@ const actions = {
   connect_robot ({ commit }, port) {
     const payload = {is_connected: true, 'port': port}
     OpenTrons.connect(port).then((was_successful) => {
-      if (was_successful) commit(types.UPDATE_ROBOT_CONNECTION, payload)
+      if (was_successful) {
+        commit(types.UPDATE_ROBOT_CONNECTION, payload)
+        OpenTrons.getVersions().then((result) => {
+          let versions = result
+          commit(types.UPDATE_ROBOT_VERSIONS, {versions})
+        })
+      }
     })
   },
   disconnect_robot ({ commit }) {

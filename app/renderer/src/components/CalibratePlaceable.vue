@@ -1,7 +1,10 @@
 <template>
 	<section id="task">
-		<h1 class="title">Calibrate the {{this.instrument.label}}
-			pipette to the center of the {{this.placeable.slot}} position of your {{this.placeable.label}} container</h1>
+		<h1 class="title">
+			Calibrate the {{this.instrument ? this.instrument.label : ""}}
+			pipette to the center of the {{this.placeable ? this.placeable.slot : ""}}
+			position of your {{this.placeable ? this.placeable.label : ""}} container
+		</h1>
 		<button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
 		<button class="btn-calibrate move-to" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
 		<button class="btn-calibrate move-to" @click="pickUpTip(instrument)">PICK UP TIP</button>
@@ -47,8 +50,9 @@
 				})[0]
 			},
 			currentPlaceable(tasks) {
+				if (!this.currentInstrument(tasks)) this.$router.push("/")
 				return this.currentInstrument(tasks).placeables.filter((placeable) => {
-					return placeable.label ==  this.$route.params.placeable
+					return placeable.label == this.$route.params.placeable
 				})[0]
 			},
 			containerType(type){

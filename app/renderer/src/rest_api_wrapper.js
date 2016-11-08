@@ -19,6 +19,7 @@ class OpenTrons {
     this.resumeProtocolUrl = this.base_url + '/resume'
     this.cancelProtocolUrl = this.base_url + '/cancel'
     this.getPortsListUrl = this.base_url + '/robot/serial/list'
+    this.versionUrl = this.base_url + '/robot/versions'
   }
 
   getPortsList() {
@@ -112,7 +113,7 @@ class OpenTrons {
         result.errors = data.errors
         result.warnings = data.warnings
         result.calibrations = data.calibrations || []
-        if (data.errors.length > 0) {
+        if (data.errors && data.errors.length > 0) {
           result.success = false
         }
         result.fileName = data.fileName
@@ -209,6 +210,16 @@ class OpenTrons {
         .then((response) => {
             console.log(response)
             console.log(`Homing ${axis}`)
+        }, (response) => {
+            console.log('failed to home', response)
+        })
+  }
+
+  getVersions () {
+    return Vue.http
+        .get(this.versionUrl)
+        .then((response) => {
+          return response.body.versions
         }, (response) => {
             console.log('failed to home', response)
         })

@@ -14,7 +14,8 @@ const state = {
   run_state: "ready",
   run_log: [],
   run_plan: [],
-  busy: false
+  busy: false,
+  versions: []
 }
 
 const mutations = {
@@ -52,6 +53,9 @@ const mutations = {
   },
   [types.UPDATE_ROBOT_STATE] (state, payload) {
     state.busy = payload.busy
+  },
+  [types.UPDATE_ROBOT_VERSIONS] (state, payload) {
+    state.versions = payload.versions
   }
 }
 

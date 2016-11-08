@@ -29,7 +29,9 @@
     },
     watch: {
       taskListLen: function() {
-        this.$router.push(this.$store.state.tasks[0].placeables[0].href)
+        if (this.$store.state.tasks[0]) {
+          this.$router.push(this.$store.state.tasks[0].placeables[0].href)
+        }
       }
     }
   }
