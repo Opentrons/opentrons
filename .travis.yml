@@ -6,11 +6,7 @@ python:
 
 install:
   - python setup.py install
-  - pip install pylama
-  - pip install coverage
-  - pip install coveralls
-  - pip install Sphinx==1.4.8
-  - pip install numpydoc==0.6.0
+  - pip install -r requirements.txt
 
 script:
   - nosetests --with-coverage
