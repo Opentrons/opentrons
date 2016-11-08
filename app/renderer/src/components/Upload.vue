@@ -10,6 +10,11 @@
 <script>
   export default {
     name: 'Upload',
+    computed: {
+      next() {
+        return this.$store.state.tasks[0].placeables[0].href
+      }
+    },
     methods: {
       fileChange(e) {
         let files = e.target.files || e.dataTransfer.files
@@ -19,7 +24,7 @@
         let formData = new FormData();
         formData.append("file", this.$refs.form.file.files[0])
         this.$store.dispatch("uploadProtocol", formData)
-        this.$router.push('/')
+        this.$router.push(this.next)
         return false
       }
     }
