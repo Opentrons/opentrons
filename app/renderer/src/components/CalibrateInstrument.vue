@@ -28,7 +28,7 @@
 			</section>
 		</div>
 		<div class="pipette-diagrams">
-            <img src="../assets/img/pipette_droptip.png"/>
+            <img src="../assets/img/pipette_top.png"/>
         </div>
 		</span>
 		<section class="calibrate tips">
