@@ -28,6 +28,9 @@ app = Flask(__name__,
             static_folder=STATIC_FOLDER,
             template_folder=TEMPLATES_FOLDER
             )
+
+app.config['LOGGER_NAME'] = 'opentrons-app'
+
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
@@ -678,15 +681,17 @@ def get_run_plan():
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
 def on_connect():
+    print(app.debug)
     print('connected to front end...')
 
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    datefmt='%d-%m-%y %H:%M:%S'
-)
-
+@app.before_request
+def log_request():
+    log_msg = "{method} {url} | {data}".format(
+        method=request.method,
+        url=request.url,
+        data=request.data,
+    )
+    app.logger.info(log_msg)
 
 if __name__ == "__main__":
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
@@ -697,8 +702,16 @@ if __name__ == "__main__":
 
     _start_connection_watcher()
 
+    import log  # NOQA
+    lg = logging.getLogger(app.logger_name)
+    lg.info('Starting Flask Server')
+
     socketio.run(
         app,
-        debug=IS_DEBUG,
+        debug=True,
+        use_reloader=False,
+        log_output=False,
+        engineio_logger=False,
         port=31950
     )
+
