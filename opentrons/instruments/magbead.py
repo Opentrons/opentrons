@@ -15,13 +15,23 @@ class Magbead(Instrument):
             name = self.__class__.__name__
         self.name = name
 
-        # all instruments should hold calibration data, even if not used
-        self.calibration_data = {}
+        self.persisted_data = []
+
+        self.calibration_key = "{axis}:{instrument_name}".format(
+            axis=self.axis,
+            instrument_name=self.name
+        )
 
         # a reference to the placeable set ontop the magbead module
         self.container = container
 
         self.engaged = False
+
+        persisted_key = '{axis}:{name}'.format(
+            axis=self.axis,
+            name=self.name)
+        self.init_calibrations(key=persisted_key)
+        self.load_persisted_data()
 
     def engage(self, enqueue=True):
         def _setup():

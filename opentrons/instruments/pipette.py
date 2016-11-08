@@ -86,8 +86,6 @@ class Pipette(Instrument):
             name = self.__class__.__name__
         self.name = name
 
-        self.calibration_data = {}
-
         self.trash_container = trash_container
         self.tip_racks = tip_racks
 
@@ -116,7 +114,15 @@ class Pipette(Instrument):
         }
         self.calibrated_positions = copy.deepcopy(self.positions)
 
-        self.init_calibrations()
+        self.calibration_data = {}
+
+        # Pipette properties to persist between sessions
+        saved_attributes = ['calibration_data', 'positions', 'max_volume']
+        persisted_key = '{axis}:{name}'.format(
+            axis=self.axis,
+            name=self.name)
+
+        self.init_calibrations(key=persisted_key, attributes=saved_attributes)
         self.load_persisted_data()
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
