@@ -1,5 +1,5 @@
 <template>
-  <div class="connect">
+  <nav class="connect">
     <select @change="searchIfNecessary()" v-model="ports.selected" id="connections">
       <option value="default">Select a port</option>
       <option value="refresh-list">&#8635 refresh</option>
@@ -7,7 +7,12 @@
         {{ option.text }}
       </option>
     </select>
-  </div>
+    
+<div id="indicator" :class="{ 'connected': connected}"></div>
+
+    
+  </nav>
+  
 </template>
 
 <script>
