@@ -176,11 +176,8 @@ class CNCDriver(object):
         self.stopped.clear()
 
     def stop(self):
-        if self.current_commands:
-            self.stopped.set()
-            self.can_move.set()
-        else:
-            self.resume()
+        self.stopped.set()
+        self.can_move.set()
 
     def send_command(self, command, **kwargs):
         """
@@ -337,7 +334,7 @@ class CNCDriver(object):
         while self.can_move.wait():
             if self.stopped.is_set():
                 self.resume()
-                return (False, self.STOPPED)
+                raise RuntimeWarning('Stop signal received')
             if self.current_commands:
                 args = self.current_commands.pop(0)
             else:

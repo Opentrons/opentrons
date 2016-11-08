@@ -85,10 +85,8 @@ class Robot(object, metaclass=Singleton):
         only once instance of a robot.
         """
         self.can_pop_command = Event()
-        self.stopped_event = Event()
 
         self.can_pop_command.set()
-        self.stopped_event.clear()
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
@@ -695,9 +693,8 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event.update(kwargs)
 
         mode = 'live'
-        if isinstance(
-                self._driver.connection, virtual_smoothie.VirtualSmoothie
-        ):
+        if isinstance(self._driver.connection,
+                      virtual_smoothie.VirtualSmoothie):
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
@@ -708,9 +705,6 @@ class Robot(object, metaclass=Singleton):
             })
             try:
                 self.can_pop_command.wait()
-                if self.stopped_event.is_set():
-                    self.resume()
-                    break
                 if command.description:
                     log.info("Executing: {}".format(command.description))
                 command()
@@ -721,7 +715,8 @@ class Robot(object, metaclass=Singleton):
                 cmd_run_event['name'] = 'command-failed',
                 cmd_run_event['error'] = str(e),
                 trace.EventBroker.get_instance().notify(cmd_run_event)
-                raise e
+                self.add_warning(str(e))
+                break
 
         return self._runtime_warnings
 
@@ -745,14 +740,14 @@ class Robot(object, metaclass=Singleton):
         for instrument in self._instruments.values():
             instrument.setup_simulate()
 
-        res = self.run()
+        self.run()
 
         self.set_connection('live')
 
         for instrument in self._instruments.values():
             instrument.teardown_simulate()
 
-        return res
+        return self._runtime_warnings
 
     def set_connection(self, mode):
         if mode in self.connections:
@@ -875,22 +870,19 @@ class Robot(object, metaclass=Singleton):
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """
         self.can_pop_command.clear()
-        self.stopped_event.clear()
         self._driver.pause()
 
     def stop(self):
         """
         Stops execution of the protocol.
         """
-        self.stopped_event.set()
-        self.can_pop_command.set()
         self._driver.stop()
+        self.can_pop_command.set()
 
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
         """
-        self.stopped_event.clear()
         self.can_pop_command.set()
         self._driver.resume()
 
