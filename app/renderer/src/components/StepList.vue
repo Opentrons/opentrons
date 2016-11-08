@@ -36,6 +36,12 @@
       tasks() {
         return this.$store.state.tasks
       }
+    },
+    beforeUpdate: function() {
+      if(this.$store.state.tasks[0]){
+        this.$router.push(this.$store.state.tasks[0].placeables[0].href)
+      }      
     }
   }
+    
 </script>

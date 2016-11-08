@@ -36,6 +36,7 @@ const actions = {
       commit(types.UPDATE_WARNINGS, {warning: result.warnings})
       commit(types.UPDATE_ERROR, {errors: result.errors})
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+
     })
     OpenTrons.getRunPlan().then((plan) => {
       commit(types.UPDATE_RUN_PLAN, {run_plan: plan})

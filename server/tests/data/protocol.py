@@ -26,7 +26,7 @@ trash = containers.load(
 )
 
 p1000 = instruments.Pipette(
-    name="p1000",
+    name="p1000 blah blah testing testing",
     trash_container=trash,
     tip_racks=[tiprack],
     min_volume=10,  # These are variable
