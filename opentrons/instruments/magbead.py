@@ -3,6 +3,10 @@ from opentrons.instruments.instrument import Instrument
 
 
 class Magbead(Instrument):
+    """
+    Through this class you can can:
+        * Control the Magbead module to :meth:`engage` or :meth:`disengage`
+    """
 
     def __init__(self, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
@@ -34,6 +38,19 @@ class Magbead(Instrument):
         self.load_persisted_data()
 
     def engage(self, enqueue=True):
+        """
+        Move the Magbead platform upwards,
+        bringing the magnetic field close to the wells
+
+        Parameters
+        ----------
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+        """
         def _setup():
             self.engaged = True
 
@@ -51,6 +68,19 @@ class Magbead(Instrument):
         return self
 
     def disengage(self, enqueue=True):
+        """
+        Move the Magbead platform downwards,
+        lowering the magnetic field away to the wells
+
+        Parameters
+        ----------
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+        """
         def _setup():
             self.engaged = False
 
@@ -68,6 +98,20 @@ class Magbead(Instrument):
         return self
 
     def delay(self, seconds, enqueue=True):
+        """
+        Pause the robot for a given number of seconds
+
+        Parameters
+        ----------
+        seconds : int or float
+            The number of seconds to delay
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+        """
         def _setup():
             pass
 
