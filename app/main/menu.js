@@ -1,8 +1,12 @@
 module.exports.addMenu = addMenu;
 
+const path = require('path')
+
 const electron = require("electron");
-const {app, dialog, Menu, MenuItem, shell} = electron;
+const {app, dialog, Menu, shell} = electron;
+const moment = require('moment-timezone')
 const zipFolder = require('zip-folder');
+
 const {getSetting, toggleSetting} = require('./preferences')
 
 function addMenu() {
@@ -56,8 +60,9 @@ function addMenu() {
 function downloadLogs() {
   selectDirectory((folder) => {
     if(folder) {
-      const destination = path.join(process.APP_DATA_DIR, 'otone_data.zip');
-      zip(source, destination);
+      const timeStamp = moment().tz('America/New_York').format()
+      const destination = path.join(folder[0], `otone-data-${timeStamp}.zip`);
+      zip(process.env.APP_DATA_DIR, destination);
     };
   });
 }
