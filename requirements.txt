@@ -1,4 +1,4 @@
-coverall
+coveralls
 coverage==4.2
 nose==1.3.7
 numpydoc==0.6.0
