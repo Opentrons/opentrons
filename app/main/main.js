@@ -14,8 +14,6 @@ const {initAutoUpdater} = require('./updater.js')
 let serverManager = new ServerManager()
 let mainWindow
 
-fs.rmdirSync(path.join(app.getPath("userData"), "Cache"))
-
 if (process.env.NODE_ENV == 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
@@ -23,6 +21,7 @@ if (process.env.NODE_ENV == 'development'){
 function createWindow () {
   mainWindow = new BrowserWindow({width: 1200, height: 900})
   // TODO: use FLASK port when not in development
+  mainWindow.webContents.clearHistory()
   mainWindow.loadURL("http://127.0.0.1:31950")
 
   mainWindow.on('closed', function () {
