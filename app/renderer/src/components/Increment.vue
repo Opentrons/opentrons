@@ -16,11 +16,7 @@
         this.$store.dispatch("selectIncrement", {inc: i})
       },
       active(i) {
-        if (this.placeable) {
-          return this.$store.state.current_increment_placeable === i
-        } else {
-          return this.$store.state.current_increment_plunger === i
-        }
+        return this.$store.state.current_increment_placeable === i       
       }
     }
   }
