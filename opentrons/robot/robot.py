@@ -715,7 +715,7 @@ class Robot(object, metaclass=Singleton):
                 cmd_run_event['name'] = 'command-failed',
                 cmd_run_event['error'] = str(e),
                 trace.EventBroker.get_instance().notify(cmd_run_event)
-                self.add_warning(e)
+                self.add_warning(str(e))
                 break
 
         return self._runtime_warnings

@@ -31,8 +31,11 @@ class RobotTest(unittest.TestCase):
         for i in range(1000):
             p200.aspirate().dispense()
 
+        res = None
+
         def _run():
-            self.assertRaises(RuntimeWarning, self.robot.run)
+            nonlocal res
+            res = self.robot.run()
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -40,6 +43,8 @@ class RobotTest(unittest.TestCase):
         self.robot.stop()
 
         thread.join()
+
+        self.assertEquals(res[-1], 'Stop signal received')
 
     def test_calibrated_max_dimension(self):
 
