@@ -19,8 +19,17 @@
         let formData = new FormData();
         formData.append("file", this.$refs.form.file.files[0])
         this.$store.dispatch("uploadProtocol", formData)
-        this.$router.push('/')
         return false
+      }
+    },
+    computed: {
+      taskListLen (){
+        return this.$store.state.tasks.length > 0
+      }
+    },
+    watch: {
+      taskListLen: function() {
+        this.$router.push(this.$store.state.tasks[0].placeables[0].href)
       }
     }
   }

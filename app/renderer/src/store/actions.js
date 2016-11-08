@@ -30,12 +30,14 @@ const actions = {
         addHrefs(tasks)
         commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
         commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
+
       } else {
         commit(types.UPDATE_TASK_LIST, {tasks: []})
       }
       commit(types.UPDATE_WARNINGS, {warning: result.warnings})
       commit(types.UPDATE_ERROR, {errors: result.errors})
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+
     })
     OpenTrons.getRunPlan().then((plan) => {
       commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
