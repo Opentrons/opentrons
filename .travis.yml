@@ -3,7 +3,7 @@ language: python
 python:
 - '3.4'
 before_install:
-- openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out ~\/.pypirc -d
+- openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
 install:
 - python setup.py install
 - pip install pylama
@@ -16,6 +16,14 @@ script:
 - pylama
 - cd docs && make html && make doctest && cd ..
 - cd scripts && ./doc-deploy.sh && cd ..
+- python setup.py sdist bdist_wheel
+deploy:
+  provider: script
+  script:
+    - python setup.py sdist bdist_wheel
+    - twine upload dist/*
+  on:
+    tags: true
 env:
   global:
   - ENCRYPTION_LABEL: c6cefc96bb2c
