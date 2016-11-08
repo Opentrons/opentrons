@@ -67,7 +67,7 @@ const actions = {
   moveToPlaceable({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     Vue.http
-    .post('http://localhost:5000/move_to_container', JSON.stringify(data), {emulateJSON: true})
+    .post('http://localhost:31950/move_to_container', JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
        commit(types.UPDATE_ROBOT_STATE, {'busy': false})
        console.log('success',response)
