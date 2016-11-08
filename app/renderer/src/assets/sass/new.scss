@@ -573,6 +573,14 @@ Buttons
     background: $primary-brand url(../assets/img/pause.png) no-repeat center;
 }
 
+.btn-play{
+    background: $primary-brand url(../assets/img/play.png) no-repeat center;
+}
+
+.btn-clear{
+    background: $primary-brand url(../assets/img/clear.png) no-repeat center;
+}
+
 
 .btn-calibrate{
     flex:0 0;
