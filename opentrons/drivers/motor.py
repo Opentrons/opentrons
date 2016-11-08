@@ -201,20 +201,23 @@ class CNCDriver(object):
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         log.debug("Write: {}".format(str(data).encode()))
-        if self.connection is None:
-            log.warn("No connection found.")
-            return
         if self.is_connected():
             self.connection.write(str(data).encode())
             return self.wait_for_response()
+        elif self.connection is None:
+            msg = "No connection found."
+            log.warn(msg)
+            raise RuntimeError(msg)
         elif max_tries > 0:
             self.reset_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
         else:
-            log.error("Cannot connect to serial port.")
-            return b''
+            msg = "Cannot connect to serial port {}".format(
+                self.connection.port)
+            log.error(msg)
+            raise RuntimeError(msg)
 
     def wait_for_response(self, timeout=20.0):
         count = 0
