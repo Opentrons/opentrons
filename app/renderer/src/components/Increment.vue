@@ -1,7 +1,7 @@
 <template>
   <section id="increment">
     <div v-for="i in increments" @click="selectIncrement(i)">
-      <input type="radio" :id="i" name="increment" :value="i" />
+      <input type="radio" :id="i" name="increment" :value="i" :checked="active(i)" />
       <label :for="i"><span></span>{{i}}</label>
     </div>
   </section>
@@ -14,6 +14,13 @@
     methods: {
       selectIncrement(i) {
         this.$store.dispatch("selectIncrement", {inc: i})
+      },
+      active(i) {
+        if (this.placeable) {
+          return this.$store.state.current_increment_placeable === i
+        } else {
+          return this.$store.state.current_increment_plunger === i
+        }
       }
     }
   }
