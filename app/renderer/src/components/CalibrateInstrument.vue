@@ -21,7 +21,7 @@
 				<button @click="moveToPlungerPosition(currentAxis(), 'blow_out')" class="btn-calibrate move-to">MOVE TO</button>
 			</section>
 
-			<section class="calibrate drop-tip">
+			<section class="calibrate drop-tip" @hover="currentPosition('drop-tip')">
 				<span class="title">DROP TIP</span>
 				<button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class="btn-calibrate save">SAVE</button>
 				<button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
@@ -44,6 +44,9 @@
     methods: {
 			currentAxis() {
 				return this.$route.params.instrument
+			},
+			currentPosition(pos){
+
 			},
     	calibrateInstrument(axis, position) {
     		this.$store.dispatch("calibrate", {axis, position})
