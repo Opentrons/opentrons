@@ -4,18 +4,14 @@ language: python
 python:
   - "3.4"
 
-install: 
+install:
   - python setup.py install
-  - pip install pylama
-  - pip install coverage
-  - pip install coveralls
-  - pip install Sphinx==1.4.8
-  - pip install numpydoc==0.6.0
+  - pip install -r requirements.txt
 
-script: 
+script:
   - nosetests --with-coverage
   - pylama
-  - cd docs && make html && cd ..
+  - cd docs && make html && make doctest && cd ..
   - cd scripts && ./doc-deploy.sh && cd ..
 
 env:
@@ -25,5 +21,3 @@ env:
 
 after_success:
   coveralls
-
-  
