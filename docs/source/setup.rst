@@ -10,12 +10,10 @@ Install Anaconda and Python 3
 
 To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install Anaconda_: (https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
-Install Jupyter
----------------
+Add Opentrons Channel
+---------------------
 
-After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](http://jupyter.readthedocs.io/en/latest/install.html).
-
-If you have finished setting up Python 3 and you have finished going through the Jupyter installation guide it is now time to run Jupyter.
+After installing Anaconda, run Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
 
 Launch Jupyter Notebook App
 ---------------------------
@@ -46,11 +44,15 @@ A new tab should open in your browser and you should have an empty text box.
 Install Opentrons API
 ---------------------
 
-After running the aforementioned step a new text box will appear for you to write code in. We will use this text box to install the Opentrons API.
+In Jupyter click `Conda`. Find and install `opentrons` package. Make sure to check for updates!
 
-* Copy paste this statement into the new text box `!pip install --upgrade git+https://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons`
+After this step you should be able to run:
 
-The should execute the installation process of the Opentrons API. The last line of this installation process should say `Successfully installed opentrons-sdk-1.0`
+::
+  import opentrons
+  opentrons.__version__
+
+Which should return the version of opentrons package installed.
 
 If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
 
