@@ -11,5 +11,7 @@ conda info -a
 conda install anaconda-client conda-build
 
 conda config --set anaconda_upload yes
-anaconda login --username opentrons --password $ANACONDA_PASSWORD
+# Add opentrons channel to look for dependencies that are not maintained by Continuum
+conda config --add channels opentrons
+anaconda login --username opentrons --password "$ANACONDA_PASSWORD"
 conda build conda.recipe
