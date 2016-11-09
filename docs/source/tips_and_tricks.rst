@@ -5,7 +5,7 @@ Opentrons API Tips and Tricks
 
 The following examples assume the containers and pipettes:
 
-.. testsetup:: main
+.. testsetup:: tips_main
 
   from opentrons.robot import Robot
   from opentrons import containers, instruments
@@ -18,14 +18,26 @@ The following examples assume the containers and pipettes:
   trough = containers.load('trough-12row', 'C1')
   trash = containers.load('point', 'C2')
       
-  p200 = instruments.Pipette(axis="b")
+  p200 = instruments.Pipette(axis="b", max_volume=200)
 
-.. testcode:: long
+.. testsetup:: tips_demo
   
   from opentrons.robot import Robot
   Robot().reset()
 
-.. testcode:: long
+.. testcleanup:: tips_main
+  
+  import opentrons
+  from opentrons.robot import Robot
+  del opentrons.robot.robot.Singleton._instances[Robot]
+
+.. testcleanup:: tips_demo
+  
+  import opentrons
+  from opentrons.robot import Robot
+  del opentrons.robot.robot.Singleton._instances[Robot]
+
+.. testcode:: tips_demo
 
   from opentrons.robot import Robot
   from opentrons import containers, instruments
@@ -45,7 +57,7 @@ Basics
 Simple Transfer
 ---------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   robot.clear_commands()        # deletes all previously created commands
 
@@ -60,12 +72,12 @@ Running on a Robot
 
 List your serial ports:
 
-.. testcode:: main
+.. testcode:: tips_main
 
   my_ports = robot.get_serial_ports_list()
   print(my_ports)
 
-.. testoutput:: main
+.. testoutput:: tips_main
   :hide:
 
   []
@@ -91,7 +103,7 @@ Pass the port name string into :any:`connect` to connect to a physical robot:
 Home
 ----
 
-.. testcode:: main
+.. testcode:: tips_main
 
   robot.clear_commands()
 
@@ -101,7 +113,7 @@ Home
 
   # this will get enqueued and executed after :meth:``~opentrons.robot.Robot.run`` has been called:
 
-.. testcode:: main
+.. testcode:: tips_main
 
   robot.home('xy', enqueue=True)
   robot.run()
@@ -109,7 +121,7 @@ Home
 Aspirate then dispense in a single well
 ---------------------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.aspirate(100, plate['A1']).dispense()
 
@@ -117,21 +129,21 @@ Aspirate then dispense in a single well
 Transfer from one well to another
 ---------------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.aspirate(100, plate['A1']).dispense(plate['B1'])
 
 Pick up then drop tip at a single location
 ------------------------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.pick_up_tip(tiprack['A1']).drop_tip()
 
 Pick up then drop tip somewhere else
 ------------------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.pick_up_tip(tiprack['A1']).drop_tip(tiprack['B1'])
   p200.pick_up_tip(tiprack['B1']).drop_tip(trash)
@@ -140,30 +152,30 @@ Pick up then drop tip somewhere else
 Mixing at a well
 ----------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.mix(100, plate[0], 3)   # arguments are (volume, location, repetitions)
 
 Iterating through wells
 -----------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   for i in range(96):
       p200.mix(100, plate[i], 3)
 
-.. testcode:: main
+.. testcode:: tips_main
 
   for well in plate:
       p200.mix(100, well, 3)
 
-.. testcode:: main
+.. testcode:: tips_main
 
   for row in plate.rows:
       for well in row:
           p200.mix(100, well, 3)
 
-.. testcode:: main
+.. testcode:: tips_main
 
   for well in plate.cols['A']:
       p200.mix(100, well, 3)
@@ -171,7 +183,7 @@ Iterating through wells
 Distribute to multiple wells
 ----------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.aspirate(100, plate['A1'])
   p200.dispense(30, plate['B1']).dispense(35, plate['B2']).dispense(45, plate['B3'])
@@ -179,7 +191,7 @@ Distribute to multiple wells
 Delay
 -----
 
-.. testcode:: main
+.. testcode:: tips_main
 
   p200.aspirate(110, plate['A1']).delay(2).dispense(10)
   p200.dispense(plate['B2'])
@@ -190,7 +202,7 @@ Advanced Use Cases
 Distribute to entire plate
 --------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   robot.clear_commands()
 
@@ -209,7 +221,7 @@ Distribute to entire plate
 Serial Dilution
 ---------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   # Here we assume a 96-well plate with 12 rows and 8 columns
   # A trough has 8 wells, with liquids corresponding to plates columns
@@ -231,7 +243,7 @@ Serial Dilution
 Plate Mapping
 -------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   sources = {
       'A1': 'water',
@@ -269,7 +281,7 @@ Plate Mapping
 Precision pipetting within a well
 ---------------------------------
 
-.. testcode:: main
+.. testcode:: tips_main
 
   robot.clear_commands()
 

@@ -217,12 +217,12 @@ class JSONProtocolProcessor(object):
             tool_instance = instruments.Pipette(
                 name=tool_name,
                 axis=tool_config.pop('axis'),
+                max_volume=tool_config.pop('volume'),
                 min_volume=0,
                 channels=(8 if tool_config.pop('multi-channel') else 1),
                 tip_racks=tip_rack_objs,
                 trash_container=trash_obj
             )
-            tool_instance.set_max_volume(tool_config.pop('volume'))
 
             head_obj[tool_name] = {
                 'instance': tool_instance,

@@ -23,8 +23,8 @@ class Pipette(Instrument):
         * Calibrate the position of each :any:`Container` on deck
 
     Here are the typical steps of using the Pipette:
-        * Instantiate a pipette, attaching it to an axis (`a` or `b`)
-        * Set the maximum volume of this pipette (using :meth:`set_max_volume`)
+        * Instantiate a pipette with a maximum volume (uL)
+        and an axis (`a` or `b`)
         * Design your protocol through the pipette's liquid-handling commands
         * Run on the :any:`Robot` using :any:`run` or :any:`simulate`
 
@@ -38,6 +38,8 @@ class Pipette(Instrument):
         The number of channels on this pipette (Default: `1`)
     min_volume : int
         The smallest recommended uL volume for this pipette (Default: `0`)
+    max_volume : int
+        The largest uL volume for this pipette (Default: `min_volume` + 1)
     trash_container : Container
         Sets the default location :meth:`drop_tip()` will put tips
         (Default: `None`)
@@ -59,13 +61,12 @@ class Pipette(Instrument):
     Examples
     --------
     >>> from opentrons import instruments, containers
-    >>> p1000 = instruments.Pipette(axis='a')
-    >>> p1000.set_max_volume(1000) # doctest: +ELLIPSIS
-    <opentrons.instruments.pipette.Pipette object at ...>
+    >>> p1000 = instruments.Pipette(axis='a', max_volume=1000)
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'A1')
-    >>> p200 = instruments.Pipette(axis='b', tip_racks=[tip_rack_200ul])
-    >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
-    <opentrons.instruments.pipette.Pipette object at ...>
+    >>> p200 = instruments.Pipette(
+    ...     axis='b',
+    ...     max_volume=200,
+    ...     tip_racks=[tip_rack_200ul])
     """
 
     def __init__(
@@ -74,6 +75,7 @@ class Pipette(Instrument):
             name=None,
             channels=1,
             min_volume=0,
+            max_volume=None,
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
@@ -104,7 +106,7 @@ class Pipette(Instrument):
         }
 
         self.min_volume = min_volume
-        self.max_volume = self.min_volume + 1
+        self.max_volume = max_volume or (min_volume + 1)
 
         self.positions = {
             'top': None,
@@ -128,6 +130,12 @@ class Pipette(Instrument):
         self.load_persisted_data()
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+
+        # if the user passed an initialization value,
+        # overwrite the loaded persisted data with it
+        if isinstance(max_volume, (int, float, complex)) and max_volume > 0:
+            self.max_volume = max_volume
+            self.update_calibrations()
 
     def reset(self):
         """
@@ -254,7 +262,6 @@ class Pipette(Instrument):
         If no `location` is passed, the pipette will aspirate
         from it's current position. If no `volume` is passed,
         `aspirate` will default to it's `max_volume`
-        (see :any:`set_max_volume`)
 
         Parameters
         ----------
@@ -284,9 +291,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
 
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -316,8 +321,10 @@ class Pipette(Instrument):
 
             if self.current_volume + volume > self.max_volume:
                 raise RuntimeWarning(
-                    'Pipette cannot hold volume {}'
-                    .format(self.current_volume + volume)
+                    'Pipette ({0}) cannot hold volume {1}'
+                    .format(
+                        self.current_volume,
+                        self.current_volume + volume)
                 )
 
             self.current_volume += volume
@@ -330,7 +337,7 @@ class Pipette(Instrument):
             nonlocal rate
 
             distance = self._plunge_distance(self.current_volume)
-            bottom = self.positions['bottom']
+            bottom = self._get_plunger_position('bottom')
             destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
@@ -394,9 +401,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -443,7 +448,7 @@ class Pipette(Instrument):
             self.move_to(location, strategy='arc', enqueue=False)
 
             distance = self._plunge_distance(self.current_volume)
-            bottom = self.positions['bottom'] or 0
+            bottom = self._get_plunger_position('bottom')
             destination = bottom - distance
 
             speed = self.speeds['dispense'] * rate
@@ -475,7 +480,7 @@ class Pipette(Instrument):
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.motor.move(self.positions['bottom'] or 0)
+            self.motor.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
         if location:
@@ -531,9 +536,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
 
         >>> # mix 50uL in a Well, three times
         >>> p200.mix(50, plate[0], 3) # doctest: +ELLIPSIS
@@ -615,9 +618,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -629,7 +630,7 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
             self.move_to(location, strategy='arc', enqueue=False)
-            self.motor.move(self.positions['blow_out'])
+            self.motor.move(self._get_plunger_position('blow_out'))
 
         _description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
@@ -673,9 +674,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a')
-        >>> p200.set_max_volume(200) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
@@ -845,7 +844,7 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
 
-            self.motor.move(self.positions['blow_out'])
+            self.motor.move(self._get_plunger_position('blow_out'))
 
             if self.current_tip_home_well:
                 placeable, _ = containers.unpack_location(
@@ -931,7 +930,7 @@ class Pipette(Instrument):
                 placeable, _ = containers.unpack_location(location)
                 self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
 
-            self.motor.move(self.positions['drop_tip'])
+            self.motor.move(self._get_plunger_position('drop_tip'))
             self.motor.home()
 
         _description = "Drop_tip at {}".format(
@@ -1214,6 +1213,25 @@ class Pipette(Instrument):
 
         return self
 
+    def _get_plunger_position(self, position):
+        """
+        Returns the calibrated coordinate of a given plunger position
+
+        Raises exception if the position has not been calibrated yet
+        """
+        try:
+            value = self.positions[position]
+            if isinstance(value, (int, float, complex)):
+                return value
+            else:
+                raise RuntimeError(
+                    'Plunger position "{}" not yet calibrated'.format(
+                        position))
+        except KeyError:
+            raise RuntimeError(
+                'Plunger position "{}" does not exist'.format(
+                    position))
+
     def _plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
 
@@ -1224,8 +1242,8 @@ class Pipette(Instrument):
         these calculations to work.
         """
         percent = self._volume_percentage(volume)
-        top = self.positions['top'] or 0
-        bottom = self.positions['bottom'] or 0
+        top = self._get_plunger_position('top')
+        bottom = self._get_plunger_position('bottom')
         travel = bottom - top
         if travel <= 0:
             self.robot.add_warning('Plunger calibrated incorrectly')

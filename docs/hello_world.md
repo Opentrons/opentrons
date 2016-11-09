@@ -15,10 +15,9 @@ plate = containers.load('96-flat', 'B1', 'plate')
     
 p200 = instruments.Pipette(
     axis="b",
+    max_volume=200,
     name="p200"
 )
-
-p200.set_max_volume(200)  # volume calibration, can be called whenever you want
 
 robot.clear_commands()
 
