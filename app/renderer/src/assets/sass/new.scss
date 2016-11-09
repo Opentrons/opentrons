@@ -461,12 +461,12 @@ Task Pipette
 section#task-pipette {
     width: 510px;
     flex: 0 0 510px;
-    height: 310px;
+    height: 330px;
     padding:30px;
     background-color: $well-bg;
     span{
         width: 510px;
-        height: 270px;
+        height: 260px;
         display:flex;
         flex-directon:row;
         div.calibrate-pipette{
@@ -484,6 +484,7 @@ section#task-pipette {
             }
             &.volume{
                 justify-content:flex-start;
+                margin-bottom:10px;
             }
             span.title{
                 flex: 0 0 90px;
