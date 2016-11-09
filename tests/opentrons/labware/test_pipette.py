@@ -44,9 +44,11 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.p200._get_plunger_position('drop_tip'), 13)
 
         self.p200.positions['drop_tip'] = None
-        self.assertRaises(RuntimeError, self.p200._get_plunger_position, 'drop_tip')
+        self.assertRaises(
+            RuntimeError, self.p200._get_plunger_position, 'drop_tip')
 
-        self.assertRaises(RuntimeError, self.p200._get_plunger_position, 'roll_out')
+        self.assertRaises(
+            RuntimeError, self.p200._get_plunger_position, 'roll_out')
 
     def test_set_max_volume(self):
 
