@@ -578,6 +578,68 @@ def move_to_plunger_position():
     })
 
 
+@app.route('/aspirate', methods=["POST"])
+def aspirate_from_current_position():
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        robot.move_head(z=20, mode='relative')
+        instrument.motor.move(instrument.positions['blow_out'])
+        instrument.motor.move(instrument.positions['bottom'])
+        robot.move_head(z=-20, mode='relative')
+        instrument.motor.move(instrument.positions['top'])
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/dispense', methods=["POST"])
+def dispense_from_current_position():
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.motor.move(instrument.positions['blow_out'])
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/set_max_volume', methods=["POST"])
+def set_max_volume():
+    volume = request.json.get("volume")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.set_max_volume(volume)
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
 def _calibrate_placeable(container_name, axis_name):
 
     deck = robot._deck
