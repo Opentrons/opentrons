@@ -106,7 +106,7 @@ class Pipette(Instrument):
         }
 
         self.min_volume = min_volume
-        self.max_volume = min_volume + 1
+        self.max_volume = max_volume
 
         self.positions = {
             'top': None,
@@ -131,6 +131,8 @@ class Pipette(Instrument):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
+        # if the user passed an initialization value,
+        # overwrite the loaded persisted data with it
         if max_volume:
             self.max_volume = max_volume
             self.update_calibrations()
@@ -335,7 +337,7 @@ class Pipette(Instrument):
             nonlocal rate
 
             distance = self._plunge_distance(self.current_volume)
-            bottom = self.positions['bottom']
+            bottom = self._get_plunger_position('bottom')
             destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
@@ -446,7 +448,7 @@ class Pipette(Instrument):
             self.move_to(location, strategy='arc', enqueue=False)
 
             distance = self._plunge_distance(self.current_volume)
-            bottom = self.positions['bottom'] or 0
+            bottom = self._get_plunger_position('bottom')
             destination = bottom - distance
 
             speed = self.speeds['dispense'] * rate
@@ -478,7 +480,7 @@ class Pipette(Instrument):
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.motor.move(self.positions['bottom'] or 0)
+            self.motor.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
         if location:
@@ -628,7 +630,7 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
             self.move_to(location, strategy='arc', enqueue=False)
-            self.motor.move(self.positions['blow_out'])
+            self.motor.move(self._get_plunger_position('blow_out'))
 
         _description = "Blow_out at {}".format(
             humanize_location(location) if location else '<In Place>'
@@ -842,7 +844,7 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
 
-            self.motor.move(self.positions['blow_out'])
+            self.motor.move(self._get_plunger_position('blow_out'))
 
             if self.current_tip_home_well:
                 placeable, _ = containers.unpack_location(
@@ -928,7 +930,7 @@ class Pipette(Instrument):
                 placeable, _ = containers.unpack_location(location)
                 self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
 
-            self.motor.move(self.positions['drop_tip'])
+            self.motor.move(self._get_plunger_position('drop_tip'))
             self.motor.home()
 
         _description = "Drop_tip at {}".format(
@@ -1211,6 +1213,25 @@ class Pipette(Instrument):
 
         return self
 
+    def _get_plunger_position(self, position):
+        """
+        Returns the calibrated coordinate of a given plunger position
+
+        Raises exception if the position has not been calibrated yet
+        """
+        try:
+            value = self.positions[position]
+            if isinstance(value, (int, float, complex)):
+                return value
+            else:
+                raise RuntimeError(
+                    'Plunger position "{}" not yet calibrated'.format(
+                        position))
+        except KeyError:
+            raise RuntimeError(
+                'Plunger position "{}" does not exist'.format(
+                    position))
+
     def _plunge_distance(self, volume):
         """Calculate axis position for a given liquid volume.
 
@@ -1221,8 +1242,8 @@ class Pipette(Instrument):
         these calculations to work.
         """
         percent = self._volume_percentage(volume)
-        top = self.positions['top'] or 0
-        bottom = self.positions['bottom'] or 0
+        top = self._get_plunger_position('top')
+        bottom = self._get_plunger_position('bottom')
         travel = bottom - top
         if travel <= 0:
             self.robot.add_warning('Plunger calibrated incorrectly')

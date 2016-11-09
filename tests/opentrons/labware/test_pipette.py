@@ -36,6 +36,18 @@ class PipetteTest(unittest.TestCase):
         self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
 
+    def test_get_plunger_position(self):
+
+        self.assertEquals(self.p200._get_plunger_position('top'), 0)
+        self.assertEquals(self.p200._get_plunger_position('bottom'), 10)
+        self.assertEquals(self.p200._get_plunger_position('blow_out'), 12)
+        self.assertEquals(self.p200._get_plunger_position('drop_tip'), 13)
+
+        self.p200.positions['drop_tip'] = None
+        self.assertRaises(RuntimeError, self.p200._get_plunger_position, 'drop_tip')
+
+        self.assertRaises(RuntimeError, self.p200._get_plunger_position, 'roll_out')
+
     def test_set_max_volume(self):
 
         self.p200.reset()
