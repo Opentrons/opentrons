@@ -26,7 +26,7 @@ trash = containers.load(
 )
 
 p1000 = instruments.Pipette(
-    name="p1000 blah blah testing testing",
+    name="p1000",
     trash_container=trash,
     tip_racks=[tiprack],
     min_volume=10,  # These are variable
@@ -39,7 +39,7 @@ p10 = instruments.Pipette(
     tip_racks=[tiprack],
     min_volume=1,  # These are variable
     axis="a",
-    channels=1
+    channels=8
 )
 
 p1000.delete_calibration_data()
