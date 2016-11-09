@@ -161,9 +161,11 @@ class UploadTestCase(unittest.TestCase):
         for key, value in expected_data['data'][0].items():
             if key != 'placeables':
                 self.assertEquals(value, response_data[key])
+                pass
             else:
                 for placeable in value:
                     self.assertTrue(placeable in response_data['placeables'])
+                    pass
 
     def test_upload_invalid_python(self):
         pass
