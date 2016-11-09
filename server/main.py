@@ -405,28 +405,32 @@ def _check_if_instrument_calibrated(instrument):
 
 
 def get_step_list():
+    try:
+        data = [{
+            'axis': instrument.axis,
+            'label': instrument.name,
+            'top': instrument.positions['top'],
+            'bottom': instrument.positions['bottom'],
+            'blow_out': instrument.positions['blow_out'],
+            'drop_tip': instrument.positions['drop_tip'],
+            'max_volume': instrument.max_volume,
+            'calibrated': _check_if_instrument_calibrated(instrument),
+            'channels': instrument.channels,
+            'placeables': [
+                {
+                    'type': container.properties['type'],
+                    'label': container.get_name(),
+                    'slot': container.get_parent().get_name(),
+                    'calibrated': _check_if_calibrated(instrument, container)
+                }
+                for container in _get_unique_containers(instrument)
+            ]
+        } for _, instrument in Robot.get_instance().get_instruments()]
 
-    data = [{
-        'axis': instrument.axis,
-        'label': instrument.name,
-        'top': instrument.positions['top'],
-        'bottom': instrument.positions['bottom'],
-        'blow_out': instrument.positions['blow_out'],
-        'drop_tip': instrument.positions['drop_tip'],
-        'max_volume': instrument.max_volume,
-        'calibrated': _check_if_instrument_calibrated(instrument),
-        'placeables': [
-            {
-                'type': container.properties['type'],
-                'label': container.get_name(),
-                'slot': container.get_parent().get_name(),
-                'calibrated': _check_if_calibrated(instrument, container)
-            }
-            for container in _get_unique_containers(instrument)
-        ]
-    } for _, instrument in Robot.get_instance().get_instruments()]
+        return data
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
 
-    return data
 
 
 @app.route('/home/<axis>')
