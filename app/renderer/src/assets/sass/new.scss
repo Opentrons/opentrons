@@ -36,50 +36,14 @@ $primary-link: $secondary-brand;
 $primary-btn: lighten( $primary-brand,15%);
 $secondary-btn: lighten( $secondary-brand,15%);
 
-@function num-col-air($n) {
-    @if $n > 0{
-        @return ($btn-size*$n)+($gutter-width*(($n - 1)*2));
-    }@else{
-        @return $btn-size*$n +$gutter-width;
-    }
-
-}
-
-@function num-col-full($n) {
-    @return num-col-air($n)+(2*$gutter-width);
-}
-
-@mixin offset-h-air($l,$r){
-    margin-left: num-col-full($l)+ $gutter-width;;
-    margin-right: num-col-full($r)+ $gutter-width;;
-}
-
-@mixin btn-square-full($n) {
-    display: block;
-    width: num-col-full($n);
-    height: num-col-full($n);
-    line-height: num-col-full($n);
-    text-align: center;
-}
-
-@mixin btn-square-air($n) {
-    display: block;
-    width: num-col-air($n);
-    height: num-col-air($n);
-    line-height: num-col-air($n);
-    margin: $gutter-width;
-    text-align: center;
-}
-
+/******************************
+Header Home Logo Connect
+******************************/
 body {
     font-size: $basesize;
     font-family: $stack-sans;
 }
 
-
-/******************************
-Header Home Logo Connect
-******************************/
 
 header#home-connect {
     width: 1004px;
@@ -574,7 +538,12 @@ Buttons
 
 .btn{
     border-radius: 6px;
-    @include btn-square-air(1);
+    display: block;
+    width: $btn-size;
+    height: $btn-size;
+    line-height: $btn-size;
+    margin: $gutter-width;
+    text-align: center;
     text-align: center;
     color:white;
 }
