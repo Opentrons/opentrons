@@ -67,7 +67,6 @@ def load_python(stream):
         print(e)
         api_response['errors'] = [str(e)]
 
-
     api_response['warnings'] = robot.get_warnings() or []
 
     return api_response
