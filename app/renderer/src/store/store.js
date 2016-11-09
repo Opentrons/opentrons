@@ -48,7 +48,7 @@ function createWebSocketPlugin(socket) {
       if (data.name == 'notification') {
         if (data.text.length > 0){
           let {text, type} = data
-          text = `${type.toUpperCase()}: ${text}`
+          text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
         }
       }

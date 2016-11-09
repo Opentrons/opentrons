@@ -226,7 +226,7 @@ def get_coordinates():
 
 
 @app.route("/robot/diagnostics")
-def get_diagnostics():
+def diagnostics():
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
