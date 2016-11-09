@@ -1,35 +1,39 @@
 const electron = require("electron");
 const {app, dialog, autoUpdater} = electron;
-const {toggleSetting, getSetting} = require('./preferences')
+const {getSetting} = require('./preferences')
+const {getLogger} = require('./logging.js')
+
 var UPDATE_SERVER_URL =  'http://ot-app-releases.herokuapp.com';
 
 
 function initAutoUpdater () {
+  const mainLogger = getLogger('electron-main')
+
   autoUpdater.on(
     'error',
-    (err) => console.log(`Update error: ${err.message}`)
+    (err) => mainLogger.log(`Update error: ${err.message}`)
   )
 
   autoUpdater.on(
     'checking-for-update',
-    () => console.log('Checking for update')
+    () => mainLogger.log('Checking for update')
   )
 
   autoUpdater.on(
     'update-available',
-    () => console.log('Update available')
+    () => mainLogger.log('Update available')
   )
 
   autoUpdater.on(
     'update-not-available',
-    () => console.log('Update not available')
+    () => mainLogger.log('Update not available')
   )
 
   autoUpdater.on(
     'update-downloaded',
    function(e, releaseNotes, releaseName, date, url) {
-       console.log(`Update downloaded: ${releaseName}: ${url}`)
-       console.log(`Update Info: ${releaseNotes}`)
+       mainLogger.log(`Update downloaded: ${releaseName}: ${url}`)
+       mainLogger.log(`Update Info: ${releaseNotes}`)
 
        var index = dialog.showMessageBox({
            type: 'info',
@@ -54,9 +58,13 @@ function initAutoUpdater () {
   if (process.platform === 'win32') {
     AUTO_UPDATE_URL = 'https://s3-us-west-2.amazonaws.com/ot-app-win-updates/'
   }
-  console.log('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
-  autoUpdater.setFeedURL(AUTO_UPDATE_URL)
-  if (getSetting("autoUpdate")) autoUpdater.checkForUpdates()
+  if (getSetting("autoUpdate")) {
+    mainLogger.log('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
+    autoUpdater.setFeedURL(AUTO_UPDATE_URL)
+
+    mainLogger.log('Auto updating is enabled, checking for updates')
+    autoUpdater.checkForUpdates()
+  }
 }
 
 module.exports = {
