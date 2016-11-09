@@ -1,9 +1,11 @@
 from opentrons.json_importer.json_importer import (
     JSONProtocolProcessor,
-    JSONProcessorRuntimeError
+    JSONProcessorRuntimeError,
+    JSONProcessorValidationError
 )
 
 __all__ = [
     JSONProtocolProcessor,
-    JSONProcessorRuntimeError
+    JSONProcessorRuntimeError,
+    JSONProcessorValidationError
 ]

@@ -110,7 +110,8 @@ class CNCDriver(object):
         return self.connection.port
 
     def get_dimensions(self):
-        self.get_ot_version()
+        if not self.ot_version:
+            self.get_ot_version()
         return self.ot_one_dimensions[self.ot_version]
 
     def get_serial_ports_list(self):
@@ -133,9 +134,10 @@ class CNCDriver(object):
             raise EnvironmentError('Unsupported platform')
 
         result = []
+        port_filter = {'usbmodem', 'COM', 'ACM', 'USB'}
         for port in ports:
             try:
-                if 'usbmodem' in port or 'COM' in port:
+                if any([f in port for f in port_filter]):
                     s = serial.Serial(port)
                     s.close()
                     result.append(port)
@@ -175,11 +177,8 @@ class CNCDriver(object):
         self.stopped.clear()
 
     def stop(self):
-        if self.current_commands:
-            self.stopped.set()
-            self.can_move.set()
-        else:
-            self.resume()
+        self.stopped.set()
+        self.can_move.set()
 
     def send_command(self, command, **kwargs):
         """
@@ -200,20 +199,23 @@ class CNCDriver(object):
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         log.debug("Write: {}".format(str(data).encode()))
-        if self.connection is None:
-            log.warn("No connection found.")
-            return
         if self.is_connected():
             self.connection.write(str(data).encode())
             return self.wait_for_response()
+        elif self.connection is None:
+            msg = "No connection found."
+            log.warn(msg)
+            raise RuntimeError(msg)
         elif max_tries > 0:
             self.reset_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
         else:
-            log.error("Cannot connect to serial port.")
-            return b''
+            msg = "Cannot connect to serial port {}".format(
+                self.connection.port)
+            log.error(msg)
+            raise RuntimeError(msg)
 
     def wait_for_response(self, timeout=20.0):
         count = 0
@@ -333,7 +335,7 @@ class CNCDriver(object):
         while self.can_move.wait():
             if self.stopped.is_set():
                 self.resume()
-                return (False, self.STOPPED)
+                raise RuntimeWarning('Stop signal received')
             if self.current_commands:
                 args = self.current_commands.pop(0)
             else:
