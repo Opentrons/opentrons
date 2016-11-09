@@ -67,8 +67,6 @@ You string these commands into full protocols that anyone with Opentrons can run
 
 If you wanted to do this 96 times, you could write it like this:
 
-
-
 .. testsetup:: main
    
   p200.aspirate(trough)
@@ -76,6 +74,38 @@ If you wanted to do this 96 times, you could write it like this:
   for i in range(95):
       p200.aspirate(100, plate[i])
       p200.dispense(plate[i + 1]).blow_out().touch_tip()
+
+Basic Principles
+----------------
+
+**Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
+
+.. testcode:: main
+
+  p200.aspirate(100, plate['A1']).dispense(plate['A2'])
+
+Is exactly what you think it would do: 
+  * Take p200 pipette
+  * Aspirate 100 uL from well A1 on your plate
+  * Dispense everything into well A2 on the same plate
+
+**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
+For example:
+
+.. testcode:: main
+
+  p200.aspirate(100, plate[0]).dispense(plate[1])
+
+while using 0 or 1 instead of 'A1' and 'B1' will do just the same.
+
+or
+
+.. testcode:: main
+
+  p200.aspirate(100, plate[0].bottom())
+
+will aspirate 100, from the bottom of a well.
+
 
 Hello World
 -----------
@@ -120,48 +150,9 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
   # robot.connect('/dev/tty.usbserialNNNN')  # connect to the robot
   # robot.run()                              # to run on a physical robot
 
-Basic Principles
-----------------
 
-**Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
 
-.. testcode:: main
-
-  p200.aspirate(100, plate['A1']).dispense(plate['A2'])
-
-Is exactly what you think it would do: 
-  * Take P200 pipette
-  * Aspirate 100 uL of liquid from well A1 on your plate
-  * Dispense everything into well A2 on the same plate
-
-**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
-For example:
-
-.. testcode:: main
-
-  p200.aspirate(100, plate[0]).dispense(plate[1])
-
-while using 0 or 1 instead of 'A1' and 'A2' will do just the same.
-
-or
-
-.. testcode:: main
-
-  p200.aspirate(100, plate[0].bottom())
-
-will aspirate 100, from the bottom of a well.
-
-Installing Opentrons API
-------------------------
-If you are just starting with Python it is recommended to install Jupyter notebook to run Opentrons API. Please refer to :ref:`setup` for detailed instructions.
-
-If you are familiar with python and comfortable running ``pip``, you can install Opentrons API by running:
-
-.. code-block:: bash
-
-  pip install opentrons
-
-Further Reading
+Documentation
 ---------------
 
 .. toctree::
@@ -169,8 +160,10 @@ Further Reading
 
    setup
    getting_started
-   api
-   tips_and_tricks
+   running_a_protocol
+   well_access
+   advanced_use_cases
+   module
 
 
 
