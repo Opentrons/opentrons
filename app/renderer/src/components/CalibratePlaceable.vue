@@ -2,7 +2,9 @@
 	<section id="task">
 		<h1 class="title">
 			Calibrate the {{this.instrument ? this.instrument.label : ""}}
-			pipette to the center of the A1 well
+			pipette to the
+			{{this.containerType(this.type) == "tiprack" ? "center" : "bottom"}}
+			{{this.calibrationPoint}}
 			of your {{this.placeable ? this.placeable.label : ""}} container
 		</h1>
 		<button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
@@ -60,6 +62,8 @@
 					return "point"
 				} else if (type.includes("tiprack")) {
 					return "tiprack"
+				} else if (type.includes("trough")) {
+					return "trough"
 				} else {
 					return "default"
 				}
@@ -79,6 +83,18 @@
 				let placeable = this.currentPlaceable(tasks)
 				let type = this.containerType(placeable.type)
 				return type
+			},
+			calibrationPoint() {
+				let type = this.containerType(this.type)
+				let position = "of the A1 well"
+				if (type == "trough") {
+					position = "of the A1 slot"
+				} else if ((type == "tiprack" || type == "default") && this.instrument.channels == 8) {
+					position = "of the A1 row"
+				} else if (type == "point") {
+					position = ""
+				}
+				return position
 			}
 		}
   }
