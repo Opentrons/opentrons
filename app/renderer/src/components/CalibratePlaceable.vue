@@ -1,31 +1,27 @@
 <template>
-	<div class="calibration-modal">
+	<section id="task">
+		<h1 class="title">
+			Calibrate the {{this.instrument ? this.instrument.label : ""}}
+			pipette to the
+			{{this.containerType(this.type) == "tiprack" ? "center" : "bottom"}}
+			{{this.calibrationPoint}}
+			of your {{this.placeable ? this.placeable.label : ""}} container
+		</h1>
+		<button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
+		<button :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
+		<button v-show="placeableType('tiprack')" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="pickUpTip(instrument)">PICK UP TIP</button>
+		<button v-show="placeableType('tiprack')" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="dropTip(instrument)">DROP TIP</button>
 		<div class="well-img">
-			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
-			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
-			<img src="../assets/img/point_top.png" v-show="placeableType('point')"/>
+			<img src="../assets/img/well_single.png" v-show="placeableType('default')" />
+			<img src="../assets/img/tiprack_single.png" v-show="placeableType('tiprack')"/>
+			<img src="../assets/img/point_trash.png" v-show="placeableType('point')"/>
 		</div>
-
-		<div :class="['update bottom', disabled]" v-show="placeableType('default') || placeableType('point')">
-			<span class="position bottom">Bottom</span>
-			<button class="btn-placeable save bottom" @click="calibratePlaceable(placeable,instrument)">Save </button>
-			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
-		</div>
-
-		<div :class="['update top', disabled]" v-show="placeableType('tiprack')">
-			<span class="position top">Tiprack</span>
-			<button class="btn-placeable save top" @click="calibratePlaceable(placeable,instrument)">Save </button>
-			<button class="btn-placeable moveto" :class="{'disabled': !placeable.calibrated}" @click="moveToPlaceable(placeable,instrument)">Move To </button>
-			<button class="pick-tip" :class="{'disabled': !placeable.calibrated}" @click="pickUpTip(instrument)">Pick Up Tip</button>
-			<button class="drop-tip" :class="{'disabled': !placeable.calibrated}" @click="dropTip(instrument)">Drop Tip</button>
-		</div>
-	</div>
+	</section>
 </template>
 
 <script>
   export default {
     name: 'CalibratePlaceable',
-    props: ['instrument', 'placeable', 'type', 'disabled'],
     methods: {
 			placeableType(type) {
 				return this.type === type
@@ -49,7 +45,57 @@
 		  dropTip(instrument) {
 		    let axis = instrument.axis
 		    this.$store.dispatch("dropTip", { axis: axis })
-		  }
-    }
+		  },
+			currentInstrument(tasks) {
+				return tasks.filter((instrument) => {
+					return instrument.axis == this.$route.params.instrument
+				})[0]
+			},
+			currentPlaceable(tasks) {
+				if (!this.currentInstrument(tasks)) this.$router.push("/")
+				return this.currentInstrument(tasks).placeables.filter((placeable) => {
+					return placeable.label == this.$route.params.placeable
+				})[0]
+			},
+			containerType(type){
+				if (type === "point") {
+					return "point"
+				} else if (type.includes("tiprack")) {
+					return "tiprack"
+				} else if (type.includes("trough")) {
+					return "trough"
+				} else {
+					return "default"
+				}
+			}
+    },
+		computed: {
+			instrument() {
+				let tasks = this.$store.state.tasks
+				return this.currentInstrument(tasks)
+			},
+			placeable() {
+				let tasks = this.$store.state.tasks
+				return this.currentPlaceable(tasks)
+			},
+			type() {
+				let tasks = this.$store.state.tasks
+				let placeable = this.currentPlaceable(tasks)
+				let type = this.containerType(placeable.type)
+				return type
+			},
+			calibrationPoint() {
+				let type = this.containerType(this.type)
+				let position = "of the A1 well"
+				if (type == "trough") {
+					position = "of the A1 slot"
+				} else if ((type == "tiprack" || type == "default") && this.instrument.channels == 8) {
+					position = "of the A1 row"
+				} else if (type == "point") {
+					position = ""
+				}
+				return position
+			}
+		}
   }
 </script>

@@ -28,6 +28,8 @@ app = Flask(__name__,
             static_folder=STATIC_FOLDER,
             template_folder=TEMPLATES_FOLDER
             )
+
+
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
@@ -64,9 +66,8 @@ def load_python(stream):
             )
             api_response['errors'] = error
     except Exception as e:
-        print(e)
+        app.logger.error(e)
         api_response['errors'] = [str(e)]
-
 
     api_response['warnings'] = robot.get_warnings() or []
 
@@ -98,15 +99,18 @@ def upload():
         })
 
     calibrations = get_step_list()
+    if len(api_response['errors']) == 0:
+        emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
     emit_notifications(api_response['errors'], 'danger')
-    emit_notifications(api_response['warnings'], 'warning')
+    # emit_notifications(api_response['warnings'], 'warning')
 
     return flask.jsonify({
         'status': 'success',
         'data': {
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
-            'calibrations': calibrations
+            'calibrations': calibrations,
+            'fileName': file.filename
         }
     })
 
@@ -139,7 +143,7 @@ def _run_commands():
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
     end_time = time.time()
-    emit_notifications(api_response['warnings'], 'warning')
+    # emit_notifications(api_response['warnings'], 'warning')
     emit_notifications(api_response['errors'], 'danger')
     seconds = end_time - start_time
     minutes, seconds = divmod(seconds, 60)
@@ -163,6 +167,7 @@ def run():
 @app.route("/pause", methods=["GET"])
 def pause():
     result = robot.pause()
+    emit_notifications(['Protocol paused'], 'info')
 
     return flask.jsonify({
         'status': 'success',
@@ -173,6 +178,7 @@ def pause():
 @app.route("/resume", methods=["GET"])
 def resume():
     result = robot.resume()
+    emit_notifications(['Protocol resumed'], 'info')
 
     return flask.jsonify({
         'status': 'success',
@@ -180,13 +186,14 @@ def resume():
     })
 
 
-@app.route("/stop", methods=["GET"])
+@app.route("/cancel", methods=["GET"])
 def stop():
-    robot.stop()
+    result = robot.stop()
+    emit_notifications(['Protocol stopped'], 'info')
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 
@@ -194,7 +201,9 @@ def stop():
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'templates', 'dist')
-    return flask.send_from_directory(scripts_root_path, filename)
+    return flask.send_from_directory(
+        scripts_root_path, filename, mimetype='application/javascript'
+    )
 
 
 @app.route("/robot/serial/list")
@@ -220,7 +229,7 @@ def get_coordinates():
 
 
 @app.route("/robot/diagnostics")
-def get_diagnostics():
+def diagnostics():
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -245,6 +254,8 @@ def connect_robot():
         robot = Robot.get_instance()
         robot.connect(
             port, options=options)
+        emit_notifications(["Successfully connected"], 'info')
+
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -297,6 +308,7 @@ def disconnect_robot():
 
     try:
         Robot.get_instance().disconnect()
+        emit_notifications(["Successfully disconnected"], 'info')
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -396,28 +408,32 @@ def _check_if_instrument_calibrated(instrument):
 
 
 def get_step_list():
+    try:
+        data = [{
+            'axis': instrument.axis,
+            'label': instrument.name,
+            'top': instrument.positions['top'],
+            'bottom': instrument.positions['bottom'],
+            'blow_out': instrument.positions['blow_out'],
+            'drop_tip': instrument.positions['drop_tip'],
+            'max_volume': instrument.max_volume,
+            'calibrated': _check_if_instrument_calibrated(instrument),
+            'channels': instrument.channels,
+            'placeables': [
+                {
+                    'type': container.properties['type'],
+                    'label': container.get_name(),
+                    'slot': container.get_parent().get_name(),
+                    'calibrated': _check_if_calibrated(instrument, container)
+                }
+                for container in _get_unique_containers(instrument)
+            ]
+        } for _, instrument in Robot.get_instance().get_instruments()]
 
-    data = [{
-        'axis': instrument.axis,
-        'label': instrument.name,
-        'top': instrument.positions['top'],
-        'bottom': instrument.positions['bottom'],
-        'blow_out': instrument.positions['blow_out'],
-        'drop_tip': instrument.positions['drop_tip'],
-        'max_volume': instrument.max_volume,
-        'calibrated': _check_if_instrument_calibrated(instrument),
-        'placeables': [
-            {
-                'type': container.properties['type'],
-                'label': container.get_name(),
-                'slot': container.get_parent().get_name(),
-                'calibrated': _check_if_calibrated(instrument, container)
-            }
-            for container in _get_unique_containers(instrument)
-        ]
-    } for _, instrument in Robot.get_instance().get_instruments()]
+        return data
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
 
-    return data
 
 
 @app.route('/home/<axis>')
@@ -429,7 +445,7 @@ def home(axis):
             result = robot.home(enqueue=False)
         else:
             result = robot.home(axis, enqueue=False)
-
+        emit_notifications(["Successfully homed"], 'info')
     except Exception as e:
         result = str(e)
         status = 'error'
@@ -578,6 +594,72 @@ def move_to_plunger_position():
     })
 
 
+@app.route('/aspirate', methods=["POST"])
+def aspirate_from_current_position():
+    axis = request.json.get("axis")
+    try:
+        # this action mimics 1.2 app experience
+        # but should be re-thought to take advantage of API features
+        instrument = robot._instruments[axis.upper()]
+        robot.move_head(z=20, mode='relative')
+        instrument.motor.move(instrument.positions['blow_out'])
+        instrument.motor.move(instrument.positions['bottom'])
+        robot.move_head(z=-20, mode='relative')
+        instrument.motor.move(instrument.positions['top'])
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/dispense', methods=["POST"])
+def dispense_from_current_position():
+    axis = request.json.get("axis")
+    try:
+        # this action mimics 1.2 app experience
+        # but should be re-thought to take advantage of API features
+        instrument = robot._instruments[axis.upper()]
+        instrument.motor.move(instrument.positions['blow_out'])
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
+@app.route('/set_max_volume', methods=["POST"])
+def set_max_volume():
+    volume = request.json.get("volume")
+    axis = request.json.get("axis")
+    try:
+        instrument = robot._instruments[axis.upper()]
+        instrument.set_max_volume(volume)
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': ''
+    })
+
+
 def _calibrate_placeable(container_name, axis_name):
 
     deck = robot._deck
@@ -607,6 +689,8 @@ def calibrate_placeable():
     axis = request.json.get("axis")
     try:
         _calibrate_placeable(name, axis)
+        calibrations = get_step_list()
+        emit_notifications(['Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -614,7 +698,6 @@ def calibrate_placeable():
             'data': str(e)
         })
 
-    calibrations = get_step_list()
 
     # TODO change calibration key to steplist
     return flask.jsonify({
@@ -645,6 +728,7 @@ def calibrate_plunger():
     axis = request.json.get("axis")
     try:
         _calibrate_plunger(position, axis)
+        emit_notifications(['Saved {0} on the {1} pipette'.format(position, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -678,27 +762,49 @@ def get_run_plan():
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
 def on_connect():
-    print('connected to front end...')
+    app.logger.info('Socketio connected to front end...')
 
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    datefmt='%d-%m-%y %H:%M:%S'
-)
+@app.before_request
+def log_before_request():
+    logger = logging.getLogger('opentrons-app')
+    log_msg = "[BR] {method} {url} | {data}".format(
+        method=request.method,
+        url=request.url,
+        data=request.data,
+    )
+    logger.info(log_msg)
+
+
+@app.after_request
+def log_after_request(response):
+    response.direct_passthrough = False
+    if response.mimetype in ('text/html', 'application/javascript'):
+        return response
+    logger = logging.getLogger('opentrons-app')
+    log_msg = "[AR] {data}".format(data=response.data)
+    logger.info(log_msg)
+    return response
 
 
 if __name__ == "__main__":
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
-
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
-
     _start_connection_watcher()
+
+    from server import log  # NOQA
+    lg = logging.getLogger('opentrons-app')
+    lg.info('Starting Flask Server')
+    [app.logger.addHandler(handler) for handler in lg.handlers]
 
     socketio.run(
         app,
-        debug=IS_DEBUG,
+        debug=False,
+        logger=False,
+        use_reloader=False,
+        log_output=False,
+        engineio_logger=False,
         port=31950
     )

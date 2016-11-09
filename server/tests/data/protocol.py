@@ -30,6 +30,7 @@ p1000 = instruments.Pipette(
     trash_container=trash,
     tip_racks=[tiprack],
     min_volume=10,  # These are variable
+    max_volume=1000,
     axis="b",
     channels=1
 )
@@ -38,15 +39,13 @@ p10 = instruments.Pipette(
     trash_container=trash,
     tip_racks=[tiprack],
     min_volume=1,  # These are variable
+    max_volume=10,
     axis="a",
-    channels=1
+    channels=8
 )
 
 p1000.delete_calibration_data()
 p10.delete_calibration_data()
-
-p1000.set_max_volume(200)
-p10.set_max_volume(10)
 
 p1000.pick_up_tip(tiprack[0])
 

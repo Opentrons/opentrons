@@ -4,17 +4,18 @@ import * as types from './mutation-types'
 const state = {
   is_connected: false,
   port: null,
-  fileName: "Select Protocol",
+  fileName: "",
   errors: [],
   warnings: false,
   tasks: [],
-  current_increment_placeable: 5,
+  current_increment_placeable: 1,
   current_increment_plunger: 1,
   coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
   run_state: "ready",
   run_log: [],
   run_plan: [],
-  busy: false
+  busy: false,
+  versions: []
 }
 
 const mutations = {
@@ -29,11 +30,8 @@ const mutations = {
     state.fileName = payload.fileName
   },
   [types.UPDATE_INCREMENT] (state, payload) {
-    if (payload.type == "placeable") {
-      state.current_increment_placeable = payload.current_increment
-    } else {
-      state.current_increment_plunger = payload.current_increment
-    }
+    state.current_increment_placeable = payload.current_increment
+    state.current_increment_plunger = payload.current_increment
   },
   [types.UPDATE_ERROR] (state, payload) {
     state.errors = payload.errors
@@ -55,6 +53,9 @@ const mutations = {
   },
   [types.UPDATE_ROBOT_STATE] (state, payload) {
     state.busy = payload.busy
+  },
+  [types.UPDATE_ROBOT_VERSIONS] (state, payload) {
+    state.versions = payload.versions
   }
 }
 

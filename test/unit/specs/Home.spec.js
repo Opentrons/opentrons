@@ -5,12 +5,13 @@ import store from '../../../app/renderer/src/store/store'
 import Home from '../../../app/renderer/src/components/Home.vue'
 
 describe('Home.vue', () => {
-  it('should render home page with title', () => {
+  it('should render home page child nodes', () => {
     const vm = new Vue({
       store,
       ...Home
     }).$mount('#app')
-    expect(vm.$el.querySelector('#app-title').textContent).to.equal('Logo')
-    expect(1).to.equal(1)
+    console.log(vm.$el)
+    expect(vm.$el.querySelector('nav').hasChildNodes()).to.equal(true)
+    expect(vm.$el.querySelector('nav').textContent.to.equal('Home: ')
   })
 })

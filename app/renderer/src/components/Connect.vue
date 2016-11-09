@@ -1,43 +1,27 @@
 <template>
-  <section>
-    <h2 class="title">Connect to Robot</h2>
-    <div class="instructions">
-      Please make sure that your computer is connected to the robot, and your machine is plugged in and turned on before continuing.
-    </div>
-    <div class="step step-connect">
-      <div class="connect" v-if="!connected">
-        <select v-model="ports.selected" id="connections" @change="searchIfNecessary()">
-          <option value="default">Select a port</option>
-          <option value="refresh-list">&#8635 refresh</option>
-          <option v-for="option in ports.options" v-bind:value="option.value">
-            {{ option.text }}
-          </option>
-        </select>
-        <button @click="connectToRobot" v-show="ports.selected" class="btn-connect">Connect!</button>
-      </div>
-      <div class="connected" v-if="connected">
-        <p>The selected port is: {{ port }}</p>
-        <button @click="disconnectRobot" v-show="connected" class="btn-connect">Disconnect!</button>
-      </div>
-    </div>
-    <Navigation :prev="prev" :next="next"></Navigation>
-  </section>
+  <nav class="connect">
+    <select @change="searchIfNecessary()" v-model="ports.selected" id="connections">
+      <option value="default">Select a port</option>
+      <option value="refresh-list">&#8635 refresh</option>
+      <option v-for="option in ports.options" v-bind:value="option.value">
+        {{ option.text }}
+      </option>
+    </select>
+    
+<div id="indicator" :class="{ 'connected': connected}"></div>
+
+    
+  </nav>
+  
 </template>
 
-
 <script>
-  import Navigation from './Navigation.vue'
   import OpenTrons from '../rest_api_wrapper'
 
   export default {
-    name: "connect",
-    components: {
-      Navigation
-    },
+    name: "Connect",
     data: function () {
       return {
-        next: "/upload",
-        prev: "/",
         ports: {
           selected: "default",
           options: []
@@ -64,12 +48,18 @@
       },
       searchIfNecessary: function () {
         let selected = this.ports.selected
+        console.log(this.ports.selected)
         if ( selected === "refresh-list" || selected === null) {
           this.getPortsList()
           this.ports.selected = "default"
+        } else if (selected === "default") {
+          this.disconnectRobot()
+        } else {
+          this.connectToRobot()
         }
       },
       connectToRobot: function() {
+        console.log(this.ports.selected)
         if (this.ports.selected === 'Refresh') {
           this.ports.selected = null
           return

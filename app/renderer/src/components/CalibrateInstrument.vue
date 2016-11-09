@@ -1,63 +1,96 @@
 <template>
-	<div class="calibration-modal" v-bind:class="currentMode">
-		<div class="pipette-img">
-		  <img src="../assets/img/pipette_top.png" class="top" />
-		  <img src="../assets/img/pipette_bottom.png" class="bottom" />
-		  <img src="../assets/img/pipette_blowout.png" class="blowout" />
-		  <img src="../assets/img/pipette_droptip.png" class="droptip" />
-		</div>
-		<div :class="['update', busy]">
-		  <a @click="toggleMode('top')"class="position top">Top</a>
-		  <button class="btn-update save top" @click="calibrateInstrument(instrument, 'top')">Save</button>
-		  <button @click="moveToPlungerPosition(instrument, 'top')" :class="[{'disabled': disabled(instrument, 'top')}, 'btn-update', 'moveto', 'top']">Move</button>
-		  <div class="spacer"></div>
-		  <a @click="toggleMode('bottom')" class="position bottom">Bottom</a>
-		  <button class="btn-update save bottom" @click="calibrateInstrument(instrument, 'bottom')">Save</button>
-		  <button @click="moveToPlungerPosition(instrument, 'bottom')" :class="[{'disabled': disabled(instrument, 'bottom')}, 'btn-update', 'moveto', 'bottom']">Move</button>
-		  <a @click="toggleMode('blowout')" class="position blowout">Blowout</a>
-		  <button class="btn-update save blowout" @click="calibrateInstrument(instrument, 'blow_out')">Save</button>
-		  <button @click="moveToPlungerPosition(instrument, 'blow_out')" :class="[{'disabled': disabled(instrument, 'blow_out')}, 'btn-update', 'moveto', 'blowout']">Move</button>
-		  <a @click="toggleMode('droptip')" class="position droptip">Drop Tip</a>
-		  <button class="btn-update save droptip" @click="calibrateInstrument(instrument, 'drop_tip')">Save</button>
-		  <button @click="moveToPlungerPosition(instrument, 'drop_tip')" :class="[{'disabled': disabled(instrument, 'drop_tip')}, 'btn-update', 'moveto', 'droptip']">Move</button>
-		  <button @click="pickUpTip(instrument)" class="btn-update test pick-liquid">Pick Up Tip</button>
-		  <button @click="dropTip(instrument)" class="btn-update test eject-liquid">Drop Tip</button>
-		</div>
-	</div>
+	<section id="task-pipette" >
+		<h1 class="title">Calibrate the p10 pipette</h1>
+		<span>
+			<div class="calibrate-pipette">
+				<section class="calibrate top" @mouseenter="toggleMode('top')">
+					<span class="title">TOP</span>
+					<button @click="calibrateInstrument(currentAxis(), 'top')" class="btn-calibrate save">SAVE</button>
+					<button @click="moveToPlungerPosition(currentAxis(), 'top')" :class="[{'disabled': !calibrated('top')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
+				</section>
+
+				<section class="calibrate bottom" @mouseenter="toggleMode('bottom')">
+					<span class="title">BOTTOM</span>
+					<button @click="calibrateInstrument(currentAxis(), 'bottom')" class="btn-calibrate save">SAVE</button>
+					<button @click="moveToPlungerPosition(currentAxis(), 'bottom')" :class="[{'disabled': !calibrated('bottom')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
+				</section>
+
+				<section class="calibrate blowout" @mouseenter="toggleMode('blow-out')">
+					<span class="title">BLOW OUT</span>
+					<button @click="calibrateInstrument(currentAxis(), 'blow_out')" class="btn-calibrate save">SAVE</button>
+					<button @click="moveToPlungerPosition(currentAxis(), 'blow_out')" :class="[{'disabled': !calibrated('blow_out')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
+				</section>
+
+				<section class="calibrate drop-tip" @mouseenter="toggleMode('drop-tip')">
+					<span class="title">DROP TIP</span>
+					<button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class="btn-calibrate save">SAVE</button>
+					<button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" :class="[{'disabled': !calibrated('drop_tip')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
+				</section>
+				<section class="calibrate volume">
+					<!-- <span class="title">MAX VOL ul</span> -->
+						<input v-model="volume" placeholder="SET MAX VOL">
+					<button @click="maxVolume(currentAxis(), volume)" class="btn-calibrate save">SAVE</button>
+				</section>
+			</div>
+			<div class="pipette-diagrams" v-bind:class="currentMode">
+	      <img src="../assets/img/pipette_top.png" class="top"/>
+	      <img src="../assets/img/pipette_bottom.png" class="bottom"/>
+	      <img src="../assets/img/pipette_blowout.png" class="blow-out"/>
+	      <img src="../assets/img/pipette_droptip.png" class="drop-tip"/>
+	    </div>
+		</span>
+		<section class="calibrate tips">
+			<button @click="pickUpTip(currentAxis())" class="btn-calibrate move-to">PICK UP TIP</button>
+			<button @click="dropTip(currentAxis())" class="btn-calibrate move-to">DROP TIP</button>
+			<button @click="aspirate(currentAxis())" class="btn-calibrate move-to">ASPIRATE</button>
+			<button @click="dispense(currentAxis())" class="btn-calibrate move-to">DISPENSE</button>
+		</section>
+	</section>
 </template>
 
 <script>
   export default {
     name: 'CalibrateInstrument',
-    props: ['instrument', 'busy'],
     data: function() {
       return {
-        currentMode : 'droptip'
+        currentMode : 'drop-tip',
+        volume : null
       }
     },
     methods: {
-    	calibrateInstrument(instrument, position) {
-    		let axis = instrument.axis
-    		this.$store.dispatch("calibrate", {axis, position})
-    	},
-      moveToPlungerPosition(instrument, position) {
-        let axis = instrument.axis
-        this.$store.dispatch("moveToPosition", {axis, position})
-      },
-			disabled(instrument, position) {
-				if (instrument[position] == undefined) { return true }
+			currentAxis() {
+				return this.$route.params.instrument
 			},
-      toggleMode(mode){
+			toggleMode(mode){
         this.currentMode = mode
       },
-			pickUpTip(instrument) {
-		    let axis = instrument.axis
-		    this.$store.dispatch("pickUpTip", { axis: axis })
+    	calibrateInstrument(axis, position) {
+    		this.$store.dispatch("calibrate", {axis, position})
+    	},
+      moveToPlungerPosition(axis, position) {
+        this.$store.dispatch("moveToPosition", {axis, position})
+      },
+			pickUpTip(axis) {
+		    this.$store.dispatch("pickUpTip", { axis })
 		  },
-		  dropTip(instrument) {
-		    let axis = instrument.axis
-		    this.$store.dispatch("dropTip", { axis: axis })
-		  }
+		  dropTip(axis) {
+		    this.$store.dispatch("dropTip", { axis })
+		  },
+		  aspirate(axis) {
+		    this.$store.dispatch("aspirate", { axis })
+		  },
+		  dispense(axis) {
+		    this.$store.dispatch("dispense", { axis })
+		  },
+		  maxVolume(axis, volume) {
+		    this.$store.dispatch("maxVolume", { axis, volume })
+		  },
+			calibrated(position) {
+				let instrument = this.$store.state.tasks.filter((instrument) => {
+					return instrument.axis == this.$route.params.instrument
+				})[0]
+				return typeof(instrument[position]) == "number" ? true : false
+			}
     }
   }
 </script>

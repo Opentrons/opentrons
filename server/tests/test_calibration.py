@@ -18,6 +18,57 @@ class CalibrationTestCase(unittest.TestCase):
         self.robot = Robot.get_instance()
         self.robot.connect()
 
+    def test_aspirate_dispense(self):
+
+        response = self.app.post('/upload', data={
+            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
+        })
+
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        self.assertEquals(self.robot._instruments['B'].max_volume, 10)
+
+        self.robot._instruments['B'].calibrate_plunger(
+            top=0, bottom=5, blow_out=6, drop_tip=7)
+
+        # moving the head down (as the user would have already done)
+        # so limit switch isn't hit during this test
+        self.robot.move_head(z=0)
+
+        arguments = {
+            'axis': 'b'
+        }
+        response = self.app.post(
+            '/aspirate',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        arguments = {
+            'axis': 'b'
+        }
+        response = self.app.post(
+            '/dispense',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        arguments = {
+            'axis': 'b',
+            'volume': 12
+        }
+        response = self.app.post(
+            '/set_max_volume',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        self.assertEquals(self.robot._instruments['B'].max_volume, 12)
+
     def test_move_to_plunger_position(self):
 
         response = self.app.post('/upload', data={

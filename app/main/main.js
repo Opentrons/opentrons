@@ -15,7 +15,6 @@ const {ServerManager} = require('./servermanager.js')
 let serverManager = new ServerManager()
 let mainWindow
 
-
 if (process.env.NODE_ENV == 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
