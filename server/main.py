@@ -29,7 +29,6 @@ app = Flask(__name__,
             template_folder=TEMPLATES_FOLDER
             )
 
-# app.config['LOGGER_NAME'] = 'opentrons-app'
 
 CORS(app)
 app.jinja_env.autoescape = False
