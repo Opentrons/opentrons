@@ -29,7 +29,7 @@ app = Flask(__name__,
             template_folder=TEMPLATES_FOLDER
             )
 
-app.config['LOGGER_NAME'] = 'opentrons-app'
+# app.config['LOGGER_NAME'] = 'opentrons-app'
 
 CORS(app)
 app.jinja_env.autoescape = False
@@ -681,33 +681,40 @@ def get_run_plan():
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
 def on_connect():
-    print(app.debug)
     print('connected to front end...')
 
+
 @app.before_request
-def log_request():
-    log_msg = "{method} {url} | {data}".format(
+def log_before_request():
+    logger = logging.getLogger('opentrons-app')
+    log_msg = "[BR] {method} {url} | {data}".format(
         method=request.method,
         url=request.url,
         data=request.data,
     )
-    app.logger.info(log_msg)
+    logger.info(log_msg)
+
+
+@app.after_request
+def log_after_request(response):
+    if response.mimetype == 'text/html':
+        return response
+    logger = logging.getLogger('opentrons-app')
+    log_msg = "[AR] {data}".format(data=response.data)
+    logger.info(log_msg)
+    return response
+
 
 if __name__ == "__main__":
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
-
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
-
     _start_connection_watcher()
 
-    app.logger.info('Initializing')
     import log  # NOQA
-    lg = logging.getLogger(app.logger_name)
+    lg = logging.getLogger('opentrons-app')
     lg.info('Starting Flask Server')
-
-    print(logging.Logger.manager.loggerDict)
 
     socketio.run(
         app,
@@ -715,6 +722,6 @@ if __name__ == "__main__":
         logger=False,
         use_reloader=False,
         log_output=False,
-        engineio_logger=False,
+        engineio_logger=True,
         port=31950
     )

@@ -47,17 +47,17 @@ logging_config = dict(
     },
     loggers={
         'opentrons-app': {
-         'handlers': ['opentrons-app'],
-         'level': logging.INFO,
+            'handlers': ['opentrons-app'],
+            'level': logging.DEBUG,
         },
         # 'socketio': {
         #  'handlers': ['socketio'],
         #  'level': logging.INFO,
         # },
         'opentrons': {
-         'handlers': ['opentrons'],
-         'level': logging.INFO,
-        }
+            'handlers': ['opentrons'],
+            'level': logging.INFO,
+        },
     }
 )
 
