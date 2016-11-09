@@ -101,7 +101,7 @@ def upload():
     if len(api_response['errors']) == 0:
         emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
     emit_notifications(api_response['errors'], 'danger')
-    emit_notifications(api_response['warnings'], 'warning')
+    # emit_notifications(api_response['warnings'], 'warning')
 
     return flask.jsonify({
         'status': 'success',
@@ -142,7 +142,7 @@ def _run_commands():
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
     end_time = time.time()
-    emit_notifications(api_response['warnings'], 'warning')
+    # emit_notifications(api_response['warnings'], 'warning')
     emit_notifications(api_response['errors'], 'danger')
     seconds = end_time - start_time
     minutes, seconds = divmod(seconds, 60)
