@@ -20,12 +20,24 @@ The following examples assume the containers and pipettes:
       
   p200 = instruments.Pipette(axis="b")
 
-.. testcode:: long
+.. testsetup:: demo
   
   from opentrons.robot import Robot
   Robot().reset()
 
-.. testcode:: long
+.. testcleanup:: main
+  
+  import opentrons
+  from opentrons.robot import Robot
+  del opentrons.robot.robot.Singleton._instances[Robot]
+
+.. testcleanup:: demo
+  
+  import opentrons
+  from opentrons.robot import Robot
+  del opentrons.robot.robot.Singleton._instances[Robot]
+
+.. testcode:: demo
 
   from opentrons.robot import Robot
   from opentrons import containers, instruments
