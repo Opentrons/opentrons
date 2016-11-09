@@ -6,9 +6,9 @@
 			of your {{this.placeable ? this.placeable.label : ""}} container
 		</h1>
 		<button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
-		<button class="btn-calibrate move-to" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
-		<button v-show="placeableType('tiprack')" class="btn-calibrate move-to" @click="pickUpTip(instrument)">PICK UP TIP</button>
-		<button v-show="placeableType('tiprack')" class="btn-calibrate move-to" @click="dropTip(instrument)">DROP TIP</button>
+		<button :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
+		<button v-show="placeableType('tiprack')" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="pickUpTip(instrument)">PICK UP TIP</button>
+		<button v-show="placeableType('tiprack')" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="dropTip(instrument)">DROP TIP</button>
 		<div class="well-img">
 			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
 			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
@@ -56,22 +56,16 @@
 				})[0]
 			},
 			containerType(type){
-				if (type === "point"){
+				if (type === "point") {
 					return "point"
-				} else if (type.includes("tiprack")){
+				} else if (type.includes("tiprack")) {
 					return "tiprack"
-				}
-				else {
+				} else {
 					return "default"
 				}
 			}
     },
 		computed: {
-			calibration() {
-				let tasks = this.$store.state.tasks
-				let placeable = this.currentPlaceable(tasks)
-				return placeable
-			},
 			instrument() {
 				let tasks = this.$store.state.tasks
 				return this.currentInstrument(tasks)
