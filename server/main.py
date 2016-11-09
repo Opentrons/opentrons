@@ -581,6 +581,8 @@ def move_to_plunger_position():
 def aspirate_from_current_position():
     axis = request.json.get("axis")
     try:
+        # this action mimics 1.2 app experience
+        # but should be re-thought to take advantage of API features
         instrument = robot._instruments[axis.upper()]
         robot.move_head(z=20, mode='relative')
         instrument.motor.move(instrument.positions['blow_out'])
@@ -604,6 +606,8 @@ def aspirate_from_current_position():
 def dispense_from_current_position():
     axis = request.json.get("axis")
     try:
+        # this action mimics 1.2 app experience
+        # but should be re-thought to take advantage of API features
         instrument = robot._instruments[axis.upper()]
         instrument.motor.move(instrument.positions['blow_out'])
     except Exception as e:
