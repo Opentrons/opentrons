@@ -6,25 +6,25 @@
 			<section class="calibrate top" @mouseenter="toggleMode('top')">
 				<span class="title">TOP</span>
 				<button @click="calibrateInstrument(currentAxis(), 'top')" class="btn-calibrate save">SAVE</button>
-				<button @click="moveToPlungerPosition(currentAxis(), 'top')" class="btn-calibrate move-to">MOVE TO</button>
+				<button @click="moveToPlungerPosition(currentAxis(), 'top')" :class="[{'disabled': !calibrated('top')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
 			</section>
 
 			<section class="calibrate bottom" @mouseenter="toggleMode('bottom')">
 				<span class="title">BOTTOM</span>
 				<button @click="calibrateInstrument(currentAxis(), 'bottom')" class="btn-calibrate save">SAVE</button>
-				<button @click="moveToPlungerPosition(currentAxis(), 'bottom')" class="btn-calibrate move-to">MOVE TO</button>
+				<button @click="moveToPlungerPosition(currentAxis(), 'bottom')" :class="[{'disabled': !calibrated('bottom')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
 			</section>
 
 			<section class="calibrate blowout" @mouseenter="toggleMode('blow-out')">
 				<span class="title">BLOWOUT</span>
 				<button @click="calibrateInstrument(currentAxis(), 'blow_out')" class="btn-calibrate save">SAVE</button>
-				<button @click="moveToPlungerPosition(currentAxis(), 'blow_out')" class="btn-calibrate move-to">MOVE TO</button>
+				<button @click="moveToPlungerPosition(currentAxis(), 'blow_out')" :class="[{'disabled': !calibrated('blow_out')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
 			</section>
 
 			<section class="calibrate drop-tip" @mouseenter="toggleMode('drop-tip')">
 				<span class="title">DROP TIP</span>
 				<button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class="btn-calibrate save">SAVE</button>
-				<button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
+				<button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" :class="[{'disabled': !calibrated('drop_tip')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
 			</section>
 		</div>
 		<div class="pipette-diagrams" v-bind:class="currentMode">
@@ -55,7 +55,6 @@
 			},
 			toggleMode(mode){
         this.currentMode = mode
-        console.log(mode)
       },
     	calibrateInstrument(axis, position) {
     		this.$store.dispatch("calibrate", {axis, position})
@@ -68,7 +67,13 @@
 		  },
 		  dropTip(axis) {
 		    this.$store.dispatch("dropTip", { axis })
-		  }
+		  },
+			calibrated(position) {
+				let instrument = this.$store.state.tasks.filter((instrument) => {
+					return instrument.axis == this.$route.params.instrument
+				})[0]
+				return typeof(instrument[position]) == "number" ? true : false
+			}
     }
   }
 </script>
