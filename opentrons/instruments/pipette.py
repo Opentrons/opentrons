@@ -64,9 +64,9 @@ class Pipette(Instrument):
     >>> p1000 = instruments.Pipette(axis='a', max_volume=1000)
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'A1')
     >>> p200 = instruments.Pipette(
-    >>>     axis='b',
-    >>>     max_volume=200,
-    >>>     tip_racks=[tip_rack_200ul])
+    ...     axis='b',
+    ...     max_volume=200,
+    ...     tip_racks=[tip_rack_200ul])
     """
 
     def __init__(
