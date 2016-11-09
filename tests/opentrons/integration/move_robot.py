@@ -23,12 +23,11 @@ p200 = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack],
+    max_volume=200,
     min_volume=0.1,  # These are variable
     axis="b",
     channels=1
 )
-
-p200.set_max_volume(200)
 
 json_file_path = os.path.join(
     os.path.dirname(__file__),

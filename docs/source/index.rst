@@ -28,10 +28,10 @@
   well_4 = plate[3]
       
   p200 = instruments.Pipette(
-      axis="b"
+      axis="b",
+      max_volume=200
   )
 
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
   pipette = p200
 
 .. testsetup:: index_long
@@ -102,10 +102,10 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
   
   # Initialize a pipette    
   p200 = instruments.Pipette(
-      axis="b"
+      axis="b",
+      max_volume=200
   )
 
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
   p200.pick_up_tip(tiprack[0])  # pick up tip from position 0 in a tip rack
 
   # loop through 95 wells, transferring to the next

@@ -18,8 +18,7 @@ The following examples assume the containers and pipettes:
   trough = containers.load('trough-12row', 'C1')
   trash = containers.load('point', 'C2')
       
-  p200 = instruments.Pipette(axis="b")
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
+  p200 = instruments.Pipette(axis="b", max_volume=200)
 
 .. testsetup:: tips_demo
   
