@@ -196,7 +196,9 @@ def stop():
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'templates', 'dist')
-    return flask.send_from_directory(scripts_root_path, filename)
+    return flask.send_from_directory(
+        scripts_root_path, filename, mimetype='application/javascript'
+    )
 
 
 @app.route("/robot/serial/list")
@@ -697,8 +699,7 @@ def log_before_request():
 @app.after_request
 def log_after_request(response):
     response.direct_passthrough = False
-    print(response.mimetype)
-    if response.mimetype == ('text/html', 'application/javascript'):
+    if response.mimetype in ('text/html', 'application/javascript'):
         return response
     logger = logging.getLogger('opentrons-app')
     log_msg = "[AR] {data}".format(data=response.data)
