@@ -67,7 +67,7 @@ def load_python(stream):
             )
             api_response['errors'] = error
     except Exception as e:
-        print(e)
+        app.logger.error(e)
         api_response['errors'] = [str(e)]
 
 
@@ -681,7 +681,7 @@ def get_run_plan():
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
 def on_connect():
-    print('connected to front end...')
+    app.logger.info('Socketio connected to front end...')
 
 
 @app.before_request
@@ -715,6 +715,7 @@ if __name__ == "__main__":
     import log  # NOQA
     lg = logging.getLogger('opentrons-app')
     lg.info('Starting Flask Server')
+    [app.logger.addHandler(handler) for handler in lg.handlers]
 
     socketio.run(
         app,
@@ -722,6 +723,6 @@ if __name__ == "__main__":
         logger=False,
         use_reloader=False,
         log_output=False,
-        engineio_logger=True,
+        engineio_logger=False,
         port=31950
     )
