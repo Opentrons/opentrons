@@ -47,7 +47,7 @@ describe('application launch', function () {
   })
 
   it('opens a window', function () {
-    return this.app.client.waitUntilWindowLoaded(5000)
+    return this.app.client.waitUntilWindowLoaded(31950)
       .getWindowCount().should.eventually.equal(1)
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false
@@ -58,85 +58,52 @@ describe('application launch', function () {
   })
 
   it('runs a protocol', function () {
-    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/protocol.py')
+    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/simple_protocol.py')
     let pauseTime = process.env.PAUSE_TIME || 0
-    let tiprackXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[3]/button[1]"
-    let plateXpath = "//*[@id='task-pane']/div/section/div/div[2]/div[2]/div[2]/button[1]"
-    let top = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[1]'
-    let topSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[1]'
-    let bottom = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[2]'
-    let bottomSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[3]'
-    let blowOut = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[3]'
-    let blowOutSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[5]'
-    let dropTip = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/a[4]'
-    let dropTipSave = '//*[@id="task-pane"]/div/section/div/div[3]/div[2]/div[2]/button[7]'
+    let connectDropDown = '//*[@id="connections"]'
+    let virtualSmoothie = connectDropDown + '/option[3]'
+    let uploadXpath = '/html/body/div/section/form/div/input'
+    let saveButton = '//*[@id="task"]/button[1]'
+    let platePath = '//*[@id="step-list"]/div/span/div/ul/li[2]/a'
+    let plungerPath = '//*[@id="step-list"]/div/span/div/ul/li[3]/a'
+    let top = '//*[@id="task-pipette"]/span/div[1]/section[1]/button[1]'
+    let bottom = '//*[@id="task-pipette"]/span/div[1]/section[2]/button[1]'
+    let dropTip = '//*[@id="task-pipette"]/span/div[1]/section[3]/button[1]'
+    let blowOut = '//*[@id="task-pipette"]/span/div[1]/section[4]/button[1]'
+    let plungerDown = '//*[@id="jog-controls"]/span[3]/button[2]'
+    let run = '//*[@id="run"]/button'
 
-    return this.app.client.waitUntilWindowLoaded(5000)
-      .click('//*[@id="connections"]/option[3]')
+    return this.app.client.waitUntilWindowLoaded(31950)
+      .click(connectDropDown)
       .pause(pauseTime)
-      .click('.btn-connect')
+      .click(virtualSmoothie)
       .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .chooseFile('//*[@id="task-pane"]/div/section/div[2]/form/div/input', file)
+      .chooseFile(uploadXpath, file)
       .pause(1000)
-      .click('.next')
       .pause(pauseTime)
-      .click(tiprackXpath)
+      .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
+      .click(saveButton)
       .pause(pauseTime)
-      .click('.next')
+      .click(platePath)
       .pause(pauseTime)
-      .click(plateXpath)
+      .click(saveButton)
       .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click(plateXpath)
-      .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click(plateXpath)
-      .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click(tiprackXpath)
-      .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click(plateXpath)
-      .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click(plateXpath)
-      .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click(plateXpath)
-      .pause(pauseTime)
-      .click('.next')
+      .click(plungerPath)
       .pause(pauseTime)
       .click(top)
-      .click(topSave)
+      .pause(pauseTime)
+      .click(plungerDown)
+      .pause(pauseTime)
       .click(bottom)
-      .click(bottomSave)
-      .click(blowOut)
-      .click(blowOutSave)
+      .pause(pauseTime)
+      .click(plungerDown)
+      .pause(pauseTime)
       .click(dropTip)
-      .click(dropTipSave)
       .pause(pauseTime)
-      .click('.next')
-      .click(top)
-      .click(topSave)
-      .click(bottom)
-      .click(bottomSave)
       .click(blowOut)
-      .click(blowOutSave)
-      .click(dropTip)
-      .click(dropTipSave)
       .pause(pauseTime)
-      .click('.next')
-      .pause(pauseTime)
-      .click('//*[@id="task-pane"]/div/section/div[2]/div[2]/button[1]')
+      .click(run)
       .pause(2000)
-      .waitForText(".toast-message-text", "Success")
+      .waitForText(".toast-message-text", "Run complete")
   })
 })
