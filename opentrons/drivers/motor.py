@@ -134,9 +134,10 @@ class CNCDriver(object):
             raise EnvironmentError('Unsupported platform')
 
         result = []
+        port_filter = {'usbmodem', 'COM', 'ACM', 'USB'}
         for port in ports:
             try:
-                if 'usbmodem' in port or 'COM' in port:
+                if any([f in port for f in port_filter]):
                     s = serial.Serial(port)
                     s.close()
                     result.append(port)
