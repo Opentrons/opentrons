@@ -19,9 +19,8 @@ logging_config = dict(
             'class': 'logging.StreamHandler',
             'formatter': 'basic',
         },
-        'development': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
+        'null': {
+            'class': 'logging.NullHandler',
         },
         'opentrons-app': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -58,6 +57,11 @@ logging_config = dict(
             'handlers': ['opentrons'],
             'level': logging.INFO,
         },
+    },
+    ## Used to override root logger in opentrons-api
+    root={
+        'handlers': ['null'],
+        'level': logging.INFO,
     }
 )
 
