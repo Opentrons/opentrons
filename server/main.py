@@ -711,7 +711,7 @@ if __name__ == "__main__":
         run_once(data_dir)
     _start_connection_watcher()
 
-    import log  # NOQA
+    from server import log  # NOQA
     lg = logging.getLogger('opentrons-app')
     lg.info('Starting Flask Server')
     [app.logger.addHandler(handler) for handler in lg.handlers]
