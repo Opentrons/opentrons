@@ -631,6 +631,11 @@ button{
   }
 }
 
+.disabled.btn-calibrate {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
 
 
 
