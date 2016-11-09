@@ -6,7 +6,7 @@ matrix:
   # Otherwise with fast_finish: true 
   # the success of Linux build is enough for CI purposes
   fast_finish: true
-   include:
+  include:
      - os: linux
        # Trying container environment
        sudo: false
