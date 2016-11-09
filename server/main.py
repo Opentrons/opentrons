@@ -28,6 +28,8 @@ app = Flask(__name__,
             static_folder=STATIC_FOLDER,
             template_folder=TEMPLATES_FOLDER
             )
+
+
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
@@ -64,7 +66,7 @@ def load_python(stream):
             )
             api_response['errors'] = error
     except Exception as e:
-        print(e)
+        app.logger.error(e)
         api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings() or []
@@ -199,7 +201,9 @@ def stop():
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path
     scripts_root_path = os.path.join(root, 'templates', 'dist')
-    return flask.send_from_directory(scripts_root_path, filename)
+    return flask.send_from_directory(
+        scripts_root_path, filename, mimetype='application/javascript'
+    )
 
 
 @app.route("/robot/serial/list")
@@ -758,27 +762,49 @@ def get_run_plan():
 # front end that a connection was established, this route does that.
 @socketio.on('connected')
 def on_connect():
-    print('connected to front end...')
+    app.logger.info('Socketio connected to front end...')
 
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    datefmt='%d-%m-%y %H:%M:%S'
-)
+@app.before_request
+def log_before_request():
+    logger = logging.getLogger('opentrons-app')
+    log_msg = "[BR] {method} {url} | {data}".format(
+        method=request.method,
+        url=request.url,
+        data=request.data,
+    )
+    logger.info(log_msg)
+
+
+@app.after_request
+def log_after_request(response):
+    response.direct_passthrough = False
+    if response.mimetype in ('text/html', 'application/javascript'):
+        return response
+    logger = logging.getLogger('opentrons-app')
+    log_msg = "[AR] {data}".format(data=response.data)
+    logger.info(log_msg)
+    return response
 
 
 if __name__ == "__main__":
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
-
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
-
     _start_connection_watcher()
+
+    from server import log  # NOQA
+    lg = logging.getLogger('opentrons-app')
+    lg.info('Starting Flask Server')
+    [app.logger.addHandler(handler) for handler in lg.handlers]
 
     socketio.run(
         app,
-        debug=IS_DEBUG,
+        debug=False,
+        logger=False,
+        use_reloader=False,
+        log_output=False,
+        engineio_logger=False,
         port=31950
     )
