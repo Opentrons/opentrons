@@ -16,6 +16,10 @@ class RobotTest(unittest.TestCase):
         self.robot.connect()
         self.robot.home(enqueue=False)
 
+    def test_home_after_disconnect(self):
+        self.robot.disconnect()
+        self.assertRaises(RuntimeError, self.robot.home)
+
     def test_simulate(self):
         self.robot.disconnect()
         p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
@@ -23,6 +27,28 @@ class RobotTest(unittest.TestCase):
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
         self.assertEquals(self.robot.connections['live'], None)
+
+    def test_stop_run(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
+
+        for i in range(1000):
+            p200.aspirate().dispense()
+
+        res = None
+
+        def _run():
+            nonlocal res
+            res = self.robot.run()
+
+        thread = threading.Thread(target=_run)
+        thread.start()
+
+        self.robot.stop()
+
+        thread.join()
+
+        self.assertEquals(res[-1], 'Stop signal received')
 
     def test_calibrated_max_dimension(self):
 
@@ -52,7 +78,7 @@ class RobotTest(unittest.TestCase):
 
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 95 + 5},
+            {'z': 100},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]
@@ -60,7 +86,7 @@ class RobotTest(unittest.TestCase):
 
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 15.5 + 5},
+            {'z': 20.5 + 5},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]

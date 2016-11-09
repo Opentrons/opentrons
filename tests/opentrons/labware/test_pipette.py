@@ -26,15 +26,40 @@ class PipetteTest(unittest.TestCase):
         self.p200 = instruments.Pipette(
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             axis="b",
             channels=1
         )
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
-        self.p200.set_max_volume(200)
         self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
+
+    def test_get_plunger_position(self):
+
+        self.assertEquals(self.p200._get_plunger_position('top'), 0)
+        self.assertEquals(self.p200._get_plunger_position('bottom'), 10)
+        self.assertEquals(self.p200._get_plunger_position('blow_out'), 12)
+        self.assertEquals(self.p200._get_plunger_position('drop_tip'), 13)
+
+        self.p200.positions['drop_tip'] = None
+        self.assertRaises(
+            RuntimeError, self.p200._get_plunger_position, 'drop_tip')
+
+        self.assertRaises(
+            RuntimeError, self.p200._get_plunger_position, 'roll_out')
+
+    def test_set_max_volume(self):
+
+        self.p200.reset()
+        self.p200.aspirate()
+        self.assertEquals(self.p200.current_volume, 200)
+
+        self.p200.reset()
+        self.p200.set_max_volume(202)
+        self.p200.aspirate()
+        self.assertEquals(self.p200.current_volume, 202)
 
     def test_calibrate_by_position_name(self):
 
@@ -434,14 +459,14 @@ class PipetteTest(unittest.TestCase):
         # so that you have liquid
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
-        self.p200.mix(100, 3, self.plate[1])
+        self.p200.mix(100, self.plate[1], 3)
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(100, enqueue=True),
-                mock.call.dispense(100, enqueue=True),
-                mock.call.dispense(100, enqueue=True)
+                mock.call.dispense(100, rate=1.0, enqueue=True),
+                mock.call.dispense(100, rate=1.0, enqueue=True),
+                mock.call.dispense(100, rate=1.0, enqueue=True)
             ]
         )
         self.assertEqual(
@@ -450,9 +475,10 @@ class PipetteTest(unittest.TestCase):
                 mock.call.aspirate(
                     volume=100,
                     location=self.plate[1],
+                    rate=1.0,
                     enqueue=True),
-                mock.call.aspirate(100, enqueue=True),
-                mock.call.aspirate(100, enqueue=True)
+                mock.call.aspirate(100, rate=1.0, enqueue=True),
+                mock.call.aspirate(100, rate=1.0, enqueue=True)
             ]
         )
 
@@ -466,15 +492,18 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
-                mock.call.dispense(50, enqueue=True),
-                mock.call.dispense(50, enqueue=True)
+                mock.call.dispense(50, rate=1.0, enqueue=True),
+                mock.call.dispense(50, rate=1.0, enqueue=True)
             ]
         )
         self.assertEqual(
             self.p200.aspirate.mock_calls,
             [
-                mock.call.aspirate(volume=50, location=None, enqueue=True),
-                mock.call.aspirate(50, enqueue=True)
+                mock.call.aspirate(volume=50,
+                                   location=None,
+                                   rate=1.0,
+                                   enqueue=True),
+                mock.call.aspirate(50, rate=1.0, enqueue=True)
             ]
         )
 
@@ -571,6 +600,7 @@ class PipetteTest(unittest.TestCase):
         p200_multi = instruments.Pipette(
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             axis="b",
             channels=8
@@ -578,7 +608,6 @@ class PipetteTest(unittest.TestCase):
 
         p200_multi.calibrate_plunger(
             top=0, bottom=10, blow_out=12, drop_tip=13)
-        p200_multi.set_max_volume(200)
         p200_multi.move_to = mock.Mock()
 
         for _ in range(0, 12 * 4):

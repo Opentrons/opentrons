@@ -3,6 +3,10 @@ from opentrons.instruments.instrument import Instrument
 
 
 class Magbead(Instrument):
+    """
+    Through this class you can can:
+        * Control the Magbead module to :meth:`engage` or :meth:`disengage`
+    """
 
     def __init__(self, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
@@ -15,15 +19,38 @@ class Magbead(Instrument):
             name = self.__class__.__name__
         self.name = name
 
-        # all instruments should hold calibration data, even if not used
-        self.calibration_data = {}
+        self.persisted_data = []
+
+        self.calibration_key = "{axis}:{instrument_name}".format(
+            axis=self.axis,
+            instrument_name=self.name
+        )
 
         # a reference to the placeable set ontop the magbead module
         self.container = container
 
         self.engaged = False
 
+        persisted_key = '{axis}:{name}'.format(
+            axis=self.axis,
+            name=self.name)
+        self.init_calibrations(key=persisted_key)
+        self.load_persisted_data()
+
     def engage(self, enqueue=True):
+        """
+        Move the Magbead platform upwards,
+        bringing the magnetic field close to the wells
+
+        Parameters
+        ----------
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+        """
         def _setup():
             self.engaged = True
 
@@ -41,6 +68,19 @@ class Magbead(Instrument):
         return self
 
     def disengage(self, enqueue=True):
+        """
+        Move the Magbead platform downwards,
+        lowering the magnetic field away to the wells
+
+        Parameters
+        ----------
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+        """
         def _setup():
             self.engaged = False
 
@@ -58,6 +98,20 @@ class Magbead(Instrument):
         return self
 
     def delay(self, seconds, enqueue=True):
+        """
+        Pause the robot for a given number of seconds
+
+        Parameters
+        ----------
+        seconds : int or float
+            The number of seconds to delay
+
+        enqueue : bool
+            If set to `True` (default), the method will be appended
+            to the robots list of commands for executing during
+            :any:`run` or :any:`simulate`. If set to `False`, the
+            method will skip the command queue and execute immediately
+        """
         def _setup():
             pass
 

@@ -62,11 +62,11 @@ class GridTestCase(unittest.TestCase):
         p200 = instruments.Pipette(
             trash_container=trash,
             tip_racks=[tiprack],
+            max_volume=200,
             min_volume=10,  # These are variable
             axis="b",
             channels=1
         )
-        p200.set_max_volume(200)
         p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
 
         for t, col in enumerate(plate.cols):

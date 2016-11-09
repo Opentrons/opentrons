@@ -27,6 +27,10 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_write_without_connection(self):
+        self.motor.disconnect()
+        self.assertRaises(RuntimeError, self.motor.calm_down)
+
     def test_version_compatible(self):
         self.robot.disconnect()
         self.robot.connect()
@@ -97,7 +101,11 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.pause()
 
         def _move_head():
-            self.motor.move_head(x=100, y=0, z=0)
+            self.assertRaises(
+                RuntimeWarning,
+                self.motor.move_head,
+                **{'x': 100, 'y': 0, 'z': 0}
+            )
 
         thread = Thread(target=_move_head)
         thread.start()
