@@ -97,15 +97,18 @@ def upload():
         })
 
     calibrations = get_step_list()
+    if len(api_response['errors']) == 0:
+        emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
     emit_notifications(api_response['errors'], 'danger')
-    emit_notifications(api_response['warnings'], 'warning')
+    # emit_notifications(api_response['warnings'], 'warning')
 
     return flask.jsonify({
         'status': 'success',
         'data': {
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
-            'calibrations': calibrations
+            'calibrations': calibrations,
+            'fileName': file.filename
         }
     })
 
@@ -138,7 +141,7 @@ def _run_commands():
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
     end_time = time.time()
-    emit_notifications(api_response['warnings'], 'warning')
+    # emit_notifications(api_response['warnings'], 'warning')
     emit_notifications(api_response['errors'], 'danger')
     seconds = end_time - start_time
     minutes, seconds = divmod(seconds, 60)
@@ -162,6 +165,7 @@ def run():
 @app.route("/pause", methods=["GET"])
 def pause():
     result = robot.pause()
+    emit_notifications(['Protocol paused'], 'info')
 
     return flask.jsonify({
         'status': 'success',
@@ -172,6 +176,7 @@ def pause():
 @app.route("/resume", methods=["GET"])
 def resume():
     result = robot.resume()
+    emit_notifications(['Protocol resumed'], 'info')
 
     return flask.jsonify({
         'status': 'success',
@@ -179,13 +184,14 @@ def resume():
     })
 
 
-@app.route("/stop", methods=["GET"])
+@app.route("/cancel", methods=["GET"])
 def stop():
-    robot.stop()
+    result = robot.stop()
+    emit_notifications(['Protocol stopped'], 'info')
 
     return flask.jsonify({
         'status': 'success',
-        'data': ''
+        'data': result
     })
 
 
@@ -219,7 +225,7 @@ def get_coordinates():
 
 
 @app.route("/robot/diagnostics")
-def get_diagnostics():
+def diagnostics():
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -244,6 +250,8 @@ def connect_robot():
         robot = Robot.get_instance()
         robot.connect(
             port, options=options)
+        emit_notifications(["Successfully connected"], 'info')
+
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -296,6 +304,7 @@ def disconnect_robot():
 
     try:
         Robot.get_instance().disconnect()
+        emit_notifications(["Successfully disconnected"], 'info')
     except Exception as e:
         status = 'error'
         data = str(e)
@@ -395,28 +404,32 @@ def _check_if_instrument_calibrated(instrument):
 
 
 def get_step_list():
+    try:
+        data = [{
+            'axis': instrument.axis,
+            'label': instrument.name,
+            'top': instrument.positions['top'],
+            'bottom': instrument.positions['bottom'],
+            'blow_out': instrument.positions['blow_out'],
+            'drop_tip': instrument.positions['drop_tip'],
+            'max_volume': instrument.max_volume,
+            'calibrated': _check_if_instrument_calibrated(instrument),
+            'channels': instrument.channels,
+            'placeables': [
+                {
+                    'type': container.properties['type'],
+                    'label': container.get_name(),
+                    'slot': container.get_parent().get_name(),
+                    'calibrated': _check_if_calibrated(instrument, container)
+                }
+                for container in _get_unique_containers(instrument)
+            ]
+        } for _, instrument in Robot.get_instance().get_instruments()]
 
-    data = [{
-        'axis': instrument.axis,
-        'label': instrument.name,
-        'top': instrument.positions['top'],
-        'bottom': instrument.positions['bottom'],
-        'blow_out': instrument.positions['blow_out'],
-        'drop_tip': instrument.positions['drop_tip'],
-        'max_volume': instrument.max_volume,
-        'calibrated': _check_if_instrument_calibrated(instrument),
-        'placeables': [
-            {
-                'type': container.properties['type'],
-                'label': container.get_name(),
-                'slot': container.get_parent().get_name(),
-                'calibrated': _check_if_calibrated(instrument, container)
-            }
-            for container in _get_unique_containers(instrument)
-        ]
-    } for _, instrument in Robot.get_instance().get_instruments()]
+        return data
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
 
-    return data
 
 
 @app.route('/home/<axis>')
@@ -428,7 +441,7 @@ def home(axis):
             result = robot.home(enqueue=False)
         else:
             result = robot.home(axis, enqueue=False)
-
+        emit_notifications(["Successfully homed"], 'info')
     except Exception as e:
         result = str(e)
         status = 'error'
@@ -672,6 +685,8 @@ def calibrate_placeable():
     axis = request.json.get("axis")
     try:
         _calibrate_placeable(name, axis)
+        calibrations = get_step_list()
+        emit_notifications(['Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -679,7 +694,6 @@ def calibrate_placeable():
             'data': str(e)
         })
 
-    calibrations = get_step_list()
 
     # TODO change calibration key to steplist
     return flask.jsonify({
@@ -710,6 +724,7 @@ def calibrate_plunger():
     axis = request.json.get("axis")
     try:
         _calibrate_plunger(position, axis)
+        emit_notifications(['Saved {0} on the {1} pipette'.format(position, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({

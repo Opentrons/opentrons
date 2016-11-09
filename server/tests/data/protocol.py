@@ -41,7 +41,7 @@ p10 = instruments.Pipette(
     min_volume=1,  # These are variable
     max_volume=10,
     axis="a",
-    channels=1
+    channels=8
 )
 
 p1000.delete_calibration_data()

@@ -8,7 +8,13 @@ const actions = {
   connect_robot ({ commit }, port) {
     const payload = {is_connected: true, 'port': port}
     OpenTrons.connect(port).then((was_successful) => {
-      if (was_successful) commit(types.UPDATE_ROBOT_CONNECTION, payload)
+      if (was_successful) {
+        commit(types.UPDATE_ROBOT_CONNECTION, payload)
+        OpenTrons.getVersions().then((result) => {
+          let versions = result
+          commit(types.UPDATE_ROBOT_VERSIONS, {versions})
+        })
+      }
     })
   },
   disconnect_robot ({ commit }) {
@@ -26,22 +32,25 @@ const actions = {
     OpenTrons.uploadProtocol(formData).then((result) => {
       if (result.success) {
         let tasks = result.calibrations
+        let fileName = result.fileName
         addHrefs(tasks)
         commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
+        commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
+
       } else {
         commit(types.UPDATE_TASK_LIST, {tasks: []})
       }
       commit(types.UPDATE_WARNINGS, {warning: result.warnings})
       commit(types.UPDATE_ERROR, {errors: result.errors})
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+
     })
     OpenTrons.getRunPlan().then((plan) => {
       commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
     })
   },
   selectIncrement ({commit}, data) {
-    let {inc, type} = data
-    commit(types.UPDATE_INCREMENT, { 'current_increment': inc, 'type': type })
+    commit(types.UPDATE_INCREMENT, { 'current_increment': data.inc })
   },
   jog ({commit}, coords) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
@@ -101,6 +110,12 @@ const actions = {
       // commit(types.UPDATE_RUN_STATE, results)
     })
   },
+  cancelProtocol({ commit }) {
+    OpenTrons.cancelProtocol().then((results) => {
+      console.log(results)
+      // commit(types.UPDATE_RUN_STATE, results)
+    })
+  },
   moveToPosition ({commit}, data) {
     let type = "plunger"
     if (data.slot) { type = "placeable" }
@@ -117,6 +132,15 @@ const actions = {
   },
   dropTip ({commit}, data) {
     OpenTrons.dropTip(data)
+  },
+  aspirate ({commit}, data) {
+    OpenTrons.aspirate(data)
+  },
+  dispense ({commit}, data) {
+    OpenTrons.dispense(data)
+  },
+  maxVolume({commit}, data) {
+    OpenTrons.maxVolume(data)
   },
   home ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})

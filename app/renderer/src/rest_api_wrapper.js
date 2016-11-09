@@ -15,9 +15,14 @@ class OpenTrons {
     this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
     this.pickUpTipUrl = this.base_url + '/pick_up_tip'
     this.dropTipUrl = this.base_url + '/drop_tip'
+    this.aspirateUrl = this.base_url + '/aspirate'
+    this.dispenseUrl = this.base_url + '/dispense'
+    this.maxVolumeUrl = this.base_url + '/set_max_volume'
     this.pauseProtocolUrl = this.base_url + '/pause'
     this.resumeProtocolUrl = this.base_url + '/resume'
+    this.cancelProtocolUrl = this.base_url + '/cancel'
     this.getPortsListUrl = this.base_url + '/robot/serial/list'
+    this.versionUrl = this.base_url + '/robot/versions'
   }
 
   getPortsList() {
@@ -52,6 +57,7 @@ class OpenTrons {
       .get(this.disconnectUrl)
       .then((response) => {
         if (response.data.status === "success") {
+          console.log("disconnected from robot")
           return true
         } else {
           return false
@@ -110,9 +116,10 @@ class OpenTrons {
         result.errors = data.errors
         result.warnings = data.warnings
         result.calibrations = data.calibrations || []
-        if (data.errors.length > 0) {
+        if (data.errors && data.errors.length > 0) {
           result.success = false
         }
+        result.fileName = data.fileName
         return result
       }, (response) => {
         console.log('Failed to upload protocol', response)
@@ -158,6 +165,15 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+  cancelProtocol () {
+    return Vue.http
+      .get(this.cancelProtocolUrl)
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
   calibrate(data, type) {
     return Vue.http
       .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
@@ -191,12 +207,52 @@ class OpenTrons {
       })
   }
 
+  aspirate (data) {
+    return Vue.http
+      .post(this.asiprateUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
+  dispense (data) {
+    return Vue.http
+      .post(this.dispenseUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
+  maxVolume (data) {
+    return Vue.http
+      .post(this.maxVolumeUrl, JSON.stringify(data), {emulateJSON: true})
+      .then((response) => {
+        console.log("success", response)
+      }, (response) => {
+        console.log('failed', response)
+      })
+  }
+
   home (axis) {
     return Vue.http
         .get(`/home/${axis}`)
         .then((response) => {
             console.log(response)
             console.log(`Homing ${axis}`)
+        }, (response) => {
+            console.log('failed to home', response)
+        })
+  }
+
+  getVersions () {
+    return Vue.http
+        .get(this.versionUrl)
+        .then((response) => {
+          return response.body.versions
         }, (response) => {
             console.log('failed to home', response)
         })
