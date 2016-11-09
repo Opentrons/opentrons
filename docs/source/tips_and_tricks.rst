@@ -7,7 +7,7 @@ The following examples assume the containers and pipettes:
 
 .. testsetup:: tips_main
 
-  from opentrons.robot import Robot
+  from opentronss.robot import Robot
   from opentrons import containers, instruments
   robot = Robot()
   robot.reset()
