@@ -10,9 +10,9 @@
 		<button v-show="placeableType('tiprack')" class="btn-calibrate move-to" @click="pickUpTip(instrument)">PICK UP TIP</button>
 		<button v-show="placeableType('tiprack')" class="btn-calibrate move-to" @click="dropTip(instrument)">DROP TIP</button>
 		<div class="well-img">
-			<img src="../assets/img/well_bottom.png" v-show="placeableType('default')" />
-			<img src="../assets/img/tiprack_top.png" v-show="placeableType('tiprack')"/>
-			<img src="../assets/img/point_top.png" v-show="placeableType('point')"/>
+			<img src="../assets/img/well_single.png" v-show="placeableType('default')" />
+			<img src="../assets/img/tiprack_single.png" v-show="placeableType('tiprack')"/>
+			<img src="../assets/img/point_trash.png" v-show="placeableType('point')"/>
 		</div>
 	</section>
 </template>
