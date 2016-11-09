@@ -26,15 +26,26 @@ class PipetteTest(unittest.TestCase):
         self.p200 = instruments.Pipette(
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             axis="b",
             channels=1
         )
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
-        self.p200.set_max_volume(200)
         self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
+
+    def test_set_max_volume(self):
+
+        self.p200.reset()
+        self.p200.aspirate()
+        self.assertEquals(self.p200.current_volume, 200)
+
+        self.p200.reset()
+        self.p200.set_max_volume(202)
+        self.p200.aspirate()
+        self.assertEquals(self.p200.current_volume, 202)
 
     def test_calibrate_by_position_name(self):
 
@@ -575,6 +586,7 @@ class PipetteTest(unittest.TestCase):
         p200_multi = instruments.Pipette(
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             axis="b",
             channels=8
@@ -582,7 +594,6 @@ class PipetteTest(unittest.TestCase):
 
         p200_multi.calibrate_plunger(
             top=0, bottom=10, blow_out=12, drop_tip=13)
-        p200_multi.set_max_volume(200)
         p200_multi.move_to = mock.Mock()
 
         for _ in range(0, 12 * 4):
