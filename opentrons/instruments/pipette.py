@@ -106,7 +106,7 @@ class Pipette(Instrument):
         }
 
         self.min_volume = min_volume
-        self.max_volume = max_volume
+        self.max_volume = max_volume or (min_volume + 1)
 
         self.positions = {
             'top': None,
@@ -133,7 +133,7 @@ class Pipette(Instrument):
 
         # if the user passed an initialization value,
         # overwrite the loaded persisted data with it
-        if max_volume:
+        if isinstance(max_volume, (int, float, complex)) and max_volume > 0:
             self.max_volume = max_volume
             self.update_calibrations()
 
