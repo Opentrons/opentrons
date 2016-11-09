@@ -24,11 +24,7 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script:
-  - python setup.py sdist bdist_wheel && twine upload dist/*
-  - conda config --set anaconda_upload yes
-  - anaconda login --username opentrons --password '$ANACONDA_PASSWORD'
-  - conda build conda.recipe
+  script: scripts/publish.sh
   on:
     tags: true
 env:
