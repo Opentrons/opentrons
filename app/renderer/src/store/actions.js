@@ -140,7 +140,7 @@ const actions = {
     OpenTrons.dispense(data)
   },
   maxVolume({commit}, data) {
-    OpenTrons.maxVoume(data)
+    OpenTrons.maxVolume(data)
   },
   home ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
