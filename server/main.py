@@ -696,7 +696,9 @@ def log_before_request():
 
 @app.after_request
 def log_after_request(response):
-    if response.mimetype == 'text/html':
+    response.direct_passthrough = False
+    print(response.mimetype)
+    if response.mimetype == ('text/html', 'application/javascript'):
         return response
     logger = logging.getLogger('opentrons-app')
     log_msg = "[AR] {data}".format(data=response.data)
@@ -718,7 +720,7 @@ if __name__ == "__main__":
 
     socketio.run(
         app,
-        debug=False,
+        debug=True,
         logger=False,
         use_reloader=False,
         log_output=False,
