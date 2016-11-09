@@ -1,8 +1,8 @@
 <template>
   <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class='upload'>
     <div class="fileUpload">
-      <span>Click or Drag to Upload </span>
-      <input ref="input" @change="fileChange" type="file" name="file" class="upload" />
+      <span>Click to Upload </span>
+      <input @drop.prevent.stop ref="input" @change="fileChange" type="file" name="file" class="upload" />
     </div>
   </form>
 </template>
@@ -17,7 +17,9 @@
       },
       uploadProtocol() {
         let formData = new FormData();
-        formData.append("file", this.$refs.form.file.files[0])
+        let file = this.$refs.form.file.files[0]
+        formData.append("file", file)
+        formData.append("lastModified", file.lastModifiedDate.toDateString())
         this.$store.dispatch("uploadProtocol", formData)
         return false
       }

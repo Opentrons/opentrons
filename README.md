@@ -6,19 +6,23 @@
 - [x] Protocol Ingestion/Verification
 - [x] Task List Generation
 - [x] Dynamic Routing
-- [x] Previous/Next buttons
+- [x] XYZAB Homing
 - [x] XYZAB Jogging
+- [x] Increment Selection
 - [x] Move to Slot
+- [x] Dynamic Deck Slots
 - [x] Protocol Error Reporting
 - [x] Calibrate Container
 - [x] Calibrate Pipette
 - [x] Run Protocol on Robot
-- [ ] Review Saved Positions
+- [x] Progress bar
+- [x] Pause, Resume, Cancel Protocol
+- [x] Diagnostics Route
+- [x] Packaging/Distribution for macOS, Windows, and Linux
 - [ ] Auto Updating (software and firmware)
 - [ ] Logging/Crash Reporting
 - [ ] Diagnostics Screen
 - [ ] Preferences Screen
-- [ ] Packaging/Distribution for macOS, Windows, and Linux
 
 ##Setup and Usage
 (NOTE: This is an unfinished Beta project - use at your own risk)

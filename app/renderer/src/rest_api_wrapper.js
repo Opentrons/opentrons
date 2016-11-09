@@ -120,6 +120,7 @@ class OpenTrons {
           result.success = false
         }
         result.fileName = data.fileName
+        result.lastModified = data.lastModified
         return result
       }, (response) => {
         console.log('Failed to upload protocol', response)

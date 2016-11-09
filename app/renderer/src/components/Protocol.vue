@@ -2,8 +2,8 @@
   <div id="protocol-info">
     <span class="title">File Name: </span>
     <span class="info">{{fileName}}</span>
-    <span class="title">Date Created: </span>
-    <span class="info">10/10/16</span>
+    <span class="title">Last Modified: </span>
+    <span class="info">{{lastModified}}</span>
   </div>
 </template>
 
@@ -13,6 +13,9 @@
     computed: {
       fileName () {
         return this.$store.state.fileName
+      },
+      lastModified () {
+        return this.$store.state.lastModified
       }
     }
   }

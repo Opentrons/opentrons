@@ -103,14 +103,14 @@ def upload():
         emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
     emit_notifications(api_response['errors'], 'danger')
     # emit_notifications(api_response['warnings'], 'warning')
-
     return flask.jsonify({
         'status': 'success',
         'data': {
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
             'calibrations': calibrations,
-            'fileName': file.filename
+            'fileName': file.filename,
+            'lastModified': request.form.get('lastModified')
         }
     })
 
