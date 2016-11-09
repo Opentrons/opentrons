@@ -133,6 +133,15 @@ const actions = {
   dropTip ({commit}, data) {
     OpenTrons.dropTip(data)
   },
+  aspirate ({commit}, data) {
+    OpenTrons.aspirate(data)
+  },
+  dispense ({commit}, data) {
+    OpenTrons.dispense(data)
+  },
+  maxVolume({commit}, data) {
+    OpenTrons.maxVoume(data)
+  },
   home ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.home(data.axis).then(() => {
