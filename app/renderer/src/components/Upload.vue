@@ -17,7 +17,9 @@
       },
       uploadProtocol() {
         let formData = new FormData();
-        formData.append("file", this.$refs.form.file.files[0])
+        let file = this.$refs.form.file.files[0]
+        formData.append("file", file)
+        formData.append("lastModified", file.lastModifiedDate.toDateString())
         this.$store.dispatch("uploadProtocol", formData)
         return false
       }

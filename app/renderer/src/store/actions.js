@@ -24,19 +24,17 @@ const actions = {
       }
     })
   },
-  updateFilename ({commit}, fileName) {
-    commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
-  },
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.uploadProtocol(formData).then((result) => {
       if (result.success) {
         let tasks = result.calibrations
         let fileName = result.fileName
+        let lastModified = result.lastModified
         addHrefs(tasks)
         commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
         commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
-
+        commit(types.UPDATE_FILE_MODIFIED, {'lastModified': lastModified})
       } else {
         commit(types.UPDATE_TASK_LIST, {tasks: []})
       }

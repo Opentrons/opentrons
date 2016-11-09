@@ -5,6 +5,7 @@ const state = {
   is_connected: false,
   port: null,
   fileName: "",
+  lastModified: "",
   errors: [],
   warnings: false,
   tasks: [],
@@ -28,6 +29,9 @@ const mutations = {
   },
   [types.UPDATE_FILE_NAME] (state, payload) {
     state.fileName = payload.fileName
+  },
+  [types.UPDATE_FILE_MODIFIED] (state, payload) {
+    state.lastModified = payload.lastModified
   },
   [types.UPDATE_INCREMENT] (state, payload) {
     state.current_increment_placeable = payload.current_increment
