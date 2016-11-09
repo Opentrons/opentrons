@@ -16,7 +16,7 @@
 			</section>
 
 			<section class="calibrate blowout" @mouseenter="toggleMode('blow-out')">
-				<span class="title">BLOWOUT</span>
+				<span class="title">BLOW OUT</span>
 				<button @click="calibrateInstrument(currentAxis(), 'blow_out')" class="btn-calibrate save">SAVE</button>
 				<button @click="moveToPlungerPosition(currentAxis(), 'blow_out')" :class="[{'disabled': !calibrated('blow_out')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
 			</section>
@@ -26,6 +26,11 @@
 				<button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class="btn-calibrate save">SAVE</button>
 				<button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" :class="[{'disabled': !calibrated('drop_tip')}, 'btn-calibrate', 'move-to']">MOVE TO</button>
 			</section>
+			<section class="calibrate volume">
+				<!-- <span class="title">MAX VOL ul</span> -->
+					<input v-model="volume" placeholder="SET MAX VOL">
+				<button @click="maxVolume(currentAxis(), volume)" class="btn-calibrate save">SAVE</button>
+			</section>
 		</div>
 		<div class="pipette-diagrams" v-bind:class="currentMode">
       <img src="../assets/img/pipette_top.png" class="top"/>
@@ -33,11 +38,15 @@
       <img src="../assets/img/pipette_blowout.png" class="blow-out"/>
       <img src="../assets/img/pipette_droptip.png" class="drop-tip"/>
     </div>
-		</span>
+	</span>
+
 		<section class="calibrate tips">
-		<button @click="pickUpTip(currentAxis())" class="btn-calibrate move-to">PICK UP TIP</button>
-		<button @click="dropTip(currentAxis())" class="btn-calibrate move-to">DROP TIP</button>
+			<button @click="pickUpTip(currentAxis())" class="btn-calibrate move-to">PICK UP TIP</button>
+			<button @click="dropTip(currentAxis())" class="btn-calibrate move-to">DROP TIP</button>
+			<button @click="aspirate(currentAxis())" class="btn-calibrate move-to">ASPIRATE</button>
+			<button @click="dispense(currentAxis())" class="btn-calibrate move-to">DISPENSE</button>
 		</section>
+		
 	</section>
 </template>
 
@@ -46,7 +55,8 @@
     name: 'CalibrateInstrument',
     data: function() {
       return {
-        currentMode : 'drop-tip'
+        currentMode : 'drop-tip',
+        volume : null
       }
     },
     methods: {
@@ -67,6 +77,15 @@
 		  },
 		  dropTip(axis) {
 		    this.$store.dispatch("dropTip", { axis })
+		  },
+		  aspirate(axis) {
+		    this.$store.dispatch("aspirate", { axis })
+		  },
+		  dispense(axis) {
+		    this.$store.dispatch("dispense", { axis })
+		  },
+		  maxVolume(axis, volume) {
+		    this.$store.dispatch("maxVolume", { axis, volume })
 		  },
 			calibrated(position) {
 				let instrument = this.$store.state.tasks.filter((instrument) => {
