@@ -43,14 +43,3 @@ Drag your .py file into the app and make sure no errors pop up.
 Calibrate Robot
 -------------------------------
 The app will populate an advised order of calibration for your containers and pipettes.  Please follow the calibration instructions assosicated with each container within the app.
-
-.. Documentation
-.. ---------------
-
-.. .. toctree::
-..    :maxdepth: 2
-
-..    index
-..    setup
-..    getting_started
-..    well_access

@@ -62,11 +62,3 @@ If you want to learn more about Jupyter Notebook Navigation [check this out](htt
 
 Documentation
 ---------------
-
-.. toctree::
-   :maxdepth: 2
-
-   index
-   getting_started
-   running_a_protocol
-   well_access

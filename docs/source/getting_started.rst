@@ -343,14 +343,3 @@ Robot.Commands()
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.
-
-.. Documentation
-.. ---------------
-
-.. .. toctree::
-..    :maxdepth: 2
-
-..    index
-..    setup
-..    running_a_protocol
-..    well_access

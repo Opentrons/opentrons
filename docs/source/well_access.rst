@@ -157,15 +157,3 @@ The chain functinos allows you to link two sets of locations together, in this c
     	p1000.aspirate(600, well)
     	p1000.dispense(300, next(dest_iter))
     	p1000.dispense(300, next(dest_iter))
-
-.. Documentation
-.. ---------------
-
-.. .. toctree::
-..    :maxdepth: 2
-
-..    index
-..    setup
-..    getting_started
-..    running_a_protocol
-..    
