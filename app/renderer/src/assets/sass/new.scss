@@ -440,7 +440,7 @@ Tasks
 
 section#task {
     width: 510px;
-    height: 270px;
+    height: 310px;
     padding:30px;
     background-color: $well-bg;
     .well-img {
@@ -460,12 +460,13 @@ Task Pipette
 ******************************/
 section#task-pipette {
     width: 510px;
-    height: 290px;
+    flex: 0 0 510px;
+    height: 330px;
     padding:30px;
     background-color: $well-bg;
     span{
         width: 510px;
-        height: 220px;
+        height: 260px;
         display:flex;
         flex-directon:row;
         div.calibrate-pipette{
@@ -481,8 +482,14 @@ section#task-pipette {
             &.top{
                 margin-bottom:40px;
             }
+            &.volume{
+                justify-content:flex-start;
+                margin-bottom:10px;
+            }
             span.title{
-                flex: 0 0 100px;
+                flex: 0 0 90px;
+                height:50px;
+                padding-left:20px;
                 font-size: 14px;
                 font-weight: 800;
                 line-height: 40px;
@@ -523,9 +530,9 @@ section#task-pipette {
 
     }
     .calibrate.tips{
-        width:200px;
-        height:10px;
-        padding-left:120px;
+        width:300px;
+        height:45px;
+        padding-left:88px;
         display:flex;
         flex-direction:row;
         justify-content:flex-end;
@@ -591,7 +598,7 @@ Buttons
 
 .btn-calibrate{
     flex:0 0;
-    min-width: $btn-size*2;
+    min-width: $btn-size*3;
     height: $btn-size;
     line-height: $btn-size;
     padding:0px 15px;
@@ -600,15 +607,27 @@ Buttons
     border-radius: 6px;
     text-align: center;
     color:white;
-    &.move-to{
-        min-width: $btn-size*3;
-    }
+}
+
+input{
+    flex:0 0 $btn-size*3 - 2;
+    min-width: $btn-size*3 - 2;
+    height: $btn-size - 2;
+    line-height: $btn-size;
+    padding:0px;
+    border:1px solid #999;
+    margin: $gutter-width*2 2px $gutter-width*2 1px;
+    text-align: left;
+    border-radius: 6px;
+    text-align: center;
+    color:$primary-text;
 }
 
 
 
 .save{
     background-color: $call-to-action;
+
 }
 
 .move-to, .pick-tip{
