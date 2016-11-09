@@ -6,7 +6,8 @@ from unittest import mock
 from opentrons.robot import Robot
 from opentrons.json_importer import (
     JSONProtocolProcessor,
-    JSONProcessorRuntimeError
+    JSONProcessorRuntimeError,
+    JSONProcessorValidationError
 )
 
 
@@ -209,6 +210,31 @@ class JSONIngestorTestCase(unittest.TestCase):
         with self.assertRaises(JSONProcessorRuntimeError):
             jpp.process_command(None, 'foo', None)
 
+    def test_validate_protocol(self):
+        protocol = self.get_protocol()
+        jpp = JSONProtocolProcessor(protocol)
+        jpp.validate()
+        self.assertEqual(jpp.errors, [])
+        self.assertEqual(
+            jpp.warnings,
+            ['JSON Protocol section "Ingredients" will not be used']
+        )
+
+        protocol = self.get_protocol()
+        jpp = JSONProtocolProcessor(protocol)
+        del jpp.protocol['head']
+        self.assertRaises(JSONProcessorValidationError, jpp.validate)
+
+        protocol = self.get_protocol()
+        jpp = JSONProtocolProcessor(protocol)
+        del jpp.protocol['deck']
+        self.assertRaises(JSONProcessorValidationError, jpp.validate)
+
+        protocol = self.get_protocol()
+        jpp = JSONProtocolProcessor(protocol)
+        del jpp.protocol['instructions']
+        self.assertRaises(JSONProcessorValidationError, jpp.validate)
+
     def test_process_instructions(self):
         protocol = self.get_protocol()
         jpp = JSONProtocolProcessor(protocol)
@@ -233,7 +259,7 @@ class JSONIngestorTestCase(unittest.TestCase):
 
         self.assertEqual(api_calls, api_calls_expected)
 
-        self.robot.run()
+        # self.robot.run()
 
         instrument = self.robot._instruments["B"]
         wells_referenced = [

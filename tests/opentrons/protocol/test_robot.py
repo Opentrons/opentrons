@@ -3,7 +3,8 @@ import unittest
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.placeable import Deck
-from opentrons import instruments
+from opentrons import instruments, containers
+from opentrons.util.vector import Vector
 
 
 class RobotTest(unittest.TestCase):
@@ -11,9 +12,13 @@ class RobotTest(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
+        self.robot.reset()
         self.robot.connect()
         self.robot.home(enqueue=False)
-        self.robot.clear_commands()
+
+    def test_home_after_disconnect(self):
+        self.robot.disconnect()
+        self.assertRaises(RuntimeError, self.robot.home)
 
     def test_simulate(self):
         self.robot.disconnect()
@@ -22,6 +27,70 @@ class RobotTest(unittest.TestCase):
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
         self.assertEquals(self.robot.connections['live'], None)
+
+    def test_stop_run(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
+
+        for i in range(1000):
+            p200.aspirate().dispense()
+
+        res = None
+
+        def _run():
+            nonlocal res
+            res = self.robot.run()
+
+        thread = threading.Thread(target=_run)
+        thread.start()
+
+        self.robot.stop()
+
+        thread.join()
+
+        self.assertEquals(res[-1], 'Stop signal received')
+
+    def test_calibrated_max_dimension(self):
+
+        expected = self.robot._deck.max_dimensions(self.robot._deck)
+        res = self.robot._calibrated_max_dimension()
+        self.assertEquals(res, expected)
+
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        plate = containers.load('96-flat', 'A1')
+        self.robot.move_head(x=10, y=10, z=10)
+        p200.calibrate_position((plate, Vector(0, 0, 0)))
+
+        res = self.robot._calibrated_max_dimension()
+
+        expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
+        self.assertEquals(res, expected)
+
+    def test_create_arc(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+        plate = containers.load('96-flat', 'A1')
+        plate2 = containers.load('96-flat', 'B1')
+
+        self.robot.move_head(x=10, y=10, z=10)
+        p200.calibrate_position((plate, Vector(0, 0, 0)))
+        self.robot.move_head(x=10, y=10, z=100)
+        p200.calibrate_position((plate2, Vector(0, 0, 0)))
+
+        res = self.robot._create_arc((0, 0, 0), plate[0])
+        expected = [
+            {'z': 100},
+            {'x': 0, 'y': 0},
+            {'z': 0}
+        ]
+        self.assertEquals(res, expected)
+
+        res = self.robot._create_arc((0, 0, 0), plate[0])
+        expected = [
+            {'z': 20.5 + 5},
+            {'x': 0, 'y': 0},
+            {'z': 0}
+        ]
+        self.assertEquals(res, expected)
 
     def test_disconnect(self):
         self.robot.disconnect()
