@@ -1,7 +1,7 @@
 # Hello, Opentrons API
 
 ```python
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons import containers, instruments
 
 robot = Robot.get_instance()

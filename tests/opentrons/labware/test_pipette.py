@@ -3,7 +3,7 @@ from unittest import mock
 from opentrons import containers
 
 from opentrons import instruments
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons.util.vector import Vector
 
 from opentrons.containers.placeable import unpack_location, Container, Well

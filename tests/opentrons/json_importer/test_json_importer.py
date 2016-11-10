@@ -3,7 +3,7 @@ import json
 import unittest
 from unittest import mock
 
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons.json_importer import (
     JSONProtocolProcessor,
     JSONProcessorRuntimeError,

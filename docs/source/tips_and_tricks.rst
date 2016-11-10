@@ -7,7 +7,7 @@ The following examples assume the containers and pipettes:
 
 .. testsetup:: tips_main
 
-  from opentrons.robot import Robot
+  from opentrons import Robot
   from opentrons import containers, instruments
   robot = Robot()
   robot.reset()
@@ -22,24 +22,24 @@ The following examples assume the containers and pipettes:
 
 .. testsetup:: tips_demo
   
-  from opentrons.robot import Robot
+  from opentrons import Robot
   Robot().reset()
 
 .. testcleanup:: tips_main
   
-  import opentrons
-  from opentrons.robot import Robot
-  del opentrons.robot.robot.Singleton._instances[Robot]
+  from opentrons.util import singleton
+  from opentrons import Robot
+  del singleton.Singleton._instances[Robot]
 
 .. testcleanup:: tips_demo
   
-  import opentrons
-  from opentrons.robot import Robot
-  del opentrons.robot.robot.Singleton._instances[Robot]
+  from opentrons.util import singleton
+  from opentrons import Robot
+  del singleton.Singleton._instances[Robot]
 
 .. testcode:: tips_demo
 
-  from opentrons.robot import Robot
+  from opentrons import Robot
   from opentrons import containers, instruments
 
   robot = Robot()

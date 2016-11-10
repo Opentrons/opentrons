@@ -32,7 +32,7 @@ def load(container_name, slot, label=None):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
-    from opentrons.robot import Robot
+    from opentrons import Robot
     if not label:
         label = container_name
     protocol = Robot.get_instance()
