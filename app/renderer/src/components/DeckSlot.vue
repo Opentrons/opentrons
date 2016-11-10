@@ -14,7 +14,7 @@
     props: ["busy"],
     methods: {
       jogToSlot(slot) {
-        this.$store.dispatch("jogToSlot", {slot: slot, axis: "a"})
+        this.$store.dispatch("jogToSlot", {slot: slot})
       }
     },
     computed: {
