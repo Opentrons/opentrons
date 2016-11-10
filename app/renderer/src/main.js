@@ -8,6 +8,7 @@ import {
   App
 } from './components/export'
 
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 

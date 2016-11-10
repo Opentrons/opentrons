@@ -62,7 +62,7 @@ describe('application launch', function () {
     let pauseTime = process.env.PAUSE_TIME || 0
     let connectDropDown = '//*[@id="connections"]'
     let virtualSmoothie = connectDropDown + '/option[3]'
-    let uploadXpath = '/html/body/div/section/span/form/div/input'
+    let uploadXpath = '/html/body/div/section/form/div/input'
     let saveButton = '//*[@id="task"]/button[1]'
     let platePath = '//*[@id="step-list"]/div/span/div/ul/li[2]/a'
     let plungerPath = '//*[@id="step-list"]/div/span/div/ul/li[3]/a'
@@ -78,7 +78,6 @@ describe('application launch', function () {
       .pause(pauseTime)
       .click(virtualSmoothie)
       .pause(pauseTime)
-      .pause(1000)
       .chooseFile(uploadXpath, file)
       .pause(1000)
       .pause(pauseTime)

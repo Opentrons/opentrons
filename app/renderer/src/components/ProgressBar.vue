@@ -1,5 +1,5 @@
 <template>
-  <div v-show="running">
+  <div id="progress">
     <span class="title">Progress: </span><span class="info"> {{runPercent}}%</span>
     <div id="progress-bar-total">
       <div :style="percentClass" id="percent-complete"></div>
@@ -19,9 +19,6 @@
       },
       percentClass() {
         return `width:${this.runPercent}%;`
-      },
-      running() {
-        return this.$store.state.running
       }
     }
   }

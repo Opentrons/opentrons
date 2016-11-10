@@ -28,7 +28,6 @@ class ServerManager {
     }
 
     backend_path = app.getAppPath() + backends[process.platform];
-    process.env["appVersion"] = app.getVersion()
     this.execFile(backend_path, [userDataPath]);
   }
 
