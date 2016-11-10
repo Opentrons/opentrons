@@ -553,7 +553,7 @@ def drop_tip():
         axis = request.json.get("axis")
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
-        instrument.drop_tip(enqueue=False)
+        instrument.return_tip(enqueue=False)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
