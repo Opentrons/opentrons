@@ -115,6 +115,25 @@ def upload():
     })
 
 
+@app.route("/load")
+def load():
+    status = "success"
+    try:
+        calibrations = get_step_list()
+    except Exception as e:
+        emit_notifications([str(e)], "danger")
+        print(str(e))
+        status = 'error'
+
+    return flask.jsonify({
+        'status': status,
+        'data': {
+            'calibrations': calibrations
+            # 'fileName': file.filename,
+            # 'lastModified': request.form.get('lastModified')
+        }
+    })
+
 def emit_notifications(notifications, _type):
     for notification in notifications:
         socketio.emit('event', {

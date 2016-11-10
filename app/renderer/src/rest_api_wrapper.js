@@ -127,6 +127,27 @@ class OpenTrons {
         return {success: false}
       })
   }
+
+  loadProtocol () {
+    return Vue.http
+      .get('http://localhost:31950/load')
+      .then((response) => {
+        console.log(response)
+        let result = {success: true, errors: [], warnings: [], calibrations: []}
+        let data = response.body.data
+        result.calibrations = data.calibrations || []
+        if (data.errors && data.errors.length > 0) {
+          result.success = false
+        }
+        result.fileName = data.fileName
+        result.lastModified = data.lastModified
+        return result
+      }, (response) => {
+        console.log('Failed to upload protocol', response)
+        return {success: false}
+      })
+  }
+
   getRunPlan () {
     return Vue.http
       .get(this.runPlanUrl)
