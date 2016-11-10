@@ -328,6 +328,14 @@ Containers are calibrated to the bottom of the well, and each labware definition
 Homing
 -----------------------------
 
+You can instruct the robot to home at any point in the protocol, or just home one axis.
+
+. testcode:: tips_main
+
+  robot.home()          
+  robot.home('ab')
+  robot.home('xyz')
+
 Debugging Your Protocol
 -----------------------------
 

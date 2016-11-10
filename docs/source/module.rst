@@ -7,17 +7,13 @@ Module
 Magnetic Bead
 --------------------------------
 
-
-
 Setting up Hardware
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-any hardware changes the user has to make
+Use your included DIY Mag Bead kit to configure the motor control board (see kit instructions).
 
-Writing a Protocol
---------------------------------
 
-Initializing Module
+Initializing Module in API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Just like a pipette, you need to set up and name your module.
@@ -78,5 +74,3 @@ You can call delay() with a pipette or a mag_deck module.
 
 	p200.delay(10)
 	mag_deck.delay(10)
-
-
