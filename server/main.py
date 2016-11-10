@@ -393,6 +393,12 @@ def _sort_containers(container_list):
 
     return _tipracks + _other
 
+def _get_all_pipettes():
+    pipette_list = []
+    for _, p in Robot.get_instance().get_instruments():
+        if isinstance(p, Pipette):
+            pipette_list.append(p)
+    return pipette_list
 
 def _get_all_containers():
     """
@@ -448,15 +454,6 @@ def _check_if_instrument_calibrated(instrument):
 
 def get_step_list():
     try:
-        pipette_list = []
-        for _, p in Robot.get_instance().get_instruments():
-            if isinstance(p, Pipette):
-                pipette_list.append(p)
-            else:
-                print(type(p).__name__)
-
-        print(Robot.get_instance().get_instruments())
-        print(pipette_list)
         data = [{
             'axis': instrument.axis,
             'label': instrument.name,
@@ -476,7 +473,7 @@ def get_step_list():
                 }
                 for container in _get_unique_containers(instrument)
             ]
-        } for instrument in pipette_list]
+        } for instrument in _get_all_pipettes()]
 
         return data
     except Exception as e:
