@@ -18,7 +18,9 @@
     <section class="protocol">
       <Upload></Upload>
       <Protocol></Protocol>
-      <ProgressBar></ProgressBar>
+      <div id="progress">
+        <ProgressBar></ProgressBar>
+      </div>
       <Run></Run>
     </section>
     <main id="container">

@@ -1,32 +1,42 @@
 <template>
   <aside id="jog">
-    <h2 class="title" id="xy">Jog [XY]</h2>
-    <h2 class="title" id="z">Jog [Z]</h2>
-    <h2 class="title" id="p">Plunger</h2>
+    <h2 class="title">Pipette Jog</h2>
+    <!-- <h2 class="title" id="z">Jog [Z]</h2>
+    <h2 class="title" id="p">Plunger</h2> -->
     <hr>
-    <section id="jog-controls" :class="{'disabled': busy}">
+    <section id="jog-controls-pipette" :class="{'disabled': busy}">
       <span class="xy">
+        <h3 class="title">[X-Y]</h3>
         <button @click="jog('y', 1)" class="btn y up">&uarr;</button>
         <button @click="jog('x', -1)" class="btn x left">&larr;</button>
         <button @click="jog('y', -1)" class="btn y down">&darr;</button>
         <button @click="jog('x', 1)" class="btn x right">&rarr;</button>
       </span>
       <span class="z">
+      <h3 class="title">[Z]</h3>
         <button @click="jog('z', 1)" class="btn z up">&uarr;</button>
         <button @click="jog('z', -1)" class="btn z down">&darr;</button>
       </span>
+  
+      <span class="increment">
+      <Increment :increments="placeable_increments"></Increment> 
+      </span>
+      </section>
+
+    <h2 class="title" >Plunger Jog</h2>
+    <hr>
+     <section id="jog-controls-plunger" :class="{'disabled': busy}">   
       <span class="p">
+      <h3 class="title">[P]</h3>
         <button @click="jog(currentAxis(), -1)"class="btn p up">&uarr;</button>
         <button @click="jog(currentAxis(), 1)" class="btn p down">&darr;</button>
       </span>
+       <span class="increment-plunger">
+        <IncrementPlunger :increments="plunger_increments"></IncrementPlunger> 
+      </span>
+      </section>
     </section>
-
-    <h2 class="title">Select Increment [mm]</h2>
-    <hr>
-    <span class="increment">
-    <Increment :increments="placeable_increments"></Increment>
-    <IncrementPlunger :increments="plunger_increments"></IncrementPlunger>
-    </span>
+    
     <h2 class="title">Move to Slot</h2>
     <hr>
     <DeckSlot :busy="busy"></DeckSlot>
@@ -43,7 +53,7 @@
     props: ["busy"],
     data: function () {
       return {
-        placeable_increments: [20,5,1,0.5,0.1],
+        placeable_increments: ["Slot",20,5,1,0.5,0.1],
         plunger_increments: [2,1,0.5,0.1]     
       }
     },

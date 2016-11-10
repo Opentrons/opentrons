@@ -226,6 +226,7 @@ section.protocol {
     div#progress{
         flex:0 0 256px;
         padding:10px 0;
+        div{
         span{
             font-size: 14px;
             text-align: left;
@@ -251,6 +252,7 @@ section.protocol {
                 background-color: $call-to-action;
             }
         }
+    }
 
     }
     div#run{
@@ -296,7 +298,7 @@ aside#jog {
             width:65px;
     }
 
-    #jog-controls{
+    #jog-controls-pipette,#jog-controls-plunger {
         width:270px;
         display: flex;
         flex-wrap: wrap;
@@ -314,7 +316,18 @@ aside#jog {
             flex: 0 0 102px;
             display:flex;
             flex-wrap: wrap;
+            margin-left: 5px;
+            h3.title{
+                margin: 0 28px;
+            }
 
+        }
+        span.z{
+            margin-right: 55px;
+            margin-left:10px;
+        }
+        span.p{
+            margin-left: 22px;
         }
         span.z, span.p{
             width: 36px;
@@ -326,13 +339,26 @@ aside#jog {
     }
 
     span.increment{
+        h3.xyz{
+            width:200px;
+            padding-left:88px
+        }
         width:270px;
         display: flex;
         flex-wrap: wrap;
         justify-content:space-around;
-        margin-bottom: 15px;
+    }
+    span.increment-plunger{
+        
+
+        margin-left:50px;
+        width:160px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content:space-around;
+    }
         #increment-xyz, #increment-plunger{
-        width:180px;
+        width:270px;
         padding-left: 5px;
         display: flex;
         flex-wrap: wrap;
@@ -341,9 +367,16 @@ aside#jog {
 
         }
         #increment-plunger{
-            width:80px;
-            padding-left: 0px;
-            border-left: 1px solid darken($well-bg, 20%);
+            width:155px;
+            padding-top:30px;
+            margin-left: 20px;
+            margin-right:10px;
+            h3.plunger{
+            width:200px;
+            padding-left:8px;
+            
+            }
+            
         }
         #increment-xyz, #increment-plunger{
             div{
@@ -352,7 +385,8 @@ aside#jog {
                 padding:5px;
                 text-align: center;
                 &.slot{
-                    flex: 0 0 60px
+                    flex: 0 0 40px;
+                    margin-right:23px;
                 }
             }
             input[type="radio"] {
@@ -365,7 +399,7 @@ aside#jog {
                 display:inline-block;
                 width:10px;
                 height:10px;
-                margin:0 4px 5px 0;
+                margin:0 0px 5px 4px;
                 vertical-align:middle;
                 cursor:pointer;
                 -moz-border-radius:  50%;
@@ -391,7 +425,7 @@ aside#jog {
               transition:background-color 0.4s linear;
             }
         }
-    }
+    
 
     
     
@@ -759,5 +793,5 @@ h2.title{
 
 hr{
     color: #FFF;
-    margin-bottom:15px;
+    margin-bottom:5px;
 }

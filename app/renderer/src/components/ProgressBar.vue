@@ -1,5 +1,5 @@
 <template>
-  <div v-show="running" id="progress">
+  <div v-show="running">
     <span class="title">Progress: </span><span class="info"> {{runPercent}}%</span>
     <div id="progress-bar-total">
       <div :style="percentClass" id="percent-complete"></div>
