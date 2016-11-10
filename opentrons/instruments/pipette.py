@@ -91,6 +91,10 @@ class Pipette(Instrument):
         self.trash_container = trash_container
         self.tip_racks = tip_racks
 
+        # default mm above tip to execute drop-tip
+        # this gives room for the drop-tip mechanism to work
+        self._drop_tip_offset = 15
+
         self.reset_tip_tracking()
 
         self.robot = Robot.get_instance()
@@ -757,7 +761,7 @@ class Pipette(Instrument):
         """
 
         def _setup():
-            self.current_volume = 0
+            pass
 
         def _do():
             pass
@@ -770,8 +774,8 @@ class Pipette(Instrument):
             enqueue=enqueue)
 
         if not self.current_tip_home_well:
-            self.robot.add_warning('Pipette has no tip to return')
-            return
+            self.robot.add_warning(
+                'Pipette has no tip to return, dropping in place')
 
         self.drop_tip(self.current_tip_home_well, enqueue=enqueue)
 
@@ -832,8 +836,13 @@ class Pipette(Instrument):
                 else:
                     self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')
+
+            if isinstance(location, Placeable):
+                location = location.bottom()
+
             self._associate_placeable(location)
-            self.current_tip_home_well = location
+            placeable, _ = containers.unpack_location(location)
+            self.current_tip_home_well = placeable
 
             self.current_volume = 0
 
@@ -842,10 +851,8 @@ class Pipette(Instrument):
 
             self.motor.move(self._get_plunger_position('blow_out'))
 
-            if self.current_tip_home_well:
-                placeable, _ = containers.unpack_location(
-                    self.current_tip_home_well)
-                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
+            if location:
+                self.move_to(location, strategy='arc', enqueue=False)
 
             tip_plunge = 6
 
@@ -915,7 +922,12 @@ class Pipette(Instrument):
             if not location and self.trash_container:
                 location = self.trash_container
 
+            if isinstance(location, Placeable):
+                # give space for the drop-tip mechanism
+                location = location.bottom(self._drop_tip_offset)
+
             self._associate_placeable(location)
+            self.current_tip_home_well = None
 
             self.current_volume = 0
 
@@ -923,8 +935,7 @@ class Pipette(Instrument):
             nonlocal location
 
             if location:
-                placeable, _ = containers.unpack_location(location)
-                self.move_to(placeable.bottom(), strategy='arc', enqueue=False)
+                self.move_to(location, strategy='arc', enqueue=False)
 
             self.motor.move(self._get_plunger_position('drop_tip'))
             self.motor.home()

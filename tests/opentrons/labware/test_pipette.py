@@ -238,14 +238,18 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.calibrate_position(location)
 
-        self.p200.drop_tip(location)
+        self.p200.drop_tip(self.plate[0])
         self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
 
         self.assertEqual(
             current_pos,
-            Vector({'x': 144.3, 'y': 97.0, 'z': 3.0})
+            Vector({
+                'x': 161.0,
+                'y': 116.7,
+                'z': 3.0 + self.p200._drop_tip_offset
+            })
         )
 
     def test_empty_aspirate(self):
@@ -639,17 +643,17 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.return_tip()
 
+        expected = [
+            mock.call(self.tiprack1[0], enqueue=True),
+            mock.call(self.tiprack1[1], enqueue=True)
+        ]
+
         self.assertEqual(
-            self.p200.drop_tip.mock_calls,
-            [
-                mock.call(self.tiprack1[0], enqueue=True),
-                mock.call(self.tiprack1[1], enqueue=True)
-            ]
-        )
+            self.p200.drop_tip.mock_calls, expected)
 
     def build_move_to_bottom(self, well):
         return mock.call(
-            well.bottom(), strategy='arc', enqueue=False)
+            well.bottom(), enqueue=False, strategy='arc')
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()
@@ -661,7 +665,11 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(
             self.p200.move_to.mock_calls,
             [
-                self.build_move_to_bottom(self.tiprack1[0]),
-                self.build_move_to_bottom(self.trash)
+                mock.call(
+                    self.tiprack1[0].bottom(), enqueue=False, strategy='arc'),
+                mock.call(
+                    self.trash.bottom(self.p200._drop_tip_offset),
+                    enqueue=False,
+                    strategy='arc')
             ]
         )
