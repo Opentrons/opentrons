@@ -11,6 +11,19 @@ VARS
     font-style: normal;
 }
 
+@font-face {
+    font-family: "open-sans";
+    src: url("../assets/fonts/OpenSans-Regular-webfont.woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*
+OpenSans-Regular-webfont.svg
+OpenSans-Regular-webfont.eot
+OpenSans-Regular-webfont.woff
+*/
+
 $baseline: 22px;
 $basesize: 12px;
 $btn-size: 30px;
@@ -21,7 +34,7 @@ $stack-sans: "trons",sans-serif;
 
 $primary-black:rgba(40,40,50,1); //black
 $primary-brand: rgba(0,112,255,1); //blue
-$secondary-brand: rgba(10,179,186,1); //teal
+$secondary-brand: #05C1B3; //teal
 $call-to-action: rgba(250,175,66,1); //mustard
 $well-bg: rgba(245,245,245,1); //light grey
 $btn-jog: rgba(100,100,100,1); //dark grey
@@ -72,15 +85,29 @@ header#home-connect {
             cursor:pointer;
         }
     }
-    div.logo{
+    .brand{
+        flex:0 0 160px;
+        display:flex;
+        flex-direction:row;
+        justify-content:space-between;
+
+        div.logo{
         width:124px;
         height:30px;
-        flex:0 0 124px;
+
         img{
-            width:100%;
+            width:124px;
             height:auto;
         }
     }
+
+        div.version{
+            flex:0 0 30px;
+            height:30px;
+            line-height: 35px;
+        }
+    }
+    
 
     nav.connect{
         width:350px;
@@ -137,9 +164,9 @@ section.protocol {
     background-color: $well-bg;
     justify-content:space-between;
     form.upload{
-        width: 270px;
+        width: 285px;
         .fileUpload {
-            width: 270px;
+            width: 285px;
             height:15px;
             padding:24px 0;
             position: relative;
@@ -174,6 +201,7 @@ section.protocol {
         flex-wrap:wrap;
         height: 45px;
         padding:10px;
+        
         span{
             font-size: 14px;
             text-align: left;
@@ -183,17 +211,32 @@ section.protocol {
             &.title{
                 font-weight: 800;
             }
+            &.info{   
+                font-size: 13px;
+                font-family: "open-sans"; 
+                line-height: 22px;            
+                width: 100px;
+                height:22px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;                   
+            }
         }
     }
     div#progress{
         flex:0 0 256px;
         padding:10px 0;
+        div{
         span{
             font-size: 14px;
             text-align: left;
             height: 22px;
             line-height: 22px;
             flex:0 0 121px;
+            &.info{
+                font-size: 13px;
+                font-family: "open-sans"; 
+            }
             &.title{
                 font-weight: 800;
             }
@@ -209,6 +252,7 @@ section.protocol {
                 background-color: $call-to-action;
             }
         }
+    }
 
     }
     div#run{
@@ -242,7 +286,7 @@ Jog Controls
 aside#jog {
     width: 270px;
     flex: 0 0 270px;
-    height: 400px;
+    height: 510px;
     padding:15px;
     border-radius: 6px;
 
@@ -254,7 +298,7 @@ aside#jog {
             width:65px;
     }
 
-    #jog-controls{
+    #jog-controls-pipette,#jog-controls-plunger {
         width:270px;
         display: flex;
         flex-wrap: wrap;
@@ -272,7 +316,18 @@ aside#jog {
             flex: 0 0 102px;
             display:flex;
             flex-wrap: wrap;
+            margin-left: 5px;
+            h3.title{
+                margin: 0 28px;
+            }
 
+        }
+        span.z{
+            margin-right: 55px;
+            margin-left:10px;
+        }
+        span.p{
+            margin-left: 22px;
         }
         span.z, span.p{
             width: 36px;
@@ -282,55 +337,98 @@ aside#jog {
 
         }
     }
-    #increment{
+
+    span.increment{
+        h3.xyz{
+            width:200px;
+            padding-left:88px
+        }
         width:270px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content:space-around;
+    }
+    span.increment-plunger{
+        
+
+        margin-left:50px;
+        width:160px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content:space-around;
+    }
+        #increment-xyz, #increment-plunger{
+        width:270px;
+        padding-left: 5px;
         display: flex;
         flex-wrap: wrap;
         position:relative;
         justify-content:space-around;
-        margin-bottom: 15px;
-        div{
-            height:30px;
-            flex:0 0 20px;
-            padding:5px;
-            text-align: center;
+
         }
-        input[type="radio"] {
-            display:none;
+        #increment-plunger{
+            width:155px;
+            padding-top:30px;
+            margin-left: 20px;
+            margin-right:10px;
+            h3.plunger{
+            width:200px;
+            padding-left:8px;
+            
+            }
+            
         }
-        input[type="radio"] + label{
-            padding-left:3px;
-        }
-        input[type="radio"] + label span {
-            display:inline-block;
-            width:15px;
-            height:15px;
-            margin:0 4px 10px 0;
-            vertical-align:middle;
-            cursor:pointer;
-            -moz-border-radius:  50%;
-            border-radius:  50%;
-        }
+        #increment-xyz, #increment-plunger{
+            div{
+                height:30px;
+                flex:0 0 20px;
+                padding:5px;
+                text-align: center;
+                &.slot{
+                    flex: 0 0 40px;
+                    margin-right:23px;
+                }
+            }
+            input[type="radio"] {
+                display:none;
+            }
+            input[type="radio"] + label{
+                padding-left:3px;
+            }
+            input[type="radio"] + label span {
+                display:inline-block;
+                width:10px;
+                height:10px;
+                margin:0 0px 5px 4px;
+                vertical-align:middle;
+                cursor:pointer;
+                -moz-border-radius:  50%;
+                border-radius:  50%;
+            }
 
 
-        input[type="radio"] + label span {
-            border: 2px solid #999;
-             background-color:#999;
-        }
+            input[type="radio"] + label span {
+                border: 2px solid #999;
+                 background-color:#999;
+            }
 
-        input[type="radio"]:checked + label span{
-            border: 2px solid #999;
-             background-color:$primary-brand;
-        }
+            input[type="radio"]:checked + label span{
+                border: 2px solid #999;
+                 background-color:$primary-brand;
+            }
 
-        input[type="radio"] + label span,
-        input[type="radio"]:checked + label span {
-          -webkit-transition:background-color 0.4s linear;
-          -o-transition:background-color 0.4s linear;
-          -moz-transition:background-color 0.4s linear;
-          transition:background-color 0.4s linear;
+            input[type="radio"] + label span,
+            input[type="radio"]:checked + label span {
+              -webkit-transition:background-color 0.4s linear;
+              -o-transition:background-color 0.4s linear;
+              -moz-transition:background-color 0.4s linear;
+              transition:background-color 0.4s linear;
+            }
         }
-    }
+    
+
+    
+    
     #deck{
         display: flex;
         justify-content:center;
@@ -366,7 +464,7 @@ section#task-pane {
     width: 710px;
     flex: 0 0 710px;
     margin-left: 10px;
-    height: 426px;
+    height: 536px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -388,7 +486,7 @@ aside#step-list {
     align-items: center;
     div.instrument {
         border-left: 5px solid $secondary-brand;
-        width: 140px;
+        width: 135px;
         &:first-child {
             margin-bottom: $baseline;
         }
@@ -645,16 +743,17 @@ button{
 }
 
 .disabled{
-  .btn, .btn-calibrate, .btn-home, button, .btn-jog, .pick-tip, .move-to, .save{
+  .btn, .btn-home, .btn-jog, .btn-run, .pick-tip, .move-to, .deck, .upload{
     pointer-events: none;
-    opacity: 0.7;
+    // opacity: 0.7;
   }
 }
 
-.disabled.btn-calibrate {
+.disabled.move-to {
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.5;
 }
+
 
 
 
@@ -665,9 +764,10 @@ button{
 Typography
 ******************************/
 h1.title{
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 800;
     line-height: $baseline;
+    font-family: "open-sans"; 
 }
 h3.title {
     font-size: 12px;
@@ -693,5 +793,5 @@ h2.title{
 
 hr{
     color: #FFF;
-    margin-bottom:15px;
+    margin-bottom:5px;
 }
