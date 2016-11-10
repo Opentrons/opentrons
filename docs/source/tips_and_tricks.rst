@@ -52,42 +52,35 @@ The following examples assume the containers and pipettes:
   p200 = instruments.Pipette(axis="b")
 
 
-
-Advanced Use Cases
-~~~~~~~~~~~~~~~~~~
-
-Distribute to entire plate
+Automatically Refill Volume
 --------------------------
 
-.. testcode:: tips_main
+Want to deposit liquid to an entire plate, but don't want to have to tell the robot when to pick up more liquid?  This example will keep track of the volume in the pipette and automatically picks up more liquid when there isn't enough for the next dispense.  
 
-  robot.clear_commands()
+.. testcode:: tips_main
 
   p200.pick_up_tip(tiprack['A1'])
 
   dispense_volume = 13
   for i in range(96):
-      # refill the tip if it's empty
       if p200.current_volume < dispense_volume:
           p200.aspirate(trough['A1'])
       p200.dispense(dispense_volume, plate[i]).touch_tip()
 
   p200.drop_tip(trash)
-  robot.simulate()
 
 Serial Dilution
 ---------------
 
+This serial dilution example assumes a standard 96 well plate, using a different tip per column and a different trough row per column.
+
 .. testcode:: tips_main
 
-  # Here we assume a 96-well plate with 12 rows and 8 columns
-  # A trough has 8 wells, with liquids corresponding to plates columns
-  # We are replacing tips for each liquid / column
   for t, col in enumerate(plate.cols):
       p200.pick_up_tip(tiprack[t])  # Use one tip per column
 
-      p200.aspirate(120, trough[t]) # aspirate from a drough
-      p200.dispense(col[0])         # dispense everythig into a first well
+      p200.aspirate(120, trough[t]) # aspirate from a trough
+      p200.dispense(col[0])         # dispense everything into a first well
 
       # zip(col[:-1], col[1:]) returns pairs of
       # (A1, A2), (A2, A3), (A3, A4), etc
@@ -100,6 +93,8 @@ Serial Dilution
 Plate Mapping
 -------------
 
+Deposit various volumes of liquids into the same plate of wells, and automatically refill the tip volume when it runs out.
+
 .. testcode:: tips_main
 
   sources = {
@@ -108,14 +103,14 @@ Plate Mapping
       'A3': 'purple'
   }
   destinations = {
-      'A1': {'water': 35, 'sugar': 10, 'purple': 12},
-      'B1': {'water': 35, 'sugar': 20, 'purple': 12},
-      'C1': {'water': 35, 'sugar': 30, 'purple': 12},
-      'D1': {'water': 35, 'sugar': 40, 'purple': 12},
-      'E1': {'water': 55, 'sugar': 10, 'purple': 14},
-      'F1': {'water': 55, 'sugar': 20, 'purple': 14},
-      'G1': {'water': 55, 'sugar': 30, 'purple': 14},
-      'H1': {'water': 55, 'sugar': 40, 'purple': 14}
+      'A1': {'water': 35, 'sugar': 10, 'purple': 1},
+      'B1': {'water': 35, 'sugar': 20, 'purple': 2},
+      'C1': {'water': 35, 'sugar': 30, 'purple': 3},
+      'D1': {'water': 35, 'sugar': 40, 'purple': 4},
+      'E1': {'water': 55, 'sugar': 10, 'purple': 5},
+      'F1': {'water': 55, 'sugar': 20, 'purple': 6},
+      'G1': {'water': 55, 'sugar': 30, 'purple': 7},
+      'H1': {'water': 55, 'sugar': 40, 'purple': 8}
   }
 
   robot.clear_commands()
@@ -135,26 +130,14 @@ Plate Mapping
     
   robot.simulate()
 
-Precision pipetting within a well
+Precision Pipetting
 ---------------------------------
+
+This example shows how to deposit liquid around the edge of a well.
 
 .. testcode:: tips_main
 
-  robot.clear_commands()
-
   p200.pick_up_tip(tiprack[3])
-
-  # aspirate from 3mm above the bottom of a well
-  p200.aspirate(plate[0].bottom(3))
-
-  # dispense from 1mm below the top of a well
-  p200.dispense(0, plate[1].top(-1))
-
-  # you can also simple move somewhere using Pipette.move_to()
-  # 'arc' will move the head up, then over, then down
-  p200.move_to(plate[95].top(10), strategy='arc')
-  # 'direct' will move the head in a straight line to the destination
-  p200.move_to(plate[95].bottom(), strategy='direct')
 
   # rotate around the edge of the well
   # dropping 10ul at a time
@@ -171,5 +154,3 @@ Precision pipetting within a well
       theta += 0.314
 
   p200.drop_tip(tiprack[3])
-
-  robot.simulate()
