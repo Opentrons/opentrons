@@ -65,25 +65,36 @@
     methods: {
       jog(axis, multiplier) {
         let increment = this.$store.state.current_increment_placeable
-        let incrementPlunger = this.$store.state.current_increment_plunger
-        increment *= multiplier
-        incrementPlunger *=multiplier
+        let increment_plunger = this.$store.state.current_increment_plunger       
+        increment_plunger *=multiplier
         let coords = {}
         switch(axis) {
           case "x":
+            if (increment === 'Slot'){
+              increment = 91
+            }
+            increment *= multiplier
             coords.x = increment
             break;
           case "y":
+            if (increment === 'Slot'){
+              increment = 135
+            }
+            increment *= multiplier
             coords.y = increment
             break;
           case "z":
+            if (increment === 'Slot'){
+              increment = 1
+            }
+            increment *= multiplier
             coords.z = increment
             break;
           case "a":
-            coords.a = incrementPlunger
+            coords.a = increment_plunger
             break;
           case "b":
-            coords.b = incrementPlunger
+            coords.b = increment_plunger
             break;
         }
         this.$store.dispatch("jog", coords)
