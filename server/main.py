@@ -10,6 +10,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
+from opentrons.instruments import Pipette
 from opentrons.robot import Robot
 from opentrons.containers import placeable
 from opentrons.util import trace
@@ -399,6 +400,10 @@ def _check_if_calibrated(instrument, container):
 
 
 def _check_if_instrument_calibrated(instrument):
+    # TODO: rethink calibrating instruments other than Pipette
+    if not isinstance(instrument, Pipette):
+        return True
+
     positions = instrument.positions
     for p in positions:
         if positions.get(p) is None:
@@ -409,6 +414,15 @@ def _check_if_instrument_calibrated(instrument):
 
 def get_step_list():
     try:
+        pipette_list = []
+        for _, p in Robot.get_instance().get_instruments():
+            if isinstance(p, Pipette):
+                pipette_list.append(p)
+            else:
+                print(type(p).__name__)
+
+        print(Robot.get_instance().get_instruments())
+        print(pipette_list)
         data = [{
             'axis': instrument.axis,
             'label': instrument.name,
@@ -428,7 +442,7 @@ def get_step_list():
                 }
                 for container in _get_unique_containers(instrument)
             ]
-        } for _, instrument in Robot.get_instance().get_instruments()]
+        } for instrument in pipette_list]
 
         return data
     except Exception as e:
@@ -488,7 +502,7 @@ def move_to_slot():
         slot = robot._deck[slot]
 
         slot_x, slot_y, _ = slot.from_center(
-            x=-0.5, y=0, z=0, reference=robot._deck)
+            x=-1, y=0, z=0, reference=robot._deck)
         _, _, robot_max_z = robot._driver.get_dimensions()
 
         robot.move_head(z=robot_max_z)
