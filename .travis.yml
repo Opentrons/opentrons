@@ -1,18 +1,15 @@
-language: python
-
 matrix:
   # Set fast_finish to false to wait for OSX build to finish
   # We need both builds when we want to push an app update
   # Otherwise with fast_finish: true 
   # the success of Linux build is enough for CI purposes
   fast_finish: false
-  include:
   - os: linux
     # Trying container environment
     sudo: false
     # sudo: required
     # dist: trusty
-    pytnon: "3.4"
+    python: "3.4"
     env: OPENTRONS_APP_UPLOAD_DIR=linux
     addons:
       apt:
