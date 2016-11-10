@@ -19,11 +19,6 @@ Install Jupyter
 
 After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](http://jupyter.readthedocs.io/en/latest/install.html).
 
-Add Opentrons Channel
-^^^^^^^^^^^^^^^^^^^^^
-
-After installing Anaconda, run Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
-
 Launch Jupyter Notebook App
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -53,7 +48,17 @@ A new tab should open in your browser and you should have an empty text box.
 Install Opentrons API
 ---------------------
 
+Before running any code, you need to install the Opentrons API. 
+
+If you are running Anaconda, open Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
+
 In Jupyter click `Conda`. Find and install `opentrons` package. Make sure to check for updates!
+
+If you are not using Anaconda copy and paste the following code into the first cell of your notebook. This only needs to be done the first time you use Jupyter, so feel free to comment it out after it successfully installs.
+
+.. code-block:: bash
+  
+  !pip install --upgrade git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
 
 After this step you should be able to run:
 
@@ -66,14 +71,3 @@ Which should return the version of opentrons package installed.
 If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
 
 If you want to learn more about Jupyter Notebook Navigation [check this out](http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb):
-
-Documentation
----------------
-
-.. toctree::
-   :maxdepth: 2
-
-   index
-   getting_started
-   running_a_protocol
-   well_access

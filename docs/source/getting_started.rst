@@ -1,7 +1,8 @@
 .. _getting_started:
-================================
+
+===============
 Getting Started
-================================
+===============
 
 Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to :ref:`setup` for detailed instructions.
 
@@ -11,7 +12,7 @@ Welcome to the API (Application Program Interface).  These tutorials assume no b
 
 
 Import Opentrons API
--------------------------------
+--------------------
 
 Before running any code, you need to install the Opentrons API in your jupyter notebook by running the cell below.  This only needs to be done the first time you use jupyter, so feel free to comment it out after it successfully installs.
 
@@ -20,6 +21,12 @@ Before running any code, you need to install the Opentrons API in your jupyter n
 	!pip install --upgrade git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
 
 Now that you've installed Opentrons API on your computer, you have access to a variety of robot container and instrument commands. You need to import them to each project (protocol) in order to access these commands.  Unlike the install, this set of imports needs to be done at the start of each protocol.
+
+.. testsetup:: main
+
+  from opentrons.robot import Robot
+  Robot().reset()
+  i = 0
 
 .. testcode:: main
 	
@@ -48,7 +55,7 @@ Now that you have a robot to run commands on, you need to tell it what container
 	This section replaces the deck and head sections of JSON files 
 
 Containers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 For each container you want to use on the deck, you need to load it into your file by telling the robot what it is, where it is, and what to label it. The label you give the container is what will appear in the app when you start calibrating.
 
@@ -89,7 +96,7 @@ The example below declares 3 different containers and assigns them to the approp
 
 
 Pipettes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
 
 .. code-block:: python
 	
@@ -128,7 +135,7 @@ Once you load your pipette, you should assign the maximum volume.
 
 .. testcode:: main
 	
-	p200.set_max_volume(200)  # maximum volume
+	p200.set_max_volume(2000)  # maximum volume
 
 
 Commands 
@@ -174,7 +181,7 @@ While you can only pick up tips from tip racks, you can eject tips back into the
 
 
 Aspirate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
 
 **pipette.aspirate** (*volume, location*)
 
@@ -227,11 +234,11 @@ While you can call multiple aspirate and dispense commands to the same location,
 
 .. testcode:: main
 
-	p200.mix(100, 3, plate['A1'])
+	p200.mix(3, 100, plate['A1'])
 
 
 Chaining Commands
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 Now that you know the basic commands, you can start transferring liquids!  However, your code can get lengthy quickly is you write it like this.
 
@@ -257,7 +264,7 @@ Command Attributes
 In addition to commands, you can attach attributes to your movements.  
 
 Touch Tip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
 
 Sometimes you want to touch the tip of the pipette to the sides of the well.  You can link this to one of the commands you just learned.
 
@@ -299,7 +306,7 @@ Delay commands can be called between any movement commands, so you have complete
 	p200.delay(10).aspirate(100, plate['A1'])
 
 Dispensing Positions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 Want to deposit at the top of a tube?  Pull liquid from the bottom of the well?  Mix from the middle?  Easy.
 
@@ -314,8 +321,8 @@ Containers are calibrated to the bottom of the well, and each labware definition
 .. testcode:: main
 
 	p200.dispense(plate['A1'].top())
-	p200.aspirate(plate['B2'].bottom())
-	p200.mix(plate['B2'].bottom(5))
+	p200.aspirate(1000, plate['B2'].bottom())
+	p200.mix(3, 100, plate['B2'].bottom(5))
 	p200.dispense(plate['A1'].top(-3))
 
 Homing
@@ -327,7 +334,7 @@ Debugging Your Protocol
 There are a couple tricks that make it easy to test your protocol, without having to run it on the robot.
 
 Print()
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^
 
 First, you can use the print command (a basic python command) to print well locations, or test to see if loops are being called.
 
@@ -336,6 +343,12 @@ First, you can use the print command (a basic python command) to print well loca
 	print("hello")
 	print(plate['A1'])
 	print(plate[i])
+
+.. testoutput:: main
+
+  hello
+  <Well A1>
+  <Well A1>
 
 This is useful when trying to determine if the location you're calling is actually the location you want, or if something is iterating properly (more on iteration later)
 

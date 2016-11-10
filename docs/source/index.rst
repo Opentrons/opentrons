@@ -28,10 +28,10 @@
   well_4 = plate[3]
       
   p200 = instruments.Pipette(
-      axis="b"
+      axis="b",
+      max_volume = 1000
   )
 
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
   pipette = p200
 
 .. testsetup:: index_long
@@ -67,12 +67,11 @@ You string these commands into full protocols that anyone with Opentrons can run
 
 If you wanted to do this 96 times, you could write it like this:
 
-.. testsetup:: index_main
+.. testcode:: index_main
    
   p200.aspirate(trough)
    
   for i in range(95):
-      p200.aspirate(100, plate[i])
       p200.dispense(plate[i + 1]).blow_out().touch_tip()
 
 Basic Principles
@@ -164,6 +163,8 @@ Documentation
    well_access
    advanced_use_cases
    module
+   api
+   tips_and_tricks
 
 
 

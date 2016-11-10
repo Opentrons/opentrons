@@ -490,9 +490,9 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def mix(self,
+            repetitions=1,
             volume=None,
             location=None,
-            repetitions=1,
             rate=1.0,
             enqueue=True):
         """
@@ -506,6 +506,9 @@ class Pipette(Instrument):
 
         Parameters
         ----------
+        repetitions: int
+            How many times the pipette should mix (Default: 1)
+
         volume : int or float
             The number of microliters to mix (Default: self.max_volume)
 
@@ -513,9 +516,6 @@ class Pipette(Instrument):
             The :any:`Placeable` (:any:`Well`) to perform the mix.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
-
-        repetitions: int
-            How many times the pipette should mix (Default: 1)
 
         rate : float
             Set plunger speed for this mix, where
@@ -539,11 +539,11 @@ class Pipette(Instrument):
         >>> p200 = instruments.Pipette(axis='a', max_volume=200)
 
         >>> # mix 50uL in a Well, three times
-        >>> p200.mix(50, plate[0], 3) # doctest: +ELLIPSIS
+        >>> p200.mix(3, 50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # mix 3x with the pipette's max volume, from current position
-        >>> p200.mix(repetitions=3) # doctest: +ELLIPSIS
+        >>> p200.mix(3) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():

@@ -27,6 +27,12 @@ Just like a pipette, you need to set up and name your module.
 	* **mofset -** default to =0
 	* **name -** the name you want to call your module
 
+.. testsetup:: main
+
+  from opentrons import instruments
+  from opentrons.instruments import Pipette
+  p200 = instruments.Pipette(axis="b", max_volume=200)
+
 .. testcode:: main
 
 	mag_deck = instruments.Magbead(
@@ -35,7 +41,7 @@ Just like a pipette, you need to set up and name your module.
 	)
 
 Activate and Deactivate Magnets 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To activate the magnets, use the following command
 
@@ -64,7 +70,7 @@ Just like aspirate() and dispense() can be chained, you can chain engage() and d
 	mag_deck.delay(60)
 	mag_deck.disengage()
 
-	magbead.engage().delay(60).disengage()
+	mag_deck.engage().delay(60).disengage()
 
 You can call delay() with a pipette or a mag_deck module.
 

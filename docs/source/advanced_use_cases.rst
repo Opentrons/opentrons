@@ -93,7 +93,7 @@ Mixing at a well
 
 .. testcode:: main
 
-  p200.mix(100, 3, plate[0])   # arguments are (volume, repetitions, location)
+  p200.mix(3, 100, plate[0])   # arguments are (volume, location, repetitions)
 
 Iterating through wells
 -----------------------
@@ -101,23 +101,23 @@ Iterating through wells
 .. testcode:: main
 
   for i in range(96):
-      p200.mix(100, 3, plate[i])
+      p200.mix(3, 100, plate[i])
 
 .. testcode:: main
 
   for well in plate:
-      p200.mix(100, 3, well)
+      p200.mix(3, 100, well)
 
 .. testcode:: main
 
   for row in plate.rows:
       for well in row:
-          p200.mix(100, 3, well)
+          p200.mix(3, 100, well)
 
 .. testcode:: main
 
   for well in plate.cols['A']:
-      p200.mix(100, 3, well)
+      p200.mix(3, 100, well)
 
 Distribute to multiple wells
 ----------------------------
