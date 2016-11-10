@@ -64,9 +64,8 @@ For each container you want to use on the deck, you need to load it into your fi
 	mycontainer = containers.load(
 		'container type', 	# trough-12row, tiprack-200ul, 96-PCR-flat
 		'slot position'		# A1, B1, C1
-		'given name'		# mycontainer
+		'given name'		# calibration name
 	)
-
 
 The example below declares 3 different containers and assigns them to the appropriate slots on the deck.
 
@@ -93,6 +92,8 @@ The example below declares 3 different containers and assigns them to the approp
 .. tip:: 
 	
 	For a complete list of container types, go here [link]	
+
+The robot will save calibration data from old runs based on the container type, slot position and given name.  Thus, if you always give something the same arguments, it will populate the app with old calibration data.  If you do not want it to do this, simply change the given name to unique names.
 
 
 Pipettes
