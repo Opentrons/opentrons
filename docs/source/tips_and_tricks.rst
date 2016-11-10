@@ -154,7 +154,7 @@ Mixing at a well
 
 .. testcode:: tips_main
 
-  p200.mix(100, plate[0], 3)   # arguments are (volume, location, repetitions)
+  p200.mix(3, 100, plate[0])   # arguments are (repetitions, volume, location)
 
 Iterating through wells
 -----------------------
@@ -162,23 +162,23 @@ Iterating through wells
 .. testcode:: tips_main
 
   for i in range(96):
-      p200.mix(100, plate[i], 3)
+      p200.mix(3, 100, plate[i])
 
 .. testcode:: tips_main
 
   for well in plate:
-      p200.mix(100, well, 3)
+      p200.mix(3, 100, well)
 
 .. testcode:: tips_main
 
   for row in plate.rows:
       for well in row:
-          p200.mix(100, well, 3)
+          p200.mix(3, 100, well)
 
 .. testcode:: tips_main
 
   for well in plate.cols['A']:
-      p200.mix(100, well, 3)
+      p200.mix(3, 100, well)
 
 Distribute to multiple wells
 ----------------------------
@@ -236,7 +236,7 @@ Serial Dilution
       # (A1, A2), (A2, A3), (A3, A4), etc
       for well, next_well in zip(col[:-1], col[1:]):
           p200.aspirate(10, well)
-          p200.dispense(10, next_well).mix(repetitions=3)
+          p200.dispense(10, next_well).mix(3)
 
       p200.drop_tip(trash)
 

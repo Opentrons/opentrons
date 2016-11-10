@@ -81,14 +81,14 @@ p200.pick_up_tip(tiprack['B1']).drop_tip(trash)
 ####Mixing at a well
 
  ```python
-p200.mix(100, 3, plate[0])   # arguments are (volume, repetitions, location)
+p200.mix(3, 100, plate[0])   # arguments are (repetitions, volume, location)
 ```
 
 ####Iterating through wells
 
 ```python
 for i in range(96):
-  p200.mix(100, 3, plate[i])
+  p200.mix(3, 100, plate[i])
 ```
 
 ####Distribute to multiple wells

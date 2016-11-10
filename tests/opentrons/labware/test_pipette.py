@@ -459,7 +459,7 @@ class PipetteTest(unittest.TestCase):
         # so that you have liquid
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
-        self.p200.mix(100, self.plate[1], 3)
+        self.p200.mix(3, 100, self.plate[1])
 
         self.assertEqual(
             self.p200.dispense.mock_calls,

@@ -473,7 +473,7 @@ class JSONProtocolProcessor(object):
         repetitions = command_args.get('repetitions', 0)
 
         tool_obj.mix(
-            volume=volume, repetitions=repetitions, location=from_well
+            repetitions=repetitions, volume=volume, location=from_well
         )
 
         if command_args.get('blow-out'):

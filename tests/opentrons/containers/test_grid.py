@@ -78,7 +78,7 @@ class GridTestCase(unittest.TestCase):
             for well, next_well in zip(col[:-1], col[1:]):
                 p200.aspirate(10, well)
                 p200.dispense(10, next_well)
-                p200.mix(volume=10, repetitions=3, location=next_well)
+                p200.mix(repetitions=3, volume=10, location=next_well)
 
             p200.drop_tip(trash)
 
