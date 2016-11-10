@@ -91,6 +91,11 @@
 				})[0]
 				return typeof(instrument[position]) == "number" ? true : false
 			}
-    }
+    },
+		created: function() {
+			if (this.$store.state.tasks) {
+				this.$store.dispatch("loadProtocol")
+			}
+		}
   }
 </script>

@@ -47,6 +47,23 @@ const actions = {
       commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
     })
   },
+  loadProtocol ({commit}) {
+    OpenTrons.loadProtocol().then((result) => {
+      if (result.success) {
+        console.log("protocol loaded")
+        let tasks = result.calibrations
+        let fileName = result.fileName
+        let lastModified = result.lastModified
+        addHrefs(tasks)
+        commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
+        // commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
+        // commit(types.UPDATE_FILE_MODIFIED, {'lastModified': lastModified})
+      } else {
+        console.log("no protocol found")
+        commit(types.UPDATE_TASK_LIST, {tasks: []})
+      }
+    })
+  },
   selectIncrement ({commit}, data) {
     commit(types.UPDATE_INCREMENT, { 'current_increment': data.inc })
   },

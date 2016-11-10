@@ -667,16 +667,17 @@ button{
 }
 
 .disabled{
-  .btn, .btn-calibrate, .btn-home, button, .btn-jog, .pick-tip, .move-to, .save{
+  .btn, .btn-home, .btn-jog, .btn-run, .pick-tip, .move-to, .deck, .upload{
     pointer-events: none;
-    opacity: 0.7;
+    // opacity: 0.7;
   }
 }
 
-.disabled.btn-calibrate {
+.disabled.move-to {
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.5;
 }
+
 
 
 

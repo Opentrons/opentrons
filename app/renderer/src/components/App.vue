@@ -49,6 +49,7 @@
     },
     computed: {
       robot_busy() {
+        if(!this.$store.state.is_connected) return true
         return this.$store.state.busy
       }
     }
