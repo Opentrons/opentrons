@@ -1,10 +1,12 @@
 <template>
-  <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data" class='upload'>
-    <div class="fileUpload">
-      <span>Click to Upload </span>
-      <input ref="input" @change="fileChange" type="file" name="file" class="upload" />
-    </div>
-  </form>
+  <span :class="{disabled: busy}">
+    <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data"  class='upload'>
+      <div class="fileUpload">
+        <span>Click to Upload </span>
+        <input ref="input" @change="fileChange" type="file" name="file" class="upload" />
+      </div>
+    </form>
+  </span>
 </template>
 
 <script>
@@ -25,8 +27,11 @@
       }
     },
     computed: {
-      taskListLen (){
+      taskListLen() {
         return this.$store.state.tasks.length > 0
+      },
+      busy() {
+        return this.$store.state.busy
       }
     },
     watch: {
