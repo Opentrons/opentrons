@@ -97,7 +97,7 @@
 			}
 		},
 		created: function() {
-			if (!this.currentInstrument(this.$store.state.tasks)) {
+			if (this.$store.state.tasks) {
 				this.$store.dispatch("loadProtocol")
 			}
 		}
