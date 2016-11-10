@@ -91,6 +91,10 @@ class Pipette(Instrument):
         self.trash_container = trash_container
         self.tip_racks = tip_racks
 
+        # default mm above tip to execute drop-tip
+        # this gives room for the drop-tip mechanism to work
+        self._drop_tip_offset = 15
+
         self.reset_tip_tracking()
 
         self.robot = Robot.get_instance()
@@ -920,7 +924,7 @@ class Pipette(Instrument):
 
             if isinstance(location, Placeable):
                 # give space for the drop-tip mechanism
-                location = location.bottom(10)
+                location = location.bottom(self._drop_tip_offset)
 
             self._associate_placeable(location)
             self.current_tip_home_well = None

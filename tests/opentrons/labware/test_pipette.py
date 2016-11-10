@@ -245,7 +245,11 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEqual(
             current_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 13.0})
+            Vector({
+                'x': 161.0,
+                'y': 116.7,
+                'z': 3.0 + self.p200._drop_tip_offset
+            })
         )
 
     def test_empty_aspirate(self):
@@ -664,6 +668,8 @@ class PipetteTest(unittest.TestCase):
                 mock.call(
                     self.tiprack1[0].bottom(), enqueue=False, strategy='arc'),
                 mock.call(
-                    self.trash.bottom(10), enqueue=False, strategy='arc')
+                    self.trash.bottom(self.p200._drop_tip_offset),
+                    enqueue=False,
+                    strategy='arc')
             ]
         )
