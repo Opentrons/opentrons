@@ -502,7 +502,7 @@ def move_to_slot():
         slot = robot._deck[slot]
 
         slot_x, slot_y, _ = slot.from_center(
-            x=-0.5, y=0, z=0, reference=robot._deck)
+            x=-1, y=0, z=0, reference=robot._deck)
         _, _, robot_max_z = robot._driver.get_dimensions()
 
         robot.move_head(z=robot_max_z)
