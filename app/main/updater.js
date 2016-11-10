@@ -3,7 +3,7 @@ const {app, dialog, autoUpdater} = electron;
 const {getSetting} = require('./preferences')
 const {getLogger} = require('./logging.js')
 
-var UPDATE_SERVER_URL =  'http://ot-app-releases.herokuapp.com';
+var UPDATE_SERVER_URL =  'http://ot-app-releases-2.herokuapp.com';
 
 
 function initAutoUpdater () {
