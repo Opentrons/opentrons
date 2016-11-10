@@ -7,25 +7,25 @@ matrix:
   # the success of Linux build is enough for CI purposes
   fast_finish: false
   include:
-   - os: linux
-     # Trying container environment
-     sudo: false
-     # sudo: required
-     # dist: trusty
-     pytnon: "3.4"
-     env: OPENTRONS_APP_UPLOAD_DIR=linux
-     addons:
-       apt:
-         sources: &common_sources
-         packages: &common_packages
-           - g++
-           - gcc
-           - icnsutils # electron-builder dependency
-           - graphicsmagick # electron-builder dependency
-           - xvfb
-    - os: osx
-      language: generic
-      env: OPENTRONS_APP_UPLOAD_DIR=mac
+  - os: linux
+    # Trying container environment
+    sudo: false
+    # sudo: required
+    # dist: trusty
+    pytnon: "3.4"
+    env: OPENTRONS_APP_UPLOAD_DIR=linux
+    addons:
+      apt:
+        sources: &common_sources
+        packages: &common_packages
+          - g++
+          - gcc
+          - icnsutils # electron-builder dependency
+          - graphicsmagick # electron-builder dependency
+          - xvfb
+   - os: osx
+     language: generic
+     env: OPENTRONS_APP_UPLOAD_DIR=mac
 
 cache:
   apt: true
