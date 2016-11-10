@@ -2,9 +2,14 @@
   <div>
     <toast position="n"></toast>
     <header id="home-connect">
-      <Home :busy="robot_busy"></Home>
-      <div class="logo">
-        <img src="../assets/img/logo_rgb_transparent.png" />
+      <Home :busy="robotBusy"></Home>
+      <div class="brand">
+        <div class="logo">
+          <img src="../assets/img/logo_rgb_transparent.png" />
+        </div>
+        <div class="version">
+          <span>v{{version}}</span>
+        </div>
       </div>
       <nav class="connect">
         <Connect></Connect>
@@ -13,12 +18,14 @@
     <section class="protocol">
       <Upload></Upload>
       <Protocol></Protocol>
-      <ProgressBar></ProgressBar>
+      <div id="progress">
+        <ProgressBar></ProgressBar>
+      </div>
       <Run></Run>
     </section>
     <main id="container">
-      <Jog :busy="robot_busy"></Jog>
-      <TaskPane :busy="robot_busy">
+      <Jog :busy="robotBusy"></Jog>
+      <TaskPane :busy="robotBusy">
     </main>
   <div>
 </template>
@@ -35,6 +42,7 @@
   import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
 
+
   export default {
     components: {
       Toast,
@@ -47,10 +55,23 @@
       Protocol,
       ProgressBar
     },
+    data: function() {
+      return {
+        version: "2.?.?"
+      }
+    },
     computed: {
-      robot_busy() {
+      robotBusy() {
+        if(!this.$store.state.is_connected) return true
         return this.$store.state.busy
       }
+    },
+    mounted: function() {
+      this.$http
+        .get('http://localhost:31950/app_version').then((response) => {
+          let version = response.body.version
+          version ? this.version = version : this.version = "2.?.?"
+      })
     }
   }
 </script>

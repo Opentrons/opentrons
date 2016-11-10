@@ -14,6 +14,7 @@
     name: "Run",
     methods: {
       runProtocol() {
+        this.$store.dispatch("running")
         this.$store.dispatch("runProtocol")
       },
       pauseProtocol() {

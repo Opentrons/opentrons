@@ -30,8 +30,6 @@ class UploadTestCase(unittest.TestCase):
 
         response = json.loads(response.data.decode())
         self.assertEqual(response['status'], 'success')
-        # self.assertTrue('errors' in response['data'])
-        # self.assertTrue('warnings' in response['data'])
 
     def test_upload_valid_python(self):
         response = self.app.post('/upload', data={

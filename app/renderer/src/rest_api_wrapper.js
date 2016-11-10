@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import {addHrefs} from './util'
+import {addHrefs, processProtocol} from './util'
 
 
 class OpenTrons {
@@ -111,22 +111,24 @@ class OpenTrons {
     return Vue.http
       .post('http://localhost:31950/upload', formData)
       .then((response) => {
-        let result = {success: true, errors: [], warnings: [], calibrations: []}
-        let data = response.body.data
-        result.errors = data.errors
-        result.warnings = data.warnings
-        result.calibrations = data.calibrations || []
-        if (data.errors && data.errors.length > 0) {
-          result.success = false
-        }
-        result.fileName = data.fileName
-        result.lastModified = data.lastModified
-        return result
+        return processProtocol(response)
       }, (response) => {
         console.log('Failed to upload protocol', response)
         return {success: false}
       })
   }
+
+  loadProtocol () {
+    return Vue.http
+      .get('http://localhost:31950/load')
+      .then((response) => {
+        return processProtocol(response)
+      }, (response) => {
+        console.log('Failed to upload protocol', response)
+        return {success: false}
+      })
+  }
+
   getRunPlan () {
     return Vue.http
       .get(this.runPlanUrl)
