@@ -67,7 +67,8 @@
     mounted: function() {
       this.$http
         .get('http://localhost:31950/app_version').then((response) => {
-        this.version = response.body.version
+          let version = response.body.version
+          version ? this.version = version : this.version = "2.?.?"
       })
     }
   }

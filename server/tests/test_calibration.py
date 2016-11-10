@@ -18,6 +18,27 @@ class CalibrationTestCase(unittest.TestCase):
         self.robot = Robot.get_instance()
         self.robot.connect()
 
+    def test_move_to_slot(self):
+        arguments = {
+            'slot': 'A1'
+        }
+        response = self.app.post(
+            '/move_to_slot',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'success')
+
+        arguments = {
+            'slot': 'A4'
+        }
+        response = self.app.post(
+            '/move_to_slot',
+            data=json.dumps(dict(arguments)),
+            content_type='application/json')
+        status = json.loads(response.data.decode())['status']
+        self.assertEqual(status, 'error')
+
     def test_aspirate_dispense(self):
 
         response = self.app.post('/upload', data={

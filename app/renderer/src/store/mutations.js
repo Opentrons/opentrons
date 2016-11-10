@@ -17,7 +17,8 @@ const state = {
   run_plan: [],
   busy: false,
   versions: [],
-  uploading: false
+  uploading: false,
+  running: false
 }
 
 const mutations = {
@@ -66,6 +67,9 @@ const mutations = {
   },
   [types.UPLOADING] (state, payload) {
     state.uploading = payload
+  },
+  [types.UPDATE_RUNNING] (state, payload) {
+    state.running = payload
   }
 }
 
