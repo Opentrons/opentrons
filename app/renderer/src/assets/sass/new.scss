@@ -85,15 +85,29 @@ header#home-connect {
             cursor:pointer;
         }
     }
-    div.logo{
+    .brand{
+        flex:0 0 160px;
+        display:flex;
+        flex-direction:row;
+        justify-content:space-between;
+
+        div.logo{
         width:124px;
         height:30px;
-        flex:0 0 124px;
+
         img{
-            width:100%;
+            width:124px;
             height:auto;
         }
     }
+
+        div.version{
+            flex:0 0 30px;
+            height:30px;
+            line-height: 35px;
+        }
+    }
+    
 
     nav.connect{
         width:350px;
