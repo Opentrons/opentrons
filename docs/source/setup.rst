@@ -1,22 +1,31 @@
 .. _setup:
 
+================================
 Running Opentrons API in Jupyter
 ================================
+
+Jupyter Code Environment
+-----------------------------
 
 Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.
 
 Install Anaconda and Python 3
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install Anaconda_: (https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
+Install Jupyter
+^^^^^^^^^^^^^^^
+
+After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](http://jupyter.readthedocs.io/en/latest/install.html).
+
 Add Opentrons Channel
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 After installing Anaconda, run Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
 
 Launch Jupyter Notebook App
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 With GUI -- *Reccomended for Beginners*:
   1. Install and open the Anaconda Navagator App you just downloaded.
@@ -29,7 +38,7 @@ In Terminal:
   3. Type `jupyter notebook` to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
 
 Programming in Jupyter Notebook: Hello World!
----------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When the Jupyter Notebook App is launched on your browser, follow these steps to open a `Notebook`
 
@@ -57,3 +66,14 @@ Which should return the version of opentrons package installed.
 If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
 
 If you want to learn more about Jupyter Notebook Navigation [check this out](http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb):
+
+Documentation
+---------------
+
+.. toctree::
+   :maxdepth: 2
+
+   index
+   getting_started
+   running_a_protocol
+   well_access
