@@ -35,7 +35,7 @@
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
-  // import electron from 'electron'
+
 
   export default {
     components: {
@@ -49,14 +49,22 @@
       Protocol,
       ProgressBar
     },
+    data: function() {
+      return {
+        version: "2.?.?"
+      }
+    },
     computed: {
       robotBusy() {
         if(!this.$store.state.is_connected) return true
         return this.$store.state.busy
-      },
-      version() {
-        // electron.remote.app.getVersion()
       }
+    },
+    mounted: function() {
+      this.$http
+        .get('http://localhost:31950/app_version').then((response) => {
+        this.version = response.body.version
+      })
     }
   }
 </script>

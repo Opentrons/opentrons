@@ -268,6 +268,13 @@ def get_versions():
     })
 
 
+@app.route("/app_version")
+def app_version():
+    return flask.jsonify({
+        'version': os.environ.get("appVersion")
+    })
+
+
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
     port = request.json.get('port')
@@ -293,6 +300,7 @@ def connect_robot():
         'status': status,
         'data': data
     })
+
 
 
 def _start_connection_watcher():
