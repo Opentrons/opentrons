@@ -1,18 +1,18 @@
 <template>
   <nav class="connect">
     <select @change="searchIfNecessary()" v-model="ports.selected" id="connections">
-      <option value="default">Select a port</option>
+      <option value="default">{{defaultOption}}</option>
       <option value="refresh-list">&#8635 refresh</option>
       <option v-for="option in ports.options" v-bind:value="option.value">
         {{ option.text }}
       </option>
     </select>
-    
+
 <div id="indicator" :class="{ 'connected': connected}"></div>
 
-    
+
   </nav>
-  
+
 </template>
 
 <script>
@@ -34,6 +34,9 @@
       },
       port () {
         return this.$store.state.port;
+      },
+      defaultOption () {
+        return this.connected ? "Disconnect" : "Select a port"
       }
     },
     methods: {
@@ -51,7 +54,7 @@
         console.log(this.ports.selected)
         if ( selected === "refresh-list" || selected === null) {
           this.getPortsList()
-          this.ports.selected = "default"
+          if (this.$store.state.is_connected) this.ports.selected = this.$store.state.port
         } else if (selected === "default") {
           this.disconnectRobot()
         } else {
@@ -59,9 +62,8 @@
         }
       },
       connectToRobot: function() {
-        console.log(this.ports.selected)
-        if (this.ports.selected === 'Refresh') {
-          this.ports.selected = null
+        if (this.ports.selected === 'Refresh' && this.$store.state.is_connected) {
+          this.ports.selected = this.$store.state.port
           return
         }
         this.$store.dispatch('connect_robot', this.ports.selected)
