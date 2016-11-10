@@ -310,9 +310,9 @@ Dispensing Positions
 
 Want to deposit at the top of a tube?  Pull liquid from the bottom of the well?  Mix from the middle?  Easy.
 
-**top** (*distance*)
+**container.top** (*distance*)
 
-**bottom** (*distance*)
+**container.bottom** (*distance*)
 
 	* **distance -** distance from calibration position (mm)
 
@@ -330,11 +330,30 @@ Homing
 
 You can instruct the robot to home at any point in the protocol, or just home one axis.
 
-. testcode:: tips_main
+
+.. testcode:: main
 
   robot.home()          
   robot.home('ab')
   robot.home('xyz')
+
+Move To
+-----------------------------
+
+If you don't want to aspirate, dispense or mix, you can still send your robot to a container using the move_to() command.
+
+**pipette.move_to** (*distance, strategy*)
+
+	* **distance -** distance from calibration position (mm)
+	* **strategy -** the type of path you want to use, either 'direct' (straight line) or 'arc' (move up Z, over XY, then down Z)
+
+.. testcode:: main
+
+	p200.move_to(plate[95].top(), 'arc')
+	p200.move_to(plate[3].top(10), 'direct)
+
+Be careful using the 'direct' strategy as the robot could crash into anything between your start and end locations.
+
 
 Debugging Your Protocol
 -----------------------------

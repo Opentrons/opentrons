@@ -1,6 +1,6 @@
 .. _tips_and_tricks:
 
-Opentrons API Tips and Tricks
+Advanced Use Cases
 =============================
 
 The following examples assume the containers and pipettes:

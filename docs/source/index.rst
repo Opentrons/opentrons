@@ -161,10 +161,9 @@ Documentation
    getting_started
    running_a_protocol
    well_access
-   advanced_use_cases
+   tips_and_tricks
    module
    api
-   tips_and_tricks
 
 
 
