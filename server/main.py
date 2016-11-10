@@ -516,28 +516,21 @@ def jog():
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
     status = 'success'
+    result = ''
     try:
         slot = request.json.get("slot")
-        axis = request.json.get("axis")
         slot = robot._deck[slot]
 
-        instrument = robot._instruments.get(axis.upper())
+        slot_x, slot_y, _ = slot.from_center(
+            x=-0.5, y=0, z=0, reference=robot._deck)
+        _, _, robot_max_z = robot._driver.get_dimensions()
 
-        relative_coord = slot.from_center(x=-1.0, y=0, z=0)
-        _, _, tallest_z = slot.max_dimensions(slot)
-        relative_coord += (0, 0, tallest_z)
-        location = (slot, relative_coord)
-
-        result = robot.move_to(
-            location,
-            enqueue=False,
-            instrument=instrument
-        )
+        robot.move_head(z=robot_max_z)
+        robot.move_head(x=slot_x, y=slot_y)
     except Exception as e:
         result = str(e)
         status = 'error'
         emit_notifications([result], 'danger')
-
 
     return flask.jsonify({
         'status': status,
@@ -594,7 +587,7 @@ def drop_tip():
         axis = request.json.get("axis")
         robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
-        instrument.drop_tip(enqueue=False)
+        instrument.return_tip(enqueue=False)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
