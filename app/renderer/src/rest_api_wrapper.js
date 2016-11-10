@@ -111,7 +111,7 @@ class OpenTrons {
     return Vue.http
       .post('http://localhost:31950/upload', formData)
       .then((response) => {
-        processProtocol(response)
+        return processProtocol(response)
       }, (response) => {
         console.log('Failed to upload protocol', response)
         return {success: false}
@@ -122,7 +122,7 @@ class OpenTrons {
     return Vue.http
       .get('http://localhost:31950/load')
       .then((response) => {
-        processProtocol(response)
+        return processProtocol(response)
       }, (response) => {
         console.log('Failed to upload protocol', response)
         return {success: false}

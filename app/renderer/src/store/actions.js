@@ -26,6 +26,7 @@ const actions = {
   },
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    commit(types.UPLOADING, {'uploading': true})
     OpenTrons.uploadProtocol(formData).then((result) => {
       if (result.success) {
         let tasks = result.calibrations
@@ -41,6 +42,7 @@ const actions = {
       commit(types.UPDATE_WARNINGS, {warning: result.warnings})
       commit(types.UPDATE_ERROR, {errors: result.errors})
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+      commit(types.UPLOADING, {'uploading': false})
 
     })
     OpenTrons.getRunPlan().then((plan) => {
@@ -50,7 +52,6 @@ const actions = {
   loadProtocol ({commit}) {
     OpenTrons.loadProtocol().then((result) => {
       if (result.success) {
-        console.log("protocol loaded")
         let tasks = result.calibrations
         let fileName = result.fileName
         let lastModified = result.lastModified

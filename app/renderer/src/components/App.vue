@@ -2,9 +2,10 @@
   <div>
     <toast position="n"></toast>
     <header id="home-connect">
-      <Home :busy="robot_busy"></Home>
+      <Home :busy="robotBusy"></Home>
       <div class="logo">
         <img src="../assets/img/logo_rgb_transparent.png" />
+        <span>v{{version}}</span>
       </div>
       <nav class="connect">
         <Connect></Connect>
@@ -17,8 +18,8 @@
       <Run></Run>
     </section>
     <main id="container">
-      <Jog :busy="robot_busy"></Jog>
-      <TaskPane :busy="robot_busy">
+      <Jog :busy="robotBusy"></Jog>
+      <TaskPane :busy="robotBusy">
     </main>
   <div>
 </template>
@@ -34,6 +35,7 @@
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
+  // import electron from 'electron'
 
   export default {
     components: {
@@ -48,9 +50,12 @@
       ProgressBar
     },
     computed: {
-      robot_busy() {
+      robotBusy() {
         if(!this.$store.state.is_connected) return true
         return this.$store.state.busy
+      },
+      version() {
+        // electron.remote.app.getVersion()
       }
     }
   }
