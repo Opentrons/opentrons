@@ -5,25 +5,25 @@ matrix:
   # We need both builds when we want to push an app update
   # Otherwise with fast_finish: true 
   # the success of Linux build is enough for CI purposes
-  fast_finish: true
+  fast_finish: false
   include:
-     - os: linux
-       # Trying container environment
-       sudo: false
-       # sudo: required
-       # dist: trusty
-       pytnon: "3.4"
-       env: OPENTRONS_APP_UPLOAD_DIR=linux
-       addons:
-         apt:
-           sources: &common_sources
-           packages: &common_packages
-             - g++
-             - gcc
-             - icnsutils # electron-builder dependency
-             - graphicsmagick # electron-builder dependency
-             - xvfb
-  allow_failures:
+    - os: linux
+      # Trying container environment
+      sudo: false
+      # sudo: required
+      # dist: trusty
+      # python: "3.4" TODO: revisit...
+      env: OPENTRONS_APP_UPLOAD_DIR=linux
+      addons:
+        apt:
+          sources: &common_sources
+          packages: &common_packages
+            - g++
+            - gcc
+            - icnsutils # electron-builder dependency
+            - graphicsmagick # electron-builder dependency
+            - xvfb
+
     - os: osx
       language: generic
       env: OPENTRONS_APP_UPLOAD_DIR=mac
