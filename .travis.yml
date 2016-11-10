@@ -1,3 +1,5 @@
+language: python
+
 matrix:
   # Set fast_finish to false to wait for OSX build to finish
   # We need both builds when we want to push an app update
