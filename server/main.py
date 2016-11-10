@@ -254,7 +254,7 @@ def connect_robot():
         robot = Robot.get_instance()
         robot.connect(
             port, options=options)
-        emit_notifications(["Successfully connected"], 'info')
+        emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
 
     except Exception as e:
         # any robot version incompatibility will be caught here
