@@ -11,6 +11,19 @@ VARS
     font-style: normal;
 }
 
+@font-face {
+    font-family: "open-sans";
+    src: url("../assets/fonts/OpenSans-Regular-webfont.woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*
+OpenSans-Regular-webfont.svg
+OpenSans-Regular-webfont.eot
+OpenSans-Regular-webfont.woff
+*/
+
 $baseline: 22px;
 $basesize: 12px;
 $btn-size: 30px;
@@ -184,7 +197,10 @@ section.protocol {
             &.title{
                 font-weight: 800;
             }
-            &.info{                 
+            &.info{   
+                font-size: 13px;
+                font-family: "open-sans"; 
+                line-height: 22px;            
                 width: 100px;
                 height:22px;
                 white-space: nowrap;
@@ -202,6 +218,10 @@ section.protocol {
             height: 22px;
             line-height: 22px;
             flex:0 0 121px;
+            &.info{
+                font-size: 13px;
+                font-family: "open-sans"; 
+            }
             &.title{
                 font-weight: 800;
             }
@@ -696,9 +716,10 @@ button{
 Typography
 ******************************/
 h1.title{
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 800;
     line-height: $baseline;
+    font-family: "open-sans"; 
 }
 h3.title {
     font-size: 12px;
