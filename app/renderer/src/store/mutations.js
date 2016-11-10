@@ -16,9 +16,7 @@ const state = {
   run_log: [],
   run_plan: [],
   busy: false,
-  versions: [],
-  uploading: false,
-  running: false
+  versions: []
 }
 
 const mutations = {
@@ -37,9 +35,7 @@ const mutations = {
   },
   [types.UPDATE_INCREMENT] (state, payload) {
     state.current_increment_placeable = payload.current_increment
-  },
-  [types.UPDATE_INCREMENT_PLUNGER] (state, payload) {
-    state.current_increment_plunger = payload.current_increment_plunger
+    state.current_increment_plunger = payload.current_increment
   },
   [types.UPDATE_ERROR] (state, payload) {
     state.errors = payload.errors
@@ -64,12 +60,6 @@ const mutations = {
   },
   [types.UPDATE_ROBOT_VERSIONS] (state, payload) {
     state.versions = payload.versions
-  },
-  [types.UPLOADING] (state, payload) {
-    state.uploading = payload
-  },
-  [types.UPDATE_RUNNING] (state, payload) {
-    state.running = payload
   }
 }
 

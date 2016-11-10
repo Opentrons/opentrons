@@ -83,7 +83,6 @@
 		    this.$store.dispatch("dispense", { axis })
 		  },
 		  maxVolume(axis, volume) {
-		  	volume = parseFloat(volume)
 		    this.$store.dispatch("maxVolume", { axis, volume })
 		  },
 			calibrated(position) {
@@ -92,11 +91,6 @@
 				})[0]
 				return typeof(instrument[position]) == "number" ? true : false
 			}
-    },
-		created: function() {
-			if (this.$store.state.tasks) {
-				this.$store.dispatch("loadProtocol")
-			}
-		}
+    }
   }
 </script>

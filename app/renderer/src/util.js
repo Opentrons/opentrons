@@ -1,4 +1,4 @@
-module.exports = {addHrefs, processProtocol}
+module.exports = {addHrefs}
 
 function addHrefs(tasks) {
   tasks.map((instrument) => {
@@ -7,16 +7,4 @@ function addHrefs(tasks) {
       placeable.href = '/calibrate/' + instrument.axis + '/' + placeable.label
     })
   })
-}
-
-function processProtocol(response) {
-  let result = {success: true, errors: [], warnings: [], calibrations: []}
-  let data = response.body.data
-  result.calibrations = data.calibrations || []
-  if (data.errors && data.errors.length > 0) {
-    result.success = false
-  }
-  result.fileName = data.fileName
-  result.lastModified = data.lastModified
-  return result
 }

@@ -52,6 +52,7 @@
 				})[0]
 			},
 			currentPlaceable(tasks) {
+				if (!this.currentInstrument(tasks)) this.$router.push("/")
 				return this.currentInstrument(tasks).placeables.filter((placeable) => {
 					return placeable.label == this.$route.params.placeable
 				})[0]
@@ -94,11 +95,6 @@
 					position = ""
 				}
 				return position
-			}
-		},
-		created: function() {
-			if (this.$store.state.tasks) {
-				this.$store.dispatch("loadProtocol")
 			}
 		}
   }
