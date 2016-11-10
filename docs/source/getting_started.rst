@@ -331,12 +331,18 @@ Homing
 
 You can instruct the robot to home at any point in the protocol, or just home one axis.
 
+**robot.home** (*axes, enqueue*)
+
+	* **axes -** the axes you want to home
+	* **enqueue -** True or False
+
+When the python file is loaded into the protocol, it runs through all of the commands.  When enqueue=False, this will cause the robot to home immediately upon loading the protocol, whereas if enqueue=True, it will run when it is called in the protocol.
 
 .. testcode:: main
 
-  robot.home()          
-  robot.home('ab')
-  robot.home('xyz')
+  robot.home(enqueue=True)          
+  robot.home('ab', enqueue=True)
+  robot.home('xyz', enqueue=True)
 
 Move To
 -----------------------------
