@@ -1,0 +1,23 @@
+<template>
+  <section id="increment-plunger">
+    <div v-for="i in increments" @click="selectIncrement(i)" >
+      <input type="radio" :id="i+'p'" name="incrementPlunger" :value="i" :checked="active(i)" />
+      <label :for="i"><span></span>{{i}}</label>
+    </div>
+  </section>
+</template>
+
+<script>
+  export default {
+    name: 'Increment',
+    props: ['increments', 'placeable'],
+    methods: {
+      selectIncrement(i) {
+        this.$store.dispatch("selectIncrementPlunger", {inc: i})
+      },
+      active(i) {
+        return this.$store.state.current_increment_plunger === i     
+      }
+    }
+  }
+</script>
