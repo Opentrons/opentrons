@@ -5,7 +5,7 @@ matrix:
   # We need both builds when we want to push an app update
   # Otherwise with fast_finish: true 
   # the success of Linux build is enough for CI purposes
-  fast_finish: true
+  fast_finish: false
   include:
      - os: linux
        # Trying container environment
