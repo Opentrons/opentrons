@@ -8,32 +8,33 @@ var UPDATE_SERVER_URL =  'http://ot-app-releases-2.herokuapp.com';
 
 function initAutoUpdater () {
   const mainLogger = getLogger('electron-main')
+  mainLogger.info('starting ')
 
   autoUpdater.on(
     'error',
-    (err) => mainLogger.log(`Update error: ${err.message}`)
+    (err) => mainLogger.info(`Update error: ${err.message}`)
   )
 
   autoUpdater.on(
     'checking-for-update',
-    () => mainLogger.log('Checking for update')
+    () => mainLogger.info('Checking for update')
   )
 
   autoUpdater.on(
     'update-available',
-    () => mainLogger.log('Update available')
+    () => mainLogger.info('Update available')
   )
 
   autoUpdater.on(
     'update-not-available',
-    () => mainLogger.log('Update not available')
+    () => mainLogger.info('Update not available')
   )
 
   autoUpdater.on(
     'update-downloaded',
    function(e, releaseNotes, releaseName, date, url) {
-       mainLogger.log(`Update downloaded: ${releaseName}: ${url}`)
-       mainLogger.log(`Update Info: ${releaseNotes}`)
+       mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
+       mainLogger.info(`Update Info: ${releaseNotes}`)
 
        var index = dialog.showMessageBox({
            type: 'info',
@@ -58,12 +59,13 @@ function initAutoUpdater () {
   if (process.platform === 'win32') {
     AUTO_UPDATE_URL = 'https://s3-us-west-2.amazonaws.com/ot-app-win-updates/'
   }
+  autoUpdater.setFeedURL(AUTO_UPDATE_URL)
+  mainLogger.info('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
   if (getSetting("autoUpdate")) {
-    mainLogger.log('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
-    autoUpdater.setFeedURL(AUTO_UPDATE_URL)
-
-    mainLogger.log('Auto updating is enabled, checking for updates')
+    mainLogger.info('Auto updating is enabled, checking for updates')
     autoUpdater.checkForUpdates()
+  } else {
+    mainLogger.info('yo')
   }
 }
 
