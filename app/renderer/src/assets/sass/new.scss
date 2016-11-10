@@ -242,7 +242,7 @@ Jog Controls
 aside#jog {
     width: 270px;
     flex: 0 0 270px;
-    height: 400px;
+    height: 430px;
     padding:15px;
     border-radius: 6px;
 
@@ -282,55 +282,77 @@ aside#jog {
 
         }
     }
-    #increment{
+
+    span.increment{
         width:270px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content:space-around;
+        margin-bottom: 15px;
+        #increment-xyz, #increment-plunger{
+        width:180px;
+        padding-left: 5px;
         display: flex;
         flex-wrap: wrap;
         position:relative;
         justify-content:space-around;
-        margin-bottom: 15px;
-        div{
-            height:30px;
-            flex:0 0 20px;
-            padding:5px;
-            text-align: center;
+
         }
-        input[type="radio"] {
-            display:none;
+        #increment-plunger{
+            width:80px;
+            padding-left: 0px;
+            border-left: 1px solid darken($well-bg, 20%);
         }
-        input[type="radio"] + label{
-            padding-left:3px;
-        }
-        input[type="radio"] + label span {
-            display:inline-block;
-            width:15px;
-            height:15px;
-            margin:0 4px 10px 0;
-            vertical-align:middle;
-            cursor:pointer;
-            -moz-border-radius:  50%;
-            border-radius:  50%;
-        }
+        #increment-xyz, #increment-plunger{
+            div{
+                height:30px;
+                flex:0 0 20px;
+                padding:5px;
+                text-align: center;
+                &.slot{
+                    flex: 0 0 60px
+                }
+            }
+            input[type="radio"] {
+                display:none;
+            }
+            input[type="radio"] + label{
+                padding-left:3px;
+            }
+            input[type="radio"] + label span {
+                display:inline-block;
+                width:10px;
+                height:10px;
+                margin:0 4px 5px 0;
+                vertical-align:middle;
+                cursor:pointer;
+                -moz-border-radius:  50%;
+                border-radius:  50%;
+            }
 
 
-        input[type="radio"] + label span {
-            border: 2px solid #999;
-             background-color:#999;
-        }
+            input[type="radio"] + label span {
+                border: 2px solid #999;
+                 background-color:#999;
+            }
 
-        input[type="radio"]:checked + label span{
-            border: 2px solid #999;
-             background-color:$primary-brand;
-        }
+            input[type="radio"]:checked + label span{
+                border: 2px solid #999;
+                 background-color:$primary-brand;
+            }
 
-        input[type="radio"] + label span,
-        input[type="radio"]:checked + label span {
-          -webkit-transition:background-color 0.4s linear;
-          -o-transition:background-color 0.4s linear;
-          -moz-transition:background-color 0.4s linear;
-          transition:background-color 0.4s linear;
+            input[type="radio"] + label span,
+            input[type="radio"]:checked + label span {
+              -webkit-transition:background-color 0.4s linear;
+              -o-transition:background-color 0.4s linear;
+              -moz-transition:background-color 0.4s linear;
+              transition:background-color 0.4s linear;
+            }
         }
     }
+
+    
+    
     #deck{
         display: flex;
         justify-content:center;
@@ -366,7 +388,7 @@ section#task-pane {
     width: 710px;
     flex: 0 0 710px;
     margin-left: 10px;
-    height: 426px;
+    height: 456px;
     display: flex;
     flex-direction: row;
     align-items: center;

@@ -67,6 +67,9 @@ const actions = {
   selectIncrement ({commit}, data) {
     commit(types.UPDATE_INCREMENT, { 'current_increment': data.inc })
   },
+  selectIncrementPlunger ({commit}, data) {
+    commit(types.UPDATE_INCREMENT_PLUNGER, { 'current_increment_plunger': data.inc })
+  },
   jog ({commit}, coords) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.jog(coords).then((result) => {
