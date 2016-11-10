@@ -35,6 +35,8 @@ app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 robot = Robot.get_instance()
+filename = "x"
+last_modified = "y"
 
 
 def notify(info):
@@ -76,7 +78,12 @@ def load_python(stream):
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    global filename
+    global last_modified
+
     file = request.files.get('file')
+    filename = file.filename
+    last_modified = request.form.get('lastModified')
 
     if not file:
         return flask.jsonify({
@@ -109,8 +116,8 @@ def upload():
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
             'calibrations': calibrations,
-            'fileName': file.filename,
-            'lastModified': request.form.get('lastModified')
+            'fileName': filename,
+            'lastModified': last_modified
         }
     })
 
@@ -128,9 +135,9 @@ def load():
     return flask.jsonify({
         'status': status,
         'data': {
-            'calibrations': calibrations
-            # 'fileName': file.filename,
-            # 'lastModified': request.form.get('lastModified')
+            'calibrations': calibrations,
+            'fileName': filename,
+            'lastModified': last_modified
         }
     })
 

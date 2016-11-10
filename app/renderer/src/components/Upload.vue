@@ -2,7 +2,7 @@
   <span :class="{disabled: busy}">
     <form ref="form" @submit="uploadProtocol" action="http://127.0.0.1:5000/upload" method="POST" enctype="multipart/form-data"  class='upload'>
       <div class="fileUpload">
-        <span>Click to Upload </span>
+        <span>{{this.uploadMessage()}}</span>
         <input ref="input" @change="fileChange" type="file" name="file" class="upload" />
       </div>
     </form>
@@ -24,6 +24,9 @@
         formData.append("lastModified", file.lastModifiedDate.toDateString())
         this.$store.dispatch("uploadProtocol", formData)
         return false
+      },
+      uploadMessage() {
+        return this.$store.state.uploading.uploading ? 'Processing...' : 'Click to Upload'
       }
     },
     computed: {
