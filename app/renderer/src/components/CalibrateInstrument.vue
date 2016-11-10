@@ -83,6 +83,7 @@
 		    this.$store.dispatch("dispense", { axis })
 		  },
 		  maxVolume(axis, volume) {
+		  	volume = parseFloat(volume)
 		    this.$store.dispatch("maxVolume", { axis, volume })
 		  },
 			calibrated(position) {
