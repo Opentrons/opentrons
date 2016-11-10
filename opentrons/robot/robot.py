@@ -531,7 +531,7 @@ class Robot(object, metaclass=Singleton):
         True
         >>> robot.home()
         True
-        >>> plate = robot.add_container('A1', '96-flat', 'plate')
+        >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
         """
@@ -685,7 +685,7 @@ class Robot(object, metaclass=Singleton):
         True
         >>> robot.home()
         True
-        >>> plate = robot.add_container('A1', '96-flat', 'plate')
+        >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> p200 = Pipette(axis='a')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
@@ -855,7 +855,9 @@ class Robot(object, metaclass=Singleton):
 
         return sorted(self._instruments.items())
 
-    def add_container(self, slot, container_name, label):
+    def add_container(self, container_name, slot, label=None):
+        if not label:
+            label = container_name
         container = containers.get_persisted_container(container_name)
         container.properties['type'] = container_name
         self._deck[slot].add(container, label)

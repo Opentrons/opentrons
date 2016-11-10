@@ -16,6 +16,22 @@ class RobotTest(unittest.TestCase):
         self.robot.connect()
         self.robot.home(enqueue=False)
 
+    def test_add_container(self):
+        c1 = self.robot.add_container('96-flat', 'A1')
+        res = self.robot.containers()
+        expected = {
+            '96-flat': c1
+        }
+        self.assertEquals(res, expected)
+
+        c2 = self.robot.add_container('96-flat', 'A2', 'my-special-plate')
+        res = self.robot.containers()
+        expected = {
+            '96-flat': c1,
+            'my-special-plate': c2
+        }
+        self.assertEquals(res, expected)
+
     def test_home_after_disconnect(self):
         self.robot.disconnect()
         self.assertRaises(RuntimeError, self.robot.home)

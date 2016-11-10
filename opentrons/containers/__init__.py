@@ -36,4 +36,4 @@ def load(container_name, slot, label=None):
     if not label:
         label = container_name
     protocol = Robot.get_instance()
-    return protocol.add_container(slot, container_name, label)
+    return protocol.add_container(container_name, slot, label)
