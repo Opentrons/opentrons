@@ -11,7 +11,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons.instruments import Pipette
-from opentrons.robot import Robot
+from opentrons import robot
 from opentrons.containers import placeable
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
@@ -35,7 +35,6 @@ CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
-robot = Robot.get_instance()
 
 
 def notify(info):
@@ -51,15 +50,23 @@ def welcome():
     return render_template("index.html")
 
 
+def get_protocol_locals():
+    from opentrons import robot, containers, instruments  # NOQA
+    return locals()
+
 def load_python(stream):
     global robot
-
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
     robot.reset()
+
+    patched_robot, restore_patched_robot = (
+        helpers.get_upload_proof_robot(robot)
+    )
     try:
-        exec(code, globals(), locals())
+        exec(code, globals(), get_protocol_locals())
+        robot = restore_patched_robot()
         robot.simulate()
         if len(robot._commands) == 0:
             error = (
@@ -69,6 +76,8 @@ def load_python(stream):
     except Exception as e:
         app.logger.error(e)
         api_response['errors'] = [str(e)]
+    finally:
+        robot = restore_patched_robot()
 
     api_response['warnings'] = robot.get_warnings() or []
 
