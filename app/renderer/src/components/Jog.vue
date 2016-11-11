@@ -12,8 +12,8 @@
       </span>
       <span class="z">
       <h3 class="title">[Z]</h3>
-        <button @click="jog('z', 1)" class="btn z up">&uarr;</button>
-        <button @click="jog('z', -1)" class="btn z down">&darr;</button>
+        <button @click="jog('z', -1)" class="btn z up">&uarr;</button>
+        <button @click="jog('z', 1)" class="btn z down">&darr;</button>
       </span>
 
       <span class="increment">
