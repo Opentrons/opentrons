@@ -42,7 +42,7 @@ Now that you have imported the opentrons modules, you need to declare a new robo
 
 .. note::
 
-	You can update your API when by repeating the !pip install, but remember to restart your notebook afterwards for the changes to take effect
+	You can update your API by repeating the !pip install, but remember to restart your notebook afterwards for the changes to take effect
 
 
 Deck Set Up
@@ -62,10 +62,16 @@ For each container you want to use on the deck, you need to load it into your fi
 .. code-block:: python
 
 	mycontainer = containers.load(
-		'container type', 	# trough-12row, tiprack-200ul, 96-PCR-flat
-		'slot position'		  # A1, B1, C1
-		'given name'		    # calibration name
+		'container type', 	
+		'slot position'		 
+		'given name'		   
 	)
+
+**containers.load** (*container, slot, name*)
+
+	* **container -** type of container (trough-12-row, etc)
+	* **slot -** the slot location on the deck (A1-E3)
+	* **name -** custom name
 
 The example below declares 3 different containers and assigns them to the appropriate slots on the deck.
 
@@ -89,9 +95,6 @@ The example below declares 3 different containers and assigns them to the approp
 		'trash'
 	)
 
-.. tip:: 
-	
-	For a complete list of container types, go here [link]	
 
 The robot will save calibration data from old runs based on the container type, slot position and given name.  Thus, if you always give something the same arguments, it will populate the app with old calibration data.  If you do not want it to do this, simply change the given name to unique names.
 

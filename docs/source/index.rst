@@ -74,6 +74,20 @@ If you wanted to do this 96 times, you could write it like this:
   for i in range(95):
       p200.dispense(plate[i + 1]).blow_out().touch_tip()
 
+Table of Contents
+-----------------
+
+.. toctree::
+   :maxdepth: 3
+
+   setup
+   getting_started
+   running_a_protocol
+   well_access
+   tips_and_tricks
+   module
+   api
+
 Basic Principles
 ----------------
 
@@ -150,20 +164,6 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
   # robot.run()                              # to run on a physical robot
 
 
-
-Documentation
----------------
-
-.. toctree::
-   :maxdepth: 2
-
-   setup
-   getting_started
-   running_a_protocol
-   well_access
-   tips_and_tricks
-   module
-   api
 
 
 
