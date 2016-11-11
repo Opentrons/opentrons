@@ -1,7 +1,7 @@
 from threading import Thread
 import unittest
 
-from opentrons.robot import Robot
+from opentrons import Robot
 
 
 class OpenTronsTest(unittest.TestCase):

@@ -5,7 +5,7 @@ import sys
 
 from opentrons.util.vector import (Vector, VectorEncoder)
 from opentrons.robot.command import Command
-from opentrons.robot import Robot
+from opentrons import Robot
 
 
 JSON_ERROR = None
