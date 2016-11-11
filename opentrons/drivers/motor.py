@@ -407,13 +407,8 @@ class CNCDriver(object):
     def wait(self, sec):
         ms = int((sec % 1.0) * 1000)
         s = int(sec)
-
-        # splitting delay messages into seconds increments
-        # so stop signals can interrupt
-        for i in range(s):
-            self.check_paused_stopped()
-            self.send_command(self.DWELL, S=1)
-        res = self.send_command(self.DWELL, P=ms)
+        self.check_paused_stopped()
+        res = self.send_command(self.DWELL, S=s, P=ms)
         return res == b'ok'
 
     def calm_down(self):
