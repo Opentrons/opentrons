@@ -23,7 +23,7 @@ def convert_byte_stream_to_str(stream):
     return ''.join([line.decode() for line in stream])
 
 
-def load_json(json_byte_stream, filename):
+def load_json(json_byte_stream):
     json_str = convert_byte_stream_to_str(json_byte_stream)
 
     api_response = {'errors': None, 'warnings': []}
