@@ -169,6 +169,7 @@ def load():
 
 def emit_notifications(notifications, _type):
     for notification in notifications:
+        print(notification)
         socketio.emit('event', {
             'name': 'notification',
             'text': notification,

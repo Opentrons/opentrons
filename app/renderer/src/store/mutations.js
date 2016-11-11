@@ -69,7 +69,7 @@ const mutations = {
     state.uploading = payload
   },
   [types.UPDATE_RUNNING] (state, payload) {
-    state.running = payload
+    state.running = payload.running
   }
 }
 

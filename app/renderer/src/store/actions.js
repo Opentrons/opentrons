@@ -27,17 +27,17 @@ const actions = {
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     commit(types.UPLOADING, {'uploading': true})
+    let tasks
     OpenTrons.uploadProtocol(formData).then((result) => {
       if (result.success) {
-        let tasks = result.calibrations
+        tasks = result.calibrations
         let fileName = result.fileName
         let lastModified = result.lastModified
         addHrefs(tasks)
-        commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
         commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
         commit(types.UPDATE_FILE_MODIFIED, {'lastModified': lastModified})
       } else {
-        commit(types.UPDATE_TASK_LIST, {tasks: []})
+        tasks = []
       }
       OpenTrons.getRunPlan().then((plan) => {
         commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
@@ -45,6 +45,7 @@ const actions = {
         commit(types.UPDATE_ERROR, {errors: result.errors})
         commit(types.UPDATE_ROBOT_STATE, {'busy': false})
         commit(types.UPLOADING, {'uploading': false})
+        commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
       })
     })
   },
@@ -113,6 +114,7 @@ const actions = {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.runProtocol().then((results) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+      commit(types.UPDATE_RUNNING, {'running': false})
       // commit(types.UPDATE_RUN_STATE, results)
     })
   },
@@ -165,6 +167,10 @@ const actions = {
     OpenTrons.home(data.axis).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
+  },
+  running ({commit}, data) {
+    console.log(data)
+    commit(types.UPDATE_RUNNING, {'running': data})
   }
 }
 

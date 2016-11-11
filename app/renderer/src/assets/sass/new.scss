@@ -107,7 +107,7 @@ header#home-connect {
             line-height: 35px;
         }
     }
-    
+
 
     nav.connect{
         width:350px;
@@ -201,7 +201,7 @@ section.protocol {
         flex-wrap:wrap;
         height: 45px;
         padding:10px;
-        
+
         span{
             font-size: 14px;
             text-align: left;
@@ -211,15 +211,15 @@ section.protocol {
             &.title{
                 font-weight: 800;
             }
-            &.info{   
+            &.info{
                 font-size: 13px;
-                font-family: "open-sans"; 
-                line-height: 22px;            
+                font-family: "open-sans";
+                line-height: 22px;
                 width: 100px;
                 height:22px;
                 white-space: nowrap;
                 overflow: hidden;
-                text-overflow: ellipsis;                   
+                text-overflow: ellipsis;
             }
         }
     }
@@ -235,7 +235,7 @@ section.protocol {
             flex:0 0 121px;
             &.info{
                 font-size: 13px;
-                font-family: "open-sans"; 
+                font-family: "open-sans";
             }
             &.title{
                 font-weight: 800;
@@ -268,6 +268,26 @@ section.protocol {
             justify-content:space-between;
         }
     }
+}
+
+.runScreen {
+  overflow-y: scroll;
+  height: 536px;
+  width: 720px;
+  font-size: 16px;
+  .runCommand {
+    background-color: $well-bg;
+    padding-bottom: 16px;
+    &:last-child {
+      color: $primary-brand;
+    }
+  }
+  #exit {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    cursor: pointer;
+  }
 }
 
 //main content wrapper
@@ -349,7 +369,7 @@ aside#jog {
         justify-content:space-around;
     }
     span.increment-plunger{
-        
+
 
         margin-left:50px;
         width:160px;
@@ -374,9 +394,9 @@ aside#jog {
             h3.plunger{
             width:200px;
             padding-left:8px;
-            
+
             }
-            
+
         }
         #increment-xyz, #increment-plunger{
             div{
@@ -425,10 +445,10 @@ aside#jog {
               transition:background-color 0.4s linear;
             }
         }
-    
 
-    
-    
+
+
+
     #deck{
         display: flex;
         justify-content:center;
@@ -767,7 +787,7 @@ h1.title{
     font-size: 14px;
     font-weight: 800;
     line-height: $baseline;
-    font-family: "open-sans"; 
+    font-family: "open-sans";
 }
 h3.title {
     font-size: 12px;
