@@ -23,6 +23,7 @@
         formData.append("file", file)
         formData.append("lastModified", file.lastModifiedDate.toDateString())
         this.$store.dispatch("uploadProtocol", formData)
+        this.$refs.form.reset()
         return false
       },
       uploadMessage() {
