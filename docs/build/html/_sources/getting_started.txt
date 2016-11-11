@@ -133,7 +133,6 @@ This example loads a single channel, 20-200 uL pipette on the b axis that pulls 
 		trash_container=trash,
 		tip_racks=[tiprack],
 		min_volume=20,
-		max_volume,
 		axis="b",
 		channels=1
 	)

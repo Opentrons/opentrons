@@ -124,11 +124,11 @@ div.relations {
 div.sphinxsidebar a {
     color: #444;
     text-decoration: none;
-    border-bottom: 1px dotted #999;
+    border-bottom: 1px dotted #DDDDDD;
 }
 
 div.sphinxsidebar a:hover {
-    border-bottom: 1px solid #999;
+    border-bottom: 1px solid #DDDDDD;
 }
 
 div.sphinxsidebarwrapper {
@@ -190,7 +190,7 @@ div.sphinxsidebar p {
 div.sphinxsidebar ul {
     margin: 10px 0;
     padding: 0;
-    color: #000;
+    color: #05C1B3;
 }
 
 div.sphinxsidebar ul li.toctree-l1 > a {
@@ -221,7 +221,7 @@ div.sphinxsidebar hr {
 /* -- body styles ----------------------------------------------------------- */
 
 a {
-    color: #004B6B;
+    color: #006FFF;
     text-decoration: underline;
 }
 
@@ -506,7 +506,7 @@ tt.xref, code.xref, a tt {
 
 a.reference {
     text-decoration: none;
-    border-bottom: 1px dotted #004B6B;
+    border-bottom: 1px dotted #006FFF;
 }
 
 /* Don't put an underline on images */
@@ -522,7 +522,7 @@ a.footnote-reference {
     text-decoration: none;
     font-size: 0.7em;
     vertical-align: top;
-    border-bottom: 1px dotted #004B6B;
+    border-bottom: 1px dotted #006FFF;
 }
 
 a.footnote-reference:hover {
@@ -610,7 +610,7 @@ a:hover tt, a:hover code {
         display: block;
         float: none;
         width: 102.5%;
-        margin: 50px -30px -20px -30px;
+        margin: -20px -30px 20px -30px;
         padding: 10px 20px;
         background: #333;
         color: #FFF;
@@ -665,6 +665,12 @@ a:hover tt, a:hover code {
 
     .github {
         display: none;
+    }
+}
+@media screen and (min-width: 876px) {
+    div.sphinxsidebar {
+        position: fixed;
+        margin-left: 0;
     }
 }
 
