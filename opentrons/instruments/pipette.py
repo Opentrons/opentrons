@@ -849,8 +849,6 @@ class Pipette(Instrument):
         def _do():
             nonlocal location
 
-            self.motor.move(self._get_plunger_position('blow_out'))
-
             if location:
                 self.move_to(location, strategy='arc', enqueue=False)
 
@@ -939,6 +937,8 @@ class Pipette(Instrument):
 
             self.motor.move(self._get_plunger_position('drop_tip'))
             self.motor.home()
+
+            self.motor.move(self._get_plunger_position('bottom'))
 
         _description = "Drop_tip at {}".format(
             (humanize_location(location) if location else '<In Place>')

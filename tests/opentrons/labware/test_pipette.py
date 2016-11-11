@@ -344,7 +344,7 @@ class PipetteTest(unittest.TestCase):
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
-            {'a': 0, 'b': 0.0}
+            {'a': 0, 'b': 10.0}
         )
 
     def test_delay(self):
