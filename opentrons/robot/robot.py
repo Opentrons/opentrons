@@ -52,7 +52,7 @@ class Robot(object, metaclass=Singleton):
 
     Examples
     --------
-    >>> from opentrons.robot import Robot
+    >>> from opentrons import Robot
     >>> from opentrons import instruments, containers
     >>> robot = Robot()
     >>> robot.reset() # doctest: +ELLIPSIS
@@ -449,7 +449,7 @@ class Robot(object, metaclass=Singleton):
 
         Examples
         --------
-        >>> from opentrons.robot import Robot
+        >>> from opentrons import Robot
         >>> robot.connect('Virtual Smoothie')
         True
         >>> robot.home()
@@ -524,7 +524,7 @@ class Robot(object, metaclass=Singleton):
 
         Examples
         --------
-        >>> from opentrons.robot import Robot
+        >>> from opentrons import Robot
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
@@ -677,7 +677,7 @@ class Robot(object, metaclass=Singleton):
         Examples
         --------
         ..
-        >>> from opentrons.robot import Robot
+        >>> from opentrons import Robot
         >>> from opentrons.instruments.pipette import Pipette
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>

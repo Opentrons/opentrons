@@ -4,7 +4,7 @@ import unittest
 
 from opentrons import instruments
 from opentrons import containers
-from opentrons.robot import Robot
+from opentrons import Robot
 
 from opentrons.helpers.helpers import import_calibration_file
 

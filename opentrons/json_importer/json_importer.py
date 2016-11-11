@@ -4,7 +4,7 @@ import os
 
 from opentrons import containers
 from opentrons import instruments
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons.util import vector
 
 

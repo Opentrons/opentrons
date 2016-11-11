@@ -1,7 +1,7 @@
 import unittest
 from opentrons import containers
 
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons.containers.placeable import Container, Deck
 from opentrons import instruments
 

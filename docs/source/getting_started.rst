@@ -1,0 +1,358 @@
+.. _getting_started:
+
+===============
+Getting Started
+===============
+
+Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to :ref:`setup` for detailed instructions.
+
+.. tip::
+
+	Separate your installs, imports, containers and commands into separate cells for easy testing!
+
+
+Import Opentrons API
+--------------------
+
+Before running any code, you need to install the Opentrons API in your jupyter notebook by running the cell below.  This only needs to be done the first time you use jupyter, so feel free to comment it out after it successfully installs.
+
+.. code-block:: bash
+	
+	!pip install --upgrade git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
+
+Now that you've installed Opentrons API on your computer, you have access to a variety of robot container and instrument commands. You need to import them to each project (protocol) in order to access these commands.  Unlike the install, this set of imports needs to be done at the start of each protocol.
+
+.. testsetup:: main
+
+  from opentrons.robot import Robot
+  Robot().reset()
+  i = 0
+
+.. testcode:: main
+	
+	from opentrons.robot import Robot
+	from opentrons import containers
+	from opentrons import instruments
+ 
+Now that you have imported the opentrons modules, you need to declare a new robot object (so you can run your protocol commands on it).
+
+.. code-block:: python
+	
+	robot = Robot()
+
+.. note::
+
+	You can update your API when by repeating the !pip install, but remember to restart your notebook afterwards for the changes to take effect
+
+
+Deck Set Up
+-----------------------------
+
+Now that you have a robot to run commands on, you need to tell it what containers and pipettes to use.
+
+.. note:: 
+	
+	This section replaces the deck and head sections of JSON files 
+
+Containers
+^^^^^^^^^^
+
+For each container you want to use on the deck, you need to load it into your file by telling the robot what it is, where it is, and what to label it. The label you give the container is what will appear in the app when you start calibrating.
+
+.. code-block:: python
+
+	mycontainer = containers.load(
+		'container type', 	# trough-12row, tiprack-200ul, 96-PCR-flat
+		'slot position'		# A1, B1, C1
+		'given name'		# mycontainer
+	)
+
+
+The example below declares 3 different containers and assigns them to the appropriate slots on the deck.
+
+.. testcode:: main
+	
+	tiprack = containers.load(
+  		'tiprack-200ul',  
+   		'A1',             
+		'tiprack'         
+	)
+
+	plate = containers.load(
+		'96-PCR-flat',
+		'B2',
+		'plate'
+	)
+
+	trash = containers.load(
+		'point',
+		'C3',
+		'trash'
+	)
+
+.. tip:: 
+	
+	For a complete list of container types, go here [link]	
+
+
+Pipettes
+^^^^^^^^
+
+.. code-block:: python
+	
+	mypipette = instruments.Pipette(	
+		name="mypipette",			
+		trash_container=trash,		
+		tip_racks=[tiprack],		
+		min_volume=20,				
+		axis="b",					
+		channels=1					
+	)
+
+**instruments.Pipette** (*name, trash_container, tip_racks, min_volume, axis, channels*)
+
+	* **name -** name you give pipette
+	* **trash_container -** given name of container where you want to deposit tips
+	* **tip_racks -** array (list) of container(s) where you want to pick up tips
+	* **min_volume=20 -** minimum volume of pipette
+	* **axis -** axis the pipette is on (a or b)
+	* **channels -** number of channels (1 or 8)
+
+This example loads a single channel, 20-200 uL pipette on the b axis that pulls tips from tiprack and deposits them in trash
+
+.. testcode:: main
+
+	p200 = instruments.Pipette(
+		name="p200",
+		trash_container=trash,
+		tip_racks=[tiprack],
+		min_volume=20,
+		axis="b",
+		channels=1
+	)
+
+Once you load your pipette, you should assign the maximum volume.  
+
+.. testcode:: main
+	
+	p200.set_max_volume(2000)  # maximum volume
+
+
+Commands 
+-----------------------------
+
+There are a few basic commands that you can string together in order to transfer liquid from place to place.  Each command is linked to the pipette doing the action.
+
+
+Pick Up and Drop Tip
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Before you can start moving liquid around, you need to pick up a tip!  You can pick up any tip in a tip rack.
+
+**pipette.pick_up_tip** (*location*)
+	
+	* **location -** container[position] location to pick up tip
+
+.. testcode:: main
+
+	p200.pick_up_tip(tiprack['A2'])
+
+However, if you just want to go through the tips in a tip rack in order, there is no need to call a location. The example below will pick up the first available tip, and the API will keep track of which tips have been used so far in the protocol.
+
+.. testcode:: main
+	
+	p200.pick_up_tip()
+
+In addition to picking up a tip, there is a command to drop tip.
+
+**pipette.drop_tip** (*location*)
+
+	* **location -** container[position] location to drop tip
+
+.. testcode:: main
+
+	p200.drop_tip(tiprack['A2'])
+
+While you can only pick up tips from tip racks, you can eject tips back into the tiprack, or send them to the trash.  While you can specify trash as a location, you can also use the default version of drop tip like the example below.
+
+.. testcode:: main
+
+	p200.drop_tip()
+
+
+Aspirate
+^^^^^^^^
+
+**pipette.aspirate** (*volume, location*)
+
+	* **volume -** volume in uL to pick up
+	* **location -** container[position] location to pick up liquid from
+
+.. testcode:: main
+	
+	p200.aspirate(200, plate['A1'])
+
+You can link multiple aspirates together in order to pick up liquid from multiple locations
+
+.. testcode:: main
+	
+	p200.aspirate(50, plate['A1']).aspirate(100, plate['B1'])
+
+
+Dispense
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Once you pick up liquid, you need to tell the robot where to dispense it.  
+
+**pipette.dispense** (*volume, location*)
+	
+	* **volume -** volume in uL to dispense
+	* **location -** container[position] location to deposit liquid
+
+.. testcode:: main
+	
+	p200.dispense(50, plate['A1'])
+
+If you want to deposit all of the liquid you just aspirated, there is no need to specify volume in the dispense command.  It will default to the entire volume in the pipette.
+
+.. testcode:: main
+
+	p200.aspirate(200, plate['A1'])
+	p200.dispense(plate['B1'])
+
+
+Mix
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+While you can call multiple aspirate and dispense commands to the same location, the mix command makes it easier to do.
+
+**pipette.mix** (*volume, repetitions, location*)
+
+	* **volume -** volume to mix
+	* **repetitions -** number of times to mix
+	* **location -** container[position] location to mix
+
+.. testcode:: main
+
+	p200.mix(3, 100, plate['A1'])
+
+
+Chaining Commands
+^^^^^^^^^^^^^^^^^
+
+Now that you know the basic commands, you can start transferring liquids!  However, your code can get lengthy quickly is you write it like this.
+
+.. testcode:: main
+
+	p200.pick_up_tip()
+	p200.aspirate(200, plate['A1'])
+	p200.dispense(50, plate['A2'])
+	p200.dispense(50, plate['A3'])
+	p200.dispense(100, plate[4])
+	p200.drop_tip()
+
+Instead of giving each command it's own line, you can chain them together using a period (as long as all commands are being called by the same pipette).
+
+.. testcode:: main
+
+	p200.pick_up_tip().aspirate(200, plate['A1']).dispense(plate['B1'])
+
+
+Command Attributes
+-----------------------------
+
+In addition to commands, you can attach attributes to your movements.  
+
+Touch Tip
+^^^^^^^^^
+
+Sometimes you want to touch the tip of the pipette to the sides of the well.  You can link this to one of the commands you just learned.
+
+**touch_tip** ()
+
+.. testcode:: main
+
+	p200.dispense(10, plate['A1']).touch_tip()
+
+Blow Out
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can blow out liquid immediately after a dispense command in the same location, or you can choose to blow out somewhere else (like over your trash container) if you want.
+
+**.blow_out** (*location*)
+
+	* **location -** container[position] location to blow out
+
+.. testcode:: main
+
+	p200.dispense(10, plate['A1']).blow_out()
+	p200.dispense(10, plate['A1']).blow_out(trash)
+
+.. note:: 
+
+	If the trash container is given a "point" labware name, instead of another container (like "trough-12row"), there is no need to call a position within the container.
+
+Delay
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Delay commands can be called between any movement commands, so you have complete control of exactly where you want the robot to pause.
+
+**delay** (*time*)
+
+	* **time -** duration of delay (seconds)
+
+.. testcode:: main
+
+	p200.delay(10).aspirate(100, plate['A1'])
+
+Dispensing Positions
+^^^^^^^^^^^^^^^^^^^^
+
+Want to deposit at the top of a tube?  Pull liquid from the bottom of the well?  Mix from the middle?  Easy.
+
+**top** (*distance*)
+
+**bottom** (*distance*)
+
+	* **distance -** distance from calibration position (mm)
+
+Containers are calibrated to the bottom of the well, and each labware definition has an inherent depth, which provides the calculated top position.  You can specify each of these locations anytime you use a container[position], as well as adjust them up (+) or down (-) by adding a distance.
+
+.. testcode:: main
+
+	p200.dispense(plate['A1'].top())
+	p200.aspirate(1000, plate['B2'].bottom())
+	p200.mix(3, 100, plate['B2'].bottom(5))
+	p200.dispense(plate['A1'].top(-3))
+
+Homing
+-----------------------------
+
+Debugging Your Protocol
+-----------------------------
+
+There are a couple tricks that make it easy to test your protocol, without having to run it on the robot.
+
+Print()
+^^^^^^^
+
+First, you can use the print command (a basic python command) to print well locations, or test to see if loops are being called.
+
+.. testcode:: main
+
+	print("hello")
+	print(plate['A1'])
+	print(plate[i])
+
+.. testoutput:: main
+
+  hello
+  <Well A1>
+  <Well A1>
+
+This is useful when trying to determine if the location you're calling is actually the location you want, or if something is iterating properly (more on iteration later)
+
+Robot.Commands()
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.
