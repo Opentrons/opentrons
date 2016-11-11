@@ -80,7 +80,7 @@ def load_python(stream, filename):
                 'Error in protocol file line {} : {}\n{}'.format(
                     line,
                     str(e),
-                    text
+                    text or ''
                 )
             )
 
