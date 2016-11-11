@@ -180,6 +180,12 @@ class CNCDriver(object):
         self.stopped.set()
         self.can_move.set()
 
+    def check_paused_stopped(self):
+        self.can_move.wait()
+        if self.stopped.is_set():
+            self.resume()
+            raise RuntimeWarning('Stop signal received')
+
     def send_command(self, command, **kwargs):
         """
         Sends a GCode command.  Keyword arguments will be automatically
@@ -285,7 +291,7 @@ class CNCDriver(object):
                 for axis in 'ab'
                 if axis in kwargs}
 
-        return self.consume_move_commands([args], 0.1)
+        return self.consume_move_commands(args)
 
     def move_head(self, mode='absolute', **kwargs):
 
@@ -303,51 +309,25 @@ class CNCDriver(object):
         }
         log.debug('Destination: {}'.format(target_point))
 
-        time_interval = 0.5
-        # convert mm/min -> mm/sec,
-        # multiply by time interval to get increment in mm
-        increment = self.head_speed / 60 * time_interval
-
         target_vector = Vector(target_point)
 
         flipped_vector = self.flip_coordinates(target_vector, mode)
-        args_list = []
-        args_list.append(
+        args = (
             {axis.upper(): flipped_vector[axis]
              for axis in 'xyz' if axis in kwargs}
         )
 
-        # vector_list = break_down_travel(
-        #     current, target_vector, mode=mode, increment=increment)
+        return self.consume_move_commands(args)
 
-        # # turn the vector list into axis args
-        # for vector in vector_list:
-        #     flipped_vector = self.flip_coordinates(vector, mode)
-        #     args_list.append(
-        #         {axis.upper(): flipped_vector[axis]
-        #          for axis in 'xyz' if axis in kwargs})
+    def consume_move_commands(self, args):
+        self.check_paused_stopped()
 
-        return self.consume_move_commands(args_list, increment)
+        log.debug("Moving head: {}".format(args))
+        res = self.send_command(self.MOVE, **args)
+        if res != b'ok':
+            return (False, self.SMOOTHIE_ERROR)
 
-    def consume_move_commands(self, args_list, step):
-        tolerance = step * 0.5
-        self.current_commands = list(args_list)
-        while self.can_move.wait():
-            if self.stopped.is_set():
-                self.resume()
-                raise RuntimeWarning('Stop signal received')
-            if self.current_commands:
-                args = self.current_commands.pop(0)
-            else:
-                self.wait_for_arrival()
-                break
-
-            self.wait_for_arrival(tolerance)
-
-            log.debug("Moving head: {}".format(args))
-            res = self.send_command(self.MOVE, **args)
-            if res != b'ok':
-                return (False, self.SMOOTHIE_ERROR)
+        self.wait_for_arrival()
 
         arguments = {
             'name': 'move-finished',
@@ -427,7 +407,13 @@ class CNCDriver(object):
     def wait(self, sec):
         ms = int((sec % 1.0) * 1000)
         s = int(sec)
-        res = self.send_command(self.DWELL, S=s, P=ms)
+
+        # splitting delay messages into seconds increments
+        # so stop signals can interrupt
+        for i in range(s):
+            self.check_paused_stopped()
+            self.send_command(self.DWELL, S=1)
+        res = self.send_command(self.DWELL, P=ms)
         return res == b'ok'
 
     def calm_down(self):
