@@ -54,7 +54,8 @@ def get_protocol_locals():
     from opentrons import robot, containers, instruments  # NOQA
     return locals()
 
-def load_python(stream):
+
+def load_python(stream, filename):
     global robot
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
@@ -75,7 +76,7 @@ def load_python(stream):
             api_response['errors'] = error
     except Exception as e:
         app.logger.error(e)
-        api_response['errors'] = [str(e)]
+        api_response['errors'] = ['Failed to load protocol: ' + str(e)]
     finally:
         robot = restore_patched_robot()
 
@@ -98,9 +99,9 @@ def upload():
 
     api_response = None
     if extension == 'py':
-        api_response = load_python(file.stream)
+        api_response = load_python(file.stream, file)
     elif extension == 'json':
-        api_response = helpers.load_json(file.stream)
+        api_response = helpers.load_json(file.stream, file)
     else:
         return flask.jsonify({
             'status': 'error',
