@@ -314,10 +314,15 @@ class Pipette(Instrument):
         >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+
+        # set True if volume before this aspirate was 0uL
+        plunger_empty = False
+
         def _setup():
             nonlocal volume
             nonlocal location
             nonlocal rate
+            nonlocal plunger_empty
             if not isinstance(volume, (int, float, complex)):
                 if volume and not location:
                     location = volume
@@ -331,6 +336,8 @@ class Pipette(Instrument):
                         self.current_volume + volume)
                 )
 
+            if self.current_volume == 0:
+                plunger_empty = True
             self.current_volume += volume
 
             self._associate_placeable(location)
@@ -339,14 +346,14 @@ class Pipette(Instrument):
             nonlocal volume
             nonlocal location
             nonlocal rate
-
+            nonlocal plunger_empty
             distance = self._plunge_distance(self.current_volume)
             bottom = self._get_plunger_position('bottom')
             destination = bottom - distance
 
             speed = self.speeds['aspirate'] * rate
 
-            self._position_for_aspirate(location)
+            self._position_for_aspirate(location, plunger_empty)
 
             self.motor.speed(speed)
             self.motor.move(destination)
@@ -471,7 +478,7 @@ class Pipette(Instrument):
             enqueue=enqueue)
         return self
 
-    def _position_for_aspirate(self, location=None):
+    def _position_for_aspirate(self, location=None, plunger_empty=False):
         """
         Position this :any:`Pipette` for an aspiration,
         given it's current state
@@ -483,7 +490,7 @@ class Pipette(Instrument):
             self.move_to(placeable.top(), strategy='arc', enqueue=False)
 
         # setup the plunger above the liquid
-        if self.current_volume == 0:
+        if plunger_empty:
             self.motor.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
