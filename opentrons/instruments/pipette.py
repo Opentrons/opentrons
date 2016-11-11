@@ -860,9 +860,10 @@ class Pipette(Instrument):
 
             tip_plunge = 6
 
-            for _ in range(3):
-                self.robot.move_head(z=tip_plunge, mode='relative')
-                self.robot.move_head(z=-tip_plunge, mode='relative')
+            self.robot.move_head(z=tip_plunge, mode='relative')
+            self.robot.move_head(z=-tip_plunge - 1, mode='relative')
+            self.robot.move_head(z=tip_plunge + 1, mode='relative')
+            self.robot.move_head(z=-tip_plunge, mode='relative')
 
         _description = "Picking up tip from {0}".format(
             (humanize_location(location) if location else '<In Place>')
