@@ -19,6 +19,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 
@@ -112,7 +113,7 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'murphy'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -139,7 +140,17 @@ html_theme_options = {
     'travis_button': 'True',
     'font_family': 'Open Sans',
     'head_font_family': 'AkkoPro-Regular',
-    'sidebar_collapse': 'True'
+    'sidebar_collapse': 'True',
+    'logo': 'logo.png',
+    'fixed_sidebar': 'True',
+    'github_user': 'OpenTrons',
+    'github_repo': 'opentrons-api',
+    'github_button': 'True',
+    'description': 'Simple Biology Lab Protocol Coding',
+    'link': '#006FFF',
+    'sidebar_list': '#05C1B3',
+    'sidebar_link_underscore': '#DDDDDD'
+
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -157,7 +168,7 @@ html_theme_options = {
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-# html_logo = None
+html_logo = 'img/logo.png'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or
@@ -168,7 +179,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['../static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
