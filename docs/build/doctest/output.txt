@@ -1,0 +1,67 @@
+Results of doctest builder run on 2016-11-03 14:20:53
+=====================================================
+
+Document: api
+-------------
+1 items passed all tests:
+  28 tests in default
+28 tests in 1 items.
+28 passed and 0 failed.
+Test passed.
+
+Document: index
+---------------
+**********************************************************************
+File "index.rst", line 73, in main (setup code)
+Failed example:
+    p200.aspirate(trough)
+
+    for i in range(95):
+        p200.aspirate(100, plate[i])
+        p200.dispense(plate[i + 1]).blow_out().touch_tip()
+Exception raised:
+    Traceback (most recent call last):
+      File "/Users/KT80/.pyenv/versions/3.5.2/lib/python3.5/doctest.py", line 1321, in __run
+        compileflags, 1), test.globs)
+      File "<doctest main (setup code)[1]>", line 4, in <module>
+        p200.aspirate(100, plate[i])
+      File "/Users/KT80/OpenTrons/opentrons-api/opentrons/instruments/pipette.py", line 161, in aspirate
+        self.create_command(_do_aspirate, description, enqueue=enqueue)
+      File "/Users/KT80/OpenTrons/opentrons-api/opentrons/instruments/instrument.py", line 49, in create_command
+        do()
+      File "/Users/KT80/OpenTrons/opentrons-api/opentrons/instruments/pipette.py", line 142, in _do_aspirate
+        .format(self.current_volume + volume)
+    RuntimeWarning: Pipette cannot hold volume 300
+**********************************************************************
+1 items had failures:
+   1 of   2 in main (setup code)
+***Test Failed*** 1 failures.
+1 items passed all tests:
+   1 tests in long
+1 tests in 1 items.
+1 passed and 0 failed.
+Test passed.
+
+Document: getting_started
+-------------------------
+1 items passed all tests:
+   1 tests in main
+1 tests in 1 items.
+1 passed and 0 failed.
+Test passed.
+
+Document: tips_and_tricks
+-------------------------
+2 items passed all tests:
+   2 tests in long
+  19 tests in main
+21 tests in 2 items.
+21 passed and 0 failed.
+Test passed.
+
+Doctest summary
+===============
+   51 tests
+    0 failures in tests
+    1 failure in setup code
+    0 failures in cleanup code
