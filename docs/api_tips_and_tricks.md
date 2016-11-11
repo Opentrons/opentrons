@@ -80,7 +80,7 @@ p200.pick_up_tip(tiprack['B1']).drop_tip(trash)
 
 ####Mixing at a well
 
- ```python
+```python
 p200.mix(3, 100, plate[0])   # arguments are (repetitions, volume, location)
 ```
 

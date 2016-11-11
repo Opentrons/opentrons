@@ -1,22 +1,26 @@
 .. _setup:
 
+================================
 Running Opentrons API in Jupyter
 ================================
+
+Jupyter Code Environment
+-----------------------------
 
 Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.
 
 Install Anaconda and Python 3
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install Anaconda_: (https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
-Add Opentrons Channel
----------------------
+Install Jupyter
+^^^^^^^^^^^^^^^
 
-After installing Anaconda, run Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
+After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](http://jupyter.readthedocs.io/en/latest/install.html).
 
 Launch Jupyter Notebook App
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 With GUI -- *Reccomended for Beginners*:
   1. Install and open the Anaconda Navagator App you just downloaded.
@@ -29,7 +33,7 @@ In Terminal:
   3. Type `jupyter notebook` to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
 
 Programming in Jupyter Notebook: Hello World!
----------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When the Jupyter Notebook App is launched on your browser, follow these steps to open a `Notebook`
 
@@ -44,7 +48,17 @@ A new tab should open in your browser and you should have an empty text box.
 Install Opentrons API
 ---------------------
 
+Before running any code, you need to install the Opentrons API. 
+
+If you are running Anaconda, open Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
+
 In Jupyter click `Conda`. Find and install `opentrons` package. Make sure to check for updates!
+
+If you are not using Anaconda copy and paste the following code into the first cell of your notebook. This only needs to be done the first time you use Jupyter, so feel free to comment it out after it successfully installs.
+
+.. code-block:: bash
+  
+  !pip install --upgrade git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
 
 After this step you should be able to run:
 

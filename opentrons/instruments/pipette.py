@@ -517,7 +517,6 @@ class Pipette(Instrument):
 
         Parameters
         ----------
-
         repetitions: int
             How many times the pipette should mix (Default: 1)
 

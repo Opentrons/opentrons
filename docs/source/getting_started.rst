@@ -24,8 +24,8 @@ Now that you've installed Opentrons API on your computer, you have access to a v
 
 .. testsetup:: main
 
-  from opentrons.robot import Robot
-  Robot().reset()
+  from opentrons import robot
+  robot.reset()
   i = 0
 
 .. testcode:: main
@@ -46,7 +46,7 @@ Now that you have imported the opentrons modules, you need to declare a new robo
 
 
 Deck Set Up
------------------------------
+-----------
 
 Now that you have a robot to run commands on, you need to tell it what containers and pipettes to use.
 
@@ -63,10 +63,9 @@ For each container you want to use on the deck, you need to load it into your fi
 
 	mycontainer = containers.load(
 		'container type', 	# trough-12row, tiprack-200ul, 96-PCR-flat
-		'slot position'		# A1, B1, C1
-		'given name'		# mycontainer
+		'slot position'		  # A1, B1, C1
+		'given name'		    # calibration name
 	)
-
 
 The example below declares 3 different containers and assigns them to the appropriate slots on the deck.
 
@@ -93,6 +92,8 @@ The example below declares 3 different containers and assigns them to the approp
 .. tip:: 
 	
 	For a complete list of container types, go here [link]	
+
+The robot will save calibration data from old runs based on the container type, slot position and given name.  Thus, if you always give something the same arguments, it will populate the app with old calibration data.  If you do not want it to do this, simply change the given name to unique names.
 
 
 Pipettes
@@ -310,9 +311,9 @@ Dispensing Positions
 
 Want to deposit at the top of a tube?  Pull liquid from the bottom of the well?  Mix from the middle?  Easy.
 
-**top** (*distance*)
+**container.top** (*distance*)
 
-**bottom** (*distance*)
+**container.bottom** (*distance*)
 
 	* **distance -** distance from calibration position (mm)
 
@@ -326,7 +327,40 @@ Containers are calibrated to the bottom of the well, and each labware definition
 	p200.dispense(plate['A1'].top(-3))
 
 Homing
------------------------------
+------
+
+You can instruct the robot to home at any point in the protocol, or just home one axis.
+
+**robot.home** (*axes, enqueue*)
+
+	* **axes -** the axes you want to home
+	* **enqueue -** True or False
+
+When the python file is loaded into the protocol, it runs through all of the commands.  When enqueue=False, this will cause the robot to home immediately upon loading the protocol, whereas if enqueue=True, it will run when it is called in the protocol.
+
+.. testcode:: main
+
+  robot.home(enqueue=True)          
+  robot.home('ab', enqueue=True)
+  robot.home('xyz', enqueue=True)
+
+Move To
+-------
+
+If you don't want to aspirate, dispense or mix, you can still send your robot to a container using the move_to() command.
+
+**pipette.move_to** (*distance, strategy*)
+
+	* **distance -** distance from calibration position (mm)
+	* **strategy -** the type of path you want to use, either 'direct' (straight line) or 'arc' (move up Z, over XY, then down Z)
+
+.. testcode:: main
+
+	p200.move_to(plate[95].top(), 'arc')
+	p200.move_to(plate[3].top(10), 'direct')
+
+Be careful using the 'direct' strategy as the robot could crash into anything between your start and end locations.
+
 
 Debugging Your Protocol
 -----------------------------
@@ -353,6 +387,6 @@ First, you can use the print command (a basic python command) to print well loca
 This is useful when trying to determine if the location you're calling is actually the location you want, or if something is iterating properly (more on iteration later)
 
 Robot.Commands()
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.
