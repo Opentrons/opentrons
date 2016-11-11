@@ -39,14 +39,13 @@ const actions = {
       } else {
         commit(types.UPDATE_TASK_LIST, {tasks: []})
       }
-      commit(types.UPDATE_WARNINGS, {warning: result.warnings})
-      commit(types.UPDATE_ERROR, {errors: result.errors})
-      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      commit(types.UPLOADING, {'uploading': false})
-
-    })
-    OpenTrons.getRunPlan().then((plan) => {
-      commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
+      OpenTrons.getRunPlan().then((plan) => {
+        commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
+        commit(types.UPDATE_WARNINGS, {warning: result.warnings})
+        commit(types.UPDATE_ERROR, {errors: result.errors})
+        commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+        commit(types.UPLOADING, {'uploading': false})
+      })
     })
   },
   loadProtocol ({commit}) {
