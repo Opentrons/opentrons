@@ -6,12 +6,13 @@ import json
 import time
 
 import flask
+import traceback
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons.instruments import Pipette
-from opentrons.robot import Robot
+from opentrons import robot
 from opentrons.containers import placeable
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
@@ -35,7 +36,7 @@ CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
-robot = Robot.get_instance()
+
 filename = "x"
 last_modified = "y"
 
@@ -53,15 +54,37 @@ def welcome():
     return render_template("index.html")
 
 
-def load_python(stream):
-    global robot
+def get_protocol_locals():
+    from opentrons import robot, containers, instruments  # NOQA
+    return locals()
 
+
+def load_python(stream, filename):
+    global robot
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
     robot.reset()
+
+    patched_robot, restore_patched_robot = (
+        helpers.get_upload_proof_robot(robot)
+    )
     try:
-        exec(code, globals(), locals())
+        try:
+            exec(code, globals(), get_protocol_locals())
+        except Exception as e:
+            tb = e.__traceback__
+            stack_list = traceback.extract_tb(tb)
+            _, line, name, text = stack_list[1]
+            raise Exception(
+                'Error in protocol file line {} : {}\n{}'.format(
+                    line,
+                    str(e),
+                    text
+                )
+            )
+
+        robot = restore_patched_robot()
         robot.simulate()
         if len(robot._commands) == 0:
             error = (
@@ -71,6 +94,8 @@ def load_python(stream):
     except Exception as e:
         app.logger.error(e)
         api_response['errors'] = [str(e)]
+    finally:
+        robot = restore_patched_robot()
 
     api_response['warnings'] = robot.get_warnings() or []
 
@@ -96,7 +121,7 @@ def upload():
 
     api_response = None
     if extension == 'py':
-        api_response = load_python(file.stream)
+        api_response = load_python(file.stream, file)
     elif extension == 'json':
         api_response = helpers.load_json(file.stream)
     else:
@@ -235,21 +260,24 @@ def script_loader(filename):
 
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
+    global robot
     return flask.jsonify({
-        'ports': Robot.get_instance().get_serial_ports_list()
+        'ports': robot.get_serial_ports_list()
     })
 
 
 @app.route("/robot/serial/is_connected")
 def is_connected():
+    global robot
     return flask.jsonify({
-        'is_connected': Robot.get_instance().is_connected(),
-        'port': Robot.get_instance().get_connected_port()
+        'is_connected': robot.is_connected(),
+        'port': robot.get_connected_port()
     })
 
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
+    global robot
     return flask.jsonify({
         'coords': robot._driver.get_position().get("target")
     })
@@ -257,6 +285,7 @@ def get_coordinates():
 
 @app.route("/robot/diagnostics")
 def diagnostics():
+    global robot
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -264,6 +293,7 @@ def diagnostics():
 
 @app.route("/robot/versions")
 def get_versions():
+    global robot
     return flask.jsonify({
         'versions': robot.versions()
     })
@@ -284,12 +314,11 @@ def connect_robot():
     status = 'success'
     data = None
 
+    global robot
     try:
-        robot = Robot.get_instance()
         robot.connect(
             port, options=options)
         emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
-
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -305,6 +334,7 @@ def connect_robot():
 
 
 def _start_connection_watcher():
+    global robot
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -321,7 +351,7 @@ def _start_connection_watcher():
                 'event',
                 {
                     'type': 'connection_status',
-                    'is_connected': Robot.get_instance().is_connected()
+                    'is_connected': robot.is_connected()
                 }
             )
             socketio.sleep(1.5)
@@ -341,8 +371,9 @@ def disconnect_robot():
     status = 'success'
     data = None
 
+    global robot
     try:
-        Robot.get_instance().disconnect()
+        robot.disconnect()
         emit_notifications(["Successfully disconnected"], 'info')
     except Exception as e:
         status = 'error'
@@ -394,8 +425,9 @@ def _sort_containers(container_list):
     return _tipracks + _other
 
 def _get_all_pipettes():
+    global robot
     pipette_list = []
-    for _, p in Robot.get_instance().get_instruments():
+    for _, p in robot.get_instruments():
         if isinstance(p, Pipette):
             pipette_list.append(p)
     return pipette_list
@@ -405,7 +437,8 @@ def _get_all_containers():
     Returns all containers currently on the deck
     """
     all_containers = list()
-    for slot in Robot.get_instance()._deck:
+    global robot
+    for slot in robot._deck:
         if slot.has_children():
             container = slot.get_children_list()[0]
             all_containers.append(container)
@@ -573,9 +606,9 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
+    global robot
     try:
         axis = request.json.get("axis")
-        robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.reset_tip_tracking()
         instrument.pick_up_tip(enqueue=False)
@@ -594,9 +627,9 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
+    global robot
     try:
         axis = request.json.get("axis")
-        robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.return_tip(enqueue=False)
     except Exception as e:
@@ -684,7 +717,7 @@ def set_max_volume():
     axis = request.json.get("axis")
     try:
         instrument = robot._instruments[axis.upper()]
-        instrument.set_max_volume(volume)
+        instrument.set_max_volume(int(volume))
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
