@@ -36,6 +36,9 @@ app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 
+filename = "x"
+last_modified = "y"
+
 
 def notify(info):
     s = json.dumps(info, cls=VectorEncoder)
@@ -87,7 +90,12 @@ def load_python(stream, filename):
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    global filename
+    global last_modified
+
     file = request.files.get('file')
+    filename = file.filename
+    last_modified = request.form.get('lastModified')
 
     if not file:
         return flask.jsonify({
@@ -101,7 +109,7 @@ def upload():
     if extension == 'py':
         api_response = load_python(file.stream, file)
     elif extension == 'json':
-        api_response = helpers.load_json(file.stream, file)
+        api_response = helpers.load_json(file.stream)
     else:
         return flask.jsonify({
             'status': 'error',
@@ -120,11 +128,30 @@ def upload():
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
             'calibrations': calibrations,
-            'fileName': file.filename,
-            'lastModified': request.form.get('lastModified')
+            'fileName': filename,
+            'lastModified': last_modified
         }
     })
 
+
+@app.route("/load")
+def load():
+    status = "success"
+    try:
+        calibrations = get_step_list()
+    except Exception as e:
+        emit_notifications([str(e)], "danger")
+        print(str(e))
+        status = 'error'
+
+    return flask.jsonify({
+        'status': status,
+        'data': {
+            'calibrations': calibrations,
+            'fileName': filename,
+            'lastModified': last_modified
+        }
+    })
 
 def emit_notifications(notifications, _type):
     for notification in notifications:
@@ -258,6 +285,13 @@ def get_versions():
     })
 
 
+@app.route("/app_version")
+def app_version():
+    return flask.jsonify({
+        'version': os.environ.get("appVersion")
+    })
+
+
 @app.route("/robot/serial/connect", methods=["POST"])
 def connect_robot():
     port = request.json.get('port')
@@ -270,7 +304,7 @@ def connect_robot():
     try:
         robot.connect(
             port, options=options)
-        emit_notifications(["Successfully connected"], 'info')
+        emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -282,6 +316,7 @@ def connect_robot():
         'status': status,
         'data': data
     })
+
 
 
 def _start_connection_watcher():

@@ -24,9 +24,9 @@ matrix:
             - graphicsmagick # electron-builder dependency
             - xvfb
 
-    - os: osx
-      language: generic
-      env: OPENTRONS_APP_UPLOAD_DIR=mac
+    # - os: osx
+    #   language: generic
+    #   env: OPENTRONS_APP_UPLOAD_DIR=mac
 
 cache:
   apt: true
