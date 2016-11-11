@@ -24,8 +24,8 @@ Now that you've installed Opentrons API on your computer, you have access to a v
 
 .. testsetup:: main
 
-  from opentrons.robot import Robot
-  Robot().reset()
+  from opentrons import robot
+  robot.reset()
   i = 0
 
 .. testcode:: main
@@ -357,7 +357,7 @@ If you don't want to aspirate, dispense or mix, you can still send your robot to
 .. testcode:: main
 
 	p200.move_to(plate[95].top(), 'arc')
-	p200.move_to(plate[3].top(10), 'direct)
+	p200.move_to(plate[3].top(10), 'direct')
 
 Be careful using the 'direct' strategy as the robot could crash into anything between your start and end locations.
 
