@@ -218,21 +218,24 @@ def script_loader(filename):
 
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
+    global robot
     return flask.jsonify({
-        'ports': Robot.get_instance().get_serial_ports_list()
+        'ports': robot.get_serial_ports_list()
     })
 
 
 @app.route("/robot/serial/is_connected")
 def is_connected():
+    global robot
     return flask.jsonify({
-        'is_connected': Robot.get_instance().is_connected(),
-        'port': Robot.get_instance().get_connected_port()
+        'is_connected': robot.is_connected(),
+        'port': robot.get_connected_port()
     })
 
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
+    global robot
     return flask.jsonify({
         'coords': robot._driver.get_position().get("target")
     })
@@ -240,6 +243,7 @@ def get_coordinates():
 
 @app.route("/robot/diagnostics")
 def diagnostics():
+    global robot
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -247,6 +251,7 @@ def diagnostics():
 
 @app.route("/robot/versions")
 def get_versions():
+    global robot
     return flask.jsonify({
         'versions': robot.versions()
     })
@@ -260,12 +265,11 @@ def connect_robot():
     status = 'success'
     data = None
 
+    global robot
     try:
-        robot = Robot.get_instance()
         robot.connect(
             port, options=options)
         emit_notifications(["Successfully connected"], 'info')
-
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -280,6 +284,7 @@ def connect_robot():
 
 
 def _start_connection_watcher():
+    global robot
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -296,7 +301,7 @@ def _start_connection_watcher():
                 'event',
                 {
                     'type': 'connection_status',
-                    'is_connected': Robot.get_instance().is_connected()
+                    'is_connected': robot.is_connected()
                 }
             )
             socketio.sleep(1.5)
@@ -316,8 +321,9 @@ def disconnect_robot():
     status = 'success'
     data = None
 
+    global robot
     try:
-        Robot.get_instance().disconnect()
+        robot.disconnect()
         emit_notifications(["Successfully disconnected"], 'info')
     except Exception as e:
         status = 'error'
@@ -369,8 +375,9 @@ def _sort_containers(container_list):
     return _tipracks + _other
 
 def _get_all_pipettes():
+    global robot
     pipette_list = []
-    for _, p in Robot.get_instance().get_instruments():
+    for _, p in robot.get_instruments():
         if isinstance(p, Pipette):
             pipette_list.append(p)
     return pipette_list
@@ -380,7 +387,8 @@ def _get_all_containers():
     Returns all containers currently on the deck
     """
     all_containers = list()
-    for slot in Robot.get_instance()._deck:
+    global robot
+    for slot in robot._deck:
         if slot.has_children():
             container = slot.get_children_list()[0]
             all_containers.append(container)
@@ -548,9 +556,9 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
+    global robot
     try:
         axis = request.json.get("axis")
-        robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.reset_tip_tracking()
         instrument.pick_up_tip(enqueue=False)
@@ -569,9 +577,9 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
+    global robot
     try:
         axis = request.json.get("axis")
-        robot = Robot.get_instance()
         instrument = robot._instruments[axis.upper()]
         instrument.return_tip(enqueue=False)
     except Exception as e:
@@ -659,7 +667,7 @@ def set_max_volume():
     axis = request.json.get("axis")
     try:
         instrument = robot._instruments[axis.upper()]
-        instrument.set_max_volume(volume)
+        instrument.set_max_volume(int(volume))
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
