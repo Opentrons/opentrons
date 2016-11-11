@@ -70,7 +70,7 @@ describe('application launch', function () {
     let bottom = '//*[@id="task-pipette"]/span/div[1]/section[2]/button[1]'
     let dropTip = '//*[@id="task-pipette"]/span/div[1]/section[3]/button[1]'
     let blowOut = '//*[@id="task-pipette"]/span/div[1]/section[4]/button[1]'
-    let plungerDown = '//*[@id="jog-controls"]/span[3]/button[2]'
+    let plungerDown = '//*[@id="jog-controls-plunger"]/span[1]/button[2]'
     let run = '//*[@id="run"]/button'
 
     return this.app.client.waitUntilWindowLoaded(31950)
