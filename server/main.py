@@ -6,6 +6,7 @@ import json
 import time
 
 import flask
+import traceback
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -69,7 +70,20 @@ def load_python(stream, filename):
         helpers.get_upload_proof_robot(robot)
     )
     try:
-        exec(code, globals(), get_protocol_locals())
+        try:
+            exec(code, globals(), get_protocol_locals())
+        except Exception as e:
+            tb = e.__traceback__
+            stack_list = traceback.extract_tb(tb)
+            _, line, name, text = stack_list[1]
+            raise Exception(
+                'Error in protocol file line {} : {}\n{}'.format(
+                    line,
+                    str(e),
+                    text
+                )
+            )
+
         robot = restore_patched_robot()
         robot.simulate()
         if len(robot._commands) == 0:
@@ -79,7 +93,7 @@ def load_python(stream, filename):
             api_response['errors'] = error
     except Exception as e:
         app.logger.error(e)
-        api_response['errors'] = ['Failed to load protocol: ' + str(e)]
+        api_response['errors'] = [str(e)]
     finally:
         robot = restore_patched_robot()
 
