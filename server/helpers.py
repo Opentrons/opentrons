@@ -52,3 +52,32 @@ def load_json(json_byte_stream):
     api_response['errors'] = errors
     api_response['warnings'] = warnings
     return api_response
+
+
+def get_upload_proof_robot(robot):
+    methods_to_stash = [
+        'connect',
+        'disconnect',
+        'move_head',
+        'move_plunger',
+        'reset',
+        'run',
+        'simulate'
+    ]
+
+    def mock(self, *args, **kwargs):
+        pass
+
+    stashed_methods = {}
+    for method in methods_to_stash:
+        stashed_methods[method] = getattr(robot, method)
+        setattr(robot, method, mock)
+
+    def restore():
+        for method_name, method_obj in stashed_methods.items():
+            setattr(robot, method_name, method_obj)
+        return robot
+
+    patched_robot = robot
+    return (patched_robot, restore)
+
