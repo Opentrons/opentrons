@@ -1,8 +1,6 @@
 <template>
   <aside id="jog">
     <h2 class="title">Pipette Jog</h2>
-    <!-- <h2 class="title" id="z">Jog [Z]</h2>
-    <h2 class="title" id="p">Plunger</h2> -->
     <hr>
     <section id="jog-controls-pipette" :class="{'disabled': busy}">
       <span class="xy">
@@ -17,26 +15,26 @@
         <button @click="jog('z', 1)" class="btn z up">&uarr;</button>
         <button @click="jog('z', -1)" class="btn z down">&darr;</button>
       </span>
-  
+
       <span class="increment">
-      <Increment :increments="placeable_increments"></Increment> 
+      <Increment :increments="placeable_increments"></Increment>
       </span>
       </section>
 
-    <h2 class="title" >Plunger Jog</h2>
+    <h2 class="title">Plunger Jog</h2>
     <hr>
-     <section id="jog-controls-plunger" :class="{'disabled': busy}">   
+     <section id="jog-controls-plunger" :class="{'disabled': busy}">
       <span class="p">
       <h3 class="title">[P]</h3>
         <button @click="jog(currentAxis(), -1)"class="btn p up">&uarr;</button>
         <button @click="jog(currentAxis(), 1)" class="btn p down">&darr;</button>
       </span>
        <span class="increment-plunger">
-        <IncrementPlunger :increments="plunger_increments"></IncrementPlunger> 
+        <IncrementPlunger :increments="plunger_increments"></IncrementPlunger>
       </span>
       </section>
     </section>
-    
+
     <h2 class="title">Move to Slot</h2>
     <hr>
     <DeckSlot :busy="busy"></DeckSlot>
@@ -54,7 +52,7 @@
     data: function () {
       return {
         placeable_increments: ["Slot",20,5,1,0.5,0.1],
-        plunger_increments: [2,1,0.5,0.1]     
+        plunger_increments: [2,1,0.5,0.1]
       }
     },
     components: {
@@ -65,7 +63,7 @@
     methods: {
       jog(axis, multiplier) {
         let increment = this.$store.state.current_increment_placeable
-        let increment_plunger = this.$store.state.current_increment_plunger       
+        let increment_plunger = this.$store.state.current_increment_plunger
         increment_plunger *=multiplier
         let coords = {}
         switch(axis) {
@@ -101,7 +99,23 @@
       },
       currentAxis() {
         return this.$route.params.instrument || "b"
+      },
+      handleJogEvent(e) {
+        if (e.key === "ArrowLeft") {
+          return this.jog('x', -1)
+        } else if (e.key === "ArrowRight") {
+          return this.jog('x', 1)
+        } else if (e.key === "ArrowDown") {
+          if (e.shiftKey) return this.jog('z', 1)
+          return this.jog('y', -1)
+        } else if (e.key === "ArrowUp") {
+          if (e.shiftKey) return this.jog('z', -1)
+          return this.jog('y', 1)
+        }
       }
-    }
+    },
+    created: function () {
+      window.addEventListener('keyup', this.handleJogEvent)
+    },
   }
 </script>
