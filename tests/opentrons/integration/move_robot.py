@@ -2,7 +2,7 @@ import os
 
 from opentrons import containers
 from opentrons.labware import instruments
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons.drivers.motor import CNCDriver
 
 from helpers.calibration import import_json_calibration

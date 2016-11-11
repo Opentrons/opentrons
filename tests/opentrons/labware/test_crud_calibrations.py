@@ -1,6 +1,6 @@
 import unittest
 
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons import containers, instruments
 from opentrons.util.vector import Vector
 

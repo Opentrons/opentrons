@@ -5,7 +5,7 @@
 
 .. testsetup:: index_main
 
-  from opentrons.robot import Robot
+  from opentrons import Robot
   from opentrons import containers, instruments
 
   robot = Robot()
@@ -36,7 +36,7 @@
 
 .. testsetup:: index_long
   
-  from opentrons.robot import Robot
+  from opentrons import Robot
   Robot().reset()
 
 Opentrons API: Simple Biology Lab Protocol Coding
@@ -114,7 +114,7 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
 .. testcode:: index_long
 
   # First, import opentrons API modules
-  from opentrons.robot import Robot
+  from opentrons import Robot
   from opentrons import containers, instruments
 
   # Initialized Robot variable

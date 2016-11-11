@@ -3,7 +3,7 @@ import time
 
 from opentrons import containers
 from opentrons import instruments
-from opentrons.robot import Robot
+from opentrons import Robot
 from opentrons.helpers.helpers import import_calibration_json
 
 from opentrons.util.trace import EventBroker

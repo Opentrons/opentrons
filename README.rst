@@ -66,7 +66,7 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
 .. code-block:: python
 
   # First, import opentrons API modules
-  from opentrons.robot import Robot
+  from opentrons import Robot
   from opentrons import containers, instruments
 
   # Initialized Robot variable

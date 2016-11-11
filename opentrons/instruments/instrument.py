@@ -3,9 +3,10 @@ import json
 import os
 import sys
 
+from opentrons.containers.calibrator import Calibrator
 from opentrons.util.vector import (Vector, VectorEncoder)
 from opentrons.robot.command import Command
-from opentrons.robot import Robot
+from opentrons import Robot
 
 
 JSON_ERROR = None
@@ -30,6 +31,8 @@ class Instrument(object):
     calibration_key = "unique_name"
     persisted_attributes = []
     persisted_defaults = {}
+
+    calibrator = Calibrator(Robot()._deck, {})
 
     def reset(self):
         """

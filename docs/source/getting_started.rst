@@ -46,7 +46,7 @@ Now that you have imported the opentrons modules, you need to declare a new robo
 
 
 Deck Set Up
------------------------------
+-----------
 
 Now that you have a robot to run commands on, you need to tell it what containers and pipettes to use.
 
@@ -63,8 +63,8 @@ For each container you want to use on the deck, you need to load it into your fi
 
 	mycontainer = containers.load(
 		'container type', 	# trough-12row, tiprack-200ul, 96-PCR-flat
-		'slot position'		# A1, B1, C1
-		'given name'		# calibration name
+		'slot position'		  # A1, B1, C1
+		'given name'		    # calibration name
 	)
 
 The example below declares 3 different containers and assigns them to the appropriate slots on the deck.
@@ -327,7 +327,7 @@ Containers are calibrated to the bottom of the well, and each labware definition
 	p200.dispense(plate['A1'].top(-3))
 
 Homing
------------------------------
+------
 
 You can instruct the robot to home at any point in the protocol, or just home one axis.
 
@@ -345,7 +345,7 @@ When the python file is loaded into the protocol, it runs through all of the com
   robot.home('xyz', enqueue=True)
 
 Move To
------------------------------
+-------
 
 If you don't want to aspirate, dispense or mix, you can still send your robot to a container using the move_to() command.
 
@@ -387,6 +387,6 @@ First, you can use the print command (a basic python command) to print well loca
 This is useful when trying to determine if the location you're calling is actually the location you want, or if something is iterating properly (more on iteration later)
 
 Robot.Commands()
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.
