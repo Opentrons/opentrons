@@ -1,21 +1,5 @@
-Results of doctest builder run on 2016-11-14 16:58:16
+Results of doctest builder run on 2016-11-14 17:02:16
 =====================================================
-
-Document: module
-----------------
-1 items passed all tests:
-   5 tests in main
-5 tests in 1 items.
-5 passed and 0 failed.
-Test passed.
-
-Document: getting_started
--------------------------
-1 items passed all tests:
-  21 tests in main
-21 tests in 1 items.
-21 passed and 0 failed.
-Test passed.
 
 Document: index
 ---------------
@@ -41,6 +25,14 @@ Test passed.
 2 passed and 0 failed.
 Test passed.
 
+Document: well_access
+---------------------
+1 items passed all tests:
+   9 tests in main
+9 tests in 1 items.
+9 passed and 0 failed.
+Test passed.
+
 Document: api
 -------------
 1 items passed all tests:
@@ -49,12 +41,20 @@ Document: api
 87 passed and 0 failed.
 Test passed.
 
-Document: well_access
----------------------
+Document: module
+----------------
 1 items passed all tests:
-   9 tests in main
-9 tests in 1 items.
-9 passed and 0 failed.
+   5 tests in main
+5 tests in 1 items.
+5 passed and 0 failed.
+Test passed.
+
+Document: getting_started
+-------------------------
+1 items passed all tests:
+  21 tests in main
+21 tests in 1 items.
+21 passed and 0 failed.
 Test passed.
 
 Doctest summary
