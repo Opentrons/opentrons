@@ -5,16 +5,15 @@
 
 .. testsetup:: index_main
 
-  from opentrons import Robot
+  from opentrons import robot
   from opentrons import containers, instruments
 
-  robot = Robot()
   robot.reset()             # clear robot's state first
 
   tiprack = containers.load(
       'tiprack-200ul',  # container type
       'A1',             # slot
-      'tiprack'         # user-defined name
+      'tiprack-test-setup'         # user-defined name
   )
   plate = containers.load('96-flat', 'B1', 'plate')
   trough = containers.load('trough-12row', 'B2', 'trough')
@@ -36,8 +35,8 @@
 
 .. testsetup:: index_long
   
-  from opentrons import Robot
-  Robot().reset()
+  from opentrons import robot
+  robot.reset()
 
 Opentrons API: Simple Biology Lab Protocol Coding
 ===========================================================
@@ -69,10 +68,10 @@ If you wanted to do this 96 times, you could write it like this:
 
 .. testcode:: index_main
    
-  p200.aspirate(trough)
-   
-  for i in range(95):
-      p200.dispense(plate[i + 1]).blow_out().touch_tip()
+  for i in range(96):
+      if p200.current_volume < 50:
+          p200.aspirate(trough[1])
+      p200.dispense(50, plate[i])
 
 
 Basic Principles
@@ -115,11 +114,8 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
 .. testcode:: index_long
 
   # First, import opentrons API modules
-  from opentrons import Robot
+  from opentrons import robot
   from opentrons import containers, instruments
-
-  # Initialized Robot variable
-  robot = Robot()
 
   # Load a tip rack and assign it to a variable
   tiprack = containers.load(

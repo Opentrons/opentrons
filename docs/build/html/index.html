@@ -103,10 +103,10 @@
 </pre></div>
 </div>
 <p>If you wanted to do this 96 times, you could write it like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p200</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="n">trough</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">95</span><span class="p">):</span>
-    <span class="n">p200</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">blow_out</span><span class="p">()</span><span class="o">.</span><span class="n">touch_tip</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">96</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">p200</span><span class="o">.</span><span class="n">current_volume</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="n">p200</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="n">trough</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">p200</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -141,11 +141,8 @@ For example:</p>
 <h2>Hello World<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h2>
 <p>Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># First, import opentrons API modules</span>
-<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">Robot</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">robot</span>
 <span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
-
-<span class="c1"># Initialized Robot variable</span>
-<span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">()</span>
 
 <span class="c1"># Load a tip rack and assign it to a variable</span>
 <span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
