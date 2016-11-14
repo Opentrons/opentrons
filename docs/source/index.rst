@@ -80,6 +80,7 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
+   updating_firmware
    setup
    getting_started
    running_a_protocol
