@@ -46,60 +46,14 @@ You string these commands into full protocols that anyone with Opentrons can run
    p200.dispense(50, plate[2])
    p200.dispense(50, plate[3])
 
-If you wanted to do enough times to fill a 96 well plate, you could write it like this:
+If you wanted to do this 96 times, you could write it like this:
 
 .. code-block:: python
    
-   #define how much volume to dispense in each well
-   dispense_vol = 50
-   
-   for i in range(96):
-      if p200.current_volume < dispense_vol:
-         p200.aspirate(trough[1])
-      p200.dispense(dispense_vol, plate[i])
-
-Hello World
------------
-
-Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
-
-.. code-block:: python
-
-  # First, import opentrons API modules
-  from opentrons import Robot
-  from opentrons import containers, instruments
-
-  # Initialized Robot variable
-  robot = Robot()
-
-  # Load a tip rack and assign it to a variable
-  tiprack = containers.load(
-      'tiprack-200ul',  # container type
-      'A1',             # slot
-      'tiprack'         # user-defined name
-  )
-  # Load a plate
-  plate = containers.load('96-flat', 'B1', 'plate')
-  
-  # Initialize a pipette    
-  p200 = instruments.Pipette(
-      axis="b"
-  )
-
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
-  p200.pick_up_tip(tiprack[0])  # pick up tip from position 0 in a tip rack
-
-  # loop through 95 wells, transferring to the next
-  for i in range(95):
-      p200.aspirate(100, plate[i])
-      p200.dispense(plate[i + 1]).blow_out().touch_tip()
-
-  # return tip to back to position 0 in a tip rack
-  p200.return_tip()
-  # simulate a protocol run on a virtual robot
-  robot.simulate()
-  # robot.connect('/dev/tty.usbserialNNNN')  # connect to the robot
-  # robot.run()                              # to run on a physical robot
+  for i in range(96):
+      if p200.current_volume < 50:
+          p200.aspirate(trough[1])
+      p200.dispense(50, plate[i])
 
 Basic Principles
 ----------------
@@ -111,8 +65,8 @@ Basic Principles
   p200.aspirate(100, plate['A1']).dispense(plate['A2'])
 
 Is exactly what you think it would do: 
-  * Take P200 pipette
-  * Aspirate 100 uL of liquid from well A1 on your plate
+  * Take p200 pipette
+  * Aspirate 100 uL from well A1 on your plate
   * Dispense everything into well A2 on the same plate
 
 **Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
@@ -122,7 +76,7 @@ For example:
 
   p200.aspirate(100, plate[0]).dispense(plate[1])
 
-while using 0 or 1 instead of 'A1' and 'A2' will do just the same.
+while using 0 or 1 instead of 'A1' and 'B1' will do just the same.
 
 or
 
@@ -131,6 +85,39 @@ or
   p200.aspirate(100, plate[0].bottom())
 
 will aspirate 100, from the bottom of a well.
+
+Hello World
+-----------
+
+Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
+
+.. code-block:: python
+
+  from opentrons import robot
+  from opentrons import containers, instruments
+
+  tiprack = containers.load(
+      'tiprack-200ul',  # container type
+      'A1',             # slot
+      'tiprack'         # user-defined name
+  )
+
+  plate = containers.load('96-flat', 'B1', 'plate')
+  
+  p200 = instruments.Pipette(
+      axis="b",
+      max_volume=200
+  )
+
+  p200.pick_up_tip(tiprack[0])
+
+  for i in range(95):
+      p200.aspirate(100, plate[i])
+      p200.dispense(plate[i + 1])
+
+  p200.return_tip()
+
+  robot.simulate()
 
 Installing Opentrons API
 ------------------------
@@ -141,10 +128,3 @@ If you are familiar with python and comfortable running ``pip``, you can install
 .. code-block:: bash
 
   pip install opentrons
-
-What's next?
----------------
-* Start with `Setting up Opentrons API`_ in `Jupyter <http://jupyter.org/>`_.
-* Write your first `Hello World API Protocol`_.
-* Learn some common `Tips and Tricks for API Liquid Handling`_.
-* Discover `Full API Documentation`_ for advanced API protocol writing.
