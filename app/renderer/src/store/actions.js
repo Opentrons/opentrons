@@ -13,7 +13,7 @@ const actions = {
         OpenTrons.jog({"z": 1}).then(() => {
           OpenTrons.jog({"z": -1}).then(() => {
             if (window.confirm("Do you want to home now?")) {
-              OpenTrons.home('all')  
+              OpenTrons.home('all')
             }
           })
         })
