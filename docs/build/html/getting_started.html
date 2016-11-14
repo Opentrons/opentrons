@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Getting Started &#8212; Opentrons API v2.0</title>
+    <title>Writing a Protocol &#8212; Opentrons API v2.0</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,9 +23,11 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Opentrons API v2.0" href="index.html" />
-    <link rel="next" title="Saving Your Protocol" href="running_a_protocol.html" />
-    <link rel="prev" title="Setting Up Jupyter" href="setup.html" />
+    <link rel="next" title="Using the App" href="running_app.html" />
+    <link rel="prev" title="Setting Up Code Environment" href="setup.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -44,8 +46,8 @@
 <h3><a href="index.html">Table Of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting Up Jupyter</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting Up Code Environment</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Writing a Protocol</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#import-opentrons-api">Import Opentrons API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#deck-set-up">Deck Set Up</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a></li>
@@ -55,7 +57,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#debugging-your-protocol">Debugging Your Protocol</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Saving Your Protocol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="running_app.html">Using the App</a></li>
 <li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a></li>
@@ -66,8 +67,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="setup.html" title="previous chapter">Setting Up Jupyter</a></li>
-      <li>Next: <a href="running_a_protocol.html" title="next chapter">Saving Your Protocol</a></li>
+      <li>Previous: <a href="setup.html" title="previous chapter">Setting Up Code Environment</a></li>
+      <li>Next: <a href="running_app.html" title="next chapter">Using the App</a></li>
   </ul></li>
 </ul>
 </div>
@@ -94,9 +95,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="getting-started">
-<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to <a class="reference internal" href="setup.html#setup"><span class="std std-ref">Setting Up Jupyter</span></a> for detailed instructions.</p>
+  <div class="section" id="writing-a-protocol">
+<span id="getting-started"></span><h1>Writing a Protocol<a class="headerlink" href="#writing-a-protocol" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to <a class="reference internal" href="setup.html#setup"><span class="std std-ref">Setting Up Code Environment</span></a> for detailed instructions.</p>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
 <p class="last">Separate your installs, imports, containers and commands into separate cells for easy testing!</p>
@@ -195,12 +196,12 @@
 </ul>
 </div></blockquote>
 <p>This example loads a single channel, 20-200 uL pipette on the b axis that pulls tips from tiprack and deposits them in trash</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p200</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;p200&quot;</span><span class="p">,</span>
         <span class="n">trash_container</span><span class="o">=</span><span class="n">trash</span><span class="p">,</span>
         <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">],</span>
         <span class="n">min_volume</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-        <span class="n">max_volume</span><span class="p">,</span>
+        <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
         <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
         <span class="n">channels</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span>
@@ -364,7 +365,6 @@
 </div></blockquote>
 <p>Containers are calibrated to the bottom of the well, and each labware definition has an inherent depth, which provides the calculated top position.  You can specify each of these locations anytime you use a container[position], as well as adjust them up (+) or down (-) by adding a distance.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p200</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="s1">&#39;A1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">top</span><span class="p">())</span>
-<span class="n">p200</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="s1">&#39;B2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bottom</span><span class="p">())</span>
 <span class="n">p200</span><span class="o">.</span><span class="n">mix</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="s1">&#39;B2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bottom</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">p200</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="s1">&#39;A1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">top</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>
@@ -439,7 +439,7 @@
       &copy;2016, Opentrons.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |

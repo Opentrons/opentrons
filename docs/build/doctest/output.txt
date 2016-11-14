@@ -1,0 +1,65 @@
+Results of doctest builder run on 2016-11-14 16:49:28
+=====================================================
+
+Document: well_access
+---------------------
+1 items passed all tests:
+   9 tests in main
+9 tests in 1 items.
+9 passed and 0 failed.
+Test passed.
+
+Document: module
+----------------
+1 items passed all tests:
+   5 tests in main
+5 tests in 1 items.
+5 passed and 0 failed.
+Test passed.
+
+Document: getting_started
+-------------------------
+1 items passed all tests:
+  21 tests in main
+21 tests in 1 items.
+21 passed and 0 failed.
+Test passed.
+
+Document: tips_and_tricks
+-------------------------
+2 items passed all tests:
+   1 tests in tips_demo
+   4 tests in tips_main
+5 tests in 2 items.
+5 passed and 0 failed.
+Test passed.
+2 items passed all tests:
+   1 tests in tips_demo (cleanup code)
+   1 tests in tips_main (cleanup code)
+2 tests in 2 items.
+2 passed and 0 failed.
+Test passed.
+
+Document: api
+-------------
+1 items passed all tests:
+  87 tests in default
+87 tests in 1 items.
+87 passed and 0 failed.
+Test passed.
+
+Document: index
+---------------
+2 items passed all tests:
+   1 tests in index_long
+   6 tests in index_main
+7 tests in 2 items.
+7 passed and 0 failed.
+Test passed.
+
+Doctest summary
+===============
+  134 tests
+    0 failures in tests
+    0 failures in setup code
+    0 failures in cleanup code

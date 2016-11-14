@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Setting Up Jupyter &#8212; Opentrons API v2.0</title>
+    <title>Setting Up Code Environment &#8212; Opentrons API v2.0</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,8 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Opentrons API v2.0" href="index.html" />
-    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="next" title="Writing a Protocol" href="getting_started.html" />
     <link rel="prev" title="Updating Firmware" href="updating_firmware.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -44,13 +46,13 @@
 <h3><a href="index.html">Table Of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Setting Up Jupyter</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Setting Up Code Environment</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#jupyter-code-environment">Jupyter Code Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-opentrons-api">Install Opentrons API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#saving-file-to-run">Saving File to Run</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Saving Your Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Writing a Protocol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="running_app.html">Using the App</a></li>
 <li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a></li>
@@ -62,7 +64,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="updating_firmware.html" title="previous chapter">Updating Firmware</a></li>
-      <li>Next: <a href="getting_started.html" title="next chapter">Getting Started</a></li>
+      <li>Next: <a href="getting_started.html" title="next chapter">Writing a Protocol</a></li>
   </ul></li>
 </ul>
 </div>
@@ -89,8 +91,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="setting-up-jupyter">
-<span id="setup"></span><h1>Setting Up Jupyter<a class="headerlink" href="#setting-up-jupyter" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="setting-up-code-environment">
+<span id="setup"></span><h1>Setting Up Code Environment<a class="headerlink" href="#setting-up-code-environment" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="jupyter-code-environment">
 <h2>Jupyter Code Environment<a class="headerlink" href="#jupyter-code-environment" title="Permalink to this headline">¶</a></h2>
 <p>Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.</p>
@@ -157,6 +159,18 @@ opentrons.__version__
 <p>If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!</p>
 <p>If you want to learn more about Jupyter Notebook Navigation <a class="reference external" href="http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb">check this out</a>.</p>
 </div>
+<div class="section" id="saving-file-to-run">
+<h2>Saving File to Run<a class="headerlink" href="#saving-file-to-run" title="Permalink to this headline">¶</a></h2>
+<p>Our app supports python (.py) files and JSON files.</p>
+<div class="section" id="py-file">
+<h3>.py File<a class="headerlink" href="#py-file" title="Permalink to this headline">¶</a></h3>
+<p>You can download any jupyter notebook files as a .py file, and the app will ignore everything except the containers and commands.</p>
+</div>
+<div class="section" id="json-file">
+<h3>JSON File<a class="headerlink" href="#json-file" title="Permalink to this headline">¶</a></h3>
+<p>Old JSON files can still be run in 2.0, and still need their deck, head, ingredients and instruction section.  However, we recommend writing all protocols using our new API as they will enable you to do a lot more with the robot - don&#8217;t hesitate to reach out if you have trouble translating your files!</p>
+</div>
+</div>
 </div>
 
 
@@ -169,7 +183,7 @@ opentrons.__version__
       &copy;2016, Opentrons.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
