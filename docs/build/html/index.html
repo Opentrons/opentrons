@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Opentrons API: Simple Biology Lab Protocol Coding &#8212; Opentrons API 2.0 documentation</title>
+    <title>Opentrons API: Simple Biology Lab Protocol Coding &#8212; Opentrons API v2.0</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Opentrons API 2.0 documentation" href="#" />
-    <link rel="next" title="Running Opentrons API in Jupyter" href="setup.html" />
+    <link rel="top" title="Opentrons API v2.0" href="#" />
+    <link rel="next" title="Updating Firmware" href="updating_firmware.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -40,22 +40,23 @@
             <p class="logo"><a href="#">
               <img class="logo" src="_static/logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Opentrons API: Simple Biology Lab Protocol Coding</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
-<li><a class="reference internal" href="#basic-principles">Basic Principles</a></li>
-<li><a class="reference internal" href="#hello-world">Hello World</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<h3><a href="#">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting Up Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Saving Your Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_app.html">Using the App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Developer Interface</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="setup.html" title="next chapter">Running Opentrons API in Jupyter</a></li>
+      <li>Next: <a href="updating_firmware.html" title="next chapter">Updating Firmware</a></li>
   </ul></li>
 </ul>
 </div>
@@ -112,82 +113,47 @@
 <h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Running Opentrons API in Jupyter</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#jupyter-code-environment">Jupyter Code Environment</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#install-anaconda-and-python-3">Install Anaconda and Python 3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#install-jupyter">Install Jupyter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#launch-jupyter-notebook-app">Launch Jupyter Notebook App</a></li>
-<li class="toctree-l3"><a class="reference internal" href="setup.html#programming-in-jupyter-notebook-hello-world">Programming in Jupyter Notebook: Hello World!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="updating_firmware.html#download-files">Download Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updating_firmware.html#open-the-smoothie-s-drive">Open the Smoothie&#8217;s Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updating_firmware.html#copy-over-firmware">Copy Over Firmware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updating_firmware.html#select-your-model-s-config">Select Your Model&#8217;s Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updating_firmware.html#restart">Restart</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting Up Jupyter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#jupyter-code-environment">Jupyter Code Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#install-opentrons-api">Install Opentrons API</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#import-opentrons-api">Import Opentrons API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#deck-set-up">Deck Set Up</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#containers">Containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#pipettes">Pipettes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#commands">Commands</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#pick-up-and-drop-tip">Pick Up and Drop Tip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#aspirate">Aspirate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#dispense">Dispense</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#mix">Mix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#chaining-commands">Chaining Commands</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#command-attributes">Command Attributes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#touch-tip">Touch Tip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#blow-out">Blow Out</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#delay">Delay</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#dispensing-positions">Dispensing Positions</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#deck-set-up">Deck Set Up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#command-attributes">Command Attributes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#homing">Homing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#move-to">Move To</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#debugging-your-protocol">Debugging Your Protocol</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#print">Print()</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#robot-commands">Robot.Commands()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#debugging-your-protocol">Debugging Your Protocol</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Saving Your Protocol</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="running_a_protocol.html#saving-the-file">Saving the File</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Running a Protocol</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="running_a_protocol.html#saving-the-file">Saving the File</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="running_a_protocol.html#file-type">File Type</a></li>
-<li class="toctree-l3"><a class="reference internal" href="running_a_protocol.html#what-to-keep">What to Keep</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="running_a_protocol.html#start-app">Start App</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="running_a_protocol.html#download">Download</a></li>
-<li class="toctree-l3"><a class="reference internal" href="running_a_protocol.html#connect">Connect</a></li>
-<li class="toctree-l3"><a class="reference internal" href="running_a_protocol.html#load-protocol">Load Protocol</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="running_a_protocol.html#calibrate-robot">Calibrate Robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_app.html">Using the App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="running_app.html#download-app">Download App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_app.html#connect-to-robot">Connect to Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_app.html#upload-protocol">Upload Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_app.html#jogging">Jogging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_app.html#calibrate">Calibrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_app.html#run-protocol">Run Protocol</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="well_access.html#rows-vs-columns">Rows vs. Columns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="well_access.html#accessing-wells">Accessing Wells</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#coordinates">Coordinates</a></li>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#rows">Rows</a></li>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#columns">Columns</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="well_access.html#iterating-wells">Iterating Wells</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#entire-plate">Entire Plate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#entire-row">Entire Row</a></li>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#entire-column">Entire Column</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="well_access.html#other-examples">Other Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#odds-evens">Odds &amp; Evens</a></li>
-<li class="toctree-l3"><a class="reference internal" href="well_access.html#chaining">Chaining</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="well_access.html#accessing-wells">Accessing Wells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="well_access.html#iterating-wells">Iterating Wells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="well_access.html#other-examples">Other Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a><ul>
@@ -198,13 +164,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module.html">Modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module.html#magnetic-bead">Magnetic Bead</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="module.html#setting-up-hardware">Setting up Hardware</a></li>
-<li class="toctree-l3"><a class="reference internal" href="module.html#initializing-module-in-api">Initializing Module in API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="module.html#activate-and-deactivate-magnets">Activate and Deactivate Magnets</a></li>
-<li class="toctree-l3"><a class="reference internal" href="module.html#chain-other-commands">Chain Other Commands</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="module.html#magnetic-bead">Magnetic Bead</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Developer Interface</a><ul>
@@ -313,6 +273,22 @@ For example:</p>
 
     
 
+    
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-83820700-1']);
+      _gaq.push(['_setDomainName', 'none']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
     
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Running Opentrons API in Jupyter &#8212; Opentrons API 2.0 documentation</title>
+    <title>Setting Up Jupyter &#8212; Opentrons API v2.0</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Opentrons API 2.0 documentation" href="index.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
     <link rel="next" title="Getting Started" href="getting_started.html" />
-    <link rel="prev" title="Opentrons API: Simple Biology Lab Protocol Coding" href="index.html" />
+    <link rel="prev" title="Updating Firmware" href="updating_firmware.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,25 +41,27 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Running Opentrons API in Jupyter</a><ul>
-<li><a class="reference internal" href="#jupyter-code-environment">Jupyter Code Environment</a><ul>
-<li><a class="reference internal" href="#install-anaconda-and-python-3">Install Anaconda and Python 3</a></li>
-<li><a class="reference internal" href="#install-jupyter">Install Jupyter</a></li>
-<li><a class="reference internal" href="#launch-jupyter-notebook-app">Launch Jupyter Notebook App</a></li>
-<li><a class="reference internal" href="#programming-in-jupyter-notebook-hello-world">Programming in Jupyter Notebook: Hello World!</a></li>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Setting Up Jupyter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#jupyter-code-environment">Jupyter Code Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-opentrons-api">Install Opentrons API</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#install-opentrons-api">Install Opentrons API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Saving Your Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_app.html">Using the App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Developer Interface</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Opentrons API: Simple Biology Lab Protocol Coding</a></li>
+      <li>Previous: <a href="updating_firmware.html" title="previous chapter">Updating Firmware</a></li>
       <li>Next: <a href="getting_started.html" title="next chapter">Getting Started</a></li>
   </ul></li>
 </ul>
@@ -87,18 +89,18 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="running-opentrons-api-in-jupyter">
-<span id="setup"></span><h1>Running Opentrons API in Jupyter<a class="headerlink" href="#running-opentrons-api-in-jupyter" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="setting-up-jupyter">
+<span id="setup"></span><h1>Setting Up Jupyter<a class="headerlink" href="#setting-up-jupyter" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="jupyter-code-environment">
 <h2>Jupyter Code Environment<a class="headerlink" href="#jupyter-code-environment" title="Permalink to this headline">¶</a></h2>
 <p>Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.</p>
 <div class="section" id="install-anaconda-and-python-3">
 <h3>Install Anaconda and Python 3<a class="headerlink" href="#install-anaconda-and-python-3" title="Permalink to this headline">¶</a></h3>
-<p>To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install <a href="#id3"><span class="problematic" id="id4">Anaconda_</span></a>: (<a class="reference external" href="https://www.continuum.io/downloads">https://www.continuum.io/downloads</a>) before going any further, this will install Python 3 for you. We recommend you use the <cite>Graphical Installer</cite> for <cite>Python3.5</cite>.</p>
+<p>To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> before going any further, this will install Python 3 for you. We recommend you use the <cite>Graphical Installer</cite> for <cite>Python3.5</cite>.</p>
 </div>
 <div class="section" id="install-jupyter">
 <h3>Install Jupyter<a class="headerlink" href="#install-jupyter" title="Permalink to this headline">¶</a></h3>
-<p>After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](<a class="reference external" href="http://jupyter.readthedocs.io/en/latest/install.html">http://jupyter.readthedocs.io/en/latest/install.html</a>).</p>
+<p>After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official <a class="reference external" href="http://jupyter.readthedocs.io/en/latest/install.html">Jupyter Installation Guide</a>.</p>
 </div>
 <div class="section" id="launch-jupyter-notebook-app">
 <h3>Launch Jupyter Notebook App<a class="headerlink" href="#launch-jupyter-notebook-app" title="Permalink to this headline">¶</a></h3>
@@ -147,14 +149,13 @@
 </pre></div>
 </div>
 <p>After this step you should be able to run:</p>
-<dl class="docutils">
-<dt>::</dt>
-<dd>import opentrons
-opentrons.__version__</dd>
-</dl>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>import opentrons
+opentrons.__version__
+</pre></div>
+</div>
 <p>Which should return the version of opentrons package installed.</p>
 <p>If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!</p>
-<p>If you want to learn more about Jupyter Notebook Navigation [check this out](<a class="reference external" href="http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb">http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb</a>):</p>
+<p>If you want to learn more about Jupyter Notebook Navigation <a class="reference external" href="http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb">check this out</a>.</p>
 </div>
 </div>
 
@@ -178,6 +179,22 @@ opentrons.__version__</dd>
 
     
 
+    
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-83820700-1']);
+      _gaq.push(['_setDomainName', 'none']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
     
   </body>
 </html>

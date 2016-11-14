@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Getting Started &#8212; Opentrons API 2.0 documentation</title>
+    <title>Getting Started &#8212; Opentrons API v2.0</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Opentrons API 2.0 documentation" href="index.html" />
-    <link rel="next" title="Running a Protocol" href="running_a_protocol.html" />
-    <link rel="prev" title="Running Opentrons API in Jupyter" href="setup.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Saving Your Protocol" href="running_a_protocol.html" />
+    <link rel="prev" title="Setting Up Jupyter" href="setup.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,46 +41,33 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Getting Started</a><ul>
-<li><a class="reference internal" href="#import-opentrons-api">Import Opentrons API</a></li>
-<li><a class="reference internal" href="#deck-set-up">Deck Set Up</a><ul>
-<li><a class="reference internal" href="#containers">Containers</a></li>
-<li><a class="reference internal" href="#pipettes">Pipettes</a></li>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting Up Jupyter</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#import-opentrons-api">Import Opentrons API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deck-set-up">Deck Set Up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-attributes">Command Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#homing">Homing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#move-to">Move To</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debugging-your-protocol">Debugging Your Protocol</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#commands">Commands</a><ul>
-<li><a class="reference internal" href="#pick-up-and-drop-tip">Pick Up and Drop Tip</a></li>
-<li><a class="reference internal" href="#aspirate">Aspirate</a></li>
-<li><a class="reference internal" href="#dispense">Dispense</a></li>
-<li><a class="reference internal" href="#mix">Mix</a></li>
-<li><a class="reference internal" href="#chaining-commands">Chaining Commands</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#command-attributes">Command Attributes</a><ul>
-<li><a class="reference internal" href="#touch-tip">Touch Tip</a></li>
-<li><a class="reference internal" href="#blow-out">Blow Out</a></li>
-<li><a class="reference internal" href="#delay">Delay</a></li>
-<li><a class="reference internal" href="#dispensing-positions">Dispensing Positions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#homing">Homing</a></li>
-<li><a class="reference internal" href="#move-to">Move To</a></li>
-<li><a class="reference internal" href="#debugging-your-protocol">Debugging Your Protocol</a><ul>
-<li><a class="reference internal" href="#print">Print()</a></li>
-<li><a class="reference internal" href="#robot-commands">Robot.Commands()</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="running_a_protocol.html">Saving Your Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_app.html">Using the App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Developer Interface</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="setup.html" title="previous chapter">Running Opentrons API in Jupyter</a></li>
-      <li>Next: <a href="running_a_protocol.html" title="next chapter">Running a Protocol</a></li>
+      <li>Previous: <a href="setup.html" title="previous chapter">Setting Up Jupyter</a></li>
+      <li>Next: <a href="running_a_protocol.html" title="next chapter">Saving Your Protocol</a></li>
   </ul></li>
 </ul>
 </div>
@@ -109,7 +96,7 @@
             
   <div class="section" id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to <a class="reference internal" href="setup.html#setup"><span class="std std-ref">Running Opentrons API in Jupyter</span></a> for detailed instructions.</p>
+<p>Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to <a class="reference internal" href="setup.html#setup"><span class="std std-ref">Setting Up Jupyter</span></a> for detailed instructions.</p>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
 <p class="last">Separate your installs, imports, containers and commands into separate cells for easy testing!</p>
@@ -213,6 +200,7 @@
         <span class="n">trash_container</span><span class="o">=</span><span class="n">trash</span><span class="p">,</span>
         <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">],</span>
         <span class="n">min_volume</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">max_volume</span><span class="p">,</span>
         <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
         <span class="n">channels</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span>
@@ -434,8 +422,8 @@
 </div>
 <p>This is useful when trying to determine if the location you&#8217;re calling is actually the location you want, or if something is iterating properly (more on iteration later)</p>
 </div>
-<div class="section" id="robot-commands">
-<h3>Robot.Commands()<a class="headerlink" href="#robot-commands" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="getting-robot-commands">
+<h3>Getting Robot Commands<a class="headerlink" href="#getting-robot-commands" title="Permalink to this headline">¶</a></h3>
 <p>Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.</p>
 </div>
 </div>
@@ -461,6 +449,22 @@
 
     
 
+    
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-83820700-1']);
+      _gaq.push(['_setDomainName', 'none']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
     
   </body>
 </html>
