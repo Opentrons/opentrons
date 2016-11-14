@@ -602,16 +602,16 @@
             "y":19
           },
           "locations":{
-              "A1":{"x":0, "y":0, "z":0, "depth":76.81281249999999, "diameter":16, "total-liquid-volume":15000 },
-              "B1":{"x":31.5, "y":0, "z":0, "depth":76.81281249999999, "diameter":16, "total-liquid-volume":15000 },
-              "C1":{"x":63, "y":0, "z":0, "depth":76.81281249999999, "diameter":16, "total-liquid-volume":15000 },
-              "A2":{"x":0, "y":22.7, "z":0, "depth":76.81281249999999, "diameter":16, "total-liquid-volume":15000 },
-              "B2":{"x":31.5, "y":22.7, "z":0, "depth":76.81281249999999, "diameter":16, "total-liquid-volume":15000 },
-              "C2":{"x":63, "y":22.7, "z":0, "depth":76.81281249999999, "diameter":16, "total-liquid-volume":15000 },
-              "A3":{"x":5.9, "y":51.26, "z":0, "depth":76.81281249999999, "diameter":26, "total-liquid-volume":50000 },
-              "B3":{"x":51.26, "y":51.26, "z":0, "depth":76.81281249999999, "diameter":26, "total-liquid-volume":50000 },
-              "A4":{"x":5.9, "y":87.1, "z":0, "depth":76.81281249999999, "diameter":26, "total-liquid-volume":50000 },
-              "B4":{"x":51.26, "y":87.1, "z":0, "depth":76.81281249999999, "diameter":26, "total-liquid-volume":50000 }
+              "A1":{"x":0, "y":0, "z":0, "depth":76.81281249999999, "diameter":17, "total-liquid-volume":15000 },
+              "B1":{"x":31.5, "y":0, "z":0, "depth":76.81281249999999, "diameter":17, "total-liquid-volume":15000 },
+              "C1":{"x":63, "y":0, "z":0, "depth":76.81281249999999, "diameter":17, "total-liquid-volume":15000 },
+              "A2":{"x":0, "y":22.7, "z":0, "depth":76.81281249999999, "diameter":17, "total-liquid-volume":15000 },
+              "B2":{"x":31.5, "y":22.7, "z":0, "depth":76.81281249999999, "diameter":17, "total-liquid-volume":15000 },
+              "C2":{"x":63, "y":22.7, "z":0, "depth":76.81281249999999, "diameter":17, "total-liquid-volume":15000 },
+              "A3":{"x":5.9, "y":51.26, "z":0, "depth":76.81281249999999, "diameter":30, "total-liquid-volume":50000 },
+              "B3":{"x":51.26, "y":51.26, "z":0, "depth":76.81281249999999, "diameter":30, "total-liquid-volume":50000 },
+              "A4":{"x":5.9, "y":87.1, "z":0, "depth":76.81281249999999, "diameter":30, "total-liquid-volume":50000 },
+              "B4":{"x":51.26, "y":87.1, "z":0, "depth":76.81281249999999, "diameter":30, "total-liquid-volume":50000 }
           }
       },
 
