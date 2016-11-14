@@ -11,7 +11,6 @@ from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
@@ -712,7 +711,7 @@ class Robot(object, metaclass=Singleton):
                     log.info("Executing: {}".format(command.description))
                 if command.setup:
                     command.setup()
-                if mode != 'simulate':
+                if kwargs.get('do', True):
                     command.do()
             except Exception as e:
                 trace.EventBroker.get_instance().notify({
@@ -725,7 +724,7 @@ class Robot(object, metaclass=Singleton):
 
         return self._runtime_warnings
 
-    def simulate(self, switches=False):
+    def simulate(self, switches=False, do=True):
         """
         Simulate a protocol run on a virtual robot.
 
@@ -745,7 +744,7 @@ class Robot(object, metaclass=Singleton):
         for instrument in self._instruments.values():
             instrument.setup_simulate()
 
-        self.run(mode='simulate')
+        self.run(mode='simulate', do=do)
 
         self.set_connection('live')
 
