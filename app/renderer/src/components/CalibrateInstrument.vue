@@ -1,6 +1,6 @@
 <template>
 	<section id="task-pipette" >
-		<h1 class="title">Calibrate the {{currentInstrument().label}} pipette</h1>
+		<h1 class="title">Calibrate the {{currentInstrument().label}} pipette on axis {{currentInstrument().axis}} </h1>
 		<span>
 			<div class="calibrate-pipette">
 				<section class="calibrate top" @mouseenter="toggleMode('top')">
