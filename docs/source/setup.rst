@@ -1,7 +1,7 @@
 .. _setup:
 
 ================================
-Running Opentrons API in Jupyter
+Running Opentrons API
 ================================
 
 Jupyter Code Environment

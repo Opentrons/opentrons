@@ -140,7 +140,7 @@ html_theme_options = {
     'travis_button': 'True',
     'font_family': 'Open Sans',
     'head_font_family': 'AkkoPro-Regular',
-    'sidebar_collapse': 'True',
+    # 'sidebar_collapse': 'True',
     'logo': 'logo.png',
     'fixed_sidebar': 'True',
     'github_user': 'OpenTrons',
@@ -199,7 +199,8 @@ html_logo = 'img/logo.png'
 
 # Custom sidebar templates, maps document names to template names.
 #
-# html_sidebars = {}
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
+
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
