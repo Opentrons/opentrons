@@ -10,17 +10,8 @@ Opentrons API
    :target: https://coveralls.io/github/OpenTrons/opentrons-api?branch=master
    :alt: Coverage Status
 
-.. _Setting up Opentrons API: http://opentrons.github.io/opentrons-api/index.html#installing-opentrons-api
-.. _Hello World API Protocol: http://opentrons.github.io/opentrons-api/index.html#hello-world 
-.. _Tips and Tricks for API Liquid Handling: http://opentrons.github.io/opentrons-api/tips_and_tricks.html
-.. _Full API Documentation: http://opentrons.github.io/opentrons-api/api.html
+.. _Full API Documentation: http://docs.opentrons.com
 
-Quick Links
------------
-
-* `Setting up Opentrons API`_
-* `Hello World API Protocol`_
-* `Tips and Tricks for API Liquid Handling`_
 * `Full API Documentation`_
 
 Introduction
@@ -121,7 +112,7 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
 
 Installing Opentrons API
 ------------------------
-If you are just starting with Python it is recommended to install Jupyter notebook to run Opentrons API. Please refer to `Setting up Opentrons API`_ for detailed instructions.
+If you are just starting with Python it is recommended to install Jupyter notebook to run Opentrons API. Please refer to `Full API Documentation`_ for detailed instructions.
 
 If you are familiar with python and comfortable running ``pip``, you can install Opentrons API by running:
 
