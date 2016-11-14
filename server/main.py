@@ -132,12 +132,16 @@ def upload():
         })
 
     calibrations = get_step_list()
-    if len(api_response['errors']) == 0:
-        emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
-    emit_notifications(api_response['errors'], 'danger')
+    status = 'success'
+    if len(api_response['errors']) > 0:
+        emit_notifications(api_response['errors'], 'danger')
+        calibrations = []
+        status = 'error'
+
+    emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
     # emit_notifications(api_response['warnings'], 'warning')
     return flask.jsonify({
-        'status': 'success',
+        'status': status,
         'data': {
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
@@ -206,6 +210,10 @@ def _run_commands():
     run_time = "%d:%02d:%02d" % (hours, minutes, seconds)
     result = "Run complete in {}".format(run_time)
     emit_notifications([result], 'success')
+
+    if api_response['errors']:
+        # simulate again to reset the robot's state
+        robot.simulate(switches=False)
 
 
 @app.route("/run", methods=["GET"])
