@@ -1,7 +1,7 @@
 .. _getting_started:
 
 ===============
-Getting Started
+Writing a Protocol
 ===============
 
 Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to :ref:`setup` for detailed instructions.
@@ -24,9 +24,37 @@ Now that you've installed Opentrons API on your computer, you have access to a v
 
 .. testsetup:: main
 
-  from opentrons import robot
+  from opentrons import robot, instruments, containers
   robot.reset()
   i = 0
+
+  tiprack = containers.load(
+      'tiprack-200ul',
+      'A2',
+      'tiprack')
+
+  plate = containers.load(
+		'96-PCR-flat',
+		'B3',
+		'plate'
+  )
+
+  trash = containers.load(
+		'point',
+		'C1',
+		'trash'
+  )
+  p200 = instruments.Pipette(
+      name="p200",
+      trash_container=trash,
+      tip_racks=[tiprack],
+      min_volume=20,
+      max_volume=2000,
+      axis="a",
+      channels=1
+  )
+
+  p200.reset()
 
 .. testcode:: main
 	
@@ -128,12 +156,12 @@ This example loads a single channel, 20-200 uL pipette on the b axis that pulls 
 
 .. testcode:: main
 
-	p200 = instruments.Pipette(
+	pipette = instruments.Pipette(
 		name="p200",
 		trash_container=trash,
 		tip_racks=[tiprack],
 		min_volume=20,
-		max_volume,
+		max_volume=200,
 		axis="b",
 		channels=1
 	)
@@ -321,7 +349,6 @@ Containers are calibrated to the bottom of the well, and each labware definition
 .. testcode:: main
 
 	p200.dispense(plate['A1'].top())
-	p200.aspirate(1000, plate['B2'].bottom())
 	p200.mix(3, 100, plate['B2'].bottom(5))
 	p200.dispense(plate['A1'].top(-3))
 
