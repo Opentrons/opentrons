@@ -114,7 +114,7 @@ const actions = {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.runProtocol().then((results) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      commit(types.UPDATE_RUNNING, {'running': false})
+      // commit(types.UPDATE_RUNNING, {'running': false})
       // commit(types.UPDATE_RUN_STATE, results)
     })
   },
@@ -169,7 +169,6 @@ const actions = {
     })
   },
   running ({commit}, data) {
-    console.log(data)
     commit(types.UPDATE_RUNNING, {'running': data})
   }
 }
