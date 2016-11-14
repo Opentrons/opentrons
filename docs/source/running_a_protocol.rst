@@ -1,45 +1,22 @@
 .. _running_a_protocol:
 ================================
-Running a Protocol
+Saving Your Protocol
 ================================
 
-Now that you have your protocol, it's time to run it on your robot!
+Now that you have your protocol, it's time to convert it to run on the robot.
 
 
 Saving the File
 -------------------------------
-File Type
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Protocols should be saved as a .py file.
+Our app supports python (.py) files and JSON files.  
 
-What to Keep
+.py File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The only cells you need to run the .py file via the app are the import cell, container cell and commands cel.  You can comment out all the pip installs and any robot commands (robot.run, robot.commands etc.)
+You can download any jupyter notebook files as a .py file, and the app will ignore everything except the containers and commands.  
 
 
-Start App
--------------------------------
-
-Download
+JSON File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Download the app from our website at **insert website here**.  Remember that we only support Windows 10 and Mac OSX.
-
-Connect
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Plug the power supply into the robot, and connect the usb cable to your computer.  Open the app, and on the top right, select your port.
-
-
-Load Protocol
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Drag your .py file into the app and make sure no errors pop up.  
-
-.. note::
-
-	We will continue to support legacy JSON files.  Let us know if you want help translating your JSON into python.
-
-
-Calibrate Robot
--------------------------------
-The app will populate an advised order of calibration for your containers and pipettes.  Please follow the calibration instructions assosicated with each container within the app.
+Old JSON files can still be run in 2.0, and still need their deck, head, ingredients and instruction section.  However, we recommend writing all protocols using our new API as they will enable you to do a lot more with the robot - don't hesitate to reach out if you have trouble translating your files!
