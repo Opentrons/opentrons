@@ -1,6 +1,6 @@
 <template>
   <div ref="commands" class="runScreen">
-    <span @click="clearRunScreen()" id="exit">X</span>
+    <h3 @click="clearRunScreen()" id="exit">x</h3>
     <div class="runCommand" v-for="command in runLog">
       {{command["command_description"]}}
       <br>
