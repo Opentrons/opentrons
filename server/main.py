@@ -320,7 +320,7 @@ def connect_robot():
     global robot
     try:
         robot.connect(port, options=options)
-        emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
+        # emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()

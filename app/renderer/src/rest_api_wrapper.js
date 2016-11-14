@@ -143,8 +143,10 @@ class OpenTrons {
       .get(this.pauseProtocolUrl)
       .then((response) => {
         console.log("success", response)
+        return true
       }, (response) => {
         console.log('failed', response)
+        return false
       })
   }
 
@@ -153,8 +155,10 @@ class OpenTrons {
       .get(this.resumeProtocolUrl)
       .then((response) => {
         console.log("success", response)
+        return true
       }, (response) => {
         console.log('failed', response)
+        return false
       })
   }
 
@@ -167,7 +171,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
-  
+
   calibrate(data, type) {
     return Vue.http
       .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})

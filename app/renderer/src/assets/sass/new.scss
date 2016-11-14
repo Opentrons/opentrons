@@ -693,9 +693,8 @@ Buttons
     color:white;
 }
 
-.btn-run{
+.btn-run, .btn-play, .btn-pause, .btn-clear{
     min-width:$btn-size*3;
-    width:98px;
     height: $btn-size;
     margin:$gutter-width;
     line-height: $btn-size;
@@ -710,21 +709,22 @@ Buttons
     }
 }
 
-.btn-play, .btn-pause, .btn-clear{
-    flex:0 0;
-    height: $btn-size;
-    min-width: $btn-size;
-    line-height: 30px;
-    padding:0px 12px;
-    text-align: center;
-    background-color: $primary-brand;
-    border-radius: 6px;
-    text-align: center;
-    color:white;
-    &:hover{
-        background-color: darken($primary-brand, 10%);
-    }
-}
+// .btn-play, .btn-pause, .btn-clear{
+//     flex:0 0;
+//     height: $btn-size;
+//     width:98px;
+//     min-width: $btn-size*3;
+//     line-height: $btn-size;
+//     padding:0px 15px;
+//     text-align: center;
+//     background-color: $primary-brand;
+//     border-radius: 6px;
+//     text-align: center;
+//     color:white;
+//     &:hover{
+//         background-color: darken($primary-brand, 10%);
+//     }
+// }
 
 .btn-pause{
     background: $primary-brand url(../assets/img/pause.png) no-repeat center;
@@ -741,10 +741,10 @@ Buttons
 }
 
 .btn-clear{
-    background: $primary-brand url(../assets/img/clear.png) no-repeat center;
-    &:hover{
-    background: darken($primary-brand,10%) url(../assets/img/clear.png) no-repeat center;
-    }
+    // background: $primary-brand url(../assets/img/clear.png) no-repeat center;
+    // &:hover{
+    // background: darken($primary-brand,10%) url(../assets/img/clear.png) no-repeat center;
+    // }
 }
 
 
@@ -780,7 +780,7 @@ input{
 .save{
     background-color: $call-to-action;
     &:hover{
-       background-color: darken($call-to-action,10%); 
+       background-color: darken($call-to-action,10%);
     }
 }
 

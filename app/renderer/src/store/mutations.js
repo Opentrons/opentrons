@@ -12,13 +12,13 @@ const state = {
   current_increment_placeable: 1,
   current_increment_plunger: 1,
   coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
-  run_state: "ready",
   run_log: [],
   run_length: 0,
   busy: false,
   versions: [],
   uploading: false,
-  running: false
+  running: false,
+  paused: false,
 }
 
 const mutations = {
@@ -70,6 +70,9 @@ const mutations = {
   },
   [types.UPDATE_RUN_LENGTH] (state, payload) {
     state.run_length = payload.commands_total
+  },
+  [types.UPDATE_PAUSED] (state, payload) {
+    state.paused = payload
   }
 }
 

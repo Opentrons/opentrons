@@ -104,26 +104,28 @@ const actions = {
     OpenTrons.runProtocol().then((results) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
       // commit(types.UPDATE_RUNNING, {'running': false})
-      // commit(types.UPDATE_RUN_STATE, results)
     })
   },
   pauseProtocol({ commit }) {
-    OpenTrons.pauseProtocol().then((results) => {
-      console.log(results)
-      // commit(types.UPDATE_RUN_STATE, results)
+    OpenTrons.pauseProtocol().then((was_successful) => {
+      console.log(was_successful)
+      if (was_successful) {
+        commit(types.UPDATE_PAUSED, was_successful)
+      }
     })
   },
   resumeProtocol({ commit }) {
-    OpenTrons.resumeProtocol().then((results) => {
-      console.log(results)
-      // commit(types.UPDATE_RUN_STATE, results)
+    OpenTrons.resumeProtocol().then((was_successful) => {
+      console.log(was_successful)
+      if (was_successful) {
+        commit(types.UPDATE_PAUSED, !was_successful)
+      }
     })
   },
   cancelProtocol({ commit }) {
     OpenTrons.cancelProtocol().then((results) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
       commit(types.UPDATE_RUNNING, {'running': false})
-      // commit(types.UPDATE_RUN_STATE, results)
     })
   },
   moveToPosition ({commit}, data) {
