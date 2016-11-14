@@ -30,7 +30,7 @@
 					<!-- <span class="title">MAX VOL ul</span> -->
 					<input v-model="volume" placeholder="SET MAX VOL">
 					<button @click="maxVolume(currentAxis(), volume)" class="btn-calibrate save">SAVE</button>
-					<button class="btn-calibrate save">{{currentInstrument().max_volume}}ul</button>
+					<span class="title">{{currentInstrument().max_volume}}ul</span>
 				</section>
 			</div>
 			<div class="pipette-diagrams" v-bind:class="currentMode">
