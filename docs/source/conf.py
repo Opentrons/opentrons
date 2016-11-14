@@ -148,6 +148,7 @@ html_theme_options = {
     'github_button': 'True',
     'description': 'Simple Biology Lab Protocol Coding',
     'link': '#006FFF',
+    'link_hover': '#05C1B3',
     'sidebar_list': '#05C1B3',
     'sidebar_link_underscore': '#DDDDDD'
 }

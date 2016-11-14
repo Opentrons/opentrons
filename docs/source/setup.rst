@@ -62,7 +62,8 @@ If you are not using Anaconda copy and paste the following code into the first c
 
 After this step you should be able to run:
 
-::
+.. code-block:: bash
+
   import opentrons
   opentrons.__version__
 
