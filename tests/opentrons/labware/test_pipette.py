@@ -519,10 +519,10 @@ class PipetteTest(unittest.TestCase):
         self.robot.simulate()
 
         self.assertEqual(
-            self.p200.move_to.mock_calls,
+            self.p200.placeables,
             [
-                self.build_move_to_bottom(self.tiprack1[0]),
-                self.build_move_to_bottom(self.tiprack1[1])
+                self.tiprack1[0],
+                self.tiprack1[1]
             ]
         )
 
@@ -587,16 +587,16 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+            expected.append(self.tiprack1[i])
         for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
+            expected.append(self.tiprack2[i])
         for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+            expected.append(self.tiprack1[i])
         for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
+            expected.append(self.tiprack2[i])
 
         self.assertEqual(
-            self.p200.move_to.mock_calls,
+            self.p200.placeables,
             expected
         )
 
@@ -621,16 +621,16 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
+            expected.append(self.tiprack1.rows[i])
         for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
+            expected.append(self.tiprack2.rows[i])
         for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
+            expected.append(self.tiprack1.rows[i])
         for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
+            expected.append(self.tiprack2.rows[i])
 
         self.assertEqual(
-            p200_multi.move_to.mock_calls,
+            p200_multi.placeables,
             expected
         )
 
@@ -656,20 +656,14 @@ class PipetteTest(unittest.TestCase):
             well.bottom(), enqueue=False, strategy='arc')
 
     def test_drop_tip_to_trash(self):
-        self.p200.move_to = mock.Mock()
-
         self.p200.pick_up_tip()
         self.p200.drop_tip()
         self.robot.simulate()
 
         self.assertEqual(
-            self.p200.move_to.mock_calls,
+            self.p200.placeables,
             [
-                mock.call(
-                    self.tiprack1[0].bottom(), enqueue=False, strategy='arc'),
-                mock.call(
-                    self.trash.bottom(self.p200._drop_tip_offset),
-                    enqueue=False,
-                    strategy='arc')
+                self.tiprack1[0],
+                self.trash
             ]
         )

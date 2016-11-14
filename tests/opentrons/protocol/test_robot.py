@@ -55,7 +55,10 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             nonlocal res
-            res = self.robot.run()
+            try:
+                self.robot.run()
+            except:
+                pass
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -64,7 +67,7 @@ class RobotTest(unittest.TestCase):
 
         thread.join()
 
-        self.assertEquals(res[-1], 'Stop signal received')
+        self.assertEquals(self.robot.get_warnings()[-1], 'Stop signal received')
 
     def test_calibrated_max_dimension(self):
 
