@@ -1,6 +1,6 @@
 <template>
 	<section id="task-pipette" >
-		<h1 class="title">Calibrate the {{currentInstrument().label}} pipette on axis {{currentInstrument().axis}} </h1>
+		<h1 class="title">Calibrate the {{currentInstrument().label}} pipette on axis {{currentInstrument().axis | capitalize}} </h1>
 		<span>
 			<div class="calibrate-pipette">
 				<section class="calibrate top" @mouseenter="toggleMode('top')">
@@ -58,6 +58,13 @@
         volume : null
       }
     },
+    filters: {
+    capitalize: function (value) {
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
+	    }
+	  },
     methods: {
 			currentAxis() {
 				return this.$route.params.instrument
@@ -95,10 +102,10 @@
 			},
 			currentInstrument() {
 				return this.$store.state.tasks.filter((instrument) => {
-					return instrument.axis == this.$route.params.instrument
-				})[0]
-			}
-    },
+						return instrument.axis == this.$route.params.instrument
+					})[0]
+				}
+	    },
 		created: function() {
 			if (this.$store.state.tasks) {
 				this.$store.dispatch("loadProtocol")
