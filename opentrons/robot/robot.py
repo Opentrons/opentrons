@@ -701,23 +701,25 @@ class Robot(object, metaclass=Singleton):
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
+        cmd_run_event['name'] = 'command-run'
         for i, command in enumerate(self._commands):
             cmd_run_event.update({
                 'command_description': command.description,
-                'command_index': i
+                'command_index': i,
+                'commands_total': len(self._commands)
             })
+            trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
                 if command.description:
                     log.info("Executing: {}".format(command.description))
                 command()
-                # emit command was done...
-                cmd_run_event['name'] = 'command-run',
-                trace.EventBroker.get_instance().notify(cmd_run_event)
             except Exception as e:
-                cmd_run_event['name'] = 'command-failed',
-                cmd_run_event['error'] = str(e),
-                trace.EventBroker.get_instance().notify(cmd_run_event)
+                trace.EventBroker.get_instance().notify({
+                    'mode': mode,
+                    'name': 'command-failed',
+                    'error': str(e)
+                })
                 self.add_warning(str(e))
                 break
 
