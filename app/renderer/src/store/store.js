@@ -42,7 +42,9 @@ function createWebSocketPlugin(socket) {
       }
       if (data.name == 'command-run') {
         if (data.caller === 'ui') {
+          // console.log(data)
           store.commit(types.UPDATE_RUN_LOG, data)
+          store.commit(types.UPDATE_RUN_LENGTH, data)
         }
       }
       if (data.name == 'notification') {

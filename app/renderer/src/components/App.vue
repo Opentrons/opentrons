@@ -72,6 +72,18 @@
           let version = response.body.version
           version ? this.version = version : this.version = "2.?.?"
       })
+      window.addEventListener("dragover", function(e) {
+        e = e || event;
+        if (e.target.tagName != "INPUT") {
+          e.preventDefault();
+        }
+      }, false);
+      window.addEventListener("drop", function(e) {
+        e = e || event;
+        if (e.target.tagName != "INPUT") {
+          e.preventDefault();
+        }
+      }, false);
     }
   }
 </script>

@@ -17,11 +17,11 @@ p10 = instruments.Pipette(
     name="p10",
     tip_racks=[tiprack],
     min_volume=1,  # These are variable
+    max_volume=10,  # These are variable
     axis="b",
     channels=1
 )
 
-p10.set_max_volume(10)
 p10.pick_up_tip(tiprack[0])
 p10.aspirate(5, plate[0])
 p10.dispense(5, plate[11])
