@@ -43,6 +43,7 @@ XYZ
 ^^^^^^^^^^^^^^^^^^^^
 
 Move in the X, Y and Z by selecting your desired increment, and then clicking an arrow button.
+
 **screenshot pipette jog**
 
 Slot Button
@@ -53,12 +54,16 @@ New to 2.0, the slot button moves exactly one slot over in either X or Y, depend
 AB Plungers
 ^^^^^^^^^^^^^^^^^^^^
 
+Use the plunger jog to move the plunger up and down.  If you have selected a container or the pipette for the B axis, then the B axis will move, and if you have selected a container or the pipette for the A axis, it will move.   
 
 **screenshot plunger jog**
 
-Move To
+The app automatically toggles between pipettes (unlike 1.2)
+
+Move to Slot
 ^^^^^^^^^^^^^^^^^^^^
 
+Jump to any slot on the deck with the Move to Slot buttons.  The deck will automatically react and change between a 3x5 layout and a 2x5 layout based on which robot you are connected to (Hood vs. Pro/Standard)
 
 Calibrate
 --------------------
