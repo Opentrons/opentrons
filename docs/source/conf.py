@@ -138,6 +138,7 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'travis_button': 'True',
+    'font_size': '14px',
     'font_family': 'Open Sans',
     'head_font_family': 'AkkoPro-Regular',
     'sidebar_collapse': 'True',
