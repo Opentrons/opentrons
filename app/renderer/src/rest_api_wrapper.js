@@ -9,7 +9,6 @@ class OpenTrons {
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
     this.jogUrl = this.base_url + '/jog'
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
-    this.runPlanUrl = this.base_url + '/run-plan'
     this.runProtocolUrl = this.base_url + '/run'
     this.jogToContainerUrl = this.base_url + '/move_to_container'
     this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
@@ -129,18 +128,6 @@ class OpenTrons {
       })
   }
 
-  getRunPlan () {
-    return Vue.http
-      .get(this.runPlanUrl)
-      .then((response) => {
-        if (response.body.status == 'success') {
-          return response.body.data || []
-        }
-        return []
-      }, (response) => {
-        console.log('failed', response)
-      })
-  }
   runProtocol () {
     return Vue.http
       .get(this.runProtocolUrl)
@@ -150,6 +137,7 @@ class OpenTrons {
         console.log("Protocol run failed to execute", response)
       })
   }
+
   pauseProtocol () {
     return Vue.http
       .get(this.pauseProtocolUrl)
@@ -159,6 +147,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+
   resumeProtocol () {
     return Vue.http
       .get(this.resumeProtocolUrl)
@@ -168,6 +157,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+
   cancelProtocol () {
     return Vue.http
       .get(this.cancelProtocolUrl)
@@ -177,6 +167,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+  
   calibrate(data, type) {
     return Vue.http
       .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})

@@ -34,14 +34,11 @@ const actions = {
       } else {
         tasks = []
       }
-      OpenTrons.getRunPlan().then((plan) => {
-        commit(types.UPDATE_RUN_PLAN, {run_plan: plan})
-        commit(types.UPDATE_WARNINGS, {warning: result.warnings})
-        commit(types.UPDATE_ERROR, {errors: result.errors})
-        commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-        commit(types.UPLOADING, {'uploading': false})
-        commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
-      })
+      commit(types.UPDATE_WARNINGS, {warning: result.warnings})
+      commit(types.UPDATE_ERROR, {errors: result.errors})
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+      commit(types.UPLOADING, {'uploading': false})
+      commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
     })
   },
   loadProtocol ({commit}) {
@@ -93,11 +90,6 @@ const actions = {
        console.log('failed', response)
     })
   },
-  getRunPlan({ commit }) {
-    OpenTrons.getRunPlan().then((results) => {
-      commit(types.UPDATE_RUN_PLAN, results)
-    })
-  },
   runProtocol({ commit }) {
     commit(types.UPDATE_RUNNING, {'running': true})
     commit(types.RESET_RUN_LOG)
@@ -122,7 +114,8 @@ const actions = {
   },
   cancelProtocol({ commit }) {
     OpenTrons.cancelProtocol().then((results) => {
-      console.log(results)
+      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+      commit(types.UPDATE_RUNNING, {'running': false})
       // commit(types.UPDATE_RUN_STATE, results)
     })
   },

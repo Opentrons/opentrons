@@ -320,8 +320,8 @@ def connect_robot():
         robot.connect(port, options=options)
         emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
         for i in range(0,4):
-            robot.move_head(z=-1, mode="relative")
             robot.move_head(z=1, mode="relative")
+            robot.move_head(z=-1, mode="relative")
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -822,14 +822,6 @@ def calibrate_plunger():
         }
     })
 
-
-@app.route("/run-plan")
-def get_run_plan():
-    global robot
-    return flask.jsonify({
-        'status': 'success',
-        'data': [i.description for i in robot._commands]
-    })
 
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the

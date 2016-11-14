@@ -14,7 +14,7 @@ const state = {
   coordinates: {"x":0, "y":0, "z":0, "a":0, "b":0},
   run_state: "ready",
   run_log: [],
-  run_plan: [],
+  run_length: 0,
   busy: false,
   versions: [],
   uploading: false,
@@ -53,9 +53,6 @@ const mutations = {
   [types.UPDATE_RUN_LOG] (state, payload) {
     state.run_log.push(payload)
   },
-  [types.UPDATE_RUN_PLAN] (state, payload) {
-    state.run_plan = payload.run_plan
-  },
   [types.UPDATE_POSITION] (state, payload) {
     state.coordinates = payload
   },
@@ -70,6 +67,9 @@ const mutations = {
   },
   [types.UPDATE_RUNNING] (state, payload) {
     state.running = payload.running
+  },
+  [types.UPDATE_RUN_LENGTH] (state, payload) {
+    state.run_length = payload.commands_total
   }
 }
 
