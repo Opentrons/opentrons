@@ -317,9 +317,11 @@ def connect_robot():
 
     global robot
     try:
-        robot.connect(
-            port, options=options)
+        robot.connect(port, options=options)
         emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
+        for i in range(0,4):
+            robot.move_head(z=-1, mode="relative")
+            robot.move_head(z=1, mode="relative")
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
