@@ -385,7 +385,7 @@ First, you can use the print command (a basic python command) to print well loca
 
 This is useful when trying to determine if the location you're calling is actually the location you want, or if something is iterating properly (more on iteration later)
 
-Robot.Commands()
+Getting Robot Commands
 ^^^^^^^^^^^^^^^^
 
 Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.
