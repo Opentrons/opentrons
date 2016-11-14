@@ -11,7 +11,8 @@ describe('Home.vue', () => {
       ...Home
     }).$mount('#app')
     console.log(vm.$el)
-    expect(vm.$el.querySelector('nav').hasChildNodes()).to.equal(true)
-    expect(vm.$el.querySelector('nav').textContent.to.equal('Home: ')
+    console.log(vm.$el.querySelector)
+    expect(vm.$el.querySelector('nav.home').hasChildNodes()).to.equal(true)
+    expect(vm.$el.querySelector('nav').textContent).to.equal('Home: ')
   })
 })

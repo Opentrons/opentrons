@@ -5,11 +5,14 @@ import ConnectComponent from '../../../../app/renderer/src/components/Connect.vu
 
 
 // TODO: Figure out how to get inject-loader to work...
-// const ConnectInjector = require('!!vue?inject!../../../../app/renderer/src/components/Connect.vue')
-// const ConnectMock = ConnectInjector({}
-// '../rest_api_wrapper': {
-//     get
-// )
+const ConnectInjector = require('!!vue?inject!../../../../app/renderer/src/components/Connect.vue')
+const ConnectMock = ConnectInjector({
+  '../rest_api_wrapper': {
+    OpenTrons: function () {
+      console.log('INJECT MOCK CALLED...')
+    }
+  }
+})
 
 
 describe('Connect Component', () => {
