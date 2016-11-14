@@ -1,6 +1,6 @@
 <template>
 	<section id="task-pipette" >
-		<h1 class="title">Calibrate the p10 pipette</h1>
+		<h1 class="title">Calibrate the {{currentInstrument().label}} pipette</h1>
 		<span>
 			<div class="calibrate-pipette">
 				<section class="calibrate top" @mouseenter="toggleMode('top')">
@@ -28,8 +28,9 @@
 				</section>
 				<section class="calibrate volume">
 					<!-- <span class="title">MAX VOL ul</span> -->
-						<input v-model="volume" placeholder="SET MAX VOL">
+					<input v-model="volume" placeholder="SET MAX VOL">
 					<button @click="maxVolume(currentAxis(), volume)" class="btn-calibrate save">SAVE</button>
+					<button class="btn-calibrate save">{{currentInstrument().max_volume}}ul</button>
 				</section>
 			</div>
 			<div class="pipette-diagrams" v-bind:class="currentMode">
@@ -91,6 +92,11 @@
 					return instrument.axis == this.$route.params.instrument
 				})[0]
 				return typeof(instrument[position]) == "number" ? true : false
+			},
+			currentInstrument() {
+				return this.$store.state.tasks.filter((instrument) => {
+					return instrument.axis == this.$route.params.instrument
+				})[0]
 			}
     },
 		created: function() {
