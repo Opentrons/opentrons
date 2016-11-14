@@ -67,7 +67,8 @@ class RobotTest(unittest.TestCase):
 
         thread.join()
 
-        self.assertEquals(self.robot.get_warnings()[-1], 'Stop signal received')
+        self.assertEquals(
+            self.robot.get_warnings()[-1], 'Stop signal received')
 
     def test_calibrated_max_dimension(self):
 
