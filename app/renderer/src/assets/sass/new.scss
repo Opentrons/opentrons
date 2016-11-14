@@ -83,6 +83,9 @@ header#home-connect {
             text-align: center;
             color:white;
             cursor:pointer;
+            &:hover{
+                 background-color: darken($primary-brand, 10%);
+            }
         }
     }
     .brand{
@@ -311,6 +314,9 @@ aside#jog {
                 background-color: $btn-jog;
                 &.y.up{
                 margin: $gutter-width 36px;
+                }
+                &:hover{
+                    background-color: darken($btn-jog, 10%);
                 }
             }
         span.xy{
@@ -699,6 +705,9 @@ Buttons
     text-align: center;
     color:white;
     background-color: $primary-brand;
+    &:hover{
+        background-color: darken($primary-brand, 10%);
+    }
 }
 
 .btn-play, .btn-pause, .btn-clear{
@@ -712,18 +721,30 @@ Buttons
     border-radius: 6px;
     text-align: center;
     color:white;
+    &:hover{
+        background-color: darken($primary-brand, 10%);
+    }
 }
 
 .btn-pause{
     background: $primary-brand url(../assets/img/pause.png) no-repeat center;
+    &:hover{
+    background: darken($primary-brand,10%) url(../assets/img/pause.png) no-repeat center;
+    }
 }
 
 .btn-play{
     background: $primary-brand url(../assets/img/play.png) no-repeat center;
+    &:hover{
+    background: darken($primary-brand,10%) url(../assets/img/play.png) no-repeat center;
+    }
 }
 
 .btn-clear{
     background: $primary-brand url(../assets/img/clear.png) no-repeat center;
+    &:hover{
+    background: darken($primary-brand,10%) url(../assets/img/clear.png) no-repeat center;
+    }
 }
 
 
@@ -758,10 +779,16 @@ input{
 
 .save{
     background-color: $call-to-action;
+    &:hover{
+       background-color: darken($call-to-action,10%); 
+    }
 }
 
 .move-to, .pick-tip{
     background-color: $primary-brand;
+    &:hover{
+        background-color: darken($primary-brand, 10%);
+    }
 }
 
 
