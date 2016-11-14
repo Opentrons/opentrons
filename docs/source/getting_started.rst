@@ -18,7 +18,7 @@ Before running any code, you need to install the Opentrons API in your jupyter n
 
 .. code-block:: bash
 	
-	!pip install --upgrade git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
+	!pip install --upgrade opentrons
 
 Now that you've installed Opentrons API on your computer, you have access to a variety of robot container and instrument commands. You need to import them to each project (protocol) in order to access these commands.  Unlike the install, this set of imports needs to be done at the start of each protocol.
 

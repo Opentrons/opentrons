@@ -1,0 +1,87 @@
+Results of doctest builder run on 2016-11-14 15:13:48
+=====================================================
+
+Document: index
+---------------
+2 items passed all tests:
+   1 tests in index_long
+   6 tests in index_main
+7 tests in 2 items.
+7 passed and 0 failed.
+Test passed.
+
+Document: api
+-------------
+1 items passed all tests:
+  87 tests in default
+87 tests in 1 items.
+87 passed and 0 failed.
+Test passed.
+
+Document: well_access
+---------------------
+1 items passed all tests:
+   9 tests in main
+9 tests in 1 items.
+9 passed and 0 failed.
+Test passed.
+
+Document: getting_started
+-------------------------
+**********************************************************************
+File "getting_started.rst", line 26, in main (setup code)
+Failed example:
+    from opentrons import robot, instruments, containers
+    robot.reset()
+    i = 0
+
+    p200 = instruments.Pipette(
+                  name="p200",
+                  trash_container=trash,
+                  tip_racks=[tiprack],
+                  min_volume=20,
+                  max_volume=200,
+                  axis="b",
+                  channels=1
+          )
+Exception raised:
+    Traceback (most recent call last):
+      File "/Users/andysigler/.pyenv/versions/3.5.1/lib/python3.5/doctest.py", line 1320, in __run
+        compileflags, 1), test.globs)
+      File "<doctest main (setup code)[0]>", line 7, in <module>
+        trash_container=trash,
+    NameError: name 'trash' is not defined
+**********************************************************************
+1 items had failures:
+   1 of   1 in main (setup code)
+***Test Failed*** 1 failures.
+
+Document: tips_and_tricks
+-------------------------
+2 items passed all tests:
+   1 tests in tips_demo
+   4 tests in tips_main
+5 tests in 2 items.
+5 passed and 0 failed.
+Test passed.
+2 items passed all tests:
+   1 tests in tips_demo (cleanup code)
+   1 tests in tips_main (cleanup code)
+2 tests in 2 items.
+2 passed and 0 failed.
+Test passed.
+
+Document: module
+----------------
+1 items passed all tests:
+   5 tests in main
+5 tests in 1 items.
+5 passed and 0 failed.
+Test passed.
+
+Doctest summary
+===============
+  113 tests
+    0 failures in tests
+    1 failure in setup code
+    0 failures in cleanup code
