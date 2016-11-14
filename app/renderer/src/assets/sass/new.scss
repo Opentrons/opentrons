@@ -489,9 +489,10 @@ Run Screen
   .runCommand {
     //background-color: $well-bg;
     padding-bottom: 16px;
+    margin: 25px;
     &:last-child {
       color: $primary-brand;
-      background-color: $call-to_action;
+      // background-color: $call-to_action;
     }
   }
   #exit {
@@ -757,7 +758,6 @@ input{
 
 .save{
     background-color: $call-to-action;
-
 }
 
 .move-to, .pick-tip{
