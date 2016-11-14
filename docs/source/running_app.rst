@@ -68,17 +68,34 @@ Jump to any slot on the deck with the Move to Slot buttons.  The deck will autom
 Calibrate
 --------------------
 
+Once each container or pipette is calibrated, a check mark will appear next to it in the container list.
+
+Tipracks
+^^^^^^^^^^^^^^^^^^^^
+
+Jog the pipette down into the first tip in the tip rack.  It should be firmly pushed into the tip, and the pick up tip button can be used to test its seating.
+
+Calling the pick up tip button from anywhere on the deck will direct the robot back to the tiprack to pick up a tip.  Drop tip will send the tip to the trash.
+
 Containers
 ^^^^^^^^^^^^^^^^^^^^
+
+With a tip on the pipette, calibrate to the bottom of the first well or tube in the container. Use the diagrams in the app to guide calibration.
 
 Pipettes
 ^^^^^^^^^^^^^^^^^^^^
 
+Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.  
+
+**screengrab pipette calibrations**
+
+Once these positions are all saved, you can test your calibrations. This is most easily done gravimetrically using a small scale. Use the aspirate and dispense buttons to pick up liquid and eject it onto the scale. If this volume isn't exactly what you expect, maybe 203 uL instead of 200, no big deal! You can go input the value into the max volume box. The robot will adjust its calculations accordingly and will then be able to dispense the correct volumes during experiments.
+
+The drop tip screw may need to be adjusted up or down if you cannot accurately calibrate Bottom.
+
 Run Protocol
 --------------------
 
-Run
-^^^^^^^^^^^^^^^^^^^^
+Once all your positions are saved, you can run your protocol.  A progress will keep track of what percentage of your protocol has been done.  Protocols can be paused, or they can be stopped entirely.  We recommend homing after all protocols have been completed or stopped.
 
-Pause & Stop
-^^^^^^^^^^^^^^^^^^^^
+**screengrab run buttons**
