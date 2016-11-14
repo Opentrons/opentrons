@@ -1,7 +1,7 @@
 .. _getting_started:
 
 ===============
-Getting Started
+Writing a Protocol
 ===============
 
 Welcome to the API (Application Program Interface).  These tutorials assume no base knowledge of python. We recommend installing the Jupyter notebook to run Opentrons API before attempting these examples. Please refer to :ref:`setup` for detailed instructions.

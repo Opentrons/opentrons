@@ -1,7 +1,7 @@
 .. _setup:
 
 ================================
-Setting Up Jupyter
+Setting Up Code Environment
 ================================
 
 Jupyter Code Environment

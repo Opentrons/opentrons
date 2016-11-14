@@ -14,7 +14,7 @@ Connect to Robot
 
 Make sure your robot is turned on, and your laptop is connected via USB cable.
 
-Mac
+Mac OSX
 ^^^^^^^^^^^^^^^^^^^^
 
 Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.  
@@ -22,7 +22,7 @@ Go to the select port drop down, and refresh if no ports are shown.  Once the po
 ** screenshot button with mac drop down**
 
 
-Windows
+Windows 10
 ^^^^^^^^^^^^^^^^^^^^
 
 ** screenshot button with windows down**
