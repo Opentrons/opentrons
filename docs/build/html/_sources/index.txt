@@ -14,8 +14,8 @@
       'A1',             # slot
       'tiprack-test-setup'         # user-defined name
   )
-  plate = containers.load('96-flat', 'B1', 'plate')
-  trough = containers.load('trough-12row', 'B2', 'trough')
+  plate = containers.load('96-flat', 'B1', 'plate-for-test')
+  trough = containers.load('trough-12row', 'B2', 'trough-for-test')
 
   tube_1 = plate[0]
   tube_2 = plate[1]
@@ -112,35 +112,30 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
 
 .. testcode:: index_long
 
-  # First, import opentrons API modules
   from opentrons import robot
   from opentrons import containers, instruments
 
-  # Load a tip rack and assign it to a variable
   tiprack = containers.load(
       'tiprack-200ul',  # container type
       'A1',             # slot
       'tiprack'         # user-defined name
   )
-  # Load a plate
-  plate = containers.load('96-flat', 'B1', 'plate-for-test')
+
+  plate = containers.load('96-flat', 'B1', 'plate')
   
-  # Initialize a pipette    
   p200 = instruments.Pipette(
       axis="b",
       max_volume=200
   )
 
-  p200.pick_up_tip(tiprack[0])  # pick up tip from position 0 in a tip rack
+  p200.pick_up_tip(tiprack[0])
 
-  # loop through 95 wells, transferring to the next
   for i in range(95):
       p200.aspirate(100, plate[i])
-      p200.dispense(plate[i + 1]).blow_out().touch_tip()
+      p200.dispense(plate[i + 1])
 
-  # return tip to back to position 0 in a tip rack
   p200.return_tip()
-  # simulate a protocol run on a virtual robot
+
   robot.simulate()
 
 Table of Contents
