@@ -5,8 +5,7 @@
 
 .. testsetup:: index_main
 
-  from opentrons import robot
-  from opentrons import containers, instruments
+  from opentrons import robot, containers, instruments
 
   robot.reset()             # clear robot's state first
 
@@ -124,14 +123,14 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
       'tiprack'         # user-defined name
   )
   # Load a plate
-  plate = containers.load('96-flat', 'B1', 'plate')
+  plate = containers.load('96-flat', 'B1', 'plate-for-test')
   
   # Initialize a pipette    
   p200 = instruments.Pipette(
-      axis="b"
+      axis="b",
+      max_volume=200
   )
 
-  p200.set_max_volume(200)  # volume calibration, can be called whenever you want
   p200.pick_up_tip(tiprack[0])  # pick up tip from position 0 in a tip rack
 
   # loop through 95 wells, transferring to the next
@@ -143,8 +142,6 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
   p200.return_tip()
   # simulate a protocol run on a virtual robot
   robot.simulate()
-  # robot.connect('/dev/tty.usbserialNNNN')  # connect to the robot
-  # robot.run()                              # to run on a physical robot
 
 Table of Contents
 -----------------

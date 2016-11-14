@@ -151,14 +151,14 @@ For example:</p>
     <span class="s1">&#39;tiprack&#39;</span>         <span class="c1"># user-defined name</span>
 <span class="p">)</span>
 <span class="c1"># Load a plate</span>
-<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;plate&#39;</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;plate-for-test&#39;</span><span class="p">)</span>
 
 <span class="c1"># Initialize a pipette</span>
 <span class="n">p200</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
-    <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;b&quot;</span>
+    <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
+    <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span>
 
-<span class="n">p200</span><span class="o">.</span><span class="n">set_max_volume</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>  <span class="c1"># volume calibration, can be called whenever you want</span>
 <span class="n">p200</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># pick up tip from position 0 in a tip rack</span>
 
 <span class="c1"># loop through 95 wells, transferring to the next</span>
@@ -170,8 +170,6 @@ For example:</p>
 <span class="n">p200</span><span class="o">.</span><span class="n">return_tip</span><span class="p">()</span>
 <span class="c1"># simulate a protocol run on a virtual robot</span>
 <span class="n">robot</span><span class="o">.</span><span class="n">simulate</span><span class="p">()</span>
-<span class="c1"># robot.connect(&#39;/dev/tty.usbserialNNNN&#39;)  # connect to the robot</span>
-<span class="c1"># robot.run()                              # to run on a physical robot</span>
 </pre></div>
 </div>
 </div>
