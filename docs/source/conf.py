@@ -139,7 +139,7 @@ html_theme = 'alabaster'
 html_theme_options = {
     'travis_button': 'True',
     'font_family': 'Open Sans',
-    'head_font_family': 'AkkoPro-Regular',
+    'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
     'logo': 'logo.png',
     'fixed_sidebar': 'True',
