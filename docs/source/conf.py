@@ -140,7 +140,7 @@ html_theme_options = {
     'travis_button': 'True',
     'font_family': 'Open Sans',
     'head_font_family': 'AkkoPro-Regular',
-    # 'sidebar_collapse': 'True',
+    'sidebar_collapse': 'True',
     'logo': 'logo.png',
     'fixed_sidebar': 'True',
     'github_user': 'OpenTrons',

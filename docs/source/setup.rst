@@ -1,7 +1,7 @@
 .. _setup:
 
 ================================
-Running Opentrons API
+Setting Up Jupyter
 ================================
 
 Jupyter Code Environment
@@ -12,12 +12,12 @@ Jupyter is an interactive programming environment that runs in the browser. Jupy
 Install Anaconda and Python 3
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install Anaconda_: (https://www.continuum.io/downloads) before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
+To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install `Anaconda`_ before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
 Install Jupyter
 ^^^^^^^^^^^^^^^
 
-After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official [Jupyter Installation Guide](http://jupyter.readthedocs.io/en/latest/install.html).
+After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official `Jupyter Installation Guide`_.
 
 Launch Jupyter Notebook App
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,4 +70,10 @@ Which should return the version of opentrons package installed.
 
 If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
 
-If you want to learn more about Jupyter Notebook Navigation [check this out](http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb):
+If you want to learn more about Jupyter Notebook Navigation `check this out`_. 
+
+.. _Anaconda: https://www.continuum.io/downloads
+
+.. _Jupyter Installation Guide: http://jupyter.readthedocs.io/en/latest/install.html
+
+.. _check this out: http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb
