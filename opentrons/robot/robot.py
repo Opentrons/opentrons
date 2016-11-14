@@ -11,7 +11,6 @@ from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
@@ -695,37 +694,39 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event = {}
         cmd_run_event.update(kwargs)
 
-        mode = 'live'
-        if isinstance(self._driver.connection,
-                      virtual_smoothie.VirtualSmoothie):
-            mode = 'simulate'
+        mode = kwargs.get('mode', 'live')
 
         cmd_run_event['mode'] = mode
         cmd_run_event['name'] = 'command-run'
         for i, command in enumerate(self._commands):
-            cmd_run_event.update({
-                'command_description': command.description,
-                'command_index': i,
-                'commands_total': len(self._commands)
-            })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
+            if mode == 'live':
+                cmd_run_event.update({
+                    'command_description': command.description,
+                    'command_index': i,
+                    'commands_total': len(self._commands)
+                })
+                trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
                 if command.description:
                     log.info("Executing: {}".format(command.description))
-                command()
+                if command.setup:
+                    command.setup()
+                if kwargs.get('do', True):
+                    command.do()
             except Exception as e:
-                trace.EventBroker.get_instance().notify({
-                    'mode': mode,
-                    'name': 'command-failed',
-                    'error': str(e)
-                })
+                if mode == 'live':
+                    trace.EventBroker.get_instance().notify({
+                        'mode': mode,
+                        'name': 'command-failed',
+                        'error': str(e)
+                    })
                 self.add_warning(str(e))
-                break
+                raise e
 
         return self._runtime_warnings
 
-    def simulate(self, switches=False):
+    def simulate(self, switches=False, do=True):
         """
         Simulate a protocol run on a virtual robot.
 
@@ -745,7 +746,7 @@ class Robot(object, metaclass=Singleton):
         for instrument in self._instruments.values():
             instrument.setup_simulate()
 
-        self.run()
+        self.run(mode='simulate', do=do)
 
         self.set_connection('live')
 
