@@ -169,6 +169,7 @@ def load():
 
 def emit_notifications(notifications, _type):
     for notification in notifications:
+        print(notification)
         socketio.emit('event', {
             'name': 'notification',
             'text': notification,
@@ -190,12 +191,14 @@ def _run_commands():
             error = "This protocol does not contain any commands for the robot."
             api_response['errors'] = [error]
     except Exception as e:
+        print("EXCEPTION")
+        print(str(e))
         api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings() or []
     api_response['name'] = 'run exited'
     end_time = time.time()
-    # emit_notifications(api_response['warnings'], 'warning')
+    emit_notifications(api_response['warnings'], 'warning')
     emit_notifications(api_response['errors'], 'danger')
     seconds = end_time - start_time
     minutes, seconds = divmod(seconds, 60)
@@ -316,9 +319,8 @@ def connect_robot():
 
     global robot
     try:
-        robot.connect(
-            port, options=options)
-        emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
+        robot.connect(port, options=options)
+        # emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -819,14 +821,6 @@ def calibrate_plunger():
         }
     })
 
-
-@app.route("/run-plan")
-def get_run_plan():
-    global robot
-    return flask.jsonify({
-        'status': 'success',
-        'data': [i.description for i in robot._commands]
-    })
 
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the

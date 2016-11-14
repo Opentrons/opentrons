@@ -83,6 +83,9 @@ header#home-connect {
             text-align: center;
             color:white;
             cursor:pointer;
+            &:hover{
+                 background-color: darken($primary-brand, 10%);
+            }
         }
     }
     .brand{
@@ -107,7 +110,7 @@ header#home-connect {
             line-height: 35px;
         }
     }
-    
+
 
     nav.connect{
         width:350px;
@@ -201,7 +204,7 @@ section.protocol {
         flex-wrap:wrap;
         height: 45px;
         padding:10px;
-        
+
         span{
             font-size: 14px;
             text-align: left;
@@ -211,15 +214,15 @@ section.protocol {
             &.title{
                 font-weight: 800;
             }
-            &.info{   
+            &.info{
                 font-size: 13px;
-                font-family: "open-sans"; 
-                line-height: 22px;            
+                font-family: "open-sans";
+                line-height: 22px;
                 width: 100px;
                 height:22px;
                 white-space: nowrap;
                 overflow: hidden;
-                text-overflow: ellipsis;                   
+                text-overflow: ellipsis;
             }
         }
     }
@@ -235,7 +238,7 @@ section.protocol {
             flex:0 0 121px;
             &.info{
                 font-size: 13px;
-                font-family: "open-sans"; 
+                font-family: "open-sans";
             }
             &.title{
                 font-weight: 800;
@@ -269,6 +272,8 @@ section.protocol {
         }
     }
 }
+
+
 
 //main content wrapper
 main#container {
@@ -310,6 +315,9 @@ aside#jog {
                 &.y.up{
                 margin: $gutter-width 36px;
                 }
+                &:hover{
+                    background-color: darken($btn-jog, 10%);
+                }
             }
         span.xy{
             width: 102px;
@@ -349,7 +357,7 @@ aside#jog {
         justify-content:space-around;
     }
     span.increment-plunger{
-        
+
 
         margin-left:50px;
         width:160px;
@@ -374,9 +382,9 @@ aside#jog {
             h3.plunger{
             width:200px;
             padding-left:8px;
-            
+
             }
-            
+
         }
         #increment-xyz, #increment-plunger{
             div{
@@ -425,10 +433,10 @@ aside#jog {
               transition:background-color 0.4s linear;
             }
         }
-    
 
-    
-    
+
+
+
     #deck{
         display: flex;
         justify-content:center;
@@ -470,6 +478,37 @@ section#task-pane {
     align-items: center;
     border: 2px solid $well-bg;
     border-radius: 6px;
+}
+
+/******************************
+Run Screen
+******************************/
+.runScreen {
+  overflow-y: scroll;
+  height: 536px;
+  width: 710px;
+  font-size: 16px;
+  border: 2px solid $well-bg;
+  border-radius: 6px;
+  position:relative;
+  margin-left: 10px;
+  .runCommand {
+    //background-color: $well-bg;
+    padding-bottom: 16px;
+    margin: 25px;
+    &:last-child {
+      color: $primary-brand;
+      // background-color: $call-to_action;
+    }
+  }
+  #exit {
+    position: static;
+    top: auto;
+    padding-left: 685px;
+    padding-right: 5px;
+    cursor: pointer;
+    color: $secondary-brand;
+  }
 }
 
 
@@ -654,9 +693,8 @@ Buttons
     color:white;
 }
 
-.btn-run{
+.btn-run, .btn-play, .btn-pause, .btn-clear{
     min-width:$btn-size*3;
-    width:98px;
     height: $btn-size;
     margin:$gutter-width;
     line-height: $btn-size;
@@ -666,31 +704,47 @@ Buttons
     text-align: center;
     color:white;
     background-color: $primary-brand;
+    &:hover{
+        background-color: darken($primary-brand, 10%);
+    }
 }
 
-.btn-play, .btn-pause, .btn-clear{
-    flex:0 0;
-    height: $btn-size;
-    min-width: $btn-size;
-    line-height: 30px;
-    padding:0px 12px;
-    text-align: center;
-    background-color: $primary-brand;
-    border-radius: 6px;
-    text-align: center;
-    color:white;
-}
+// .btn-play, .btn-pause, .btn-clear{
+//     flex:0 0;
+//     height: $btn-size;
+//     width:98px;
+//     min-width: $btn-size*3;
+//     line-height: $btn-size;
+//     padding:0px 15px;
+//     text-align: center;
+//     background-color: $primary-brand;
+//     border-radius: 6px;
+//     text-align: center;
+//     color:white;
+//     &:hover{
+//         background-color: darken($primary-brand, 10%);
+//     }
+// }
 
 .btn-pause{
     background: $primary-brand url(../assets/img/pause.png) no-repeat center;
+    &:hover{
+    background: darken($primary-brand,10%) url(../assets/img/pause.png) no-repeat center;
+    }
 }
 
 .btn-play{
     background: $primary-brand url(../assets/img/play.png) no-repeat center;
+    &:hover{
+    background: darken($primary-brand,10%) url(../assets/img/play.png) no-repeat center;
+    }
 }
 
 .btn-clear{
-    background: $primary-brand url(../assets/img/clear.png) no-repeat center;
+    // background: $primary-brand url(../assets/img/clear.png) no-repeat center;
+    // &:hover{
+    // background: darken($primary-brand,10%) url(../assets/img/clear.png) no-repeat center;
+    // }
 }
 
 
@@ -725,11 +779,16 @@ input{
 
 .save{
     background-color: $call-to-action;
-
+    &:hover{
+       background-color: darken($call-to-action,10%);
+    }
 }
 
 .move-to, .pick-tip{
     background-color: $primary-brand;
+    &:hover{
+        background-color: darken($primary-brand, 10%);
+    }
 }
 
 
@@ -767,7 +826,7 @@ h1.title{
     font-size: 14px;
     font-weight: 800;
     line-height: $baseline;
-    font-family: "open-sans"; 
+    font-family: "open-sans";
 }
 h3.title {
     font-size: 12px;

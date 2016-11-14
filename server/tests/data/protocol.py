@@ -48,15 +48,10 @@ p1000.delete_calibration_data()
 p10.delete_calibration_data()
 
 p1000.pick_up_tip(tiprack[0])
-
 p1000.aspirate(10, trough[0])
 p1000.dispense(10, plate[0])
-
 p1000.drop_tip(trash)
-
 p10.pick_up_tip(tiprack[0])
-
 p10.aspirate(5, trough[0])
 p10.dispense(5, plate[0])
-
 p10.drop_tip(trash)
