@@ -159,7 +159,6 @@ Table of Contents
    updating_firmware
    setup
    getting_started
-   running_a_protocol
    running_app
    well_access
    tips_and_tricks
