@@ -12,10 +12,10 @@ Opentrons API
 
 .. _Full API Documentation: http://docs.opentrons.com
 
-* `Full API Documentation`_
-
 Introduction
 ------------
+
+Please refer to `Full API Documentation`_ for detailed instructions.
 
 The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy. 
 
