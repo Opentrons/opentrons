@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import * as types from './mutation-types'
 import OpenTrons from '../rest_api_wrapper'
-import {addHrefs} from '../util'
+import {addHrefs, processTasks} from '../util'
 
 
 const actions = {
@@ -27,15 +27,10 @@ const actions = {
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     commit(types.UPLOADING, {'uploading': true})
-    let tasks
     OpenTrons.uploadProtocol(formData).then((result) => {
+      let tasks
       if (result.success) {
-        tasks = result.calibrations
-        let fileName = result.fileName
-        let lastModified = result.lastModified
-        addHrefs(tasks)
-        commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
-        commit(types.UPDATE_FILE_MODIFIED, {'lastModified': lastModified})
+        tasks = processTasks(result, commit)
       } else {
         tasks = []
       }
@@ -52,13 +47,8 @@ const actions = {
   loadProtocol ({commit}) {
     OpenTrons.loadProtocol().then((result) => {
       if (result.success) {
-        let tasks = result.calibrations
-        let fileName = result.fileName
-        let lastModified = result.lastModified
-        addHrefs(tasks)
-        commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
-        commit(types.UPDATE_FILE_NAME, {'fileName': fileName})
-        commit(types.UPDATE_FILE_MODIFIED, {'lastModified': lastModified})
+        let tasks = processTasks(result, commit)
+        commit(types.UPDATE_TASK_LIST, {tasks})
       } else {
         commit(types.UPDATE_TASK_LIST, {tasks: []})
       }
@@ -160,7 +150,18 @@ const actions = {
     OpenTrons.dispense(data)
   },
   maxVolume({commit}, data) {
-    OpenTrons.maxVolume(data)
+    OpenTrons.maxVolume(data).then((result) => {
+      if (result) {
+        OpenTrons.loadProtocol().then((result) => {
+          if (result.success) {
+            let tasks = processTasks(result, commit)
+            commit(types.UPDATE_TASK_LIST, {tasks})
+          } else {
+            commit(types.UPDATE_TASK_LIST, {tasks: []})
+          }
+        })
+      }
+    })
   },
   home ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
