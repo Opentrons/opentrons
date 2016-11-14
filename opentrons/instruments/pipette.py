@@ -102,6 +102,7 @@ class Pipette(Instrument):
         self.motor = self.robot.get_motor(self.axis)
 
         self.placeables = []
+        self.previous_placeable = None
         self.current_volume = 0
 
         self.speeds = {
@@ -147,6 +148,7 @@ class Pipette(Instrument):
         setting current volume to zero, and resetting tip tracking
         """
         self.placeables = []
+        self.previous_placeable = None
         self.current_volume = 0
         self.reset_tip_tracking()
 
@@ -202,6 +204,7 @@ class Pipette(Instrument):
             return
 
         placeable, _ = containers.unpack_location(location)
+        self.previous_placeable = placeable
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
@@ -582,8 +585,8 @@ class Pipette(Instrument):
             description=_description,
             enqueue=enqueue)
 
-        if not location and len(self.placeables):
-            location = self.placeables[-1]
+        if not location and self.previous_placeable:
+            location = self.previous_placeable
         self.aspirate(location=location,
                       volume=volume,
                       rate=rate,
@@ -701,7 +704,7 @@ class Pipette(Instrument):
             if location:
                 self.move_to(location, strategy='arc', enqueue=False)
             else:
-                location = self.placeables[-1]
+                location = self.previous_placeable
 
             self.move_to(
                 (location, location.from_center(x=1, y=0, z=1)),
