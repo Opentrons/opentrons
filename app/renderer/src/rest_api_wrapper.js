@@ -212,7 +212,7 @@ class OpenTrons {
 
   aspirate (data) {
     return Vue.http
-      .post(this.asiprateUrl, JSON.stringify(data), {emulateJSON: true})
+      .post(this.aspirateUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
       }, (response) => {
@@ -235,8 +235,10 @@ class OpenTrons {
       .post(this.maxVolumeUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
+        return true
       }, (response) => {
         console.log('failed', response)
+        return false
       })
   }
 
