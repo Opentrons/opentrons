@@ -699,12 +699,13 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event['mode'] = mode
         cmd_run_event['name'] = 'command-run'
         for i, command in enumerate(self._commands):
-            cmd_run_event.update({
-                'command_description': command.description,
-                'command_index': i,
-                'commands_total': len(self._commands)
-            })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
+            if mode == 'live':
+                cmd_run_event.update({
+                    'command_description': command.description,
+                    'command_index': i,
+                    'commands_total': len(self._commands)
+                })
+                trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
                 if command.description:
@@ -714,11 +715,12 @@ class Robot(object, metaclass=Singleton):
                 if kwargs.get('do', True):
                     command.do()
             except Exception as e:
-                trace.EventBroker.get_instance().notify({
-                    'mode': mode,
-                    'name': 'command-failed',
-                    'error': str(e)
-                })
+                if mode == 'live':
+                    trace.EventBroker.get_instance().notify({
+                        'mode': mode,
+                        'name': 'command-failed',
+                        'error': str(e)
+                    })
                 self.add_warning(str(e))
                 raise e
 
