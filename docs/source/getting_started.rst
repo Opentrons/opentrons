@@ -31,18 +31,18 @@ Now that you've installed Opentrons API on your computer, you have access to a v
   tiprack = containers.load(
       'tiprack-200ul',
       'A2',
-      'tiprack')
+      'tiprack-for-test')
 
   plate = containers.load(
 		'96-PCR-flat',
 		'B3',
-		'plate'
+		'plate-for-test'
   )
 
   trash = containers.load(
 		'point',
 		'C1',
-		'trash'
+		'trash-for-test'
   )
   p200 = instruments.Pipette(
       name="p200",
