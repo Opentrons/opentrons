@@ -447,6 +447,9 @@ class Pipette(Instrument):
             if not volume or (self.current_volume - volume < 0):
                 volume = self.current_volume
 
+            if isinstance(location, Placeable):
+                location = location.bottom(1)
+
             self.current_volume -= volume
 
             self._associate_placeable(location)

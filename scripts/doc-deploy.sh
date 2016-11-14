@@ -3,6 +3,7 @@ set -e # Exit with nonzero exit code if anything fails
 
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
+CNAME="docs.opentrons.com"
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
@@ -26,17 +27,21 @@ cd ..
 rm -rf out/* || exit 0
 cp -r ../docs/build/html/* out/
 touch out/.nojekyll
+echo "$CNAME" > out/CNAME
 
 # Now let's go have some fun with the cloned repo
 cd out
 git config user.name "Travis CI"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
 
-# If there are no changes to the compiled out (e.g. this is a README update) then just bail.
-if [ -z $(git diff) ]; then
-    echo "No changes to the output on this push; exiting."
-    exit 0
-fi
+git add CNAME
+
+# TODO revisit bash script for checking of there are changes to commit
+# # If there are no changes to the compiled out (e.g. this is a README update) then just bail.
+# if [ -z $(git diff) ]; then
+#     echo "No changes to the output on this push; exiting."
+#     exit 0
+# fi
 
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.

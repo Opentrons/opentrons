@@ -148,6 +148,7 @@ html_theme_options = {
     'github_button': 'True',
     'description': 'Simple Biology Lab Protocol Coding',
     'link': '#006FFF',
+    'link_hover': '#05C1B3',
     'sidebar_list': '#05C1B3',
     'sidebar_link_underscore': '#DDDDDD'
 }
@@ -199,7 +200,8 @@ html_logo = 'img/logo.png'
 
 # Custom sidebar templates, maps document names to template names.
 #
-# html_sidebars = {}
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
+
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
