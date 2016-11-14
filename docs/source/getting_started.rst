@@ -20,6 +20,10 @@ Before running any code, you need to install the Opentrons API in your jupyter n
 	
 	!pip install --upgrade opentrons
 
+.. note::
+
+	You can update your API by repeating the !pip install, but remember to restart your notebook afterwards for the changes to take effect
+
 Now that you've installed Opentrons API on your computer, you have access to a variety of robot container and instrument commands. You need to import them to each project (protocol) in order to access these commands.  Unlike the install, this set of imports needs to be done at the start of each protocol.
 
 .. testsetup:: main
@@ -58,19 +62,7 @@ Now that you've installed Opentrons API on your computer, you have access to a v
 
 .. testcode:: main
 	
-	from opentrons.robot import Robot
-	from opentrons import containers
-	from opentrons import instruments
- 
-Now that you have imported the opentrons modules, you need to declare a new robot object (so you can run your protocol commands on it).
-
-.. code-block:: python
-	
-	robot = Robot()
-
-.. note::
-
-	You can update your API by repeating the !pip install, but remember to restart your notebook afterwards for the changes to take effect
+	from opentrons import robot, containers, instruments
 
 
 Deck Set Up
@@ -132,24 +124,24 @@ Pipettes
 
 .. code-block:: python
 	
-	mypipette = instruments.Pipette(	
-		name="mypipette",			
+	mypipette = instruments.Pipette(
+		name="mypipette",
+		axis="b",	
+		max_volume=200,
+		min_volume=20,		
 		trash_container=trash,		
-		tip_racks=[tiprack],		
-		min_volume=20,
-		max_volume=200				
-		axis="b",					
+		tip_racks=[tiprack],									
 		channels=1					
 	)
 
 **instruments.Pipette** (*name, trash_container, tip_racks, min_volume, max_volume, axis, channels*)
 
 	* **name -** name you give pipette
+	* **axis -** axis the pipette is on (a or b)
+	* **max_volume -** maximum volume of pipette
+	* **min_volume -** minimum volume of pipette
 	* **trash_container -** given name of container where you want to deposit tips
 	* **tip_racks -** array (list) of container(s) where you want to pick up tips
-	* **min_volume -** minimum volume of pipette
-	* **max_volume -** maximum volume of pipette
-	* **axis -** axis the pipette is on (a or b)
 	* **channels -** number of channels (1 or 8)
 
 This example loads a single channel, 20-200 uL pipette on the b axis that pulls tips from tiprack and deposits them in trash
