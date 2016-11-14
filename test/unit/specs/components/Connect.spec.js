@@ -8,10 +8,9 @@ import ConnectComponent from '../../../../app/renderer/src/components/Connect.vu
 const ConnectInjector = require('!!vue?inject!../../../../app/renderer/src/components/Connect.vue')
 const ConnectMock = ConnectInjector({
   '../rest_api_wrapper': {
-    OpenTrons: (function () {
-      return
-      console.log('INJECT MOCK CALLED...')
-    })()
+    getPortsList: function () {
+      return ['COM1', '/dev/tty.ccu123']
+    }
   }
 })
 
