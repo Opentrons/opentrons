@@ -71,8 +71,8 @@ class PersistedContainersTestCase(unittest.TestCase):
         well_1 = wells[0]
         well_2 = wells[1]
 
-        self.assertEqual(well_1.coordinates(), (13.3 + 0, 17.5 + 0, 0))
-        self.assertEqual(well_2.coordinates(), (13.3 + 0, 17.5 + 19.3, 0))
+        self.assertEqual(well_1.coordinates(), (13.67 + 0, 16.0 + 0, 0))
+        self.assertEqual(well_2.coordinates(), (13.67 + 0, 16.0 + 19.3, 0))
 
     def test_load_all_persisted_containers(self):
         all_persisted_containers = \
