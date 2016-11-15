@@ -75,7 +75,9 @@ def load_python(stream, filename):
         except Exception as e:
             tb = e.__traceback__
             stack_list = traceback.extract_tb(tb)
-            _, line, name, text = stack_list[1]
+            _, line, name, text = stack_list[-1]
+            if 'exec' in text:
+                text = None
             raise Exception(
                 'Error in protocol file line {} : {}\n{}'.format(
                     line,
