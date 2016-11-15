@@ -23,6 +23,7 @@
 			<img src="../assets/img/well_multi.png" v-show="placeableType('default')" />
 			<img src="../assets/img/tiprack_multi.png" v-show="placeableType('tiprack')"/>
 			<img src="../assets/img/trough_multi.png" v-show="placeableType('trough')"/>
+			<img src="../assets/img/tuberack_single.png" v-show="placeableType('tuberack')"/>
 			<img src="../assets/img/point_trash.png" v-show="placeableType('point')"/>
 		</span>
 		</div>
