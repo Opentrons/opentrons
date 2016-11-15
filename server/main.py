@@ -162,7 +162,6 @@ def load():
         calibrations = update_step_list()
     except Exception as e:
         emit_notifications([str(e)], "danger")
-        print(str(e))
         status = 'error'
 
     return flask.jsonify({
@@ -198,8 +197,6 @@ def _run_commands():
             error = "This protocol does not contain any commands for the robot."
             api_response['errors'] = [error]
     except Exception as e:
-        print("EXCEPTION")
-        print(str(e))
         api_response['errors'] = [str(e)]
 
     api_response['warnings'] = robot.get_warnings() or []
@@ -545,7 +542,6 @@ def update_step_list():
             for placeable_step in step['placeables']:
                 for c in _get_all_containers():
                     if c.get_name() == placeable_step['label']:
-                        print('three')
                         placeable_step.update({
                             'calibrated': _check_if_calibrated(instrument, c)
                         })
