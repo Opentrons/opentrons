@@ -449,8 +449,7 @@ def _get_all_containers():
     global robot
     for slot in robot._deck:
         if slot.has_children():
-            container = slot.get_children_list()[0]
-            all_containers.append(container)
+            all_containers += slot.get_children_list()
 
     return _sort_containers(all_containers)
 
@@ -499,15 +498,15 @@ def _get_container_from_step(step):
     Retruns the matching Container for a given placeable step in the step-list
     """
     all_containers = _get_all_containers()
-    for c in all_containers:
+    for container in all_containers:
         match = [
-            c.get_name() == step['label'],
-            c.get_parent().get_name() == step['slot'],
-            c.properties['type'] == step['type']
+            container.get_name() == step['label'],
+            container.get_parent().get_name() == step['slot'],
+            container.properties['type'] == step['type']
 
         ]
         if all(match):
-            return c
+            return container
     return None
 
 
