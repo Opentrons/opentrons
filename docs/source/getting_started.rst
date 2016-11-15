@@ -30,6 +30,7 @@ Now that you've installed Opentrons API on your computer, you have access to a v
 
   from opentrons import robot, instruments, containers
   robot.reset()
+  robot.connect()
   i = 0
 
   tiprack = containers.load(
