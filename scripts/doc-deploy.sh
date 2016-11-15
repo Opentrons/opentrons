@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e # Exit with nonzero exit code if anything fails
 
-SOURCE_BRANCH="20161115-updating-documentation-templates"
+SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 CNAME="docs.opentrons.com"
 
