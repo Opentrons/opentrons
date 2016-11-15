@@ -1,0 +1,34 @@
+/* This file intentionally left blank. */
+div.body p{
+	line-height: 20pt;
+}
+
+div.body h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    font-size: 2.4em;
+    min-height: 80px;
+}
+
+{
+    font-family: Open Sans;
+}
+
+div.sphinxsidebar h2, 
+div.sphinxsidebar h3, 
+div.sphinxsidebar h4,
+div.sphinxsidebar h5,
+div.sphinxsidebar h6,
+div.body h2, 
+div.body h3, 
+div.body h4, 
+div.body h5 {
+	font-family: Open Sans;
+}
+
+div.sphinxsidebar h3 a,  
+div.sphinxsidebar h3 a:hover,
+div.body h2{
+	font-size: 22px;
+}
