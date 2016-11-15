@@ -211,10 +211,6 @@ def _run_commands():
     result = "Run complete in {}".format(run_time)
     emit_notifications([result], 'success')
 
-    if api_response['errors']:
-        # simulate again to reset the robot's state
-        robot.simulate(switches=False)
-
 
 @app.route("/run", methods=["GET"])
 def run():
