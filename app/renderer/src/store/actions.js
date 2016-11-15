@@ -101,10 +101,7 @@ const actions = {
     commit(types.UPDATE_RUNNING, {'running': true})
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.runProtocol().then((results) => {
-      // commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      // commit(types.UPDATE_RUNNING, {'running': false})
-    })
+    OpenTrons.runProtocol()
   },
   pauseProtocol({ commit }) {
     OpenTrons.pauseProtocol().then((was_successful) => {
@@ -123,10 +120,7 @@ const actions = {
     })
   },
   cancelProtocol({ commit }) {
-    OpenTrons.cancelProtocol().then((results) => {
-      // commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      // commit(types.UPDATE_RUNNING, {'running': false})
-    })
+    OpenTrons.cancelProtocol()
   },
   moveToPosition ({commit}, data) {
     let type = "plunger"
