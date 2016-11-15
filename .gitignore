@@ -14,11 +14,11 @@ __pycache__/
 .Python
 env/
 build/
-!build/
-build/*
-!build/html/
-build/html/*
-!build/html/_static/
+#!build/
+#build/*
+#!build/html/
+#build/html/*
+#!build/html/_static/
 
 develop-eggs/
 dist/
