@@ -10,7 +10,7 @@ install:
 script:
 - nosetests --with-coverage
 - pylama
-- cd docs && make html && make doctest && cd ..
+- cd docs && make clean html && make doctest && cd ..
 - cd scripts && ./doc-deploy.sh && cd ..
 deploy:
   provider: script

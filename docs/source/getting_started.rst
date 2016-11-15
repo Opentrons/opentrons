@@ -166,7 +166,7 @@ There are a few basic commands that you can string together in order to transfer
 
 
 Pick Up and Drop Tip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 Before you can start moving liquid around, you need to pick up a tip!  You can pick up any tip in a tip rack.
 
@@ -221,7 +221,7 @@ You can link multiple aspirates together in order to pick up liquid from multipl
 
 
 Dispense
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
 
 Once you pick up liquid, you need to tell the robot where to dispense it.  
 
@@ -243,7 +243,7 @@ If you want to deposit all of the liquid you just aspirated, there is no need to
 
 
 Mix
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^
 
 While you can call multiple aspirate and dispense commands to the same location, the mix command makes it easier to do.
 
@@ -314,7 +314,7 @@ You can blow out liquid immediately after a dispense command in the same locatio
 	If the trash container is given a "point" labware name, instead of another container (like "trough-12row"), there is no need to call a position within the container.
 
 Delay
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^
 
 Delay commands can be called between any movement commands, so you have complete control of exactly where you want the robot to pause.
 
@@ -407,6 +407,6 @@ First, you can use the print command (a basic python command) to print well loca
 This is useful when trying to determine if the location you're calling is actually the location you want, or if something is iterating properly (more on iteration later)
 
 Getting Robot Commands
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 Another useful tool is robot.commands(), which will print out the list of actions the virtual robot just performed.
