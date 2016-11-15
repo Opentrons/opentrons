@@ -58,7 +58,7 @@ If you are not using Anaconda copy and paste the following code into the first c
 
 .. code-block:: bash
   
-  !pip install --upgrade opentrons
+  !pip install --upgrade git+git://github.com/OpenTrons/opentrons-api.git@master#egg=opentrons
 
 After this step you should be able to run:
 

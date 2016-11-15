@@ -138,6 +138,7 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'travis_button': 'True',
+    'font_size': '14px',
     'font_family': 'Open Sans',
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
@@ -201,7 +202,14 @@ html_logo = 'img/logo.png'
 
 # Custom sidebar templates, maps document names to template names.
 #
-html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
+html_sidebars = {
+    '**': [
+        'globaltoc.html',
+        'relations.html',
+        'sourcelink.html',
+        'searchbox.html'
+    ],
+}
 
 
 # Additional templates that should be rendered to pages, maps page names to

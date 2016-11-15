@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using the App &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Container Well Access" href="well_access.html" />
+    <link rel="prev" title="Writing a Protocol" href="getting_started.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="updating_firmware.html">Updating Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting Up Code Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Writing a Protocol</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using the App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#download-app">Download App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connect-to-robot">Connect to Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upload-protocol">Upload Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jogging">Jogging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#calibrate">Calibrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-protocol">Run Protocol</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="well_access.html">Container Well Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_and_tricks.html">Advanced Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Developer Interface</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="getting_started.html" title="previous chapter">Writing a Protocol</a></li>
+      <li>Next: <a href="well_access.html" title="next chapter">Container Well Access</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/running_app.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-the-app">
+<span id="running-app"></span><h1>Using the App<a class="headerlink" href="#using-the-app" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="download-app">
+<h2>Download App<a class="headerlink" href="#download-app" title="Permalink to this headline">¶</a></h2>
+<p>You can download the latest version of the app from out website <strong>website link</strong></p>
+</div>
+<div class="section" id="connect-to-robot">
+<h2>Connect to Robot<a class="headerlink" href="#connect-to-robot" title="Permalink to this headline">¶</a></h2>
+<p>Make sure your robot is turned on, and your laptop is connected via USB cable.</p>
+<div class="section" id="mac-osx">
+<h3>Mac OSX<a class="headerlink" href="#mac-osx" title="Permalink to this headline">¶</a></h3>
+<p>Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.</p>
+<p>** screenshot button with mac drop down**</p>
+</div>
+<div class="section" id="windows-10">
+<h3>Windows 10<a class="headerlink" href="#windows-10" title="Permalink to this headline">¶</a></h3>
+<p>** screenshot button with windows down**</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Every time you connect to the robot, you need to home all axes before doing anything else.</p>
+</div>
+</div>
+</div>
+<div class="section" id="upload-protocol">
+<h2>Upload Protocol<a class="headerlink" href="#upload-protocol" title="Permalink to this headline">¶</a></h2>
+<p>Click to upload your protocol file (refer to <span class="xref std std-ref">running_a_protocol</span>)</p>
+</div>
+<div class="section" id="jogging">
+<h2>Jogging<a class="headerlink" href="#jogging" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="xyz">
+<h3>XYZ<a class="headerlink" href="#xyz" title="Permalink to this headline">¶</a></h3>
+<p>Move in the X, Y and Z by selecting your desired increment, and then clicking an arrow button.</p>
+<p><strong>screenshot pipette jog</strong></p>
+</div>
+<div class="section" id="slot-button">
+<h3>Slot Button<a class="headerlink" href="#slot-button" title="Permalink to this headline">¶</a></h3>
+<p>New to 2.0, the slot button moves exactly one slot over in either X or Y, depending on which arrow you choose.  This is particularly useful when calibrating multiple containers of the same type (eg an entire deck of 96 well plates).  There is no slot Z, the robot will just move 1 mm.</p>
+</div>
+<div class="section" id="ab-plungers">
+<h3>AB Plungers<a class="headerlink" href="#ab-plungers" title="Permalink to this headline">¶</a></h3>
+<p>Use the plunger jog to move the plunger up and down.  If you have selected a container or the pipette for the B axis, then the B axis will move, and if you have selected a container or the pipette for the A axis, it will move.</p>
+<p><strong>screenshot plunger jog</strong></p>
+<p>The app automatically toggles between pipettes (unlike 1.2)</p>
+</div>
+<div class="section" id="move-to-slot">
+<h3>Move to Slot<a class="headerlink" href="#move-to-slot" title="Permalink to this headline">¶</a></h3>
+<p>Jump to any slot on the deck with the Move to Slot buttons.  The deck will automatically react and change between a 3x5 layout and a 2x5 layout based on which robot you are connected to (Hood vs. Pro/Standard)</p>
+</div>
+</div>
+<div class="section" id="calibrate">
+<h2>Calibrate<a class="headerlink" href="#calibrate" title="Permalink to this headline">¶</a></h2>
+<p>Once each container or pipette is calibrated, a check mark will appear next to it in the container list.</p>
+<div class="section" id="tipracks">
+<h3>Tipracks<a class="headerlink" href="#tipracks" title="Permalink to this headline">¶</a></h3>
+<p>Jog the pipette down into the first tip in the tip rack.  It should be firmly pushed into the tip, and the pick up tip button can be used to test its seating.</p>
+<p>Calling the pick up tip button from anywhere on the deck will direct the robot back to the tiprack to pick up a tip.  Drop tip will send the tip to the trash.</p>
+</div>
+<div class="section" id="containers">
+<h3>Containers<a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h3>
+<p>With a tip on the pipette, calibrate to the bottom of the first well or tube in the container. Use the diagrams in the app to guide calibration.</p>
+</div>
+<div class="section" id="pipettes">
+<h3>Pipettes<a class="headerlink" href="#pipettes" title="Permalink to this headline">¶</a></h3>
+<p>Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.</p>
+<p><strong>screengrab pipette calibrations</strong></p>
+<p>Once these positions are all saved, you can test your calibrations. This is most easily done gravimetrically using a small scale. Use the aspirate and dispense buttons to pick up liquid and eject it onto the scale. If this volume isn&#8217;t exactly what you expect, maybe 203 uL instead of 200, no big deal! You can go input the value into the max volume box. The robot will adjust its calculations accordingly and will then be able to dispense the correct volumes during experiments.</p>
+<p>The drop tip screw may need to be adjusted up or down if you cannot accurately calibrate Bottom.</p>
+</div>
+</div>
+<div class="section" id="run-protocol">
+<h2>Run Protocol<a class="headerlink" href="#run-protocol" title="Permalink to this headline">¶</a></h2>
+<p>Once all your positions are saved, you can run your protocol.  A progress will keep track of what percentage of your protocol has been done.  Protocols can be paused, or they can be stopped entirely.  We recommend homing after all protocols have been completed or stopped.</p>
+<p><strong>screengrab run buttons</strong></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2016, Opentrons.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/running_app.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-83820700-1']);
+      _gaq.push(['_setDomainName', 'none']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+    
+  </body>
+</html>
