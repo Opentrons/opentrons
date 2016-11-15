@@ -7,42 +7,26 @@ The following examples assume the containers and pipettes:
 
 .. testsetup:: tips_main
 
-  from opentrons import Robot
+  from opentrons import robot
   from opentrons import containers, instruments
-  robot = Robot()
-  robot.reset()
   robot.connect('Virtual Smoothie')
 
-  tiprack = containers.load('tiprack-200ul', 'A1')
-  plate = containers.load('96-flat', 'B1')
-  trough = containers.load('trough-12row', 'C1')
-  trash = containers.load('point', 'C2')
+  tiprack = containers.load('tiprack-200ul', 'A1', 'tiprack-for-doctest')
+  plate = containers.load('96-flat', 'B1', 'plate-for-doctest')
+  trough = containers.load('trough-12row', 'C1', 'trough-for-doctest')
+  trash = containers.load('point', 'C2', 'trash-for-doctest')
       
   p200 = instruments.Pipette(axis="b", max_volume=200)
 
 .. testsetup:: tips_demo
   
-  from opentrons import Robot
-  Robot().reset()
-
-.. testcleanup:: tips_main
-  
-  from opentrons.util import singleton
-  from opentrons import Robot
-  del singleton.Singleton._instances[Robot]
-
-.. testcleanup:: tips_demo
-  
-  from opentrons.util import singleton
-  from opentrons import Robot
-  del singleton.Singleton._instances[Robot]
+  from opentrons import robot
+  robot.reset()
 
 .. testcode:: tips_demo
 
-  from opentrons import Robot
+  from opentrons import robot
   from opentrons import containers, instruments
-
-  robot = Robot()
 
   tiprack = containers.load('tiprack-200ul', 'A1')
   plate = containers.load('96-flat', 'B1')
