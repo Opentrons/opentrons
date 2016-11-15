@@ -73,6 +73,9 @@ describe('application launch', function () {
     let plungerDown = '//*[@id="jog-controls-plunger"]/span[1]/button[2]'
     let run = '//*[@id="run"]/button'
 
+    this.app.client.execute(() => {
+      window.confirm = function() {return true}
+    })
     return this.app.client.waitUntilWindowLoaded(31950)
       .click(connectDropDown)
       .pause(pauseTime)

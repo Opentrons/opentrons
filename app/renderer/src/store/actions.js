@@ -10,13 +10,9 @@ const actions = {
     OpenTrons.connect(port).then((was_successful) => {
       if (was_successful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
-        OpenTrons.jog({"z": 1}).then(() => {
-          OpenTrons.jog({"z": -1}).then(() => {
-            if (window.confirm("Do you want to home now?")) {
-              OpenTrons.home('all')
-            }
-          })
-        })
+        if (window.confirm("Successfully Connected. Do you want to home now?")) {
+          OpenTrons.home('all')
+        }
         OpenTrons.getVersions().then((result) => {
           let versions = result
           commit(types.UPDATE_ROBOT_VERSIONS, {versions})
@@ -101,10 +97,7 @@ const actions = {
     commit(types.UPDATE_RUNNING, {'running': true})
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.runProtocol().then((results) => {
-      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      // commit(types.UPDATE_RUNNING, {'running': false})
-    })
+    OpenTrons.runProtocol()
   },
   pauseProtocol({ commit }) {
     OpenTrons.pauseProtocol().then((was_successful) => {
@@ -123,10 +116,7 @@ const actions = {
     })
   },
   cancelProtocol({ commit }) {
-    OpenTrons.cancelProtocol().then((results) => {
-      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      commit(types.UPDATE_RUNNING, {'running': false})
-    })
+    OpenTrons.cancelProtocol()
   },
   moveToPosition ({commit}, data) {
     let type = "plunger"
@@ -170,9 +160,6 @@ const actions = {
     OpenTrons.home(data.axis).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
-  },
-  running ({commit}, data) {
-    commit(types.UPDATE_RUNNING, {'running': data})
   }
 }
 

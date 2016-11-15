@@ -210,7 +210,7 @@ def _run_commands():
     run_time = "%d:%02d:%02d" % (hours, minutes, seconds)
     result = "Run complete in {}".format(run_time)
     emit_notifications([result], 'success')
-
+    socketio.emit('event', {'name': 'run-finished'})
 
 @app.route("/run", methods=["GET"])
 def run():
@@ -449,8 +449,7 @@ def _get_all_containers():
     global robot
     for slot in robot._deck:
         if slot.has_children():
-            container = slot.get_children_list()[0]
-            all_containers.append(container)
+            all_containers += slot.get_children_list()
 
     return _sort_containers(all_containers)
 
@@ -494,6 +493,23 @@ def _check_if_instrument_calibrated(instrument):
     return True
 
 
+def _get_container_from_step(step):
+    """
+    Retruns the matching Container for a given placeable step in the step-list
+    """
+    all_containers = _get_all_containers()
+    for container in all_containers:
+        match = [
+            container.get_name() == step['label'],
+            container.get_parent().get_name() == step['slot'],
+            container.properties['type'] == step['type']
+
+        ]
+        if all(match):
+            return container
+    return None
+
+
 current_protocol_step_list = None
 
 
@@ -535,13 +551,12 @@ def update_step_list():
                 'calibrated': _check_if_instrument_calibrated(instrument)
             })
 
-            all_containers = _get_all_containers()
             for placeable_step in step['placeables']:
-                for c in all_containers:
-                    if c.get_name() == placeable_step['label']:
-                        placeable_step.update({
-                            'calibrated': _check_if_calibrated(instrument, c)
-                        })
+                c = _get_container_from_step(placeable_step)
+                if c:
+                    placeable_step.update({
+                        'calibrated': _check_if_calibrated(instrument, c)
+                    })
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
