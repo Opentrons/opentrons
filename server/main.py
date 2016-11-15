@@ -494,6 +494,23 @@ def _check_if_instrument_calibrated(instrument):
     return True
 
 
+def _get_container_from_step(step):
+    """
+    Retruns the matching Container for a given placeable step in the step-list
+    """
+    all_containers = _get_all_containers()
+    for c in all_containers:
+        match = [
+            c.get_name() == step['label'],
+            c.get_parent().get_name() == step['slot'],
+            c.properties['type'] == step['type']
+
+        ]
+        if all(match):
+            return c
+    return None
+
+
 current_protocol_step_list = None
 
 
@@ -535,13 +552,12 @@ def update_step_list():
                 'calibrated': _check_if_instrument_calibrated(instrument)
             })
 
-            all_containers = _get_all_containers()
             for placeable_step in step['placeables']:
-                for c in all_containers:
-                    if c.get_name() == placeable_step['label']:
-                        placeable_step.update({
-                            'calibrated': _check_if_calibrated(instrument, c)
-                        })
+                c = _get_container_from_step(placeable_step)
+                if c:
+                    placeable_step.update({
+                        'calibrated': _check_if_calibrated(instrument, c)
+                    })
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
