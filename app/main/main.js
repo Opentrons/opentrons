@@ -60,6 +60,7 @@ function startUp() {
   // Startup Actions
   serverManager.start();
   waitUntilServerResponds(createWindow)
+  addMenu()
   initAutoUpdater()
 }
 
