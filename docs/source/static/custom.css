@@ -34,7 +34,7 @@ div.body h2{
 	font-size: 22px;
 }
 
-@media screen and (max-width: 875px), (max-device-width: 768px) {
+@media screen and (max-width: 875px), (max-device-width: 767px) {
 
     body {
         margin: 0;
@@ -114,9 +114,13 @@ div.body h2{
     }
 
     pre, tt, code {
-    font-family: 'Consolas', 'Menlo', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
-    font-size: 1.2em;
+    font-size: 1.5em;
     }
 }
 
+@media screen and (min-device-width: 320px)and (max-device-width: 640px) {
 
+    pre, tt, code {
+    font-size: 2em;
+    }
+}
