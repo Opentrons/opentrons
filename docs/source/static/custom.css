@@ -107,4 +107,11 @@ div.body h2{
     .github {
         display: none;
     }
+
+    div.sphinxsidebar {
+        position: relative;
+        margin-left: 0;
+    }
 }
+
+
