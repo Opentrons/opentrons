@@ -57,7 +57,7 @@ function initAutoUpdater () {
   //  If platform is Windows, use S3 file server instead of update server.
   //  please see /docs/windows_updating.txt for more information
   if (process.platform === 'win32') {
-    AUTO_UPDATE_URL = 'https://s3-us-west-2.amazonaws.com/ot-app-win-updates-2/'
+    AUTO_UPDATE_URL = 'https://s3.amazonaws.com/ot-app-win-updates-2/'
   }
   autoUpdater.setFeedURL(AUTO_UPDATE_URL)
   mainLogger.info('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
