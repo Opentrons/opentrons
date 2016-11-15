@@ -30,6 +30,7 @@ Now that you've installed Opentrons API on your computer, you have access to a v
 
   from opentrons import robot, instruments, containers
   robot.reset()
+  robot.connect()
   i = 0
 
   tiprack = containers.load(
@@ -89,9 +90,9 @@ For each container you want to use on the deck, you need to load it into your fi
 
 **containers.load** (*container, slot, name*)
 
-	* **container -** type of container (trough-12-row, etc)
-	* **slot -** the slot location on the deck (A1-E3)
-	* **name -** custom name
+	* **container -** type of container (aka "trough-12row")
+	* **slot -** the slot location on the deck ("A1" through "E3")
+	* **name -** custom name, used inside API when saving calibration data
 
 The example below declares 3 different containers and assigns them to the appropriate slots on the deck.
 
@@ -144,7 +145,7 @@ Pipettes
 	* **tip_racks -** array (list) of container(s) where you want to pick up tips
 	* **channels -** number of channels (1 or 8)
 
-This example loads a single channel, 20-200 uL pipette on the b axis that pulls tips from tiprack and deposits them in trash
+This example loads a single channel, 20-200 uL pipette on the ``b`` axis that pulls tips from tiprack and deposits them in trash
 
 .. testcode:: main
 
@@ -340,9 +341,9 @@ Containers are calibrated to the bottom of the well, and each labware definition
 
 .. testcode:: main
 
-	p200.dispense(plate['A1'].top())
-	p200.mix(3, 100, plate['B2'].bottom(5))
-	p200.dispense(plate['A1'].top(-3))
+	p200.dispense(plate['A1'].top())         # at the top of well
+	p200.mix(3, 100, plate['B2'].bottom(5))  # 5mm above bottom of well
+	p200.dispense(plate['A1'].top(-3))       # 3mm below top of well
 
 Homing
 ------
@@ -354,13 +355,14 @@ You can instruct the robot to home at any point in the protocol, or just home on
 	* **axes -** the axes you want to home
 	* **enqueue -** True or False
 
-When the python file is loaded into the protocol, it runs through all of the commands.  When enqueue=False, this will cause the robot to home immediately upon loading the protocol, whereas if enqueue=True, it will run when it is called in the protocol.
+When the python file is loaded into the protocol, it runs through all of the commands.  When enqueue=False (default), this will cause the robot to home immediately upon loading the protocol, whereas if enqueue=True, it will run when it is called in the protocol.
 
 .. testcode:: main
 
-  robot.home(enqueue=True)          
-  robot.home('ab', enqueue=True)
-  robot.home('xyz', enqueue=True)
+  robot.home()                     # causes robot to home immediately
+  robot.home(enqueue=True)         # adds "home" command to protocol queue     
+  robot.home('ab', enqueue=True)   # adds "home ab" command to protocol queue
+  robot.home('xyz', enqueue=True)  # adds "home xyz" command to protocol queue
 
 Move To
 -------

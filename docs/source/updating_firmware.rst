@@ -20,8 +20,6 @@ After downloading, unpack the zip file to view its contents.
 Open the Smoothie's Drive
 ---------------------------------
 
-.. image:: img/update-firmware/driveIcon.png
-
 Power on and plug in your Opentrons liquid handler, and make sure you do not have the app open. You will notice the Smoothieboard shows up on the computer as a Mass Storage Device, like an external hard drive or flash drive.
 
 .. image:: img/update-firmware/firmware_files.png

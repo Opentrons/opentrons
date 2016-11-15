@@ -20,7 +20,7 @@ Accessing Wells
 Coordinates
 ^^^^^^^^^^^
 
-Wells can be called via their string ['A1'], or their well number [0].  In python, number ranges start with 0, and end at **ask katie for better python description**
+Wells can be called via their string ['A1'], or their well number [0].  List indices in Python start with 0, so for a 96 well plate, the first well is at index 0 and last is at index 95. 
 
 .. code-block:: python
 
@@ -29,7 +29,7 @@ Wells can be called via their string ['A1'], or their well number [0].  In pytho
   plate[94] # G12
   plate[95] # H12
 
-You can also split the coordinates for the rows and columns and use either .rows or .cols.
+You can also split the coordinates for the rows and columns and use either ``.rows`` or ``.cols``.
 
 .. testsetup:: main
 
@@ -94,7 +94,7 @@ Similar to .rows, except .cols.
 Iterating Wells
 -------------------------------
 
-There are many wells to iterate through a plate, well by well, row by row, col by col, or skipping around.  We will show you examples of how to do all of these.
+There are many ways to iterate through a plate, well by well, row by row, col by col, or skipping around.  We will show you examples of how to do all of these.
 
 .. tip::
 
@@ -144,7 +144,7 @@ Other Examples
 Odds & Evens
 ^^^^^^^^^^^^
 
-In order to access every other row, you can utilize the third parameter in range and add a step count to your loop.  A step of 2 skips every other number, giving you all the odds or all the evens (see below) depending on the start of your range.
+In order to access every other row, you can utilize the third parameter in ``range()`` and add a step-count to your loop.  A step-count of ``2`` will skip every other number, so calling ``range(0, 10, 2)`` will create ``[0, 2, 4, 6, 8]``.
 
 .. testcode:: main
 
@@ -164,13 +164,12 @@ Chaining
 ^^^^^^^^
 
 Skipping around multiple chains is easy, once you have the right tools.  There are some python functions that are not inherent to the API, but that can be imported to make your life easier.  You can import the chain function when you import the opentrons API at the start of your python notebook.
-**ask katie for python import explanation**
 
 .. testcode:: main
 
   from itertools import chain
 
-The chain functinos allows you to link two sets of locations together, in this case, two different columns.  The loop will iterate through all wells in column A and column E, while skipping columns BCDFGH.
+The chain function allows you to link two sets of locations together, in this case, two different columns.  The loop will iterate through all wells in column A and column E, while skipping columns BCDFGH.
 
 .. testcode:: main
 
