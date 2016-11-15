@@ -131,15 +131,18 @@ def upload():
             '.py or .json'.format(extension)
         })
 
-    calibrations = get_step_list()
-    status = 'success'
     if len(api_response['errors']) > 0:
+        # TODO: no need for both http response and socket emit
         emit_notifications(api_response['errors'], 'danger')
-        calibrations = []
         status = 'error'
+        calibrations = []
+    else:
+        # TODO: no need for both http response and socket emit
+        emit_notifications(
+            ["Successfully uploaded {}".format(file.filename)], 'success')
+        status = 'success'
+        calibrations = create_step_list()
 
-    emit_notifications(["Successfully uploaded {}".format(file.filename)], 'success')
-    # emit_notifications(api_response['warnings'], 'warning')
     return flask.jsonify({
         'status': status,
         'data': {
@@ -156,7 +159,7 @@ def upload():
 def load():
     status = "success"
     try:
-        calibrations = get_step_list()
+        calibrations = update_step_list()
     except Exception as e:
         emit_notifications([str(e)], "danger")
         print(str(e))
@@ -399,7 +402,7 @@ def disconnect_robot():
 @app.route("/instruments/placeables")
 def placeables():
     try:
-        data = get_step_list()
+        data = update_step_list()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
@@ -440,7 +443,10 @@ def _get_all_pipettes():
     for _, p in robot.get_instruments():
         if isinstance(p, Pipette):
             pipette_list.append(p)
-    return pipette_list
+    return sorted(
+        pipette_list,
+        key=lambda p: p.name.lower()
+    )
 
 def _get_all_containers():
     """
@@ -495,30 +501,56 @@ def _check_if_instrument_calibrated(instrument):
     return True
 
 
-def get_step_list():
+current_protocol_step_list = None
+
+
+def create_step_list():
+    global current_protocol_step_list
+    current_protocol_step_list = []
     try:
-        data = [{
+        current_protocol_step_list = [{
             'axis': instrument.axis,
             'label': instrument.name,
-            'top': instrument.positions['top'],
-            'bottom': instrument.positions['bottom'],
-            'blow_out': instrument.positions['blow_out'],
-            'drop_tip': instrument.positions['drop_tip'],
-            'max_volume': instrument.max_volume,
-            'calibrated': _check_if_instrument_calibrated(instrument),
             'channels': instrument.channels,
             'placeables': [
                 {
                     'type': container.properties['type'],
                     'label': container.get_name(),
-                    'slot': container.get_parent().get_name(),
-                    'calibrated': _check_if_calibrated(instrument, container)
+                    'slot': container.get_parent().get_name()
                 }
                 for container in _get_unique_containers(instrument)
             ]
         } for instrument in _get_all_pipettes()]
 
-        return data
+        return update_step_list()
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+
+
+def update_step_list():
+    if not current_protocol_step_list:
+        create_step_list()
+    try:
+        for step in current_protocol_step_list:
+            _, instrument = robot.get_instruments_by_name(step['label'])[0]
+            step.update({
+                'top': instrument.positions['top'],
+                'bottom': instrument.positions['bottom'],
+                'blow_out': instrument.positions['blow_out'],
+                'drop_tip': instrument.positions['drop_tip'],
+                'max_volume': instrument.max_volume,
+                'calibrated': _check_if_instrument_calibrated(instrument)
+            })
+
+            for placeable_step in step['placeables']:
+                for c in _get_all_containers():
+                    if c.get_name() == placeable_step['label']:
+                        print('three')
+                        placeable_step.update({
+                            'calibrated': _check_if_calibrated(instrument, c)
+                        })
+
+        return current_protocol_step_list
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
@@ -770,7 +802,7 @@ def calibrate_placeable():
     axis = request.json.get("axis")
     try:
         _calibrate_placeable(name, axis)
-        calibrations = get_step_list()
+        calibrations = update_step_list()
         emit_notifications(['Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
@@ -817,7 +849,7 @@ def calibrate_plunger():
             'data': str(e)
         })
 
-    calibrations = get_step_list()
+    calibrations = update_step_list()
 
     # TODO change calibration key to steplist
     return flask.jsonify({
