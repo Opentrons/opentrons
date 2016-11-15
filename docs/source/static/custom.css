@@ -34,7 +34,7 @@ div.body h2{
 	font-size: 22px;
 }
 
-@media screen and (max-width: 875px) {
+@media screen and (max-width: 875px), (max-device-width: 768px) {
 
     body {
         margin: 0;
