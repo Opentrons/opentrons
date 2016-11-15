@@ -112,6 +112,11 @@ div.body h2{
         position: relative;
         margin-left: 0;
     }
+
+    pre, tt, code {
+    font-family: 'Consolas', 'Menlo', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    font-size: 1.2em;
+    }
 }
 
 
