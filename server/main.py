@@ -503,7 +503,6 @@ current_protocol_step_list = None
 
 def create_step_list():
     global current_protocol_step_list
-    current_protocol_step_list = []
     try:
         current_protocol_step_list = [{
             'axis': instrument.axis,
@@ -518,13 +517,14 @@ def create_step_list():
                 for container in _get_unique_containers(instrument)
             ]
         } for instrument in _get_all_pipettes()]
-
-        return update_step_list()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
+    return update_step_list()
+
 
 def update_step_list():
+    global current_protocol_step_list
     if not current_protocol_step_list:
         create_step_list()
     try:
@@ -545,10 +545,10 @@ def update_step_list():
                         placeable_step.update({
                             'calibrated': _check_if_calibrated(instrument, c)
                         })
-
-        return current_protocol_step_list
     except Exception as e:
         emit_notifications([str(e)], 'danger')
+
+    return current_protocol_step_list
 
 
 
