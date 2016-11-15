@@ -102,7 +102,7 @@ const actions = {
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     OpenTrons.runProtocol().then((results) => {
-      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+      // commit(types.UPDATE_ROBOT_STATE, {'busy': false})
       // commit(types.UPDATE_RUNNING, {'running': false})
     })
   },
@@ -124,8 +124,8 @@ const actions = {
   },
   cancelProtocol({ commit }) {
     OpenTrons.cancelProtocol().then((results) => {
-      commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      commit(types.UPDATE_RUNNING, {'running': false})
+      // commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+      // commit(types.UPDATE_RUNNING, {'running': false})
     })
   },
   moveToPosition ({commit}, data) {
@@ -170,9 +170,6 @@ const actions = {
     OpenTrons.home(data.axis).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
-  },
-  running ({commit}, data) {
-    commit(types.UPDATE_RUNNING, {'running': data})
   }
 }
 

@@ -8,7 +8,7 @@
           <img src="../assets/img/logo_rgb_transparent.png" />
         </div>
         <div class="version">
-          <span>&nbsp v{{version}}</span>
+          v{{version}}
         </div>
       </div>
       <nav class="connect">

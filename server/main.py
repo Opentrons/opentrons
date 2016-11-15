@@ -210,7 +210,7 @@ def _run_commands():
     run_time = "%d:%02d:%02d" % (hours, minutes, seconds)
     result = "Run complete in {}".format(run_time)
     emit_notifications([result], 'success')
-
+    socketio.emit('event', {'name': 'run-finished'})
 
 @app.route("/run", methods=["GET"])
 def run():

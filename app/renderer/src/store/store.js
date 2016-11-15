@@ -42,7 +42,6 @@ function createWebSocketPlugin(socket) {
       }
       if (data.name == 'command-run') {
         if (data.caller === 'ui') {
-          // console.log(data)
           store.commit(types.UPDATE_RUN_LOG, data)
           store.commit(types.UPDATE_RUN_LENGTH, data)
         }
@@ -53,6 +52,10 @@ function createWebSocketPlugin(socket) {
           text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
         }
+      }
+      if (data.name == 'run-finished') {
+        store.commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+        store.commit(types.UPDATE_RUNNING, {'running': false})
       }
     })
   }
