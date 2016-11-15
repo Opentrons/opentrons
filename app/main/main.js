@@ -1,3 +1,4 @@
+if (require('electron-squirrel-startup')) return;
 const child_process = require('child_process')
 const fs = require('fs')
 const http = require('http')
@@ -10,6 +11,7 @@ const {addMenu} = require('./menu.js')
 const {getLogger} = require('./logging.js')
 const {initAutoUpdater} = require('./updater.js')
 const {ServerManager} = require('./servermanager.js')
+const {waitUntilServerResponds} = require('./util.js')
 
 
 let serverManager = new ServerManager()
@@ -57,7 +59,7 @@ function startUp() {
 
   // Startup Actions
   serverManager.start();
-  setTimeout(createWindow, 2000)
+  waitUntilServerResponds(createWindow)
   addMenu()
   initAutoUpdater()
 }
