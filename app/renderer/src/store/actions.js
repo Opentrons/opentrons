@@ -10,13 +10,9 @@ const actions = {
     OpenTrons.connect(port).then((was_successful) => {
       if (was_successful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
-        OpenTrons.jog({"z": 1}).then(() => {
-          OpenTrons.jog({"z": -1}).then(() => {
-            if (window.confirm("Do you want to home now?")) {
-              OpenTrons.home('all')
-            }
-          })
-        })
+        if (window.confirm("Do you want to home now?")) {
+          OpenTrons.home('all')
+        }
         OpenTrons.getVersions().then((result) => {
           let versions = result
           commit(types.UPDATE_ROBOT_VERSIONS, {versions})
