@@ -37,7 +37,7 @@
   from opentrons import robot
   robot.reset()
 
-Opentrons API: Simple Biology Lab Protocol Coding
+Opentrons API:|br| Simple Biology Lab Protocol Coding
 ===========================================================
 
 Introduction
@@ -161,3 +161,7 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. |br| raw:: html
+
+   <br />

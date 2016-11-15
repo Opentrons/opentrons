@@ -8,13 +8,14 @@ div.body h1 {
     margin-bottom: 0;
     padding-top: 0;
     font-size: 2.4em;
-    min-height: 80px;
+    min-height: 78px;
+    
 }
 
-{
-    font-family: Open Sans;
+div.body h1 + p{
+	padding-top: 24px;
 }
-
+x
 div.sphinxsidebar h2, 
 div.sphinxsidebar h3, 
 div.sphinxsidebar h4,
