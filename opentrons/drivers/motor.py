@@ -184,6 +184,8 @@ class CNCDriver(object):
         self.can_move.wait()
         if self.stopped.is_set():
             self.resume()
+            self.halt()
+            self.calm_down()
             raise RuntimeWarning('Stop signal received')
 
     def send_command(self, command, **kwargs):
@@ -353,6 +355,7 @@ class CNCDriver(object):
         arrived = False
         coords = self.get_position()
         while not arrived:
+            self.check_paused_stopped()
             coords = self.get_position()
             diff = {}
             for axis in coords.get('target', {}):
@@ -414,6 +417,11 @@ class CNCDriver(object):
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         return res == b'ok'
+
+    def halt(self):
+        res = self.send_command(self.HALT)
+        e = b'ok Emergency Stop Requested - reset or M999 required to continue'
+        return res == e
 
     def set_position(self, **kwargs):
         uppercase_args = {}

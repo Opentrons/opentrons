@@ -144,6 +144,10 @@ class VirtualSmoothie(object):
     def process_calm_down(self, arguments):
         return 'ok'
 
+    def process_halt(self, arguments):
+        e = 'ok Emergency Stop Requested - reset or M999 required to continue'
+        return e
+
     def process_absolute_positioning(self, arguments):
         self.absolute = True
         return 'ok'
@@ -207,6 +211,7 @@ class VirtualSmoothie(object):
             'G28': self.process_home_command,
             'M119': self.process_get_endstops,
             'M999': self.process_calm_down,
+            'M112': self.process_halt,
             'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
             'G91': self.process_relative_positioning,
