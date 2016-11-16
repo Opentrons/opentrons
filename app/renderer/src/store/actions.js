@@ -1,19 +1,19 @@
 import Vue from 'vue'
 import * as types from './mutation-types'
-import OpenTrons from '../rest_api_wrapper'
+import Opentrons from '../rest_api_wrapper'
 import {addHrefs, processTasks} from '../util'
 
 
 const actions = {
   connect_robot ({ commit }, port) {
     const payload = {is_connected: true, 'port': port}
-    OpenTrons.connect(port).then((was_successful) => {
+    Opentrons.connect(port).then((was_successful) => {
       if (was_successful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
         if (window.confirm("Successfully Connected. Do you want to home now?")) {
-          OpenTrons.home('all')
+          Opentrons.home('all')
         }
-        OpenTrons.getVersions().then((result) => {
+        Opentrons.getVersions().then((result) => {
           let versions = result
           commit(types.UPDATE_ROBOT_VERSIONS, {versions})
         })
@@ -21,7 +21,7 @@ const actions = {
     })
   },
   disconnect_robot ({ commit }) {
-    OpenTrons.disconnect().then((was_successful) => {
+    Opentrons.disconnect().then((was_successful) => {
       if (was_successful) {
         commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
       }
@@ -30,7 +30,7 @@ const actions = {
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     commit(types.UPLOADING, {'uploading': true})
-    OpenTrons.uploadProtocol(formData).then((result) => {
+    Opentrons.uploadProtocol(formData).then((result) => {
       let tasks
       if (result.success) {
         tasks = processTasks(result, commit)
@@ -45,7 +45,7 @@ const actions = {
     })
   },
   loadProtocol ({commit}) {
-    OpenTrons.loadProtocol().then((result) => {
+    Opentrons.loadProtocol().then((result) => {
       if (result.success) {
         let tasks = processTasks(result, commit)
         commit(types.UPDATE_TASK_LIST, {tasks})
@@ -62,20 +62,20 @@ const actions = {
   },
   jog ({commit}, coords) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.jog(coords).then((result) => {
+    Opentrons.jog(coords).then((result) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
   },
   jogToSlot ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.jogToSlot(data).then(() => {
+    Opentrons.jogToSlot(data).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
   },
   calibrate ({commit}, data) {
     let type = "plunger"
     if (data.slot) { type = "placeable"}
-    OpenTrons.calibrate(data, type).then((tasks) => {
+    Opentrons.calibrate(data, type).then((tasks) => {
       if (tasks) {
         commit('UPDATE_TASK_LIST', {'tasks': tasks})
       }
@@ -97,10 +97,10 @@ const actions = {
     commit(types.UPDATE_RUNNING, {'running': true})
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.runProtocol()
+    Opentrons.runProtocol()
   },
   pauseProtocol({ commit }) {
-    OpenTrons.pauseProtocol().then((was_successful) => {
+    Opentrons.pauseProtocol().then((was_successful) => {
       console.log(was_successful)
       if (was_successful) {
         commit(types.UPDATE_PAUSED, was_successful)
@@ -108,7 +108,7 @@ const actions = {
     })
   },
   resumeProtocol({ commit }) {
-    OpenTrons.resumeProtocol().then((was_successful) => {
+    Opentrons.resumeProtocol().then((was_successful) => {
       console.log(was_successful)
       if (was_successful) {
         commit(types.UPDATE_PAUSED, !was_successful)
@@ -116,35 +116,35 @@ const actions = {
     })
   },
   cancelProtocol({ commit }) {
-    OpenTrons.cancelProtocol()
+    Opentrons.cancelProtocol()
   },
   moveToPosition ({commit}, data) {
     let type = "plunger"
     if (data.slot) { type = "placeable" }
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.moveToPosition(data, type).then(() => {
+    Opentrons.moveToPosition(data, type).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
   },
   pickUpTip ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.pickUpTip(data).then(() => {
+    Opentrons.pickUpTip(data).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
   },
   dropTip ({commit}, data) {
-    OpenTrons.dropTip(data)
+    Opentrons.dropTip(data)
   },
   aspirate ({commit}, data) {
-    OpenTrons.aspirate(data)
+    Opentrons.aspirate(data)
   },
   dispense ({commit}, data) {
-    OpenTrons.dispense(data)
+    Opentrons.dispense(data)
   },
   maxVolume({commit}, data) {
-    OpenTrons.maxVolume(data).then((result) => {
+    Opentrons.maxVolume(data).then((result) => {
       if (result) {
-        OpenTrons.loadProtocol().then((result) => {
+        Opentrons.loadProtocol().then((result) => {
           if (result.success) {
             let tasks = processTasks(result, commit)
             commit(types.UPDATE_TASK_LIST, {tasks})
@@ -157,7 +157,7 @@ const actions = {
   },
   home ({commit}, data) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    OpenTrons.home(data.axis).then(() => {
+    Opentrons.home(data.axis).then(() => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     })
   }

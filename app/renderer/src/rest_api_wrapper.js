@@ -2,7 +2,7 @@ import Vue from 'vue'
 import {addHrefs, processProtocol} from './util'
 
 
-class OpenTrons {
+class Opentrons {
   constructor (base_url) {
     this.base_url = base_url || 'http://localhost:31950'
     this.connectUrl = this.base_url + '/robot/serial/connect'
@@ -259,4 +259,4 @@ class OpenTrons {
   }
 }
 
-export default new OpenTrons('http://localhost:31950')
+export default new Opentrons('http://localhost:31950')

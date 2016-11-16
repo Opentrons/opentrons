@@ -11,7 +11,7 @@ const {getSetting, toggleSetting} = require('./preferences')
 
 function addMenu() {
   const template =  [{
-    label: "OpenTrons",
+    label: "Opentrons",
     submenu: [
       { label: "About", selector: "orderFrontStandardAboutPanel:" },
       { type: "separator" },

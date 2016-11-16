@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenTrons/robot_frontend_v2.git"
+    "url": "https://github.com/Opentrons/robot_frontend_v2.git"
   },
   "author": {
     "name": "engineering@opentrons.com",
@@ -25,7 +25,7 @@
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/OpenTrons/robot_frontend_v2/issues"
+    "url": "https://github.com/Opentrons/robot_frontend_v2/issues"
   },
-  "homepage": "https://github.com/OpenTrons/robot_frontend_v2"
+  "homepage": "https://github.com/Opentrons/robot_frontend_v2"
 }
