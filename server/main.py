@@ -177,7 +177,6 @@ def load():
 
 def emit_notifications(notifications, _type):
     for notification in notifications:
-        print(notification)
         socketio.emit('event', {
             'name': 'notification',
             'text': notification,
@@ -326,12 +325,13 @@ def connect_robot():
     global robot
     try:
         robot.connect(port, options=options)
-        # emit_notifications(["Successfully connected. It is recommended that you home now."], 'info')
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
         status = 'error'
         data = str(e)
+        if "versions are incompatible" in data:
+            data += ". To upgrade, go to docs.opentrons.com"
         emit_notifications([data], 'danger')
 
     return flask.jsonify({

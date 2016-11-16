@@ -73,7 +73,7 @@ socket.on('disconnect', function(){
 })
 
 const websocketplugin = createWebSocketPlugin(socket)
-const toast = createModule({dismissInterval: 8000})
+const toast = createModule({dismissInterval: 12000})
 
 export default new Vuex.Store({
   state,
