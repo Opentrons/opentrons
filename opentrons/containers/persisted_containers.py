@@ -179,6 +179,12 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
 
         well = Well(properties=well_properties)
 
+        # subtract half the size, because
+        # Placeable assigns X-Y to bottom-left corner, but
+        # persisted container files assign X-Y to center of each Well
+        x -= (well.x_size() / 2)
+        y -= (well.y_size() / 2)
+
         well_coordinates = (
             x + origin_offset_x,
             y + origin_offset_y,
