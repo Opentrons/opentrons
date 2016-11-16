@@ -208,7 +208,10 @@ class CNCDriver(object):
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
         log.debug("Write: {}".format(str(data).encode()))
         if self.is_connected():
-            self.connection.write(str(data).encode())
+            try:
+                self.connection.write(str(data).encode())
+            except:
+                self.disconnect()
             return self.wait_for_response()
         elif self.connection is None:
             msg = "No connection found."
@@ -228,7 +231,7 @@ class CNCDriver(object):
     def wait_for_response(self, timeout=20.0):
         count = 0
         max_retries = int(timeout / self.serial_timeout)
-        while count < max_retries:
+        while self.is_connected() and count < max_retries:
             count = count + 1
             out = self.readline_from_serial()
             if out:
@@ -242,7 +245,7 @@ class CNCDriver(object):
                     log.debug(
                         "Waiting {} lines for response.".format(count)
                     )
-        raise RuntimeWarning('no response after {} seconds'.format(timeout))
+        raise RuntimeWarning('no response from serial port')
 
     def flush_port(self):
         # if we are running a virtual smoothie
@@ -256,11 +259,14 @@ class CNCDriver(object):
 
     def readline_from_serial(self):
         msg = b''
-        if self.is_connected():
-            # serial.readline() returns an empty byte string if it times out
-            msg = self.connection.readline().strip()
-            if msg:
-                log.debug("Read: {}".format(msg))
+        try:
+            msg = self.connection.readline()
+            msg = msg.strip()
+        except:
+            self.disconnect()
+            return b''
+        if msg:
+            log.debug("Read: {}".format(msg))
 
         # detect if it hit a home switch
         if b'!!' in msg or b'limit' in msg:
