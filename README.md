@@ -31,7 +31,7 @@
 
 ####Setup:
 
-`git clone https://github.com/OpenTrons/opentrons-app.git`
+`git clone https://github.com/Opentrons/opentrons-app.git`
 
 `cd robot_frontend_v2`
 
