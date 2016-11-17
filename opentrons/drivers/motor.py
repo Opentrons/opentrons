@@ -44,6 +44,8 @@ class CNCDriver(object):
 
     DISENGAGE_FEEDBACK = 'M63'
 
+    RESET = 'reset'
+
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
@@ -433,6 +435,11 @@ class CNCDriver(object):
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         return res == b'ok'
+
+    def reset(self):
+        res = self.send_command(self.RESET)
+        if b'Rebooting' in res:
+            self.disconnect()
 
     def set_position(self, **kwargs):
         uppercase_args = {}
