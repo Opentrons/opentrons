@@ -8,8 +8,15 @@ module.exports = {
     publicPath: '/dist/',
     filename: 'build.js'
   },
+  resolve: {
+    extensions: ['', '.js', '.vue'],
+    fallback: [path.join(__dirname, 'node_modules')],
+    alias: {
+      renderer: path.resolve(__dirname, 'app/renderer')
+    }
+  },
   resolveLoader: {
-    root: path.join(__dirname, 'node_modules'),
+    fallback: [path.join(__dirname, 'node_modules')]
   },
   module: {
     loaders: [
@@ -55,11 +62,6 @@ module.exports = {
   },
   headers: { "Access-Control-Allow-Origin": "http://localhost:5000", "Access-Control-Allow-Credentials": "true" },
   devtool: '#eval-source-map',
-  resolve: {
-    alias: {
-      vue: 'vue/dist/vue.js'
-    }
-  },
   target: "electron"
 }
 
