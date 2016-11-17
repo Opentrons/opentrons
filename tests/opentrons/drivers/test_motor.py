@@ -27,6 +27,10 @@ class OpenTronsTest(unittest.TestCase):
     def tearDown(self):
         self.motor.disconnect()
 
+    def test_reset(self):
+        self.motor.reset()
+        self.assertEquals(self.motor.connection, None)
+
     def test_write_without_connection(self):
         self.motor.disconnect()
         self.assertRaises(RuntimeError, self.motor.calm_down)
