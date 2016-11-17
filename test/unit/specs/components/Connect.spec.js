@@ -2,32 +2,40 @@ import { expect } from 'chai'
 import Vue from 'vue'
 
 // TODO: add link/comment to explain this..
+const detectedPorts = ['COM1', '/dev/tty.ccu123']
 const ConnectInjector = require('!!vue?inject!renderer/src/components/Connect.vue')
 const Connect = ConnectInjector({
   '../rest_api_wrapper': {
     getPortsList: function () {
       return {
-        then: function () {
-          return ['COM1', '/dev/tty.ccu123']
+        then: function (cb) {
+          console.log(arguments)
+          return cb(detectedPorts)
         }
       }
     }
   }
 })
 
+import store from 'renderer/src/store/store'
+
 
 describe('Connect Component', () => {
   // TODO: Figure out how to get inject-loader to work...
   it('renders with drop down', () => {
-
     const vm = new Vue({
+      store: store,
       el: document.createElement('div'),
-      // template: '<div><connect></connect></div>',
       render: h => h(Connect)
-      // components: {'connect': Connect}
     }).$mount()
-    console.log(vm.$el)
-    expect(vm.$el.querySelector('select')).to.be.true
+
+    let options = vm.$el.querySelectorAll('nav.connect select#connections option')
+    let dropdownPorts = []
+    options.forEach(el => dropdownPorts.push(el.innerHTML))
+    expect(vm.$el.querySelector('nav.connect select#connections').length).to.equal(4)
+
+    expect(/COM/.test(dropdownPorts[2])).to.be.true
+    expect(/ccu/.test(dropdownPorts[3])).to.be.true
   })
 
   it('has methods for business logic', () => {
