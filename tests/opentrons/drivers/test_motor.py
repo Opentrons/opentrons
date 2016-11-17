@@ -57,11 +57,11 @@ class OpenTronsTest(unittest.TestCase):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
 
     def test_set_plunger_speed(self):
-        res = self.motor.set_plunger_speed(400, 'a')
+        self.motor.set_plunger_speed(400, 'a')
         self.assertRaises(ValueError, self.motor.set_plunger_speed, 400, 'x')
 
     def test_set_head_speed(self):
-        res = self.motor.set_head_speed(4000)
+        self.motor.set_head_speed(4000)
         self.assertEquals(self.motor.head_speed, 4000)
 
     def test_get_connected_port(self):
