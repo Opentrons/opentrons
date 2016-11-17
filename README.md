@@ -19,13 +19,12 @@
 - [x] Pause, Resume, Cancel Protocol
 - [x] Diagnostics Route
 - [x] Packaging/Distribution for macOS, Windows, and Linux
-- [ ] Auto Updating (software and firmware)
-- [ ] Logging/Crash Reporting
-- [ ] Diagnostics Screen
-- [ ] Preferences Screen
+- [x] Auto Updating (software and firmware)
+- [x] Diagnostics
+- [x] Preferences Screen
 
 ##Setup and Usage
-(NOTE: This is an unfinished Beta project - use at your own risk)
+To download, visit (our app page)[http://opentrons.com/ot-app]. To build locally, follow the instructions below.
 
 ###macOS
 
@@ -33,7 +32,7 @@
 
 `git clone https://github.com/Opentrons/opentrons-app.git`
 
-`cd robot_frontend_v2`
+`cd opentrons-app`
 
 `npm install`
 
@@ -62,4 +61,4 @@ At this point, the Flask server that serves up the Single Page Application and h
 
 You can now open the OT App in your web browser by navigating to 127.0.0.1:5000. You can also open the app in Electron by running `npm start` from the root directory of this folder.
 
-If you would like to interface with the Virtual Smoothieboard (as opposed to the actual robot), you can execute `export Debug=True` before running `python main.py`.
+If you would like to interface with the Virtual Smoothieboard (as opposed to the actual robot), you can execute `export ENABLE_VIRTUAL_SMOOTHIE=True` before running `python main.py`.
