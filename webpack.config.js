@@ -12,7 +12,8 @@ module.exports = {
     extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, 'node_modules')],
     alias: {
-      renderer: path.resolve(__dirname, 'app/renderer')
+      renderer: path.resolve(__dirname, 'app/renderer'),
+      vue: 'vue/dist/vue.js'
     }
   },
   resolveLoader: {
