@@ -64,36 +64,13 @@
       jog(axis, multiplier) {
         let increment = this.$store.state.current_increment_placeable
         let increment_plunger = this.$store.state.current_increment_plunger
-        increment_plunger *=multiplier
         let coords = {}
-        switch(axis) {
-          case "x":
-            if (increment === 'Slot'){
-              increment = 91
-            }
-            increment *= multiplier
-            coords.x = increment
-            break;
-          case "y":
-            if (increment === 'Slot'){
-              increment = 135
-            }
-            increment *= multiplier
-            coords.y = increment
-            break;
-          case "z":
-            if (increment === 'Slot'){
-              increment = 1
-            }
-            increment *= multiplier
-            coords.z = increment
-            break;
-          case "a":
-            coords.a = increment_plunger
-            break;
-          case "b":
-            coords.b = increment_plunger
-            break;
+        const slots = {"x": 91, "y": 135, "z": 1}
+        if ("xyz".includes(axis)) {
+          if (increment === 'Slot') increment = slots[axis]
+          coords[axis] = increment * multiplier
+        } else if ("ab".includes(axis)) {
+          coords[axis] = increment_plunger * multiplier
         }
         this.$store.dispatch("jog", coords)
       },
@@ -101,16 +78,17 @@
         return this.$route.params.instrument || "b"
       },
       handleJogEvent(e) {
+        if (this.busy) return
         if (e.key === "ArrowLeft") {
-          return this.jog('x', -1)
+          this.jog('x', -1)
         } else if (e.key === "ArrowRight") {
-          return this.jog('x', 1)
+          this.jog('x', 1)
         } else if (e.key === "ArrowDown") {
           if (e.shiftKey) return this.jog('z', -1)
-          return this.jog('y', -1)
+          this.jog('y', -1)
         } else if (e.key === "ArrowUp") {
           if (e.shiftKey) return this.jog('z', 1)
-          return this.jog('y', 1)
+          this.jog('y', 1)
         }
       }
     },
