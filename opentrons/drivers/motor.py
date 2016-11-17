@@ -90,8 +90,9 @@ class CNCDriver(object):
     }
 
     def __init__(self):
+        self.halted = Event()
         self.stopped = Event()
-        self.can_move = Event()
+        self.paused = Event()
         self.resume()
         self.head_speed = 3000  # smoothie's default speed in mm/minute
         self.current_commands = []
@@ -170,21 +171,31 @@ class CNCDriver(object):
         self.turn_off_feedback()
 
     def pause(self):
-        self.can_move.clear()
+        self.halted.clear()
+        self.stopped.clear()
+        self.paused.clear()
 
     def resume(self):
-        self.can_move.set()
+        self.halted.clear()
         self.stopped.clear()
+        self.paused.set()
 
     def stop(self):
+        self.halted.clear()
         self.stopped.set()
-        self.can_move.set()
+        self.paused.set()
+
+    def halt(self):
+        self.halted.set()
+        self.stopped.set()
+        self.paused.set()
 
     def check_paused_stopped(self):
-        self.can_move.wait()
+        self.paused.wait()
         if self.stopped.is_set():
+            if self.halted.is_set():
+                self.send_command(self.HALT)
             self.resume()
-            self.halt()
             self.calm_down()
             raise RuntimeWarning('Stop signal received')
 
@@ -423,11 +434,6 @@ class CNCDriver(object):
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         return res == b'ok'
-
-    def halt(self):
-        res = self.send_command(self.HALT)
-        e = b'ok Emergency Stop Requested - reset or M999 required to continue'
-        return res == e
 
     def set_position(self, **kwargs):
         uppercase_args = {}
