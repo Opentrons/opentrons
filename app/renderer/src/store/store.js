@@ -43,6 +43,7 @@ function createWebSocketPlugin(socket) {
       if (data.name == 'command-run') {
         if (data.caller === 'ui') {
           store.commit(types.UPDATE_RUN_LOG, data)
+          store.commit(types.UPDATE_RUN_LENGTH, data)
         }
       }
       if (data.name == 'notification') {
@@ -51,6 +52,10 @@ function createWebSocketPlugin(socket) {
           text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
         }
+      }
+      if (data.name == 'run-finished') {
+        store.commit(types.UPDATE_ROBOT_STATE, {'busy': false})
+        store.commit(types.UPDATE_RUNNING, {'running': false})
       }
     })
   }
@@ -68,7 +73,7 @@ socket.on('disconnect', function(){
 })
 
 const websocketplugin = createWebSocketPlugin(socket)
-const toast = createModule({dismissInterval: 8000})
+const toast = createModule({dismissInterval: 12000})
 
 export default new Vuex.Store({
   state,

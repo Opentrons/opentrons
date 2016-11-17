@@ -186,4 +186,4 @@ class UploadTestCase(unittest.TestCase):
             )
         })
         status = json.loads(response.data.decode())['status']
-        self.assertEqual(status, 'success')
+        self.assertEqual(status, 'error')

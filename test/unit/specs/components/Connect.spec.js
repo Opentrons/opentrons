@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 
-// TODO: Figure out how to get inject-loader to work...
+// TODO: add link/comment to explain this..
 const ConnectInjector = require('!!vue?inject!renderer/src/components/Connect.vue')
-const ConnectMock = ConnectInjector({
+const ConnectComponent = ConnectInjector({
   '../rest_api_wrapper': {
     getPortsList: function () {
       return {
@@ -19,7 +19,8 @@ const ConnectMock = ConnectInjector({
 describe('Connect Component', () => {
   // TODO: Figure out how to get inject-loader to work...
   it('renders with drop down', () => {
-    const vm = new Vue(ConnectMock).$mount()
+    const vm = new Vue(ConnectComponent).$mount()
+    console.log(vm.$el)
     expect(vm.$el.querySelector('select')).to.be.true
   })
 

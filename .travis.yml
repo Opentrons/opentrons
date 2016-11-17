@@ -3,7 +3,7 @@ language: python
 matrix:
   # Set fast_finish to false to wait for OSX build to finish
   # We need both builds when we want to push an app update
-  # Otherwise with fast_finish: true 
+  # Otherwise with fast_finish: true
   # the success of Linux build is enough for CI purposes
   fast_finish: false
   include:

@@ -1,10 +1,10 @@
 <template>
   <div id="run" :class="{'disabled': !calibrated}">
-    <button @click="runProtocol()" class='btn-run'>Run Job</button>
+    <button v-show="!running" @click="runProtocol()" class='btn-run'>Run Job</button>
+    <button v-show="running"@click="cancelProtocol()" class="btn-clear">Cancel Job</button>
     <div class="controls">
-      <button @click="pauseProtocol()" class="btn btn-pause"></button>
-      <button @click="resumeProtocol()" class="btn btn-play"></button>
-      <button @click="cancelProtocol()" class="btn btn-clear"></button>
+      <button v-show="!paused && running" @click="pauseProtocol()" class="btn btn-pause"></button>
+      <button v-show="paused && running" @click="resumeProtocol()" class="btn btn-play"></button>
     </div>
   </div>
 </template>
@@ -27,8 +27,11 @@
       }
     },
     computed: {
-      runState() {
-        return this.$store.state.run_state
+      running() {
+        return this.$store.state.running
+      },
+      paused() {
+        return this.$store.state.paused
       },
       calibrated() {
         if(!this.$store.state.is_connected) return false

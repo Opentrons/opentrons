@@ -1,3 +1,4 @@
+if (require('electron-squirrel-startup')) return;
 const child_process = require('child_process')
 const fs = require('fs')
 const http = require('http')
@@ -10,6 +11,7 @@ const {addMenu} = require('./menu.js')
 const {getLogger} = require('./logging.js')
 const {initAutoUpdater} = require('./updater.js')
 const {ServerManager} = require('./servermanager.js')
+const {waitUntilServerResponds} = require('./util.js')
 
 
 let serverManager = new ServerManager()
@@ -20,7 +22,7 @@ if (process.env.NODE_ENV == 'development'){
 }
 
 function createWindow () {
-  mainWindow = new BrowserWindow({width: 1038, height: 650})
+  mainWindow = new BrowserWindow({width: 1060, height: 750})
   mainWindow.loadURL("http://127.0.0.1:31950")
   mainWindow.on('closed', function () {
     mainWindow = null
@@ -57,7 +59,7 @@ function startUp() {
 
   // Startup Actions
   serverManager.start();
-  setTimeout(createWindow, 2000)
+  waitUntilServerResponds(createWindow)
   addMenu()
   initAutoUpdater()
 }

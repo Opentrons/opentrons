@@ -16,10 +16,9 @@
 </template>
 
 <script>
-  import OpenTrons from '../rest_api_wrapper'
+  import Opentrons from '../rest_api_wrapper'
 
   export default {
-    OpenTrons,
     name: "Connect",
     data: function () {
       return {
@@ -46,7 +45,7 @@
           selected: "default",
           options: []
         }
-        OpenTrons.getPortsList().then((ports) => {
+        Opentrons.getPortsList().then((ports) => {
           this.ports.options = ports.map((port) => ({text: port, value: port}))
         })
       },

@@ -2,14 +2,13 @@ import Vue from 'vue'
 import {addHrefs, processProtocol} from './util'
 
 
-class OpenTrons {
+class Opentrons {
   constructor (base_url) {
     this.base_url = base_url || 'http://localhost:31950'
     this.connectUrl = this.base_url + '/robot/serial/connect'
     this.disconnectUrl = this.base_url + '/robot/serial/disconnect'
     this.jogUrl = this.base_url + '/jog'
     this.jogToSlotUrl = this.base_url + '/move_to_slot'
-    this.runPlanUrl = this.base_url + '/run-plan'
     this.runProtocolUrl = this.base_url + '/run'
     this.jogToContainerUrl = this.base_url + '/move_to_container'
     this.jogToPlungerUrl = this.base_url + '/move_to_plunger_position'
@@ -129,18 +128,6 @@ class OpenTrons {
       })
   }
 
-  getRunPlan () {
-    return Vue.http
-      .get(this.runPlanUrl)
-      .then((response) => {
-        if (response.body.status == 'success') {
-          return response.body.data || []
-        }
-        return []
-      }, (response) => {
-        console.log('failed', response)
-      })
-  }
   runProtocol () {
     return Vue.http
       .get(this.runProtocolUrl)
@@ -150,24 +137,31 @@ class OpenTrons {
         console.log("Protocol run failed to execute", response)
       })
   }
+
   pauseProtocol () {
     return Vue.http
       .get(this.pauseProtocolUrl)
       .then((response) => {
         console.log("success", response)
+        return true
       }, (response) => {
         console.log('failed', response)
+        return false
       })
   }
+
   resumeProtocol () {
     return Vue.http
       .get(this.resumeProtocolUrl)
       .then((response) => {
         console.log("success", response)
+        return true
       }, (response) => {
         console.log('failed', response)
+        return false
       })
   }
+
   cancelProtocol () {
     return Vue.http
       .get(this.cancelProtocolUrl)
@@ -177,6 +171,7 @@ class OpenTrons {
         console.log('failed', response)
       })
   }
+
   calibrate(data, type) {
     return Vue.http
       .post(`${this.base_url}/calibrate_${type}`, JSON.stringify(data), {emulateJSON: true})
@@ -212,7 +207,7 @@ class OpenTrons {
 
   aspirate (data) {
     return Vue.http
-      .post(this.asiprateUrl, JSON.stringify(data), {emulateJSON: true})
+      .post(this.aspirateUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
       }, (response) => {
@@ -235,8 +230,10 @@ class OpenTrons {
       .post(this.maxVolumeUrl, JSON.stringify(data), {emulateJSON: true})
       .then((response) => {
         console.log("success", response)
+        return true
       }, (response) => {
         console.log('failed', response)
+        return false
       })
   }
 
@@ -262,4 +259,4 @@ class OpenTrons {
   }
 }
 
-export default new OpenTrons('http://localhost:31950')
+export default new Opentrons('http://localhost:31950')
