@@ -27,7 +27,9 @@ function addMenu() {
         { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
         { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
         { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-      ]}, {
+      ]
+    },
+    {
       label: 'File',
       submenu: [
         {
@@ -50,7 +52,25 @@ function addMenu() {
           checked: getSetting("crashReport"),
           click() { toggleSetting("crashReport") }
         }
-      ]}
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Open API Documentation',
+          click() { electron.shell.openExternal('http://docs.opentrons.com') }
+        },
+        {
+          label: 'Open Getting Started',
+          click() { electron.shell.openExternal('https://opentrons.com/getting-started') }
+        },
+        {
+          label: 'Log an Issue',
+          click() { electron.shell.openExternal('https://github.com/OpenTrons/opentrons-app/issues/new') }
+        }
+      ]
+    }
   ]
 
   const menu = Menu.buildFromTemplate(template);
