@@ -159,6 +159,9 @@ class VirtualSmoothie(object):
     def process_version(self, arguments):
         return '{"version":' + self.version + '}'
 
+    def process_reset(self, arguments):
+        return 'Smoothie out. Peace. Rebooting in 5 seconds...'
+
     def process_config_get(self, arguments):
         folder = arguments[0]
         setting = arguments[1]
@@ -230,6 +233,7 @@ class VirtualSmoothie(object):
             'M17': self.process_power_on,
             'M18': self.process_power_off,
             'version': self.process_version,
+            'reset': self.process_reset,
             'config-get': self.process_config_get,
             'config-set': self.process_config_set
         }
