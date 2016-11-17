@@ -19,6 +19,7 @@
   import OpenTrons from '../rest_api_wrapper'
 
   export default {
+    OpenTrons,
     name: "Connect",
     data: function () {
       return {
