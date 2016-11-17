@@ -94,7 +94,8 @@ class CNCDriver(object):
         self.stopped = Event()
         self.paused = Event()
         self.resume()
-        self.head_speed = 3000  # smoothie's default speed in mm/minute
+        self.head_speed = 3000
+        self.plunger_speed = {'a': 300, 'b': 500}
         self.current_commands = []
 
         self.SMOOTHIE_SUCCESS = 'Succes'
@@ -302,22 +303,10 @@ class CNCDriver(object):
         else:
             raise ValueError('Invalid coordinate mode: ' + mode)
 
-    def move_plunger(self, mode='absolute', **kwargs):
-
+    def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
-        args = {axis.upper(): kwargs.get(axis)
-                for axis in 'ab'
-                if axis in kwargs}
-
-        return self.consume_move_commands(args)
-
-    def move_head(self, mode='absolute', **kwargs):
-
-        self.set_coordinate_system(mode)
-        self.set_head_speed()
         current = self.get_head_position()['target']
-
         log.debug('Current Head Position: {}'.format(current))
         target_point = {
             axis: kwargs.get(
@@ -328,20 +317,30 @@ class CNCDriver(object):
         }
         log.debug('Destination: {}'.format(target_point))
 
-        target_vector = Vector(target_point)
+        flipped_vector = self.flip_coordinates(
+            Vector(target_point), mode)
+        for axis in 'xyz':
+            kwargs[axis] = flipped_vector[axis]
 
-        flipped_vector = self.flip_coordinates(target_vector, mode)
-        args = (
-            {axis.upper(): flipped_vector[axis]
-             for axis in 'xyz' if axis in kwargs}
-        )
+        args = {axis.upper(): kwargs.get(axis)
+                for axis in 'xyzab'
+                if axis in kwargs}
+        args.update({"F": self.head_speed})
+        args.update({"a": self.plunger_speed['a']})
+        args.update({"b": self.plunger_speed['b']})
 
         return self.consume_move_commands(args)
+
+    def move_plunger(self, mode='absolute', **kwargs):
+        return self.move(mode, **kwargs)
+
+    def move_head(self, mode='absolute', **kwargs):
+        return self.move(mode, **kwargs)
 
     def consume_move_commands(self, args):
         self.check_paused_stopped()
 
-        log.debug("Moving head: {}".format(args))
+        log.debug("Moving : {}".format(args))
         res = self.send_command(self.MOVE, **args)
         if res != b'ok':
             return (False, self.SMOOTHIE_ERROR)
@@ -497,16 +496,11 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-        kwargs = {"F": self.head_speed}
-        res = self.send_command(self.SET_SPEED, **kwargs)
-        return res == b'ok'
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':
             raise ValueError('Axis {} not supported'.format(axis))
-        kwargs = {axis.lower(): rate}
-        res = self.send_command(self.SET_SPEED, **kwargs)
-        return res == b'ok'
+        self.plunger_speed[axis] = rate
 
     def versions_compatible(self):
         self.get_ot_version()
