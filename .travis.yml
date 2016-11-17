@@ -3,7 +3,7 @@ language: python
 matrix:
   # Set fast_finish to false to wait for OSX build to finish
   # We need both builds when we want to push an app update
-  # Otherwise with fast_finish: true 
+  # Otherwise with fast_finish: true
   # the success of Linux build is enough for CI purposes
   fast_finish: false
   include:
@@ -57,7 +57,7 @@ deploy:
   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
-    repo: Opentrons/opentrons-app
+    repo: OpenTrons/opentrons-app
     all_branches: true
 
 notifications:
