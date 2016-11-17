@@ -1,15 +1,10 @@
 import { expect } from 'chai'
-import Vue from 'vue'
-
-import ConnectComponent from '../../../../app/renderer/src/components/Connect.vue'
-
 
 // TODO: Figure out how to get inject-loader to work...
-// const ConnectInjector = require('!!vue?inject!../../../../app/renderer/src/components/Connect.vue')
-// const ConnectMock = ConnectInjector({}
-// '../rest_api_wrapper': {
-//     get
-// )
+const ConnectInjector = require('!!vue?inject!renderer/src/components/Connect.vue')
+const ConnectMock = ConnectInjector({
+  '../rest_api_wrapper': {}
+})
 
 
 describe('Connect Component', () => {
