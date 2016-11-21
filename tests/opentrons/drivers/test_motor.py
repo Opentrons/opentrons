@@ -202,22 +202,27 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.home()
         self.motor.set_steps_per_mm('x', 80.0)
         self.motor.set_steps_per_mm('y', 80.0)
+        self.motor.set_steps_per_mm('z', 1068.7)
         self.motor.move_head(x=200, y=200)
 
         self.motor.calibrate_steps_per_mm('x', 200, 198)
         self.motor.calibrate_steps_per_mm('y', 200, 202)
+        self.motor.calibrate_steps_per_mm('z', 100, 101)
 
         new_x_steps = self.motor.get_steps_per_mm('x')
         new_y_steps = self.motor.get_steps_per_mm('y')
+        new_z_steps = self.motor.get_steps_per_mm('z')
 
         exptected_x = round((200 / 198) * 80.0, 2)
         exptected_y = round((200 / 202) * 80.0, 2)
+        exptected_z = round((100 / 101) * 1068.7, 2)
 
         self.assertEqual(exptected_x, new_x_steps)
         self.assertEqual(exptected_y, new_y_steps)
+        self.assertEqual(exptected_z, new_z_steps)
 
-        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'z')
-        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'z', 80.0)
+        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'a')
+        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'a', 80.0)
 
         self.motor.set_steps_per_mm('x', 80.0)
         self.motor.set_steps_per_mm('y', 80.0)

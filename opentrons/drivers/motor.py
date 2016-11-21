@@ -67,7 +67,8 @@ class CNCDriver(object):
     CONFIG_VERSION = 'version'
     CONFIG_STEPS_PER_MM = {
         'x': 'alpha_steps_per_mm',
-        'y': 'beta_steps_per_mm'
+        'y': 'beta_steps_per_mm',
+        'z': 'gamma_steps_per_mm'
     }
 
     MOSFET = [
@@ -109,7 +110,7 @@ class CNCDriver(object):
             self.settings['DEFAULT'].get('timeout', 0.1))
         self.serial_baudrate = int(
             self.settings['DEFAULT'].get('baudrate', 0.1))
-        self.head_speed = int(self.settings['DEFAULT'].get('head-speed', 3000))
+        self.head_speed = int(self.settings['DEFAULT'].get('head_speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
             self.settings['compatible'].get('firmware-versions', '[]'))
@@ -183,10 +184,10 @@ class CNCDriver(object):
         self.versions_compatible()
         # set the previously saved steps_per_mm values for X and Y
         if self.ignore_smoothie_sd:
-            self.set_steps_per_mm(
-                'X', self.settings['config'].get('alpha_steps_per_mm', 80.0))
-            self.set_steps_per_mm(
-                'Y', self.settings['config'].get('beta_steps_per_mm', 80.0))
+            for axis in 'xyz':
+                self.set_steps_per_mm(
+                    axis, self.settings['config'].get(
+                        self.CONFIG_STEPS_PER_MM[axis]))
         return self.calm_down()
 
     def is_connected(self):
@@ -507,7 +508,7 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-            self.settings['DEFAULT']['head-speed'] = str(self.head_speed)
+            self.settings['DEFAULT']['head_speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
                 self.settings.write(configfile)
         kwargs = {"F": self.head_speed}
@@ -532,7 +533,7 @@ class CNCDriver(object):
         }
         if self.firmware_version not in self.COMPATIBLE_FIRMARE:
             res['firmware'] = False
-        if self.settings_version not in self.COMPATIBLE_CONFIG:
+        if self.config_file_version not in self.COMPATIBLE_CONFIG:
             res['config'] = False
         if not self.ot_version:
             res['ot_version'] = False
@@ -544,7 +545,7 @@ class CNCDriver(object):
                 'config={config}, '
                 'ot_version={ot_version}'.format(
                     firmware=self.firmware_version,
-                    config=self.settings_version,
+                    config=self.config_file_version,
                     ot_version=self.ot_version
                 )
             )
@@ -571,11 +572,11 @@ class CNCDriver(object):
 
     def get_config_version(self):
         res = self.get_config_value(self.CONFIG_VERSION)
-        self.settings_version = res
-        return self.settings_version
+        self.config_file_version = res
+        return self.config_file_version
 
     def get_steps_per_mm(self, axis):
-        if axis not in self.CONFIG_STEPS_PER_MM:
+        if axis.lower() not in 'xyz':
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM)
@@ -588,7 +589,7 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def set_steps_per_mm(self, axis, value):
-        if axis.lower() not in self.CONFIG_STEPS_PER_MM:
+        if axis.lower() not in 'xyz':
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
