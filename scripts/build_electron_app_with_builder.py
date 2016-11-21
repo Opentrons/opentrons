@@ -166,6 +166,8 @@ def clean_build_dist(build_tag):
     """
 
     platform_type = util.get_os()
+    if platform_type == "win":
+        platform_type = "win-unpacked"
 
     electron_builder_dist = os.path.join(project_root_dir, "dist", platform_type)
     print("\n\n\n\n*******************\n\n\n")
