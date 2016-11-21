@@ -148,6 +148,7 @@ Table of Contents
    setup
    getting_started
    well_access
+   running_app
    tips_and_tricks
    module
    api
