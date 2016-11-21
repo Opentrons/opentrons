@@ -81,7 +81,7 @@
         "dmg",
         "zip"
       ],
-      "category": "public.app-category.productivity"
+      "category": "productivity"
     },
     "win": {
       "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
