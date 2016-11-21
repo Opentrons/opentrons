@@ -168,7 +168,7 @@ def clean_build_dist(build_tag):
     platform_type = util.get_os()
 
     electron_builder_dist = os.path.join(project_root_dir, "dist", platform_type)
-
+    print(os.listdir(os.path.join(project_root_dir, "dist")))
     print(script_tab + 'Contents electron-builder dist dir: {}'.format(
         str(os.listdir(os.path.join(project_root_dir, "dist", platform_type)))
     ))
