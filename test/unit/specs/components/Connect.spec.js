@@ -8,7 +8,7 @@ import sinon from 'sinon'
 Vue.use(Vuex)
 
 const detectedPorts = ['COM1', '/dev/tty.ccu123']
-const ConnectInjector = require('!!vue?inject!renderer/src/components/Connect.vue')
+const ConnectInjector = require('!!vue?inject!renderer/components/Connect.vue')
 const Connect = ConnectInjector({
   '../rest_api_wrapper': {
     getPortsList: function () {
