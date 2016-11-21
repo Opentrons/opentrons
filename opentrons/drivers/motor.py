@@ -1,6 +1,9 @@
+import configparser
 import glob
 import json
 import math
+import os
+import pkg_resources
 import sys
 import time
 from threading import Event
@@ -13,6 +16,15 @@ from opentrons.util.vector import Vector
 
 from opentrons.util import trace
 
+
+CONFIG_DIR_PATH = pkg_resources.resource_filename(
+    'opentrons.config',
+    'smoothie'
+)
+CONFIG_FILE_PATH = os.path.join(
+    CONFIG_DIR_PATH,
+    'smoothie-config.ini'
+)
 
 JSON_ERROR = None
 if sys.version_info > (3, 4):
@@ -41,23 +53,21 @@ class CNCDriver(object):
     ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
+    STEPS_PER_MM = 'M92'
 
     DISENGAGE_FEEDBACK = 'M63'
 
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
-    GET_OT_VERSION = 'config-get sd ot_version'
+    CONFIG_GET = 'config-get sd'
+    CONFIG_SET = 'config-set sd'
+    OT_VERSION = 'ot_version'
     GET_FIRMWARE_VERSION = 'version'
-    GET_CONFIG_VERSION = 'config-get sd version'
-    GET_STEPS_PER_MM = {
-        'x': 'config-get sd alpha_steps_per_mm',
-        'y': 'config-get sd beta_steps_per_mm'
-    }
-
-    SET_STEPS_PER_MM = {
-        'x': 'config-set sd alpha_steps_per_mm ',
-        'y': 'config-set sd beta_steps_per_mm '
+    CONFIG_VERSION = 'version'
+    CONFIG_STEPS_PER_MM = {
+        'x': 'alpha_steps_per_mm',
+        'y': 'beta_steps_per_mm'
     }
 
     MOSFET = [
@@ -74,33 +84,42 @@ class CNCDriver(object):
     """
     connection = None
 
-    serial_timeout = 0.1
+    serial_timeout = None
+    serial_baudrate = None
 
-    # TODO: move to config
-    COMPATIBLE_FIRMARE = ['v1.0.5']
-    COMPATIBLE_CONFIG = ['v1.2.0']
     firmware_version = None
     config_version = None
-
     ot_version = None
-    ot_one_dimensions = {
-        'hood': Vector(400, 250, 100),
-        'one_pro': Vector(400, 400, 100),
-        'one_standard': Vector(400, 400, 100)
-    }
 
     def __init__(self):
+
+        self.config = configparser.ConfigParser()
+        self.config.read(CONFIG_FILE_PATH)
+
         self.stopped = Event()
         self.can_move = Event()
         self.resume()
-        self.head_speed = 3000  # smoothie's default speed in mm/minute
         self.current_commands = []
 
-        self.SMOOTHIE_SUCCESS = 'Succes'
+        self.SMOOTHIE_SUCCESS = 'Success'
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
         self.STOPPED = 'Received a STOP signal and exited from movements'
 
-        self.ignore_config = False
+        self.serial_timeout = float(self.config['DEFAULT'].get('timeout', 0.1))
+        self.serial_baudrate = int(self.config['DEFAULT'].get('baudrate', 0.1))
+
+        self.head_speed = int(self.config['DEFAULT'].get('head-speed', 3000))
+
+        self.COMPATIBLE_FIRMARE = json.loads(
+            self.config['compatible'].get('firmware-versions', '[]'))
+        self.COMPATIBLE_CONFIG = json.loads(
+            self.config['compatible'].get('config-versions', '[]'))
+        self.ot_one_dimensions = json.loads(
+            self.config['compatible'].get('ot_models', '{}'))
+        for key in self.ot_one_dimensions.keys():
+            self.ot_one_dimensions[key] = Vector(self.ot_one_dimensions[key])
+
+        self.ignore_smoothie_sd = False
 
     def get_connected_port(self):
         """
@@ -129,8 +148,9 @@ class CNCDriver(object):
         elif (sys.platform.startswith('linux') or
               sys.platform.startswith('cygwin')):
             # this excludes your current terminal "/dev/tty"
-            self.ignore_config = True
             ports = glob.glob('/dev/tty*')
+            # ignore Smoothie's local storage if linux (temporary work-around)
+            self.ignore_smoothie_sd = True
         elif sys.platform.startswith('darwin'):
             ports = glob.glob('/dev/tty.*')
         else:
@@ -187,7 +207,7 @@ class CNCDriver(object):
         self.can_move.wait()
         if self.stopped.is_set():
             self.resume()
-            raise RuntimeWarning('Stop signal received')
+            raise RuntimeWarning(self.STOPPED)
 
     def send_command(self, command, **kwargs):
         """
@@ -480,6 +500,9 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
+            self.config['DEFAULT']['head-speed'] = str(self.head_speed)
+            with open(CONFIG_FILE_PATH, 'w') as configfile:
+                self.config.write(configfile)
         kwargs = {"F": self.head_speed}
         res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
@@ -521,12 +544,11 @@ class CNCDriver(object):
         return res
 
     def get_ot_version(self):
-        if self.ignore_config:
-            self.ot_version = 'one_pro'
+        if self.ignore_smoothie_sd:
+            self.ot_version = self.config['DEFAULT'].get(
+                self.OT_VERSION, 'one_pro')
             return self.ot_version
-
-        res = self.send_command(self.GET_OT_VERSION)
-        res = res.decode().split(' ')[-1]
+        res = self.get_config_value(self.OT_VERSION)
         self.ot_version = None
         if res not in self.ot_one_dimensions:
             log.debug('{} is not an ot_version'.format(res))
@@ -545,31 +567,59 @@ class CNCDriver(object):
         return self.firmware_version
 
     def get_config_version(self):
-        if self.ignore_config:
-            self.config_version = self.COMPATIBLE_CONFIG[0]
+        if self.ignore_smoothie_sd:
+            self.config_version = self.config['DEFAULT'].get(
+                self.CONFIG_VERSION, self.COMPATIBLE_CONFIG[0])
             return self.config_version
-        res = self.send_command(self.GET_CONFIG_VERSION)
-        res = res.decode().split(' ')[-1]
+        res = self.get_config_value(self.CONFIG_VERSION)
         self.config_version = res
         return self.config_version
 
     def get_steps_per_mm(self, axis):
-        if axis not in self.GET_STEPS_PER_MM:
+        if axis not in self.CONFIG_STEPS_PER_MM:
             raise ValueError('Axis {} not supported'.format(axis))
-        if self.ignore_config:
-            return 80.0
-        res = self.send_command(self.GET_STEPS_PER_MM[axis])
-        return float(res.decode().split(' ')[-1])
+
+        res = self.send_command(self.STEPS_PER_MM)
+        self.wait_for_response()  # extra b'ok' sent from smoothie
+        try:
+            value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
+            return float(value)
+        except Exception:
+            raise RuntimeError(
+                '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def set_steps_per_mm(self, axis, value):
-        if axis not in self.SET_STEPS_PER_MM:
-            raise ValueError('Axis {} not supported'.format(axis))
-        if self.ignore_config:
-            return True
-        command = self.SET_STEPS_PER_MM[axis]
-        command += str(value)
+        if axis not in self.CONFIG_STEPS_PER_MM:
+            raise ValueError('Axis {} notify supported'.format(axis))
+
+        res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
+        self.wait_for_response()  # extra b'ok' sent from smoothie
+        value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
+        if not self.ignore_smoothie_sd:
+            key = self.CONFIG_STEPS_PER_MM[axis]
+            self.set_config_value(key, str(value))
+        try:
+            response_dict = json.loads(res.decode())
+            returned_value = response_dict[self.STEPS_PER_MM][axis.upper()]
+            return float(returned_value) == value
+        except Exception:
+            raise RuntimeError(
+                '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
+
+    def get_config_value(self, key):
+        command = '{0} {1}'.format(self.CONFIG_GET, key)
         res = self.send_command(command)
-        return res.decode().split(' ')[-1] == str(value)
+        return res.decode().split(' ')[-1]
+
+    def set_config_value(self, key, value):
+        command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
+        res = self.send_command(command)
+        success = res.decode().split(' ')[-1] == str(value)
+        if success:
+            self.config['DEFAULT'][key] = value
+            with open(CONFIG_FILE_PATH, 'w') as configfile:
+                self.config.write(configfile)
+        return success
 
     def get_endstop_switches(self):
         first_line = self.send_command(self.GET_ENDSTOPS)

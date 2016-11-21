@@ -17,7 +17,11 @@ class OpenTronsTest(unittest.TestCase):
         self.motor = self.robot._driver
 
         options = {
-            'limit_switches': True
+            'limit_switches': True,
+            'config': {
+                'alpha_steps_per_mm': 80.0,
+                'beat_steps_per_mm': 80.0
+            }
         }
 
         myport = self.robot.VIRTUAL_SMOOTHIE_PORT

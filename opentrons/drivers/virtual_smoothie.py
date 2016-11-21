@@ -39,6 +39,13 @@ class VirtualSmoothie(object):
             'min_a': 0,
             'min_b': 0
         }
+        print(self.config.get('alpha_steps_per_mm'))
+        self.steps_per_mm = {
+            'X': self.config.get('alpha_steps_per_mm', 80),
+            'Y': self.config.get('beta_steps_per_mm', 80),
+            'Z': 1068.7,
+            'F': 60
+        }
         self.init_coordinates()
 
     def isOpen(self):
@@ -172,6 +179,14 @@ class VirtualSmoothie(object):
         return '{0}: {1} has been set to {2}'.format(
             folder, setting, value)
 
+    def process_steps_per_mm(self, arguments):
+        for axis in arguments.keys():
+            if axis.upper() in 'XYZ':
+                self.steps_per_mm[axis.upper()] = arguments[axis]
+        response = json.dumps({'M92': self.steps_per_mm})
+        response += '\nok'
+        return response
+
     def process_dwell_command(self, arguments):
         return 'ok'
 
@@ -206,6 +221,7 @@ class VirtualSmoothie(object):
             'G92': self.process_set_position_command,
             'G28': self.process_home_command,
             'M119': self.process_get_endstops,
+            'M92': self.process_steps_per_mm,
             'M999': self.process_calm_down,
             'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
