@@ -7,25 +7,21 @@ Using the App
 Download App
 --------------------
 
-You can download the latest version of the app from out website **website link**
+You can download the latest version of the app from `our website`_.
+
+.. _our website: https://opentrons.com/getting-started/download-app
 
 Connect to Robot
 --------------------
 
 Make sure your robot is turned on, and your laptop is connected via USB cable.
 
-Mac OSX
-^^^^^^^^^^^^^^^^^^^^
-
 Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.  
 
-.. screenshot button with mac drop down
+.. screenshot button with port drop down
 
-
-Windows 10
-^^^^^^^^^^^^^^^^^^^^
-
-.. screenshot button with windows down
+.. image:: img/app/ports.png
+.. image:: img/app/connected.png
 
 .. important::
 
@@ -34,7 +30,8 @@ Windows 10
 Upload Protocol
 --------------------
 
-Click to upload your protocol file (refer to :ref:`running_a_protocol`)
+Click to upload your protocol file (please refer to :doc:`running_a_protocol`)
+
 
 Jogging
 --------------------
@@ -44,7 +41,7 @@ XYZ
 
 Move in the X, Y and Z by selecting your desired increment, and then clicking an arrow button.
 
-.. screenshot pipette jog
+.. image:: img/app/pipette-jog.png
 
 Slot Button
 ^^^^^^^^^^^^^^^^^^^^
@@ -65,10 +62,15 @@ Move to Slot
 
 Jump to any slot on the deck with the Move to Slot buttons.  The deck will automatically react and change between a 3x5 layout and a 2x5 layout based on which robot you are connected to (Hood vs. Pro/Standard)
 
+.. image:: img/app/move-to-slot.png
+
+
 Calibrate
 --------------------
 
 Once each container or pipette is calibrated, a check mark will appear next to it in the container list.
+
+.. image:: img/app/container-list.png
 
 Tipracks
 ^^^^^^^^^^^^^^^^^^^^
@@ -76,6 +78,8 @@ Tipracks
 Jog the pipette down into the first tip in the tip rack.  It should be firmly pushed into the tip, and the pick up tip button can be used to test its seating.
 
 Calling the pick up tip button from anywhere on the deck will direct the robot back to the tiprack to pick up a tip.  Drop tip will send the tip to the trash.
+
+.. image:: img/app/container-calibration.png
 
 Containers
 ^^^^^^^^^^^^^^^^^^^^
@@ -87,7 +91,7 @@ Pipettes
 
 Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.  
 
-.. screengrab pipette calibrations**
+.. image:: img/app/pipette-calibration.png
 
 Once these positions are all saved, you can test your calibrations. This is most easily done gravimetrically using a small scale. Use the aspirate and dispense buttons to pick up liquid and eject it onto the scale. If this volume isn't exactly what you expect, maybe 203 uL instead of 200, no big deal! You can go input the value into the max volume box. The robot will adjust its calculations accordingly and will then be able to dispense the correct volumes during experiments.
 
@@ -98,4 +102,4 @@ Run Protocol
 
 Once all your positions are saved, you can run your protocol.  A progress will keep track of what percentage of your protocol has been done.  Protocols can be paused, or they can be stopped entirely.  We recommend homing after all protocols have been completed or stopped.
 
-.. screengrab run buttons**
+.. image:: img/app/running-protocol.png
