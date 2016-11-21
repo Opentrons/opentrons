@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Vue from 'vue'
 import Vuex from 'vuex'
 import sinon from 'sinon'
@@ -6,7 +7,6 @@ import sinon from 'sinon'
 
 Vue.use(Vuex)
 
-// TODO: add link/comment to explain this..
 const detectedPorts = ['COM1', '/dev/tty.ccu123']
 const ConnectInjector = require('!!vue?inject!renderer/src/components/Connect.vue')
 const Connect = ConnectInjector({

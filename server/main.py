@@ -770,6 +770,8 @@ def set_max_volume():
     try:
         instrument = robot._instruments[axis.upper()]
         instrument.set_max_volume(int(volume))
+        msg = "Max volume set to {0}ul on the {1} axis".format(volume, axis)
+        emit_notifications([msg], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
