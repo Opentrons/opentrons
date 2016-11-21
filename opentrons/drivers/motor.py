@@ -184,9 +184,9 @@ class CNCDriver(object):
         # set the previously saved steps_per_mm values for X and Y
         if self.ignore_smoothie_sd:
             self.set_steps_per_mm(
-                'X', self.settings['config'].get('alpha_steps_per_mm'))
+                'X', self.settings['config'].get('alpha_steps_per_mm', 80.0))
             self.set_steps_per_mm(
-                'Y', self.settings['config'].get('beta_steps_per_mm'))
+                'Y', self.settings['config'].get('beta_steps_per_mm', 80.0))
         return self.calm_down()
 
     def is_connected(self):
