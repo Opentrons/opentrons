@@ -105,8 +105,10 @@ class CNCDriver(object):
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
         self.STOPPED = 'Received a STOP signal and exited from movements'
 
-        self.serial_timeout = float(self.settings['DEFAULT'].get('timeout', 0.1))
-        self.serial_baudrate = int(self.settings['DEFAULT'].get('baudrate', 0.1))
+        self.serial_timeout = float(
+            self.settings['DEFAULT'].get('timeout', 0.1))
+        self.serial_baudrate = int(
+            self.settings['DEFAULT'].get('baudrate', 0.1))
         self.head_speed = int(self.settings['DEFAULT'].get('head-speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
