@@ -30,6 +30,7 @@ test:
   imports:
     - opentrons
     - opentrons.config
+    - opentrons.config.smoothie
     - opentrons.config.containers
     - opentrons.containers
     - opentrons.drivers
