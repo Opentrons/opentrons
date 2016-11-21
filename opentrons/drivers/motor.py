@@ -100,6 +100,8 @@ class CNCDriver(object):
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
         self.STOPPED = 'Received a STOP signal and exited from movements'
 
+        self.ignore_config = False
+
     def get_connected_port(self):
         """
         Returns the port the driver is currently connected to
@@ -127,6 +129,7 @@ class CNCDriver(object):
         elif (sys.platform.startswith('linux') or
               sys.platform.startswith('cygwin')):
             # this excludes your current terminal "/dev/tty"
+            self.ignore_config = True
             ports = glob.glob('/dev/tty*')
         elif sys.platform.startswith('darwin'):
             ports = glob.glob('/dev/tty.*')
@@ -518,6 +521,10 @@ class CNCDriver(object):
         return res
 
     def get_ot_version(self):
+        if self.ignore_config:
+            self.ot_version = 'one_pro'
+            return self.ot_version
+
         res = self.send_command(self.GET_OT_VERSION)
         res = res.decode().split(' ')[-1]
         self.ot_version = None
@@ -538,6 +545,9 @@ class CNCDriver(object):
         return self.firmware_version
 
     def get_config_version(self):
+        if self.ignore_config:
+            self.config_version = self.COMPATIBLE_CONFIG[0]
+            return self.config_version
         res = self.send_command(self.GET_CONFIG_VERSION)
         res = res.decode().split(' ')[-1]
         self.config_version = res
@@ -546,12 +556,16 @@ class CNCDriver(object):
     def get_steps_per_mm(self, axis):
         if axis not in self.GET_STEPS_PER_MM:
             raise ValueError('Axis {} not supported'.format(axis))
+        if self.ignore_config:
+            return 80.0
         res = self.send_command(self.GET_STEPS_PER_MM[axis])
         return float(res.decode().split(' ')[-1])
 
     def set_steps_per_mm(self, axis, value):
         if axis not in self.SET_STEPS_PER_MM:
             raise ValueError('Axis {} not supported'.format(axis))
+        if self.ignore_config:
+            return True
         command = self.SET_STEPS_PER_MM[axis]
         command += str(value)
         res = self.send_command(command)
