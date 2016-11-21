@@ -93,8 +93,8 @@ class CNCDriver(object):
 
     def __init__(self):
 
-        self.config = configparser.ConfigParser()
-        self.config.read(CONFIG_FILE_PATH)
+        self.settings = configparser.ConfigParser()
+        self.settings.read(CONFIG_FILE_PATH)
 
         self.stopped = Event()
         self.can_move = Event()
@@ -105,16 +105,16 @@ class CNCDriver(object):
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
         self.STOPPED = 'Received a STOP signal and exited from movements'
 
-        self.serial_timeout = float(self.config['DEFAULT'].get('timeout', 0.1))
-        self.serial_baudrate = int(self.config['DEFAULT'].get('baudrate', 0.1))
-        self.head_speed = int(self.config['DEFAULT'].get('head-speed', 3000))
+        self.serial_timeout = float(self.settings['DEFAULT'].get('timeout', 0.1))
+        self.serial_baudrate = int(self.settings['DEFAULT'].get('baudrate', 0.1))
+        self.head_speed = int(self.settings['DEFAULT'].get('head-speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
-            self.config['compatible'].get('firmware-versions', '[]'))
+            self.settings['compatible'].get('firmware-versions', '[]'))
         self.COMPATIBLE_CONFIG = json.loads(
-            self.config['compatible'].get('config-versions', '[]'))
+            self.settings['compatible'].get('config-versions', '[]'))
         self.ot_one_dimensions = json.loads(
-            self.config['compatible'].get('ot_versions', '{}'))
+            self.settings['compatible'].get('ot_versions', '{}'))
         for key in self.ot_one_dimensions.keys():
             self.ot_one_dimensions[key] = Vector(self.ot_one_dimensions[key])
 
@@ -182,9 +182,9 @@ class CNCDriver(object):
         # set the previously saved steps_per_mm values for X and Y
         if self.ignore_smoothie_sd:
             self.set_steps_per_mm(
-                'X', self.config['config'].get('alpha_steps_per_mm'))
+                'X', self.settings['config'].get('alpha_steps_per_mm'))
             self.set_steps_per_mm(
-                'Y', self.config['config'].get('beta_steps_per_mm'))
+                'Y', self.settings['config'].get('beta_steps_per_mm'))
         return self.calm_down()
 
     def is_connected(self):
@@ -505,9 +505,9 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-            self.config['DEFAULT']['head-speed'] = str(self.head_speed)
+            self.settings['DEFAULT']['head-speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
-                self.config.write(configfile)
+                self.settings.write(configfile)
         kwargs = {"F": self.head_speed}
         res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
@@ -530,7 +530,7 @@ class CNCDriver(object):
         }
         if self.firmware_version not in self.COMPATIBLE_FIRMARE:
             res['firmware'] = False
-        if self.config_version not in self.COMPATIBLE_CONFIG:
+        if self.settings_version not in self.COMPATIBLE_CONFIG:
             res['config'] = False
         if not self.ot_version:
             res['ot_version'] = False
@@ -542,7 +542,7 @@ class CNCDriver(object):
                 'config={config}, '
                 'ot_version={ot_version}'.format(
                     firmware=self.firmware_version,
-                    config=self.config_version,
+                    config=self.settings_version,
                     ot_version=self.ot_version
                 )
             )
@@ -569,8 +569,8 @@ class CNCDriver(object):
 
     def get_config_version(self):
         res = self.get_config_value(self.CONFIG_VERSION)
-        self.config_version = res
-        return self.config_version
+        self.settings_version = res
+        return self.settings_version
 
     def get_steps_per_mm(self, axis):
         if axis not in self.CONFIG_STEPS_PER_MM:
@@ -603,7 +603,7 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        res = self.config['config'].get(key)
+        res = self.settings['config'].get(key)
         if not self.ignore_smoothie_sd:
             command = '{0} {1}'.format(self.CONFIG_GET, key)
             res = self.send_command(command).decode().split(' ')[-1]
@@ -615,9 +615,9 @@ class CNCDriver(object):
             command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
             res = self.send_command(command)
             success = res.decode().split(' ')[-1] == str(value)
-        self.config['config'][key] = value
+        self.settings['config'][key] = value
         with open(CONFIG_FILE_PATH, 'w') as configfile:
-            self.config.write(configfile)
+            self.settings.write(configfile)
         return success
 
     def get_endstop_switches(self):
