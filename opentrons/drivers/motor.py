@@ -115,7 +115,7 @@ class CNCDriver(object):
         self.COMPATIBLE_CONFIG = json.loads(
             self.config['compatible'].get('config-versions', '[]'))
         self.ot_one_dimensions = json.loads(
-            self.config['compatible'].get('ot_models', '{}'))
+            self.config['compatible'].get('ot_versions', '{}'))
         for key in self.ot_one_dimensions.keys():
             self.ot_one_dimensions[key] = Vector(self.ot_one_dimensions[key])
 
@@ -152,6 +152,7 @@ class CNCDriver(object):
             # ignore Smoothie's local storage if linux (temporary work-around)
             self.ignore_smoothie_sd = True
         elif sys.platform.startswith('darwin'):
+            self.ignore_smoothie_sd = True
             ports = glob.glob('/dev/tty.*')
         else:
             raise EnvironmentError('Unsupported platform')
@@ -544,10 +545,6 @@ class CNCDriver(object):
         return res
 
     def get_ot_version(self):
-        if self.ignore_smoothie_sd:
-            self.ot_version = self.config['DEFAULT'].get(
-                self.OT_VERSION, 'one_pro')
-            return self.ot_version
         res = self.get_config_value(self.OT_VERSION)
         self.ot_version = None
         if res not in self.ot_one_dimensions:
@@ -567,10 +564,6 @@ class CNCDriver(object):
         return self.firmware_version
 
     def get_config_version(self):
-        if self.ignore_smoothie_sd:
-            self.config_version = self.config['DEFAULT'].get(
-                self.CONFIG_VERSION, self.COMPATIBLE_CONFIG[0])
-            return self.config_version
         res = self.get_config_value(self.CONFIG_VERSION)
         self.config_version = res
         return self.config_version
@@ -595,9 +588,8 @@ class CNCDriver(object):
         res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
         self.wait_for_response()  # extra b'ok' sent from smoothie
         value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
-        if not self.ignore_smoothie_sd:
-            key = self.CONFIG_STEPS_PER_MM[axis]
-            self.set_config_value(key, str(value))
+        key = self.CONFIG_STEPS_PER_MM[axis]
+        self.set_config_value(key, str(value))
         try:
             response_dict = json.loads(res.decode())
             returned_value = response_dict[self.STEPS_PER_MM][axis.upper()]
@@ -607,18 +599,21 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        command = '{0} {1}'.format(self.CONFIG_GET, key)
-        res = self.send_command(command)
-        return res.decode().split(' ')[-1]
+        res = self.config['DEFAULT'].get(key)
+        if not self.ignore_smoothie_sd:
+            command = '{0} {1}'.format(self.CONFIG_GET, key)
+            res = self.send_command(command).decode().split(' ')[-1]
+        return res
 
     def set_config_value(self, key, value):
-        command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
-        res = self.send_command(command)
-        success = res.decode().split(' ')[-1] == str(value)
-        if success:
-            self.config['DEFAULT'][key] = value
-            with open(CONFIG_FILE_PATH, 'w') as configfile:
-                self.config.write(configfile)
+        success = True
+        if not self.ignore_smoothie_sd:
+            command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
+            res = self.send_command(command)
+            success = res.decode().split(' ')[-1] == str(value)
+        self.config['DEFAULT'][key] = value
+        with open(CONFIG_FILE_PATH, 'w') as configfile:
+            self.config.write(configfile)
         return success
 
     def get_endstop_switches(self):

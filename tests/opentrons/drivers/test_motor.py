@@ -219,6 +219,9 @@ class OpenTronsTest(unittest.TestCase):
         self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'z')
         self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'z', 80.0)
 
+        self.motor.set_steps_per_mm('x', 80.0)
+        self.motor.set_steps_per_mm('y', 80.0)
+
     def test_get_endstop_switches(self):
         res = self.motor.get_endstop_switches()
         expected = {
