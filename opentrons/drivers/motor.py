@@ -109,7 +109,7 @@ class CNCDriver(object):
         self.serial_timeout = float(
             self.settings['DEFAULT'].get('timeout', 0.1))
         self.serial_baudrate = int(
-            self.settings['DEFAULT'].get('baudrate', 0.1))
+            self.settings['DEFAULT'].get('baudrate', 115200))
         self.head_speed = int(self.settings['DEFAULT'].get('head_speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
