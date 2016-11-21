@@ -226,6 +226,7 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor.set_steps_per_mm('x', 80.0)
         self.motor.set_steps_per_mm('y', 80.0)
+        self.motor.set_steps_per_mm('z', 1068.7)
 
     def test_get_endstop_switches(self):
         res = self.motor.get_endstop_switches()
