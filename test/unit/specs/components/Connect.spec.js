@@ -63,6 +63,8 @@ describe('Connect.vue', () => {
     connect.selected = detectedPorts[0]
     connect.connectToRobot()
     expect(mockStore.actions.connect_robot.called).to.be.true
+    let selectEl = vm.$el.querySelector('select#connections')
+    console.log(selectEl)
   })
 
 
@@ -81,24 +83,25 @@ describe('Connect.vue', () => {
     connect.selected = detectedPorts[0]
     connect.disconnectRobot()
     expect(mockStore.actions.disconnect_robot.called).to.be.true
+    expect(vm.$el.querySelector('nav '))
   })
 
-  // it('doesnt change connected port after refresh', () => {
-  //   mockStore.state.is_connected = true
-  //   mockStore.state.port = detectedPorts[0]
-  //
-  //   const vm = new Vue({
-  //     store: new Vuex.Store(mockStore),
-  //     el: document.createElement('div'),
-  //     render: h => h(Connect)
-  //   }).$mount()
-  //
-  //   expect(vm.$children[0].connected).to.be.true
-  //   let connect = vm.$children[0]
-  //   connect.selected = detectedPorts[0]
-  //   connect.refre()
-  //   expect(mockStore.actions.disconnect_robot.called).to.be.true
-  // })
+  it('does not change connected port after refresh', () => {
+    mockStore.state.is_connected = true
+    mockStore.state.port = detectedPorts[0]
+
+    const vm = new Vue({
+      store: new Vuex.Store(mockStore),
+      el: document.createElement('div'),
+      render: h => h(Connect)
+    }).$mount()
+    expect(vm.$children[0].connected).to.be.true
+
+    let connect = vm.$children[0]
+    connect.selected = detectedPorts[0]
+    connect.searchIfNecessary()
+    expect(mockStore.actions.disconnect_robot.called).to.be.true
+  })
 
 
   it('has methods for business logic', () => {

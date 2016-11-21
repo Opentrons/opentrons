@@ -8,12 +8,10 @@
       </option>
     </select>
 
-<div id="indicator" :class="{ 'connected': connected}"></div>
-
-
+    <div id="indicator" :class="{ 'connected': connected}"></div>
   </nav>
-
 </template>
+
 
 <script>
   import Opentrons from '../rest_api_wrapper'
@@ -62,10 +60,6 @@
         }
       },
       connectToRobot: function() {
-        if (this.ports.selected === 'Refresh' && this.$store.state.is_connected) {
-          this.ports.selected = this.$store.state.port
-          return
-        }
         this.$store.dispatch('connect_robot', this.ports.selected)
       },
       disconnectRobot: function() {
