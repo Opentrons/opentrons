@@ -39,11 +39,10 @@ class VirtualSmoothie(object):
             'min_a': 0,
             'min_b': 0
         }
-        print(self.config.get('alpha_steps_per_mm'))
         self.steps_per_mm = {
             'X': self.config.get('alpha_steps_per_mm', 80),
             'Y': self.config.get('beta_steps_per_mm', 80),
-            'Z': 1068.7,
+            'Z': self.config.get('gamma_steps_per_mm', 1068.7),
             'F': 60
         }
         self.init_coordinates()

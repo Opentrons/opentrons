@@ -594,12 +594,12 @@ class CNCDriver(object):
 
         res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
         self.wait_for_response()  # extra b'ok' sent from smoothie after M92
-        value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
+
         key = self.CONFIG_STEPS_PER_MM[axis.lower()]
-        self.set_config_value(key, str(value))
         try:
             response_dict = json.loads(res.decode())
             returned_value = response_dict[self.STEPS_PER_MM][axis.upper()]
+            self.set_config_value(key, str(returned_value))
             return float(returned_value) == value
         except Exception:
             raise RuntimeError(
