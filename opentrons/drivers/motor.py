@@ -107,7 +107,6 @@ class CNCDriver(object):
 
         self.serial_timeout = float(self.config['DEFAULT'].get('timeout', 0.1))
         self.serial_baudrate = int(self.config['DEFAULT'].get('baudrate', 0.1))
-
         self.head_speed = int(self.config['DEFAULT'].get('head-speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
@@ -183,9 +182,9 @@ class CNCDriver(object):
         # set the previously saved steps_per_mm values for X and Y
         if self.ignore_smoothie_sd:
             self.set_steps_per_mm(
-                'X', self.config['DEFAULT'].get('alpha_steps_per_mm'))
+                'X', self.config['config'].get('alpha_steps_per_mm'))
             self.set_steps_per_mm(
-                'Y', self.config['DEFAULT'].get('beta_steps_per_mm'))
+                'Y', self.config['config'].get('beta_steps_per_mm'))
         return self.calm_down()
 
     def is_connected(self):
@@ -604,7 +603,7 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        res = self.config['DEFAULT'].get(key)
+        res = self.config['config'].get(key)
         if not self.ignore_smoothie_sd:
             command = '{0} {1}'.format(self.CONFIG_GET, key)
             res = self.send_command(command).decode().split(' ')[-1]
@@ -616,7 +615,7 @@ class CNCDriver(object):
             command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
             res = self.send_command(command)
             success = res.decode().split(' ')[-1] == str(value)
-        self.config['DEFAULT'][key] = value
+        self.config['config'][key] = value
         with open(CONFIG_FILE_PATH, 'w') as configfile:
             self.config.write(configfile)
         return success
