@@ -181,6 +181,12 @@ class CNCDriver(object):
         self.reset_port()
         log.debug("Connected to {}".format(device))
         self.versions_compatible()
+        # set the previously saved steps_per_mm values for X and Y
+        if self.ignore_smoothie_sd:
+            self.set_steps_per_mm(
+                'X', self.config['DEFAULT'].get('alpha_steps_per_mm'))
+            self.set_steps_per_mm(
+                'Y', self.config['DEFAULT'].get('beta_steps_per_mm'))
         return self.calm_down()
 
     def is_connected(self):
@@ -573,7 +579,7 @@ class CNCDriver(object):
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM)
-        self.wait_for_response()  # extra b'ok' sent from smoothie
+        self.wait_for_response()  # extra b'ok' sent from smoothie after M92
         try:
             value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
             return float(value)
@@ -582,13 +588,13 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def set_steps_per_mm(self, axis, value):
-        if axis not in self.CONFIG_STEPS_PER_MM:
-            raise ValueError('Axis {} notify supported'.format(axis))
+        if axis.lower() not in self.CONFIG_STEPS_PER_MM:
+            raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
-        self.wait_for_response()  # extra b'ok' sent from smoothie
+        self.wait_for_response()  # extra b'ok' sent from smoothie after M92
         value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
-        key = self.CONFIG_STEPS_PER_MM[axis]
+        key = self.CONFIG_STEPS_PER_MM[axis.lower()]
         self.set_config_value(key, str(value))
         try:
             response_dict = json.loads(res.decode())
