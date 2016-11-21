@@ -369,7 +369,8 @@ class Robot(object, metaclass=Singleton):
                         'ot_version': 'one_pro',
                         'version': 'v1.0.3',        # config version
                         'alpha_steps_per_mm': 80.0,
-                        'beta_steps_per_mm': 80.0
+                        'beta_steps_per_mm': 80.0,
+                        'gamma_steps_per_mm': 1068.7
                     }
                 }
 
@@ -381,7 +382,8 @@ class Robot(object, metaclass=Singleton):
                 'ot_version': 'one_pro',
                 'version': 'v1.2.0',        # config version
                 'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
+                'beta_steps_per_mm': 80.0,
+                'gamma_steps_per_mm': 1068.7
             }
         }
         if options:
