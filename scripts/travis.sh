@@ -9,7 +9,7 @@ run_install ()
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
   else
     mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
-    echo "$(brew --prefix nvm)/nvm.sh" >> ~/.bashrc    
+    echo "$(brew --prefix nvm)/nvm.sh" >> ~/.bashrc
   fi
 
   if [ "$1" == "linux" ]; then
@@ -25,9 +25,9 @@ run_install ()
   # We are running in container environment for Linux
   # Install into user's home dir
   if [ "$1" == "linux" ]; then
-    pip3 install --user pip --upgrade 
+    pip3 install --user pip --upgrade
   else
-    pip3 install pip --upgrade 
+    pip3 install pip --upgrade
   fi
 
   which pip
@@ -51,7 +51,7 @@ run_install ()
   npm run unit
   npm run release:posix
   npm run integration
-  ls dist/$1
+  ls dist/*
   ls releases
 }
 
@@ -127,4 +127,3 @@ fi
 if [ "$os" = "Linux" ]; then
     execute_linux $1
 fi
-
