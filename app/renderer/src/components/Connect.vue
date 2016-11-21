@@ -46,7 +46,6 @@
           options: []
         }
         Opentrons.getPortsList().then((ports) => {
-          console.log(ports)
           this.ports.options = ports.map((port) => ({text: port, value: port}))
         })
       },
