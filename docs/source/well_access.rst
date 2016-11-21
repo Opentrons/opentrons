@@ -11,7 +11,7 @@ Rows vs. Columns
 
 The OT-One deck and containers are all set up with the same coordinate system - numbered rows and lettered columns.
 
---Insert diagrams showing rows, columns and well order (left to right etc.)
+.. Insert diagrams showing rows, columns and well order (left to right etc.)
 
 
 Accessing Wells

@@ -19,13 +19,13 @@ Mac OSX
 
 Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.  
 
-** screenshot button with mac drop down**
+.. screenshot button with mac drop down
 
 
 Windows 10
 ^^^^^^^^^^^^^^^^^^^^
 
-** screenshot button with windows down**
+.. screenshot button with windows down
 
 .. important::
 
@@ -44,7 +44,7 @@ XYZ
 
 Move in the X, Y and Z by selecting your desired increment, and then clicking an arrow button.
 
-**screenshot pipette jog**
+.. screenshot pipette jog
 
 Slot Button
 ^^^^^^^^^^^^^^^^^^^^
@@ -56,7 +56,7 @@ AB Plungers
 
 Use the plunger jog to move the plunger up and down.  If you have selected a container or the pipette for the B axis, then the B axis will move, and if you have selected a container or the pipette for the A axis, it will move.   
 
-**screenshot plunger jog**
+.. screenshot plunger jog
 
 The app automatically toggles between pipettes (unlike 1.2)
 
@@ -87,7 +87,7 @@ Pipettes
 
 Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.  
 
-**screengrab pipette calibrations**
+.. screengrab pipette calibrations**
 
 Once these positions are all saved, you can test your calibrations. This is most easily done gravimetrically using a small scale. Use the aspirate and dispense buttons to pick up liquid and eject it onto the scale. If this volume isn't exactly what you expect, maybe 203 uL instead of 200, no big deal! You can go input the value into the max volume box. The robot will adjust its calculations accordingly and will then be able to dispense the correct volumes during experiments.
 
@@ -98,4 +98,4 @@ Run Protocol
 
 Once all your positions are saved, you can run your protocol.  A progress will keep track of what percentage of your protocol has been done.  Protocols can be paused, or they can be stopped entirely.  We recommend homing after all protocols have been completed or stopped.
 
-**screengrab run buttons**
+.. screengrab run buttons**
