@@ -13,17 +13,25 @@ module.exports = {
     fallback: [path.join(__dirname, 'node_modules')],
     alias: {
       renderer: path.resolve(__dirname, 'app/renderer'),
-      vue: 'vue/dist/vue.js'
+      vue: 'vue/dist/vue.js',
+      sinon: 'sinon/pkg/sinon'
     }
   },
   resolveLoader: {
     fallback: [path.join(__dirname, 'node_modules')]
   },
   module: {
+    noParse: [
+      /sinon/
+    ],
     preLoaders: [
 
     ],
     loaders: [
+      {
+        test: /sinon.*\.js$/,
+        loader: "imports?define=>false,require=>false"
+      },
       {
         test: /\.vue$/,
         loader: 'vue'

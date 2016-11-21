@@ -1,7 +1,10 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import sinon from 'sinon'
 
+
+Vue.use(Vuex)
 
 // TODO: add link/comment to explain this..
 const detectedPorts = ['COM1', '/dev/tty.ccu123']
@@ -14,44 +17,27 @@ const Connect = ConnectInjector({
           return cb(detectedPorts)
         }
       }
-    },
-    connectToRobot: function () {
-      console.log('connecToRobot called')
-      return {
-        then: function (cb) {
-          return cb()
-        }
-      }
     }
   }
 })
 
-
 // import store from 'renderer/src/store/store'
-
-import sinon from 'sinon'
-
-Vue.use(Vuex)
-
-
-const mockedStore = {
+const mockStore = {
   state: {
     is_connected: false,
-    port: null,
+    port: null
   },
   actions: {
-    connect_robot: new sinon.spy(),
-    disconnect_robot: new sinon.spy(),
+    connect_robot: sinon.spy(),
+    disconnect_robot: sinon.spy(),
   }
-
 }
 
 
-describe('Connect Component', () => {
-  // TODO: Figure out how to get inject-loader to work...
+describe('Connect.vue', () => {
   it('renders with drop down', () => {
     const vm = new Vue({
-      store: new Vuex.Store(mockedStore),
+      store: new Vuex.Store(mockStore),
       el: document.createElement('div'),
       render: h => h(Connect)
     }).$mount()
@@ -65,34 +51,54 @@ describe('Connect Component', () => {
     expect(/ccu/.test(dropdownPorts[3])).to.be.true
   })
 
-  it('connects to a robot', done => {
-    // console.log(Connect.__file)
-    // console.log(Object.keys(Connect))
-    // console.log(Connect.store)
-
-    // Connect.methods.connectToRobot()
+  it('connects to a robot', () => {
     const vm = new Vue({
-      // store: store,
-      store: new Vuex.Store(mockedStore),
+      store: new Vuex.Store(mockStore),
+      el: document.createElement('div'),
+      render: h => h(Connect)
+    }).$mount()
+    expect(vm.$store.state.is_connected).to.be.false
+
+    let connect = vm.$children[0]
+    connect.selected = detectedPorts[0]
+    connect.connectToRobot()
+    expect(mockStore.actions.connect_robot.called).to.be.true
+  })
+
+
+  it('disconnects from robot', () => {
+    mockStore.state.is_connected = true
+    mockStore.state.port = detectedPorts[0]
+
+    const vm = new Vue({
+      store: new Vuex.Store(mockStore),
       el: document.createElement('div'),
       render: h => h(Connect)
     }).$mount()
 
-    console.log(Connect.data())
-    Connect.methods.searchIfNecessary()
-
-    Vue.nextTick(() => {
-      console.log(vm.$el)
-      expect(vm.$store.state.is_connected).to.be.true
-      done()
-    })
-
-    //
-    // // vm.$store.state.selected = detectedPorts[0]
-    // // console.log(Object.keys(vm))
-    // // vm.methods.connectToRobot()
-    // expect(vm.$store.state.is_connected).to.be.true
+    expect(vm.$children[0].connected).to.be.true
+    let connect = vm.$children[0]
+    connect.selected = detectedPorts[0]
+    connect.disconnectRobot()
+    expect(mockStore.actions.disconnect_robot.called).to.be.true
   })
+
+  // it('doesnt change connected port after refresh', () => {
+  //   mockStore.state.is_connected = true
+  //   mockStore.state.port = detectedPorts[0]
+  //
+  //   const vm = new Vue({
+  //     store: new Vuex.Store(mockStore),
+  //     el: document.createElement('div'),
+  //     render: h => h(Connect)
+  //   }).$mount()
+  //
+  //   expect(vm.$children[0].connected).to.be.true
+  //   let connect = vm.$children[0]
+  //   connect.selected = detectedPorts[0]
+  //   connect.refre()
+  //   expect(mockStore.actions.disconnect_robot.called).to.be.true
+  // })
 
 
   it('has methods for business logic', () => {
