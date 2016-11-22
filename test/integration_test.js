@@ -3,26 +3,7 @@ let chai = require('chai')
 let chaiAsPromised = require('chai-as-promised')
 let path = require('path')
 let glob = require("glob")
-
-
-let appPath;
-if (process.platform === 'win32') {
-  appPath = path.resolve(
-    __dirname,
-    '../node_modules/electron/dist/Electron.exe'
-  );
-} else if (process.platform === 'darwin') {
-  appPath = path.resolve(
-    __dirname,
-    '../node_modules/electron/dist/Electron.app/Contents/MacOS/Electron'
-  );
-} else {
-  appPath = path.resolve(
-    __dirname,
-    '../node_modules/electron/dist/electron'
-  );
-}
-
+let appPath = require("electron")
 
 chai.should()
 chai.use(chaiAsPromised)
