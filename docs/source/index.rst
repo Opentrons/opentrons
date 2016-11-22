@@ -147,8 +147,8 @@ Table of Contents
    updating_firmware
    setup
    getting_started
-   running_app
    well_access
+   running_app
    tips_and_tricks
    module
    api
