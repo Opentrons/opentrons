@@ -22,7 +22,8 @@ module.exports = {
   },
   module: {
     noParse: [
-      /sinon/
+      /sinon/,
+      /socket.io/
     ],
     preLoaders: [
 
