@@ -335,7 +335,7 @@ class Robot(object, metaclass=Singleton):
         try:
             device = serial.Serial(
                 port=port,
-                baudrate=115200,
+                baudrate=self._driver.serial_baudrate,
                 timeout=self._driver.serial_timeout
             )
             return device
@@ -369,7 +369,8 @@ class Robot(object, metaclass=Singleton):
                         'ot_version': 'one_pro',
                         'version': 'v1.0.3',        # config version
                         'alpha_steps_per_mm': 80.0,
-                        'beta_steps_per_mm': 80.0
+                        'beta_steps_per_mm': 80.0,
+                        'gamma_steps_per_mm': 1068.7
                     }
                 }
 
@@ -381,12 +382,14 @@ class Robot(object, metaclass=Singleton):
                 'ot_version': 'one_pro',
                 'version': 'v1.2.0',        # config version
                 'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
+                'beta_steps_per_mm': 80.0,
+                'gamma_steps_per_mm': 1068.7
             }
         }
-        if not options:
-            options = {}
-        default_options.update(options)
+        if options:
+            default_options['config'].update(options.get('config', {}))
+            options['config'] = default_options['config']
+            default_options.update(options)
         return VirtualSmoothie(port=port, options=default_options)
 
     def connect(self, port=None, options=None):
