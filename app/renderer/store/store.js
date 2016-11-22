@@ -6,12 +6,11 @@ import app_mutations from './mutations'
 import app_actions from './actions'
 import { createModule, ADD_TOAST_MESSAGE } from 'vuex-toast'
 
-
 const { mutations, state } = app_mutations
 const { actions } = app_actions
 Vue.use(Vuex)
 
-function createWebSocketPlugin(socket) {
+function createWebSocketPlugin (socket) {
   return store => {
     socket.on('event', data => {
       if (data.type === 'connection_status') {
@@ -28,10 +27,7 @@ function createWebSocketPlugin(socket) {
           b: data.position.plunger.b
         })
       }
-      if (data.name === "home" && data.axis) {
-        let axis_homed = data.axis.split('').map((axis) => {
-          return axis.toLowerCase()
-        })
+      if (data.name === 'home' && data.axis) {
         store.commit(types.UPDATE_POSITION, {
           x: data.position.head.x,
           y: data.position.head.y,
@@ -40,20 +36,20 @@ function createWebSocketPlugin(socket) {
           b: data.position.plunger.b
         })
       }
-      if (data.name == 'command-run') {
+      if (data.name === 'command-run') {
         if (data.caller === 'ui') {
           store.commit(types.UPDATE_RUN_LOG, data)
           store.commit(types.UPDATE_RUN_LENGTH, data)
         }
       }
-      if (data.name == 'notification') {
-        if (data.text.length > 0){
+      if (data.name === 'notification') {
+        if (data.text.length > 0) {
           let {text, type} = data
           text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
         }
       }
-      if (data.name == 'run-finished') {
+      if (data.name === 'run-finished') {
         store.commit(types.UPDATE_ROBOT_STATE, {'busy': false})
         store.commit(types.UPDATE_RUNNING, {'running': false})
       }
@@ -63,12 +59,12 @@ function createWebSocketPlugin(socket) {
 
 const socket = io.connect('ws://localhost:31950')
 
-socket.on('connect', function(){
+socket.on('connect', function () {
   console.log('WebSocket has connected.')
   socket.emit('connected')
-});
+})
 
-socket.on('disconnect', function(){
+socket.on('disconnect', function () {
   console.log('WebSocket has disconnected')
 })
 
