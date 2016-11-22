@@ -250,8 +250,8 @@ class CNCDriver(object):
         if self.stopped.is_set():
             if self.halted.is_set():
                 self.send_command(self.HALT)
+                self.calm_down()
             self.resume()
-            self.calm_down()
             raise RuntimeWarning(self.STOPPED)
 
     def send_command(self, command, **kwargs):
