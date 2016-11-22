@@ -2,13 +2,13 @@
 	<section id="task">
 		<h1 class="title">
 			Calibrate the {{this.instrument().label}} pipette to the
-			{{this.containerType(this.type) == "tiprack" ? "center" : "bottom"}}
+			{{this.sanitizedType === "tiprack" ? "center" : "bottom"}}
 			{{this.calibrationPoint}} of your {{this.placeable.label}} container
 		</h1>
 		<CalibratePlaceable :placeable='placeable()' :instrument='instrument()'>
 		</CalibratePlaceable>
 		<div class="well-img">
-			<img :src="`${placeableImages(this.type, this.channels)}`" />
+			<img :src="`${placeableImages(this.sanitizedType, this.channels)}`" />
 		</div>
 	</section>
 </template>
@@ -32,20 +32,8 @@
 					return placeable.label === this.$route.params.placeable
 				})[0]
 			},
-			containerType(type){
-				if (type === "point") {
-					return "point"
-				} else if (type.includes("tiprack")) {
-					return "tiprack"
-				} else if (type.includes("trough")) {
-					return "trough"
-				} else if (type.includes("tuberack")) {
-					return "tuberack"
-				}else {
-					return "default"
-				}
-			},
 			placeableImages(type, channels) {
+				console.log(type, channels)
 				const imageUrls = {
 					"default": {"single": "well_single", "multi": "well_multi"},
 					"tiprack": {"single": "tiprack_single", "multi": "tiprack_multi"},
@@ -57,17 +45,12 @@
 			}
     },
 		computed: {
-			type() {
-				let placeable = this.placeable()
-				let type = this.containerType(placeable.type)
-				return type
-			},
 			channels() {
 				console.log(typeof(this.instrument.channels), this.instrument.channels)
 				return this.instrument().channels === 1 ? "single" : "multi"
 			},
 			calibrationPoint() {
-				let type = this.containerType(this.type)
+				let type = this.sanitizedType
 				let position = "of the A1 well"
 				if (type == "trough") {
 					position = "of the A1 slot"
@@ -77,6 +60,20 @@
 					position = ""
 				}
 				return position
+			},
+			sanitizedType() {
+				let type = this.placeable().type
+				if (type === "point") {
+					return "point"
+				} else if (type.includes("tiprack")) {
+					return "tiprack"
+				} else if (type.includes("trough")) {
+					return "trough"
+				} else if (type.includes("tuberack")) {
+					return "tuberack"
+				} else {
+					return "default"
+				}
 			}
 		},
 		created: function() {
