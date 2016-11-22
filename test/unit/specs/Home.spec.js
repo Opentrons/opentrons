@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import Vue from 'vue'
 
-import Home from 'renderer/src/components/Home.vue'
+import Home from 'renderer/components/Home.vue'
 
 
 describe('Home.vue', () => {

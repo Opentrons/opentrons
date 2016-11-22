@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import * as types from '../../../../app/renderer/src/store/mutation-types'
-import app_mutations from '../../../../app/renderer/src/store/mutations'
+import * as types from 'renderer/store/mutation-types'
+import app_mutations from 'renderer/store/mutations'
 const { mutations } = app_mutations
 
 
