@@ -94,7 +94,7 @@ class CNCDriver(object):
     def __init__(self):
         self.halted = Event()
         self.stopped = Event()
-        self.paused = Event()
+        self.do_not_pause = Event()
         self.resume()
         self.current_commands = []
 
@@ -229,25 +229,25 @@ class CNCDriver(object):
     def pause(self):
         self.halted.clear()
         self.stopped.clear()
-        self.paused.clear()
+        self.do_not_pause.clear()
 
     def resume(self):
         self.halted.clear()
         self.stopped.clear()
-        self.paused.set()
+        self.do_not_pause.set()
 
     def stop(self):
         self.halted.clear()
         self.stopped.set()
-        self.paused.set()
+        self.do_not_pause.set()
 
     def halt(self):
         self.halted.set()
         self.stopped.set()
-        self.paused.set()
+        self.do_not_pause.set()
 
     def check_paused_stopped(self):
-        self.paused.wait()
+        self.do_not_pause.wait()
         if self.stopped.is_set():
             if self.halted.is_set():
                 self.send_command(self.HALT)
@@ -277,8 +277,9 @@ class CNCDriver(object):
         if self.is_connected():
             try:
                 self.connection.write(str(data).encode())
-            except:
+            except Exception as e:
                 self.disconnect()
+                raise RuntimeError('Lost connection with serial port') from e
             return self.wait_for_response()
         elif self.connection is None:
             msg = "No connection found."
@@ -323,9 +324,9 @@ class CNCDriver(object):
         try:
             msg = self.connection.readline()
             msg = msg.strip()
-        except:
+        except Exception as e:
             self.disconnect()
-            return b''
+            raise RuntimeWarning('Lost connection with serial port') from e
         if msg:
             log.debug("Read: {}".format(msg))
 

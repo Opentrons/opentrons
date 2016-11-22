@@ -25,6 +25,7 @@ class OpenTronsTest(unittest.TestCase):
         }
 
         myport = self.robot.VIRTUAL_SMOOTHIE_PORT
+        self.robot.disconnect()
         success = self.robot.connect(port=myport, options=options)
         self.assertTrue(success)
 
