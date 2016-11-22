@@ -35,6 +35,12 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.disconnect()
         self.assertRaises(RuntimeError, self.motor.calm_down)
 
+    def test_write_with_lost_connection(self):
+        old_method = self.motor.is_connected
+        self.motor.is_connected = lambda: False
+        self.assertRaises(RuntimeError, self.motor.calm_down)
+        self.motor.is_connected = old_method
+
     def test_version_compatible(self):
         self.robot.disconnect()
         self.robot.connect()
@@ -56,6 +62,9 @@ class OpenTronsTest(unittest.TestCase):
             }
         }
         self.assertRaises(RuntimeError, self.robot.connect, **kwargs)
+
+    def test_invalid_coordinate_system(self):
+        self.assertRaises(ValueError, self.motor.set_coordinate_system, 'andy')
 
     def test_message_timeout(self):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
@@ -135,6 +144,7 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_get_position(self):
         self.motor.home()
+        self.motor.ot_version = None
         self.motor.move_head(x=100)
         coords = self.motor.get_head_position()
         expected_coords = {
