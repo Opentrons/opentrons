@@ -2,7 +2,6 @@ let Application = require('spectron').Application
 let chai = require('chai')
 let chaiAsPromised = require('chai-as-promised')
 let path = require('path')
-let glob = require("glob")
 let appPath = require("electron")
 
 chai.should()
