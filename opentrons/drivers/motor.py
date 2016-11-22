@@ -300,14 +300,8 @@ class CNCDriver(object):
         raise RuntimeWarning('no response after {} seconds'.format(timeout))
 
     def flush_port(self):
-        # if we are running a virtual smoothie
-        # we don't need a timeout for flush
-        if isinstance(self.connection, VirtualSmoothie):
-            self.readline_from_serial()
-        else:
+        while self.readline_from_serial():
             time.sleep(self.serial_timeout)
-            while self.readline_from_serial():
-                time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
         msg = b''
