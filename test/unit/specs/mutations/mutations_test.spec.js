@@ -4,7 +4,6 @@ import * as types from 'renderer/store/mutation-types'
 import app_mutations from 'renderer/store/mutations'
 const { mutations } = app_mutations
 
-
 describe('mutations', () => {
   it(types.UPDATE_ROBOT_CONNECTION, () => {
     // mock state

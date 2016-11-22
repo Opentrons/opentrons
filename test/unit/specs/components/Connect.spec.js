@@ -1,9 +1,7 @@
 import { expect } from 'chai'
-
 import Vue from 'vue'
 import Vuex from 'vuex'
 import sinon from 'sinon'
-
 
 Vue.use(Vuex)
 
@@ -21,7 +19,6 @@ const Connect = ConnectInjector({
   }
 })
 
-
 function getMockStore() {
   return {
     state: {
@@ -34,7 +31,6 @@ function getMockStore() {
     }
   }
 }
-
 
 describe('Connect.vue', () => {
   it('renders with drop down', () => {
@@ -95,7 +91,8 @@ describe('Connect.vue', () => {
     mockStore.state.port = detectedPorts
     Vue.nextTick(() => {
       let selectEl = vm.$el.querySelector('select#connections')
-      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal("Select a port")
+      let msg = 'Select a port'
+      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal(msg)
       done()
     })
   })
