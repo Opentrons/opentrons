@@ -10,7 +10,6 @@ from threading import Event
 
 import serial
 
-from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 
