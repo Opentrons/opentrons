@@ -9,17 +9,17 @@ let appPath;
 if (process.platform === 'win32') {
   appPath = path.resolve(
     __dirname,
-    '../node_modules/electron-prebuilt/dist/Electron.exe'
+    '../node_modules/electron/dist/Electron.exe'
   );
 } else if (process.platform === 'darwin') {
   appPath = path.resolve(
     __dirname,
-    '../node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron'
+    '../node_modules/electron/dist/Electron.app/Contents/MacOS/Electron'
   );
 } else {
   appPath = path.resolve(
     __dirname,
-    '../node_modules/electron-prebuilt/dist/electron'
+    '../node_modules/electron/dist/electron'
   );
 }
 
