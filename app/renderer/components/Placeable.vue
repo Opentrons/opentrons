@@ -33,12 +33,11 @@
 				})[0]
 			},
 			placeableImages(type, channels) {
-				console.log(type, channels)
 				const imageUrls = {
 					"default": {"single": "well_single", "multi": "well_multi"},
 					"tiprack": {"single": "tiprack_single", "multi": "tiprack_multi"},
 					"trough": {"single": "trough_single", "multi": "trough_multi"},
-					"tuberack": {"single": "tuberack_single", "tuberack_single": ""},
+					"tuberack": {"single": "tuberack_single", "multi": "tuberack_single"},
 					"point": {"single": "point_trash", "multi": "point_trash"}
 				}
 				return require(`../assets/img/${imageUrls[type][channels]}.png`)
@@ -46,7 +45,6 @@
     },
 		computed: {
 			channels() {
-				console.log(typeof(this.instrument.channels), this.instrument.channels)
 				return this.instrument().channels === 1 ? "single" : "multi"
 			},
 			calibrationPoint() {
@@ -63,17 +61,10 @@
 			},
 			sanitizedType() {
 				let type = this.placeable().type
-				if (type === "point") {
-					return "point"
-				} else if (type.includes("tiprack")) {
-					return "tiprack"
-				} else if (type.includes("trough")) {
-					return "trough"
-				} else if (type.includes("tuberack")) {
-					return "tuberack"
-				} else {
-					return "default"
-				}
+				let sanitized = ['point', 'tiprack', 'trough', 'tuberack'].filter((el) =>
+					type.includes(el)
+				)[0]
+				return sanitized ? sanitized : "default"
 			}
 		},
 		created: function() {
