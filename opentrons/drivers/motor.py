@@ -17,14 +17,12 @@ from opentrons.util.vector import Vector
 from opentrons.util import trace
 
 
-CONFIG_DIR_PATH = pkg_resources.resource_filename(
-    'opentrons.config',
-    'smoothie'
-)
-CONFIG_FILE_PATH = os.path.join(
-    CONFIG_DIR_PATH,
-    'smoothie-config.ini'
-)
+DEFAULTS_DIR_PATH = pkg_resources.resource_filename(
+    'opentrons.config', 'smoothie')
+DEFAULTS_FILE_PATH = os.path.join(DEFAULTS_DIR_PATH, 'smoothie-defaults.ini')
+CONFIG_DIR_PATH = os.environ.get('APP_DATA_DIR', os.getcwd())
+CONFIG_DIR_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie')
+CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 
 JSON_ERROR = None
 if sys.version_info > (3, 4):
@@ -94,9 +92,6 @@ class CNCDriver(object):
 
     def __init__(self):
 
-        self.settings = configparser.ConfigParser()
-        self.settings.read(CONFIG_FILE_PATH)
-
         self.stopped = Event()
         self.can_move = Event()
         self.resume()
@@ -106,22 +101,53 @@ class CNCDriver(object):
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
         self.STOPPED = 'Received a STOP signal and exited from movements'
 
+        self.ignore_smoothie_sd = False
+
+        self.defaults = configparser.ConfigParser()
+        self.defaults.read(DEFAULTS_FILE_PATH)
+        self.saved_settings = self.get_persistent_config()
+        self._apply_settings()
+
+    def get_persistent_config(self):
+
+        persistent_config = configparser.ConfigParser()
+        if not os.path.isdir(CONFIG_DIR_PATH):
+            os.mkdir(CONFIG_DIR_PATH)
+        if not os.path.isfile(CONFIG_FILE_PATH):
+            for section in self.defaults.sections():
+                persistent_config[section] = self.defaults[section]
+            with open(CONFIG_FILE_PATH, 'w') as configfile:
+                persistent_config.write(configfile)
+        else:
+            persistent_config.read(CONFIG_FILE_PATH)
+
+        for section_name in self.defaults.sections():
+            section = self.defaults[section_name]
+            if section_name not in persistent_config:
+                persistent_config[section_name] = section
+            for key, val in section.items():
+                if key not in persistent_config[section_name]:
+                    persistent_config[section][key] = val
+
+        return persistent_config
+
+    def _apply_settings(self):
         self.serial_timeout = float(
-            self.settings['DEFAULT'].get('timeout', 0.1))
+            self.saved_settings['DEFAULT'].get('timeout', 0.1))
         self.serial_baudrate = int(
-            self.settings['DEFAULT'].get('baudrate', 115200))
-        self.head_speed = int(self.settings['DEFAULT'].get('head_speed', 3000))
+            self.saved_settings['DEFAULT'].get('baudrate', 115200))
+        self.head_speed = int(
+            self.saved_settings['DEFAULT'].get('head_speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
-            self.settings['compatible'].get('firmware-versions', '[]'))
+            self.saved_settings['versions'].get('firmware', '[]'))
         self.COMPATIBLE_CONFIG = json.loads(
-            self.settings['compatible'].get('config-versions', '[]'))
+            self.saved_settings['versions'].get('config', '[]'))
         self.ot_one_dimensions = json.loads(
-            self.settings['compatible'].get('ot_versions', '{}'))
+            self.saved_settings['versions'].get('ot_versions', '{}'))
         for key in self.ot_one_dimensions.keys():
-            self.ot_one_dimensions[key] = Vector(self.ot_one_dimensions[key])
-
-        self.ignore_smoothie_sd = False
+            axis_size = Vector(self.ot_one_dimensions[key])
+            self.ot_one_dimensions[key] = axis_size
 
     def get_connected_port(self):
         """
@@ -186,7 +212,7 @@ class CNCDriver(object):
         if self.ignore_smoothie_sd:
             for axis in 'xyz':
                 self.set_steps_per_mm(
-                    axis, self.settings['config'].get(
+                    axis, self.defaults['config'].get(
                         self.CONFIG_STEPS_PER_MM[axis]))
         return self.calm_down()
 
@@ -225,7 +251,7 @@ class CNCDriver(object):
         Returns a string with the Smoothie board's response
         Empty string if no response from Smoothie
 
-        >>> send_command(self.MOVE, x=100 y=100)
+        send_command(self.MOVE, x=100 y=100)
         G0 X100 Y100
         """
 
@@ -508,9 +534,9 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-            self.settings['DEFAULT']['head_speed'] = str(self.head_speed)
+            self.defaults['DEFAULT']['head_speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
-                self.settings.write(configfile)
+                self.defaults.write(configfile)
         kwargs = {"F": self.head_speed}
         res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
@@ -606,7 +632,7 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        res = self.settings['config'].get(key)
+        res = self.defaults['config'].get(key)
         if not self.ignore_smoothie_sd:
             command = '{0} {1}'.format(self.CONFIG_GET, key)
             res = self.send_command(command).decode().split(' ')[-1]
@@ -618,9 +644,9 @@ class CNCDriver(object):
             command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
             res = self.send_command(command)
             success = res.decode().split(' ')[-1] == str(value)
-        self.settings['config'][key] = value
+        self.defaults['config'][key] = value
         with open(CONFIG_FILE_PATH, 'w') as configfile:
-            self.settings.write(configfile)
+            self.defaults.write(configfile)
         return success
 
     def get_endstop_switches(self):
