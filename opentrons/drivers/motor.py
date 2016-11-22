@@ -96,8 +96,6 @@ class CNCDriver(object):
         self.stopped = Event()
         self.paused = Event()
         self.resume()
-        self.head_speed = 3000
-        self.plunger_speed = {'a': 300, 'b': 500}
         self.current_commands = []
 
         self.SMOOTHIE_SUCCESS = 'Success'
@@ -137,6 +135,9 @@ class CNCDriver(object):
 
         self.head_speed = int(
             self.saved_settings['state'].get('head_speed', 3000))
+        self.plunger_speed = json.loads(
+            self.saved_settings['state'].get(
+                'plunger_speed', '{"a":300,"b",300}'))
 
         self.COMPATIBLE_FIRMARE = json.loads(
             self.saved_settings['versions'].get('firmware', '[]'))
