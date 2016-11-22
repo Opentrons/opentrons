@@ -211,7 +211,7 @@ class CNCDriver(object):
         if self.ignore_smoothie_sd:
             for axis in 'xyz':
                 self.set_steps_per_mm(
-                    axis, self.defaults['config'].get(
+                    axis, self.saved_settings['config'].get(
                         self.CONFIG_STEPS_PER_MM[axis]))
         return self.calm_down()
 
@@ -527,9 +527,9 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-            self.defaults['DEFAULT']['head_speed'] = str(self.head_speed)
+            self.saved_settings['DEFAULT']['head_speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
-                self.defaults.write(configfile)
+                self.saved_settings.write(configfile)
         kwargs = {"F": self.head_speed}
         res = self.send_command(self.SET_SPEED, **kwargs)
         return res == b'ok'
@@ -625,7 +625,7 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        res = self.defaults['config'].get(key)
+        res = self.saved_settings['config'].get(key)
         if not self.ignore_smoothie_sd:
             command = '{0} {1}'.format(self.CONFIG_GET, key)
             res = self.send_command(command).decode().split(' ')[-1]
@@ -637,9 +637,9 @@ class CNCDriver(object):
             command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
             res = self.send_command(command)
             success = res.decode().split(' ')[-1] == str(value)
-        self.defaults['config'][key] = value
+        self.saved_settings['config'][key] = value
         with open(CONFIG_FILE_PATH, 'w') as configfile:
-            self.defaults.write(configfile)
+            self.saved_settings.write(configfile)
         return success
 
     def get_endstop_switches(self):
