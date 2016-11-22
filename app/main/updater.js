@@ -65,7 +65,7 @@ function initAutoUpdater () {
     mainLogger.info('Auto updating is enabled, checking for updates')
     autoUpdater.checkForUpdates()
   } else {
-    mainLogger.info('yo')
+    mainLogger.info('Auto updating disabled in settings, skipping checkForUpdates')
   }
 }
 

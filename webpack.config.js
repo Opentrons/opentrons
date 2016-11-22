@@ -2,7 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 
 module.exports = {
-  entry: './app/renderer/src/main.js',
+  entry: './app/renderer/main.js',
   output: {
     path: path.resolve(__dirname, './server/templates/dist'),
     publicPath: '/dist/',
@@ -22,10 +22,20 @@ module.exports = {
   },
   module: {
     noParse: [
-      /sinon/
+      /sinon/,
+      /socket.io/
     ],
     preLoaders: [
-
+      {
+        test: /\.vue$/,
+        loader: 'eslint',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.js$/,
+        loader: 'eslint',
+        exclude: /vue-devtools|node_modules/
+      }
     ],
     loaders: [
       {
