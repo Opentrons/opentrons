@@ -40,7 +40,7 @@ module.exports = {
     loaders: [
       {
         test: /sinon.*\.js$/,
-        loader: "imports?define=>false,require=>false"
+        loader: 'imports?define=>false,require=>false'
       },
       {
         test: /\.vue$/,
@@ -66,7 +66,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loaders: ["style", "css", 'resolve-url', "sass?sourceMap"]
+        loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
       },
       {
         test: /\.css$/,
@@ -74,7 +74,7 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2)$/,
-        loader: "url-loader?limit=10000&minetype=application/font-woff"
+        loader: 'url-loader?limit=10000&minetype=application/font-woff'
       }
     ]
   },
@@ -82,9 +82,9 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
-  headers: { "Access-Control-Allow-Origin": "http://localhost:5000", "Access-Control-Allow-Credentials": "true" },
+  headers: { 'Access-Control-Allow-Origin': 'http://localhost:5000', 'Access-Control-Allow-Credentials': 'true' },
   devtool: '#eval-source-map',
-  target: "electron"
+  target: 'electron'
 }
 
 if (process.env.NODE_ENV === 'production') {
