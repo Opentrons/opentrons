@@ -86,6 +86,7 @@ class Instrument(object):
         >>>     print(' world')
         >>> description = 'printing "hello world"'
         >>> instrument.create_command(do, setup, description)
+        hello
         >>> robot.simulate()
         hello world
         >>> instrument.create_command(do, setup, description, enqueue=False)

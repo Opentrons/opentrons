@@ -64,7 +64,8 @@ class RobotTest(unittest.TestCase):
 
         thread.join()
 
-        self.assertEquals(res[-1], 'Stop signal received')
+        self.assertEquals(
+            res[-1], 'Received a STOP signal and exited from movements')
 
     def test_calibrated_max_dimension(self):
 
