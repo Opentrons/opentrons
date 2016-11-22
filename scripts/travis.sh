@@ -43,9 +43,7 @@ run_install ()
     pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
   fi
 
-  # npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
-  npm install -g yarn
-  yarn
+  npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
 
   cd server && python3 -m nose -s --logging-level WARNING && cd ..
 

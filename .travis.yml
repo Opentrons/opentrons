@@ -37,7 +37,6 @@ cache:
     - pip
     - $HOME/.cache/pip3
     - $HOME/.cache/our-brew
-    - $HOME/.yarn-cache
 
 before_install:
   - ./scripts/travis.sh pre-install
