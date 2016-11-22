@@ -104,39 +104,35 @@ class CNCDriver(object):
 
         self.defaults = configparser.ConfigParser()
         self.defaults.read(DEFAULTS_FILE_PATH)
-        self.saved_settings = self.get_persistent_config()
+        self._create_saved_settings_file()
+        self.saved_settings = configparser.ConfigParser()
+        self.saved_settings.read(CONFIG_FILE_PATH)
+        self._copy_defaults_to_settings()
         self._apply_settings()
 
-    def get_persistent_config(self):
-
-        persistent_config = configparser.ConfigParser()
+    def _create_saved_settings_file(self):
         if not os.path.isdir(CONFIG_DIR_PATH):
             os.mkdir(CONFIG_DIR_PATH)
         if not os.path.isfile(CONFIG_FILE_PATH):
-            for section in self.defaults.sections():
-                persistent_config[section] = self.defaults[section]
             with open(CONFIG_FILE_PATH, 'w') as configfile:
-                persistent_config.write(configfile)
-        else:
-            persistent_config.read(CONFIG_FILE_PATH)
+                configfile.write('')
 
-        for section_name in self.defaults.sections():
-            section = self.defaults[section_name]
-            if section_name not in persistent_config:
-                persistent_config[section_name] = section
-            for key, val in section.items():
-                if key not in persistent_config[section_name]:
-                    persistent_config[section][key] = val
-
-        return persistent_config
+    def _copy_defaults_to_settings(self):
+        for n in self.defaults.sections():
+            if n not in self.saved_settings:
+                self.saved_settings[n] = self.defaults[n]
+            for key, val in self.defaults[n].items():
+                if key not in self.saved_settings[n]:
+                    self.saved_settings[n][key] = val
 
     def _apply_settings(self):
         self.serial_timeout = float(
-            self.saved_settings['DEFAULT'].get('timeout', 0.1))
+            self.saved_settings['serial'].get('timeout', 0.1))
         self.serial_baudrate = int(
-            self.saved_settings['DEFAULT'].get('baudrate', 115200))
+            self.saved_settings['serial'].get('baudrate', 115200))
+
         self.head_speed = int(
-            self.saved_settings['DEFAULT'].get('head_speed', 3000))
+            self.saved_settings['state'].get('head_speed', 3000))
 
         self.COMPATIBLE_FIRMARE = json.loads(
             self.saved_settings['versions'].get('firmware', '[]'))
@@ -527,7 +523,7 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-            self.saved_settings['DEFAULT']['head_speed'] = str(self.head_speed)
+            self.saved_settings['state']['head_speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
                 self.saved_settings.write(configfile)
         kwargs = {"F": self.head_speed}
