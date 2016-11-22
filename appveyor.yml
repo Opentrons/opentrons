@@ -67,7 +67,7 @@ install:
   - cmd: npm config list
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
-  - npm install
+  - yarn
   - npm install -g mocha@3.1.2
   - npm run release:win
   # - npm run integration
@@ -88,3 +88,6 @@ deploy:
     set_public: true
     folder: win
     artifact: OTAppWin
+
+cache:
+ - "%LOCALAPPDATA%/Yarn"
