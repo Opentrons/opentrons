@@ -2,13 +2,13 @@
 	<section id="task">
 		<h1 class="title">
 			Calibrate the {{this.instrument().label}} pipette to the
-			{{this.sanitizedType === "tiprack" ? "center" : "bottom"}}
+			{{this.placeable().sanitizedType === "tiprack" ? "center" : "bottom"}}
 			{{this.calibrationPoint}} of your {{this.placeable.label}} container
 		</h1>
 		<CalibratePlaceable :placeable='placeable()' :instrument='instrument()'>
 		</CalibratePlaceable>
 		<div class="well-img">
-			<img :src="`${placeableImages(this.sanitizedType, this.channels)}`" />
+			<img :src="`${placeableImages(this.placeable().sanitizedType, this.channels)}`" />
 		</div>
 	</section>
 </template>
@@ -28,9 +28,15 @@
 				})[0]
 			},
 			placeable() {
-				return this.instrument().placeables.filter((placeable) => {
-					return placeable.label === this.$route.params.placeable
+				let placeable = this.instrument().placeables.filter((p) => {
+					return p.label === this.$route.params.placeable
 				})[0]
+				let sanitized = ['point', 'tiprack', 'trough', 'tuberack'].filter((el) =>
+					placeable.type.includes(el)
+				)[0]
+
+				placeable.sanitizedType = sanitized || "default"
+				return placeable
 			},
 			placeableImages(type, channels) {
 				const imageUrls = {
@@ -48,7 +54,7 @@
 				return this.instrument().channels === 1 ? "single" : "multi"
 			},
 			calibrationPoint() {
-				let type = this.sanitizedType
+				let type = this.placeable().sanitizedType
 				let position = "of the A1 well"
 				if (type == "trough") {
 					position = "of the A1 slot"
@@ -58,13 +64,6 @@
 					position = ""
 				}
 				return position
-			},
-			sanitizedType() {
-				let type = this.placeable().type
-				let sanitized = ['point', 'tiprack', 'trough', 'tuberack'].filter((el) =>
-					type.includes(el)
-				)[0]
-				return sanitized ? sanitized : "default"
 			}
 		},
 		created: function() {

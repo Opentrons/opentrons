@@ -1,9 +1,9 @@
 <template>
   <span>
-    <button class="btn-calibrate save" @click="calibratePlaceable(placeable, instrument)">SAVE</button>
-    <button :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="moveToPlaceable(placeable, instrument)">MOVE TO</button>
-    <button v-show="isTiprack" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="pickUpTip(instrument)">PICK UP TIP</button>
-    <button v-show="isTiprack" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="dropTip(instrument)">DROP TIP</button>
+    <button class="btn-calibrate save" @click="calibratePlaceable()">SAVE</button>
+    <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click="moveToPlaceable()">MOVE TO</button>
+    <button v-show="isTiprack" :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click="pickUpTip()">PICK UP TIP</button>
+    <button v-show="isTiprack" :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click="dropTip()">DROP TIP</button>
   </span>
 </template>
 
@@ -12,28 +12,33 @@
     name: "CalibratePlaceable",
     props: ["instrument", "placeable"],
     methods: {
-      calibratePlaceable(placeable, instrument) {
-        let slot = placeable.slot
-        let label = placeable.label
-        let axis = instrument.axis
-        this.$store.dispatch("calibrate", {slot: slot, label: label, axis: axis})
+      calibratePlaceable() {
+        let slot = this.placeable.slot
+        let label = this.placeable.label
+        let axis = this.instrument.axis
+        this.$store.dispatch("calibrate", {slot, label, axis})
       },
-      moveToPlaceable(placeable,instrument) {
-        let slot = placeable.slot
-        let label = placeable.label
-        let axis = instrument.axis
-        this.$store.dispatch("moveToPosition", {slot: slot, label: label, axis: axis})
+      moveToPlaceable() {
+        let slot = this.placeable.slot
+        let label = this.placeable.label
+        let axis = this.instrument.axis
+        this.$store.dispatch("moveToPosition", {slot, label, axis})
       },
-      pickUpTip(instrument) {
-        let axis = instrument.axis
-        this.$store.dispatch("pickUpTip", { axis: axis })
+      pickUpTip() {
+        let axis = this.instrument.axis
+        this.$store.dispatch("pickUpTip", {axis})
       },
-      dropTip(instrument) {
-        let axis = instrument.axis
-        this.$store.dispatch("dropTip", { axis: axis })
-      },
+      dropTip() {
+        let axis = this.instrument.axis
+        this.$store.dispatch("dropTip", {axis})
+      }
+    },
+    computed: {
       isTiprack() {
-        this.placeable.label.includes("tiprack")
+        return this.placeable.sanitizedType === 'tiprack'
+      },
+      isCalibrated() {
+        return this.placeable.calibrated
       }
     }
   }
