@@ -335,7 +335,7 @@ class Pipette(Instrument):
                 raise RuntimeWarning(
                     'Pipette ({0}) cannot hold volume {1}'
                     .format(
-                        self.current_volume,
+                        self.max_volume,
                         self.current_volume + volume)
                 )
 
