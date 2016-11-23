@@ -39,15 +39,15 @@ You can also split the coordinates for the rows and columns and use either ``.ro
   robot.reset()
   robot.connect('Virtual Smoothie')
 
-  tiprack = containers.load('tiprack-200ul', 'A1')
+  p1000rack = containers.load('tiprack-1000ul', 'A1')
   p200rack = containers.load('tiprack-200ul', 'A2', 'p200rack')
   plate = containers.load('96-flat', 'B1')
   plate1 = containers.load('96-flat', 'B2', 'plate1')
   trough = containers.load('trough-12row', 'C1')
   trash = containers.load('point', 'C2')
       
-  p200 = instruments.Pipette(axis="b", max_volume=1000)
-  p1000 = instruments.Pipette(axis="b", max_volume=1000)
+  p200 = instruments.Pipette(axis="a", max_volume=1000, tip_racks=[p200rack])
+  p1000 = instruments.Pipette(axis="b", max_volume=1000, tip_racks=[p1000rack])
 
 .. testcode:: main
 
@@ -144,19 +144,17 @@ Other Examples
 Odds & Evens
 ^^^^^^^^^^^^
 
-In order to access every other row, you can utilize the third parameter in ``range()`` and add a step-count to your loop.  A step-count of ``2`` will skip every other number, so calling ``range(0, 10, 2)`` will create ``[0, 2, 4, 6, 8]``.
+In order to access every other row, you can utilize the third parameter in ``range()`` and add a step-count to your loop.  A step-count of ``2`` will skip every other number, so calling ``range(0, 12, 2)`` will create ``[0, 2, 4, 6, 8, 10]``.
 
 .. testcode:: main
 
-  for i in range(1, 12, 2):
+  for i in range(0, 12, 2):
       well = plate1.rows[i]
-      tip = p200rack.rows[i]
-      p200.pick_up_tip(tip).aspirate(200, trough['A1']).dispense(well).drop_tip(tip)
+      p200.pick_up_tip().aspirate(200, trough['A1']).dispense(well).return_tip()
 
   # Or a bit more Pythonic
-  for well in plate1.rows[1:12:2]:
-      tip = p200rack.rows[i]
-      p200.pick_up_tip(tip).aspirate(200, trough['A1']).dispense(well).drop_tip(tip)
+  for well in plate1.rows[0:12:2]:
+      p200.pick_up_tip().aspirate(200, trough['A1']).dispense(well).return_tip()
 
 You can alter this step to be any integer and get access to every n wells.
 
