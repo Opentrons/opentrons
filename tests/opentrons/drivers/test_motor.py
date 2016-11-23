@@ -30,21 +30,26 @@ class OpenTronsTest(unittest.TestCase):
         self.assertTrue(success)
 
     def tearDown(self):
-        self.motor.disconnect()
+        pass
 
     def test_reset(self):
         self.motor.reset()
         self.assertEquals(self.motor.connection, None)
 
-    def test_write_without_connection(self):
+    def test_write_with_lost_connection(self):
+        self.motor.connection.is_open = False
+        old_method = getattr(self.motor, 'is_connected')
+
+        def _temp():
+            return True
+        setattr(self.motor, 'is_connected', _temp)
+        self.assertTrue(self.motor.is_connected())
+        self.assertRaises(RuntimeError, self.motor.calm_down)
+        setattr(self.motor, 'is_connected', old_method)
+
+    def test_write_after_disconnect(self):
         self.motor.disconnect()
         self.assertRaises(RuntimeError, self.motor.calm_down)
-
-    def test_write_with_lost_connection(self):
-        old_method = self.motor.is_connected
-        self.motor.is_connected = lambda: False
-        self.assertRaises(RuntimeError, self.motor.calm_down)
-        self.motor.is_connected = old_method
 
     def test_version_compatible(self):
         self.robot.disconnect()
@@ -144,6 +149,40 @@ class OpenTronsTest(unittest.TestCase):
         }
         self.assertDictEqual(coords, expected_coords)
 
+    def test_halt(self):
+        self.motor.home()
+
+        self.motor.pause()
+
+        def _move_head():
+            self.assertRaises(
+                RuntimeWarning,
+                self.motor.move_head,
+                **{'x': 100, 'y': 0, 'z': 0}
+            )
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.halt()
+
+        thread.join()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (0, 400, 100),
+            'current': (0, 400, 100)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
+        self.motor.move_head(x=100, y=0, z=0)
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
     def test_get_position(self):
         self.motor.home()
         self.motor.ot_version = None
@@ -174,14 +213,17 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.home()
 
     def test_move_x(self):
+        self.motor.ot_version = None
         success = self.motor.move_head(x=100)
         self.assertTrue(success)
 
     def test_move_y(self):
+        self.motor.ot_version = None
         success = self.motor.move_head(y=100)
         self.assertTrue(success)
 
     def test_move_z(self):
+        self.motor.ot_version = None
         success = self.motor.move_head(z=30)
         self.assertTrue(success)
 

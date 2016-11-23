@@ -199,7 +199,7 @@ class CNCDriver(object):
         return result
 
     def disconnect(self):
-        if self.is_connected():
+        if self.is_connected() and self.connection:
             self.connection.close()
         self.connection = None
 

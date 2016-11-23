@@ -32,6 +32,8 @@ class PipetteTest(unittest.TestCase):
             channels=1
         )
 
+        self.p200.reset()
+
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
