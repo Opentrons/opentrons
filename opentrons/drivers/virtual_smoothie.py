@@ -268,12 +268,16 @@ class VirtualSmoothie(object):
                     'Command {} is not supported'.format(command))
 
     def write(self, data):
+        if not self.isOpen():
+            raise Exception('Virtual Smoothie no currently connected')
         if not isinstance(data, str):
             data = data.decode('utf-8')
         # make it async later
         self.process_command(data)
 
     def readline(self):
+        if not self.isOpen():
+            raise Exception('Virtual Smoothie no currently connected')
         if len(self.responses) > 0:
             return self.responses.pop().encode('utf-8')
         else:
