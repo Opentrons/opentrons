@@ -849,12 +849,15 @@ class Pipette(Instrument):
                     self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')
 
+            self.current_tip_home_well = None
+            if location:
+                placeable, _ = containers.unpack_location(location)
+                self.current_tip_home_well = placeable
+
             if isinstance(location, Placeable):
                 location = location.bottom()
 
             self._associate_placeable(location)
-            placeable, _ = containers.unpack_location(location)
-            self.current_tip_home_well = placeable
 
             self.current_volume = 0
 
