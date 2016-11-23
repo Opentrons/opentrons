@@ -384,6 +384,25 @@ Normally, home commands are run immediately when called, and therefore should no
   robot.home('ab', enqueue=True)   # adds "home ab" command to protocol queue
   robot.home('xyz', enqueue=True)  # adds "home xyz" command to protocol queue
 
+Head Speed
+----------
+
+The speed of the robot's X and Y movements can be sped up or slowed down.
+
+**robot.head_speed** (*rate*)
+
+	* **rate -** the speed at which the X and Y axis will move (millimeters per minute)
+
+This method will immediately set the speed of the robot, and all following movements will use that speed.
+
+.. note::
+	Speeds too fast (around 6000 and higher) will cause the robot to skip step, be careful when using this method
+
+.. testcode:: main
+
+  robot.head_speed(4500)
+  p200.pick_up_tip()
+
 Move To
 -------
 
