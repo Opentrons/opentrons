@@ -17,22 +17,21 @@
       </span>
 
       <span class="increment">
-      <Increment :increments="placeable_increments"></Increment>
+        <Increment :increments="placeable_increments"></Increment>
       </span>
-      </section>
+    </section>
 
     <h2 class="title">Plunger Jog</h2>
     <hr>
-     <section id="jog-controls-plunger" :class="{'disabled': busy}">
+    <section id="jog-controls-plunger" :class="{'disabled': busy}">
       <span class="p">
-      <h3 class="title">[P]</h3>
+        <h3 class="title">[P]</h3>
         <button @click="jog(currentAxis(), -1)"class="btn p up">&uarr;</button>
         <button @click="jog(currentAxis(), 1)" class="btn p down">&darr;</button>
       </span>
-       <span class="increment-plunger">
+      <span class="increment-plunger">
         <IncrementPlunger :increments="plunger_increments"></IncrementPlunger>
       </span>
-      </section>
     </section>
 
     <h2 class="title">Move to Slot</h2>

@@ -10,15 +10,15 @@ const CalibratePlaceable = CalibratePlaceableInjector({
   '../rest_api_wrapper': {
     getPortsList: function () {
       return {
-        then: function (cb) {
-          return cb(detectedPorts)
+        then: function () {
+          return 'hi'
         }
       }
     }
   }
 })
 
-function getMockStore() {
+function getMockStore () {
   return {
     state: {
       is_connected: false,
@@ -40,16 +40,12 @@ describe('CalibratePlaceable.vue', (done) => {
       'sanitizedType': 'tiprack'
     }
     let instrument = {'axis': 'a'}
-
     const vm = new Vue({
       store: new Vuex.Store(mockStore),
       el: document.createElement('div'),
       render: h => h(CalibratePlaceable),
-      propsData: {placeable, instrument}
+      props: {placeable, instrument}
     }).$mount()
-    console.log("************************")
-    console.log(vm)
-    console.log("************************")
     Vue.nextTick(() => {
       expect(vm.$el.querySelector('span').length).to.equal(1)
       done()
