@@ -1,0 +1,18 @@
+/******************************
+Calibrate Placeable
+******************************/
+section#task {
+    width: 510px;
+    height: 310px;
+    padding: 30px;
+    background-color: $well-bg;
+    .well-img {
+        width: 500px;
+        margin-top: 10px;
+        height: 190px;
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+}

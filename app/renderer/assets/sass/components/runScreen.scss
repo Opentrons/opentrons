@@ -1,0 +1,31 @@
+/******************************
+Run Screen
+******************************/
+.runScreen {
+    overflow-y: scroll;
+    height: 536px;
+    width: 710px;
+    font-size: 16px;
+    border: 2px solid $well-bg;
+    border-radius: 6px;
+    position: relative;
+    margin-left: 10px;
+    .runCommand {
+        //background-color: $well-bg;
+        padding-bottom: 16px;
+        margin: 25px;
+        &:last-child {
+            color: $primary-brand;
+            // background-color: $call-to_action;
+        }
+    }
+    
+    #exit {
+        position: static;
+        top: auto;
+        padding-left: 685px;
+        padding-right: 5px;
+        cursor: pointer;
+        color: $secondary-brand;
+    }
+}

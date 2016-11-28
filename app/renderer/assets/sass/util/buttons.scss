@@ -1,0 +1,127 @@
+/******************************
+Buttons
+******************************/
+.btn {
+    border-radius: 6px;
+    display: block;
+    width: $btn-size;
+    height: $btn-size;
+    line-height: $btn-size;
+    margin: $gutter-width;
+    text-align: center;
+    text-align: center;
+    color: white;
+}
+.btn-run,
+.btn-play,
+.btn-pause,
+.btn-clear {
+    min-width: $btn-size*3;
+    height: $btn-size;
+    margin: $gutter-width;
+    line-height: $btn-size;
+    padding: 0px 15px;
+    text-align: center;
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+    background-color: $primary-brand;
+    &:hover {
+        background-color: darken($primary-brand, 10%);
+    }
+}
+// .btn-play, .btn-pause, .btn-clear{
+//     flex:0 0;
+//     height: $btn-size;
+//     width:98px;
+//     min-width: $btn-size*3;
+//     line-height: $btn-size;
+//     padding:0px 15px;
+//     text-align: center;
+//     background-color: $primary-brand;
+//     border-radius: 6px;
+//     text-align: center;
+//     color:white;
+//     &:hover{
+//         background-color: darken($primary-brand, 10%);
+//     }
+// }
+.btn-pause {
+    background: $primary-brand url(../assets/img/pause.png) no-repeat center;
+    &:hover {
+        background: darken($primary-brand, 10%) url(../assets/img/pause.png) no-repeat center;
+    }
+}
+.btn-play {
+    background: $primary-brand url(../assets/img/play.png) no-repeat center;
+    &:hover {
+        background: darken($primary-brand, 10%) url(../assets/img/play.png) no-repeat center;
+    }
+}
+.btn-clear {
+    // background: $primary-brand url(../assets/img/clear.png) no-repeat center;
+    // &:hover{
+    // background: darken($primary-brand,10%) url(../assets/img/clear.png) no-repeat center;
+    // }
+}
+.btn-calibrate {
+    flex: 0 0;
+    min-width: $btn-size*3;
+    height: $btn-size;
+    line-height: $btn-size;
+    padding: 0px 15px;
+    margin: 2 * $gutter-width;
+    text-align: center;
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+}
+input {
+    flex: 0 0 $btn-size*3 - 2;
+    min-width: $btn-size*3 - 2;
+    height: $btn-size - 2;
+    line-height: $btn-size;
+    padding: 0px;
+    border: 1px solid #999;
+    margin: $gutter-width*2 2px $gutter-width*2 1px;
+    text-align: left;
+    border-radius: 6px;
+    text-align: center;
+    color: $primary-text;
+}
+.save {
+    background-color: $call-to-action;
+    &:hover {
+        background-color: darken($call-to-action, 10%);
+    }
+}
+.move-to,
+.pick-tip {
+    background-color: $primary-brand;
+    &:hover {
+        background-color: darken($primary-brand, 10%);
+    }
+}
+button {
+    background-color: $well-bg;
+    &:focus {
+        outline: 0;
+    }
+}
+.disabled {
+    .btn,
+    .btn-home,
+    .btn-jog,
+    .btn-run,
+    .pick-tip,
+    .move-to,
+    .deck,
+    .upload {
+        pointer-events: none;
+        // opacity: 0.7;
+    }
+}
+.disabled.move-to {
+    pointer-events: none;
+    opacity: 0.5;
+}
