@@ -125,3 +125,36 @@ button {
     pointer-events: none;
     opacity: 0.5;
 }
+
+//increment radio buttons
+input[type="radio"] {
+        display: none;
+    }
+    input[type="radio"] + label {
+        padding-left: 3px;
+    }
+    input[type="radio"] + label span {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin: 0 0px 5px 4px;
+        vertical-align: middle;
+        cursor: pointer;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+    }
+    input[type="radio"] + label span {
+        border: 2px solid #999;
+        background-color: #999;
+    }
+    input[type="radio"]:checked + label span {
+        border: 2px solid #999;
+        background-color: $primary-brand;
+    }
+    input[type="radio"] + label span,
+    input[type="radio"]:checked + label span {
+        -webkit-transition: background-color 0.4s linear;
+        -o-transition: background-color 0.4s linear;
+        -moz-transition: background-color 0.4s linear;
+        transition: background-color 0.4s linear;
+    }
