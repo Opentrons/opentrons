@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 import unittest
 
@@ -236,7 +237,12 @@ class OpenTronsTest(unittest.TestCase):
         self.assertTrue(success)
 
     def test_wait(self):
+        # set connection to be something other than VirtualSmoothie
+        self.motor.connection = int()
+        start_time = time.time()
         success = self.motor.wait(1.234)
+        end_time = time.time()
+        self.assertAlmostEquals(end_time - start_time, 1.234, places=2)
         self.assertTrue(success)
 
     def test_wait_for_arrival(self):
