@@ -12,7 +12,7 @@
   export default {
     computed: {
       runLog() {
-        return this.$store.state.run_log
+        return this.$store.state.runLog
       }
     },
     methods: {
