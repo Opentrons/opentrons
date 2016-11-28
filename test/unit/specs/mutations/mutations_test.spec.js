@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 
 import * as types from 'renderer/store/mutation-types'
-import app_mutations from 'renderer/store/mutations'
-const { mutations } = app_mutations
+import appMutations from 'renderer/store/mutations'
+const { mutations } = appMutations
 
 describe('mutations', () => {
   it(types.UPDATE_ROBOT_CONNECTION, () => {

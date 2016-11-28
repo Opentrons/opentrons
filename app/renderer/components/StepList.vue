@@ -2,7 +2,7 @@
   <div>
     <span v-for="instrument in tasks">
       <div class="instrument">
-        <h3 class="title">[{{instrument.axis  | capitalize}}] {{instrument.label}} <span  v-if="instrument.channels == 1 ">Single</span><span v-else>Multi</span></h3>
+        <h3 class="title">[{{instrument.axis  | capitalize}}] {{instrument.label}} <span  v-if="instrument.channels === 1 ">Single</span><span v-else>Multi</span></h3>
         <ul>
           <li v-for="placeable in instrument.placeables">
             <router-link v-bind:to="placeable.href" :class="{'completed': placeable.calibrated}" exact>
@@ -11,7 +11,7 @@
           </li>
           <li>
             <router-link v-bind:to="instrument.href" :class="{'completed': instrument.calibrated}"  exact>
-              <span class="clip">[{{instrument.axis | capitalize}}] {{instrument.label}} <span  v-if="instrument.channels == 1 ">Single</span><span v-else>Multi</span></span>
+              <span class="clip">[{{instrument.axis | capitalize}}] {{instrument.label}} <span  v-if="instrument.channels === 1 ">Single</span><span v-else>Multi</span></span>
             </router-link>
           </li>
         </ul>

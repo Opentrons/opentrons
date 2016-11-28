@@ -2,12 +2,12 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client/socket.io'
 import * as types from './mutation-types'
-import app_mutations from './mutations'
-import app_actions from './actions'
+import appMutations from './mutations'
+import appActions from './actions'
 import { createModule, ADD_TOAST_MESSAGE } from 'vuex-toast'
 
-const { mutations, state } = app_mutations
-const { actions } = app_actions
+const { mutations, state } = appMutations
+const { actions } = appActions
 Vue.use(Vuex)
 
 function createWebSocketPlugin (socket) {

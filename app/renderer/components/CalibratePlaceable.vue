@@ -3,7 +3,7 @@
 		<h1 class="title">
 			Calibrate the {{this.instrument ? this.instrument.label : ""}}
 			pipette to the
-			{{this.containerType(this.type) == "tiprack" ? "center" : "bottom"}}
+			{{this.containerType(this.type) === "tiprack" ? "center" : "bottom"}}
 			{{this.calibrationPoint}}
 			of your {{this.placeable ? this.placeable.label : ""}} container
 		</h1>
@@ -12,7 +12,7 @@
 		<button v-show="placeableType('tiprack')" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="pickUpTip(instrument)">PICK UP TIP</button>
 		<button v-show="placeableType('tiprack')" :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click="dropTip(instrument)">DROP TIP</button>
 		<div class="well-img">
-		<span v-if="instrument.channels == 1">
+		<span v-if="instrument.channels === 1">
 			<img src="../assets/img/well_single.png" v-show="placeableType('default')" />
 			<img src="../assets/img/tiprack_single.png" v-show="placeableType('tiprack')"/>
 			<img src="../assets/img/trough_single.png" v-show="placeableType('trough')"/>
@@ -59,12 +59,12 @@
 		  },
 			currentInstrument(tasks) {
 				return tasks.filter((instrument) => {
-					return instrument.axis == this.$route.params.instrument
+					return instrument.axis === this.$route.params.instrument
 				})[0]
 			},
 			currentPlaceable(tasks) {
 				return this.currentInstrument(tasks).placeables.filter((placeable) => {
-					return placeable.label == this.$route.params.placeable
+					return placeable.label === this.$route.params.placeable
 				})[0]
 			},
 			containerType(type){
@@ -99,11 +99,11 @@
 			calibrationPoint() {
 				let type = this.containerType(this.type)
 				let position = "of the A1 well"
-				if (type == "trough") {
+				if (type === "trough") {
 					position = "of the A1 slot"
-				} else if ((type == "tiprack" || type == "default") && this.instrument.channels == 8) {
+				} else if ((type === "tiprack" || type === "default") && this.instrument.channels === 8) {
 					position = "of the A1 row"
-				} else if (type == "point") {
+				} else if (type === "point") {
 					position = ""
 				}
 				return position

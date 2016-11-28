@@ -35,7 +35,7 @@
       },
       calibrated() {
         if(!this.$store.state.isConnected) return false
-        if(this.$store.state.tasks.length == 0) return false
+        if(this.$store.state.tasks.length === 0) return false
 
         return this.$store.state.tasks.every((instrument) => {
           let placeableCalibrated = instrument.placeables.every((placeable) => {

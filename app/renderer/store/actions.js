@@ -5,7 +5,7 @@ import {processTasks} from '../util'
 
 const actions = {
   connectRobot ({ commit }, port) {
-    const payload = {isConnected: true, 'port': port}
+    const payload = {isConnected: true, port}
     Opentrons.connect(port).then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
@@ -40,7 +40,7 @@ const actions = {
       commit(types.UPDATE_ERROR, {errors: result.errors})
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
       commit(types.UPLOADING, {'uploading': false})
-      commit(types.UPDATE_TASK_LIST, {'tasks': tasks})
+      commit(types.UPDATE_TASK_LIST, {tasks})
     })
   },
   loadProtocol ({commit}) {
@@ -76,7 +76,7 @@ const actions = {
     if (data.slot) { type = 'placeable' }
     Opentrons.calibrate(data, type).then((tasks) => {
       if (tasks) {
-        commit('UPDATE_TASK_LIST', {'tasks': tasks})
+        commit('UPDATE_TASK_LIST', {tasks})
       }
     })
   },

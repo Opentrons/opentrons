@@ -96,13 +96,13 @@
 		  },
 			calibrated(position) {
 				let instrument = this.$store.state.tasks.filter((instrument) => {
-					return instrument.axis == this.$route.params.instrument
+					return instrument.axis === this.$route.params.instrument
 				})[0]
-				return typeof(instrument[position]) == "number" ? true : false
+				return typeof(instrument[position]) === "number" ? true : false
 			},
 			currentInstrument() {
 				return this.$store.state.tasks.filter((instrument) => {
-						return instrument.axis == this.$route.params.instrument
+						return instrument.axis === this.$route.params.instrument
 					})[0]
 				}
 	    },
