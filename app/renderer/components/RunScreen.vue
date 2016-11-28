@@ -2,7 +2,7 @@
   <div ref="commands" class="runScreen">
     <h3 @click="clearRunScreen()" id="exit">x</h3>
     <div class="runCommand" v-for="command in runLog">
-      {{command["command_description"]}}
+      {{command.timestamp}} - {{command.command_description}}
       <br>
     </div>
   </div>

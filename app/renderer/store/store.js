@@ -38,6 +38,8 @@ function createWebSocketPlugin (socket) {
       }
       if (data.name === 'command-run') {
         if (data.caller === 'ui') {
+          let newDate = new Date().toUTCString().split(' ').slice(-2).join(' ')
+          data.timestamp = newDate.toUTCString()
           store.commit(types.UPDATE_RUN_LOG, data)
           store.commit(types.UPDATE_RUN_LENGTH, data)
         }
@@ -76,5 +78,6 @@ export default new Vuex.Store({
   actions,
   mutations,
   plugins: [websocketplugin],
-  modules: {toast}
+  modules: {toast},
+  strict: true
 })
