@@ -1,0 +1,24 @@
+/******************************
+Logo and Version Number 
+(part of main app component)
+******************************/
+
+.brand {
+    flex: 0 0 160px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.logo {
+        width: 124px;
+        height: 30px;
+        img {
+            width: 124px;
+            height: auto;
+        }
+    }
+    div.version {
+        flex: 0 0 30px;
+        height: 30px;
+        line-height: 35px;
+    }
+}

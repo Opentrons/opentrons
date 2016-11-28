@@ -1,0 +1,17 @@
+/******************************
+Run Protocol Controls
+******************************/
+
+div#run {
+    min-width: $btn-size*3;
+    flex: 0 0 $btn-size*3;
+    height: 65px;
+    padding: 0 40px;
+    div.controls {
+        width: $btn-size*3;
+        flex: 0 0 $btn-size*3;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
