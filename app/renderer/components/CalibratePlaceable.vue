@@ -9,22 +9,22 @@
 		</h1>
 		<button class='btn-calibrate save' @click='calibratePlaceable(placeable, instrument)'>SAVE</button>
 		<button :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click='moveToPlaceable(placeable, instrument)'>MOVE TO</button>
-		<button v-show='placeableType('tiprack')' :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip(instrument)'>PICK UP TIP</button>
-		<button v-show='placeableType('tiprack')' :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click='dropTip(instrument)'>DROP TIP</button>
+		<button v-show='placeableType("tiprack")' :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip(instrument)'>PICK UP TIP</button>
+		<button v-show='placeableType("tiprack")' :class="[{'disabled': !placeable.calibrated}, 'btn-calibrate', 'move-to']" @click='dropTip(instrument)'>DROP TIP</button>
 		<div class='well-img'>
 			<span v-if='instrument.channels === 1'>
-				<img src='../assets/img/well_single.png' v-show='placeableType('default')' />
-				<img src='../assets/img/tiprack_single.png' v-show='placeableType('tiprack')'/>
-				<img src='../assets/img/trough_single.png' v-show='placeableType('trough')'/>
-				<img src='../assets/img/tuberack_single.png' v-show='placeableType('tuberack')'/>
-				<img src='../assets/img/point_trash.png' v-show='placeableType('point')'/>
+				<img src='../assets/img/well_single.png' v-show='placeableType("default")' />
+				<img src='../assets/img/tiprack_single.png' v-show='placeableType("tiprack")'/>
+				<img src='../assets/img/trough_single.png' v-show='placeableType("trough")'/>
+				<img src='../assets/img/tuberack_single.png' v-show='placeableType("tuberack")'/>
+				<img src='../assets/img/point_trash.png' v-show='placeableType("point")'/>
 			</span>
 			<span v-else>
-				<img src='../assets/img/well_multi.png' v-show='placeableType('default')' />
-				<img src='../assets/img/tiprack_multi.png' v-show='placeableType('tiprack')'/>
-				<img src='../assets/img/trough_multi.png' v-show='placeableType('trough')'/>
-				<img src='../assets/img/tuberack_single.png' v-show='placeableType('tuberack')'/>
-				<img src='../assets/img/point_trash.png' v-show='placeableType('point')'/>
+				<img src='../assets/img/well_multi.png' v-show='placeableType("default")' />
+				<img src='../assets/img/tiprack_multi.png' v-show='placeableType("tiprack")'/>
+				<img src='../assets/img/trough_multi.png' v-show='placeableType("trough")'/>
+				<img src='../assets/img/tuberack_single.png' v-show='placeableType("tuberack")'/>
+				<img src='../assets/img/point_trash.png' v-show='placeableType("point")'/>
 			</span>
 		</div>
 	</section>

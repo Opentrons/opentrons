@@ -1,11 +1,13 @@
 <template>
   <section id='increment-xyz'>
-  <h3 class='title xyz'>[mm]</h3>
+    <h3 class='title xyz'>[mm]</h3>
     <div v-for='i in increments' @click='selectIncrement(i)' :class="{'slot': i === 'Slot'}">
       <input type='radio' :id='i' name='increment' :value='i' :checked='active(i)' />
-      <label :for='i'>{{i}}<br><span></span></label>
+      <label :for='i'>
+        {{i}}<br>
+        <span></span>
+      </label>
     </div>
-
   </section>
 </template>
 

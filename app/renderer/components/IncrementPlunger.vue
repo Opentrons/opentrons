@@ -2,7 +2,7 @@
   <section id='increment-plunger'>
   <h3 class='title plunger'>[mm]</h3>
     <div v-for='i in increments' @click='selectIncrement(i)' >
-      <input type='radio' :id='i+'p'' name='incrementPlunger' :value='i' :checked='active(i)' />
+      <input type='radio' :id="i+'p'" name='incrementPlunger' :value='i' :checked='active(i)' />
       <label :for='i'>{{i}}<br><span></span></label>
     </div>
   </section>

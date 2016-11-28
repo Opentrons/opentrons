@@ -5,15 +5,15 @@
     <section id='jog-controls-pipette' :class="{'disabled': busy}">
       <span class='xy'>
         <h3 class='title'>[X-Y]</h3>
-        <button @click='jog('y', 1)' class='btn y up'>&uarr;</button>
-        <button @click='jog('x', -1)' class='btn x left'>&larr;</button>
-        <button @click='jog('y', -1)' class='btn y down'>&darr;</button>
-        <button @click='jog('x', 1)' class='btn x right'>&rarr;</button>
+        <button @click="jog('y', 1)" class='btn y up'>&uarr;</button>
+        <button @click="jog('x', -1)" class='btn x left'>&larr;</button>
+        <button @click="jog('y', -1)" class='btn y down'>&darr;</button>
+        <button @click="jog('x', 1)" class='btn x right'>&rarr;</button>
       </span>
       <span class='z'>
         <h3 class='title'>[Z]</h3>
-        <button @click='jog('z', 1)' class='btn z up'>&uarr;</button>
-        <button @click='jog('z', -1)' class='btn z down'>&darr;</button>
+        <button @click="jog('z', 1)" class='btn z up'>&uarr;</button>
+        <button @click="jog('z', -1)" class='btn z down'>&darr;</button>
       </span>
 
       <span class='increment'>
