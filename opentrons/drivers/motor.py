@@ -54,6 +54,8 @@ class CNCDriver(object):
 
     DISENGAGE_FEEDBACK = 'M63'
 
+    RESET = 'reset'
+
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
@@ -90,9 +92,9 @@ class CNCDriver(object):
     ot_version = None
 
     def __init__(self):
-
+        self.halted = Event()
         self.stopped = Event()
-        self.can_move = Event()
+        self.do_not_pause = Event()
         self.resume()
         self.current_commands = []
 
@@ -125,6 +127,12 @@ class CNCDriver(object):
                 if key not in self.saved_settings[n]:
                     self.saved_settings[n][key] = val
 
+    def _set_step_per_mm_from_config(self):
+        for axis in 'xyz':
+            value = self.saved_settings['config'].get(
+                self.CONFIG_STEPS_PER_MM[axis])
+            self.set_steps_per_mm(axis, value)
+
     def _apply_settings(self):
         self.serial_timeout = float(
             self.saved_settings['serial'].get('timeout', 0.1))
@@ -133,6 +141,9 @@ class CNCDriver(object):
 
         self.head_speed = int(
             self.saved_settings['state'].get('head_speed', 3000))
+        self.plunger_speed = json.loads(
+            self.saved_settings['state'].get(
+                'plunger_speed', '{"a":300,"b",300}'))
 
         self.COMPATIBLE_FIRMARE = json.loads(
             self.saved_settings['versions'].get('firmware', '[]'))
@@ -194,47 +205,56 @@ class CNCDriver(object):
         return result
 
     def disconnect(self):
-        if self.is_connected():
+        if self.is_connected() and self.connection:
             self.connection.close()
         self.connection = None
 
     def connect(self, device):
         self.connection = device
-        self.reset_port()
+        self.toggle_port()
         log.debug("Connected to {}".format(device))
+
+        self.turn_off_feedback()
         self.versions_compatible()
-        # set the previously saved steps_per_mm values for X and Y
         if self.ignore_smoothie_sd:
-            for axis in 'xyz':
-                self.set_steps_per_mm(
-                    axis, self.saved_settings['config'].get(
-                        self.CONFIG_STEPS_PER_MM[axis]))
+            self._set_step_per_mm_from_config()
+
         return self.calm_down()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
 
-    def reset_port(self):
+    def toggle_port(self):
         self.connection.close()
         self.connection.open()
         self.flush_port()
 
-        self.turn_off_feedback()
-
     def pause(self):
-        self.can_move.clear()
+        self.halted.clear()
+        self.stopped.clear()
+        self.do_not_pause.clear()
 
     def resume(self):
-        self.can_move.set()
+        self.halted.clear()
         self.stopped.clear()
+        self.do_not_pause.set()
 
     def stop(self):
+        self.halted.clear()
         self.stopped.set()
-        self.can_move.set()
+        self.do_not_pause.set()
+
+    def halt(self):
+        self.halted.set()
+        self.stopped.set()
+        self.do_not_pause.set()
 
     def check_paused_stopped(self):
-        self.can_move.wait()
+        self.do_not_pause.wait()
         if self.stopped.is_set():
+            if self.halted.is_set():
+                self.send_command(self.HALT)
+                self.calm_down()
             self.resume()
             raise RuntimeWarning(self.STOPPED)
 
@@ -256,16 +276,27 @@ class CNCDriver(object):
         return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
+        """
+        Sends data string to serial ports
+
+        Returns data immediately read from port after write
+
+        Raises RuntimeError write fails or connection times out
+        """
         log.debug("Write: {}".format(str(data).encode()))
         if self.is_connected():
-            self.connection.write(str(data).encode())
+            try:
+                self.connection.write(str(data).encode())
+            except Exception as e:
+                self.disconnect()
+                raise RuntimeError('Lost connection with serial port') from e
             return self.wait_for_response()
         elif self.connection is None:
             msg = "No connection found."
             log.warn(msg)
             raise RuntimeError(msg)
         elif max_tries > 0:
-            self.reset_port()
+            self.toggle_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
@@ -276,9 +307,15 @@ class CNCDriver(object):
             raise RuntimeError(msg)
 
     def wait_for_response(self, timeout=20.0):
+        """
+        Repeatedly reads from serial port until data is received,
+        or timeout is exceeded
+
+        Raises RuntimeWarning() if no response was recieved before timeout
+        """
         count = 0
         max_retries = int(timeout / self.serial_timeout)
-        while count < max_retries:
+        while self.is_connected() and count < max_retries:
             count = count + 1
             out = self.readline_from_serial()
             if out:
@@ -292,23 +329,39 @@ class CNCDriver(object):
                     log.debug(
                         "Waiting {} lines for response.".format(count)
                     )
-        raise RuntimeWarning('no response after {} seconds'.format(timeout))
+        raise RuntimeWarning(
+            'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
         while self.readline_from_serial():
             time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
-        msg = b''
-        if self.is_connected():
-            # serial.readline() returns an empty byte string if it times out
-            msg = self.connection.readline().strip()
-            if msg:
-                log.debug("Read: {}".format(msg))
+        """
+        Attempt to read a line of data from serial port
 
-        # detect if it hit a home switch
+        Raises RuntimeWarning if read fails on serial port
+        """
+        msg = b''
+        try:
+            msg = self.connection.readline()
+            msg = msg.strip()
+        except Exception as e:
+            self.disconnect()
+            raise RuntimeWarning('Lost connection with serial port') from e
+        if msg:
+            log.debug("Read: {}".format(msg))
+            self.detect_limit_hit(msg)  # raises RuntimeWarning if switch hit
+
+        return msg
+
+    def detect_limit_hit(self, msg):
+        """
+        Detect if it hit a home switch
+
+        Raises RuntimeWarning if Smoothie reports a limit hit
+        """
         if b'!!' in msg or b'limit' in msg:
-            # TODO (andy): allow this to bubble up so UI is notified
             log.debug('home switch hit')
             self.flush_port()
             self.calm_down()
@@ -319,8 +372,6 @@ class CNCDriver(object):
                     axis = ax
             raise RuntimeWarning('{} limit switch hit'.format(axis.upper()))
 
-        return msg
-
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
             self.send_command(self.ABSOLUTE_POSITIONING)
@@ -329,22 +380,10 @@ class CNCDriver(object):
         else:
             raise ValueError('Invalid coordinate mode: ' + mode)
 
-    def move_plunger(self, mode='absolute', **kwargs):
-
+    def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
-        args = {axis.upper(): kwargs.get(axis)
-                for axis in 'ab'
-                if axis in kwargs}
-
-        return self.consume_move_commands(args)
-
-    def move_head(self, mode='absolute', **kwargs):
-
-        self.set_coordinate_system(mode)
-        self.set_head_speed()
         current = self.get_head_position()['target']
-
         log.debug('Current Head Position: {}'.format(current))
         target_point = {
             axis: kwargs.get(
@@ -355,20 +394,30 @@ class CNCDriver(object):
         }
         log.debug('Destination: {}'.format(target_point))
 
-        target_vector = Vector(target_point)
+        flipped_vector = self.flip_coordinates(
+            Vector(target_point), mode)
+        for axis in 'xyz':
+            kwargs[axis] = flipped_vector[axis]
 
-        flipped_vector = self.flip_coordinates(target_vector, mode)
-        args = (
-            {axis.upper(): flipped_vector[axis]
-             for axis in 'xyz' if axis in kwargs}
-        )
+        args = {axis.upper(): kwargs.get(axis)
+                for axis in 'xyzab'
+                if axis in kwargs}
+        args.update({"F": self.head_speed})
+        args.update({"a": self.plunger_speed['a']})
+        args.update({"b": self.plunger_speed['b']})
 
         return self.consume_move_commands(args)
+
+    def move_plunger(self, mode='absolute', **kwargs):
+        return self.move(mode, **kwargs)
+
+    def move_head(self, mode='absolute', **kwargs):
+        return self.move(mode, **kwargs)
 
     def consume_move_commands(self, args):
         self.check_paused_stopped()
 
-        log.debug("Moving head: {}".format(args))
+        log.debug("Moving : {}".format(args))
         res = self.send_command(self.MOVE, **args)
         if res != b'ok':
             return (False, self.SMOOTHIE_ERROR)
@@ -399,6 +448,7 @@ class CNCDriver(object):
         arrived = False
         coords = self.get_position()
         while not arrived:
+            self.check_paused_stopped()
             coords = self.get_position()
             diff = {}
             for axis in coords.get('target', {}):
@@ -460,6 +510,11 @@ class CNCDriver(object):
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         return res == b'ok'
+
+    def reset(self):
+        res = self.send_command(self.RESET)
+        if b'Rebooting' in res:
+            self.disconnect()
 
     def set_position(self, **kwargs):
         uppercase_args = {}
@@ -533,9 +588,7 @@ class CNCDriver(object):
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':
             raise ValueError('Axis {} not supported'.format(axis))
-        kwargs = {axis.lower(): rate}
-        res = self.send_command(self.SET_SPEED, **kwargs)
-        return res == b'ok'
+        self.plunger_speed[axis] = rate
 
     def versions_compatible(self):
         self.get_ot_version()

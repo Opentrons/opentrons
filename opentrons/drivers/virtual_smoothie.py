@@ -150,6 +150,10 @@ class VirtualSmoothie(object):
     def process_calm_down(self, arguments):
         return 'ok'
 
+    def process_halt(self, arguments):
+        e = 'ok Emergency Stop Requested - reset or M999 required to continue'
+        return e
+
     def process_absolute_positioning(self, arguments):
         self.absolute = True
         return 'ok'
@@ -160,6 +164,9 @@ class VirtualSmoothie(object):
 
     def process_version(self, arguments):
         return '{"version":' + self.version + '}'
+
+    def process_reset(self, arguments):
+        return 'Smoothie out. Peace. Rebooting in 5 seconds...'
 
     def process_config_get(self, arguments):
         folder = arguments[0]
@@ -222,6 +229,7 @@ class VirtualSmoothie(object):
             'M119': self.process_get_endstops,
             'M92': self.process_steps_per_mm,
             'M999': self.process_calm_down,
+            'M112': self.process_halt,
             'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
             'G91': self.process_relative_positioning,
@@ -240,6 +248,7 @@ class VirtualSmoothie(object):
             'M17': self.process_power_on,
             'M18': self.process_power_off,
             'version': self.process_version,
+            'reset': self.process_reset,
             'config-get': self.process_config_get,
             'config-set': self.process_config_set
         }
@@ -259,12 +268,16 @@ class VirtualSmoothie(object):
                     'Command {} is not supported'.format(command))
 
     def write(self, data):
+        if not self.isOpen():
+            raise Exception('Virtual Smoothie no currently connected')
         if not isinstance(data, str):
             data = data.decode('utf-8')
         # make it async later
         self.process_command(data)
 
     def readline(self):
+        if not self.isOpen():
+            raise Exception('Virtual Smoothie no currently connected')
         if len(self.responses) > 0:
             return self.responses.pop().encode('utf-8')
         else:
