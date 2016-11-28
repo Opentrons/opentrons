@@ -34,7 +34,7 @@
         return this.$store.state.paused
       },
       calibrated() {
-        if(!this.$store.state.is_connected) return false
+        if(!this.$store.state.isConnected) return false
         if(this.$store.state.tasks.length == 0) return false
 
         return this.$store.state.tasks.every((instrument) => {

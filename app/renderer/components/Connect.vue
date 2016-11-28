@@ -25,7 +25,7 @@
     },
     computed: {
       connected () {
-        return this.$store.state.is_connected;
+        return this.$store.state.isConnected;
       },
       port () {
         return this.$store.state.port;
@@ -48,7 +48,7 @@
         let selected = this.ports.selected
         if ( selected === "refresh-list" || selected === null) {
           this.getPortsList()
-          if (this.$store.state.is_connected) this.ports.selected = this.$store.state.port
+          if (this.$store.state.isConnected) this.ports.selected = this.$store.state.port
         } else if (selected === "default") {
           this.disconnectRobot()
         } else {

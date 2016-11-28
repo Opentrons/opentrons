@@ -18,8 +18,8 @@
         this.$store.dispatch("selectIncrement", {inc: i})
       },
       active(i) {
-        return this.$store.state.current_increment_placeable === i     
-      }    
+        return this.$store.state.currentIncrementPlaceable === i     
+      }
     }
   }
 </script>

@@ -38,8 +38,8 @@ function createWebSocketPlugin (socket) {
       }
       if (data.name === 'command-run') {
         if (data.caller === 'ui') {
-          let newDate = new Date().toUTCString().split(' ').slice(-2).join(' ')
-          data.timestamp = newDate.toUTCString()
+          let newDate = new Date()
+          data.timestamp = newDate.toUTCString().split(' ').slice(-2).join(' ')
           store.commit(types.UPDATE_RUN_LOG, data)
           store.commit(types.UPDATE_RUN_LENGTH, data)
         }

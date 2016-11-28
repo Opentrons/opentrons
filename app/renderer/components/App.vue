@@ -62,7 +62,7 @@
     },
     computed: {
       robotBusy() {
-        if(!this.$store.state.is_connected) return true
+        if(!this.$store.state.isConnected) return true
         return this.$store.state.busy
       }
     },

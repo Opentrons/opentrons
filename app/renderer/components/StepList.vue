@@ -35,7 +35,7 @@
         if (task.href === "/upload") {
           return this.$store.state.tasks[0] && !this.$store.state.error
         } else if (task.href === "/connect") {
-          return this.$store.state.is_connected
+          return this.$store.state.isConnected
         }
       }
     },

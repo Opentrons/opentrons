@@ -1,9 +1,7 @@
 import { expect } from 'chai'
-
 import Vue from 'vue'
 import Vuex from 'vuex'
 import sinon from 'sinon'
-
 
 Vue.use(Vuex)
 
@@ -21,8 +19,7 @@ const Connect = ConnectInjector({
   }
 })
 
-
-function getMockStore() {
+function getMockStore () {
   return {
     state: {
       isConnected: false,
@@ -30,11 +27,10 @@ function getMockStore() {
     },
     actions: {
       connectRobot: sinon.spy(),
-      disconnectRobot: sinon.spy(),
+      disconnectRobot: sinon.spy()
     }
   }
 }
-
 
 describe('Connect.vue', () => {
   it('renders with drop down', () => {
@@ -75,7 +71,6 @@ describe('Connect.vue', () => {
     })
   })
 
-
   it('disconnects from robot', () => {
     let mockStore = getMockStore()
     mockStore.state.isConnected = true
@@ -95,7 +90,7 @@ describe('Connect.vue', () => {
     mockStore.state.port = detectedPorts
     Vue.nextTick(() => {
       let selectEl = vm.$el.querySelector('select#connections')
-      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal("Select a port")
+      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal('Select a port')
       done()
     })
   })
@@ -117,7 +112,6 @@ describe('Connect.vue', () => {
     connect.searchIfNecessary()
     expect(mockStore.actions.disconnectRobot.called).to.be.true
   })
-
 
   it('has methods for business logic', () => {
     expect(typeof Connect.methods.getPortsList).be.a.function

@@ -12,16 +12,16 @@
     name: "ProgressBar",
     computed: {
       runPercent() {
-        let finished_tasks_length = this.$store.state.runLog.length
-        let all_tasks_length = this.$store.state.runLength
-        let percent = Math.round((finished_tasks_length / all_tasks_length) * 100)
+        let finishedTasksLength = this.$store.state.runLog.length
+        let allTasksLength = this.$store.state.runLength
+        let percent = Math.round((finishedTasksLength / allTasksLength) * 100)
         return percent || 0
       },
       percentClass() {
         return `width:${this.runPercent}%;`
       },
       running() {
-        return this.$store.state.running
+        return this.$store.state.running || this.$store.state.protocolFinished
       }
     }
   }

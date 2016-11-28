@@ -17,7 +17,7 @@
         this.$store.dispatch("selectIncrementPlunger", {inc: i})
       },
       active(i) {
-        return this.$store.state.current_increment_plunger === i     
+        return this.$store.state.currentIncrementPlunger === i     
       }
     }
   }
