@@ -501,24 +501,29 @@ class CNCDriver(object):
         else:
             return False
 
-    def wait(self, sec):
-        ms = int((sec % 1.0) * 1000)
-        s = int(sec)
+    def wait(self, delay_time):
+        ms = int((delay_time % 1.0) * 1000)
+        sec = int(delay_time)
         self.check_paused_stopped()
 
-        # res = self.send_command(self.DWELL, S=s, P=ms)
+        # res = self.send_command(self.DWELL, S=sec, P=ms)
         # return res == b'ok'
 
+        start_time = time.time()
+        end_time = start_time + delay_time
+        counter = 0
         if not isinstance(self.connection, VirtualSmoothie):
-            for i in range(s):
+            while time.time() < end_time - 1:
                 self.check_paused_stopped()
                 arguments = {
                     'name': 'delay',
-                    'countdown': s - i
+                    'countdown': sec - i
                 }
                 trace.EventBroker.get_instance().notify(arguments)
                 time.sleep(1)
-            time.sleep(ms)
+                counter += 1
+            remaining_time = end_time - time.time()
+            time.sleep(max(0, remaining_time))
         arguments = {
             'name': 'delay',
             'countdown': 0
