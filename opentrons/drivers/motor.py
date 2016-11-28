@@ -512,8 +512,18 @@ class CNCDriver(object):
         if not isinstance(self.connection, VirtualSmoothie):
             for i in range(s):
                 self.check_paused_stopped()
+                arguments = {
+                    'name': 'delay',
+                    'countdown': s - i
+                }
+                trace.EventBroker.get_instance().notify(arguments)
                 time.sleep(1)
             time.sleep(ms)
+        arguments = {
+            'name': 'delay',
+            'countdown': 0
+        }
+        trace.EventBroker.get_instance().notify(arguments)
         return True
 
     def calm_down(self):
