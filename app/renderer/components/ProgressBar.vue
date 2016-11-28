@@ -12,7 +12,10 @@
     name: "ProgressBar",
     computed: {
       runPercent() {
-        let finishedTasksLength = this.$store.state.runLog.length
+        let finishedTasksLength = this.$store.state.runLog.filter((command) => {
+          return command.notification
+        }).length
+        console.log(finishedTasksLength)
         let allTasksLength = this.$store.state.runLength
         let percent = Math.round((finishedTasksLength / allTasksLength) * 100)
         return percent || 0

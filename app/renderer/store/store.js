@@ -49,6 +49,12 @@ function createWebSocketPlugin (socket) {
           let {text, type} = data
           text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
+
+          let newDate = new Date()
+          data.timestamp = newDate.toUTCString().split(' ').slice(-2).join(' ')
+          data.command_description = text
+          data.notification = true
+          store.commit(types.UPDATE_RUN_LOG, data)
         }
       }
       if (data.name === 'run-finished') {
