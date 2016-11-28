@@ -13,7 +13,7 @@
     computed: {
       runPercent() {
         let finishedTasksLength = this.$store.state.runLog.filter((command) => {
-          return command.notification
+          return !command.notification
         }).length
         console.log(finishedTasksLength)
         let allTasksLength = this.$store.state.runLength
