@@ -7,8 +7,7 @@ The following examples assume the containers and pipettes:
 
 .. testsetup:: tips_main
 
-  from opentrons import robot
-  from opentrons import containers, instruments
+  from opentrons import robot, containers, instruments
   robot.connect('Virtual Smoothie')
 
   tiprack = containers.load('tiprack-200ul', 'A1', 'tiprack-for-doctest')
@@ -16,7 +15,10 @@ The following examples assume the containers and pipettes:
   trough = containers.load('trough-12row', 'C1', 'trough-for-doctest')
   trash = containers.load('point', 'C2', 'trash-for-doctest')
       
-  p200 = instruments.Pipette(axis="b", max_volume=200)
+  p200 = instruments.Pipette(
+      axis="b",
+      max_volume=200,
+      tip_racks=[tiprack])
 
 .. testsetup:: tips_demo
   
@@ -25,15 +27,17 @@ The following examples assume the containers and pipettes:
 
 .. testcode:: tips_demo
 
-  from opentrons import robot
-  from opentrons import containers, instruments
+  from opentrons import robot, containers, instruments
 
   tiprack = containers.load('tiprack-200ul', 'A1')
   plate = containers.load('96-flat', 'B1')
   trough = containers.load('trough-12row', 'C1')
   trash = containers.load('point', 'C2')
       
-  p200 = instruments.Pipette(axis="b")
+  p200 = instruments.Pipette(
+      axis="b",
+      max_volume=200,
+      tip_racks=[tiprack])
 
 
 Automatically Refill Volume
@@ -43,7 +47,7 @@ Want to deposit liquid to an entire plate, but don't want to have to tell the ro
 
 .. testcode:: tips_main
 
-  p200.pick_up_tip(tiprack['A1'])
+  p200.pick_up_tip()
 
   dispense_volume = 13
   for i in range(96):
@@ -51,7 +55,7 @@ Want to deposit liquid to an entire plate, but don't want to have to tell the ro
           p200.aspirate(trough['A1'])
       p200.dispense(dispense_volume, plate[i]).touch_tip()
 
-  p200.drop_tip(trash)
+  p200.blow_out(trough['A1']).drop_tip(trash)
 
 Serial Dilution
 ---------------
@@ -97,22 +101,14 @@ Deposit various volumes of liquids into the same plate of wells, and automatical
       'H1': {'water': 55, 'sugar': 40, 'purple': 8}
   }
 
-  robot.clear_commands()
-
-  for source_well, ingredient in sources.items():
-      # each ingredient has it's own tip
-      p200.pick_up_tip(tiprack[source_well])
-      # loop through all destination wells
+  for source_name, ingredient in sources.items():
+      p200.pick_up_tip()
       for destination_well, mapping in destinations.items():
           dispense_volume = mapping[ingredient]
-          # refill this tip if it's empty
           if p200.current_volume < dispense_volume:
-             p200.aspirate(trough[source_well])
+             p200.aspirate(trough[source_name])
           p200.dispense(dispense_volume, plate[destination_well])
-      # blow out the extra liquid, then save the tip
-      p200.blow_out(trash).drop_tip(tiprack[source_well])
-    
-  robot.simulate()
+      p200.blow_out(trough[source_name]).return_tip()
 
 Precision Pipetting
 ---------------------------------
