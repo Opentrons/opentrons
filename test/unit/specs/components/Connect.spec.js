@@ -29,8 +29,8 @@ function getMockStore() {
       port: null
     },
     actions: {
-      connect_robot: sinon.spy(),
-      disconnect_robot: sinon.spy(),
+      connectRobot: sinon.spy(),
+      disconnectRobot: sinon.spy(),
     }
   }
 }
@@ -65,7 +65,7 @@ describe('Connect.vue', () => {
     let connect = vm.$children[0]
     connect.ports.selected = detectedPorts[0]
     connect.searchIfNecessary()
-    expect(mockStore.actions.connect_robot.called).to.be.true
+    expect(mockStore.actions.connectRobot.called).to.be.true
     mockStore.state.port = detectedPorts
 
     Vue.nextTick(() => {
@@ -91,7 +91,7 @@ describe('Connect.vue', () => {
     let connect = vm.$children[0]
     connect.selected = detectedPorts[0]
     connect.disconnectRobot()
-    expect(mockStore.actions.disconnect_robot.called).to.be.true
+    expect(mockStore.actions.disconnectRobot.called).to.be.true
     mockStore.state.port = detectedPorts
     Vue.nextTick(() => {
       let selectEl = vm.$el.querySelector('select#connections')
@@ -115,7 +115,7 @@ describe('Connect.vue', () => {
     let connect = vm.$children[0]
     connect.selected = detectedPorts[0]
     connect.searchIfNecessary()
-    expect(mockStore.actions.disconnect_robot.called).to.be.true
+    expect(mockStore.actions.disconnectRobot.called).to.be.true
   })
 
 

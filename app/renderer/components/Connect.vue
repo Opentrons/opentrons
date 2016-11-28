@@ -56,10 +56,10 @@
         }
       },
       connectToRobot: function() {
-        this.$store.dispatch('connect_robot', this.ports.selected)
+        this.$store.dispatch('connectRobot', this.ports.selected)
       },
       disconnectRobot: function() {
-        this.$store.dispatch('disconnect_robot')
+        this.$store.dispatch('disconnectRobot')
       }
     },
     beforeMount: function() {

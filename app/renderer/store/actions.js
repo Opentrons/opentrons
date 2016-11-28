@@ -4,8 +4,8 @@ import Opentrons from '../rest_api_wrapper'
 import {processTasks} from '../util'
 
 const actions = {
-  connect_robot ({ commit }, port) {
-    const payload = {is_connected: true, 'port': port}
+  connectRobot ({ commit }, port) {
+    const payload = {isConnected: true, 'port': port}
     Opentrons.connect(port).then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
@@ -19,7 +19,7 @@ const actions = {
       }
     })
   },
-  disconnect_robot ({ commit }) {
+  disconnectRobot ({ commit }) {
     Opentrons.disconnect().then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
