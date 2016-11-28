@@ -18,7 +18,6 @@
     methods: {
       clearRunScreen() {
         this.$store.dispatch("cancelProtocol")
-        // this.$store.dispatch("running", false)
       }
     },
     watch: {
