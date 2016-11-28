@@ -22,7 +22,7 @@
     },
     computed: {
       running() {
-        return this.$store.state.running
+        return this.$store.state.running || this.$store.state.protocolFinished
       }
     }
   }
