@@ -27,7 +27,7 @@ function processTasks(result, commit) {
   let fileName = result.fileName
   let lastModified = result.lastModified
   addHrefs(tasks)
-  commit("UPDATE_FILE_NAME", {'fileName': fileName})
-  commit("UPDATE_FILE_MODIFIED", {'lastModified': lastModified})
+  commit('UPDATE_FILE_NAME', {'fileName': fileName})
+  commit('UPDATE_FILE_MODIFIED', {'lastModified': lastModified})
   return tasks
 }

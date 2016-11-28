@@ -1,4 +1,4 @@
-const rp = require('request-promise');
+const rp = require('request-promise')
 
 function waitUntilServerResponds(createWindow) {
   rp('http://127.0.0.1:31950')

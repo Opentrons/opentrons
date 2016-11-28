@@ -46,6 +46,9 @@ describe('CalibratePlaceable.vue', (done) => {
       render: h => h(CalibratePlaceable),
       props: {placeable, instrument}
     }).$mount()
+    console.log('************************')
+    console.log(vm)
+    console.log('************************')
     Vue.nextTick(() => {
       expect(vm.$el.querySelector('span').length).to.equal(1)
       done()

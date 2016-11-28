@@ -10,7 +10,7 @@ const { mutations, state } = app_mutations
 const { actions } = app_actions
 Vue.use(Vuex)
 
-function createWebSocketPlugin (socket) {
+function createWebSocketPlugin(socket) {
   return store => {
     socket.on('event', data => {
       if (data.type === 'connection_status') {

@@ -1,4 +1,4 @@
-if (require('electron-squirrel-startup')) return;
+if (require('electron-squirrel-startup')) return
 const child_process = require('child_process')
 const fs = require('fs')
 const http = require('http')
@@ -13,17 +13,16 @@ const {initAutoUpdater} = require('./updater.js')
 const {ServerManager} = require('./servermanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
-
 let serverManager = new ServerManager()
 let mainWindow
 
-if (process.env.NODE_ENV == 'development'){
-  require('electron-debug')({showDevTools: 'undocked'});
+if (process.env.NODE_ENV == 'development') {
+  require('electron-debug')({showDevTools: 'undocked'})
 }
 
-function createWindow () {
+function createWindow() {
   mainWindow = new BrowserWindow({width: 1060, height: 750})
-  mainWindow.loadURL("http://127.0.0.1:31950")
+  mainWindow.loadURL('http://127.0.0.1:31950')
   mainWindow.on('closed', function () {
     mainWindow = null
     app.quit()
@@ -32,7 +31,7 @@ function createWindow () {
 
 function createAndSetAppDataDir() {
   if (!app.isReady()) {
-    throw Error("Attempting to create otone_data dir when app is not ready")
+    throw Error('Attempting to create otone_data dir when app is not ready')
   }
   const appDataDir = path.join(app.getPath('userData'), 'otone_data')
 
@@ -48,7 +47,7 @@ function startUp() {
 
   const mainLogger = getLogger('electron-main')
   process.on('uncaughtException', (error) => {
-    if (process.listeners("uncaughtException").length > 1) {
+    if (process.listeners('uncaughtException').length > 1) {
       console.log(error)
       mainLogger.info(error)
     }
@@ -58,7 +57,7 @@ function startUp() {
   }
 
   // Startup Actions
-  serverManager.start();
+  serverManager.start()
   waitUntilServerResponds(createWindow)
   addMenu()
   initAutoUpdater()
@@ -66,6 +65,6 @@ function startUp() {
 
 app.on('ready', startUp)
 
-app.on('quit', function(){
-  serverManager.shutdown();
-});
+app.on('quit', function () {
+  serverManager.shutdown()
+})

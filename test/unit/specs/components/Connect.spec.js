@@ -27,7 +27,7 @@ function getMockStore() {
     },
     actions: {
       connect_robot: sinon.spy(),
-      disconnect_robot: sinon.spy(),
+      disconnect_robot: sinon.spy()
     }
   }
 }
@@ -71,7 +71,6 @@ describe('Connect.vue', () => {
     })
   })
 
-
   it('disconnects from robot', () => {
     let mockStore = getMockStore()
     mockStore.state.is_connected = true
@@ -114,7 +113,6 @@ describe('Connect.vue', () => {
     connect.searchIfNecessary()
     expect(mockStore.actions.disconnect_robot.called).to.be.true
   })
-
 
   it('has methods for business logic', () => {
     expect(typeof Connect.methods.getPortsList).be.a.function
