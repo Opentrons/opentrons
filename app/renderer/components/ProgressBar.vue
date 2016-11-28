@@ -12,7 +12,7 @@
   export default {
     name: 'ProgressBar',
     computed: {
-      runPercent() {
+      runPercent () {
         let finishedTasksLength = this.$store.state.runLog.filter((command) => {
           return !command.notification
         }).length
@@ -20,10 +20,10 @@
         let percent = Math.round((finishedTasksLength / allTasksLength) * 100)
         return percent || 0
       },
-      percentClass() {
+      percentClass () {
         return `width:${this.runPercent}%;`
       },
-      running() {
+      running () {
         return this.$store.state.running || this.$store.state.protocolFinished
       }
     }

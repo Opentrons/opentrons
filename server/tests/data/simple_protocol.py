@@ -23,7 +23,7 @@ p10 = instruments.Pipette(
 )
 
 # p10.delete_calibration_data()
-for i in range(25):
-    p10.pick_up_tip(tiprack[0])
-    p10.aspirate(5, plate[0])
-    p10.dispense(5, plate[11])
+# for i in range(25):
+p10.pick_up_tip(tiprack[0])
+p10.aspirate(5, plate[0])
+p10.dispense(5, plate[11])
