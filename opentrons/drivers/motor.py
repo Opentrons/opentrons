@@ -12,6 +12,7 @@ import serial
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
+from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 
 from opentrons.util import trace
 
@@ -504,8 +505,16 @@ class CNCDriver(object):
         ms = int((sec % 1.0) * 1000)
         s = int(sec)
         self.check_paused_stopped()
-        res = self.send_command(self.DWELL, S=s, P=ms)
-        return res == b'ok'
+
+        # res = self.send_command(self.DWELL, S=s, P=ms)
+        # return res == b'ok'
+
+        if not isinstance(self.connection, VirtualSmoothie):
+            for i in range(s):
+                self.check_paused_stopped()
+                time.sleep(1)
+            time.sleep(ms)
+        return True
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
