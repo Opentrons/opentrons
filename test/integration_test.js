@@ -3,24 +3,23 @@ let chai = require('chai')
 let chaiAsPromised = require('chai-as-promised')
 let path = require('path')
 
-let appPath;
+let appPath
 if (process.platform === 'win32') {
   appPath = path.resolve(
     __dirname,
     '../node_modules/electron/dist/Electron.exe'
-  );
+  )
 } else if (process.platform === 'darwin') {
   appPath = path.resolve(
     __dirname,
     '../node_modules/electron/dist/Electron.app/Contents/MacOS/Electron'
-  );
+  )
 } else {
   appPath = path.resolve(
     __dirname,
     '../node_modules/electron/dist/electron'
-  );
+  )
 }
-
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -72,7 +71,7 @@ describe('application launch', function () {
     let run = '//*[@id="run"]/button'
 
     this.app.client.execute(() => {
-      window.confirm = function() {return true}
+      window.confirm = function () {return true}
     })
     return this.app.client.waitUntilWindowLoaded(31950)
       .click(connectDropDown)
@@ -106,6 +105,6 @@ describe('application launch', function () {
       .pause(pauseTime)
       .click(run)
       .pause(2000)
-      .waitForText(".toast-message-text", "Run complete")
+      .waitForText('.toast-message-text', 'Run complete')
   })
 })

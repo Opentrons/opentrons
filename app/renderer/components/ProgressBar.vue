@@ -1,27 +1,30 @@
 <template>
-  <div v-show="running">
-    <span class="title">Progress: </span><span class="info"> {{runPercent}}%</span>
-    <div id="progress-bar-total">
-      <div :style="percentClass" id="percent-complete"></div>
+  <div v-show='running'>
+    <span class='title'>Progress: </span>
+    <span class='info'> {{runPercent}}%</span>
+    <div id='progress-bar-total'>
+      <div :style='percentClass' id='percent-complete'></div>
     </div>
   </div>
 </template>
 
 <script>
   export default {
-    name: "ProgressBar",
+    name: 'ProgressBar',
     computed: {
-      runPercent() {
-        let finished_tasks_length = this.$store.state.run_log.length
-        let all_tasks_length = this.$store.state.run_length
-        let percent = Math.round((finished_tasks_length / all_tasks_length) * 100)
+      runPercent () {
+        let finishedTasksLength = this.$store.state.runLog.filter((command) => {
+          return !command.notification
+        }).length
+        let allTasksLength = this.$store.state.runLength
+        let percent = Math.round((finishedTasksLength / allTasksLength) * 100)
         return percent || 0
       },
-      percentClass() {
+      percentClass () {
         return `width:${this.runPercent}%;`
       },
-      running() {
-        return this.$store.state.running
+      running () {
+        return this.$store.state.running || this.$store.state.protocolFinished
       }
     }
   }

@@ -1,12 +1,12 @@
 <template>
   <span>
-    <section id="task-pane" v-show="!running">
-      <aside id="step-list">
+    <section id='task-pane' v-show='!running'>
+      <aside id='step-list'>
         <StepList></StepList>
       </aside>
       <router-view :class="{'disabled': busy}"></router-view>
     </section>
-    <RunScreen v-show="running"></RunScreen>
+    <RunScreen v-show='running'></RunScreen>
   </span>
 </template>
 
@@ -15,14 +15,14 @@
   import RunScreen from './RunScreen.vue'
 
   export default {
-    props: ["busy"],
+    props: ['busy'],
     components: {
       StepList,
       RunScreen
     },
     computed: {
-      running() {
-        return this.$store.state.running
+      running () {
+        return this.$store.state.running || this.$store.state.protocolFinished
       }
     }
   }
