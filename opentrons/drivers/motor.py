@@ -127,6 +127,12 @@ class CNCDriver(object):
                 if key not in self.saved_settings[n]:
                     self.saved_settings[n][key] = val
 
+    def _set_step_per_mm_from_config(self):
+        for axis in 'xyz':
+            value = self.saved_settings['config'].get(
+                self.CONFIG_STEPS_PER_MM[axis])
+            self.set_steps_per_mm(axis, value)
+
     def _apply_settings(self):
         self.serial_timeout = float(
             self.saved_settings['serial'].get('timeout', 0.1))
@@ -205,26 +211,23 @@ class CNCDriver(object):
 
     def connect(self, device):
         self.connection = device
-        self.reset_port()
+        self.toggle_port()
         log.debug("Connected to {}".format(device))
+
+        self.turn_off_feedback()
         self.versions_compatible()
-        # set the previously saved steps_per_mm values for X and Y
         if self.ignore_smoothie_sd:
-            for axis in 'xyz':
-                self.set_steps_per_mm(
-                    axis, self.saved_settings['config'].get(
-                        self.CONFIG_STEPS_PER_MM[axis]))
+            self._set_step_per_mm_from_config()
+
         return self.calm_down()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
 
-    def reset_port(self):
+    def toggle_port(self):
         self.connection.close()
         self.connection.open()
         self.flush_port()
-
-        self.turn_off_feedback()
 
     def pause(self):
         self.halted.clear()
@@ -273,6 +276,13 @@ class CNCDriver(object):
         return response
 
     def write_to_serial(self, data, max_tries=10, try_interval=0.2):
+        """
+        Sends data string to serial ports
+
+        Returns data immediately read from port after write
+
+        Raises RuntimeError write fails or connection times out
+        """
         log.debug("Write: {}".format(str(data).encode()))
         if self.is_connected():
             try:
@@ -286,7 +296,7 @@ class CNCDriver(object):
             log.warn(msg)
             raise RuntimeError(msg)
         elif max_tries > 0:
-            self.reset_port()
+            self.toggle_port()
             return self.write_to_serial(
                 data, max_tries=max_tries - 1, try_interval=try_interval
             )
@@ -297,6 +307,12 @@ class CNCDriver(object):
             raise RuntimeError(msg)
 
     def wait_for_response(self, timeout=20.0):
+        """
+        Repeatedly reads from serial port until data is received,
+        or timeout is exceeded
+
+        Raises RuntimeWarning() if no response was recieved before timeout
+        """
         count = 0
         max_retries = int(timeout / self.serial_timeout)
         while self.is_connected() and count < max_retries:
@@ -313,13 +329,19 @@ class CNCDriver(object):
                     log.debug(
                         "Waiting {} lines for response.".format(count)
                     )
-        raise RuntimeWarning('no response from serial port')
+        raise RuntimeWarning(
+            'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
         while self.readline_from_serial():
             time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
+        """
+        Attempt to read a line of data from serial port
+
+        Raises RuntimeWarning if read fails on serial port
+        """
         msg = b''
         try:
             msg = self.connection.readline()
@@ -329,10 +351,17 @@ class CNCDriver(object):
             raise RuntimeWarning('Lost connection with serial port') from e
         if msg:
             log.debug("Read: {}".format(msg))
+            self.detect_limit_hit(msg)  # raises RuntimeWarning if switch hit
 
-        # detect if it hit a home switch
+        return msg
+
+    def detect_limit_hit(self, msg):
+        """
+        Detect if it hit a home switch
+
+        Raises RuntimeWarning if Smoothie reports a limit hit
+        """
         if b'!!' in msg or b'limit' in msg:
-            # TODO (andy): allow this to bubble up so UI is notified
             log.debug('home switch hit')
             self.flush_port()
             self.calm_down()
@@ -342,8 +371,6 @@ class CNCDriver(object):
                 if ('min_' + ax) in msg:
                     axis = ax
             raise RuntimeWarning('{} limit switch hit'.format(axis.upper()))
-
-        return msg
 
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
