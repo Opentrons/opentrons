@@ -22,7 +22,7 @@ const actions = {
   disconnectRobot ({ commit }) {
     Opentrons.disconnect().then((wasSuccessful) => {
       if (wasSuccessful) {
-        commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
+        commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
       }
     })
   },
@@ -54,10 +54,10 @@ const actions = {
     })
   },
   selectIncrement ({commit}, data) {
-    commit(types.UPDATE_INCREMENT, { 'current_increment': data.inc })
+    commit(types.UPDATE_INCREMENT, { 'currentIncrement': data.inc })
   },
   selectIncrementPlunger ({commit}, data) {
-    commit(types.UPDATE_INCREMENT_PLUNGER, { 'current_increment_plunger': data.inc })
+    commit(types.UPDATE_INCREMENT_PLUNGER, { 'currentIncrementPlunger': data.inc })
   },
   jog ({commit}, coords) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})

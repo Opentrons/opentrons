@@ -25,7 +25,7 @@ const Connect = ConnectInjector({
 function getMockStore() {
   return {
     state: {
-      is_connected: false,
+      isConnected: false,
       port: null
     },
     actions: {
@@ -60,7 +60,7 @@ describe('Connect.vue', () => {
       el: document.createElement('div'),
       render: h => h(Connect)
     }).$mount()
-    expect(vm.$store.state.is_connected).to.be.false
+    expect(vm.$store.state.isConnected).to.be.false
 
     let connect = vm.$children[0]
     connect.ports.selected = detectedPorts[0]
@@ -78,7 +78,7 @@ describe('Connect.vue', () => {
 
   it('disconnects from robot', () => {
     let mockStore = getMockStore()
-    mockStore.state.is_connected = true
+    mockStore.state.isConnected = true
     mockStore.state.port = detectedPorts[0]
 
     const vm = new Vue({
@@ -102,7 +102,7 @@ describe('Connect.vue', () => {
 
   it('does not change connected port after refresh', () => {
     let mockStore = getMockStore()
-    mockStore.state.is_connected = true
+    mockStore.state.isConnected = true
     mockStore.state.port = detectedPorts[0]
 
     const vm = new Vue({

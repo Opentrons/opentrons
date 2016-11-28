@@ -14,8 +14,8 @@ function createWebSocketPlugin (socket) {
   return store => {
     socket.on('event', data => {
       if (data.type === 'connection_status') {
-        if (data.is_connected === false) {
-          store.commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
+        if (data.isConnected === false) {
+          store.commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
         }
       }
       if (data.name === 'move-finished') {

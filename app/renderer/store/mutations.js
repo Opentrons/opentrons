@@ -36,7 +36,7 @@ const mutations = {
     state.lastModified = payload.lastModified
   },
   [types.UPDATE_INCREMENT] (state, payload) {
-    state.currentIncrementPlaceable = payload.current_increment
+    state.currentIncrementPlaceable = payload.currentIncrement
   },
   [types.UPDATE_INCREMENT_PLUNGER] (state, payload) {
     state.currentIncrementPlunger = payload.currentIncrementPlunger
