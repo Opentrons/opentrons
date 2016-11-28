@@ -25,7 +25,7 @@ function createWebSocketPlugin (socket) {
           z: data.position.head.z,
           a: data.position.plunger.a,
           b: data.position.plunger.b
-        })
+        }, { silent: true })
       }
       if (data.name === 'home' && data.axis) {
         store.commit(types.UPDATE_POSITION, {
