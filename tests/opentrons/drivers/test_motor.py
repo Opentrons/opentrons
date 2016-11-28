@@ -17,17 +17,37 @@ class OpenTronsTest(unittest.TestCase):
         self.motor = self.robot._driver
 
         options = {
-            'limit_switches': True
+            'limit_switches': True,
+            'config': {
+                'alpha_steps_per_mm': 80.0,
+                'beat_steps_per_mm': 80.0
+            }
         }
 
         myport = self.robot.VIRTUAL_SMOOTHIE_PORT
+        self.robot.disconnect()
         success = self.robot.connect(port=myport, options=options)
         self.assertTrue(success)
 
     def tearDown(self):
-        self.motor.disconnect()
+        pass
 
-    def test_write_without_connection(self):
+    def test_reset(self):
+        self.motor.reset()
+        self.assertEquals(self.motor.connection, None)
+
+    def test_write_with_lost_connection(self):
+        self.motor.connection.is_open = False
+        old_method = getattr(self.motor, 'is_connected')
+
+        def _temp():
+            return True
+        setattr(self.motor, 'is_connected', _temp)
+        self.assertTrue(self.motor.is_connected())
+        self.assertRaises(RuntimeError, self.motor.calm_down)
+        setattr(self.motor, 'is_connected', old_method)
+
+    def test_write_after_disconnect(self):
         self.motor.disconnect()
         self.assertRaises(RuntimeError, self.motor.calm_down)
 
@@ -53,18 +73,18 @@ class OpenTronsTest(unittest.TestCase):
         }
         self.assertRaises(RuntimeError, self.robot.connect, **kwargs)
 
+    def test_invalid_coordinate_system(self):
+        self.assertRaises(ValueError, self.motor.set_coordinate_system, 'andy')
+
     def test_message_timeout(self):
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
 
     def test_set_plunger_speed(self):
-        res = self.motor.set_plunger_speed(400, 'a')
-        self.assertEquals(res, True)
-
+        self.motor.set_plunger_speed(400, 'a')
         self.assertRaises(ValueError, self.motor.set_plunger_speed, 400, 'x')
 
     def test_set_head_speed(self):
-        res = self.motor.set_head_speed(4000)
-        self.assertEquals(res, True)
+        self.motor.set_head_speed(4000)
         self.assertEquals(self.motor.head_speed, 4000)
 
     def test_get_connected_port(self):
@@ -129,8 +149,43 @@ class OpenTronsTest(unittest.TestCase):
         }
         self.assertDictEqual(coords, expected_coords)
 
+    def test_halt(self):
+        self.motor.home()
+
+        self.motor.pause()
+
+        def _move_head():
+            self.assertRaises(
+                RuntimeWarning,
+                self.motor.move_head,
+                **{'x': 100, 'y': 0, 'z': 0}
+            )
+
+        thread = Thread(target=_move_head)
+        thread.start()
+
+        self.motor.halt()
+
+        thread.join()
+
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (0, 400, 100),
+            'current': (0, 400, 100)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
+        self.motor.move_head(x=100, y=0, z=0)
+        coords = self.motor.get_head_position()
+        expected_coords = {
+            'target': (100, 0, 0),
+            'current': (100, 0, 0)
+        }
+        self.assertDictEqual(coords, expected_coords)
+
     def test_get_position(self):
         self.motor.home()
+        self.motor.ot_version = None
         self.motor.move_head(x=100)
         coords = self.motor.get_head_position()
         expected_coords = {
@@ -158,14 +213,17 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.home()
 
     def test_move_x(self):
+        self.motor.ot_version = None
         success = self.motor.move_head(x=100)
         self.assertTrue(success)
 
     def test_move_y(self):
+        self.motor.ot_version = None
         success = self.motor.move_head(y=100)
         self.assertTrue(success)
 
     def test_move_z(self):
+        self.motor.ot_version = None
         success = self.motor.move_head(z=30)
         self.assertTrue(success)
 
@@ -198,22 +256,31 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.home()
         self.motor.set_steps_per_mm('x', 80.0)
         self.motor.set_steps_per_mm('y', 80.0)
+        self.motor.set_steps_per_mm('z', 1068.7)
         self.motor.move_head(x=200, y=200)
 
         self.motor.calibrate_steps_per_mm('x', 200, 198)
         self.motor.calibrate_steps_per_mm('y', 200, 202)
+        self.motor.calibrate_steps_per_mm('z', 100, 101)
 
         new_x_steps = self.motor.get_steps_per_mm('x')
         new_y_steps = self.motor.get_steps_per_mm('y')
+        new_z_steps = self.motor.get_steps_per_mm('z')
 
         exptected_x = round((200 / 198) * 80.0, 2)
         exptected_y = round((200 / 202) * 80.0, 2)
+        exptected_z = round((100 / 101) * 1068.7, 2)
 
         self.assertEqual(exptected_x, new_x_steps)
         self.assertEqual(exptected_y, new_y_steps)
+        self.assertEqual(exptected_z, new_z_steps)
 
-        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'z')
-        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'z', 80.0)
+        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'a')
+        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'a', 80.0)
+
+        self.motor.set_steps_per_mm('x', 80.0)
+        self.motor.set_steps_per_mm('y', 80.0)
+        self.motor.set_steps_per_mm('z', 1068.7)
 
     def test_get_endstop_switches(self):
         res = self.motor.get_endstop_switches()

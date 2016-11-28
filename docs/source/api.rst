@@ -13,7 +13,7 @@ Robot
 All protocols are set up, simulated and executed using a Robot class.
 
 .. autoclass:: Robot
-   :members: connect, home, reset, run, simulate, commands, move_to, containers, actions, disconnect, pause, resume, stop, diagnostics, get_warnings, add_instrument, get_mosfet, get_motor
+   :members: connect, home, reset, run, simulate, commands, move_to, containers, actions, disconnect, head_speed, pause, resume, stop, diagnostics, get_warnings, add_instrument, get_mosfet, get_motor
 
 Pipette
 -----------------

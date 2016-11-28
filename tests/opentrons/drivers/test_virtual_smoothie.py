@@ -19,11 +19,18 @@ class VirtualSmoothieTestCase(unittest.TestCase):
             }
         }
         self.s = VirtualSmoothie(port=None, options=options)
+        self.s.open()
 
     def test_version(self):
         self.s.write('version')
         res = self.s.readline()
         self.assertEqual(res, b'{"version":v1.0.5}')
+
+    def test_reset(self):
+        self.s.write('reset')
+        res = self.s.readline()
+        self.assertEqual(
+            res, b'Smoothie out. Peace. Rebooting in 5 seconds...')
 
     def test_config_get(self):
         self.s.write('config-get sd ot_version')

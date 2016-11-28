@@ -31,6 +31,7 @@ class Robot(object, metaclass=Singleton):
         * :meth:`run` the protocol on a robot
         * :meth:`home` axis, move head (:meth:`move_to`)
         * :meth:`pause` and :func:`resume` the protocol run
+        * set the :meth:`head_speed` of the robot
 
     Each Opentrons protocol is a Python script. When evaluated the script
     creates an execution plan which is stored as a list of commands in
@@ -335,7 +336,7 @@ class Robot(object, metaclass=Singleton):
         try:
             device = serial.Serial(
                 port=port,
-                baudrate=115200,
+                baudrate=self._driver.serial_baudrate,
                 timeout=self._driver.serial_timeout
             )
             return device
@@ -369,7 +370,8 @@ class Robot(object, metaclass=Singleton):
                         'ot_version': 'one_pro',
                         'version': 'v1.0.3',        # config version
                         'alpha_steps_per_mm': 80.0,
-                        'beta_steps_per_mm': 80.0
+                        'beta_steps_per_mm': 80.0,
+                        'gamma_steps_per_mm': 1068.7
                     }
                 }
 
@@ -381,12 +383,14 @@ class Robot(object, metaclass=Singleton):
                 'ot_version': 'one_pro',
                 'version': 'v1.2.0',        # config version
                 'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0
+                'beta_steps_per_mm': 80.0,
+                'gamma_steps_per_mm': 1068.7
             }
         }
-        if not options:
-            options = {}
-        default_options.update(options)
+        if options:
+            default_options['config'].update(options.get('config', {}))
+            options['config'] = default_options['config']
+            default_options.update(options)
         return VirtualSmoothie(port=port, options=default_options)
 
     def connect(self, port=None, options=None):
@@ -474,6 +478,16 @@ class Robot(object, metaclass=Singleton):
             log.info('Executing: Home now')
             return _do()
 
+    def comment(self, description):
+        def _do():
+            pass
+
+        def _setup():
+            pass
+
+        c = Command(do=_do, setup=_setup, description=description)
+        self.add_command(c)
+
     def add_command(self, command):
 
         if command.description:
@@ -494,6 +508,26 @@ class Robot(object, metaclass=Singleton):
         self._driver.move_plunger(*args, **kwargs)
 
     def head_speed(self, rate):
+        """
+        Set the XY axis speeds of the robot, set in millimeters per minute
+
+        Parameters
+        ----------
+        rate : int
+            An integer setting the mm/minute rate of the X and Y axis.
+            Speeds too fast (around 6000 and higher) will cause the robot
+            to skip step, be careful when using this method
+
+        Examples
+        --------
+        >>> from opentrons import robot
+        >>> robot.connect('Virtual Smoothie')
+        True
+        >>> robot.home()
+        True
+        >>> robot.head_speed(4500)
+        >>> robot.move_head(x=200, y=200)
+        """
         self._driver.set_head_speed(rate)
 
     @traceable('move-to')

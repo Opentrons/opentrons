@@ -32,6 +32,12 @@ class RobotTest(unittest.TestCase):
         }
         self.assertEquals(res, expected)
 
+    def test_comment(self):
+        self.robot.clear_commands()
+        self.robot.comment('hello')
+        self.assertEquals(len(self.robot.commands()), 1)
+        self.assertEquals(self.robot._commands[0].description, 'hello')
+
     def test_home_after_disconnect(self):
         self.robot.disconnect()
         self.assertRaises(RuntimeError, self.robot.home)
@@ -64,7 +70,8 @@ class RobotTest(unittest.TestCase):
 
         thread.join()
 
-        self.assertEquals(res[-1], 'Stop signal received')
+        self.assertEquals(
+            res[-1], 'Received a STOP signal and exited from movements')
 
     def test_calibrated_max_dimension(self):
 

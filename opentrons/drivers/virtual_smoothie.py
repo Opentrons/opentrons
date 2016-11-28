@@ -39,6 +39,12 @@ class VirtualSmoothie(object):
             'min_a': 0,
             'min_b': 0
         }
+        self.steps_per_mm = {
+            'X': self.config.get('alpha_steps_per_mm', 80),
+            'Y': self.config.get('beta_steps_per_mm', 80),
+            'Z': self.config.get('gamma_steps_per_mm', 1068.7),
+            'F': 60
+        }
         self.init_coordinates()
 
     def isOpen(self):
@@ -144,6 +150,10 @@ class VirtualSmoothie(object):
     def process_calm_down(self, arguments):
         return 'ok'
 
+    def process_halt(self, arguments):
+        e = 'ok Emergency Stop Requested - reset or M999 required to continue'
+        return e
+
     def process_absolute_positioning(self, arguments):
         self.absolute = True
         return 'ok'
@@ -154,6 +164,9 @@ class VirtualSmoothie(object):
 
     def process_version(self, arguments):
         return '{"version":' + self.version + '}'
+
+    def process_reset(self, arguments):
+        return 'Smoothie out. Peace. Rebooting in 5 seconds...'
 
     def process_config_get(self, arguments):
         folder = arguments[0]
@@ -171,6 +184,14 @@ class VirtualSmoothie(object):
         self.config[setting] = value
         return '{0}: {1} has been set to {2}'.format(
             folder, setting, value)
+
+    def process_steps_per_mm(self, arguments):
+        for axis in arguments.keys():
+            if axis.upper() in 'XYZ':
+                self.steps_per_mm[axis.upper()] = arguments[axis]
+        response = json.dumps({'M92': self.steps_per_mm})
+        response += '\nok'
+        return response
 
     def process_dwell_command(self, arguments):
         return 'ok'
@@ -206,7 +227,9 @@ class VirtualSmoothie(object):
             'G92': self.process_set_position_command,
             'G28': self.process_home_command,
             'M119': self.process_get_endstops,
+            'M92': self.process_steps_per_mm,
             'M999': self.process_calm_down,
+            'M112': self.process_halt,
             'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
             'G91': self.process_relative_positioning,
@@ -225,6 +248,7 @@ class VirtualSmoothie(object):
             'M17': self.process_power_on,
             'M18': self.process_power_off,
             'version': self.process_version,
+            'reset': self.process_reset,
             'config-get': self.process_config_get,
             'config-set': self.process_config_set
         }
@@ -244,12 +268,16 @@ class VirtualSmoothie(object):
                     'Command {} is not supported'.format(command))
 
     def write(self, data):
+        if not self.isOpen():
+            raise Exception('Virtual Smoothie no currently connected')
         if not isinstance(data, str):
             data = data.decode('utf-8')
         # make it async later
         self.process_command(data)
 
     def readline(self):
+        if not self.isOpen():
+            raise Exception('Virtual Smoothie no currently connected')
         if len(self.responses) > 0:
             return self.responses.pop().encode('utf-8')
         else:
