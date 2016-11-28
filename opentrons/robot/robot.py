@@ -478,6 +478,16 @@ class Robot(object, metaclass=Singleton):
             log.info('Executing: Home now')
             return _do()
 
+    def comment(self, description):
+        def _do():
+            pass
+
+        def _setup():
+            pass
+
+        c = Command(do=_do, setup=_setup, description=description)
+        self.add_command(c)
+
     def add_command(self, command):
 
         if command.description:
