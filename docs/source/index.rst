@@ -149,6 +149,7 @@ Table of Contents
   getting_started
   well_access
   labware_library
+  custom_containers
   running_app
   tips_and_tricks
   module
