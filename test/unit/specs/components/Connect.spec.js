@@ -1,3 +1,4 @@
+/* global describe, it */
 import { expect } from 'chai'
 import Vue from 'vue'
 import Vuex from 'vuex'

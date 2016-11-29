@@ -1,10 +1,9 @@
-const electron = require("electron");
-const {app, dialog, autoUpdater} = electron;
+const electron = require('electron')
+const {app, dialog, autoUpdater} = electron
 const {getSetting} = require('./preferences')
 const {getLogger} = require('./logging.js')
 
-var UPDATE_SERVER_URL =  'http://ot-app-releases-2.herokuapp.com';
-
+var UPDATE_SERVER_URL = 'http://ot-app-releases-2.herokuapp.com'
 
 function initAutoUpdater () {
   const mainLogger = getLogger('electron-main')
@@ -32,23 +31,23 @@ function initAutoUpdater () {
 
   autoUpdater.on(
     'update-downloaded',
-   function(e, releaseNotes, releaseName, date, url) {
-       mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
-       mainLogger.info(`Update Info: ${releaseNotes}`)
+   function (e, releaseNotes, releaseName, date, url) {
+     mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
+     mainLogger.info(`Update Info: ${releaseNotes}`)
 
-       var index = dialog.showMessageBox({
-           type: 'info',
-           buttons: ['Restart','Later'],
-           title: "OT App", // TODO: Make this a config
-           message: 'The new version has been downloaded. Please restart the application to apply the updates.',
-           detail: releaseName + "\n\n" + releaseNotes
-       });
+     var index = dialog.showMessageBox({
+       type: 'info',
+       buttons: ['Restart', 'Later'],
+       title: 'OT App', // TODO: Make this a config
+       message: 'The new version has been downloaded. Please restart the application to apply the updates.',
+       detail: releaseName + '\n\n' + releaseNotes
+     })
 
-       if (index === 1) {
-           return;
-       }
+     if (index === 1) {
+       return
+     }
 
-       autoUpdater.quitAndInstall();
+     autoUpdater.quitAndInstall()
    }
   )
 
@@ -61,7 +60,7 @@ function initAutoUpdater () {
   }
   autoUpdater.setFeedURL(AUTO_UPDATE_URL)
   mainLogger.info('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
-  if (getSetting("autoUpdate")) {
+  if (getSetting('autoUpdate')) {
     mainLogger.info('Auto updating is enabled, checking for updates')
     autoUpdater.checkForUpdates()
   } else {
@@ -70,5 +69,5 @@ function initAutoUpdater () {
 }
 
 module.exports = {
-    initAutoUpdater
-};
+  initAutoUpdater
+}
