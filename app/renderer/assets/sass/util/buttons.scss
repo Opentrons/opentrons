@@ -1,6 +1,40 @@
 /******************************
             Buttons
 ******************************/
+input {
+    flex: 0 0 $btn-size*3 - 2;
+    min-width: $btn-size*3 - 2;
+    height: $btn-size - 2;
+    line-height: $btn-size;
+    padding: 0px;
+    border: 1px solid #999;
+    margin: $gutter-width*2 2px $gutter-width*2 1px;
+    text-align: left;
+    border-radius: 6px;
+    text-align: center;
+    color: $primary-text;
+}
+
+button {
+    background-color: $well-bg;
+    &:focus {
+        outline: 0;
+    }
+}
+
+.disabled {
+    .btn,
+    .btn-home,
+    .btn-jog,
+    .btn-run,
+    .pick-tip,
+    .move-to,
+    .deck,
+    .upload {
+        pointer-events: none;
+        // opacity: 0.7;
+    }
+}
 
 .btn {
     border-radius: 6px;
@@ -60,20 +94,6 @@
     color: white;
 }
 
-input {
-    flex: 0 0 $btn-size*3 - 2;
-    min-width: $btn-size*3 - 2;
-    height: $btn-size - 2;
-    line-height: $btn-size;
-    padding: 0px;
-    border: 1px solid #999;
-    margin: $gutter-width*2 2px $gutter-width*2 1px;
-    text-align: left;
-    border-radius: 6px;
-    text-align: center;
-    color: $primary-text;
-}
-
 .save {
     background-color: $call-to-action;
     &:hover {
@@ -86,27 +106,6 @@ input {
     background-color: $primary-brand;
     &:hover {
         background-color: darken($primary-brand, 10%);
-    }
-}
-
-button {
-    background-color: $well-bg;
-    &:focus {
-        outline: 0;
-    }
-}
-
-.disabled {
-    .btn,
-    .btn-home,
-    .btn-jog,
-    .btn-run,
-    .pick-tip,
-    .move-to,
-    .deck,
-    .upload {
-        pointer-events: none;
-        // opacity: 0.7;
     }
 }
 

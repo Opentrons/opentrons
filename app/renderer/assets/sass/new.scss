@@ -1,5 +1,6 @@
 @import "util";
 @import "components";
+
 body {
     font-size: $basesize;
     font-family: $stack-sans;
@@ -163,7 +164,7 @@ aside#step-list {
 
 
 /******************************
-Tasks Screens
+        Tasks Screens
 ******************************/
 
 section#task,
@@ -172,11 +173,7 @@ section#task-pipette {
     height: 310px;
     padding: 30px;
     background-color: $well-bg;
-    
 }
-
-
-section#task-pipette {}
 
 
 /******************************
