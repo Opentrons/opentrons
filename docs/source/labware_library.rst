@@ -10,17 +10,21 @@ Please refer to this detailed tutorial on :ref:`well_access` to learn the variou
 
 	Note:  All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
 
+Points
+------
 
 point
------
+^^^^^
 
 Use ``point`` when there is only one position per container, such as the trash or a scale.  
 
 You can access the point position as ``container[0]`` or ``container['A1']``.
 
+Tipracks
+--------
 
 tiprack-10ul 
-------------
+^^^^^^^^^^^^
 
 Tip rack for a 10 uL pipette (single or 8-channel)
 
@@ -30,7 +34,7 @@ Tip rack for a 10 uL pipette (single or 8-channel)
 
 
 tiprack-10ul-H 
---------------
+^^^^^^^^^^^^^^
 
 Tip rack for a single channel 10 uL pipette when the pipette is in the center position.  Set initial position to H1, and the pipette will use all the tips on the right hand side (E-H, 1-12)
 
@@ -40,7 +44,7 @@ Tip rack for a single channel 10 uL pipette when the pipette is in the center po
 
 
 tiprack-200ul
--------------
+^^^^^^^^^^^^^
 
 Tip rack for a 200 or 300 uL pipette (single or 8-channel)
 
@@ -50,7 +54,7 @@ Tip rack for a 200 or 300 uL pipette (single or 8-channel)
 
 
 tiprack-1000ul
---------------
+^^^^^^^^^^^^^^
 
 Tip rack for a 1000 uL pipette (single or 8-channel)
 
@@ -60,7 +64,7 @@ Tip rack for a 1000 uL pipette (single or 8-channel)
 
 
 tiprack-1000ul-chem  
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 Tip rack for 1000ul chem (10x10)
 
@@ -69,9 +73,11 @@ Tip rack for 1000ul chem (10x10)
 .. image:: img/labware_lib/Tiprack-1000ul-chem.png
 
 
+Troughs
+-------
 
 trough-12row 
-------------
+^^^^^^^^^^^^
 12 row reservoir
 
 **Accessing Rows:** *single channel* ``[‘A1’]-[‘A12’]``, *8-channel* ``[‘A1’]-[‘A12’]``
@@ -79,9 +85,11 @@ trough-12row
 .. image:: img/labware_lib/Trough-12row.png
 
 
+Tube Racks
+----------
 
 tube-rack-.75ml 
----------------
+^^^^^^^^^^^^^^^
 
 4x6 rack that holds .75 mL microcentrifuge tubes
 (A1, A1-D6)
@@ -92,7 +100,7 @@ tube-rack-.75ml
 
 
 tube-rack-2ml 
--------------
+^^^^^^^^^^^^^
 
 4x6 rack that holds 1.5 mL microcentrifuge tubes and 2 mL microcentrifuge tubes
 
@@ -102,7 +110,7 @@ tube-rack-2ml
 
 
 tube-rack-15_50ml
------------------
+^^^^^^^^^^^^^^^^^
 
 rack that holds 6 15 mL tubes and 4 50 mL tubes
 
@@ -111,8 +119,11 @@ rack that holds 6 15 mL tubes and 4 50 mL tubes
 ..image:: img/labware_lib/Tuberack-15-50ml.png
 
 
+Plates
+------
+
 96-deep-well
-------------
+^^^^^^^^^^^^
 
 See dimensions in diagram below.
 
@@ -121,7 +132,7 @@ See dimensions in diagram below.
 .. image:: img/labware_lib/96-Deep-Well.png
 
 96-PCR-tall
------------
+^^^^^^^^^^^
 
 See dimensions in diagram below.
 
@@ -131,7 +142,7 @@ See dimensions in diagram below.
 
 
 96-PCR-flat
--------------
+^^^^^^^^^^^
 
 See dimensions in diagram below.
 
@@ -141,7 +152,7 @@ See dimensions in diagram below.
 
 
 PCR-strip-tall
---------------
+^^^^^^^^^^^^^^
 
 See dimensions in diagram below.
 
@@ -150,7 +161,7 @@ See dimensions in diagram below.
 .. image:: img/labware_lib/96-PCR-Strip.png
 
 384-plate
----------
+^^^^^^^^^
 
 See dimensions in diagram below.
 
