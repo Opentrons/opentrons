@@ -19,7 +19,7 @@ const router = new VueRouter({
 })
 
 window.onload = function () {
-  const app = new Vue({
+  new Vue({
     router,
     store,
     ...App

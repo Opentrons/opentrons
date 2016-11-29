@@ -47,7 +47,7 @@ module.exports = function (config) {
     frameworks: ['mocha'],  // ['jasmine'],
     reporters: ['spec', 'coverage'],
     files: [
-      './index.js',
+      './index.js'
     ],
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']
