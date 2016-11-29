@@ -1,3 +1,4 @@
+/* global describe, it, beforeEach, afterEach */
 let Application = require('spectron').Application
 let chai = require('chai')
 let chaiAsPromised = require('chai-as-promised')
