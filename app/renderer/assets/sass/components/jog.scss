@@ -1,45 +1,162 @@
 /******************************
-Jog Controls 
-(Pipette and Plunger)
+Jog Controls
 ******************************/
-#jog-controls-pipette,
-#jog-controls-plunger {
+
+aside#jog {
     width: 270px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin-bottom: 15px;
-    .btn {
-        background-color: $btn-jog;
-        &.y.up {
-            margin: $gutter-width 36px;
-        }
-        &:hover {
-            background-color: darken($btn-jog, 10%);
-        }
+    flex: 0 0 270px;
+    height: 510px;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: $well-bg;
+    h2#xy {
+        width: 145px;
     }
-    span.xy {
-        width: 102px;
-        flex: 0 0 102px;
+    h2#z {
+        width: 65px;
+    }
+    #jog-controls-pipette,
+    #jog-controls-plunger {
+        width: 270px;
         display: flex;
         flex-wrap: wrap;
-        margin-left: 5px;
-        h3.title {
-            margin: 0 28px;
+        justify-content: space-around;
+        margin-bottom: 15px;
+        .btn {
+            background-color: $btn-jog;
+            &.y.up {
+                margin: $gutter-width 36px;
+            }
+            &:hover {
+                background-color: darken($btn-jog, 10%);
+            }
+        }
+        span.xy {
+            width: 102px;
+            flex: 0 0 102px;
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 5px;
+            h3.title {
+                margin: 0 28px;
+            }
+        }
+        span.z {
+            margin-right: 55px;
+            margin-left: 10px;
+        }
+        span.p {
+            margin-left: 22px;
+        }
+        span.z,
+        span.p {
+            width: 36px;
+            flex: 0 0 36px;
+            display: flex;
+            flex-wrap: wrap;
         }
     }
-    span.z {
-        margin-right: 55px;
-        margin-left: 10px;
-    }
-    span.p {
-        margin-left: 22px;
-    }
-    span.z,
-    span.p {
-        width: 36px;
-        flex: 0 0 36px;
+    span.increment {
+        h3.xyz {
+            width: 200px;
+            padding-left: 88px
+        }
+        width:270px;
         display: flex;
         flex-wrap: wrap;
+        justify-content:space-around;
+    }
+    span.increment-plunger {
+        margin-left: 50px;
+        width: 160px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    #increment-plunger {
+        width: 155px;
+        padding-top: 30px;
+        margin-left: 20px;
+        margin-right: 10px;
+        h3.plunger {
+            width: 200px;
+            padding-left: 8px;
+        }
+    }
+
+    #increment-xyz,
+    #increment-plunger {
+        width: 270px;
+        padding-left: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        justify-content: space-around;
+        div {
+            height: 30px;
+            flex: 0 0 20px;
+            padding: 5px;
+            text-align: center;
+            &.slot {
+                flex: 0 0 40px;
+                margin-right: 23px;
+            }
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        input[type="radio"] + label {
+            padding-left: 3px;
+        }
+        input[type="radio"] + label span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 0 0px 5px 4px;
+            vertical-align: middle;
+            cursor: pointer;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+        }
+        input[type="radio"] + label span {
+            border: 2px solid #999;
+            background-color: #999;
+        }
+        input[type="radio"]:checked + label span {
+            border: 2px solid #999;
+            background-color: $primary-brand;
+        }
+        input[type="radio"] + label span,
+        input[type="radio"]:checked + label span {
+            -webkit-transition: background-color 0.4s linear;
+            -o-transition: background-color 0.4s linear;
+            -moz-transition: background-color 0.4s linear;
+            transition: background-color 0.4s linear;
+        }
+    }
+    #deck {
+        display: flex;
+        justify-content: center;
+        .deck {
+            width: 140px;
+            display: flex;
+            flex-wrap: wrap;
+            border-left: 1px solid #999;
+            border-right: 1px solid #999;
+            button {
+                width: 28px;
+                height: 40px;
+                border-left: 1px solid #999;
+                border-right: 1px solid #999;
+                line-height: 40px;
+                background-color: none;
+                &:focus,
+                &.active {
+                    box-shadow: inset 5px 5px 0px 0px $primary-brand, inset -5px -5px 0px 0px $primary-brand;
+                    ;
+                }
+            }
+        }
     }
 }
