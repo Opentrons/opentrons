@@ -24,7 +24,7 @@
   well_2 = plate[1]
   well_3 = plate[2]
   well_4 = plate[3]
-      
+
   p200 = instruments.Pipette(
       axis="b",
       max_volume = 1000
@@ -33,7 +33,7 @@
   pipette = p200
 
 .. testsetup:: index_long
-  
+
   from opentrons import robot
   robot.reset()
 
@@ -43,20 +43,20 @@ Opentrons API:|br| Simple Biology Lab Protocol Coding
 Introduction
 ------------
 
-The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy. 
+The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
 
-We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook. 
+We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
 .. testcode:: index_main
-   
+
    pipette.aspirate(tube_1).dispense(tube_2)
 
-That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one. 
+That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one.
 
 You string these commands into full protocols that anyone with Opentrons can run. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into the first four wells in a 96 well plate called 'plate.'
 
 .. testcode:: index_main
-   
+
    p200.aspirate(trough[1])
    p200.dispense(50, plate[0])
    p200.dispense(50, plate[1])
@@ -66,7 +66,7 @@ You string these commands into full protocols that anyone with Opentrons can run
 If you wanted to do this 96 times, you could write it like this:
 
 .. testcode:: index_main
-   
+
   for i in range(96):
       if p200.current_volume < 50:
           p200.aspirate(trough[1])
@@ -82,12 +82,12 @@ Basic Principles
 
   p200.aspirate(100, plate['A1']).dispense(plate['A2'])
 
-Is exactly what you think it would do: 
+Is exactly what you think it would do:
   * Take p200 pipette
   * Aspirate 100 uL from well A1 on your plate
   * Dispense everything into well A2 on the same plate
 
-**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
+**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them.
 For example:
 
 .. testcode:: index_main
@@ -122,7 +122,7 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
   )
 
   plate = containers.load('96-flat', 'B1', 'plate')
-  
+
   p200 = instruments.Pipette(
       axis="b",
       max_volume=200
@@ -150,6 +150,7 @@ Table of Contents
    well_access
    running_app
    tips_and_tricks
+   custom_containers
    module
    api
 
