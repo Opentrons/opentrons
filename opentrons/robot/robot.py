@@ -83,10 +83,6 @@ class Robot(object, metaclass=Singleton):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self.can_pop_command = Event()
-
-        self.can_pop_command.set()
-
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
@@ -102,6 +98,13 @@ class Robot(object, metaclass=Singleton):
 
         self._driver = motor_drivers.CNCDriver()
         self.reset()
+
+    def setup_unpickleable_attributes(self):
+        self.can_pop_command = Event()
+        self.can_pop_command.set()
+
+    def teardown_unpickleable_attributes(self):
+        self.can_pop_command = None
 
     @classmethod
     def get_instance(cls):

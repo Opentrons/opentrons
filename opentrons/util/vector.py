@@ -4,6 +4,10 @@ from collections import namedtuple
 import json
 
 
+value_type = namedtuple('VectorValue', ['x', 'y', 'z'])
+value_type.__module__ = __name__
+
+
 # To keep Python 3.4 compatibility
 def isclose(a, b, rel_tol):
     return abs(a - b) < rel_tol
@@ -21,29 +25,25 @@ class VectorEncoder(json.JSONEncoder):
 
 class Vector(object):
     zero_vector = None
-    value_type = namedtuple('VectorValue', ['x', 'y', 'z'])
 
     @classmethod
     def zero_coordinates(cls):
 
         if not cls.zero_vector:
-            cls.zero_vector = cls.value_type(0, 0, 0)
+            cls.zero_vector = tuple(0, 0, 0)
 
         return cls.zero_vector
 
     @classmethod
-    def coordinates_from_dict(cls, dictionary):
-        kwargs = {}
-        for axis in 'xyz':
-            kwargs[axis] = dictionary.get(axis, 0)
-        return cls.value_type(**kwargs)
+    def coordinates_from_dict(cls, data : dict):
+        return tuple([data.get(axis, 0) for axis in 'xyz'])
 
     @classmethod
     def coordinates_from_iterable(cls, iterable):
-        return cls.value_type(
-            iterable[0],
-            iterable[1],
-            iterable[2])
+        return tuple(*iterable[0:3])
+            # iterable[0],
+            # iterable[1],
+            # iterable[2])
 
     def to_iterable(self):
         return self.coordinates
@@ -56,9 +56,9 @@ class Vector(object):
 
     def length(self):
         return math.sqrt(
-            pow(self.coordinates.x, 2) +
-            pow(self.coordinates.y, 2) +
-            pow(self.coordinates.z, 2)
+            pow(self.coordinates[0], 2) +
+            pow(self.coordinates[1], 2) +
+            pow(self.coordinates[2], 2)
         )
 
     def __init__(self, *args, **kwargs):
@@ -79,7 +79,7 @@ class Vector(object):
                      "expected to be dict or iterable, received {}")
                     .format(type(arg)))
         elif args_len == 3:
-            self.coordinates = Vector.value_type(*args)
+            self.coordinates = tuple(*args)
         else:
             raise ValueError("Expected either a dict/iterable or x, y, z")
 
@@ -99,9 +99,9 @@ class Vector(object):
     def __add__(self, other):
         other = other
         return Vector(
-            self.coordinates.x + other[0],
-            self.coordinates.y + other[1],
-            self.coordinates.z + other[2]
+            self.coordinates[0] + other[0],
+            self.coordinates[1] + other[1],
+            self.coordinates[2] + other[2]
         )
 
     def __sub__(self, other):
@@ -127,9 +127,9 @@ class Vector(object):
 
     def __str__(self):
         return "(x={:.2f}, y={:.2f}, z={:.2f})".format(
-            self.coordinates.x,
-            self.coordinates.y,
-            self.coordinates.z,
+            self.coordinates[0],
+            self.coordinates[1],
+            self.coordinates[2],
         )
 
     def __repr__(self):
@@ -140,7 +140,8 @@ class Vector(object):
         if isinstance(index, int):
             res = self.coordinates[index]
         elif isinstance(index, str):
-            res = getattr(self.coordinates, index)
+            i = ord(index.upper()) - 65 - 23
+            res = self.coordinates[i]
         elif isinstance(index, slice):
             res = self.coordinates[index]
         else:
