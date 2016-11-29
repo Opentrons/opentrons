@@ -57,10 +57,10 @@ class ServerManager {
       );
   }
   shutdown() {
-    if (process.platform == "darwin") {
+    if (process.platform === "darwin") {
       child_process.spawnSync('pkill', ['-9', this.processName]);
     }
-    else if (process.platform == "win32") {
+    else if (process.platform === "win32") {
       child_process.spawnSync('taskkill', ['/t', '/f',  '/im', this.processName]);
     }
     console.log('backend process successfully shutdown')

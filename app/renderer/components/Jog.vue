@@ -1,43 +1,42 @@
 <template>
-  <aside id="jog">
-    <h2 class="title">Pipette Jog</h2>
+  <aside id='jog'>
+    <h2 class='title'>Pipette Jog</h2>
     <hr>
-    <section id="jog-controls-pipette" :class="{'disabled': busy}">
-      <span class="xy">
-        <h3 class="title">[X-Y]</h3>
-        <button @click="jog('y', 1)" class="btn y up">&uarr;</button>
-        <button @click="jog('x', -1)" class="btn x left">&larr;</button>
-        <button @click="jog('y', -1)" class="btn y down">&darr;</button>
-        <button @click="jog('x', 1)" class="btn x right">&rarr;</button>
+    <section id='jog-controls-pipette' :class="{'disabled': busy}">
+      <span class='xy'>
+        <h3 class='title'>[X-Y]</h3>
+        <button @click="jog('y', 1)" class='btn y up'>&uarr;</button>
+        <button @click="jog('x', -1)" class='btn x left'>&larr;</button>
+        <button @click="jog('y', -1)" class='btn y down'>&darr;</button>
+        <button @click="jog('x', 1)" class='btn x right'>&rarr;</button>
       </span>
-      <span class="z">
-      <h3 class="title">[Z]</h3>
-        <button @click="jog('z', 1)" class="btn z up">&uarr;</button>
-        <button @click="jog('z', -1)" class="btn z down">&darr;</button>
+      <span class='z'>
+        <h3 class='title'>[Z]</h3>
+        <button @click="jog('z', 1)" class='btn z up'>&uarr;</button>
+        <button @click="jog('z', -1)" class='btn z down'>&darr;</button>
       </span>
 
-      <span class="increment">
-      <Increment :increments="placeable_increments"></Increment>
+      <span class='increment'>
+        <Increment :increments='placeableIncrements'></Increment>
       </span>
-      </section>
-
-    <h2 class="title">Plunger Jog</h2>
-    <hr>
-     <section id="jog-controls-plunger" :class="{'disabled': busy}">
-      <span class="p">
-      <h3 class="title">[P]</h3>
-        <button @click="jog(currentAxis(), -1)"class="btn p up">&uarr;</button>
-        <button @click="jog(currentAxis(), 1)" class="btn p down">&darr;</button>
-      </span>
-       <span class="increment-plunger">
-        <IncrementPlunger :increments="plunger_increments"></IncrementPlunger>
-      </span>
-      </section>
     </section>
 
-    <h2 class="title">Move to Slot</h2>
+    <h2 class='title'>Plunger Jog</h2>
     <hr>
-    <DeckSlot :busy="busy"></DeckSlot>
+     <section id='jog-controls-plunger' :class="{'disabled': busy}">
+      <span class='p'>
+        <h3 class='title'>[P]</h3>
+        <button @click='jog(currentAxis(), -1)'class='btn p up'>&uarr;</button>
+        <button @click='jog(currentAxis(), 1)' class='btn p down'>&darr;</button>
+      </span>
+      <span class='increment-plunger'>
+        <IncrementPlunger :increments='plungerIncrements'></IncrementPlunger>
+      </span>
+    </section>
+
+    <h2 class='title'>Move to Slot</h2>
+    <hr>
+    <DeckSlot :busy='busy'></DeckSlot>
   </aside>
 </template>
 
@@ -48,11 +47,11 @@
 
   export default {
     name: 'Jog',
-    props: ["busy"],
+    props: ['busy'],
     data: function () {
       return {
-        placeable_increments: ["Slot",20,5,1,0.5,0.1],
-        plunger_increments: [2,1,0.5,0.1]
+        placeableIncrements: ['Slot', 20, 5, 1, 0.5, 0.1],
+        plungerIncrements: [2, 1, 0.5, 0.1]
       }
     },
     components: {
@@ -61,32 +60,32 @@
       DeckSlot
     },
     methods: {
-      jog(axis, multiplier) {
-        let increment = this.$store.state.current_increment_placeable
-        let increment_plunger = this.$store.state.current_increment_plunger
+      jog (axis, multiplier) {
+        let increment = this.$store.state.currentIncrementPlaceable
+        let incrementPlunger = this.$store.state.currentIncrementPlunger
         let coords = {}
-        const slots = {"x": 91, "y": 135, "z": 1}
-        if ("xyz".includes(axis)) {
+        const slots = {'x': 91, 'y': 135, 'z': 1}
+        if ('xyz'.includes(axis)) {
           if (increment === 'Slot') increment = slots[axis]
           coords[axis] = increment * multiplier
-        } else if ("ab".includes(axis)) {
-          coords[axis] = increment_plunger * multiplier
+        } else if ('ab'.includes(axis)) {
+          coords[axis] = incrementPlunger * multiplier
         }
-        this.$store.dispatch("jog", coords)
+        this.$store.dispatch('jog', coords)
       },
-      currentAxis() {
-        return this.$route.params.instrument || "b"
+      currentAxis () {
+        return this.$route.params.instrument || 'b'
       },
-      handleJogEvent(e) {
+      handleJogEvent (e) {
         if (this.busy) return
-        if (e.key === "ArrowLeft") {
+        if (e.key === 'ArrowLeft') {
           this.jog('x', -1)
-        } else if (e.key === "ArrowRight") {
+        } else if (e.key === 'ArrowRight') {
           this.jog('x', 1)
-        } else if (e.key === "ArrowDown") {
+        } else if (e.key === 'ArrowDown') {
           if (e.shiftKey) return this.jog('z', -1)
           this.jog('y', -1)
-        } else if (e.key === "ArrowUp") {
+        } else if (e.key === 'ArrowUp') {
           if (e.shiftKey) return this.jog('z', 1)
           this.jog('y', 1)
         }
@@ -94,6 +93,6 @@
     },
     created: function () {
       window.addEventListener('keyup', this.handleJogEvent)
-    },
+    }
   }
 </script>

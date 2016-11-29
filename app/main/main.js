@@ -17,7 +17,7 @@ const {waitUntilServerResponds} = require('./util.js')
 let serverManager = new ServerManager()
 let mainWindow
 
-if (process.env.NODE_ENV == 'development'){
+if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
 
@@ -53,7 +53,7 @@ function startUp() {
       mainLogger.info(error)
     }
   })
-  if (process.env.NODE_ENV == 'development') {
+  if (process.env.NODE_ENV === 'development') {
     require('vue-devtools').install()
   }
 
