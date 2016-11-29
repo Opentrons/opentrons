@@ -1,10 +1,7 @@
 .. _custom_containers:
 
 Custom Containers
-=============================
-
-Creating a Custom Container
----------------------------
+=================
 
 To create a custom container, you need to create a JSON file that defines the shape of the container.
 Here is an example of a custom container that represents a plate with only 3 circular wells.
@@ -114,6 +111,5 @@ Here is an example of loading into a Python protocol the custom trash container 
 
   custom_trash = containers.load(
       'trash-square',
-      'B2',
-      'custom_trash'
+      'B2'
   )
