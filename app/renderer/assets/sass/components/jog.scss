@@ -1,14 +1,4 @@
-/******************************
-Jog Controls
-******************************/
-
 aside#jog {
-    width: 270px;
-    flex: 0 0 270px;
-    height: 510px;
-    padding: 15px;
-    border-radius: 6px;
-    background-color: $well-bg;
     h2#xy {
         width: 145px;
     }
@@ -73,7 +63,15 @@ aside#jog {
         flex-wrap: wrap;
         justify-content: space-around;
     }
-
+    #increment-xyz,
+    #increment-plunger {
+        width: 270px;
+        padding-left: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        justify-content: space-around;
+    }
     #increment-plunger {
         width: 155px;
         padding-top: 30px;
@@ -84,15 +82,8 @@ aside#jog {
             padding-left: 8px;
         }
     }
-
     #increment-xyz,
     #increment-plunger {
-        width: 270px;
-        padding-left: 5px;
-        display: flex;
-        flex-wrap: wrap;
-        position: relative;
-        justify-content: space-around;
         div {
             height: 30px;
             flex: 0 0 20px;
@@ -102,37 +93,6 @@ aside#jog {
                 flex: 0 0 40px;
                 margin-right: 23px;
             }
-        }
-        input[type="radio"] {
-            display: none;
-        }
-        input[type="radio"] + label {
-            padding-left: 3px;
-        }
-        input[type="radio"] + label span {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            margin: 0 0px 5px 4px;
-            vertical-align: middle;
-            cursor: pointer;
-            -moz-border-radius: 50%;
-            border-radius: 50%;
-        }
-        input[type="radio"] + label span {
-            border: 2px solid #999;
-            background-color: #999;
-        }
-        input[type="radio"]:checked + label span {
-            border: 2px solid #999;
-            background-color: $primary-brand;
-        }
-        input[type="radio"] + label span,
-        input[type="radio"]:checked + label span {
-            -webkit-transition: background-color 0.4s linear;
-            -o-transition: background-color 0.4s linear;
-            -moz-transition: background-color 0.4s linear;
-            transition: background-color 0.4s linear;
         }
     }
     #deck {
