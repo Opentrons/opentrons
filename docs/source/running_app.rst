@@ -11,6 +11,18 @@ You can download the latest version of the app from `our website`_.
 
 .. _our website: https://opentrons.com/getting-started/download-app
 
+.. note::
+
+	If running on Linux:
+	The user will need to be given permissions to open the robot's serial port. In a terminal window, run the following command.
+
+	.. code-block:: bash
+
+		sudo usermod -a -G dialout $USER
+
+	Then logout and log back in as the user to activate the change.
+
+
 Connect to Robot
 --------------------
 
