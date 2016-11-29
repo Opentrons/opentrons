@@ -142,16 +142,17 @@ Table of Contents
 -----------------
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   updating_firmware
-   setup
-   getting_started
-   well_access
-   running_app
-   tips_and_tricks
-   module
-   api
+  updating_firmware
+  setup
+  getting_started
+  well_access
+  labware_library
+  running_app
+  tips_and_tricks
+  module
+  api
 
 
 

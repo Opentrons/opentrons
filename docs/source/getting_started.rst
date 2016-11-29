@@ -84,6 +84,8 @@ Containers
 
 Each container on the deck is loaded using the container's name and assign it to a slot. The API comes packaged with a set of containers, and users can create and add their own custom containers.
 
+For a list of .supported containers see :ref: `labware_library`.
+
 **containers.load** (*container, slot, name*)
 
 	* **container -** type of container (aka "trough-12row")
