@@ -1,4 +1,5 @@
 import copy
+import pickle
 import os
 from threading import Event
 
@@ -83,6 +84,10 @@ class Robot(object, metaclass=Singleton):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
+
+        self.can_pop_command = Event()
+        self.can_pop_command.set()
+
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
@@ -95,16 +100,22 @@ class Robot(object, metaclass=Singleton):
                 options={'limit_switches': True}
             )
         }
-
         self._driver = motor_drivers.CNCDriver()
         self.reset()
 
-    def setup_unpickleable_attributes(self):
-        self.can_pop_command = Event()
-        self.can_pop_command.set()
+    def pickle(self):
+        def stash_unpickleable_attributes():
+            attrs = ['can_pop_command', '_driver']
+            attrs_objs = dict([(i, getattr(self, i)) for i in attrs])
+            [setattr(self, i, None) for i in attrs]
+            def restore():
+                [setattr(self, i, attrs_objs[i]) for i in attrs]
+            return restore
 
-    def teardown_unpickleable_attributes(self):
-        self.can_pop_command = None
+        bring_back_pickle_unsafe_objs = stash_unpickleable_attributes()
+        self_as_bytes = pickle.dumps(self)
+        bring_back_pickle_unsafe_objs()
+        return self_as_bytes
 
     @classmethod
     def get_instance(cls):
@@ -141,7 +152,6 @@ class Robot(object, metaclass=Singleton):
 
         """
         self._commands = []
-        self._handlers = []
         self._runtime_warnings = []
 
         self._previous_container = None

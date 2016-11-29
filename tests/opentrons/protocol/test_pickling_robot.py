@@ -1,15 +1,30 @@
 import pickle
 import unittest
 
-from opentrons import robot
+from opentrons import containers, instruments
+from opentrons import Robot
 
 
 class PicklingRobotTestCase(unittest.TestCase):
     def setUp(self):
-        robot.reset_for_tests()
+        Robot.reset_for_tests()
+        self.robot = Robot()
 
     def test_pickling_unconfigured_robot(self):
-        robot.teardown_unpickleable_attributes()
-        robot_as_bytes = pickle.dumps(robot)
+        robot_as_bytes = self.robot.pickle()
+        self.assertIsInstance(robot_as_bytes, bytes)
         reconstructed_robot = pickle.loads(robot_as_bytes)
-        robot.setup_unpickleable_attributes()
+
+    # def test_pickling_configured_robot(self):
+    #     plate = containers.load('96-flat', 'A1')
+    #     p200 = instruments.Pipette(axis='b', max_volume=200)
+    #
+    #     for well in plate:
+    #         p200.aspirate(well).delay(5).dispense(well)
+    #
+    #     cmd_cnts = len(self.robot.commands())
+    #     robot_as_bytes = self.robot.pickle()
+    #     self.assertIsInstance(robot_as_bytes, bytes)
+    #     reconstructed_robot = pickle.loads(robot_as_bytes)
+    #
+    #     reconstructed_robot_cmd_cnts = len(reconstructed_robot.commands())
