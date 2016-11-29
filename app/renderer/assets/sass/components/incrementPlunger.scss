@@ -1,0 +1,23 @@
+#increment-plunger {
+    width: 155px;
+    padding-top: 30px;
+    margin-left: 20px;
+    margin-right: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    justify-content: space-around;
+    h3.plunger {
+        width: 200px;
+        padding-left: 8px;
+    }
+}
+
+span.increment-plunger {
+    margin-left: 50px;
+    width: 160px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
