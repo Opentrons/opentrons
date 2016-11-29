@@ -242,7 +242,7 @@ class OpenTronsTest(unittest.TestCase):
         start_time = time.time()
         success = self.motor.wait(1.234)
         end_time = time.time()
-        self.assertAlmostEquals(end_time - start_time, 1.234, places=2)
+        self.assertAlmostEquals(end_time - start_time, 1.234, places=1)
         self.assertTrue(success)
 
     def test_wait_for_arrival(self):
