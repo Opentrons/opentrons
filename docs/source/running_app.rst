@@ -14,13 +14,23 @@ You can download the latest version of the app from `our website`_.
 .. note::
 
 	If running on Linux:
-	The user will need to be given permissions to open the robot's serial port. In a terminal window, run the following command.
+	The user will need to be given permissions to open the robot's serial port. This requires `sudo` privileges.
+	In a terminal window, run the following command
 
 	.. code-block:: bash
 
 		sudo usermod -a -G dialout $USER
 
-	Then logout and log back in as the user to activate the change.
+	If you are running this command from an administrative account that will not be running the app (in order to get `sudo` privileges),
+	replace $USER with the username of the account that will be running the app (this username can be found by typing
+
+	.. code-block:: bash
+
+		echo $USER
+
+	in the account that will be running the app.
+
+	Finally, logout and log back in as the user to activate the change.
 
 
 Connect to Robot
@@ -28,7 +38,7 @@ Connect to Robot
 
 Make sure your robot is turned on, and your laptop is connected via USB cable.
 
-Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.  
+Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.
 
 .. screenshot button with port drop down
 
@@ -63,7 +73,7 @@ New to 2.0, the slot button moves exactly one slot over in either X or Y, depend
 AB Plungers
 ^^^^^^^^^^^^^^^^^^^^
 
-Use the plunger jog to move the plunger up and down.  If you have selected a container or the pipette for the B axis, then the B axis will move, and if you have selected a container or the pipette for the A axis, it will move.   
+Use the plunger jog to move the plunger up and down.  If you have selected a container or the pipette for the B axis, then the B axis will move, and if you have selected a container or the pipette for the A axis, it will move.
 
 .. screenshot plunger jog
 
@@ -101,7 +111,7 @@ With a tip on the pipette, calibrate to the bottom of the first well or tube in 
 Pipettes
 ^^^^^^^^^^^^^^^^^^^^
 
-Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.  
+Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.
 
 .. image:: img/app/pipette-calibration.png
 
