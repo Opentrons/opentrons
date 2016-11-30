@@ -1,3 +1,4 @@
+/* global describe, it, beforeEach, afterEach */
 let Application = require('spectron').Application
 let chai = require('chai')
 let chaiAsPromised = require('chai-as-promised')
@@ -71,7 +72,7 @@ describe('application launch', function () {
     let run = '//*[@id="run"]/button'
 
     this.app.client.execute(() => {
-      window.confirm = function () {return true}
+      window.confirm = function () { return true }
     })
     return this.app.client.waitUntilWindowLoaded(31950)
       .click(connectDropDown)

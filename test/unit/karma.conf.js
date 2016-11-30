@@ -5,7 +5,7 @@
 
 var path = require('path')
 var merge = require('webpack-merge')
-var baseConfig = require('../../webpack.config.js')
+var baseConfig = require('../../webpack.config.js')[0]
 var projectRoot = path.resolve(__dirname, '../../')
 
 var webpackConfig = merge(baseConfig, {
@@ -47,7 +47,7 @@ module.exports = function (config) {
     frameworks: ['mocha'],  // ['jasmine'],
     reporters: ['spec', 'coverage'],
     files: [
-      './index.js',
+      './index.js'
     ],
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']

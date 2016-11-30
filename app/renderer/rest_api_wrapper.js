@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import {addHrefs, processProtocol} from './util'
 
-
 class Opentrons {
   constructor (baseUrl) {
     this.baseUrl = baseUrl || 'http://localhost:31950'

@@ -1,3 +1,4 @@
+/* global describe, it */
 import { expect } from 'chai'
 
 import * as types from 'renderer/store/mutation-types'
