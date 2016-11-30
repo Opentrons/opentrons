@@ -1,5 +1,4 @@
 import copy
-import pickle
 import os
 from threading import Event
 
@@ -19,6 +18,92 @@ from opentrons.util.singleton import Singleton
 
 
 log = get_logger(__name__)
+
+
+class InstrumentMosfet(object):
+    """
+    Provides access to MagBead's MOSFET.
+    """
+
+    def __init__(self, driver, mosfet_index):
+        self.motor_driver = driver
+        self.mosfet_index = mosfet_index
+
+    def engage(self):
+        """
+        Engages the MOSFET.
+        """
+        self.motor_driver.set_mosfet(self.mosfet_index, True)
+
+    def disengage(self):
+        """
+        Disengages the MOSFET.
+        """
+        self.motor_driver.set_mosfet(self.mosfet_index, False)
+
+    def wait(self, seconds):
+        """
+        Pauses protocol execution.
+
+        Parameters
+        ----------
+        seconds : int
+            Number of seconds to pause for.
+        """
+        self.motor_driver.wait(seconds)
+
+
+class InstrumentMotor(object):
+    """
+    Provides access to Robot's head motor.
+    """
+    def __init__(self, driver, axis):
+        self.motor_driver = driver
+        self.axis = axis
+
+    def move(self, value, mode='absolute'):
+        """
+        Move plunger motor.
+
+        Parameters
+        ----------
+        value : int
+            A one-dimensional coordinate to move to.
+        mode : {'absolute', 'relative'}
+        """
+        kwargs = {self.axis: value}
+        return self.motor_driver.move_plunger(
+            mode=mode, **kwargs
+        )
+
+    def home(self):
+        """
+        Home plunger motor.
+        """
+        return self.motor_driver.home(self.axis)
+
+    def wait(self, seconds):
+        """
+        Wait.
+
+        Parameters
+        ----------
+        seconds : int
+            Number of seconds to pause for.
+        """
+        self.motor_driver.wait(seconds)
+
+    def speed(self, rate):
+        """
+        Set motor speed.
+
+        Parameters
+        ----------
+        rate : int
+        """
+        self.motor_driver.set_plunger_speed(rate, self.axis)
+        return self
+
 
 
 class Robot(object, metaclass=Singleton):
@@ -103,20 +188,6 @@ class Robot(object, metaclass=Singleton):
         self._driver = motor_drivers.CNCDriver()
         self.reset()
 
-    def pickle(self):
-        def stash_unpickleable_attributes():
-            attrs = ['can_pop_command', '_driver']
-            attrs_objs = dict([(i, getattr(self, i)) for i in attrs])
-            [setattr(self, i, None) for i in attrs]
-            def restore():
-                [setattr(self, i, attrs_objs[i]) for i in attrs]
-            return restore
-
-        bring_back_pickle_unsafe_objs = stash_unpickleable_attributes()
-        self_as_bytes = pickle.dumps(self)
-        bring_back_pickle_unsafe_objs()
-        return self_as_bytes
-
     @classmethod
     def get_instance(cls):
         """
@@ -138,8 +209,8 @@ class Robot(object, metaclass=Singleton):
         """
         Deprecated.
         """
+        del Singleton._instances[cls]
         robot = Robot.get_instance()
-        robot.reset()
         return robot
 
     def reset(self):
@@ -224,40 +295,8 @@ class Robot(object, metaclass=Singleton):
         -------
         Instance of :class:`InstrumentMosfet`.
         """
-        robot_self = self
 
-        class InstrumentMosfet():
-            """
-            Provides access to MagBead's MOSFET.
-            """
-
-            def __init__(self):
-                self.motor_driver = robot_self._driver
-
-            def engage(self):
-                """
-                Engages the MOSFET.
-                """
-                self.motor_driver.set_mosfet(mosfet_index, True)
-
-            def disengage(self):
-                """
-                Disengages the MOSFET.
-                """
-                self.motor_driver.set_mosfet(mosfet_index, False)
-
-            def wait(self, seconds):
-                """
-                Pauses protocol execution.
-
-                Parameters
-                ----------
-                seconds : int
-                    Number of seconds to pause for.
-                """
-                self.motor_driver.wait(seconds)
-
-        return InstrumentMosfet()
+        return InstrumentMosfet(self._driver, mosfet_index)
 
     def get_motor(self, axis):
         """
@@ -268,61 +307,7 @@ class Robot(object, metaclass=Singleton):
         axis : {'a', 'b'}
             Axis name. Please check stickers on robot's gantry for the name.
         """
-        robot_self = self
-
-        class InstrumentMotor():
-
-            """
-            Provides access to Robot's head motor.
-            """
-
-            def __init__(self):
-                self.motor_driver = robot_self._driver
-
-            def move(self, value, mode='absolute'):
-                """
-                Move plunger motor.
-
-                Parameters
-                ----------
-                value : int
-                    A one-dimensional coordinate to move to.
-                mode : {'absolute', 'relative'}
-                """
-                kwargs = {axis: value}
-                return self.motor_driver.move_plunger(
-                    mode=mode, **kwargs
-                )
-
-            def home(self):
-                """
-                Home plunger motor.
-                """
-                return self.motor_driver.home(axis)
-
-            def wait(self, seconds):
-                """
-                Wait.
-
-                Parameters
-                ----------
-                seconds : int
-                    Number of seconds to pause for.
-                """
-                self.motor_driver.wait(seconds)
-
-            def speed(self, rate):
-                """
-                Set motor speed.
-
-                Parameters
-                ----------
-                rate : int
-                """
-                self.motor_driver.set_plunger_speed(rate, axis)
-                return self
-
-        return InstrumentMotor()
+        return InstrumentMotor(self._driver, axis)
 
     def flip_coordinates(self, coordinates):
         """
