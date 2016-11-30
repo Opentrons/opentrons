@@ -84,6 +84,5 @@ export default new Vuex.Store({
   actions,
   mutations,
   plugins: [websocketplugin],
-  modules: {toast},
-  strict: true
+  modules: {toast}
 })
