@@ -12,7 +12,7 @@
     "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/renderer",
     "release:posix": "npm run build:backend:posix && npm run build:frontend:posix",
     "release:win": "npm run build:backend:win && npm run build:frontend:win",
-    "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/",
+    "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron --disable-http-cache app/",
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "integration": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/integration_test.js",
     "test": "npm run unit; npm run integration; nosetests"

@@ -64,7 +64,9 @@ function createWebSocketPlugin (socket) {
         store.commit(types.UPDATE_RUNNING, {'running': false})
       }
       if (data.name === 'jupyter-upload') {
-        processTasks(data, store.commit)
+        let tasks = data.data
+        processTasks(tasks, store.commit)
+        store.commit(types.UPDATE_TASK_LIST, { tasks })
       }
     })
   }

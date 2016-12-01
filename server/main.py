@@ -169,7 +169,8 @@ def upload_jupyter():
     jupyter_robot.can_pop_command = robot.can_pop_command
 
     Singleton._instances[Robot] = jupyter_robot
-    import pdb; pdb.set_trace()
+    robot = jupyter_robot
+
     calibrations = update_step_list()
     upload_data = {
         'calibrations': calibrations,
