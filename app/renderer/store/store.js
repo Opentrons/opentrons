@@ -10,7 +10,6 @@ import { processTasks } from '../util'
 const { mutations, state } = appMutations
 const { actions } = appActions
 
-
 Vue.use(Vuex)
 
 function createWebSocketPlugin (socket) {

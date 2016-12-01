@@ -169,13 +169,17 @@ def upload_jupyter():
     jupyter_robot.can_pop_command = robot.can_pop_command
 
     Singleton._instances[Robot] = jupyter_robot
-    calibrations = create_step_list()
+    import pdb; pdb.set_trace()
+    calibrations = update_step_list()
     upload_data = {
         'calibrations': calibrations,
         'fileName': 'JUPYTER UPLOAD',
         'lastModified': 'NA'
     }
-    emit_notifications([upload_data], 'jupyter-upload')
+    socketio.emit('event', {
+        'data': upload_data,
+        'name': 'jupyter-upload'
+    })
     return flask.jsonify({
         'status': 'success',
         'data': None
@@ -564,7 +568,7 @@ def create_step_list():
 
 def update_step_list():
     global current_protocol_step_list
-    if not current_protocol_step_list:
+    if current_protocol_step_list is None:
         create_step_list()
     try:
         for step in current_protocol_step_list:
