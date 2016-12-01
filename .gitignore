@@ -8,6 +8,8 @@ server/static/css
 .DS_Store
 calibrations
 server/calibrations
+smoothie
+server/smoothie
 
 # Logs
 logs

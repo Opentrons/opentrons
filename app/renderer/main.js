@@ -18,6 +18,7 @@ const router = new VueRouter({
   ]
 })
 
+/* eslint-disable no-unused-vars */
 window.onload = function () {
   const app = new Vue({
     router,
@@ -25,3 +26,4 @@ window.onload = function () {
     ...App
   }).$mount('#app')
 }
+/* eslint-enable no-unused-vars */

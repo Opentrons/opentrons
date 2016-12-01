@@ -166,11 +166,16 @@ def clean_build_dist(build_tag):
     """
 
     platform_type = util.get_os()
+    if platform_type == "win":
+        platform_dist_dir = "win-unpacked"
+    elif platform_type == "linux":
+        platform_dist_dir = "linux-unpacked"
+    elif platform_type == "mac":
+        platform_dist_dir = "mac"
 
-    electron_builder_dist = os.path.join(project_root_dir, "dist", platform_type)
-
+    electron_builder_dist = os.path.join(project_root_dir, "dist", platform_dist_dir)
     print(script_tab + 'Contents electron-builder dist dir: {}'.format(
-        str(os.listdir(os.path.join(project_root_dir, "dist", platform_type)))
+        str(os.listdir(os.path.join(project_root_dir, "dist", platform_dist_dir)))
     ))
 
     print(script_tab + 'Searching for build artifacts in electron-builder '

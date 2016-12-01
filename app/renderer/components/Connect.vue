@@ -1,11 +1,11 @@
 <template>
-  <nav class="connect">
-    <select @change="searchIfNecessary()" v-model="ports.selected" id="connections">
-      <option value="default">{{defaultOption}}</option>
-      <option value="refresh-list">&#8635 refresh</option>
-      <option v-for="option in ports.options" v-bind:value="option.value">{{ option.text }}</option>
+  <nav class='connect'>
+    <select @change='searchIfNecessary()' v-model='ports.selected' id='connections'>
+      <option value='default'>{{defaultOption}}</option>
+      <option value='refresh-list'>&#8635 refresh</option>
+      <option v-for='option in ports.options' v-bind:value='option.value'>{{ option.text }}</option>
     </select>
-    <div id="indicator" :class="{ 'connected': connected}"></div>
+    <div id='indicator' :class="{'connected': connected}"></div>
   </nav>
 </template>
 
@@ -14,30 +14,30 @@
   import Opentrons from '../rest_api_wrapper'
 
   export default {
-    name: "Connect",
+    name: 'Connect',
     data: function () {
       return {
         ports: {
-          selected: "default",
+          selected: 'default',
           options: []
         }
       }
     },
     computed: {
       connected () {
-        return this.$store.state.is_connected;
+        return this.$store.state.isConnected
       },
       port () {
-        return this.$store.state.port;
+        return this.$store.state.port
       },
       defaultOption () {
-        return this.connected ? "Disconnect" : "Select a port"
+        return this.connected ? 'Disconnect' : 'Select a port'
       }
     },
     methods: {
       getPortsList: function () {
         this.ports = {
-          selected: "default",
+          selected: 'default',
           options: []
         }
         Opentrons.getPortsList().then((ports) => {
@@ -46,24 +46,24 @@
       },
       searchIfNecessary: function () {
         let selected = this.ports.selected
-        if ( selected === "refresh-list" || selected === null) {
+        if (selected === 'refresh-list' || selected === null) {
           this.getPortsList()
-          if (this.$store.state.is_connected) this.ports.selected = this.$store.state.port
-        } else if (selected === "default") {
+          if (this.$store.state.isConnected) this.ports.selected = this.$store.state.port
+        } else if (selected === 'default') {
           this.disconnectRobot()
         } else {
           this.connectToRobot()
         }
       },
-      connectToRobot: function() {
-        this.$store.dispatch('connect_robot', this.ports.selected)
+      connectToRobot: function () {
+        this.$store.dispatch('connectRobot', this.ports.selected)
       },
-      disconnectRobot: function() {
-        this.$store.dispatch('disconnect_robot')
+      disconnectRobot: function () {
+        this.$store.dispatch('disconnectRobot')
       }
     },
-    beforeMount: function() {
-      this.getPortsList();
+    beforeMount: function () {
+      this.getPortsList()
     }
   }
 </script>

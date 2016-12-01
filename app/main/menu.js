@@ -9,13 +9,13 @@ const zipFolder = require('zip-folder')
 
 const {getSetting, toggleSetting} = require('./preferences')
 
-function addMenu() {
+function addMenu () {
   const template = [{
     label: 'Opentrons',
     submenu: [
       { label: 'About', selector: 'orderFrontStandardAboutPanel:' },
       { type: 'separator' },
-      { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() }}
+      { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() } }
     ]},
     {
       label: 'Edit',
@@ -34,23 +34,23 @@ function addMenu() {
       submenu: [
         {
           label: 'Download Logs',
-          click() { downloadLogs() }
+          click () { downloadLogs() }
         },
         {
           label: 'Open Containers Folder',
-          click() { openContainersFolder() }
+          click () { openContainersFolder() }
         },
         {
-          label: `Enable Auto Updating this App`,
+          label: 'Enable Auto Updating this App',
           type: 'checkbox',
           checked: getSetting('autoUpdate'),
-          click() { toggleSetting('autoUpdate') }
+          click () { toggleSetting('autoUpdate') }
         },
         {
-          label: `Enable Anonymous Crash Reporting`,
+          label: 'Enable Anonymous Crash Reporting',
           type: 'checkbox',
           checked: getSetting('crashReport'),
-          click() { toggleSetting('crashReport') }
+          click () { toggleSetting('crashReport') }
         }
       ]
     },
@@ -59,15 +59,15 @@ function addMenu() {
       submenu: [
         {
           label: 'Open API Documentation',
-          click() { electron.shell.openExternal('http://docs.opentrons.com') }
+          click () { electron.shell.openExternal('http://docs.opentrons.com') }
         },
         {
           label: 'Open Getting Started',
-          click() { electron.shell.openExternal('https://opentrons.com/getting-started') }
+          click () { electron.shell.openExternal('https://opentrons.com/getting-started') }
         },
         {
           label: 'Log an Issue',
-          click() { electron.shell.openExternal('https://github.com/OpenTrons/opentrons-app/issues/new') }
+          click () { electron.shell.openExternal('https://github.com/OpenTrons/opentrons-app/issues/new') }
         }
       ]
     }
@@ -77,7 +77,7 @@ function addMenu() {
   Menu.setApplicationMenu(menu)
 }
 
-function downloadLogs() {
+function downloadLogs () {
   selectDirectory((folder) => {
     if (folder) {
       const timeStamp = moment().tz('America/New_York').format()
@@ -87,12 +87,12 @@ function downloadLogs() {
   })
 }
 
-function openContainersFolder() {
+function openContainersFolder () {
   const containersFolderDir = path.join(process.env.APP_DATA_DIR, 'containers')
   shell.openItem(containersFolderDir)
 }
 
-function zip(source, destination) {
+function zip (source, destination) {
   zipFolder(source, destination, function (err) {
     if (err) {
       dialog.showMessageBox({
@@ -108,7 +108,7 @@ function zip(source, destination) {
   })
 }
 
-function selectDirectory(callback) {
+function selectDirectory (callback) {
   dialog.showOpenDialog({
     properties: ['openDirectory']
   }, callback)

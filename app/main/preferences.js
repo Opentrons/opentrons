@@ -1,10 +1,10 @@
 const electron = require('electron')
-const {dialog, Menu} = electron
+const {dialog} = electron
 const settings = require('electron-settings')
 
 settings.on('create', pathToSettings => {
   const result = dialog.showMessageBox({
-    message: `Do you want to turn on auto updating?`,
+    message: 'Do you want to turn on auto updating?',
     buttons: ['Yes', 'No']
   })
 
@@ -15,11 +15,11 @@ settings.on('create', pathToSettings => {
   }
 })
 
-function getSetting(setting) {
+function getSetting (setting) {
   return settings.getSync(setting)
 }
 
-function toggleSetting(setting) {
+function toggleSetting (setting) {
   settings.setSync(setting, !getSetting(setting))
 }
 

@@ -2,8 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const winston = require('winston')
 
-function createLogger(path, name) {
+function createLogger (path, name) {
   fs.appendFileSync(path, '')
+
   return new (winston.Logger)({
     transports: [
       new (winston.transports.Console)(),
@@ -23,7 +24,7 @@ function createLogger(path, name) {
   })
 }
 
-function getLogger(name) {
+function getLogger (name) {
   const logDir = process.env.APP_DATA_DIR
   const loggerPath = path.join(logDir, name.concat('.log'))
   return createLogger(loggerPath, name)

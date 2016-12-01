@@ -315,7 +315,7 @@ def app_version():
 
 
 @app.route("/robot/serial/connect", methods=["POST"])
-def connect_robot():
+def connectRobot():
     port = request.json.get('port')
     options = request.json.get('options', {'limit_switches': False})
 
@@ -375,7 +375,7 @@ def _start_connection_watcher():
 
 
 @app.route("/robot/serial/disconnect")
-def disconnect_robot():
+def disconnectRobot():
     status = 'success'
     data = None
 

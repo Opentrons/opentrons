@@ -1,8 +1,8 @@
 <template>
-  <div ref="commands" class="runScreen">
-    <h3 @click="clearRunScreen()" id="exit">x</h3>
-    <div class="runCommand" v-for="command in runLog">
-      {{command["command_description"]}}
+  <div ref='commands' class='runScreen'>
+    <h3 @click='clearRunScreen()' id='exit'>x</h3>
+    <div class='runCommand' v-for='command in runLog'>
+      {{command.timestamp}} - {{command.command_description}}
       <br>
     </div>
   </div>
@@ -11,18 +11,17 @@
 <script>
   export default {
     computed: {
-      runLog() {
-        return this.$store.state.run_log
+      runLog () {
+        return this.$store.state.runLog
       }
     },
     methods: {
-      clearRunScreen() {
-        this.$store.dispatch("cancelProtocol")
-        // this.$store.dispatch("running", false)
+      clearRunScreen () {
+        this.$store.dispatch('finishRun')
       }
     },
     watch: {
-      runLog: function(val, oldVal) {
+      runLog: function (val, oldVal) {
         this.$refs.commands.scrollTop = this.$refs.commands.scrollHeight
       }
     }

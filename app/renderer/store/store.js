@@ -2,20 +2,20 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client/socket.io'
 import * as types from './mutation-types'
-import app_mutations from './mutations'
-import app_actions from './actions'
+import appMutations from './mutations'
+import appActions from './actions'
 import { createModule, ADD_TOAST_MESSAGE } from 'vuex-toast'
 
-const { mutations, state } = app_mutations
-const { actions } = app_actions
+const { mutations, state } = appMutations
+const { actions } = appActions
 Vue.use(Vuex)
 
-function createWebSocketPlugin(socket) {
+function createWebSocketPlugin (socket) {
   return store => {
     socket.on('event', data => {
       if (data.type === 'connection_status') {
-        if (data.is_connected === false) {
-          store.commit(types.UPDATE_ROBOT_CONNECTION, {'is_connected': false, 'port': null})
+        if (data.isConnected === false) {
+          store.commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
         }
       }
       if (data.name === 'move-finished') {
@@ -25,7 +25,7 @@ function createWebSocketPlugin(socket) {
           z: data.position.head.z,
           a: data.position.plunger.a,
           b: data.position.plunger.b
-        })
+        }, { silent: true })
       }
       if (data.name === 'home' && data.axis) {
         store.commit(types.UPDATE_POSITION, {
@@ -38,6 +38,8 @@ function createWebSocketPlugin(socket) {
       }
       if (data.name === 'command-run') {
         if (data.caller === 'ui') {
+          let newDate = new Date()
+          data.timestamp = newDate.toUTCString().split(' ').slice(-2).join(' ')
           store.commit(types.UPDATE_RUN_LOG, data)
           store.commit(types.UPDATE_RUN_LENGTH, data)
         }
@@ -47,6 +49,12 @@ function createWebSocketPlugin(socket) {
           let {text, type} = data
           text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
+
+          let newDate = new Date()
+          data.timestamp = newDate.toUTCString().split(' ').slice(-2).join(' ')
+          data.command_description = text
+          data.notification = true
+          store.commit(types.UPDATE_RUN_LOG, data)
         }
       }
       if (data.name === 'run-finished') {

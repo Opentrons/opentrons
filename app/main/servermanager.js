@@ -1,19 +1,19 @@
-const child_process = require('child_process')
+const childProcess = require('child_process')
 const electron = require('electron')
 const path = require('path')
 
 const {app} = electron
 
 class ServerManager {
-  constructor() {
+  constructor () {
     this.serverProcess = null
     this.processName = null
   }
 
-  start() {
+  start () {
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
-    let backend_path
+    let backendPath
 
     let backends = {
       'darwin': '/backend-dist/mac/otone_server',
@@ -26,9 +26,9 @@ class ServerManager {
       return
     }
 
-    backend_path = app.getAppPath() + backends[process.platform]
+    backendPath = app.getAppPath() + backends[process.platform]
     process.env['appVersion'] = app.getVersion()
-    this.execFile(backend_path, [userDataPath])
+    this.execFile(backendPath, [userDataPath])
   }
 
   /**
@@ -36,11 +36,11 @@ class ServerManager {
   * @param {param} filePath - path to an executable
   * @param {Array} extraArgs - Array of arguments to pass during invocation of file
   */
-  execFile(filePath, extraArgs) {
-    this.serverProcess = child_process.execFile(
+  execFile (filePath, extraArgs) {
+    this.serverProcess = childProcess.execFile(
       filePath,
       extraArgs,
-      {stdio: 'ignore' },
+      { stdio: 'ignore' },
       function (error, stdout, stderr) {
         console.log(stdout)
         console.log(stderr)
@@ -55,11 +55,11 @@ class ServerManager {
         'and using spawnfile', this.processName
       )
   }
-  shutdown() {
-    if (process.platform == 'darwin') {
-      child_process.spawnSync('pkill', ['-9', this.processName])
-    } else if (process.platform == 'win32') {
-      child_process.spawnSync('taskkill', ['/t', '/f', '/im', this.processName])
+  shutdown () {
+    if (process.platform === 'darwin') {
+      childProcess.spawnSync('pkill', ['-9', this.processName])
+    } else if (process.platform === 'win32') {
+      childProcess.spawnSync('taskkill', ['/t', '/f', '/im', this.processName])
     }
     console.log('backend process successfully shutdown')
   }
