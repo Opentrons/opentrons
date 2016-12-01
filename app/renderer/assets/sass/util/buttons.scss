@@ -1,0 +1,153 @@
+/******************************
+            Buttons
+******************************/
+input {
+    flex: 0 0 $btn-size*3 - 2;
+    min-width: $btn-size*3 - 2;
+    height: $btn-size - 2;
+    line-height: $btn-size;
+    padding: 0px;
+    border: 1px solid #999;
+    margin: $gutter-width*2 2px $gutter-width*2 1px;
+    text-align: left;
+    border-radius: 6px;
+    text-align: center;
+    color: $primary-text;
+}
+
+button {
+    background-color: $well-bg;
+    &:focus {
+        outline: 0;
+    }
+}
+
+.disabled {
+    .btn,
+    .btn-home,
+    .btn-jog,
+    .btn-run,
+    .pick-tip,
+    .move-to,
+    .deck,
+    .upload {
+        pointer-events: none;
+        // opacity: 0.7;
+    }
+}
+
+.btn {
+    border-radius: 6px;
+    display: block;
+    width: $btn-size;
+    height: $btn-size;
+    line-height: $btn-size;
+    margin: $gutter-width;
+    text-align: center;
+    text-align: center;
+    color: white;
+}
+
+.btn-run,
+.btn-play,
+.btn-pause,
+.btn-clear {
+    min-width: $btn-size*3;
+    height: $btn-size;
+    margin: $gutter-width;
+    line-height: $btn-size;
+    padding: 0px 15px;
+    text-align: center;
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+    background-color: $primary-brand;
+    &:hover {
+        background-color: darken($primary-brand, 10%);
+    }
+}
+
+.btn-pause {
+    background: $primary-brand url(../assets/img/pause.png) no-repeat center;
+    &:hover {
+        background: darken($primary-brand, 10%) url(../assets/img/pause.png) no-repeat center;
+    }
+}
+
+.btn-play {
+    background: $primary-brand url(../assets/img/play.png) no-repeat center;
+    &:hover {
+        background: darken($primary-brand, 10%) url(../assets/img/play.png) no-repeat center;
+    }
+}
+
+.btn-calibrate {
+    flex: 0 0;
+    min-width: $btn-size*3;
+    height: $btn-size;
+    line-height: $btn-size;
+    padding: 0px 15px;
+    margin: 2 * $gutter-width;
+    text-align: center;
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+}
+
+.save {
+    background-color: $call-to-action;
+    &:hover {
+        background-color: darken($call-to-action, 10%);
+    }
+}
+
+.move-to,
+.pick-tip {
+    background-color: $primary-brand;
+    &:hover {
+        background-color: darken($primary-brand, 10%);
+    }
+}
+
+.disabled.move-to {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+//increment radio buttons
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"] + label {
+    padding-left: 3px;
+}
+
+input[type="radio"] + label span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 0px 5px 4px;
+    vertical-align: middle;
+    cursor: pointer;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}
+
+input[type="radio"] + label span {
+    border: 2px solid #999;
+    background-color: #999;
+}
+
+input[type="radio"]:checked + label span {
+    border: 2px solid #999;
+    background-color: $primary-brand;
+}
+
+input[type="radio"] + label span,
+input[type="radio"]:checked + label span {
+    -webkit-transition: background-color 0.4s linear;
+    -o-transition: background-color 0.4s linear;
+    -moz-transition: background-color 0.4s linear;
+    transition: background-color 0.4s linear;
+}

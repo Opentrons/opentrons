@@ -1,0 +1,56 @@
+/******************************
+Step List
+******************************/
+aside#step-list {
+    width: 140px;
+    flex: 0 0 140px;
+    height: 330px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    div.instrument {
+        border-left: 5px solid $secondary-brand;
+        width: 135px;
+        &:first-child {
+            margin-bottom: $baseline;
+        }
+        ul {
+            list-style: none;
+            display: block;
+            padding: 0;
+            margin: 0;
+            li {
+                position: relative;
+            }
+            a {
+                display: block;
+                line-height: $baseline;
+                padding-left: 30px;
+                text-decoration: none;
+                color: $primary-black;
+                // not in use yet but will need to truncate longer container names
+                span.clip {
+                    display: block;
+                    width: 80px;
+                    height: 20px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+            a.router-link-active {
+                background-color: $well-bg;
+            }
+            a.completed:before {
+                content: "\2713";
+                font-size: 16px;
+                color: $secondary-brand;
+                float: left;
+                padding-left: 10px;
+                position: absolute;
+                top: 0;
+                left: 0px;
+            }
+        }
+    }
+}

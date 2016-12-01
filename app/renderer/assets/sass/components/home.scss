@@ -1,0 +1,24 @@
+/******************************
+							Home
+******************************/
+
+nav.home {
+    width: 280px;
+    display: flex;
+    justify-content: space-between;
+    .btn-home {
+        flex: 0 0;
+        height: $btn-size;
+        line-height: 30px;
+        padding: 0px 12px;
+        text-align: center;
+        background-color: $primary-brand;
+        border-radius: 6px;
+        text-align: center;
+        color: white;
+        cursor: pointer;
+        &:hover {
+            background-color: darken($primary-brand, 10%);
+        }
+    }
+}
