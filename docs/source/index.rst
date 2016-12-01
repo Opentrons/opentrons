@@ -155,15 +155,6 @@ Table of Contents
   module
   api
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 .. |br| raw:: html
 
    <br />
