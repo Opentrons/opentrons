@@ -126,7 +126,7 @@ def upload():
 
     api_response = None
     if extension == 'py':
-        api_response = load_python(file.stream, file)
+        api_response = load_python(file.stream)
     elif extension == 'json':
         api_response = helpers.load_json(file.stream)
     else:
