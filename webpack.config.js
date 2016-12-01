@@ -1,7 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 
-let electronConfig = {
+module.exports = {
   entry: './app/renderer/main.js',
   output: {
     path: path.resolve(__dirname, './server/templates/dist'),
@@ -84,16 +84,8 @@ let electronConfig = {
   },
   headers: { 'Access-Control-Allow-Origin': 'http://localhost:5000', 'Access-Control-Allow-Credentials': 'true' },
   devtool: '#eval-source-map',
-  target: 'electron'
+  target: process.env['APP_TARGET'] || 'electron'
 }
-
-let webConfig = Object.assign({}, electronConfig)
-webConfig['target'] = 'web'
-
-module.exports = [
-  electronConfig,
-  webConfig
-]
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.devtool = '#source-map'
