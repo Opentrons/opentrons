@@ -24,28 +24,25 @@ function getRenderedVm (Component, propsData) {
   return vm
 }
 
-describe('CalibratePlaceable.vue', (done) => {
-  it('renders with tiprack based on prop', () => {
-    let placeable = {
-      'slot': 'A1',
-      'label': 'tiprack-12ml',
-      'sanitizedType': 'tiprack',
-      'calibrated': false
-    }
-    let instrument = {'axis': 'a'}
+let placeable = {
+  'slot': 'A1',
+  'label': 'tiprack-12ml',
+  'sanitizedType': 'tiprack',
+  'calibrated': false
+}
+let instrument = {'axis': 'a'}
 
+describe('CalibratePlaceable.vue', (done) => {
+  it('renders pick_up/drop tip if placeable is tiprack', () => {
     expect(getRenderedVm(CalibratePlaceable, {
       placeable,
       instrument
     }).$el.querySelectorAll('button').length).to.equal(4)
+  })
 
+  it('does not render tip buttons if placeable is not tiprack', () => {
     let plate = placeable
     plate['sanitizedType'] = 'default'
-
-    console.log(getRenderedVm(CalibratePlaceable, {
-      placeable: plate,
-      instrument
-    }).placeable)
 
     expect(getRenderedVm(CalibratePlaceable, {
       placeable: plate,
