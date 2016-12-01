@@ -2,8 +2,8 @@
   <span>
     <button class='btn-calibrate save' @click='calibratePlaceable()'>SAVE</button>
     <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='moveToPlaceable()'>MOVE TO</button>
-    <button v-show='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip()'>PICK UP TIP</button>
-    <button v-show='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='dropTip()'>DROP TIP</button>
+    <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip()'>PICK UP TIP</button>
+    <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='dropTip()'>DROP TIP</button>
   </span>
 </template>
 

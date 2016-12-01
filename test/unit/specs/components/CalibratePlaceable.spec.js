@@ -4,7 +4,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 // import sinon from 'sinon'
 import CalibratePlaceable from 'renderer/components/CalibratePlaceable.vue'
-// const CalibratePlaceableInjector = require('!!vue?inject!renderer/components/CalibratePlaceable.vue')
 
 Vue.use(Vuex)
 
@@ -19,9 +18,14 @@ Vue.use(Vuex)
 //   }
 // }
 
+function getRenderedVm (Component, propsData) {
+  const Ctor = Vue.extend(Component)
+  const vm = new Ctor({ propsData }).$mount()
+  return vm
+}
+
 describe('CalibratePlaceable.vue', (done) => {
   it('renders with tiprack based on prop', () => {
-    // let mockStore = getMockStore()
     let placeable = {
       'slot': 'A1',
       'label': 'tiprack-12ml',
@@ -30,24 +34,22 @@ describe('CalibratePlaceable.vue', (done) => {
     }
     let instrument = {'axis': 'a'}
 
-    function getRenderedText (Component, propsData) {
-      const Ctor = Vue.extend(Component)
-      const vm = new Ctor({ propsData }).$mount()
-      return vm.$el.textContent
-    }
-
-    // const vm = new Vue({
-    //   // store: new Vuex.Store(mockStore),
-    //   el: document.createElement('div'),
-    //   render: h => h(CalibratePlaceable)
-    // }).$mount()
-
-    // console.log(vm)
-
-    // expect(vm.$el.querySelector('button').length).to.equal('foo')
-    expect(getRenderedText(CalibratePlaceable, {
+    expect(getRenderedVm(CalibratePlaceable, {
       placeable,
       instrument
-    })).to.equal('Hello')
+    }).$el.querySelectorAll('button').length).to.equal(4)
+
+    let plate = placeable
+    plate['sanitizedType'] = 'default'
+
+    console.log(getRenderedVm(CalibratePlaceable, {
+      placeable: plate,
+      instrument
+    }).placeable)
+
+    expect(getRenderedVm(CalibratePlaceable, {
+      placeable: plate,
+      instrument
+    }).$el.querySelectorAll('button').length).to.equal(2)
   })
 })
