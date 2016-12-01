@@ -142,26 +142,18 @@ Table of Contents
 -----------------
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   updating_firmware
-   setup
-   getting_started
-   well_access
-   running_app
-   tips_and_tricks
-   custom_containers
-   module
-   api
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+  updating_firmware
+  setup
+  getting_started
+  well_access
+  labware_library
+  custom_containers
+  running_app
+  tips_and_tricks
+  module
+  api
 
 .. |br| raw:: html
 

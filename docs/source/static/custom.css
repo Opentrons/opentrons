@@ -104,9 +104,9 @@ div.body h2{
         width: auto;
     }
 
-    .github {
+/*     .github {
         display: none;
-    }
+    } */
 
     div.sphinxsidebar {
         position: relative;
@@ -116,6 +116,23 @@ div.body h2{
     pre, tt, code {
     font-size: 1.5em;
     }
+}
+
+
+div.body p.caption{
+    font-size: 22px;
+}
+
+
+ul{
+    list-style-type: none;
+    margin-left: 0;
+}
+
+ul ul{
+    list-style-type: circle;
+    margin-left: 30px;
+    color: #999;
 }
 
 @media screen and (min-device-width: 320px)and (max-device-width: 640px) {
