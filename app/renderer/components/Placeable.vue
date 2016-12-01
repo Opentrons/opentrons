@@ -22,14 +22,17 @@
       CalibratePlaceable
     },
     methods: {
+      params () {
+        return this.$route.params
+      },
       instrument () {
         return this.$store.state.tasks.filter((instrument) => {
-          return instrument.axis === this.$route.params.instrument
+          return instrument.axis === this.params().instrument
         })[0]
       },
       placeable () {
         let placeable = this.instrument().placeables.filter((p) => {
-          return p.label === this.$route.params.placeable
+          return p.label === this.params().placeable
         })[0]
         let sanitized = ['point', 'tiprack', 'trough', 'tuberack'].filter((el) =>
           placeable.type.includes(el)
@@ -58,7 +61,7 @@
         let position = 'of the A1 well'
         if (type === 'trough') {
           position = 'of the A1 slot'
-        } else if ((type === 'tiprack' || type === 'default') && this.instrument.channels === 8) {
+        } else if ((type === 'tiprack' || type === 'default') && this.instrument().channels === 8) {
           position = 'of the A1 row'
         } else if (type === 'point') {
           position = ''
