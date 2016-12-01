@@ -2,6 +2,8 @@ import copy
 import os
 from threading import Event
 
+import dill
+import requests
 import serial
 
 from opentrons import containers
@@ -756,6 +758,26 @@ class Robot(object, metaclass=Singleton):
                 break
 
         return self._runtime_warnings
+
+    def send_to_app(self):
+        robot_as_bytes = dill.dumps(self)
+        try:
+            resp = requests.get('http://localhost:31950')
+            if not resp.ok:
+                raise Exception
+        except (Exception, requests.exceptions.ConnectionError):
+            raise Exception(
+                    'Cannot detect Opentrons App on your machine.'
+                    ' Please make sure it is installed and running'
+                )
+
+        resp = requests.post(
+            'http://localhost:31950/upload-jupyter',
+            data=robot_as_bytes,
+            headers={'Content-Type': 'application/octet-stream'}
+        )
+        if not resp.ok:
+            raise Exception('Failed to send Robot to app')
 
     def simulate(self, switches=False):
         """

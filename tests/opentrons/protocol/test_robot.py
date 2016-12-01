@@ -283,3 +283,15 @@ class RobotTest(unittest.TestCase):
             }
         }
         self.assertDictEqual(res, expected)
+
+    def test_send_to_app_with_unconfigured_robot(self):
+        self.robot.send_to_app()
+
+    def test_send_to_app_with_configured_robot(self):
+        plate = containers.load('96-flat', 'A1')
+        p200 = instruments.Pipette(axis='b', max_volume=200)
+
+        for well in plate:
+            p200.aspirate(well).delay(5).dispense(well)
+
+        self.robot.send_to_app()

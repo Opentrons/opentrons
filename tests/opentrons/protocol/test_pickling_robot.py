@@ -25,6 +25,17 @@ class PicklingRobotTestCase(unittest.TestCase):
         original_robot_cmd_cnts = len(self.robot._commands)
         robot_as_bytes = dill.dumps(self.robot)
         self.assertIsInstance(robot_as_bytes, bytes)
-        reconstructed_robot = dill.loads(robot_as_bytes)
-        reconstructed_robot_cmd_cnts = len(reconstructed_robot._commands)
-        self.assertEqual(reconstructed_robot_cmd_cnts, original_robot_cmd_cnts)
+        deserialized_robot = dill.loads(robot_as_bytes)
+        deserialized_robot_cmd_cnts = len(deserialized_robot._commands)
+        self.assertEqual(deserialized_robot_cmd_cnts, original_robot_cmd_cnts)
+
+        original_robot_instruments = self.robot.get_instruments()
+        deserialized_robot_instruments = self.robot.get_instruments()
+        self.assertEqual(
+            len(original_robot_instruments),
+            len(deserialized_robot_instruments),
+        )
+        self.assertEqual(
+            original_robot_instruments[0][0],
+            deserialized_robot_instruments[0][0],
+        )
