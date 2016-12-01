@@ -5,6 +5,7 @@ import threading
 import json
 import time
 
+import dill
 import flask
 import traceback
 from flask import Flask, render_template, request
@@ -16,6 +17,8 @@ from opentrons import robot
 from opentrons.containers import placeable
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
+from opentrons import Robot
+from opentrons.util.singleton import Singleton
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from server import helpers
@@ -154,6 +157,28 @@ def upload():
             'fileName': filename,
             'lastModified': last_modified
         }
+    })
+
+
+@app.route("/upload-jupyter", methods=["POST"])
+def upload_jupyter():
+    global robot
+    jupyter_robot = dill.loads(request.data)
+    # These attributes need to be persisted from existing robot
+    jupyter_robot._driver = robot._driver
+    jupyter_robot.can_pop_command = robot.can_pop_command
+
+    Singleton._instances[Robot] = jupyter_robot
+    calibrations = create_step_list()
+    upload_data = {
+        'calibrations': calibrations,
+        'fileName': 'JUPYTER UPLOAD',
+        'lastModified': 'NA'
+    }
+    emit_notifications([upload_data], 'jupyter-upload')
+    return flask.jsonify({
+        'status': 'success',
+        'data': None
     })
 
 

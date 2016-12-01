@@ -5,9 +5,12 @@ import * as types from './mutation-types'
 import appMutations from './mutations'
 import appActions from './actions'
 import { createModule, ADD_TOAST_MESSAGE } from 'vuex-toast'
+import { processTasks } from '../util'
 
 const { mutations, state } = appMutations
 const { actions } = appActions
+
+
 Vue.use(Vuex)
 
 function createWebSocketPlugin (socket) {
@@ -60,6 +63,9 @@ function createWebSocketPlugin (socket) {
       if (data.name === 'run-finished') {
         store.commit(types.UPDATE_ROBOT_STATE, {'busy': false})
         store.commit(types.UPDATE_RUNNING, {'running': false})
+      }
+      if (data.name === 'jupyter-upload') {
+        processTasks(data, store.commit)
       }
     })
   }
