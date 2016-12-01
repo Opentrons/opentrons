@@ -1,62 +1,15 @@
-@import "reset";
+@import "util";
+@import "components";
 
-/******************************
-VARS
-******************************/
-
-@font-face {
-    font-family: "trons";
-    src: url("../assets/fonts/Geogtq-Rg-webfont.woff2");
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "open-sans";
-    src: url("../assets/fonts/OpenSans-Regular-webfont.woff");
-    font-weight: normal;
-    font-style: normal;
-}
-
-/*
-OpenSans-Regular-webfont.svg
-OpenSans-Regular-webfont.eot
-OpenSans-Regular-webfont.woff
-*/
-
-$baseline: 22px;
-$basesize: 12px;
-$btn-size: 30px;
-$gutter-width:2px;
-$stack-sans: "trons",sans-serif;
-
-/* Color Scheme */
-
-$primary-black:rgba(40,40,50,1); //black
-$primary-brand: rgba(0,112,255,1); //blue
-$secondary-brand: #05C1B3; //teal
-$call-to-action: rgba(250,175,66,1); //mustard
-$well-bg: rgba(245,245,245,1); //light grey
-$btn-jog: rgba(100,100,100,1); //dark grey
-
-/* Typography Specific*/
-
-$primary-text: rgba(41,30,38,1); //black
-$primary-link: $secondary-brand;
-
-/* Buttons */
-
-$primary-btn: lighten( $primary-brand,15%);
-$secondary-btn: lighten( $secondary-brand,15%);
-
-/******************************
-Header Home Logo Connect
-******************************/
 body {
     font-size: $basesize;
     font-family: $stack-sans;
 }
 
+
+/***************************
+Header Home Connect Wrapper
+****************************/
 
 header#home-connect {
     width: 1004px;
@@ -65,96 +18,35 @@ header#home-connect {
     margin: 5px auto;
     display: flex;
     flex-direction: row;
-    justify-content:space-between;
+    justify-content: space-between;
     border-radius: 6px;
     background-color: $well-bg;
-    nav.home{
-        width:280px;
-        display:flex;
-        justify-content:space-between;
-        .btn-home{
-            flex:0 0;
-            height: $btn-size;
-            line-height: 30px;
-            padding:0px 12px;
-            text-align: center;
-            background-color: $primary-brand;
-            border-radius: 6px;
-            text-align: center;
-            color:white;
-            cursor:pointer;
-            &:hover{
-                 background-color: darken($primary-brand, 10%);
+    // Logo and Version #
+    .brand {
+        flex: 0 0 160px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        div.logo {
+            width: 124px;
+            height: 30px;
+            img {
+                width: 124px;
+                height: auto;
             }
         }
-    }
-    .brand{
-        flex:0 0 160px;
-        display:flex;
-        flex-direction:row;
-        justify-content:space-between;
-
-        div.logo{
-        width:124px;
-        height:30px;
-
-        img{
-            width:124px;
-            height:auto;
-        }
-    }
-
-        div.version{
-            flex:0 0 30px;
-            height:30px;
+        div.version {
+            flex: 0 0 30px;
+            height: 30px;
             line-height: 35px;
         }
     }
-
-
-    nav.connect{
-        width:350px;
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:flex-end;
-        select {
-            flex:0 0;
-            background: white;
-            border-radius: 6px;
-            border: 2px solid lighten($btn-jog, 15%);
-            -webkit-appearance: none;
-            outline: none;
-            color: white;
-            height:$btn-size;
-            min-width: 6*$btn-size;
-            padding-left: 10px;
-            background-image: url("../assets/img/caret.png");
-            background-repeat: no-repeat;
-            background-position: 95% 50%;
-            color: $btn-jog;
-
-        }
-        div#indicator{
-            width:12px;
-            height:12px;
-            flex: 0 0 12px;
-            border-radius: 50%;
-            border:4px solid #888;
-            background-color: #f33b59;
-            margin:5px;
-            &.connected{
-                background-color: #3bf389;
-            }
-
-        }
-    }
-
 }
 
 
-/******************************
-Protocol Upload and Run Controls
-******************************/
+/***************************************
+Protocol Upload and Run Controls Wrapper
+****************************************/
 
 section.protocol {
     width: 1004px;
@@ -165,117 +57,14 @@ section.protocol {
     flex-direction: row;
     border-radius: 6px;
     background-color: $well-bg;
-    justify-content:space-between;
-    form.upload{
-        width: 285px;
-        .fileUpload {
-            width: 285px;
-            height:15px;
-            padding:24px 0;
-            position: relative;
-            overflow: hidden;
-            color:#888;
-            border-radius: 6px;
-            border: 2px dashed darken($well-bg,10%);
-            text-align: center;
-            justify-items:center;
-
-            &:hover {
-               background-color: darken($well-bg,10%);
-            }
-        }
-        .fileUpload input.upload {
-            position: absolute;
-            top: 0;
-            right: 0;
-            margin: 0px;
-            padding: 15px;
-            font-size: 30px;
-            cursor: pointer;
-            opacity: 0;
-            filter: alpha(opacity=0);
-        }
-    }
-    div#protocol-info{
-        margin-left: 20px;
-        flex: 0 0 242px;
-        display: flex;
-        flex-direction:row;
-        flex-wrap:wrap;
-        height: 45px;
-        padding:10px;
-
-        span{
-            font-size: 14px;
-            text-align: left;
-            height: 22px;
-            line-height: 22px;
-            flex:0 0 121px;
-            &.title{
-                font-weight: 800;
-            }
-            &.info{
-                font-size: 13px;
-                font-family: "open-sans";
-                line-height: 22px;
-                width: 100px;
-                height:22px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        }
-    }
-    div#progress{
-        flex:0 0 256px;
-        padding:10px 0;
-        div{
-        span{
-            font-size: 14px;
-            text-align: left;
-            height: 22px;
-            line-height: 22px;
-            flex:0 0 121px;
-            &.info{
-                font-size: 13px;
-                font-family: "open-sans";
-            }
-            &.title{
-                font-weight: 800;
-            }
-        }
-        #progress-bar-total{
-            width:100%;
-            margin-top: 7px;
-            height:12px;
-            background-color: #BBB;
-            #percent-complete{
-                width:20%;
-                height:12px;
-                background-color: $call-to-action;
-            }
-        }
-    }
-
-    }
-    div#run{
-        min-width:$btn-size*3;
-        flex:0 0 $btn-size*3;
-        height:65px;
-         padding:0 40px;
-        div.controls{
-            width:$btn-size*3;
-            flex:0 0 $btn-size*3;
-            display:flex;
-            flex-direction:row;
-            justify-content:space-between;
-        }
-    }
+    justify-content: space-between;
 }
 
 
+/******************************
+    Main Content Wrapper
+******************************/
 
-//main content wrapper
 main#container {
     width: 1024px;
     margin: 5px auto;
@@ -285,187 +74,21 @@ main#container {
 
 
 /******************************
-Jog Controls
+    Jog Controls Wrapper
 ******************************/
 
 aside#jog {
     width: 270px;
     flex: 0 0 270px;
     height: 510px;
-    padding:15px;
+    padding: 15px;
     border-radius: 6px;
-
     background-color: $well-bg;
-    h2#xy{
-            width:145px;
-    }
-    h2#z{
-            width:65px;
-    }
-
-    #jog-controls-pipette,#jog-controls-plunger {
-        width:270px;
-        display: flex;
-        flex-wrap: wrap;
-
-        justify-content:space-around;
-        margin-bottom: 15px;
-        .btn{
-                background-color: $btn-jog;
-                &.y.up{
-                margin: $gutter-width 36px;
-                }
-                &:hover{
-                    background-color: darken($btn-jog, 10%);
-                }
-            }
-        span.xy{
-            width: 102px;
-            flex: 0 0 102px;
-            display:flex;
-            flex-wrap: wrap;
-            margin-left: 5px;
-            h3.title{
-                margin: 0 28px;
-            }
-
-        }
-        span.z{
-            margin-right: 55px;
-            margin-left:10px;
-        }
-        span.p{
-            margin-left: 22px;
-        }
-        span.z, span.p{
-            width: 36px;
-            flex: 0 0 36px;
-            display:flex;
-            flex-wrap: wrap;
-
-        }
-    }
-
-    span.increment{
-        h3.xyz{
-            width:200px;
-            padding-left:88px
-        }
-        width:270px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content:space-around;
-    }
-    span.increment-plunger{
-
-
-        margin-left:50px;
-        width:160px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content:space-around;
-    }
-        #increment-xyz, #increment-plunger{
-        width:270px;
-        padding-left: 5px;
-        display: flex;
-        flex-wrap: wrap;
-        position:relative;
-        justify-content:space-around;
-
-        }
-        #increment-plunger{
-            width:155px;
-            padding-top:30px;
-            margin-left: 20px;
-            margin-right:10px;
-            h3.plunger{
-            width:200px;
-            padding-left:8px;
-
-            }
-
-        }
-        #increment-xyz, #increment-plunger{
-            div{
-                height:30px;
-                flex:0 0 20px;
-                padding:5px;
-                text-align: center;
-                &.slot{
-                    flex: 0 0 40px;
-                    margin-right:23px;
-                }
-            }
-            input[type="radio"] {
-                display:none;
-            }
-            input[type="radio"] + label{
-                padding-left:3px;
-            }
-            input[type="radio"] + label span {
-                display:inline-block;
-                width:10px;
-                height:10px;
-                margin:0 0px 5px 4px;
-                vertical-align:middle;
-                cursor:pointer;
-                -moz-border-radius:  50%;
-                border-radius:  50%;
-            }
-
-
-            input[type="radio"] + label span {
-                border: 2px solid #999;
-                 background-color:#999;
-            }
-
-            input[type="radio"]:checked + label span{
-                border: 2px solid #999;
-                 background-color:$primary-brand;
-            }
-
-            input[type="radio"] + label span,
-            input[type="radio"]:checked + label span {
-              -webkit-transition:background-color 0.4s linear;
-              -o-transition:background-color 0.4s linear;
-              -moz-transition:background-color 0.4s linear;
-              transition:background-color 0.4s linear;
-            }
-        }
-
-
-
-
-    #deck{
-        display: flex;
-        justify-content:center;
-        .deck{
-            width:140px;
-            display: flex;
-            flex-wrap: wrap;
-            border-left:1px solid #999;
-            border-right:1px solid #999;
-            button{
-                width:28px;
-                height:40px;
-                border-left:1px solid #999;
-                border-right:1px solid #999;
-                line-height: 40px;
-                background-color: none;
-                &:focus, &.active {
-                    box-shadow: inset 5px 5px 0px 0px $primary-brand,inset -5px -5px 0px 0px $primary-brand; ;
-                }
-            }
-        }
-
-    }
-
 }
 
 
 /******************************
-Task Pane
+    Task Pane Wrapper
 ******************************/
 
 section#task-pane {
@@ -478,37 +101,6 @@ section#task-pane {
     align-items: center;
     border: 2px solid $well-bg;
     border-radius: 6px;
-}
-
-/******************************
-Run Screen
-******************************/
-.runScreen {
-  overflow-y: scroll;
-  height: 536px;
-  width: 710px;
-  font-size: 16px;
-  border: 2px solid $well-bg;
-  border-radius: 6px;
-  position:relative;
-  margin-left: 10px;
-  .runCommand {
-    //background-color: $well-bg;
-    padding-bottom: 16px;
-    margin: 25px;
-    &:last-child {
-      color: $primary-brand;
-      // background-color: $call-to_action;
-    }
-  }
-  #exit {
-    position: fixed;
-    top: auto;
-    padding-left: 685px;
-    padding-right: 5px;
-    cursor: pointer;
-    color: $secondary-brand;
-  }
 }
 
 
@@ -533,9 +125,9 @@ aside#step-list {
             list-style: none;
             display: block;
             padding: 0;
-            margin:0;
-            li{
-                position:relative;
+            margin: 0;
+            li {
+                position: relative;
             }
             a {
                 display: block;
@@ -547,7 +139,7 @@ aside#step-list {
                 span.clip {
                     display: block;
                     width: 80px;
-                    height:20px;
+                    height: 20px;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -559,7 +151,7 @@ aside#step-list {
             a.completed:before {
                 content: "\2713";
                 font-size: 16px;
-                color:$secondary-brand;
+                color: $secondary-brand;
                 float: left;
                 padding-left: 10px;
                 position: absolute;
@@ -572,285 +164,29 @@ aside#step-list {
 
 
 /******************************
-Tasks
+        Tasks Screens
 ******************************/
 
-section#task {
-    width: 510px;
-    height: 310px;
-    padding:30px;
-    background-color: $well-bg;
-    .well-img {
-        width: 500px;
-        margin-top: 10px;
-        height:190px;
-        img{
-        width:100%;
-        height:auto;
-        }
-    }
-}
-
-
-/******************************
-Task Pipette
-******************************/
+section#task,
 section#task-pipette {
     width: 510px;
-    flex: 0 0 510px;
-    height: 330px;
-    padding:30px;
+    height: 310px;
+    padding: 30px;
     background-color: $well-bg;
-    span{
-        width: 510px;
-        height: 260px;
-        display:flex;
-        flex-directon:row;
-        div.calibrate-pipette{
-        width:300px;
-        display:flex;
-        flex-direction:column;
-        flex:0 0 300px;
-        .calibrate{
-            width:290px;
-            display:flex;
-            flex-direction:row;
-            justify-content:flex-end;
-            &.top{
-                margin-bottom:40px;
-            }
-            &.volume{
-                justify-content:flex-start;
-                margin-bottom:10px;
-            }
-            span.title{
-                flex: 0 0 90px;
-                height:50px;
-                padding-left:20px;
-                font-size: 14px;
-                font-weight: 800;
-                line-height: 40px;
-                text-align: right;
-                }
-            }
-        }
-        div.pipette-diagrams{
-            width:220px;
-            flex:0 0 220px;
-            img{
-                display:none;
-            }
-            &.top{
-                img.top{
-                  display:block;
-                }
-            }
-
-            &.bottom{
-                img.bottom{
-                  display:block;
-                }
-            }
-
-            &.blow-out{
-                img.blow-out{
-                  display:block;
-                }
-            }
-
-            &.drop-tip{
-                img.drop-tip{
-                  display:block;
-                }
-            }
-        }
-
-    }
-    .calibrate.tips{
-        width:300px;
-        height:45px;
-        padding-left:88px;
-        display:flex;
-        flex-direction:row;
-        justify-content:flex-end;
-    }
 }
 
 
 /******************************
-Buttons
+        Run Screen Wrapper
 ******************************/
 
-.btn{
+.runScreen {
+    overflow-y: scroll;
+    height: 536px;
+    width: 710px;
+    font-size: 16px;
+    border: 2px solid $well-bg;
     border-radius: 6px;
-    display: block;
-    width: $btn-size;
-    height: $btn-size;
-    line-height: $btn-size;
-    margin: $gutter-width;
-    text-align: center;
-    text-align: center;
-    color:white;
-}
-
-.btn-run, .btn-play, .btn-pause, .btn-clear{
-    min-width:$btn-size*3;
-    height: $btn-size;
-    margin:$gutter-width;
-    line-height: $btn-size;
-    padding:0px 15px;
-    text-align: center;
-    border-radius: 6px;
-    text-align: center;
-    color:white;
-    background-color: $primary-brand;
-    &:hover{
-        background-color: darken($primary-brand, 10%);
-    }
-}
-
-// .btn-play, .btn-pause, .btn-clear{
-//     flex:0 0;
-//     height: $btn-size;
-//     width:98px;
-//     min-width: $btn-size*3;
-//     line-height: $btn-size;
-//     padding:0px 15px;
-//     text-align: center;
-//     background-color: $primary-brand;
-//     border-radius: 6px;
-//     text-align: center;
-//     color:white;
-//     &:hover{
-//         background-color: darken($primary-brand, 10%);
-//     }
-// }
-
-.btn-pause{
-    background: $primary-brand url(../assets/img/pause.png) no-repeat center;
-    &:hover{
-    background: darken($primary-brand,10%) url(../assets/img/pause.png) no-repeat center;
-    }
-}
-
-.btn-play{
-    background: $primary-brand url(../assets/img/play.png) no-repeat center;
-    &:hover{
-    background: darken($primary-brand,10%) url(../assets/img/play.png) no-repeat center;
-    }
-}
-
-.btn-clear{
-    // background: $primary-brand url(../assets/img/clear.png) no-repeat center;
-    // &:hover{
-    // background: darken($primary-brand,10%) url(../assets/img/clear.png) no-repeat center;
-    // }
-}
-
-
-.btn-calibrate{
-    flex:0 0;
-    min-width: $btn-size*3;
-    height: $btn-size;
-    line-height: $btn-size;
-    padding:0px 15px;
-    margin: 2 * $gutter-width;
-    text-align: center;
-    border-radius: 6px;
-    text-align: center;
-    color:white;
-}
-
-input{
-    flex:0 0 $btn-size*3 - 2;
-    min-width: $btn-size*3 - 2;
-    height: $btn-size - 2;
-    line-height: $btn-size;
-    padding:0px;
-    border:1px solid #999;
-    margin: $gutter-width*2 2px $gutter-width*2 1px;
-    text-align: left;
-    border-radius: 6px;
-    text-align: center;
-    color:$primary-text;
-}
-
-
-
-.save{
-    background-color: $call-to-action;
-    &:hover{
-       background-color: darken($call-to-action,10%);
-    }
-}
-
-.move-to, .pick-tip{
-    background-color: $primary-brand;
-    &:hover{
-        background-color: darken($primary-brand, 10%);
-    }
-}
-
-
-
-
-button{
-    background-color: $well-bg;
-    &:focus {
-        outline: 0;
-    }
-}
-
-.disabled{
-  .btn, .btn-home, .btn-jog, .btn-run, .pick-tip, .move-to, .deck, .upload{
-    pointer-events: none;
-    // opacity: 0.7;
-  }
-}
-
-.disabled.move-to {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-
-
-
-
-
-
-/******************************
-Typography
-******************************/
-h1.title{
-    font-size: 14px;
-    font-weight: 800;
-    line-height: $baseline;
-    font-family: "open-sans";
-}
-h3.title {
-    font-size: 12px;
-    font-weight: 800;
-    line-height: $baseline;
-    padding-left: 10px;
-}
-
-h2.title{
-    font-size: 14px;
-    font-weight: 800;
-    line-height: $baseline;
-    display:inline-block;
-}
-
-.label{
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 30px;
-    width:40px;
-    flex:0 0;
-}
-
-hr{
-    color: #FFF;
-    margin-bottom:5px;
+    position: relative;
+    margin-left: 10px;
 }

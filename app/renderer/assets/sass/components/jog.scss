@@ -1,0 +1,122 @@
+aside#jog {
+    h2#xy {
+        width: 145px;
+    }
+    h2#z {
+        width: 65px;
+    }
+    #jog-controls-pipette,
+    #jog-controls-plunger {
+        width: 270px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        margin-bottom: 15px;
+        .btn {
+            background-color: $btn-jog;
+            &.y.up {
+                margin: $gutter-width 36px;
+            }
+            &:hover {
+                background-color: darken($btn-jog, 10%);
+            }
+        }
+        span.xy {
+            width: 102px;
+            flex: 0 0 102px;
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 5px;
+            h3.title {
+                margin: 0 28px;
+            }
+        }
+        span.z {
+            margin-right: 55px;
+            margin-left: 10px;
+        }
+        span.p {
+            margin-left: 22px;
+        }
+        span.z,
+        span.p {
+            width: 36px;
+            flex: 0 0 36px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+    span.increment {
+        h3.xyz {
+            width: 200px;
+            padding-left: 88px
+        }
+        width:270px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content:space-around;
+    }
+    span.increment-plunger {
+        margin-left: 50px;
+        width: 160px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+    #increment-xyz,
+    #increment-plunger {
+        width: 270px;
+        padding-left: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        justify-content: space-around;
+    }
+    #increment-plunger {
+        width: 155px;
+        padding-top: 30px;
+        margin-left: 20px;
+        margin-right: 10px;
+        h3.plunger {
+            width: 200px;
+            padding-left: 8px;
+        }
+    }
+    #increment-xyz,
+    #increment-plunger {
+        div {
+            height: 30px;
+            flex: 0 0 20px;
+            padding: 5px;
+            text-align: center;
+            &.slot {
+                flex: 0 0 40px;
+                margin-right: 23px;
+            }
+        }
+    }
+    #deck {
+        display: flex;
+        justify-content: center;
+        .deck {
+            width: 140px;
+            display: flex;
+            flex-wrap: wrap;
+            border-left: 1px solid #999;
+            border-right: 1px solid #999;
+            button {
+                width: 28px;
+                height: 40px;
+                border-left: 1px solid #999;
+                border-right: 1px solid #999;
+                line-height: 40px;
+                background-color: none;
+                &:focus,
+                &.active {
+                    box-shadow: inset 5px 5px 0px 0px $primary-brand, inset -5px -5px 0px 0px $primary-brand;
+                    ;
+                }
+            }
+        }
+    }
+}
