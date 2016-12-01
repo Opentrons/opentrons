@@ -40,8 +40,8 @@ app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
 socketio = SocketIO(app, async_mode='gevent')
 
-filename = "x"
-last_modified = "y"
+filename = "N/A"
+last_modified = "N/A"
 
 
 def notify(info):
@@ -162,21 +162,29 @@ def upload():
 
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
-    global robot
-    jupyter_robot = dill.loads(request.data)
-    # These attributes need to be persisted from existing robot
-    jupyter_robot._driver = robot._driver
-    jupyter_robot.can_pop_command = robot.can_pop_command
+    global robot, filename, last_modified
 
-    Singleton._instances[Robot] = jupyter_robot
-    robot = jupyter_robot
+    try:
+        jupyter_robot = dill.loads(request.data)
+        # These attributes need to be persisted from existing robot
+        jupyter_robot._driver = robot._driver
+        jupyter_robot.can_pop_command = robot.can_pop_command
 
-    calibrations = update_step_list()
-    upload_data = {
-        'calibrations': calibrations,
-        'fileName': 'JUPYTER UPLOAD',
-        'lastModified': 'NA'
-    }
+        Singleton._instances[Robot] = jupyter_robot
+        robot = jupyter_robot
+
+        calibrations = update_step_list()
+        filename = 'JUPYTER UPLOAD'
+        last_modified = 'NA' # TODO: send current time...
+        upload_data = {
+            'calibrations': calibrations,
+            'fileName': filename,
+            'lastModified': last_modified # TODO: send current time...
+        }
+    except Exception as e:
+        print(e)
+
+    print(upload_data)
     socketio.emit('event', {
         'data': upload_data,
         'name': 'jupyter-upload'

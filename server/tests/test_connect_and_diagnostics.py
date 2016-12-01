@@ -13,7 +13,7 @@ class ConnectDiagnosticsTestCase(unittest.TestCase):
         self.data_path = os.path.join(
             os.path.dirname(__file__) + '/data/'
         )
-
+        Robot.get_instance().reset_for_tests()
         self.robot = Robot.get_instance()
         self.robot.connect()
 

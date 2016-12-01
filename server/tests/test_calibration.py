@@ -15,6 +15,7 @@ class CalibrationTestCase(unittest.TestCase):
             os.path.dirname(__file__) + '/data/'
         )
 
+        Robot.get_instance().reset_for_tests()
         self.robot = Robot.get_instance()
         self.robot.connect()
 

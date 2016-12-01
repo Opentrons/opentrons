@@ -13,7 +13,7 @@ class UploadTestCase(unittest.TestCase):
         self.data_path = os.path.join(
             os.path.dirname(__file__) + '/data/'
         )
-
+        Robot.get_instance().reset_for_tests()
         self.robot = Robot.get_instance()
 
     def test_upload_and_run(self):

@@ -16,10 +16,10 @@ class JupyterUploadTestCase(unittest.TestCase):
         self.robot_as_bytes = dill.dumps(self.robot)
 
     def get_configured_robot(self):
+        Robot.get_instance().reset_for_tests()
         robot = Robot.get_instance()
         plate = containers.load('96-flat', 'B2', 'test-plate')
         tiprack = containers.load('tiprack-200ul', 'A1', 'test-tiprack')
-        trough = containers.load('trough-12row', 'B1', 'test-trough')
         trash = containers.load('point', 'A2', 'test-trash')
 
         p1000 = instruments.Pipette(
