@@ -78,8 +78,8 @@ describe('CalibratePlaceable.vue', (done) => {
       instrument
     })
 
-    renderedCalibratePlaceable.calibratePlaceable()
-    renderedCalibratePlaceable.moveToPlaceable()
+    renderedCalibratePlaceable.calibrate()
+    renderedCalibratePlaceable.moveToPosition()
     renderedCalibratePlaceable.pickUpTip()
     renderedCalibratePlaceable.dropTip()
 
