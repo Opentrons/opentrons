@@ -1,12 +1,179 @@
-{% extends "!layout.html" %}
+{%- extends "basic/layout.html" %}
 
 {% set css_files = css_files + ['_static/custom.css'] %}
 
-{%- block extrahead %} 
-<script>
+{%- block extrahead %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" />
+  {% if theme_touch_icon %}
+    <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" />
+  {% endif %}
+  {% if theme_canonical_url %}
+    <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html"/>
+  {% endif %}
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  <!-- INTERCOM -->
+  <script>
   window.intercomSettings = {
     app_id: "ukpodv2l"
   };
 </script>
-<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/ukpodv2l';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>    
+<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/ukpodv2l';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
 {% endblock %}
+
+{# Disable base theme's top+bottom related navs; we have our own in sidebar #}
+{%- block relbar1 %}{% endblock %}
+{%- block relbar2 %}{% endblock %}
+
+{# Nav should appear before content, not after #}
+{%- block content %}
+<header>
+	<a href="https://opentrons.com" class="brand">
+    <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+</a>
+<div id="nav-collapse">
+    <div class="bar1"></div>
+    <div class="bar2"></div>
+    <div class="bar3"></div>
+</div>
+<nav>
+    <ul id="main">
+        <li>
+            <a href="" class="menu-toggle" data-dropdown=".products">Products</a>
+        </li>
+        <li>
+            <a href="" class="menu-toggle" data-dropdown=".company">Company</a>
+        </li>
+        <li>
+            <a href="" class="menu-toggle" data-dropdown=".resources">Resources</a>
+        </li>
+        <li>
+            <a href="">Buy</a>
+        </li>
+    </ul>
+    <section id="dropdown">
+        <ul class="products">
+            <li class="mobile">Products</li>
+            <li><a href="https://opentrons.com/robots">Robots</a></li>
+            <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+            <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+            <li></li>
+        </ul>
+        <ul class="company">
+            <li class="mobile">Company</li>
+            <li><a href="https://opentrons.com/about">About</a></li>
+            <li><a href="https://opentrons.com/team">Team</a></li>
+            <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+            <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+        </ul>
+        <ul class="resources">
+            <li class="mobile">Resources</li>
+            <li><a href="https://opentrons.com/getting-started/">Getting Started</a></li>
+            <li><a href="http://docs.opentrons.com/">Opentrons API</a></li>
+            <li><a href="https://opentrons.com/faqs">FAQ</a></li>
+            <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+        </ul>
+    </section>
+</nav>
+<br style="clear:both">
+
+<script type="text/javascript">
+$(function() {
+
+    $('#dropdown').slideUp(0);
+
+    $('#nav-collapse').click(function(event) {
+        $(this).toggleClass('change');
+        $('#dropdown').slideToggle(500);
+    });
+
+    $('.menu-toggle').click(function(event) {
+        event.preventDefault();
+        var target = $(this).attr('data-dropdown');
+        if ($(this).hasClass('active')) {
+            $('*').removeClass('active');
+
+            $('#dropdown').slideUp(500);
+            $('.brand').removeClass('open');
+            $('#nav-spacer').removeClass('nav-open');
+
+        } else {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+            $(target).addClass('active');
+
+            $('#dropdown').slideDown(500);
+
+            $('.brand').addClass('open');
+            $('#nav-spacer').addClass('nav-open');
+        }
+
+    });
+});
+</script>
+
+</header>
+<div id="nav-spacer">&nbsp;</div>
+{%- if theme_fixed_sidebar|lower == 'true' %}
+
+  <div class="document">
+    {{ sidebar() }}
+    {%- block document %}
+      <div class="documentwrapper">
+      {%- if render_sidebar %}
+        <div class="bodywrapper">
+      {%- endif %}
+          <div class="body" role="main">
+            {% block body %} {% endblock %}
+          </div>
+      {%- if render_sidebar %}
+        </div>
+      {%- endif %}
+      </div>
+    {%- endblock %}
+    <div class="clearer"></div>
+  </div>
+{%- else %}
+{{ super() }}
+{%- endif %}
+{%- endblock %}
+
+{%- block footer %}
+    <div class="footer">
+      {% if show_copyright %}&copy;{{ copyright }}.{% endif %}
+      {% if theme_show_powered_by|lower == 'true' %}
+      {% if show_copyright %}|{% endif %}
+      Powered by <a href="http://sphinx-doc.org/">Sphinx {{ sphinx_version }}</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster {{ alabaster_version }}</a>
+      {% endif %}
+      {%- if show_source and has_source and sourcename %}
+      {% if show_copyright or theme_show_powered_by %}|{% endif %}
+      <a href="{{ pathto('_sources/' + sourcename, true)|e }}"
+          rel="nofollow">{{ _('Page source') }}</a>
+      {%- endif %}
+    </div>
+
+    {% if theme_github_banner|lower != 'false' %}
+    <a href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    {% endif %}
+
+    {% if theme_analytics_id %}
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', '{{ theme_analytics_id }}']);
+      _gaq.push(['_setDomainName', 'none']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    {% endif %}
+{%- endblock %}
+
+
