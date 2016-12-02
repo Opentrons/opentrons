@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
 
-function createWindow() {
+function createWindow () {
   mainWindow = new BrowserWindow({width: 1060, height: 750})
   mainWindow.loadURL('http://127.0.0.1:31950')
   mainWindow.on('closed', function () {
@@ -29,7 +29,7 @@ function createWindow() {
   })
 }
 
-function createAndSetAppDataDir() {
+function createAndSetAppDataDir () {
   if (!app.isReady()) {
     throw Error('Attempting to create otone_data dir when app is not ready')
   }
@@ -41,7 +41,7 @@ function createAndSetAppDataDir() {
   process.env['APP_DATA_DIR'] = appDataDir
 }
 
-function startUp() {
+function startUp () {
   // Prepare app data dir (necessary for logging errors that occur during setup)
   createAndSetAppDataDir()
 
