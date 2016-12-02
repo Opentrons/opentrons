@@ -777,7 +777,7 @@ class Robot(object, metaclass=Singleton):
             headers={'Content-Type': 'application/octet-stream'}
         )
         if not resp.ok:
-            raise Exception('Failed to send Robot to app')
+            raise Exception('App failed to accept protocol upload')
 
     def simulate(self, switches=False):
         """
