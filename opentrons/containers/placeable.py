@@ -587,4 +587,8 @@ class WellSeries(Placeable):
             return list(self.values)[index]
 
     def __getattr__(self, name):
+        # getstate/setstate are used by pickle and are not implemented by
+        # downstream objects (Wells) therefore raise attribute error
+        if name in ('__getstate__', '__setstate__'):
+            raise AttributeError()
         return getattr(self.values[self.offset], name)
