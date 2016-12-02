@@ -8,6 +8,7 @@ header {
     font-family: "Open Sans", "sans-serif";
     padding: 10px 0;
     position: fixed;
+    top: 0px;
     width: 100vw;
     z-index: 100;
     font-size: 12px;
