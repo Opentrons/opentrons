@@ -82,17 +82,15 @@ describe('Placeable.vue', (done) => {
     let tiprackStore = getMockStore()
     tiprackStore.state.tasks[0].placeables[0].type = 'tiprack'
     tiprackStore.state.tasks[0].channels = 8
-    console.log(getRenderedVm(Placeable, tiprackStore).placeable().sanitizedType === 'tiprack')
-    console.log(getRenderedVm(Placeable, tiprackStore).instrument().channels === 8)
     expect(getRenderedVm(Placeable, tiprackStore).calibrationPoint).to.equal('of the A1 row')
 
-    // let defaultStore = getMockStore()
-    // defaultStore.state.tasks[0].placeables[0].type = 'plate'
-    // defaultStore.state.tasks[0].channels = 8
-    // expect(getRenderedVm(Placeable, defaultStore).calibrationPoint).to.equal('of the A1 row')
+    let defaultStore = getMockStore()
+    defaultStore.state.tasks[0].placeables[0].type = 'plate'
+    defaultStore.state.tasks[0].channels = 8
+    expect(getRenderedVm(Placeable, defaultStore).calibrationPoint).to.equal('of the A1 row')
 
     let tiprackSingleStore = getMockStore()
     tiprackSingleStore.state.tasks[0].placeables[0].type = 'plate'
-    expect(getRenderedVm(Placeable, tiprackSingleStore).calibrationPoint).to.equal('')
+    expect(getRenderedVm(Placeable, tiprackSingleStore).calibrationPoint).to.equal('of the A1 well')
   })
 })
