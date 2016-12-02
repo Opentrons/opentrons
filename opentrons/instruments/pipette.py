@@ -97,9 +97,9 @@ class Pipette(Instrument):
 
         self.reset_tip_tracking()
 
-        self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.motor = self.robot.get_motor(self.axis)
+        # self.motor = self.robot.get_motor(self.axis)
+        # self.robot = Robot.get_instance()
 
         self.placeables = []
         self.previous_placeable = None
@@ -1307,5 +1307,4 @@ class Pipette(Instrument):
         keys = {'aspirate', 'dispense'} & kwargs.keys()
         for key in keys:
             self.speeds[key] = kwargs.get(key)
-
         return self

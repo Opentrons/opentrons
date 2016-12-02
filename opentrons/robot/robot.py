@@ -175,9 +175,6 @@ class Robot(object, metaclass=Singleton):
         self.can_pop_command = Event()
         self.can_pop_command.set()
 
-        self.axis_homed = {
-            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-
         self.connections = {
             'live': None,
             'simulate': self.get_virtual_device(
@@ -817,8 +814,9 @@ class Robot(object, metaclass=Singleton):
                 self._driver.disconnect()
         else:
             raise ValueError(
-                'mode expected to be "live" or "simulate", '
-                '{} provided'.format(mode))
+                'mode expected to be "live", "simulate_switches", '
+                'or "simulate", {} provided'.format(mode)
+            )
 
     def disconnect(self):
         """

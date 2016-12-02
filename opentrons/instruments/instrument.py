@@ -242,3 +242,13 @@ class Instrument(object):
                 except JSON_ERROR:
                     pass
         return obj
+
+
+    @property
+    def robot(self):
+        return Robot.get_instance()
+
+    @property
+    def motor(self):
+        return self.robot.get_motor(self.axis)
+

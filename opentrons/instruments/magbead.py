@@ -11,9 +11,7 @@ class Magbead(Instrument):
     def __init__(self, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
 
-        self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.motor = self.robot.get_mosfet(mosfet)
 
         if not name:
             name = self.__class__.__name__
