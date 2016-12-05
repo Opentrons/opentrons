@@ -19,8 +19,10 @@
     },
     computed: {
       slots () {
-        let baseSlots = ['A2', 'B2', 'C2', 'D2', 'E2',
-                          'A1', 'B1', 'C1', 'D1', 'E1']
+        let baseSlots = [
+          'A2', 'B2', 'C2', 'D2', 'E2',
+          'A1', 'B1', 'C1', 'D1', 'E1'
+        ]
         if (this.$store.state.versions.ot_version) {
           let version = this.$store.state.versions.ot_version.version
           if (version !== 'hood') {
