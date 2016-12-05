@@ -314,7 +314,7 @@ class Robot(object, metaclass=Singleton):
 
         return InstrumentMosfet(self._driver, mosfet_index)
 
-    def get_motor(self, axis, **kwargs):
+    def get_instrument_driver(self, type, axis, **kwargs):
         """
         Get robot's head motor.
 
@@ -323,6 +323,12 @@ class Robot(object, metaclass=Singleton):
         axis : {'a', 'b'}
             Axis name. Please check stickers on robot's gantry for the name.
         """
+
+        MOTOR_TYPES_MAP = {
+            'mosfet': InstrumentMosfet,
+            'instrument': InstrumentMotor
+        }
+        motor_class = MOTOR_TYPES_MAP[type]
         motor_obj = self.AXIS_MOTORS_CACHE.get(axis)
         if not motor_obj:
             motor_obj = InstrumentMotor(self._driver, axis, **kwargs)
