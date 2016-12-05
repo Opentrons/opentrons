@@ -10,7 +10,7 @@ class Magbead(Instrument):
 
     def __init__(self, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
-        self.mostfet_index = mosfet
+        self.mosfet_index = mosfet
 
         self.robot.add_instrument(self.axis, self)
 
@@ -125,3 +125,9 @@ class Magbead(Instrument):
             enqueue=enqueue)
 
         return self
+
+
+    @property
+    def motor(self):
+        return self.robot.get_mosfet(self.mosfet_index)
+

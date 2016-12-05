@@ -1308,3 +1308,7 @@ class Pipette(Instrument):
         for key in keys:
             self.speeds[key] = kwargs.get(key)
         return self
+
+    @property
+    def motor(self):
+        return self.robot.get_motor(self.axis)

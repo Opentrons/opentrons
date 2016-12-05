@@ -35,6 +35,7 @@ class InstrumentMosfet(object):
         """
         Engages the MOSFET.
         """
+        import pdb; pdb.set_trace()
         self.motor_driver.set_mosfet(self.mosfet_index, True)
 
     def disengage(self):
@@ -159,6 +160,7 @@ class Robot(object, metaclass=Singleton):
     _instance = None
 
     VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
+    INSTRUMENT_DRIVERS_CACHE = {}
 
     def __init__(self):
         """
@@ -293,8 +295,14 @@ class Robot(object, metaclass=Singleton):
         -------
         Instance of :class:`InstrumentMosfet`.
         """
+        instr_type = 'mosfet'
+        key = (instr_type, mosfet_index)
 
-        return InstrumentMosfet(self._driver, mosfet_index)
+        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
+        if not motor_obj:
+            motor_obj = InstrumentMosfet(self._driver, mosfet_index)
+            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
+        return motor_obj
 
     def get_motor(self, axis):
         """
@@ -305,10 +313,13 @@ class Robot(object, metaclass=Singleton):
         axis : {'a', 'b'}
             Axis name. Please check stickers on robot's gantry for the name.
         """
-        motor_obj = self.AXIS_MOTORS_CACHE.get(axis)
+        instr_type = 'instrument'
+        key = (instr_type, axis)
+
+        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
         if not motor_obj:
             motor_obj = InstrumentMotor(self._driver, axis)
-            self.AXIS_MOTORS_CACHE[axis] = motor_obj
+            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
         return motor_obj
 
     def flip_coordinates(self, coordinates):

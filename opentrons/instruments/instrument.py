@@ -247,9 +247,3 @@ class Instrument(object):
     @property
     def robot(self):
         return Robot.get_instance()
-
-    @property
-    def motor(self):
-        mosfet_index = getattr(self, 'mosfet_index', None)
-        return self.robot.get_motor(self.axis, mosfet_index=mosfet_index)
-
