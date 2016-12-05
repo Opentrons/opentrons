@@ -284,18 +284,19 @@ class RobotTest(unittest.TestCase):
         }
         self.assertDictEqual(res, expected)
 
-    def test_get_motor(self):
+    def test_get_motor_caching(self):
         a_motor = self.robot.get_motor('a')
-        self.assertEqual(
-            a_motor,
-            self.robot.get_motor('a')
-        )
+        self.assertEqual(a_motor, self.robot.get_motor('a'))
 
-        b_motor = self.robot.get_motor('b', mosfet_index=1)
-        self.assertEqual(
-            b_motor,
-            self.robot.get_motor('a', mosfet_index=1)
-        )
+        b_motor = self.robot.get_motor('b')
+        self.assertEqual(b_motor, self.robot.get_motor('b'))
+
+    def test_get_mosfet_caching(self):
+        m0 = self.robot.get_mosfet(0)
+        self.assertEqual(m0, self.robot.get_mosfet(0))
+
+        m1 = self.robot.get_mosfet(1)
+        self.assertEqual(m1, self.robot.get_mosfet(1))
 
     def test_send_to_app_with_unconfigured_robot(self):
         self.robot.send_to_app()
