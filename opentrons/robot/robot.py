@@ -59,9 +59,32 @@ class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
-    def __init__(self, driver, axis):
+    def __init__(self, driver, axis, mosfet_index=None):
         self.motor_driver = driver
         self.axis = axis
+        self.mosfet_index = mosfet_index
+
+    def disengage(self):
+        """
+        Disengages the MOSFET.
+        """
+        if not isinstance(self.mosfet_index, int):
+            raise Exception('MOSFET index not set for instrument')
+        self.motor_driver.set_mosfet(self.mosfet_index, False)
+
+    def engage(self):
+        """
+        Engages the MOSFET.
+        """
+        if not isinstance(self.mosfet_index, int):
+            raise Exception('MOSFET index not set for instrument')
+        self.motor_driver.set_mosfet(self.mosfet_index, True)
+
+    def home(self):
+        """
+        Home plunger motor.
+        """
+        return self.motor_driver.home(self.axis)
 
     def move(self, value, mode='absolute'):
         """
@@ -77,12 +100,6 @@ class InstrumentMotor(object):
         return self.motor_driver.move_plunger(
             mode=mode, **kwargs
         )
-
-    def home(self):
-        """
-        Home plunger motor.
-        """
-        return self.motor_driver.home(self.axis)
 
     def wait(self, seconds):
         """
@@ -105,7 +122,6 @@ class InstrumentMotor(object):
         """
         self.motor_driver.set_plunger_speed(rate, self.axis)
         return self
-
 
 
 class Robot(object, metaclass=Singleton):
@@ -160,6 +176,7 @@ class Robot(object, metaclass=Singleton):
     _instance = None
 
     VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
+    AXIS_MOTORS_CACHE = {}
 
     def __init__(self):
         """
@@ -297,7 +314,7 @@ class Robot(object, metaclass=Singleton):
 
         return InstrumentMosfet(self._driver, mosfet_index)
 
-    def get_motor(self, axis):
+    def get_motor(self, axis, **kwargs):
         """
         Get robot's head motor.
 
@@ -306,7 +323,11 @@ class Robot(object, metaclass=Singleton):
         axis : {'a', 'b'}
             Axis name. Please check stickers on robot's gantry for the name.
         """
-        return InstrumentMotor(self._driver, axis)
+        motor_obj = self.AXIS_MOTORS_CACHE.get(axis)
+        if not motor_obj:
+            motor_obj = InstrumentMotor(self._driver, axis, **kwargs)
+            self.AXIS_MOTORS_CACHE[axis] = motor_obj
+        return motor_obj
 
     def flip_coordinates(self, coordinates):
         """
