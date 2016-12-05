@@ -1,0 +1,21 @@
+{
+  "extends": "standard",
+  "plugins": [
+      "standard",
+      "promise",
+      "html"
+  ],
+  "root": true,
+  "rules": {
+    "arrow-parens": "off",
+    "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
+  },
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "mocha": true,
+    "jasmine": true,
+    "es6": true
+  }
+}
