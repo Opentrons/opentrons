@@ -1,4 +1,8 @@
-{%- extends "basic/layout.html" %} {% set css_files = css_files + ['_static/custom.css'] %} {%- block extrahead %} {{ super() }}
+{%- extends "basic/layout.html" %} 
+{% set css_files = css_files   + ['https://opentrons.com/css/master.css'] + ['_static/override_master.css'] + ['_static/override_sphinx.css'] %} 
+
+
+{%- block extrahead %} {{ super() }}
 <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" /> {% if theme_touch_icon %}
 <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" /> {% endif %} {% if theme_canonical_url %}
 <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" /> {% endif %}
