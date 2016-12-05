@@ -285,16 +285,16 @@ class RobotTest(unittest.TestCase):
         self.assertDictEqual(res, expected)
 
     def test_get_motor(self):
-        a_motor = self.robot.get_instrument_driver('a')
+        a_motor = self.robot.get_motor('a')
         self.assertEqual(
             a_motor,
-            self.robot.get_instrument_driver('a')
+            self.robot.get_motor('a')
         )
 
-        b_motor = self.robot.get_instrument_driver('b', mosfet_index=1)
+        b_motor = self.robot.get_motor('b', mosfet_index=1)
         self.assertEqual(
             b_motor,
-            self.robot.get_instrument_driver('a', mosfet_index=1)
+            self.robot.get_motor('a', mosfet_index=1)
         )
 
     def test_send_to_app_with_unconfigured_robot(self):
