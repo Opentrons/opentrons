@@ -29,7 +29,7 @@
 {# Nav should appear before content, not after #}
 {%- block content %}
 <header>
-	<a href="https://opentrons.com" class="brand">
+<a href="https://opentrons.com" class="brand">
     <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
 </a>
 <div id="nav-collapse">
@@ -40,16 +40,16 @@
 <nav>
     <ul id="main">
         <li>
-            <a href="" class="menu-toggle" data-dropdown=".products">Products</a>
+            <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
         </li>
         <li>
-            <a href="" class="menu-toggle" data-dropdown=".company">Company</a>
+            <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
         </li>
         <li>
-            <a href="" class="menu-toggle" data-dropdown=".resources">Resources</a>
+            <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
         </li>
         <li>
-            <a href="">Buy</a>
+            <a href="https://shop.opentrons.com/">Buy</a>
         </li>
     </ul>
     <section id="dropdown">
@@ -58,7 +58,7 @@
             <li><a href="https://opentrons.com/robots">Robots</a></li>
             <li><a href="https://opentrons.com/ot-app">OT App</a></li>
             <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
-            <li></li>
+            <li>&nbsp;</li>
         </ul>
         <ul class="company">
             <li class="mobile">Company</li>
@@ -70,14 +70,13 @@
         <ul class="resources">
             <li class="mobile">Resources</li>
             <li><a href="https://opentrons.com/getting-started/">Getting Started</a></li>
-            <li><a href="http://docs.opentrons.com/">Opentrons API</a></li>
+            <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
             <li><a href="https://opentrons.com/faqs">FAQ</a></li>
             <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
         </ul>
     </section>
 </nav>
 <br style="clear:both">
-
 <script type="text/javascript">
 $(function() {
 
@@ -88,27 +87,25 @@ $(function() {
         $('#dropdown').slideToggle(500);
     });
 
-    $('.menu-toggle').click(function(event) {
+    $('.menu-toggle').mouseenter(function(event) {
         event.preventDefault();
         var target = $(this).attr('data-dropdown');
-        if ($(this).hasClass('active')) {
-            $('*').removeClass('active');
 
-            $('#dropdown').slideUp(500);
-            $('.brand').removeClass('open');
-            $('#nav-spacer').removeClass('nav-open');
+        $('*').removeClass('active');
+        $(this).addClass('active');
+        $(target).addClass('active');
 
-        } else {
-            $('*').removeClass('active');
-            $(this).addClass('active');
-            $(target).addClass('active');
+        $('#dropdown').slideDown(300);
 
-            $('#dropdown').slideDown(500);
+        $('.brand').addClass('open');
+        $('#nav-spacer').addClass('nav-open');
 
-            $('.brand').addClass('open');
-            $('#nav-spacer').addClass('nav-open');
-        }
 
+    });
+    $('header').mouseleave(function(event) {
+        $('#dropdown').slideUp(300);
+        $('.brand').removeClass('open');
+        $('#nav-spacer').removeClass('nav-open');
     });
 });
 </script>
