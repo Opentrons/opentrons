@@ -126,7 +126,6 @@ class Magbead(Instrument):
 
         return self
 
-
     @property
     def motor(self):
         return self.robot.get_mosfet(self.mosfet_index)

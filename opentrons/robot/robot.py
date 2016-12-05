@@ -35,7 +35,6 @@ class InstrumentMosfet(object):
         """
         Engages the MOSFET.
         """
-        import pdb; pdb.set_trace()
         self.motor_driver.set_mosfet(self.mosfet_index, True)
 
     def disengage(self):
@@ -160,7 +159,6 @@ class Robot(object, metaclass=Singleton):
     _instance = None
 
     VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
-    INSTRUMENT_DRIVERS_CACHE = {}
 
     def __init__(self):
         """
@@ -172,6 +170,8 @@ class Robot(object, metaclass=Singleton):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
+
+        self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
         self.can_pop_command.set()
