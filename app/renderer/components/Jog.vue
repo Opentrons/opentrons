@@ -15,7 +15,6 @@
         <button @click="jog('z', 1)" class='btn z up'>&uarr;</button>
         <button @click="jog('z', -1)" class='btn z down'>&darr;</button>
       </span>
-
       <span class='increment'>
         <Increment :increments='placeableIncrements'></Increment>
       </span>

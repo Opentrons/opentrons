@@ -1,7 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 
-let webpackConfig = {
+module.exports = {
   entry: './app/renderer/main.js',
   output: {
     path: path.resolve(__dirname, './server/templates/dist'),
@@ -84,10 +84,8 @@ let webpackConfig = {
   },
   headers: { 'Access-Control-Allow-Origin': 'http://localhost:5000', 'Access-Control-Allow-Credentials': 'true' },
   devtool: '#eval-source-map',
-  target: 'electron'
+  target: process.env['APP_TARGET'] || 'electron'
 }
-
-module.exports = webpackConfig
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.devtool = '#source-map'

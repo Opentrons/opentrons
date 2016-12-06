@@ -16,7 +16,6 @@
     props: ['busy'],
     methods: {
       home (axis) {
-        console.log(axis)
         this.$store.dispatch('home', {axis: axis})
       }
     }
