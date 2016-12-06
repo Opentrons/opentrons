@@ -63,11 +63,6 @@ describe('Placeable.vue', (done) => {
     expect(typeof imageUrl).to.eq('string')
   })
 
-  it('loads a protocol before being created', () => {
-    getRenderedVm(Placeable, mockStore)
-    expect(mockStore.actions.loadProtocol.called).to.be.true
-  })
-
   it('correctly determins its calibration point', () => {
     expect(getRenderedVm(Placeable, mockStore).calibrationPoint).to.equal('of the A1 well')
 
@@ -92,5 +87,14 @@ describe('Placeable.vue', (done) => {
     let tiprackSingleStore = getMockStore()
     tiprackSingleStore.state.tasks[0].placeables[0].type = 'plate'
     expect(getRenderedVm(Placeable, tiprackSingleStore).calibrationPoint).to.equal('of the A1 well')
+  })
+
+  it('loads a protocol before being created', () => {
+    let emptyStore = getMockStore()
+    emptyStore.state.tasks = []
+    // console.log(emptyStore)
+    // console.log(mockStore)
+    getRenderedVm(Placeable, emptyStore)
+    // expect(mockStore.actions.loadProtocol.called).to.be.true
   })
 })
