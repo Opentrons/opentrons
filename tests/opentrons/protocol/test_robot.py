@@ -302,12 +302,12 @@ class RobotTest(unittest.TestCase):
     @mock.patch('requests.post')
     def test_send_to_app_with_unconfigured_robot(self, req_get, req_post):
         def fake_get(url, data, headers):
-            res =  mock.Mock()
+            res = mock.Mock()
             res.ok = True
             return res
 
         def fake_post(*args, **kwargs):
-            res =  mock.Mock()
+            res = mock.Mock()
             res.ok = True
             return res
         req_get.side_effect = fake_get
@@ -320,12 +320,12 @@ class RobotTest(unittest.TestCase):
     @mock.patch('requests.post')
     def test_send_to_app_with_configured_robot(self, req_get, req_post):
         def fake_get(url, data, headers):
-            res =  mock.Mock()
+            res = mock.Mock()
             res.ok = True
             return res
 
         def fake_post(*args, **kwargs):
-            res =  mock.Mock()
+            res = mock.Mock()
             res.ok = True
             return res
         plate = containers.load('96-flat', 'A1')
