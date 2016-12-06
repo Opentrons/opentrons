@@ -1,8 +1,6 @@
 import copy
 
 from opentrons import containers
-
-from opentrons.robot.robot import Robot
 from opentrons.containers.calibrator import Calibrator
 from opentrons.containers.placeable import Placeable, humanize_location
 from opentrons.instruments.instrument import Instrument

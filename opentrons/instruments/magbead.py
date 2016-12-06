@@ -1,4 +1,3 @@
-from opentrons.robot.robot import Robot
 from opentrons.instruments.instrument import Instrument
 
 
@@ -129,4 +128,3 @@ class Magbead(Instrument):
     @property
     def motor(self):
         return self.robot.get_mosfet(self.mosfet_index)
-

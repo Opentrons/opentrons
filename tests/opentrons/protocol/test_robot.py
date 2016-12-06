@@ -294,14 +294,14 @@ class RobotTest(unittest.TestCase):
     def test_get_mosfet_caching(self):
         m0 = self.robot.get_mosfet(0)
         self.assertEqual(m0, self.robot.get_mosfet(0))
-
         m1 = self.robot.get_mosfet(1)
         self.assertEqual(m1, self.robot.get_mosfet(1))
 
-    # @unittest.mock.patch('requests.get')
+    # TODO: setup mock.patch
     def test_send_to_app_with_unconfigured_robot(self):
         self.robot.send_to_app()
 
+    # TODO: setup mock.patch
     def test_send_to_app_with_configured_robot(self):
         plate = containers.load('96-flat', 'A1')
         p200 = instruments.Pipette(axis='b', max_volume=200)

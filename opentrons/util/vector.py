@@ -7,12 +7,12 @@ from builtins import property as _property, tuple as _tuple
 from operator import itemgetter as _itemgetter
 from collections import OrderedDict
 
+
 class VectorValue(tuple):
     """
     # from collections import namedtuple
     # value_type = namedtuple('VectorValue', ['x', 'y', 'z'])
     """
-
     'VectorValue(x, y, z)'
 
     __slots__ = ()
@@ -32,7 +32,9 @@ class VectorValue(tuple):
         return result
 
     def _replace(_self, **kwds):
-        'Return a new VectorValue object replacing specified fields with new values'
+        """Return a new VectorValue object replacing specified fields with
+        new values
+        """
         result = _self._make(map(kwds.pop, ('x', 'y', 'z'), _self))
         if kwds:
             raise ValueError('Got unexpected field names: %r' % list(kwds))

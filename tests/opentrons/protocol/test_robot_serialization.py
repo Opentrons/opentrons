@@ -11,10 +11,10 @@ class RobotSerializationTestCase(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot()
 
-    def test_serializing_unconfigured_robot(self):
+    def test_serializing_and_deserializing_unconfigured_robot(self):
         robot_as_bytes = dill.dumps(self.robot)
         self.assertIsInstance(robot_as_bytes, bytes)
-        reconstructed_robot = dill.loads(robot_as_bytes)
+        dill.loads(robot_as_bytes)
 
     def test_serializing_configured_robot(self):
         plate = containers.load('96-flat', 'A1')
@@ -106,4 +106,3 @@ class RobotSerializationTestCase(unittest.TestCase):
             inst1.aspirate(well).delay(5).dispense(well)
         for row in inst2_plate.rows[::-1]:
             inst2.aspirate(row).delay(5).dispense(row)
-
