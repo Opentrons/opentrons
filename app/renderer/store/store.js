@@ -18,24 +18,6 @@ function createWebSocketPlugin (socket) {
           store.commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
         }
       }
-      if (data.name === 'move-finished') {
-        store.commit(types.UPDATE_POSITION, {
-          x: data.position.head.x,
-          y: data.position.head.y,
-          z: data.position.head.z,
-          a: data.position.plunger.a,
-          b: data.position.plunger.b
-        }, { silent: true })
-      }
-      if (data.name === 'home' && data.axis) {
-        store.commit(types.UPDATE_POSITION, {
-          x: data.position.head.x,
-          y: data.position.head.y,
-          z: data.position.head.z,
-          a: data.position.plunger.a,
-          b: data.position.plunger.b
-        })
-      }
       if (data.name === 'command-run') {
         if (data.caller === 'ui') {
           let newDate = new Date()

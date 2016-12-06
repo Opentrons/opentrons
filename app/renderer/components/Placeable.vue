@@ -70,7 +70,7 @@
       }
     },
     created: function () {
-      if (this.$store.state.tasks) {
+      if (!this.$store.state.tasks[0]) {
         this.$store.dispatch('loadProtocol')
       }
     }
