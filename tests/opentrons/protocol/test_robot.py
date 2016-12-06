@@ -1,5 +1,6 @@
 import threading
 import unittest
+from unittest import mock
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.placeable import Deck
@@ -297,16 +298,44 @@ class RobotTest(unittest.TestCase):
         m1 = self.robot.get_mosfet(1)
         self.assertEqual(m1, self.robot.get_mosfet(1))
 
-    # TODO: setup mock.patch
-    def test_send_to_app_with_unconfigured_robot(self):
-        self.robot.send_to_app()
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_send_to_app_with_unconfigured_robot(self, req_get, req_post):
+        def fake_get(url, data, headers):
+            res =  mock.Mock()
+            res.ok = True
+            return res
 
-    # TODO: setup mock.patch
-    def test_send_to_app_with_configured_robot(self):
+        def fake_post(*args, **kwargs):
+            res =  mock.Mock()
+            res.ok = True
+            return res
+        req_get.side_effect = fake_get
+        req_post.side_effect = fake_post
+        self.robot.send_to_app()
+        self.assertTrue(req_get.called)
+        self.assertTrue(req_post.called)
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_send_to_app_with_configured_robot(self, req_get, req_post):
+        def fake_get(url, data, headers):
+            res =  mock.Mock()
+            res.ok = True
+            return res
+
+        def fake_post(*args, **kwargs):
+            res =  mock.Mock()
+            res.ok = True
+            return res
         plate = containers.load('96-flat', 'A1')
         p200 = instruments.Pipette(axis='b', max_volume=200)
 
         for well in plate:
             p200.aspirate(well).delay(5).dispense(well)
 
+        req_get.side_effect = fake_get
+        req_post.side_effect = fake_post
         self.robot.send_to_app()
+        self.assertTrue(req_get.called)
+        self.assertTrue(req_post.called)
