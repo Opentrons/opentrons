@@ -530,7 +530,7 @@ class Robot(object, metaclass=Singleton):
         """
         self._driver.set_head_speed(rate)
 
-    @traceable('move-to')
+    # @traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -742,7 +742,9 @@ class Robot(object, metaclass=Singleton):
                 'command_index': i,
                 'commands_total': len(self._commands)
             })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
+            if mode == "live":
+                trace.EventBroker.get_instance().notify(cmd_run_event)
+                
             try:
                 self.can_pop_command.wait()
                 if command.description:

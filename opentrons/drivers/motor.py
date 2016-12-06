@@ -432,7 +432,8 @@ class CNCDriver(object):
             },
             'class': type(self.connection).__name__
         }
-        trace.EventBroker.get_instance().notify(arguments)
+        if type(self.connection).__name__ != "VirtualSmoothie":
+            trace.EventBroker.get_instance().notify(arguments)
         return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
