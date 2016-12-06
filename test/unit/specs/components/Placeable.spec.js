@@ -2,14 +2,14 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import sinon from 'sinon'
+import sinon from 'sinon'
 import Placeable from 'renderer/components/Placeable.vue'
 
 Vue.use(Vuex)
 
 function getMockStore () {
   return {
-    actions: { loadProtocol: console.log('I M LOADING N ACTION') },
+    actions: { loadProtocol: sinon.spy() },
     state: {
       tasks: [
         {
@@ -63,14 +63,14 @@ describe('Placeable.vue', (done) => {
     expect(typeof imageUrl).to.eq('string')
   })
 
-  it('loads a protocol before being created', () => {
+  it('loads a protocol before being created if there are no tasks', () => {
+    getRenderedVm(Placeable, mockStore)
+    expect(mockStore.actions.loadProtocol.called).to.be.false
+
     let emptyStore = getMockStore()
     emptyStore.state.tasks = []
-    // console.log(emptyStore)
-    // console.log(mockStore)
-    let p = getRenderedVm(Placeable, emptyStore)
-    console.log(p.$store.state.tasks)
-    // expect(mockStore.actions.loadProtocol.called).to.be.true
+    getRenderedVm(Placeable, emptyStore)
+    expect(emptyStore.actions.loadProtocol.calledOnce).to.be.true
   })
 
   it('correctly determins its calibration point', () => {

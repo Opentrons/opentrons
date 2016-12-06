@@ -1,5 +1,5 @@
 <template>
-  <section id='task'>
+  <section id='task' v-if='this.instrument() && this.placeable()'>
     <h1 class='title'>
       Calibrate the {{this.instrument().label}} pipette to the
       {{this.placeable().sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
@@ -70,9 +70,7 @@
       }
     },
     created: function () {
-      console.log('CREATED')
       if (!this.$store.state.tasks[0]) {
-        console.log('CALLED')
         this.$store.dispatch('loadProtocol')
       }
     }
