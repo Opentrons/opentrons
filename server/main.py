@@ -254,15 +254,11 @@ def _run_commands():
     emit_notifications([result], 'success')
     socketio.emit('event', {'name': 'run-finished'})
 
+
 @app.route("/run", methods=["GET"])
 def run():
-    thread = threading.Thread(target=_run_commands)
-    thread.start()
-
-    return flask.jsonify({
-        'status': 'success',
-        'data': {}
-    })
+    threading.Thread(target=_run_commands).start()
+    return flask.jsonify({'status': 'success', 'data': {}})
 
 
 @app.route("/pause", methods=["GET"])
