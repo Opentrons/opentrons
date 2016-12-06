@@ -265,11 +265,7 @@ def run():
 def pause():
     result = robot.pause()
     emit_notifications(['Protocol paused'], 'info')
-
-    return flask.jsonify({
-        'status': 'success',
-        'data': result
-    })
+    return flask.jsonify({'status': 'success', 'data': result})
 
 
 @app.route("/resume", methods=["GET"])
