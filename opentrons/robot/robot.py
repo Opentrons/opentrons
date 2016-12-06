@@ -13,7 +13,7 @@ from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
-from opentrons.util.trace import traceable
+# from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
 
 
@@ -744,7 +744,6 @@ class Robot(object, metaclass=Singleton):
             })
             if mode == "live":
                 trace.EventBroker.get_instance().notify(cmd_run_event)
-                
             try:
                 self.can_pop_command.wait()
                 if command.description:
