@@ -70,7 +70,9 @@
       }
     },
     created: function () {
+      console.log('CREATED')
       if (!this.$store.state.tasks[0]) {
+        console.log('CALLED')
         this.$store.dispatch('loadProtocol')
       }
     }

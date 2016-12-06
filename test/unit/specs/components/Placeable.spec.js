@@ -2,14 +2,14 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import sinon from 'sinon'
+// import sinon from 'sinon'
 import Placeable from 'renderer/components/Placeable.vue'
 
 Vue.use(Vuex)
 
 function getMockStore () {
   return {
-    actions: { loadProtocol: sinon.spy() },
+    actions: { loadProtocol: console.log('I M LOADING N ACTION') },
     state: {
       tasks: [
         {
@@ -63,6 +63,16 @@ describe('Placeable.vue', (done) => {
     expect(typeof imageUrl).to.eq('string')
   })
 
+  it('loads a protocol before being created', () => {
+    let emptyStore = getMockStore()
+    emptyStore.state.tasks = []
+    // console.log(emptyStore)
+    // console.log(mockStore)
+    let p = getRenderedVm(Placeable, emptyStore)
+    console.log(p.$store.state.tasks)
+    // expect(mockStore.actions.loadProtocol.called).to.be.true
+  })
+
   it('correctly determins its calibration point', () => {
     expect(getRenderedVm(Placeable, mockStore).calibrationPoint).to.equal('of the A1 well')
 
@@ -87,14 +97,5 @@ describe('Placeable.vue', (done) => {
     let tiprackSingleStore = getMockStore()
     tiprackSingleStore.state.tasks[0].placeables[0].type = 'plate'
     expect(getRenderedVm(Placeable, tiprackSingleStore).calibrationPoint).to.equal('of the A1 well')
-  })
-
-  it('loads a protocol before being created', () => {
-    let emptyStore = getMockStore()
-    emptyStore.state.tasks = []
-    // console.log(emptyStore)
-    // console.log(mockStore)
-    getRenderedVm(Placeable, emptyStore)
-    // expect(mockStore.actions.loadProtocol.called).to.be.true
   })
 })
