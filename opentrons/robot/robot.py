@@ -17,6 +17,7 @@ from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
+from opentrons.util.environment import settings
 
 
 log = get_logger(__name__)
@@ -773,17 +774,17 @@ class Robot(object, metaclass=Singleton):
     def send_to_app(self):
         robot_as_bytes = dill.dumps(self)
         try:
-            resp = requests.get('http://localhost:31950')
+            resp = requests.get(settings.get('APP_IS_ALIVE_URL'))
             if not resp.ok:
                 raise Exception
         except (Exception, requests.exceptions.ConnectionError):
             raise Exception(
-                    'Cannot detect Opentrons App on your machine.'
-                    ' Please make sure it is installed and running'
+                    'Cannot if the Opentrons App is up and running on your '
+                    'computer. Please make sure it is installed and running'
                 )
 
         resp = requests.post(
-            'http://localhost:31950/upload-jupyter',
+            settings.get('APP_JUPYTER_UPLOAD_URL'),
             data=robot_as_bytes,
             headers={'Content-Type': 'application/octet-stream'}
         )

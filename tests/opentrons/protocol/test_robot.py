@@ -298,6 +298,7 @@ class RobotTest(unittest.TestCase):
         m1 = self.robot.get_mosfet(1)
         self.assertEqual(m1, self.robot.get_mosfet(1))
 
+    # @unittest.mock.patch('requests.get')
     def test_send_to_app_with_unconfigured_robot(self):
         self.robot.send_to_app()
 

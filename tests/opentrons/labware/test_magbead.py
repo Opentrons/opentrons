@@ -27,7 +27,6 @@ class MagbeadTest(unittest.TestCase):
 
         self.robot.run()
 
-        # import pdb; pdb.set_trace()
         calls = self.robot._driver.set_mosfet.mock_calls
         expected = [mock.call(0, True)]
         self.assertEquals(calls, expected)
