@@ -742,8 +742,8 @@ class Robot(object, metaclass=Singleton):
                 'command_index': i,
                 'commands_total': len(self._commands)
             })
-            if mode == "live":
-                trace.EventBroker.get_instance().notify(cmd_run_event)
+            # if mode == "live":
+            trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
                 if command.description:
