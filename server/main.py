@@ -162,17 +162,18 @@ def upload():
 
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
-    global robot, filename, last_modified
+    global robot, filename, last_modified, current_protocol_step_list
 
     try:
         jupyter_robot = dill.loads(request.data)
         # These attributes need to be persisted from existing robot
         jupyter_robot._driver = robot._driver
+        jupyter_robot.connections = robot.connections
         jupyter_robot.can_pop_command = robot.can_pop_command
-
         Singleton._instances[Robot] = jupyter_robot
         robot = jupyter_robot
 
+        current_protocol_step_list = None
         calibrations = update_step_list()
         filename = 'JUPYTER UPLOAD'
         last_modified = 'NA' # TODO: send current time...
@@ -181,10 +182,11 @@ def upload_jupyter():
             'fileName': filename,
             'lastModified': last_modified # TODO: send current time...
         }
+        app.logger.info('Successfully deserialized robot for jupyter upload')
     except Exception as e:
+        app.logger.exception('Failed to properly deserialize jupyter upload')
         print(e)
 
-    print(upload_data)
     socketio.emit('event', {
         'data': upload_data,
         'name': 'jupyter-upload'
@@ -223,8 +225,9 @@ def emit_notifications(notifications, _type):
 
 
 def _run_commands():
-    start_time = time.time()
     global robot
+
+    start_time = time.time()
 
     api_response = {'errors': [], 'warnings': []}
 
@@ -627,6 +630,7 @@ def home(axis):
 
 @app.route('/jog', methods=["POST"])
 def jog():
+    global robot
     coords = request.json
 
     status = 'success'
@@ -649,6 +653,7 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
+    global robot
     status = 'success'
     result = ''
     try:
