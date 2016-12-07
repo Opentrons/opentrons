@@ -63,7 +63,7 @@ def get_protocol_locals():
 
 
 def load_python(stream):
-    global robot
+    robot = Robot.get_instance()
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
