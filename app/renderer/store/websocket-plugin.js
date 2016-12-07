@@ -3,7 +3,13 @@ import { ADD_TOAST_MESSAGE } from 'vuex-toast'
 import * as types from './mutation-types'
 import { processTasks } from '../util'
 
-function webSocketPlugin (socket) {
+function handleJupyterUpload (store, data) {
+  let tasks = data.data
+  processTasks(tasks, store.commit)
+  store.commit(types.UPDATE_TASK_LIST, { tasks: tasks.calibrations })
+}
+
+function WebSocketPlugin (socket) {
   return store => {
     socket.on('event', data => {
       if (data.type === 'connection_status') {
@@ -55,13 +61,11 @@ function webSocketPlugin (socket) {
         store.commit(types.UPDATE_RUNNING, {'running': false})
       }
       if (data.name === 'jupyter-upload') {
-        console.log(data)
-        let tasks = data.data
-        processTasks(tasks, store.commit)
-        store.commit(types.UPDATE_TASK_LIST, { tasks: tasks.calibrations })
+        console.log('JUPYTER UPLOAD HANDLER DISPATCHED W/', data)
+        handleJupyterUpload(store, data)
       }
     })
   }
 }
 
-export default { webSocketPlugin }
+export default { handleJupyterUpload, WebSocketPlugin }

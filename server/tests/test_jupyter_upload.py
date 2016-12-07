@@ -10,6 +10,7 @@ from opentrons.robot import Robot
 
 class JupyterUploadTestCase(unittest.TestCase):
     def setUp(self):
+        Robot.get_instance().reset_for_tests()
         from main import app
         self.app = app.test_client()
         self.robot = self.get_configured_robot()
