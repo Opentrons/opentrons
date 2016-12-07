@@ -31,7 +31,7 @@ describe('Protocol.vue', (done) => {
 
   it('renders fileName and lastModified', () => {
     let infoSelector = protocol.$el.querySelectorAll('.info')
-    expect(infoSelector[0].innerHTML).to.equal(mockStore.state.fileName)
-    expect(infoSelector[1].innerHTML).to.equal(mockStore.state.lastModified)
+    expect(infoSelector[0].textContent).to.equal(mockStore.state.fileName)
+    expect(infoSelector[1].textContent).to.equal(mockStore.state.lastModified)
   })
 })

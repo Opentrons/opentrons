@@ -33,7 +33,7 @@ describe('Home.vue', (done) => {
     buttons.map((button, i) => {
       button.click()
       let homeArgs = mockStore.actions.home.getCall(i).args.slice(-2)[0]
-      expect(homeArgs.axis).to.equal(button.innerHTML.toLowerCase())
+      expect(homeArgs.axis).to.equal(button.textContent.toLowerCase())
     })
     expect(mockStore.actions.home.callCount).to.equal(6)
   })

@@ -45,7 +45,7 @@ describe('DeckSlot.vue', (done) => {
     buttons.map((button, i) => {
       button.click()
       let jogArgs = mockStore.actions.jogToSlot.getCall(i).args.slice(-2)[0]
-      expect(jogArgs.slot).to.equal(button.innerHTML.trim())
+      expect(jogArgs.slot).to.equal(button.textContent.trim())
     })
     expect(mockStore.actions.jogToSlot.callCount).to.equal(10)
   })
