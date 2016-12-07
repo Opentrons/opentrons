@@ -1,8 +1,9 @@
+import datetime as dt
+import json
 import logging
 import os
 import sys
 import threading
-import json
 import time
 
 import dill
@@ -178,11 +179,11 @@ def upload_jupyter():
         current_protocol_step_list = None
         calibrations = update_step_list()
         filename = 'JUPYTER UPLOAD'
-        last_modified = 'NA' # TODO: send current time...
+        last_modified = dt.datetime.now().strftime('%a %b %d %Y')
         upload_data = {
             'calibrations': calibrations,
-            'fileName': filename,
-            'lastModified': last_modified # TODO: send current time...
+            'fileName': 'JUPYTER UPLOAD',
+            'lastModified': last_modified
         }
         app.logger.info('Successfully deserialized robot for jupyter upload')
     except Exception as e:
