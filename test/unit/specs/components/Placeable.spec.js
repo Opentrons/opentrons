@@ -63,9 +63,14 @@ describe('Placeable.vue', (done) => {
     expect(typeof imageUrl).to.eq('string')
   })
 
-  it('loads a protocol before being created', () => {
+  it('loads a protocol before being created if there are no tasks', () => {
     getRenderedVm(Placeable, mockStore)
-    expect(mockStore.actions.loadProtocol.called).to.be.true
+    expect(mockStore.actions.loadProtocol.called).to.be.false
+
+    let emptyStore = getMockStore()
+    emptyStore.state.tasks = []
+    getRenderedVm(Placeable, emptyStore)
+    expect(emptyStore.actions.loadProtocol.calledOnce).to.be.true
   })
 
   it('correctly determins its calibration point', () => {
