@@ -20,6 +20,16 @@ describe('websocket-plugin', () => {
       }
     }
     handleJupyterUpload(store, data)
-    expect(store.commit.called).to.be.true
+
+    let expectedActions = [
+      'UPDATE_FILE_NAME',
+      'UPDATE_FILE_MODIFIED',
+      'UPDATE_TASK_LIST'
+    ]
+
+    let resultedActions = Array(3).fill().map((_, i) => {
+      return store.commit.getCall(i).args[0]
+    });
+    expect(resultedActions).to.deep.equal(expectedActions)
   })
 })
