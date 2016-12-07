@@ -14,7 +14,7 @@
 <script>
   export default {
     name: 'Increment',
-    props: ['increments', 'placeable'],
+    props: ['increments'],
     methods: {
       selectIncrement (i) {
         this.$store.dispatch('selectIncrement', {inc: i})
