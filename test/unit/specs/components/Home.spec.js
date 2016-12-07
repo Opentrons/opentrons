@@ -9,12 +9,12 @@ Vue.use(Vuex)
 
 function getMockStore () {
   return {
-    actions: { loadProtocol: sinon.spy() },
-    state: {}
+    actions: { home: sinon.spy() }
   }
 }
 
 const mockStore = getMockStore()
+const home = getRenderedVm(Home, mockStore)
 
 function getRenderedVm (Component, store) {
   const Ctor = Vue.extend(Component)
@@ -23,8 +23,18 @@ function getRenderedVm (Component, store) {
 }
 
 describe('Home.vue', (done) => {
-  it('has 6 btn-homes', () => {
-    let home = getRenderedVm(Home, mockStore)
+  it('has 6 btn-home classes', () => {
     expect(home.$el.querySelectorAll('.btn-home').length).to.equal(6)
+  })
+
+  it('has each button send a home dispatch with the correct axis', () => {
+    let buttons = [].slice.call(home.$el.querySelectorAll('.btn-home'))
+    expect(mockStore.actions.home.called).to.be.false
+    buttons.map((button, i) => {
+      button.click()
+      let homeArgs = mockStore.actions.home.getCall(i).args.slice(-2)[0]
+      expect(homeArgs.axis).to.equal(button.innerHTML.toLowerCase())
+    })
+    expect(mockStore.actions.home.callCount).to.equal(6)
   })
 })
