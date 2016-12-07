@@ -565,6 +565,7 @@ def create_step_list():
             ]
         } for instrument in _get_all_pipettes()]
     except Exception as e:
+        app.logger.exception('Error creating step list')
         emit_notifications([str(e)], 'danger')
 
     return update_step_list()
