@@ -63,7 +63,8 @@ def get_protocol_locals():
 
 
 def load_python(stream):
-    global robot
+    # global robot
+    robot = Robot.get_instance()
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
@@ -162,7 +163,7 @@ def upload():
 
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
-    global robot, filename, last_modified, current_protocol_step_list
+    robot = Robot.get_instance(), filename, last_modified, current_protocol_step_list
 
     try:
         jupyter_robot = dill.loads(request.data)
@@ -225,7 +226,7 @@ def emit_notifications(notifications, _type):
 
 
 def _run_commands():
-    global robot
+    robot = Robot.get_instance()
 
     start_time = time.time()
 
@@ -301,7 +302,7 @@ def script_loader(filename):
 
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
-    global robot
+    robot = Robot.get_instance()
     return flask.jsonify({
         'ports': robot.get_serial_ports_list()
     })
@@ -309,7 +310,7 @@ def get_serial_ports_list():
 
 @app.route("/robot/serial/is_connected")
 def is_connected():
-    global robot
+    robot = Robot.get_instance()
     return flask.jsonify({
         'is_connected': robot.is_connected(),
         'port': robot.get_connected_port()
@@ -318,7 +319,7 @@ def is_connected():
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
-    global robot
+    robot = Robot.get_instance()
     return flask.jsonify({
         'coords': robot._driver.get_position().get("target")
     })
@@ -326,7 +327,7 @@ def get_coordinates():
 
 @app.route("/robot/diagnostics")
 def diagnostics():
-    global robot
+    robot = Robot.get_instance()
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -334,7 +335,7 @@ def diagnostics():
 
 @app.route("/robot/versions")
 def get_versions():
-    global robot
+    robot = Robot.get_instance()
     return flask.jsonify({
         'versions': robot.versions()
     })
@@ -355,7 +356,7 @@ def connectRobot():
     status = 'success'
     data = None
 
-    global robot
+    robot = Robot.get_instance()
     try:
         robot.connect(port, options=options)
     except Exception as e:
@@ -375,7 +376,7 @@ def connectRobot():
 
 
 def _start_connection_watcher():
-    global robot
+    robot = Robot.get_instance()
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -412,7 +413,7 @@ def disconnectRobot():
     status = 'success'
     data = None
 
-    global robot
+    robot = Robot.get_instance()
     try:
         robot.disconnect()
         emit_notifications(["Successfully disconnected"], 'info')
@@ -466,7 +467,7 @@ def _sort_containers(container_list):
     return _tipracks + _other
 
 def _get_all_pipettes():
-    global robot
+    robot = Robot.get_instance()
     pipette_list = []
     for _, p in robot.get_instruments():
         if isinstance(p, Pipette):
@@ -481,7 +482,7 @@ def _get_all_containers():
     Returns all containers currently on the deck
     """
     all_containers = list()
-    global robot
+    robot = Robot.get_instance()
     for slot in robot._deck:
         if slot.has_children():
             all_containers += slot.get_children_list()
@@ -622,7 +623,7 @@ def home(axis):
 
 @app.route('/jog', methods=["POST"])
 def jog():
-    global robot
+    robot = Robot.get_instance()
     coords = request.json
 
     status = 'success'
@@ -645,7 +646,7 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
-    global robot
+    robot = Robot.get_instance()
     status = 'success'
     result = ''
     try:
@@ -693,7 +694,7 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
-    global robot
+    robot = Robot.get_instance()
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -714,7 +715,7 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
-    global robot
+    robot = Robot.get_instance()
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
