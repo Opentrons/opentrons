@@ -51,10 +51,19 @@ describe('DeckSlot.vue', (done) => {
   })
 
   it('disables buttons when passed a busy prop', () => {
-    // expect(deckSlot.percentClass()).to.equal('width:33%;')
+    expect(deckSlot.$el.querySelectorAll('.disabled').length).to.equal(0)
+    const busyProp = { busy: true }
+    const busyDeckSlot = getRenderedVm(DeckSlot, busyProp, mockStore)
+    Vue.nextTick(() => {
+      expect(busyDeckSlot.$el.querySelectorAll('.disabled').length).to.equal(1)
+    })
   })
 
   it('has 15 slots when the robot version is not a hood', () => {
-    // expect(deckSlot.percentClass()).to.equal('width:33%;')
+    let proStore = getMockStore()
+    proStore.state.versions.ot_version.version = 'pro'
+    const proDeckSlot = getRenderedVm(DeckSlot, propsData, proStore)
+    expect(proDeckSlot.$el.querySelectorAll('button').length).to.equal(15)
+    expect(proDeckSlot.slots().length).to.equal(15)
   })
 })
