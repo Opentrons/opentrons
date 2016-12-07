@@ -6,7 +6,7 @@
       </aside>
       <router-view :class="{'disabled': busy}"></router-view>
     </section>
-    <RunScreen v-show='running()'></RunScreen>
+    <RunScreen class='run-screen' v-show='running()'></RunScreen>
   </span>
 </template>
 
