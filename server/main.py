@@ -63,7 +63,7 @@ def get_protocol_locals():
 
 
 def load_python(stream):
-    # global robot
+    global robot
     robot = Robot.get_instance()
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
@@ -163,7 +163,8 @@ def upload():
 
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
-    robot = Robot.get_instance(), filename, last_modified, current_protocol_step_list
+    global robot, filename, last_modified, current_protocol_step_list
+    robot = Robot.get_instance()
 
     try:
         jupyter_robot = dill.loads(request.data)
