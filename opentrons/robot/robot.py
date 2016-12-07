@@ -778,10 +778,11 @@ class Robot(object, metaclass=Singleton):
             if not resp.ok:
                 raise Exception
         except (Exception, requests.exceptions.ConnectionError):
-            raise Exception(
-                    'Cannot if the Opentrons App is up and running on your '
-                    'computer. Please make sure it is installed and running'
-                )
+            print(
+                'Cannot determine if the Opentrons App is up and running.'
+                ' Please make sure it is installed and running'
+            )
+            return
 
         resp = requests.post(
             settings.get('APP_JUPYTER_UPLOAD_URL'),
