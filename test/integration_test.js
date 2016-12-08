@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach, afterEach */
 let Application = require('spectron').Application
 let chai = require('chai')
+const { expect } = chai
 let chaiAsPromised = require('chai-as-promised')
 let path = require('path')
 let child_process = require('child_process')
@@ -44,6 +45,10 @@ describe('application launch', function () {
       return this.app.stop()
     }
   })
+
+  function assertText(result, expected) {
+    expect(result).to.equal(expected)
+  }
 
   it('opens a window', function () {
     return this.app.client.waitUntilWindowLoaded(31950)
@@ -100,16 +105,21 @@ describe('application launch', function () {
       .waitForText('.toast-message-text', 'Run complete')
   }
 
+  function uploadProtocol(file) {
+    let uploadXpath = '/html/body/div/section/span/form/div/input'
+    return this.app.client
+      .chooseFile(uploadXpath, file)
+      .pause(1000)
+  }
+
   it('runs a user uploaded protocol', function () {
     let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/simple_protocol.py')
-    let uploadXpath = '/html/body/div/section/span/form/div/input'
 
     this.app.client.execute(() => {
       window.confirm = function () { return true }
     })
     return this.app.client.waitUntilWindowLoaded(31950)
-      .chooseFile(uploadXpath, file)
-      .pause(1000)
+      .then(uploadProtocol.bind(this, file))
       .then(connectAndRunLoadedProtocol.bind(this))
       .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
   })
@@ -123,5 +133,14 @@ describe('application launch', function () {
     })
     return this.app.client.waitUntilWindowLoaded(31950)
       .then(connectAndRunLoadedProtocol.bind(this))
+  })
+
+  it('handles upload of empty protocol gracefully', function () {
+    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/empty.py')
+    let expectedText = 'This protocol does not contain any commands for the robot.'
+    return this.app.client.waitUntilWindowLoaded(31950)
+      .then(uploadProtocol.bind(this, file))
+      .getText('.toast-message-text')
+      .then(assertText.bind(null, expectedText))
   })
 })

@@ -96,7 +96,7 @@ def load_python(stream):
             error = (
                 "This protocol does not contain any commands for the robot."
             )
-            api_response['errors'] = error
+            api_response['errors'] = [error]
     except Exception as e:
         app.logger.error(e)
         api_response['errors'] = [str(e)]
