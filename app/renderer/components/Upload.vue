@@ -1,9 +1,9 @@
 <template>
   <span :class='{disabled: busy}'>
-    <form ref='form' @submit='uploadProtocol' action='http://127.0.0.1:5000/upload' method='POST' enctype='multipart/form-data'  class='upload'>
+    <form ref='form' class='upload'>
       <div class='fileUpload'>
         <span>{{this.uploadMessage()}}</span>
-        <input ref='input' @change='fileChange' type='file' name='file' class='upload' />
+        <input ref='input' @change='uploadProtocol' type='file' name='file' class='upload' />
       </div>
     </form>
   </span>
@@ -13,9 +13,6 @@
   export default {
     name: 'Upload',
     methods: {
-      fileChange (e) {
-        this.uploadProtocol()
-      },
       uploadProtocol () {
         let formData = new FormData()
         let file = this.$refs.form.file.files[0]
