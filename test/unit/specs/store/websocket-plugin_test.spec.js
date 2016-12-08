@@ -2,10 +2,8 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 
-
 import wsp from 'renderer/store/websocket-plugin'
 const { handleJupyterUpload } = wsp
-
 
 describe('websocket-plugin', () => {
   it('updates task list when jupyter upload data is sent', () => {
@@ -29,7 +27,7 @@ describe('websocket-plugin', () => {
 
     let resultedActions = Array(3).fill().map((_, i) => {
       return store.commit.getCall(i).args[0]
-    });
+    })
     expect(resultedActions).to.deep.equal(expectedActions)
   })
 })
