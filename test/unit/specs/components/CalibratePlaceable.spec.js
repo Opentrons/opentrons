@@ -25,7 +25,7 @@ let placeable = {
 }
 let instrument = {'axis': 'a'}
 
-describe('CalibratePlaceable.vue', (done) => {
+describe('CalibratePlaceable.vue', () => {
   it('renders pick_up/drop tip if placeable is tiprack', () => {
     expect(getRenderedVm(CalibratePlaceable, {
       placeable,

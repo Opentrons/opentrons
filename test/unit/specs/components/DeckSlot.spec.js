@@ -22,7 +22,7 @@ const mockStore = getMockStore()
 const propsData = { busy: false }
 const deckSlot = getRenderedVm(DeckSlot, propsData, mockStore)
 
-describe('DeckSlot.vue', (done) => {
+describe('DeckSlot.vue', () => {
   it('renders each slot', () => {
     const slotsLength = deckSlot.slots().length
     expect(deckSlot.$el.querySelectorAll('button').length).to.equal(slotsLength)

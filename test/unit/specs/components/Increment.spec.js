@@ -15,7 +15,7 @@ const mockStore = getMockStore()
 const propsData = { increments: [1, 2, 5, 10] }
 const protocol = getRenderedVm(Increment, propsData, mockStore)
 
-describe('Increment.vue', (done) => {
+describe('Increment.vue', () => {
   it('has a radio button for each increment', () => {
     expect(protocol.$el.querySelectorAll('input').length).to.equal(4)
   })
