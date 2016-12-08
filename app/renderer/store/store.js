@@ -10,7 +10,6 @@ const { WebSocketPlugin } = wsp
 const { mutations, state } = appMutations
 const { actions } = appActions
 
-
 Vue.use(Vuex)
 
 const socket = io.connect('ws://localhost:31950')
