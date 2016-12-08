@@ -1,10 +1,7 @@
 /* global describe, it */
 import { expect } from 'chai'
-import Vue from 'vue'
-import Vuex from 'vuex'
 import ProgressBar from 'renderer/components/ProgressBar.vue'
-
-Vue.use(Vuex)
+import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
@@ -21,15 +18,6 @@ function getMockStore () {
 }
 
 const mockStore = getMockStore()
-
-function getRenderedVm (Component, propsData, store) {
-  const Ctor = Vue.extend(Component)
-  return new Ctor({
-    propsData,
-    store: new Vuex.Store(store)
-  }).$mount()
-}
-
 const propsData = { increments: [1, 2, 5, 10] }
 const progressBar = getRenderedVm(ProgressBar, propsData, mockStore)
 

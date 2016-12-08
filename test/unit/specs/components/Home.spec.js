@@ -1,11 +1,8 @@
 /* global describe, it */
 import { expect } from 'chai'
-import Vue from 'vue'
-import Vuex from 'vuex'
 import sinon from 'sinon'
 import Home from 'renderer/components/Home.vue'
-
-Vue.use(Vuex)
+import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
@@ -14,13 +11,7 @@ function getMockStore () {
 }
 
 const mockStore = getMockStore()
-const home = getRenderedVm(Home, mockStore)
-
-function getRenderedVm (Component, store) {
-  const Ctor = Vue.extend(Component)
-  const vm = new Ctor({store: new Vuex.Store(store)}).$mount()
-  return vm
-}
+const home = getRenderedVm(Home, {}, mockStore)
 
 describe('Home.vue', (done) => {
   it('has 6 btn-home classes', () => {

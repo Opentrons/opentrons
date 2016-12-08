@@ -1,11 +1,8 @@
 /* global describe, it */
 import { expect } from 'chai'
-import Vue from 'vue'
-import Vuex from 'vuex'
 import sinon from 'sinon'
 import IncrementPlunger from 'renderer/components/IncrementPlunger.vue'
-
-Vue.use(Vuex)
+import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
@@ -15,17 +12,8 @@ function getMockStore () {
 }
 
 const mockStore = getMockStore()
-
-function getRenderedVm (Component, propsData) {
-  const Ctor = Vue.extend(Component)
-  return new Ctor({
-    propsData,
-    store: new Vuex.Store(mockStore)
-  }).$mount()
-}
-
 const propsData = { increments: [1, 2, 5] }
-const protocol = getRenderedVm(IncrementPlunger, propsData)
+const protocol = getRenderedVm(IncrementPlunger, propsData, mockStore)
 
 describe('IncrementPlunger.vue', (done) => {
   it('has a radio button for each increment', () => {

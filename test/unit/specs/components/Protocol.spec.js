@@ -1,10 +1,7 @@
 /* global describe, it */
 import { expect } from 'chai'
-import Vue from 'vue'
-import Vuex from 'vuex'
 import Protocol from 'renderer/components/Protocol.vue'
-
-Vue.use(Vuex)
+import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
@@ -15,13 +12,8 @@ function getMockStore () {
   }
 }
 
-function getRenderedVm (Component, store) {
-  const Ctor = Vue.extend(Component)
-  return new Ctor({store: new Vuex.Store(store)}).$mount()
-}
-
 const mockStore = getMockStore()
-const protocol = getRenderedVm(Protocol, mockStore)
+const protocol = getRenderedVm(Protocol, {}, mockStore)
 
 describe('Protocol.vue', (done) => {
   it('has 2 titles and 2 infos', () => {

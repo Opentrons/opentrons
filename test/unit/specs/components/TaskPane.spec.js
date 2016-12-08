@@ -1,13 +1,8 @@
 /* global describe, it */
 import { expect } from 'chai'
 import Vue from 'vue'
-import Vuex from 'vuex'
-import VueRouter from 'vue-router'
+import { getRenderedVm } from '../../util.js'
 
-Vue.use(Vuex)
-Vue.use(VueRouter)
-
-const router = new VueRouter({})
 const TaskPaneInjector = require('!!vue?inject!renderer/components/TaskPane.vue')
 const TaskPane = TaskPaneInjector({
   './StepList.vue': {
@@ -28,19 +23,8 @@ function getMockStore () {
 }
 
 const mockStore = getMockStore()
-
-function getRenderedVm (Component, propsData, store) {
-  const Ctor = Vue.extend(Component)
-  return new Ctor({
-    propsData,
-    router,
-    store: new Vuex.Store(store)
-  }).$mount()
-}
-
 const propsData = { busy: false }
 const taskPane = getRenderedVm(TaskPane, propsData, mockStore)
-
 const busyProps = { busy: true }
 const busyTaskPane = getRenderedVm(TaskPane, busyProps, mockStore)
 

@@ -1,11 +1,9 @@
 /* global describe, it */
 import { expect } from 'chai'
 import Vue from 'vue'
-import Vuex from 'vuex'
 import sinon from 'sinon'
 import DeckSlot from 'renderer/components/DeckSlot.vue'
-
-Vue.use(Vuex)
+import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
@@ -21,15 +19,6 @@ function getMockStore () {
 }
 
 const mockStore = getMockStore()
-
-function getRenderedVm (Component, propsData, store) {
-  const Ctor = Vue.extend(Component)
-  return new Ctor({
-    propsData,
-    store: new Vuex.Store(store)
-  }).$mount()
-}
-
 const propsData = { busy: false }
 const deckSlot = getRenderedVm(DeckSlot, propsData, mockStore)
 
