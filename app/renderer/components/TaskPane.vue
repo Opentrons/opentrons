@@ -1,12 +1,12 @@
 <template>
   <span>
-    <section id='task-pane' v-show='!running'>
+    <section id='task-pane' v-show='!running()'>
       <aside id='step-list'>
         <StepList></StepList>
       </aside>
       <router-view :class="{'disabled': busy}"></router-view>
     </section>
-    <RunScreen v-show='running'></RunScreen>
+    <RunScreen class='run-screen' v-show='running()'></RunScreen>
   </span>
 </template>
 
@@ -20,7 +20,7 @@
       StepList,
       RunScreen
     },
-    computed: {
+    methods: {
       running () {
         return this.$store.state.running || this.$store.state.protocolFinished
       }

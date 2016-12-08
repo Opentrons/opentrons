@@ -1,11 +1,8 @@
 /* global describe, it */
 import { expect } from 'chai'
-import Vue from 'vue'
-import Vuex from 'vuex'
 import sinon from 'sinon'
 import CalibratePlaceable from 'renderer/components/CalibratePlaceable.vue'
-
-Vue.use(Vuex)
+import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
@@ -19,15 +16,6 @@ function getMockStore () {
 }
 
 const mockStore = getMockStore()
-
-function getRenderedVm (Component, propsData) {
-  const Ctor = Vue.extend(Component)
-  const vm = new Ctor({
-    propsData,
-    store: new Vuex.Store(mockStore)
-  }).$mount()
-  return vm
-}
 
 let placeable = {
   'slot': 'A1',
@@ -76,7 +64,7 @@ describe('CalibratePlaceable.vue', (done) => {
     let renderedCalibratePlaceable = getRenderedVm(CalibratePlaceable, {
       placeable,
       instrument
-    })
+    }, mockStore)
 
     renderedCalibratePlaceable.calibrate()
     renderedCalibratePlaceable.moveToPosition()
