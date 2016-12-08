@@ -5,20 +5,19 @@ import os
 import sys
 import threading
 import time
+import traceback
 
 import dill
 import flask
-import traceback
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons.instruments import Pipette
-from opentrons import robot
+from opentrons import robot, Robot
 from opentrons.containers import placeable
+from opentrons.instruments import Pipette
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
-from opentrons import Robot
 from opentrons.util.singleton import Singleton
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
@@ -182,7 +181,7 @@ def upload_jupyter():
         last_modified = dt.datetime.now().strftime('%a %b %d %Y')
         upload_data = {
             'calibrations': calibrations,
-            'fileName': 'JUPYTER UPLOAD',
+            'fileName': 'Jupyter Upload',
             'lastModified': last_modified
         }
         app.logger.info('Successfully deserialized robot for jupyter upload')
@@ -194,10 +193,7 @@ def upload_jupyter():
         'data': upload_data,
         'name': 'jupyter-upload'
     })
-    return flask.jsonify({
-        'status': 'success',
-        'data': None
-    })
+    return flask.jsonify({ 'status': 'success', 'data': None})
 
 
 @app.route("/load")
