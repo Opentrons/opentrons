@@ -175,6 +175,10 @@ def upload_jupyter():
         Singleton._instances[Robot] = jupyter_robot
         robot = jupyter_robot
 
+        # Reload instrument calibrations
+        [instr.load_persisted_data()
+         for _, instr in jupyter_robot.get_instruments()]
+
         current_protocol_step_list = None
         calibrations = update_step_list()
         filename = 'JUPYTER UPLOAD'
