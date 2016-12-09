@@ -177,7 +177,7 @@ def upload_jupyter():
 
         # Reload instrument calibrations
         [instr.load_persisted_data()
-         for _, instr in jupyter_robot.get_instruments()]
+        for _, instr in jupyter_robot.get_instruments()]
 
         current_protocol_step_list = None
         calibrations = update_step_list()
@@ -189,15 +189,13 @@ def upload_jupyter():
             'lastModified': last_modified
         }
         app.logger.info('Successfully deserialized robot for jupyter upload')
+        socketio.emit('event', {'data': upload_data, 'name': 'jupyter-upload'})
     except Exception as e:
         app.logger.exception('Failed to properly deserialize jupyter upload')
         print(e)
 
-    socketio.emit('event', {
-        'data': upload_data,
-        'name': 'jupyter-upload'
-    })
-    return flask.jsonify({ 'status': 'success', 'data': None})
+
+    return flask.jsonify({'status': 'success', 'data': None})
 
 
 @app.route("/load")
