@@ -1,8 +1,4 @@
-{%- extends "basic/layout.html" %} 
-{% set css_files = css_files   + ['https://opentrons.com/css/master.css'] + ['_static/override_master.css'] + ['_static/override_sphinx.css'] %} 
-
-
-{%- block extrahead %} {{ super() }}
+{%- extends "basic/layout.html" %} {% set css_files = css_files + ['https://opentrons.com/css/master.css'] + ['_static/override_master.css'] + ['_static/override_sphinx.css'] %} {%- block extrahead %} {{ super() }}
 <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" /> {% if theme_touch_icon %}
 <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" /> {% endif %} {% if theme_canonical_url %}
 <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" /> {% endif %}
@@ -230,48 +226,40 @@ window.intercomSettings = {
 </footer>
 <script>
 $(document).ready(function() {
-    $(".footerForm").submit(function(event) {
-        var data = {};
-        $(".footerForm").serializeArray().map(function(x) {
-            data[x.name] = x.value;
-        });
-        ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, {
-            'dimension1': data.email
-        });
-        console.log(data)
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
 
-        $.ajax({
-            type: "POST",
-            url: "https://email.opentrons.com:3000",
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function(res) {
-                console.log(`success: ${res}`);
-                $(".footerForm").fadeOut("slow");
-                $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
-            },
-            error: function(err) {
-                console.log(`err: ${JSON.stringify(err)}`)
-            },
-        });
-
-        event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
     });
 
-    $("form.validate").submit(function(event) {
-        var data = {};
-        $("form.validate").serializeArray().map(function(x) {
-            data[x.name] = x.value;
-        });
-        ga('send', 'event', 'Newsletter', 'Signup', window.location.href, {
-            'dimension1': data.EMAIL
-        })
-    });
+    
+    return false;
+  });
 
-    $('#chat').on('click', () => {
-        Intercom('showNewMessage');
-    })
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
 });
 </script>
 {% if theme_github_banner|lower != 'false' %}
