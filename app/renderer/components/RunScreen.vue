@@ -1,7 +1,7 @@
 <template>
   <div ref='commands' class='runScreen'>
     <h3 @click='clearRunScreen()' id='exit'>x</h3>
-    <div class='runCommand' v-for='command in runLog'>
+    <div class='runCommand' v-for='command in runLog()'>
       {{command.timestamp}} - {{command.command_description}}
       <br>
     </div>
@@ -10,14 +10,12 @@
 
 <script>
   export default {
-    computed: {
-      runLog () {
-        return this.$store.state.runLog
-      }
-    },
     methods: {
       clearRunScreen () {
         this.$store.dispatch('finishRun')
+      },
+      runLog () {
+        return this.$store.state.runLog
       }
     },
     watch: {
