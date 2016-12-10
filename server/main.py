@@ -178,6 +178,9 @@ def upload_jupyter():
         # Reload instrument calibrations
         [instr.load_persisted_data()
         for _, instr in jupyter_robot.get_instruments()]
+        [instr.update_calibrator()
+        for _, instr in jupyter_robot.get_instruments()]
+
 
         current_protocol_step_list = None
         calibrations = update_step_list()
@@ -673,6 +676,7 @@ def move_to_slot():
 
 @app.route('/move_to_container', methods=["POST"])
 def move_to_container():
+    robot = Robot.get_instance()
     slot = request.json.get("slot")
     name = request.json.get("label")
     axis = request.json.get("axis")
@@ -823,7 +827,7 @@ def set_max_volume():
 
 
 def _calibrate_placeable(container_name, axis_name):
-
+    robot = Robot.get_instance()
     deck = robot._deck
     containers = deck.containers()
     axis_name = axis_name.upper()
