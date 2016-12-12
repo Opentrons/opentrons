@@ -1,7 +1,65 @@
 import math
 
-from collections import namedtuple
 import json
+
+
+from builtins import property as _property, tuple as _tuple
+from operator import itemgetter as _itemgetter
+from collections import OrderedDict
+
+
+class VectorValue(tuple):
+    """
+    # from collections import namedtuple
+    # value_type = namedtuple('VectorValue', ['x', 'y', 'z'])
+    """
+    'VectorValue(x, y, z)'
+
+    __slots__ = ()
+
+    _fields = ('x', 'y', 'z')
+
+    def __new__(_cls, x, y, z):
+        'Create new instance of VectorValue(x, y, z)'
+        return _tuple.__new__(_cls, (x, y, z))
+
+    @classmethod
+    def _make(cls, iterable, new=tuple.__new__, len=len):
+        'Make a new VectorValue object from a sequence or iterable'
+        result = new(cls, iterable)
+        if len(result) != 3:
+            raise TypeError('Expected 3 arguments, got %d' % len(result))
+        return result
+
+    def _replace(_self, **kwds):
+        """Return a new VectorValue object replacing specified fields with
+        new values
+        """
+        result = _self._make(map(kwds.pop, ('x', 'y', 'z'), _self))
+        if kwds:
+            raise ValueError('Got unexpected field names: %r' % list(kwds))
+        return result
+
+    def __repr__(self):
+        'Return a nicely formatted representation string'
+        return self.__class__.__name__ + '(x=%r, y=%r, z=%r)' % self
+
+    def _asdict(self):
+        'Return a new OrderedDict which maps field names to their values.'
+        return OrderedDict(zip(self._fields, self))
+
+    def __getnewargs__(self):
+        'Return self as a plain tuple.  Used by copy and pickle.'
+        return tuple(self)
+
+    x = _property(_itemgetter(0), doc='Alias for field number 0')
+
+    y = _property(_itemgetter(1), doc='Alias for field number 1')
+
+    z = _property(_itemgetter(2), doc='Alias for field number 2')
+
+
+value_type = VectorValue
 
 
 # To keep Python 3.4 compatibility
@@ -21,13 +79,12 @@ class VectorEncoder(json.JSONEncoder):
 
 class Vector(object):
     zero_vector = None
-    value_type = namedtuple('VectorValue', ['x', 'y', 'z'])
 
     @classmethod
     def zero_coordinates(cls):
 
         if not cls.zero_vector:
-            cls.zero_vector = cls.value_type(0, 0, 0)
+            cls.zero_vector = value_type(0, 0, 0)
 
         return cls.zero_vector
 
@@ -36,11 +93,11 @@ class Vector(object):
         kwargs = {}
         for axis in 'xyz':
             kwargs[axis] = dictionary.get(axis, 0)
-        return cls.value_type(**kwargs)
+        return value_type(**kwargs)
 
     @classmethod
     def coordinates_from_iterable(cls, iterable):
-        return cls.value_type(
+        return value_type(
             iterable[0],
             iterable[1],
             iterable[2])
@@ -79,7 +136,7 @@ class Vector(object):
                      "expected to be dict or iterable, received {}")
                     .format(type(arg)))
         elif args_len == 3:
-            self.coordinates = Vector.value_type(*args)
+            self.coordinates = value_type(*args)
         else:
             raise ValueError("Expected either a dict/iterable or x, y, z")
 
