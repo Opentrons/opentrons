@@ -1,7 +1,7 @@
 <template>
   <section id='deck' :class="{'disabled': busy}">
     <div class='deck'>
-      <button v-for='slot in slots' @click='jogToSlot(slot)'>
+      <button v-for='slot in slots()' @click='jogToSlot(slot)'>
         {{slot}}
       </button>
     </div>
@@ -15,9 +15,7 @@
     methods: {
       jogToSlot (slot) {
         this.$store.dispatch('jogToSlot', {slot: slot})
-      }
-    },
-    computed: {
+      },
       slots () {
         let baseSlots = [
           'A2', 'B2', 'C2', 'D2', 'E2',

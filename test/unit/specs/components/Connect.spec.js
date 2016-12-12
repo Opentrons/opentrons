@@ -44,7 +44,7 @@ describe('Connect.vue', () => {
 
     let options = vm.$el.querySelectorAll('nav.connect select#connections option')
     let dropdownPorts = []
-    options.forEach(el => dropdownPorts.push(el.innerHTML))
+    options.forEach(el => dropdownPorts.push(el.textContent))
     expect(vm.$el.querySelector('nav.connect select#connections').length).to.equal(4)
     expect(dropdownPorts[2]).to.equal(detectedPorts[0])
     expect(dropdownPorts[3]).to.equal(detectedPorts[1])
@@ -67,7 +67,7 @@ describe('Connect.vue', () => {
 
     Vue.nextTick(() => {
       let selectEl = vm.$el.querySelector('select#connections')
-      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal(detectedPorts[0])
+      expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal(detectedPorts[0])
       done()
     })
   })
@@ -93,8 +93,8 @@ describe('Connect.vue', () => {
     Vue.nextTick(() => {
       let selectEl = vm.$el.querySelector('select#connections')
       let msg = 'Select a port'
-      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal(msg)
-      expect(selectEl.options[selectEl.selectedIndex].innerHTML).to.equal('Select a port')
+      expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal(msg)
+      expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal('Select a port')
       done()
     })
   })

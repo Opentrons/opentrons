@@ -1,9 +1,9 @@
 <template>
-  <div v-show='running'>
+  <div v-show='running()'>
     <span class='title'>Progress: </span>
-    <span class='info'> {{runPercent}}%</span>
+    <span class='info'> {{runPercent()}}%</span>
     <div id='progress-bar-total'>
-      <div :style='percentClass' id='percent-complete'></div>
+      <div :style='percentClass()' id='percent-complete'></div>
     </div>
   </div>
 </template>
@@ -11,7 +11,7 @@
 <script>
   export default {
     name: 'ProgressBar',
-    computed: {
+    methods: {
       runPercent () {
         let finishedTasksLength = this.$store.state.runLog.filter((command) => {
           return !command.notification
@@ -21,7 +21,7 @@
         return percent || 0
       },
       percentClass () {
-        return `width:${this.runPercent}%;`
+        return `width:${this.runPercent()}%;`
       },
       running () {
         return this.$store.state.running || this.$store.state.protocolFinished
