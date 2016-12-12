@@ -7,13 +7,13 @@ from opentrons.robot import Robot
 
 class ConnectDiagnosticsTestCase(unittest.TestCase):
     def setUp(self):
+        Robot.get_instance().reset_for_tests()
         from main import app
         self.app = app.test_client()
 
         self.data_path = os.path.join(
             os.path.dirname(__file__) + '/data/'
         )
-
         self.robot = Robot.get_instance()
         self.robot.connect()
 
