@@ -138,6 +138,9 @@ class Pipette(Instrument):
             self.max_volume = max_volume
             self.update_calibrations()
 
+    def update_calibrator(self):
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+
     def reset(self):
         """
         Resets the state of this pipette, removing associated placeables,
