@@ -43,7 +43,9 @@ last_modified = "y"
 
 def notify(info):
     s = json.dumps(info, cls=VectorEncoder)
-    socketio.emit('event', json.loads(s))
+    name = json.loads(s).get('name')
+    if name != 'move-finished' and name != 'move-to':
+        socketio.emit('event', json.loads(s))
 
 
 trace.EventBroker.get_instance().add(notify)
