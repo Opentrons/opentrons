@@ -77,7 +77,7 @@ class PersistedContainersTestCase(unittest.TestCase):
     def test_load_all_persisted_containers(self):
         all_persisted_containers = \
             persisted_containers.load_all_persisted_containers()
-        self.assertEqual(len(all_persisted_containers), 25)
+        self.assertEqual(len(all_persisted_containers), 28)
 
     def test_create_container_obj_from_dict(self):
         container_data = """{
