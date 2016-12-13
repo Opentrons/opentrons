@@ -19,11 +19,12 @@ requirements:
   build:
     - python
     - setuptools
-    - pyserial
 
   run:
+    - dill
     - python
     - pyserial
+    - requests
 
 test:
   # Python imports
