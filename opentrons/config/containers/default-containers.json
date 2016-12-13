@@ -1,5 +1,15 @@
 {
 "containers":{
+      "T75-flask":{
+            "locations":{
+                  "A1":{"x":0,"y":0,"z":0,"depth":163,"diameter":25,"total-liquid-volume":75000}
+            }
+      },
+      "T25-flask":{
+            "locations":{
+                  "A1":{"x":0,"y":0,"z":0,"depth":99,"diameter":18,"total-liquid-volume":25000}
+            }
+      },      
       "trash-box":{
         "origin-offset":{
             "x":0,
