@@ -67,6 +67,7 @@ class Calibrator(object):
             current = children[name]
 
         current['delta'] = delta
+        current['type'] = placeable.get_type()
         self.calibration_data = calibration_data
 
         self._apply_calibration(calibration_data, self.root_placeable)

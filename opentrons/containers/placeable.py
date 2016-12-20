@@ -135,6 +135,12 @@ class Placeable(object):
 
         return self.parent.children_by_reference[self]
 
+    def get_type(self):
+        """
+        Returns the Placeable's type or class name
+        """
+        return self.properties.get('type', self.__class__.__name__)
+
     def get_children_list(self):
         """
         Returns the list of children in the order they were added
