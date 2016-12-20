@@ -135,7 +135,7 @@ class Instrument(object):
         """
         last_persisted_data = self._read_calibrations()
 
-        last_persisted_data[self.calibration_key] = (
+        last_persisted_data['data'][self.calibration_key] = (
             self._strip_vector(
                 self._build_calibration_data())
         )
@@ -197,7 +197,8 @@ class Instrument(object):
         """
         :return: this instrument's saved calibrations data
         """
-        return self._read_calibrations().get(self.calibration_key)
+        data = self._read_calibrations()['data']
+        return data.get(self.calibration_key)
 
     def _build_calibration_data(self):
         """
@@ -215,9 +216,10 @@ class Instrument(object):
         """
         with open(self._get_calibration_file_path()) as f:
             try:
-                loaded_json = json.load(f).get('data', {})
+                loaded_json = json.load(f)
             except json.decoder.JSONDecodeError:
-                loaded_json = {}
+                self._write_blank_calibrations_file()
+                return self._read_calibrations()
             return self._restore_vector(loaded_json)
 
     def _check_calibrations_version(self):
