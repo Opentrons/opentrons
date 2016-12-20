@@ -15,7 +15,9 @@ def refresh():
         'LOG_DIR': os.path.join(APP_DATA_DIR, 'logs'),
         'LOG_FILE': os.path.join(APP_DATA_DIR, 'logs', 'api.log'),
         'CONTAINERS_DIR': os.path.join(APP_DATA_DIR, 'containers'),
-        'CALIBRATIONS_DIR': os.path.join(APP_DATA_DIR, 'calibrations')
+        'CALIBRATIONS_DIR': os.path.join(APP_DATA_DIR, 'calibrations'),
+        'APP_IS_ALIVE_URL': 'http://localhost:31950',
+        'APP_JUPYTER_UPLOAD_URL': 'http://localhost:31950/upload-jupyter',
     })
 
     return settings

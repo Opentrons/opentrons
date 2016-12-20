@@ -1,8 +1,6 @@
 import copy
 
 from opentrons import containers
-
-from opentrons.robot.robot import Robot
 from opentrons.containers.calibrator import Calibrator
 from opentrons.containers.placeable import Placeable, humanize_location
 from opentrons.instruments.instrument import Instrument
@@ -97,9 +95,7 @@ class Pipette(Instrument):
 
         self.reset_tip_tracking()
 
-        self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.motor = self.robot.get_motor(self.axis)
 
         self.placeables = []
         self.previous_placeable = None
@@ -141,6 +137,9 @@ class Pipette(Instrument):
         if isinstance(max_volume, (int, float, complex)) and max_volume > 0:
             self.max_volume = max_volume
             self.update_calibrations()
+
+    def update_calibrator(self):
+        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
     def reset(self):
         """
@@ -1307,5 +1306,8 @@ class Pipette(Instrument):
         keys = {'aspirate', 'dispense'} & kwargs.keys()
         for key in keys:
             self.speeds[key] = kwargs.get(key)
-
         return self
+
+    @property
+    def motor(self):
+        return self.robot.get_motor(self.axis)

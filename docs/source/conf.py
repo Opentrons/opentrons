@@ -147,7 +147,7 @@ html_theme_options = {
     'github_user': 'OpenTrons',
     'github_repo': 'opentrons-api',
     'github_button': 'True',
-    'analytics_id': 'UA-83820700-1',
+    # 'analytics_id': 'UA-83820700-1',
     'description': 'Simple Biology Lab Protocol Coding',
     'link': '#006FFF',
     'link_hover': '#05C1B3',
