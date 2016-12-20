@@ -128,7 +128,8 @@ class PipetteTest(unittest.TestCase):
             'A2': {
                 'children': {
                     '96-flat': {
-                        'delta': (1.0, 2.0, 3.0)
+                        'delta': (1.0, 2.0, 3.0),
+                        'type': '96-flat'
                     }}}}
 
         self.assertDictEqual(
