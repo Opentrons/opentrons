@@ -1,8 +1,10 @@
 /* global describe, it, beforeEach, afterEach */
 let Application = require('spectron').Application
 let chai = require('chai')
+const { expect } = chai
 let chaiAsPromised = require('chai-as-promised')
 let path = require('path')
+let child_process = require('child_process')
 
 let appPath
 if (process.platform === 'win32') {
@@ -44,6 +46,10 @@ describe('application launch', function () {
     }
   })
 
+  function assertText(result, expected) {
+    expect(result).to.equal(expected)
+  }
+
   it('opens a window', function () {
     return this.app.client.waitUntilWindowLoaded(31950)
       .getWindowCount().should.eventually.equal(1)
@@ -55,12 +61,10 @@ describe('application launch', function () {
       .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
   })
 
-  it('runs a protocol', function () {
-    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/simple_protocol.py')
+  function connectAndRunLoadedProtocol() {
     let pauseTime = process.env.PAUSE_TIME || 0
     let connectDropDown = '//*[@id="connections"]'
     let virtualSmoothie = connectDropDown + '/option[3]'
-    let uploadXpath = '/html/body/div/section/span/form/div/input'
     let saveButton = '//*[@id="task"]/span/button[1]'
     let platePath = '//*[@id="step-list"]/div/span/div/ul/li[2]/a'
     let plungerPath = '//*[@id="step-list"]/div/span/div/ul/li[3]/a'
@@ -71,19 +75,11 @@ describe('application launch', function () {
     let plungerDown = '//*[@id="jog-controls-plunger"]/span[1]/button[2]'
     let run = '//*[@id="run"]/button'
 
-    this.app.client.execute(() => {
-      window.confirm = function () { return true }
-    })
-    return this.app.client.waitUntilWindowLoaded(31950)
+    return this.app.client
       .click(connectDropDown)
       .pause(pauseTime)
       .click(virtualSmoothie)
       .pause(pauseTime)
-      .pause(1000)
-      .chooseFile(uploadXpath, file)
-      .pause(1000)
-      .pause(pauseTime)
-      .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
       .click(saveButton)
       .pause(pauseTime)
       .click(platePath)
@@ -107,5 +103,44 @@ describe('application launch', function () {
       .click(run)
       .pause(2000)
       .waitForText('.toast-message-text', 'Run complete')
+  }
+
+  function uploadProtocol(file) {
+    let uploadXpath = '/html/body/div/section/span/form/div/input'
+    return this.app.client
+      .chooseFile(uploadXpath, file)
+      .pause(1000)
+  }
+
+  it('runs a user uploaded protocol', function () {
+    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/simple_protocol.py')
+
+    this.app.client.execute(() => {
+      window.confirm = function () { return true }
+    })
+    return this.app.client.waitUntilWindowLoaded(31950)
+      .then(uploadProtocol.bind(this, file))
+      .then(connectAndRunLoadedProtocol.bind(this))
+      .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
+  })
+
+  it('runs jupyter protocol', function () {
+    let uploadScript = path.join(__dirname, 'jupyter_upload.py')
+    child_process.spawnSync('python3', [uploadScript])
+
+    this.app.client.execute(() => {
+      window.confirm = function () { return true }
+    })
+    return this.app.client.waitUntilWindowLoaded(31950)
+      .then(connectAndRunLoadedProtocol.bind(this))
+  })
+
+  it('handles upload of empty protocol gracefully', function () {
+    let file = path.join(__dirname, '..', 'server', 'tests', 'data', '/empty.py')
+    let expectedText = 'This protocol does not contain any commands for the robot.'
+    return this.app.client.waitUntilWindowLoaded(31950)
+      .then(uploadProtocol.bind(this, file))
+      .getText('.toast-message-text')
+      .then(assertText.bind(null, expectedText))
   })
 })
