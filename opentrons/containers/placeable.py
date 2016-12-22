@@ -573,6 +573,9 @@ class WellSeries(Placeable):
         """
         self.offset = offset
 
+    def __len__(self):
+        return len(self.values)
+
     def __iter__(self):
         return iter(self.values)
 
