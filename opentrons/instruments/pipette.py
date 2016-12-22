@@ -1012,19 +1012,117 @@ class Pipette(Instrument):
             enqueue=enqueue)
         return self
 
-    def transfer(self, volume, source, destination=None, enqueue=True):
-        """
-        transfer
-        """
-        if not isinstance(volume, (int, float, complex)):
-            if volume and not destination:
-                destination = source
-                source = volume
-            volume = None
+    def _find_aspirate_volume(self, vol):
+        aspirate_volume = 0
+        if isinstance(vol, (int, float, complex)):
+            remaining_volume = self.max_volume - self.current_volume
+            aspirate_volume = min(vol, remaining_volume)
+        elif isinstance(vol, (list, iter)):
+            n = 0
+            total_aspirated = self.current_volume
+            while n < len(vol):
+                if total_aspirated + vol[n] > self.max_volume:
+                    break
+                aspirate_volume += vol[n]
+                total_aspirated += aspirate_volume
+                n += 1
 
-        self.aspirate(volume, source, enqueue=enqueue)
-        self.dispense(volume, destination, enqueue=enqueue)
-        return self
+        if not aspirate_volume:
+            aspirate_volume = vol[0] if isinstance(vol, list) else vol
+        return min(aspirate_volume, self.max_volume)
+
+    def _match_volume_and_wells(self, volumes, sources, targets):
+
+        volumes = [volumes] if not isinstance(volumes, list) else volumes
+        sources = [sources] if not isinstance(sources, list) else sources
+        targets = [targets] if not isinstance(targets, list) else targets
+        length = max(len(sources), len(targets))
+        if length > min(len(sources), len(targets)) > 1:
+            raise RuntimeError('Sources and Targets list lengths do not match')
+        if len(volumes) != length:
+            if len(volumes) == 1:
+                volumes *= length
+            else:
+                raise RuntimeError(
+                    'Length of volumes does not match length of wells')
+        return (volumes, sources, targets)
+
+    def _transfer_single(self, volumes, source, target, **kwargs):
+
+        tips = kwargs.get('tips', 1)
+        rate = kwargs.get('rate', 1)
+        delay = kwargs.get('delay', 0.5)
+        touch = kwargs.get('touch', True)
+        mix = kwargs.get('mix', (0, 0))
+        blow = kwargs.get('blow', True)
+        trash = kwargs.get('trash', True)
+        separate = kwargs.get('separate', False)
+
+        if not isinstance(volumes, list):
+            volumes = [volumes]
+
+        if tips > 0:
+            self.pick_up_tip(enqueue=False)
+
+        amount_remaining = volumes[0]
+        while amount_remaining > 0:
+
+            volumes[0] = min(volumes[0], amount_remaining)
+            if self.current_volume < volumes[0]:
+                if separate:
+                    aspirate_volume = self._find_aspirate_volume(volumes[0])
+                else:
+                    aspirate_volume = self._find_aspirate_volume(volumes)
+                self.aspirate(
+                    aspirate_volume, source, rate=rate, enqueue=False)
+
+                if delay:
+                    self.delay(delay, enqueue=False)
+                if touch:
+                    self.touch_tip(enqueue=False)
+
+            dispense_volume = min(volumes[0], self.current_volume)
+            amount_remaining -= dispense_volume
+            self.dispense(dispense_volume, target, rate=rate, enqueue=False)
+
+            if isinstance(mix, tuple) and len(mix) > 1 and sum(mix):
+                self.mix(mix[0], mix[1], enqueue=False)
+            if touch:
+                self.touch_tip(enqueue=False)
+            if blow and self.current_volume == 0:
+                self.blow_out(enqueue=False)
+
+        if tips > 0:
+            if trash:
+                self.drop_tip(enqueue=False)
+            else:
+                self.return_tip(enqueue=False)
+
+    def transfer(self, volumes, sources, targets, **kwargs):
+
+        tips = kwargs.get('tips', 1)
+        trash = kwargs.get('trash', True)
+
+        volumes, sources, targets = self._match_volume_and_wells(
+            volumes, sources, targets)
+
+        if tips == 1:
+            self.pick_up_tip(enqueue=False)
+
+        for i in range(len(volumes)):
+            s = sources[i] if len(sources) > 1 else sources[0]
+            t = targets[i] if len(targets) > 1 else targets[0]
+            kwargs['tips'] = 0 if tips <= 1 else 1
+            kwargs['separate'] = kwargs.get(
+                'separate',
+                True if len(sources) > 1 else False)
+            self._transfer_single(volumes[i:], s, t, **kwargs)
+
+        if tips == 1:
+            if trash:
+                self.drop_tip(enqueue=False)
+            else:
+                self.return_tip(enqueue=False)
 
     # QUEUEABLE
     def distribute(self, volume, source, destinations, enqueue=True):
