@@ -1031,25 +1031,36 @@ class Pipette(Instrument):
             aspirate_volume = vol[0] if isinstance(vol, list) else vol
         return min(aspirate_volume, self.max_volume)
 
+    def _create_gradient(self, min_vol, max_vol, target_series):
+        volumes = []
+        targets = []
+        diff_vol = max_vol - min_vol
+        series_length = len(target_series)
+        for i, series in enumerate(target_series):
+            new_volume = ((i / series_length) * diff_vol) + min_vol
+            if not len(series):
+                series = [series]
+            for well in series:
+                targets.append(well)
+                volumes.append(new_volume)
+        return (volumes, targets)
+
     def _match_volume_and_wells(self, volumes, sources, targets):
 
-        volumes = [volumes] if not isinstance(volumes, list) else volumes
-        sources = [sources] if not isinstance(sources, list) else sources
-        targets = [targets] if not isinstance(targets, list) else targets
+        volumes = volumes if len(volumes) else [volumes]
+        sources = sources if len(sources) else [sources]
+        targets = targets if len(targets) else [targets]
         length = max(len(sources), len(targets))
         if length > min(len(sources), len(targets)) > 1:
             raise RuntimeError('Sources and Targets list lengths do not match')
         if len(volumes) != length:
             if len(volumes) == 1:
                 volumes *= length
-            else:
-                raise RuntimeError(
-                    'Length of volumes does not match length of wells')
+            volumes, targets = self._create_gradient(volumes, targets)
         return (volumes, sources, targets)
 
     def _transfer_single(self, volumes, source, target, **kwargs):
 
-        tips = kwargs.get('tips', 1)
         rate = kwargs.get('rate', 1)
         delay = kwargs.get('delay', 0.5)
         touch = kwargs.get('touch', True)
@@ -1060,9 +1071,6 @@ class Pipette(Instrument):
 
         if not isinstance(volumes, list):
             volumes = [volumes]
-
-        if tips > 0:
-            self.pick_up_tip(enqueue=False)
 
         amount_remaining = volumes[0]
         while amount_remaining > 0:
@@ -1092,37 +1100,29 @@ class Pipette(Instrument):
             if blow and self.current_volume == 0:
                 self.blow_out(enqueue=False)
 
-        if tips > 0:
-            if trash:
-                self.drop_tip(enqueue=False)
-            else:
-                self.return_tip(enqueue=False)
-
     def transfer(self, volumes, sources, targets, **kwargs):
 
         tips = kwargs.get('tips', 1)
-        trash = kwargs.get('trash', True)
 
         volumes, sources, targets = self._match_volume_and_wells(
             volumes, sources, targets)
 
-        if tips == 1:
-            self.pick_up_tip(enqueue=False)
-
         for i in range(len(volumes)):
+            if tips > 0:
+                self.pick_up_tip(enqueue=False)
+                tips -= 1
+
             s = sources[i] if len(sources) > 1 else sources[0]
             t = targets[i] if len(targets) > 1 else targets[0]
-            kwargs['tips'] = 0 if tips <= 1 else 1
             kwargs['separate'] = kwargs.get(
-                'separate',
-                True if len(sources) > 1 else False)
+                'separate', True if len(sources) > 1 else False)
             self._transfer_single(volumes[i:], s, t, **kwargs)
 
-        if tips == 1:
-            if trash:
-                self.drop_tip(enqueue=False)
-            else:
-                self.return_tip(enqueue=False)
+            if tips > 0:
+                if trash:
+                    self.drop_tip(enqueue=False)
+                else:
+                    self.return_tip(enqueue=False)
 
     # QUEUEABLE
     def distribute(self, volume, source, destinations, enqueue=True):

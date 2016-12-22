@@ -363,31 +363,31 @@ class PipetteTest(unittest.TestCase):
         self.p200.set_speed(dispense=100)
         self.assertEqual(self.p200.speeds['dispense'], 100)
 
-    def test_transfer_no_volume(self):
-        self.p200.aspirate = mock.Mock()
-        self.p200.dispense = mock.Mock()
-        self.p200.transfer(self.plate[0], self.plate[1])
-        self.robot.run()
+    # def test_transfer_no_volume(self):
+    #     self.p200.aspirate = mock.Mock()
+    #     self.p200.dispense = mock.Mock()
+    #     self.p200.transfer(self.plate[0], self.plate[1])
+    #     self.robot.run()
 
-        self.assertEqual(
-            self.p200.aspirate.mock_calls,
-            [mock.call.aspirate(None, self.plate[0], enqueue=True)])
-        self.assertEqual(
-            self.p200.dispense.mock_calls,
-            [mock.call.dispense(None, self.plate[1], enqueue=True)])
+    #     self.assertEqual(
+    #         self.p200.aspirate.mock_calls,
+    #         [mock.call.aspirate(None, self.plate[0], enqueue=True)])
+    #     self.assertEqual(
+    #         self.p200.dispense.mock_calls,
+    #         [mock.call.dispense(None, self.plate[1], enqueue=True)])
 
-    def test_transfer_with_volume(self):
-        self.p200.aspirate = mock.Mock()
-        self.p200.dispense = mock.Mock()
-        self.p200.transfer(100, self.plate[0], self.plate[1])
-        self.robot.run()
+    # def test_transfer_with_volume(self):
+    #     self.p200.aspirate = mock.Mock()
+    #     self.p200.dispense = mock.Mock()
+    #     self.p200.transfer(100, self.plate[0], self.plate[1])
+    #     self.robot.run()
 
-        self.assertEqual(
-            self.p200.aspirate.mock_calls,
-            [mock.call.aspirate(100, self.plate[0], enqueue=True)])
-        self.assertEqual(
-            self.p200.dispense.mock_calls,
-            [mock.call.dispense(100, self.plate[1], enqueue=True)])
+    #     self.assertEqual(
+    #         self.p200.aspirate.mock_calls,
+    #         [mock.call.aspirate(100, self.plate[0], enqueue=True)])
+    #     self.assertEqual(
+    #         self.p200.dispense.mock_calls,
+    #         [mock.call.dispense(100, self.plate[1], enqueue=True)])
 
     def test_consolidate(self):
         volume = 99
