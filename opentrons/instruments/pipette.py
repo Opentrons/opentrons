@@ -3,7 +3,7 @@ import itertools
 
 from opentrons import containers
 from opentrons.containers.calibrator import Calibrator
-from opentrons.containers.placeable import Placeable, WellSeries
+from opentrons.containers.placeable import Placeable
 from opentrons.containers.placeable import humanize_location
 from opentrons.instruments.instrument import Instrument
 from opentrons.helpers import helpers
@@ -1030,11 +1030,6 @@ class Pipette(Instrument):
         tips = kwargs.get('tips', 1)
         trash = kwargs.get('trash', True)
         enqueue = kwargs.get('enqueue', True)
-        rate = kwargs.get('rate', 1)
-        touch = kwargs.get('touch', True)
-        mix = kwargs.get('mix', (0, 0))
-        blow = kwargs.get('blow', True)
-        separate_sources = kwargs.get('separate', False)
 
         if trash and not self.trash_container:
             raise RuntimeError('Requires trash attached to pipette')
@@ -1051,32 +1046,8 @@ class Pipette(Instrument):
             if tips > 0 and not self.tip():
                 self.pick_up_tip(enqueue=enqueue)
 
-            while volumes[i] > 0:
-                if self.current_volume < volumes[i]:
-                    if separate_sources:
-                        source_volumes = [volumes[i]]
-                    else:
-                        source_volumes = helpers._match_volumes_to_sources(
-                            volumes[i:], sources[i:])
-                    a_volume = helpers._find_aspirate_volume(
-                        source_volumes, self.max_volume - self.current_volume)
-                    self.aspirate(
-                        a_volume, sources[i], rate=rate, enqueue=enqueue)
-                    if touch:
-                        self.touch_tip(enqueue=enqueue)
-
-                dispense_volume = min(volumes[i], self.current_volume)
-                volumes[i] -= dispense_volume
-                self.dispense(
-                    dispense_volume, targets[i], rate=rate, enqueue=enqueue)
-
-                if volumes[i] <= 0 and isinstance(mix, (tuple, list)):
-                    if len(mix) == 2 and sum(mix):
-                        self.mix(mix[0], mix[1], enqueue=enqueue)
-                if touch:
-                    self.touch_tip(enqueue=enqueue)
-                if blow and self.current_volume == 0:
-                    self.blow_out(enqueue=enqueue)
+            self._transfer_single_volume(
+                volumes[i:], sources[i:], targets[i:], **kwargs)
 
             if tips > 1 or i + 1 == total_transfers:
                 tips -= 1
@@ -1084,6 +1055,42 @@ class Pipette(Instrument):
                     self.drop_tip(enqueue=enqueue)
                 else:
                     self.return_tip(enqueue=enqueue)
+
+    def _transfer_single_volume(self, volumes, sources, targets, **kwargs):
+
+        enqueue = kwargs.get('enqueue', True)
+        rate = kwargs.get('rate', 1)
+        touch = kwargs.get('touch', True)
+        mix = kwargs.get('mix', (0, 0))
+        blow = kwargs.get('blow', True)
+        separate_sources = kwargs.get('separate', False)
+
+        while volumes[0] > 0:
+            if self.current_volume < volumes[0]:
+                if separate_sources:
+                    source_volumes = [volumes[0]]
+                else:
+                    source_volumes = helpers._match_volumes_to_sources(
+                        volumes, sources)
+                a_volume = helpers._find_aspirate_volume(
+                    source_volumes, self.max_volume - self.current_volume)
+                self.aspirate(
+                    a_volume, sources[0], rate=rate, enqueue=enqueue)
+                if touch:
+                    self.touch_tip(enqueue=enqueue)
+
+            dispense_volume = min(volumes[0], self.current_volume)
+            volumes[0] -= dispense_volume
+            self.dispense(
+                dispense_volume, targets[0], rate=rate, enqueue=enqueue)
+
+            if volumes[0] <= 0 and isinstance(mix, (tuple, list)):
+                if len(mix) == 2 and sum(mix):
+                    self.mix(mix[0], mix[1], enqueue=enqueue)
+            if touch:
+                self.touch_tip(enqueue=enqueue)
+            if blow and self.current_volume == 0:
+                self.blow_out(enqueue=enqueue)
 
     # QUEUEABLE
     def delay(self, seconds, enqueue=True):
