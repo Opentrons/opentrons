@@ -1051,7 +1051,7 @@ class Pipette(Instrument):
 
             if tips > 1 or i + 1 == total_transfers:
                 tips -= 1
-                if trash:
+                if trash and self.trash_container:
                     self.drop_tip(enqueue=enqueue)
                 else:
                     self.return_tip(enqueue=enqueue)
