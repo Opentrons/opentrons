@@ -1096,25 +1096,25 @@ class Pipette(Instrument):
         separate_sources = kwargs.get('separate', False)
         enqueue = kwargs.get('enqueue', True)
 
-        v = volumes[0]
-        s = sources[0]
-        t = targets[0]
-        while v > 0:
-            if self.current_volume < v:
-                source_volumes = [v]
-                if not separate_sources:
+        while volumes[0] > 0:
+            if self.current_volume < volumes[0]:
+                if separate_sources:
+                    source_volumes = volumes[0:1]
+                else:
                     source_volumes = self._match_volumes_to_sources(
                         volumes, sources)
                 aspirate_volume = self._find_aspirate_volume(source_volumes)
-                self.aspirate(aspirate_volume, s, rate=rate, enqueue=enqueue)
+                self.aspirate(
+                    aspirate_volume, sources[0], rate=rate, enqueue=enqueue)
                 if touch:
                     self.touch_tip(enqueue=enqueue)
 
-            dispense_volume = min(v, self.current_volume)
-            v -= dispense_volume
-            self.dispense(dispense_volume, t, rate=rate, enqueue=enqueue)
+            dispense_volume = min(volumes[0], self.current_volume)
+            volumes[0] -= dispense_volume
+            self.dispense(
+                dispense_volume, targets[0], rate=rate, enqueue=enqueue)
 
-            if v <= 0 and isinstance(mix, (tuple, list)):
+            if volumes[0] <= 0 and isinstance(mix, (tuple, list)):
                 if len(mix) == 2 and sum(mix):
                     self.mix(mix[0], mix[1], enqueue=enqueue)
             if touch:
