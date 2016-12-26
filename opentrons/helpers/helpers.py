@@ -1,6 +1,7 @@
 import json
 
 from opentrons.util.vector import Vector
+from opentrons.containers.placeable import WellSeries
 
 
 def unpack_coordinates(coordinates):
@@ -98,3 +99,73 @@ def import_calibration_file(file_name, robot):
     with open(file_name) as f:
         json_string = '\n'.join(f)
         import_calibration_json(json_string, robot)
+
+
+def _get_list(n):
+    if isinstance(n, (list, tuple, WellSeries)):
+        return n
+    return [n]
+
+
+def _create_well_pairs(s, t):
+
+    # make source and targets lists of equal length
+    s = _get_list(s)
+    t = _get_list(t)
+    length = max(len(s), len(t))
+    if length > min(len(s), len(t)) > 1:
+        raise RuntimeError('Sources and Targets list lengths do not match')
+    elif len(s) == 1:
+        s *= length
+    elif len(t) == 1:
+        t *= length
+    return (s, t)
+
+
+def _create_volume_gradient(min_v, max_v, total, interpolate=None):
+
+    diff_vol = max_v - min_v
+
+    def _map_volume(i):
+        nonlocal diff_vol, total
+        rel_x = i / (total - 1)
+        rel_y = interpolate(rel_x) if interpolate else rel_x
+        return (rel_y * diff_vol) + min_v
+
+    return [_map_volume(i) for i in range(total)]
+
+
+def _create_volume_pairs(v, total, interpolate=None):
+
+    v = _get_list(v)
+    t_vol = len(v)
+    if t_vol > total:
+        raise RuntimeError(
+            '{0} volumes do not match with {1} transfers'.format(
+                t_vol, total))
+    elif len(v) == total:
+        return v
+    elif len(v) == 1:
+        return v * total
+    elif len(v) == 2:
+        v = _create_volume_gradient(
+            v[0], v[1], total, interpolate=interpolate)
+        return v
+
+
+def _find_aspirate_volume(volumes, remaining_volume):
+    aspirate_volume = min(volumes[0], remaining_volume)
+    for n in range(1, len(volumes)):
+        if aspirate_volume + volumes[n] > remaining_volume:
+            break
+        aspirate_volume += volumes[n]
+    return aspirate_volume
+
+
+def _match_volumes_to_sources(volumes, sources):
+    same_source_volumes = [volumes[0]]
+    for i in range(1, len(volumes)):
+        if sources[i] != sources[0]:
+            break
+        same_source_volumes.append(volumes[i])
+    return same_source_volumes

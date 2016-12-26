@@ -3,8 +3,10 @@ import itertools
 
 from opentrons import containers
 from opentrons.containers.calibrator import Calibrator
-from opentrons.containers.placeable import Placeable, WellSeries, humanize_location
+from opentrons.containers.placeable import Placeable, WellSeries
+from opentrons.containers.placeable import humanize_location
 from opentrons.instruments.instrument import Instrument
+from opentrons.helpers import helpers
 
 
 class Pipette(Instrument):
@@ -1022,130 +1024,60 @@ class Pipette(Instrument):
             enqueue=enqueue)
         return self
 
-    def _get_list(self, n):
-        if isinstance(n, (list, tuple, WellSeries)):
-            return n
-        return [n]
+    # QUEUEABLE
+    def transfer(self, volumes, sources, targets, **kwargs):
 
-    def _create_well_pairs(self, s, t):
-
-        # make source and targets lists of equal length
-        s = self._get_list(s)
-        t = self._get_list(t)
-        length = max(len(s), len(t))
-        if length > min(len(s), len(t)) > 1:
-            raise RuntimeError('Sources and Targets list lengths do not match')
-        elif len(s) == 1:
-            s *= length
-        elif len(t) == 1:
-            t *= length
-        return (s, t)
-
-    def _create_volume_gradient(self, min_v, max_v, total, interpolate=None):
-
-        diff_vol = max_v - min_v
-
-        def _map_volume(i):
-            nonlocal diff_vol, total
-            rel_x = i / (total - 1)
-            rel_y = interpolate(rel_x) if interpolate else rel_x
-            return (rel_y * diff_vol) + min_v
-
-        return [_map_volume(i) for i in range(total)]
-
-    def _create_volume_pairs(self, v, total, interpolate=None):
-
-        v = self._get_list(v)
-        t_vol = len(v)
-        if t_vol > total:
-            raise RuntimeError(
-                '{0} volumes do not match with {1} transfers'.format(
-                    t_vol, total))
-        elif len(v) == total:
-            return v
-        elif len(v) == 1:
-            return v * total
-        elif len(v) == 2:
-            v = self._create_volume_gradient(
-                v[0], v[1], total, interpolate=interpolate)
-            return v
-
-    def _find_aspirate_volume(self, volumes):
-        remaining_volume = self.max_volume - self.current_volume
-        aspirate_volume = min(volumes[0], remaining_volume)
-        for n in range(1, len(volumes)):
-            if aspirate_volume + volumes[n] > remaining_volume:
-                break
-            aspirate_volume += volumes[n]
-        return aspirate_volume
-
-    def _match_volumes_to_sources(self, volumes, sources):
-        same_source_volumes = [volumes[0]]
-        for i in range(1, len(volumes)):
-            if sources[i] != sources[0]:
-                break
-            same_source_volumes.append(volumes[i])
-        return same_source_volumes
-
-    def _transfer_single(self, volumes, sources, targets, **kwargs):
-
+        tips = kwargs.get('tips', 1)
+        trash = kwargs.get('trash', True)
+        enqueue = kwargs.get('enqueue', True)
         rate = kwargs.get('rate', 1)
         touch = kwargs.get('touch', True)
         mix = kwargs.get('mix', (0, 0))
         blow = kwargs.get('blow', True)
         separate_sources = kwargs.get('separate', False)
-        enqueue = kwargs.get('enqueue', True)
-
-        while volumes[0] > 0:
-            if self.current_volume < volumes[0]:
-                if separate_sources:
-                    source_volumes = volumes[0:1]
-                else:
-                    source_volumes = self._match_volumes_to_sources(
-                        volumes, sources)
-                aspirate_volume = self._find_aspirate_volume(source_volumes)
-                self.aspirate(
-                    aspirate_volume, sources[0], rate=rate, enqueue=enqueue)
-                if touch:
-                    self.touch_tip(enqueue=enqueue)
-
-            dispense_volume = min(volumes[0], self.current_volume)
-            volumes[0] -= dispense_volume
-            self.dispense(
-                dispense_volume, targets[0], rate=rate, enqueue=enqueue)
-
-            if volumes[0] <= 0 and isinstance(mix, (tuple, list)):
-                if len(mix) == 2 and sum(mix):
-                    self.mix(mix[0], mix[1], enqueue=enqueue)
-            if touch:
-                self.touch_tip(enqueue=enqueue)
-            if blow and self.current_volume == 0:
-                self.blow_out(enqueue=enqueue)
-
-    # QUEUEABLE
-    def transfer(self, volumes, sources, targets, **kwargs):
-
-        sources, targets = self._create_well_pairs(sources, targets)
-        total_transfers = len(targets)
-
-        volumes = self._create_volume_pairs(
-            volumes, total_transfers, kwargs.get('interpolate', None))
-
-        tips = kwargs.get('tips', 1)
-        trash = kwargs.get('trash', True)
-        enqueue = kwargs.get('enqueue', True)
 
         if trash and not self.trash_container:
             raise RuntimeError('Requires trash attached to pipette')
         if tips and not self.has_tip_rack():
             raise RuntimeError('Requires tip rack attached to pipette')
 
-        for i in range(total_transfers):
-            if tips > 0 and not self.tip():
+        sources, targets = helpers._create_well_pairs(sources, targets)
+        total_transfers = len(targets)
+        volumes = helpers._create_volume_pairs(
+            volumes, total_transfers, kwargs.get('interpolate', None))
 
+        for i in range(total_transfers):
+
+            if tips > 0 and not self.tip():
                 self.pick_up_tip(enqueue=enqueue)
-            self._transfer_single(
-                volumes[i:], sources[i:], targets[i:], **kwargs)
+
+            while volumes[i] > 0:
+                if self.current_volume < volumes[i]:
+                    if separate_sources:
+                        source_volumes = [volumes[i]]
+                    else:
+                        source_volumes = helpers._match_volumes_to_sources(
+                            volumes[i:], sources[i:])
+                    a_volume = helpers._find_aspirate_volume(
+                        source_volumes, self.max_volume - self.current_volume)
+                    self.aspirate(
+                        a_volume, sources[i], rate=rate, enqueue=enqueue)
+                    if touch:
+                        self.touch_tip(enqueue=enqueue)
+
+                dispense_volume = min(volumes[i], self.current_volume)
+                volumes[i] -= dispense_volume
+                self.dispense(
+                    dispense_volume, targets[i], rate=rate, enqueue=enqueue)
+
+                if volumes[i] <= 0 and isinstance(mix, (tuple, list)):
+                    if len(mix) == 2 and sum(mix):
+                        self.mix(mix[0], mix[1], enqueue=enqueue)
+                if touch:
+                    self.touch_tip(enqueue=enqueue)
+                if blow and self.current_volume == 0:
+                    self.blow_out(enqueue=enqueue)
+
             if tips > 1 or i + 1 == total_transfers:
                 tips -= 1
                 if trash:
