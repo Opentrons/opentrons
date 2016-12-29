@@ -514,6 +514,22 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+        self.p200.reset()
+        self.p200.transfer(
+            30,
+            self.plate[0],
+            self.plate
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        total_dispenses = 0
+        for c in self.robot.commands():
+            if 'dispensing' in c.lower():
+                total_dispenses += 1
+        self.assertEqual(total_dispenses, 96)
+        self.robot.clear_commands()
+
     def test_transfer_volume_control(self):
 
         self.p200.reset()

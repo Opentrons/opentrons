@@ -1,7 +1,6 @@
 import json
 
 from opentrons.util.vector import Vector
-from opentrons.containers.placeable import WellSeries
 
 
 def unpack_coordinates(coordinates):
@@ -102,7 +101,7 @@ def import_calibration_file(file_name, robot):
 
 
 def _get_list(n):
-    if isinstance(n, (list, tuple, WellSeries)):
+    if hasattr(n, '__len__') and len(n) > 0:
         return n
     return [n]
 
