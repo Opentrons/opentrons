@@ -53,8 +53,8 @@ You can also split the coordinates for the rows and columns and use either ``.ro
   plate.rows[0][0] # A1
   plate.cols[0][0] # A1
 
-  plate.rows[0][1] # A2
-  plate.cols[1][0] # B1
+  plate.rows[0][1] # B1
+  plate.cols[0][1] # A2
 
 
 Rows
