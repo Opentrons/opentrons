@@ -1,5 +1,26 @@
 {
 "containers":{
+      "alum-block-pcr-strips":{
+          
+          "locations":{
+              "A1":{"x":0, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "B1":{"x":9, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "C1":{"x":18, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "D1":{"x":27, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "E1":{"x":36, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "F1":{"x":45, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "G1":{"x":54, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "H1":{"x":63, "y":0, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "A2":{"x":0, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "B2":{"x":9, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "C2":{"x":18, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "D2":{"x":27, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "E2":{"x":36, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "F2":{"x":45, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "G2":{"x":54, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 },
+              "H2":{"x":63, "y":117, "z":0, "depth":19.5, "diameter":6.4, "total-liquid-volume":280 }
+          }
+      },
       "T75-flask":{
             "locations":{
                   "A1":{"x":0,"y":0,"z":0,"depth":163,"diameter":25,"total-liquid-volume":75000}
