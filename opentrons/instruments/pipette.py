@@ -3,7 +3,7 @@ import itertools
 
 from opentrons import containers
 from opentrons.containers.calibrator import Calibrator
-from opentrons.containers.placeable import Placeable
+from opentrons.containers.placeable import Placeable, WellSeries
 from opentrons.containers.placeable import humanize_location
 from opentrons.instruments.instrument import Instrument
 from opentrons.helpers import helpers
@@ -1031,10 +1031,10 @@ class Pipette(Instrument):
         trash = kwargs.get('trash', True)
         enqueue = kwargs.get('enqueue', True)
 
-        if trash and not self.trash_container:
-            raise RuntimeError('Requires trash attached to pipette')
-        if tips and not self.has_tip_rack():
-            raise RuntimeError('Requires tip rack attached to pipette')
+        # if trash and not self.trash_container:
+        #     raise RuntimeError('Requires trash attached to pipette')
+        # if tips and not self.has_tip_rack():
+        #     raise RuntimeError('Requires tip rack attached to pipette')
 
         # SPECIAL CASE: using multi-channel pipette,
         # and the source/target is WellSeries
