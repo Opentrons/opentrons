@@ -41,9 +41,9 @@
       },      
       "trash-box":{
         "origin-offset":{
-            "x":0,
-            "y":0
-          },
+              "x":42.75,
+              "y":63.875
+            },
           "locations":{
               "A1":{"x":0, "y":0, "z":0, "depth":40, "length":120, "width":90}
           }
