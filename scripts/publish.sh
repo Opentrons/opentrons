@@ -1,5 +1,12 @@
 #!/bin/bash
 
+echo "--------- GIT STATUS ---------"
+git status
+
+echo "--------- GIT CHECKOUT + CLEAN ---------"
+git checkout .
+git clean -fd
+
 # Publish to PyPI
 python setup.py sdist bdist_wheel && twine upload dist/*
 
