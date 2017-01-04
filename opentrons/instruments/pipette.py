@@ -1036,7 +1036,17 @@ class Pipette(Instrument):
         if tips and not self.has_tip_rack():
             raise RuntimeError('Requires tip rack attached to pipette')
 
+        # SPECIAL CASE: using multi-channel pipette,
+        # and the source/target is WellSeries
+        # then treat the WellSeries as a single location
+        if self.channels > 1:
+            if isinstance(sources, WellSeries):
+                sources = [sources]
+            if isinstance(targets, WellSeries):
+                targets = [targets]
+
         sources, targets = helpers._create_well_pairs(sources, targets)
+
         total_transfers = len(targets)
         volumes = helpers._create_volume_pairs(
             volumes, total_transfers, kwargs.get('interpolate', None))
