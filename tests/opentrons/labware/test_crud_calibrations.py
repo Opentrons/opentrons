@@ -57,9 +57,6 @@ class CrudCalibrationsTestCase(unittest.TestCase):
             'type': '96-flat'
         }
 
-        from pprint import pprint
-        pprint(self.p200.calibration_data)
-
         self.assertTrue('A1' in self.p200.calibration_data)
         actual = self.p200.calibration_data['A1']['children']
         self.assertTrue('plate' in actual)
