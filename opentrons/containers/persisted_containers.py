@@ -82,6 +82,11 @@ def get_persisted_container(container_name: str) -> Container:
     return create_container_obj_from_dict(container_data)
 
 
+def list_container_names():
+    c_list = [n for n in persisted_containers_dict.keys()]
+    return sorted(c_list, key=lambda s: s.lower())
+
+
 def load_all_persisted_containers():
     containers = []
     for container_name, container_data in persisted_containers_dict.items():

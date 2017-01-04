@@ -1,6 +1,7 @@
 import unittest
 import math
 
+from opentrons import containers
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -21,6 +22,10 @@ class ContainerTestCase(unittest.TestCase):
                            0)
             c.add(well, name, coordinates)
         return c
+
+    def test_containers_list(self):
+        res = containers.list()
+        self.assertEquals(len(res), 30)
 
     def test_iterator(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
