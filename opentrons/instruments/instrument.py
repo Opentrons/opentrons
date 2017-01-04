@@ -174,7 +174,7 @@ class Instrument(object):
 
     def _write_blank_calibrations_file(self):
         self._delete_calibration_file()
-        with open(self._get_calibration_file_path(), 'a') as f:
+        with open(self._get_calibration_file_path(), 'w') as f:
             f.write(json.dumps({
                 'version': self.calibration_data_version,
                 'data': {}
@@ -229,8 +229,10 @@ class Instrument(object):
         """
         with open(self._get_calibration_file_path()) as f:
             try:
-                version = json.load(f).get('version')
-                if not version:
+                file = json.load(f)
+                version = file.get('version')
+                data = file.get('data')
+                if not version or not data or len(file.keys()) > 2:
                     self._write_blank_calibrations_file()
             except json.decoder.JSONDecodeError:
                 self._write_blank_calibrations_file()
