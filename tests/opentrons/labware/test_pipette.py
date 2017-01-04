@@ -589,6 +589,31 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_transfer_multichannel(self):
+        self.p200.reset()
+        self.p200.channels = 8
+        self.p200.transfer(
+            200,
+            self.plate.rows[0],
+            self.plate.rows[1],
+            touch=False,
+            blow=False
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '200', 'A1'],
+            ['dispensing', '200', 'A2'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
         # so that you have liquid
