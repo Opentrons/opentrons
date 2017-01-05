@@ -510,6 +510,11 @@ class CNCDriver(object):
             while time.time() + 1.0 < end_time:
                 self.check_paused_stopped()
                 time.sleep(1)
+                arguments = {
+                    'name': 'countdown',
+                    'countdown': int(end_time - time.time())
+                }
+                trace.EventBroker.get_instance().notify(arguments)
             remaining_time = end_time - time.time()
             time.sleep(max(0, remaining_time))
         arguments = {'name': 'delay-finish'}
