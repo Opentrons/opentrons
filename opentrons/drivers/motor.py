@@ -504,23 +504,15 @@ class CNCDriver(object):
     def wait(self, delay_time):
         start_time = time.time()
         end_time = start_time + delay_time
-        countdown = int(delay_time)
+        arguments = {'name': 'delay-start', 'time': delay_time}
+        trace.EventBroker.get_instance().notify(arguments)
         if not isinstance(self.connection, VirtualSmoothie):
             while time.time() + 1.0 < end_time:
                 self.check_paused_stopped()
-                arguments = {
-                    'name': 'delay',
-                    'countdown': countdown
-                }
-                trace.EventBroker.get_instance().notify(arguments)
                 time.sleep(1)
-                countdown -= 1
             remaining_time = end_time - time.time()
             time.sleep(max(0, remaining_time))
-        arguments = {
-            'name': 'delay',
-            'countdown': 0
-        }
+        arguments = {'name': 'delay-finish'}
         trace.EventBroker.get_instance().notify(arguments)
         return True
 
