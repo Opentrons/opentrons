@@ -84,6 +84,8 @@ Containers
 
 Each container on the deck is loaded using the container's name and assign it to a slot. The API comes packaged with a set of containers, and users can create and add their own custom containers.
 
+For a list of .supported containers see :ref: `labware_library`.
+
 **containers.load** (*container, slot, name*)
 
 	* **container -** type of container (aka "trough-12row")
@@ -263,10 +265,10 @@ Mix
 
 While you can call multiple aspirate and dispense commands to the same location, the mix command makes it easier to do.
 
-**pipette.mix** (*volume, repetitions, location*)
-
-	* **volume -** volume to mix
+**pipette.mix** (*repetitions, volume, location*)
+	
 	* **repetitions -** number of times to mix
+	* **volume -** volume to mix
 	* **location -** container[position] location to mix
 
 .. testcode:: main
@@ -317,7 +319,7 @@ Blow Out
 
 You can blow out liquid immediately after a dispense command in the same location, or you can choose to blow out somewhere else (like over your trash container) if you want.
 
-**.blow_out** (*location*)
+**blow_out** (*location*)
 
 	* **location -** container[position] location to blow out
 

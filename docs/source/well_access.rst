@@ -11,7 +11,6 @@ Rows vs. Columns
 
 The OT-One deck and containers are all set up with the same coordinate system - numbered rows and lettered columns.
 
-.. Insert diagrams showing rows, columns and well order (left to right etc.)
 .. image:: img/well_iteration/Well_Iteration.png
 
 Accessing Wells
@@ -55,7 +54,7 @@ You can also split the coordinates for the rows and columns and use either ``.ro
   plate.cols[0][0] # A1
 
   plate.rows[0][1] # B1
-  plate.cols[1][0] # A2
+  plate.cols[0][1] # A2
 
 
 Rows

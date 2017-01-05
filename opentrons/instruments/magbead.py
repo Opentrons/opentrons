@@ -1,4 +1,3 @@
-from opentrons.robot.robot import Robot
 from opentrons.instruments.instrument import Instrument
 
 
@@ -10,10 +9,9 @@ class Magbead(Instrument):
 
     def __init__(self, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
+        self.mosfet_index = mosfet
 
-        self.robot = Robot.get_instance()
         self.robot.add_instrument(self.axis, self)
-        self.motor = self.robot.get_mosfet(mosfet)
 
         if not name:
             name = self.__class__.__name__
@@ -126,3 +124,7 @@ class Magbead(Instrument):
             enqueue=enqueue)
 
         return self
+
+    @property
+    def motor(self):
+        return self.robot.get_mosfet(self.mosfet_index)

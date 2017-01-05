@@ -242,3 +242,7 @@ class Instrument(object):
                 except JSON_ERROR:
                     pass
         return obj
+
+    @property
+    def robot(self):
+        return Robot.get_instance()
