@@ -29,8 +29,8 @@ class GridTestCase(unittest.TestCase):
 
     def test_placeable(self):
         plate = self.plate
-        self.assertEqual(plate.rows[0].center(plate), (14.44, 17.54, 5.25))
-        self.assertEqual(plate.rows[1].center(plate), (14.44, 26.54, 5.25))
+        self.assertEqual(plate.rows[0].center(plate), (11.24, 14.34, 5.25))
+        self.assertEqual(plate.rows[1].center(plate), (11.24, 23.34, 5.25))
         self.assertEqual(plate.rows[0].center(plate),
                          plate.cols[0].center(plate))
 
