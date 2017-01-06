@@ -191,9 +191,7 @@ class Pipette(Instrument):
                 for rack in self.tip_racks:
                     iterables.append(rack.rows)
 
-            self.tip_rack_iter = itertools.cycle(
-                itertools.chain(*iterables)
-            )
+            self.tip_rack_iter = itertools.chain(*iterables)
 
     def _associate_placeable(self, location):
         """
@@ -843,7 +841,11 @@ class Pipette(Instrument):
             if not location:
                 if self.has_tip_rack():
                     # TODO: raise warning/exception if looped back to first tip
-                    location = next(self.tip_rack_iter)
+                    try:
+                        location = next(self.tip_rack_iter)
+                    except StopIteration as e:
+                        raise RuntimeWarning(
+                            '{0} has run out of tips'.format(self.name))
                 else:
                     self.robot.add_warning(
                         'pick_up_tip called with no reference to a tip')

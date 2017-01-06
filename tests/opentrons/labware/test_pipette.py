@@ -583,7 +583,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.move_to = mock.Mock()
 
-        for _ in range(0, total_tips_per_plate * 4):
+        for _ in range(0, total_tips_per_plate * 2):
             self.p200.pick_up_tip()
 
         self.robot.simulate()
@@ -593,15 +593,19 @@ class PipetteTest(unittest.TestCase):
             expected.append(self.build_move_to_bottom(self.tiprack1[i]))
         for i in range(0, total_tips_per_plate):
             expected.append(self.build_move_to_bottom(self.tiprack2[i]))
-        for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
-        for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
             expected
         )
+
+        # test then when we go over the total number of tips,
+        # Pipette raises a RuntimeWarning
+        self.robot.clear_commands()
+        self.p200.reset()
+        for _ in range(0, total_tips_per_plate * 2):
+            self.p200.pick_up_tip()
+        self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
     def test_tip_tracking_chain_multi_channel(self):
         p200_multi = instruments.Pipette(
@@ -617,16 +621,12 @@ class PipetteTest(unittest.TestCase):
             top=0, bottom=10, blow_out=12, drop_tip=13)
         p200_multi.move_to = mock.Mock()
 
-        for _ in range(0, 12 * 4):
+        for _ in range(0, 12 * 2):
             p200_multi.pick_up_tip()
 
         self.robot.simulate()
 
         expected = []
-        for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
-        for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
         for i in range(0, 12):
             expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
         for i in range(0, 12):
