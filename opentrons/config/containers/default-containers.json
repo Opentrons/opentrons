@@ -107,8 +107,8 @@
 
       "rigaku-compact-crystallization-plate":{
         "origin-offset":{
-            "x":11.24,
-            "y":14.34
+            "x":9,
+            "y":11
           },
         "locations":{
           "A1":{"x":0, "y":0, "z":0, "depth":2.5, "diameter":2, "total-liquid-volume":6},
