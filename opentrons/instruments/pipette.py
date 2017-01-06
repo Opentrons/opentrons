@@ -193,6 +193,19 @@ class Pipette(Instrument):
 
             self.tip_rack_iter = itertools.chain(*iterables)
 
+    def get_next_tip(self):
+        next_tip = None
+        if self.has_tip_rack():
+            try:
+                next_tip = next(self.tip_rack_iter)
+            except StopIteration as e:
+                raise RuntimeWarning(
+                    '{0} has run out of tips'.format(self.name))
+        else:
+            self.robot.add_warning(
+                'pick_up_tip called with no reference to a tip')
+        return next_tip
+
     def _associate_placeable(self, location):
         """
         Saves a reference to a placeable
@@ -839,16 +852,7 @@ class Pipette(Instrument):
         def _setup():
             nonlocal location
             if not location:
-                if self.has_tip_rack():
-                    # TODO: raise warning/exception if looped back to first tip
-                    try:
-                        location = next(self.tip_rack_iter)
-                    except StopIteration as e:
-                        raise RuntimeWarning(
-                            '{0} has run out of tips'.format(self.name))
-                else:
-                    self.robot.add_warning(
-                        'pick_up_tip called with no reference to a tip')
+                location = self.get_next_tip()
 
             self.current_tip_home_well = None
             if location:
