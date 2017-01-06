@@ -89,6 +89,7 @@ class Pipette(Instrument):
 
         self.trash_container = trash_container
         self.tip_racks = tip_racks
+        self.starting_tip = None
 
         # default mm above tip to execute drop-tip
         # this gives room for the drop-tip mechanism to work
@@ -187,20 +188,44 @@ class Pipette(Instrument):
         """
         Resets the :any:`Pipette` tip tracking, "refilling" the tip racks
         """
-        self.current_tip_home_well = None
+        self.current_tip(None)
         self.tip_rack_iter = iter([])
 
         if self.has_tip_rack():
             iterables = self.tip_racks
 
             if self.channels > 1:
-                iterables = []
-                for rack in self.tip_racks:
-                    iterables.append(rack.rows)
+                iterables = [r for rack in self.tip_racks for r in rack.rows]
+            else:
+                iterables = [w for rack in self.tip_racks for w in rack]
 
-            self.tip_rack_iter = itertools.cycle(
-                itertools.chain(*iterables)
-            )
+            if self.starting_tip:
+                iterables = iterables[iterables.index(self.starting_tip):]
+
+            self.tip_rack_iter = itertools.chain(iterables)
+
+    def current_tip(self, *args):
+        if len(args) and (isinstance(args[0], Placeable) or args[0] is None):
+            self.current_tip_home_well = args[0]
+        return self.current_tip_home_well
+
+    def start_at_tip(self, _tip):
+        if isinstance(_tip, Placeable):
+            self.starting_tip = _tip
+            self.reset_tip_tracking()
+
+    def get_next_tip(self):
+        next_tip = None
+        if self.has_tip_rack():
+            try:
+                next_tip = next(self.tip_rack_iter)
+            except StopIteration as e:
+                raise RuntimeWarning(
+                    '{0} has run out of tips'.format(self.name))
+        else:
+            self.robot.add_warning(
+                'pick_up_tip called with no reference to a tip')
+        return next_tip
 
     def _associate_placeable(self, location):
         """
@@ -367,6 +392,10 @@ class Pipette(Instrument):
             self.motor.speed(speed)
             self.motor.move(destination)
 
+        # if volume is specified as 0uL, then do nothing
+        if volume is 0:
+            return self
+
         _description = "Aspirating {0}uL at {1}".format(
             volume,
             (humanize_location(location) if location else '<In Place>')
@@ -478,6 +507,10 @@ class Pipette(Instrument):
 
             self.motor.speed(speed)
             self.motor.move(destination)
+
+        # if volume is specified as 0uL, then do nothing
+        if volume is 0:
+            return self
 
         _description = "Dispensing {0}uL at {1}".format(
             volume,
@@ -701,8 +734,13 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        height_offset = 0
+
         def _setup():
-            nonlocal location
+            nonlocal location, height_offset
+            if isinstance(location, (int, float, complex)):
+                height_offset = location
+                location = self.previous_placeable
             self._associate_placeable(location)
 
         def _do():
@@ -715,20 +753,34 @@ class Pipette(Instrument):
             else:
                 location = self.previous_placeable
 
+            v_offset = (0, 0, height_offset)
+
             self.move_to(
-                (location, location.from_center(x=1, y=0, z=1)),
+                (
+                    location,
+                    location.from_center(x=1, y=0, z=1) + v_offset
+                ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
-                (location, location.from_center(x=-1, y=0, z=1)),
+                (
+                    location,
+                    location.from_center(x=-1, y=0, z=1) + v_offset
+                ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
-                (location, location.from_center(x=0, y=1, z=1)),
+                (
+                    location,
+                    location.from_center(x=0, y=1, z=1) + v_offset
+                ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
-                (location, location.from_center(x=0, y=-1, z=1)),
+                (
+                    location,
+                    location.from_center(x=0, y=-1, z=1) + v_offset
+                ),
                 strategy='direct',
                 enqueue=False)
 
@@ -738,6 +790,70 @@ class Pipette(Instrument):
             setup=_setup,
             description=_description,
             enqueue=enqueue)
+
+        return self
+
+    # QUEUEABLE
+    def air_gap(self, volume=None, height=None, enqueue=True):
+        """
+        Pull air into the :any:`Pipette` current tip
+
+        Notes
+        -----
+        If no `location` is passed, the pipette will touch_tip
+        from it's current position.
+
+        Parameters
+        ----------
+        volume : number
+            The amount in uL to aspirate air into the tube.
+            (Default will use all remaining volume in tip)
+
+        height : number
+            The number of millimiters to move above the current Placeable
+            to perform and air-gap aspirate
+            (Default will be 10mm above current Placeable)
+
+        Returns
+        -------
+
+        This instance of :class:`Pipette`.
+
+        Examples
+        --------
+        ..
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.air_gap(50) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        """
+
+        def _setup():
+            pass
+
+        def _do():
+            pass
+
+        # if volumes is specified as 0uL, do nothing
+        if volume is 0:
+            return self
+
+        _description = 'Air gap'
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
+
+        if height is None:
+            height = 20
+
+        location = self.previous_placeable.top(height)
+        # "move_to" separate from aspirate command
+        # so "_position_for_aspirate" isn't executed
+        self.move_to(location, enqueue=enqueue)
+        self.aspirate(volume, enqueue=enqueue)
 
         return self
 
@@ -794,11 +910,11 @@ class Pipette(Instrument):
             description=_description,
             enqueue=enqueue)
 
-        if not self.current_tip_home_well:
+        if not self.current_tip():
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.drop_tip(self.current_tip_home_well, enqueue=enqueue)
+        self.drop_tip(self.current_tip(), enqueue=enqueue)
 
         return self
 
@@ -851,19 +967,11 @@ class Pipette(Instrument):
         def _setup():
             nonlocal location
             if not location:
-                if self.has_tip_rack():
-                    # TODO: raise warning/exception if looped back to first tip
-                    location = next(self.tip_rack_iter)
-                elif self.previous_placeable:
-                    location = self.previous_placeable
-                else:
-                    self.robot.add_warning(
-                        'pick_up_tip called with no reference to a tip')
-
-            self.current_tip_home_well = None
+                location = self.get_next_tip()
+            self.current_tip(None)
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.current_tip_home_well = placeable
+                self.current_tip(placeable)
 
             if isinstance(location, Placeable):
                 location = location.bottom()
@@ -952,7 +1060,7 @@ class Pipette(Instrument):
                 location = location.bottom(self._drop_tip_offset)
 
             self._associate_placeable(location)
-            self.current_tip_home_well = None
+            self.current_tip(None)
 
             self.current_volume = 0
 

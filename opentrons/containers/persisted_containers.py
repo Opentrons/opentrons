@@ -82,6 +82,11 @@ def get_persisted_container(container_name: str) -> Container:
     return create_container_obj_from_dict(container_data)
 
 
+def list_container_names():
+    c_list = [n for n in persisted_containers_dict.keys()]
+    return sorted(c_list, key=lambda s: s.lower())
+
+
 def load_all_persisted_containers():
     containers = []
     for container_name, container_data in persisted_containers_dict.items():
@@ -178,6 +183,12 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         assert isinstance(z, numbers.Number)
 
         well = Well(properties=well_properties)
+
+        # subtract half the size, because
+        # Placeable assigns X-Y to bottom-left corner, but
+        # persisted container files assign X-Y to center of each Well
+        x -= (well.x_size() / 2)
+        y -= (well.y_size() / 2)
 
         well_coordinates = (
             x + origin_offset_x,

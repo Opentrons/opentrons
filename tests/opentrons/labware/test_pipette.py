@@ -128,7 +128,8 @@ class PipetteTest(unittest.TestCase):
             'A2': {
                 'children': {
                     '96-flat': {
-                        'delta': (1.0, 2.0, 3.0)
+                        'delta': (1.0, 2.0, 3.0),
+                        'type': '96-flat'
                     }}}}
 
         self.assertDictEqual(
@@ -664,6 +665,46 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_touch_tip(self):
+        self.p200.move_to = mock.Mock()
+        self.p200.touch_tip(self.plate[0])
+        self.p200.touch_tip(-3)
+
+        self.robot.simulate()
+
+        from pprint import pprint
+        pprint(self.p200.move_to.mock_calls)
+
+        expected = [
+            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(
+                (self.plate[0], (6.40, 3.20, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (0.00, 3.20, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 6.40, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 0.00, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(
+                (self.plate[0], (6.40, 3.20, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (0.00, 3.20, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 6.40, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 0.00, 7.50)),
+                enqueue=False, strategy='direct')]
+
+        self.assertEquals(expected, self.p200.move_to.mock_calls)
+
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
         # so that you have liquid
@@ -691,6 +732,31 @@ class PipetteTest(unittest.TestCase):
                 mock.call.aspirate(100, rate=1.0, enqueue=True)
             ]
         )
+
+    def test_air_gap(self):
+        self.p200.aspirate(50, self.plate[0])
+        self.p200.air_gap()
+        self.assertEquals(self.p200.current_volume, 200)
+
+        self.p200.dispense()
+        self.p200.aspirate(50, self.plate[1])
+        self.p200.air_gap(10)
+        self.assertEquals(self.p200.current_volume, 60)
+
+        self.p200.dispense()
+        self.p200.aspirate(50, self.plate[2])
+        self.p200.air_gap(10, 10)
+        self.assertEquals(self.p200.current_volume, 60)
+
+        self.p200.dispense()
+        self.p200.aspirate(50, self.plate[2])
+        self.p200.air_gap(0)
+        self.assertEquals(self.p200.current_volume, 50)
+
+    def test_pipette_home(self):
+        self.p200.motor.home = mock.Mock()
+        self.p200.home()
+        self.assertEquals(len(self.robot.commands()), 1)
 
     def test_mix_with_named_args(self):
         self.p200.current_volume = 100
@@ -786,7 +852,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.move_to = mock.Mock()
 
-        for _ in range(0, total_tips_per_plate * 4):
+        for _ in range(0, total_tips_per_plate * 2):
             self.p200.pick_up_tip()
 
         self.robot.simulate()
@@ -796,15 +862,19 @@ class PipetteTest(unittest.TestCase):
             expected.append(self.build_move_to_bottom(self.tiprack1[i]))
         for i in range(0, total_tips_per_plate):
             expected.append(self.build_move_to_bottom(self.tiprack2[i]))
-        for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
-        for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
             expected
         )
+
+        # test then when we go over the total number of tips,
+        # Pipette raises a RuntimeWarning
+        self.robot.clear_commands()
+        self.p200.reset()
+        for _ in range(0, total_tips_per_plate * 2):
+            self.p200.pick_up_tip()
+        self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
     def test_tip_tracking_chain_multi_channel(self):
         p200_multi = instruments.Pipette(
@@ -820,7 +890,7 @@ class PipetteTest(unittest.TestCase):
             top=0, bottom=10, blow_out=12, drop_tip=13)
         p200_multi.move_to = mock.Mock()
 
-        for _ in range(0, 12 * 4):
+        for _ in range(0, 12 * 2):
             p200_multi.pick_up_tip()
 
         self.robot.simulate()
@@ -830,15 +900,16 @@ class PipetteTest(unittest.TestCase):
             expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
         for i in range(0, 12):
             expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
-        for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
-        for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
 
         self.assertEqual(
             p200_multi.move_to.mock_calls,
             expected
         )
+
+    def test_tip_tracking_start_at_tip(self):
+        self.p200.start_at_tip(self.tiprack1['B2'])
+        self.p200.pick_up_tip()
+        self.assertEquals(self.tiprack1['B2'], self.p200.current_tip())
 
     def test_tip_tracking_return(self):
         self.p200.drop_tip = mock.Mock()

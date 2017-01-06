@@ -28,6 +28,9 @@ class Instrument(object):
     It gives the instruments ability to CRUD their calibration data,
     and gives access to some common methods across instruments
     """
+
+    calibration_data_version = 1
+
     calibration_key = "unique_name"
     persisted_attributes = []
     persisted_defaults = {}
@@ -121,10 +124,10 @@ class Instrument(object):
         if not os.path.isdir(self._get_calibration_dir()):
             os.mkdir(self._get_calibration_dir())
 
-        file_path = self._get_calibration_file_path()
-        if not os.path.isfile(file_path):
-            with open(file_path, 'a') as f:
-                f.write(json.dumps({}))
+        if not os.path.isfile(self._get_calibration_file_path()):
+            self._write_blank_calibrations_file()
+        else:
+            self._check_calibrations_version()
 
     def update_calibrations(self):
         """
@@ -132,7 +135,7 @@ class Instrument(object):
         """
         last_persisted_data = self._read_calibrations()
 
-        last_persisted_data[self.calibration_key] = (
+        last_persisted_data['data'][self.calibration_key] = (
             self._strip_vector(
                 self._build_calibration_data())
         )
@@ -161,13 +164,21 @@ class Instrument(object):
             setattr(self, key, val)
         self.update_calibrations()
 
-    def delete_calibration_file(self):
+    def _delete_calibration_file(self):
         """
         Deletes the entire calibrations file
         """
         file_path = self._get_calibration_file_path()
         if os.path.exists(file_path):
             os.remove(file_path)
+
+    def _write_blank_calibrations_file(self):
+        self._delete_calibration_file()
+        with open(self._get_calibration_file_path(), 'w') as f:
+            f.write(json.dumps({
+                'version': self.calibration_data_version,
+                'data': {}
+            }))
 
     def _get_calibration_dir(self):
         """
@@ -186,7 +197,8 @@ class Instrument(object):
         """
         :return: this instrument's saved calibrations data
         """
-        return self._read_calibrations().get(self.calibration_key)
+        data = self._read_calibrations()['data']
+        return data.get(self.calibration_key)
 
     def _build_calibration_data(self):
         """
@@ -206,8 +218,24 @@ class Instrument(object):
             try:
                 loaded_json = json.load(f)
             except json.decoder.JSONDecodeError:
-                loaded_json = {}
+                self._write_blank_calibrations_file()
+                return self._read_calibrations()
             return self._restore_vector(loaded_json)
+
+    def _check_calibrations_version(self):
+        """
+        Read calibration file, and checks for version number
+        If no version number, file is replaced with version number
+        """
+        with open(self._get_calibration_file_path()) as f:
+            try:
+                file = json.load(f)
+                version = file.get('version')
+                data = file.get('data')
+                if not version or not data or len(file.keys()) > 2:
+                    self._write_blank_calibrations_file()
+            except json.decoder.JSONDecodeError:
+                self._write_blank_calibrations_file()
 
     def _strip_vector(self, obj, root=True):
         """

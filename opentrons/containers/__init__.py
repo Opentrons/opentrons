@@ -1,4 +1,5 @@
 from opentrons.containers.persisted_containers import get_persisted_container
+from opentrons.containers.persisted_containers import list_container_names
 from opentrons.containers.placeable import (
     Deck,
     Slot,
@@ -37,3 +38,7 @@ def load(container_name, slot, label=None):
         label = container_name
     protocol = Robot.get_instance()
     return protocol.add_container(container_name, slot, label)
+
+
+def list():
+    return list_container_names()
