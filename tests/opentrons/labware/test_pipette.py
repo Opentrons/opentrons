@@ -368,7 +368,9 @@ class PipetteTest(unittest.TestCase):
         self.p200.transfer(
             30,
             self.plate[0],
-            self.plate[1:9]
+            self.plate[1:9],
+            touch=True,
+            blow=True
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -397,6 +399,7 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'A2'],
             ['touch'],
             ['blow'],
+            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -421,32 +424,39 @@ class PipetteTest(unittest.TestCase):
             ['pick'],
             ['aspirating', '30', 'A1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'B1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'C1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'D1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'E1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'F1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'G1'],
             ['dispensing', '30', 'A2'],
             ['aspirating', '30', 'H1'],
             ['dispensing', '30', 'A2'],
+            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -459,7 +469,10 @@ class PipetteTest(unittest.TestCase):
         self.p200.transfer(
             30,
             self.plate[0:8],
-            self.plate[1:9]
+            self.plate[1:9],
+            touch=True,
+            blow=True,
+            trash=True
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -549,6 +562,7 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '200', 'B1'],
             ['aspirating', '100', 'A1'],
             ['dispensing', '100', 'B1'],
+            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -581,6 +595,41 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '70', 'G2'],
             ['aspirating', '80', 'A1'],
             ['dispensing', '80', 'H2'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+        self.p200.reset()
+        self.p200.transfer(
+            (10, 80),
+            self.plate[0],
+            self.plate.rows[1],
+            touch=False,
+            blow=False,
+            gradient=lambda x: 1.0 - x
+        )
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '150', 'A1'],
+            ['dispensing', '80', 'A2'],
+            ['dispensing', '70', 'B2'],
+            ['aspirating', '200', 'A1'],
+            ['dispensing', '60', 'C2'],
+            ['dispensing', '50', 'D2'],
+            ['dispensing', '40', 'E2'],
+            ['dispensing', '30', 'F2'],
+            ['aspirating', '30', 'A1'],
+            ['dispensing', '20', 'G2'],
+            ['dispensing', '10', 'H2'],
+            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -606,6 +655,7 @@ class PipetteTest(unittest.TestCase):
             ['pick'],
             ['aspirating', '200', 'A1'],
             ['dispensing', '200', 'A2'],
+            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))

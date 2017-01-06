@@ -1028,7 +1028,7 @@ class Pipette(Instrument):
     def transfer(self, volumes, sources, targets, **kwargs):
 
         tips = kwargs.get('tips', 1)
-        trash = kwargs.get('trash', True)
+        trash = kwargs.get('trash', False)
         enqueue = kwargs.get('enqueue', True)
 
         # if trash and not self.trash_container:
@@ -1049,7 +1049,7 @@ class Pipette(Instrument):
 
         total_transfers = len(targets)
         volumes = helpers._create_volume_pairs(
-            volumes, total_transfers, kwargs.get('interpolate', None))
+            volumes, total_transfers, kwargs.get('gradient', None))
 
         for i in range(total_transfers):
 
@@ -1070,14 +1070,14 @@ class Pipette(Instrument):
 
         enqueue = kwargs.get('enqueue', True)
         rate = kwargs.get('rate', 1)
-        touch = kwargs.get('touch', True)
+        touch = kwargs.get('touch', False)
         mix = kwargs.get('mix', (0, 0))
-        blow = kwargs.get('blow', True)
-        separate_sources = kwargs.get('separate', False)
+        blow = kwargs.get('blow', False)
+        repeater = kwargs.get('repeater', True)
 
         while volumes[0] > 0:
             if self.current_volume < volumes[0]:
-                if separate_sources:
+                if not repeater:
                     source_volumes = [volumes[0]]
                 else:
                     source_volumes = helpers._match_volumes_to_sources(
