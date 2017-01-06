@@ -637,6 +637,11 @@ class PipetteTest(unittest.TestCase):
             expected
         )
 
+    def test_tip_tracking_start_at_tip(self):
+        self.p200.start_at_tip(self.tiprack1['B2'])
+        self.p200.pick_up_tip()
+        self.assertEquals(self.tiprack1['B2'], self.p200.current_tip())
+
     def test_tip_tracking_return(self):
         self.p200.drop_tip = mock.Mock()
 
