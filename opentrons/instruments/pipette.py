@@ -385,6 +385,10 @@ class Pipette(Instrument):
             self.motor.speed(speed)
             self.motor.move(destination)
 
+        # if volume is specified as 0uL, then do nothing
+        if volume is 0:
+            return self
+
         _description = "Aspirating {0}uL at {1}".format(
             volume,
             (humanize_location(location) if location else '<In Place>')
@@ -496,6 +500,10 @@ class Pipette(Instrument):
 
             self.motor.speed(speed)
             self.motor.move(destination)
+
+        # if volume is specified as 0uL, then do nothing
+        if volume is 0:
+            return self
 
         _description = "Dispensing {0}uL at {1}".format(
             volume,
@@ -772,6 +780,70 @@ class Pipette(Instrument):
             setup=_setup,
             description=_description,
             enqueue=enqueue)
+
+        return self
+
+    # QUEUEABLE
+    def air_gap(self, volume=None, height=None, enqueue=True):
+        """
+        Pull air into the :any:`Pipette` current tip
+
+        Notes
+        -----
+        If no `location` is passed, the pipette will touch_tip
+        from it's current position.
+
+        Parameters
+        ----------
+        volume : number
+            The amount in uL to aspirate air into the tube.
+            (Default will use all remaining volume in tip)
+
+        height : number
+            The number of millimiters to move above the current Placeable
+            to perform and air-gap aspirate
+            (Default will be 10mm above current Placeable)
+
+        Returns
+        -------
+
+        This instance of :class:`Pipette`.
+
+        Examples
+        --------
+        ..
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p200.air_gap(50) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        """
+
+        def _setup():
+            pass
+
+        def _do():
+            pass
+
+        # if volumes is specified as 0uL, do nothing
+        if volume is 0:
+            return self
+
+        _description = 'Air gap'
+        self.create_command(
+            do=_do,
+            setup=_setup,
+            description=_description,
+            enqueue=enqueue)
+
+        if height is None:
+            height = 20
+
+        location = self.previous_placeable.top(height)
+        # "move_to" separate from aspirate command
+        # so "_position_for_aspirate" isn't executed
+        self.move_to(location, enqueue=enqueue)
+        self.aspirate(volume, enqueue=enqueue)
 
         return self
 

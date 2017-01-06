@@ -529,6 +529,31 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
+    def test_air_gap(self):
+        self.p200.aspirate(50, self.plate[0])
+        self.p200.air_gap()
+        self.assertEquals(self.p200.current_volume, 200)
+
+        self.p200.dispense()
+        self.p200.aspirate(50, self.plate[1])
+        self.p200.air_gap(10)
+        self.assertEquals(self.p200.current_volume, 60)
+
+        self.p200.dispense()
+        self.p200.aspirate(50, self.plate[2])
+        self.p200.air_gap(10, 10)
+        self.assertEquals(self.p200.current_volume, 60)
+
+        self.p200.dispense()
+        self.p200.aspirate(50, self.plate[2])
+        self.p200.air_gap(0)
+        self.assertEquals(self.p200.current_volume, 50)
+
+    def test_pipette_home(self):
+        self.p200.motor.home = mock.Mock()
+        self.p200.home()
+        self.assertEquals(len(self.robot.commands()), 1)
+
     def test_mix_with_named_args(self):
         self.p200.current_volume = 100
         self.p200.aspirate = mock.Mock()
