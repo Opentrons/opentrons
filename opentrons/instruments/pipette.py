@@ -88,6 +88,7 @@ class Pipette(Instrument):
 
         self.trash_container = trash_container
         self.tip_racks = tip_racks
+        self.starting_tip = None
 
         # default mm above tip to execute drop-tip
         # this gives room for the drop-tip mechanism to work
@@ -187,11 +188,19 @@ class Pipette(Instrument):
             iterables = self.tip_racks
 
             if self.channels > 1:
-                iterables = []
-                for rack in self.tip_racks:
-                    iterables.append(rack.rows)
+                iterables = [r for rack in self.tip_racks for r in rack.rows]
+            else:
+                iterables = [w for rack in self.tip_racks for w in rack]
 
-            self.tip_rack_iter = itertools.chain(*iterables)
+            if self.starting_tip:
+                iterables = iterables[iterables.index(self.starting_tip):]
+
+            self.tip_rack_iter = itertools.chain(iterables)
+
+    def start_at_tip(self, _tip):
+        if isinstance(_tip, Placeable):
+            self.starting_tip = _tip
+            self.reset_tip_tracking()
 
     def get_next_tip(self):
         next_tip = None
