@@ -570,7 +570,9 @@ class WellSeries(Placeable):
     """
     def __init__(self, items):
         self.items = items
-        self.values = list(self.items.values())
+        if isinstance(items, dict):
+            items = list(self.items.values())
+        self.values = items
         self.offset = 0
 
     def set_offset(self, offset):

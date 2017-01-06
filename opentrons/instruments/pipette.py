@@ -88,6 +88,7 @@ class Pipette(Instrument):
 
         self.trash_container = trash_container
         self.tip_racks = tip_racks
+        self.starting_tip = None
 
         # default mm above tip to execute drop-tip
         # this gives room for the drop-tip mechanism to work
@@ -180,20 +181,44 @@ class Pipette(Instrument):
         """
         Resets the :any:`Pipette` tip tracking, "refilling" the tip racks
         """
-        self.current_tip_home_well = None
+        self.current_tip(None)
         self.tip_rack_iter = iter([])
 
         if self.has_tip_rack():
             iterables = self.tip_racks
 
             if self.channels > 1:
-                iterables = []
-                for rack in self.tip_racks:
-                    iterables.append(rack.rows)
+                iterables = [r for rack in self.tip_racks for r in rack.rows]
+            else:
+                iterables = [w for rack in self.tip_racks for w in rack]
 
-            self.tip_rack_iter = itertools.cycle(
-                itertools.chain(*iterables)
-            )
+            if self.starting_tip:
+                iterables = iterables[iterables.index(self.starting_tip):]
+
+            self.tip_rack_iter = itertools.chain(iterables)
+
+    def current_tip(self, *args):
+        if len(args) and (isinstance(args[0], Placeable) or args[0] is None):
+            self.current_tip_home_well = args[0]
+        return self.current_tip_home_well
+
+    def start_at_tip(self, _tip):
+        if isinstance(_tip, Placeable):
+            self.starting_tip = _tip
+            self.reset_tip_tracking()
+
+    def get_next_tip(self):
+        next_tip = None
+        if self.has_tip_rack():
+            try:
+                next_tip = next(self.tip_rack_iter)
+            except StopIteration as e:
+                raise RuntimeWarning(
+                    '{0} has run out of tips'.format(self.name))
+        else:
+            self.robot.add_warning(
+                'pick_up_tip called with no reference to a tip')
+        return next_tip
 
     def _associate_placeable(self, location):
         """
@@ -803,11 +828,11 @@ class Pipette(Instrument):
             description=_description,
             enqueue=enqueue)
 
-        if not self.current_tip_home_well:
+        if not self.current_tip():
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.drop_tip(self.current_tip_home_well, enqueue=enqueue)
+        self.drop_tip(self.current_tip(), enqueue=enqueue)
 
         return self
 
@@ -860,17 +885,12 @@ class Pipette(Instrument):
         def _setup():
             nonlocal location
             if not location:
-                if self.has_tip_rack():
-                    # TODO: raise warning/exception if looped back to first tip
-                    location = next(self.tip_rack_iter)
-                else:
-                    self.robot.add_warning(
-                        'pick_up_tip called with no reference to a tip')
+                location = self.get_next_tip()
 
-            self.current_tip_home_well = None
+            self.current_tip(None)
             if location:
                 placeable, _ = containers.unpack_location(location)
-                self.current_tip_home_well = placeable
+                self.current_tip(placeable)
 
             if isinstance(location, Placeable):
                 location = location.bottom()
@@ -959,7 +979,7 @@ class Pipette(Instrument):
                 location = location.bottom(self._drop_tip_offset)
 
             self._associate_placeable(location)
-            self.current_tip_home_well = None
+            self.current_tip(None)
 
             self.current_volume = 0
 
