@@ -461,6 +461,46 @@ class PipetteTest(unittest.TestCase):
             ]
         )
 
+    def test_touch_tip(self):
+        self.p200.move_to = mock.Mock()
+        self.p200.touch_tip(self.plate[0])
+        self.p200.touch_tip(-3)
+
+        self.robot.simulate()
+
+        from pprint import pprint
+        pprint(self.p200.move_to.mock_calls)
+
+        expected = [
+            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(
+                (self.plate[0], (6.40, 3.20, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (0.00, 3.20, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 6.40, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 0.00, 10.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(
+                (self.plate[0], (6.40, 3.20, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (0.00, 3.20, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 6.40, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 0.00, 7.50)),
+                enqueue=False, strategy='direct')]
+
+        self.assertEquals(expected, self.p200.move_to.mock_calls)
+
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
         # so that you have liquid

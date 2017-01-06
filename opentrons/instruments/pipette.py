@@ -691,8 +691,12 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        height_offset = 0
         def _setup():
-            nonlocal location
+            nonlocal location, height_offset
+            if isinstance(location, (int, float, complex)):
+                height_offset = location
+                location = self.previous_placeable
             self._associate_placeable(location)
 
         def _do():
@@ -706,19 +710,31 @@ class Pipette(Instrument):
                 location = self.previous_placeable
 
             self.move_to(
-                (location, location.from_center(x=1, y=0, z=1)),
+                (
+                    location,
+                    location.from_center(x=1, y=0, z=1) + (0, 0, height_offset)
+                ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
-                (location, location.from_center(x=-1, y=0, z=1)),
+                (
+                    location,
+                    location.from_center(x=-1, y=0, z=1) + (0, 0, height_offset)
+                ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
-                (location, location.from_center(x=0, y=1, z=1)),
+                (
+                    location,
+                    location.from_center(x=0, y=1, z=1) + (0, 0, height_offset)
+                ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
-                (location, location.from_center(x=0, y=-1, z=1)),
+                (
+                    location,
+                    location.from_center(x=0, y=-1, z=1) + (0, 0, height_offset)
+                ),
                 strategy='direct',
                 enqueue=False)
 
