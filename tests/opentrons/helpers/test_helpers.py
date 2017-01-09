@@ -94,27 +94,27 @@ class HelpersTest(unittest.TestCase):
         self.assertEquals(expected, result)
 
         result = helpers._create_volume_pairs(
-            [0, 10], 11, interpolate=lambda x: 1 - x)
+            [0, 10], 11, gradient=lambda x: 1 - x)
         expected = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
         for i in range(len(result)):
             self.assertAlmostEquals(result[i], expected[i])
 
-    def test_match_volumes_to_sources(self):
+    def test_match_volumes_with_same_source(self):
         s = [self.plate[0], self.plate[0], self.plate[0]]
         v = [1, 1, 2]
-        result = helpers._match_volumes_to_sources(v, s)
+        result = helpers._match_volumes_with_same_source(v, s)
         expected = [1, 1, 2]
         self.assertEquals(result, expected)
 
         s = [self.plate[0], self.plate[0], self.plate[1]]
         v = [1, 1, 2]
-        result = helpers._match_volumes_to_sources(v, s)
+        result = helpers._match_volumes_with_same_source(v, s)
         expected = [1, 1]
         self.assertEquals(result, expected)
 
         s = [self.plate[0], self.plate[1], self.plate[0]]
         v = [1, 1, 2]
-        result = helpers._match_volumes_to_sources(v, s)
+        result = helpers._match_volumes_with_same_source(v, s)
         expected = [1]
         self.assertEquals(result, expected)
 
