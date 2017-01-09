@@ -672,9 +672,6 @@ class PipetteTest(unittest.TestCase):
 
         self.robot.simulate()
 
-        from pprint import pprint
-        pprint(self.p200.move_to.mock_calls)
-
         expected = [
             mock.call(self.plate[0], enqueue=False, strategy='arc'),
             mock.call(
