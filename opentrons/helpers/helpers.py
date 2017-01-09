@@ -121,20 +121,20 @@ def _create_well_pairs(s, t):
     return (s, t)
 
 
-def _create_volume_gradient(min_v, max_v, total, interpolate=None):
+def _create_volume_gradient(min_v, max_v, total, gradient=None):
 
     diff_vol = max_v - min_v
 
     def _map_volume(i):
         nonlocal diff_vol, total
         rel_x = i / (total - 1)
-        rel_y = interpolate(rel_x) if interpolate else rel_x
+        rel_y = gradient(rel_x) if gradient else rel_x
         return (rel_y * diff_vol) + min_v
 
     return [_map_volume(i) for i in range(total)]
 
 
-def _create_volume_pairs(v, total, interpolate=None):
+def _create_volume_pairs(v, total, gradient=None):
 
     v = _get_list(v)
     t_vol = len(v)
@@ -148,7 +148,7 @@ def _create_volume_pairs(v, total, interpolate=None):
         return v * total
     elif len(v) == 2:
         v = _create_volume_gradient(
-            v[0], v[1], total, interpolate=interpolate)
+            v[0], v[1], total, gradient=gradient)
         return v
 
 
@@ -161,7 +161,7 @@ def _find_aspirate_volume(volumes, remaining_volume):
     return aspirate_volume
 
 
-def _match_volumes_to_sources(volumes, sources):
+def _match_volumes_with_same_source(volumes, sources):
     same_source_volumes = [volumes[0]]
     for i in range(1, len(volumes)):
         if sources[i] != sources[0]:

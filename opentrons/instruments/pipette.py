@@ -170,12 +170,6 @@ class Pipette(Instrument):
         """
         self.positions = self.calibrated_positions
 
-    def tip(self):
-        """
-        Returns the origin location of the currently held tip or None
-        """
-        return self.current_tip_home_well
-
     def has_tip_rack(self):
         """
         Returns True of this :any:`Pipette` was instantiated with tip_racks
@@ -1139,14 +1133,9 @@ class Pipette(Instrument):
         trash = kwargs.get('trash', False)
         enqueue = kwargs.get('enqueue', True)
 
-        # if trash and not self.trash_container:
-        #     raise RuntimeError('Requires trash attached to pipette')
-        # if tips and not self.has_tip_rack():
-        #     raise RuntimeError('Requires tip rack attached to pipette')
-
         # SPECIAL CASE: using multi-channel pipette,
         # and the source/target is WellSeries
-        # then treat the WellSeries as a single location
+        # then treat the WellSeries as a single location (not an iterable)
         if self.channels > 1:
             if isinstance(sources, WellSeries):
                 sources = [sources]
@@ -1157,17 +1146,17 @@ class Pipette(Instrument):
 
         total_transfers = len(targets)
         volumes = helpers._create_volume_pairs(
-            volumes, total_transfers, kwargs.get('gradient', None))
+            volumes,
+            total_transfers,
+            gradient=kwargs.get('gradient', None)
+        )
 
         for i in range(total_transfers):
-
-            if tips > 0 and not self.tip():
+            if tips > 0 and not self.current_tip():
                 self.pick_up_tip(enqueue=enqueue)
-
             self._transfer_single_volume(
                 volumes[i:], sources[i:], targets[i:], **kwargs)
-
-            if tips > 1 or i + 1 == total_transfers:
+            if tips > 1 or (i + 1 == total_transfers):
                 tips -= 1
                 if trash and self.trash_container:
                     self.drop_tip(enqueue=enqueue)
@@ -1188,7 +1177,7 @@ class Pipette(Instrument):
                 if not repeater:
                     source_volumes = [volumes[0]]
                 else:
-                    source_volumes = helpers._match_volumes_to_sources(
+                    source_volumes = helpers._match_volumes_with_same_source(
                         volumes, sources)
                 a_volume = helpers._find_aspirate_volume(
                     source_volumes, self.max_volume - self.current_volume)
