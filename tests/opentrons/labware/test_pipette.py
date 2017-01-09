@@ -63,6 +63,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate()
         self.assertEquals(self.p200.current_volume, 202)
 
+        self.assertRaises(RuntimeError, self.p200.set_max_volume, 9)
+
     def test_calibrate_by_position_name(self):
 
         self.p200.motor.move(9)
