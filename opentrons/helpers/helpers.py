@@ -1,6 +1,7 @@
 import json
 
 from opentrons.util.vector import Vector
+from opentrons.containers.placeable import Placeable
 
 
 def unpack_coordinates(coordinates):
@@ -115,9 +116,15 @@ def _create_well_pairs(s, t):
     if length > min(len(s), len(t)) > 1:
         raise RuntimeError('Sources and Targets list lengths do not match')
     elif len(s) == 1:
-        s *= length
+        if isinstance(s, Placeable):
+            s = [s] * length
+        else:
+            s *= length
     elif len(t) == 1:
-        t *= length
+        if isinstance(t, Placeable):
+            t = [t] * length
+        else:
+            t *= length
     return (s, t)
 
 
