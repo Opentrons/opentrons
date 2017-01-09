@@ -96,7 +96,7 @@ tube-rack-.75ml
 
 **Accessing Tubes:** *single channel* ``[‘A1’]-[‘D6’]``
 
-..image:: img/labware_lib/Tuberack-0.75ml.png
+.. image:: img/labware_lib/Tuberack-075ml.png
 
 
 tube-rack-2ml 
@@ -116,7 +116,7 @@ rack that holds 6 15 mL tubes and 4 50 mL tubes
 
 **Accessing Tubes:** *single channel* ``[‘A1’]-[‘A3’], [‘B1’]-[‘B3’], [‘C1’]-[‘C2’], [‘D1’]-[‘D2’]``
 
-..image:: img/labware_lib/Tuberack-15-50ml.png
+.. image:: img/labware_lib/Tuberack-15-50ml.png
 
 
 Plates
