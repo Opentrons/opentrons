@@ -295,6 +295,14 @@ class PipetteTest(unittest.TestCase):
             self.p200.aspirate(500)
             self.robot.run()
 
+    def test_volume_percentage(self):
+        self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
+        self.assertRaises(RuntimeError, self.p200._volume_percentage, 300)
+        self.assertEquals(self.p200._volume_percentage(100), 0.5)
+        self.assertEquals(len(self.robot.get_warnings()), 0)
+        self.p200._volume_percentage(self.p200.min_volume / 2)
+        self.assertEquals(len(self.robot.get_warnings()), 1)
+
     def test_dispense(self):
         self.p200.aspirate(100)
         self.p200.dispense(20)
@@ -614,9 +622,9 @@ class PipetteTest(unittest.TestCase):
             blow=False,
             gradient=lambda x: 1.0 - x
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
         expected = [
             ['pick'],
             ['aspirating', '150', 'A1'],
