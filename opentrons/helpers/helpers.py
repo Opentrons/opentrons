@@ -217,7 +217,7 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
 
 
 def _compress_for_consolidate(max_vol, plan, **kwargs):
-    target = plan[0]['aspirate']['location']
+    target = plan[0]['dispense']['location']
     d_vol = 0
     temp_aspirates = []
     new_transfer_plan = []
