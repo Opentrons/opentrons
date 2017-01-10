@@ -376,7 +376,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_transfer(self):
         self.p200.reset()
-        self.p200.transfer(
+        self.p200.distribute(
             30,
             self.plate[0],
             self.plate[1:9],
@@ -420,13 +420,14 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.transfer(
+        self.p200.consolidate(
             30,
             self.plate[0:8],
             self.plate[8],
             blow=False,
             touch=False,
-            tips=7
+            tips=7,
+            repeater=False
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -539,7 +540,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.transfer(
+        self.p200.distribute(
             30,
             self.plate[0],
             self.plate
@@ -583,7 +584,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.transfer(
+        self.p200.distribute(
             (10, 80),
             self.plate[0],
             self.plate.rows[1],
@@ -616,7 +617,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.transfer(
+        self.p200.distribute(
             (10, 80),
             self.plate[0],
             self.plate.rows[1],
@@ -637,8 +638,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '50', 'D2'],
             ['dispensing', '40', 'E2'],
             ['dispensing', '30', 'F2'],
-            ['aspirating', '30', 'A1'],
             ['dispensing', '20', 'G2'],
+            ['aspirating', '10', 'A1'],
             ['dispensing', '10', 'H2'],
             ['return'],
             ['drop']

@@ -1127,11 +1127,17 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def transfer(self, volumes, sources, targets, **kwargs):
+    def distribute(self, *args, **kwargs):
+        kwargs['mode'] = 'distribute'
+        self.transfer(*args, **kwargs)
 
-        tips = kwargs.get('tips', 1)
-        trash = kwargs.get('trash', False)
-        enqueue = kwargs.get('enqueue', True)
+    # QUEUEABLE
+    def consolidate(self, *args, **kwargs):
+        kwargs['mode'] = 'consolidate'
+        self.transfer(*args, **kwargs)
+
+    # QUEUEABLE
+    def transfer(self, volumes, sources, targets, **kwargs):
 
         # SPECIAL CASE: using multi-channel pipette,
         # and the source/target is WellSeries
@@ -1142,62 +1148,71 @@ class Pipette(Instrument):
             if isinstance(targets, WellSeries):
                 targets = [targets]
 
-        sources, targets = helpers._create_well_pairs(sources, targets)
+        kwargs['mode'] = kwargs.get('mode', 'transfer')
+        transfer_plan = helpers._create_transfer_plan(
+            volumes, sources, targets, **kwargs)
+        transfer_plan = helpers._expand_for_carryover(
+            self.max_volume, transfer_plan, **kwargs)
+        transfer_plan = helpers._compress_for_repeater(
+            self.max_volume, transfer_plan, **kwargs)
 
-        total_transfers = len(targets)
-        volumes = helpers._create_volume_pairs(
-            volumes,
-            total_transfers,
-            gradient=kwargs.get('gradient', None)
-        )
+        tips = kwargs.get('tips', 1)
+        if 'tips' in kwargs:
+            del kwargs['tips']
+        total_transfers = len(transfer_plan)
+        for i, plan in enumerate(transfer_plan):
+            this_aspirate = plan.get('aspirate')
+            if this_aspirate:
+                vol = this_aspirate['volume']
+                loc = this_aspirate['location']
+                self._add_tip_during_transfer(tips, **kwargs)
+                self._handle_aspirate_options(vol, loc, **kwargs)
+            this_dispense = plan.get('dispense')
+            if this_dispense:
+                vol = this_dispense['volume']
+                loc = this_dispense['location']
+                self._handle_dispense_options(vol, loc, **kwargs)
+                tips = self._remove_tip_during_transfer(
+                    tips, i, total_transfers, **kwargs)
 
-        for i in range(total_transfers):
-            if tips > 0 and not self.current_tip():
-                self.pick_up_tip(enqueue=enqueue)
-            self._transfer_single_volume(
-                volumes[i:], sources[i:], targets[i:], **kwargs)
-            if tips > 1 or (i + 1 == total_transfers):
-                tips -= 1
-                if trash and self.trash_container:
-                    self.drop_tip(enqueue=enqueue)
-                else:
-                    self.return_tip(enqueue=enqueue)
-
-    def _transfer_single_volume(self, volumes, sources, targets, **kwargs):
-
+    def _add_tip_during_transfer(self, tips, **kwargs):
         enqueue = kwargs.get('enqueue', True)
+        if tips > 0 and not self.current_tip():
+            self.pick_up_tip(enqueue=enqueue)
+
+    def _remove_tip_during_transfer(self, tips, i, total, **kwargs):
+        enqueue = kwargs.get('enqueue', True)
+        trash = kwargs.get('trash', False)
+        if tips > 1 or (i + 1 == total):
+            tips -= 1
+            if trash and self.trash_container:
+                self.drop_tip(enqueue=enqueue)
+            else:
+                self.return_tip(enqueue=enqueue)
+        return tips
+
+    def _handle_aspirate_options(self, vol, loc, **kwargs):
+        enqueue = kwargs.get('enqueue', True)
+        touch = kwargs.get('touch', False)
         rate = kwargs.get('rate', 1)
+        self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
+        if touch:
+            self.touch_tip(enqueue=enqueue)
+
+    def _handle_dispense_options(self, vol, loc, **kwargs):
+        enqueue = kwargs.get('enqueue', True)
         touch = kwargs.get('touch', False)
         mix = kwargs.get('mix', (0, 0))
         blow = kwargs.get('blow', False)
-        repeater = kwargs.get('repeater', True)
-
-        while volumes[0] > 0:
-            if self.current_volume < volumes[0]:
-                if not repeater:
-                    source_volumes = [volumes[0]]
-                else:
-                    source_volumes = helpers._match_volumes_with_same_source(
-                        volumes, sources)
-                a_volume = helpers._find_aspirate_volume(
-                    source_volumes, self.max_volume - self.current_volume)
-                self.aspirate(
-                    a_volume, sources[0], rate=rate, enqueue=enqueue)
-                if touch:
-                    self.touch_tip(enqueue=enqueue)
-
-            dispense_volume = min(volumes[0], self.current_volume)
-            volumes[0] -= dispense_volume
-            self.dispense(
-                dispense_volume, targets[0], rate=rate, enqueue=enqueue)
-
-            if volumes[0] <= 0 and isinstance(mix, (tuple, list)):
-                if len(mix) == 2 and sum(mix):
-                    self.mix(mix[0], mix[1], enqueue=enqueue)
-            if touch:
-                self.touch_tip(enqueue=enqueue)
-            if blow and self.current_volume == 0:
-                self.blow_out(enqueue=enqueue)
+        rate = kwargs.get('rate', 1)
+        self.dispense(vol, loc, rate=rate, enqueue=enqueue)
+        if self.current_volume == 0 and isinstance(mix, (tuple, list)):
+            if len(mix) == 2 and 0 not in mix:
+                self.mix(mix[0], mix[1], enqueue=enqueue)
+        if touch:
+            self.touch_tip(enqueue=enqueue)
+        if blow and self.current_volume == 0:
+            self.blow_out(enqueue=enqueue)
 
     # QUEUEABLE
     def delay(self, seconds, enqueue=True):

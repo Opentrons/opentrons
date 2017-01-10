@@ -107,27 +107,6 @@ def _get_list(n):
     return [n]
 
 
-def _create_well_pairs(s, t):
-
-    # make source and targets lists of equal length
-    s = _get_list(s)
-    t = _get_list(t)
-    length = max(len(s), len(t))
-    if length > min(len(s), len(t)) > 1:
-        raise RuntimeError('Sources and Targets list lengths do not match')
-    elif len(s) == 1:
-        if isinstance(s, Placeable):
-            s = [s] * length
-        else:
-            s *= length
-    elif len(t) == 1:
-        if isinstance(t, Placeable):
-            t = [t] * length
-        else:
-            t *= length
-    return (s, t)
-
-
 def _create_volume_gradient(min_v, max_v, total, gradient=None):
 
     diff_vol = max_v - min_v
@@ -141,7 +120,9 @@ def _create_volume_gradient(min_v, max_v, total, gradient=None):
     return [_map_volume(i) for i in range(total)]
 
 
-def _create_volume_pairs(v, total, gradient=None):
+def _create_volume_pairs(v, total, **kwargs):
+
+    gradient = kwargs.get('gradient', None)
 
     v = _get_list(v)
     t_vol = len(v)
@@ -159,19 +140,134 @@ def _create_volume_pairs(v, total, gradient=None):
         return v
 
 
-def _find_aspirate_volume(volumes, remaining_volume):
-    aspirate_volume = min(volumes[0], remaining_volume)
-    for n in range(1, len(volumes)):
-        if aspirate_volume + volumes[n] > remaining_volume:
-            break
-        aspirate_volume += volumes[n]
-    return aspirate_volume
+def _create_transfer_plan(v, s, t, **kwargs):
+    t = _get_list(t)
+    s = _get_list(s)
+    mode = kwargs.get('mode', 'transfer')
+    if mode == 'transfer':
+        if len(s) != len(t):
+            raise RuntimeError(
+                'Transfer sources/targets must be same length')
+    elif mode == 'distribute':
+        if not (len(t) >= len(s) == 1):
+            raise RuntimeError(
+                'Distribute must have 1 source and multiple targets')
+        s *= len(t)
+    elif mode == 'consolidate':
+        if not (len(s) >= len(t) == 1):
+            raise RuntimeError(
+                'Consolidate must have multiple sources and 1 target')
+        t *= len(s)
+
+    total_transfers = len(t)
+    v = _create_volume_pairs(v, total_transfers, **kwargs)
+
+    transfer_plan = []
+    for i in range(total_transfers):
+        transfer_plan.append({
+            'aspirate': {'location': s[i], 'volume': v[i]},
+            'dispense': {'location': t[i], 'volume': v[i]}
+        })
+    return transfer_plan
 
 
-def _match_volumes_with_same_source(volumes, sources):
-    same_source_volumes = [volumes[0]]
-    for i in range(1, len(volumes)):
-        if sources[i] != sources[0]:
-            break
-        same_source_volumes.append(volumes[i])
-    return same_source_volumes
+def _compress_for_repeater(max_vol, plan, **kwargs):
+    max_vol = float(max_vol)
+    mode = kwargs.get('mode', 'transfer')
+    repeater = kwargs.get('repeater', True)
+    if not repeater:
+        return plan
+    new_transfer_plan = []
+    if mode == 'distribute':  # combine target volumes into single aspirate
+        return _compress_for_distribute(max_vol, plan, **kwargs)
+    if mode == 'consolidate':  # combine target volumes into multiple aspirates
+        return _compress_for_consolidate(max_vol, plan, **kwargs)
+    else:
+        return plan
+
+
+def _compress_for_distribute(max_vol, plan, **kwargs):
+    source = plan[0]['aspirate']['location']
+    a_vol = 0
+    temp_dispenses = []
+    new_transfer_plan = []
+
+    def _add():
+        nonlocal a_vol, temp_dispenses, new_transfer_plan, source
+        new_transfer_plan.append({
+            'aspirate': {
+                'location': source, 'volume': a_vol
+            }
+        })
+        for d in temp_dispenses:
+            new_transfer_plan.append({
+                'dispense': {
+                    'location': d['location'], 'volume': d['volume']
+                }
+            })
+        a_vol = 0
+        temp_dispenses = []
+
+    for i, p in enumerate(plan):
+        this_vol = p['aspirate']['volume']
+        if this_vol + a_vol > max_vol:
+            _add()
+        a_vol += this_vol
+        temp_dispenses.append(p['dispense'])
+    _add()
+    return new_transfer_plan
+
+
+def _compress_for_consolidate(max_vol, plan, **kwargs):
+    target = plan[0]['aspirate']['location']
+    d_vol = 0
+    temp_aspirates = []
+    new_transfer_plan = []
+
+    def _add():
+        nonlocal d_vol, temp_aspirates, new_transfer_plan, target
+        for a in temp_aspirates:
+            new_transfer_plan.append({
+                'aspirate': {
+                    'location': a['location'], 'volume': a['volume']
+                }
+            })
+        new_transfer_plan.append({
+            'dispense': {
+                'location': target, 'volume': d_vol
+            }
+        })
+        d_vol = 0
+        temp_aspirates = []
+
+    for i, p in enumerate(plan):
+        this_vol = p['aspirate']['volume']
+        if this_vol + d_vol > max_vol:
+            _add()
+        d_vol += this_vol
+        temp_aspirates.append(p['aspirate'])
+    _add()
+    return new_transfer_plan
+
+
+def _expand_for_carryover(max_vol, plan, **kwargs):
+    max_vol = float(max_vol)
+    carryover = kwargs.get('carryover', True)
+    if not carryover:
+        return plan
+    new_transfer_plan = []
+    for p in plan:
+        source = p['aspirate']['location']
+        target = p['dispense']['location']
+        volume = float(p['aspirate']['volume'])
+        while volume > max_vol:
+            new_transfer_plan.append({
+                'aspirate': {'location': source, 'volume': max_vol},
+                'dispense': {'location': target, 'volume': max_vol}
+            })
+            volume -= max_vol
+        new_transfer_plan.append({
+            'aspirate': {'location': source, 'volume': float(volume)},
+            'dispense': {'location': target, 'volume': float(volume)}
+        })
+    return new_transfer_plan
