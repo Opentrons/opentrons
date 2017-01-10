@@ -1,7 +1,6 @@
 import json
 
 from opentrons.util.vector import Vector
-from opentrons.containers.placeable import Placeable
 
 
 def unpack_coordinates(coordinates):
@@ -177,7 +176,6 @@ def _compress_for_repeater(max_vol, plan, **kwargs):
     repeater = kwargs.get('repeater', True)
     if not repeater:
         return plan
-    new_transfer_plan = []
     if mode == 'distribute':  # combine target volumes into single aspirate
         return _compress_for_distribute(max_vol, plan, **kwargs)
     if mode == 'consolidate':  # combine target volumes into multiple aspirates
