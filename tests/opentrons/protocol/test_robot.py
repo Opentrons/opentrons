@@ -62,7 +62,7 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             nonlocal res
-            res = self.robot.run()
+            self.assertRaises(RuntimeError(self.robot.run))
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -70,9 +70,6 @@ class RobotTest(unittest.TestCase):
         self.robot.stop()
 
         thread.join()
-
-        self.assertEquals(
-            res[-1], 'Received a STOP signal and exited from movements')
 
     def test_calibrated_max_dimension(self):
 

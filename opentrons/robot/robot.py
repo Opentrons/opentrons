@@ -766,8 +766,9 @@ class Robot(object, metaclass=Singleton):
                     'name': 'command-failed',
                     'error': str(e)
                 })
-                self.add_warning(str(e))
-                break
+                raise RuntimeError(
+                    'Command #{0} failed (\"{1}\"").\nError: \"{2}\"'.format(
+                        i, command.description, str(e))) from e
 
         return self._runtime_warnings
 
