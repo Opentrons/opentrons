@@ -16,6 +16,12 @@ class VectorTestCase(unittest.TestCase):
         self.assertEqual(v3, (1, 2, 3))
         self.assertEqual(v4, Vector(1, 0, 0))
 
+        self.assertRaises(ValueError, Vector)
+
+    def test_repr(self):
+        v1 = Vector(1, 2, 3)
+        self.assertEquals(str(v1), '(x=1.00, y=2.00, z=3.00)')
+
     def test_add(self):
         v1 = Vector(1, 2, 3)
         v2 = Vector(4, 5, 6)

@@ -62,7 +62,7 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             nonlocal res
-            res = self.robot.run()
+            self.assertRaises(RuntimeError(self.robot.run))
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -71,8 +71,17 @@ class RobotTest(unittest.TestCase):
 
         thread.join()
 
-        self.assertEquals(
-            res[-1], 'Received a STOP signal and exited from movements')
+    def test_exceptions_during_run(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+
+        def _do():
+            return 'hello' / 3
+
+        p200.create_command(
+            do=_do,
+            enqueue=True)
+
+        self.assertRaises(RuntimeError, self.robot.run)
 
     def test_calibrated_max_dimension(self):
 
