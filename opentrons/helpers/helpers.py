@@ -101,9 +101,9 @@ def import_calibration_file(file_name, robot):
 
 
 def _get_list(n):
-    if hasattr(n, '__len__') and len(n) > 0:
-        return n
-    return [n]
+    if not hasattr(n, '__len__') or len(n) == 0 or isinstance(n, tuple):
+        n = [n]
+    return n
 
 
 def _create_volume_gradient(min_v, max_v, total, gradient=None):
@@ -123,20 +123,19 @@ def _create_volume_pairs(v, total, **kwargs):
 
     gradient = kwargs.get('gradient', None)
 
+    if isinstance(v, tuple):
+        return _create_volume_gradient(
+            v[0], v[-1], total, gradient=gradient)
+
     v = _get_list(v)
     t_vol = len(v)
-    if t_vol > total:
+    if (t_vol < total and t_vol != 1) or t_vol > total:
         raise RuntimeError(
             '{0} volumes do not match with {1} transfers'.format(
                 t_vol, total))
-    elif len(v) == total:
-        return v
-    elif len(v) == 1:
-        return v * total
-    elif len(v) == 2:
-        v = _create_volume_gradient(
-            v[0], v[1], total, gradient=gradient)
-        return v
+    if t_vol < total:
+        v = [v[0]] * total
+    return v
 
 
 def _create_transfer_plan(v, s, t, **kwargs):

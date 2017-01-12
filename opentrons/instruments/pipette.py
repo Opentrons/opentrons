@@ -1275,6 +1275,33 @@ class Pipette(Instrument):
         transfer_plan = helpers._compress_for_repeater(
             self.max_volume, transfer_plan, **kwargs)
 
+        """
+        transfer_plan = [
+            {
+                'aspirate': {
+                    'location': Placeable or (Placeable, Vector),
+                    'volume': number
+                },
+                'dispense': {
+                    'location': Placeable or (Placeable, Vector),
+                    'volume': number
+                }
+            },
+            {
+                'aspirate': {
+                    'location': Placeable or (Placeable, Vector),
+                    'volume': number
+                }
+            },
+            {
+                'dispense': {
+                    'location': Placeable or (Placeable, Vector),
+                    'volume': number
+                }
+            }
+        ]
+        """
+
         tips = kwargs.get('tips', 1)
         if 'tips' in kwargs:
             del kwargs['tips']
@@ -1285,55 +1312,16 @@ class Pipette(Instrument):
                 vol = this_aspirate['volume']
                 loc = this_aspirate['location']
                 self._add_tip_during_transfer(tips, **kwargs)
-                self._handle_aspirate_options(vol, loc, **kwargs)
+                self._aspirate_during_transfer(vol, loc, **kwargs)
             this_dispense = plan.get('dispense')
             if this_dispense:
                 vol = this_dispense['volume']
                 loc = this_dispense['location']
-                self._handle_dispense_options(vol, loc, **kwargs)
+                self._dispense_during_transfer(vol, loc, **kwargs)
                 tips = self._remove_tip_during_transfer(
                     tips, i, total_transfers, **kwargs)
 
         return self
-
-    def _add_tip_during_transfer(self, tips, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
-        if tips > 0 and not self.current_tip():
-            self.pick_up_tip(enqueue=enqueue)
-
-    def _remove_tip_during_transfer(self, tips, i, total, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
-        trash = kwargs.get('trash', False)
-        if tips > 1 or (i + 1 == total):
-            tips -= 1
-            if trash and self.trash_container:
-                self.drop_tip(enqueue=enqueue)
-            else:
-                self.return_tip(enqueue=enqueue)
-        return tips
-
-    def _handle_aspirate_options(self, vol, loc, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
-        touch = kwargs.get('touch', False)
-        rate = kwargs.get('rate', 1)
-        self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
-        if touch:
-            self.touch_tip(enqueue=enqueue)
-
-    def _handle_dispense_options(self, vol, loc, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
-        touch = kwargs.get('touch', False)
-        mix = kwargs.get('mix', (0, 0))
-        blow = kwargs.get('blow', False)
-        rate = kwargs.get('rate', 1)
-        self.dispense(vol, loc, rate=rate, enqueue=enqueue)
-        if self.current_volume == 0 and isinstance(mix, (tuple, list)):
-            if len(mix) == 2 and 0 not in mix:
-                self.mix(mix[0], mix[1], enqueue=enqueue)
-        if touch:
-            self.touch_tip(enqueue=enqueue)
-        if blow and self.current_volume == 0:
-            self.blow_out(enqueue=enqueue)
 
     # QUEUEABLE
     def delay(self, seconds, enqueue=True):
@@ -1572,6 +1560,62 @@ class Pipette(Instrument):
                     volume, self.min_volume))
 
         return volume / self.max_volume
+
+    def _add_tip_during_transfer(self, tips, **kwargs):
+        """
+        Performs a :any:`pick_up_tip` when running a :any:`transfer`,
+        :any:`distribute`, or :any:`consolidate`.
+        """
+        enqueue = kwargs.get('enqueue', True)
+        if tips > 0 and not self.current_tip():
+            self.pick_up_tip(enqueue=enqueue)
+
+    def _remove_tip_during_transfer(self, tips, i, total, **kwargs):
+        """
+        Performs a :any:`drop_tip` or :any:`return_tip` when
+        running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
+        """
+        enqueue = kwargs.get('enqueue', True)
+        trash = kwargs.get('trash', False)
+        if tips > 1 or (i + 1 == total):
+            tips -= 1
+            if trash and self.trash_container:
+                self.drop_tip(enqueue=enqueue)
+            else:
+                self.return_tip(enqueue=enqueue)
+        return tips
+
+    def _aspirate_during_transfer(self, vol, loc, **kwargs):
+        """
+        Performs an :any:`aspirate` when running a :any:`transfer`, and
+        optionally a :any:`touch_tip` afterwards.
+        """
+        enqueue = kwargs.get('enqueue', True)
+        touch = kwargs.get('touch', False)
+        rate = kwargs.get('rate', 1)
+        self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
+        if touch:
+            self.touch_tip(enqueue=enqueue)
+
+    def _dispense_during_transfer(self, vol, loc, **kwargs):
+        """
+        Performs a :any:`dispense` when running a :any:`transfer`, and
+        optionally a :any:`mix`, :any:`touch_tip`, and/or
+        :any:`blow_out` afterwards.
+        """
+        enqueue = kwargs.get('enqueue', True)
+        touch = kwargs.get('touch', False)
+        mix = kwargs.get('mix', (0, 0))
+        blow = kwargs.get('blow', False)
+        rate = kwargs.get('rate', 1)
+        self.dispense(vol, loc, rate=rate, enqueue=enqueue)
+        if self.current_volume == 0 and isinstance(mix, (tuple, list)):
+            if len(mix) == 2 and 0 not in mix:
+                self.mix(mix[0], mix[1], enqueue=enqueue)
+        if touch:
+            self.touch_tip(enqueue=enqueue)
+        if blow and self.current_volume == 0:
+            self.blow_out(enqueue=enqueue)
 
     def set_speed(self, **kwargs):
         """
