@@ -1128,21 +1128,140 @@ class Pipette(Instrument):
 
     # QUEUEABLE
     def distribute(self, *args, **kwargs):
+        """
+        Distribute will move a volume of liquid from a single of source
+        to a list of target locations. See :any:`Transfer` for details
+        and a full list of optional arguments.
+
+        Returns
+        -------
+
+        This instance of :class:`Pipette`.
+
+        Examples
+        --------
+        ..
+        >>> plate = containers.load('96-flat', 'B1')
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        """
         kwargs['mode'] = 'distribute'
-        self.transfer(*args, **kwargs)
+        return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
     def consolidate(self, *args, **kwargs):
+        """
+        Consolidate will move a volume of liquid from a list of sources
+        to a single target location. See :any:`Transfer` for details
+        and a full list of optional arguments.
+
+        Returns
+        -------
+
+        This instance of :class:`Pipette`.
+
+        Examples
+        --------
+        ..
+        >>> plate = containers.load('96-flat', 'B1')
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        """
         kwargs['mode'] = 'consolidate'
-        self.transfer(*args, **kwargs)
+        return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
     def transfer(self, volumes, sources, targets, **kwargs):
 
-        # SPECIAL CASE: using multi-channel pipette,
-        # and the source/target is WellSeries
-        # then treat the WellSeries as a single location (not an iterable)
+        """
+        Transfer will move a volume of liquid from a source location(s)
+        to a target location(s). It is a higher-level command, incorporating
+        other :any:`Pipette` commands, like :any:`aspirate` and
+        :any:`dispense`, designed to make protocol writing easier at the
+        cost of specificity.
+
+        Parameters
+        ----------
+        volumes : number, list, or tuple
+            The amount of volume to remove from each `sources` :any:`Placeable`
+            and add to each `targets` :any:`Placeable`. If `volumes` is a list,
+            each volume will be used for the sources/targets at the
+            matching index. If `volumes` is a tuple with two elements,
+            like `(20, 100)`, then a list of volumes will be generated with
+            a linear gradient between the two volumes in the tuple.
+
+        sources : Placeable or list
+            Single :any:`Placeable` or list of :any:`Placeable`s, from where
+            liquid will be :any:`aspirate`ed from.
+
+        targets : Placeable or list
+            Single :any:`Placeable` or list of :any:`Placeable`s, where
+            liquid will be :any:`dispense`ed to.
+
+        tips : number
+            The number of clean tips this transfer command will use. If 0,
+            no tips will be picked up nor dropped. If 1, a single tip will be
+            used for all commands.
+
+        trash : boolean
+            If `False` (default behavior) tips will be returned to their
+            tip rack. If `True` and a trash container has been attached
+            to this `Pipette`, then the tip will be sent to the trash
+            container.
+
+        touch : boolean
+            If `True`, a :any:`touch_tip` will occur following each
+            :any:`aspirate` and :any:`dispense`. If set to `False` (default),
+            no :any:`touch_tip` will occur.
+
+        blow : boolean
+            If `True`, a :any:`blow_out` will occur following each
+            :any:`dispense`, but only if the pipette has no liquid left in it.
+            If set to `False` (default), no :any:`blow_out` will occur.
+
+        mix : tuple
+            Specify the number of repetitions volume to mix, and a :any:`mix`
+            will following each :any:`dispense` during the transfer. The
+            tuple's values is interpreted as (repetitions, volume).
+
+        carryover : boolean
+            If `True` (default), any `volumes` that exceed the maximum volume
+            of this `Pipette` will be split into multiple smaller volumes.
+
+        repeater : boolean
+            (Only applicable to :any:`distribute` and :any:`consolidate`)If
+            `True` (default), sequential :any:`aspirate` volumes will be
+            combined into one tip for the purpose of saving time. If `False`,
+            all volumes will be transferred seperately.
+
+        gradient : lambda
+            Function for calculated the curve used for gradient volumes.
+            When `volumes` is a tuple of length 2, it's values are used
+            to create a list of gradient volumes. The default curve for
+            this gradient is linear (lambda x: x), however a method can
+            be passed with the `gradient` keyword argument to create a
+            custom curve.
+
+        Returns
+        -------
+
+        This instance of :class:`Pipette`.
+
+        Examples
+        --------
+        ..
+        >>> plate = containers.load('96-flat', 'B1')
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        """
+
         if self.channels > 1:
+            # SPECIAL CASE: if using multi-channel pipette,
+            # and the source or target is a WellSeries
+            # then avoid iterating through it's Wells
             if isinstance(sources, WellSeries):
                 sources = [sources]
             if isinstance(targets, WellSeries):
@@ -1174,6 +1293,8 @@ class Pipette(Instrument):
                 self._handle_dispense_options(vol, loc, **kwargs)
                 tips = self._remove_tip_during_transfer(
                     tips, i, total_transfers, **kwargs)
+
+        return self
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         enqueue = kwargs.get('enqueue', True)
