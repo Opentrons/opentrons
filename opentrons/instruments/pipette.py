@@ -1264,15 +1264,6 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        if self.channels > 1:
-            # SPECIAL CASE: if using multi-channel pipette,
-            # and the source or target is a WellSeries
-            # then avoid iterating through it's Wells
-            if isinstance(sources, WellSeries):
-                sources = [sources]
-            if isinstance(targets, WellSeries):
-                targets = [targets]
-
         kwargs['mode'] = kwargs.get('mode', 'transfer')
         transfer_plan = self._create_transfer_plan(
             volumes, sources, targets, **kwargs)
@@ -1537,6 +1528,15 @@ class Pipette(Instrument):
         return volume / self.max_volume
 
     def _create_transfer_plan(self, v, s, t, **kwargs):
+        if self.channels > 1:
+            # SPECIAL CASE: if using multi-channel pipette,
+            # and the source or target is a WellSeries
+            # then avoid iterating through it's Wells
+            if isinstance(s, WellSeries):
+                s = [s]
+            if isinstance(t, WellSeries):
+                t = [t]
+
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
         total_transfers = len(t)
