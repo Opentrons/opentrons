@@ -106,20 +106,44 @@ def _get_list(n):
     return n
 
 
-def _create_volume_gradient(min_v, max_v, total, gradient=None):
+def _create_transfer_plan(v, s, t, **kwargs):
+    # create list of volumes, sources, and targets of equal length
+    s, t = _create_source_target_lists(s, t, **kwargs)
+    total_transfers = len(t)
+    v = _create_volume_list(v, total_transfers, **kwargs)
 
-    diff_vol = max_v - min_v
+    # convert to array of transfer dicts
+    transfer_plan = []
+    for i in range(total_transfers):
+        transfer_plan.append({
+            'aspirate': {'location': s[i], 'volume': v[i]},
+            'dispense': {'location': t[i], 'volume': v[i]}
+        })
+    return transfer_plan
 
-    def _map_volume(i):
-        nonlocal diff_vol, total
-        rel_x = i / (total - 1)
-        rel_y = gradient(rel_x) if gradient else rel_x
-        return (rel_y * diff_vol) + min_v
 
-    return [_map_volume(i) for i in range(total)]
+def _create_source_target_lists(s, t, **kwargs):
+    s = _get_list(s)
+    t = _get_list(t)
+    mode = kwargs.get('mode', 'transfer')
+    if mode == 'transfer':
+        if len(s) != len(t):
+            raise RuntimeError(
+                'Transfer sources/targets must be same length')
+    elif mode == 'distribute':
+        if not (len(t) >= len(s) == 1):
+            raise RuntimeError(
+                'Distribute must have 1 source and multiple targets')
+        s *= len(t)
+    elif mode == 'consolidate':
+        if not (len(s) >= len(t) == 1):
+            raise RuntimeError(
+                'Consolidate must have multiple sources and 1 target')
+        t *= len(s)
+    return (s, t)
 
 
-def _create_volume_pairs(v, total, **kwargs):
+def _create_volume_list(v, total, **kwargs):
 
     gradient = kwargs.get('gradient', None)
 
@@ -138,43 +162,22 @@ def _create_volume_pairs(v, total, **kwargs):
     return v
 
 
-def _create_transfer_plan(v, s, t, **kwargs):
-    t = _get_list(t)
-    s = _get_list(s)
-    mode = kwargs.get('mode', 'transfer')
-    if mode == 'transfer':
-        if len(s) != len(t):
-            raise RuntimeError(
-                'Transfer sources/targets must be same length')
-    elif mode == 'distribute':
-        if not (len(t) >= len(s) == 1):
-            raise RuntimeError(
-                'Distribute must have 1 source and multiple targets')
-        s *= len(t)
-    elif mode == 'consolidate':
-        if not (len(s) >= len(t) == 1):
-            raise RuntimeError(
-                'Consolidate must have multiple sources and 1 target')
-        t *= len(s)
+def _create_volume_gradient(min_v, max_v, total, gradient=None):
 
-    total_transfers = len(t)
-    v = _create_volume_pairs(v, total_transfers, **kwargs)
+    diff_vol = max_v - min_v
 
-    transfer_plan = []
-    for i in range(total_transfers):
-        transfer_plan.append({
-            'aspirate': {'location': s[i], 'volume': v[i]},
-            'dispense': {'location': t[i], 'volume': v[i]}
-        })
-    return transfer_plan
+    def _map_volume(i):
+        nonlocal diff_vol, total
+        rel_x = i / (total - 1)
+        rel_y = gradient(rel_x) if gradient else rel_x
+        return (rel_y * diff_vol) + min_v
+
+    return [_map_volume(i) for i in range(total)]
 
 
 def _compress_for_repeater(max_vol, plan, **kwargs):
     max_vol = float(max_vol)
     mode = kwargs.get('mode', 'transfer')
-    repeater = kwargs.get('repeater', True)
-    if not repeater:
-        return plan
     if mode == 'distribute':  # combine target volumes into single aspirate
         return _compress_for_distribute(max_vol, plan, **kwargs)
     if mode == 'consolidate':  # combine target volumes into multiple aspirates
@@ -202,13 +205,13 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
                     'location': d['location'], 'volume': d['volume']
                 }
             })
-        a_vol = 0
-        temp_dispenses = []
 
-    for i, p in enumerate(plan):
+    for p in plan:
         this_vol = p['aspirate']['volume']
         if this_vol + a_vol > max_vol:
             _add()
+            a_vol = 0
+            temp_dispenses = []
         a_vol += this_vol
         temp_dispenses.append(p['dispense'])
     _add()

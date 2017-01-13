@@ -1270,37 +1270,14 @@ class Pipette(Instrument):
         kwargs['mode'] = kwargs.get('mode', 'transfer')
         transfer_plan = helpers._create_transfer_plan(
             volumes, sources, targets, **kwargs)
-        transfer_plan = helpers._expand_for_carryover(
-            self.max_volume, transfer_plan, **kwargs)
-        transfer_plan = helpers._compress_for_repeater(
-            self.max_volume, transfer_plan, **kwargs)
 
-        """
-        transfer_plan = [
-            {
-                'aspirate': {
-                    'location': Placeable or (Placeable, Vector),
-                    'volume': number
-                },
-                'dispense': {
-                    'location': Placeable or (Placeable, Vector),
-                    'volume': number
-                }
-            },
-            {
-                'aspirate': {
-                    'location': Placeable or (Placeable, Vector),
-                    'volume': number
-                }
-            },
-            {
-                'dispense': {
-                    'location': Placeable or (Placeable, Vector),
-                    'volume': number
-                }
-            }
-        ]
-        """
+        if kwargs.get('carryover', True):
+            transfer_plan = helpers._expand_for_carryover(
+                self.max_volume, transfer_plan, **kwargs)
+
+        if kwargs.get('repeater', True):
+            transfer_plan = helpers._compress_for_repeater(
+                self.max_volume, transfer_plan, **kwargs)
 
         tips = kwargs.get('tips', 1)
         if 'tips' in kwargs:
