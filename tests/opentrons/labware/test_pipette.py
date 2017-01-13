@@ -295,7 +295,6 @@ class PipetteTest(unittest.TestCase):
     def test_aspirate_invalid_max_volume(self):
         with self.assertRaises(RuntimeWarning):
             self.p200.aspirate(500)
-            self.robot.run()
 
     def test_volume_percentage(self):
         self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
@@ -660,9 +659,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
-                if s.lower() not in c.lower():
-                    print('{0} != {1}'.format(s.lower(), c.lower()))
-                    self.assertTrue(False)
+                self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
     def test_consolidate_mix(self):
@@ -690,9 +687,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
-                if s.lower() not in c.lower():
-                    print('{0} != {1}'.format(s.lower(), c.lower()))
-                    self.assertTrue(False)
+                self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
     def test_distribute_mix(self):
@@ -720,9 +715,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
-                if s.lower() not in c.lower():
-                    print('{0} != {1}'.format(s.lower(), c.lower()))
-                    self.assertTrue(False)
+                self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
     def test_transfer_multichannel(self):
