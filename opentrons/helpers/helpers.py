@@ -106,22 +106,6 @@ def _get_list(n):
     return n
 
 
-def _create_transfer_plan(v, s, t, **kwargs):
-    # create list of volumes, sources, and targets of equal length
-    s, t = _create_source_target_lists(s, t, **kwargs)
-    total_transfers = len(t)
-    v = _create_volume_list(v, total_transfers, **kwargs)
-
-    # convert to array of transfer dicts
-    transfer_plan = []
-    for i in range(total_transfers):
-        transfer_plan.append({
-            'aspirate': {'location': s[i], 'volume': v[i]},
-            'dispense': {'location': t[i], 'volume': v[i]}
-        })
-    return transfer_plan
-
-
 def _create_source_target_lists(s, t, **kwargs):
     s = _get_list(s)
     t = _get_list(t)

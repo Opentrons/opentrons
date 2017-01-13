@@ -1274,16 +1274,8 @@ class Pipette(Instrument):
                 targets = [targets]
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
-        transfer_plan = helpers._create_transfer_plan(
+        transfer_plan = self._create_transfer_plan(
             volumes, sources, targets, **kwargs)
-
-        if kwargs.get('carryover', True):
-            transfer_plan = helpers._expand_for_carryover(
-                self.max_volume, transfer_plan, **kwargs)
-
-        if kwargs.get('repeater', True):
-            transfer_plan = helpers._compress_for_repeater(
-                self.max_volume, transfer_plan, **kwargs)
 
         tips = kwargs.get('tips', 1)
         if 'tips' in kwargs:
@@ -1543,6 +1535,29 @@ class Pipette(Instrument):
                     volume, self.min_volume))
 
         return volume / self.max_volume
+
+    def _create_transfer_plan(self, v, s, t, **kwargs):
+        # create list of volumes, sources, and targets of equal length
+        s, t = helpers._create_source_target_lists(s, t, **kwargs)
+        total_transfers = len(t)
+        v = helpers._create_volume_list(v, total_transfers, **kwargs)
+
+        # convert to array of transfer dicts
+        transfer_plan = []
+        for i in range(total_transfers):
+            transfer_plan.append({
+                'aspirate': {'location': s[i], 'volume': v[i]},
+                'dispense': {'location': t[i], 'volume': v[i]}
+            })
+        if kwargs.get('carryover', True):
+            transfer_plan = helpers._expand_for_carryover(
+                self.max_volume, transfer_plan, **kwargs)
+
+        if kwargs.get('repeater', True):
+            transfer_plan = helpers._compress_for_repeater(
+                self.max_volume, transfer_plan, **kwargs)
+
+        return transfer_plan
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """

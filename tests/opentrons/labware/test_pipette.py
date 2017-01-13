@@ -665,6 +665,7 @@ class PipetteTest(unittest.TestCase):
                     self.assertTrue(False)
         self.robot.clear_commands()
 
+    def test_consolidate_mix(self):
         self.p200.reset()
         self.p200.consolidate(
             200,
@@ -694,6 +695,7 @@ class PipetteTest(unittest.TestCase):
                     self.assertTrue(False)
         self.robot.clear_commands()
 
+    def test_distribute_mix(self):
         self.p200.reset()
         self.p200.distribute(
             200,
