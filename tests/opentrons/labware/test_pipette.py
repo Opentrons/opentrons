@@ -632,6 +632,97 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_transfer_mix(self):
+        self.p200.reset()
+        self.p200.transfer(
+            200,
+            self.plate[0],
+            self.plate[1],
+            mix_before=(1, 10),
+            mix_after=(1, 10)
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['mix', '10'],
+            ['aspirating', 'Well A1'],
+            ['dispensing'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well B1'],
+            ['mix', '10'],
+            ['aspirating', 'Well B1'],
+            ['dispensing'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                if s.lower() not in c.lower():
+                    print('{0} != {1}'.format(s.lower(), c.lower()))
+                    self.assertTrue(False)
+        self.robot.clear_commands()
+
+        self.p200.reset()
+        self.p200.consolidate(
+            200,
+            self.plate[0],
+            self.plate[1],
+            mix_before=(1, 10),
+            mix_after=(1, 10)
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well B1'],
+            ['mix', '10'],
+            ['aspirating', 'Well B1'],
+            ['dispensing'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                if s.lower() not in c.lower():
+                    print('{0} != {1}'.format(s.lower(), c.lower()))
+                    self.assertTrue(False)
+        self.robot.clear_commands()
+
+        self.p200.reset()
+        self.p200.distribute(
+            200,
+            self.plate[0],
+            self.plate[1],
+            mix_before=(1, 10),
+            mix_after=(1, 10)
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['mix', '10'],
+            ['aspirating', 'Well A1'],
+            ['dispensing'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well B1'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                if s.lower() not in c.lower():
+                    print('{0} != {1}'.format(s.lower(), c.lower()))
+                    self.assertTrue(False)
+        self.robot.clear_commands()
+
     def test_transfer_multichannel(self):
         self.p200.reset()
         self.p200.channels = 8

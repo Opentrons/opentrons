@@ -1221,10 +1221,16 @@ class Pipette(Instrument):
             :any:`dispense`, but only if the pipette has no liquid left in it.
             If set to `False` (default), no :any:`blow_out` will occur.
 
-        mix : tuple
+        mix_before : tuple
             Specify the number of repetitions volume to mix, and a :any:`mix`
-            will following each :any:`dispense` during the transfer. The
-            tuple's values is interpreted as (repetitions, volume).
+            will proceed each :any:`aspirate` during the transfer and dispense.
+            The tuple's values is interpreted as (repetitions, volume).
+
+        mix_after : tuple
+            Specify the number of repetitions volume to mix, and a :any:`mix`
+            will following each :any:`dispense` during the transfer or
+            consolidate. The tuple's values is interpreted as
+            (repetitions, volume).
 
         carryover : boolean
             If `True` (default), any `volumes` that exceed the maximum volume
@@ -1568,8 +1574,13 @@ class Pipette(Instrument):
         optionally a :any:`touch_tip` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
+        mode = kwargs.get('mode', 'transfer')
         touch = kwargs.get('touch', False)
         rate = kwargs.get('rate', 1)
+        mix_before = kwargs.get('mix_before', (0, 0))
+        if mode != 'consolidate' and isinstance(mix_before, (tuple, list)):
+            if len(mix_before) == 2 and 0 not in mix_before:
+                self.mix(mix_before[0], mix_before[1], loc, enqueue=enqueue)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
         if touch:
             self.touch_tip(enqueue=enqueue)
@@ -1581,14 +1592,15 @@ class Pipette(Instrument):
         :any:`blow_out` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
+        mode = kwargs.get('mode', 'transfer')
         touch = kwargs.get('touch', False)
-        mix = kwargs.get('mix', (0, 0))
+        mix_after = kwargs.get('mix_after', (0, 0))
         blow = kwargs.get('blow', False)
         rate = kwargs.get('rate', 1)
         self.dispense(vol, loc, rate=rate, enqueue=enqueue)
-        if self.current_volume == 0 and isinstance(mix, (tuple, list)):
-            if len(mix) == 2 and 0 not in mix:
-                self.mix(mix[0], mix[1], enqueue=enqueue)
+        if mode != 'distribute' and isinstance(mix_after, (tuple, list)):
+            if len(mix_after) == 2 and 0 not in mix_after:
+                self.mix(mix_after[0], mix_after[1], enqueue=enqueue)
         if touch:
             self.touch_tip(enqueue=enqueue)
         if blow and self.current_volume == 0:
