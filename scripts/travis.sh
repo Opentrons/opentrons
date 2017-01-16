@@ -75,7 +75,7 @@ execute_mac ()
     node --version
     npm --version
 
-    brew install python3
+    brew install scripts/ot_python3.rb
     python3 --version
     python3 -c "import struct; print(struct.calcsize('P') * 8)"
     python --version
