@@ -12,7 +12,7 @@ matrix:
       sudo: false
       # sudo: required
       # dist: trusty
-      # python: "3.4" TODO: revisit...
+      python: "3.5"  # TODO: revisit...
       env: OPENTRONS_APP_UPLOAD_DIR=linux
       addons:
         apt:
