@@ -11,13 +11,21 @@
             "labware": "tiprack-10ul",
             "slot": "B1"
         },
+        "p10-rack-ST-2": {
+            "labware": "tiprack-10ul",
+            "slot": "B2"
+        },
+        "p10-rack-ST-3": {
+            "labware": "tiprack-10ul",
+            "slot": "B3"
+        },
         "p200-rack": {
             "labware": "tiprack-200ul",
             "slot": "A2"
         },
         "trash": {
             "labware": "point",
-            "slot": "B2"
+            "slot": "C2"
         },
         "reagents": {
             "labware": "tube-rack-2ml",
@@ -72,6 +80,12 @@
             "tip-racks": [
                 {
                     "container": "p10-rack-ST"
+                },
+                {
+                    "container": "p10-rack-ST-2"
+                },
+                {
+                    "container": "p10-rack-ST-3"
                 }
             ],
             "trash-container": {

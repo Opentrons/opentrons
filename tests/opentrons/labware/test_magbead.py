@@ -24,6 +24,7 @@ class MagbeadTest(unittest.TestCase):
 
     def test_magbead_engage(self):
         self.magbead.engage()
+
         self.robot.run()
 
         calls = self.robot._driver.set_mosfet.mock_calls

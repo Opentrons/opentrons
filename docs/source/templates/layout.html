@@ -1,8 +1,4 @@
-{%- extends "basic/layout.html" %} 
-{% set css_files = css_files   + ['https://opentrons.com/css/master.css'] + ['_static/override_master.css'] + ['_static/override_sphinx.css'] %} 
-
-
-{%- block extrahead %} {{ super() }}
+{%- extends "basic/layout.html" %} {% set css_files = css_files + ['https://opentrons.com/css/master.css'] + ['_static/override_master.css'] + ['_static/override_sphinx.css'] %} {%- block extrahead %} {{ super() }}
 <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" /> {% if theme_touch_icon %}
 <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" /> {% endif %} {% if theme_canonical_url %}
 <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" /> {% endif %}
@@ -230,68 +226,57 @@ window.intercomSettings = {
 </footer>
 <script>
 $(document).ready(function() {
-    $(".footerForm").submit(function(event) {
-        var data = {};
-        $(".footerForm").serializeArray().map(function(x) {
-            data[x.name] = x.value;
-        });
-        ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, {
-            'dimension1': data.email
-        });
-        console.log(data)
 
-        $.ajax({
-            type: "POST",
-            url: "https://email.opentrons.com:3000",
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function(res) {
-                console.log(`success: ${res}`);
-                $(".footerForm").fadeOut("slow");
-                $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
-            },
-            error: function(err) {
-                console.log(`err: ${JSON.stringify(err)}`)
-            },
-        });
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-        event.preventDefault();
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
+
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
     });
 
-    $("form.validate").submit(function(event) {
-        var data = {};
-        $("form.validate").serializeArray().map(function(x) {
-            data[x.name] = x.value;
-        });
-        ga('send', 'event', 'Newsletter', 'Signup', window.location.href, {
-            'dimension1': data.EMAIL
-        })
-    });
+    
+    return false;
+  });
 
-    $('#chat').on('click', () => {
-        Intercom('showNewMessage');
-    })
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
 });
 </script>
+
+
 {% if theme_github_banner|lower != 'false' %}
 <a href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}" class="github">
     <img style="position: absolute; top: 0; right: 0; border: 0;" src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}" alt="Fork me on GitHub" class="github" />
 </a>
 {% endif %} {% if theme_analytics_id %}
-<script type="text/javascript">
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', '{{ theme_analytics_id }}']);
-_gaq.push(['_setDomainName', 'none']);
-_gaq.push(['_setAllowLinker', true]);
-_gaq.push(['_trackPageview']);
-(function() {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-})();
-</script>
+
 {% endif %} {%- endblock %}

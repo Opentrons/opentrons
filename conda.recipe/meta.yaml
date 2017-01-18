@@ -17,13 +17,17 @@ source:
 
 requirements:
   build:
+    - dill
     - python
-    - setuptools
     - pyserial
+    - requests
+    - setuptools
 
   run:
+    - dill
     - python
     - pyserial
+    - requests
 
 test:
   # Python imports

@@ -12,6 +12,7 @@ import serial
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
+from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 
 from opentrons.util import trace
 
@@ -500,12 +501,25 @@ class CNCDriver(object):
         else:
             return False
 
-    def wait(self, sec):
-        ms = int((sec % 1.0) * 1000)
-        s = int(sec)
-        self.check_paused_stopped()
-        res = self.send_command(self.DWELL, S=s, P=ms)
-        return res == b'ok'
+    def wait(self, delay_time):
+        start_time = time.time()
+        end_time = start_time + delay_time
+        arguments = {'name': 'delay-start', 'time': delay_time}
+        trace.EventBroker.get_instance().notify(arguments)
+        if not isinstance(self.connection, VirtualSmoothie):
+            while time.time() + 1.0 < end_time:
+                self.check_paused_stopped()
+                time.sleep(1)
+                arguments = {
+                    'name': 'countdown',
+                    'countdown': int(end_time - time.time())
+                }
+                trace.EventBroker.get_instance().notify(arguments)
+            remaining_time = end_time - time.time()
+            time.sleep(max(0, remaining_time))
+        arguments = {'name': 'delay-finish'}
+        trace.EventBroker.get_instance().notify(arguments)
+        return True
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)

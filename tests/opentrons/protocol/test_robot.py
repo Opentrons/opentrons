@@ -1,5 +1,6 @@
 import threading
 import unittest
+from unittest import mock
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.placeable import Deck
@@ -61,7 +62,7 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             nonlocal res
-            res = self.robot.run()
+            self.assertRaises(RuntimeError(self.robot.run))
 
         thread = threading.Thread(target=_run)
         thread.start()
@@ -70,8 +71,17 @@ class RobotTest(unittest.TestCase):
 
         thread.join()
 
-        self.assertEquals(
-            res[-1], 'Received a STOP signal and exited from movements')
+    def test_exceptions_during_run(self):
+        p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
+
+        def _do():
+            return 'hello' / 3
+
+        p200.create_command(
+            do=_do,
+            enqueue=True)
+
+        self.assertRaises(RuntimeError, self.robot.run)
 
     def test_calibrated_max_dimension(self):
 
@@ -283,3 +293,58 @@ class RobotTest(unittest.TestCase):
             }
         }
         self.assertDictEqual(res, expected)
+
+    def test_get_motor_caching(self):
+        a_motor = self.robot.get_motor('a')
+        self.assertEqual(a_motor, self.robot.get_motor('a'))
+
+        b_motor = self.robot.get_motor('b')
+        self.assertEqual(b_motor, self.robot.get_motor('b'))
+
+    def test_get_mosfet_caching(self):
+        m0 = self.robot.get_mosfet(0)
+        self.assertEqual(m0, self.robot.get_mosfet(0))
+        m1 = self.robot.get_mosfet(1)
+        self.assertEqual(m1, self.robot.get_mosfet(1))
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_send_to_app_with_unconfigured_robot(self, req_get, req_post):
+        def fake_get(url, data, headers):
+            res = mock.Mock()
+            res.ok = True
+            return res
+
+        def fake_post(*args, **kwargs):
+            res = mock.Mock()
+            res.ok = True
+            return res
+        req_get.side_effect = fake_get
+        req_post.side_effect = fake_post
+        self.robot.send_to_app()
+        self.assertTrue(req_get.called)
+        self.assertTrue(req_post.called)
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_send_to_app_with_configured_robot(self, req_get, req_post):
+        def fake_get(url, data, headers):
+            res = mock.Mock()
+            res.ok = True
+            return res
+
+        def fake_post(*args, **kwargs):
+            res = mock.Mock()
+            res.ok = True
+            return res
+        plate = containers.load('96-flat', 'A1')
+        p200 = instruments.Pipette(axis='b', max_volume=200)
+
+        for well in plate:
+            p200.aspirate(well).delay(5).dispense(well)
+
+        req_get.side_effect = fake_get
+        req_post.side_effect = fake_post
+        self.robot.send_to_app()
+        self.assertTrue(req_get.called)
+        self.assertTrue(req_post.called)

@@ -38,7 +38,8 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.p200 = instruments.Pipette(name="p200", axis="b")
 
         expected_delta = {
-            'delta': (1.0, 2.0, 3.0)
+            'delta': (1.0, 2.0, 3.0),
+            'type': '96-flat'
         }
 
         self.assertTrue('A1' in self.p200.calibration_data)
@@ -52,7 +53,8 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.p200 = instruments.Pipette(name="p200", axis="b")
 
         expected_delta = {
-            'delta': (1.0, 2.0, 3.0)
+            'delta': (1.0, 2.0, 3.0),
+            'type': '96-flat'
         }
 
         self.assertTrue('A1' in self.p200.calibration_data)

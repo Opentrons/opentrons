@@ -2,6 +2,8 @@ import copy
 import os
 from threading import Event
 
+import dill
+import requests
 import serial
 
 from opentrons import containers
@@ -15,9 +17,95 @@ from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
+from opentrons.util.environment import settings
 
 
 log = get_logger(__name__)
+
+
+class InstrumentMosfet(object):
+    """
+    Provides access to MagBead's MOSFET.
+    """
+
+    def __init__(self, driver, mosfet_index):
+        self.motor_driver = driver
+        self.mosfet_index = mosfet_index
+
+    def engage(self):
+        """
+        Engages the MOSFET.
+        """
+        self.motor_driver.set_mosfet(self.mosfet_index, True)
+
+    def disengage(self):
+        """
+        Disengages the MOSFET.
+        """
+        self.motor_driver.set_mosfet(self.mosfet_index, False)
+
+    def wait(self, seconds):
+        """
+        Pauses protocol execution.
+
+        Parameters
+        ----------
+        seconds : int
+            Number of seconds to pause for.
+        """
+        self.motor_driver.wait(seconds)
+
+
+class InstrumentMotor(object):
+    """
+    Provides access to Robot's head motor.
+    """
+    def __init__(self, driver, axis):
+        self.motor_driver = driver
+        self.axis = axis
+
+    def move(self, value, mode='absolute'):
+        """
+        Move plunger motor.
+
+        Parameters
+        ----------
+        value : int
+            A one-dimensional coordinate to move to.
+        mode : {'absolute', 'relative'}
+        """
+        kwargs = {self.axis: value}
+        return self.motor_driver.move_plunger(
+            mode=mode, **kwargs
+        )
+
+    def home(self):
+        """
+        Home plunger motor.
+        """
+        return self.motor_driver.home(self.axis)
+
+    def wait(self, seconds):
+        """
+        Wait.
+
+        Parameters
+        ----------
+        seconds : int
+            Number of seconds to pause for.
+        """
+        self.motor_driver.wait(seconds)
+
+    def speed(self, rate):
+        """
+        Set motor speed.
+
+        Parameters
+        ----------
+        rate : int
+        """
+        self.motor_driver.set_plunger_speed(rate, self.axis)
+        return self
 
 
 class Robot(object, metaclass=Singleton):
@@ -83,12 +171,11 @@ class Robot(object, metaclass=Singleton):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
+
+        self.INSTRUMENT_DRIVERS_CACHE = {}
+
         self.can_pop_command = Event()
-
         self.can_pop_command.set()
-
-        self.axis_homed = {
-            'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
         self.connections = {
             'live': None,
@@ -99,7 +186,6 @@ class Robot(object, metaclass=Singleton):
                 options={'limit_switches': True}
             )
         }
-
         self._driver = motor_drivers.CNCDriver()
         self.reset()
 
@@ -124,8 +210,8 @@ class Robot(object, metaclass=Singleton):
         """
         Deprecated.
         """
+        del Singleton._instances[cls]
         robot = Robot.get_instance()
-        robot.reset()
         return robot
 
     def reset(self):
@@ -138,7 +224,6 @@ class Robot(object, metaclass=Singleton):
 
         """
         self._commands = []
-        self._handlers = []
         self._runtime_warnings = []
 
         self._previous_container = None
@@ -211,40 +296,14 @@ class Robot(object, metaclass=Singleton):
         -------
         Instance of :class:`InstrumentMosfet`.
         """
-        robot_self = self
+        instr_type = 'mosfet'
+        key = (instr_type, mosfet_index)
 
-        class InstrumentMosfet():
-            """
-            Provides access to MagBead's MOSFET.
-            """
-
-            def __init__(self):
-                self.motor_driver = robot_self._driver
-
-            def engage(self):
-                """
-                Engages the MOSFET.
-                """
-                self.motor_driver.set_mosfet(mosfet_index, True)
-
-            def disengage(self):
-                """
-                Disengages the MOSFET.
-                """
-                self.motor_driver.set_mosfet(mosfet_index, False)
-
-            def wait(self, seconds):
-                """
-                Pauses protocol execution.
-
-                Parameters
-                ----------
-                seconds : int
-                    Number of seconds to pause for.
-                """
-                self.motor_driver.wait(seconds)
-
-        return InstrumentMosfet()
+        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
+        if not motor_obj:
+            motor_obj = InstrumentMosfet(self._driver, mosfet_index)
+            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
+        return motor_obj
 
     def get_motor(self, axis):
         """
@@ -255,61 +314,14 @@ class Robot(object, metaclass=Singleton):
         axis : {'a', 'b'}
             Axis name. Please check stickers on robot's gantry for the name.
         """
-        robot_self = self
+        instr_type = 'instrument'
+        key = (instr_type, axis)
 
-        class InstrumentMotor():
-
-            """
-            Provides access to Robot's head motor.
-            """
-
-            def __init__(self):
-                self.motor_driver = robot_self._driver
-
-            def move(self, value, mode='absolute'):
-                """
-                Move plunger motor.
-
-                Parameters
-                ----------
-                value : int
-                    A one-dimensional coordinate to move to.
-                mode : {'absolute', 'relative'}
-                """
-                kwargs = {axis: value}
-                return self.motor_driver.move_plunger(
-                    mode=mode, **kwargs
-                )
-
-            def home(self):
-                """
-                Home plunger motor.
-                """
-                return self.motor_driver.home(axis)
-
-            def wait(self, seconds):
-                """
-                Wait.
-
-                Parameters
-                ----------
-                seconds : int
-                    Number of seconds to pause for.
-                """
-                self.motor_driver.wait(seconds)
-
-            def speed(self, rate):
-                """
-                Set motor speed.
-
-                Parameters
-                ----------
-                rate : int
-                """
-                self.motor_driver.set_plunger_speed(rate, axis)
-                return self
-
-        return InstrumentMotor()
+        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
+        if not motor_obj:
+            motor_obj = InstrumentMotor(self._driver, axis)
+            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
+        return motor_obj
 
     def flip_coordinates(self, coordinates):
         """
@@ -754,10 +766,32 @@ class Robot(object, metaclass=Singleton):
                     'name': 'command-failed',
                     'error': str(e)
                 })
-                self.add_warning(str(e))
-                break
+                raise RuntimeError(
+                    'Command #{0} failed (\"{1}\"").\nError: \"{2}\"'.format(
+                        i, command.description, str(e))) from e
 
         return self._runtime_warnings
+
+    def send_to_app(self):
+        robot_as_bytes = dill.dumps(self)
+        try:
+            resp = requests.get(settings.get('APP_IS_ALIVE_URL'))
+            if not resp.ok:
+                raise Exception
+        except (Exception, requests.exceptions.ConnectionError):
+            print(
+                'Cannot determine if the Opentrons App is up and running.'
+                ' Please make sure it is installed and running'
+            )
+            return
+
+        resp = requests.post(
+            settings.get('APP_JUPYTER_UPLOAD_URL'),
+            data=robot_as_bytes,
+            headers={'Content-Type': 'application/octet-stream'}
+        )
+        if not resp.ok:
+            raise Exception('App failed to accept protocol upload')
 
     def simulate(self, switches=False):
         """
@@ -797,8 +831,9 @@ class Robot(object, metaclass=Singleton):
                 self._driver.disconnect()
         else:
             raise ValueError(
-                'mode expected to be "live" or "simulate", '
-                '{} provided'.format(mode))
+                'mode expected to be "live", "simulate_switches", '
+                'or "simulate", {} provided'.format(mode)
+            )
 
     def disconnect(self):
         """

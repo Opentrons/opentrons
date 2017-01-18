@@ -1,6 +1,6 @@
 import unittest
 
-from opentrons.util.vector import (Vector, VectorEncoder)
+from opentrons.util.vector import (Vector, VectorEncoder, VectorValue)
 import json
 
 
@@ -16,12 +16,29 @@ class VectorTestCase(unittest.TestCase):
         self.assertEqual(v3, (1, 2, 3))
         self.assertEqual(v4, Vector(1, 0, 0))
 
+        self.assertRaises(ValueError, Vector)
+
+    def test_repr(self):
+        v1 = Vector(1, 2, 3)
+        self.assertEquals(str(v1), '(x=1.00, y=2.00, z=3.00)')
+
     def test_add(self):
         v1 = Vector(1, 2, 3)
         v2 = Vector(4, 5, 6)
         res = v1 + v2
 
         self.assertEqual(res, Vector(5, 7, 9))
+
+    def test_to_iterable(self):
+
+        v1 = Vector(1, 2, 3)
+        iterable = v1.to_iterable()
+        self.assertTrue(hasattr(iterable, '__iter__'))
+
+    def test_zero_coordinates(self):
+
+        zero_coords = Vector(1, 2, 3).zero_coordinates()
+        self.assertEquals(zero_coords, VectorValue(0, 0, 0))
 
     def test_substract(self):
         v1 = Vector(1, 2, 3)

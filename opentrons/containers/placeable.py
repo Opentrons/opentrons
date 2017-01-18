@@ -135,6 +135,12 @@ class Placeable(object):
 
         return self.parent.children_by_reference[self]
 
+    def get_type(self):
+        """
+        Returns the Placeable's type or class name
+        """
+        return self.properties.get('type', self.__class__.__name__)
+
     def get_children_list(self):
         """
         Returns the list of children in the order they were added
@@ -564,7 +570,9 @@ class WellSeries(Placeable):
     """
     def __init__(self, items):
         self.items = items
-        self.values = list(self.items.values())
+        if isinstance(items, dict):
+            items = list(self.items.values())
+        self.values = items
         self.offset = 0
 
     def set_offset(self, offset):
@@ -587,4 +595,8 @@ class WellSeries(Placeable):
             return list(self.values)[index]
 
     def __getattr__(self, name):
+        # getstate/setstate are used by pickle and are not implemented by
+        # downstream objects (Wells) therefore raise attribute error
+        if name in ('__getstate__', '__setstate__'):
+            raise AttributeError()
         return getattr(self.values[self.offset], name)

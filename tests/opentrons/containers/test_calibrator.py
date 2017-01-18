@@ -27,17 +27,21 @@ class CalibratorTestCase(unittest.TestCase):
         calibration_data = {
             'A1':
             {
+                'type': 'Slot',
                 'delta': (1, 1, 1),
                 'children': {
                     'tube_rack': {
+                        'type': 'tube-rack-2ml',
                         'delta': (1, 1, 1),
                         'children': {
                             'Red':
                             {
+                                'type': 'Well',
                                 'delta': (1, 1, 1)
                             },
                             'Blue':
                             {
+                                'type': 'Well',
                                 'delta': (2, 2, 2)
                             }
                         }
@@ -62,17 +66,21 @@ class CalibratorTestCase(unittest.TestCase):
         calibration_data = {
             'A1':
             {
+                'type': 'Slot',
                 'delta': (1, 1, 1),
                 'children': {
                     'tube_rack': {
+                        'type': 'tube-rack-2ml',
                         'delta': (1, 1, 1),
                         'children': {
                             'Red':
                             {
+                                'type': 'Well',
                                 'delta': (1, 1, 1)
                             },
                             'Blue':
                             {
+                                'type': 'Well',
                                 'delta': (2, 2, 2)
                             }
                         }
@@ -108,7 +116,8 @@ class CalibratorTestCase(unittest.TestCase):
             'A1': {
                 'children': {
                     'tube_rack': {
-                        'delta': (-1.0, -1.0, -1.0)
+                        'delta': (-1.0, -1.0, -1.0),
+                        'type': 'Container'
                     }
                 }
             }
