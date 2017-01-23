@@ -36,8 +36,9 @@
     },
     watch: {
       taskListLen: function () {
-        if (this.$store.state.tasks[0]) {
-          this.$router.push(this.$store.state.tasks[0].placeables[0].href)
+        var task = this.$store.state.tasks[0]
+        if (task && task.placeables && task.placeables[0]) {
+          this.$router.push(task.placeables[0].href)
         } else {
           this.$router.push('/')
         }
