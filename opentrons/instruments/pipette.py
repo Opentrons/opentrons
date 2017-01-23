@@ -1148,6 +1148,7 @@ class Pipette(Instrument):
         """
         kwargs['mode'] = 'distribute'
         kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
+        kwargs['mix_after'] = (0, 0)
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1172,6 +1173,7 @@ class Pipette(Instrument):
         """
         kwargs['mode'] = 'consolidate'
         kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
+        kwargs['mix_before'] = (0, 0)
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1591,11 +1593,10 @@ class Pipette(Instrument):
         optionally a :any:`touch_tip` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
-        mode = kwargs.get('mode', 'transfer')
         touch = kwargs.get('touch', False)
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix_before', (0, 0))
-        if mode != 'consolidate' and isinstance(mix_before, (tuple, list)):
+        if isinstance(mix_before, (tuple, list)):
             if len(mix_before) == 2 and 0 not in mix_before:
                 self.mix(mix_before[0], mix_before[1], loc, enqueue=enqueue)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
@@ -1609,13 +1610,12 @@ class Pipette(Instrument):
         :any:`blow_out` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
-        mode = kwargs.get('mode', 'transfer')
         touch = kwargs.get('touch', False)
         mix_after = kwargs.get('mix_after', (0, 0))
         blow = kwargs.get('blow', False)
         rate = kwargs.get('rate', 1)
         self.dispense(vol, loc, rate=rate, enqueue=enqueue)
-        if mode != 'distribute' and isinstance(mix_after, (tuple, list)):
+        if isinstance(mix_after, (tuple, list)):
             if len(mix_after) == 2 and 0 not in mix_after:
                 self.mix(mix_after[0], mix_after[1], enqueue=enqueue)
         if touch:
