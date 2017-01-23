@@ -3,6 +3,7 @@
 body {
     padding: 0;
     margin: 0;
+    font-family: "Open Sans", "sans-serif";
 }
 
 
@@ -10,6 +11,7 @@ body {
 
 div.body p {
     line-height: 20pt;
+    font-family: "Open Sans", "sans-serif";
 }
 
 div.body h1 {
@@ -33,7 +35,7 @@ div.body h2,
 div.body h3,
 div.body h4,
 div.body h5 {
-    font-family: Open Sans;
+    font-family: "Open Sans", "sans-serif";
 }
 
 div.sphinxsidebar h3 a,
@@ -126,12 +128,14 @@ div.body p.caption {
 ul {
     list-style-type: none;
     margin-left: 0;
+    font-family: "Open Sans", "sans-serif";
 }
 
 ul ul {
     list-style-type: circle;
     margin-left: 30px;
     color: #999;
+    font-family: "Open Sans", "sans-serif";
 }
 
 @media screen and (min-device-width: 320px)and (max-device-width: 640px) {
