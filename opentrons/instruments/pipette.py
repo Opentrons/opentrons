@@ -1288,8 +1288,8 @@ class Pipette(Instrument):
                 vol = this_dispense['volume']
                 loc = this_dispense['location']
                 self._dispense_during_transfer(vol, loc, **kwargs)
-                tips = self._remove_tip_during_transfer(
-                    tips, i, total_transfers, **kwargs)
+                if tips > 1 or (i + 1 == total_transfers and tips > 0):
+                    tips = self._remove_tip_during_transfer(tips, **kwargs)
 
         return self
 
@@ -1572,19 +1572,18 @@ class Pipette(Instrument):
         if tips > 0 and not self.current_tip():
             self.pick_up_tip(enqueue=enqueue)
 
-    def _remove_tip_during_transfer(self, tips, i, total, **kwargs):
+    def _remove_tip_during_transfer(self, tips, **kwargs):
         """
         Performs a :any:`drop_tip` or :any:`return_tip` when
         running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
         """
         enqueue = kwargs.get('enqueue', True)
         trash = kwargs.get('trash', False)
-        if tips > 1 or (i + 1 == total):
-            tips -= 1
-            if trash and self.trash_container:
-                self.drop_tip(enqueue=enqueue)
-            else:
-                self.return_tip(enqueue=enqueue)
+        tips -= 1
+        if trash and self.trash_container:
+            self.drop_tip(enqueue=enqueue)
+        else:
+            self.return_tip(enqueue=enqueue)
         return tips
 
     def _aspirate_during_transfer(self, vol, loc, **kwargs):
