@@ -7,11 +7,7 @@ environment:
 
   matrix:
     - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5.x" # currently 3.4.3
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5.0"
+      PYTHON_VERSION: "3.5.x" # currently 3.5.1
       PYTHON_ARCH: "64"
 
 install:
