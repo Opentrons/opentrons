@@ -28,7 +28,7 @@ const taskPane = getRenderedVm(TaskPane, propsData, mockStore)
 const busyProps = { busy: true }
 const busyTaskPane = getRenderedVm(TaskPane, busyProps, mockStore)
 
-describe('TaskPane.vue', (done) => {
+describe('TaskPane.vue', () => {
   it('only shows the task pane section when not running', () => {
     expect(taskPane.running()).to.be.true
     const taskPaneSelector = taskPane.$el.querySelector('#task-pane')

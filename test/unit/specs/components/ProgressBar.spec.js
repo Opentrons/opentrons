@@ -21,7 +21,7 @@ const mockStore = getMockStore()
 const propsData = { increments: [1, 2, 5, 10] }
 const progressBar = getRenderedVm(ProgressBar, propsData, mockStore)
 
-describe('ProgressBar.vue', (done) => {
+describe('ProgressBar.vue', () => {
   it('determines run percent correctly, leaving out notifications', () => {
     expect(progressBar.runPercent()).to.equal(33)
   })

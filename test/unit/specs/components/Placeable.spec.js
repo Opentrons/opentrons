@@ -36,7 +36,7 @@ Placeable.methods.params = () => {
 }
 const placeable = getRenderedVm(Placeable, {}, mockStore)
 
-describe('Placeable.vue', (done) => {
+describe('Placeable.vue', () => {
   it('correctly filters instruments and placeables', () => {
     let pipette = mockStore.state.tasks[0]
     expect(placeable.instrument()).to.equal(pipette)

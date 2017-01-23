@@ -15,8 +15,6 @@ function getMockStore () {
   }
 }
 
-const mockStore = getMockStore()
-
 let placeable = {
   'slot': 'A1',
   'label': 'tiprack-12ml',
@@ -25,12 +23,14 @@ let placeable = {
 }
 let instrument = {'axis': 'a'}
 
-describe('CalibratePlaceable.vue', (done) => {
+const mockStore = getMockStore()
+const propsData = { placeable, instrument }
+let calibratePlaceable = getRenderedVm(CalibratePlaceable, propsData, mockStore)
+
+describe('CalibratePlaceable.vue', () => {
   it('renders pick_up/drop tip if placeable is tiprack', () => {
-    expect(getRenderedVm(CalibratePlaceable, {
-      placeable,
-      instrument
-    }).$el.querySelectorAll('button').length).to.equal(4)
+    const buttons = calibratePlaceable.$el.querySelectorAll('button')
+    expect(buttons.length).to.equal(4)
   })
 
   it('does not render tip buttons if placeable is not tiprack', () => {
@@ -54,22 +54,15 @@ describe('CalibratePlaceable.vue', (done) => {
   })
 
   it('enables all buttons when calibrated', () => {
-    expect(getRenderedVm(CalibratePlaceable, {
-      placeable,
-      instrument
-    }).$el.querySelectorAll('button.disabled').length).to.equal(0)
+    let buttons = calibratePlaceable.$el.querySelectorAll('button.disabled')
+    expect(buttons.length).to.equal(0)
   })
 
   it('calls the correct actions for each button click', () => {
-    let renderedCalibratePlaceable = getRenderedVm(CalibratePlaceable, {
-      placeable,
-      instrument
-    }, mockStore)
-
-    renderedCalibratePlaceable.calibrate()
-    renderedCalibratePlaceable.moveToPosition()
-    renderedCalibratePlaceable.pickUpTip()
-    renderedCalibratePlaceable.dropTip()
+    calibratePlaceable.calibrate()
+    calibratePlaceable.moveToPosition()
+    calibratePlaceable.pickUpTip()
+    calibratePlaceable.dropTip()
 
     expect(mockStore.actions.calibrate.called).to.be.true
     expect(mockStore.actions.moveToPosition.called).to.be.true

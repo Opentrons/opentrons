@@ -15,7 +15,7 @@ function getMockStore () {
 const mockStore = getMockStore()
 const protocol = getRenderedVm(Protocol, {}, mockStore)
 
-describe('Protocol.vue', (done) => {
+describe('Protocol.vue', () => {
   it('has 2 titles and 2 infos', () => {
     expect(protocol.$el.querySelectorAll('.title').length).to.equal(2)
     expect(protocol.$el.querySelectorAll('.info').length).to.equal(2)

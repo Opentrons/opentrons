@@ -13,7 +13,7 @@ function getMockStore () {
 const mockStore = getMockStore()
 const home = getRenderedVm(Home, {}, mockStore)
 
-describe('Home.vue', (done) => {
+describe('Home.vue', () => {
   it('has 6 btn-home classes', () => {
     expect(home.$el.querySelectorAll('.btn-home').length).to.equal(6)
   })
