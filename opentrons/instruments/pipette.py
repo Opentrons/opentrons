@@ -1147,6 +1147,7 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         kwargs['mode'] = 'distribute'
+        kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1170,6 +1171,7 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         kwargs['mode'] = 'consolidate'
+        kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
