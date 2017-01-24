@@ -5,8 +5,11 @@ import sys
 
 from opentrons.containers.calibrator import Calibrator
 from opentrons.util.vector import (Vector, VectorEncoder)
+from opentrons.util import environment
 from opentrons.robot.command import Command
 from opentrons import Robot
+
+from opentrons.util.log import get_logger
 
 
 JSON_ERROR = None
@@ -16,8 +19,7 @@ else:
     JSON_ERROR = json.decoder.JSONDecodeError
 
 
-CALIBRATIONS_FOLDER = 'calibrations'
-CALIBRATIONS_FILE = 'calibrations.json'
+log = get_logger(__name__)
 
 
 class Instrument(object):
@@ -121,13 +123,8 @@ class Instrument(object):
             for key in attributes:
                 self.persisted_defaults[key] = copy.copy(getattr(self, key))
 
-        if not os.path.isdir(self._get_calibration_dir()):
-            os.mkdir(self._get_calibration_dir())
-
         if not os.path.isfile(self._get_calibration_file_path()):
             self._write_blank_calibrations_file()
-        else:
-            self._check_calibrations_version()
 
     def update_calibrations(self):
         """
@@ -180,18 +177,11 @@ class Instrument(object):
                 'data': {}
             }))
 
-    def _get_calibration_dir(self):
-        """
-        :return: the directory to save calibration data
-        """
-        DATA_DIR = os.environ.get('APP_DATA_DIR') or os.getcwd()
-        return os.path.join(DATA_DIR, CALIBRATIONS_FOLDER)
-
     def _get_calibration_file_path(self):
         """
         :return: the absolute file path of the calibration file
         """
-        return os.path.join(self._get_calibration_dir(), CALIBRATIONS_FILE)
+        return environment.get_path('CALIBRATIONS_FILE')
 
     def _get_calibration(self):
         """
@@ -212,30 +202,37 @@ class Instrument(object):
     def _read_calibrations(self):
         """
         Reads calibration data from file system.
+        Expects a valid valibration format
         :return: json of calibration data
         """
-        with open(self._get_calibration_file_path()) as f:
-            try:
-                loaded_json = json.load(f)
-            except json.decoder.JSONDecodeError:
-                self._write_blank_calibrations_file()
-                return self._read_calibrations()
-            return self._restore_vector(loaded_json)
+        file_path = self._get_calibration_file_path()
+        self._validate_calibration_file(file_path)
+        loaded_json = ""
+        with open(file_path) as f:
+            loaded_json = json.load(f)
 
-    def _check_calibrations_version(self):
+        return self._restore_vector(loaded_json)
+
+    def _validate_calibration_file(self, file_path):
         """
         Read calibration file, and checks for version number
         If no version number, file is replaced with version number
         """
-        with open(self._get_calibration_file_path()) as f:
+        valid = False
+        with open(file_path) as f:
             try:
                 file = json.load(f)
                 version = file.get('version')
                 data = file.get('data')
-                if not version or not data or len(file.keys()) > 2:
-                    self._write_blank_calibrations_file()
-            except json.decoder.JSONDecodeError:
-                self._write_blank_calibrations_file()
+                if version and data and len(file.keys()) == 2:
+                    valid = True
+            except json.decoder.JSONDecodeError as e:
+                log.error(
+                    'Error parsing calibration data (file: {}): {}'.format(
+                        file_path, e))
+
+        if not valid:
+            self._write_blank_calibrations_file()
 
     def _strip_vector(self, obj, root=True):
         """
