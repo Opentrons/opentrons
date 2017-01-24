@@ -218,6 +218,7 @@ class Instrument(object):
             try:
                 loaded_json = json.load(f)
             except json.decoder.JSONDecodeError:
+                f.close()
                 self._write_blank_calibrations_file()
                 return self._read_calibrations()
             return self._restore_vector(loaded_json)
@@ -233,8 +234,10 @@ class Instrument(object):
                 version = file.get('version')
                 data = file.get('data')
                 if not version or not data or len(file.keys()) > 2:
+                    f.close()
                     self._write_blank_calibrations_file()
             except json.decoder.JSONDecodeError:
+                f.close()
                 self._write_blank_calibrations_file()
 
     def _strip_vector(self, obj, root=True):
