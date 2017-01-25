@@ -42,6 +42,8 @@ before_install:
   - ./scripts/travis.sh pre-install
 
 install:
+  - python --version
+  - python3 --version
   - ./scripts/travis.sh install
 
 script: echo "No python test scripts to run"

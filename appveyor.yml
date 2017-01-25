@@ -3,8 +3,8 @@ os: unstable
 environment:
   matrix:
     - language: cpp
-      PYTHON3: "C:\\Python34"
-      PYTHON3_VERSION: "3.4.3"
+      PYTHON3: "C:\\Python35"
+      PYTHON3_VERSION: "3.5.0"
       PYTHON3_ARCH: "64"
 
       # PYTHON2.7 REQUIRED FOR NODE-GYP & ELECTRON
@@ -12,7 +12,7 @@ environment:
       PYTHON2_VERSION: "2.7.9"
       PYTHON2_ARCH: "64"
 
-  PIP3: C:\\Python34\Scripts\pip
+  PIP3: C:\\Python35\Scripts\pip
   PIP2: C:\\Python27\Scripts\pip
 
   npm_config_arch: x64
@@ -52,13 +52,14 @@ init:
   # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
   - cmd: ECHO Path - %PATH%
-  - ps: cp C:\Python34\python.exe C:\Python34\python3.4.exe
+  - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
 
 install:
   # NOTE: OTONE-FRONTEND NOW CLONED INTO C:\\PROJECTS\OTOONE-FRONTEND
 
   # 1. INSTALL PYTHON DEPENDENCIES
   - cmd: "%PIP3% install -r requirements.txt"
+  - ls: C:\Python35\scripts
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
@@ -69,6 +70,7 @@ install:
 
   - npm install
   - npm install -g mocha@3.1.2
+  - npm run unit
   - npm run release:win
   # - npm run integration
 

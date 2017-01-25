@@ -84,7 +84,7 @@ module.exports = {
   },
   headers: { 'Access-Control-Allow-Origin': 'http://localhost:5000', 'Access-Control-Allow-Credentials': 'true' },
   devtool: '#eval-source-map',
-  target: process.env['APP_TARGET'] || 'electron'
+  target: 'electron'  // process.env['APP_TARGET'] (TODO: bring back)
 }
 
 if (process.env.NODE_ENV === 'production') {

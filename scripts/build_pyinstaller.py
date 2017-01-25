@@ -64,8 +64,7 @@ def pyinstaller_build():
     """
 
     process_args = [
-        "pyinstaller",
-
+        shutil.which("pyinstaller"),
         "{}".format(os.path.join("scripts", "pyinstaller.spec")),
         "--workpath", PYINSTALLER_WORKPATH,
         "--distpath", PYINSTALLER_DISTPATH
@@ -81,6 +80,8 @@ def pyinstaller_build():
     if pyinstaller_process.returncode != 0:
         print(script_tab + "ERROR: PyInstaller returned with exit code: %s" %
               pyinstaller_process.returncode)
+        print(script_tab + "PyInstaller STD OUT: {}".format(std_op))
+        print(script_tab + "PyInstaller STD ERR: {}".format(std_err_op))
         return False
 
     return True

@@ -1,3 +1,4 @@
+*.swp
 .sublime-project.sublime-workspace
 flip
 server/static/css

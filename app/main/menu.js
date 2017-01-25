@@ -80,7 +80,8 @@ function addMenu () {
 function downloadLogs () {
   selectDirectory((folder) => {
     if (folder) {
-      const timeStamp = moment().tz('America/New_York').format()
+      let timeStamp = moment().tz('America/New_York').format()
+      timeStamp = timeStamp.replace(/:/g, '-')  // Make windows safe by removing colons
       const destination = path.join(folder[0], `otone-data-${timeStamp}.zip`)
       zip(process.env.APP_DATA_DIR, destination)
     };
