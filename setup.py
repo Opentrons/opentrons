@@ -35,6 +35,10 @@ TEST_SUITE = 'nose.collector'
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
+with open('requirements-app.txt') as f:
+    INSTALL_REQUIRES.extend([i.strip() for i in list(f.readlines())])
+
+
 def read(*parts):
     """
     Build an absolute path from *parts* and and return the contents of the
