@@ -206,6 +206,18 @@ With one or more tip racks attached, a pipette can also return a tip to it's ori
 	p200.pick_up_tip()  	# automatically goes to tiprack['A1']
 	p200.return_tip()	# automatically goes back to tiprack['A1']
 
+Advanced Tip Commands
+^^^^^^^^^^^^^^^^^^^^
+
+Only use half a rack of tips and don't want to move them all to the front?  Tell your next protocol to start at a specific tip in the tip rack.
+
+**pipette.start_at_tip** (*location*)
+
+	* **location -** tip location to start at
+
+.. testcode:: main
+
+	p200.start_at_tip(tiprack['B3'])
 
 Aspirate
 ^^^^^^^^
