@@ -153,7 +153,7 @@ To use the tip-tracking features, create your pipette with tip racks and a trash
 Commands 
 -----------------------------
 
-There are a few basic commands that you can string together in order to transfer liquid from place to place.  Each command is linked to the pipette doing the action.
+There are a few basic commands that you can string together in order to transfer liquid from place to place.  Each command is linked to the pipette doing the action. 
 
 
 Pick Up and Drop Tip
@@ -218,6 +218,11 @@ Only use half a rack of tips and don't want to move them all to the front?  Tell
 .. testcode:: main
 
 	p200.start_at_tip(tiprack['B3'])
+
+.. note:: 
+
+	If your protocol calls for more tips than you have on your deck, the pipette will raise a RuntimeWarning to let you know.
+
 
 Aspirate
 ^^^^^^^^
