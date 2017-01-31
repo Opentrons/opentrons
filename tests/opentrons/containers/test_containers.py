@@ -25,7 +25,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_containers_list(self):
         res = containers.list()
-        self.assertEquals(len(res), 32)
+        self.assertEquals(len(res), 37)
 
     def test_iterator(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
