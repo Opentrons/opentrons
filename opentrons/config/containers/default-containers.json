@@ -121,6 +121,7 @@
           "E8":{"x":52.32, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
           "F8":{"x":65.4, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950}
         }
+      },
       "trough-1row-25ml":{
           "locations":{
               "A1":{"x":42.75, "y":63.875, "z":0, "depth":26, "diameter":10, "total-liquid-volume":25000 }
