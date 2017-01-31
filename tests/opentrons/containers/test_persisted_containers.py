@@ -41,7 +41,7 @@ class PersistedContainersTestCase(unittest.TestCase):
 
     def test_load_all_containers(self):
         persisted_containers.load_all_persisted_containers_from_disk()
-        persisted_containers.get_persisted_container("24-plate")
+        persisted_containers.get_persisted_container("24-vial-rack")
         persisted_containers.get_persisted_container("container-1")
         persisted_containers.get_persisted_container("container-2")
 
@@ -60,7 +60,7 @@ class PersistedContainersTestCase(unittest.TestCase):
             persisted_containers.get_persisted_container("container-4")
 
     def test_load_persisted_container(self):
-        plate = persisted_containers.get_persisted_container("24-plate")
+        plate = persisted_containers.get_persisted_container("24-vial-rack")
         self.assertIsInstance(plate, Container)
 
         self.assertIsInstance(plate, Container)

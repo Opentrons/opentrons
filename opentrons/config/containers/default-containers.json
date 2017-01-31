@@ -37,7 +37,7 @@
       "24-well-plate":{
         "origin-offset":{
             "x":13.67,
-            "y":16
+            "y":15
           },
         "locations":{
           "A1":{"x":0, "y":0, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
@@ -1307,7 +1307,7 @@
           }
       },
 
-      "24-plate":{
+      "24-vial-rack":{
           "origin-offset":{
             "x":13.67,
             "y":16
