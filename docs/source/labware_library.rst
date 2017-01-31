@@ -10,6 +10,14 @@ Please refer to this detailed tutorial on :ref:`well_access` to learn the variou
 
 	Note:  All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
 
+Working in Jupyter?  Run the following command to get a list of all labware in the library for easy reference.
+
+**container.list** ()
+
+.. testcode:: main
+	from opentrons import containers
+	containers.list()
+
 Points
 ------
 
