@@ -595,9 +595,7 @@ class CNCDriver(object):
             self.saved_settings['state']['head_speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
                 self.saved_settings.write(configfile)
-        kwargs = {"F": self.head_speed}
-        res = self.send_command(self.SET_SPEED, **kwargs)
-        return res == b'ok'
+        return True
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':
