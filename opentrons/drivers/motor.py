@@ -334,7 +334,7 @@ class CNCDriver(object):
             'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
-        while self.readline_from_serial():
+        while self.connection.readline():
             time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
