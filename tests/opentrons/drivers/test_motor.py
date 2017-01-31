@@ -3,6 +3,7 @@ from threading import Thread
 import unittest
 
 from opentrons import Robot
+from opentrons.util.vector import Vector
 
 
 class OpenTronsTest(unittest.TestCase):
