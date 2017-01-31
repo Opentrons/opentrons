@@ -237,7 +237,7 @@ def _compress_for_consolidate(max_vol, plan, **kwargs):
     return new_transfer_plan
 
 
-def _expand_for_carryover(max_vol, plan, **kwargs):
+def _expand_for_carryover(min_vol, max_vol, plan, **kwargs):
     max_vol = float(max_vol)
     carryover = kwargs.get('carryover', True)
     if not carryover:
@@ -247,12 +247,20 @@ def _expand_for_carryover(max_vol, plan, **kwargs):
         source = p['aspirate']['location']
         target = p['dispense']['location']
         volume = float(p['aspirate']['volume'])
-        while volume > max_vol:
+        while volume > max_vol * 2:
             new_transfer_plan.append({
                 'aspirate': {'location': source, 'volume': max_vol},
                 'dispense': {'location': target, 'volume': max_vol}
             })
             volume -= max_vol
+
+        # try and make sure no volumes are less than min_vol
+        if volume > max_vol:
+            volume /= 2
+            new_transfer_plan.append({
+                'aspirate': {'location': source, 'volume': float(volume)},
+                'dispense': {'location': target, 'volume': float(volume)}
+            })
         new_transfer_plan.append({
             'aspirate': {'location': source, 'volume': float(volume)},
             'dispense': {'location': target, 'volume': float(volume)}

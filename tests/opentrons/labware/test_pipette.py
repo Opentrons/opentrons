@@ -679,10 +679,10 @@ class PipetteTest(unittest.TestCase):
         # pprint(self.robot.commands())
         expected = [
             ['pick'],
-            ['aspirating', '200', 'Well A1'],
-            ['dispensing', '200', 'Well B1'],
-            ['aspirating', '100', 'Well A1'],
-            ['dispensing', '100', 'Well B1'],
+            ['aspirating', '150', 'Well A1'],
+            ['dispensing', '150', 'Well B1'],
+            ['aspirating', '150', 'Well A1'],
+            ['dispensing', '150', 'Well B1'],
             ['return'],
             ['drop']
         ]

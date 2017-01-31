@@ -1555,7 +1555,7 @@ class Pipette(Instrument):
             })
         if kwargs.get('carryover', True):
             transfer_plan = helpers._expand_for_carryover(
-                self.max_volume, transfer_plan, **kwargs)
+                self.min_volume, self.max_volume, transfer_plan, **kwargs)
 
         if kwargs.get('repeater', True):
             transfer_plan = helpers._compress_for_repeater(
