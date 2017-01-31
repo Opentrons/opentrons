@@ -1,5 +1,127 @@
 {
 "containers":{
+      "6-well-plate":{
+        "origin-offset":{
+            "x":23.16,
+            "y":24.76
+          },
+        "locations":{
+          "A1":{"x":0, "y":0, "z":0, "depth":17.4, "diameter":22.5, "total-liquid-volume":16800},
+          "B1":{"x":39.12, "y":0, "z":0, "depth":17.4, "diameter":22.5, "total-liquid-volume":16800},
+          "A2":{"x":0, "y":39.12, "z":0, "depth":17.4, "diameter":22.5, "total-liquid-volume":16800},
+          "B2":{"x":39.12, "y":39.12, "z":0, "depth":17.4, "diameter":22.5, "total-liquid-volume":16800},
+          "A3":{"x":0, "y":78.24, "z":0, "depth":17.4, "diameter":22.5, "total-liquid-volume":16800},
+          "B3":{"x":39.12, "y":78.24, "z":0, "depth":17.4, "diameter":22.5, "total-liquid-volume":16800}
+        }
+      },
+      "12-well-plate":{
+        "origin-offset":{
+            "x":16.79,
+            "y":24.94
+          },
+        "locations":{
+          "A1":{"x":0, "y":0, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "B1":{"x":26.01, "y":0, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "C1":{"x":52.02, "y":0, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "A2":{"x":0, "y":26.01, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "B2":{"x":26.01, "y":26.01, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "C2":{"x":52.02, "y":26.01, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "A3":{"x":0, "y":52.02, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "B3":{"x":26.01, "y":52.02, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "C3":{"x":52.02, "y":52.02, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "A4":{"x":0, "y":78.03, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "B4":{"x":26.01, "y":78.03, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900},
+          "C4":{"x":52.02, "y":78.03, "z":0, "depth":17.53, "diameter":22.5, "total-liquid-volume":6900}
+        }
+      },
+      "24-well-plate":{
+        "origin-offset":{
+            "x":13.67,
+            "y":15
+          },
+        "locations":{
+          "A1":{"x":0, "y":0, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "B1":{"x":19.3, "y":0, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "C1":{"x":38.6, "y":0, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "D1":{"x":57.9, "y":0, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "A2":{"x":0, "y":19.3, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "B2":{"x":19.3, "y":19.3, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "C2":{"x":38.6, "y":19.3, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "D2":{"x":57.9, "y":19.3, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "A3":{"x":0, "y":38.6, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "B3":{"x":19.3, "y":38.6, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "C3":{"x":38.6, "y":38.6, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "D3":{"x":57.9, "y":38.6, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "A4":{"x":0, "y":57.9, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "B4":{"x":19.3, "y":57.9, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "C4":{"x":38.6, "y":57.9, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "D4":{"x":57.9, "y":57.9, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "A5":{"x":0, "y":77.2, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "B5":{"x":19.3, "y":77.2, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "C5":{"x":38.6, "y":77.2, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "D5":{"x":57.9, "y":77.2, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "A6":{"x":0, "y":96.5, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "B6":{"x":19.3, "y":96.5, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "C6":{"x":38.6, "y":96.5, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900},
+          "D6":{"x":57.9, "y":96.5, "z":0, "depth":17.4, "diameter":16, "total-liquid-volume":1900}
+        }
+      },
+      "48-well-plate":{
+        "origin-offset":{
+            "x":10.08,
+            "y":18.16
+          },
+        "locations":{
+          "A1":{"x":0, "y":0, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B1":{"x":13.08, "y":0, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C1":{"x":26.16, "y":0, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D1":{"x":39.24, "y":0, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E1":{"x":52.32, "y":0, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F1":{"x":65.4, "y":0, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A2":{"x":0, "y":13.08, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B2":{"x":13.08, "y":13.08, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C2":{"x":26.16, "y":13.08, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D2":{"x":39.24, "y":13.08, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E2":{"x":52.32, "y":13.08, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F2":{"x":65.4, "y":13.08, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A3":{"x":0, "y":26.16, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B3":{"x":13.08, "y":26.16, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C3":{"x":26.16, "y":26.16, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D3":{"x":39.24, "y":26.16, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E3":{"x":52.32, "y":26.16, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F3":{"x":65.4, "y":26.16, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A4":{"x":0, "y":39.24, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B4":{"x":13.08, "y":39.24, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C4":{"x":26.16, "y":39.24, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D4":{"x":39.24, "y":39.24, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E4":{"x":52.32, "y":39.24, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F4":{"x":65.4, "y":39.24, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A5":{"x":0, "y":52.32, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B5":{"x":13.08, "y":52.32, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C5":{"x":26.16, "y":52.32, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D5":{"x":39.24, "y":52.32, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E5":{"x":52.32, "y":52.32, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F5":{"x":65.4, "y":52.32, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A6":{"x":0, "y":65.4, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B6":{"x":13.08, "y":65.4, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C6":{"x":26.16, "y":65.4, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D6":{"x":39.24, "y":65.4, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E6":{"x":52.32, "y":65.4, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F6":{"x":65.4, "y":65.4, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A7":{"x":0, "y":78.48, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B7":{"x":13.08, "y":78.48, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C7":{"x":26.16, "y":78.48, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D7":{"x":39.24, "y":78.48, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E7":{"x":52.32, "y":78.48, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F7":{"x":65.4, "y":78.48, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "A8":{"x":0, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "B8":{"x":13.08, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "C8":{"x":26.16, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "D8":{"x":39.24, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "E8":{"x":52.32, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950},
+          "F8":{"x":65.4, "y":91.56, "z":0, "depth":17.4, "diameter":11.25, "total-liquid-volume":950}
+        }
+      },
       "trough-1row-25ml":{
           "locations":{
               "A1":{"x":42.75, "y":63.875, "z":0, "depth":26, "diameter":10, "total-liquid-volume":25000 }
@@ -1185,7 +1307,7 @@
           }
       },
 
-      "24-plate":{
+      "24-vial-rack":{
           "origin-offset":{
             "x":13.67,
             "y":16
