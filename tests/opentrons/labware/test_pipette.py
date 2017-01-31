@@ -607,8 +607,8 @@ class PipetteTest(unittest.TestCase):
             30,
             self.plate[0:8],
             self.plate[1:9],
-            touch=True,
-            blow=True,
+            touch_tip=True,
+            blow_out=True,
             trash=True
         )
         # from pprint import pprint
@@ -671,8 +671,8 @@ class PipetteTest(unittest.TestCase):
             300,
             self.plate[0],
             self.plate[1],
-            touch=False,
-            blow=False
+            touch_tip=False,
+            blow_out=False
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -697,8 +697,8 @@ class PipetteTest(unittest.TestCase):
             598,
             self.plate[0],
             self.plate[1],
-            touch=False,
-            blow=False
+            touch_tip=False,
+            blow_out=False
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -736,8 +736,8 @@ class PipetteTest(unittest.TestCase):
             (10, 80),
             self.plate[0],
             self.plate.rows[1],
-            touch=False,
-            blow=False
+            touch_tip=False,
+            blow_out=False
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -769,8 +769,8 @@ class PipetteTest(unittest.TestCase):
             (10, 80),
             self.plate[0],
             self.plate.rows[1],
-            touch=False,
-            blow=False,
+            touch_tip=False,
+            blow_out=False,
             gradient=lambda x: 1.0 - x
         )
         # from pprint import pprint
@@ -892,8 +892,8 @@ class PipetteTest(unittest.TestCase):
             200,
             self.plate.rows[0],
             self.plate.rows[1],
-            touch=False,
-            blow=False
+            touch_tip=False,
+            blow_out=False
         )
         # from pprint import pprint
         # print('\n\n***\n')

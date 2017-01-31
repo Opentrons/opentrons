@@ -1215,12 +1215,12 @@ class Pipette(Instrument):
             to this `Pipette`, then the tip will be sent to the trash
             container.
 
-        touch : boolean
+        touch_tip : boolean
             If `True`, a :any:`touch_tip` will occur following each
             :any:`aspirate` and :any:`dispense`. If set to `False` (default),
             no :any:`touch_tip` will occur.
 
-        blow : boolean
+        blow_out : boolean
             If `True`, a :any:`blow_out` will occur following each
             :any:`dispense`, but only if the pipette has no liquid left in it.
             If set to `False` (default), no :any:`blow_out` will occur.
@@ -1592,14 +1592,14 @@ class Pipette(Instrument):
         optionally a :any:`touch_tip` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
-        touch = kwargs.get('touch', False)
+        should_touch_tip = kwargs.get('touch_tip', False)
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix_before', (0, 0))
         if isinstance(mix_before, (tuple, list)):
             if len(mix_before) == 2 and 0 not in mix_before:
                 self.mix(mix_before[0], mix_before[1], loc, enqueue=enqueue)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
-        if touch:
+        if should_touch_tip:
             self.touch_tip(enqueue=enqueue)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
@@ -1609,17 +1609,17 @@ class Pipette(Instrument):
         :any:`blow_out` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
-        touch = kwargs.get('touch', False)
+        should_touch_tip = kwargs.get('touch_tip', False)
         mix_after = kwargs.get('mix_after', (0, 0))
-        blow = kwargs.get('blow', False)
+        should_blow_out = kwargs.get('blow_out', False)
         rate = kwargs.get('rate', 1)
         self.dispense(vol, loc, rate=rate, enqueue=enqueue)
         if isinstance(mix_after, (tuple, list)):
             if len(mix_after) == 2 and 0 not in mix_after:
                 self.mix(mix_after[0], mix_after[1], enqueue=enqueue)
-        if touch:
+        if should_touch_tip:
             self.touch_tip(enqueue=enqueue)
-        if blow and self.current_volume == 0:
+        if should_blow_out and self.current_volume == 0:
             self.blow_out(enqueue=enqueue)
 
     def set_speed(self, **kwargs):
