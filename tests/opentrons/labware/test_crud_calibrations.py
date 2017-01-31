@@ -1,8 +1,12 @@
+import shutil
+import os
+import json
 import unittest
 
 from opentrons import Robot
 from opentrons import containers, instruments
 from opentrons.util.vector import Vector
+from opentrons.util import environment
 
 
 class CrudCalibrationsTestCase(unittest.TestCase):
@@ -71,3 +75,22 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.assertDictEqual(self.p200.positions, {
             'top': None, 'bottom': None, 'blow_out': None, 'drop_tip': None
         })
+
+    def test_delete_old_calibration_file(self):
+
+        def test_file(file_name):
+            calib_dir = environment.get_path('CALIBRATIONS_DIR')
+            shutil.copyfile(
+                os.path.join(os.path.dirname(__file__), file_name),
+                os.path.join(calib_dir, 'calibrations.json')
+            )
+
+            instruments.instrument.Instrument()._read_calibrations()
+
+            file = os.path.join(calib_dir, 'calibrations.json')
+            with open(file) as f:
+                calib_object = json.load(f)
+                self.assertEquals(calib_object['version'], 1)
+
+        test_file('data/calibrations.json')
+        test_file('data/invalid_json.json')
