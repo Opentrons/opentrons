@@ -24,12 +24,6 @@ CONFIG_DIR_PATH = os.environ.get('APP_DATA_DIR', os.getcwd())
 CONFIG_DIR_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie')
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 
-JSON_ERROR = None
-if sys.version_info > (3, 4):
-    JSON_ERROR = ValueError
-else:
-    JSON_ERROR = json.decoder.JSONDecodeError
-
 log = get_logger(__name__)
 
 
@@ -574,7 +568,7 @@ class CNCDriver(object):
                 # the uppercase axis are the "target" values
                 coords['target'][letter] = response_dict.get(letter.upper(), 0)
 
-        except JSON_ERROR:
+        except ValueError:
             log.critical("Error parsing JSON string from smoothie board:")
             log.critical(res)
 
