@@ -480,7 +480,12 @@ class CNCDriver(object):
         if not axis_to_home:
             return
 
-        res = self.send_command(self.HOME + axis_to_home)
+        res = None
+        try:
+            res = self.send_command(self.HOME + axis_to_home)
+        except Exception:
+            raise RuntimeWarning(
+                'HOMING ERROR: Check switches are being pressed and connected')
         if res == b'ok':
             # the axis aren't necessarily set to 0.0
             # values after homing, so force it
