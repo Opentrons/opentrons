@@ -15,7 +15,7 @@ Working in Jupyter?  Run the following command to get a list of all labware in t
 **container.list** ()
 
 .. testcode:: main
-	
+	from opentrons import containers
 	containers.list()
 
 Points

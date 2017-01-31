@@ -100,7 +100,7 @@ The example below declares 3 different containers and assigns them to the approp
 
 .. testcode:: main
 	
-	tiprack = containers.load('tiprack-200ul', 'A1')
+	tip_rack = containers.load('tiprack-200ul', 'A1')
 	plate = containers.load('96-PCR-flat', 'B2')
 	trash = containers.load('point', 'C3', 'my-weird-trash-container')
 
@@ -335,9 +335,10 @@ Want to deposit at the top of a tube?  Pull liquid from the bottom of the well? 
 .. testcode:: main
 
 	well = plate['A1']
-	p200.dispense(well.top())         # at the top of well
+	p200.dispense(well.bottom())      # at the bottom of well
 	p200.mix(3, 100, well.bottom(5))  # 5mm above bottom of well
-	p200.aspirate(well.top(-3))       # 3mm below top of well
+	p200.aspirate(50, well.top(-3))   # 3mm below top of well
+	p200.dispense(well.top(3))        # 3mm above top of well
 
 
 Delay
@@ -353,7 +354,6 @@ Delay commands can be called between any movement commands, so you have complete
 
 	p200.aspirate(120, plate['A1']).delay(1).dispense(10)
 	p200.dispense(plate['B2']).delay(60)
-	p200.aspirate(100, plate['B2'])
 
 Touch Tip
 ^^^^^^^^^
@@ -400,9 +400,17 @@ You can instruct the robot to pull up an extra volume of air after it aspirates 
 
 .. testcode:: main
 	
-	p200.aspirate(50, plate['A1']).air_gap() # moves 20 mm above well and aspirates air until pipette is full
-	p200.aspirate(50, plate['A1']).air_gap(50) # moves 20 mm above well and aspirates 50 uL
-	p200.aspirate(50, plate['A1']).air_gap(25, 5) # moves 5 mm above well and aspirates 25 uL
+	p200.aspirate(50, plate['A1'])
+	p200.air_gap()      # moves 20 mm above well and aspirates air until pipette is full
+	p200.dispense()
+
+	p200.aspirate(50, plate['A1'])
+	p200.air_gap(50)    # moves 20 mm above well and aspirates 50 uL
+	p200.dispense()
+
+	p200.aspirate(50, plate['A1'])
+	p200.air_gap(25, 5) # moves 5 mm above well and aspirates 25 uL
+	p200.dispense()
 
 
 Homing
