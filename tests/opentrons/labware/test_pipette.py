@@ -693,6 +693,60 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
+        self.p200.transfer(
+            202,
+            self.plate[0],
+            self.plate[1],
+            touch=False,
+            blow=False
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '101', 'Well A1'],
+            ['dispensing', '101', 'Well B1'],
+            ['aspirating', '101', 'Well A1'],
+            ['dispensing', '101', 'Well B1'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+        self.p200.reset()
+        self.p200.transfer(
+            598,
+            self.plate[0],
+            self.plate[1],
+            touch=False,
+            blow=False
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well B1'],
+            ['aspirating', '199', 'Well A1'],
+            ['dispensing', '199', 'Well B1'],
+            ['aspirating', '199', 'Well A1'],
+            ['dispensing', '199', 'Well B1'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+        self.p200.reset()
         self.assertRaises(
             RuntimeWarning,
             self.p200.transfer,
