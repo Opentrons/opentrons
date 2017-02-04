@@ -16,7 +16,7 @@ class PlaceableTestCase(unittest.TestCase):
         for i in range(0, wells):
             well = Well(properties={'radius': radius, 'height': height})
             row, col = divmod(i, cols)
-            name = chr(row + ord('A')) + str(1 + col)
+            name = chr(col + ord('A')) + str(1 + row)
             coordinates = (col * spacing[0] + offset[0],
                            row * spacing[1] + offset[1],
                            0)
@@ -40,7 +40,7 @@ class PlaceableTestCase(unittest.TestCase):
     def test_next(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         well = c['A1']
-        expected = c.get_child_by_name('A2')
+        expected = c.get_child_by_name('B1')
 
         self.assertEqual(next(well), expected)
 
@@ -48,7 +48,7 @@ class PlaceableTestCase(unittest.TestCase):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
 
         self.assertEqual(c[3], c.get_child_by_name('B2'))
-        self.assertEqual(c[1], c.get_child_by_name('A2'))
+        self.assertEqual(c[1], c.get_child_by_name('B1'))
 
     def test_named_well(self):
         deck = Deck()
@@ -165,3 +165,11 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertEqual(
             plate['A1'].top(10),
             (plate['A1'], Vector(5, 5, 20)))
+
+    def test_slice_with_strings(self):
+        c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+        self.assertListEqual(c['A1':'A2'], c[0:8])
+        self.assertListEqual(c['A12':], c.rows[-1][0:])
+        self.assertListEqual(c.rows['4':'8'], c.rows[3:7])
+        self.assertListEqual(c.cols['B':'E'], c.cols[1:4])
+        self.assertListEqual(c.cols['B']['1':'7'], c.cols[1][0:6])

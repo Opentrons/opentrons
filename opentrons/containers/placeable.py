@@ -86,7 +86,17 @@ class Placeable(object):
         Returns placeable by name or index
         If slice is given, returns a list
         """
-        if isinstance(name, int) or isinstance(name, slice):
+        if isinstance(name, slice):
+            if isinstance(name.start, str):
+                s = self.get_children_list().index(
+                    self.get_child_by_name(name.start))
+                name = slice(s, name.stop, name.step)
+            if isinstance(name.stop, str):
+                s = self.get_children_list().index(
+                    self.get_child_by_name(name.stop))
+                name = slice(name.start, s, name.step)
+            return self.get_children_list()[name]
+        elif isinstance(name, int):
             return self.get_children_list()[name]
         elif isinstance(name, str):
             return self.get_child_by_name(name)
@@ -589,10 +599,22 @@ class WellSeries(Placeable):
             ' '.join([str(well) for well in self.values]))
 
     def __getitem__(self, index):
-        if isinstance(index, str):
+        if isinstance(index, slice):
+            if isinstance(index.start, str):
+                s = list(self.values).index(
+                    self.items[index.start])
+                index = slice(s, index.stop, index.step)
+            if isinstance(index.stop, str):
+                s = list(self.values).index(
+                    self.items[index.stop])
+                index = slice(index.start, s, index.step)
+            return list(self.values)[index]
+        elif isinstance(index, int):
+            return list(self.values)[index]
+        elif isinstance(index, str):
             return self.items[index]
         else:
-            return list(self.values)[index]
+            raise TypeError('Expected int, slice or str')
 
     def __getattr__(self, name):
         # getstate/setstate are used by pickle and are not implemented by
