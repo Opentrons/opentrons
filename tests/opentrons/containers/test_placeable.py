@@ -25,7 +25,11 @@ class PlaceableTestCase(unittest.TestCase):
 
     def assertWellSeriesEqual(self, w1, w2):
         if hasattr(w1, '__len__') and hasattr(w2, '__len__'):
-            self.assertEqual(len(w1), len(w2))
+            if len(w1) != len(w2):
+                print(w1)
+                print('!=')
+                print(w2)
+                assert False
             for i in range(len(w1)):
                 self.assertEquals(w1[i], w2[i])
         else:
@@ -223,6 +227,12 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(
             c.cols['A'].range('2', '7', 2),
             c.cols['A']['2':'7':2])
+        self.assertWellSeriesEqual(
+            c.cols['A'].range('7', '2', 2),
+            c.cols['A'].wells('7', '5', '3'))
+        self.assertWellSeriesEqual(
+            c.cols['A'].range('7', '2', -2),
+            c.cols['A'].wells('7', '5', '3'))
 
     def test_group(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
@@ -230,6 +240,18 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(
             c.group('A1', 'H1'),
             c.range('A1', 'A2'))
+
+        self.assertWellSeriesEqual(
+            c.group('A1', 'H1', 2),
+            c.range('A1', 'A2', 2))
+
+        self.assertWellSeriesEqual(
+            c.group('H1', 'B1'),
+            c.range('H1', 'A1'))
+
+        self.assertWellSeriesEqual(
+            c.group('H1', 'A1', -2),
+            c.range('H1', 'A1', -2))
 
         self.assertWellSeriesEqual(
             c.cols.group('A', 'C'),
@@ -250,7 +272,6 @@ class PlaceableTestCase(unittest.TestCase):
             c.chain('A3'),
             c['A3':])
 
-        print('\n\n\n\n FUCK \n\n\n')
         self.assertWellSeriesEqual(
             c.chain('C3', 8),
             c['C3':'C4'])
@@ -258,6 +279,14 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(
             c.chain('C3', 4, -1),
             c.wells('C3', 'B3', 'A3', 'H2'))
+
+        self.assertWellSeriesEqual(
+            c.chain('C3', -4),
+            c.wells('C3', 'B3', 'A3', 'H2'))
+
+        self.assertWellSeriesEqual(
+            c.chain('C3', -4, 2),
+            c.wells('C3', 'A3', 'G2', 'E2'))
 
         self.assertWellSeriesEqual(
             c.cols.chain('A', 3),

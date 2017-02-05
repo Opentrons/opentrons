@@ -584,6 +584,12 @@ class Container(Placeable):
         """
         Returns WellSeries of child Wells using slice
         """
+        args = list(args)
+        if len(args) == 2:
+            args.append(1)  # default step is 1
+        if len(args) > 1:   # negative step if stop < start
+            if args[1] < args[0] and args[2] > 0:
+                args[2] *= -1
         return self.__getitem__(slice(*args))
 
     def group(self, first, last, step=1):
@@ -591,9 +597,16 @@ class Container(Placeable):
         Returns WellSeries of child Wells, similar to range
         but specify last instead of stop
         """
+        if isinstance(first, str):
+            first = self.get_index_from_name(first)
         if isinstance(last, str):
             last = self.get_index_from_name(last)
-        return WellSeries(self.__getitem__(slice(first, last + 1, step)))
+        if last < first and step > 0:
+            step *= -1
+        child_list = [w for w in self.__getitem__(slice(first, last, step))]
+        if abs(last - first) % abs(step) == 0:
+            child_list.append(self[last])
+        return WellSeries(child_list)
 
     def chain(self, first, length=None, step=1):
         """
@@ -604,6 +617,10 @@ class Container(Placeable):
             first = self.get_index_from_name(first)
         if length is None:
             length = len(self)
+        if length < 0:
+            length *= -1
+            if step > 0:
+                step *= -1
         return WellSeries(self.__getitem__(
             slice(first, first + (length * step), step)))
 
