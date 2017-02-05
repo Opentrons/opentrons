@@ -132,8 +132,9 @@ class Placeable(object):
         """
         Returns Placeable's name withing the parent
         """
-        if not self.parent:
+        if self.parent is None:
             return None
+
         return self.parent.children_by_reference[self]
 
     def get_type(self):
