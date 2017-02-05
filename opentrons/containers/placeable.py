@@ -260,7 +260,7 @@ class Placeable(object):
         if isinstance(s.stop, str):
             s = slice(
                 s.start, self.get_index_from_name(s.stop), s.step)
-        return self.get_children_list()[s]
+        return WellSeries(self.get_children_list()[s])
 
     def has_children(self):
         """
@@ -516,7 +516,7 @@ class Container(Placeable):
 
     def get_wellseries(self, matrix):
         """
-        Returns the grid as a series of WellSeries
+        Returns the grid as a WellSeries of WellSeries
         """
         res = OrderedDict()
         for row, cells in matrix.items():
@@ -526,7 +526,7 @@ class Container(Placeable):
                 res[row][col] = self.children_by_name[
                     ''.join(reversed(cell))
                 ]
-            res[row] = WellSeries(res[row])
+            res[row] = WellSeries(res[row], name=row)
         return WellSeries(res)
 
     @property
@@ -581,15 +581,15 @@ class Container(Placeable):
         Returns child Well or list of child Wells
         """
         if len(args) > 0:
-            return [self.__getitem__(n) for n in args]
+            return WellSeries([self.__getitem__(n) for n in args])
         else:
-            return self.get_children_list()
+            return WellSeries(self.get_children_list())
 
     def range(self, *args):
         """
         Returns list of child Wells using slice
         """
-        return self.__getitem__(slice(*args))
+        return WellSeries(self.__getitem__(slice(*args)))
 
     def group(self, first, last, step=1):
         """
@@ -598,7 +598,7 @@ class Container(Placeable):
         """
         if isinstance(last, str):
             last = self.get_index_from_name(last)
-        return self.__getitem__(slice(first, last + 1, step))
+        return WellSeries(self.__getitem__(slice(first, last + 1, step)))
 
     def chain(self, first, length=None, step=1):
         """
@@ -609,8 +609,8 @@ class Container(Placeable):
             first = self.get_index_from_name(first)
         if length is None:
             length = len(self)
-        return self.__getitem__(
-            slice(first, first + (length * step), step))
+        return WellSeries(self.__getitem__(
+            slice(first, first + (length * step), step)))
 
 
 class WellSeries(Container):
@@ -624,12 +624,15 @@ class WellSeries(Container):
 
     Default well index can be overriden using :set_offset:
     """
-    def __init__(self, items):
-        self.items = items
-        if isinstance(items, dict):
-            items = list(self.items.values())
-        self.values = items
+    def __init__(self, wells, name='<Series>'):
+        if isinstance(wells, dict):
+            self.items = wells
+            self.values = list(wells.values())
+        else:
+            self.items = {w.get_name(): w for w in wells}
+            self.values = wells
         self.offset = 0
+        self.name = name
 
     def set_offset(self, offset):
         """
@@ -665,7 +668,7 @@ class WellSeries(Container):
         return getattr(self.values[self.offset], name)
 
     def get_name(self):
-        return '<Series>'
+        return str(self.name)
 
     def get_children_list(self):
         return list(self.values)
