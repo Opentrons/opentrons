@@ -238,7 +238,7 @@ class Placeable(object):
         """
         return self.children_by_name.get(name)
 
-    def get_index_by_name(self, name):
+    def get_index_from_name(self, name):
         """
         Retrieves child's name by index
         """
@@ -251,10 +251,10 @@ class Placeable(object):
         """
         if isinstance(s.start, str):
             s = slice(
-                self.get_index_by_name(s.start), s.stop, s.step)
+                self.get_index_from_name(s.start), s.stop, s.step)
         if isinstance(s.stop, str):
             s = slice(
-                s.start, self.get_index_by_name(s.stop), s.step)
+                s.start, self.get_index_from_name(s.stop), s.step)
         return self.get_children_list()[s]
 
     def has_children(self):
@@ -528,12 +528,12 @@ class Container(Placeable):
     def rows(self):
         """
         Rows can be accessed as:
-        >>> plate.row[0]
-        >>> plate.row['1']
+        >>> plate.rows[0]
+        >>> plate.rows['1']
 
         Wells can be accessed as:
-        >>> plate.row[0][0]
-        >>> plate.row['1']['A']
+        >>> plate.rows[0][0]
+        >>> plate.rows['1']['A']
         """
         self.calculate_grid()
         return self.grid
@@ -565,20 +565,50 @@ class Container(Placeable):
         """
         return self.columns
 
-    def well(self, name):
+    def well(self, name=None):
         """
         Returns well by :name:
         """
-        return self.get_child_by_name(name)
+        return self.wells(name)
 
-    def wells(self):
+    def wells(self, *args):
         """
-        Returns all wells
+        Returns child Well or list of child Wells
         """
-        return self.get_children()
+        if len(args) > 1:
+            return [self.__getitem__(n) for n in args]
+        elif len(args) == 0:
+            return self.get_children_list()
+        return self.__getitem__(args[0])
+
+    def range(self, *args):
+        """
+        Returns list of child Wells using slice
+        """
+        return self.__getitem__(slice(*args))
+
+    def group(self, first, last, step=None):
+        """
+        Returns list of child Wells, similar to range
+        but specify last instead of stop
+        """
+        if isinstance(last, str):
+            last = self.get_index_from_name(last)
+        return self.__getitem__(slice(first, last + 1, step))
+
+    def chain(self, first, length=None, step=None):
+        """
+        Returns list of child Wells, similar to range
+        but specify last instead of stop
+        """
+        if isinstance(first, str):
+            first = self.get_index_from_name(first)
+        if length is None:
+            length = len(self) - first
+        return self.__getitem__(slice(first, first + length, step))
 
 
-class WellSeries(Placeable):
+class WellSeries(Container):
     """
     :WellSeries: represents a series of wells to make
     accessing rows and columns easier. You can access
@@ -613,11 +643,14 @@ class WellSeries(Placeable):
         if isinstance(index, slice):
             return self.get_children_from_slice(index)
         elif isinstance(index, int):
-            return list(self.values)[index]
+            return self.get_children_list()[index]
         elif isinstance(index, str):
             return self.items[index]
         else:
             raise TypeError('Expected int, slice or str')
+
+    def __len__(self):
+        return len(self.values)
 
     def __getattr__(self, name):
         # getstate/setstate are used by pickle and are not implemented by
@@ -626,11 +659,14 @@ class WellSeries(Placeable):
             raise AttributeError()
         return getattr(self.values[self.offset], name)
 
-    def get_index_by_name(self, name):
+    def get_children_list(self):
+        return list(self.values)
+
+    def get_index_from_name(self, name):
         """
         Retrieves child's name by index
         """
-        return list(self.values).index(
+        return self.get_children_list().index(
             self.items[name])
 
     def get_children_from_slice(self, s):
@@ -639,8 +675,8 @@ class WellSeries(Placeable):
         """
         if isinstance(s.start, str):
             s = slice(
-                self.get_index_by_name(s.start), s.stop, s.step)
+                self.get_index_from_name(s.start), s.stop, s.step)
         if isinstance(s.stop, str):
             s = slice(
-                s.start, self.get_index_by_name(s.stop), s.step)
-        return list(self.values)[s]
+                s.start, self.get_index_from_name(s.stop), s.step)
+        return self.get_children_list()[s]
