@@ -81,6 +81,52 @@ class Placeable(object):
             if dimension not in properties:
                 properties[dimension] = 0
 
+    def __call__(self, *args, **kwargs):
+        try:
+            return self._parse_string(*args, **kwargs)
+        except (ValueError, IndexError, KeyError) as e:
+            return self.wells(*args, **kwargs)
+
+    def _parse_string(self, *args, **kwargs):
+        '''
+        Attemps to parse the argument for .chain() or .group() methods
+        It looks for '~' (chain) or '-' (group) to split the passed string
+        Validates them as argument to .chain() or .group(), then calls
+        those methods
+
+        Example:
+
+            plate('A1-H1')  # same as `plate.group('A1', 'H1')`
+            plate('A1~4')  # same as `plate.chain('A1', 4)`
+        '''
+
+        def _parse_arguments(method, character, *args):
+            vals = args[0].split(character)
+            if vals[0] not in self.children_by_name:
+                raise KeyError()
+            if method == 'chain':
+                if vals[1]:
+                    vals[1] = int(vals[1])
+                else:
+                    del vals[1]
+            elif vals[1] not in self.children_by_name:
+                raise KeyError()
+            if len(vals) == 2 and len(args) >= 2:
+                vals.append(args[1])
+            return vals
+
+        methods = {
+            'chain': '~',
+            'group': '-'
+        }
+        for meth, l in methods.items():
+            try:
+                a = _parse_arguments(meth, l, *args)
+                return getattr(self, meth)(*a)
+            except Exception:
+                pass
+        raise ValueError()
+
     def __getitem__(self, name):
         """
         Returns placeable by name or index
@@ -576,7 +622,7 @@ class Container(Placeable):
         Returns child Well or list of child Wells
         """
         if len(args) > 0:
-            return WellSeries([self.__getitem__(n) for n in args])
+            return WellSeries([self.well(n) for n in args])
         else:
             return WellSeries(self.get_children_list())
 
@@ -590,7 +636,7 @@ class Container(Placeable):
         if len(args) > 1:   # negative step if stop < start
             if args[1] < args[0] and args[2] > 0:
                 args[2] *= -1
-        return self.__getitem__(slice(*args))
+        return self.well(slice(*args))
 
     def group(self, first, last, step=1):
         """
@@ -617,6 +663,8 @@ class Container(Placeable):
             index = self.get_index_from_name(index)
         if length is None:
             length = len(self) - index
+        if not isinstance(length, int):
+            length = int(length)
         if length < 0:
             length = abs(length)
             if step > 0:

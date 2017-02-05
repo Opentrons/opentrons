@@ -311,3 +311,56 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(
             c.cols['A'].chain('4', -3, 3),
             c.cols['A'].wells('4', '1', '10'))
+
+    def test_string_syntax(self):
+        plate = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+
+        # WELLS
+
+        self.assertWellSeriesEqual(
+            plate(),
+            plate)
+
+        self.assertWellSeriesEqual(
+            plate('A1'),
+            [plate['A1']])
+
+        self.assertWellSeriesEqual(
+            plate('A1', 'B3', 'C8'),
+            plate.wells('A1', 'B3', 'C8'))
+
+        # CHAIN ~
+
+        self.assertWellSeriesEqual(
+            plate.chain('A1', -8),
+            plate('A1~-8'))
+
+        self.assertWellSeriesEqual(
+            plate.chain('A2'),
+            plate('A2~'))
+
+        self.assertWellSeriesEqual(
+            plate.chain('A2', 3, 3),
+            plate('A2~3', 3))
+
+        self.assertWellSeriesEqual(
+            plate.chain('A2', 3, -3),
+            plate('A2~-3', -3))
+
+        # GROUP -
+
+        self.assertWellSeriesEqual(
+            plate.group('C1', 'H8'),
+            plate('C1-H8'))
+
+        self.assertWellSeriesEqual(
+            plate.group(2, 1),
+            plate('C1-B1'))
+
+        self.assertWellSeriesEqual(
+            plate.group('A1', 'H1'),
+            plate('A1-H1'))
+
+        self.assertWellSeriesEqual(
+            plate.group('A1', 'H1', 2),
+            plate('A1-H1', 2))
