@@ -249,3 +249,7 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertListEqual(
             c.cols['A'].chain('1', 3),
             c.cols['A'].range('1', '4'))
+
+        self.assertListEqual(
+            c.cols['A'].chain('1', 3, 3),
+            c.cols['A'].range('1', '8', 3))
