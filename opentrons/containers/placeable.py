@@ -87,15 +87,7 @@ class Placeable(object):
         If slice is given, returns a list
         """
         if isinstance(name, slice):
-            if isinstance(name.start, str):
-                s = self.get_children_list().index(
-                    self.get_child_by_name(name.start))
-                name = slice(s, name.stop, name.step)
-            if isinstance(name.stop, str):
-                s = self.get_children_list().index(
-                    self.get_child_by_name(name.stop))
-                name = slice(name.start, s, name.step)
-            return self.get_children_list()[name]
+            return self.get_children_from_slice(name)
         elif isinstance(name, int):
             return self.get_children_list()[name]
         elif isinstance(name, str):
