@@ -333,6 +333,12 @@ class PlaceableTestCase(unittest.TestCase):
             plate('A1,B3,C8'),
             plate.wells('A1', 'B3', 'C8'))
 
+        self.assertWellSeriesEqual(
+            plate('A1,B3', 'C8'),
+            plate.wells('A1', 'B3', 'C8'))
+
+        self.assertRaises(Exception, plate, 'A1,B23')
+
         # CHAIN ~
 
         self.assertWellSeriesEqual(

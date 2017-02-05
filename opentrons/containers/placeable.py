@@ -118,19 +118,19 @@ class Placeable(object):
         vals = [n.strip() for n in args[0].split(character)]
         if len(vals) < 2:
             raise ValueError()
-        if vals[0] not in self.children_by_name:
-            raise KeyError()
-        if method == 'chain':
-            if vals[1]:
+
+        if method is 'chain':
+            assert self.children_by_name[vals[0]]
+            try:
                 vals[1] = int(vals[1])
-            else:
-                del vals[1]
-        elif len(vals) > 1:
-            for v in vals[1:]:
-                if v not in self.children_by_name:
-                    raise KeyError()
-        if method != 'wells' and len(vals) == 2 and len(args) >= 2:
-            vals.append(args[1])
+            except ValueError:
+                vals = vals[:1]
+        else:
+            for v in vals:
+                assert self.children_by_name[v]
+
+        if (method is 'wells' or len(vals) is 2) and len(args) > 1:
+            vals.extend(args[1:])
         return vals
 
     def __getitem__(self, name):
