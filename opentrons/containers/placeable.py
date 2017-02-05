@@ -603,26 +603,29 @@ class Container(Placeable):
             last = self.get_index_from_name(last)
         if last < first and step > 0:
             step *= -1
-        child_list = [w for w in self.__getitem__(slice(first, last, step))]
+        child_list = [w for w in self.range(first, last, step)]
         if abs(last - first) % abs(step) == 0:
             child_list.append(self[last])
         return WellSeries(child_list)
 
-    def chain(self, first, length=None, step=1):
+    def chain(self, index, length=None, step=1):
         """
         Returns WellSeries of child Wells of the specified "length",
         starting at the "first" well, and iterating using "step"
         """
-        if isinstance(first, str):
-            first = self.get_index_from_name(first)
+        if isinstance(index, str):
+            index = self.get_index_from_name(index)
         if length is None:
-            length = len(self)
+            length = len(self) - index
         if length < 0:
-            length *= -1
+            length = abs(length)
             if step > 0:
                 step *= -1
-        return WellSeries(self.__getitem__(
-            slice(first, first + (length * step), step)))
+        child_wells = []
+        while len(child_wells) < length:
+            child_wells.append(self[index])
+            index = (index + step) % len(self)
+        return WellSeries(child_wells)
 
 
 class WellSeries(Container):

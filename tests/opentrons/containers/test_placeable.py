@@ -27,7 +27,7 @@ class PlaceableTestCase(unittest.TestCase):
         if hasattr(w1, '__len__') and hasattr(w2, '__len__'):
             if len(w1) != len(w2):
                 print(w1)
-                print('!=')
+                print('{} != {}'.format(len(w1), len(w2)))
                 print(w2)
                 assert False
             for i in range(len(w1)):
@@ -289,6 +289,10 @@ class PlaceableTestCase(unittest.TestCase):
             c.wells('C3', 'A3', 'G2', 'E2'))
 
         self.assertWellSeriesEqual(
+            c.chain('B1', -4),
+            c.wells('B1', 'A1', 'H12', 'G12'))
+
+        self.assertWellSeriesEqual(
             c.cols.chain('A', 3),
             c.cols.range('A', 'D'))
 
@@ -299,3 +303,11 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(
             c.cols['A'].chain('1', 3, 3),
             c.cols['A'].range('1', '8', 3))
+
+        self.assertWellSeriesEqual(
+            c.cols['A'].chain('7', -3, 3),
+            c.cols['A'].wells('7', '4', '1'))
+
+        self.assertWellSeriesEqual(
+            c.cols['A'].chain('4', -3, 3),
+            c.cols['A'].wells('4', '1', '10'))
