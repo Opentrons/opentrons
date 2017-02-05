@@ -315,7 +315,7 @@ class PlaceableTestCase(unittest.TestCase):
     def test_string_syntax(self):
         plate = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
 
-        # WELLS
+        # WELLS ,
 
         self.assertWellSeriesEqual(
             plate(),
@@ -327,6 +327,10 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertWellSeriesEqual(
             plate('A1', 'B3', 'C8'),
+            plate.wells('A1', 'B3', 'C8'))
+
+        self.assertWellSeriesEqual(
+            plate('A1,B3,C8'),
             plate.wells('A1', 'B3', 'C8'))
 
         # CHAIN ~

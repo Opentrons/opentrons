@@ -96,12 +96,15 @@ class Placeable(object):
 
         Example:
 
+            plate('A1,B3,C2')  # same as `plate.wells('A1', 'B3', 'C2')`
             plate('A1-H1')  # same as `plate.group('A1', 'H1')`
             plate('A1~4')  # same as `plate.chain('A1', 4)`
         '''
 
-        def _parse_arguments(method, character, *args):
-            vals = args[0].split(character)
+        def _parse_arguments(method, character, args):
+            vals = [n.strip() for n in args[0].split(character)]
+            if len(vals) < 2:
+                raise ValueError()
             if vals[0] not in self.children_by_name:
                 raise KeyError()
             if method == 'chain':
@@ -109,19 +112,22 @@ class Placeable(object):
                     vals[1] = int(vals[1])
                 else:
                     del vals[1]
-            elif vals[1] not in self.children_by_name:
-                raise KeyError()
-            if len(vals) == 2 and len(args) >= 2:
+            elif len(vals) > 1:
+                for v in vals[1:]:
+                    if v not in self.children_by_name:
+                        raise KeyError()
+            if method != 'wells' and len(vals) == 2 and len(args) >= 2:
                 vals.append(args[1])
             return vals
 
         methods = {
             'chain': '~',
-            'group': '-'
+            'group': '-',
+            'wells': ','
         }
         for meth, l in methods.items():
             try:
-                a = _parse_arguments(meth, l, *args)
+                a = _parse_arguments(meth, l, args)
                 return getattr(self, meth)(*a)
             except Exception:
                 pass
