@@ -203,7 +203,6 @@ class Placeable(object):
 
         child._coordinates = Vector(coordinates)
         child.parent = self
-        child.name = name
         self.children_by_name[name] = child
         self.children_by_reference[child] = name
 
