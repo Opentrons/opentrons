@@ -247,6 +247,10 @@ class PlaceableTestCase(unittest.TestCase):
             c[0:8])
 
         self.assertWellSeriesEqual(
+            c.chain('A3'),
+            c['A3':])
+
+        self.assertWellSeriesEqual(
             c.chain('C3', 8),
             c['C3':'C4'])
 
