@@ -101,25 +101,6 @@ class Placeable(object):
             plate('A1~4')  # same as `plate.chain('A1', 4)`
         '''
 
-        def _parse_arguments(method, character, args):
-            vals = [n.strip() for n in args[0].split(character)]
-            if len(vals) < 2:
-                raise ValueError()
-            if vals[0] not in self.children_by_name:
-                raise KeyError()
-            if method == 'chain':
-                if vals[1]:
-                    vals[1] = int(vals[1])
-                else:
-                    del vals[1]
-            elif len(vals) > 1:
-                for v in vals[1:]:
-                    if v not in self.children_by_name:
-                        raise KeyError()
-            if method != 'wells' and len(vals) == 2 and len(args) >= 2:
-                vals.append(args[1])
-            return vals
-
         methods = {
             'chain': '~',
             'group': '-',
@@ -127,11 +108,30 @@ class Placeable(object):
         }
         for meth, l in methods.items():
             try:
-                a = _parse_arguments(meth, l, args)
+                a = self._parse_string_arguments(meth, l, args)
                 return getattr(self, meth)(*a)
             except Exception:
                 pass
         raise ValueError()
+
+    def _parse_string_arguments(self, method, character, args):
+        vals = [n.strip() for n in args[0].split(character)]
+        if len(vals) < 2:
+            raise ValueError()
+        if vals[0] not in self.children_by_name:
+            raise KeyError()
+        if method == 'chain':
+            if vals[1]:
+                vals[1] = int(vals[1])
+            else:
+                del vals[1]
+        elif len(vals) > 1:
+            for v in vals[1:]:
+                if v not in self.children_by_name:
+                    raise KeyError()
+        if method != 'wells' and len(vals) == 2 and len(args) >= 2:
+            vals.append(args[1])
+        return vals
 
     def __getitem__(self, name):
         """
