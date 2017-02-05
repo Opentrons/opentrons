@@ -120,14 +120,14 @@ class Placeable(object):
             raise ValueError()
 
         if method is 'chain':
-            assert self.children_by_name[vals[0]]
+            assert self.get_child_by_name(vals[0])
             try:
                 vals[1] = int(vals[1])
             except ValueError:
                 vals = vals[:1]
         else:
             for v in vals:
-                assert self.children_by_name[v]
+                assert self.get_child_by_name(v)
 
         if (method is 'wells' or len(vals) is 2) and len(args) > 1:
             vals.extend(args[1:])
