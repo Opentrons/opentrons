@@ -246,6 +246,25 @@ class Placeable(object):
         """
         return self.children_by_name.get(name)
 
+    def get_index_by_name(self, name):
+        """
+        Retrieves child's name by index
+        """
+        return self.get_children_list().index(
+            self.get_child_by_name(name))
+
+    def get_children_from_slice(self, s):
+        """
+        Retrieves list of children within slice
+        """
+        if isinstance(s.start, str):
+            s = slice(
+                self.get_index_by_name(s.start), s.stop, s.step)
+        if isinstance(s.stop, str):
+            s = slice(
+                s.start, self.get_index_by_name(s.stop), s.step)
+        return self.get_children_list()[s]
+
     def has_children(self):
         """
         Returns *True* if :Placeable: has children
@@ -600,15 +619,7 @@ class WellSeries(Placeable):
 
     def __getitem__(self, index):
         if isinstance(index, slice):
-            if isinstance(index.start, str):
-                s = list(self.values).index(
-                    self.items[index.start])
-                index = slice(s, index.stop, index.step)
-            if isinstance(index.stop, str):
-                s = list(self.values).index(
-                    self.items[index.stop])
-                index = slice(index.start, s, index.step)
-            return list(self.values)[index]
+            return self.get_children_from_slice(index)
         elif isinstance(index, int):
             return list(self.values)[index]
         elif isinstance(index, str):
@@ -622,3 +633,22 @@ class WellSeries(Placeable):
         if name in ('__getstate__', '__setstate__'):
             raise AttributeError()
         return getattr(self.values[self.offset], name)
+
+    def get_index_by_name(self, name):
+        """
+        Retrieves child's name by index
+        """
+        return list(self.values).index(
+            self.items[name])
+
+    def get_children_from_slice(self, s):
+        """
+        Retrieves list of children within slice
+        """
+        if isinstance(s.start, str):
+            s = slice(
+                self.get_index_by_name(s.start), s.stop, s.step)
+        if isinstance(s.stop, str):
+            s = slice(
+                s.start, self.get_index_by_name(s.stop), s.step)
+        return list(self.values)[s]
