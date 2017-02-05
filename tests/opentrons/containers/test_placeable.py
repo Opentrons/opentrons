@@ -179,7 +179,7 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertEquals(c.well(0), c[0])
         self.assertEquals(c.well('A2'), c['A2'])
-        self.assertEquals(c.wells(0), c[0])
+        self.assertEquals(c.wells(0), [c[0]])
         self.assertListEqual(c.wells(), c[0:])
 
         expected = [c[n] for n in ['A1', 'B2', 'C3']]

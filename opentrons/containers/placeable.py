@@ -569,17 +569,16 @@ class Container(Placeable):
         """
         Returns well by :name:
         """
-        return self.wells(name)
+        return self.__getitem__(name)
 
     def wells(self, *args):
         """
         Returns child Well or list of child Wells
         """
-        if len(args) > 1:
+        if len(args) > 0:
             return [self.__getitem__(n) for n in args]
-        elif len(args) == 0:
+        else:
             return self.get_children_list()
-        return self.__getitem__(args[0])
 
     def range(self, *args):
         """
@@ -605,7 +604,8 @@ class Container(Placeable):
             first = self.get_index_from_name(first)
         if length is None:
             length = len(self)
-        return self.__getitem__(slice(first, first + (length * step), step))
+        return self.__getitem__(
+            slice(first, first + (length * step), step))
 
 
 class WellSeries(Container):
@@ -668,15 +668,3 @@ class WellSeries(Container):
         """
         return self.get_children_list().index(
             self.items[name])
-
-    def get_children_from_slice(self, s):
-        """
-        Retrieves list of children within slice
-        """
-        if isinstance(s.start, str):
-            s = slice(
-                self.get_index_from_name(s.start), s.stop, s.step)
-        if isinstance(s.stop, str):
-            s = slice(
-                s.start, self.get_index_from_name(s.stop), s.step)
-        return self.get_children_list()[s]
