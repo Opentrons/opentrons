@@ -23,6 +23,14 @@ class PlaceableTestCase(unittest.TestCase):
             c.add(well, name, coordinates)
         return c
 
+    def assertWellSeriesEqual(self, w1, w2):
+        if hasattr(w1, '__len__') and hasattr(w2, '__len__'):
+            self.assertEqual(len(w1), len(w2))
+            for i in range(len(w1)):
+                self.assertEquals(w1[i], w2[i])
+        else:
+            self.assertEquals(w1, w2)
+
     def test_get_name(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         expected = '<Well A1>'
@@ -168,88 +176,88 @@ class PlaceableTestCase(unittest.TestCase):
 
     def test_slice_with_strings(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
-        self.assertListEqual(c['A1':'A2'], c[0:8])
-        self.assertListEqual(c['A12':], c.rows[-1][0:])
-        self.assertListEqual(c.rows['4':'8'], c.rows[3:7])
-        self.assertListEqual(c.cols['B':'E'], c.cols[1:4])
-        self.assertListEqual(c.cols['B']['1':'7'], c.cols[1][0:6])
+        self.assertWellSeriesEqual(c['A1':'A2'], c[0:8])
+        self.assertWellSeriesEqual(c['A12':], c.rows[-1][0:])
+        self.assertWellSeriesEqual(c.rows['4':'8'], c.rows[3:7])
+        self.assertWellSeriesEqual(c.cols['B':'E'], c.cols[1:4])
+        self.assertWellSeriesEqual(c.cols['B']['1':'7'], c.cols[1][0:6])
 
     def test_wells(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
 
-        self.assertEquals(c.well(0), c[0])
-        self.assertEquals(c.well('A2'), c['A2'])
-        self.assertEquals(c.wells(0), [c[0]])
-        self.assertListEqual(c.wells(), c[0:])
+        self.assertWellSeriesEqual(c.well(0), c[0])
+        self.assertWellSeriesEqual(c.well('A2'), c['A2'])
+        self.assertWellSeriesEqual(c.wells(0), [c[0]])
+        self.assertWellSeriesEqual(c.wells(), c[0:])
 
         expected = [c[n] for n in ['A1', 'B2', 'C3']]
-        self.assertListEqual(c.wells('A1', 'B2', 'C3'), expected)
+        self.assertWellSeriesEqual(c.wells('A1', 'B2', 'C3'), expected)
 
         expected = [c.cols[0][0], c.cols[0][5]]
-        self.assertListEqual(c.cols['A'].wells('1', '6'), expected)
+        self.assertWellSeriesEqual(c.cols['A'].wells('1', '6'), expected)
 
     def test_range(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.range(0, 96),
             c[0:96])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.range(2, 12, 3),
             c[2:12:3])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.range('A3'),
             c[0:16])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.range('A1', 'A3'),
             c['A1':'A3'])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols.range('A', 'D'),
             c.cols['A':'D'])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols['A'].range('2', '7'),
             c.cols['A']['2':'7'])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols.range('A', 'D', 2),
             c.cols['A':'D':2])
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols['A'].range('2', '7', 2),
             c.cols['A']['2':'7':2])
 
     def test_group(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.group('A1', 'H1'),
             c.range('A1', 'A2'))
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols.group('A', 'C'),
             c.cols.range('A', 'D'))
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols['A'].group('1', '3'),
             c.cols['A'].range('1', '4'))
 
     def test_chain(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.chain('A1', 8),
             c[0:8])
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.chain('C3', 8),
             c['C3':'C4'])
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols.chain('A', 3),
             c.cols.range('A', 'D'))
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols['A'].chain('1', 3),
             c.cols['A'].range('1', '4'))
 
-        self.assertListEqual(
+        self.assertWellSeriesEqual(
             c.cols['A'].chain('1', 3, 3),
             c.cols['A'].range('1', '8', 3))

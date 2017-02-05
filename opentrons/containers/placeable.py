@@ -60,6 +60,7 @@ class Placeable(object):
         self._max_dimensions = {}
 
         self.parent = parent
+        self.name = None
 
         if properties is None:
             properties = {}
@@ -132,10 +133,13 @@ class Placeable(object):
         """
         Returns Placeable's name withing the parent
         """
-        if self.parent is None:
+        if self.name:
+            return str(self.name)
+        elif self.parent:
+            self.name = self.parent.children_by_reference[self]
+            return self.name
+        else:
             return None
-
-        return self.parent.children_by_reference[self]
 
     def get_type(self):
         """
@@ -203,6 +207,7 @@ class Placeable(object):
 
         child._coordinates = Vector(coordinates)
         child.parent = self
+        child.name = name
         self.children_by_name[name] = child
         self.children_by_reference[child] = name
 
@@ -658,6 +663,9 @@ class WellSeries(Container):
         if name in ('__getstate__', '__setstate__'):
             raise AttributeError()
         return getattr(self.values[self.offset], name)
+
+    def get_name(self):
+        return '<Series>'
 
     def get_children_list(self):
         return list(self.values)
