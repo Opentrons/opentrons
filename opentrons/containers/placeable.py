@@ -60,7 +60,6 @@ class Placeable(object):
         self._max_dimensions = {}
 
         self.parent = parent
-        self.name = None
 
         if properties is None:
             properties = {}
@@ -133,13 +132,9 @@ class Placeable(object):
         """
         Returns Placeable's name withing the parent
         """
-        if self.name:
-            return str(self.name)
-        elif self.parent:
-            self.name = self.parent.children_by_reference[self]
-            return self.name
-        else:
+        if not self.parent:
             return None
+        return self.parent.children_by_reference[self]
 
     def get_type(self):
         """
