@@ -250,9 +250,14 @@ class PlaceableTestCase(unittest.TestCase):
             c.chain('A3'),
             c['A3':])
 
+        print('\n\n\n\n FUCK \n\n\n')
         self.assertWellSeriesEqual(
             c.chain('C3', 8),
             c['C3':'C4'])
+
+        self.assertWellSeriesEqual(
+            c.chain('C3', 4, -1),
+            c.wells('C3', 'B3', 'A3', 'H2'))
 
         self.assertWellSeriesEqual(
             c.cols.chain('A', 3),

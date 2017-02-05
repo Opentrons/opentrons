@@ -582,13 +582,13 @@ class Container(Placeable):
 
     def range(self, *args):
         """
-        Returns list of child Wells using slice
+        Returns WellSeries of child Wells using slice
         """
-        return WellSeries(self.__getitem__(slice(*args)))
+        return self.__getitem__(slice(*args))
 
     def group(self, first, last, step=1):
         """
-        Returns list of child Wells, similar to range
+        Returns WellSeries of child Wells, similar to range
         but specify last instead of stop
         """
         if isinstance(last, str):
@@ -597,7 +597,7 @@ class Container(Placeable):
 
     def chain(self, first, length=None, step=1):
         """
-        Returns list of child Wells of the specified "length",
+        Returns WellSeries of child Wells of the specified "length",
         starting at the "first" well, and iterating using "step"
         """
         if isinstance(first, str):
