@@ -108,10 +108,10 @@ class Placeable(object):
             self.__class__.__name__, self.get_name())
 
     def __iter__(self):
-        return iter(self.children_by_reference.keys())
+        return iter(self.get_children_list())
 
     def __len__(self):
-        return len(self.children_by_name)
+        return len(self.get_children_list())
 
     def __bool__(self):
         return True
@@ -619,7 +619,7 @@ class WellSeries(Container):
 
     Default well index can be overriden using :set_offset:
     """
-    def __init__(self, wells, name='<Series>'):
+    def __init__(self, wells, name=None):
         if isinstance(wells, dict):
             self.items = wells
             self.values = list(wells.values())
@@ -635,25 +635,9 @@ class WellSeries(Container):
         """
         self.offset = offset
 
-    def __iter__(self):
-        return iter(self.values)
-
     def __str__(self):
         return '<Series: {}>'.format(
             ' '.join([str(well) for well in self.values]))
-
-    def __getitem__(self, index):
-        if isinstance(index, slice):
-            return self.get_children_from_slice(index)
-        elif isinstance(index, int):
-            return self.get_children_list()[index]
-        elif isinstance(index, str):
-            return self.items[index]
-        else:
-            raise TypeError('Expected int, slice or str')
-
-    def __len__(self):
-        return len(self.values)
 
     def __getattr__(self, name):
         # getstate/setstate are used by pickle and are not implemented by
@@ -663,14 +647,12 @@ class WellSeries(Container):
         return getattr(self.values[self.offset], name)
 
     def get_name(self):
+        if self.name is None:
+            return str(self)
         return str(self.name)
 
     def get_children_list(self):
         return list(self.values)
 
-    def get_index_from_name(self, name):
-        """
-        Retrieves child's name by index
-        """
-        return self.get_children_list().index(
-            self.items[name])
+    def get_child_by_name(self, name):
+        return self.items[name]
