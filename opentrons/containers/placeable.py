@@ -126,7 +126,13 @@ class Placeable(object):
                         vals[i] = int(vals[i]) if len(vals[i]) else None
                     elif not self.get_child_by_name(vals[i]):
                         raise ValueError()
-                return [w.get_name() for w in getattr(self, m)(*vals)]
+                new_wells = getattr(self, m)(*vals)
+                return [
+                    self.get_name_by_instance(w)
+                    if isinstance(self, WellSeries)
+                    else w.get_name()
+                    for w in new_wells
+                ]
             except Exception:
                 pass
         raise ValueError('Cannot parse argument {}'.format(c))
@@ -723,8 +729,32 @@ class WellSeries(Container):
             return str(self)
         return str(self.name)
 
+    def get_name_by_instance(self, well):
+        for name, value in self.items.items():
+            if value is well:
+                return name
+        return None
+
     def get_children_list(self):
         return list(self.values)
 
     def get_child_by_name(self, name):
         return self.items.get(name)
+
+    def trim(self, *args):
+        new = []
+        for w in self.get_children_list():
+            new.append(w.__call__(*args))
+        self.__init__(new, name=self.name)
+        return self
+
+    def flatten(self, *args):
+        new = []
+        for series in self.get_children_list():
+            if isinstance(series, WellSeries):
+                for w in series:
+                    new.append(w)
+            else:
+                new.append(series)
+        self.__init__(new)
+        return self

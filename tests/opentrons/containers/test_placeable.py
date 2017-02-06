@@ -27,11 +27,15 @@ class PlaceableTestCase(unittest.TestCase):
         if hasattr(w1, '__len__') and hasattr(w2, '__len__'):
             if len(w1) != len(w2):
                 print(w1)
-                print('{} != {}'.format(len(w1), len(w2)))
+                print('lengths: {} and {}'.format(len(w1), len(w2)))
                 print(w2)
                 assert False
             for i in range(len(w1)):
-                self.assertEquals(w1[i], w2[i])
+                if w1[i] != w2[i]:
+                    print(w1)
+                    print('lengths: {} and {}'.format(len(w1), len(w2)))
+                    print(w2)
+                    assert False
         else:
             self.assertEquals(w1, w2)
 
@@ -396,3 +400,16 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(
             plate.cols('A', 'C'),
             plate.cols('A-H')('A~2:2'))
+
+    def test_well_series_trim(self):
+        plate = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+
+        grid = plate.cols('A-B', 'E').trim('1~3:2')
+        expected = plate('A1,A3,A5,B1,B3,B5,E1,E3,E5')
+        count = 0
+        self.assertEquals(len(grid), 3)
+        for c in grid:
+            for w in c:
+                self.assertEqual(w, expected[count])
+                count += 1
+        self.assertWellSeriesEqual(grid.flatten(), expected)
