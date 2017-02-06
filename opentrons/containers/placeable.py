@@ -742,11 +742,11 @@ class WellSeries(Container):
         return self.items.get(name)
 
     def trim(self, *args):
-        new = []
-        for w in self.get_children_list():
-            new.append(w.__call__(*args))
-        self.__init__(new, name=self.name)
-        return self
+        new = [
+            w.__call__(*args)
+            for w in self.get_children_list()
+        ]
+        return WellSeries(new, name=self.name)
 
     def flatten(self, *args):
         new = []
@@ -756,5 +756,4 @@ class WellSeries(Container):
                     new.append(w)
             else:
                 new.append(series)
-        self.__init__(new)
-        return self
+        return WellSeries(new)
