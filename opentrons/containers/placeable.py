@@ -82,12 +82,6 @@ class Placeable(object):
                 properties[dimension] = 0
 
     def __call__(self, *args, **kwargs):
-        try:
-            return self._parse_string(*args, **kwargs)
-        except (ValueError, IndexError, KeyError) as e:
-            return self.wells(*args, **kwargs)
-
-    def _parse_string(self, *args, **kwargs):
         '''
         Attemps to parse the argument for .chain() or .group() methods
         It looks for '~' (chain) or '-' (group) to split the passed string
@@ -101,37 +95,41 @@ class Placeable(object):
             plate('A1~4')  # same as `plate.chain('A1', 4)`
         '''
 
+        new_args = []
+        for a in args:
+            if self.get_child_by_name(a) or isinstance(a, int):
+                new_args.append(a)
+            else:
+                for c in a.split(','):
+                    if self.get_child_by_name(c):
+                        new_args.append(c)
+                    else:
+                        new_args.extend(self._parse_string_arguments(c))
+        return self.wells(*new_args)
+
+    def _parse_string_arguments(self, c):
         methods = {
             'chain': '~',
-            'group': '-',
-            'wells': ','
+            'group': '-'
         }
-        for meth, l in methods.items():
+        step_char = ':'
+        for m, l in methods.items():
             try:
-                a = self._parse_string_arguments(meth, l, args)
-                return getattr(self, meth)(*a)
+                vals = [n.strip() for n in c.split(l)]
+                if step_char in vals[1]:
+                    v, steps = tuple(
+                        [n.strip() for n in vals[1].split(step_char)])
+                    vals[1] = v
+                    vals.append(steps)
+                for i in range(len(vals)):
+                    if (i is 1 and m is 'chain') or (i is len(vals) - 1 is 2):
+                        vals[i] = int(vals[i]) if len(vals[i]) else None
+                    elif not self.get_child_by_name(vals[i]):
+                        raise ValueError()
+                return [w.get_name() for w in getattr(self, m)(*vals)]
             except Exception:
                 pass
-        raise ValueError()
-
-    def _parse_string_arguments(self, method, character, args):
-        vals = [n.strip() for n in args[0].split(character)]
-        if len(vals) < 2:
-            raise ValueError()
-
-        if method is 'chain':
-            assert self.get_child_by_name(vals[0])
-            try:
-                vals[1] = int(vals[1])
-            except ValueError:
-                vals = vals[:1]
-        else:
-            for v in vals:
-                assert self.get_child_by_name(v)
-
-        if (method is 'wells' or len(vals) is 2) and len(args) > 1:
-            vals.extend(args[1:])
-        return vals
+        raise ValueError('Cannot parse argument {}'.format(c))
 
     def __getitem__(self, name):
         """
@@ -729,4 +727,4 @@ class WellSeries(Container):
         return list(self.values)
 
     def get_child_by_name(self, name):
-        return self.items[name]
+        return self.items.get(name)

@@ -334,8 +334,8 @@ class PlaceableTestCase(unittest.TestCase):
             plate.wells('A1', 'B3', 'C8'))
 
         self.assertWellSeriesEqual(
-            plate('A1,B3', 'C8'),
-            plate.wells('A1', 'B3', 'C8'))
+            plate('A1,B3', 'C8', 'F2'),
+            plate.wells('A1', 'B3', 'C8', 'F2'))
 
         self.assertRaises(Exception, plate, 'A1,B23')
 
@@ -351,11 +351,11 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertWellSeriesEqual(
             plate.chain('A2', 3, 3),
-            plate('A2~3', 3))
+            plate('A2~3:3'))
 
         self.assertWellSeriesEqual(
             plate.chain('A2', 3, -3),
-            plate('A2~-3', -3))
+            plate('A2~-3:-3'))
 
         # GROUP -
 
@@ -373,7 +373,11 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertWellSeriesEqual(
             plate.group('A1', 'H1', 2),
-            plate('A1-H1', 2))
+            plate('A1-H1:2'))
+
+        self.assertWellSeriesEqual(
+            plate.wells('A1', 'C1', 'E1', 'G1', 'D6', 'F2', 'D2', 'B2'),
+            plate('A1-H1:2', 'D6', 'F2~3:-2'))
 
         # COLUMNS and ROWS
 
@@ -391,4 +395,4 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertWellSeriesEqual(
             plate.cols('A', 'C'),
-            plate.cols('A-H')('A~2', 2))
+            plate.cols('A-H')('A~2:2'))
