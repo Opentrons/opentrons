@@ -1277,23 +1277,19 @@ class Pipette(Instrument):
         if 'tips' in kwargs:
             del kwargs['tips']
         total_transfers = len(transfer_plan)
-        just_dispensed = False
         for i, plan in enumerate(transfer_plan):
             this_aspirate = plan.get('aspirate')
             if this_aspirate:
-                just_dispensed = False
                 vol = this_aspirate['volume']
                 loc = this_aspirate['location']
                 self._add_tip_during_transfer(tips, **kwargs)
                 self._aspirate_during_transfer(vol, loc, **kwargs)
             this_dispense = plan.get('dispense')
             if this_dispense:
-                just_dispensed = True
                 vol = this_dispense['volume']
                 loc = this_dispense['location']
                 self._dispense_during_transfer(vol, loc, **kwargs)
             if plan.get('blow_out'):
-                just_dispensed = True
                 self.blow_out(self.trash_container, enqueue=enqueue)
             tips = self._remove_tip_during_transfer(
                 tips, i, total_transfers, **kwargs)

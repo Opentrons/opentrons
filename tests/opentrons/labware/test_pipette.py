@@ -386,7 +386,7 @@ class PipetteTest(unittest.TestCase):
         # pprint(self.robot.commands())
         expected = [
             ['pick'],
-            ['aspirating', '180', 'Well A1'],
+            ['aspirating', '190', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
             ['dispensing', '30', 'Well C1'],
             ['dispensing', '30', 'Well D1'],
@@ -394,7 +394,7 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
             ['blow_out', 'point'],
-            ['aspirating', '60', 'Well A1'],
+            ['aspirating', '70', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
             ['blow_out', 'point'],
@@ -418,7 +418,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
-            ['aspirating', '180', 'Well A1'],
+            ['aspirating', '190', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
             ['dispensing', '30', 'Well C1'],
             ['dispensing', '30', 'Well D1'],
@@ -426,7 +426,7 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
             ['blow_out', 'point'],
-            ['aspirating', '60', 'Well A1'],
+            ['aspirating', '70', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
             ['blow_out', 'point'],
@@ -779,9 +779,9 @@ class PipetteTest(unittest.TestCase):
             blow_out=False,
             gradient=lambda x: 1.0 - x
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
         expected = [
             ['pick'],
             ['aspirating', '160', 'Well A1'],
@@ -885,7 +885,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well B1'],
-            ['blow_out', 'point'],
             ['return'],
             ['drop']
         ]
