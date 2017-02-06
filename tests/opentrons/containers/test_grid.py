@@ -27,6 +27,22 @@ class GridTestCase(unittest.TestCase):
         for well, next_well in zip(wells[:-1], wells[1:]):
             self.assertEqual(well, next_well)
 
+    def test_remove_child(self):
+        robot = Robot.get_instance()
+        robot.reset()
+
+        slot = 'B1'
+
+        plate = containers.load('96-flat', slot, 'plate')
+        self.assertEquals(len(robot.containers()), 1)
+        plate.get_parent().remove_child(plate.get_name())
+        self.assertEquals(len(robot.containers()), 0)
+
+        plate = containers.load('96-flat', slot, 'plate')
+        self.assertEquals(len(robot.containers()), 1)
+        robot.deck[slot].remove_child(plate.get_name())
+        self.assertEquals(len(robot.containers()), 0)
+
     def test_placeable(self):
         plate = self.plate
         self.assertEqual(plate.rows[0].center(plate), (11.24, 14.34, 5.25))
