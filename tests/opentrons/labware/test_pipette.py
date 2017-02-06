@@ -398,7 +398,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
             ['blow_out', 'point'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -458,7 +457,8 @@ class PipetteTest(unittest.TestCase):
             30,
             self.plate[0],
             self.plate[1:9],
-            repeater=False
+            repeater=False,
+            trash=False
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -514,7 +514,6 @@ class PipetteTest(unittest.TestCase):
             ['aspirating', '30', 'Well G1'],
             ['aspirating', '30', 'Well H1'],
             ['dispensing', '60', 'Well A2'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -595,7 +594,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well A2'],
             ['aspirating', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -687,7 +685,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '150', 'Well B1'],
             ['aspirating', '150', 'Well A1'],
             ['dispensing', '150', 'Well B1'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -715,7 +712,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '199', 'Well B1'],
             ['aspirating', '199', 'Well A1'],
             ['dispensing', '199', 'Well B1'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -761,7 +757,6 @@ class PipetteTest(unittest.TestCase):
             ['blow_out', 'point'],
             ['aspirating', '80', 'Well A1'],
             ['dispensing', '80', 'Well H2'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -798,7 +793,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '20', 'Well G2'],
             ['dispensing', '10', 'Well H2'],
             ['blow_out', 'point'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -829,7 +823,6 @@ class PipetteTest(unittest.TestCase):
             ['mix', '10'],
             ['aspirating', 'Well B1'],
             ['dispensing'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -857,7 +850,6 @@ class PipetteTest(unittest.TestCase):
             ['mix', '10'],
             ['aspirating', 'Well B1'],
             ['dispensing'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -885,7 +877,6 @@ class PipetteTest(unittest.TestCase):
             ['dispensing'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well B1'],
-            ['return'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -902,7 +893,8 @@ class PipetteTest(unittest.TestCase):
             self.plate.rows[0],
             self.plate.rows[1],
             touch_tip=False,
-            blow_out=False
+            blow_out=False,
+            trash=False
         )
         # from pprint import pprint
         # print('\n\n***\n')

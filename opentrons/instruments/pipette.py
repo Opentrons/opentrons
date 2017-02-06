@@ -1581,7 +1581,7 @@ class Pipette(Instrument):
         running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
         """
         enqueue = kwargs.get('enqueue', True)
-        trash = kwargs.get('trash', False)
+        trash = kwargs.get('trash', True)
         if tips > 1 or (i + 1 == total_transfers and tips > 0):
             if trash and self.trash_container:
                 self.drop_tip(enqueue=enqueue)
