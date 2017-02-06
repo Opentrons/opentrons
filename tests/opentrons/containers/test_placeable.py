@@ -383,6 +383,18 @@ class PlaceableTestCase(unittest.TestCase):
             plate.wells('A1', 'C1', 'E1', 'G1', 'D6', 'F2', 'D2', 'B2'),
             plate('A1-H1:2', 'D6', 'F2~3:-2'))
 
+        self.assertWellSeriesEqual(
+            plate.wells('A1', 'C1', 'E1', 'G1'),
+            plate('A1:A2:2'))
+
+        self.assertWellSeriesEqual(
+            plate.wells('H1', 'F1', 'D1', 'B1'),
+            plate('H1:A1:2'))
+
+        self.assertWellSeriesEqual(
+            plate.wells('H1', 'F1', 'D1', 'B1'),
+            plate('H1:A1:-2'))
+
         # COLUMNS and ROWS
 
         self.assertWellSeriesEqual(

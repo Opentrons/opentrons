@@ -110,7 +110,8 @@ class Placeable(object):
     def _parse_string_arguments(self, c):
         methods = {
             'chain': '~',
-            'group': '-'
+            'group': '-',
+            'range': ':'
         }
         step_char = ':'
         for m, l in methods.items():
