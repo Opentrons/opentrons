@@ -1271,25 +1271,32 @@ class Pipette(Instrument):
         kwargs['mode'] = kwargs.get('mode', 'transfer')
         transfer_plan = self._create_transfer_plan(
             volumes, sources, targets, **kwargs)
+        enqueue = kwargs.get('enqueue', True)
 
         tips = kwargs.get('tips', 1)
         if 'tips' in kwargs:
             del kwargs['tips']
         total_transfers = len(transfer_plan)
+        just_dispensed = False
         for i, plan in enumerate(transfer_plan):
             this_aspirate = plan.get('aspirate')
             if this_aspirate:
+                just_dispensed = False
                 vol = this_aspirate['volume']
                 loc = this_aspirate['location']
                 self._add_tip_during_transfer(tips, **kwargs)
                 self._aspirate_during_transfer(vol, loc, **kwargs)
             this_dispense = plan.get('dispense')
             if this_dispense:
+                just_dispensed = True
                 vol = this_dispense['volume']
                 loc = this_dispense['location']
                 self._dispense_during_transfer(vol, loc, **kwargs)
-                if tips > 1 or (i + 1 == total_transfers and tips > 0):
-                    tips = self._remove_tip_during_transfer(tips, **kwargs)
+            if plan.get('blow_out'):
+                just_dispensed = True
+                self.blow_out(self.trash_container, enqueue=enqueue)
+            tips = self._remove_tip_during_transfer(
+                tips, i, total_transfers, **kwargs)
 
         return self
 
@@ -1559,7 +1566,7 @@ class Pipette(Instrument):
 
         if kwargs.get('repeater', True):
             transfer_plan = helpers._compress_for_repeater(
-                self.max_volume, transfer_plan, **kwargs)
+                self.min_volume, self.max_volume, transfer_plan, **kwargs)
 
         return transfer_plan
 
@@ -1569,21 +1576,22 @@ class Pipette(Instrument):
         :any:`distribute`, or :any:`consolidate`.
         """
         enqueue = kwargs.get('enqueue', True)
-        if tips > 0 and not self.current_tip():
+        if self.has_tip_rack() and tips > 0 and not self.current_tip():
             self.pick_up_tip(enqueue=enqueue)
 
-    def _remove_tip_during_transfer(self, tips, **kwargs):
+    def _remove_tip_during_transfer(self, tips, i, total_transfers, **kwargs):
         """
         Performs a :any:`drop_tip` or :any:`return_tip` when
         running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
         """
         enqueue = kwargs.get('enqueue', True)
         trash = kwargs.get('trash', False)
-        tips -= 1
-        if trash and self.trash_container:
-            self.drop_tip(enqueue=enqueue)
-        else:
-            self.return_tip(enqueue=enqueue)
+        if tips > 1 or (i + 1 == total_transfers and tips > 0):
+            if trash and self.trash_container:
+                self.drop_tip(enqueue=enqueue)
+            else:
+                self.return_tip(enqueue=enqueue)
+            tips -= 1
         return tips
 
     def _aspirate_during_transfer(self, vol, loc, **kwargs):

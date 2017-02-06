@@ -162,18 +162,19 @@ def _create_volume_gradient(min_v, max_v, total, gradient=None):
     return [_map_volume(i) for i in range(total)]
 
 
-def _compress_for_repeater(max_vol, plan, **kwargs):
+def _compress_for_repeater(min_vol, max_vol, plan, **kwargs):
+    min_vol = float(min_vol)
     max_vol = float(max_vol)
     mode = kwargs.get('mode', 'transfer')
-    if mode == 'distribute':  # combine target volumes into single aspirate
-        return _compress_for_distribute(max_vol, plan, **kwargs)
+    if mode == 'distribute':   # combine target volumes into single aspirate
+        return _compress_for_distribute(min_vol, max_vol, plan, **kwargs)
     if mode == 'consolidate':  # combine target volumes into multiple aspirates
-        return _compress_for_consolidate(max_vol, plan, **kwargs)
+        return _compress_for_consolidate(min_vol, max_vol, plan, **kwargs)
     else:
         return plan
 
 
-def _compress_for_distribute(max_vol, plan, **kwargs):
+def _compress_for_distribute(min_vol, max_vol, plan, **kwargs):
     source = plan[0]['aspirate']['location']
     a_vol = 0
     temp_dispenses = []
@@ -181,6 +182,14 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
 
     def _add():
         nonlocal a_vol, temp_dispenses, new_transfer_plan, source
+
+        if not temp_dispenses:
+            return
+
+        # distribute commands get an extra volume added
+        if len(temp_dispenses) > 1:
+            a_vol += min_vol
+
         new_transfer_plan.append({
             'aspirate': {
                 'location': source, 'volume': a_vol
@@ -193,9 +202,14 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
                 }
             })
 
+        if min_vol and len(temp_dispenses) > 1:
+            new_transfer_plan.append({
+                'blow_out': {'blow_out': True}
+            })
+
     for p in plan:
         this_vol = p['aspirate']['volume']
-        if this_vol + a_vol > max_vol:
+        if this_vol + a_vol > max_vol - min_vol:
             _add()
             a_vol = 0
             temp_dispenses = []
@@ -205,7 +219,7 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
     return new_transfer_plan
 
 
-def _compress_for_consolidate(max_vol, plan, **kwargs):
+def _compress_for_consolidate(min_vol, max_vol, plan, **kwargs):
     target = plan[0]['dispense']['location']
     d_vol = 0
     temp_aspirates = []

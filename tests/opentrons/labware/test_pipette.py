@@ -393,9 +393,11 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well E1'],
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
+            ['blow_out', 'point'],
             ['aspirating', '60', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
+            ['blow_out', 'point'],
             ['return'],
             ['drop']
         ]
@@ -423,9 +425,11 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well E1'],
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
+            ['blow_out', 'point'],
             ['aspirating', '60', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
-            ['dispensing', '30', 'Well A2']
+            ['dispensing', '30', 'Well A2'],
+            ['blow_out', 'point'],
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
@@ -744,15 +748,17 @@ class PipetteTest(unittest.TestCase):
         # pprint(self.robot.commands())
         expected = [
             ['pick'],
-            ['aspirating', '150', 'Well A1'],
+            ['aspirating', '160', 'Well A1'],
             ['dispensing', '10', 'Well A2'],
             ['dispensing', '20', 'Well B2'],
             ['dispensing', '30', 'Well C2'],
             ['dispensing', '40', 'Well D2'],
             ['dispensing', '50', 'Well E2'],
-            ['aspirating', '130', 'Well A1'],
+            ['blow_out', 'point'],
+            ['aspirating', '140', 'Well A1'],
             ['dispensing', '60', 'Well F2'],
             ['dispensing', '70', 'Well G2'],
+            ['blow_out', 'point'],
             ['aspirating', '80', 'Well A1'],
             ['dispensing', '80', 'Well H2'],
             ['return'],
@@ -773,22 +779,25 @@ class PipetteTest(unittest.TestCase):
             blow_out=False,
             gradient=lambda x: 1.0 - x
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
         expected = [
             ['pick'],
-            ['aspirating', '150', 'Well A1'],
+            ['aspirating', '160', 'Well A1'],
             ['dispensing', '80', 'Well A2'],
             ['dispensing', '70', 'Well B2'],
-            ['aspirating', '200', 'Well A1'],
+            ['blow_out', 'point'],
+            ['aspirating', '190', 'Well A1'],
             ['dispensing', '60', 'Well C2'],
             ['dispensing', '50', 'Well D2'],
             ['dispensing', '40', 'Well E2'],
             ['dispensing', '30', 'Well F2'],
+            ['blow_out', 'point'],
+            ['aspirating', '40', 'Well A1'],
             ['dispensing', '20', 'Well G2'],
-            ['aspirating', '10', 'Well A1'],
             ['dispensing', '10', 'Well H2'],
+            ['blow_out', 'point'],
             ['return'],
             ['drop']
         ]
@@ -876,6 +885,7 @@ class PipetteTest(unittest.TestCase):
             ['dispensing'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well B1'],
+            ['blow_out', 'point'],
             ['return'],
             ['drop']
         ]
