@@ -858,6 +858,55 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_consolidate_multiple_args(self):
+        self.p200.reset()
+        self.p200.consolidate(
+            100,
+            self.plate[0],
+            self.plate[2],
+            self.plate[1]
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '100', 'Well A1'],
+            ['aspirating', '100', 'Well C1'],
+            ['dispensing', '200', 'Well B1'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+    def test_distribute_multiple_args(self):
+        self.p200.reset()
+        self.p200.distribute(
+            50,
+            self.plate[0],
+            self.plate[2],
+            self.plate[1]
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '110', 'Well A1'],
+            ['dispensing', '50', 'Well C1'],
+            ['dispensing', '50', 'Well B1'],
+            ['blow'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
     def test_distribute_mix(self):
         self.p200.reset()
         self.p200.distribute(

@@ -1149,6 +1149,8 @@ class Pipette(Instrument):
         kwargs['mode'] = 'distribute'
         kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
         kwargs['mix_after'] = (0, 0)
+        if len(args) > 3:
+            args = [args[0], args[1], list(args[2:])]
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1174,6 +1176,8 @@ class Pipette(Instrument):
         kwargs['mode'] = 'consolidate'
         kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
         kwargs['mix_before'] = (0, 0)
+        if len(args) > 3:
+            args = [args[0], list(args[1:-1]), args[-1]]
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
