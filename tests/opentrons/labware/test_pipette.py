@@ -38,6 +38,14 @@ class PipetteTest(unittest.TestCase):
         self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
 
+    def test_bad_volume_percentage(self):
+        self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
+
+    def test_aspirate_zero_volume(self):
+        self.assertEquals(len(self.robot.commands()), 0)
+        self.p200.aspirate(0)
+        self.assertEquals(len(self.robot.commands()), 0)
+
     def test_get_plunger_position(self):
 
         self.assertEquals(self.p200._get_plunger_position('top'), 0)
