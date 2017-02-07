@@ -16,12 +16,28 @@ class PlaceableTestCase(unittest.TestCase):
         for i in range(0, wells):
             well = Well(properties={'radius': radius, 'height': height})
             row, col = divmod(i, cols)
-            name = chr(row + ord('A')) + str(1 + col)
+            name = chr(col + ord('A')) + str(1 + row)
             coordinates = (col * spacing[0] + offset[0],
                            row * spacing[1] + offset[1],
                            0)
             c.add(well, name, coordinates)
         return c
+
+    def assertWellSeriesEqual(self, w1, w2):
+        if hasattr(w1, '__len__') and hasattr(w2, '__len__'):
+            if len(w1) != len(w2):
+                print(w1)
+                print('lengths: {} and {}'.format(len(w1), len(w2)))
+                print(w2)
+                assert False
+            for i in range(len(w1)):
+                if w1[i] != w2[i]:
+                    print(w1)
+                    print('lengths: {} and {}'.format(len(w1), len(w2)))
+                    print(w2)
+                    assert False
+        else:
+            self.assertEquals(w1, w2)
 
     def test_get_name(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
@@ -40,7 +56,7 @@ class PlaceableTestCase(unittest.TestCase):
     def test_next(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         well = c['A1']
-        expected = c.get_child_by_name('A2')
+        expected = c.get_child_by_name('B1')
 
         self.assertEqual(next(well), expected)
 
@@ -48,7 +64,7 @@ class PlaceableTestCase(unittest.TestCase):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
 
         self.assertEqual(c[3], c.get_child_by_name('B2'))
-        self.assertEqual(c[1], c.get_child_by_name('A2'))
+        self.assertEqual(c[1], c.get_child_by_name('B1'))
 
     def test_named_well(self):
         deck = Deck()
@@ -165,3 +181,25 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertEqual(
             plate['A1'].top(10),
             (plate['A1'], Vector(5, 5, 20)))
+
+    def test_slice_with_strings(self):
+        c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+        self.assertWellSeriesEqual(c['A1':'A2'], c[0:8])
+        self.assertWellSeriesEqual(c['A12':], c.rows[-1][0:])
+        self.assertWellSeriesEqual(c.rows['4':'8'], c.rows[3:7])
+        self.assertWellSeriesEqual(c.cols['B':'E'], c.cols[1:4])
+        self.assertWellSeriesEqual(c.cols['B']['1':'7'], c.cols[1][0:6])
+
+    def test_wells(self):
+        c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+
+        self.assertWellSeriesEqual(c.well(0), c[0])
+        self.assertWellSeriesEqual(c.well('A2'), c['A2'])
+        self.assertWellSeriesEqual(c.wells(0), c[0])
+        self.assertWellSeriesEqual(c.wells(), c[0:])
+
+        expected = [c[n] for n in ['A1', 'B2', 'C3']]
+        self.assertWellSeriesEqual(c.wells('A1', 'B2', 'C3'), expected)
+
+        expected = [c.cols[0][0], c.cols[0][5]]
+        self.assertWellSeriesEqual(c.cols['A'].wells('1', '6'), expected)
