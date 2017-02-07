@@ -34,7 +34,7 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
-        self.assertEquals(p.get_parent(), robot._deck['A1'])
+        self.assertEquals(p.get_parent(), robot.deck['A1'])
         self.assertEquals(p['C3'], p[18])
 
     def test_containers_list(self):
