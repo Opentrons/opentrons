@@ -25,7 +25,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_containers_list(self):
         res = containers.list()
-        self.assertEquals(len(res), 37)
+        self.assertEquals(len(res), 38)
 
     def test_bad_unpack_containers(self):
         self.assertRaises(
