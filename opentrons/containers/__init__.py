@@ -54,8 +54,8 @@ def create(slot, grid, spacing, diameter, depth, name=None):
         'height': depth
     }
 
-    for c in range(columns):
-        for r in range(rows):
+    for r in range(rows):
+        for c in range(columns):
             well = Well(properties=properties)
             name = chr(c + ord('A')) + str(1 + r)
             coordinates = (c * col_spacing, r * row_spacing, 0)
