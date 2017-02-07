@@ -1147,10 +1147,10 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         kwargs['mode'] = 'distribute'
-        kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
+        kwargs['new_tip'] = kwargs.get('new_tip', 'once')
+        if kwargs['new_tip'] is 'always':
+            kwargs['new_tip'] = 'once'
         kwargs['mix_after'] = (0, 0)
-        if len(args) > 3:
-            args = [args[0], args[1], list(args[2:])]
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1174,14 +1174,14 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         kwargs['mode'] = 'consolidate'
-        kwargs['tips'] = 1 if kwargs.get('tips', 1) else 0
+        kwargs['new_tip'] = kwargs.get('new_tip', 'once')
+        if kwargs['new_tip'] is 'always':
+            kwargs['new_tip'] = 'once'
         kwargs['mix_before'] = (0, 0)
-        if len(args) > 3:
-            args = [args[0], list(args[1:-1]), args[-1]]
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
-    def transfer(self, volumes, sources, targets, **kwargs):
+    def transfer(self, volumes, of, to, **kwargs):
 
         """
         Transfer will move a volume of liquid from a source location(s)
@@ -1200,11 +1200,11 @@ class Pipette(Instrument):
             like `(20, 100)`, then a list of volumes will be generated with
             a linear gradient between the two volumes in the tuple.
 
-        sources : Placeable or list
+        of : Placeable or list
             Single :any:`Placeable` or list of :any:`Placeable`s, from where
             liquid will be :any:`aspirate`ed from.
 
-        targets : Placeable or list
+        to : Placeable or list
             Single :any:`Placeable` or list of :any:`Placeable`s, where
             liquid will be :any:`dispense`ed to.
 
@@ -1244,7 +1244,7 @@ class Pipette(Instrument):
             If `True` (default), any `volumes` that exceed the maximum volume
             of this `Pipette` will be split into multiple smaller volumes.
 
-        repeater : boolean
+        repeat : boolean
             (Only applicable to :any:`distribute` and :any:`consolidate`)If
             `True` (default), sequential :any:`aspirate` volumes will be
             combined into one tip for the purpose of saving time. If `False`,
@@ -1272,14 +1272,20 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
+        sources = of
+        targets = to
+        enqueue = kwargs.get('enqueue', True)
         kwargs['mode'] = kwargs.get('mode', 'transfer')
         transfer_plan = self._create_transfer_plan(
             volumes, sources, targets, **kwargs)
-        enqueue = kwargs.get('enqueue', True)
 
-        tips = kwargs.get('tips', 1)
-        if 'tips' in kwargs:
-            del kwargs['tips']
+        tip_options = {
+            'once': 1,
+            'never': 0,
+            'always': float('inf')
+        }
+        tips = tip_options.get(kwargs.pop('new_tip', 'once'))
+
         total_transfers = len(transfer_plan)
         for i, plan in enumerate(transfer_plan):
             this_aspirate = plan.get('aspirate')
@@ -1543,10 +1549,8 @@ class Pipette(Instrument):
             # SPECIAL CASE: if using multi-channel pipette,
             # and the source or target is a WellSeries
             # then avoid iterating through it's Wells
-            if isinstance(s, WellSeries):
-                s = [s]
-            if isinstance(t, WellSeries):
-                t = [t]
+            s = [s] if isinstance(s, WellSeries) else s
+            t = [t] if isinstance(t, WellSeries) else t
 
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
@@ -1564,7 +1568,7 @@ class Pipette(Instrument):
             transfer_plan = helpers._expand_for_carryover(
                 self.min_volume, self.max_volume, transfer_plan, **kwargs)
 
-        if kwargs.get('repeater', True):
+        if kwargs.get('repeat', True):
             transfer_plan = helpers._compress_for_repeater(
                 self.min_volume, self.max_volume, transfer_plan, **kwargs)
 
