@@ -1,7 +1,7 @@
 import unittest
 import math
 
-from opentrons import containers, robot
+from opentrons import containers
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -24,6 +24,7 @@ class ContainerTestCase(unittest.TestCase):
         return c
 
     def test_containers_create(self):
+        from opentrons import Robot
         p = containers.create(
             slot='A1',
             grid=(8, 12),
@@ -34,7 +35,8 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
-        self.assertEquals(p.get_parent(), robot.deck['A1'])
+        self.assertEquals(
+            p.get_parent(), Robot.get_instance().deck['A1'])
         self.assertEquals(p['C3'], p[18])
 
     def test_containers_list(self):
