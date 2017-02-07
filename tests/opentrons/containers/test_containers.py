@@ -23,6 +23,22 @@ class ContainerTestCase(unittest.TestCase):
             c.add(well, name, coordinates)
         return c
 
+    def test_containers_create(self):
+        from opentrons import Robot
+        p = containers.create(
+            slot='A1',
+            grid=(8, 12),
+            spacing=(9, 9),
+            diameter=4,
+            depth=8,
+            name='platez')
+        self.assertEquals(len(p), 96)
+        self.assertEquals(len(p.rows), 12)
+        self.assertEquals(len(p.cols), 8)
+        self.assertEquals(
+            p.get_parent(), Robot.get_instance().deck['A1'])
+        self.assertEquals(p['C3'], p[18])
+
     def test_containers_list(self):
         res = containers.list()
         self.assertEquals(len(res), 38)

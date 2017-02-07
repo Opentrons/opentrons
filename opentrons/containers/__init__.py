@@ -42,3 +42,24 @@ def load(container_name, slot, label=None):
 
 def list():
     return list_container_names()
+
+
+def create(slot, grid, spacing, diameter, depth, name=None):
+    columns, rows = grid
+    col_spacing, row_spacing = spacing
+    custom_container = Container()
+    properties = {
+        'type': 'custom',
+        'radius': diameter / 2,
+        'height': depth
+    }
+
+    for r in range(rows):
+        for c in range(columns):
+            well = Well(properties=properties)
+            name = chr(c + ord('A')) + str(1 + r)
+            coordinates = (c * col_spacing, r * row_spacing, 0)
+            custom_container.add(well, name, coordinates)
+    from opentrons import Robot
+    Robot.get_instance().deck[slot].add(custom_container, name)
+    return custom_container
