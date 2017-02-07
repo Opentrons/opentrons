@@ -60,6 +60,6 @@ def create(slot, grid, spacing, diameter, depth, name=None):
             name = chr(c + ord('A')) + str(1 + r)
             coordinates = (c * col_spacing, r * row_spacing, 0)
             custom_container.add(well, name, coordinates)
-    from opentrons import robot
-    robot.deck[slot].add(custom_container, name)
+    from opentrons import Robot
+    Robot.get_instance().deck[slot].add(custom_container, name)
     return custom_container
