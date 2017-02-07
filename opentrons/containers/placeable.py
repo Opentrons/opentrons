@@ -81,63 +81,6 @@ class Placeable(object):
             if dimension not in properties:
                 properties[dimension] = 0
 
-    def __call__(self, *args, **kwargs):
-        '''
-        Attemps to parse the argument for .chain() or .group() methods
-        It looks for '~' (chain) or '-' (group) to split the passed string
-        Validates them as argument to .chain() or .group(), then calls
-        those methods
-
-        Example:
-
-            plate('A1,B3,C2')  # same as `plate.wells('A1', 'B3', 'C2')`
-            plate('A1-H1')  # same as `plate.group('A1', 'H1')`
-            plate('A1~4')  # same as `plate.chain('A1', 4)`
-        '''
-
-        new_args = []
-        for a in args:
-            if self.get_child_by_name(a) or isinstance(a, int):
-                new_args.append(a)
-            else:
-                for c in a.split(','):
-                    if self.get_child_by_name(c):
-                        new_args.append(c)
-                    else:
-                        new_args.extend(self._parse_string_arguments(c))
-        return self.wells(*new_args)
-
-    def _parse_string_arguments(self, c):
-        methods = {
-            'chain': '~',
-            'group': '-',
-            'range': ':'
-        }
-        step_char = ':'
-        for m, l in methods.items():
-            try:
-                vals = [n.strip() for n in c.split(l)]
-                if step_char in vals[1]:
-                    v, steps = tuple(
-                        [n.strip() for n in vals[1].split(step_char)])
-                    vals[1] = v
-                    vals.append(steps)
-                for i in range(len(vals)):
-                    if (i is 1 and m is 'chain') or (i is len(vals) - 1 is 2):
-                        vals[i] = int(vals[i]) if len(vals[i]) else None
-                    elif not self.get_child_by_name(vals[i]):
-                        raise ValueError()
-                new_wells = getattr(self, m)(*vals)
-                return [
-                    self.get_name_by_instance(w)
-                    if isinstance(self, WellSeries)
-                    else w.get_name()
-                    for w in new_wells
-                ]
-            except Exception:
-                pass
-        raise ValueError('Cannot parse argument {}'.format(c))
-
     def __getitem__(self, name):
         """
         Returns placeable by name or index
@@ -632,59 +575,14 @@ class Container(Placeable):
         """
         Returns child Well or list of child Wells
         """
+        new_wells = None
         if len(args) > 0:
-            return WellSeries([self.well(n) for n in args])
+            new_wells = WellSeries([self.well(n) for n in args])
         else:
-            return WellSeries(self.get_children_list())
-
-    def range(self, *args):
-        """
-        Returns WellSeries of child Wells using slice
-        """
-        args = list(args)
-        if len(args) == 2:
-            args.append(1)  # default step is 1
-        if len(args) > 1:   # negative step if stop < start
-            if args[1] < args[0] and args[2] > 0:
-                args[2] *= -1
-        return self.well(slice(*args))
-
-    def group(self, first, last, step=1):
-        """
-        Returns WellSeries of child Wells, similar to range
-        but specify last instead of stop
-        """
-        if isinstance(first, str):
-            first = self.get_index_from_name(first)
-        if isinstance(last, str):
-            last = self.get_index_from_name(last)
-        if last < first and step > 0:
-            step *= -1
-        child_list = [w for w in self.range(first, last, step)]
-        if abs(last - first) % abs(step) == 0:
-            child_list.append(self[last])
-        return WellSeries(child_list)
-
-    def chain(self, index, length=None, step=1):
-        """
-        Returns WellSeries of child Wells of the specified "length",
-        starting at the "first" well, and iterating using "step"
-        """
-        if isinstance(index, str):
-            index = self.get_index_from_name(index)
-        if length is None:
-            length = len(self) - index
-        if not isinstance(length, int):
-            length = int(length)
-        if length < 0:
-            length = abs(length)
-            if step > 0:
-                step *= -1
-        child_wells = []
-        while len(child_wells) < length:
-            child_wells.append(self[index])
-            index = (index + step) % len(self)
-        return WellSeries(child_wells)
+            new_wells = WellSeries(self.get_children_list())
+        if len(new_wells) is 1:
+            return new_wells[0]
+        return new_wells
 
 
 class WellSeries(Container):
@@ -741,20 +639,3 @@ class WellSeries(Container):
 
     def get_child_by_name(self, name):
         return self.items.get(name)
-
-    def trim(self, *args):
-        new = [
-            w.__call__(*args)
-            for w in self.get_children_list()
-        ]
-        return WellSeries(new, name=self.name)
-
-    def flatten(self, *args):
-        new = []
-        for series in self.get_children_list():
-            if isinstance(series, WellSeries):
-                for w in series:
-                    new.append(w)
-            else:
-                new.append(series)
-        return WellSeries(new)
