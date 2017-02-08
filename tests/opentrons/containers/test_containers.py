@@ -3,7 +3,6 @@ import math
 
 from opentrons import containers
 from opentrons.util import environment
-from opentrons.containers import persisted_containers
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -30,26 +29,14 @@ class ContainerTestCase(unittest.TestCase):
         import json
         from opentrons import Robot
         container_name = 'plate_for_testing_containers_create'
-        p = containers.create(
-            slot='A1',
+        containers.create(
+            name=container_name,
             grid=(8, 12),
             spacing=(9, 9),
             diameter=4,
             depth=8,
-            volume=1000,
-            name=container_name)
-        self.assertEquals(len(p), 96)
-        self.assertEquals(len(p.rows), 12)
-        self.assertEquals(len(p.cols), 8)
-        self.assertEquals(
-            p.get_parent(), Robot.get_instance().deck['A1'])
-        self.assertEquals(p['C3'], p[18])
-        self.assertEquals(p['C3'].max_volume(), 1000)
-        for i, w in enumerate(p):
-            self.assertEquals(w, p[i])
+            volume=1000)
 
-        Robot.get_instance().reset()
-        persisted_containers.load_all_persisted_containers_from_disk()
         p = containers.load(container_name, 'A1')
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
