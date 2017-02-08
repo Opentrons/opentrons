@@ -15,6 +15,9 @@ def refresh():
         'LOG_DIR': os.path.join(APP_DATA_DIR, 'logs'),
         'LOG_FILE': os.path.join(APP_DATA_DIR, 'logs', 'api.log'),
         'CONTAINERS_DIR': os.path.join(APP_DATA_DIR, 'containers'),
+        'CONTAINERS_FILE':
+            os.path.join(
+                APP_DATA_DIR, 'containers', '_containers_create.json'),
         'CALIBRATIONS_DIR': os.path.join(APP_DATA_DIR, 'calibrations'),
         'CALIBRATIONS_FILE':
             os.path.join(APP_DATA_DIR, 'calibrations', 'calibrations.json'),

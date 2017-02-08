@@ -274,6 +274,12 @@ class Placeable(object):
             self.z_size()
         )
 
+    def max_volume(self):
+        """
+        Returns placeable's maximum liquid volume in uL
+        """
+        return self.properties['total-liquid-volume']
+
     def x_size(self):
         """
         Returns placeable's size along X axis
