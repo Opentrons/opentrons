@@ -3,7 +3,7 @@ import json
 import os
 
 from opentrons.containers.persisted_containers import get_persisted_container
-from opentrons.containers.persisted_containers import list_container_names
+from opentrons.containers import persisted_containers
 from opentrons.containers.placeable import (
     Deck,
     Slot,
@@ -46,7 +46,7 @@ def load(container_name, slot, label=None):
 
 
 def list():
-    return list_container_names()
+    return persisted_containers.list_container_names()
 
 
 def create(slot, grid, spacing, diameter, depth, volume=0, name=None):
@@ -100,3 +100,4 @@ def save_custom_container(data):
         f.seek(0)
         f.write(json.dumps(old_data, indent=4))
         f.truncate()
+    persisted_containers.load_all_persisted_containers_from_disk()
