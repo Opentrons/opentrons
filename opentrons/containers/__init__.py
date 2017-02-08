@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import json
 import os
 
@@ -69,14 +70,14 @@ def create(slot, grid, spacing, diameter, depth, volume=0, name=None):
     if name is None:
         name = 'custom_{0}x{1}'.format(columns, rows)
     else:
-        json_container = container_to_json(c, name)
+        json_container = container_to_json(custom_container, name)
         update_container_create_file(json_container)
     Robot.get_instance().deck[slot].add(custom_container, name)
     return custom_container
 
 
 def container_to_json(c, name):
-    locations = {}
+    locations = OrderedDict()
     for w in c:
         x, y, z = w.coordinates()
         locations[w.get_name()] = {
@@ -97,5 +98,5 @@ def update_container_create_file(data):
         old_data = json.load(f)
         old_data['containers'].update(data)
         f.seek(0)
-        f.write(json.dumps(old_data))
+        f.write(json.dumps(old_data, indent=4))
         f.truncate()

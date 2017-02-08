@@ -31,6 +31,7 @@ class ContainerTestCase(unittest.TestCase):
             spacing=(9, 9),
             diameter=4,
             depth=8,
+            volume=1000,
             name='platez')
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
@@ -38,10 +39,13 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(
             p.get_parent(), Robot.get_instance().deck['A1'])
         self.assertEquals(p['C3'], p[18])
+        self.assertEquals(p['C3'].max_volume(), 1000)
+        for i, w in enumerate(p):
+            self.assertEquals(w, p[i])
 
     def test_containers_list(self):
         res = containers.list()
-        self.assertEquals(len(res), 38)
+        self.assertTrue(len(res))
 
     def test_bad_unpack_containers(self):
         self.assertRaises(
