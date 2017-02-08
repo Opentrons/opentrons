@@ -29,6 +29,7 @@ class ContainerTestCase(unittest.TestCase):
         import os
         import json
         from opentrons import Robot
+        container_name = 'plate_for_testing_containers_create'
         p = containers.create(
             slot='A1',
             grid=(8, 12),
@@ -36,7 +37,7 @@ class ContainerTestCase(unittest.TestCase):
             diameter=4,
             depth=8,
             volume=1000,
-            name='platez')
+            name=container_name)
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
@@ -49,7 +50,7 @@ class ContainerTestCase(unittest.TestCase):
 
         Robot.get_instance().reset()
         persisted_containers.load_all_persisted_containers_from_disk()
-        p = containers.load('platez', 'A1')
+        p = containers.load(container_name, 'A1')
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
