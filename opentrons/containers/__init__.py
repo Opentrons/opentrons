@@ -71,7 +71,7 @@ def create(slot, grid, spacing, diameter, depth, volume=0, name=None):
         name = 'custom_{0}x{1}'.format(columns, rows)
     else:
         json_container = container_to_json(custom_container, name)
-        update_container_create_file(json_container)
+        save_custom_container(json_container)
     Robot.get_instance().deck[slot].add(custom_container, name)
     return custom_container
 
@@ -89,7 +89,7 @@ def container_to_json(c, name):
     return {name: {'locations': locations}}
 
 
-def update_container_create_file(data):
+def save_custom_container(data):
     container_file_path = environment.get_path('CONTAINERS_FILE')
     if not os.path.isfile(container_file_path):
         with open(container_file_path, 'w') as f:
