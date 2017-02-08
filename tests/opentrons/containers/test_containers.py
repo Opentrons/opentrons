@@ -2,6 +2,8 @@ import unittest
 import math
 
 from opentrons import containers
+from opentrons.util import environment
+from opentrons.containers import persisted_containers
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -24,6 +26,8 @@ class ContainerTestCase(unittest.TestCase):
         return c
 
     def test_containers_create(self):
+        import os
+        import json
         from opentrons import Robot
         p = containers.create(
             slot='A1',
@@ -42,6 +46,30 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(p['C3'].max_volume(), 1000)
         for i, w in enumerate(p):
             self.assertEquals(w, p[i])
+
+        Robot.get_instance().reset()
+        persisted_containers.load_all_persisted_containers_from_disk()
+        p = containers.load('platez', 'A1')
+        self.assertEquals(len(p), 96)
+        self.assertEquals(len(p.rows), 12)
+        self.assertEquals(len(p.cols), 8)
+        self.assertEquals(
+            p.get_parent(), Robot.get_instance().deck['A1'])
+        self.assertEquals(p['C3'], p[18])
+        print(p['C3'].properties['total-liquid-volume'])
+        self.assertEquals(p['C3'].max_volume(), 1000)
+        for i, w in enumerate(p):
+            self.assertEquals(w, p[i])
+
+        # remove the file if we only created it for this test
+        should_delete = False
+        with open(environment.get_path('CONTAINERS_FILE')) as f:
+            created_containers = json.load(f)
+            del created_containers['containers'][p.get_name()]
+            if not len(created_containers['containers'].keys()):
+                should_delete = True
+        if should_delete:
+            os.remove(environment.get_path('CONTAINERS_FILE'))
 
     def test_containers_list(self):
         res = containers.list()

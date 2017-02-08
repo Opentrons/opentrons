@@ -84,7 +84,7 @@ def container_to_json(c, name):
             'x': x, 'y': y, 'z': z,
             'depth': w.z_size(),
             'diameter': w.x_size(),
-            'total-liquid-volume': 0
+            'total-liquid-volume': w.max_volume()
         }
     return {name: {'locations': locations}}
 
