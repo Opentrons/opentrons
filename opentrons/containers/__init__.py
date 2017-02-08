@@ -55,7 +55,7 @@ def create(slot, grid, spacing, diameter, depth, volume=0, name=None):
     custom_container = Container()
     properties = {
         'type': 'custom',
-        'radius': diameter / 2,
+        'diameter': diameter,
         'height': depth,
         'total-liquid-volume': volume
     }
