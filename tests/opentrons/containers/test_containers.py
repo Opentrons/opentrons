@@ -56,7 +56,6 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(
             p.get_parent(), Robot.get_instance().deck['A1'])
         self.assertEquals(p['C3'], p[18])
-        print(p['C3'].properties['total-liquid-volume'])
         self.assertEquals(p['C3'].max_volume(), 1000)
         for i, w in enumerate(p):
             self.assertEquals(w, p[i])
