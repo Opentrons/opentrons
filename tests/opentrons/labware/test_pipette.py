@@ -617,6 +617,9 @@ class PipetteTest(unittest.TestCase):
             30,
             self.plate[0:8],
             self.plate[1:9],
+            new_tip='always',
+            air_gap=10,
+            disposal_vol=20,  # ignored by transfer
             touch_tip=True,
             blow_out=True,
             trash=True
@@ -626,46 +629,68 @@ class PipetteTest(unittest.TestCase):
         # pprint(self.robot.commands())
         expected = [
             ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well A1'],
             ['touch'],
             ['dispensing', '30', 'Well B1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well B1'],
             ['touch'],
             ['dispensing', '30', 'Well C1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well C1'],
             ['touch'],
             ['dispensing', '30', 'Well D1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well D1'],
             ['touch'],
             ['dispensing', '30', 'Well E1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well E1'],
             ['touch'],
             ['dispensing', '30', 'Well F1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well F1'],
             ['touch'],
             ['dispensing', '30', 'Well G1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well G1'],
             ['touch'],
             ['dispensing', '30', 'Well H1'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
+            ['drop'],
+            ['pick'],
+            ['air'], ['moving'], ['aspirating', '10'],
             ['aspirating', '30', 'Well H1'],
             ['touch'],
             ['dispensing', '30', 'Well A2'],
+            ['blow', 'in place'],
             ['touch'],
-            ['blow'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -673,6 +698,33 @@ class PipetteTest(unittest.TestCase):
             for s in expected[i]:
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
+
+    def test_bad_transfer(self):
+        self.p200.reset()
+        self.assertRaises(
+            ValueError,
+            self.p200.distribute,
+            30,
+            self.plate[0],
+            self.plate[1]
+        )
+
+        self.assertRaises(
+            ValueError,
+            self.p200.consolidate,
+            30,
+            self.plate[0],
+            self.plate[1]
+        )
+
+        self.assertRaises(
+            ValueError,
+            self.p200.transfer,
+            30,
+            self.plate[0],
+            self.plate[1],
+            new_tip='sometimes'
+        )
 
     def test_transfer_volume_control(self):
 
@@ -745,7 +797,7 @@ class PipetteTest(unittest.TestCase):
             self.plate[0],
             self.plate.rows[1],
             touch_tip=False,
-            blow_out=False
+            blow_out=True
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -765,6 +817,7 @@ class PipetteTest(unittest.TestCase):
             ['blow_out', 'point'],
             ['aspirating', '80', 'Well A1'],
             ['dispensing', '80', 'Well H2'],
+            ['blow_out', 'in place'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -839,12 +892,116 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_transfer_air_gap(self):
+        self.p200.reset()
+        self.p200.transfer(
+            120,
+            self.plate[0],
+            self.plate[1],
+            air_gap=20
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['air gap'], ['moving'], ['aspirating', '20'],
+            ['aspirating', '120', 'Well A1'],
+            ['dispensing', '120', 'Well B1'],
+            ['blow', 'in place'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+    def test_consolidate_air_gap(self):
+        self.p200.reset()
+        self.p200.consolidate(
+            60,
+            self.plate[0:2],
+            self.plate[2],
+            air_gap=20
+        )
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['air gap'], ['moving to'], ['aspirating', '20'],
+            ['aspirating', '60', 'Well A1'],
+            ['aspirating', '60', 'Well B1'],
+            ['dispensing', '120', 'Well C1'],
+            ['blow', 'in place'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+    def test_distribute_air_gap(self):
+        self.p200.reset()
+        self.p200.distribute(
+            60,
+            self.plate[2],
+            self.plate[0:2],
+            air_gap=20
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['air gap'], ['moving to'], ['aspirating', '20'],
+            ['aspirating', '130', 'Well C1'],
+            ['dispensing', '60', 'Well A1'],
+            ['dispensing', '60', 'Well B1'],
+            ['blow', 'point'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+    def test_distribute_air_gap_and_disposal_vol(self):
+        self.p200.reset()
+        self.p200.distribute(
+            60,
+            self.plate[2],
+            self.plate[0:2],
+            air_gap=20,
+            disposal_vol=20
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['air gap'], ['moving to'], ['aspirating', '20'],
+            ['aspirating', '140', 'Well C1'],
+            ['dispensing', '60', 'Well A1'],
+            ['dispensing', '60', 'Well B1'],
+            ['blow', 'point'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
     def test_consolidate_mix(self):
         self.p200.reset()
         self.p200.consolidate(
             200,
-            self.plate[0],
-            self.plate[1],
+            self.plate[0:2],
+            self.plate[2],
             mix_before=(1, 10),
             mix_after=(1, 10)
         )
@@ -854,9 +1011,14 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['pick'],
             ['aspirating', '200', 'Well A1'],
-            ['dispensing', '200', 'Well B1'],
+            ['dispensing', '200', 'Well C1'],
             ['mix', '10'],
-            ['aspirating', 'Well B1'],
+            ['aspirating', 'Well C1'],
+            ['dispensing'],
+            ['aspirating', '200', 'Well B1'],
+            ['dispensing', '200', 'Well C1'],
+            ['mix', '10'],
+            ['aspirating', 'Well C1'],
             ['dispensing'],
             ['drop']
         ]
@@ -871,7 +1033,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.distribute(
             200,
             self.plate[0],
-            self.plate[1],
+            self.plate[1:3],
             mix_before=(1, 10),
             mix_after=(1, 10)
         )
@@ -885,6 +1047,11 @@ class PipetteTest(unittest.TestCase):
             ['dispensing'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well B1'],
+            ['mix', '10'],
+            ['aspirating', 'Well A1'],
+            ['dispensing'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well C1'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))

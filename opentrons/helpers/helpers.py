@@ -162,70 +162,106 @@ def _create_volume_gradient(min_v, max_v, total, gradient=None):
     return [_map_volume(i) for i in range(total)]
 
 
-def _compress_for_repeater(min_vol, max_vol, plan, **kwargs):
-    min_vol = float(min_vol)
+def _expand_for_carryover(max_vol, plan, **kwargs):
+    """
+    Divide volumes larger than maximum volume into separate transfers
+    """
+    max_vol = float(max_vol)
+    carryover = kwargs.get('carryover', True)
+    if not carryover:
+        return plan
+    new_transfer_plan = []
+    for p in plan:
+        source = p['aspirate']['location']
+        target = p['dispense']['location']
+        volume = float(p['aspirate']['volume'])
+        while volume > max_vol * 2:
+            new_transfer_plan.append({
+                'aspirate': {'location': source, 'volume': max_vol},
+                'dispense': {'location': target, 'volume': max_vol}
+            })
+            volume -= max_vol
+
+        if volume > max_vol:
+            volume /= 2
+            new_transfer_plan.append({
+                'aspirate': {'location': source, 'volume': float(volume)},
+                'dispense': {'location': target, 'volume': float(volume)}
+            })
+        new_transfer_plan.append({
+            'aspirate': {'location': source, 'volume': float(volume)},
+            'dispense': {'location': target, 'volume': float(volume)}
+        })
+    return new_transfer_plan
+
+
+def _compress_for_repeater(max_vol, plan, **kwargs):
+    """
+    Reduce size of transfer plan, if mode is distribute or consolidate
+    """
     max_vol = float(max_vol)
     mode = kwargs.get('mode', 'transfer')
     if mode == 'distribute':   # combine target volumes into single aspirate
-        return _compress_for_distribute(min_vol, max_vol, plan, **kwargs)
+        return _compress_for_distribute(max_vol, plan, **kwargs)
     if mode == 'consolidate':  # combine target volumes into multiple aspirates
-        return _compress_for_consolidate(min_vol, max_vol, plan, **kwargs)
+        return _compress_for_consolidate(max_vol, plan, **kwargs)
     else:
         return plan
 
 
-def _compress_for_distribute(min_vol, max_vol, plan, **kwargs):
+def _compress_for_distribute(max_vol, plan, **kwargs):
+    """
+    Combines as many dispenses as can fit within the maximum volume
+    """
     source = plan[0]['aspirate']['location']
     a_vol = 0
     temp_dispenses = []
     new_transfer_plan = []
+    disposal_vol = kwargs.get('disposal_vol', 0)
 
-    def _add():
+    def _append_dispenses():
         nonlocal a_vol, temp_dispenses, new_transfer_plan, source
-
         if not temp_dispenses:
             return
-
-        # distribute commands get an extra volume added
+        added_volume = 0
         if len(temp_dispenses) > 1:
-            a_vol += min_vol
-
+            added_volume = disposal_vol
         new_transfer_plan.append({
             'aspirate': {
-                'location': source, 'volume': a_vol
+                'location': source,
+                'volume': a_vol + added_volume
             }
         })
         for d in temp_dispenses:
             new_transfer_plan.append({
                 'dispense': {
-                    'location': d['location'], 'volume': d['volume']
+                    'location': d['location'],
+                    'volume': d['volume']
                 }
             })
-
-        if min_vol and len(temp_dispenses) > 1:
-            new_transfer_plan.append({
-                'blow_out': {'blow_out': True}
-            })
+        a_vol = 0
+        temp_dispenses = []
 
     for p in plan:
         this_vol = p['aspirate']['volume']
-        if this_vol + a_vol > max_vol - min_vol:
-            _add()
-            a_vol = 0
-            temp_dispenses = []
+        if this_vol + a_vol > max_vol - disposal_vol:
+            _append_dispenses()
         a_vol += this_vol
         temp_dispenses.append(p['dispense'])
-    _add()
+    _append_dispenses()
     return new_transfer_plan
 
 
-def _compress_for_consolidate(min_vol, max_vol, plan, **kwargs):
+def _compress_for_consolidate(max_vol, plan, **kwargs):
+    """
+    Combines as many aspirates as can fit within the maximum volume
+    """
     target = plan[0]['dispense']['location']
     d_vol = 0
     temp_aspirates = []
     new_transfer_plan = []
 
-    def _add():
+    def _append_aspirates():
         nonlocal d_vol, temp_aspirates, new_transfer_plan, target
         for a in temp_aspirates:
             new_transfer_plan.append({
@@ -244,39 +280,8 @@ def _compress_for_consolidate(min_vol, max_vol, plan, **kwargs):
     for i, p in enumerate(plan):
         this_vol = p['aspirate']['volume']
         if this_vol + d_vol > max_vol:
-            _add()
+            _append_aspirates()
         d_vol += this_vol
         temp_aspirates.append(p['aspirate'])
-    _add()
-    return new_transfer_plan
-
-
-def _expand_for_carryover(min_vol, max_vol, plan, **kwargs):
-    max_vol = float(max_vol)
-    carryover = kwargs.get('carryover', True)
-    if not carryover:
-        return plan
-    new_transfer_plan = []
-    for p in plan:
-        source = p['aspirate']['location']
-        target = p['dispense']['location']
-        volume = float(p['aspirate']['volume'])
-        while volume > max_vol * 2:
-            new_transfer_plan.append({
-                'aspirate': {'location': source, 'volume': max_vol},
-                'dispense': {'location': target, 'volume': max_vol}
-            })
-            volume -= max_vol
-
-        # try and make sure no volumes are less than min_vol
-        if volume > max_vol:
-            volume /= 2
-            new_transfer_plan.append({
-                'aspirate': {'location': source, 'volume': float(volume)},
-                'dispense': {'location': target, 'volume': float(volume)}
-            })
-        new_transfer_plan.append({
-            'aspirate': {'location': source, 'volume': float(volume)},
-            'dispense': {'location': target, 'volume': float(volume)}
-        })
+    _append_aspirates()
     return new_transfer_plan
