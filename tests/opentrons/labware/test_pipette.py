@@ -624,9 +624,9 @@ class PipetteTest(unittest.TestCase):
             blow_out=True,
             trash=True
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
         expected = [
             ['pick'],
             ['air'], ['moving'], ['aspirating', '10'],
@@ -698,6 +698,33 @@ class PipetteTest(unittest.TestCase):
             for s in expected[i]:
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
+
+    def test_bad_transfer(self):
+        self.p200.reset()
+        self.assertRaises(
+            ValueError,
+            self.p200.distribute,
+            30,
+            self.plate[0],
+            self.plate[1]
+        )
+
+        self.assertRaises(
+            ValueError,
+            self.p200.consolidate,
+            30,
+            self.plate[0],
+            self.plate[1]
+        )
+
+        self.assertRaises(
+            ValueError,
+            self.p200.transfer,
+            30,
+            self.plate[0],
+            self.plate[1],
+            new_tip='sometimes'
+        )
 
     def test_transfer_volume_control(self):
 
