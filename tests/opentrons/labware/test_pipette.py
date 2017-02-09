@@ -917,6 +917,33 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_distribute_air_gap_and_disposal_vol(self):
+        self.p200.reset()
+        self.p200.distribute(
+            60,
+            self.plate[2],
+            self.plate[0:2],
+            air_gap=20,
+            disposal_vol=20
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['air gap'], ['moving to'], ['aspirating', '20'],
+            ['aspirating', '140', 'Well C1'],
+            ['dispensing', '60', 'Well A1'],
+            ['dispensing', '60', 'Well B1'],
+            ['blow', 'point'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
     def test_consolidate_mix(self):
         self.p200.reset()
         self.p200.consolidate(
