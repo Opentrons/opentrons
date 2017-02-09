@@ -1181,11 +1181,11 @@ class Pipette(Instrument):
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
-    def transfer(self, volume, source, target, **kwargs):
+    def transfer(self, volume, source, dest, **kwargs):
 
         """
         Transfer will move a volume of liquid from a source location(s)
-        to a target location(s). It is a higher-level command, incorporating
+        to a dest location(s). It is a higher-level command, incorporating
         other :any:`Pipette` commands, like :any:`aspirate` and
         :any:`dispense`, designed to make protocol writing easier at the
         cost of specificity.
@@ -1204,7 +1204,7 @@ class Pipette(Instrument):
             Single :any:`Placeable` or list of :any:`Placeable`s, from where
             liquid will be :any:`aspirate`ed from.
 
-        target : Placeable or list
+        dest : Placeable or list
             Single :any:`Placeable` or list of :any:`Placeable`s, where
             liquid will be :any:`dispense`ed to.
 
@@ -1272,40 +1272,41 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        enqueue = kwargs.get('enqueue', True)
         kwargs['mode'] = kwargs.get('mode', 'transfer')
-        transfer_plan = self._create_transfer_plan(
-            volume, source, target, **kwargs)
+        if kwargs['mode'] is 'distribute' and 'disposal_vol' not in kwargs:
+            kwargs['disposal_vol'] = self.min_volume
 
         tip_options = {
             'once': 1,
             'never': 0,
             'always': float('inf')
         }
-        tip_option = kwargs.pop('new_tip', 'once')
+        tip_option = kwargs.get('new_tip', 'once')
         tips = tip_options.get(tip_option)
         if tips is None:
-            raise ValueError('Unknown "new_tip" value: {}'.format(tip_option))
+            raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
 
-        total_transfers = len(transfer_plan)
-        for i, plan in enumerate(transfer_plan):
-            aspirate = plan.get('aspirate')
-            dispense = plan.get('dispense')
-            blowout = plan.get('blow_out')
-            if this_aspirate:
+        plan = self._create_transfer_plan(volume, source, dest, **kwargs)
+
+        total_transfers = len(plan)
+        for i, step in enumerate(plan):
+
+            aspirate = step.get('aspirate')
+            dispense = step.get('dispense')
+
+            if aspirate:
                 self._add_tip_during_transfer(tips, **kwargs)
+
                 self._aspirate_during_transfer(
                     aspirate['volume'], aspirate['location'], **kwargs)
-            if this_dispense:
+
+            if dispense:
                 self._dispense_during_transfer(
                     dispense['volume'], dispense['location'], **kwargs)
-            if blowout:
-                blow_out_location = self.trash_container
-                if isinstance(kwargs.get('blow_out'), Placeable):
-                    blow_out_location = kwargs.get('blow_out')
-                self.blow_out(blow_out_location, enqueue=enqueue)
-            tips = self._remove_tip_during_transfer(
-                tips, i, total_transfers, **kwargs)
+
+            if dispense and (step is plan[-1] or plan[i + 1].get('aspirate')):
+                tips = self._remove_tip_during_transfer(
+                    tips, i, total_transfers, **kwargs)
 
         return self
 
@@ -1557,23 +1558,30 @@ class Pipette(Instrument):
 
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
+        if kwargs['mode'] is 'distribute' and not len(t) > 1:
+            raise ValueError('distribute requires multiple targets')
+        if kwargs['mode'] is 'consolidate' and not len(s) > 1:
+            raise ValueError('consolidate requires multiple targets')
         total_transfers = len(t)
         v = helpers._create_volume_list(v, total_transfers, **kwargs)
 
-        # convert to array of transfer dicts
         transfer_plan = []
         for i in range(total_transfers):
             transfer_plan.append({
                 'aspirate': {'location': s[i], 'volume': v[i]},
                 'dispense': {'location': t[i], 'volume': v[i]}
             })
-        if kwargs.get('carryover', True):
+
+        max_vol = self.max_volume
+        max_vol -= kwargs.get('air_gap', 0)  # air
+
+        if kwargs.get('divide', True):
             transfer_plan = helpers._expand_for_carryover(
-                self.min_volume, self.max_volume, transfer_plan, **kwargs)
+                max_vol, transfer_plan, **kwargs)
 
         if kwargs.get('repeat', True):
             transfer_plan = helpers._compress_for_repeater(
-                self.min_volume, self.max_volume, transfer_plan, **kwargs)
+                max_vol, transfer_plan, **kwargs)
 
         return transfer_plan
 
@@ -1593,6 +1601,17 @@ class Pipette(Instrument):
         """
         enqueue = kwargs.get('enqueue', True)
         trash = kwargs.get('trash', True)
+        blow_out = kwargs.get('blow_out', False)
+        if self.current_volume > 0 or blow_out:
+            if not isinstance(blow_out, Placeable):
+                if self.current_volume == 0:
+                    blow_out = None
+                elif self.current_volume == kwargs.get('air_gap'):
+                    blow_out = None
+                else:
+                    blow_out = self.trash_container
+            self.blow_out(blow_out, enqueue=enqueue)
+
         if tips > 1 or (i + 1 == total_transfers and tips > 0):
             if trash and self.trash_container:
                 self.drop_tip(enqueue=enqueue)
@@ -1607,17 +1626,19 @@ class Pipette(Instrument):
         optionally a :any:`touch_tip` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
-        should_touch_tip = kwargs.get('touch_tip', False)
-        air_gap = kwargs.get('air_gap', 0)
         rate = kwargs.get('rate', 1)
-        mix_before = kwargs.get('mix_before', (0, 0))
+        mix_before = kwargs.get('mix', kwargs.get('mix_before', (0, 0)))
+        air_gap = kwargs.get('air_gap', 0)
+        touch_tip_before = kwargs.get(
+            'touch_tip_before', kwargs.get('touch_tip', False))
+
+        if air_gap and self.current_volume == 0:
+            self.air_gap(air_gap)
         if isinstance(mix_before, (tuple, list)):
             if len(mix_before) == 2 and 0 not in mix_before:
                 self.mix(mix_before[0], mix_before[1], loc, enqueue=enqueue)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
-        if air_gap:
-            self.air_gap(air_gap)
-        if should_touch_tip:
+        if touch_tip_before:
             self.touch_tip(enqueue=enqueue)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
@@ -1627,18 +1648,17 @@ class Pipette(Instrument):
         :any:`blow_out` afterwards.
         """
         enqueue = kwargs.get('enqueue', True)
-        should_touch_tip = kwargs.get('touch_tip', False)
-        mix_after = kwargs.get('mix_after', (0, 0))
-        should_blow_out = kwargs.get('blow_out', False)
+        touch_tip_after = kwargs.get(
+            'touch_tip_after', kwargs.get('touch_tip', False))
+        mix_after = kwargs.get('mix', kwargs.get('mix_after', (0, 0)))
         rate = kwargs.get('rate', 1)
+
         self.dispense(vol, loc, rate=rate, enqueue=enqueue)
         if isinstance(mix_after, (tuple, list)):
             if len(mix_after) == 2 and 0 not in mix_after:
                 self.mix(mix_after[0], mix_after[1], enqueue=enqueue)
-        if should_touch_tip:
+        if touch_tip_after:
             self.touch_tip(enqueue=enqueue)
-        if should_blow_out and self.current_volume == 0:
-            self.blow_out(enqueue=enqueue)
 
     def set_speed(self, **kwargs):
         """

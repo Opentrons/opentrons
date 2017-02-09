@@ -613,7 +613,8 @@ class Robot(object, metaclass=Singleton):
                     'Unknown move strategy: {}'.format(strategy))
 
         if enqueue:
-            self.add_command(Command(do=_do))
+            _description = 'Moving to {}'.format(placeable)
+            self.add_command(Command(do=_do, description=_description))
         else:
             _do()
 
