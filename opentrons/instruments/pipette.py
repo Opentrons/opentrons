@@ -1181,7 +1181,7 @@ class Pipette(Instrument):
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
-    def transfer(self, volumes, of, to, **kwargs):
+    def transfer(self, volume, source, target, **kwargs):
 
         """
         Transfer will move a volume of liquid from a source location(s)
@@ -1200,15 +1200,15 @@ class Pipette(Instrument):
             like `(20, 100)`, then a list of volumes will be generated with
             a linear gradient between the two volumes in the tuple.
 
-        of : Placeable or list
+        source : Placeable or list
             Single :any:`Placeable` or list of :any:`Placeable`s, from where
             liquid will be :any:`aspirate`ed from.
 
-        to : Placeable or list
+        target : Placeable or list
             Single :any:`Placeable` or list of :any:`Placeable`s, where
             liquid will be :any:`dispense`ed to.
 
-        tips : number
+        new_tip : number
             The number of clean tips this transfer command will use. If 0,
             no tips will be picked up nor dropped. If 1, a single tip will be
             used for all commands.
@@ -1272,35 +1272,38 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        sources = of
-        targets = to
         enqueue = kwargs.get('enqueue', True)
         kwargs['mode'] = kwargs.get('mode', 'transfer')
         transfer_plan = self._create_transfer_plan(
-            volumes, sources, targets, **kwargs)
+            volume, source, target, **kwargs)
 
         tip_options = {
             'once': 1,
             'never': 0,
             'always': float('inf')
         }
-        tips = tip_options.get(kwargs.pop('new_tip', 'once'))
+        tip_option = kwargs.pop('new_tip', 'once')
+        tips = tip_options.get(tip_option)
+        if tips is None:
+            raise ValueError('Unknown "new_tip" value: {}'.format(tip_option))
 
         total_transfers = len(transfer_plan)
         for i, plan in enumerate(transfer_plan):
-            this_aspirate = plan.get('aspirate')
+            aspirate = plan.get('aspirate')
+            dispense = plan.get('dispense')
+            blowout = plan.get('blow_out')
             if this_aspirate:
-                vol = this_aspirate['volume']
-                loc = this_aspirate['location']
                 self._add_tip_during_transfer(tips, **kwargs)
-                self._aspirate_during_transfer(vol, loc, **kwargs)
-            this_dispense = plan.get('dispense')
+                self._aspirate_during_transfer(
+                    aspirate['volume'], aspirate['location'], **kwargs)
             if this_dispense:
-                vol = this_dispense['volume']
-                loc = this_dispense['location']
-                self._dispense_during_transfer(vol, loc, **kwargs)
-            if plan.get('blow_out'):
-                self.blow_out(self.trash_container, enqueue=enqueue)
+                self._dispense_during_transfer(
+                    dispense['volume'], dispense['location'], **kwargs)
+            if blowout:
+                blow_out_location = self.trash_container
+                if isinstance(kwargs.get('blow_out'), Placeable):
+                    blow_out_location = kwargs.get('blow_out')
+                self.blow_out(blow_out_location, enqueue=enqueue)
             tips = self._remove_tip_during_transfer(
                 tips, i, total_transfers, **kwargs)
 
@@ -1605,12 +1608,15 @@ class Pipette(Instrument):
         """
         enqueue = kwargs.get('enqueue', True)
         should_touch_tip = kwargs.get('touch_tip', False)
+        air_gap = kwargs.get('air_gap', 0)
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix_before', (0, 0))
         if isinstance(mix_before, (tuple, list)):
             if len(mix_before) == 2 and 0 not in mix_before:
                 self.mix(mix_before[0], mix_before[1], loc, enqueue=enqueue)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
+        if air_gap:
+            self.air_gap(air_gap)
         if should_touch_tip:
             self.touch_tip(enqueue=enqueue)
 
