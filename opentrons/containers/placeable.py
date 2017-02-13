@@ -581,27 +581,53 @@ class Container(Placeable):
         """
         Returns child Well or list of child Wells
         """
-        to = kwargs.get('to', None)
-        skip = kwargs.get('skip', 1)
-        length = kwargs.get('length', 1)
+
+        if len(args) and isinstance(args[0], list):
+            args = args[0]
 
         new_wells = None
-        if len(args) > 1:
-            new_wells = WellSeries([self.well(n) for n in args])
-        elif len(args) is 1:
-            if isinstance(args[0], list):
-                new_wells = WellSeries([self.well(n) for n in args[0]])
-            elif to:
-                stop = self.get_index_from_name(to) + 1
-                new_wells = self[args[0]:stop:skip]
-            else:
-                new_wells = self[args[0]::skip][:length]
-        else:
+        if not args:
             new_wells = WellSeries(self.get_children_list())
+        elif len(args) > 1:
+            new_wells = WellSeries([self.well(n) for n in args])
+        else:
+            new_wells = self._parse_wells_to_and_length(*args, **kwargs)
 
         if len(new_wells) is 1:
             return new_wells[0]
         return new_wells
+
+    def _parse_wells_to_and_length(self, *args, **kwargs):
+        start = args[0]
+        stop = kwargs.get('to', None)
+        step = kwargs.get('step', 1)
+        length = kwargs.get('length', 1)
+
+        wrapped_wells = [
+            w
+            for i in range(3)
+            for w in self.get_children_list()
+        ]
+
+        if isinstance(start, str):
+            start = self.get_index_from_name(start)
+        if stop is not None:
+            if isinstance(stop, str):
+                stop = self.get_index_from_name(stop)
+            if stop > start:
+                stop += 1
+                step = step * -1 if step < 0 else step
+            elif stop < start:
+                stop -= 1
+                step = step * -1 if step > 0 else step
+            return WellSeries(
+                wrapped_wells[start + 96:stop + 96:step])
+        else:
+            if length < 0:
+                length *= -1
+                step = step * -1 if step > 0 else step
+            return WellSeries(
+                wrapped_wells[start + 96::step][:length])
 
 
 class WellSeries(Container):
