@@ -1569,6 +1569,13 @@ class Pipette(Instrument):
 
     def _run_transfer_plan(self, tips, plan, **kwargs):
         enqueue = kwargs.get('enqueue', True)
+
+        should_touch_tip = kwargs.get('touch_tip', False)
+        if isinstance(should_touch_tip, (int, float, complex)):
+            touch_tip = should_touch_tip
+        else:
+            touch_tip = -1
+
         total_transfers = len(plan)
         for i, step in enumerate(plan):
 
@@ -1580,8 +1587,8 @@ class Pipette(Instrument):
 
                 self._aspirate_during_transfer(
                     aspirate['volume'], aspirate['location'], **kwargs)
-                if kwargs.get('touch_tip'):
-                    self.touch_tip(enqueue=enqueue)
+                if should_touch_tip is not False:
+                    self.touch_tip(touch_tip, enqueue=enqueue)
 
             if dispense:
                 self._dispense_during_transfer(
@@ -1589,12 +1596,12 @@ class Pipette(Instrument):
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
-                    if kwargs.get('touch_tip'):
-                        self.touch_tip(enqueue=enqueue)
+                    if should_touch_tip is not False:
+                        self.touch_tip(touch_tip, enqueue=enqueue)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
-                elif kwargs.get('touch_tip'):
-                    self.touch_tip(enqueue=enqueue)
+                elif should_touch_tip is not False:
+                    self.touch_tip(touch_tip, enqueue=enqueue)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """
