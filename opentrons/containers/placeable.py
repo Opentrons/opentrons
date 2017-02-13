@@ -577,15 +577,28 @@ class Container(Placeable):
         """
         return self.__getitem__(name)
 
-    def wells(self, *args):
+    def wells(self, *args, **kwargs):
         """
         Returns child Well or list of child Wells
         """
+        to = kwargs.get('to', None)
+        skip = kwargs.get('skip', 1)
+        length = kwargs.get('length', 1)
+
         new_wells = None
-        if len(args) > 0:
+        if len(args) > 1:
             new_wells = WellSeries([self.well(n) for n in args])
+        elif len(args) is 1:
+            if isinstance(args[0], list):
+                new_wells = WellSeries([self.well(n) for n in args[0]])
+            elif to:
+                stop = self.get_index_from_name(to) + 1
+                new_wells = self[args[0]:stop:skip]
+            else:
+                new_wells = self[args[0]::skip][:length]
         else:
             new_wells = WellSeries(self.get_children_list())
+
         if len(new_wells) is 1:
             return new_wells[0]
         return new_wells
