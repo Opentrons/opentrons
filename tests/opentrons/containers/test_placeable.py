@@ -231,3 +231,6 @@ class PlaceableTestCase(unittest.TestCase):
 
         expected = c.wells('A1', 'H12', 'G12', 'F12')
         self.assertWellSeriesEqual(c.wells('A1', length=-4, step=1), expected)
+
+        expected = c.wells('A1', 'B1', 'C1', 'D1')
+        self.assertWellSeriesEqual(c.wells(length=4), expected)
