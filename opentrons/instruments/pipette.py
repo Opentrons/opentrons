@@ -1589,10 +1589,6 @@ class Pipette(Instrument):
                 self._add_tip_during_transfer(tips, **kwargs)
                 self._aspirate_during_transfer(
                     aspirate['volume'], aspirate['location'], **kwargs)
-                if air_gap:
-                    self.air_gap(air_gap, enqueue=enqueue)
-                if should_touch_tip is not False:
-                    self.touch_tip(touch_tip, enqueue=enqueue)
 
             if dispense:
                 self._dispense_during_transfer(
@@ -1628,10 +1624,19 @@ class Pipette(Instrument):
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix', kwargs.get('mix_before', (0, 0)))
         air_gap = kwargs.get('air_gap', 0)
+        should_touch_tip = kwargs.get('touch_tip', False)
+        if isinstance(should_touch_tip, (int, float, complex)):
+            touch_tip = should_touch_tip
+        else:
+            touch_tip = -1
 
         if self.current_volume == 0:
             self._mix_during_transfer(mix_before, loc, **kwargs)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
+        if air_gap:
+            self.air_gap(air_gap, enqueue=enqueue)
+        if should_touch_tip is not False:
+            self.touch_tip(touch_tip, enqueue=enqueue)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
         """
