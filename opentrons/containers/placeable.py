@@ -597,6 +597,12 @@ class Container(Placeable):
             return new_wells[0]
         return new_wells
 
+    def get(self, *args, **kwargs):
+        """
+        Passes all arguments to Wells() and returns result
+        """
+        return self.wells(*args, **kwargs)
+
     def _parse_wells_to_and_length(self, *args, **kwargs):
         start = args[0] if len(args) else 0
         stop = kwargs.get('to', None)
