@@ -614,6 +614,7 @@ class Container(Placeable):
             for i in range(3)
             for w in self.get_children_list()
         ]
+        total_kids = len(self.get_children_list())
 
         if isinstance(start, str):
             start = self.get_index_from_name(start)
@@ -627,13 +628,13 @@ class Container(Placeable):
                 stop -= 1
                 step = step * -1 if step > 0 else step
             return WellSeries(
-                wrapped_wells[start + 96:stop + 96:step])
+                wrapped_wells[start + total_kids:stop + total_kids:step])
         else:
             if length < 0:
                 length *= -1
                 step = step * -1 if step > 0 else step
             return WellSeries(
-                wrapped_wells[start + 96::step][:length])
+                wrapped_wells[start + total_kids::step][:length])
 
 
 class WellSeries(Container):

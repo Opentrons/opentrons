@@ -1535,8 +1535,10 @@ class Pipette(Instrument):
             # SPECIAL CASE: if using multi-channel pipette,
             # and the source or target is a WellSeries
             # then avoid iterating through it's Wells
-            s = [s] if isinstance(s, WellSeries) else s
-            t = [t] if isinstance(t, WellSeries) else t
+            if isinstance(s, WellSeries) and not isinstance(s[0], WellSeries):
+                s = [s] if isinstance(s, WellSeries) else s
+            if isinstance(t, WellSeries) and not isinstance(t[0], WellSeries):
+                t = [t] if isinstance(t, WellSeries) else t
 
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
