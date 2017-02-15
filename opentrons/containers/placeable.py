@@ -1,3 +1,4 @@
+import itertools
 import math
 import numbers
 from collections import OrderedDict
@@ -127,6 +128,25 @@ class Placeable(object):
         children = self.parent.get_children_list()
         my_loc = children.index(self)
         return children[my_loc + 1]
+
+    def iter(self):
+        """
+        Returns an iterable built from this Placeable's children list
+        """
+        return iter(self.get_children_list())
+
+    def chain(self, *args):
+        """
+        Returns an itertools.chain built from this Placeable's children list
+        and appending any passed lists with *args
+        """
+        return itertools.chain(self.get_children_list(), *args)
+
+    def cycle(self):
+        """
+        Returns an itertools.cycle from this Placeable's children list
+        """
+        return itertools.cycle(self.get_children_list())
 
     def get_name(self):
         """
