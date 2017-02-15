@@ -1294,7 +1294,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def delay(self, seconds, enqueue=True):
+    def delay(self, seconds=0, minutes=0, enqueue=True):
         """
         Parameters
         ----------
@@ -1308,13 +1308,19 @@ class Pipette(Instrument):
             :any:`run` or :any:`simulate`. If set to `False`, the
             method will skip the command queue and execute immediately
         """
+
         def _setup():
             pass
 
         def _do():
+            nonlocal seconds
             self.motor.wait(seconds)
 
-        _description = "Delaying {} seconds".format(seconds)
+        minutes += int(seconds / 60)
+        seconds = seconds % 60
+        _description = "Delaying {} minutes and {} seconds".format(
+            minutes, seconds)
+        seconds += float(minutes * 60)
         self.create_command(
             do=_do,
             setup=_setup,
