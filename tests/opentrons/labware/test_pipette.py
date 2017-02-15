@@ -374,7 +374,7 @@ class PipetteTest(unittest.TestCase):
             self.robot._commands[-1].description,
             "Delaying 0 minutes and 1 seconds")
 
-        robot.clear_commands()
+        self.robot.clear_commands()
         self.p200.delay(seconds=12, minutes=10)
 
         self.assertEqual(
