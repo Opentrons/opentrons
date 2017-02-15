@@ -201,6 +201,7 @@ class PlaceableTestCase(unittest.TestCase):
         expected = [c[n] for n in ['A1', 'B2', 'C3']]
         self.assertWellSeriesEqual(c.wells('A1', 'B2', 'C3'), expected)
         self.assertWellSeriesEqual(c.get('A1', 'B2', 'C3'), expected)
+        self.assertWellSeriesEqual(c('A1', 'B2', 'C3'), expected)
 
         expected = [c.cols[0][0], c.cols[0][5]]
         self.assertWellSeriesEqual(c.cols['A'].wells('1', '6'), expected)
@@ -209,6 +210,7 @@ class PlaceableTestCase(unittest.TestCase):
         expected = [c.cols[0][0], c.cols[0][5]]
         self.assertWellSeriesEqual(c.cols['A'].wells(['1', '6']), expected)
         self.assertWellSeriesEqual(c.cols['A'].get('1', '6'), expected)
+        self.assertWellSeriesEqual(c.cols('A').get('1', '6'), expected)
 
         expected = c.wells('A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1')
         self.assertWellSeriesEqual(c.wells('A1', to='H1'), expected)
