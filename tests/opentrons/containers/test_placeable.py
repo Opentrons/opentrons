@@ -60,6 +60,31 @@ class PlaceableTestCase(unittest.TestCase):
 
         self.assertEqual(next(well), expected)
 
+    def test_cycle(self):
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        cycle_iter = c.cycle()
+        for n in range(3):
+            for i in range(4):
+                self.assertEqual(next(cycle_iter), c[i])
+
+    def test_iter_method(self):
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        cycle_iter = c.iter()
+        for i in range(4):
+            self.assertEqual(next(cycle_iter), c[i])
+
+    def test_chain_method(self):
+        a = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        b = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        cycle_iter = a.chain(b, c)
+        for i in range(4):
+            self.assertEqual(next(cycle_iter), a[i])
+        for i in range(4):
+            self.assertEqual(next(cycle_iter), b[i])
+        for i in range(4):
+            self.assertEqual(next(cycle_iter), c[i])
+
     def test_int_index(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
 
