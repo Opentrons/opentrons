@@ -1573,11 +1573,11 @@ class Pipette(Instrument):
     def _run_transfer_plan(self, tips, plan, **kwargs):
         enqueue = kwargs.get('enqueue', True)
         air_gap = kwargs.get('air_gap', 0)
-        should_touch_tip = kwargs.get('touch_tip', False)
-        if isinstance(should_touch_tip, (int, float, complex)):
-            touch_tip = should_touch_tip
-        else:
+
+        touch_tip = kwargs.get('touch_tip', False)
+        if touch_tip is True:
             touch_tip = -1
+        kwargs['touch_tip'] = touch_tip
 
         total_transfers = len(plan)
         for i, step in enumerate(plan):
@@ -1596,14 +1596,14 @@ class Pipette(Instrument):
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
-                    if should_touch_tip is not False:
+                    if touch_tip or touch_tip is 0:
                         self.touch_tip(touch_tip, enqueue=enqueue)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
                         self.air_gap(air_gap, enqueue=enqueue)
-                    if should_touch_tip is not False:
+                    if touch_tip or touch_tip is 0:
                         self.touch_tip(touch_tip, enqueue=enqueue)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
@@ -1624,18 +1624,14 @@ class Pipette(Instrument):
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix', kwargs.get('mix_before', (0, 0)))
         air_gap = kwargs.get('air_gap', 0)
-        should_touch_tip = kwargs.get('touch_tip', False)
-        if isinstance(should_touch_tip, (int, float, complex)):
-            touch_tip = should_touch_tip
-        else:
-            touch_tip = -1
+        touch_tip = kwargs.get('touch_tip', False)
 
         if self.current_volume == 0:
             self._mix_during_transfer(mix_before, loc, **kwargs)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
         if air_gap:
             self.air_gap(air_gap, enqueue=enqueue)
-        if should_touch_tip is not False:
+        if touch_tip or touch_tip is 0:
             self.touch_tip(touch_tip, enqueue=enqueue)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
