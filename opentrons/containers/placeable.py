@@ -107,6 +107,11 @@ class Placeable(object):
         return '<{} {}>'.format(
             self.__class__.__name__, self.get_name())
 
+    def __add__(self, other):
+        return WellSeries(
+            self.get_children_list() + other.get_children_list()
+        )
+
     def __iter__(self):
         return iter(self.get_children_list())
 

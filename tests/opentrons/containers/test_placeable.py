@@ -66,6 +66,24 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertEqual(c[3], c.get_child_by_name('B2'))
         self.assertEqual(c[1], c.get_child_by_name('B1'))
 
+    def test_add_placeables(self):
+        a = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        b = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+
+        result = a + b
+        self.assertEqual(len(result), 8)
+        for i in range(len(a)):
+            self.assertEqual(a[i], result[i])
+        for i in range(len(b)):
+            self.assertEqual(b[i], result[i + len(a)])
+
+        result = a.rows(0) + b.cols(0)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(a[0], result[0])
+        self.assertEqual(a[1], result[1])
+        self.assertEqual(b[0], result[2])
+        self.assertEqual(b[2], result[3])
+
     def test_named_well(self):
         deck = Deck()
         slot = Slot()
