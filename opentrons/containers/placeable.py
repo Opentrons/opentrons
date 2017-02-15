@@ -597,6 +597,12 @@ class Container(Placeable):
             return new_wells[0]
         return new_wells
 
+    def __call__(self, *args, **kwargs):
+        """
+        Passes all arguments to Wells() and returns result
+        """
+        return self.wells(*args, **kwargs)
+
     def get(self, *args, **kwargs):
         """
         Passes all arguments to Wells() and returns result
