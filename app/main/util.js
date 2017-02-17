@@ -1,14 +1,14 @@
 const rp = require('request-promise')
 
-function waitUntilServerResponds (createWindow) {
-  rp('http://127.0.0.1:31950')
+function waitUntilServerResponds (createWindow, windowUrl) {
+  rp(windowUrl)
     .then((html) => {
       return createWindow()
     })
     .catch((err) => {
       console.log(err)
       setTimeout(() => {
-        waitUntilServerResponds(createWindow)
+        waitUntilServerResponds(createWindow, windowUrl)
       }, 500)
     })
 }

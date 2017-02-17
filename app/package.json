@@ -10,10 +10,12 @@
     "electron-squirrel-startup": "^1.0.0",
     "fs": "0.0.2",
     "moment-timezone": "^0.5.9",
-    "winston": "^2.2.0",
-    "zip-folder": "^1.0.0",
     "request": "^2.78.0",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "tar": "^2.2.1",
+    "unzip": "0.1.11",
+    "winston": "^2.2.0",
+    "zip-folder": "^1.0.0"
   },
   "repository": {
     "type": "git",
