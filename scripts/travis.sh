@@ -36,9 +36,10 @@ run_install ()
   cd server && python3 -m nose -s --logging-level WARNING && cd ..
 
   npm i -g mocha
-  npm run unit
+  npm run unit-renderer
+  npm run unit-main
   npm run release:posix
-  npm run integration
+  npm run e2e
   ls dist/*
   ls releases
 }
