@@ -13,7 +13,7 @@ matrix:
       # sudo: required
       # dist: trusty
       python: "3.5"  # TODO: revisit...
-      python: "3.6"
+      # python: "3.6"
       env: OPENTRONS_APP_UPLOAD_DIR=linux
       addons:
         apt:
@@ -41,14 +41,14 @@ cache:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
-  - ./scripts/travis.sh pre-install
+  - ./app/scripts/travis.sh pre-install
 
 install:
   - python --version
   - python3 --version
   - python3 setup.py install
   - pip3 install -r requirements.txt
-  - ./scripts/travis.sh install
+  - ./app/scripts/travis.sh install
 
 script:
   - nosetests --with-coverage
@@ -63,7 +63,7 @@ deploy:
   secret_access_key: $AWS_SECRET_KEY
   bucket: ot-app-builds
   skip_cleanup: true
-  local-dir: releases
+  local-dir: app/releases
   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
