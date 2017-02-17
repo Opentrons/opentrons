@@ -63,6 +63,8 @@ install:
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
+  - ps: C:\Python35\python scripts\create_env.py
+  - ps: scripts\test_env.bat
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   - cmd: npm config list

@@ -132,3 +132,5 @@ releases/*
 out/
 
 server/protocols/*
+env-dist
+env-build

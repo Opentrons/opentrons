@@ -28,8 +28,8 @@
     "chai-as-promised": "^5.3.0",
     "cross-env": "^3.1.3",
     "css-loader": "^0.25.0",
-    "electron-builder": "10.9.2",
     "electron": "^1.4.7",
+    "electron-builder": "10.9.2",
     "electron-chromedriver": "1.4.1",
     "eslint": "^3.10.2",
     "eslint-config-standard": "^5.1.0",
@@ -67,6 +67,7 @@
     "appId": "ot.one.opentrons",
     "electronVersion": "1.4.7",
     "productName": "Opentrons 2.0",
+    "extraResources": ["env-dist/venv.zip"],
     "dmg": {
       "backgroundColor": "white",
       "contents": [
@@ -92,7 +93,9 @@
     },
     "win": {
       "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico",
-      "target": ["squirrel"]
+      "target": [
+        "squirrel"
+      ]
     },
     "linux": {
       "category": "Science",
@@ -100,6 +103,7 @@
     }
   },
   "dependencies": {
+    "asar": "^0.13.0",
     "babel-preset-es2016": "^6.16.0",
     "electron-debug": "^1.0.1",
     "imports-loader": "^0.6.5",
@@ -108,10 +112,10 @@
     "socket.io-client": "~1.3.7",
     "underscore.string": "^3.3.4",
     "vue": "2.0.5",
-    "vue-template-compiler": "2.0.5",
     "vue-loader": "9.9.3",
     "vue-resource": "1.0.3",
     "vue-router": "2.0.2",
+    "vue-template-compiler": "2.0.5",
     "vuex": "2.0.0",
     "vuex-toast": "0.0.2",
     "websocket": "^1.0.23"

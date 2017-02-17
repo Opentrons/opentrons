@@ -23,6 +23,8 @@ run_install ()
   npm --version
 
   pip3 install pip --upgrade
+  echo "Upgrading virtualenv"
+  pip3 install --upgrade virtualenv
 
   which pip
   which pip3
@@ -42,6 +44,10 @@ run_install ()
   npm run e2e
   ls dist/*
   ls releases
+
+  echo "Creating python virtualenv"
+  python3 scripts/create_env.py
+  cd env-dist && ../scripts/test_env.sh && cd ..
 }
 
 execute_mac ()
