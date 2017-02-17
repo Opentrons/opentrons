@@ -3,6 +3,7 @@ from threading import Thread
 import unittest
 
 from opentrons import Robot
+from opentrons.util.vector import Vector
 
 
 class OpenTronsTest(unittest.TestCase):
@@ -94,6 +95,11 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.disconnect()
         res = self.motor.get_connected_port()
         self.assertEquals(res, None)
+
+    def test_get_dimensions(self):
+        self.motor.ot_version = None
+        res = self.motor.get_dimensions()
+        self.assertEquals(res, Vector(400.00, 400.00, 100.00))
 
     def test_pause_resume(self):
         self.motor.home()

@@ -1,6 +1,7 @@
 import json
 
 from opentrons.util.vector import Vector
+from opentrons.containers.placeable import Placeable
 
 
 def unpack_coordinates(coordinates):
@@ -98,3 +99,189 @@ def import_calibration_file(file_name, robot):
     with open(file_name) as f:
         json_string = '\n'.join(f)
         import_calibration_json(json_string, robot)
+
+
+def _get_list(n):
+    if not hasattr(n, '__len__') or len(n) == 0 or isinstance(n, tuple):
+        n = [n]
+    if isinstance(n, Placeable) and len(n) == 1:
+        n = [n[0]]
+    return n
+
+
+def _create_source_target_lists(s, t, **kwargs):
+    s = _get_list(s)
+    t = _get_list(t)
+    mode = kwargs.get('mode', 'transfer')
+    if mode == 'transfer':
+        if len(s) != len(t):
+            raise RuntimeError(
+                'Transfer sources/targets must be same length')
+    elif mode == 'distribute':
+        if not (len(t) >= len(s) == 1):
+            raise RuntimeError(
+                'Distribute must have 1 source and multiple targets')
+        s *= len(t)
+    elif mode == 'consolidate':
+        if not (len(s) >= len(t) == 1):
+            raise RuntimeError(
+                'Consolidate must have multiple sources and 1 target')
+        t *= len(s)
+    return (s, t)
+
+
+def _create_volume_list(v, total, **kwargs):
+
+    gradient = kwargs.get('gradient', None)
+
+    if isinstance(v, tuple):
+        return _create_volume_gradient(
+            v[0], v[-1], total, gradient=gradient)
+
+    v = _get_list(v)
+    t_vol = len(v)
+    if (t_vol < total and t_vol != 1) or t_vol > total:
+        raise RuntimeError(
+            '{0} volumes do not match with {1} transfers'.format(
+                t_vol, total))
+    if t_vol < total:
+        v = [v[0]] * total
+    return v
+
+
+def _create_volume_gradient(min_v, max_v, total, gradient=None):
+
+    diff_vol = max_v - min_v
+
+    def _map_volume(i):
+        nonlocal diff_vol, total
+        rel_x = i / (total - 1)
+        rel_y = gradient(rel_x) if gradient else rel_x
+        return (rel_y * diff_vol) + min_v
+
+    return [_map_volume(i) for i in range(total)]
+
+
+def _expand_for_carryover(max_vol, plan, **kwargs):
+    """
+    Divide volumes larger than maximum volume into separate transfers
+    """
+    max_vol = float(max_vol)
+    carryover = kwargs.get('carryover', True)
+    if not carryover:
+        return plan
+    new_transfer_plan = []
+    for p in plan:
+        source = p['aspirate']['location']
+        target = p['dispense']['location']
+        volume = float(p['aspirate']['volume'])
+        while volume > max_vol * 2:
+            new_transfer_plan.append({
+                'aspirate': {'location': source, 'volume': max_vol},
+                'dispense': {'location': target, 'volume': max_vol}
+            })
+            volume -= max_vol
+
+        if volume > max_vol:
+            volume /= 2
+            new_transfer_plan.append({
+                'aspirate': {'location': source, 'volume': float(volume)},
+                'dispense': {'location': target, 'volume': float(volume)}
+            })
+        new_transfer_plan.append({
+            'aspirate': {'location': source, 'volume': float(volume)},
+            'dispense': {'location': target, 'volume': float(volume)}
+        })
+    return new_transfer_plan
+
+
+def _compress_for_repeater(max_vol, plan, **kwargs):
+    """
+    Reduce size of transfer plan, if mode is distribute or consolidate
+    """
+    max_vol = float(max_vol)
+    mode = kwargs.get('mode', 'transfer')
+    if mode == 'distribute':   # combine target volumes into single aspirate
+        return _compress_for_distribute(max_vol, plan, **kwargs)
+    if mode == 'consolidate':  # combine target volumes into multiple aspirates
+        return _compress_for_consolidate(max_vol, plan, **kwargs)
+    else:
+        return plan
+
+
+def _compress_for_distribute(max_vol, plan, **kwargs):
+    """
+    Combines as many dispenses as can fit within the maximum volume
+    """
+    source = plan[0]['aspirate']['location']
+    a_vol = 0
+    temp_dispenses = []
+    new_transfer_plan = []
+    disposal_vol = kwargs.get('disposal_vol', 0)
+
+    def _append_dispenses():
+        nonlocal a_vol, temp_dispenses, new_transfer_plan, source
+        if not temp_dispenses:
+            return
+        added_volume = 0
+        if len(temp_dispenses) > 1:
+            added_volume = disposal_vol
+        new_transfer_plan.append({
+            'aspirate': {
+                'location': source,
+                'volume': a_vol + added_volume
+            }
+        })
+        for d in temp_dispenses:
+            new_transfer_plan.append({
+                'dispense': {
+                    'location': d['location'],
+                    'volume': d['volume']
+                }
+            })
+        a_vol = 0
+        temp_dispenses = []
+
+    for p in plan:
+        this_vol = p['aspirate']['volume']
+        if this_vol + a_vol > max_vol - disposal_vol:
+            _append_dispenses()
+        a_vol += this_vol
+        temp_dispenses.append(p['dispense'])
+    _append_dispenses()
+    return new_transfer_plan
+
+
+def _compress_for_consolidate(max_vol, plan, **kwargs):
+    """
+    Combines as many aspirates as can fit within the maximum volume
+    """
+    target = plan[0]['dispense']['location']
+    d_vol = 0
+    temp_aspirates = []
+    new_transfer_plan = []
+
+    def _append_aspirates():
+        nonlocal d_vol, temp_aspirates, new_transfer_plan, target
+        for a in temp_aspirates:
+            new_transfer_plan.append({
+                'aspirate': {
+                    'location': a['location'], 'volume': a['volume']
+                }
+            })
+        new_transfer_plan.append({
+            'dispense': {
+                'location': target, 'volume': d_vol
+            }
+        })
+        d_vol = 0
+        temp_aspirates = []
+
+    for i, p in enumerate(plan):
+        this_vol = p['aspirate']['volume']
+        if this_vol + d_vol > max_vol:
+            _append_aspirates()
+        d_vol += this_vol
+        temp_aspirates.append(p['aspirate'])
+    _append_aspirates()
+    return new_transfer_plan

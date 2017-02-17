@@ -2,6 +2,7 @@ import unittest
 import math
 
 from opentrons import containers
+from opentrons.util import environment
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -23,9 +24,61 @@ class ContainerTestCase(unittest.TestCase):
             c.add(well, name, coordinates)
         return c
 
+    def test_containers_create(self):
+        import os
+        import json
+        from opentrons import Robot
+        container_name = 'plate_for_testing_containers_create'
+        containers.create(
+            name=container_name,
+            grid=(8, 12),
+            spacing=(9, 9),
+            diameter=4,
+            depth=8,
+            volume=1000)
+
+        p = containers.load(container_name, 'A1')
+        self.assertEquals(len(p), 96)
+        self.assertEquals(len(p.rows), 12)
+        self.assertEquals(len(p.cols), 8)
+        self.assertEquals(
+            p.get_parent(), Robot.get_instance().deck['A1'])
+        self.assertEquals(p['C3'], p[18])
+        self.assertEquals(p['C3'].max_volume(), 1000)
+        for i, w in enumerate(p):
+            self.assertEquals(w, p[i])
+
+        # remove the file if we only created it for this test
+        should_delete = False
+        with open(environment.get_path('CONTAINERS_FILE')) as f:
+            created_containers = json.load(f)
+            del created_containers['containers'][p.get_name()]
+            if not len(created_containers['containers'].keys()):
+                should_delete = True
+        if should_delete:
+            os.remove(environment.get_path('CONTAINERS_FILE'))
+
     def test_containers_list(self):
         res = containers.list()
-        self.assertEquals(len(res), 32)
+        self.assertTrue(len(res))
+
+    def test_bad_unpack_containers(self):
+        self.assertRaises(
+            ValueError, containers.placeable.unpack_location, 1)
+
+    def test_iterate_without_parent(self):
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        self.assertRaises(
+            Exception, next, c)
+
+    def test_remove_child(self):
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c.remove_child('A2')
+        self.assertEquals(len(c), 3)
+
+    def test_back_container_getitem(self):
+        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        self.assertRaises(TypeError, c.__getitem__, (1, 1))
 
     def test_iterator(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)

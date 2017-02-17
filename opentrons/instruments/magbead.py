@@ -95,7 +95,7 @@ class Magbead(Instrument):
 
         return self
 
-    def delay(self, seconds, enqueue=True):
+    def delay(self, seconds=0, minutes=0, enqueue=True):
         """
         Pause the robot for a given number of seconds
 
@@ -116,7 +116,11 @@ class Magbead(Instrument):
         def _do():
             self.motor.wait(seconds)
 
-        _description = "Delaying Magbead for {} seconds".format(seconds)
+        minutes += int(seconds / 60)
+        seconds = int(seconds % 60)
+        _description = "Delaying {} minutes and {} seconds".format(
+            minutes, seconds)
+        seconds += (minutes * 60)
         self.create_command(
             do=_do,
             setup=_setup,

@@ -24,12 +24,6 @@ CONFIG_DIR_PATH = os.environ.get('APP_DATA_DIR', os.getcwd())
 CONFIG_DIR_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie')
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 
-JSON_ERROR = None
-if sys.version_info > (3, 4):
-    JSON_ERROR = ValueError
-else:
-    JSON_ERROR = json.decoder.JSONDecodeError
-
 log = get_logger(__name__)
 
 
@@ -334,7 +328,7 @@ class CNCDriver(object):
             'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
-        while self.readline_from_serial():
+        while self.connection.readline():
             time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
@@ -480,7 +474,12 @@ class CNCDriver(object):
         if not axis_to_home:
             return
 
-        res = self.send_command(self.HOME + axis_to_home)
+        res = None
+        try:
+            res = self.send_command(self.HOME + axis_to_home)
+        except Exception:
+            raise RuntimeWarning(
+                'HOMING ERROR: Check switches are being pressed and connected')
         if res == b'ok':
             # the axis aren't necessarily set to 0.0
             # values after homing, so force it
@@ -569,7 +568,7 @@ class CNCDriver(object):
                 # the uppercase axis are the "target" values
                 coords['target'][letter] = response_dict.get(letter.upper(), 0)
 
-        except JSON_ERROR:
+        except ValueError:
             log.critical("Error parsing JSON string from smoothie board:")
             log.critical(res)
 
@@ -595,9 +594,7 @@ class CNCDriver(object):
             self.saved_settings['state']['head_speed'] = str(self.head_speed)
             with open(CONFIG_FILE_PATH, 'w') as configfile:
                 self.saved_settings.write(configfile)
-        kwargs = {"F": self.head_speed}
-        res = self.send_command(self.SET_SPEED, **kwargs)
-        return res == b'ok'
+        return True
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':

@@ -100,7 +100,7 @@ The example below declares 3 different containers and assigns them to the approp
 
 .. testcode:: main
 	
-	tiprack = containers.load('tiprack-200ul', 'A1')
+	tip_rack = containers.load('tiprack-200ul', 'A1')
 	plate = containers.load('96-PCR-flat', 'B2')
 	trash = containers.load('point', 'C3', 'my-weird-trash-container')
 
@@ -153,7 +153,7 @@ To use the tip-tracking features, create your pipette with tip racks and a trash
 Commands 
 -----------------------------
 
-There are a few basic commands that you can string together in order to transfer liquid from place to place.  Each command is linked to the pipette doing the action.
+There are a few basic commands that you can string together in order to transfer liquid from place to place.  Each command is linked to the pipette doing the action. 
 
 
 Pick Up and Drop Tip
@@ -205,6 +205,23 @@ With one or more tip racks attached, a pipette can also return a tip to it's ori
 
 	p200.pick_up_tip()  	# automatically goes to tiprack['A1']
 	p200.return_tip()	# automatically goes back to tiprack['A1']
+
+Advanced Tip Commands
+^^^^^^^^^^^^^^^^^^^^
+
+Only use half a rack of tips and don't want to move them all to the front?  Tell your next protocol to start at a specific tip in the tip rack.
+
+**pipette.start_at_tip** (*location*)
+
+	* **location -** tip location to start at
+
+.. testcode:: main
+
+	p200.start_at_tip(tiprack['B3'])
+
+.. note:: 
+
+	If your protocol calls for more tips than you have on your deck, the pipette will raise a RuntimeWarning to let you know.
 
 
 Aspirate
@@ -302,17 +319,56 @@ Instead of giving each command it's own line, you can chain them together using 
 
 	p200.pick_up_tip().aspirate(200, plate['A1']).dispense(plate['B1'])
  
+Position Within a Well
+^^^^^^^^^^^^^^^^^^^^^^
+
+Want to deposit at the top of a tube?  Pull liquid from the bottom of the well?  It's easy with a Well's ``top()`` and ``bottom()`` methods.
+
+**container.top** (*distance*)
+
+	* **distance -** (optional) distance above/below top of Well (mm)
+
+**container.bottom** (*distance*)
+
+	* **distance -** (optional) distance above bottom of Well (mm)
+
+.. testcode:: main
+
+	well = plate['A1']
+	p200.dispense(well.bottom())      # at the bottom of well
+	p200.mix(3, 100, well.bottom(5))  # 5mm above bottom of well
+	p200.aspirate(50, well.top(-3))   # 3mm below top of well
+	p200.dispense(well.top(3))        # 3mm above top of well
+
+
+Delay
+^^^^^
+
+Delay commands can be called between any movement commands, so you have complete control of exactly where you want the robot to pause.
+
+**delay** (*time*)
+
+	* **time -** duration of delay (seconds)
+
+.. testcode:: main
+
+	p200.aspirate(120, plate['A1']).delay(1).dispense(10)
+	p200.dispense(plate['B2']).delay(60)
 
 Touch Tip
 ^^^^^^^^^
 
 Sometimes you want to touch the tip of the pipette to the sides of the well.  You can link this to one of the commands you just learned.
 
-**touch_tip** ()
+**touch_tip** (*height*)
+	
+	* **height -** height above or below position.top() to touch tip
 
 .. testcode:: main
 
-	p200.dispense(10, plate['A1']).touch_tip()
+	p200.dispense(10, plate['A1']).touch_tip() # touches at top() of well
+	p200.touch_tip(plate['A1'].bottom()) # touches at bottom() of well
+	p200.touch_tip(-3) # touches 3 mm below top() of previous well
 
 Blow Out
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -332,40 +388,30 @@ You can blow out liquid immediately after a dispense command in the same locatio
 
 	Since the trash container is given a "point" labware name, it has no wells inside it. Therefore there is no need to call a position within the container.
 
-Delay
-^^^^^
 
-Delay commands can be called between any movement commands, so you have complete control of exactly where you want the robot to pause.
+Air Gap
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**delay** (*time*)
+You can instruct the robot to pull up an extra volume of air after it aspirates liquid. 
 
-	* **time -** duration of delay (seconds)
-
-.. testcode:: main
-
-	p200.aspirate(120, plate['A1']).delay(1).dispense(10)
-	p200.dispense(plate['B2']).delay(60)
-	p200.aspirate(100, plate['B2'])
-
-Position Within a Well
-^^^^^^^^^^^^^^^^^^^^^^
-
-Want to deposit at the top of a tube?  Pull liquid from the bottom of the well?  It's easy with a Well's ``top()`` and ``bottom()`` methods.
-
-**container.top** (*distance*)
-
-	* **distance -** (optional) distance above/below top of Well (mm)
-
-**container.bottom** (*distance*)
-
-	* **distance -** (optional) distance above bottom of Well (mm)
+**air_gap** (*volume, height*)
+	* **volume -** volume of air to pull up
+	* **height -** how far to move above the well
 
 .. testcode:: main
+	
+	p200.aspirate(50, plate['A1'])
+	p200.air_gap()      # moves 20 mm above well and aspirates air until pipette is full
+	p200.dispense()
 
-	well = plate['A1']
-	p200.dispense(well.top())         # at the top of well
-	p200.mix(3, 100, well.bottom(5))  # 5mm above bottom of well
-	p200.aspirate(well.top(-3))       # 3mm below top of well
+	p200.aspirate(50, plate['A1'])
+	p200.air_gap(50)    # moves 20 mm above well and aspirates 50 uL
+	p200.dispense()
+
+	p200.aspirate(50, plate['A1'])
+	p200.air_gap(25, 5) # moves 5 mm above well and aspirates 25 uL
+	p200.dispense()
+
 
 Homing
 ------

@@ -1,5 +1,9 @@
+from collections import OrderedDict
+import json
+import os
+
 from opentrons.containers.persisted_containers import get_persisted_container
-from opentrons.containers.persisted_containers import list_container_names
+from opentrons.containers import persisted_containers
 from opentrons.containers.placeable import (
     Deck,
     Slot,
@@ -9,6 +13,7 @@ from opentrons.containers.placeable import (
     unpack_location
 )
 from opentrons.containers.calibrator import apply_calibration
+from opentrons.util import environment
 
 __all__ = [
     get_persisted_container,
@@ -41,4 +46,52 @@ def load(container_name, slot, label=None):
 
 
 def list():
-    return list_container_names()
+    return persisted_containers.list_container_names()
+
+
+def create(name, grid, spacing, diameter, depth, volume=0):
+    columns, rows = grid
+    col_spacing, row_spacing = spacing
+    custom_container = Container()
+    properties = {
+        'type': 'custom',
+        'diameter': diameter,
+        'height': depth,
+        'total-liquid-volume': volume
+    }
+
+    for r in range(rows):
+        for c in range(columns):
+            well = Well(properties=properties)
+            well_name = chr(c + ord('A')) + str(1 + r)
+            coordinates = (c * col_spacing, r * row_spacing, 0)
+            custom_container.add(well, well_name, coordinates)
+    json_container = container_to_json(custom_container, name)
+    save_custom_container(json_container)
+    persisted_containers.load_all_persisted_containers_from_disk()
+
+
+def container_to_json(c, name):
+    locations = OrderedDict()
+    for w in c:
+        x, y, z = w.coordinates()
+        locations[w.get_name()] = {
+            'x': x, 'y': y, 'z': z,
+            'depth': w.z_size(),
+            'diameter': w.x_size(),
+            'total-liquid-volume': w.max_volume()
+        }
+    return {name: {'locations': locations}}
+
+
+def save_custom_container(data):
+    container_file_path = environment.get_path('CONTAINERS_FILE')
+    if not os.path.isfile(container_file_path):
+        with open(container_file_path, 'w') as f:
+            f.write(json.dumps({'containers': {}}))
+    with open(container_file_path, 'r+') as f:
+        old_data = json.load(f)
+        old_data['containers'].update(data)
+        f.seek(0)
+        f.write(json.dumps(old_data, indent=4))
+        f.truncate()

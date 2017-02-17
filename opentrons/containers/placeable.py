@@ -1,3 +1,4 @@
+import itertools
 import math
 import numbers
 from collections import OrderedDict
@@ -86,7 +87,9 @@ class Placeable(object):
         Returns placeable by name or index
         If slice is given, returns a list
         """
-        if isinstance(name, int) or isinstance(name, slice):
+        if isinstance(name, slice):
+            return self.get_children_from_slice(name)
+        elif isinstance(name, int):
             return self.get_children_list()[name]
         elif isinstance(name, str):
             return self.get_child_by_name(name)
@@ -105,11 +108,16 @@ class Placeable(object):
         return '<{} {}>'.format(
             self.__class__.__name__, self.get_name())
 
+    def __add__(self, other):
+        return WellSeries(
+            self.get_children_list() + other.get_children_list()
+        )
+
     def __iter__(self):
-        return iter(self.children_by_reference.keys())
+        return iter(self.get_children_list())
 
     def __len__(self):
-        return len(self.children_by_name)
+        return len(self.get_children_list())
 
     def __bool__(self):
         return True
@@ -125,6 +133,25 @@ class Placeable(object):
         children = self.parent.get_children_list()
         my_loc = children.index(self)
         return children[my_loc + 1]
+
+    def iter(self):
+        """
+        Returns an iterable built from this Placeable's children list
+        """
+        return iter(self.get_children_list())
+
+    def chain(self, *args):
+        """
+        Returns an itertools.chain built from this Placeable's children list
+        and appending any passed lists with *args
+        """
+        return itertools.chain(self.get_children_list(), *args)
+
+    def cycle(self):
+        """
+        Returns an itertools.cycle from this Placeable's children list
+        """
+        return itertools.cycle(self.get_children_list())
 
     def get_name(self):
         """
@@ -236,6 +263,25 @@ class Placeable(object):
         """
         return self.children_by_name.get(name)
 
+    def get_index_from_name(self, name):
+        """
+        Retrieves child's name by index
+        """
+        return self.get_children_list().index(
+            self.get_child_by_name(name))
+
+    def get_children_from_slice(self, s):
+        """
+        Retrieves list of children within slice
+        """
+        if isinstance(s.start, str):
+            s = slice(
+                self.get_index_from_name(s.start), s.stop, s.step)
+        if isinstance(s.stop, str):
+            s = slice(
+                s.start, self.get_index_from_name(s.stop), s.step)
+        return WellSeries(self.get_children_list()[s])
+
     def has_children(self):
         """
         Returns *True* if :Placeable: has children
@@ -252,6 +298,12 @@ class Placeable(object):
             self.y_size(),
             self.z_size()
         )
+
+    def max_volume(self):
+        """
+        Returns placeable's maximum liquid volume in uL
+        """
+        return self.properties['total-liquid-volume']
 
     def x_size(self):
         """
@@ -490,7 +542,7 @@ class Container(Placeable):
 
     def get_wellseries(self, matrix):
         """
-        Returns the grid as a series of WellSeries
+        Returns the grid as a WellSeries of WellSeries
         """
         res = OrderedDict()
         for row, cells in matrix.items():
@@ -500,19 +552,19 @@ class Container(Placeable):
                 res[row][col] = self.children_by_name[
                     ''.join(reversed(cell))
                 ]
-            res[row] = WellSeries(res[row])
+            res[row] = WellSeries(res[row], name=row)
         return WellSeries(res)
 
     @property
     def rows(self):
         """
         Rows can be accessed as:
-        >>> plate.row[0]
-        >>> plate.row['1']
+        >>> plate.rows[0]
+        >>> plate.rows['1']
 
         Wells can be accessed as:
-        >>> plate.row[0][0]
-        >>> plate.row['1']['A']
+        >>> plate.rows[0][0]
+        >>> plate.rows['1']['A']
         """
         self.calculate_grid()
         return self.grid
@@ -544,20 +596,79 @@ class Container(Placeable):
         """
         return self.columns
 
-    def well(self, name):
+    def well(self, name=None):
         """
         Returns well by :name:
         """
-        return self.get_child_by_name(name)
+        return self.__getitem__(name)
 
-    def wells(self):
+    def wells(self, *args, **kwargs):
         """
-        Returns all wells
+        Returns child Well or list of child Wells
         """
-        return self.get_children()
+
+        if len(args) and isinstance(args[0], list):
+            args = args[0]
+
+        new_wells = None
+        if not args and not kwargs:
+            new_wells = WellSeries(self.get_children_list())
+        elif len(args) > 1:
+            new_wells = WellSeries([self.well(n) for n in args])
+        else:
+            new_wells = self._parse_wells_to_and_length(*args, **kwargs)
+
+        if len(new_wells) is 1:
+            return new_wells[0]
+        return new_wells
+
+    def __call__(self, *args, **kwargs):
+        """
+        Passes all arguments to Wells() and returns result
+        """
+        return self.wells(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        """
+        Passes all arguments to Wells() and returns result
+        """
+        return self.wells(*args, **kwargs)
+
+    def _parse_wells_to_and_length(self, *args, **kwargs):
+        start = args[0] if len(args) else 0
+        stop = kwargs.get('to', None)
+        step = kwargs.get('step', 1)
+        length = kwargs.get('length', 1)
+
+        wrapped_wells = [
+            w
+            for i in range(3)
+            for w in self.get_children_list()
+        ]
+        total_kids = len(self.get_children_list())
+
+        if isinstance(start, str):
+            start = self.get_index_from_name(start)
+        if stop is not None:
+            if isinstance(stop, str):
+                stop = self.get_index_from_name(stop)
+            if stop > start:
+                stop += 1
+                step = step * -1 if step < 0 else step
+            elif stop < start:
+                stop -= 1
+                step = step * -1 if step > 0 else step
+            return WellSeries(
+                wrapped_wells[start + total_kids:stop + total_kids:step])
+        else:
+            if length < 0:
+                length *= -1
+                step = step * -1 if step > 0 else step
+            return WellSeries(
+                wrapped_wells[start + total_kids::step][:length])
 
 
-class WellSeries(Placeable):
+class WellSeries(Container):
     """
     :WellSeries: represents a series of wells to make
     accessing rows and columns easier. You can access
@@ -568,12 +679,15 @@ class WellSeries(Placeable):
 
     Default well index can be overriden using :set_offset:
     """
-    def __init__(self, items):
-        self.items = items
-        if isinstance(items, dict):
-            items = list(self.items.values())
-        self.values = items
+    def __init__(self, wells, name=None):
+        if isinstance(wells, dict):
+            self.items = wells
+            self.values = list(wells.values())
+        else:
+            self.items = {w.get_name(): w for w in wells}
+            self.values = wells
         self.offset = 0
+        self.name = name
 
     def set_offset(self, offset):
         """
@@ -581,18 +695,9 @@ class WellSeries(Placeable):
         """
         self.offset = offset
 
-    def __iter__(self):
-        return iter(self.values)
-
     def __str__(self):
         return '<Series: {}>'.format(
             ' '.join([str(well) for well in self.values]))
-
-    def __getitem__(self, index):
-        if isinstance(index, str):
-            return self.items[index]
-        else:
-            return list(self.values)[index]
 
     def __getattr__(self, name):
         # getstate/setstate are used by pickle and are not implemented by
@@ -600,3 +705,20 @@ class WellSeries(Placeable):
         if name in ('__getstate__', '__setstate__'):
             raise AttributeError()
         return getattr(self.values[self.offset], name)
+
+    def get_name(self):
+        if self.name is None:
+            return str(self)
+        return str(self.name)
+
+    def get_name_by_instance(self, well):
+        for name, value in self.items.items():
+            if value is well:
+                return name
+        return None
+
+    def get_children_list(self):
+        return list(self.values)
+
+    def get_child_by_name(self, name):
+        return self.items.get(name)

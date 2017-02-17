@@ -62,7 +62,7 @@ class RobotTest(unittest.TestCase):
 
         def _run():
             nonlocal res
-            self.assertRaises(RuntimeError(self.robot.run))
+            self.assertRaises(RuntimeError, self.robot.run)
 
         thread = threading.Thread(target=_run)
         thread.start()

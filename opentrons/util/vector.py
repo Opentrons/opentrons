@@ -73,7 +73,7 @@ class VectorEncoder(json.JSONEncoder):
             return dict(zip('xyz', obj))
         try:
             return json.JSONEncoder.default(self, obj)
-        except:
+        except Exception:
             return str(obj)
 
 

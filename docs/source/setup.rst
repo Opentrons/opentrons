@@ -7,12 +7,12 @@ Code Environment
 Jupyter Code Environment
 -----------------------------
 
-Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.
+Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.5.
 
 Install Anaconda and Python 3
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To run Opentrons you will need to ensure you have Python 3 installed. We recommend you install `Anaconda`_ before going any further, this will install Python 3 for you. We recommend you use the `Graphical Installer` for `Python3.5`.
+To run Opentrons you will need to ensure you have Python 3.5 installed. We recommend you install `Anaconda`_ before going any further, this will install Python for you. We recommend you use the `Graphical Installer` for `Python3.5`.
 
 Install Jupyter
 ^^^^^^^^^^^^^^^
