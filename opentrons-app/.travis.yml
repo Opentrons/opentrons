@@ -1,0 +1,68 @@
+language: python
+
+matrix:
+  # Set fast_finish to false to wait for OSX build to finish
+  # We need both builds when we want to push an app update
+  # Otherwise with fast_finish: true
+  # the success of Linux build is enough for CI purposes
+  fast_finish: false
+  include:
+    - os: linux
+      # Trying container environment
+      sudo: false
+      # sudo: required
+      # dist: trusty
+      python: "3.5"  # TODO: revisit...
+      env: OPENTRONS_APP_UPLOAD_DIR=linux
+      addons:
+        apt:
+          sources: &common_sources
+          packages: &common_packages
+            - g++
+            - gcc
+            - icnsutils # electron-builder dependency
+            - graphicsmagick # electron-builder dependency
+            - xvfb
+
+    - os: osx
+      language: generic
+      env: OPENTRONS_APP_UPLOAD_DIR=mac
+
+cache:
+  apt: true
+  directories:
+    - node_modules
+    - app/node_modules
+    - $HOME/.electron
+    - pip
+    - $HOME/.cache/pip3
+    - $HOME/.cache/our-brew
+
+before_install:
+  - ./scripts/travis.sh pre-install
+
+install:
+  - python --version
+  - python3 --version
+  - ./scripts/travis.sh install
+
+script: echo "No python test scripts to run"
+
+# Deploy the build version in an S3 bucket
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: ot-app-builds
+  skip_cleanup: true
+  local-dir: releases
+  upload-dir: $OPENTRONS_APP_UPLOAD_DIR
+  acl: public_read
+  on:
+    repo: OpenTrons/opentrons-app
+    all_branches: true
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change

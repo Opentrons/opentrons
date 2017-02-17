@@ -1,0 +1,21 @@
+/******************************
+Run Screen
+******************************/
+.runScreen {
+    .runCommand {
+        padding-bottom: 16px;
+        margin: 25px;
+        &:last-child {
+            color: $primary-brand;
+        }
+    }
+    
+    #exit {
+        position: static;
+        top: auto;
+        padding-left: 685px;
+        padding-right: 5px;
+        cursor: pointer;
+        color: $secondary-brand;
+    }
+}

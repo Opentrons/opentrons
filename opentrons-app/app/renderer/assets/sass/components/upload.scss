@@ -1,0 +1,64 @@
+/******************************
+	Protocol Upload and Info
+******************************/
+
+section.protocol {
+    form.upload {
+        width: 285px;
+        .fileUpload {
+            width: 285px;
+            height: 15px;
+            padding: 24px 0;
+            position: relative;
+            overflow: hidden;
+            color: #888;
+            border-radius: 6px;
+            border: 2px dashed darken($well-bg, 10%);
+            text-align: center;
+            justify-items: center;
+            &:hover {
+                background-color: darken($well-bg, 10%);
+            }
+        }
+        .fileUpload input.upload {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0px;
+            padding: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+    }
+    div#protocol-info {
+        margin-left: 20px;
+        flex: 0 0 242px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        height: 45px;
+        padding: 10px;
+        span {
+            font-size: 14px;
+            text-align: left;
+            height: 22px;
+            line-height: 22px;
+            flex: 0 0 121px;
+            &.title {
+                font-weight: 800;
+            }
+            &.info {
+                font-size: 13px;
+                font-family: "open-sans";
+                line-height: 22px;
+                width: 100px;
+                height: 22px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}

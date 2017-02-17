@@ -1,0 +1,84 @@
+section#task,
+section#task-pipette {
+    .well-img {
+        width: 500px;
+        margin-top: 10px;
+        height: 190px;
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+}
+section#task-pipette {
+    span {
+        width: 510px;
+        height: 260px;
+        display: flex;
+        flex-directon: row;
+        div.calibrate-pipette {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 300px;
+            .calibrate {
+                width: 290px;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-end;
+                &.top {
+                    margin-bottom: 40px;
+                }
+                &.volume {
+                    justify-content: flex-start;
+                    margin-bottom: 10px;
+                }
+                span.title {
+                    flex: 0 0 90px;
+                    height: 50px;
+                    padding-left: 20px;
+                    font-size: 14px;
+                    font-weight: 800;
+                    line-height: 40px;
+                    text-align: right;
+                }
+            }
+        }
+        div.pipette-diagrams {
+            width: 220px;
+            flex: 0 0 220px;
+            img {
+                display: none;
+            }
+            &.top {
+                img.top {
+                    display: block;
+                }
+            }
+            &.bottom {
+                img.bottom {
+                    display: block;
+                }
+            }
+            &.blow-out {
+                img.blow-out {
+                    display: block;
+                }
+            }
+            &.drop-tip {
+                img.drop-tip {
+                    display: block;
+                }
+            }
+        }
+    }
+    .calibrate.tips {
+        width: 300px;
+        height: 45px;
+        padding-left: 88px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+    
+    }
+}

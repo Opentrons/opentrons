@@ -1,0 +1,192 @@
+@import "util";
+@import "components";
+
+body {
+    font-size: $basesize;
+    font-family: $stack-sans;
+}
+
+
+/***************************
+Header Home Connect Wrapper
+****************************/
+
+header#home-connect {
+    width: 1004px;
+    height: 30px;
+    padding: 10px;
+    margin: 5px auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 6px;
+    background-color: $well-bg;
+    // Logo and Version #
+    .brand {
+        flex: 0 0 160px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        div.logo {
+            width: 124px;
+            height: 30px;
+            img {
+                width: 124px;
+                height: auto;
+            }
+        }
+        div.version {
+            flex: 0 0 30px;
+            height: 30px;
+            line-height: 35px;
+        }
+    }
+}
+
+
+/***************************************
+Protocol Upload and Run Controls Wrapper
+****************************************/
+
+section.protocol {
+    width: 1004px;
+    height: 65px;
+    padding: 10px;
+    margin: 5px auto;
+    display: flex;
+    flex-direction: row;
+    border-radius: 6px;
+    background-color: $well-bg;
+    justify-content: space-between;
+}
+
+
+/******************************
+    Main Content Wrapper
+******************************/
+
+main#container {
+    width: 1024px;
+    margin: 5px auto;
+    display: flex;
+    flex-direction: row;
+}
+
+
+/******************************
+    Jog Controls Wrapper
+******************************/
+
+aside#jog {
+    width: 270px;
+    flex: 0 0 270px;
+    height: 510px;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: $well-bg;
+}
+
+
+/******************************
+    Task Pane Wrapper
+******************************/
+
+section#task-pane {
+    width: 710px;
+    flex: 0 0 710px;
+    margin-left: 10px;
+    height: 536px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 2px solid $well-bg;
+    border-radius: 6px;
+}
+
+
+/******************************
+Step List
+******************************/
+
+aside#step-list {
+    width: 140px;
+    flex: 0 0 140px;
+    height: 330px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    div.instrument {
+        border-left: 5px solid $secondary-brand;
+        width: 135px;
+        &:first-child {
+            margin-bottom: $baseline;
+        }
+        ul {
+            list-style: none;
+            display: block;
+            padding: 0;
+            margin: 0;
+            li {
+                position: relative;
+            }
+            a {
+                display: block;
+                line-height: $baseline;
+                padding-left: 30px;
+                text-decoration: none;
+                color: $primary-black;
+                // not in use yet but will need to truncate longer container names
+                span.clip {
+                    display: block;
+                    width: 80px;
+                    height: 20px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+            a.router-link-active {
+                background-color: $well-bg;
+            }
+            a.completed:before {
+                content: "\2713";
+                font-size: 16px;
+                color: $secondary-brand;
+                float: left;
+                padding-left: 10px;
+                position: absolute;
+                top: 0;
+                left: 0px;
+            }
+        }
+    }
+}
+
+
+/******************************
+        Tasks Screens
+******************************/
+
+section#task,
+section#task-pipette {
+    width: 510px;
+    height: 310px;
+    padding: 30px;
+    background-color: $well-bg;
+}
+
+
+/******************************
+        Run Screen Wrapper
+******************************/
+
+.runScreen {
+    overflow-y: scroll;
+    height: 536px;
+    width: 710px;
+    font-size: 16px;
+    border: 2px solid $well-bg;
+    border-radius: 6px;
+    position: relative;
+    margin-left: 10px;
+}
