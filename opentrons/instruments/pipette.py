@@ -1147,9 +1147,6 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         kwargs['mode'] = 'distribute'
-        kwargs['new_tip'] = kwargs.get('new_tip', 'once')
-        if kwargs['new_tip'] is 'always':
-            kwargs['new_tip'] = 'once'
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
@@ -1176,9 +1173,6 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         kwargs['mode'] = 'consolidate'
-        kwargs['new_tip'] = kwargs.get('new_tip', 'once')
-        if kwargs['new_tip'] is 'always':
-            kwargs['new_tip'] = 'once'
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
@@ -1277,6 +1271,11 @@ class Pipette(Instrument):
         """
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
+
+        touch_tip = kwargs.get('touch_tip', False)
+        if touch_tip is True:
+            touch_tip = -1
+        kwargs['touch_tip'] = touch_tip
 
         tip_options = {
             'once': 1,
@@ -1579,11 +1578,7 @@ class Pipette(Instrument):
     def _run_transfer_plan(self, tips, plan, **kwargs):
         enqueue = kwargs.get('enqueue', True)
         air_gap = kwargs.get('air_gap', 0)
-
-        touch_tip = kwargs.get('touch_tip', False)
-        if touch_tip is True:
-            touch_tip = -1
-        kwargs['touch_tip'] = touch_tip
+        touch_tip = kwargs.get('touch_tip', -1)
 
         total_transfers = len(plan)
         for i, step in enumerate(plan):

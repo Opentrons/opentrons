@@ -394,7 +394,7 @@ class PipetteTest(unittest.TestCase):
             30,
             self.plate[0],
             self.plate[1:9],
-            new_tip='always'  # should use only 1 tip
+            new_tip='always'
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -409,6 +409,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
             ['blow_out', 'point'],
+            ['drop'],
+            ['pick'],
             ['aspirating', '70', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
@@ -512,7 +514,7 @@ class PipetteTest(unittest.TestCase):
             30,
             self.plate[0:8],
             self.plate['A2'],
-            new_tip='always'  # should use only 1 tip
+            new_tip='always'
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -526,6 +528,8 @@ class PipetteTest(unittest.TestCase):
             ['aspirating', '30', 'Well E1'],
             ['aspirating', '30', 'Well F1'],
             ['dispensing', '180', 'Well A2'],
+            ['drop'],
+            ['pick'],
             ['aspirating', '30', 'Well G1'],
             ['aspirating', '30', 'Well H1'],
             ['dispensing', '60', 'Well A2'],
@@ -740,6 +744,85 @@ class PipetteTest(unittest.TestCase):
             self.plate[1],
             new_tip='sometimes'
         )
+
+    def test_divisible_locations(self):
+        self.p200.reset()
+        self.p200.transfer(
+            100,
+            self.plate[0:4],
+            self.plate[0:2]
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '100', 'Well A1'],
+            ['dispensing', '100', 'Well A1'],
+            ['aspirating', '100', 'Well B1'],
+            ['dispensing', '100', 'Well A1'],
+            ['aspirating', '100', 'Well C1'],
+            ['dispensing', '100', 'Well B1'],
+            ['aspirating', '100', 'Well D1'],
+            ['dispensing', '100', 'Well B1'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+        self.p200.reset()
+        self.p200.consolidate(
+            100,
+            self.plate[0:4],
+            self.plate[0:2]
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '100', 'Well A1'],
+            ['aspirating', '100', 'Well B1'],
+            ['dispensing', '200', 'Well A1'],
+            ['aspirating', '100', 'Well C1'],
+            ['aspirating', '100', 'Well D1'],
+            ['dispensing', '200', 'Well B1'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+        self.p200.reset()
+        self.p200.distribute(
+            100,
+            self.plate[0:2],
+            self.plate[0:4],
+            disposal_vol=0
+        )
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '100', 'Well A1'],
+            ['dispensing', '100', 'Well B1'],
+            ['aspirating', '200', 'Well B1'],
+            ['dispensing', '100', 'Well C1'],
+            ['dispensing', '100', 'Well D1'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
 
     def test_transfer_volume_control(self):
 
