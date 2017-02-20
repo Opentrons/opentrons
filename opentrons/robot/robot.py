@@ -15,7 +15,7 @@ from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
-from opentrons.util.trace import traceable
+# from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
 from opentrons.util.environment import settings
 
@@ -542,7 +542,7 @@ class Robot(object, metaclass=Singleton):
         """
         self._driver.set_head_speed(rate)
 
-    @traceable('move-to')
+    # @traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -755,6 +755,7 @@ class Robot(object, metaclass=Singleton):
                 'command_index': i,
                 'commands_total': len(self._commands)
             })
+            # if mode == "live":
             trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
