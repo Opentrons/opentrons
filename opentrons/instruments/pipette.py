@@ -3,7 +3,7 @@ import itertools
 
 from opentrons import containers
 from opentrons.containers.calibrator import Calibrator
-from opentrons.containers.placeable import Placeable, WellSeries
+from opentrons.containers.placeable import Placeable, WellSeries, Container
 from opentrons.containers.placeable import humanize_location
 from opentrons.instruments.instrument import Instrument
 from opentrons.helpers import helpers
@@ -87,6 +87,8 @@ class Pipette(Instrument):
             name = self.__class__.__name__
         self.name = name
 
+        if isinstance(trash_container, Container) and len(trash_container) > 0:
+            trash_container = trash_container[0]
         self.trash_container = trash_container
         self.tip_racks = tip_racks
         self.starting_tip = None
