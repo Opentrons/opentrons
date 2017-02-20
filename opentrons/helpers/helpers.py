@@ -223,6 +223,7 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
     temp_dispenses = []
     new_transfer_plan = []
     disposal_vol = kwargs.get('disposal_vol', 0)
+    max_vol = max_vol - disposal_vol
 
     def _append_dispenses():
         nonlocal a_vol, temp_dispenses, new_transfer_plan, source
@@ -250,7 +251,7 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
     for p in plan:
         this_vol = p['aspirate']['volume']
         new_source = p['aspirate']['location']
-        if (new_source is not source) or (this_vol + a_vol > max_vol - disposal_vol):
+        if (new_source is not source) or (this_vol + a_vol > max_vol):
             _append_dispenses()
         source = new_source
         a_vol += this_vol
