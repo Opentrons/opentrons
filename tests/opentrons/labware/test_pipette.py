@@ -1567,7 +1567,7 @@ class PipetteTest(unittest.TestCase):
                 mock.call(
                     self.tiprack1[0].bottom(), enqueue=False, strategy='arc'),
                 mock.call(
-                    self.trash.bottom(self.p200._drop_tip_offset),
+                    self.trash[0].bottom(self.p200._drop_tip_offset),
                     enqueue=False,
                     strategy='arc')
             ]
