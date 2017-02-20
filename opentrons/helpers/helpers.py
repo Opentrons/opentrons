@@ -104,8 +104,6 @@ def import_calibration_file(file_name, robot):
 def _get_list(n):
     if not hasattr(n, '__len__') or len(n) == 0 or isinstance(n, tuple):
         n = [n]
-    if isinstance(n, Placeable) and len(n) == 1:
-        n = [n[0]]
     return n
 
 

@@ -1594,18 +1594,16 @@ class Pipette(Instrument):
             if dispense:
                 self._dispense_during_transfer(
                     dispense['volume'], dispense['location'], **kwargs)
+                if touch_tip or touch_tip is 0:
+                    self.touch_tip(touch_tip, enqueue=enqueue)
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
-                    if touch_tip or touch_tip is 0:
-                        self.touch_tip(touch_tip, enqueue=enqueue)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
                         self.air_gap(air_gap, enqueue=enqueue)
-                    if touch_tip or touch_tip is 0:
-                        self.touch_tip(touch_tip, enqueue=enqueue)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """
@@ -1630,10 +1628,10 @@ class Pipette(Instrument):
         if self.current_volume == 0:
             self._mix_during_transfer(mix_before, loc, **kwargs)
         self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
-        if air_gap:
-            self.air_gap(air_gap, enqueue=enqueue)
         if touch_tip or touch_tip is 0:
             self.touch_tip(touch_tip, enqueue=enqueue)
+        if air_gap:
+            self.air_gap(air_gap, enqueue=enqueue)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
         """
