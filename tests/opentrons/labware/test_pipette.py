@@ -1278,6 +1278,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])
         self.p200.touch_tip(-3)
+        self.p200.touch_tip(-3, radius=0.5)
 
         self.robot.simulate()
 
@@ -1307,8 +1308,23 @@ class PipetteTest(unittest.TestCase):
                 enqueue=False, strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
-                enqueue=False, strategy='direct')]
+                enqueue=False, strategy='direct'),
+            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(
+                (self.plate[0], (4.80, 3.20, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (1.60, 3.20, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 4.80, 7.50)),
+                enqueue=False, strategy='direct'),
+            mock.call(
+                (self.plate[0], (3.20, 1.60, 7.50)),
+                enqueue=False, strategy='direct')
+        ]
 
+        print(self.p200.move_to.mock_calls)
         self.assertEquals(expected, self.p200.move_to.mock_calls)
 
     def test_mix(self):

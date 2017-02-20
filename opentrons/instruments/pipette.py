@@ -691,7 +691,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def touch_tip(self, location=None, enqueue=True):
+    def touch_tip(self, location=None, radius=1.0, enqueue=True):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -707,6 +707,13 @@ class Pipette(Instrument):
             The :any:`Placeable` (:any:`Well`) to perform the touch_tip.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
+
+        radius : float
+            Radius is a floating point number between 0.0 and 1.0, describing
+            the percentage of a well's radius. When radius=1.0,
+            :any:`touch_tip()` will move to 100% of the wells radius. When
+            radius=0.5, :any:`touch_tip()` will move to 50% of the wells
+            radius.
 
         enqueue : bool
             If set to `True` (default), the method will be appended
@@ -738,7 +745,7 @@ class Pipette(Instrument):
             self._associate_placeable(location)
 
         def _do():
-            nonlocal location
+            nonlocal location, radius
 
             # if no location specified, use the previously
             # associated placeable to get Well dimensions
@@ -752,28 +759,28 @@ class Pipette(Instrument):
             self.move_to(
                 (
                     location,
-                    location.from_center(x=1, y=0, z=1) + v_offset
+                    location.from_center(x=radius, y=0, z=1) + v_offset
                 ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
                 (
                     location,
-                    location.from_center(x=-1, y=0, z=1) + v_offset
+                    location.from_center(x=radius * -1, y=0, z=1) + v_offset
                 ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
                 (
                     location,
-                    location.from_center(x=0, y=1, z=1) + v_offset
+                    location.from_center(x=0, y=radius, z=1) + v_offset
                 ),
                 strategy='direct',
                 enqueue=False)
             self.move_to(
                 (
                     location,
-                    location.from_center(x=0, y=-1, z=1) + v_offset
+                    location.from_center(x=0, y=radius * -1, z=1) + v_offset
                 ),
                 strategy='direct',
                 enqueue=False)
