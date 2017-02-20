@@ -1,7 +1,6 @@
 import json
 
 from opentrons.util.vector import Vector
-from opentrons.containers.placeable import Placeable
 
 
 def unpack_coordinates(coordinates):
