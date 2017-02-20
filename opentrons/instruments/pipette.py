@@ -691,7 +691,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def touch_tip(self, location=None, radius=1, enqueue=True):
+    def touch_tip(self, location=None, radius=1.0, enqueue=True):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
