@@ -408,13 +408,13 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well E1'],
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
-            ['blow_out', 'point'],
+            ['blow', 'point'],
             ['drop'],
             ['pick'],
             ['aspirating', '70', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
-            ['blow_out', 'point'],
+            ['blow', 'point'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -430,9 +430,9 @@ class PipetteTest(unittest.TestCase):
             self.plate[1:9],
             new_tip='never'
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
         expected = [
             ['aspirating', '190', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
@@ -441,11 +441,11 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well E1'],
             ['dispensing', '30', 'Well F1'],
             ['dispensing', '30', 'Well G1'],
-            ['blow_out', 'point'],
+            ['blow', 'point'],
             ['aspirating', '70', 'Well A1'],
             ['dispensing', '30', 'Well H1'],
             ['dispensing', '30', 'Well A2'],
-            ['blow_out', 'point'],
+            ['blow', 'point'],
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
@@ -949,14 +949,14 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '30', 'Well C2'],
             ['dispensing', '40', 'Well D2'],
             ['dispensing', '50', 'Well E2'],
-            ['blow_out', 'point'],
+            ['blow', 'point'],
             ['aspirating', '140', 'Well A1'],
             ['dispensing', '60', 'Well F2'],
             ['dispensing', '70', 'Well G2'],
-            ['blow_out', 'point'],
+            ['blow', 'point'],
             ['aspirating', '80', 'Well A1'],
             ['dispensing', '80', 'Well H2'],
-            ['blow_out', 'in place'],
+            ['blow'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
