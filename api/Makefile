@@ -1,12 +1,10 @@
-.PHONY: api api-install api-install-deps api-test api-lint api-docs api-deploy api-clean
+.PHONY: api api-install api-test api-lint api-docs api-deploy api-clean
 
-api: api-clean api-install api-install-deps api-lint api-test api-docs api-deploy
+api: api-clean api-install api-lint api-test api-docs api-deploy
 
 api-install:
-	python3 setup.py install
-
-api-install-deps:
 	pip3 install -r requirements.txt
+	python3 setup.py install
 
 api-test:
 	nosetests --with-coverage
