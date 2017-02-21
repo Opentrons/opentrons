@@ -49,11 +49,11 @@ install:
   - git diff --name-only $TRAVIS_COMMIT_RANGE
   - git diff --name-only $TRAVIS_COMMIT_RANGE api
   - git remote set-branches --add origin master
-  - git fetch
-  - echo $TRAVIS_COMMIT_RANGE
-  - git diff origin/master $TRAVIS_BRANCH
-  - git diff HEAD master
-  - ./has_changes.sh api
+  # - git fetch
+  # - echo $TRAVIS_COMMIT_RANGE
+  # - git diff origin/master $TRAVIS_BRANCH
+  # - git diff HEAD master
+  # - ./has_changes.sh api
   - ./has_changes.sh api && cd api && make api
   - ./has_changes.sh app && cd app && make app
   # - cd api && python3 api/setup.py install
