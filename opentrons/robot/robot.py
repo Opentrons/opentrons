@@ -151,7 +151,7 @@ class Robot(object, metaclass=Singleton):
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
-    ['Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>']
+    ['Aspirating 200 at <Deck><Slot A1><Container plate><Well A1>']
     >>> robot.simulate()
     []
     """
