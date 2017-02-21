@@ -46,15 +46,16 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - cd api && python3 api/setup.py install
-  - pip3 install -r api/requirements.txt
+  # - cd api && python3 api/setup.py install
+  # - pip3 install -r api/requirements.txt
+  - cd api && make api
   - ./app/scripts/travis.sh install
 
 script:
-  - nosetests --with-coverage
-  - pylama
-  - cd docs && make clean html && make doctest && cd ..
-  - cd scripts && ./doc-deploy.sh && cd ..
+  # - nosetests --with-coverage
+  # - pylama
+  # - cd docs && make clean html && make doctest && cd ..
+  # - cd scripts && ./doc-deploy.sh && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:
