@@ -82,7 +82,7 @@ sample_protocol.py
 calibrations/
 smoothie/
 */smoothie
-!app/smoothie
+!api/smoothie
 */calibrations
 
 # SDK logs
