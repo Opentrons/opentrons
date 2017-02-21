@@ -80,6 +80,9 @@ sample_protocol.py
 
 # Local Calibration Data
 calibrations/
+smoothie/
+!app/smoothie
+!app/opentrons/config/smoothie
 */calibrations
 
 # SDK logs
