@@ -49,7 +49,7 @@ install:
   - git diff --name-only $TRAVIS_COMMIT_RANGE
   - git diff --name-only $TRAVIS_COMMIT_RANGE api
   - git remote set-branches --add origin master
-  # - git fetch
+  - git fetch
   # - echo $TRAVIS_COMMIT_RANGE
   # - git diff origin/master $TRAVIS_BRANCH
   # - git diff HEAD master
