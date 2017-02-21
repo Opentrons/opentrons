@@ -80,9 +80,6 @@ sample_protocol.py
 
 # Local Calibration Data
 calibrations/
-smoothie/
-*/smoothie
-!api/smoothie
 */calibrations
 
 # SDK logs
