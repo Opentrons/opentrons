@@ -272,6 +272,6 @@ class JSONIngestorTestCase(unittest.TestCase):
             ('.75 mL Tube Rack', 'C1'),  # 1st transfer
             ('.75 mL Tube Rack', 'A1'),  # 2nd transfer
             ('.75 mL Tube Rack', 'C1'),  # 2nd transfer
-            ('B2', 'trash')  # Location of tiprack in trash
+            ('trash', 'A1')  # Location of tiprack in trash
         ]
         self.assertEqual(wells_referenced, wells_referenced_expected)

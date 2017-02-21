@@ -1,7 +1,6 @@
 import json
 
 from opentrons.util.vector import Vector
-from opentrons.containers.placeable import Placeable
 
 
 def unpack_coordinates(coordinates):
@@ -104,29 +103,31 @@ def import_calibration_file(file_name, robot):
 def _get_list(n):
     if not hasattr(n, '__len__') or len(n) == 0 or isinstance(n, tuple):
         n = [n]
-    if isinstance(n, Placeable) and len(n) == 1:
-        n = [n[0]]
     return n
 
 
 def _create_source_target_lists(s, t, **kwargs):
     s = _get_list(s)
     t = _get_list(t)
+    len_s = len(s)
+    len_t = len(t)
     mode = kwargs.get('mode', 'transfer')
-    if mode == 'transfer':
-        if len(s) != len(t):
-            raise RuntimeError(
-                'Transfer sources/targets must be same length')
-    elif mode == 'distribute':
-        if not (len(t) >= len(s) == 1):
-            raise RuntimeError(
-                'Distribute must have 1 source and multiple targets')
-        s *= len(t)
-    elif mode == 'consolidate':
-        if not (len(s) >= len(t) == 1):
-            raise RuntimeError(
-                'Consolidate must have multiple sources and 1 target')
-        t *= len(s)
+    if len_s < len_t:
+        if mode is 'consolidate':
+            raise ValueError(
+                'Consolidate requires more sources than destinations')
+        if (len_t / len_s) % 1 > 0:
+            raise ValueError(
+                'Source and destination lists must be divisible')
+        s = [source for source in s for i in range(int(len_t / len_s))]
+    elif len_s > len_t:
+        if mode is 'distribute':
+            raise ValueError(
+                'Distribute requires more destinations than sources')
+        if (len_s / len_t) % 1 > 0:
+            raise ValueError(
+                'Source and destination lists must be divisible')
+        t = [dest for dest in t for i in range(int(len_s / len_t))]
     return (s, t)
 
 
@@ -213,11 +214,13 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
     """
     Combines as many dispenses as can fit within the maximum volume
     """
-    source = plan[0]['aspirate']['location']
+    source = None
+    new_source = None
     a_vol = 0
     temp_dispenses = []
     new_transfer_plan = []
     disposal_vol = kwargs.get('disposal_vol', 0)
+    max_vol = max_vol - disposal_vol
 
     def _append_dispenses():
         nonlocal a_vol, temp_dispenses, new_transfer_plan, source
@@ -244,8 +247,10 @@ def _compress_for_distribute(max_vol, plan, **kwargs):
 
     for p in plan:
         this_vol = p['aspirate']['volume']
-        if this_vol + a_vol > max_vol - disposal_vol:
+        new_source = p['aspirate']['location']
+        if (new_source is not source) or (this_vol + a_vol > max_vol):
             _append_dispenses()
+        source = new_source
         a_vol += this_vol
         temp_dispenses.append(p['dispense'])
     _append_dispenses()
@@ -256,13 +261,16 @@ def _compress_for_consolidate(max_vol, plan, **kwargs):
     """
     Combines as many aspirates as can fit within the maximum volume
     """
-    target = plan[0]['dispense']['location']
+    target = None
+    new_target = None
     d_vol = 0
     temp_aspirates = []
     new_transfer_plan = []
 
     def _append_aspirates():
         nonlocal d_vol, temp_aspirates, new_transfer_plan, target
+        if not temp_aspirates:
+            return
         for a in temp_aspirates:
             new_transfer_plan.append({
                 'aspirate': {
@@ -279,8 +287,10 @@ def _compress_for_consolidate(max_vol, plan, **kwargs):
 
     for i, p in enumerate(plan):
         this_vol = p['aspirate']['volume']
-        if this_vol + d_vol > max_vol:
+        new_target = p['dispense']['location']
+        if (new_target is not target) or (this_vol + d_vol > max_vol):
             _append_aspirates()
+        target = new_target
         d_vol += this_vol
         temp_aspirates.append(p['aspirate'])
     _append_aspirates()
