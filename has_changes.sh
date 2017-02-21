@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ $(git diff --name-only $TRAVIS_COMMIT_RANGE $1) ]]; then
+if [[ $(git diff origin/master $TRAVIS_BRANCH $1) ]]; then
     exit 0
 else
     exit 1
