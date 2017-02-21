@@ -44,8 +44,8 @@ install:
   - "pip install --disable-pip-version-check --user --upgrade pip"
   # - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
   - ps: "ls ."
-  - ps: "ls c:\\MinGW"
-  - ps: "ls c:\\MinGW\\bin\\"
+  - ps: "ls c:\\cygwin64"
+  - ps: "ls c:\\cygwin64\\bin\\"
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
