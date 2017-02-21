@@ -22,4 +22,14 @@ api-deploy:
 
 
 api-clean:
-	echo "Need to write clean command"
+	rm -rf \
+		*.core \
+		*.egg-info \
+		.coverage \
+		.tox \
+		build/ \
+		dist/ \
+		htmlcov/ \
+		calibrations/ \
+		smoothie/ \
+		tmp/
