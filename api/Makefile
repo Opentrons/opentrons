@@ -23,13 +23,9 @@ api-deploy:
 
 api-clean:
 	rm -rf \
-		*.core \
 		*.egg-info \
-		.coverage \
-		.tox \
 		build/ \
 		dist/ \
-		htmlcov/ \
 		calibrations/ \
 		smoothie/ \
 		tmp/
