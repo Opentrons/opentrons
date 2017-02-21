@@ -3,8 +3,8 @@
 api: api-clean api-install api-lint api-test api-docs api-deploy
 
 api-install:
-	pip3 install -r requirements.txt
-	python3 setup.py install
+	pip install -r requirements.txt
+	python setup.py install
 
 api-test:
 	nosetests --with-coverage
