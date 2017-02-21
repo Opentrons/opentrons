@@ -392,9 +392,9 @@ class Pipette(Instrument):
         if volume is 0:
             return self
 
-        _description = "Aspirating {0}uL at {1}".format(
+        _description = "Aspirating {0} {1}".format(
             volume,
-            (humanize_location(location) if location else '<In Place>')
+            ('at ' + humanize_location(location) if location else '')
         )
         self.create_command(
             do=_do,
@@ -508,9 +508,9 @@ class Pipette(Instrument):
         if volume is 0:
             return self
 
-        _description = "Dispensing {0}uL at {1}".format(
+        _description = "Dispensing {0} {1}".format(
             volume,
-            (humanize_location(location) if location else '<In Place>')
+            ('at ' + humanize_location(location) if location else '')
         )
         self.create_command(
             do=_do,
@@ -682,8 +682,8 @@ class Pipette(Instrument):
             self.move_to(location, strategy='arc', enqueue=False)
             self.motor.move(self._get_plunger_position('blow_out'))
 
-        _description = "Blow_out at {}".format(
-            humanize_location(location) if location else '<In Place>'
+        _description = "Blowing out {}".format(
+            'at ' + humanize_location(location) if location else ''
         )
         self.create_command(
             do=_do,
@@ -996,8 +996,8 @@ class Pipette(Instrument):
             self.robot.move_head(z=tip_plunge + 1, mode='relative')
             self.robot.move_head(z=-tip_plunge, mode='relative')
 
-        _description = "Picking up tip from {0}".format(
-            (humanize_location(location) if location else '<In Place>')
+        _description = "Picking up tip {0}".format(
+            ('from ' + humanize_location(location) if location else '')
         )
         self.create_command(
             do=_do,
@@ -1078,8 +1078,8 @@ class Pipette(Instrument):
 
             self.motor.move(self._get_plunger_position('bottom'))
 
-        _description = "Drop_tip at {}".format(
-            (humanize_location(location) if location else '<In Place>')
+        _description = "Drop_tip {}".format(
+            ('at ' + humanize_location(location) if location else '')
         )
 
         self.create_command(

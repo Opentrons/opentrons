@@ -100,7 +100,7 @@ class Placeable(object):
         """
         Return full path to the :Placeable: for debugging
         """
-        return '/'.join([str(i) for i in reversed(self.get_trace())])
+        return ''.join([str(i) for i in reversed(self.get_trace())])
 
     def __str__(self):
         if not self.parent:
@@ -695,9 +695,16 @@ class WellSeries(Container):
         """
         self.offset = offset
 
+    def __repr__(self):
+        """
+        Return full path to the :Placeable: for debugging
+        """
+        return str(self)
+
     def __str__(self):
-        return '<Series: {}>'.format(
-            ' '.join([str(well) for well in self.values]))
+        return '<{0}: {1}>'.format(
+            self.__class__.__name__,
+            ''.join([str(well) for well in self.values]))
 
     def __getattr__(self, name):
         # getstate/setstate are used by pickle and are not implemented by
