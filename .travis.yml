@@ -46,8 +46,8 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - ./has_changes.sh api
   - git diff --name-only $TRAVIS_COMMIT_RANGE
+  - ./has_changes.sh api
   - ./has_changes.sh api && cd api && make api
   - ./has_changes.sh app && cd app && make app
   # - cd api && python3 api/setup.py install
