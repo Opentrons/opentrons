@@ -25,5 +25,3 @@ api-clean:
 		build/ \
 		dist/ \
 		calibrations/ \
-		smoothie/ \
-		tmp/
