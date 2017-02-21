@@ -49,6 +49,7 @@ install:
   - git diff --name-only $TRAVIS_COMMIT_RANGE
   - git diff --name-only $TRAVIS_COMMIT_RANGE api
   - echo $TRAVIS_COMMIT_RANGE
+  - git diff remotes/origin/master $TRAVIS_BRANCH
   - git diff HEAD master
   - ./has_changes.sh api
   - ./has_changes.sh api && cd api && make api
