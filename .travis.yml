@@ -32,8 +32,8 @@ matrix:
 cache:
   apt: true
   directories:
-    - node_modules
     - app/node_modules
+    - app/app/node_modules
     - $HOME/.electron
     - pip
     - $HOME/.cache/pip3
@@ -46,8 +46,8 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - python3 setup.py install
-  - pip3 install -r requirements.txt
+  - python3 api/setup.py install
+  - pip3 install -r api/requirements.txt
   - ./app/scripts/travis.sh install
 
 script:
