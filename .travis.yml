@@ -46,7 +46,7 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - ./has_changes.sh && cd api && make api
+  - ./has_changes.sh api && cd api && make api
   # - cd api && python3 api/setup.py install
   # - pip3 install -r api/requirements.txt
   # - ./app/scripts/travis.sh install
