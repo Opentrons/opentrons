@@ -49,7 +49,7 @@ def list():
     return persisted_containers.list_container_names()
 
 
-def create(slot, grid, spacing, diameter, depth, volume=0, name=None):
+def create(name, grid, spacing, diameter, depth, volume=0):
     columns, rows = grid
     col_spacing, row_spacing = spacing
     custom_container = Container()
@@ -66,14 +66,9 @@ def create(slot, grid, spacing, diameter, depth, volume=0, name=None):
             well_name = chr(c + ord('A')) + str(1 + r)
             coordinates = (c * col_spacing, r * row_spacing, 0)
             custom_container.add(well, well_name, coordinates)
-    from opentrons import Robot
-    if name is None:
-        name = 'custom_{0}x{1}'.format(columns, rows)
-    else:
-        json_container = container_to_json(custom_container, name)
-        save_custom_container(json_container)
-    Robot.get_instance().deck[slot].add(custom_container, name)
-    return custom_container
+    json_container = container_to_json(custom_container, name)
+    save_custom_container(json_container)
+    persisted_containers.load_all_persisted_containers_from_disk()
 
 
 def container_to_json(c, name):
@@ -100,4 +95,3 @@ def save_custom_container(data):
         f.seek(0)
         f.write(json.dumps(old_data, indent=4))
         f.truncate()
-    persisted_containers.load_all_persisted_containers_from_disk()

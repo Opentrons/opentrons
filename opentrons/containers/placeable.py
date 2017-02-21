@@ -1,3 +1,4 @@
+import itertools
 import math
 import numbers
 from collections import OrderedDict
@@ -107,6 +108,11 @@ class Placeable(object):
         return '<{} {}>'.format(
             self.__class__.__name__, self.get_name())
 
+    def __add__(self, other):
+        return WellSeries(
+            self.get_children_list() + other.get_children_list()
+        )
+
     def __iter__(self):
         return iter(self.get_children_list())
 
@@ -127,6 +133,25 @@ class Placeable(object):
         children = self.parent.get_children_list()
         my_loc = children.index(self)
         return children[my_loc + 1]
+
+    def iter(self):
+        """
+        Returns an iterable built from this Placeable's children list
+        """
+        return iter(self.get_children_list())
+
+    def chain(self, *args):
+        """
+        Returns an itertools.chain built from this Placeable's children list
+        and appending any passed lists with *args
+        """
+        return itertools.chain(self.get_children_list(), *args)
+
+    def cycle(self):
+        """
+        Returns an itertools.cycle from this Placeable's children list
+        """
+        return itertools.cycle(self.get_children_list())
 
     def get_name(self):
         """
@@ -577,18 +602,70 @@ class Container(Placeable):
         """
         return self.__getitem__(name)
 
-    def wells(self, *args):
+    def wells(self, *args, **kwargs):
         """
         Returns child Well or list of child Wells
         """
+
+        if len(args) and isinstance(args[0], list):
+            args = args[0]
+
         new_wells = None
-        if len(args) > 0:
+        if not args and not kwargs:
+            new_wells = WellSeries(self.get_children_list())
+        elif len(args) > 1:
             new_wells = WellSeries([self.well(n) for n in args])
         else:
-            new_wells = WellSeries(self.get_children_list())
+            new_wells = self._parse_wells_to_and_length(*args, **kwargs)
+
         if len(new_wells) is 1:
             return new_wells[0]
         return new_wells
+
+    def __call__(self, *args, **kwargs):
+        """
+        Passes all arguments to Wells() and returns result
+        """
+        return self.wells(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        """
+        Passes all arguments to Wells() and returns result
+        """
+        return self.wells(*args, **kwargs)
+
+    def _parse_wells_to_and_length(self, *args, **kwargs):
+        start = args[0] if len(args) else 0
+        stop = kwargs.get('to', None)
+        step = kwargs.get('step', 1)
+        length = kwargs.get('length', 1)
+
+        wrapped_wells = [
+            w
+            for i in range(3)
+            for w in self.get_children_list()
+        ]
+        total_kids = len(self.get_children_list())
+
+        if isinstance(start, str):
+            start = self.get_index_from_name(start)
+        if stop is not None:
+            if isinstance(stop, str):
+                stop = self.get_index_from_name(stop)
+            if stop > start:
+                stop += 1
+                step = step * -1 if step < 0 else step
+            elif stop < start:
+                stop -= 1
+                step = step * -1 if step > 0 else step
+            return WellSeries(
+                wrapped_wells[start + total_kids:stop + total_kids:step])
+        else:
+            if length < 0:
+                length *= -1
+                step = step * -1 if step > 0 else step
+            return WellSeries(
+                wrapped_wells[start + total_kids::step][:length])
 
 
 class WellSeries(Container):
