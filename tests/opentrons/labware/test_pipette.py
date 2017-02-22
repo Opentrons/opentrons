@@ -723,6 +723,30 @@ class PipetteTest(unittest.TestCase):
             ValueError,
             self.p200.transfer,
             30,
+            self.plate[0:2],
+            self.plate[0:3]
+        )
+
+        self.assertRaises(
+            ValueError,
+            self.p200.transfer,
+            30,
+            self.plate[0:3],
+            self.plate[0:2]
+        )
+
+        self.assertRaises(
+            RuntimeError,
+            self.p200.transfer,
+            [30, 30, 30],
+            self.plate[0:2],
+            self.plate[0:2]
+        )
+
+        self.assertRaises(
+            ValueError,
+            self.p200.transfer,
+            30,
             self.plate[0],
             self.plate[1],
             new_tip='sometimes'
