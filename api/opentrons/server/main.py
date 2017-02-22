@@ -179,10 +179,9 @@ def upload_jupyter():
 
         # Reload instrument calibrations
         [instr.load_persisted_data()
-        for _, instr in jupyter_robot.get_instruments()]
+            for _, instr in jupyter_robot.get_instruments()]
         [instr.update_calibrator()
-        for _, instr in jupyter_robot.get_instruments()]
-
+            for _, instr in jupyter_robot.get_instruments()]
 
         current_protocol_step_list = None
         calibrations = update_step_list()
@@ -198,7 +197,6 @@ def upload_jupyter():
     except Exception as e:
         app.logger.exception('Failed to properly deserialize jupyter upload')
         print(e)
-
 
     return flask.jsonify({'status': 'success', 'data': None})
 
@@ -221,6 +219,7 @@ def load():
         }
     })
 
+
 def emit_notifications(notifications, _type):
     for notification in notifications:
         socketio.emit('event', {
@@ -242,7 +241,8 @@ def _run_commands():
         robot.home()
         robot.run(caller='ui')
         if len(robot._commands) == 0:
-            error = "This protocol does not contain any commands for the robot."
+            error = \
+                "This protocol does not contain any commands for the robot."
             api_response['errors'] = [error]
     except Exception as e:
         api_response['errors'] = [str(e)]
@@ -379,7 +379,6 @@ def connectRobot():
     })
 
 
-
 def _start_connection_watcher():
     robot = Robot.get_instance()
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
@@ -471,6 +470,7 @@ def _sort_containers(container_list):
 
     return _tipracks + _other
 
+
 def _get_all_pipettes():
     robot = Robot.get_instance()
     pipette_list = []
@@ -481,6 +481,7 @@ def _get_all_pipettes():
         pipette_list,
         key=lambda p: p.name.lower()
     )
+
 
 def _get_all_containers():
     """
@@ -603,7 +604,6 @@ def update_step_list():
         emit_notifications([str(e)], 'danger')
 
     return current_protocol_step_list
-
 
 
 @app.route('/home/<axis>')
@@ -858,14 +858,14 @@ def calibrate_placeable():
     try:
         _calibrate_placeable(name, axis)
         calibrations = update_step_list()
-        emit_notifications(['Saved {0} for the {1} axis'.format(name, axis)], 'success')
+        emit_notifications([
+            'Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
             'status': 'error',
             'data': str(e)
         })
-
 
     # TODO change calibration key to steplist
     return flask.jsonify({
@@ -896,7 +896,8 @@ def calibrate_plunger():
     axis = request.json.get("axis")
     try:
         _calibrate_plunger(position, axis)
-        emit_notifications(['Saved {0} on the {1} pipette'.format(position, axis)], 'success')
+        emit_notifications(
+            ['Saved {0} on the {1} pipette'.format(position, axis)], 'success')
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -915,7 +916,6 @@ def calibrate_plunger():
             'calibrations': calibrations
         }
     })
-
 
 
 # NOTE(Ahmed): DO NOT REMOVE socketio requires a confirmation from the
@@ -947,7 +947,7 @@ def log_after_request(response):
     return response
 
 
-def run():
+def start():
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
@@ -971,4 +971,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    start()
