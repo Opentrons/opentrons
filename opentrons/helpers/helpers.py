@@ -113,17 +113,11 @@ def _create_source_target_lists(s, t, **kwargs):
     len_t = len(t)
     mode = kwargs.get('mode', 'transfer')
     if len_s < len_t:
-        if mode is 'consolidate':
-            raise ValueError(
-                'Consolidate requires more sources than destinations')
         if (len_t / len_s) % 1 > 0:
             raise ValueError(
                 'Source and destination lists must be divisible')
         s = [source for source in s for i in range(int(len_t / len_s))]
     elif len_s > len_t:
-        if mode is 'distribute':
-            raise ValueError(
-                'Distribute requires more destinations than sources')
         if (len_s / len_t) % 1 > 0:
             raise ValueError(
                 'Source and destination lists must be divisible')

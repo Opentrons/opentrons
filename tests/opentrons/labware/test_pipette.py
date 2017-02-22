@@ -720,53 +720,6 @@ class PipetteTest(unittest.TestCase):
 
     def test_bad_transfer(self):
         self.p200.reset()
-        self.assertRaises(
-            ValueError,
-            self.p200.distribute,
-            30,
-            self.plate[0],
-            self.plate[1]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.consolidate,
-            30,
-            self.plate[0],
-            self.plate[1]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.consolidate,
-            30,
-            self.plate[0],
-            self.plate[1:3]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.distribute,
-            30,
-            self.plate[0:2],
-            self.plate[0:5]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.consolidate,
-            30,
-            self.plate[0:5],
-            self.plate[0:2]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.distribute,
-            30,
-            self.plate[0:3],
-            self.plate[1]
-        )
 
         self.assertRaises(
             ValueError,
