@@ -58,7 +58,7 @@ logging_config = dict(
             'level': logging.DEBUG,
         },
     },
-    ## Used to override root logger in opentrons-api
+    # Used to override root logger in opentrons-api
     root={
         'handlers': ['opentrons-app'],
         'level': logging.ERROR,

@@ -80,4 +80,3 @@ def get_upload_proof_robot(robot):
 
     patched_robot = robot
     return (patched_robot, restore)
-
