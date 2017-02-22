@@ -29,7 +29,15 @@ DESCRIPTION = (
     "The Opentrons API is a simple framework designed to make "
     "writing automated biology lab protocols easy.")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = ['dill==0.2.5', 'requests>=2.12.4', 'pyserial==3.2.1']
+INSTALL_REQUIRES = [
+    'dill==0.2.5',
+    'requests>=2.12.4',
+    'pyserial==3.2.1',
+    'Flask==0.10.1',
+    'Flask-SocketIO==2.5',
+    'Flask-Cors==3.0.2',
+    'psutil==4.3.1',
+    'gevent==1.1.2']
 TEST_SUITE = 'nose.collector'
 
 HERE = os.path.abspath(os.path.dirname(__file__))

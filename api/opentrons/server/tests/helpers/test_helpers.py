@@ -5,7 +5,7 @@ from unittest import mock
 
 from opentrons.robot import Robot
 
-from server import helpers
+from opentrons.server import helpers
 
 
 class MiscHelpersTestCase(unittest.TestCase):

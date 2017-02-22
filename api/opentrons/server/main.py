@@ -21,8 +21,8 @@ from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
-from server import helpers
-from server.process_manager import run_once
+from opentrons.server import helpers
+from opentrons.server.process_manager import run_once
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
@@ -947,14 +947,14 @@ def log_after_request(response):
     return response
 
 
-if __name__ == "__main__":
+def run():
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
     _start_connection_watcher()
 
-    from server import log  # NOQA
+    from opentrons.server import log  # NOQA
     lg = logging.getLogger('opentrons-app')
     lg.info('Starting Flask Server')
     [app.logger.addHandler(handler) for handler in lg.handlers]
@@ -968,3 +968,7 @@ if __name__ == "__main__":
         engineio_logger=False,
         port=31950
     )
+
+
+if __name__ == "__main__":
+    run()
