@@ -15,6 +15,7 @@ matrix:
       python: "3.5"  # TODO: revisit...
       # python: "3.6"
       env: OPENTRONS_APP_UPLOAD_DIR=linux
+      env: OPENTRONS_APP_ASSETS_DIR=linux
       addons:
         apt:
           sources: &common_sources
@@ -72,11 +73,25 @@ deploy:
     all_branches: true
 
 deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: ot-app-builds
+  skip_cleanup: true
+  local-dir: app/releases
+  upload-dir: $OPENTRONS_APP_ASSETS_DIR
+  acl: public_read
+  on:
+    repo: OpenTrons/opentrons-app
+    all_branches: true
+
+deploy:
   provider: script
   skip_cleanup: true
   script: scripts/publish.sh
   on:
     tags: true
+
 env:
   global:
   - ENCRYPTION_LABEL: c6cefc96bb2c

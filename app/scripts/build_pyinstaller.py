@@ -5,6 +5,7 @@ import shutil
 import platform
 import subprocess
 
+from boto.s3.connnection import S3Connection
 
 import util
 
@@ -124,6 +125,22 @@ def generate_static_assets():
               webpack_process.returncode)
         return False
     return True
+
+
+def upload_to_s3(bucket, key, file_path):
+    conn = S3Connection(
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_KEY')
+    )
+    bucket_obj = conn.get_bucket(bucket_name)
+    key_obj = Key(bucket_obj)
+    key_obj.key = key
+    key_set.set_contents_from_file_name(file_path)
+    print(
+        script_tab + "Uploaded {} to {}/{} on S3".format(
+            file_path, bucket, key
+        )
+    )
 
 
 def build_ot_python_backend_executable():
