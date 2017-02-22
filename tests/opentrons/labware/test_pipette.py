@@ -470,11 +470,10 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.distribute(
+        self.p200.transfer(
             30,
             self.plate[0],
             self.plate[1:9],
-            repeat=False,
             trash=False
         )
         # from pprint import pprint
@@ -586,11 +585,10 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.consolidate(
+        self.p200.transfer(
             30,
             self.plate[0:8],
-            self.plate['A2'],
-            repeat=False
+            self.plate['A2']
         )
         # from pprint import pprint
         # print('\n\n***\n')

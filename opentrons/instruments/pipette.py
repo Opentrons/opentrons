@@ -1574,9 +1574,8 @@ class Pipette(Instrument):
             transfer_plan = helpers._expand_for_carryover(
                 max_vol, transfer_plan, **kwargs)
 
-        if kwargs.get('repeat', True):
-            transfer_plan = helpers._compress_for_repeater(
-                max_vol, transfer_plan, **kwargs)
+        transfer_plan = helpers._compress_for_repeater(
+            max_vol, transfer_plan, **kwargs)
 
         return transfer_plan
 
