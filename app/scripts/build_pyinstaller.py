@@ -157,36 +157,40 @@ def build_ot_python_backend_executable():
     if not success:
         raise SystemExit(script_tab + "Exiting due to error generating static assets")
 
+    print(script_tag + "Uploading app assets to S3")
+    app_assets_path = os.path.join(project_root_dir, 'releases', 'build.js')
+    app_assets_key = 'assets/{}'.format(util.get_tag(util.get_os()))
+    upload_to_s3('ot-app-builds', app_assets_key, app_assets_path)
 
-    print(script_tag + "Removing PyInstaller old temp directories.")
-    remove_pyinstaller_temps()
+    # print(script_tag + "Removing PyInstaller old temp directories.")
+    # remove_pyinstaller_temps()
+    #
+    # print(script_tag + "Running PyInstaller process.")
+    # success = pyinstaller_build()
+    #
+    # if not success:
+    #     print(script_tab + "Removing PyInstaller recent temp directories.")
+    #     remove_pyinstaller_temps()
+    #     raise SystemExit(script_tab + "Exiting as there was an error in the "
+    #                                   "PyInstaller execution.")
 
-    print(script_tag + "Running PyInstaller process.")
-    success = pyinstaller_build()
+    # print(script_tag + "Removing old OT-App Backend executable directory.")
+    # backend_exec_path = os.path.join(
+    #     exec_folder_name, util.get_os(), get_spec_coll_name()
+    # )
+    # if os.path.isfile(backend_exec_path):
+    #     os.remove(backend_exec_path)
 
-    if not success:
-        print(script_tab + "Removing PyInstaller recent temp directories.")
-        remove_pyinstaller_temps()
-        raise SystemExit(script_tab + "Exiting as there was an error in the "
-                                      "PyInstaller execution.")
-
-    print(script_tag + "Removing old OT-App Backend executable directory.")
-    backend_exec_path = os.path.join(
-        exec_folder_name, util.get_os(), get_spec_coll_name()
-    )
-    if os.path.isfile(backend_exec_path):
-        os.remove(backend_exec_path)
-
-    print(script_tag + "Moving executable folder to backend-dist.")
-    success = move_executable_folder(backend_exec_path)
-    if not success:
-        print(script_tab + "Removing PyInstaller recent temp directories.")
-        remove_pyinstaller_temps()
-        raise SystemExit(script_tab + "Exiting now as there was an error in "
-                                      "the PyInstaller execution.")
-
-    print(script_tag + "Removing PyInstaller recent temp directories.")
-    remove_pyinstaller_temps()
+    # print(script_tag + "Moving executable folder to backend-dist.")
+    # success = move_executable_folder(backend_exec_path)
+    # if not success:
+    #     print(script_tab + "Removing PyInstaller recent temp directories.")
+    #     remove_pyinstaller_temps()
+    #     raise SystemExit(script_tab + "Exiting now as there was an error in "
+    #                                   "the PyInstaller execution.")
+    #
+    # print(script_tag + "Removing PyInstaller recent temp directories.")
+    # remove_pyinstaller_temps()
 
 if __name__ == "__main__":
     build_ot_python_backend_executable()
