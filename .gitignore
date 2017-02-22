@@ -1,5 +1,5 @@
 .DS_Store
-
+.env
 .python-version
 
 # Byte-compiled / optimized / DLL files
@@ -14,6 +14,7 @@ __pycache__/
 .Python
 env/
 build/
+app/release-assets/*
 #!build/
 #build/*
 #!build/html/

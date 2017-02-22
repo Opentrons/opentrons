@@ -18,7 +18,8 @@ const router = new VueRouter({
   ]
 })
 
-/* eslint-disable no-unused-vars */
+/* eslint-disable */
+const __webpack_public_path__ = window.location.host
 window.onload = function () {
   const app = new Vue({
     router,
@@ -26,4 +27,4 @@ window.onload = function () {
     ...App
   }).$mount('#app')
 }
-/* eslint-enable no-unused-vars */
+/* eslint-enable */
