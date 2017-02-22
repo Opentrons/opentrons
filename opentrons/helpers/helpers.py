@@ -111,7 +111,6 @@ def _create_source_target_lists(s, t, **kwargs):
     t = _get_list(t)
     len_s = len(s)
     len_t = len(t)
-    mode = kwargs.get('mode', 'transfer')
     if len_s < len_t:
         if (len_t / len_s) % 1 > 0:
             raise ValueError(
