@@ -49,8 +49,10 @@ install:
   - python3 --version
   - git remote set-branches --add origin $STABLE_BRANCH
   - git fetch
+  - ./build-all
   - ./has_changes.sh api && cd api && make api && cd ..
   - ./has_changes.sh app && cd app && make app
+  - if $STABLE_BRANCH
 
 script:
   # - nosetests --with-coverage
