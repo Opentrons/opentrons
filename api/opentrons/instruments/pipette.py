@@ -1671,10 +1671,6 @@ class Pipette(Instrument):
                 if self.current_volume == 0:
                     blow_out = None
             self.blow_out(blow_out, enqueue=enqueue)
-            self._mix_during_transfer(
-                kwargs.get('mix_after', (0, 0)),
-                loc,
-                **kwargs)
 
     def _drop_tip_during_transfer(self, tips, i, total, **kwargs):
         """
