@@ -847,7 +847,7 @@ class Pipette(Instrument):
             enqueue=enqueue)
 
         if height is None:
-            height = 20
+            height = 5
 
         location = self.previous_placeable.top(height)
         # "move_to" separate from aspirate command
