@@ -1,0 +1,46 @@
+section.protocol {
+    div#progress {
+        flex: 0 0 256px;
+        padding: 10px 0;
+        div {
+            span {
+                font-size: 14px;
+                text-align: left;
+                height: 22px;
+                line-height: 22px;
+                flex: 0 0 121px;
+                &.info {
+                    font-size: 13px;
+                    font-family: "open-sans";
+                }
+                &.title {
+                    font-weight: 800;
+                }
+            }
+            #progress-bar-total {
+                width: 100%;
+                margin-top: 7px;
+                height: 12px;
+                background-color: #BBB;
+                #percent-complete {
+                    width: 20%;
+                    height: 12px;
+                    background-color: $call-to-action;
+                }
+            }
+        }
+    }
+    div#run {
+        min-width: $btn-size*3;
+        flex: 0 0 $btn-size*3;
+        height: 65px;
+        padding: 0 40px;
+        div.controls {
+            width: $btn-size*3;
+            flex: 0 0 $btn-size*3;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    }
+}
