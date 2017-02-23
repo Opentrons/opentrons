@@ -194,6 +194,7 @@ def create_env():
     and zips it
     """
     print(script_tag + "Creating virtual environment in: {}".format(ENV_WORKPATH))
+    remove_directory(ENV_WORKPATH)
     (not os.path.exists(ENV_WORKPATH) and os.mkdir(ENV_WORKPATH))
 
     print(script_tag + "Running virtualenv cmd in subprocess.")
@@ -213,11 +214,11 @@ def create_env():
     (not os.path.exists(ENV_DISTPATH) and os.mkdir(ENV_DISTPATH))
     compress_virtual_env(ENV_DISTPATH)
 
-    # print(script_tag + "Copying virtualenv to release dir")
-    # copy_virtual_env_to_release_dir()
+    print(script_tag + "Copying virtualenv to release dir")
+    copy_virtual_env_to_release_dir()
 
-    print(script_tag + "Copying virtualenv to app")
-    copy_virtual_env_to_app()
+    # print(script_tag + "Copying virtualenv to app")
+    # copy_virtual_env_to_app()
 
 
 if __name__ == '__main__':
