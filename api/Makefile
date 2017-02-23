@@ -18,6 +18,10 @@ api-docs:
 api-deploy:
 	cd scripts && ./doc-deploy.sh && cd ..
 
+api-wheel: api
+	rm ../app/release-assets/*.whl
+	python setup.py bdist_wheel -d ../app/release-assets
+	ls ../app/release-assets/*.whl | xargs -I{} basename {} > ../app/release-assets/whl-name
 
 api-clean:
 	rm -rf \

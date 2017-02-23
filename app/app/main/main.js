@@ -84,7 +84,9 @@ function startUp () {
   // Startup Actions
   pythonEnvManager.setupEnvironment()
   // serverManager.start()
-  let _createWindow = () => {return createWindow('http://opentrons-test-deploy.surge.sh/')}
+  let _createWindow = () => {
+      return createWindow('http://opentrons-test-deploy.surge.sh/')
+  }
   waitUntilServerResponds(_createWindow, 'http://localhost:8000')
   addMenu()
   initAutoUpdater()
