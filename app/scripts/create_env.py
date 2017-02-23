@@ -213,8 +213,8 @@ def create_env():
     (not os.path.exists(ENV_DISTPATH) and os.mkdir(ENV_DISTPATH))
     compress_virtual_env(ENV_DISTPATH)
 
-    print(script_tag + "Copying virtualenv to release dir")
-    copy_virtual_env_to_release_dir()
+    # print(script_tag + "Copying virtualenv to release dir")
+    # copy_virtual_env_to_release_dir()
 
     print(script_tag + "Copying virtualenv to app")
     copy_virtual_env_to_app()

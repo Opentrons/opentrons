@@ -1,6 +1,6 @@
 .PHONY: api api-install api-test api-lint api-docs api-deploy api-clean
 
-api: api-clean api-install api-lint api-test api-docs api-deploy
+api: api-clean api-install api-lint api-test api-docs api-deploy api-wheel
 
 api-install:
 	pip install -r requirements.txt
@@ -18,9 +18,8 @@ api-docs:
 api-deploy:
 	cd scripts && ./doc-deploy.sh && cd ..
 
-api-wheel: api
-	rm ../app/release-assets/*.whl
-	python setup.py bdist_wheel -d ../app/release-assets
+api-wheel:
+	rm ../app/release-assets/*.whl; python setup.py bdist_wheel -d ../app/release-assets
 	ls ../app/release-assets/*.whl | xargs -I{} basename {} > ../app/release-assets/whl-name
 
 api-clean:
