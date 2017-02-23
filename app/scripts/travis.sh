@@ -46,8 +46,9 @@ run_install ()
   ls releases
 
   echo "Creating python virtualenv"
-  python3 scripts/create_env.py
-  cd env-dist && ../scripts/test_env.sh && cd ..
+  # TODO(Ahmed): Run create env test script in create_env dir!!!
+  # python3 scripts/create_env.py
+  # cd env-dist && ../scripts/test_env.sh && cd ..
 }
 
 execute_mac ()
