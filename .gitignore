@@ -15,6 +15,7 @@ __pycache__/
 env/
 build/
 app/release-assets/*
+!app/release-assets/index.html
 #!build/
 #build/*
 #!build/html/
