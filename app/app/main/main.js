@@ -63,12 +63,13 @@ app.on('python-env-ready', function () {
   console.log('Run pip update')
   let envLoc = pythonEnvManager.getEnvAppDataDirPath()
   let pyRunScript = path.join(envLoc, 'pyrun.sh')
-  let wheelFileBase = 'https://s3.amazonaws.com/ot-app-builds/assets/'
-  let wheelNameFile = wheelFileBase + '20170217-151500-opentrons-fusion-local-dev/whl-name'
+  let wheelFileBase = 'https://s3.amazonaws.com/ot-app-builds/assets/stable/'
+  let wheelNameFile = wheelFileBase + 'whl-name'
 
   rp(wheelNameFile).then(wheelName => {
     console.log(`Found: "${wheelName}"`)
-    spawnProcess(pyRunProcess, pyRunScript, [wheelFileBase + wheelName], {cwd: envLoc})
+    let wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
+    spawnProcess(pyRunProcess, pyRunScript, [wheelFileBase + wheelNameURIEncoded], {cwd: envLoc})
   })
 })
 
@@ -92,9 +93,9 @@ function startUp () {
   pythonEnvManager.setupEnvironment()
   // serverManager.start()
   let _createWindow = () => {
-      return createWindow('http://opentrons-test-deploy.surge.sh/')
+    return createWindow('http://s3.amazonaws.com/ot-app-builds/assets/stable/index.html')
   }
-  waitUntilServerResponds(_createWindow, 'http://localhost:8000')
+  waitUntilServerResponds(_createWindow, 'http://localhost:31950/robot/serial/list')
   addMenu()
   initAutoUpdater()
 }
