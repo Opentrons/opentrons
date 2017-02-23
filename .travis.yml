@@ -47,7 +47,7 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - git remote set-branches --add origin stable
+  - git remote set-branches --add origin $STABLE_BRANCH
   - git fetch
   - ./has_changes.sh api && cd api && make api && cd ..
   - ./has_changes.sh app && cd app && make app
