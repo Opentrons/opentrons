@@ -1557,10 +1557,6 @@ class Pipette(Instrument):
 
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
-        if kwargs['mode'] is 'distribute' and not len(t) > 1:
-            raise ValueError('distribute requires multiple targets')
-        if kwargs['mode'] is 'consolidate' and not len(s) > 1:
-            raise ValueError('consolidate requires multiple targets')
         total_transfers = len(t)
         v = helpers._create_volume_list(v, total_transfers, **kwargs)
 
@@ -1578,9 +1574,8 @@ class Pipette(Instrument):
             transfer_plan = helpers._expand_for_carryover(
                 max_vol, transfer_plan, **kwargs)
 
-        if kwargs.get('repeat', True):
-            transfer_plan = helpers._compress_for_repeater(
-                max_vol, transfer_plan, **kwargs)
+        transfer_plan = helpers._compress_for_repeater(
+            max_vol, transfer_plan, **kwargs)
 
         return transfer_plan
 

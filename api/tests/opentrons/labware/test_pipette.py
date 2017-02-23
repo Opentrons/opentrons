@@ -470,11 +470,10 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.distribute(
+        self.p200.transfer(
             30,
             self.plate[0],
             self.plate[1:9],
-            repeat=False,
             trash=False
         )
         # from pprint import pprint
@@ -586,11 +585,10 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
-        self.p200.consolidate(
+        self.p200.transfer(
             30,
             self.plate[0:8],
-            self.plate['A2'],
-            repeat=False
+            self.plate['A2']
         )
         # from pprint import pprint
         # print('\n\n***\n')
@@ -720,52 +718,29 @@ class PipetteTest(unittest.TestCase):
 
     def test_bad_transfer(self):
         self.p200.reset()
-        self.assertRaises(
-            ValueError,
-            self.p200.distribute,
-            30,
-            self.plate[0],
-            self.plate[1]
-        )
 
         self.assertRaises(
             ValueError,
-            self.p200.consolidate,
-            30,
-            self.plate[0],
-            self.plate[1]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.consolidate,
-            30,
-            self.plate[0],
-            self.plate[1:3]
-        )
-
-        self.assertRaises(
-            ValueError,
-            self.p200.distribute,
+            self.p200.transfer,
             30,
             self.plate[0:2],
-            self.plate[0:5]
+            self.plate[0:3]
         )
 
         self.assertRaises(
             ValueError,
-            self.p200.consolidate,
+            self.p200.transfer,
             30,
-            self.plate[0:5],
+            self.plate[0:3],
             self.plate[0:2]
         )
 
         self.assertRaises(
-            ValueError,
-            self.p200.distribute,
-            30,
-            self.plate[0:3],
-            self.plate[1]
+            RuntimeError,
+            self.p200.transfer,
+            [30, 30, 30],
+            self.plate[0:2],
+            self.plate[0:2]
         )
 
         self.assertRaises(
