@@ -167,17 +167,6 @@ def compress_virtual_env(path):
     os.chdir(old_cwd)
 
 
-def copy_virtual_env_to_release_dir():
-    """
-    Copies artifact "ENV_DISTPATH/venv.zip" to "releases/venv-{build-tag}.zip"
-    """
-    tag = util.get_build_tag(util.get_os())
-    shutil.copy(
-        os.path.join(ENV_DISTPATH, 'venv.zip'),
-        os.path.join(project_root_dir, 'releases', 'venv-{}.zip'.format(tag))
-    )
-
-
 def copy_environment_starting_script():
     env_starter = 'pyrun.bat' if util.get_os() == 'win' else 'pyrun.sh'
     shutil.copy(
@@ -213,9 +202,6 @@ def create_env():
     print(script_tag + "Compress virtualenv environment")
     (not os.path.exists(ENV_DISTPATH) and os.mkdir(ENV_DISTPATH))
     compress_virtual_env(ENV_DISTPATH)
-
-    print(script_tag + "Copying virtualenv to release dir")
-    copy_virtual_env_to_release_dir()
 
 
 if __name__ == '__main__':
