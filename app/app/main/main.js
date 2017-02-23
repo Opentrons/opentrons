@@ -5,6 +5,7 @@ const http = require('http')
 const path = require('path')
 
 const electron = require('electron')
+const rp = require('request-promise')
 const {app, BrowserWindow} = electron
 
 const {addMenu} = require('./menu.js')
@@ -45,24 +46,30 @@ function createAndSetAppDataDir () {
   process.env['APP_DATA_DIR'] = appDataDir
 }
 
+function spawnProcess(cp, file, args, options) {
+  cp = child_process.spawn(file, args, options)
+  cp.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+  cp.stderr.on('data', (data) => {
+    console.log(`stderr: ${data}`);
+  });
+  cp.on('close', (code) => {
+    console.log(`child process exited with code ${code}`);
+  });
+}
+
 app.on('python-env-ready', function () {
   console.log('Run pip update')
   let envLoc = pythonEnvManager.getEnvAppDataDirPath()
   let pyRunScript = path.join(envLoc, 'pyrun.sh')
-  console.log(pyRunScript)
+  let wheelFileBase = 'https://s3.amazonaws.com/ot-app-builds/assets/'
+  let wheelNameFile = wheelFileBase + '20170217-151500-opentrons-fusion-local-dev/whl-name'
 
-  pyRunProcess = child_process.spawn(pyRunScript, {cwd: envLoc})
-  pyRunProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  pyRunProcess.stderr.on('data', (data) => {
-    console.log(`stderr: ${data}`);
-  });
-
-  pyRunProcess.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-  });
+  rp(wheelNameFile).then(wheelName => {
+    console.log(`Found: "${wheelName}"`)
+    spawnProcess(pyRunProcess, pyRunScript, [wheelFileBase + wheelName], {cwd: envLoc})
+  })
 })
 
 

@@ -178,6 +178,14 @@ def copy_virtual_env_to_release_dir():
     )
 
 
+def copy_environment_starting_script():
+    env_starter = 'pyrun.bat' if util.get_os() == 'win' else 'pyrun.sh'
+    shutil.copy(
+        os.path.join(os.path.dirname(__file__), env_starter),
+        ENV_WORKPATH
+    )
+
+
 def create_env():
     """Creates standalone, distributable python virtual environment
     and zips it
@@ -198,6 +206,9 @@ def create_env():
         "to take env path as an argument"
     )
     alter_activate_script()
+
+    print(script_tag + "Copy environment starting scripts")
+    copy_environment_starting_script()
 
     print(script_tag + "Compress virtualenv environment")
     (not os.path.exists(ENV_DISTPATH) and os.mkdir(ENV_DISTPATH))
