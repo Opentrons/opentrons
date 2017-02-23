@@ -178,17 +178,6 @@ def copy_virtual_env_to_release_dir():
     )
 
 
-def copy_virtual_env_to_app():
-    """
-    Copies artifact "ENV_DISTPATH/venv.zip" to "releases/venv-{build-tag}.zip"
-    """
-    shutil.copy(
-        os.path.join(ENV_DISTPATH, 'venv.zip'),
-        os.path.join(
-            project_root_dir, 'app', 'backend-env', util.get_os(), 'venv.zip')
-    )
-
-
 def create_env():
     """Creates standalone, distributable python virtual environment
     and zips it
@@ -216,9 +205,6 @@ def create_env():
 
     print(script_tag + "Copying virtualenv to release dir")
     copy_virtual_env_to_release_dir()
-
-    # print(script_tag + "Copying virtualenv to app")
-    # copy_virtual_env_to_app()
 
 
 if __name__ == '__main__':
