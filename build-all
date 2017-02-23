@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+CI_BRANCH="${TRAVIS_BRANCH:-$APPVEYOR_BRANCH}"
+export CI_BRANCH
+
+if [[ $STABLE_BRANCH == $CI_BRANCH ]]; then
+    echo "Building all of app CI_BRANCH: $CI_BRANCH STABLE_BRANCH: $STABLE_BRANCH"
+    cd api && make api && cd ../app && make app
+else
+    echo "Not building all of app CI_BRANCH: $CI_BRANCH TRAVIS_BRANCH: $TRAVIS_BRANCH APPVEYOR_BRANCH: $APPVEYOR_BRANCH"
+fi;
