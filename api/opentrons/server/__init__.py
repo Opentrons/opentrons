@@ -1,3 +1,3 @@
-from opentrons.server.main import run
+from opentrons.server.main import start
 
-__all__ = [run]
+__all__ = [start]
