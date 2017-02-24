@@ -50,14 +50,8 @@ install:
   - git remote set-branches --add origin $STABLE_BRANCH
   - git fetch
   - ./build-all
-  - ./has_changes.sh api 2>/dev/null && cd api && make api && cd ..
-  - ./has_changes.sh app 2>/dev/null && cd app && make app
-
-script:
-  # - nosetests --with-coverage
-  # - pylama
-  # - cd docs && make clean html && make doctest && cd ..
-  # - cd scripts && ./doc-deploy.sh && cd ..
+  - ./has_changes.sh api "cd api && make api && cd .."
+  - ./has_changes.sh app "cd app && make app && cd .."
 
 # Deploy the build version in an S3 bucket
 deploy:
@@ -68,19 +62,6 @@ deploy:
   skip_cleanup: true
   local-dir: app/releases
   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
-  acl: public_read
-  on:
-    repo: OpenTrons/opentrons-app
-    all_branches: true
-
-deploy:
-  provider: s3
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
-  bucket: ot-app-builds
-  skip_cleanup: true
-  local-dir: app/releases
-  upload-dir: $OPENTRONS_APP_ASSETS_DIR
   acl: public_read
   on:
     repo: OpenTrons/opentrons-app
