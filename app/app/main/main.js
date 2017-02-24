@@ -21,14 +21,9 @@ let pythonEnvManager = new PythonEnvManager()
 let mainWindow
 let pyRunProcess
 
-console.log('before', process.env.STATIC_ASSETS_BASE_URL, process.env.STATIC_ASSETS_BRANCH)
-const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'https://s3.amazonaws.com/ot-app-builds/assets/'
+const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/assets/'
 const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
 const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
-
-console.log(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH, STATIC_ASSETS_URL)
-
-
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
@@ -54,7 +49,7 @@ function createAndSetAppDataDir () {
   process.env['APP_DATA_DIR'] = appDataDir
 }
 
-function spawnProcess(cp, file, args, options) {
+function spawnProcess(file, args, options) {
   cp = child_process.spawn(file, args, options)
   cp.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
@@ -65,6 +60,7 @@ function spawnProcess(cp, file, args, options) {
   cp.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
   });
+  return cp
 }
 
 app.on('python-env-ready', function () {
@@ -77,7 +73,7 @@ app.on('python-env-ready', function () {
   rp(wheelNameFile).then(wheelName => {
     console.log(`Found: "${wheelName}"`)
     let wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-    spawnProcess(pyRunProcess, pyRunScript, [urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)], {cwd: envLoc})
+    pyRunProcess = spawnProcess(pyRunScript, [urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)], {cwd: envLoc})
   })
 })
 
@@ -87,6 +83,10 @@ function startUp () {
   createAndSetAppDataDir()
 
   const mainLogger = getLogger('electron-main')
+  mainLogger.info(`STATIC_ASSETS_BASE_URL: ${STATIC_ASSETS_BASE_URL}`)
+  mainLogger.info(`STATIC_ASSETS_BRANCH: ${STATIC_ASSETS_BRANCH}`)
+  mainLogger.info(`STATIC_ASSETS_URL: ${STATIC_ASSETS_URL}`)
+
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
       console.log(error)
