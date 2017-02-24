@@ -1237,7 +1237,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])
         self.p200.touch_tip(-3)
-        self.p200.touch_tip(-3, radius=0.5)
+        self.p200.touch_tip(self.plate[1], radius=0.5)
 
         self.robot.simulate()
 
@@ -1255,7 +1255,6 @@ class PipetteTest(unittest.TestCase):
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
                 enqueue=False, strategy='direct'),
-            mock.call(self.plate[0], enqueue=False, strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
                 enqueue=False, strategy='direct'),
@@ -1268,18 +1267,18 @@ class PipetteTest(unittest.TestCase):
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
                 enqueue=False, strategy='direct'),
-            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(self.plate[1], enqueue=False, strategy='arc'),
             mock.call(
-                (self.plate[0], (4.80, 3.20, 7.50)),
+                (self.plate[1], (4.80, 3.20, 10.50)),
                 enqueue=False, strategy='direct'),
             mock.call(
-                (self.plate[0], (1.60, 3.20, 7.50)),
+                (self.plate[1], (1.60, 3.20, 10.50)),
                 enqueue=False, strategy='direct'),
             mock.call(
-                (self.plate[0], (3.20, 4.80, 7.50)),
+                (self.plate[1], (3.20, 4.80, 10.50)),
                 enqueue=False, strategy='direct'),
             mock.call(
-                (self.plate[0], (3.20, 1.60, 7.50)),
+                (self.plate[1], (3.20, 1.60, 10.50)),
                 enqueue=False, strategy='direct')
         ]
 
