@@ -21,9 +21,12 @@ let pythonEnvManager = new PythonEnvManager()
 let mainWindow
 let pyRunProcess
 
-const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'https://s3.amazonaws.com/ot-app-builds/'
+console.log('before', process.env.STATIC_ASSETS_BASE_URL, process.env.STATIC_ASSETS_BRANCH)
+const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'https://s3.amazonaws.com/ot-app-builds/assets/'
 const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
 const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
+
+console.log(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH, STATIC_ASSETS_URL)
 
 
 if (process.env.NODE_ENV === 'development'){
@@ -69,6 +72,7 @@ app.on('python-env-ready', function () {
   let envLoc = pythonEnvManager.getEnvAppDataDirPath()
   let pyRunScript = path.join(envLoc, 'pyrun.sh')
   let wheelNameFile = urlJoin(STATIC_ASSETS_URL, 'whl-name')
+  console.log('wheel name file', wheelNameFile)
 
   rp(wheelNameFile).then(wheelName => {
     console.log(`Found: "${wheelName}"`)
@@ -97,7 +101,7 @@ function startUp () {
   pythonEnvManager.setupEnvironment()
   // serverManager.start()
   let _createWindow = () => {
-    return createWindow('http://s3.amazonaws.com/ot-app-builds/assets/stable/index.html')
+    return createWindow(urlJoin(STATIC_ASSETS_URL, 'index.html'))
   }
   waitUntilServerResponds(_createWindow, 'http://localhost:31950/robot/serial/list')
   addMenu()
