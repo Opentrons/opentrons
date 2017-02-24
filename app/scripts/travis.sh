@@ -74,8 +74,7 @@ execute_mac ()
 
     # NOTE(ahmed): We might not need python 3 explicit installation any more
     # brew install scripts/ot_python3.rb
-    python3 --version
-    python3 -c "import struct; print(struct.calcsize('P') * 8)"
+    # python3 --version
     python --version
     echo $PATH
 
