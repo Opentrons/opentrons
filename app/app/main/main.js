@@ -3,6 +3,7 @@ const child_process = require('child_process')
 const fs = require('fs')
 const http = require('http')
 const path = require('path')
+const urlJoin = require('url-join')
 
 const electron = require('electron')
 const rp = require('request-promise')
@@ -19,6 +20,10 @@ let serverManager = new ServerManager()
 let pythonEnvManager = new PythonEnvManager()
 let mainWindow
 let pyRunProcess
+
+const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'https://s3.amazonaws.com/ot-app-builds/'
+const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
+const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
 
 
 if (process.env.NODE_ENV === 'development'){
@@ -63,13 +68,12 @@ app.on('python-env-ready', function () {
   console.log('Run pip update')
   let envLoc = pythonEnvManager.getEnvAppDataDirPath()
   let pyRunScript = path.join(envLoc, 'pyrun.sh')
-  let wheelFileBase = 'https://s3.amazonaws.com/ot-app-builds/assets/stable/'
-  let wheelNameFile = wheelFileBase + 'whl-name'
+  let wheelNameFile = urlJoin(STATIC_ASSETS_URL, 'whl-name')
 
   rp(wheelNameFile).then(wheelName => {
     console.log(`Found: "${wheelName}"`)
     let wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-    spawnProcess(pyRunProcess, pyRunScript, [wheelFileBase + wheelNameURIEncoded], {cwd: envLoc})
+    spawnProcess(pyRunProcess, pyRunScript, [STATIC_ASSETS_BASE_URL + wheelNameURIEncoded], {cwd: envLoc})
   })
 })
 
