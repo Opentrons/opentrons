@@ -53,6 +53,9 @@ install:
   - ./has_changes.sh api "cd api && make api && cd .."
   - ./has_changes.sh app "cd app && make app && cd .."
 
+script:
+# - echo "Scripts go here"
+
 # Deploy the build version in an S3 bucket
 deploy:
   provider: s3
