@@ -73,7 +73,7 @@ app.on('python-env-ready', function () {
   rp(wheelNameFile).then(wheelName => {
     console.log(`Found: "${wheelName}"`)
     let wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-    spawnProcess(pyRunProcess, pyRunScript, [STATIC_ASSETS_BASE_URL + wheelNameURIEncoded], {cwd: envLoc})
+    spawnProcess(pyRunProcess, pyRunScript, [urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)], {cwd: envLoc})
   })
 })
 
