@@ -676,7 +676,11 @@ class Pipette(Instrument):
 
         def _do():
             nonlocal location
-            self.move_to(location, strategy='arc', enqueue=False)
+            if not location and self.previous_placeable:
+                location = self.previous_placeable.top()
+                self.move_to(location, strategy='direct', enqueue=False)
+            else:
+                self.move_to(location, strategy='arc', enqueue=False)
             self.motor.move(self._get_plunger_position('blow_out'))
 
         _description = "Blowing out {}".format(
@@ -740,7 +744,7 @@ class Pipette(Instrument):
             nonlocal location, height_offset
             if isinstance(location, (int, float, complex)):
                 height_offset = location
-                location = self.previous_placeable
+                location = None
             self._associate_placeable(location)
 
         def _do():
