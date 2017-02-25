@@ -33,9 +33,10 @@ run_install ()
 
   pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
 
+  python --version
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
-
-  cd server && python3 -m nose -s --logging-level WARNING && cd ..
+  # cd server && python3 -m nose -s --logging-level WARNING && cd ..
+  cd server && python -m nose -s --logging-level WARNING && cd ..
 
   npm i -g mocha
   npm run unit-renderer
