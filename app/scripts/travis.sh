@@ -33,10 +33,9 @@ run_install ()
 
   pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
 
-  python --version
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
-  # cd server && python3 -m nose -s --logging-level WARNING && cd ..
-  cd server && python -m nose -s --logging-level WARNING && cd ..
+
+  cd server && python3 -m nose -s --logging-level WARNING && cd ..
 
   npm i -g mocha
   npm run unit-renderer
@@ -75,7 +74,9 @@ execute_mac ()
 
     # NOTE(ahmed): We might not need python 3 explicit installation any more
     # brew install scripts/ot_python3.rb
-    # python3 --version
+    brew install python3
+    python3 --version
+    python3 -c "import struct; print(struct.calcsize('P') * 8)"
     python --version
     echo $PATH
 
