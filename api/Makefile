@@ -3,7 +3,7 @@
 api: api-clean api-install api-lint api-test api-docs api-deploy api-wheel
 
 api-install:
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 	python3 setup.py install
 
 api-test:
