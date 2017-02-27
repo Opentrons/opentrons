@@ -140,7 +140,8 @@ def copy_site_packages():
                     continue
                 make_dirs(d)
                 shutil.copy(s, d)
-    copy(python_std_lib_path, os.path.join(ENV_WORKPATH, 'lib'))
+    # copy(python_std_lib_path, os.path.join(ENV_WORKPATH, 'lib'))
+    copy(python_std_lib_path, os.path.join(ENV_WORKPATH))
     copy(sys_python, os.path.join(ENV_WORKPATH))
 
 
