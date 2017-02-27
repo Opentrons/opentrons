@@ -103,7 +103,7 @@ function startUp () {
   let _createWindow = () => {
     return createWindow(urlJoin(STATIC_ASSETS_URL, 'index.html'))
   }
-  waitUntilServerResponds(_createWindow, 'http://localhost:31950/robot/serial/list')
+  // waitUntilServerResponds(_createWindow, 'http://localhost:31950/robot/serial/list')
   addMenu()
   initAutoUpdater()
 }

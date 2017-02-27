@@ -104,7 +104,7 @@ def copy_site_packages():
     """
     import logging
     python_std_lib_path = os.path.normpath(
-        os.path.join(logging.__file__, '..', '..')
+        os.path.join(logging.__file__, '..', '..', '..')
     )
     if IS_WIN:
         sys_python = shutil.which('python')
@@ -140,7 +140,7 @@ def copy_site_packages():
                     continue
                 make_dirs(d)
                 shutil.copy(s, d)
-    copy(python_std_lib_path, os.path.join(ENV_WORKPATH, 'lib', 'python3.6'))
+    copy(python_std_lib_path, os.path.join(ENV_WORKPATH, 'lib'))
     copy(sys_python, os.path.join(ENV_WORKPATH))
 
 
