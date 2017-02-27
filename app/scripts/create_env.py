@@ -124,8 +124,7 @@ def copy_site_packages():
 
     def copy(src, dest):
         for item in os.listdir(src):
-            # if item in ('site-packages', 'Headers', '__pycache__'):
-            if item in ('Headers', '__pycache__'):
+            if item in ('site-packages', 'Headers', '__pycache__'):
                 continue
             s = os.path.join(src, item)
             d = os.path.join(dest, item)
@@ -141,7 +140,7 @@ def copy_site_packages():
                     continue
                 make_dirs(d)
                 shutil.copy(s, d)
-    copy(python_std_lib_path, os.path.join(ENV_WORKPATH, 'lib'))
+    copy(python_std_lib_path, os.path.join(ENV_WORKPATH, 'lib', 'python3.6'))
     copy(sys_python, os.path.join(ENV_WORKPATH))
 
 
