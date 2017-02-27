@@ -689,9 +689,6 @@ class Robot(object, metaclass=Singleton):
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(tallest_z, robot_max_z)
 
-        print('here!!!')
-        print(tallest_z, robot_max_z)
-
         self._previous_container = this_container
 
         return [
