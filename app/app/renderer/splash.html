@@ -5,7 +5,7 @@
       // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 
       ipcRenderer.on('app-env-loading', (event, arg) => {
-        console.log(arg)
+        console.log(new TextDecoder("utf-8").decoded(arg)
       })
     </script>
   </head>

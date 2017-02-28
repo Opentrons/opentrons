@@ -28,6 +28,8 @@ if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
 
+console.log(process.env)
+
 function createWindow (windowUrl) {
   mainWindow = new BrowserWindow({width: 1060, height: 750})
   mainWindow.loadURL(windowUrl)
@@ -84,7 +86,7 @@ app.on('python-env-ready', function () {
 
 function startUp () {
   mainWindow = createWindow('file://' + __dirname + '/splash.html')
-  mainWindow.once('show', () => {
+  ipcMain.once('splash-ready', () => {
     console.log('Ready to show!!!')
     pythonEnvManager.setupEnvironment()
   })

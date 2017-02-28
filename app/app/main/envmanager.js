@@ -44,7 +44,7 @@ class PythonEnvManager {
   * Decompresses python environment in apps data dir if env does not exist
   * or if environment version differs from current app version
   */
-  setupEnvironment (doneCallback) {
+  setupEnvironment () {
     const hasPythonEnvironment = fs.existsSync(this.getVersionFilePath())
     const isSameVersion = this.getEnvVersionTag() === app.getVersion()
     if (!hasPythonEnvironment || !isSameVersion) {

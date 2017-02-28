@@ -1,12 +1,36 @@
 <html lang="en">
   <head>
+    <style>
+      .log-line {
+        white-space: pre-wrap;
+        border: dotted 1px black;
+        margin: 10px 0px 10px 0px;
+      }
+    </style>
     <script>
+      function htmlLog (message) {
+        var logContainer = document.getElementById('log')
+        var logLine = document.createElement('div')
+        logLine.classList.add('log-line')
+        logLine.innerHTML = message
+        logContainer.appendChild(logLine)
+      }
+      function consoleLog (message) {
+        console.log(message)
+      }
+
       const {ipcRenderer} = require('electron')
       // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 
       ipcRenderer.on('app-env-loading', (event, arg) => {
-        console.log(arg)
+        try {
+          arg = new TextDecoder('utf-8').decode(arg)
+          htmlLog(arg)
+        } catch (e) {
+          htmlLog(arg)
+        }
       })
+      ipcRenderer.send('splash-ready', 'ping')
     </script>
   </head>
   <body>

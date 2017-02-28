@@ -2,7 +2,10 @@
 
 set -e
 
+# STATIC_ASSETS_BASE_URL="http://s3.amazonaws.com/ot-app-builds/assets/"\
+
 ./node_modules/.bin/cross-env ENABLE_VIRTUAL_SMOOTHIE=true\
-    NODE_ENV=development\
-    STATIC_ASSETS_BASE_URL="http://s3.amazonaws.com/ot-app-builds/assets/"\
+    NODE_ENV="development"\
+    STATIC_ASSETS_BASE_URL="http://localhost:8000/"\
+    STATIC_ASSETS_BRANCH="release-assets"\
     ./node_modules/.bin/electron app/ --disable-http-cache
