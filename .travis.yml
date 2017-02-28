@@ -67,7 +67,7 @@ deploy:
   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
-    repo: OpenTrons/opentrons-app
+    repo: OpenTrons/opentrons-api
     all_branches: true
 
 deploy:

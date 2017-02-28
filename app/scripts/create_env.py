@@ -117,6 +117,7 @@ def copy_site_packages():
             os.path.join(os.path.realpath(sys_python), '..', '..')
         )
 
+    print('Detected Sys python location:', sys_python)
     def make_dirs(path):
         dir_path = os.path.splitext(path)[0]
         if not os.path.exists(dir_path):
