@@ -3,32 +3,43 @@
     <style>
       .log-line {
         white-space: pre-wrap;
-        border: dotted 1px black;
         margin: 10px 0px 10px 0px;
+      }
+      .error {
+        background-color: red;
       }
     </style>
     <script>
-      function htmlLog (message) {
-        var logContainer = document.getElementById('log')
-        var logLine = document.createElement('div')
-        logLine.classList.add('log-line')
-        logLine.innerHTML = message
-        logContainer.appendChild(logLine)
-      }
-      function consoleLog (message) {
-        console.log(message)
-      }
-
       const {ipcRenderer} = require('electron')
-      // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 
-      ipcRenderer.on('app-env-loading', (event, arg) => {
-        try {
-          arg = new TextDecoder('utf-8').decode(arg)
-          htmlLog(arg)
-        } catch (e) {
-          htmlLog(arg)
+      function createLogger (type) {
+        return function (message) {
+          console.log(message)
+          var logContainer = document.getElementById('log')
+          var logLine = document.createElement('div')
+          logLine.classList.add('log-line')
+          logLine.classList.add(type)
+          logLine.innerHTML = message
+          logContainer.appendChild(logLine)
         }
+      }
+
+      function handleMessage(message, logger) {
+        try {
+          message = new TextDecoder('utf-8').decode(message)
+          logger(message)
+        } catch (e) {
+          logger(message)
+        }
+      }
+
+      const dataLogger = createLogger('data')
+      const errorLogger = createLogger('error')
+      ipcRenderer.on('app-env-loading-data', (event, message) => {
+        handleMessage(message, dataLogger)
+      })
+      ipcRenderer.on('app-env-loading-error', (event, message) => {
+        handleMessage(message, errorLogger)
       })
       ipcRenderer.send('splash-ready', 'ping')
     </script>

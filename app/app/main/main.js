@@ -56,15 +56,15 @@ function spawnProcess(file, args, options) {
   cp = child_process.spawn(file, args, options)
   cp.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
-    mainWindow.webContents.send('app-env-loading', data)
+    mainWindow.webContents.send('app-env-loading-data', data)
   });
   cp.stderr.on('data', (data) => {
     console.log(`stderr: ${data}`);
-    mainWindow.webContents.send('app-env-loading', data)
+    mainWindow.webContents.send('app-env-loading-error', data)
   });
   cp.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
-    mainWindow.webContents.send('app-env-loading', code)
+    mainWindow.webContents.send('app-env-loading-error', `Update process failed with code ${code}`)
   });
   return cp
 }
@@ -112,9 +112,13 @@ function startUp () {
   // pythonEnvManager.setupEnvironment()
   // serverManager.start()
   let _createWindow = () => {
-    return createWindow(urlJoin(STATIC_ASSETS_URL, 'index.html'))
+    // return createWindow(urlJoin(STATIC_ASSETS_URL, 'index.html'))
+    mainWindow.loadURL(urlJoin(STATIC_ASSETS_URL, 'index.html'))
   }
-  // waitUntilServerResponds(_createWindow, 'http://localhost:31950/robot/serial/list')
+  waitUntilServerResponds(
+    _createWindow,
+    'http://localhost:31950/robot/serial/list'
+  )
   addMenu()
   initAutoUpdater()
 }

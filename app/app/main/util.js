@@ -6,7 +6,6 @@ function waitUntilServerResponds (createWindow, windowUrl) {
       return createWindow()
     })
     .catch((err) => {
-      console.log(err)
       setTimeout(() => {
         waitUntilServerResponds(createWindow, windowUrl)
       }, 500)
