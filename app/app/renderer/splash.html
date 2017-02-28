@@ -1,0 +1,14 @@
+<html lang="en">
+  <head>
+    <script>
+      const {ipcRenderer} = require('electron')
+      // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
+
+      ipcRenderer.on('app-env-loading', (event, arg) => {
+        console.log(arg)
+      })
+    </script>
+  </head>
+  <body>
+    <div id="log"></div>
+  </body>

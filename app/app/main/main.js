@@ -7,7 +7,7 @@ const urlJoin = require('url-join')
 
 const electron = require('electron')
 const rp = require('request-promise')
-const {app, BrowserWindow} = electron
+const {app, BrowserWindow, ipcMain} = electron
 
 const {addMenu} = require('./menu.js')
 const {getLogger} = require('./logging.js')
@@ -35,6 +35,7 @@ function createWindow (windowUrl) {
     mainWindow = null
     app.quit()
   })
+  return mainWindow
 }
 
 function createAndSetAppDataDir () {
@@ -53,12 +54,15 @@ function spawnProcess(file, args, options) {
   cp = child_process.spawn(file, args, options)
   cp.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
+    mainWindow.webContents.send('app-env-loading', data)
   });
   cp.stderr.on('data', (data) => {
     console.log(`stderr: ${data}`);
+    mainWindow.webContents.send('app-env-loading', data)
   });
   cp.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
+    mainWindow.webContents.send('app-env-loading', code)
   });
   return cp
 }
@@ -79,6 +83,11 @@ app.on('python-env-ready', function () {
 
 
 function startUp () {
+  mainWindow = createWindow('file://' + __dirname + '/splash.html')
+  mainWindow.once('show', () => {
+    console.log('Ready to show!!!')
+    pythonEnvManager.setupEnvironment()
+  })
   // Prepare app data dir (necessary for logging errors that occur during setup)
   createAndSetAppDataDir()
 
@@ -98,7 +107,7 @@ function startUp () {
   }
 
   // Startup Actions
-  pythonEnvManager.setupEnvironment()
+  // pythonEnvManager.setupEnvironment()
   // serverManager.start()
   let _createWindow = () => {
     return createWindow(urlJoin(STATIC_ASSETS_URL, 'index.html'))
