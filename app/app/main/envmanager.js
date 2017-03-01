@@ -45,18 +45,21 @@ class PythonEnvManager {
   * or if environment version differs from current app version
   */
   setupEnvironment () {
-    const hasPythonEnvironment = fs.existsSync(this.getVersionFilePath())
-    const isSameVersion = this.getEnvVersionTag() === app.getVersion()
-    if (!hasPythonEnvironment || !isSameVersion) {
-        console.log('Updating app python environment')
-        this.copyAndDecompressEnvironment(
-          this.getPackedEnvPath(),
-          this.getEnvAppDataDirPath()
-        )
-        this.writeEnvVersionTag()
-    } else {
-      app.emit('python-env-ready')
-    }
+    # FIXME: Ignore this until embeddable python is figured out
+    app.emit('python-env-ready')
+    return
+    // const hasPythonEnvironment = fs.existsSync(this.getVersionFilePath())
+    // const isSameVersion = this.getEnvVersionTag() === app.getVersion()
+    // if (!hasPythonEnvironment || !isSameVersion) {
+    //     console.log('Updating app python environment')
+    //     this.copyAndDecompressEnvironment(
+    //       this.getPackedEnvPath(),
+    //       this.getEnvAppDataDirPath()
+    //     )
+    //     this.writeEnvVersionTag()
+    // } else {
+    //   app.emit('python-env-ready')
+    // }
   }
 
   /**
