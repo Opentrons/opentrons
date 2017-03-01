@@ -66,7 +66,10 @@ def get_current_branch():
     res = subprocess.check_output(["git", "branch"])
     # Parses branch name where branch name is a line that starts with an '*'
     branch = re.search(r'\*\s(.*)\s', res.decode()).group(1)
-    return '{}-local-dev'.format(branch)
+    return '{branch}-{username}'.format(
+        branch=branch,
+        username=os.environ.get('USER')
+    )
 
 
 def get_current_commit():

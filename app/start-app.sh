@@ -9,7 +9,7 @@ if [[ $1 == "remote" ]]; then
     # Upload data to S3 and run app off of S3 data
     echo "Uploading assets to S3"
     python scripts/build_app_assets.py
-    STATIC_ASSETS_BRANCH=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+    STATIC_ASSETS_BRANCH=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')"-$USER"
     STATIC_ASSETS_BASE_URL="http://s3.amazonaws.com/ot-app-builds/assets/"
 else
     # Host data locally and run app off of local python server data
