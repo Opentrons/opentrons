@@ -45,7 +45,7 @@ class PythonEnvManager {
   * or if environment version differs from current app version
   */
   setupEnvironment () {
-    # FIXME: Ignore this until embeddable python is figured out
+    // FIXME: Ignore this until embeddable python is figured out
     app.emit('python-env-ready')
     return
     // const hasPythonEnvironment = fs.existsSync(this.getVersionFilePath())

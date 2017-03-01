@@ -28,8 +28,6 @@ if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
 
-console.log(process.env)
-
 function createWindow (windowUrl) {
   mainWindow = new BrowserWindow({width: 1060, height: 750})
   mainWindow.loadURL(windowUrl)
@@ -123,9 +121,5 @@ function startUp () {
 app.on('ready', startUp)
 
 app.on('quit', function () {
-  serverManager.shutdown()
-  child_process.spawnSync(
-    'pkill',
-    ['-9', path.basename(pyRunProcess.serverProcess.spawnfile)]
-  )
+  pyRunProcess.kill()
 })
