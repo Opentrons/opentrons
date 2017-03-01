@@ -69,7 +69,9 @@
     "appId": "ot.one.opentrons",
     "electronVersion": "1.4.7",
     "productName": "Opentrons 2.0",
-    "extraResources": ["env-dist/venv.zip"],
+    "extraResources": [
+      "env-dist/venv.zip"
+    ],
     "dmg": {
       "backgroundColor": "white",
       "contents": [
@@ -106,6 +108,7 @@
   },
   "dependencies": {
     "asar": "^0.13.0",
+    "autotrack": "1.1.0",
     "babel-preset-es2016": "^6.16.0",
     "electron-debug": "^1.0.1",
     "imports-loader": "^0.6.5",
