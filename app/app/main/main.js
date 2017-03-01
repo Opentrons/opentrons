@@ -121,5 +121,5 @@ function startUp () {
 app.on('ready', startUp)
 
 app.on('quit', function () {
-  pyRunProcess.kill()
+  rp('http://localhost:31950/exit')
 })
