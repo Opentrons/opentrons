@@ -109,14 +109,11 @@ function startUp () {
   }
 
   // Startup Actions
-  // pythonEnvManager.setupEnvironment()
-  // serverManager.start()
-  let _createWindow = () => {
-    // return createWindow(urlJoin(STATIC_ASSETS_URL, 'index.html'))
+  let loadAppWindow = () => {
     mainWindow.loadURL(urlJoin(STATIC_ASSETS_URL, 'index.html'))
   }
   waitUntilServerResponds(
-    _createWindow,
+    loadAppWindow,
     'http://localhost:31950/robot/serial/list'
   )
   addMenu()
