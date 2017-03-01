@@ -50,7 +50,8 @@ def upload_to_s3(s3_connection, bucket, key, file_path):
     bucket_obj = s3_connection.get_bucket(bucket)
     key_obj = Key(bucket_obj)
     key_obj.key = key
-    key_obj.set_contents_from_filename(file_path)
+    headers = {'Cache-Control':'max-age=31556926'}
+    key_obj.set_contents_from_filename(file_path, headers=headers)
     key_obj.set_acl('public-read')
     print(
         script_tab + "Uploaded {} to {}/{} on S3".format(

@@ -81,7 +81,6 @@ app.on('python-env-ready', function () {
   })
 })
 
-
 function startUp () {
   mainWindow = createWindow('file://' + __dirname + '/splash.html')
   ipcMain.once('splash-ready', () => {
@@ -108,7 +107,9 @@ function startUp () {
 
   // Startup Actions
   let loadAppWindow = () => {
-    mainWindow.loadURL(urlJoin(STATIC_ASSETS_URL, 'index.html'))
+    // rp('')
+    // webContents.loadURL(url, {"extraHeaders" : "pragma: no-cache\n"})
+    mainWindow.webContents.loadURL(urlJoin(STATIC_ASSETS_URL, 'index.html'))
   }
   waitUntilServerResponds(
     loadAppWindow,
@@ -119,7 +120,6 @@ function startUp () {
 }
 
 app.on('ready', startUp)
-
 app.on('quit', function () {
   rp('http://localhost:31950/exit')
 })
