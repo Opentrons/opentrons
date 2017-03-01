@@ -8,6 +8,12 @@ import {
   App
 } from './components/export'
 
+// Google analytics SPA extensions: https://github.com/googleanalytics/autotrack
+require('autotrack')
+window.ga('require', 'eventTracker')
+window.ga('require', 'outboundLinkTracker')
+window.ga('require', 'urlChangeTracker')
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
@@ -15,7 +21,8 @@ const router = new VueRouter({
   routes: [
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
     { path: '/calibrate/:instrument/:placeable', component: Placeable }
-  ]
+  ],
+  mode: 'history'
 })
 
 /* eslint-disable */

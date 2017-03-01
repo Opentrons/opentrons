@@ -59,6 +59,11 @@ def welcome():
     return render_template("index.html")
 
 
+@app.route("/exit")
+def exit():
+    sys.exit()
+
+
 def get_protocol_locals():
     from opentrons import robot, containers, instruments  # NOQA
     return locals()
