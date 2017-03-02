@@ -76,16 +76,17 @@ app.on('python-env-ready', function () {
 
   rp(wheelNameFile).then(wheelName => {
     console.log(`Found: "${wheelName}"`)
-    let wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-    pyRunProcess = spawnProcess(pyRunScript, [urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)], {cwd: envLoc})
+    const wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
+    const opentronsWheelUrl = urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)
+    pyRunProcess = spawnProcess(pyRunScript, [opentronsWheelUrl], {cwd: envLoc})
+  }).catch((err) => {
+    pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
   })
 })
-
 
 function startUp () {
   mainWindow = createWindow('file://' + __dirname + '/splash.html')
   ipcMain.once('splash-ready', () => {
-    console.log('Ready to show!!!')
     pythonEnvManager.setupEnvironment()
   })
   // Prepare app data dir (necessary for logging errors that occur during setup)
@@ -106,9 +107,19 @@ function startUp () {
     require('vue-devtools').install()
   }
 
-  // Startup Actions
+  /* Load the app from the web if we have access to the site else
+   * load the app from browser cache.
+   */
   let loadAppWindow = () => {
-    mainWindow.loadURL(urlJoin(STATIC_ASSETS_URL, 'index.html'))
+    const indexPageUrl = urlJoin(STATIC_ASSETS_URL, 'index.html')
+    rp(indexPageUrl).then(() => {
+      mainWindow.webContents.loadURL(
+        indexPageUrl,
+        {"extraHeaders" : "pragma: no-cache\n"}  // Ignore existing cache
+      )
+    }).catch(() => {
+      mainWindow.webContents.loadURL(indexPageUrl)
+    })
   }
   waitUntilServerResponds(
     loadAppWindow,
@@ -119,7 +130,6 @@ function startUp () {
 }
 
 app.on('ready', startUp)
-
 app.on('quit', function () {
   rp('http://localhost:31950/exit')
 })

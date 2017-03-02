@@ -50,7 +50,8 @@ def upload_to_s3(s3_connection, bucket, key, file_path):
     bucket_obj = s3_connection.get_bucket(bucket)
     key_obj = Key(bucket_obj)
     key_obj.key = key
-    key_obj.set_contents_from_filename(file_path)
+    headers = {'Cache-Control':'max-age=61536000'}
+    key_obj.set_contents_from_filename(file_path, headers=headers)
     key_obj.set_acl('public-read')
     print(
         script_tab + "Uploaded {} to {}/{} on S3".format(
@@ -65,7 +66,10 @@ def get_current_branch():
     res = subprocess.check_output(["git", "branch"])
     # Parses branch name where branch name is a line that starts with an '*'
     branch = re.search(r'\*\s(.*)\s', res.decode()).group(1)
-    return '{}-local-dev'.format(branch)
+    return '{branch}-{username}'.format(
+        branch=branch,
+        username=os.environ.get('USER')
+    )
 
 
 def get_current_commit():
