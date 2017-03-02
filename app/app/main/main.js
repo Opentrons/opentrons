@@ -107,13 +107,15 @@ function startUp () {
     require('vue-devtools').install()
   }
 
-  // Startup Actions
+  /* Load the app from the web if we have access to the site else
+   * load the app from browser cache.
+   */
   let loadAppWindow = () => {
     const indexPageUrl = urlJoin(STATIC_ASSETS_URL, 'index.html')
     rp(indexPageUrl).then(() => {
       mainWindow.webContents.loadURL(
         indexPageUrl,
-        {"extraHeaders" : "pragma: no-cache\n"}
+        {"extraHeaders" : "pragma: no-cache\n"}  // Ignore existing cache
       )
     }).catch(() => {
       mainWindow.webContents.loadURL(indexPageUrl)
