@@ -15,6 +15,7 @@ else
     # Host data locally and run app off of local python server data
     echo "Starting python server on port: $PORT"
     python -m http.server $PORT >/dev/null 2>&1 &
+    webpack --watch &
     STATIC_ASSETS_BRANCH="release-assets"
     STATIC_ASSETS_BASE_URL="http://localhost:$PORT/"
 fi;

@@ -238,7 +238,7 @@ class Opentrons {
 
   home (axis) {
     return Vue.http
-        .get(`/home/${axis}`)
+        .get(`${this.baseUrl}/home/${axis}`)
         .then((response) => {
           console.log(response)
           console.log(`Homing ${axis}`)
