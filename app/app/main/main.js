@@ -78,6 +78,8 @@ app.on('python-env-ready', function () {
     console.log(`Found: "${wheelName}"`)
     let wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
     pyRunProcess = spawnProcess(pyRunScript, [urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)], {cwd: envLoc})
+  }).catch((err) => {
+    pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
   })
 })
 
@@ -107,7 +109,7 @@ function startUp () {
 
   // Startup Actions
   let loadAppWindow = () => {
-    // rp('')
+    rp('')
     // webContents.loadURL(url, {"extraHeaders" : "pragma: no-cache\n"})
     mainWindow.webContents.loadURL(urlJoin(STATIC_ASSETS_URL, 'index.html'))
   }
