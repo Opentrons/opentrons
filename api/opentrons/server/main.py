@@ -573,7 +573,7 @@ def create_step_list():
                     'label': container.get_name(),
                     'slot': container.get_parent().get_name()
                 }
-                for container in _get_unique_containers(instrument)
+                for container in _get_all_containers()
             ]
         } for instrument in _get_all_pipettes()]
     except Exception as e:
