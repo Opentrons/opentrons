@@ -147,6 +147,7 @@ Table of Contents
   updating_firmware
   setup
   getting_started
+  containers
   well_access
   labware_library
   custom_containers
