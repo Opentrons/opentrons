@@ -223,8 +223,7 @@ class Placeable(object):
             name = str(child)
 
         if name in self.children_by_name:
-            raise Exception('Child with the name {} already exists'
-                            .format(name))
+            del self.children_by_name[name]
 
         child._coordinates = Vector(coordinates)
         child.parent = self
