@@ -455,11 +455,11 @@ class Deck(Placeable):
         """
         Returns all containers on a deck as a name:placeable dict
         """
-        containers = []
+        containers = OrderedDict()
         for slot in self:
             for container in slot:
-                containers.append(container)
-        return {c.get_name(): c for c in containers}
+                containers[container.get_name()] = container
+        return containers
 
     def has_container(self, container_instance):
         """
