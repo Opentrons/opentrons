@@ -3,158 +3,72 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. testsetup:: index_main
-
-  from opentrons import robot, containers, instruments
-
-  robot.reset()             # clear robot's state first
-
-  tiprack = containers.load(
-      'tiprack-200ul',  # container type
-      'A1',             # slot
-      'tiprack-test-setup'         # user-defined name
-  )
-  plate = containers.load('96-flat', 'B1', 'plate-for-test')
-  trough = containers.load('trough-12row', 'B2', 'trough-for-test')
-
-  tube_1 = plate[0]
-  tube_2 = plate[1]
-
-  well_1 = plate[0]
-  well_2 = plate[1]
-  well_3 = plate[2]
-  well_4 = plate[3]
-
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume = 1000
-  )
-
-  pipette = p200
-
-.. testsetup:: index_long
-
-  from opentrons import robot
-  robot.reset()
-
-Opentrons API:|br| Simple Biology Lab Protocol Coding
-===========================================================
-
-Introduction
-------------
-
-The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
-
-We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
-
-.. testcode:: index_main
-
-   pipette.aspirate(tube_1).dispense(tube_2)
-
-That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one.
-
-You string these commands into full protocols that anyone with Opentrons can run. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into the first four wells in a 96 well plate called 'plate.'
-
-.. testcode:: index_main
-
-   p200.aspirate(trough[1])
-   p200.dispense(50, plate[0])
-   p200.dispense(50, plate[1])
-   p200.dispense(50, plate[2])
-   p200.dispense(50, plate[3])
-
-If you wanted to do this 96 times, you could write it like this:
-
-.. testcode:: index_main
-
-  for i in range(96):
-      if p200.current_volume < 50:
-          p200.aspirate(trough[1])
-      p200.dispense(50, plate[i])
+Opentrons API
+=============
 
 
-Basic Principles
-----------------
 
-**Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
+.. testsetup::  helloworld
 
-.. testcode:: index_main
+    from opentrons import containers, instruments, robot
 
-  p200.aspirate(100, plate['A1']).dispense(plate['A2'])
+    robot.reset()
 
-Is exactly what you think it would do:
-  * Take p200 pipette
-  * Aspirate 100 uL from well A1 on your plate
-  * Dispense everything into well A2 on the same plate
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    plate = containers.load('96-flat', 'B1')
 
-**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them.
-For example:
+    pipette = instruments.Pipette(axis='b', max_volume=200)
 
-.. testcode:: index_main
+Hello Opentrons
+---------------
 
-  p200.aspirate(100, plate[0]).dispense(plate[1])
+Below is a short protocol that will pick up a tip and use it to move 100ul from well ``'A1'`` to well ``'B1'``:
 
-while using 0 or 1 instead of 'A1' and 'B1' will do just the same.
+.. testcode::  helloworld
 
-or
+    from opentrons import containers, instruments, robot
 
-.. testcode:: index_main
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    plate = containers.load('96-flat', 'B1')
 
-  p200.aspirate(100, plate[0].bottom())
+    pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
-will aspirate 100, from the bottom of a well.
+    pipette.transfer(100, plate.wells('A1'), plate.wells('A2'))
 
 
-Hello World
------------
+The Opentrons API is a simple framework designed to make writing automated lab protocols easy.
 
-Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
+Human Readable
+^^^^^^^^^^^^^^
 
-.. testcode:: index_long
+The design goal of the Opentrons API is to make code readable and easy to understand. If we were to read the above code example as if it were in plain English, it would look like the following:
 
-  from opentrons import robot
-  from opentrons import containers, instruments
+.. testcode::
+    # Import the Opentrons API's containers and instruments
 
-  tiprack = containers.load(
-      'tiprack-200ul',  # container type
-      'A1',             # slot
-      'tiprack'         # user-defined name
-  )
+    # Load a 200uL tip rack and place it in slot 'A1'
+    # Load in a 96 well plate and place it in slot 'B1'
 
-  plate = containers.load('96-flat', 'B1', 'plate')
+    # Create a 200uL pipette, tell it to use the 200uL tip rack,
+    # and attach that pipette to axis 'b' on the robot
 
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume=200
-  )
+    # Transfer 100uL from the plate's 'A1' well to it's 'A2' well
 
-  p200.pick_up_tip(tiprack[0])
-
-  for i in range(95):
-      p200.aspirate(100, plate[i])
-      p200.dispense(plate[i + 1])
-
-  p200.return_tip()
-
-  robot.simulate()
 
 Table of Contents
 -----------------
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 3
 
-  updating_firmware
   setup
-  getting_started
-  containers
-  well_access
-  labware_library
-  custom_containers
+  wells
+  tips
+  basic
   running_app
-  tips_and_tricks
   module
   api
+  updating_firmware
 
 .. |br| raw:: html
 
