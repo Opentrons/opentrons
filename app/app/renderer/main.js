@@ -9,11 +9,6 @@ import {
 } from './components/export'
 
 // Google analytics SPA extensions: https://github.com/googleanalytics/autotrack
-require('autotrack')
-window.ga('require', 'eventTracker')
-window.ga('require', 'outboundLinkTracker')
-window.ga('require', 'urlChangeTracker')
-
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
@@ -28,6 +23,11 @@ const router = new VueRouter({
 /* eslint-disable */
 const __webpack_public_path__ = window.location.host
 window.onload = function () {
+  require('autotrack')
+  window.ga('require', 'eventTracker')
+  window.ga('require', 'outboundLinkTracker')
+  window.ga('require', 'urlChangeTracker')
+
   const app = new Vue({
     router,
     store,

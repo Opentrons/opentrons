@@ -1,6 +1,8 @@
 <template>
   <div ref='commands' class='runScreen'>
-    <h3 @click='clearRunScreen()' id='exit'>x</h3>
+    <div id="exit-wrapper">
+      <h3 @click='clearRunScreen()' id='exit'>x  </h3>
+    </div>
     <div class='runCommand' v-for='command in runLog()'>
       {{command.timestamp}} - {{command.command_description}}
       <br>

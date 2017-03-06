@@ -9,12 +9,16 @@ Run Screen
             color: $primary-brand;
         }
     }
-    
+
+    #exit-wrapper {
+        position: fixed;
+        margin-right: 50px;
+    }
     #exit {
-        position: static;
+        position: absolute;
         top: auto;
         padding-left: 685px;
-        padding-right: 5px;
+        padding-right: 10px;
         cursor: pointer;
         color: $secondary-brand;
     }
