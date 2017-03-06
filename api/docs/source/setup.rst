@@ -1,8 +1,8 @@
 .. _setup:
 
-==============
-Protocol Setup
-==============
+=====
+Setup
+=====
 
 There are a few things to consider when beginning a new Python protocol. Below, we exlain the Opentrons API's ``containers``, ``instruments``, and ``robot`` modules, and how they are used to setup and control your Python protocol.
 

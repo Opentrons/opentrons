@@ -64,7 +64,7 @@ Table of Contents
   setup
   wells
   tips
-  basic
+  pipettes
   running_app
   module
   api
