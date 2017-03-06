@@ -17,7 +17,7 @@ const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
 let serverManager = new ServerManager()
-let pythonEnvManager = new PythonEnvManager()
+// let pythonEnvManager = new PythonEnvManager()
 let mainWindow
 let pyRunProcess
 
@@ -50,52 +50,54 @@ function createAndSetAppDataDir () {
   process.env['APP_DATA_DIR'] = appDataDir
 }
 
-function spawnProcess(file, args, options) {
-  cp = child_process.spawn(file, args, options)
-  cp.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-    mainWindow.webContents.send('app-env-loading-data', data)
-  });
-  cp.stderr.on('data', (data) => {
-    console.log(`stderr: ${data}`);
-    mainWindow.webContents.send('app-env-loading-error', data)
-  });
-  cp.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-    mainWindow.webContents.send('app-env-loading-error', `Update process failed with code ${code}`)
-  });
-  return cp
-}
+// function spawnProcess(file, args, options) {
+//   cp = child_process.spawn(file, args, options)
+//   cp.stdout.on('data', (data) => {
+//     console.log(`stdout: ${data}`);
+//     mainWindow.webContents.send('app-env-loading-data', data)
+//   });
+//   cp.stderr.on('data', (data) => {
+//     console.log(`stderr: ${data}`);
+//     mainWindow.webContents.send('app-env-loading-error', data)
+//   });
+//   cp.on('close', (code) => {
+//     console.log(`child process exited with code ${code}`);
+//     mainWindow.webContents.send('app-env-loading-error', `Update process failed with code ${code}`)
+//   });
+//   return cp
+// }
 
-app.on('python-env-ready', function () {
-  console.log('Run pip update')
-  let envLoc = pythonEnvManager.getEnvAppDataDirPath()
-  let pyRunScript = path.join(envLoc, 'pyrun.sh')
-  let wheelNameFile = urlJoin(STATIC_ASSETS_URL, 'whl-name')
-  console.log('wheel name file', wheelNameFile)
-
-  rp(wheelNameFile).then(wheelName => {
-    console.log(`Found: "${wheelName}"`)
-    const wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-    const opentronsWheelUrl = urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)
-    pyRunProcess = spawnProcess(pyRunScript, [opentronsWheelUrl], {cwd: envLoc})
-  }).catch((err) => {
-    pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
-  })
-})
+// app.on('python-env-ready', function () {
+//   console.log('Run pip update')
+//   let envLoc = pythonEnvManager.getEnvAppDataDirPath()
+//   let pyRunScript = path.join(envLoc, 'pyrun.sh')
+//   let wheelNameFile = urlJoin(STATIC_ASSETS_URL, 'whl-name')
+//   console.log('wheel name file', wheelNameFile)
+//
+//   rp(wheelNameFile).then(wheelName => {
+//     console.log(`Found: "${wheelName}"`)
+//     const wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
+//     const opentronsWheelUrl = urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)
+//     pyRunProcess = spawnProcess(pyRunScript, [opentronsWheelUrl], {cwd: envLoc})
+//   }).catch((err) => {
+//     pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
+//   })
+// })
+//
 
 function startUp () {
-  mainWindow = createWindow('file://' + __dirname + '/splash.html')
-  ipcMain.once('splash-ready', () => {
-    pythonEnvManager.setupEnvironment()
-  })
   // Prepare app data dir (necessary for logging errors that occur during setup)
   createAndSetAppDataDir()
-
   const mainLogger = getLogger('electron-main')
+
   mainLogger.info(`STATIC_ASSETS_BASE_URL: ${STATIC_ASSETS_BASE_URL}`)
   mainLogger.info(`STATIC_ASSETS_BRANCH: ${STATIC_ASSETS_BRANCH}`)
   mainLogger.info(`STATIC_ASSETS_URL: ${STATIC_ASSETS_URL}`)
+
+  // mainWindow = createWindow('file://' + __dirname + '/splash.html')
+  // ipcMain.once('splash-ready', () => {
+  //   pythonEnvManager.setupEnvironment()
+  // })
 
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
@@ -110,20 +112,22 @@ function startUp () {
   /* Load the app from the web if we have access to the site else
    * load the app from browser cache.
    */
-  let loadAppWindow = () => {
-    const indexPageUrl = urlJoin(STATIC_ASSETS_URL, 'index.html')
-    rp(indexPageUrl).then(() => {
-      mainWindow.webContents.loadURL(
-        indexPageUrl,
-        {"extraHeaders" : "pragma: no-cache\n"}  // Ignore existing cache
-      )
-    }).catch(() => {
-      mainWindow.webContents.loadURL(indexPageUrl)
-    })
-  }
+  // let loadAppWindow = () => {
+  //   const indexPageUrl = urlJoin(STATIC_ASSETS_URL, 'index.html')
+  //   rp(indexPageUrl).then(() => {
+  //     mainWindow.webContents.loadURL(
+  //       indexPageUrl,
+  //       {"extraHeaders" : "pragma: no-cache\n"}  // Ignore existing cache
+  //     )
+  //   }).catch(() => {
+  //     mainWindow.webContents.loadURL(indexPageUrl)
+  //   })
+  // }
+
+  serverManager.start()
   waitUntilServerResponds(
-    loadAppWindow,
-    'http://localhost:31950/robot/serial/list'
+    () => createWindow('http://localhost:31950/'),
+    'http://localhost:31950/'
   )
   addMenu()
   initAutoUpdater()
