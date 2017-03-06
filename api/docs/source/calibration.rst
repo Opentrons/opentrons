@@ -1,8 +1,8 @@
-.. _running_app:
+.. _calibration:
 
-====================
-Using the App
-====================
+===========
+Calibration
+===========
 
 Download App
 --------------------

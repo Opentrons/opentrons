@@ -4,7 +4,7 @@
 Wells
 =====
 
-We spend a fair amount of time organizing and counting wells when writing Python protocols. This section describes the waits we can access individual wells and groups of wells, for the purposes of then using these wells in our pipetting commands.
+We spend a fair amount of time organizing and counting wells when writing Python protocols. This section describes the different ways we can access wells and groups of wells.
 
 **********************
 

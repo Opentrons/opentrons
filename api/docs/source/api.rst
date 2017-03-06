@@ -1,7 +1,7 @@
 .. _api:
 
-Developer Interface
-===================
+API
+===
 
 .. module:: opentrons
 
