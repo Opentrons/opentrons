@@ -108,22 +108,22 @@ def move_executable_folder(final_exec_dir):
     return True
 
 
-def generate_static_assets():
-    process_args = [
-        shutil.which('webpack'), '--config', 'webpack.config.js'
-    ]
-
-    if platform.system().lower() == "windows":
-        webpack_process = subprocess.Popen(process_args, shell=True)
-    else:
-        webpack_process = subprocess.Popen(process_args)
-
-    webpack_process.communicate()
-    if webpack_process.returncode != 0:
-        print(script_tab + "ERROR: webpack returned with exit code: %s" %
-              webpack_process.returncode)
-        return False
-    return True
+# def generate_static_assets():
+#     process_args = [
+#         shutil.which('webpack'), '--config', 'webpack.config.js'
+#     ]
+#
+#     if platform.system().lower() == "windows":
+#         webpack_process = subprocess.Popen(process_args, shell=True)
+#     else:
+#         webpack_process = subprocess.Popen(process_args)
+#
+#     webpack_process.communicate()
+#     if webpack_process.returncode != 0:
+#         print(script_tab + "ERROR: webpack returned with exit code: %s" %
+#               webpack_process.returncode)
+#         return False
+#     return True
 
 
 def build_ot_python_backend_executable():
@@ -135,10 +135,10 @@ def build_ot_python_backend_executable():
     print(script_tag + "Project directory is:     %s" % project_root_dir)
     print(script_tag + "Script working directory: %s" % os.getcwd())
 
-    print(script_tag + "Generating static files (JS/CSS/etc) for Flask app.")
-    success = generate_static_assets()
-    if not success:
-        raise SystemExit(script_tab + "Exiting due to error generating static assets")
+    # print(script_tag + "Generating static files (JS/CSS/etc) for Flask app.")
+    # success = generate_static_assets()
+    # if not success:
+    #     raise SystemExit(script_tab + "Exiting due to error generating static assets")
 
 
     print(script_tag + "Removing PyInstaller old temp directories.")

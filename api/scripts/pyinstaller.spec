@@ -6,11 +6,11 @@ import opentrons
 
 block_cipher = None
 
-a = Analysis(['../server/main.py'],
+a = Analysis(['../opentrons/server/main.py'],
              pathex=[],
              binaries=None,
              datas=[
-                 ('../server/templates/', 'templates'),
+                 ('../opentrons/server/templates/', 'templates'),
                  (os.path.join(opentrons.__path__[0], 'config'), 'opentrons/config')
              ],
              hiddenimports=[
