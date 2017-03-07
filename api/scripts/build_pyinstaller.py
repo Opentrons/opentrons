@@ -2,9 +2,9 @@
 
 import os
 import shutil
+import sys
 import platform
 import subprocess
-
 
 import util
 
@@ -22,8 +22,6 @@ exec_folder_name = os.path.join(project_root_dir, "app", "backend-dist")
 
 PYINSTALLER_DISTPATH = os.path.join(project_root_dir, "pyinstaller-dist")
 PYINSTALLER_WORKPATH = os.path.join(project_root_dir, "pyinstaller-build")
-
-# verbose_print = print if verbose else lambda *a, **k: None
 
 
 def remove_directory(dir_to_remove):
@@ -126,7 +124,7 @@ def move_executable_folder(final_exec_dir):
 #     return True
 
 
-def build_ot_python_backend_executable():
+def build_ot_python_backend_executable(backend_exec_path):
     print(script_tag + "Build procedure started.")
     print(script_tag + "Checking for OS.")
     os_type = util.get_os()
@@ -135,6 +133,7 @@ def build_ot_python_backend_executable():
     print(script_tag + "Project directory is:     %s" % project_root_dir)
     print(script_tag + "Script working directory: %s" % os.getcwd())
 
+    # TODO: Check that app frontend assets have been moved to server/templates
     # print(script_tag + "Generating static files (JS/CSS/etc) for Flask app.")
     # success = generate_static_assets()
     # if not success:
@@ -153,12 +152,13 @@ def build_ot_python_backend_executable():
         raise SystemExit(script_tab + "Exiting as there was an error in the "
                                       "PyInstaller execution.")
 
-    print(script_tag + "Removing old OT-App Backend executable directory.")
-    backend_exec_path = os.path.join(
-        exec_folder_name, util.get_os(), get_spec_coll_name()
-    )
-    if os.path.isfile(backend_exec_path):
-        os.remove(backend_exec_path)
+    # TODO(ahmed): Do we need to remove the old file?
+    # print(script_tag + "Removing old OT-App Backend executable directory.")
+    # backend_exec_path = os.path.join(
+    #     exec_folder_name, util.get_os(), get_spec_coll_name()
+    # )
+    # if os.path.isfile(backend_exec_path):
+    #     os.remove(backend_exec_path)
 
     print(script_tag + "Moving executable folder to backend-dist.")
     success = move_executable_folder(backend_exec_path)
@@ -172,4 +172,10 @@ def build_ot_python_backend_executable():
     remove_pyinstaller_temps()
 
 if __name__ == "__main__":
-    build_ot_python_backend_executable()
+    output_dir = os.path.join(
+        exec_folder_name, util.get_os(), get_spec_coll_name()
+    )
+    if len(sys.argv) == 2:
+        output_dir = sys.argv[1]
+
+    build_ot_python_backend_executable(output_dir)
