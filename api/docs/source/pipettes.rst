@@ -1,8 +1,15 @@
 .. _pipettes:
 
-========
+===========
 Pipettes
-========
+===========
+
+This is the fun section, where we get to move things around and pipette! This section describes the ``Pipette`` object's many liquid-handling commands, as well as how to move the ``robot``.
+
+.. toctree::
+    :maxdepth: 3
+
+    pipettes
 
 **********************
 
@@ -23,7 +30,7 @@ Demonstrates the usage for liquid-handling specific commands
 .. testcode:: liquid
     
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments
 
@@ -142,7 +149,7 @@ Demonstrates the different ways to control the movement of the Opentrons liquid 
 .. testcode:: moving
     
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments, robot
 

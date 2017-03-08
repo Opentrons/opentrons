@@ -1,12 +1,22 @@
 .. _setup:
 
-=====
+==========
 Setup
-=====
+==========
 
-There are a few things to consider when beginning a new Python protocol. Below, we exlain the Opentrons API's ``containers``, ``instruments``, and ``robot`` modules, and how they are used to setup and control your Python protocol.
+There are a few things to consider when beginning a new Python protocol. In this section, we exlain the Opentrons API's ``containers``, ``instruments``, and ``robot`` modules, and how they are used to setup and control your Python protocol.
+
+.. toctree::
+    :maxdepth: 3
+
+    setup
 
 **********************
+
+.. testsetup:: containers
+
+    from opentrons import containers, robot
+    robot.reset()
 
 Containers
 ----------
@@ -118,10 +128,10 @@ will print out...
 
 **********************
 
-Pipettes
---------
+Instruments
+-----------
 
-The instruments module gives your protocol access to the Pipette, which is what you will be primarily using to create protocol commands.
+The ``instruments`` module gives your protocol access to the ``Pipette``, which is what you will be primarily using to create protocol commands.
 
 .. testcode:: pipettes
 

@@ -1,12 +1,15 @@
 .. _wells:
 
-=====
+========
 Wells
-=====
+========
 
 We spend a fair amount of time organizing and counting wells when writing Python protocols. This section describes the different ways we can access wells and groups of wells.
 
-**********************
+.. toctree::
+    :maxdepth: 3
+
+    wells
 
 .. testsetup:: individualwells
 
@@ -15,15 +18,21 @@ We spend a fair amount of time organizing and counting wells when writing Python
     robot.reset()
     plate = containers.load('96-flat', 'A1')
 
+**********************
+
 Individual Wells
 ----------------
 
 When writing a protocol using the API, you will be spending most of your time selecting which wells to transfer liquids to and from.
 
+The OT-One deck and containers are all set up with the same coordinate system - numbered rows and lettered columns.
+
+.. image:: img/well_iteration/Well_Iteration.png
+
 .. testcode:: individualwells
     
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers
 
@@ -99,7 +108,7 @@ When describing a liquid transfer, we can point to groups of wells for the liqui
 .. testcode:: multiwells
     
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers
 

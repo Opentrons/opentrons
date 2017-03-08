@@ -3,10 +3,31 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+===============
 Opentrons API
-=============
+===============
 
+The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
 
+We’ve designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
+
+`View source code on GitHub`__
+
+__ https://github.com/opentrons/opentrons-api
+
+Work Flow
+---------
+
+Writing protocols in Python requires some up-front design before seeing your liquid handling automation in action. At a high-level, writing protocols with the Opentrons API looks like:
+
+1) Write a Python protocol
+2) Test your code for errors
+3) Repeat 1 & 2 until ready to run
+4) Load protocol into calibration UI
+5) Save positions of everything on your robot
+6) Run the protocol and monitor progress
+
+**********************
 
 .. testsetup::  helloworld
 
@@ -19,53 +40,16 @@ Opentrons API
 
     pipette = instruments.Pipette(axis='b', max_volume=200)
 
-**********************
-
-Hello Opentrons
----------------
-
-The Opentrons API is a simple framework designed to make writing automated lab protocols easy.
-
-Below is a short protocol that will pick up a tip and use it to move 100ul from well ``'A1'`` to well ``'B1'``:
-
-.. testcode::  helloworld
-
-    from opentrons import containers, instruments
-
-    plate = containers.load('96-flat', 'B1')
-
-    tiprack = containers.load('tiprack-200ul', 'A1')
-    pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
-
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
-
-
-The design goal of the Opentrons API is to make code readable and easy to understand. If we were to read the above code example as if it were in plain English, it would look like the following:
-
-.. code-block:: none
-
-    Use the Opentrons API's containers and instruments
-
-    Add a 96 well plate, and place it in slot 'B1'
-
-    Add a 200uL tip rack, and place it in slot 'A1'
-    Add a 200uL pipette to axis 'b', and tell it to use that tip rack
-
-    Transfer 100uL from the plate's 'A1' well to it's 'A2' well
-
-**********************
 
 Table of Contents
 -----------------
 
 .. toctree::
-  :maxdepth: 3
+  :maxdepth: 2
 
-  setup
-  wells
-  tips
-  pipettes
-  transfer
+  introduction
+  labware_library
+  tutorials
   calibration
   modules
   api

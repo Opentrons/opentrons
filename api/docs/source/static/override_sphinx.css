@@ -6,8 +6,8 @@ body {
     font-family: "Open Sans", "sans-serif";
 }
 
-.highlight-none {
-    color: #05C1B3;
+.highlight-none, .mi, .literal {
+    color: #048f85;
 }
 
 

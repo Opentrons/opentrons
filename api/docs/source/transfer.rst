@@ -19,9 +19,16 @@
         tip_racks=[tiprack],
         trash_container=trash)
 
-========
+===========
 Transfer
-========
+===========
+
+The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write ``loop``s and ``if`` statements, we can simply use the ``transfer()`` command, making Python protocol both easier to write and read!
+
+.. toctree::
+    :maxdepth: 3
+
+    transfer
 
 Transfer
 --------
@@ -31,7 +38,7 @@ Most of time, a protocol is really just looping over some wells, aspirating, and
 .. testcode:: transfer
 
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments
 
@@ -318,7 +325,7 @@ Save time and tips with the ``distribute()`` and ``consolidate()`` commands. The
 .. testcode:: distributeconsolidate
 
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments
 
@@ -559,7 +566,7 @@ There are other options for customizing your transfer command:
 .. testcode:: options
 
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments
 

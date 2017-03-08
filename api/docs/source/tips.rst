@@ -1,10 +1,15 @@
 .. _tips:
 
-====
+=======
 Tips
-====
+=======
 
 When we handle liquids with a pipette, we are constantly exchanging old, used tips for new ones to prevent cross-contamination between our wells. To help with this constant need, we describe in this section a few methods for getting new tips, and removing tips from a pipette.
+
+.. toctree::
+    :maxdepth: 3
+
+    tips
 
 **********************
 
@@ -27,7 +32,7 @@ This section demonstrates the options available for controlling tips
 .. testcode:: tips
     
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments
 
@@ -97,7 +102,7 @@ Automatically iterate through tips and drop tip in trash by attaching containers
 .. testcode:: tipsiterating
     
     '''
-    Examples on this page expect the following
+    Examples in this section expect the following
     '''
     from opentrons import containers, instruments
 

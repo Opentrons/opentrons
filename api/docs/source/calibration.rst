@@ -1,8 +1,8 @@
 .. _calibration:
 
-===========
-Calibration
-===========
+==============
+Calibration UI
+==============
 
 Download App
 --------------------
