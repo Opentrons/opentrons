@@ -1,8 +1,18 @@
 .. _introduction:
 
-============
-API Intro
-============
+===============
+Opentrons API
+===============
+
+The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
+
+We’ve designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
+
+`View source code on GitHub`__
+
+__ https://github.com/opentrons/opentrons-api
+
+**********************
 
 .. testsetup::  helloworld
 
@@ -15,10 +25,8 @@ API Intro
 
     pipette = instruments.Pipette(axis='b', max_volume=200)
 
-Hello Opentrons
+How it Looks
 ---------------
-
-The Opentrons API is a simple framework designed to make writing automated lab protocols easy.
 
 Below is a short protocol that will pick up a tip and use it to move 100ul from well ``'A1'`` to well ``'B1'``:
 
@@ -53,8 +61,8 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
 **********************
 
-Protocol Sections
------------------
+How it's Organized
+------------------
 
 When writing protocols using the Opentrons API, there are generally three sections:
 
@@ -108,3 +116,48 @@ From the example above, the "commands" section looked like:
 
     pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
+**********************
+
+How to Use
+-------------
+
+Writing protocols in Python requires some up-front design before seeing your liquid handling automation in action. At a high-level, writing protocols with the Opentrons API looks like:
+
+1) Write a Python protocol
+2) Test your protocol for errors
+3) Repeat steps 1 & 2
+4) Load protocol into calibration UI
+5) Calibrate containers and pipettes
+6) Run your protocol
+
+We at Opentrons are actively working towards our own protocol editor, but in the mean time we recommend writing your protocols in one of two ways:
+
+Text Editor
+^^^^^^^^^^^
+
+Using a popular and free code editor, like `Sublime Text 3`__, is a common method for writing Python protocols. Download onto your computer, and you can now write and save Python scripts.
+
+__ https://www.sublimetext.com/3
+
+.. note::
+
+    Make sure that when saving a protocol file, it ends with the ``.py`` file extension. This will ensure the App and other programs are able to properly read it.
+
+    For example, ``my_protocol_file.py``
+
+Jupyter Notebook
+^^^^^^^^^^^^^^^^
+
+For a more interactive environment to write and debug, we recommend using Jupyter Notebook. To begin using it, you will need to install `Anaconda`__, which comes with Jupyter Notebook.
+
+Once installed, launch Jupyter Notebook, and install the Opentrons API by doing the following:
+
+1) Create a new Python notebook
+2) Run the command ``!pip install --upgrade opentrons`` in a cell
+3) Restart your notebook's Kernel, and API will be installed
+
+__ https://www.continuum.io/downloads
+
+.. note::
+
+    Be sure to download the **Python 3.6 version** if Anaconda, and Python 2.7 will not work with the Opentrons API.

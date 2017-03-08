@@ -6,13 +6,17 @@ Labware Library
 
 The Opentrons API comes with many common labware containers built in. These containers can be loaded into you Python protocol using the ``containers.load()`` method, and the specific name of the labware you need.
 
+`Check out this webpage`__ to see a visualization of all the API's current built-in containers.
+
+__ https://andysigler.github.io/ot-api-containerviz/
+
 Below are a list of some of the most commonly used containers in the API, as well as images for how they look.
 
 If you are interested in using your own container that is not included in the API, please take a look at how to create custom containers using ``containers.create()``, or contact Opentrons Support.
 
 .. note::
 
-	Note:  All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
+	All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
 
 **********************
 
