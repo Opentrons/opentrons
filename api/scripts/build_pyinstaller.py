@@ -2,7 +2,6 @@
 
 import os
 import shutil
-import sys
 import platform
 import subprocess
 
@@ -14,11 +13,13 @@ script_tab = "                       "
 
 # The project_root_dir depends on the location of this file, so it cannot be
 # moved without updating this line
+# Going up 1 level folder dir of this
 project_root_dir = \
-    os.path.dirname(                                  # going up 1 level
-        os.path.dirname(os.path.realpath(__file__)))  # folder dir of this
+    os.path.dirname(
+        os.path.dirname(os.path.realpath(__file__)))
+app_shell_root = os.path.join(project_root_dir, "..", "app-shell")
 
-exec_folder_name = os.path.join(project_root_dir, "app", "backend-dist")
+exec_folder_name = os.path.join(app_shell_root, "app", "backend-dist")
 
 PYINSTALLER_DISTPATH = os.path.join(project_root_dir, "pyinstaller-dist")
 PYINSTALLER_WORKPATH = os.path.join(project_root_dir, "pyinstaller-build")
@@ -56,8 +57,8 @@ def remove_pyinstaller_temps():
 
 def pyinstaller_build():
     """
-    Launches a subprocess running Python PyInstaller with the spec file from the
-    package folder. Captures the output streams and checks for errors.
+    Launches a subprocess running Python PyInstaller with the spec file from
+    the package folder. Captures the output streams and checks for errors.
     :return: Boolean indicating the success state of the operation.
     """
 
@@ -96,32 +97,20 @@ def move_executable_folder(final_exec_dir):
     )
 
     if os.path.exists(original_exec_dir):
-        print(script_tab + "Moving exec files from %s \n" % original_exec_dir +
-              script_tab + "to %s" % final_exec_dir)
+        print(
+            script_tab +
+            "Moving exec files from %s \n" % original_exec_dir +
+            script_tab + "to %s" % final_exec_dir
+        )
         shutil.move(original_exec_dir, final_exec_dir)
     else:
-        print(script_tab + "ERROR: PyInstaller executable output folder '%s' " %
-              original_exec_dir + "not found!")
+        print(
+            script_tab +
+            "ERROR: PyInstaller executable output folder '%s' " %
+            original_exec_dir + "not found!"
+        )
         return False
     return True
-
-
-# def generate_static_assets():
-#     process_args = [
-#         shutil.which('webpack'), '--config', 'webpack.config.js'
-#     ]
-#
-#     if platform.system().lower() == "windows":
-#         webpack_process = subprocess.Popen(process_args, shell=True)
-#     else:
-#         webpack_process = subprocess.Popen(process_args)
-#
-#     webpack_process.communicate()
-#     if webpack_process.returncode != 0:
-#         print(script_tab + "ERROR: webpack returned with exit code: %s" %
-#               webpack_process.returncode)
-#         return False
-#     return True
 
 
 def build_ot_python_backend_executable(backend_exec_path):
@@ -133,12 +122,7 @@ def build_ot_python_backend_executable(backend_exec_path):
     print(script_tag + "Project directory is:     %s" % project_root_dir)
     print(script_tag + "Script working directory: %s" % os.getcwd())
 
-    # TODO: Check that app frontend assets have been moved to server/templates
-    # print(script_tag + "Generating static files (JS/CSS/etc) for Flask app.")
-    # success = generate_static_assets()
-    # if not success:
-    #     raise SystemExit(script_tab + "Exiting due to error generating static assets")
-
+    # TODO: Check that app frontend assets have been moved to
 
     print(script_tag + "Removing PyInstaller old temp directories.")
     remove_pyinstaller_temps()
@@ -152,10 +136,6 @@ def build_ot_python_backend_executable(backend_exec_path):
         raise SystemExit(script_tab + "Exiting as there was an error in the "
                                       "PyInstaller execution.")
 
-    # TODO(ahmed): Do we need to remove the old file?
-    # backend_exec_path = os.path.join(
-    #     exec_folder_name, util.get_os(), get_spec_coll_name()
-    # )
     print(script_tag + "Removing old OT-App Backend executable directory.")
     if os.path.isfile(backend_exec_path):
         os.remove(backend_exec_path)
@@ -171,12 +151,21 @@ def build_ot_python_backend_executable(backend_exec_path):
     print(script_tag + "Removing PyInstaller recent temp directories.")
     remove_pyinstaller_temps()
 
+
 if __name__ == "__main__":
-    output_dir = os.path.join(
+    backend_exec_path = os.path.join(
         exec_folder_name, util.get_os(), get_spec_coll_name()
     )
-    output_dir = os.environ.get('EXE_OUTPUT_DIR', output_dir)
-    backend_exec_path = os.path.join(os.getcwd(), output_dir, get_spec_coll_name())
 
-    print(script_tag + "Initiating app exe build. Artifact output will be: ", backend_exec_path)
+    # Overwrite backend_exec_path if output dir is specified in env var
+    output_dir = os.environ.get('EXE_OUTPUT_DIR')
+    if output_dir:
+        backend_exec_path = os.path.join(
+            os.getcwd(), output_dir, get_spec_coll_name()
+        )
+
+    print(
+        script_tag + "Initiating app exe build. Artifact output will be: ",
+        backend_exec_path
+    )
     build_ot_python_backend_executable(backend_exec_path)

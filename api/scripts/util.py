@@ -64,7 +64,7 @@ def get_build_tag(os_type):
             commit_var='APPVEYOR_REPO_COMMIT'
         )
 
-    app_version = '2.2.0' # get_app_version()
+    app_version = 'NA'  # get_app_version()
 
     build_tag = "v{app_version}-{arch_time_stamp}".format(
         app_version=app_version,
@@ -90,5 +90,3 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
     if branch and commit:
         return "{}_{}".format(branch, commit[:10])
     return None
-
-
