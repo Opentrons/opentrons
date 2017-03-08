@@ -2,8 +2,10 @@ var argv = require('yargs').argv;
 var path = require('path')
 var webpack = require('webpack')
 
+var CopyWebpackPlugin = require('copy-webpack-plugin')
+
 var outputPathDir = argv.out || path.resolve(__dirname, './dist')
-console.log('[Webpack] Output build dir path is:', outputPathDir)
+console.log('[OT App Webpack] Output build dir path is:', outputPathDir)
 
 module.exports = {
   entry: './src/main.js',
@@ -87,7 +89,12 @@ module.exports = {
   },
   headers: { 'Access-Control-Allow-Origin': 'http://localhost:5000', 'Access-Control-Allow-Credentials': 'true' },
   devtool: '#eval-source-map',
-  target: 'electron'  // process.env['APP_TARGET'] (TODO: bring back)
+  target: 'electron',  // process.env['APP_TARGET'] (TODO: bring back),
+  plugins: [
+      new CopyWebpackPlugin([
+          {from: 'src/index.html'}
+      ])
+  ]
 }
 
 if (process.env.NODE_ENV === 'production') {
