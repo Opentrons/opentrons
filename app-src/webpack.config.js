@@ -2,20 +2,20 @@ var argv = require('yargs').argv;
 var path = require('path')
 var webpack = require('webpack')
 
-var outputPath = argv.out || path.resolve(__dirname, './dist')
-console.log('Creating output dir in ', outputPath)
+var outputPathDir = argv.out || path.resolve(__dirname, './dist')
+console.log('[Webpack] Output build dir path is:', outputPathDir)
 
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: outputPath,
+    path: outputPathDir,
     filename: 'build.js'
   },
   resolve: {
     extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, 'node_modules')],
     alias: {
-      src: path.resolve(__dirname, 'src'),
+      src: path.resolve(__dirname, 'src'), // this alias is used by karma tests to import modules from the ./src dir
       vue: 'vue/dist/vue.js',
       sinon: 'sinon/pkg/sinon'
     }
