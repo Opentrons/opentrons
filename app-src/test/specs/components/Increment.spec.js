@@ -1,7 +1,7 @@
 /* global describe, it */
 import { expect } from 'chai'
 import sinon from 'sinon'
-import Increment from 'renderer/components/Increment.vue'
+import Increment from 'src/components/Increment.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {

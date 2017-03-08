@@ -11,6 +11,6 @@ testsContext.keys().forEach(testsContext)
 // you can also change this to match only the subset of files that
 // you want coverage for.
 
-// NOTE(Ahmed): we're conly considering renderer files -- need to add main process files as well..
+// NOTE(Ahmed): we're conly considering src files -- need to add main process files as well..
 var srcContext = require.context('src/', true, /(!(fonts|assets|style))/)
 srcContext.keys().forEach(srcContext)

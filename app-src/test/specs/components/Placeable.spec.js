@@ -1,7 +1,7 @@
 /* global describe, it */
 import { expect } from 'chai'
 import sinon from 'sinon'
-import Placeable from 'renderer/components/Placeable.vue'
+import Placeable from 'src/components/Placeable.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {

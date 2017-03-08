@@ -15,7 +15,7 @@ module.exports = {
     extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, 'node_modules')],
     alias: {
-      renderer: path.resolve(__dirname, 'app/renderer'),
+      src: path.resolve(__dirname, 'src'),
       vue: 'vue/dist/vue.js',
       sinon: 'sinon/pkg/sinon'
     }

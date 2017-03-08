@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import Vue from 'vue'
 import { getRenderedVm } from '../../util.js'
 
-const TaskPaneInjector = require('!!vue?inject!renderer/components/TaskPane.vue')
+const TaskPaneInjector = require('!!vue?inject!src/components/TaskPane.vue')
 const TaskPane = TaskPaneInjector({
   './StepList.vue': {
     template: '<div>StepList</div>'

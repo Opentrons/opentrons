@@ -1,6 +1,6 @@
 /* global describe, it */
 import { expect } from 'chai'
-import ProgressBar from 'renderer/components/ProgressBar.vue'
+import ProgressBar from 'src/components/ProgressBar.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
