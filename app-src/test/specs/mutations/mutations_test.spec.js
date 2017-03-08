@@ -1,8 +1,8 @@
 /* global describe, it */
 import { expect } from 'chai'
 
-import * as types from 'renderer/store/mutation-types'
-import appMutations from 'renderer/store/mutations'
+import * as types from 'src/store/mutation-types'
+import appMutations from 'src/store/mutations'
 const { mutations } = appMutations
 
 describe('mutations', () => {

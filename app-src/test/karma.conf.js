@@ -5,8 +5,8 @@
 
 var path = require('path')
 var merge = require('webpack-merge')
-var baseConfig = require('../../webpack.config.js')
-var projectRoot = path.resolve(__dirname, '../../')
+var baseConfig = require('../webpack.config.js')
+var projectRoot = path.resolve(__dirname, '..')
 
 var webpackConfig = merge(baseConfig, {
   // use inline sourcemap for karma-sourcemap-loader

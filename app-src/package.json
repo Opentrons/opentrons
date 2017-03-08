@@ -15,7 +15,7 @@
     "release:posix": "npm run build:env:posix && npm run build:backend:posix && npm run build:frontend:posix",
     "release:win": "npm run build:env:win && npm run build:backend:win && npm run build:frontend:win",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
-    "unit-renderer": "karma start test/renderer/karma.conf.js --single-run",
+    "unit": "karma start test/karma.conf.js --single-run",
     "unit-main": "mocha test/main/",
     "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js",
     "test": "npm run unit-main; npm run unit-renderer; npm run integration; nosetests"
