@@ -89,5 +89,5 @@
 
 <style lang='sass'>
   @import "../assets/sass/new.scss";
-  @import "../../../node_modules/vuex-toast/dist/vuex-toast.css";
+  @import "../../node_modules/vuex-toast/dist/vuex-toast.css";
 </style>
