@@ -95,3 +95,5 @@ smoothie/
 # JS
 node_modules
 
+# app api assets
+api/opentrons/server/templates/

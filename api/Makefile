@@ -22,6 +22,9 @@ api-wheel:
 	rm ../app/release-assets/*.whl; python3 setup.py bdist_wheel -d ../app/release-assets
 	ls ../app/release-assets/*.whl | xargs -I{} basename {} > ../app/release-assets/whl-name
 
+api-to-exe:
+	python3 scripts/build_pyinstaller.py
+
 api-clean:
 	rm -rf \
 		*.egg-info \

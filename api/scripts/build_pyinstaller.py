@@ -178,4 +178,5 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         output_dir = sys.argv[1]
 
+    print(script_tag + "Initiating app exe build. Output dir: ", output_dir)
     build_ot_python_backend_executable(output_dir)
