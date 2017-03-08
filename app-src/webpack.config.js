@@ -10,7 +10,8 @@ console.log('[OT App Webpack] Output build dir path is:', outputPathDir)
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: outputPathDir,
+    path: path.join(outputPathDir, 'dist'),
+    publicPath: '/dist/',
     filename: 'build.js'
   },
   resolve: {
@@ -92,7 +93,7 @@ module.exports = {
   target: 'electron',  // process.env['APP_TARGET'] (TODO: bring back),
   plugins: [
       new CopyWebpackPlugin([
-          {from: 'src/index.html'}
+          {from: 'src/index.html', to: outputPathDir}
       ])
   ]
 }

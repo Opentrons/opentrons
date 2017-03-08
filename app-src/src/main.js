@@ -20,7 +20,6 @@ const router = new VueRouter({
 })
 
 /* eslint-disable */
-const __webpack_public_path__ = window.location.host
 window.onload = function () {
   // Google analytics SPA extensions: https://github.com/googleanalytics/autotrack
   require('autotrack')

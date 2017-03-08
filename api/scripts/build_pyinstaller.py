@@ -153,12 +153,12 @@ def build_ot_python_backend_executable(backend_exec_path):
                                       "PyInstaller execution.")
 
     # TODO(ahmed): Do we need to remove the old file?
-    # print(script_tag + "Removing old OT-App Backend executable directory.")
     # backend_exec_path = os.path.join(
     #     exec_folder_name, util.get_os(), get_spec_coll_name()
     # )
-    # if os.path.isfile(backend_exec_path):
-    #     os.remove(backend_exec_path)
+    print(script_tag + "Removing old OT-App Backend executable directory.")
+    if os.path.isfile(backend_exec_path):
+        os.remove(backend_exec_path)
 
     print(script_tag + "Moving executable folder to backend-dist.")
     success = move_executable_folder(backend_exec_path)
@@ -175,8 +175,8 @@ if __name__ == "__main__":
     output_dir = os.path.join(
         exec_folder_name, util.get_os(), get_spec_coll_name()
     )
-    if len(sys.argv) == 2:
-        output_dir = sys.argv[1]
+    output_dir = os.environ.get('EXE_OUTPUT_DIR', output_dir)
+    backend_exec_path = os.path.join(os.getcwd(), output_dir, get_spec_coll_name())
 
-    print(script_tag + "Initiating app exe build. Output dir: ", output_dir)
-    build_ot_python_backend_executable(output_dir)
+    print(script_tag + "Initiating app exe build. Artifact output will be: ", backend_exec_path)
+    build_ot_python_backend_executable(backend_exec_path)
