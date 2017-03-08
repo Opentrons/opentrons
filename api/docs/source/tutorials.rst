@@ -4,8 +4,8 @@
 API Tutorials
 =============
 
-Setup
-^^^^^^^^^
+Python Setup
+^^^^^^^^^^^^^^^
 
 `click here for tutorial`__
 
