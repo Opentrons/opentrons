@@ -93,7 +93,7 @@ module.exports = {
   target: 'electron',  // process.env['APP_TARGET'] (TODO: bring back),
   plugins: [
       new CopyWebpackPlugin([
-          {from: 'src/index.html', to: outputPathDir}
+          {from: 'src/index.html', to: '../index.html'}
       ])
   ]
 }

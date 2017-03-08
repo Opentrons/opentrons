@@ -94,6 +94,7 @@ smoothie/
 
 # JS
 node_modules
+app-src/test/coverage
 
 # app api assets
 api/opentrons/server/templates/
