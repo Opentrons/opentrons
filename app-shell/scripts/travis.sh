@@ -100,7 +100,10 @@ execute_linux ()
     nvm use 6.0.0
     node --version
     npm --version
-    ls -la ~/virtualenv/python2.7/bin/
+
+    npm i -g mocha
+
+    # ls -la ~/virtualenv/python2.7/bin/
     npm config set python ~/virtualenv/python2.7/bin/python
     echo "npm's python is $(npm config get python)"
     # if [ "$1" == "linux" ]; then
