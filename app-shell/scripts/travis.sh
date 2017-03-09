@@ -32,7 +32,6 @@ run_install ()
   mkdir -p $HOME/.cache/pip3
 
   pip3 install -r requirements.txt --cache-dir $HOME/.cache/pip3
-  npm config set python ~/virtualenv/python2.7
   npm install && cd app && npm install && cd ..  # Hack until instapp-app-deps works on travis
 
   cd server && python3 -m nose -s --logging-level WARNING && cd ..
@@ -101,6 +100,8 @@ execute_linux ()
     nvm use 6.0.0
     node --version
     npm --version
+    npm config set python ~/virtualenv/python2.7
+    echo "npm's python is $(npm config get python)"
 
     # sudo apt-get install g++
     # sudo apt-get install gcc
