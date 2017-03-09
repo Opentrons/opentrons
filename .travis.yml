@@ -53,7 +53,7 @@ install:
   # - ./build-all
   # - ./has_changes.sh api "cd api && make api && cd .."
   # - ./has_changes.sh app "cd app && make app && cd .."
-  -  ./scripts/make_app.sh
+  -  ./scripts/with_xvfb.sh
   - make api-exe
 
 script:
