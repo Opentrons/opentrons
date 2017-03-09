@@ -11,5 +11,7 @@ nvm use 6.0.0
 npm --version
 node --version
 
+# ./build-app-src
 echo "Starting app build"
-eval $1
+
+make app
