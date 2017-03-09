@@ -53,7 +53,7 @@ install:
   # - ./build-all
   # - ./has_changes.sh api "cd api && make api && cd .."
   # - ./has_changes.sh app "cd app && make app && cd .."
-  - nvm use 6.0.0 && make app
+  -  ./scripts/with_xvfb.sh "make app"
   - make api-exe
 
 script:
