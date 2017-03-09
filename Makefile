@@ -1,7 +1,7 @@
 .PHONY: app
 
 app:
-	cd app-src &&\
+	nvm use 6.0.0; cd app-src &&\
 		npm --version &&\
 		node --version &&\
 		npm config get python &&\
