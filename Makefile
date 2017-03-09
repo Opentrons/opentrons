@@ -20,7 +20,6 @@ app-shll:
 		node --version &&\
 		npm config get python &&\
 		npm i &&\
-		npm run unit &&\
 		npm run unit-main &&\
 		npm run release:posix &&\
 		ls dist/* &&\
