@@ -16,7 +16,12 @@ nvm alias default 6.0.0
 nvm use 6.0.0
 
 echo "Starting app build"
-./build-app-src
+# ./build-app-src
 
-# echo "Starting app build"
-
+cd app-src &&\
+    npm --version &&\
+    node --version &&\
+    npm config get python &&\
+    npm i &&\
+    npm run unit &&\
+    webpack --out ../api/opentrons/server/templates
