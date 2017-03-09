@@ -11,7 +11,5 @@ nvm use 6.0.0
 npm --version
 node --version
 
-# ./build-app-src
-echo "Starting app build"
-
-make app
+echo "Evaluating cmd: '$1'"
+eval $1
