@@ -12,7 +12,7 @@ matrix:
       sudo: false
       # sudo: required
       # dist: trusty
-      python: "3.5"  # TODO: revisit...
+      # python: "3.5"  # TODO: revisit...
       # python: "3.6"
       env: OPENTRONS_APP_UPLOAD_DIR=linux
       env: OPENTRONS_APP_ASSETS_DIR=linux
