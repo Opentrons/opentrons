@@ -100,7 +100,8 @@ execute_linux ()
     nvm use 6.0.0
     node --version
     npm --version
-    npm config set python ~/virtualenv/python2.7
+    ls -la ~/virtualenv/python2.7/bin/
+    npm config set python ~/virtualenv/python2.7/bin/python
     echo "npm's python is $(npm config get python)"
 
     # sudo apt-get install g++
