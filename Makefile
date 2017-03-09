@@ -21,6 +21,6 @@ app-shll:
 		npm config get python &&\
 		npm i &&\
 		npm run unit-main &&\
-		npm run release:posix &&\
+		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
