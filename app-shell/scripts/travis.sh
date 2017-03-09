@@ -104,8 +104,8 @@ execute_linux ()
     npm config set python ~/virtualenv/python2.7/bin/python
     echo "npm's python is $(npm config get python)"
     # if [ "$1" == "linux" ]; then
-    export DISPLAY=':99.0'
-    Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      # export DISPLAY=':99.0'
+      # Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
     # fi
 
     # sudo apt-get install g++
