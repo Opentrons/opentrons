@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+echo "got here.."
 set -e
 
 export DISPLAY=':99.0'
