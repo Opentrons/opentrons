@@ -458,7 +458,7 @@ def _sort_containers(container_list):
     _tipracks = []
     _other = []
     for c in container_list:
-        _type = c.properties['type'].lower()
+        _type = c.get_type().lower()
         if 'tip' in _type:
             _tipracks.append(c)
         else:
@@ -549,7 +549,7 @@ def _get_container_from_step(step):
         match = [
             container.get_name() == step['label'],
             container.get_parent().get_name() == step['slot'],
-            container.properties['type'] == step['type']
+            container.get_type() == step['type']
 
         ]
         if all(match):
@@ -569,11 +569,11 @@ def create_step_list():
             'channels': instrument.channels,
             'placeables': [
                 {
-                    'type': container.properties['type'],
+                    'type': container.get_type(),
                     'label': container.get_name(),
                     'slot': container.get_parent().get_name()
                 }
-                for container in _get_unique_containers(instrument)
+                for container in _get_all_containers()
             ]
         } for instrument in _get_all_pipettes()]
     except Exception as e:
