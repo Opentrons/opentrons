@@ -7,7 +7,7 @@ app:
 		npm config get python &&\
 		npm i &&\
 		npm run unit &&\
-		webpack --out ../api/opentrons/server/templates
+		./node_modules/.bin/webpack --out ../api/opentrons/server/templates
 
 api-exe:
 	cd api &&\
