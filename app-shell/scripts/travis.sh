@@ -72,8 +72,7 @@ execute_mac ()
     npm --version
 
     # NOTE(ahmed): We might not need python 3 explicit installation any more
-    # brew install scripts/ot_python3.rb
-    brew install python3
+    brew install scripts/ot_python3.rb
     python3 --version
     python3 -c "import struct; print(struct.calcsize('P') * 8)"
     python --version
@@ -100,10 +99,7 @@ execute_linux ()
     nvm use 6.0.0
     node --version
     npm --version
-
-    npm i -g mocha
-
-    # ls -la ~/virtualenv/python2.7/bin/
+    ls -la ~/virtualenv/python2.7/bin/
     npm config set python ~/virtualenv/python2.7/bin/python
     echo "npm's python is $(npm config get python)"
     # if [ "$1" == "linux" ]; then
