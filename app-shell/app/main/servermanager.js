@@ -10,23 +10,36 @@ class ServerManager {
     this.processName = null
   }
 
-  start () {
+  /*
+   * Returns map of latest backends
+   */
+  getBackendsMap () {
+    // TODO: return path of existing backend
+  }
+
+  /*
+   * Returns map of backends zipped into electron app
+   */
+  getBuiltinBackendsMap () {
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
-    let backendPath
-
-    let backends = {
+    return {
       'darwin': '/backend-dist/mac/otone_server',
       'linux': '/backend-dist/linux/otone_server',
       'win32': '\\backend-dist\\win\\otone_server.exe'
     }
+  }
 
+  start () {
+    let backendPath
     if (!(process.platform in backends)) {
       console.log('\n\n\n\nunknown OS: ' + process.platform + '\n\n\n\n')
       return
     }
 
+    // TODO: abstract this into a function
     backendPath = app.getAppPath() + backends[process.platform]
+
     process.env['appVersion'] = app.getVersion()
     this.execFile(backendPath, [userDataPath])
   }

@@ -99,12 +99,12 @@ function startUp () {
   //   pythonEnvManager.setupEnvironment()
   // })
 
-  process.on('uncaughtException', (error) => {
-    if (process.listeners('uncaughtException').length > 1) {
-      console.log(error)
-      mainLogger.info(error)
-    }
-  })
+  // process.on('uncaughtException', (error) => {
+  //   if (process.listeners('uncaughtException').length > 1) {
+  //     console.log(error)
+  //     mainLogger.info(error)
+  //   }
+  // })
   if (process.env.NODE_ENV === 'development') {
     require('vue-devtools').install()
   }
