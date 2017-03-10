@@ -67,7 +67,7 @@ deploy:
   secret_access_key: $AWS_SECRET_KEY
   bucket: ot-app-builds
   skip_cleanup: true
-  local-dir: app/releases
+  local-dir: app-shell/app/releases
   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
