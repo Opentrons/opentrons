@@ -4,6 +4,8 @@ const path = require('path')
 
 const {app} = electron
 
+const glob = require('glob')
+
 class ServerManager {
   constructor () {
     this.serverProcess = null
@@ -13,35 +15,36 @@ class ServerManager {
   /*
    * Returns map of latest backends
    */
-  getBackendsMap () {
-    // TODO: return path of existing backend
+  getLatestExecutable () {
+    const userDataPath = app.getPath('userData')
+    let serverExecutablesPath = path.join(userDataPath, 'server-executables')
+    return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
   }
 
   /*
-   * Returns map of backends zipped into electron app
+   * Returns path to backend built with electron app
    */
-  getBuiltinBackendsMap () {
+  getBuiltinExecutable () {
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
-    return {
+    let builtinExesMap = {
       'darwin': '/backend-dist/mac/otone_server',
       'linux': '/backend-dist/linux/otone_server',
       'win32': '\\backend-dist\\win\\otone_server.exe'
     }
+    if (!(process.platform in builtinExesMap)) {
+      console.log('\n\n\n\nunknown OS: ' + process.platform + '\n\n\n\n')
+      return null
+    }
+    let backendPath = app.getAppPath() + builtinExesMap[process.platform]
+    return backendPath
   }
 
   start () {
-    let backendPath
-    if (!(process.platform in backends)) {
-      console.log('\n\n\n\nunknown OS: ' + process.platform + '\n\n\n\n')
-      return
-    }
-
-    // TODO: abstract this into a function
-    backendPath = app.getAppPath() + backends[process.platform]
-
+    const userDataPath = app.getPath('userData')
+    let exePath = this.getLatestExecutable() || this.getBuiltinExecutable()
     process.env['appVersion'] = app.getVersion()
-    this.execFile(backendPath, [userDataPath])
+    this.execFile(exePath, [userDataPath])
   }
 
   /**
