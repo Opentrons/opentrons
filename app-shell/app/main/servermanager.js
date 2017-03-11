@@ -8,6 +8,39 @@ const {app} = electron
 
 const glob = require('glob')
 
+/**
+* Returns path to backend built with electron app
+*/
+function getBuiltinExecutable () {
+  const userDataPath = app.getPath('userData')
+  console.log('User Data Path', userDataPath)
+  let builtinExesMap = {
+    'darwin': '/backend-dist/mac/otone_server',
+    'linux': '/backend-dist/linux/otone_server',
+    'win32': '\\backend-dist\\win\\otone_server.exe'
+  }
+  if (!(process.platform in builtinExesMap)) {
+    console.log('\n\n\n\nunknown OS: ' + process.platform + '\n\n\n\n')
+    return null
+  }
+  let backendPath = app.getAppPath() + builtinExesMap[process.platform]
+  return backendPath
+}
+
+/**
+* Parses exe version from exe path
+*/
+function getExeVersion(exePath) {
+  if (!exePath.endsWith('.latest')) {
+    return app.getVersion()
+  }
+
+  // name of exe is based on artifact name convention
+  return path.basename(exePath)
+    .replace('otone_server-', '')
+    .replace('.latest', '')
+    .replace('.exe', '')
+}
 
 /**
 * Returns path to latest executable
@@ -18,70 +51,19 @@ function getLatestExecutable () {
   return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
 }
 
-function download (url, dest, cb) {
-  var file = fs.createWriteStream(dest);
-  var request = http.get(url, function(response) {
-      response.pipe(file);
-      file.on('finish', function() {
-        file.close(cb);
-      });
-    }).on('error', function(err) {
-      fs.unlink(dest);
-      if (cb) cb(err.message);
-    });
-};
-
-function rename() {
-  // ...
-}
-
 class ServerManager {
   constructor () {
     this.serverProcess = null
     this.processName = null
   }
 
-  /*
-   * Returns path to backend built with electron app
-   */
-  getBuiltinExecutable () {
-    const userDataPath = app.getPath('userData')
-    console.log('User Data Path', userDataPath)
-    let builtinExesMap = {
-      'darwin': '/backend-dist/mac/otone_server',
-      'linux': '/backend-dist/linux/otone_server',
-      'win32': '\\backend-dist\\win\\otone_server.exe'
-    }
-    if (!(process.platform in builtinExesMap)) {
-      console.log('\n\n\n\nunknown OS: ' + process.platform + '\n\n\n\n')
-      return null
-    }
-    let backendPath = app.getAppPath() + builtinExesMap[process.platform]
-    return backendPath
-  }
-
-  /**
-   * Returns version of current running exe
-   */
-  getExeVersion() {
-    let latestExecutablePath = getLatestExecutable()
-    if (latestExecutablePath === null) {
-      return app.getVersion()
-    }
-
-    // name of exe is based on artifact name convention
-    return path.basename(latestExecutablePath)
-      .replace('otone_server-', '')
-      .replace('.latest', '')
-      .replace('.exe', '')
-  }
-
   start () {
     const userDataPath = app.getPath('userData')
-    let exePath = getLatestExecutable() || this.getBuiltinExecutable()
-    console.log('Exe version:', this.getExeVersion())
+    let exePath = getLatestExecutable() || getBuiltinExecutable()
+    let exeVersion = getExeVersion(exePath)
+    console.log('Exe version:', exeVersion)
     console.log('exePath:', exePath)
-    process.env['appVersion'] = this.getExeVersion()
+    process.env['appVersion'] = exeVersion
     this.execFile(exePath, [userDataPath])
   }
 
@@ -109,6 +91,7 @@ class ServerManager {
         'and using spawnfile', this.processName
       )
   }
+
   shutdown () {
     if (process.platform === 'darwin') {
       childProcess.spawnSync('pkill', ['-9', this.processName])
