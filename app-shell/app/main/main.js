@@ -12,7 +12,7 @@ const {app, BrowserWindow, ipcMain} = electron
 const {addMenu} = require('./menu.js')
 const {getLogger} = require('./logging.js')
 const {initAutoUpdater} = require('./updater.js')
-const {ServerManager} = require('./servermanager.js')
+const {promoteNewlyDownloadedExeToLatest, ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
@@ -98,6 +98,7 @@ function startUp () {
     require('vue-devtools').install()
   }
 
+  promoteNewlyDownloadedExeToLatest()
   serverManager.start()
   waitUntilServerResponds(
     () => createWindow('http://localhost:31950/'),

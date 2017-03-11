@@ -69,6 +69,25 @@ function getServerExecutablesPath () {
   return path.join(userDataPath, 'server-executables')
 }
 
+/**
+ * Renames the 'new' exe to 'latest'
+ */
+function promoteNewlyDownloadedExeToLatest () {
+  const newExePath = getNewlyDownloadedExecutablePath()
+
+  // if we dont have a new exe exit
+  if (newExePath === null) {
+    return
+  }
+
+  const latestExePath = newExePath.replace('new', 'latest')
+  try {
+    fs.renameSync(newExePath, latestExePath)
+  } catch (e) {
+    console.log(`Error renaming exe from ${newExePath} to ${latestExePath}`)
+  }
+}
+
 class ServerManager {
   constructor () {
     this.serverProcess = null
@@ -121,5 +140,6 @@ class ServerManager {
 }
 
 module.exports = {
+  promoteNewlyDownloadedExeToLatest,
   ServerManager
 }
