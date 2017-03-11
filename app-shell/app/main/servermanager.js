@@ -50,7 +50,7 @@ class ServerManager {
     }
 
     // name of exe is based on artifact name convention
-    return path.basename(x)
+    return path.basename(latestExecutablePath)
       .replace('otone_server-', '')
       .replace('.latest', '')
       .replace('.exe', '')
@@ -59,7 +59,8 @@ class ServerManager {
   start () {
     const userDataPath = app.getPath('userData')
     let exePath = this.getLatestExecutable() || this.getBuiltinExecutable()
-    console.log(this.getExeVersion())
+    console.log('Exe version:', this.getExeVersion())
+    console.log('exePath:', exePath)
     process.env['appVersion'] = this.getExeVersion()
     this.execFile(exePath, [userDataPath])
   }
