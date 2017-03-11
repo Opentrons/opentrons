@@ -40,10 +40,27 @@ class ServerManager {
     return backendPath
   }
 
+  /**
+   * Returns version of current running exe
+   */
+  getExeVersion() {
+    let latestExecutablePath = this.getLatestExecutable()
+    if (latestExecutablePath === null) {
+      return app.getVersion()
+    }
+
+    // name of exe is based on artifact name convention
+    return path.basename(x)
+      .replace('otone_server-', '')
+      .replace('.latest', '')
+      .replace('.exe', '')
+  }
+
   start () {
     const userDataPath = app.getPath('userData')
     let exePath = this.getLatestExecutable() || this.getBuiltinExecutable()
-    process.env['appVersion'] = app.getVersion()
+    console.log(this.getExeVersion())
+    process.env['appVersion'] = this.getExeVersion()
     this.execFile(exePath, [userDataPath])
   }
 
