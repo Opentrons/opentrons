@@ -88,6 +88,19 @@ function promoteNewlyDownloadedExeToLatest () {
   }
 }
 
+function downloadedLatestExe (source) {
+  // Get text file w/latest exe in bucket
+  // ...
+  rp(wheelNameFile).then(wheelName => {
+    // console.log(`Found: "${wheelName}"`)
+    const wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
+    const opentronsWheelUrl = urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)
+    pyRunProcess = spawnProcess(pyRunScript, [opentronsWheelUrl], {cwd: envLoc})
+  }).catch((err) => {
+    // pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
+  })
+}
+
 class ServerManager {
   constructor () {
     this.serverProcess = null

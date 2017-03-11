@@ -83,7 +83,19 @@ function createAndSetAppDataDir () {
 //     pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
 //   })
 // })
-//
+
+function downloadNewBackendServer () {
+  /**
+   * 1) Get exe name from from file
+   * 2) With exe name; download actual exe
+   * 3) Save downloaded exe with extension "*.new"
+   */
+  const = urlToFileWithNewExeName = ''
+  rp(urlToFileWithNewExeName).then(exeName => {
+    const exeNameURIEncoded = encodeURIComponent(exeName.trim())
+    const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
+  })
+}
 
 function startUp () {
   // Prepare app data dir (necessary for logging errors that occur during setup)
