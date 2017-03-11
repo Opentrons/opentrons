@@ -1,24 +1,44 @@
 const childProcess = require('child_process')
 const electron = require('electron')
+const fs = require('fs');
+const http = require('http');
 const path = require('path')
 
 const {app} = electron
 
 const glob = require('glob')
 
+
+/**
+* Returns path to latest executable
+*/
+function getLatestExecutable () {
+  const userDataPath = app.getPath('userData')
+  let serverExecutablesPath = path.join(userDataPath, 'server-executables')
+  return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
+}
+
+function download (url, dest, cb) {
+  var file = fs.createWriteStream(dest);
+  var request = http.get(url, function(response) {
+      response.pipe(file);
+      file.on('finish', function() {
+        file.close(cb);
+      });
+    }).on('error', function(err) {
+      fs.unlink(dest);
+      if (cb) cb(err.message);
+    });
+};
+
+function rename() {
+  // ...
+}
+
 class ServerManager {
   constructor () {
     this.serverProcess = null
     this.processName = null
-  }
-
-  /*
-   * Returns map of latest backends
-   */
-  getLatestExecutable () {
-    const userDataPath = app.getPath('userData')
-    let serverExecutablesPath = path.join(userDataPath, 'server-executables')
-    return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
   }
 
   /*
@@ -44,7 +64,7 @@ class ServerManager {
    * Returns version of current running exe
    */
   getExeVersion() {
-    let latestExecutablePath = this.getLatestExecutable()
+    let latestExecutablePath = getLatestExecutable()
     if (latestExecutablePath === null) {
       return app.getVersion()
     }
@@ -58,7 +78,7 @@ class ServerManager {
 
   start () {
     const userDataPath = app.getPath('userData')
-    let exePath = this.getLatestExecutable() || this.getBuiltinExecutable()
+    let exePath = getLatestExecutable() || this.getBuiltinExecutable()
     console.log('Exe version:', this.getExeVersion())
     console.log('exePath:', exePath)
     process.env['appVersion'] = this.getExeVersion()

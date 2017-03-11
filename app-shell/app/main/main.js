@@ -17,13 +17,13 @@ const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
 let serverManager = new ServerManager()
-// let pythonEnvManager = new PythonEnvManager()
 let mainWindow
 let pyRunProcess
 
 const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/assets/'
 const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
 const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
+
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
 }
@@ -94,35 +94,9 @@ function startUp () {
   mainLogger.info(`STATIC_ASSETS_BRANCH: ${STATIC_ASSETS_BRANCH}`)
   mainLogger.info(`STATIC_ASSETS_URL: ${STATIC_ASSETS_URL}`)
 
-  // mainWindow = createWindow('file://' + __dirname + '/splash.html')
-  // ipcMain.once('splash-ready', () => {
-  //   pythonEnvManager.setupEnvironment()
-  // })
-
-  // process.on('uncaughtException', (error) => {
-  //   if (process.listeners('uncaughtException').length > 1) {
-  //     console.log(error)
-  //     mainLogger.info(error)
-  //   }
-  // })
   if (process.env.NODE_ENV === 'development') {
     require('vue-devtools').install()
   }
-
-  /* Load the app from the web if we have access to the site else
-   * load the app from browser cache.
-   */
-  // let loadAppWindow = () => {
-  //   const indexPageUrl = urlJoin(STATIC_ASSETS_URL, 'index.html')
-  //   rp(indexPageUrl).then(() => {
-  //     mainWindow.webContents.loadURL(
-  //       indexPageUrl,
-  //       {"extraHeaders" : "pragma: no-cache\n"}  // Ignore existing cache
-  //     )
-  //   }).catch(() => {
-  //     mainWindow.webContents.loadURL(indexPageUrl)
-  //   })
-  // }
 
   serverManager.start()
   waitUntilServerResponds(
