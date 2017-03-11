@@ -9,9 +9,9 @@ const {app} = electron
 const glob = require('glob')
 
 /**
-* Returns path to backend built with electron app
-*/
-function getBuiltinExecutable () {
+ * Returns path to backend built with electron app
+ */
+function getBuiltinExecutablePath () {
   const userDataPath = app.getPath('userData')
   console.log('User Data Path', userDataPath)
   let builtinExesMap = {
@@ -28,8 +28,8 @@ function getBuiltinExecutable () {
 }
 
 /**
-* Parses exe version from exe path
-*/
+ * Parses exe version from exe path
+ */
 function getExeVersion(exePath) {
   if (!exePath.endsWith('.latest')) {
     return app.getVersion()
@@ -43,12 +43,27 @@ function getExeVersion(exePath) {
 }
 
 /**
-* Returns path to latest executable
-*/
-function getLatestExecutable () {
+ * Returns path to latest executable
+ */
+function getLatestExecutablePath () {
   const userDataPath = app.getPath('userData')
-  let serverExecutablesPath = path.join(userDataPath, 'server-executables')
+  let serverExecutablesPath = getServerExecutablesPath()
   return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
+}
+
+function getNewlyDownloadedExecutablePath () {
+  const userDataPath = app.getPath('userData')
+  let serverExecutablesPath = getServerExecutablesPath()
+  return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
+}
+
+/**
+ * Returns the path where the 'latest' and 'new' server executables are
+ * downloaded and stored
+ */
+function getServerExecutablesPath () {
+  const userDataPath = app.getPath('userData')
+  return path.join(userDataPath, 'server-executables')
 }
 
 class ServerManager {
@@ -59,7 +74,7 @@ class ServerManager {
 
   start () {
     const userDataPath = app.getPath('userData')
-    let exePath = getLatestExecutable() || getBuiltinExecutable()
+    let exePath = getLatestExecutablePath() || getBuiltinExecutablePath()
     let exeVersion = getExeVersion(exePath)
     console.log('Exe version:', exeVersion)
     console.log('exePath:', exePath)
