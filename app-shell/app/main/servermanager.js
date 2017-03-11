@@ -43,7 +43,7 @@ function getExeVersion(exePath) {
 }
 
 /**
- * Returns path to latest executable
+ * Returns path to "latest" executable
  */
 function getLatestExecutablePath () {
   const userDataPath = app.getPath('userData')
@@ -51,10 +51,13 @@ function getLatestExecutablePath () {
   return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
 }
 
+/**
+ * Returns path to "new" executable
+ */
 function getNewlyDownloadedExecutablePath () {
   const userDataPath = app.getPath('userData')
   let serverExecutablesPath = getServerExecutablesPath()
-  return glob.sync(path.join(serverExecutablesPath, '*.latest'))[0] || null
+  return glob.sync(path.join(serverExecutablesPath, '*.new'))[0] || null
 }
 
 /**
