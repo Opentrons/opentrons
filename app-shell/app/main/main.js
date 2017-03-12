@@ -22,7 +22,6 @@ let pyRunProcess
 
 const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/server-exes/'
 const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
-// const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
 
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
