@@ -88,16 +88,38 @@ function promoteNewlyDownloadedExeToLatest () {
   }
 }
 
-// function downloadedLatestExe (source) {
-//   // Get text file w/latest exe in bucket
-//   // ...
-//   rp(wheelNameFile).then(wheelName => {
-//     // console.log(`Found: "${wheelName}"`)
-//     const wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-//     const opentronsWheelUrl = urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)
-//     pyRunProcess = spawnProcess(pyRunScript, [opentronsWheelUrl], {cwd: envLoc})
+function downloadNewBackendServer () {
+  /**
+   * 1) Get exe name from from file
+   * 2) With exe name; download actual exe
+   * 3) Save downloaded exe with extension "*.new"
+   */
+
+  return new Promise((resolve, reject) => {
+    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
+    rp(urlToFileWithNewExeName).then(exeName => {
+      const exeNameURIEncoded = encodeURIComponent(exeName.trim())
+      const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
+      console.log('Detected new server exe:', opentronsExeUrl)
+    }).catch((err) => {
+      console.log('Could not find latest exe to download', err)
+    })
+  })
+}
+
+// function downloadNewBackendServer () {
+//   #<{(|*
+//    * 1) Get exe name from from file
+//    * 2) With exe name; download actual exe
+//    * 3) Save downloaded exe with extension "*.new"
+//    |)}>#
+//   const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
+//   rp(urlToFileWithNewExeName).then(exeName => {
+//     const exeNameURIEncoded = encodeURIComponent(exeName.trim())
+//     const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
+//     console.log('Detected new server exe:', opentronsExeUrl)
 //   }).catch((err) => {
-//     // pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
+//     console.log('Could not find latest exe to download', err)
 //   })
 // }
 

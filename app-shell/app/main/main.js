@@ -14,7 +14,7 @@ const {getLogger} = require('./logging.js')
 const {initAutoUpdater} = require('./updater.js')
 const {promoteNewlyDownloadedExeToLatest, ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
-const {waitUntilServerResponds} = require('./util.js')
+const {download, waitUntilServerResponds} = require('./util.js')
 
 let serverManager = new ServerManager()
 let mainWindow
@@ -50,19 +50,45 @@ function createAndSetAppDataDir () {
   process.env['APP_DATA_DIR'] = appDataDir
 }
 
-function downloadNewBackendServer () {
+function getDownloadInfoForNewBackendServer () {
   /**
    * 1) Get exe name from from file
    * 2) With exe name; download actual exe
    * 3) Save downloaded exe with extension "*.new"
    */
-  const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
-  rp(urlToFileWithNewExeName).then(exeName => {
-    const exeNameURIEncoded = encodeURIComponent(exeName.trim())
-    const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
-    console.log('Detected new server exe:', opentronsExeUrl)
-  }).catch((err) => {
-    console.log('Could not find latest exe to download', err)
+
+  var processPlatformToS3BucketMap = {
+    'darwin': 'mac',
+    'win32': 'win',
+    'linux': 'linux'
+  }
+
+  return new Promise((resolve, reject) => {
+    let downloadInfo = {url: null, name: null}
+    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
+    rp(urlToFileWithNewExeName).then(exeName => {
+      downloadInfo.name = path.basename(exeName.trim())
+      const exeNameURIEncoded = encodeURIComponent(downloadInfo.name)
+      const opentronsExeUrl = urlJoin(
+        STATIC_ASSETS_URL,
+        processPlatformToS3BucketMap[process.platform],
+        exeNameURIEncoded
+      )
+      downloadInfo.url = opentronsExeUrl
+      console.log('New server exe info:', downloadInfo)
+      resolve(downloadInfo)
+    }).catch((err) => {
+      console.log('Could not find latest exe to download from', urlToFileWithNewExeName)
+    })
+  })
+}
+
+function downloadNewBackendServer() {
+  getDownloadInfoForNewBackendServer().then((downloadInfo) => {
+    const userDataPath = app.getPath('userData')
+    const exeFolder = path.join(userDataPath, 'server-executables')
+    const downloadDest = path.join(exeFolder, downloadInfo.name, '.new')
+    download(downloadInfo.url, downloadDest, console.log)
   })
 }
 
@@ -79,6 +105,7 @@ function startUp () {
     require('vue-devtools').install()
   }
 
+  // downloadNewBackendServer()
   downloadNewBackendServer()
   promoteNewlyDownloadedExeToLatest()
   serverManager.start()

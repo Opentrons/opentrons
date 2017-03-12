@@ -13,6 +13,7 @@ function waitUntilServerResponds (createWindow, windowUrl) {
 }
 
 function download (url, dest, cb) {
+  console.log('got here..')
   var file = fs.createWriteStream(dest);
   var request = http.get(url, function(response) {
     response.pipe(file);
