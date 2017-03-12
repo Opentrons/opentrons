@@ -20,9 +20,9 @@ let serverManager = new ServerManager()
 let mainWindow
 let pyRunProcess
 
-const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/assets/'
+const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/server-exes/'
 const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
-const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
+// const STATIC_ASSETS_URL = urlJoin(STATIC_ASSETS_BASE_URL, STATIC_ASSETS_BRANCH)
 
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
@@ -65,12 +65,12 @@ function getDownloadInfoForNewBackendServer () {
 
   return new Promise((resolve, reject) => {
     let downloadInfo = {url: null, name: null}
-    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
+    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_BASE_URL, 'exe-name-' + STATIC_ASSETS_BRANCH)
     rp(urlToFileWithNewExeName).then(exeName => {
       downloadInfo.name = path.basename(exeName.trim())
       const exeNameURIEncoded = encodeURIComponent(downloadInfo.name)
       const opentronsExeUrl = urlJoin(
-        STATIC_ASSETS_URL,
+        STATIC_ASSETS_BASE_URL,
         processPlatformToS3FolderMap[process.platform],
         exeNameURIEncoded
       )
@@ -84,12 +84,13 @@ function getDownloadInfoForNewBackendServer () {
 }
 
 function downloadNewBackendServer() {
+  let makeFileExecutable = (file) => () => { fs.chmodSync(file, '755') }
   getDownloadInfoForNewBackendServer().then((downloadInfo) => {
     const userDataPath = app.getPath('userData')
     const exeFolder = path.join(userDataPath, 'server-executables')
     const downloadDest = path.join(exeFolder, downloadInfo.name + '.new')
     console.log('Downloading exe to', downloadDest)
-    download(downloadInfo.url, downloadDest, console.log)
+    download(downloadInfo.url, downloadDest, makeFileExecutable(downloadDest), console.log)
   })
 }
 
@@ -100,13 +101,12 @@ function startUp () {
 
   mainLogger.info(`STATIC_ASSETS_BASE_URL: ${STATIC_ASSETS_BASE_URL}`)
   mainLogger.info(`STATIC_ASSETS_BRANCH: ${STATIC_ASSETS_BRANCH}`)
-  mainLogger.info(`STATIC_ASSETS_URL: ${STATIC_ASSETS_URL}`)
+  // mainLogger.info(`STATIC_ASSETS_URL: ${STATIC_ASSETS_URL}`)
 
   if (process.env.NODE_ENV === 'development') {
     require('vue-devtools').install()
   }
 
-  // downloadNewBackendServer()
   downloadNewBackendServer()
   promoteNewlyDownloadedExeToLatest()
   serverManager.start()

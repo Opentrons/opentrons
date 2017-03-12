@@ -1,3 +1,5 @@
+const http = require('http');
+const fs = require('fs');
 const rp = require('request-promise')
 
 function waitUntilServerResponds (createWindow, windowUrl) {
@@ -12,17 +14,16 @@ function waitUntilServerResponds (createWindow, windowUrl) {
     })
 }
 
-function download (url, dest, cb) {
-  console.log('got here..')
+function download (url, dest, successCb, failureCb) {
   var file = fs.createWriteStream(dest);
   var request = http.get(url, function(response) {
     response.pipe(file);
     file.on('finish', function() {
-      file.close(cb);
+      file.close(successCb);
     });
   }).on('error', function(err) {
     fs.unlink(dest);
-    if (cb) cb(err.message);
+    if (failureCb) failureCb(err.message);
   });
 };
 
