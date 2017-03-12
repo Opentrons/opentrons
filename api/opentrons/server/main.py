@@ -13,7 +13,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons import robot, Robot
+from opentrons import robot, Robot, containers, instruments
 from opentrons.containers import placeable
 from opentrons.instruments import Pipette
 from opentrons.util import trace
@@ -82,7 +82,7 @@ def load_python(stream):
     )
     try:
         try:
-            exec(code, globals(), get_protocol_locals())
+            exec(code, globals())
         except Exception as e:
             tb = e.__traceback__
             stack_list = traceback.extract_tb(tb)
@@ -98,7 +98,7 @@ def load_python(stream):
             )
 
         robot = restore_patched_robot()
-        robot.simulate()
+        # robot.simulate()
         if len(robot._commands) == 0:
             error = (
                 "This protocol does not contain any commands for the robot."
@@ -507,9 +507,11 @@ def _get_unique_containers(instrument):
     """
     unique_containers = set()
     for location in instrument.placeables:
-        containers = [c for c in location.get_trace() if isinstance(
-            c, placeable.Container)]
-        unique_containers.add(containers[0])
+        if isinstance(location, placeable.WellSeries):
+            location = location[0]
+        for c in location.get_trace():
+            if isinstance(c, placeable.Container):
+                unique_containers.add(c)
 
     return _sort_containers(list(unique_containers))
 
@@ -573,7 +575,7 @@ def create_step_list():
                     'label': container.get_name(),
                     'slot': container.get_parent().get_name()
                 }
-                for container in _get_all_containers()
+                for container in _get_unique_containers(instrument)
             ]
         } for instrument in _get_all_pipettes()]
     except Exception as e:
@@ -690,7 +692,17 @@ def move_to_container():
     try:
         instrument = robot._instruments[axis.upper()]
         container = robot._deck[slot].get_child_by_name(name)
-        instrument.move_to(container[0].bottom(), enqueue=False)
+
+        well_x, well_y, well_z = tuple(instrument.calibrator.convert(
+            container[0],
+            container[0].bottom()[1]))
+        _, _, robot_max_z = robot._driver.get_dimensions()
+
+        # move to max Z to avoid collisions while calibrating
+        robot.move_head(z=robot_max_z)
+        robot.move_head(x=well_x, y=well_y)
+        robot.move_head(z=well_z)
+
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
