@@ -50,50 +50,19 @@ function createAndSetAppDataDir () {
   process.env['APP_DATA_DIR'] = appDataDir
 }
 
-// function spawnProcess(file, args, options) {
-//   cp = child_process.spawn(file, args, options)
-//   cp.stdout.on('data', (data) => {
-//     console.log(`stdout: ${data}`);
-//     mainWindow.webContents.send('app-env-loading-data', data)
-//   });
-//   cp.stderr.on('data', (data) => {
-//     console.log(`stderr: ${data}`);
-//     mainWindow.webContents.send('app-env-loading-error', data)
-//   });
-//   cp.on('close', (code) => {
-//     console.log(`child process exited with code ${code}`);
-//     mainWindow.webContents.send('app-env-loading-error', `Update process failed with code ${code}`)
-//   });
-//   return cp
-// }
-
-// app.on('python-env-ready', function () {
-//   console.log('Run pip update')
-//   let envLoc = pythonEnvManager.getEnvAppDataDirPath()
-//   let pyRunScript = path.join(envLoc, 'pyrun.sh')
-//   let wheelNameFile = urlJoin(STATIC_ASSETS_URL, 'whl-name')
-//   console.log('wheel name file', wheelNameFile)
-//
-//   rp(wheelNameFile).then(wheelName => {
-//     console.log(`Found: "${wheelName}"`)
-//     const wheelNameURIEncoded = encodeURIComponent(wheelName.trim())
-//     const opentronsWheelUrl = urlJoin(STATIC_ASSETS_URL, wheelNameURIEncoded)
-//     pyRunProcess = spawnProcess(pyRunScript, [opentronsWheelUrl], {cwd: envLoc})
-//   }).catch((err) => {
-//     pyRunProcess = spawnProcess(pyRunScript, [''], {cwd: envLoc})
-//   })
-// })
-
 function downloadNewBackendServer () {
   /**
    * 1) Get exe name from from file
    * 2) With exe name; download actual exe
    * 3) Save downloaded exe with extension "*.new"
    */
-  const = urlToFileWithNewExeName = ''
+  const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
   rp(urlToFileWithNewExeName).then(exeName => {
     const exeNameURIEncoded = encodeURIComponent(exeName.trim())
     const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
+    console.log('Detected new server exe:', opentronsExeUrl)
+  }).catch((err) => {
+    console.log('Could not find latest exe to download', err)
   })
 }
 
@@ -110,6 +79,7 @@ function startUp () {
     require('vue-devtools').install()
   }
 
+  downloadNewBackendServer()
   promoteNewlyDownloadedExeToLatest()
   serverManager.start()
   waitUntilServerResponds(

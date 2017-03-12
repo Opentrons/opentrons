@@ -3,7 +3,7 @@
 set -e
 
 # STATIC_ASSETS_BASE_URL="http://s3.amazonaws.com/ot-app-builds/assets/"\
-PORT=6500
+PORT=8000
 
 if [[ $1 == "remote" ]]; then
     # Upload data to S3 and run app off of S3 data
@@ -12,11 +12,7 @@ if [[ $1 == "remote" ]]; then
     STATIC_ASSETS_BRANCH=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')"-$USER"
     STATIC_ASSETS_BASE_URL="http://s3.amazonaws.com/ot-app-builds/assets/"
 else
-    # Host data locally and run app off of local python server data
-    echo "Starting python server on port: $PORT"
-    python -m http.server $PORT >/dev/null 2>&1 &
-    webpack --watch &
-    STATIC_ASSETS_BRANCH="release-assets"
+    STATIC_ASSETS_BRANCH="assets"
     STATIC_ASSETS_BASE_URL="http://localhost:$PORT/"
 fi;
 
