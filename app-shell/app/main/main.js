@@ -57,7 +57,7 @@ function getDownloadInfoForNewBackendServer () {
    * 3) Save downloaded exe with extension "*.new"
    */
 
-  var processPlatformToS3BucketMap = {
+  var processPlatformToS3FolderMap = {
     'darwin': 'mac',
     'win32': 'win',
     'linux': 'linux'
@@ -71,7 +71,7 @@ function getDownloadInfoForNewBackendServer () {
       const exeNameURIEncoded = encodeURIComponent(downloadInfo.name)
       const opentronsExeUrl = urlJoin(
         STATIC_ASSETS_URL,
-        processPlatformToS3BucketMap[process.platform],
+        processPlatformToS3FolderMap[process.platform],
         exeNameURIEncoded
       )
       downloadInfo.url = opentronsExeUrl
@@ -87,7 +87,8 @@ function downloadNewBackendServer() {
   getDownloadInfoForNewBackendServer().then((downloadInfo) => {
     const userDataPath = app.getPath('userData')
     const exeFolder = path.join(userDataPath, 'server-executables')
-    const downloadDest = path.join(exeFolder, downloadInfo.name, '.new')
+    const downloadDest = path.join(exeFolder, downloadInfo.name + '.new')
+    console.log('Downloading exe to', downloadDest)
     download(downloadInfo.url, downloadDest, console.log)
   })
 }
