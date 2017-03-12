@@ -709,41 +709,6 @@ def move_to_container():
     })
 
 
-@app.route('/move_to_well', methods=["POST"])
-def move_to_well():
-    robot = Robot.get_instance()
-    slot = request.json.get("slot")
-    name = request.json.get("label")
-    axis = request.json.get("axis")
-    well_name = request.json.get("well")
-    try:
-        instrument = robot._instruments[axis.upper()]
-        container = robot._deck[slot].get_child_by_name(name)
-        well = container[well_name]
-
-        well_x, well_y, _ = well.from_center(
-            x=0, y=0, z=0, reference=robot._deck)
-        _, _, robot_max_z = robot._driver.get_dimensions()
-
-        # move to max Z to avoid collisions while calibrating
-        robot.move_head(z=robot_max_z)
-        robot.move_head(x=well_x, y=well_y)
-        instrument.move_to(
-            well.bottom(), strategy='direct', enqueue=False)
-
-    except Exception as e:
-        emit_notifications([str(e)], 'danger')
-        return flask.jsonify({
-            'status': 'error',
-            'data': str(e)
-        })
-
-    return flask.jsonify({
-        'status': 'success',
-        'data': ''
-    })
-
-
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
     robot = Robot.get_instance()
