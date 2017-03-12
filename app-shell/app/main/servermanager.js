@@ -175,6 +175,7 @@ class ServerManager {
 }
 
 module.exports = {
+  getLatestExecutablePath,
   promoteNewlyDownloadedExeToLatest,
   ServerManager
 }

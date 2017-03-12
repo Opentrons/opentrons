@@ -12,7 +12,7 @@ const {app, BrowserWindow, ipcMain} = electron
 const {addMenu} = require('./menu.js')
 const {getLogger} = require('./logging.js')
 const {initAutoUpdater} = require('./updater.js')
-const {promoteNewlyDownloadedExeToLatest, ServerManager} = require('./servermanager.js')
+const {getLatestExecutablePath, promoteNewlyDownloadedExeToLatest, ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
 const {download, waitUntilServerResponds} = require('./util.js')
 
@@ -84,13 +84,22 @@ function getDownloadInfoForNewBackendServer () {
 }
 
 function downloadNewBackendServer() {
-  let makeFileExecutable = (file) => () => { fs.chmodSync(file, '755') }
+  let promoteExeFromLoadingToNew = (file) => () => {
+    let newFile = file.replace('loading', 'new')
+    fs.chmodSync(file, '755')
+    fs.renameSync(file, newFile)
+  }
   getDownloadInfoForNewBackendServer().then((downloadInfo) => {
     const userDataPath = app.getPath('userData')
     const exeFolder = path.join(userDataPath, 'server-executables')
-    const downloadDest = path.join(exeFolder, downloadInfo.name + '.new')
+    const downloadDest = path.join(exeFolder, downloadInfo.name + '.loading')
+    let latestExePath = getLatestExecutablePath().replace('.latest', '.loading')
+    if (downloadDest === latestExePath) {
+      console.log('SKIPPING EXE DOWNLOAD')
+      return
+    }
     console.log('Downloading exe to', downloadDest)
-    download(downloadInfo.url, downloadDest, makeFileExecutable(downloadDest), console.log)
+    download(downloadInfo.url, downloadDest, promoteExeFromLoadingToNew(downloadDest), console.log)
   })
 }
 
