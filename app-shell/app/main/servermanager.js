@@ -108,7 +108,6 @@ function getDownloadInfoForNewBackendServer () {
    * 2) With exe name; download actual exe
    * 3) Save downloaded exe with extension "*.new"
    */
-
   var processPlatformToS3FolderMap = {
     'darwin': 'mac',
     'win32': 'win',
@@ -123,7 +122,6 @@ function getDownloadInfoForNewBackendServer () {
       , 'exe-name-' + STATIC_ASSETS_BRANCH
     )
     console.log(`[ServerManager] urlToFileWithNewExeName: ${urlToFileWithNewExeName}`)
-
     rp(urlToFileWithNewExeName).then(exeName => {
       downloadInfo.name = path.basename(exeName.trim())
       const exeNameURIEncoded = encodeURIComponent(downloadInfo.name)
@@ -132,9 +130,8 @@ function getDownloadInfoForNewBackendServer () {
         processPlatformToS3FolderMap[process.platform],
         exeNameURIEncoded
       )
-
-      console.log('GOT HERE')
       downloadInfo.url = opentronsExeUrl
+
       console.log('[ServerManager] New server exe info', downloadInfo)
       resolve(downloadInfo)
     }).catch((err) => {
