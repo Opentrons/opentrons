@@ -91,9 +91,10 @@ function promoteNewlyDownloadedExeToLatest () {
     const latestExePath = newExePath.replace('new', 'latest')
     console.log(`[ServerManager] Found new exe: "${newExePath}". Renaming to: "${latestExePath}"`)
 
+    const currentExePath = getLatestExecutablePath()
     try {
-      fs.renameSync(newExePath, latestExePath)
-      // console.log('[ServerManager] Exe  promotion done')
+      if (currentExePath) fs.unlink(currentExePath)  // Remove old latest
+      fs.renameSync(newExePath, latestExePath)  // Mark new exe as latest
     } catch (e) {
       console.log(`[ServerManager] Error renaming exe from ${newExePath} to ${latestExePath}`)
     }
