@@ -51,6 +51,7 @@ function startUp () {
   createAndSetAppDataDir()
   const mainLogger = getLogger('electron-main')
 
+  // TODO: Refactor app into function that logs all env vars startup..
   // mainLogger.info(`STATIC_ASSETS_BASE_URL: ${STATIC_ASSETS_BASE_URL}`)
   // mainLogger.info(`STATIC_ASSETS_BRANCH: ${STATIC_ASSETS_BRANCH}`)
 
@@ -60,7 +61,6 @@ function startUp () {
 
   downloadNewBackendServer()  // rename to async
   promoteNewlyDownloadedExeToLatest().then(() => serverManager.start())
-  // serverManager.start()
   waitUntilServerResponds(
     () => createWindow('http://localhost:31950/'),
     'http://localhost:31950/'

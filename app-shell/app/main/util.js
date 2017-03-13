@@ -28,6 +28,6 @@ function downloadFileFromWeb (url, dest, successCb, failureCb) {
 };
 
 module.exports = {
-  download,
+  downloadFileFromWeb,
   waitUntilServerResponds
 }
