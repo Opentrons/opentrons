@@ -73,19 +73,25 @@ function getServerExecutablesPath () {
  * Renames the 'new' exe to 'latest'
  */
 function promoteNewlyDownloadedExeToLatest () {
-  const newExePath = getNewlyDownloadedExecutablePath()
+  return new Promise((resolve, reject) => {
+    console.log('[ServerManager] Initiating promotion of new exe to latest')
+    const newExePath = getNewlyDownloadedExecutablePath()
+    // if we dont have a new exe exit
+    if (newExePath === null) {
+      console.log('[ServerManager] No "*.new" exe detected; skipping promotion')
+      resolve()
+    }
+    const latestExePath = newExePath.replace('new', 'latest')
+    console.log(`[ServerManager] Found new exe: "${newExePath}". Renaming to: "${latestExePath}"`)
 
-  // if we dont have a new exe exit
-  if (newExePath === null) {
-    return
-  }
-
-  const latestExePath = newExePath.replace('new', 'latest')
-  try {
-    fs.renameSync(newExePath, latestExePath)
-  } catch (e) {
-    console.log(`Error renaming exe from ${newExePath} to ${latestExePath}`)
-  }
+    try {
+      fs.renameSync(newExePath, latestExePath)
+      // console.log('[ServerManager] Exe  promotion done')
+    } catch (e) {
+      console.log(`[ServerManager] Error renaming exe from ${newExePath} to ${latestExePath}`)
+    }
+    resolve()
+  })
 }
 
 function downloadNewBackendServer () {

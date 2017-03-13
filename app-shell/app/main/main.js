@@ -109,15 +109,14 @@ function startUp () {
 
   mainLogger.info(`STATIC_ASSETS_BASE_URL: ${STATIC_ASSETS_BASE_URL}`)
   mainLogger.info(`STATIC_ASSETS_BRANCH: ${STATIC_ASSETS_BRANCH}`)
-  // mainLogger.info(`STATIC_ASSETS_URL: ${STATIC_ASSETS_URL}`)
 
   if (process.env.NODE_ENV === 'development') {
     require('vue-devtools').install()
   }
 
-  downloadNewBackendServer()
-  promoteNewlyDownloadedExeToLatest()
-  serverManager.start()
+  downloadNewBackendServer()  // Make async
+  promoteNewlyDownloadedExeToLatest().then(() => serverManager.start())
+  // serverManager.start()
   waitUntilServerResponds(
     () => createWindow('http://localhost:31950/'),
     'http://localhost:31950/'
