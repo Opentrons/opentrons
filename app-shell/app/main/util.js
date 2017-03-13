@@ -17,6 +17,10 @@ function waitUntilServerResponds (createWindow, windowUrl) {
 function downloadFileFromWeb (url, dest, successCb, failureCb) {
   var file = fs.createWriteStream(dest);
   var request = http.get(url, function(response) {
+    // Ensure file response is valid
+    if (response.statusCode != 200) {
+      if (failureCb) failureCb(err.message);
+    }
     response.pipe(file);
     file.on('finish', function() {
       file.close(successCb);

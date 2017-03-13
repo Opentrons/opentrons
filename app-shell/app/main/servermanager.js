@@ -101,25 +101,6 @@ function promoteNewlyDownloadedExeToLatest () {
   })
 }
 
-// function downloadNewBackendServer () {
-//   #<{(|*
-//    * 1) Get exe name from from file
-//    * 2) With exe name; download actual exe
-//    * 3) Save downloaded exe with extension "*.new"
-//    |)}>#
-//
-//   return new Promise((resolve, reject) => {
-//     const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
-//     rp(urlToFileWithNewExeName).then(exeName => {
-//       const exeNameURIEncoded = encodeURIComponent(exeName.trim())
-//       const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
-//       console.log(`[ServerManager] Detected new server exe: ${opentronsExeUrl}`)
-//     }).catch((err) => {
-//       console.log(`[ServerManager] Could not download latest exe ${err}`)
-//     })
-//   })
-// }
-
 function getDownloadInfoForNewBackendServer () {
   /**
    * 1) Get exe name from from file
@@ -135,8 +116,11 @@ function getDownloadInfoForNewBackendServer () {
 
   return new Promise((resolve, reject) => {
     let downloadInfo = {url: null, name: null}
-    console.log(`[ServerManager] varss`, STATIC_ASSETS_BASE_URL, 'exe-name-' + STATIC_ASSETS_BRANCH)
-    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_BASE_URL, 'exe-name-' + STATIC_ASSETS_BRANCH)
+    const urlToFileWithNewExeName = urlJoin(
+      STATIC_ASSETS_BASE_URL,
+      processPlatformToS3FolderMap[process.platform]
+      , 'exe-name-' + STATIC_ASSETS_BRANCH
+    )
     console.log(`[ServerManager] urlToFileWithNewExeName: ${urlToFileWithNewExeName}`)
 
     rp(urlToFileWithNewExeName).then(exeName => {
