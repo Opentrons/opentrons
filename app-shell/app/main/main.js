@@ -83,7 +83,7 @@ function getDownloadInfoForNewBackendServer () {
 }
 
 function downloadNewBackendServer() {
-  let promoteExeFromLoadingToNew = (file) => () => {
+  let promoteExeFromLoadingToNewFuncMaker = (file) => () => {
     let newFile = file.replace('loading', 'new')
     fs.chmodSync(file, '755')
     fs.renameSync(file, newFile)
@@ -114,7 +114,7 @@ function startUp () {
     require('vue-devtools').install()
   }
 
-  downloadNewBackendServer()  // Make async
+  downloadNewBackendServer()  // rename to async
   promoteNewlyDownloadedExeToLatest().then(() => serverManager.start())
   // serverManager.start()
   waitUntilServerResponds(

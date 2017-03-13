@@ -1,12 +1,15 @@
 const childProcess = require('child_process')
-const electron = require('electron')
 const fs = require('fs');
 const http = require('http');
 const path = require('path')
+const os = require('os')
 
+const electron = require('electron')
 const {app} = electron
-
 const glob = require('glob')
+
+const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/server-exes/'
+const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
 
 /**
  * Returns path to backend built with electron app
@@ -113,21 +116,63 @@ function downloadNewBackendServer () {
   })
 }
 
-// function downloadNewBackendServer () {
-//   #<{(|*
-//    * 1) Get exe name from from file
-//    * 2) With exe name; download actual exe
-//    * 3) Save downloaded exe with extension "*.new"
-//    |)}>#
-//   const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
-//   rp(urlToFileWithNewExeName).then(exeName => {
-//     const exeNameURIEncoded = encodeURIComponent(exeName.trim())
-//     const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
-//     console.log('Detected new server exe:', opentronsExeUrl)
-//   }).catch((err) => {
-//     console.log('Could not find latest exe to download', err)
-//   })
-// }
+function getDownloadInfoForNewBackendServer () {
+  /**
+   * 1) Get exe name from from file
+   * 2) With exe name; download actual exe
+   * 3) Save downloaded exe with extension "*.new"
+   */
+
+  var processPlatformToS3FolderMap = {
+    'darwin': 'mac',
+    'win32': 'win',
+    'linux': 'linux'
+  }
+
+  return new Promise((resolve, reject) => {
+    let downloadInfo = {url: null, name: null}
+    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_BASE_URL, 'exe-name-' + STATIC_ASSETS_BRANCH)
+    rp(urlToFileWithNewExeName).then(exeName => {
+      downloadInfo.name = path.basename(exeName.trim())
+      const exeNameURIEncoded = encodeURIComponent(downloadInfo.name)
+      const opentronsExeUrl = urlJoin(
+        STATIC_ASSETS_BASE_URL,
+        processPlatformToS3FolderMap[process.platform],
+        exeNameURIEncoded
+      )
+      downloadInfo.url = opentronsExeUrl
+      console.log('New server exe info:', downloadInfo)
+      resolve(downloadInfo)
+    }).catch((err) => {
+      console.log('Could not find latest exe to download from', urlToFileWithNewExeName)
+    })
+  })
+}
+
+function downloadNewBackendServer() {
+  let promoteExeFromLoadingToNew = (file) => () => {
+    let newFile = file.replace('loading', 'new')
+    fs.chmodSync(file, '755')
+    fs.renameSync(file, newFile)
+  }
+  getDownloadInfoForNewBackendServer().then((downloadInfo) => {
+    const userDataPath = app.getPath('userData')
+    // const exeFolder = path.join(userDataPath, 'server-executables')
+    const downloadDest = path.join(os.tempdir(), downloadInfo.name + '.new')
+    if (path.basename(downloadDest) === path.basename(latestExePath)) {
+      console.log('[ServerManager] Skipping exe download because current exe is the lastest')
+      return
+    } else {
+      console.log(`[ServerManager] Initiating new exe download at: ${downloadDest}`)
+      download(
+        downloadInfo.url,
+        downloadDest,
+        promoteExeFromLoadingToNew(downloadDest),
+        console.log
+      )
+    }
+  })
+}
 
 class ServerManager {
   constructor () {
