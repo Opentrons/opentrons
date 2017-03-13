@@ -14,7 +14,7 @@ function waitUntilServerResponds (createWindow, windowUrl) {
     })
 }
 
-function download (url, dest, successCb, failureCb) {
+function downloadFileFromWeb (url, dest, successCb, failureCb) {
   var file = fs.createWriteStream(dest);
   var request = http.get(url, function(response) {
     response.pipe(file);

@@ -7,6 +7,10 @@ const os = require('os')
 const electron = require('electron')
 const {app} = electron
 const glob = require('glob')
+const rp = require('request-promise')
+const urlJoin = require('url-join')
+
+const {download} = require('./util.js')
 
 const STATIC_ASSETS_BASE_URL = process.env.STATIC_ASSETS_BASE_URL || 'http://s3.amazonaws.com/ot-app-builds/server-exes/'
 const STATIC_ASSETS_BRANCH = process.env.STATIC_ASSETS_BRANCH || 'stable'
@@ -97,24 +101,24 @@ function promoteNewlyDownloadedExeToLatest () {
   })
 }
 
-function downloadNewBackendServer () {
-  /**
-   * 1) Get exe name from from file
-   * 2) With exe name; download actual exe
-   * 3) Save downloaded exe with extension "*.new"
-   */
-
-  return new Promise((resolve, reject) => {
-    const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
-    rp(urlToFileWithNewExeName).then(exeName => {
-      const exeNameURIEncoded = encodeURIComponent(exeName.trim())
-      const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
-      console.log('Detected new server exe:', opentronsExeUrl)
-    }).catch((err) => {
-      console.log('Could not find latest exe to download', err)
-    })
-  })
-}
+// function downloadNewBackendServer () {
+//   #<{(|*
+//    * 1) Get exe name from from file
+//    * 2) With exe name; download actual exe
+//    * 3) Save downloaded exe with extension "*.new"
+//    |)}>#
+//
+//   return new Promise((resolve, reject) => {
+//     const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_URL, 'exe-name')
+//     rp(urlToFileWithNewExeName).then(exeName => {
+//       const exeNameURIEncoded = encodeURIComponent(exeName.trim())
+//       const opentronsExeUrl = urlJoin(STATIC_ASSETS_URL, exeNameURIEncoded)
+//       console.log(`[ServerManager] Detected new server exe: ${opentronsExeUrl}`)
+//     }).catch((err) => {
+//       console.log(`[ServerManager] Could not download latest exe ${err}`)
+//     })
+//   })
+// }
 
 function getDownloadInfoForNewBackendServer () {
   /**
@@ -131,7 +135,10 @@ function getDownloadInfoForNewBackendServer () {
 
   return new Promise((resolve, reject) => {
     let downloadInfo = {url: null, name: null}
+    console.log(`[ServerManager] varss`, STATIC_ASSETS_BASE_URL, 'exe-name-' + STATIC_ASSETS_BRANCH)
     const urlToFileWithNewExeName = urlJoin(STATIC_ASSETS_BASE_URL, 'exe-name-' + STATIC_ASSETS_BRANCH)
+    console.log(`[ServerManager] urlToFileWithNewExeName: ${urlToFileWithNewExeName}`)
+
     rp(urlToFileWithNewExeName).then(exeName => {
       downloadInfo.name = path.basename(exeName.trim())
       const exeNameURIEncoded = encodeURIComponent(downloadInfo.name)
@@ -140,26 +147,31 @@ function getDownloadInfoForNewBackendServer () {
         processPlatformToS3FolderMap[process.platform],
         exeNameURIEncoded
       )
+
+      console.log('GOT HERE')
       downloadInfo.url = opentronsExeUrl
-      console.log('New server exe info:', downloadInfo)
+      console.log('[ServerManager] New server exe info', downloadInfo)
       resolve(downloadInfo)
     }).catch((err) => {
-      console.log('Could not find latest exe to download from', urlToFileWithNewExeName)
+      console.log(`[ServerManager] Could not find latest exe to download from: ${urlToFileWithNewExeName}`)
     })
   })
 }
 
 function downloadNewBackendServer() {
+  console.log('[ServerManager] Initiating new server download')
   let promoteExeFromLoadingToNew = (file) => () => {
-    let newFile = file.replace('loading', 'new')
+    // let newFile = file.replace('loading', 'new')
     fs.chmodSync(file, '755')
     fs.renameSync(file, newFile)
   }
   getDownloadInfoForNewBackendServer().then((downloadInfo) => {
     const userDataPath = app.getPath('userData')
     // const exeFolder = path.join(userDataPath, 'server-executables')
-    const downloadDest = path.join(os.tempdir(), downloadInfo.name + '.new')
-    if (path.basename(downloadDest) === path.basename(latestExePath)) {
+    const downloadDest = path.join(os.tmpdir(), downloadInfo.name + '.new')
+    console.log(`[ServerManager] New exe downloadDest ${downloadDest}`)
+    const currentExePath = getLatestExecutablePath() || getBuiltinExecutablePath()
+    if (path.basename(downloadDest) === path.basename(currentExePath)) {
       console.log('[ServerManager] Skipping exe download because current exe is the lastest')
       return
     } else {
@@ -171,6 +183,9 @@ function downloadNewBackendServer() {
         console.log
       )
     }
+  }).catch((err) => {
+    console.log('[ServerManager] Error encountered getting download info for new exe')
+    console.trace(`[ServerManager] ${err}`)
   })
 }
 
@@ -226,7 +241,7 @@ class ServerManager {
 }
 
 module.exports = {
-  getLatestExecutablePath,
+  downloadNewBackendServer,
   promoteNewlyDownloadedExeToLatest,
   ServerManager
 }
