@@ -15,7 +15,6 @@ matrix:
       python: "3.5"  # TODO: revisit...
       # python: "3.6"
       env: OPENTRONS_APP_UPLOAD_DIR=linux
-      env: OPENTRONS_APP_ASSETS_DIR=linux
       addons:
         apt:
           sources: &common_sources
@@ -33,25 +32,29 @@ matrix:
 cache:
   apt: true
   directories:
-    - app/node_modules
-    - app/app/node_modules
-    - $HOME/.electron
-    - pip
-    - $HOME/.cache/pip3
+    - app-src/node_modules
+    - app-shell/node_modules
+    - app-shell/app/node_modules
+    # - $HOME/.electron
+    # - pip
+    # - $HOME/.cache/pip3
     - $HOME/.cache/our-brew
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
-  - ./app/scripts/travis.sh pre-install
+  - ./app-shell/scripts/travis.sh pre-install
 
 install:
   - python --version
   - python3 --version
   - git remote set-branches --add origin $STABLE_BRANCH
   - git fetch
-  - ./build-all
-  - ./has_changes.sh api "cd api && make api && cd .."
-  - ./has_changes.sh app "cd app && make app && cd .."
+  # - ./build-all
+  # - ./has_changes.sh api "cd api && make api && cd .."
+  # - ./has_changes.sh app "cd app && make app && cd .."
+  -  ./scripts/with-nodenv-linux "make app"
+  - make api-exe
+  -  ./scripts/with-nodenv-linux "make app-shll"
 
 script:
   - echo "Skipping Travis scripts"
@@ -63,19 +66,19 @@ deploy:
   secret_access_key: $AWS_SECRET_KEY
   bucket: ot-app-builds
   skip_cleanup: true
-  local-dir: app/releases
+  local-dir: app-shell/releases
   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
   acl: public_read
   on:
     repo: OpenTrons/opentrons-api
     all_branches: true
 
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: scripts/publish.sh
-  on:
-    tags: true
+# deploy:
+#   provider: script
+#   skip_cleanup: true
+#   script: scripts/publish.sh
+#   on:
+#     tags: true
 
 env:
   global:
