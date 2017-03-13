@@ -14,8 +14,8 @@ __pycache__/
 .Python
 env/
 build/
-app/release-assets/*
-!app/release-assets/index.html
+app-shell/release-assets/*
+!app-shell/release-assets/index.html
 #!build/
 #build/*
 #!build/html/
@@ -90,3 +90,11 @@ smoothie/
 # SDK logs
 *.log
 *.log.*
+
+
+# JS
+node_modules
+app-src/test/coverage
+
+# app api assets
+api/opentrons/server/templates/
