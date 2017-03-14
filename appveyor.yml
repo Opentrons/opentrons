@@ -63,7 +63,7 @@ install:
   # 1. INSTALL PYTHON DEPENDENCIES
   # - cmd: "%PIP3% install -r requirements.txt"
   # - ls: C:\Python35\scripts
-  - make app
+  - make.exe app
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
