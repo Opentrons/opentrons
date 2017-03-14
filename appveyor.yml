@@ -52,6 +52,7 @@ init:
 
   # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
+  - cmd: set PATH=c:\MinGW\bin;%PATH%
   - cmd: ECHO Path - %PATH%
   # - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
   - ps: cp C:\Python35\python.exe C:\Python35\python3
@@ -60,8 +61,9 @@ install:
   # NOTE: OTONE-FRONTEND NOW CLONED INTO C:\\PROJECTS\OTOONE-FRONTEND
 
   # 1. INSTALL PYTHON DEPENDENCIES
-  - cmd: "%PIP3% install -r requirements.txt"
-  - ls: C:\Python35\scripts
+  # - cmd: "%PIP3% install -r requirements.txt"
+  # - ls: C:\Python35\scripts
+  - make app
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
@@ -74,8 +76,8 @@ install:
   - npm install -g mocha@3.1.2
   - npm run unit
   - npm run release:win
-  - ps: C:\Python35\python scripts\create_env.py
-  - ps: scripts\test_env.bat
+  # - ps: C:\Python35\python scripts\create_env.py
+  # - ps: scripts\test_env.bat
   # - npm run integration
 
 build: off
