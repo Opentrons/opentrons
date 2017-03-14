@@ -54,7 +54,7 @@ init:
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
   - cmd: ECHO Path - %PATH%
   # - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
-  - ps: cp C:\Python35\python.exe C:\Python34\python3
+  - ps: cp C:\Python35\python.exe C:\Python35\python3
 
 install:
   # NOTE: OTONE-FRONTEND NOW CLONED INTO C:\\PROJECTS\OTOONE-FRONTEND
@@ -65,8 +65,6 @@ install:
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
-  # - ps: C:\Python35\python scripts\create_env.py
-  # - ps: scripts\test_env.bat
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   - cmd: npm config list
