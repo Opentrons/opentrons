@@ -65,7 +65,7 @@ def get_upload_proof_robot(robot):
         'simulate'
     ]
 
-    def mock(self, *args, **kwargs):
+    def mock(*args, **kwargs):
         pass
 
     stashed_methods = {}
