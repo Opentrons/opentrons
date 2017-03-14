@@ -52,7 +52,7 @@ init:
 
   # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
-  - ps: cp c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make
+  - cmd: cp c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make
   - cmd: set PATH=c:\MinGW\bin;%PATH%
   - cmd: ls -la c:\MinGW\bin
   - cmd: ECHO Path - %PATH%
@@ -71,9 +71,9 @@ install:
   - cmd: npm config list
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
-  - cmd: make app
-  - cmd: make api-exe
-  - cmd: make app-shll
+  - ps: make app
+  - ps: make api-exe
+  - ps: make app-shll
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   # - npm install
