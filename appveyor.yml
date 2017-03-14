@@ -53,7 +53,7 @@ init:
   # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
   - cmd: set PATH=c:\MinGW\bin;%PATH%
-  - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make
+  - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
   - cmd: ECHO Path - %PATH%
   # - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
   - ps: cp C:\Python35\python.exe C:\Python35\python3
@@ -71,7 +71,7 @@ install:
   - cmd: npm config list
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
-  - make app
+  - make.exe app
   - mingw32-make api-exe
   - mingw32-make app-shll
 
