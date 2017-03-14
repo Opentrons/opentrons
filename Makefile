@@ -13,7 +13,7 @@ api-exe:
 	cd api &&\
 		make api
 
-api-exe:
+api-exe-win:
 	cd api &&\
 		make api-win
 

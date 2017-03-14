@@ -72,7 +72,7 @@ install:
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
   - make app
-  - make api-exe
+  - make api-exe-win
   - make app-shll
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
