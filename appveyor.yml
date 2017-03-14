@@ -52,8 +52,9 @@ init:
 
   # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
-  - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make
+  - ps: cp c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make
   - cmd: set PATH=c:\MinGW\bin;%PATH%
+  - cmd: ls c:\MinGW\bin
   - cmd: ECHO Path - %PATH%
   - ps: cp C:\Python35\python.exe C:\Python35\python3
 
