@@ -72,8 +72,8 @@ install:
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
   - make app
-  - mingw32-make api-exe
-  - mingw32-make app-shll
+  - make api-exe
+  - make app-shll
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   # - npm install
@@ -87,9 +87,9 @@ install:
 build: off
 
 before_deploy:
-  - ps: Get-ChildItem .\releases\*
-  - ps: ls .\releases\*
-  - ps: Get-ChildItem .\releases\* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
+  - ps: Get-ChildItem .\app-shell\releases\*
+  - ps: ls .\app-shell\releases\*
+  - ps: Get-ChildItem .\app-shell\releases\* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
 
 
 deploy:

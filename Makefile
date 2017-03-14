@@ -17,8 +17,6 @@ api-exe:
 	cd api &&\
 		make api-win
 
-
-
 app-shll:
 	cd app-shell &&\
 		npm --version &&\
