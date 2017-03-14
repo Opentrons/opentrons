@@ -70,10 +70,12 @@ install:
 
   - cmd: npm config list
   - cmd: npm config set python %PYTHON2%\python.exe --global
+  # - git log --oneline --all --graph --decorate  $(git reflog | awk '{print $1}')
 
-  - ps: make app
-  - ps: make api-exe
-  - ps: make app-shll
+  - cmd: doskey make=c:\MinGW\bin\mingw32-make.exe $*
+  - cmd: make app
+  - cmd: make api-exe
+  - cmd: make app-shll
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   # - npm install
