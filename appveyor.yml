@@ -71,7 +71,7 @@ install:
   - cmd: npm config list
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
-  - make.exe app
+  - make app
   - mingw32-make api-exe
   - mingw32-make app-shll
 
