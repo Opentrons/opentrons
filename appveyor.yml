@@ -72,13 +72,12 @@ install:
   - cmd: npm config set python %PYTHON2%\python.exe --global
   # - git log --oneline --all --graph --decorate  $(git reflog | awk '{print $1}')
 
-  # - cmd: doskey make=c:\MinGW\bin\mingw32-make.exe $*
+  - cmd: doskey make=c:\MinGW\bin\mingw32-make.exe $*
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
   - cmd: cp c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make
-  - cmd: set PATH=c:\MinGW\bin;%PATH%
-  - cmd: make app
-  - cmd: make api-exe
-  - cmd: make app-shll
+  - make app
+  - make api-exe
+  - make app-shll
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   # - npm install
