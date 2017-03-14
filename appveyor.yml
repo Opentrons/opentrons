@@ -45,14 +45,16 @@ init:
   - ps: Install-Product node 6.0.0 x64
   - cmd: node --version
   - cmd: npm --version
-    # CRITICAL FOR NODE-GYP TO WORK
+
+  # CRITICAL FOR NODE-GYP TO WORK
   - cmd: npm -g install npm@latest
   - cmd: npm --version
 
   # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
   - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
   - cmd: ECHO Path - %PATH%
-  - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
+  # - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
+  - ps: cp C:\Python35\python.exe C:\Python34\python3
 
 install:
   # NOTE: OTONE-FRONTEND NOW CLONED INTO C:\\PROJECTS\OTOONE-FRONTEND
@@ -63,8 +65,8 @@ install:
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
-  - ps: C:\Python35\python scripts\create_env.py
-  - ps: scripts\test_env.bat
+  # - ps: C:\Python35\python scripts\create_env.py
+  # - ps: scripts\test_env.bat
 
   # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   - cmd: npm config list
