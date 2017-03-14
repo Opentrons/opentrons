@@ -63,19 +63,22 @@ install:
   # 1. INSTALL PYTHON DEPENDENCIES
   # - cmd: "%PIP3% install -r requirements.txt"
   # - ls: C:\Python35\scripts
-  - mingw32-make app
 
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
 
-  # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
   - cmd: npm config list
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
-  - npm install
-  - npm install -g mocha@3.1.2
-  - npm run unit
-  - npm run release:win
+  - mingw32-make app
+  - mingw32-make app-exe
+  - mingw32-make app-shll
+
+  # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
+  # - npm install
+  # - npm install -g mocha@3.1.2
+  # - npm run unit
+  # - npm run release:win
   # - ps: C:\Python35\python scripts\create_env.py
   # - ps: scripts\test_env.bat
   # - npm run integration
