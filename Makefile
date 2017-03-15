@@ -13,6 +13,10 @@ api-exe:
 	cd api &&\
 		make api
 
+api-exe-win:
+	cd api &&\
+		make api-win
+
 app-shll:
 	cd app-shell &&\
 		npm --version &&\

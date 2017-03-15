@@ -1,68 +1,85 @@
+os: unstable
+
 environment:
-  global:
-    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
-    # /E:ON and /V:ON options are not enabled in the batch script intepreter
-    # See: http://stackoverflow.com/a/13751649/163740
-    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
-
   matrix:
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5.x" # currently 3.5.1
-      PYTHON_ARCH: "64"
+    - language: cpp
+      PYTHON3: "C:\\Python35"
+      PYTHON3_VERSION: "3.5.0"
+      PYTHON3_ARCH: "64"
 
-install:
-  # If there is a newer build queued for the same PR, cancel this one.
-  # The AppVeyor 'rollout builds' option is supposed to serve the same
-  # purpose but it is problematic because it tends to cancel builds pushed
-  # directly to master instead of just PR builds (or the converse).
-  # credits: JuliaLang developers.
-  - ps: if ($env:APPVEYOR_PULL_REQUEST_NUMBER -and $env:APPVEYOR_BUILD_NUMBER -ne ((Invoke-RestMethod `
-        https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG/history?recordsNumber=50).builds | `
-        Where-Object pullRequestId -eq $env:APPVEYOR_PULL_REQUEST_NUMBER)[0].buildNumber) { `
-          throw "There are newer queued builds for this pull request, failing early." }
-  - ECHO "Filesystem root:"
-  - ps: "ls \"C:/\""
+      # PYTHON2.7 REQUIRED FOR NODE-GYP & ELECTRON
+      PYTHON2: "C:\\Python27"
+      PYTHON2_VERSION: "2.7.9"
+      PYTHON2_ARCH: "64"
 
-  - ECHO "Installed SDKs:"
+  PIP3: C:\\Python35\Scripts\pip
+  PIP2: C:\\Python27\Scripts\pip
+
+  npm_config_arch: x64
+
+platform: x64
+
+configuration: Release
+
+init:
+  - cmd: node --version
+  - cmd: npm --version
+
+  - "ECHO Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
 
-  # Install Python (from the official .msi of http://python.org) and pip when
-  # not already installed.
-  - ps: if (-not(Test-Path($env:PYTHON))) { & appveyor\install.ps1 }
+  - cmd: ECHO Processor architecture - %PROCESSOR_ARCHITECTURE%
+  - cmd: wmic OS get OSArchitecture
+  - cmd: npm config set msvs_version 2015 --global
 
-  # Prepend newly installed Python to the PATH of this build (this cannot be
-  # done from inside the powershell script as it would require to restart
-  # the parent CMD process).
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - cmd: ECHO %PYTHON3% %PYTHON3_VERSION% %PYTHON3_ARCH%
+  - cmd: "%PYTHON3%\\python --version"
+  - cmd: "%PYTHON3%\\python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - cmd: "%PYTHON3%\\python -m pip install --upgrade pip"
 
-  # Check that we have the expected version and architecture for Python
-  - "python --version"
-  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - cmd: ECHO %PYTHON2% %PYTHON2_VERSION% %PYTHON2_ARCH%
+  - cmd: "%PYTHON2%\\python --version"
+  - cmd: "%PYTHON2%\\python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - cmd: "%PYTHON2%\\python -m pip install --upgrade pip"
 
-  # Upgrade to the latest version of pip to avoid it displaying warnings
-  # about it being out of date.
-  - "pip install --disable-pip-version-check --user --upgrade pip"
-  # - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
-  - ps: "ls ."
-  - ps: "ls c:\\cygwin64"
-  - ps: "ls c:\\cygwin64\\bin\\"
+  - ps: Install-Product node 6.0.0 x64
+  - cmd: node --version
+  - cmd: npm --version
 
-  # Install the build dependencies of the project. If some dependencies contain
-  # compiled extensions and are not provided as pre-built wheel packages,
-  # pip will build them from source using the MSVC compiler matching the
-  # target Python version and architecture
-  # - "%CMD_IN_ENV% pip install -r requirements.txt"
+  # CRITICAL FOR NODE-GYP TO WORK
+  - cmd: npm -g install npm@latest
+  - cmd: npm --version
 
-build_script:
-  # Build the compiled extension
-  # - "%CMD_IN_ENV% python setup.py build"
-  # - "%CMD_IN_ENV% cd api && c:\\cygwin64\\bin\\make.exe api-install && c:\\cygwin64\\bin\\make.exe -f Makefile api-test"
-  - cmd: "cd api && ls && c:\\cygwin64\\bin\\make.exe api-install && c:\\cygwin64\\bin\\make.exe api-test"
+  # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
+  - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
+  - cmd: set PATH=c:\MinGW\bin;%PATH%
+  - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
+  - cmd: ECHO Path - %PATH%
+  - ps: cp C:\Python35\python.exe C:\Python35\python3
 
-# test_script:
-  # Run the project tests
-  # - "%CMD_IN_ENV% python setup.py nosetests"
+install:
+  - cmd: "%PIP2% freeze"
+  - cmd: "%PIP3% freeze"
 
+  - cmd: npm config list
+  - cmd: npm config set python %PYTHON2%\python.exe --global
 
-#on_success:
-#  - TODO: upload the content of dist/*.whl to a public wheelhouse
+  - make app
+  - make api-exe-win
+  - make app-shll
+
+build: off
+
+before_deploy:
+  - ps: Get-ChildItem .\app-shell\releases\*
+  - ps: ls .\app-shell\releases\*
+  - ps: Get-ChildItem .\app-shell\releases\* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
+
+deploy:
+  - provider: S3
+    access_key_id: $(AWS_ACCESS_KEY)
+    secret_access_key: $(AWS_SECRET_KEY)
+    bucket: ot-app-builds
+    set_public: true
+    folder: win
+    artifact: OTAppWin
