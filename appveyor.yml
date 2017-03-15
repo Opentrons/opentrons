@@ -55,16 +55,9 @@ init:
   - cmd: set PATH=c:\MinGW\bin;%PATH%
   - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
   - cmd: ECHO Path - %PATH%
-  # - ps: cp C:\Python35\python.exe C:\Python34\python3.5.exe
   - ps: cp C:\Python35\python.exe C:\Python35\python3
 
 install:
-  # NOTE: OTONE-FRONTEND NOW CLONED INTO C:\\PROJECTS\OTOONE-FRONTEND
-
-  # 1. INSTALL PYTHON DEPENDENCIES
-  # - cmd: "%PIP3% install -r requirements.txt"
-  # - ls: C:\Python35\scripts
-
   - cmd: "%PIP2% freeze"
   - cmd: "%PIP3% freeze"
 
@@ -75,22 +68,12 @@ install:
   - make api-exe-win
   - make app-shll
 
-  # ADDITIONAL NPM PREP FOR ELECTRON APP BUILD
-  # - npm install
-  # - npm install -g mocha@3.1.2
-  # - npm run unit
-  # - npm run release:win
-  # - ps: C:\Python35\python scripts\create_env.py
-  # - ps: scripts\test_env.bat
-  # - npm run integration
-
 build: off
 
 before_deploy:
   - ps: Get-ChildItem .\app-shell\releases\*
   - ps: ls .\app-shell\releases\*
   - ps: Get-ChildItem .\app-shell\releases\* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
-
 
 deploy:
   - provider: S3
