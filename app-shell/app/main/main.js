@@ -18,7 +18,6 @@ const {waitUntilServerResponds} = require('./util.js')
 
 let serverManager = new ServerManager()
 let mainWindow
-let pyRunProcess
 
 
 if (process.env.NODE_ENV === 'development'){
