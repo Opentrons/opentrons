@@ -17,6 +17,7 @@ api-exe-win:
 	cd api &&\
 		make api-win
 
+# TODO(Ahmed): turn on integration tests; "npm run e2e"
 app-shell:
 	cd app-shell &&\
 		npm --version &&\
@@ -24,7 +25,6 @@ app-shell:
 		npm config get python &&\
 		npm i &&\
 		npm run unit-main &&\
-		npm run e2e &&\
 		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
