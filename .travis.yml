@@ -54,7 +54,7 @@ install:
   # - ./has_changes.sh app "cd app && make app && cd .."
   -  ./scripts/with-nodenv-linux "make app"
   - make api-exe
-  -  ./scripts/with-nodenv-linux "make app-shll"
+  -  ./scripts/with-nodenv-linux "make app-shell"
 
 script:
   - echo "Skipping Travis scripts"
