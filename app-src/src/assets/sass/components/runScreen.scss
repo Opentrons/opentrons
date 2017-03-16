@@ -3,18 +3,19 @@ Run Screen
 ******************************/
 .runScreen {
     .runCommand {
-        padding-bottom: 16px;
-        margin: 25px;
+        padding-bottom: 0px;
+        margin: 5px;
         &:last-child {
             color: $primary-brand;
         }
     }
-    
     #exit {
-        position: static;
+        position: fixed;
         top: auto;
         padding-left: 685px;
-        padding-right: 5px;
+        padding-right: 10px;
+        font-size: xx-large;
+        font-weight: bold;
         cursor: pointer;
         color: $secondary-brand;
     }
