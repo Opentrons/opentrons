@@ -113,7 +113,7 @@ describe('application launch', function () {
   }
 
   it('runs a user uploaded protocol', function () {
-    let file = path.join(__dirname, '..', '..', 'server', 'tests', 'data', '/simple_protocol.py')
+    let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/simple_protocol.py')
 
     this.app.client.execute(() => {
       window.confirm = function () { return true }
@@ -136,7 +136,7 @@ describe('application launch', function () {
   })
 
   it('handles upload of empty protocol gracefully', function () {
-    let file = path.join(__dirname, '..', '..', 'server', 'tests', 'data', '/empty.py')
+    let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/empty.py')
     let expectedText = 'This protocol does not contain any commands for the robot.'
     return this.app.client.waitUntilWindowLoaded(31950)
       .then(uploadProtocol.bind(this, file))
