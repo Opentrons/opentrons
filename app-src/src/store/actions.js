@@ -97,7 +97,13 @@ const actions = {
     commit(types.UPDATE_PROTOCOL_FINISHED, {'running': true})
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    Opentrons.runProtocol()
+    if (window.confirm('About to run protocol. Home robot before running?')) {
+      console.log('one')
+      Opentrons.runHomeProtocol()
+    } else {
+      console.log('two')
+      Opentrons.runProtocol()
+    }
   },
   pauseProtocol ({ commit }) {
     Opentrons.pauseProtocol().then((wasSuccessful) => {
