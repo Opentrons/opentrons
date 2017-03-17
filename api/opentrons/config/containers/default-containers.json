@@ -5511,6 +5511,10 @@
                }
           },
           "wheaton_vial_rack": {
+               "origin-offset": {
+                    "x": 9,
+                    "y": 9
+               },
                "locations": {
                     "A1": {
                          "x": 0,
