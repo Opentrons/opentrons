@@ -847,24 +847,25 @@ def set_max_volume():
     })
 
 
-def _calibrate_placeable(container_name, axis_name):
+def _calibrate_placeable(container_name, parent_slot, axis_name):
     robot = Robot.get_instance()
     deck = robot._deck
-    deck_containers = deck.containers()
+    slot = deck.get_child_by_name(parent_slot)
     axis_name = axis_name.upper()
+    this_container = slot.get_child_by_name(container_name)
 
-    if container_name not in deck_containers:
-        raise ValueError('Container {} is not defined'.format(container_name))
+    if not this_container:
+        raise ValueError('Container {0} not found in slot {1}'.format(
+            container_name, parent_slot))
 
     if axis_name not in robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
     instrument = robot._instruments[axis_name]
-    container = deck_containers[container_name]
 
-    well = container[0]
-    pos = well.from_center(x=0, y=0, z=-1, reference=container)
-    location = (container, pos)
+    well = this_container[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=this_container)
+    location = (this_container, pos)
 
     instrument.calibrate_position(location)
     return instrument.calibration_data
@@ -874,8 +875,9 @@ def _calibrate_placeable(container_name, axis_name):
 def calibrate_placeable():
     name = request.json.get("label")
     axis = request.json.get("axis")
+    slot = request.json.get("slot")
     try:
-        _calibrate_placeable(name, axis)
+        _calibrate_placeable(name, slot, axis)
         calibrations = update_step_list()
         emit_notifications([
             'Saved {0} for the {1} axis'.format(name, axis)], 'success')
