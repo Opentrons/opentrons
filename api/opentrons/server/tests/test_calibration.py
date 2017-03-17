@@ -125,7 +125,7 @@ class CalibrationTestCase(unittest.TestCase):
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
-        self.robot.move_to = mock.Mock()
+        self.robot.move_head = mock.Mock()
 
         arguments = {
             'label': 'test-plate',
@@ -145,13 +145,11 @@ class CalibrationTestCase(unittest.TestCase):
             'test-plate')
         instrument = self.robot._instruments['B']
         expected = [
-            mock.call(
-                container[0].bottom(),
-                instrument=instrument,
-                strategy='arc',
-                enqueue=False)
+            mock.call(z=100),
+            mock.call(x=112.24, y=158.83999999999997),
+            mock.call(z=0.0)
         ]
-        self.assertEquals(self.robot.move_to.mock_calls, expected)
+        self.assertEquals(self.robot.move_head.mock_calls, expected)
 
     def test_calibrate_placeable(self):
         response = self.app.post('/upload', data={
