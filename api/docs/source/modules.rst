@@ -1,11 +1,30 @@
-.. _module:
+.. _modules:
 
-================================
+=======
 Modules
-================================
+=======
 
-Magnetic Bead
---------------------------------
+**********************
+
+Heat Deck
+---------
+
+The heat deck runs off the opensource platform Arduino, which is how you can control it's temperature. Our heat decks come automatically set to reach a temperature of 55 deg Celsius, but you can edit this value by editing the Arduino file.
+
+Find our Heat Deck source code `on GitHub here`__, and download.
+
+__ https://github.com/OpenTrons/opentrons-modules
+
+Also download and install the `Arduino IDE`__.
+
+__ https://www.arduino.cc/en/main/software
+
+Open the file, and you will see detailed instruction for how to update the temperature. The overiew is that you simply set the number for what temperature you want, then upload that code to the Heat Deck.
+
+**********************
+
+Magbead
+-------
 
 Setting up Hardware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
