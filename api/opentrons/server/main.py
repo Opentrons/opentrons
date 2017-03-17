@@ -232,7 +232,7 @@ def emit_notifications(notifications, _type):
         })
 
 
-def _run_commands():
+def _run_commands(should_home_first=True):
     robot = Robot.get_instance()
 
     start_time = time.time()
@@ -241,7 +241,6 @@ def _run_commands():
 
     try:
         robot.resume()
-        robot.home()
         robot.run(caller='ui')
         if len(robot._commands) == 0:
             error = \
@@ -268,6 +267,13 @@ def _run_commands():
 def run():
     threading.Thread(target=_run_commands).start()
     return flask.jsonify({'status': 'success', 'data': {}})
+
+
+@app.route("/run_home", methods=["GET"])
+def run_home():
+    robot = Robot.get_instance()
+    robot.home()
+    return run()
 
 
 @app.route("/pause", methods=["GET"])
