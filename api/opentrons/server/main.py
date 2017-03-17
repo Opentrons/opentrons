@@ -850,9 +850,8 @@ def set_max_volume():
 def _calibrate_placeable(container_name, parent_slot, axis_name):
     robot = Robot.get_instance()
     deck = robot._deck
-    slot = deck.get_child_by_name(parent_slot)
+    this_container = deck[parent_slot].get_child_by_name(container_name)
     axis_name = axis_name.upper()
-    this_container = slot.get_child_by_name(container_name)
 
     if not this_container:
         raise ValueError('Container {0} not found in slot {1}'.format(

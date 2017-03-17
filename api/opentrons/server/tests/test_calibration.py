@@ -158,7 +158,8 @@ class CalibrationTestCase(unittest.TestCase):
 
         arguments = {
             'label': 'test-plate',
-            'axis': 'b'
+            'axis': 'b',
+            'slot': 'B2'
         }
 
         response = self.app.post(
