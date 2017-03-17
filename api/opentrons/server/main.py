@@ -14,8 +14,6 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons import robot, Robot, containers, instruments
-from opentrons.containers import placeable
-from opentrons.instruments import Pipette
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
@@ -480,7 +478,7 @@ def _get_all_pipettes():
     robot = Robot.get_instance()
     pipette_list = []
     for _, p in robot.get_instruments():
-        if isinstance(p, Pipette):
+        if isinstance(p, instruments.Pipette):
             pipette_list.append(p)
     return sorted(
         pipette_list,
@@ -507,10 +505,10 @@ def _get_unique_containers(instrument):
     """
     unique_containers = set()
     for location in instrument.placeables:
-        if isinstance(location, placeable.WellSeries):
+        if isinstance(location, containers.placeable.WellSeries):
             location = location[0]
         for c in location.get_trace():
-            if isinstance(c, placeable.Container):
+            if isinstance(c, containers.placeable.Container):
                 unique_containers.add(c)
 
     return _sort_containers(list(unique_containers))
@@ -531,7 +529,7 @@ def _check_if_calibrated(instrument, container):
 
 def _check_if_instrument_calibrated(instrument):
     # TODO: rethink calibrating instruments other than Pipette
-    if not isinstance(instrument, Pipette):
+    if not isinstance(instrument, instruments.Pipette):
         return True
 
     positions = instrument.positions
@@ -846,17 +844,17 @@ def set_max_volume():
 def _calibrate_placeable(container_name, axis_name):
     robot = Robot.get_instance()
     deck = robot._deck
-    containers = deck.containers()
+    deck_containers = deck.containers()
     axis_name = axis_name.upper()
 
-    if container_name not in containers:
+    if container_name not in deck_containers:
         raise ValueError('Container {} is not defined'.format(container_name))
 
     if axis_name not in robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
     instrument = robot._instruments[axis_name]
-    container = containers[container_name]
+    container = deck_containers[container_name]
 
     well = container[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=container)

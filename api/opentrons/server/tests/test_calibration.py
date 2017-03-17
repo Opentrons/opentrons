@@ -141,9 +141,6 @@ class CalibrationTestCase(unittest.TestCase):
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
-        container = self.robot._deck['B2'].get_child_by_name(
-            'test-plate')
-        instrument = self.robot._instruments['B']
         expected = [
             mock.call(z=100),
             mock.call(x=112.24, y=158.83999999999997),
