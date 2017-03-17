@@ -1,0 +1,128 @@
+{
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "clean": "rm -rf ./out && rm -rf ./releases/*",
+    "build:backend": "python3 scripts/build_pyinstaller.py",
+    "build:frontend": "python scripts/build_electron_app_with_builder.py",
+    "release": "npm run build:backend && npm run build:frontend",
+    "build:env:win": "C:\\Python35\\python scripts\\create_env.py",
+    "build:env:posix": "./scripts/build_app_assets.py",
+    "build:backend:posix": "./scripts/create_env.py",
+    "build:backend:win": "C:\\Python35\\python scripts\\build_app_assets.py",
+    "build:frontend:posix": "./scripts/build_electron_app_with_builder.py",
+    "build:frontend:win": "C:\\Python35\\python scripts\\build_electron_app_with_builder.py",
+    "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/renderer",
+    "release:posix": "npm run build:env:posix && npm run build:backend:posix && npm run build:frontend:posix",
+    "release:win": "npm run build:env:win && npm run build:backend:win && npm run build:frontend:win",
+    "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
+    "unit-renderer": "karma start test/renderer/karma.conf.js --single-run",
+    "unit-main": "mocha test/main/",
+    "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js",
+    "test": "npm run unit-main; npm run unit-renderer; npm run integration; nosetests"
+  },
+  "devDependencies": {
+    "babel-core": "^6.0.0",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.0.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-stage-2": "^6.17.0",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
+    "cross-env": "^3.1.3",
+    "css-loader": "^0.25.0",
+    "electron": "^1.4.7",
+    "electron-builder": "10.9.2",
+    "electron-chromedriver": "1.4.1",
+    "eslint": "^3.10.2",
+    "eslint-config-standard": "^5.1.0",
+    "eslint-friendly-formatter": "^1.2.2",
+    "eslint-loader": "^1.3.0",
+    "eslint-plugin-html": "^1.3.0",
+    "eslint-plugin-promise": "^1.0.8",
+    "eslint-plugin-standard": "^1.3.2",
+    "file-loader": "^0.9.0",
+    "glob": "^7.1.1",
+    "inject-loader": "^2.0.1",
+    "isparta-loader": "^2.0.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-coverage": "^1.1.1",
+    "karma-electron": "^5.1.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-mocha": "^1.2.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-spec-reporter": "0.0.26",
+    "karma-webpack": "^1.8.0",
+    "live-reload": "^1.1.0",
+    "mocha": "^3.1.2",
+    "node-sass": "^3.10.1",
+    "sass-loader": "^4.0.2",
+    "spectron": "3.4.1",
+    "url-loader": "^0.5.7",
+    "vue-devtools": "^2.0.4",
+    "webpack": "1.13.2",
+    "webpack-dev-server": "1.14.0",
+    "webpack-merge": "^0.15.0"
+  },
+  "build": {
+    "asar": true,
+    "appId": "ot.one.opentrons",
+    "electronVersion": "1.4.7",
+    "productName": "Opentrons 2.0",
+    "extraResources": [
+      "env-dist/venv.zip"
+    ],
+    "dmg": {
+      "backgroundColor": "white",
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "productivity"
+    },
+    "win": {
+      "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico",
+      "target": [
+        "squirrel"
+      ]
+    },
+    "linux": {
+      "category": "Science",
+      "target": "deb"
+    }
+  },
+  "dependencies": {
+    "asar": "^0.13.0",
+    "autotrack": "1.1.0",
+    "babel-preset-es2016": "^6.16.0",
+    "electron-debug": "^1.0.1",
+    "imports-loader": "^0.6.5",
+    "resolve-url-loader": "^1.6.0",
+    "sinon": "^1.17.6",
+    "socket.io-client": "~1.3.7",
+    "underscore.string": "^3.3.4",
+    "vue": "2.0.5",
+    "vue-loader": "9.9.3",
+    "vue-resource": "1.0.3",
+    "vue-router": "2.0.2",
+    "vue-template-compiler": "2.0.5",
+    "vuex": "2.0.0",
+    "vuex-toast": "0.0.2",
+    "websocket": "^1.0.23"
+  }
+}

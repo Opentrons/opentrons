@@ -1,0 +1,43 @@
+/******************************
+VARS
+******************************/
+
+@font-face {
+    font-family: "trons";
+    src: url("../assets/fonts/Geogtq-Rg-webfont.woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "open-sans";
+    src: url("../assets/fonts/OpenSans-Regular-webfont.woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*
+OpenSans-Regular-webfont.svg
+OpenSans-Regular-webfont.eot
+OpenSans-Regular-webfont.woff
+*/
+
+$baseline: 22px;
+$basesize: 12px;
+$btn-size: 30px;
+$gutter-width:2px;
+$stack-sans: "trons",sans-serif;
+
+/* Color Scheme */
+
+$primary-black:rgba(40,40,50,1); //black
+$primary-brand: rgba(0,112,255,1); //blue
+$secondary-brand: #05C1B3; //teal
+$call-to-action: rgba(250,175,66,1); //mustard
+$well-bg: rgba(245,245,245,1); //light grey
+$btn-jog: rgba(100,100,100,1); //dark grey
+
+/* Typography Specific*/
+
+$primary-text: rgba(41,30,38,1); //black
+$primary-link: $secondary-brand;
