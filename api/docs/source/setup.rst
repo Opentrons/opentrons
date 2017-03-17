@@ -1,96 +1,379 @@
 .. _setup:
 
-================
-Code Environment
-================
+==========
+Setup
+==========
 
-Jupyter Code Environment
------------------------------
+There are a few things to consider when beginning a new Python protocol. In this section, we exlain the Opentrons API's ``containers``, ``instruments``, and ``robot`` modules, and how they are used to setup and control your Python protocol.
 
-Jupyter is an interactive programming environment that runs in the browser. Jupyter can support multiple programming languages but we will only be using it for Python 3.5.
+.. toctree::
+    :maxdepth: 3
 
-Install Anaconda and Python 3
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    setup
 
-To run Opentrons you will need to ensure you have Python 3.5 installed. We recommend you install `Anaconda`_ before going any further, this will install Python for you. We recommend you use the `Graphical Installer` for `Python3.5`.
+**********************
 
-Install Jupyter
+.. testsetup:: containers
+
+    from opentrons import containers, robot
+    robot.reset()
+
+Containers
+----------
+
+The containers module allows you to load common labware into your protocol. `Go here`__ to see a visualization of all built-in containers.
+
+__ https://andysigler.github.io/ot-api-containerviz/
+
+.. testcode:: containers
+
+    '''
+    Examples in this section require the following
+    '''
+    from opentrons import containers
+
+List
+^^^^
+
+Once the container module is loaded, you can see a list of all containers currently inside the API by calling ``containers.list()``
+
+.. testcode:: containers
+
+    containers.list()
+
+Load
+^^^^
+
+Labware is loaded with two arguments: 1) the container type, and 2) the deck slot it will be placed in on the robot.
+
+.. testcode:: containers
+
+    p = containers.load('96-flat', 'B1')
+
+A third optional argument can be used to give a container a unique name.
+
+.. testcode:: containers
+
+    p = containers.load('96-flat', 'B1', 'any-name-you-want')
+
+Unique names are useful in a few scenarios. First, they allow the container to have independant calibration data from other containers in the same slot. In the example above, the container named 'any-name-you-want' will assume different calibration data from the unnamed plate, even though they are the same type and in the same slot.
+
+.. note::
+
+    Calibration data refers to the saved positions for each container on deck, and is a part of the `Opentrons App calibration procedure`__.
+
+__ https://opentrons.com/getting-started/calibrate-deck
+
+Names can also be used to place multiple containers in the same slot all at once. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
+
+.. testcode:: containers
+
+    fa = containers.load('T25-flask', 'D1', 'flask_a')
+    fb = containers.load('T25-flask', 'D1', 'flask_b')
+    fc = containers.load('T25-flask', 'D1', 'flask_c')
+
+Create
+^^^^^^
+
+In addition to the default containers that come with the Opentrons API, you can create your own custom containers.
+
+Through the API's call containers.create(), you can create simple grid containers, which consist of circular wells arranged in columns and rows.
+
+.. testcode:: containers
+
+    containers.create(
+        '3x6_plate',                    # name of you container
+        grid=(3, 6),                    # specify amount of (columns, rows)
+        spacing=(12, 12),               # distances (mm) between each (column, row)
+        diameter=5,                     # diameter (mm) of each well on the plate
+        depth=10)                       # depth (mm) of each well on the plate
+
+When you create your custom container, then it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
+
+.. testcode:: containers
+
+    custom_plate = containers.load('3x6_plate', 'D1')
+
+    for well in custom_plate.wells():
+        print(well)
+
+will print out...
+
+.. testoutput:: containers
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+
+    <Well A1>
+    <Well B1>
+    <Well C1>
+    <Well A2>
+    <Well B2>
+    <Well C2>
+    <Well A3>
+    <Well B3>
+    <Well C3>
+    <Well A4>
+    <Well B4>
+    <Well C4>
+    <Well A5>
+    <Well B5>
+    <Well C5>
+    <Well A6>
+    <Well B6>
+    <Well C6>
+
+.. testsetup:: pipettes
+
+    from opentrons import instruments, robot
+    robot.reset()
+
+**********************
+
+Instruments
+-----------
+
+The ``instruments`` module gives your protocol access to the ``Pipette``, which is what you will be primarily using to create protocol commands.
+
+.. testcode:: pipettes
+
+    '''
+    Examples in this section require the following
+    '''
+    from opentrons import instruments
+
+Axis and Max Volume
+^^^^^^^^^^^^^^^^^^^
+
+To create a ``Pipette``, you must give it an axis and a max_volume. The axis can be either ``'a'`` or ``'b'``, and the volume is whatever your hand pipette is calibrated for. In this example, we are using a 200uL pipette.
+
+.. testcode:: pipettes
+
+    pipette = instruments.Pipette(
+        axis='b',
+        name='my-p200',
+        max_volume=200)
+
+Minimum Volume
+^^^^^^^^^^^^^^
+
+The minimum allowed volume can be set for each pipette. If your protocol attempts to aspirate or dispense a volume below this volume, the API will give you a warning.
+
+.. testcode:: pipettes
+
+    pipette = instruments.Pipette(
+        axis='b',
+        name='my-p200',
+        max_volume=200,
+        min_volume=20)
+
+Channels
+^^^^^^^^
+
+Pipettes can also be assigned a number of channels, either ``channel=1`` or ``channel=8``. If you do not specify, it will default to ``channel=1`` channel.
+
+.. testcode:: pipettes
+
+    pipette = instruments.Pipette(
+        axis='b',
+        name='my-p200-multichannel',
+        max_volume=200,
+        min_volume=20,
+        channels=8)
+
+Plunger Speeds
+^^^^^^^^^^^^^^
+
+The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_speed`` and ``dispense_speed``. The values are in millimeters/minute, and default to ``aspirate_speed=300`` and ``dispense_speed=500``.
+
+.. testcode:: pipettes
+
+    pipeipette = instruments.Pipette(
+        axis='b',
+        name='my-p200-multichannel',
+        max_volume=200,
+        min_volume=20,
+        channels=8,
+        aspirate_speed=200,
+        dispense_speed=600)
+
+.. testsetup:: robot
+
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
+
+    plate = containers.load('96-flat', 'B1', 'my-plate')
+    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
+
+    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
+
+**********************
+
+Robot
+-----
+
+The robot module can be thought of as the parent for all aspects of the Opentrons API. All containers, instruments, and protocol commands are added to and controlled by robot.
+
+.. testcode:: robot
+
+    '''
+    Examples in this section require the following
+    '''
+    from opentrons import robot, containers, instruments
+
+    plate = containers.load('96-flat', 'B1', 'my-plate')
+    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
+
+    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
+
+Get Containers
+^^^^^^^^^^^^^^
+
+When containers are loaded, they are automatically added to the ``robot``. You can see all currently held containers by calling ``robot.get_containers()``, which returns a `Python list`__.
+
+__ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
+
+.. testcode:: robot
+    
+    for name, container in robot.get_containers():
+        print(name, container.get_type())
+
+will print out...
+
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+
+    my-plate 96-flat
+    my-rack tiprack-200ul
+
+Get Instruments
 ^^^^^^^^^^^^^^^
 
-After Anaconda and Python 3 are installed, you can get started installing Jupyter by following the official `Jupyter Installation Guide`_.
+When instruments are created, they are automatically added to the ``robot``. You can see all currently held instruments by calling ``robot.get_instruments()``, which returns a `Python list`__.
 
-Launch Jupyter Notebook App
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
-With GUI -- *Reccomended for Beginners*:
-  1. Install and open the Anaconda Navagator App you just downloaded.
-  2. Click 'Launch' under Jupyter Notebook.
-  3. A new Jupyter Notebook will open in a new browser window. 
+.. testcode:: robot
+    
+    for axis, pipette in robot.get_instruments():
+        print(pipette.name, axis)
 
-In Terminal:
-  1. Click on spotlight, type `terminal` to open a terminal window.
-  2. Create and Enter the startup folder by typing `mkdir some_folder_name && cd some_folder_name`.
-  3. Type `jupyter notebook` to launch the Jupyter Notebook App (it will appear in a new browser window or tab).
+will print out...
 
-Programming in Jupyter Notebook: Hello World!
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-When the Jupyter Notebook App is launched on your browser, follow these steps to open a `Notebook`
+    my-pipette B
 
-  1. Navigate towards the `New` dropdown menu button towards the top right hand side of the screen Jupyter Notebook App. 
-  2. Click the `New` menu button and scroll down and click `python [conda root]`.
+Commands
+^^^^^^^^
 
-A new tab should open in your browser and you should have an empty text box.
+When commands are called on a pipette, they are automatically enqueued to the ``robot`` in the order they are called. You can see all currently held commands by calling ``robot.commands()``, which returns a `Python list`__.
 
-  3. Type `print('hello world')` in the text box. 
-  4. Scroll to the top menu bar and press they `play button >| ` to execute the code in the text box. This will cause Jupyter to execute the code in the text box and return you the computed result, which should be 'Hello World'.
+__ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
-Install Opentrons API
----------------------
+.. testcode:: robot
+    
+    pipette.pick_up_tip(tiprack.wells('A1'))
+    pipette.drop_tip(tiprack.wells('A1'))
 
-Before running any code, you need to install the Opentrons API. 
+    for c in robot.commands():
+        print(c)
 
-If you are running Anaconda, open Anaconda Navigator. On Home screen click `Channels` and add `opentrons`. This will allow you to install `opentrons` package from our channel. 
+will print out...
 
-In Jupyter click `Conda`. Find and install `opentrons` package. Make sure to check for updates!
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-If you are not using Anaconda copy and paste the following code into the first cell of your notebook. This only needs to be done the first time you use Jupyter, so feel free to comment it out after it successfully installs.
+    Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
+    Drop_tip at <Deck><Slot A1><Container my-rack><Well A1>
 
-.. code-block:: bash
-  
-  !pip install --upgrade opentrons
+Clear Commands
+^^^^^^^^^^^^^^
 
-After this step you should be able to run:
+Once commands are enqueued to the ``robot``, we can erase those commands by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but all commands are erased.
 
-.. code-block:: bash
+.. testcode:: robot
+    
+    robot.clear_commands()
+    pipette.pick_up_tip(tiprack['A1'])
+    print('There is', len(robot.commands()), 'command')
 
-  import opentrons
-  opentrons.__version__
+    robot.clear_commands()
+    print('There are now', len(robot.commands()), 'commands')
 
-Which should return the version of opentrons package installed.
+will print out...
 
-If you made it this far without any errors then you are done! You should treat yourself well tonight and celebrate your successes generously!
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-If you want to learn more about Jupyter Notebook Navigation `check this out`_. 
+    There is 1 command
+    There are now 0 commands
 
-.. _Anaconda: https://www.continuum.io/downloads
+Comment
+^^^^^^^
 
-.. _Jupyter Installation Guide: http://jupyter.readthedocs.io/en/latest/install.html
+You can add a custom message to the list of command descriptions you see when running ``robot.commands()``. This command is ``robot.comment()``, and it allows you to print out any information you want at the point in your protocol
 
-.. _check this out: http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb
+.. testcode:: robot
+    
+    robot.clear_commands()
 
-Saving File to Run
----------------------
+    pipette.pick_up_tip(tiprack['A1'])
+    robot.comment("Hello, just picked up tip A1")
 
-Our app supports python (.py) files and JSON files.  
+    pipette.pick_up_tip(tiprack['A1'])
+    robot.comment("Goodbye, just dropped tip A1")
 
-.py File
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    for c in robot.commands():
+        print(c)
 
-You can download any jupyter notebook files as a .py file, and the app will ignore everything except the containers and commands.  
+will print out...
 
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-JSON File
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
+    Hello, just picked up tip A1
+    Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
+    Goodbye, just dropped tip A1
 
-Old JSON files can still be run in 2.0, and still need their deck, head, ingredients and instruction section.  However, we recommend writing all protocols using our new API as they will enable you to do a lot more with the robot - don't hesitate to reach out if you have trouble translating your files!
+Simulate
+^^^^^^^^
+
+Once commands have been enqueued to the ``robot``, we can simulate their execution by calling ``robot.simulate()``. This helps us debug our protocol, and to see if the robots gives us any warnings.
+
+.. testcode:: robot
+    
+    pipette.pick_up_tip()
+
+    for warning in robot.simulate():
+        print(warning)
+
+will print out...
+
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+
+    pick_up_tip called with no reference to a tip
+
+Reset
+^^^^^
+
+Calling ``robot.reset()`` will remove everything from the robot. Any previously added containers, pipettes, or commands will be erased.
+
+.. testcode:: robot
+    
+    robot.reset()
+    print(robot.get_containers())
+    print(robot.get_instruments())
+    print(robot.commands())
+
+will print out...
+
+.. testoutput:: robot
+    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+
+    []
+    []
+    []
+

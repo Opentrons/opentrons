@@ -850,7 +850,7 @@ class Robot(object, metaclass=Singleton):
 
     def containers(self):
         """
-        Returns the list of the containers on the deck.
+        Returns the dict with all of the containers on the deck.
         """
         return self._deck.containers()
 
@@ -925,7 +925,15 @@ class Robot(object, metaclass=Singleton):
         if name:
             return self.get_instruments_by_name(name)
 
-        return sorted(self._instruments.items())
+        return sorted(
+            self._instruments.items(), key=lambda s: s[0].lower())
+
+    def get_containers(self):
+        """
+        Returns the list of the containers on the deck.
+        """
+        return sorted(
+            self._deck.containers().items(), key=lambda s: s[0].lower())
 
     def add_container(self, container_name, slot, label=None):
         if not label:
