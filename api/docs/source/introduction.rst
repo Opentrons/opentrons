@@ -1,7 +1,4 @@
-.. Opentrons API documentation master file, created by
-   sphinx-quickstart on Thu Oct 27 12:10:26 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _introduction:
 
 ===============
 Opentrons API
@@ -169,22 +166,3 @@ From the example above, the "commands" section looked like:
 .. code-block:: python
 
     pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
-
-
-Table of Contents
------------------
-
-.. toctree::
-  :maxdepth: 2
-
-  introduction
-  labware_library
-  tutorials
-  calibration
-  modules
-  api
-  firmware
-
-.. |br| raw:: html
-
-   <br />
