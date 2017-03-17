@@ -692,7 +692,15 @@ def move_to_container():
     try:
         instrument = robot._instruments[axis.upper()]
         container = robot._deck[slot].get_child_by_name(name)
-        instrument.move_to(container[0].bottom(), enqueue=False)
+        well_x, well_y, _ = container[0].from_center(
+            x=0, y=0, z=0, reference=robot._deck)
+        _, _, robot_max_z = robot._driver.get_dimensions()
+
+        # move to max Z to avoid collisions while calibrating
+        robot.move_head(z=robot_max_z)
+        robot.move_head(x=well_x, y=well_y)
+        instrument.move_to(
+            container[0].bottom(), strategy='direct', enqueue=False)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
