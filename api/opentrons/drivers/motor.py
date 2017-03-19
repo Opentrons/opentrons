@@ -333,7 +333,7 @@ class CNCDriver(object):
             msg = msg.decode()
             axis = ''
             for ax in 'xyzab':
-                if ('min_' + ax) in msg:
+                if (ax.upper() + '_min') in msg:
                     axis = ax
             raise RuntimeWarning('{} limit switch hit'.format(axis.upper()))
 
@@ -663,17 +663,17 @@ class CNCDriver(object):
         return success
 
     def get_endstop_switches(self):
-        first_line = self.send_command(self.GET_ENDSTOPS)
-        second_line = self.wait_for_response()
-        if second_line == b'ok':
-            res = json.loads(first_line.decode())
-            res = res.get(self.GET_ENDSTOPS)
-            obj = {}
-            for axis in 'xyzab':
-                obj[axis] = bool(res.get('min_' + axis))
-            return obj
-        else:
-            return False
+        # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 pins- (XL)P1.24:0 .......
+        endstop_values = self.send_command(self.GET_ENDSTOPS).decode()
+        self.wait_for_response()  # remove 'ok'
+        self.wait_for_response()  # remove 'ok'
+
+        # ['X_min:0', 'Y_min:0', 'Z_min:0', 'A_min:0', 'B_min:0']
+        endstop_values = endstop_values.split(' ')[:5]
+        return {
+            endstop[0].lower(): bool(int(endstop.split(':')[1]))
+            for endstop in endstop_values
+        }
 
     def set_mosfet(self, mosfet_index, state):
         try:

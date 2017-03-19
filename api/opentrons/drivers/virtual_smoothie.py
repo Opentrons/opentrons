@@ -33,11 +33,11 @@ class VirtualSmoothie(object):
             }
         }
         self.endstop = {
-            'min_x': 0,
-            'min_y': 0,
-            'min_z': 0,
-            'min_a': 0,
-            'min_b': 0
+            'X_min': 0,
+            'Y_min': 0,
+            'Z_min': 0,
+            'A_min': 0,
+            'B_min': 0
         }
         self.steps_per_mm = {
             'X': self.config.get('alpha_steps_per_mm', 80),
@@ -87,8 +87,15 @@ class VirtualSmoothie(object):
         return res
 
     def process_get_endstops(self, arguments):
-        res = {"M119": self.endstop}
-        return json.dumps(res) + '\nok'
+        # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 C_min:0 \
+        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0 
+        # ok
+        # ok
+        res = ''
+        for name, value in self.endstop.items():
+            res += '{}:{} '.format(name, value)
+        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0'
+        return res + '\nok\nok'
 
     def set_position_from_arguments(self, arguments):
         for axis in 'XYZAB':
@@ -105,7 +112,7 @@ class VirtualSmoothie(object):
 
         for axis in axis_list:
             arguments[axis.upper()] = 0.0
-            self.endstop['min_' + axis.lower()] = 0
+            self.endstop[axis.upper() + '_min'] = 0
 
         self.set_position_from_arguments(arguments)
 
@@ -122,7 +129,7 @@ class VirtualSmoothie(object):
         axis_hit = None
         for axis in 'xyzab':
             if self.coordinates['target'][axis] < -3 and self.limit_switches:
-                axis_hit = 'min_' + axis
+                axis_hit = axis.upper() + '_min'
                 self.endstop[axis_hit] = 1
                 break
 
