@@ -58,7 +58,7 @@ class VirtualSmoothie(object):
 
     def parse_command(self, gcode):
         parse_arguments = re.compile(r"(([XYZABSPabF])(\-?[0-9\.]*))")
-        parse_command = re.compile(r"([GM][0-9]*)")
+        parse_command = re.compile(r"([GM][0-9\.]*)")
 
         command = re.findall(parse_command, gcode)
         if len(command) != 1:
@@ -225,7 +225,7 @@ class VirtualSmoothie(object):
             'G4': self.process_dwell_command,
             'M114': self.process_get_position,
             'G92': self.process_set_position_command,
-            'G28': self.process_home_command,
+            'G28.2': self.process_home_command,
             'M119': self.process_get_endstops,
             'M92': self.process_steps_per_mm,
             'M999': self.process_calm_down,

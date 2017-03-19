@@ -35,7 +35,7 @@ class CNCDriver(object):
 
     MOVE = 'G0'
     DWELL = 'G4'
-    HOME = 'G28'
+    HOME = 'G28.2'
     SET_POSITION = 'G92'
     GET_POSITION = 'M114'
     GET_ENDSTOPS = 'M119'
