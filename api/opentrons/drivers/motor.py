@@ -36,10 +36,9 @@ class CNCDriver(object):
     MOVE = 'G0'
     DWELL = 'G4'
     HOME = 'G28.2'
-    SET_POSITION = 'G92'
-    GET_POSITION = 'M114'
+    GET_POSITION = 'M114.2'
+    GET_TARGET = 'M114.4'
     GET_ENDSTOPS = 'M119'
-    SET_SPEED = 'G0'
     HALT = 'M112'
     CALM_DOWN = 'M999'
     ACCELERATION = 'M204'
@@ -467,7 +466,7 @@ class CNCDriver(object):
                 }
             }
             trace.EventBroker.get_instance().notify(arguments)
-            return self.set_position(**pos_args)
+            return True
         else:
             return False
 
@@ -500,13 +499,6 @@ class CNCDriver(object):
         if b'Rebooting' in res:
             self.disconnect()
 
-    def set_position(self, **kwargs):
-        uppercase_args = {}
-        for key in kwargs:
-            uppercase_args[key.upper()] = kwargs[key]
-        res = self.send_command(self.SET_POSITION, **uppercase_args)
-        return res == b'ok'
-
     def get_head_position(self):
         coords = self.get_position()
         coords['current'] = self.flip_coordinates(Vector(coords['current']))
@@ -526,21 +518,27 @@ class CNCDriver(object):
         return plunger_coords
 
     def get_position(self):
-        res = self.send_command(self.GET_POSITION)
-        # remove the "ok " from beginning of response
-        res = res.decode('utf-8')[3:]
+        # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
+        current_string = self.send_command(self.GET_POSITION)
+        self.wait_for_response()  # remove 'ok' from buffer
+
+        # ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
+        target_string = self.send_command(self.GET_TARGET)
+        self.wait_for_response()  # remove 'ok' from buffer
+
         coords = {}
         try:
-            response_dict = json.loads(res).get(self.GET_POSITION)
-            coords = {'target': {}, 'current': {}}
-            for letter in 'xyzab':
-                # the lowercase axis are the "real-time" values
-                coords['current'][letter] = response_dict.get(letter, 0)
-                # the uppercase axis are the "target" values
-                coords['target'][letter] = response_dict.get(letter.upper(), 0)
+            coords['current'] = {
+                s.split(':')[0].lower(): float(s.split(':')[1])
+                for s in current_string.decode('utf-8').split(' ')[2:]
+            }
+            coords['target'] = {
+                s.split(':')[0].lower(): float(s.split(':')[1])
+                for s in target_string.decode('utf-8').split(' ')[2:]
+            }
 
         except ValueError:
-            log.critical("Error parsing JSON string from smoothie board:")
+            log.critical("Error parsing position string from smoothie board:")
             log.critical(res)
 
         return coords

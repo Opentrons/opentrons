@@ -90,15 +90,13 @@ class VirtualSmoothie(object):
         res = {"M119": self.endstop}
         return json.dumps(res) + '\nok'
 
-    def process_set_position_command(self, arguments):
+    def set_position_from_arguments(self, arguments):
         for axis in 'XYZAB':
             if axis in arguments:
                 target = self.coordinates['target']
                 target[axis.lower()] = arguments[axis]
                 current = self.coordinates['current']
                 current[axis.lower()] = arguments[axis]
-
-        return 'ok'
 
     def process_home_command(self, arguments):
         axis_list = arguments.keys()
@@ -109,7 +107,7 @@ class VirtualSmoothie(object):
             arguments[axis.upper()] = 0.0
             self.endstop['min_' + axis.lower()] = 0
 
-        self.process_set_position_command(arguments)
+        self.set_position_from_arguments(arguments)
 
         return 'ok'
 
@@ -119,7 +117,7 @@ class VirtualSmoothie(object):
             if axis.lower() in 'xyzab' and not self.absolute:
                 arguments[axis] += self.coordinates['target'][axis.lower()]
 
-        self.process_set_position_command(arguments)
+        self.set_position_from_arguments(arguments)
 
         axis_hit = None
         for axis in 'xyzab':
@@ -140,12 +138,18 @@ class VirtualSmoothie(object):
         return 'ok'
 
     def process_get_position(self, arguments):
-        res = {}
-        for axis in 'xyzab':
-            res[axis.upper()] = self.coordinates['target'][axis]
-            res[axis] = self.coordinates['current'][axis]
-        res = {'M114': res}
-        return 'ok {}'.format(json.dumps(res))
+        # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+        res = 'ok MCS:'
+        for axis in 'XYZAB':
+            res += ' {}:{}'.format(axis, self.coordinates['current'][axis.lower()])
+        return '{}\nok'.format(res)
+
+    def process_get_target(self, arguments):
+        # ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+        res = 'ok MP:'
+        for axis in 'XYZAB':
+            res += ' {}:{}'.format(axis, self.coordinates['target'][axis.lower()])
+        return '{}\nok'.format(res)
 
     def process_calm_down(self, arguments):
         return 'ok'
@@ -223,8 +227,8 @@ class VirtualSmoothie(object):
             'M': self.process_nop,
             'G0': self.process_move_command,
             'G4': self.process_dwell_command,
-            'M114': self.process_get_position,
-            'G92': self.process_set_position_command,
+            'M114.2': self.process_get_position,
+            'M114.4': self.process_get_target,
             'G28.2': self.process_home_command,
             'M119': self.process_get_endstops,
             'M92': self.process_steps_per_mm,
