@@ -101,51 +101,26 @@ class CNCDriver(object):
 
         self.defaults = configparser.ConfigParser()
         self.defaults.read(DEFAULTS_FILE_PATH)
-        self._create_saved_settings_file()
-        self.saved_settings = configparser.ConfigParser()
-        self.saved_settings.read(CONFIG_FILE_PATH)
-        self._copy_defaults_to_settings()
-        self._apply_settings()
+        self._apply_defaults()
 
-    def _create_saved_settings_file(self):
-        if not os.path.isdir(CONFIG_DIR_PATH):
-            os.mkdir(CONFIG_DIR_PATH)
-        if not os.path.isfile(CONFIG_FILE_PATH):
-            with open(CONFIG_FILE_PATH, 'w') as configfile:
-                configfile.write('')
-
-    def _copy_defaults_to_settings(self):
-        for n in self.defaults.sections():
-            if n not in self.saved_settings:
-                self.saved_settings[n] = self.defaults[n]
-            for key, val in self.defaults[n].items():
-                if key not in self.saved_settings[n]:
-                    self.saved_settings[n][key] = val
-
-    def _set_step_per_mm_from_config(self):
-        for axis in 'xyz':
-            value = self.saved_settings['config'].get(
-                self.CONFIG_STEPS_PER_MM[axis])
-            self.set_steps_per_mm(axis, value)
-
-    def _apply_settings(self):
+    def _apply_defaults(self):
         self.serial_timeout = float(
-            self.saved_settings['serial'].get('timeout', 0.1))
+            self.defaults['serial'].get('timeout', 0.1))
         self.serial_baudrate = int(
-            self.saved_settings['serial'].get('baudrate', 115200))
+            self.defaults['serial'].get('baudrate', 115200))
 
         self.head_speed = int(
-            self.saved_settings['state'].get('head_speed', 3000))
+            self.defaults['state'].get('head_speed', 3000))
         self.plunger_speed = json.loads(
-            self.saved_settings['state'].get(
+            self.defaults['state'].get(
                 'plunger_speed', '{"a":300,"b",300}'))
 
         self.COMPATIBLE_FIRMARE = json.loads(
-            self.saved_settings['versions'].get('firmware', '[]'))
+            self.defaults['versions'].get('firmware', '[]'))
         self.COMPATIBLE_CONFIG = json.loads(
-            self.saved_settings['versions'].get('config', '[]'))
+            self.defaults['versions'].get('config', '[]'))
         self.ot_one_dimensions = json.loads(
-            self.saved_settings['versions'].get('ot_versions', '{}'))
+            self.defaults['versions'].get('ot_versions', '{}'))
         for key in self.ot_one_dimensions.keys():
             axis_size = Vector(self.ot_one_dimensions[key])
             self.ot_one_dimensions[key] = axis_size
@@ -178,8 +153,6 @@ class CNCDriver(object):
               sys.platform.startswith('cygwin')):
             # this excludes your current terminal "/dev/tty"
             ports = glob.glob('/dev/tty*')
-            # ignore Smoothie's local storage if linux (temporary work-around)
-            self.ignore_smoothie_sd = True
         elif sys.platform.startswith('darwin'):
             ports = glob.glob('/dev/tty.*')
         else:
@@ -211,8 +184,6 @@ class CNCDriver(object):
 
         self.turn_off_feedback()
         self.versions_compatible()
-        if self.ignore_smoothie_sd:
-            self._set_step_per_mm_from_config()
 
         return self.calm_down()
 
@@ -591,9 +562,6 @@ class CNCDriver(object):
     def set_head_speed(self, rate=None):
         if rate:
             self.head_speed = rate
-            self.saved_settings['state']['head_speed'] = str(self.head_speed)
-            with open(CONFIG_FILE_PATH, 'w') as configfile:
-                self.saved_settings.write(configfile)
         return True
 
     def set_plunger_speed(self, rate, axis):
@@ -685,21 +653,15 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        res = self.saved_settings['config'].get(key)
-        if not self.ignore_smoothie_sd:
-            command = '{0} {1}'.format(self.CONFIG_GET, key)
-            res = self.send_command(command).decode().split(' ')[-1]
+        command = '{0} {1}'.format(self.CONFIG_GET, key)
+        res = self.send_command(command).decode().split(' ')[-1]
         return res
 
     def set_config_value(self, key, value):
         success = True
-        if not self.ignore_smoothie_sd:
-            command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
-            res = self.send_command(command)
-            success = res.decode().split(' ')[-1] == str(value)
-        self.saved_settings['config'][key] = value
-        with open(CONFIG_FILE_PATH, 'w') as configfile:
-            self.saved_settings.write(configfile)
+        command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
+        res = self.send_command(command)
+        success = res.decode().split(' ')[-1] == str(value)
         return success
 
     def get_endstop_switches(self):
