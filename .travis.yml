@@ -60,18 +60,18 @@ script:
   - echo "Skipping Travis scripts"
 
 # Deploy the build version in an S3 bucket
-deploy:
-  provider: s3
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
-  bucket: ot-app-builds
-  skip_cleanup: true
-  local-dir: app-shell/releases
-  upload-dir: $OPENTRONS_APP_UPLOAD_DIR
-  acl: public_read
-  on:
-    repo: OpenTrons/opentrons-api
-    all_branches: true
+# deploy:
+#   provider: s3
+#   access_key_id: $AWS_ACCESS_KEY
+#   secret_access_key: $AWS_SECRET_KEY
+#   bucket: ot-app-builds
+#   skip_cleanup: true
+#   local-dir: app-shell/releases
+#   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
+#   acl: public_read
+#   on:
+#     repo: OpenTrons/opentrons-api
+#     all_branches: true
 
 deploy:
   provider: script
@@ -82,8 +82,6 @@ deploy:
   on:
     repo: OpenTrons/opentrons-api
     all_branches: true
-
-
 
 env:
   global:
