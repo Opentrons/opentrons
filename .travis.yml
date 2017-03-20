@@ -13,7 +13,6 @@ matrix:
       # sudo: required
       # dist: trusty
       python: "3.5"  # TODO: revisit...
-      # python: "3.6"
       env: OPENTRONS_APP_UPLOAD_DIR=linux
       addons:
         apt:
@@ -49,39 +48,34 @@ install:
   - python3 --version
   - git remote set-branches --add origin $STABLE_BRANCH
   - git fetch
-  # - ./build-all
-  # - ./has_changes.sh api "cd api && make api && cd .."
-  # - ./has_changes.sh app "cd app && make app && cd .."
-  # -  ./scripts/with-nodenv-linux "make app"
-  # - make api-exe
-  # -  ./scripts/with-nodenv-linux "make app-shell"
+  -  ./scripts/with-nodenv-linux "make app"
+  - make api-exe
+  -  ./scripts/with-nodenv-linux "make app-shell"
 
 script:
   - echo "Skipping Travis scripts"
 
 # Deploy the build version in an S3 bucket
-# deploy:
-#   provider: s3
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key: $AWS_SECRET_KEY
-#   bucket: ot-app-builds
-#   skip_cleanup: true
-#   local-dir: app-shell/releases
-#   upload-dir: $OPENTRONS_APP_UPLOAD_DIR
-#   acl: public_read
-#   on:
-#     repo: OpenTrons/opentrons-api
-#     all_branches: true
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: ot-app-builds
+  skip_cleanup: true
+  local-dir: app-shell/releases
+  upload-dir: $OPENTRONS_APP_UPLOAD_DIR
+  acl: public_read
+  on:
+    repo: OpenTrons/opentrons-api
+    all_branches: true
 
+# Publish API to PyPI and Anaconda
 deploy:
   provider: script
   skip_cleanup: true
   script: api/scripts/publish.sh
-  # on:
-  #   tags: true
   on:
-    repo: OpenTrons/opentrons-api
-    all_branches: true
+    tags: true
 
 env:
   global:
