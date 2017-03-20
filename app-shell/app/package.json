@@ -1,7 +1,7 @@
 {
   "name": "ot-one-desktop-app",
   "productName": "OT One App 2",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "OT One Robot Companion Desktop App",
   "main": "main/main.js",
   "dependencies": {
