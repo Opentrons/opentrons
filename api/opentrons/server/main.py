@@ -591,11 +591,13 @@ def create_step_list():
 
 def update_step_list():
     global current_protocol_step_list
+    robot = Robot.get_instance()
     if current_protocol_step_list is None:
         create_step_list()
     try:
         for step in current_protocol_step_list:
-            _, instrument = robot.get_instruments_by_name(step['label'])[0]
+            t_axis = str(step['axis']).upper()
+            instrument = robot._instruments[t_axis]
             step.update({
                 'top': instrument.positions['top'],
                 'bottom': instrument.positions['bottom'],
