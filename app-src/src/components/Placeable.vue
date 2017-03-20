@@ -32,7 +32,7 @@
       },
       placeable () {
         let placeable = this.instrument().placeables.filter((p) => {
-          return p.label === this.params().placeable
+          return p.label === this.params().placeable && p.slot === this.params().slot
         })[0]
         let sanitized = ['point', 'tiprack', 'trough', 'tuberack'].filter((el) =>
           placeable.type.includes(el)
