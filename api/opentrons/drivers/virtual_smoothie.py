@@ -42,8 +42,16 @@ class VirtualSmoothie(object):
         self.steps_per_mm = {
             'X': self.config.get('alpha_steps_per_mm', 80),
             'Y': self.config.get('beta_steps_per_mm', 80),
-            'Z': self.config.get('gamma_steps_per_mm', 1068.7),
-            'F': 60
+            'Z': self.config.get('gamma_steps_per_mm', 400),
+            'A': self.config.get('delta_steps_per_mm', 1600),
+            'B': self.config.get('epsilon_steps_per_mm', 1600)
+        }
+        self.accelerations = {
+            'X': self.config.get('alpha_steps_per_mm', 2000),
+            'Y': self.config.get('beta_steps_per_mm', 2000),
+            'Z': self.config.get('gamma_steps_per_mm', 2000),
+            'A': self.config.get('delta_steps_per_mm', 300),
+            'B': self.config.get('epsilon_steps_per_mm', 300)
         }
         self.init_coordinates()
 
@@ -57,7 +65,7 @@ class VirtualSmoothie(object):
         self.is_open = True
 
     def parse_command(self, gcode):
-        parse_arguments = re.compile(r"(([XYZABSPabF])(\-?[0-9\.]*))")
+        parse_arguments = re.compile(r"(([XYZABCSPabF])(\-?[0-9\.]*))")
         parse_command = re.compile(r"([GM][0-9\.]*)")
 
         command = re.findall(parse_command, gcode)
@@ -116,7 +124,7 @@ class VirtualSmoothie(object):
 
         self.set_position_from_arguments(arguments)
 
-        return 'ok'
+        return 'ok\nok'
 
     def process_move_command(self, arguments):
 
@@ -141,8 +149,9 @@ class VirtualSmoothie(object):
                 self.speed['plunger'][axis.lower()] = arguments[axis]
 
         if axis_hit and self.limit_switches:
-            return 'ok\n{"limit":"' + axis_hit + '"}'
-        return 'ok'
+            # Limit switch X was hit - reset or M999 required
+            return 'Limit switch {} was hit - reset or M999 required'.format(axis_hit)
+        return 'ok\nok'
 
     def process_get_position(self, arguments):
         # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
@@ -158,42 +167,56 @@ class VirtualSmoothie(object):
             res += ' {}:{}'.format(axis, self.coordinates['target'][axis.lower()])
         return '{}\nok'.format(res)
 
+    def process_acceleration(self, arguments):
+        for axis, value in arguments.items():
+            if axis.upper() in 'XYZAB':
+                self.accelerations[axis.upper()] = value
+        return 'ok\nok'
+
     def process_calm_down(self, arguments):
-        return 'ok'
+        return 'ok\nok'
 
     def process_halt(self, arguments):
-        e = 'ok Emergency Stop Requested - reset or M999 required to continue'
+        e = 'ok Emergency Stop Requested - reset or M999 required to exit HALT state'
         return e
 
     def process_absolute_positioning(self, arguments):
         self.absolute = True
-        return 'ok'
+        return 'ok\nok'
 
     def process_relative_positioning(self, arguments):
         self.absolute = False
-        return 'ok'
+        return 'ok\nok'
 
     def process_version(self, arguments):
-        return '{"version":' + self.version + '}'
+        # Build version: edge-0c9209a, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
+        #   CNC Build 6 axis
+        # ok
+        res = 'Build version: edge-0c9209a, '
+        res += 'Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz'
+        res += '\n  CNC Build 6 axis'
+        return res + '\nok'
 
     def process_reset(self, arguments):
-        return 'Smoothie out. Peace. Rebooting in 5 seconds...'
+        return 'Smoothie out. Peace. Rebooting in 5 seconds...\nok'
 
     def process_config_get(self, arguments):
+        # sd: alpha_steps_per_mm is set to 80
+        # ok
         folder = arguments[0]
         setting = arguments[1]
         if setting in self.config:
             value = self.config[setting]
-            return '{0}: {1} is set to {2}'.format(folder, setting, value)
+            return '{0}: {1} is set to {2}\nok'.format(folder, setting, value)
         else:
-            return '{0}: {1} is not in config'.format(folder, setting)
+            return '{0}: {1} is not in config\nok'.format(folder, setting)
 
     def process_config_set(self, arguments):
         folder = arguments[0]
         setting = arguments[1]
         value = arguments[2]
         self.config[setting] = value
-        return '{0}: {1} has been set to {2}'.format(
+        return '{0}: {1} has been set to {2}\nok'.format(
             folder, setting, value)
 
     def process_steps_per_mm(self, arguments):
@@ -205,22 +228,19 @@ class VirtualSmoothie(object):
         return response
 
     def process_dwell_command(self, arguments):
-        return 'ok'
+        return 'ok\nok'
 
     def process_nop(self, arguments):
-        return 'ok'
-
-    def process_disengage_feedback(self, arguments):
-        return 'feedback disengaged\nok'
+        return 'ok\nok'
 
     def process_mosfet_state(self, arguments):
-        return 'ok'
+        return 'ok\nok'
 
     def process_power_on(self, arguments):
-        return 'ok'
+        return 'ok\nok'
 
     def process_power_off(self, arguments):
-        return 'ok'
+        return 'ok\nok'
 
     def insert_response(self, message):
         messages = message.split('\n')
@@ -236,12 +256,12 @@ class VirtualSmoothie(object):
             'G4': self.process_dwell_command,
             'M114.2': self.process_get_position,
             'M114.4': self.process_get_target,
+            'M204': self.process_acceleration,
             'G28.2': self.process_home_command,
             'M119': self.process_get_endstops,
             'M92': self.process_steps_per_mm,
             'M999': self.process_calm_down,
             'M112': self.process_halt,
-            'M63': self.process_disengage_feedback,
             'G90': self.process_absolute_positioning,
             'G91': self.process_relative_positioning,
             'M40': self.process_mosfet_state,

@@ -46,8 +46,6 @@ class CNCDriver(object):
     MOTORS_OFF = 'M18'
     STEPS_PER_MM = 'M92'
 
-    DISENGAGE_FEEDBACK = 'M63'
-
     RESET = 'reset'
 
     ABSOLUTE_POSITIONING = 'G90'
@@ -104,7 +102,7 @@ class CNCDriver(object):
 
     def _apply_defaults(self):
         self.serial_timeout = float(
-            self.defaults['serial'].get('timeout', 0.1))
+            self.defaults['serial'].get('timeout', 0.02))
         self.serial_baudrate = int(
             self.defaults['serial'].get('baudrate', 115200))
 
@@ -181,7 +179,6 @@ class CNCDriver(object):
         self.toggle_port()
         log.debug("Connected to {}".format(device))
 
-        self.turn_off_feedback()
         self.versions_compatible()
 
         return self.calm_down()
@@ -298,7 +295,7 @@ class CNCDriver(object):
             'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
-        while self.connection.readline():
+        while self.connection.readline().decode():
             time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
@@ -326,7 +323,7 @@ class CNCDriver(object):
 
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
-        if b'!!' in msg or b'limit' in msg:
+        if b'!!' in msg or b'Limit' in msg:
             log.debug('home switch hit')
             self.flush_port()
             self.calm_down()
@@ -344,6 +341,7 @@ class CNCDriver(object):
             self.send_command(self.RELATIVE_POSITIONING)
         else:
             raise ValueError('Invalid coordinate mode: ' + mode)
+        self.wait_for_ok()
 
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
@@ -383,9 +381,8 @@ class CNCDriver(object):
         self.check_paused_stopped()
 
         log.debug("Moving : {}".format(args))
-        res = self.send_command(self.MOVE, **args)
-        if res != b'ok':
-            return (False, self.SMOOTHIE_ERROR)
+        self.send_command(self.MOVE, **args)
+        self.wait_for_ok()
 
         self.wait_for_arrival()
 
@@ -418,7 +415,6 @@ class CNCDriver(object):
             diff = {}
             for axis in coords.get('target', {}):
                 diff[axis] = coords['current'][axis] - coords['target'][axis]
-
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
             dist_head = math.sqrt(dist)
 
@@ -446,29 +442,22 @@ class CNCDriver(object):
 
         res = None
         try:
-            res = self.send_command(self.HOME + axis_to_home)
+            self.send_command(self.HOME + axis_to_home)
+            self.wait_for_ok()
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
-        if res == b'ok':
-            # the axis aren't necessarily set to 0.0
-            # values after homing, so force it
-            pos_args = {}
-            for l in axis_to_home:
-                pos_args[l] = 0
 
-            arguments = {
-                'name': 'home',
-                'axis': axis_to_home,
-                'position': {
-                    'head': self.get_head_position()["current"],
-                    'plunger': self.get_plunger_positions()["current"]
-                }
+        arguments = {
+            'name': 'home',
+            'axis': axis_to_home,
+            'position': {
+                'head': self.get_head_position()["current"],
+                'plunger': self.get_plunger_positions()["current"]
             }
-            trace.EventBroker.get_instance().notify(arguments)
-            return True
-        else:
-            return False
+        }
+        trace.EventBroker.get_instance().notify(arguments)
+        return True
 
     def wait(self, delay_time):
         start_time = time.time()
@@ -491,12 +480,13 @@ class CNCDriver(object):
         return True
 
     def calm_down(self):
-        res = self.send_command(self.CALM_DOWN)
-        return res == b'ok'
+        self.send_command(self.CALM_DOWN)
+        return self.wait_for_ok()
 
     def reset(self):
         res = self.send_command(self.RESET)
         if b'Rebooting' in res:
+            self.wait_for_ok()
             self.disconnect()
 
     def get_head_position(self):
@@ -520,11 +510,11 @@ class CNCDriver(object):
     def get_position(self):
         # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
         current_string = self.send_command(self.GET_POSITION)
-        self.wait_for_response()  # remove 'ok' from buffer
+        self.wait_for_ok()
 
         # ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
         target_string = self.send_command(self.GET_TARGET)
-        self.wait_for_response()  # remove 'ok' from buffer
+        self.wait_for_ok()
 
         coords = {}
         try:
@@ -536,26 +526,26 @@ class CNCDriver(object):
                 s.split(':')[0].lower(): float(s.split(':')[1])
                 for s in target_string.decode('utf-8').split(' ')[2:]
             }
-
         except ValueError:
             log.critical("Error parsing position string from smoothie board:")
             log.critical(res)
 
         return coords
 
-    def turn_off_feedback(self):
-        res = self.send_command(self.DISENGAGE_FEEDBACK)
-        if res == b'feedback disengaged':
-            res = self.wait_for_response()
-            return res == b'ok'
-        else:
-            return False
-
     def calibrate_steps_per_mm(self, axis, expected_travel, actual_travel):
         current_steps_per_mm = self.get_steps_per_mm(axis)
         current_steps_per_mm *= (expected_travel / actual_travel)
         current_steps_per_mm = round(current_steps_per_mm, 2)
         return self.set_steps_per_mm(axis, current_steps_per_mm)
+
+    def set_acceleration(self, **kwargs):
+        axis = {
+            ax.upper(): val
+            for ax, val in kwargs.items()
+            if ax.upper() in 'XYZABC'
+        }
+        self.send_command(self.ACCELERATION, **axis)
+        self.wait_for_ok()
 
     def set_head_speed(self, rate=None):
         if rate:
@@ -576,10 +566,10 @@ class CNCDriver(object):
             'config': True,
             'ot_version': True
         }
-        if self.firmware_version not in self.COMPATIBLE_FIRMARE:
-            res['firmware'] = False
-        if self.config_file_version not in self.COMPATIBLE_CONFIG:
-            res['config'] = False
+        # if self.firmware_version not in self.COMPATIBLE_FIRMARE:
+        #     res['firmware'] = False
+        # if self.config_file_version not in self.COMPATIBLE_CONFIG:
+        #     res['config'] = False
         if not self.ot_version:
             res['ot_version'] = False
 
@@ -607,12 +597,16 @@ class CNCDriver(object):
         return self.ot_version
 
     def get_firmware_version(self):
-        res = self.send_command(self.GET_FIRMWARE_VERSION)
-        res = res.decode().split(' ')[-1]
-        # the version is returned as a JSON dict, the version is a string
-        # but not wrapped in double-quotes as JSON requires...
-        # aka --> {"version":v1.0.5}
-        self.firmware_version = res.split(':')[-1][:-1]
+        # Build version: edge-0c9209a, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
+        #   CNC Build 6 axis
+        # ok
+        line_1 = self.send_command(self.GET_FIRMWARE_VERSION)
+        self.ignore_next_line()
+        self.wait_for_ok()
+
+        # use the "branch-hash" portion as the version
+        self.firmware_version = line_1.decode().split(',')[0].split(' ')[-1]
+
         return self.firmware_version
 
     def get_config_version(self):
@@ -625,7 +619,7 @@ class CNCDriver(object):
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM)
-        self.wait_for_response()  # extra b'ok' sent from smoothie after M92
+        self.wait_for_ok()  # extra b'ok' sent from smoothie after M92
         try:
             value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
             return float(value)
@@ -638,7 +632,7 @@ class CNCDriver(object):
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
-        self.wait_for_response()  # extra b'ok' sent from smoothie after M92
+        self.wait_for_ok()  # extra b'ok' sent from smoothie after M92
 
         key = self.CONFIG_STEPS_PER_MM[axis.lower()]
         try:
@@ -653,20 +647,22 @@ class CNCDriver(object):
     def get_config_value(self, key):
         command = '{0} {1}'.format(self.CONFIG_GET, key)
         res = self.send_command(command).decode().split(' ')[-1]
+        self.wait_for_ok()  # ignore second 'ok'
         return res
 
     def set_config_value(self, key, value):
         success = True
         command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
         res = self.send_command(command)
+        self.wait_for_ok()  # ignore second 'ok'
         success = res.decode().split(' ')[-1] == str(value)
         return success
 
     def get_endstop_switches(self):
         # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 pins- (XL)P1.24:0 .......
         endstop_values = self.send_command(self.GET_ENDSTOPS).decode()
-        self.wait_for_response()  # remove 'ok'
-        self.wait_for_response()  # remove 'ok'
+        self.wait_for_ok()  # remove 'ok'
+        self.wait_for_ok()  # remove 'ok'
 
         # ['X_min:0', 'Y_min:0', 'Z_min:0', 'A_min:0', 'B_min:0']
         endstop_values = endstop_values.split(' ')[:5]
@@ -691,3 +687,13 @@ class CNCDriver(object):
     def power_off(self):
         res = self.send_command(self.MOTORS_OFF)
         return res == b'ok'
+
+    def wait_for_ok(self):
+        res = self.wait_for_response()
+        if res != b'ok':
+            raise RuntimeError(
+                '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
+        return True
+
+    def ignore_next_line(self):
+        self.wait_for_response()
