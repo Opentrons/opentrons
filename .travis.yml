@@ -52,9 +52,9 @@ install:
   # - ./build-all
   # - ./has_changes.sh api "cd api && make api && cd .."
   # - ./has_changes.sh app "cd app && make app && cd .."
-  -  ./scripts/with-nodenv-linux "make app"
+  # -  ./scripts/with-nodenv-linux "make app"
   - make api-exe
-  -  ./scripts/with-nodenv-linux "make app-shell"
+  # -  ./scripts/with-nodenv-linux "make app-shell"
 
 script:
   - echo "Skipping Travis scripts"
@@ -76,7 +76,7 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script: scripts/publish.sh
+  script: api/scripts/publish.sh
   # on:
   #   tags: true
   on:
