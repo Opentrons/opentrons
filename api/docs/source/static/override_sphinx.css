@@ -6,6 +6,10 @@ body {
     font-family: "Open Sans", "sans-serif";
 }
 
+.highlight-none, .mi, .literal {
+    color: #048f85;
+}
+
 
 /* DOCS */
 
@@ -40,9 +44,9 @@ div.body h5 {
 
 div.sphinxsidebar h3 a,
 div.sphinxsidebar h3 a:hover,
-div.body h2 {
+/*div.body h2 {
     font-size: 22px;
-}
+}*/
 
 @media screen and (max-width: 875px),
 (max-device-width: 767px) {

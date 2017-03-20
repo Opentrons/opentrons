@@ -1,8 +1,8 @@
-.. _running_app:
+.. _calibration:
 
-====================
-Using the App
-====================
+==============
+Calibration UI
+==============
 
 Download App
 --------------------
@@ -10,27 +10,6 @@ Download App
 You can download the latest version of the app from `our website`_.
 
 .. _our website: https://opentrons.com/getting-started/download-app
-
-.. note::
-
-	If running on Linux:
-	The user will need to be given permissions to open the robot's serial port. This requires `sudo` privileges.
-	In a terminal window, run the following command
-
-	.. code-block:: bash
-
-		sudo usermod -a -G dialout $USER
-
-	If you are running this command from an administrative account that will not be running the app (in order to get `sudo` privileges),
-	replace $USER with the username of the account that will be running the app (this username can be found by typing
-
-	.. code-block:: bash
-
-		echo $USER
-
-	in the account that will be running the app.
-
-	Finally, logout and log back in as the user to activate the change.
 
 
 Connect to Robot
@@ -49,10 +28,31 @@ Go to the select port drop down, and refresh if no ports are shown.  Once the po
 
 	Every time you connect to the robot, you need to home all axes before doing anything else.
 
+.. note::
+
+	Linux users will need to get permission to open the robot's serial port. This requires `sudo` privileges.
+	In a terminal window, run the following command
+
+	.. code-block:: bash
+
+		sudo usermod -a -G dialout USER_NAME_HERE
+
+	Where USER_NAME_HERE is the name of account that will be running the App.
+
+	Finally, logout and log back in as the user to activate the change.
+
 Upload Protocol
 --------------------
 
-Click to upload your protocol file (please refer to :doc:`running_a_protocol`)
+Your ``.py`` protocol file can load into the App, through either clicking the "Upload" button, or drag-and-drop the ``.py`` file over that same button.
+
+.. note::
+
+    Make sure that when saving a protocol file, it ends with the ``.py`` file extension. This will ensure the App and other programs are able to properly read it.
+
+    For example, ``my_protocol_file.py``
+
+If successfully loaded, your Python protocol will be simulated in the background to detect any errors. While this is happening, you will see the word "Upload" replaced by the word "Processing". Once finished, the App will fill the calibration section of the App with your containers and pipettes.
 
 
 Jogging
@@ -68,7 +68,7 @@ Move in the X, Y and Z by selecting your desired increment, and then clicking an
 Slot Button
 ^^^^^^^^^^^^^^^^^^^^
 
-New to 2.0, the slot button moves exactly one slot over in either X or Y, depending on which arrow you choose.  This is particularly useful when calibrating multiple containers of the same type (eg an entire deck of 96 well plates).  There is no slot Z, the robot will just move 1 mm.
+The slot button moves exactly one slot over in either X or Y, depending on which arrow you choose.  This is particularly useful when calibrating multiple containers of the same type (eg an entire deck of 96 well plates).  There is no slot Z, the robot will just move 1 mm.
 
 AB Plungers
 ^^^^^^^^^^^^^^^^^^^^

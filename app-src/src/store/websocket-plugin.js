@@ -37,8 +37,7 @@ function WebSocketPlugin (socket) {
       }
       if (data.name === 'command-run') {
         if (data.caller === 'ui') {
-          let newDate = new Date()
-          data.timestamp = newDate.toUTCString().split(' ').slice(-2).join(' ')
+          data.timestamp = (new Date()).toLocaleTimeString()
           store.commit(types.UPDATE_RUN_LOG, data)
           store.commit(types.UPDATE_RUN_LENGTH, data)
         }
@@ -49,8 +48,7 @@ function WebSocketPlugin (socket) {
           text = `${text}`
           store.dispatch(ADD_TOAST_MESSAGE, {text, type})
 
-          let newDate = new Date()
-          data.timestamp = newDate.toUTCString().split(' ').slice(-2).join(' ')
+          data.timestamp = (new Date()).toLocaleTimeString()
           data.command_description = text
           data.notification = true
           store.commit(types.UPDATE_RUN_LOG, data)
