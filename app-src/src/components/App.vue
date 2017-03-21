@@ -88,6 +88,6 @@
 </script>
 
 <style lang='sass'>
-  @import "../assets/sass/new.scss";
+  @import "../assets/sass/main.scss";
   @import "../../node_modules/vuex-toast/dist/vuex-toast.css";
 </style>
