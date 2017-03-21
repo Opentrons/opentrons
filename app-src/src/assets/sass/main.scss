@@ -1,0 +1,119 @@
+@import "util";
+@import "components";
+
+body {
+    font-size: $basesize;
+    font-family: $stack-sans;
+}
+
+
+/***************************
+Header Home Connect Wrapper
+****************************/
+
+header#home-connect {
+    width: 1004px;
+    height: 30px;
+    padding: 10px;
+    margin: 5px auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 6px;
+    background-color: $well-bg;
+    // Logo and Version #
+    .brand {
+        flex: 0 0 160px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        div.logo {
+            width: 124px;
+            height: 30px;
+            img {
+                width: 124px;
+                height: auto;
+            }
+        }
+        div.version {
+            flex: 0 0 30px;
+            height: 30px;
+            line-height: 35px;
+        }
+    }
+}
+
+
+/***************************************
+Protocol Upload and Run Controls Wrapper
+****************************************/
+
+section.protocol {
+    width: 1004px;
+    height: 65px;
+    padding: 10px;
+    margin: 5px auto;
+    display: flex;
+    flex-direction: row;
+    border-radius: 6px;
+    background-color: $well-bg;
+    justify-content: space-between;
+}
+
+
+/******************************
+    Main Content Wrapper
+******************************/
+
+main#container {
+    width: 1024px;
+    margin: 5px auto;
+    display: flex;
+    flex-direction: row;
+}
+
+
+/******************************
+    Jog Controls Wrapper
+******************************/
+
+aside#jog {
+    width: 270px;
+    flex: 0 0 270px;
+    height: 510px;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: $well-bg;
+}
+
+
+/******************************
+    Task Pane Wrapper
+******************************/
+
+section#task-pane {
+    width: 710px;
+    flex: 0 0 710px;
+    margin-left: 10px;
+    height: 536px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    //border: 2px solid $well-bg;
+    //border-radius: 6px;
+}
+
+/******************************
+        Run Screen Wrapper
+******************************/
+
+.runScreen {
+    overflow-y: scroll;
+    height: 536px;
+    width: 710px;
+    font-size: 16px;
+    border: 2px solid $well-bg;
+    border-radius: 6px;
+    position: relative;
+    margin-left: 10px;
+}

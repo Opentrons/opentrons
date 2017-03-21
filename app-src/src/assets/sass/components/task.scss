@@ -1,3 +1,31 @@
+/******************************
+        Tasks Screens
+******************************/
+div.task{
+    width: 535px;
+    display:flex;
+    flex-direction:column;
+}
+
+section#task-placeable{
+    width: 535px;
+    height: 100px;
+    padding: 20px;
+    background-color: $well-bg;
+    border-radius: 6px;
+}
+
+section#task-pipette {
+    width: 515px;
+    height: 310px;
+    padding: 30px;
+    background-color: $well-bg;
+    border-radius: 6px;
+}
+
+
+
+// Will phase out and relocate to popup
 section#task,
 section#task-pipette {
     .well-img {

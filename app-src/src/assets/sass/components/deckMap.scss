@@ -1,0 +1,37 @@
+/******************************
+        Deck Map
+******************************/
+
+section#deck-map {
+    width: 545px;
+    height: 365px;
+    padding: 15px;
+    background-color: $well-bg;
+    border-radius: 6px;
+    margin-top: 5px;
+    div.deck-container {
+        width: 400px;
+        height: 300px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        border: 1px solid #BBB;
+        .deck-col {
+            display: flex;
+            flex-direction: column-reverse;
+            flex: 1 1 20%;
+            justify-content: stretch;
+            .deck-slot {
+                flex: 1 1 100%;
+                display: flex;
+                justify-content: stretch;
+                align-items: center;
+                border: 1px solid #DDD;
+                p{
+                  text-align: center;
+                  width:100%;
+                }
+            }
+        }
+    }
+}
