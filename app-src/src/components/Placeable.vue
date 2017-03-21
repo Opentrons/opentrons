@@ -1,5 +1,7 @@
 <template>
-  <section id='task' v-if='this.instrument() && this.placeable()'>
+
+  <div class="task">
+  <section id='task-placeable' v-if='this.instrument() && this.placeable()'>
     <h1 class='title'>
       Calibrate the {{this.instrument().label}} pipette to the
       {{this.placeable().sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
@@ -7,19 +9,20 @@
     </h1>
     <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'>
     </CalibratePlaceable>
-    <div class='well-img'>
-      <img :src='`${placeableImages(this.placeable().sanitizedType, this.channels)}`' />
-    </div>
   </section>
+  <deck-map v-if='this.instrument()' :placeable='placeable()' ><deck-map>
+  </deck-map>
 </template>
 
 <script>
   import CalibratePlaceable from './CalibratePlaceable.vue'
+  import DeckMap from './DeckMap.vue'
 
   export default {
     name: 'Placeable',
     components: {
-      CalibratePlaceable
+      CalibratePlaceable,
+      DeckMap
     },
     methods: {
       params () {
