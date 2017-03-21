@@ -19,6 +19,8 @@ const router = new VueRouter({
   mode: 'history'
 })
 
+console.log('got herboooo')
+
 /* eslint-disable */
 window.onload = function () {
   // Google analytics SPA extensions: https://github.com/googleanalytics/autotrack
@@ -26,6 +28,17 @@ window.onload = function () {
   window.ga('require', 'eventTracker')
   window.ga('require', 'outboundLinkTracker')
   window.ga('require', 'urlChangeTracker')
+  // window.Intercom("boot", {
+  //   app_id: "bsgvg3q7"
+  // });
+    //
+  console.log('got here...')
+  window.Intercom("boot", {
+      app_id: "bsgvg3q7",
+      name: "Jane Doe", // Full name
+      email: "customer@example.com", // Email address
+      created_at: 1312182000 // Signup date as a Unix timestamp
+  });
 
   const app = new Vue({
     router,
