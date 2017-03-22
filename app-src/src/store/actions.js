@@ -4,6 +4,29 @@ import Opentrons from '../rest_api_wrapper'
 import {processTasks} from '../util'
 
 const actions = {
+  updateContainers ({commit}) {
+    let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/master/api/opentrons/config/containers/default-containers.json'
+    let containers = {}
+    Vue.http.get(url).then((response) => {
+      containers = JSON.parse(response.data).containers
+    }).then(() => {
+      for (const c in containers) {
+        let offset = {'x': 0, 'y': 0}
+        let container = containers[c]
+        if (container['origin-offset']) {
+          offset['x'] = container['origin-offset']['x']
+          offset['y'] = container['origin-offset']['y']
+        }
+        let wells = container['locations']
+        for (const w in wells) {
+          let well = wells[w]
+          well['x'] = (well['x'] + offset['x'])
+          well['y'] = (well['y'] + offset['y'])
+        }
+      }
+      commit(types.UPDATE_CONTAINERS, {containers})
+    })
+  },
   connectRobot ({ commit }, port) {
     const payload = {isConnected: true, port}
     Opentrons.connect(port).then((wasSuccessful) => {

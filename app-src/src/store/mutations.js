@@ -1,6 +1,7 @@
 import * as types from './mutation-types'
 
 const state = {
+  apiContainers: {},
   isConnected: false,
   port: null,
   fileName: '',
@@ -22,6 +23,9 @@ const state = {
 }
 
 const mutations = {
+  [types.UPDATE_CONTAINERS] (state, payload) {
+    state.apiContainers = payload.containers
+  },
   [types.UPDATE_ROBOT_CONNECTION] (state, payload) {
     state.isConnected = payload.isConnected
     state.port = payload.port
