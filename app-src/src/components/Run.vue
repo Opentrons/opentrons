@@ -15,15 +15,21 @@
     methods: {
       runProtocol () {
         this.$store.dispatch('runProtocol')
+        window.Intercom('trackEvent', 'run-protocol', {
+          'protocol-file': this.$store.state.fileName
+        })
       },
       pauseProtocol () {
         this.$store.dispatch('pauseProtocol')
+        window.Intercom('trackEvent', 'pause-protocol')
       },
       resumeProtocol () {
         this.$store.dispatch('resumeProtocol')
+        window.Intercom('trackEvent', 'resume-protocol')
       },
       cancelProtocol () {
         this.$store.dispatch('cancelProtocol')
+        window.Intercom('trackEvent', 'cancel-protocol')
       }
     },
     computed: {

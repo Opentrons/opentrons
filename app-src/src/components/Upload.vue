@@ -39,8 +39,10 @@
         var task = this.$store.state.tasks[0]
         if (task && task.placeables && task.placeables[0]) {
           this.$router.push(task.placeables[0].href)
+          window.Intercom('trackEvent', 'upload-successful')
         } else {
           this.$router.push('/')
+          window.Intercom('trackEvent', 'upload-error')
         }
       }
     }

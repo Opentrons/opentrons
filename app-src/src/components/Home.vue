@@ -17,6 +17,9 @@
     methods: {
       home (axis) {
         this.$store.dispatch('home', {axis: axis})
+        window.Intercom('trackEvent', 'home-robot', {
+          'axis': axis
+        })
       }
     }
   }
