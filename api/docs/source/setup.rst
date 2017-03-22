@@ -1,15 +1,11 @@
 .. _setup:
 
-==========
-Setup
-==========
+##################
+Protocol Setup
+##################
+
 
 There are a few things to consider when beginning a new Python protocol. In this section, we exlain the Opentrons API's ``containers``, ``instruments``, and ``robot`` modules, and how they are used to setup and control your Python protocol.
-
-.. toctree::
-    :maxdepth: 3
-
-    setup
 
 **********************
 
@@ -18,8 +14,9 @@ There are a few things to consider when beginning a new Python protocol. In this
     from opentrons import containers, robot
     robot.reset()
 
+**************
 Containers
-----------
+**************
 
 The containers module allows you to load common labware into your protocol. `Go here`__ to see a visualization of all built-in containers.
 
@@ -33,7 +30,7 @@ __ https://andysigler.github.io/ot-api-containerviz/
     from opentrons import containers
 
 List
-^^^^
+====
 
 Once the container module is loaded, you can see a list of all containers currently inside the API by calling ``containers.list()``
 
@@ -42,7 +39,7 @@ Once the container module is loaded, you can see a list of all containers curren
     containers.list()
 
 Load
-^^^^
+====
 
 Labware is loaded with two arguments: 1) the container type, and 2) the deck slot it will be placed in on the robot.
 
@@ -73,7 +70,7 @@ Names can also be used to place multiple containers in the same slot all at once
     fc = containers.load('T25-flask', 'D1', 'flask_c')
 
 Create
-^^^^^^
+======
 
 In addition to the default containers that come with the Opentrons API, you can create your own custom containers.
 
@@ -128,8 +125,9 @@ will print out...
 
 **********************
 
+***********
 Instruments
------------
+***********
 
 The ``instruments`` module gives your protocol access to the ``Pipette``, which is what you will be primarily using to create protocol commands.
 
@@ -141,7 +139,7 @@ The ``instruments`` module gives your protocol access to the ``Pipette``, which 
     from opentrons import instruments
 
 Axis and Max Volume
-^^^^^^^^^^^^^^^^^^^
+===================
 
 To create a ``Pipette``, you must give it an axis and a max_volume. The axis can be either ``'a'`` or ``'b'``, and the volume is whatever your hand pipette is calibrated for. In this example, we are using a 200uL pipette.
 
@@ -153,7 +151,7 @@ To create a ``Pipette``, you must give it an axis and a max_volume. The axis can
         max_volume=200)
 
 Minimum Volume
-^^^^^^^^^^^^^^
+==============
 
 The minimum allowed volume can be set for each pipette. If your protocol attempts to aspirate or dispense a volume below this volume, the API will give you a warning.
 
@@ -166,7 +164,7 @@ The minimum allowed volume can be set for each pipette. If your protocol attempt
         min_volume=20)
 
 Channels
-^^^^^^^^
+========
 
 Pipettes can also be assigned a number of channels, either ``channel=1`` or ``channel=8``. If you do not specify, it will default to ``channel=1`` channel.
 
@@ -180,7 +178,7 @@ Pipettes can also be assigned a number of channels, either ``channel=1`` or ``ch
         channels=8)
 
 Plunger Speeds
-^^^^^^^^^^^^^^
+==============
 
 The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_speed`` and ``dispense_speed``. The values are in millimeters/minute, and default to ``aspirate_speed=300`` and ``dispense_speed=500``.
 
@@ -208,8 +206,9 @@ The speeds at which the pipette will aspirate and dispense can be set through ``
 
 **********************
 
+*****
 Robot
------
+*****
 
 The robot module can be thought of as the parent for all aspects of the Opentrons API. All containers, instruments, and protocol commands are added to and controlled by robot.
 
@@ -226,7 +225,7 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
 Get Containers
-^^^^^^^^^^^^^^
+==============
 
 When containers are loaded, they are automatically added to the ``robot``. You can see all currently held containers by calling ``robot.get_containers()``, which returns a `Python list`__.
 
@@ -246,7 +245,7 @@ will print out...
     my-rack tiprack-200ul
 
 Get Instruments
-^^^^^^^^^^^^^^^
+===============
 
 When instruments are created, they are automatically added to the ``robot``. You can see all currently held instruments by calling ``robot.get_instruments()``, which returns a `Python list`__.
 
@@ -265,7 +264,7 @@ will print out...
     my-pipette B
 
 Commands
-^^^^^^^^
+========
 
 When commands are called on a pipette, they are automatically enqueued to the ``robot`` in the order they are called. You can see all currently held commands by calling ``robot.commands()``, which returns a `Python list`__.
 
@@ -288,7 +287,7 @@ will print out...
     Drop_tip at <Deck><Slot A1><Container my-rack><Well A1>
 
 Clear Commands
-^^^^^^^^^^^^^^
+==============
 
 Once commands are enqueued to the ``robot``, we can erase those commands by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but all commands are erased.
 
@@ -310,7 +309,7 @@ will print out...
     There are now 0 commands
 
 Comment
-^^^^^^^
+=======
 
 You can add a custom message to the list of command descriptions you see when running ``robot.commands()``. This command is ``robot.comment()``, and it allows you to print out any information you want at the point in your protocol
 
@@ -338,7 +337,7 @@ will print out...
     Goodbye, just dropped tip A1
 
 Simulate
-^^^^^^^^
+========
 
 Once commands have been enqueued to the ``robot``, we can simulate their execution by calling ``robot.simulate()``. This helps us debug our protocol, and to see if the robots gives us any warnings.
 
@@ -357,7 +356,7 @@ will print out...
     pick_up_tip called with no reference to a tip
 
 Reset
-^^^^^
+=====
 
 Calling ``robot.reset()`` will remove everything from the robot. Any previously added containers, pipettes, or commands will be erased.
 

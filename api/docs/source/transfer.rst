@@ -19,19 +19,14 @@
         tip_racks=[tiprack],
         trash_container=trash)
 
-===========
-Transfer
-===========
+#################
+Transfer Commands
+#################
 
 The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write ``loop``s and ``if`` statements, we can simply use the ``transfer()`` command, making Python protocol both easier to write and read!
 
-.. toctree::
-    :maxdepth: 3
-
-    transfer
-
 Transfer
---------
+========
 
 Most of time, a protocol is really just looping over some wells, aspirating, and then dispensing. Even though they are simple in nature, these loops take up a lot of space. The ``pipette.transfer()`` command takes care of those common loops. It will combine aspirates and dispenses automatically, making your protocol easier to read and edit.
 
@@ -54,7 +49,7 @@ Most of time, a protocol is really just looping over some wells, aspirating, and
         trash_container=trash)
 
 Basic
-^^^^^
+-----
 
 The example below will transfer 100 uL from well ``'A1'`` to well ``'B1'``, automatically picking up a new tip and then dropping it when finished.
 
@@ -80,7 +75,7 @@ will print out...
     Drop_tip 
 
 Large Volumes
-^^^^^^^^^^^^^
+-------------
 
 Volumes larger than the pipette's ``max_volume`` will automatically divide into smaller transfers.
 
@@ -110,7 +105,7 @@ will print out...
     Drop_tip 
 
 Multiple Wells
-^^^^^^^^^^^^^^
+--------------
 
 Transfer commands are most useful when moving liquid between multiple wells.
 
@@ -156,7 +151,7 @@ will print out...
     Drop_tip 
 
 One to Many
-^^^^^^^^^^^
+-------------
 
 You can transfer from a single source to multiple destinations, and the other way around (many sources to one destination).
 
@@ -194,7 +189,7 @@ will print out...
     Drop_tip
 
 Few to Many
-^^^^^^^^^^^
+-------------
 
 What happens if, for example, you tell your pipette to transfer from 4 source wells to 2 destination wells? The transfer command will attempt to divide the wells evenly, or raise an error if the number of wells aren't divisible.
 
@@ -227,7 +222,7 @@ will print out...
     Drop_tip 
 
 List of Volumes
-^^^^^^^^^^^^^^^
+---------------
 
 Instead of applying a single volume amount to all source/destination wells, you can instead pass a list of volumes.
 
@@ -258,7 +253,7 @@ will print out...
     Drop_tip 
 
 Volume Gradient
-^^^^^^^^^^^^^^^
+---------------
 
 Create a linear gradient between a start and ending volume (uL). The start and ending volumes must be the first and second elements of a tuple.
 
@@ -318,7 +313,7 @@ will print out...
         trash_container=trash)
 
 Distribute and Consolidate
---------------------------
+==========================
 
 Save time and tips with the ``distribute()`` and ``consolidate()`` commands. These are nearly identical to ``transfer()``, except that they will combine multiple transfer's into a single tip.
 
@@ -341,7 +336,7 @@ Save time and tips with the ``distribute()`` and ``consolidate()`` commands. The
         trash_container=trash)
 
 Consolidate
-^^^^^^^^^^^
+-----------
 
 Volumes going to the same destination well are combined within the same tip, so that multiple aspirates can be combined to a single dispense.
 
@@ -402,7 +397,7 @@ will print out...
     Drop_tip 
 
 Distribute
-^^^^^^^^^^
+-----------
 
 Volumes from the same source well are combined within the same tip, so that one aspirate can provide for multiple dispenses.
 
@@ -464,7 +459,7 @@ will print out...
     Drop_tip 
 
 Disposal Volume
-^^^^^^^^^^^^^^^
+---------------
 
 When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added ``disposal_vol`` can be set as an optional argument.
 
@@ -559,7 +554,7 @@ will print out...
         trash_container=trash)
 
 Transfer Options
-----------------
+================
 
 There are other options for customizing your transfer command:
 
@@ -582,7 +577,7 @@ There are other options for customizing your transfer command:
         trash_container=trash)
 
 Always Get a New Tip
-^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 Transfer commands will by default use the same one tip for each well, then finally drop it in the trash once finished.
 
@@ -620,7 +615,7 @@ will print out...
     Drop_tip 
 
 Never Get a New Tip
-^^^^^^^^^^^^^^^^^^^
+------------------------
 
 For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()`` elsewhere in your protocol, the transfer command can ignore picking up or dropping tips.
 
@@ -650,7 +645,7 @@ will print out...
     Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B3>
 
 Trash or Return Tip
-^^^^^^^^^^^^^^^^^^^
+------------------------
 
 By default, the transfer command will drop the pipette's tips in the trash container. However, if you wish to instead return the tip to it's tip rack, you can set ``trash=False``.
 
@@ -679,7 +674,7 @@ will print out...
     Drop_tip at <Deck><Slot A1><Container tiprack-200ul><Well D1>
 
 Touch Tip
-^^^^^^^^^
+---------
 
 A touch-tip can be performed after every aspirate and dispense by setting ``touch_tip=True``.
 
@@ -709,7 +704,7 @@ will print out...
     Drop_tip 
 
 Blow Out
-^^^^^^^^
+--------
 
 A blow-out can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
 
@@ -738,7 +733,7 @@ will print out...
     Drop_tip
 
 Mix Before/After
-^^^^^^^^^^^^^^^^
+----------------
 
 A mix can be performed before every aspirate by setting ``mix_before=``. The value of ``mix_before=`` must be a tuple, the 1st value is the number of repetitions, the 2nd value is the amount of liquid to mix.
 
@@ -779,7 +774,7 @@ will print out...
     Drop_tip 
 
 Air Gap
-^^^^^^^
+-------
 
 An air gap can be performed after every aspirate by setting ``air_gap=int``, where the value is the volume of air in microliters to aspirate after aspirating the liquid.
 
