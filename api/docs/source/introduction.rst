@@ -1,7 +1,7 @@
 .. _introduction:
 
 ===============
-Introduction
+Opentrons API
 ===============
 
 The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
