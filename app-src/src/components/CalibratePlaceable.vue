@@ -17,6 +17,23 @@
         let label = this.placeable.label
         let axis = this.instrument.axis
         this.$store.dispatch('calibrate', {slot, label, axis})
+
+        // FIXME: This is error prone and not likely to be consistent
+        function isCalibrated () {
+          // TODO: Move this to state
+          if (!this.$store.state.isConnected) return false
+          if (this.$store.state.tasks.length === 0) return false
+
+          return this.$store.state.tasks.every((instrument) => {
+            let placeableCalibrated = instrument.placeables.every((placeable) => {
+              return placeable.calibrated
+            })
+            return instrument.calibrated && placeableCalibrated
+          })
+        }
+        if (isCalibrated.bind(this)()) {
+          window.Intercom('trackEvent', 'deck-calibrated')
+        }
       },
       moveToPosition () {
         let slot = this.placeable.slot
