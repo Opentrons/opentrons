@@ -66,6 +66,7 @@
       }
     },
     mounted: function () {
+      this.$store.dispatch('updateContainers')
       this.$http
         .get('http://localhost:31950/app_version').then((response) => {
           let version = response.body.version

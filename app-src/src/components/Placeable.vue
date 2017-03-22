@@ -10,7 +10,7 @@
     <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'>
     </CalibratePlaceable>
   </section>
-  <deck-map v-if='this.instrument()' :placeable='placeable()' ><deck-map>
+  <deck-map v-if='instrument()' :placeable='placeable()' :instrument='instrument()' :deck='deck()' ><deck-map>
   </deck-map>
 </template>
 
@@ -53,6 +53,21 @@
           'point': {'single': 'point_trash', 'multi': 'point_trash'}
         }
         return require(`../assets/img/${imageUrls[type][channels]}.png`)
+      },
+      deck () {
+        let tasks = this.$store.state.tasks
+        let containers = []
+        for (let inst of tasks) {
+          for (let p of inst['placeables']) {
+            let container = {}
+            let type = p.type
+            let slot = p.slot
+            container.type = type
+            container.slot = slot
+            containers.push(container)
+          }
+        }
+        return containers
       }
     },
     computed: {
