@@ -1,6 +1,9 @@
-/******************************
+    /******************************
         Deck Map
 ******************************/
+$deck-width : 400px;
+$deck-height : 350px;
+$slot-height : $deck-height/3;
 
 section#deck-map {
     width: 545px;
@@ -10,8 +13,8 @@ section#deck-map {
     border-radius: 6px;
     margin-top: 5px;
     div.deck-container {
-        width: 400px;
-        height: 300px;
+        width: $deck-width;
+        height: $deck-height;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -22,14 +25,59 @@ section#deck-map {
             flex: 1 1 20%;
             justify-content: stretch;
             .deck-slot {
-                flex: 1 1 100%;
                 display: flex;
                 justify-content: stretch;
                 align-items: center;
-                border: 1px solid #DDD;
-                p{
-                  text-align: center;
-                  width:100%;
+                box-sizing: border-box;               
+                height: $slot-height;
+                .empty {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                    border: 1px solid #DDD;
+                    p {
+                        font-family: 'trons';
+                        color: #BBB;
+                        font-weight: 500;
+                        font-size: 36px;
+                    }
+                }
+                &:not(.active){
+                    border: 1px solid #DDD;
+                }
+                &.active {
+                    outline: 4px solid $call-to-action;
+                    box-sizing: border-box;
+                    z-index: 1000;
+                }
+                &.occupied {
+                    display: flex;
+                    justify-content: stretch;
+                    box-sizing: border-box;
+                    .placeable {
+                        flex: 1 1 100%;
+                        width: 100%;
+                        position: relative;
+                        border: 2px solid #68affc;
+                        background-color: $primary-brand;
+                        svg {
+                            box-sizing:border-box;
+                            overflow: visible;
+                            height: 100%;
+                            align-self: center;
+                            .well,
+                            .trough {
+                                stroke: #004999;
+                                stroke-width: 1px;
+                                fill: #68affc;
+                                // &:hover{
+                                //     fill:$call-to-action;
+                                // }
+                            }
+                        }
+                    }
                 }
             }
         }
