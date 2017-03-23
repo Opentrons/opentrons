@@ -19,7 +19,7 @@
     methods: {
       home (axis) {
         this.$store.dispatch('home', {axis: axis})
-        trackEvent('home' + axis)
+        trackEvent('home-' + axis)
       }
     }
   }
