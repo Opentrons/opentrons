@@ -11,9 +11,9 @@
 
     pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
-###############
--- Robot
-###############
+##################
+-- Robot Commands
+##################
 
 The robot module can be thought of as the parent for all aspects of the Opentrons API. All containers, instruments, and protocol commands are added to and controlled by robot.
 
