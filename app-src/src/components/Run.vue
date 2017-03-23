@@ -10,26 +10,28 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'Run',
     methods: {
       runProtocol () {
         this.$store.dispatch('runProtocol')
-        window.Intercom('trackEvent', 'run-protocol', {
+        trackEvent('run-protocol', {
           'protocol-file': this.$store.state.fileName
         })
       },
       pauseProtocol () {
         this.$store.dispatch('pauseProtocol')
-        window.Intercom('trackEvent', 'pause-protocol')
+        trackEvent('pause-protocol')
       },
       resumeProtocol () {
         this.$store.dispatch('resumeProtocol')
-        window.Intercom('trackEvent', 'resume-protocol')
+        trackEvent('resume-protocol')
       },
       cancelProtocol () {
         this.$store.dispatch('cancelProtocol')
-        window.Intercom('trackEvent', 'cancel-protocol')
+        trackEvent('cancel-protocol')
       }
     },
     computed: {

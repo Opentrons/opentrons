@@ -8,6 +8,8 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'CalibratePlaceable',
     props: ['instrument', 'placeable'],
@@ -32,7 +34,7 @@
           })
         }
         if (isCalibrated.bind(this)()) {
-          window.Intercom('trackEvent', 'deck-calibrated')
+          trackEvent('deck-calibrated')
         }
       },
       moveToPosition () {

@@ -10,6 +10,8 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'Upload',
     methods: {
@@ -39,10 +41,10 @@
         var task = this.$store.state.tasks[0]
         if (task && task.placeables && task.placeables[0]) {
           this.$router.push(task.placeables[0].href)
-          window.Intercom('trackEvent', 'upload-successful')
+          trackEvent('upload-successful')
         } else {
           this.$router.push('/')
-          window.Intercom('trackEvent', 'upload-error')
+          trackEvent('upload-error')
         }
       }
     }

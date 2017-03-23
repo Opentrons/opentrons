@@ -66,11 +66,6 @@
         return this.$store.state.busy
       }
     },
-    watch: {
-      taskListLen: function () {
-        window.Intercom('trackEvent', 'upload-successful')
-      }
-    },
     mounted: function () {
       this.$http
         .get('http://localhost:31950/app_version').then((response) => {
