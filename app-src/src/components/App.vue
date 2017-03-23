@@ -85,7 +85,6 @@
               app_id: 'bsgvg3q7',
               name: username + ' OT App', // Full name
               email: username + '@opentrons-app.com' // Email address
-              // created_at: 1312182000 // Signup date as a Unix timestamp
             })
           }
         })
