@@ -403,7 +403,7 @@ class Placeable(object):
         """
         return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
-    def bottom(self, z=0, reference=None):
+    def bottom(self, z=0, radius=0, degrees=0, reference=None):
         """
         Returns (:Placeable, :Vector:) tuple where :Vector:
         corresponds to the bottom of a :Placeable:
@@ -411,10 +411,14 @@ class Placeable(object):
         If :reference: :Placeable: is provided, returns
         the :Vector: within :reference: coordinate system
         """
-        coordinates = self.from_center(x=0, y=0, z=-1, reference=reference)
+        coordinates = self.from_center(
+            r=radius,
+            theta=(degrees / 180) * math.pi,
+            h=-1,
+            reference=reference)
         return (self, coordinates + (0, 0, z))
 
-    def top(self, z=0, reference=None):
+    def top(self, z=0, radius=0, degrees=0, reference=None):
         """
         Returns (:Placeable, :Vector:) tuple where :Vector:
         corresponds to the top of a :Placeable:
@@ -423,7 +427,11 @@ class Placeable(object):
         the :Vector: within :reference: coordinate system
         """
 
-        coordinates = self.from_center(x=0, y=0, z=1, reference=reference)
+        coordinates = self.from_center(
+            r=radius,
+            theta=(degrees / 180) * math.pi,
+            h=1,
+            reference=reference)
         return (self, coordinates + (0, 0, z))
 
     def from_center(self, x=None, y=None, z=None, r=None,
