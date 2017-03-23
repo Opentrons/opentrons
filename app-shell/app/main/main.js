@@ -60,7 +60,8 @@ function startUp () {
 
   serverManager.start()
   waitUntilServerResponds(
-    () => createWindow('http://localhost:31950/'),
+    () => createWindow('http://localhost:8090/'),
+    // () => createWindow('http://localhost:31950/'),
     'http://localhost:31950/'
   )
   addMenu()
