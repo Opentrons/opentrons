@@ -1,7 +1,7 @@
 .. _pipettes:
 
 ########################
--- Pipettes
+Liquid Handling
 ########################
 
 The ``instruments`` module gives your protocol access to the ``Pipette``, which is what you will be primarily using to create protocol commands.

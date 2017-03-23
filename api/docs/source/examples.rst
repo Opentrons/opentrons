@@ -1,136 +1,116 @@
 .. _examples:
 
+########
 Examples
-========
+########
 
-The following examples assume the containers and pipettes:
-
-.. testsetup:: tips_main
-
-  from opentrons import robot, containers, instruments
-  robot.connect('Virtual Smoothie')
-
-  tiprack = containers.load('tiprack-200ul', 'A1', 'tiprack-for-doctest')
-  plate = containers.load('96-flat', 'B1', 'plate-for-doctest')
-  trough = containers.load('trough-12row', 'C1', 'trough-for-doctest')
-  trash = containers.load('point', 'C2', 'trash-for-doctest')
-      
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume=200,
-      tip_racks=[tiprack])
-
-.. testsetup:: tips_demo
-  
-  from opentrons import robot
-  robot.reset()
-
-.. testcode:: tips_demo
+.. testsetup:: examples
 
   from opentrons import robot, containers, instruments
 
-  tiprack = containers.load('tiprack-200ul', 'A1')
   plate = containers.load('96-flat', 'B1')
   trough = containers.load('trough-12row', 'C1')
-  trash = containers.load('point', 'C2')
+
+  tiprack_1 = containers.load('tiprack-200ul', 'A1')
+  tiprack_2 = containers.load('tiprack-200ul', 'A2')
       
   p200 = instruments.Pipette(
       axis="b",
       max_volume=200,
-      tip_racks=[tiprack])
+      tip_racks=[tiprack_2]) 
 
+All examples on this page assume the following containers and pipette:
 
-Automatically Refill Volume
----------------------------
+.. testcode:: examples
 
-Want to deposit liquid to an entire plate, but don't want to have to tell the robot when to pick up more liquid?  This example will keep track of the volume in the pipette and automatically picks up more liquid when there isn't enough for the next dispense.  
+  from opentrons import robot, containers, instruments
 
-.. testcode:: tips_main
+  plate = containers.load('96-flat', 'B1')
+  trough = containers.load('trough-12row', 'C1')
 
-  p200.pick_up_tip()
+  tiprack_1 = containers.load('tiprack-200ul', 'A1')
+  tiprack_2 = containers.load('tiprack-200ul', 'A2') 
+      
+  p200 = instruments.Pipette(
+      axis="b",
+      max_volume=200,
+      tip_racks=[tiprack_2])  
 
-  dispense_volume = 13
-  for i in range(96):
-      if p200.current_volume < dispense_volume:
-          p200.aspirate(trough['A1'])
-      p200.dispense(dispense_volume, plate[i]).touch_tip()
-
-  p200.blow_out(trough['A1']).drop_tip(trash)
-
+***************
 Serial Dilution
----------------
+***************
 
 This serial dilution example assumes a standard 96 well plate, using a different tip per column and a different trough row per column.
 
-.. testcode:: tips_main
+.. testcode:: examples
 
-  for t, col in enumerate(plate.cols):
-      p200.pick_up_tip(tiprack[t])  # Use one tip per column
+  # spread dilutent
+  p200.distribute(50, trough.wells('A12'), plate.wells())
 
-      p200.aspirate(120, trough[t]) # aspirate from a trough
-      p200.dispense(col[0])         # dispense everything into a first well
+  # dilute down each plate column
+  for i in range(8):
+    col = plate.cols(i)
 
-      # zip(col[:-1], col[1:]) returns pairs of
-      # (A1, A2), (A2, A3), (A3, A4), etc
-      for well, next_well in zip(col[:-1], col[1:]):
-          p200.aspirate(10, well)
-          p200.dispense(10, next_well).mix(3)
+    # begin the column by transferring 10uL of sample to first well
+    p200.pick_up_tip().aspirate(10, trough.wells(i)).dispense(col.wells('1'))
 
-      p200.drop_tip(trash)
+    # dilute the sample down the column
+    p200.transfer(
+      10, col.wells('1', to='11'), col.wells('2', to='12'),
+      mix_after=(3, 25))
 
+******************************
+
+***************
 Plate Mapping
--------------
+***************
 
 Deposit various volumes of liquids into the same plate of wells, and automatically refill the tip volume when it runs out.
 
-.. testcode:: tips_main
+.. testcode:: examples
 
-  sources = {
-      'A1': 'water',
-      'A2': 'sugar',
-      'A3': 'purple'
-  }
-  destinations = {
-      'A1': {'water': 35, 'sugar': 10, 'purple': 1},
-      'B1': {'water': 35, 'sugar': 20, 'purple': 2},
-      'C1': {'water': 35, 'sugar': 30, 'purple': 3},
-      'D1': {'water': 35, 'sugar': 40, 'purple': 4},
-      'E1': {'water': 55, 'sugar': 10, 'purple': 5},
-      'F1': {'water': 55, 'sugar': 20, 'purple': 6},
-      'G1': {'water': 55, 'sugar': 30, 'purple': 7},
-      'H1': {'water': 55, 'sugar': 40, 'purple': 8}
-  }
+  # these uL values were created randomly for this example
+  water_volumes = [
+    29, 41, 86, 74, 30, 36, 98, 64,
+    54, 42, 36, 10, 52, 10, 75, 41,
+    85, 17, 46, 19, 92, 77, 81, 40,
+    46, 30, 15, 93, 81, 98, 29, 16,
+    68, 41, 60, 62, 73, 45, 78, 78,
+    38, 34, 86, 58, 92, 77, 74, 78,
+    23, 33, 65, 63, 20, 35, 34, 24,
+    99, 12, 99, 96, 52, 75, 70, 82,
+    10, 64, 90, 14, 27, 86, 99, 79,
+    17, 99, 31, 68, 29, 15, 57, 61,
+    79, 58, 94, 79, 17, 29, 78, 54,
+    50, 85, 68, 17, 84, 39, 28, 57
+  ]
 
-  for source_name, ingredient in sources.items():
-      p200.pick_up_tip()
-      for destination_well, mapping in destinations.items():
-          dispense_volume = mapping[ingredient]
-          if p200.current_volume < dispense_volume:
-             p200.aspirate(trough[source_name])
-          p200.dispense(dispense_volume, plate[destination_well])
-      p200.blow_out(trough[source_name]).return_tip()
+  p200.distribute(water_volumes, trough.wells('A12'), plate)
 
+
+******************************
+
+*******************
 Precision Pipetting
----------------------------------
+*******************
 
 This example shows how to deposit liquid around the edge of a well.
 
-.. testcode:: tips_main
+.. testcode:: examples
 
-  p200.pick_up_tip(tiprack[3])
+  p200.pick_up_tip()
 
-  # rotate around the edge of the well
-  # dropping 10ul at a time
+  # rotate around the edge of the well, dropping 10ul at a time
   theta = 0.0
   while p200.current_volume > 0:
       # we can move around a circle with radius (r) and theta (degrees)
-      well_edge = plate[1].from_center(r=1.0, theta=theta, h=0.9)
+      well_edge = plate.wells('B1').from_center(r=1.0, theta=theta, h=0.9)
       
       # combine a Well with a Vector in a tuple
-      destination = (plate[1], well_edge)
+      destination = (plate.wells('B1'), well_edge)
       p200.move_to(destination, strategy='direct')  # move straight there
       p200.dispense(10)
       
       theta += 0.314
 
-  p200.drop_tip(tiprack[3])
+  p200.drop_tip()

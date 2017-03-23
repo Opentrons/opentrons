@@ -19,7 +19,7 @@
         trash_container=trash)
 
 #######################
--- Protocol Short-Cuts
+Transfer Shortcuts
 #######################
 
 The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write ``loop`` and ``if`` statements, we can simply use the ``transfer()`` command, making Python protocol both easier to write and read!

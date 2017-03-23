@@ -11,9 +11,13 @@
 
     pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
-##################
--- Robot Commands
-##################
+###################
+Advanced Control
+###################
+
+.. note::
+
+    The below features are designed for advanced users who wish to use the Opentrons API in their own Python environment (ie Jupyter). This page is not relevant for users only using the Opentrons App, because the features described below will not be accessible.
 
 The robot module can be thought of as the parent for all aspects of the Opentrons API. All containers, instruments, and protocol commands are added to and controlled by robot.
 

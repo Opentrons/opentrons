@@ -1,7 +1,7 @@
 .. _containers:
 
 ######################
--- Containers
+Containers
 ######################
 
 We spend a fair amount of time organizing and counting wells when writing Python protocols. This section describes the different ways we can access wells and groups of wells.
