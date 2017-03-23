@@ -24,9 +24,14 @@
     <hr>
      <section id='jog-controls-plunger' :class="{'disabled': busy}">
       <span class='p'>
-        <h3 class='title'>[P]</h3>
-        <button @click='jog(currentAxis(), -1)'class='btn p up'>&uarr;</button>
-        <button @click='jog(currentAxis(), 1)' class='btn p down'>&darr;</button>
+        <h3 class='title'>[B]</h3>
+        <button @click='jog("b", -1)'class='btn p up'>&uarr;</button>
+        <button @click='jog("b", 1)' class='btn p down'>&darr;</button>
+      </span>
+      <span class='p'>
+        <h3 class='title'>[A]</h3>
+        <button @click='jog("a", -1)'class='btn p up'>&uarr;</button>
+        <button @click='jog("a", 1)' class='btn p down'>&darr;</button>
       </span>
       <span class='increment-plunger'>
         <IncrementPlunger :increments='plungerIncrements'></IncrementPlunger>
