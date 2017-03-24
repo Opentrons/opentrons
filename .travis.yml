@@ -49,6 +49,9 @@ install:
   - git remote set-branches --add origin $STABLE_BRANCH
   - git fetch
   -  ./scripts/with-nodenv-linux "make app"
+  - ls -la /Applications
+  - ls -la /Users/$USER/Applications
+  - cd app-src && ./node_modules/.bin/electron
   - make api-exe
   -  ./scripts/with-nodenv-linux "make app-shell"
 
