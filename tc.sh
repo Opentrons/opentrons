@@ -10,11 +10,9 @@ virtualenv -p python3 venv && source venv/bin/activate
 
 # Build app src
 make app
-# ./scripts/with-nodenv-linux "make app"
 
 # Build app exe
-make api-osx
+make api-exe-osx
 
 # Build app shell
 make app-shell
-# ./scripts/with-nodenv-linux "make app-shell"

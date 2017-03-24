@@ -13,6 +13,10 @@ api-exe:
 	cd api &&\
 		make api
 
+api-exe-osx:
+	cd api &&\
+		make api-osx
+
 api-exe-win:
 	cd api &&\
 		make api-win
@@ -27,7 +31,6 @@ app-shll:
 		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
-
 
 app-dev:
 	./scripts/run-dev
