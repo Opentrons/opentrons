@@ -1,8 +1,8 @@
 .. _calibration:
 
-==============
-Calibration UI
-==============
+================
+How to Calibrate
+================
 
 Download App
 --------------------
