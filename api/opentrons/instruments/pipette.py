@@ -1546,14 +1546,21 @@ class Pipette(Instrument):
         return volume / self.max_volume
 
     def _create_transfer_plan(self, v, s, t, **kwargs):
+        # SPECIAL CASE: if using multi-channel pipette,
+        # and the source or target is a WellSeries
+        # then avoid iterating through it's Wells.
+        # Else, single channel pipettes will flatten a multi-dimensional
+        # WellSeries into a 1 dimensional list of wells
         if self.channels > 1:
-            # SPECIAL CASE: if using multi-channel pipette,
-            # and the source or target is a WellSeries
-            # then avoid iterating through it's Wells
             if isinstance(s, WellSeries) and not isinstance(s[0], WellSeries):
-                s = [s] if isinstance(s, WellSeries) else s
+                s = [s]
             if isinstance(t, WellSeries) and not isinstance(t[0], WellSeries):
-                t = [t] if isinstance(t, WellSeries) else t
+                t = [t]
+        else:
+            if isinstance(s, WellSeries) and isinstance(s[0], WellSeries):
+                s = [well for series in s for well in series]
+            if isinstance(t, WellSeries) and isinstance(t[0], WellSeries):
+                t = [well for series in t for well in series]
 
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
