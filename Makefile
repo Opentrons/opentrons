@@ -1,4 +1,4 @@
-.PHONY: app api-exe
+.PHONY: app api-exe app-shell
 
 app:
 	cd app-src &&\
@@ -21,7 +21,7 @@ api-exe-win:
 	cd api &&\
 		make api-win
 
-app-shll:
+app-shell:
 	cd app-shell &&\
 		npm --version &&\
 		node --version &&\
