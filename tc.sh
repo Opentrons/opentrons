@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-echo "Got here..."
+set -e
 
 # Enable nvm
 mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
