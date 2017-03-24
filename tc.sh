@@ -13,7 +13,7 @@ make app
 # ./scripts/with-nodenv-linux "make app"
 
 # Build app exe
-make api-exe
+make api-osx
 
 # Build app shell
 make app-shell
