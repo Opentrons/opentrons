@@ -1,4 +1,5 @@
 import datetime as dt
+import getpass
 import json
 import logging
 import os
@@ -24,12 +25,13 @@ from opentrons.server.process_manager import run_once
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
-STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'static')
+STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
-            template_folder=TEMPLATES_FOLDER
+            template_folder=TEMPLATES_FOLDER,
+            static_url_path=''
             )
 
 
@@ -60,6 +62,13 @@ def welcome():
 @app.route("/exit")
 def exit():
     sys.exit()
+
+
+@app.route("/username")
+def username():
+    return flask.jsonify({
+        'username': getpass.getuser()
+    })
 
 
 def get_protocol_locals():

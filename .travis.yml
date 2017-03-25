@@ -69,8 +69,6 @@ deploy:
     repo: OpenTrons/opentrons-api
     all_branches: true
 
-# Publish API to PyPI and Anaconda
-deploy:
   provider: script
   skip_cleanup: true
   script: api/scripts/publish.sh

@@ -11,12 +11,15 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'Home',
     props: ['busy'],
     methods: {
       home (axis) {
         this.$store.dispatch('home', {axis: axis})
+        trackEvent('home-' + axis)
       }
     }
   }
