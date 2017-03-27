@@ -1,6 +1,7 @@
 {
   "scripts": {
     "unit": "karma start test/karma.conf.js --single-run",
+    "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/",
     "build": "webpack"
   },
   "devDependencies": {
