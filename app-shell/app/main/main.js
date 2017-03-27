@@ -23,6 +23,7 @@ let mainWindow
 let appWindowUrl = 'http://localhost:31950/'
 
 if (process.env.NODE_ENV === 'development'){
+  // require('vue-devtools').install()
   require('electron-debug')({showDevTools: 'undocked'});
   appWindowUrl = 'http://localhost:8090/'
 }
@@ -64,6 +65,11 @@ function startUp () {
     // console.log('Sending event', appEvent, appEventMetadata)
     deskmetrics.send(appEvent, appEventMetadata)
   })
+
+  // NOTE: vue-devtools can only be installed after app the 'ready' event
+  if (process.env.NODE_ENV === 'development'){
+    require('vue-devtools').install()
+  }
 
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
