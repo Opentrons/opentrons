@@ -23,10 +23,15 @@
     <h2 class='title'>Plunger Jog</h2>
     <hr>
      <section id='jog-controls-plunger' :class="{'disabled': busy}">
+      <span class='p b'>
+        <h3 class='title'>[B]</h3>
+        <button @click='jog("b", -1)'class='btn p up' :class="{'current-axis': currentAxis('b')}">&uarr;</button>
+        <button @click='jog("b", 1)' class='btn p down' :class="{'current-axis': currentAxis('b')}">&darr;</button>
+      </span>
       <span class='p'>
-        <h3 class='title'>[P]</h3>
-        <button @click='jog(currentAxis(), -1)'class='btn p up'>&uarr;</button>
-        <button @click='jog(currentAxis(), 1)' class='btn p down'>&darr;</button>
+        <h3 class='title'>[A]</h3>
+        <button @click='jog("a", -1)'class='btn p up' :class="{'current-axis': currentAxis('a')}">&uarr;</button>
+        <button @click='jog("a", 1)' class='btn p down' :class="{'current-axis': currentAxis('a')}">&darr;</button>
       </span>
       <span class='increment-plunger'>
         <IncrementPlunger :increments='plungerIncrements'></IncrementPlunger>
@@ -49,7 +54,7 @@
     props: ['busy'],
     data: function () {
       return {
-        placeableIncrements: ['Slot', 20, 5, 1, 0.5, 0.1],
+        placeableIncrements: ['Slot', 50, 20, 5, 1, 0.5, 0.1],
         plungerIncrements: [2, 1, 0.5, 0.1]
       }
     },
@@ -72,8 +77,8 @@
         }
         this.$store.dispatch('jog', coords)
       },
-      currentAxis () {
-        return this.$route.params.instrument || 'b'
+      currentAxis (axis) {
+        return this.$route.params.instrument === axis
       },
       handleJogEvent (e) {
         if (this.busy) return
