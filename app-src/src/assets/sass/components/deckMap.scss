@@ -50,7 +50,7 @@ section#deck-map {
                 &.active {
                     outline: 4px solid $call-to-action;
                     box-sizing: border-box;
-                    z-index: 1000;
+                    z-index: 10000;
                 }
                 &.occupied {
                     display: flex;

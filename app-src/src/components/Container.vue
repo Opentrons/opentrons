@@ -1,5 +1,6 @@
 <template>
   <div class='placeable'>
+    <router-link :to="placeable.href">
     <span v-if="wells">
       <svg v-if="!drawRect" :width="width" viewBox='0 0 86 127' width='100%' preserveAspectRatio='xMinYMin meet'>
         <g>
@@ -13,6 +14,7 @@
         </g>
       </svg>
     </span>
+    </router-link>
   </div>
 </template>
 

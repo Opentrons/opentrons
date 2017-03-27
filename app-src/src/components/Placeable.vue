@@ -62,8 +62,10 @@
             let container = {}
             let type = p.type
             let slot = p.slot
+            let link = p.href
             container.type = type
             container.slot = slot
+            container.href = link
             containers.push(container)
           }
         }

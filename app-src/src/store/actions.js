@@ -5,7 +5,7 @@ import {processTasks} from '../util'
 
 const actions = {
   updateContainers ({commit}) {
-    let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/master/api/opentrons/config/containers/default-containers.json'
+    let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/march-22-container-file-update/api/opentrons/config/containers/default-containers.json'
     let containers = {}
     Vue.http.get(url).then((response) => {
       containers = JSON.parse(response.data).containers
