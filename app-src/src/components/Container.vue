@@ -2,13 +2,13 @@
   <div class='placeable'>
     <router-link :to="placeable.href">
     <span v-if="wells">
-      <svg v-if="!drawRect" :width="width" viewBox='0 0 86 127' width='100%' preserveAspectRatio='xMinYMin meet'>
+      <svg v-if="!drawRect" :width="width" viewBox='0 0 85.5 127.75' width='100%' preserveAspectRatio='xMinYMin meet'>
         <g>
-          <circle v-for="well in wells"  fill='blue' stroke='white' :cx='well.x' :cy='well.y' :r='well.diameter/2' class="well">
+          <circle v-for="well in wells"  fill='blue' stroke='white' :cx='well.x' :cy='slotDimY-well.y' :r='well.diameter/2' class="well">
           </circle>
         </g>
       </svg>
-      <svg v-else viewBox='0 0 86 127' width='100%' preserveAspectRatio='xMinYMin'>
+      <svg v-else viewBox='0 0 85.5 127.75' width='100%' preserveAspectRatio='xMinYMin'>
         <g>
           <rect v-for="well in wells"  fill='blue' stroke='white' :x='well.x - well.width/2' :y='well.y - well.length/2' :width='well.width' :height="well.length" class="trough"></rect>
         </g>
