@@ -1,5 +1,15 @@
 module.exports = { trackEvent }
 
+const ipcRenderer = require('electron').ipcRenderer
+
+function deskmetricsTrackEvent (ourEvent, metadata) {
+  try {
+    ipcRenderer.send('analytics', ourEvent, metadata)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 function intercomTrackEvent (event, metadata) {
   if (typeof window.Intercom !== 'function') {
     return
@@ -27,4 +37,5 @@ function trackEvent (event, metadata) {
   console.log(`[Event] ${event} Metadata: ${metadata}`)
   intercomTrackEvent(event, metadata)
   gaTrackEvent(event, metadata)
+  deskmetricsTrackEvent(event, metadata)
 }

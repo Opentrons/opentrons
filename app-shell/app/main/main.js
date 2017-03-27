@@ -16,6 +16,8 @@ const {ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
+const deskmetrics = require('deskmetrics')
+
 let serverManager = new ServerManager()
 let mainWindow
 let appWindowUrl = 'http://localhost:31950/'
@@ -51,6 +53,17 @@ function startUp () {
   // Prepare app data dir (necessary for logging errors that occur during setup)
   createAndSetAppDataDir()
   const mainLogger = getLogger('electron-main')
+
+  deskmetrics.start({ appId: '8d9af03aa1', version:  app.getVersion()}).then(function() {
+    // Set properties
+    console.log('App version is', app.getVersion());
+    deskmetrics.setProperty('version', app.getVersion())
+    deskmetrics.setProperty('build', app.getVersion())
+  })
+  ipcMain.on('analytics', (event, appEvent, appEventMetadata) => {
+    // console.log('Sending event', appEvent, appEventMetadata)
+    deskmetrics.send(appEvent, appEventMetadata)
+  })
 
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
