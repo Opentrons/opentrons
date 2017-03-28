@@ -51,6 +51,11 @@ function startUp () {
   createAndSetAppDataDir()
   const mainLogger = getLogger('electron-main')
 
+  // NOTE: vue-devtools can only be installed after app the 'ready' event
+  if (process.env.NODE_ENV === 'development'){
+    require('vue-devtools').install()
+  }
+
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
       console.log(error)
