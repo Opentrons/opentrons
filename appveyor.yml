@@ -65,7 +65,7 @@ install:
   - cmd: npm config set python %PYTHON2%\python.exe --global
 
   - make app
-  - make api-exe-win
+  - make api-valid-exe
   - make app-shell-win
 
 build: off

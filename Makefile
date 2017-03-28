@@ -15,7 +15,7 @@ api-exe:
 
 api-exe-osx:
 	cd api &&\
-		make api-osx
+		make api-valid-exe
 
 api-exe-win:
 	cd api &&\
