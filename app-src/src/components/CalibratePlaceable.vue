@@ -4,13 +4,30 @@
     <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='moveToPosition()'>MOVE TO</button>
     <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip()'>PICK UP TIP</button>
     <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='dropTip()'>DROP TIP</button>
+    <div class="more-info">
+    <a role="button" id="show-modal" @click="showModal = true">more info</a>
+
+    <modal v-if="showModal" @close="showModal = false" :placeable="placeable" :instrument="instrument">
+    </modal>
+    </div>
   </span>
+  
 </template>
 
 <script>
+  import Modal from './Modal.vue'
+
   export default {
     name: 'CalibratePlaceable',
+    data () {
+      return {
+        showModal: false
+      }
+    },
     props: ['instrument', 'placeable'],
+    components: {
+      Modal
+    },
     methods: {
       calibrate () {
         let slot = this.placeable.slot
@@ -42,4 +59,5 @@
       }
     }
   }
+
 </script>

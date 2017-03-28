@@ -44,16 +44,6 @@
         placeable.sanitizedType = sanitized || 'default'
         return placeable
       },
-      placeableImages (type, channels) {
-        const imageUrls = {
-          'default': {'single': 'well_single', 'multi': 'well_multi'},
-          'tiprack': {'single': 'tiprack_single', 'multi': 'tiprack_multi'},
-          'trough': {'single': 'trough_single', 'multi': 'trough_multi'},
-          'tuberack': {'single': 'tuberack_single', 'multi': 'tuberack_single'},
-          'point': {'single': 'point_trash', 'multi': 'point_trash'}
-        }
-        return require(`../assets/img/${imageUrls[type][channels]}.png`)
-      },
       deck () {
         let tasks = this.$store.state.tasks
         let containers = []
