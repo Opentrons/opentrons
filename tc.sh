@@ -12,7 +12,7 @@ virtualenv -p python3 venv && source venv/bin/activate
 make app
 
 # Build app exe
-make api-exe-osx
+make api-valid-exe
 
 # Build app shell
 make app-shell

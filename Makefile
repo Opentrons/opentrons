@@ -1,4 +1,4 @@
-.PHONY: app api-exe app-shell api-exe-osx
+.PHONY: app api-exe app-shell api-valid-exe
 
 app:
 	cd app-src &&\
@@ -13,7 +13,7 @@ api-exe:
 	cd api &&\
 		make api
 
-api-exe-osx:
+api-valid-exe:
 	cd api &&\
 		make api-valid-exe
 
