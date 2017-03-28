@@ -2,7 +2,7 @@
 
 api: api-clean api-install api-lint api-test api-docs api-deploy api-exe
 
-api-win: api-clean api-install api-test api-exe
+api-valid-exe: api-clean api-install api-test api-exe
 
 api-install:
 	pip3 install -r requirements.txt
