@@ -106,11 +106,12 @@ class CNCDriver(object):
         self.serial_baudrate = int(
             self.defaults['serial'].get('baudrate', 115200))
 
-        self.head_speed = int(
-            self.defaults['state'].get('head_speed', 3000))
-        self.plunger_speed = json.loads(
+        self.speeds = json.loads(
             self.defaults['state'].get(
-                'plunger_speed', '{"a":300,"b",300}'))
+                'speeds',
+                '{"x": 3000, "y":3000, "z": 1600, "a": 300, "b": 300}'
+            )
+        )
 
         self.COMPATIBLE_FIRMARE = json.loads(
             self.defaults['versions'].get('firmware', '[]'))
@@ -353,6 +354,8 @@ class CNCDriver(object):
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
+        slowest_speed = self.get_slowest_speed(*list(kwargs.keys()))
+
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
         target_point = {
@@ -372,7 +375,7 @@ class CNCDriver(object):
         args = {axis.upper(): kwargs.get(axis)
                 for axis in 'xyzab'
                 if axis in kwargs}
-        args.update({"F": self.head_speed})
+        args.update({"F": slowest_speed})
 
         return self.consume_move_commands(args)
 
@@ -411,7 +414,7 @@ class CNCDriver(object):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=0.1):
+    def wait_for_arrival(self, tolerance=2):
         arrived = False
         coords = self.get_position()
         while not arrived:
@@ -428,6 +431,9 @@ class CNCDriver(object):
             but seems to be about +-0.05 mm from the target coordinate
             the robot's physical resolution is found with:
             1mm / config_steps_per_mm
+
+            Also, the higher the tolerance, the faster robot coordinates
+            will transition from one to the next (faster change in direction)
             """
             if dist_head < tolerance:
                 if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
@@ -486,7 +492,7 @@ class CNCDriver(object):
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
-        if res == b'ok':
+        if res != b'ok':
             self.wait_for_ok()
         return self.wait_for_ok()
 
@@ -558,15 +564,27 @@ class CNCDriver(object):
         self.send_command(self.ACCELERATION, **axis)
         self.wait_for_ok()
 
-    def set_head_speed(self, rate=None):
-        if rate:
-            self.head_speed = rate
+    def get_slowest_speed(self, *args):
+        received_axis = [ax for ax in 'xyzab' if ax in args]
+        their_speeds = [self.speeds.get(ax, 500) for ax in received_axis]
+        return min(their_speeds)
+
+    def set_speed(self, *args, **kwargs):
+        if len(args) > 0:
+            self.speeds['x'] = args[0]
+            self.speeds['y'] = args[0]
+        if 'xy' in kwargs:
+            self.speeds['x'] = kwargs['xy']
+            self.speeds['y'] = kwargs['xy']
+        for l in 'xyzab':
+            if l in kwargs:
+                self.speeds[l] = int(kwargs[l])
         return True
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':
             raise ValueError('Axis {} not supported'.format(axis))
-        self.plunger_speed[axis] = rate
+        self.speeds[axis] = rate
 
     def versions_compatible(self):
         self.get_ot_version()
