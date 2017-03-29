@@ -428,12 +428,8 @@ class Robot(object, metaclass=Singleton):
         else:
             device = self.get_serial_device(port)
 
-        res = self._driver.connect(device)
-
-        if res:
-            self.connections['live'] = device
-
-        return res
+        self._driver.connect(device)
+        self.connections['live'] = device
 
     def _update_axis_homed(self, *args):
         for a in args:

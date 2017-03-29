@@ -566,11 +566,11 @@ class CNCDriver(object):
             'config': True,
             'ot_version': True
         }
-        # if self.firmware_version not in self.COMPATIBLE_FIRMARE:
-        #     res['firmware'] = False
-        # if self.config_file_version not in self.COMPATIBLE_CONFIG:
-        #     res['config'] = False
-        if not self.ot_version:
+        if self.firmware_version not in self.COMPATIBLE_FIRMARE:
+            res['firmware'] = False
+        if self.config_file_version not in self.COMPATIBLE_CONFIG:
+            res['config'] = False
+        if self.ot_version not in self.ot_one_dimensions:
             res['ot_version'] = False
 
         if not all(res.values()):
@@ -599,8 +599,10 @@ class CNCDriver(object):
     def get_firmware_version(self):
         # Build version: edge-0c9209a, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
         #   CNC Build 6 axis
+        #   6 axis
         # ok
         line_1 = self.send_command(self.GET_FIRMWARE_VERSION)
+        self.ignore_next_line()
         self.ignore_next_line()
         self.wait_for_ok()
 
@@ -646,9 +648,12 @@ class CNCDriver(object):
 
     def get_config_value(self, key):
         command = '{0} {1}'.format(self.CONFIG_GET, key)
-        res = self.send_command(command).decode().split(' ')[-1]
-        self.wait_for_ok()  # ignore second 'ok'
-        return res
+        res = self.send_command(command).decode()
+        print(res)
+        self.wait_for_ok()
+        if 'is set to' in res:
+            return res.split(' ')[-1]
+        return None
 
     def set_config_value(self, key, value):
         success = True
