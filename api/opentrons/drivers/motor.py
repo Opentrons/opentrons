@@ -181,6 +181,13 @@ class CNCDriver(object):
 
         self.versions_compatible()
 
+        # TODO: (andy) smoothieware edge has this weird bug,
+        # seems to require the following commands to run after Smoothieboard
+        # boots, or else all motors freeze up and make high-pitch sounds
+        self.write_to_serial('G91 G0 X0.001\r\n')
+        self.wait_for_ok()
+        self.send_halt_command()
+
         return self.calm_down()
 
     def is_connected(self):
@@ -215,7 +222,7 @@ class CNCDriver(object):
         self.do_not_pause.wait()
         if self.stopped.is_set():
             if self.halted.is_set():
-                self.send_command(self.HALT)
+                self.send_halt_command()
                 self.calm_down()
             self.resume()
             raise RuntimeWarning(self.STOPPED)
@@ -366,8 +373,6 @@ class CNCDriver(object):
                 for axis in 'xyzab'
                 if axis in kwargs}
         args.update({"F": self.head_speed})
-        args.update({"a": self.plunger_speed['a']})
-        args.update({"b": self.plunger_speed['b']})
 
         return self.consume_move_commands(args)
 
@@ -480,8 +485,14 @@ class CNCDriver(object):
         return True
 
     def calm_down(self):
-        self.send_command(self.CALM_DOWN)
+        res = self.send_command(self.CALM_DOWN)
+        if res == b'ok':
+            self.wait_for_ok()
         return self.wait_for_ok()
+
+    def send_halt_command(self):
+        self.send_command(self.HALT)
+        self.wait_for_ok()
 
     def reset(self):
         res = self.send_command(self.RESET)
@@ -649,7 +660,6 @@ class CNCDriver(object):
     def get_config_value(self, key):
         command = '{0} {1}'.format(self.CONFIG_GET, key)
         res = self.send_command(command).decode()
-        print(res)
         self.wait_for_ok()
         if 'is set to' in res:
             return res.split(' ')[-1]
