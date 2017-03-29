@@ -13,8 +13,8 @@ Vue.use(VueResource)
 
 const router = new VueRouter({
   routes: [
-    { path: '/calibrate/:instrument', component: CalibrateInstrument },
-    { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable }
+    { name: 'instrument', path: '/calibrate/:instrument', component: CalibrateInstrument },
+    { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: Placeable }
   ],
   mode: 'history'
 })

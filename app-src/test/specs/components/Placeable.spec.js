@@ -6,23 +6,28 @@ import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
   return {
-    actions: { loadProtocol: sinon.spy() },
+    actions: { loadProtocol: sinon.spy(), processTasks: sinon.spy() },
     state: {
+      versions: {
+        ot_version: {
+          version: 'hood'
+        }
+      },
       tasks: [
         {
           axis: 'a',
           channels: 1,
           placeables: [
-              {label: 'plate', type: ''},
-              {label: 'tiprack', type: 'tiprack'}
+              {label: 'plate', type: '96-well-plate-20mm', slot: 'B1'},
+              {label: 'tiprack', type: 'tiprack', slot: 'A1'}
           ]
         },
         {
           axis: 'b',
           channels: 8,
           placeables: [
-              {label: 'trash', type: 'point'},
-              {label: 'tiprack', type: 'tiprack'}
+              {label: 'trash', type: 'point', slot: 'E2'},
+              {label: 'tiprack', type: 'tiprack', slot: 'A2'}
           ]
         }
       ]
@@ -32,7 +37,7 @@ function getMockStore () {
 
 const mockStore = getMockStore()
 Placeable.methods.params = () => {
-  return { 'instrument': 'a', 'placeable': 'plate' }
+  return { 'instrument': 'a', 'slot': 'B1', 'placeable': 'plate' }
 }
 const placeable = getRenderedVm(Placeable, {}, mockStore)
 
@@ -41,17 +46,6 @@ describe('Placeable.vue', () => {
     let pipette = mockStore.state.tasks[0]
     expect(placeable.instrument()).to.equal(pipette)
     expect(placeable.placeable()).to.equal(pipette.placeables[0])
-  })
-
-  it('correctly generates a placeableImage URL based on channels', () => {
-    let sanitizedType = placeable.placeable().sanitizedType
-    expect(sanitizedType).to.equal('default')
-
-    let channels = placeable.channels
-    expect(channels).to.equal('single')
-
-    let imageUrl = placeable.placeableImages(sanitizedType, channels)
-    expect(typeof imageUrl).to.eq('string')
   })
 
   it('loads a protocol before being created if there are no tasks', () => {
@@ -63,9 +57,8 @@ describe('Placeable.vue', () => {
     expect(emptyStore.actions.loadProtocol.calledOnce).to.be.true
   })
 
-  it('correctly determins its calibration point', () => {
+  it('correctly determines its calibration point', () => {
     expect(placeable.calibrationPoint).to.equal('of the A1 well')
-
     let troughStore = getMockStore()
     troughStore.state.tasks[0].placeables[0].type = 'trough'
     expect(getRenderedVm(Placeable, {}, troughStore).calibrationPoint).to.equal('of the A1 slot')
