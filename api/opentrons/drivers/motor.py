@@ -459,6 +459,7 @@ class CNCDriver(object):
             self.wait_for_ok()
             self.send_command(self.SET_ZERO + axis_to_home)
             self.wait_for_ok()
+            self.power_off()
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
