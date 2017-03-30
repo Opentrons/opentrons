@@ -192,7 +192,6 @@ class CNCDriver(object):
         self.send_halt_command()
 
         self.calm_down()
-        self.set_speed()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
@@ -356,6 +355,7 @@ class CNCDriver(object):
 
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
+        self.set_speed()
 
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
@@ -414,15 +414,16 @@ class CNCDriver(object):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=2):
-        arrived = False
-        coords = self.get_position()
-        while not arrived:
+    def wait_for_arrival(self, tolerance=0.5):
+        target = self.get_target_position()
+
+        while True:
             self.check_paused_stopped()
-            coords = self.get_position()
+
+            current = self.get_current_position()
             diff = {}
-            for axis in coords.get('target', {}):
-                diff[axis] = coords['current'][axis] - coords['target'][axis]
+            for axis in list(target.keys()):
+                diff[axis] = current[axis] - target[axis]
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
             dist_head = math.sqrt(dist)
 
@@ -437,9 +438,13 @@ class CNCDriver(object):
             """
             if dist_head < tolerance:
                 if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
-                    arrived = True
+                    break
 
     def home(self, *axis):
+
+        self.send_halt_command()
+        self.calm_down()
+
         axis_to_home = ''
         for a in axis:
             ax = ''.join(sorted(a)).upper()
@@ -522,29 +527,33 @@ class CNCDriver(object):
         return plunger_coords
 
     def get_position(self):
+        return {
+            'current': self.get_current_position(),
+            'target': self.get_target_position()
+        }
+
+    def get_current_position(self):
         # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
         current_string = self.send_command(self.GET_POSITION)
         self.wait_for_ok()
+        return self._parse_get_pos(current_string)
 
+    def get_target_position(self):
         # ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
         target_string = self.send_command(self.GET_TARGET)
         self.wait_for_ok()
+        return self._parse_get_pos(target_string)
 
-        coords = {}
+    def _parse_get_pos(self, string):
         try:
-            coords['current'] = {
+            return {
                 s.split(':')[0].lower(): float(s.split(':')[1])
-                for s in current_string.decode('utf-8').split(' ')[2:]
+                for s in string.decode('utf-8').split(' ')[2:]
             }
-            coords['target'] = {
-                s.split(':')[0].lower(): float(s.split(':')[1])
-                for s in target_string.decode('utf-8').split(' ')[2:]
-            }
-        except ValueError:
+        except ValueError as e:
             log.critical("Error parsing position string from smoothie board:")
             log.critical(res)
-
-        return coords
+            raise ValueError(e) from e
 
     def calibrate_steps_per_mm(self, axis, expected_travel, actual_travel):
         current_steps_per_mm = self.get_steps_per_mm(axis)
