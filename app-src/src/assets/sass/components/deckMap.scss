@@ -2,24 +2,23 @@
         Deck Map
 ******************************/
     
-    $deck-width: 400px;
-    $deck-height: 350px;
+    $deck-width: 428px * 0.9;
+    $deck-height: 383px * 0.9;
     $slot-height: $deck-height/3;
     section#deck-map {
-        width: 710px;
-        height: 395px;
-        
-        
+        width: 720px;
+        //height: 430px;        
         border-radius: 6px;
-        margin-top: 5px;
+        //margin-top: 5px;
         button.tab {
-            width: 195px;
+            width: 200px;
             height: 40px;
             margin-right:5px;
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
             border: 2px solid $well-bg;
             background-color: white;
+            border-bottom-width:0px;
             &.active{
                 background-color: $well-bg;            
             }
@@ -27,7 +26,7 @@
 
         }
         div.deck-wrapper{
-            padding: 22px 15px;
+            padding: 20px;
             background-color: $well-bg;
             border-radius: 6px;
             border-top-left-radius: 0px;
