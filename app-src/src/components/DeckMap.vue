@@ -69,10 +69,6 @@
         let i = this.tasks.find(element => element.axis === axis)
         console.log(i.placeables[0])
         let container = i.placeables.find(element => element.slot === this.$route.params.slot) || i.placeables[0]
-        // if (container === undefined) {
-        //   container = i.placeables[0]
-        // }
-
         this.$router.push({ name: 'placeable', params: {instrument: axis, slot: container.slot, placeable: container.label} })
       }
     }
