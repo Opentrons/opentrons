@@ -4,7 +4,9 @@
 <!--       <aside id='step-list'>
         <StepList></StepList>
       </aside> -->
-      <router-view :class="{'disabled': busy}"></router-view>
+<!--       <router-view :class="{'disabled': busy}"></router-view> -->
+
+<router-view></router-view>
     </section>
     <RunScreen class='run-screen' v-show='running()'></RunScreen>
   </span>

@@ -1,9 +1,10 @@
 <template>
   <section id="deck-map">
-    <button  v-for="instrument in tasks" 
-    class="tab" :class="{active : activePipette(instrument)}"
-    @click="togglePipette(instrument.axis)"> 
-    {{instrument.axis}} {{instrument.label}} <span v-for="c in instrument.channels">&#9661;</span>
+  {{pipettes}}
+    <button  v-for="instrument in tasks.instruments" 
+    class="tab" :class="{active : activePipette(instrument)}"  
+    > <!-- @click="togglePipette(instrument.axis)" -->
+    {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span>
     </button>
     <div class="deck-wrapper">
       <div class="deck-container">
@@ -48,6 +49,9 @@
       },
       tasks () {
         return this.$store.state.tasks
+      },
+      pipettes () {
+        return this.$store.state.tasks.pipettes
       }
     },
     methods: {
@@ -66,10 +70,7 @@
         return instrument.axis === this.$route.params.instrument
       },
       togglePipette (axis) {
-        let i = this.tasks.find(element => element.axis === axis)
-        console.log(i.placeables[0])
-        let container = i.placeables.find(element => element.slot === this.$route.params.slot) || i.placeables[0]
-        this.$router.push({ name: 'placeable', params: {instrument: axis, slot: container.slot, placeable: container.label} })
+        this.$router.push({ name: 'instrument', params: { instrument: axis } })
       }
     }
   }

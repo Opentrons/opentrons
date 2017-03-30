@@ -95,13 +95,13 @@
         this.$store.dispatch('maxVolume', { axis, volume })
       },
       calibrated (position) {
-        let instrument = this.$store.state.tasks.filter((instrument) => {
+        let instrument = this.$store.state.tasks.instruments.filter((instrument) => {
           return instrument.axis === this.$route.params.instrument
         })[0]
         return typeof (instrument[position]) === 'number'
       },
       currentInstrument () {
-        return this.$store.state.tasks.filter((instrument) => {
+        return this.$store.state.tasks.instruments.filter((instrument) => {
           return instrument.axis === this.$route.params.instrument
         })[0]
       }

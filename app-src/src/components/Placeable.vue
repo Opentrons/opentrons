@@ -29,38 +29,23 @@
       params () {
         return this.$route.params
       },
-      instrument () {
-        return this.$store.state.tasks.filter((instrument) => {
-          return instrument.axis === this.params().instrument
-        })[0]
+      deck () {
+        return this.$store.state.tasks.deck
       },
       placeable () {
-        let placeable = this.instrument().placeables.filter((p) => {
+        let placeable = this.deck().filter((p) => {
           return p.label === this.params().placeable && p.slot === this.params().slot
         })[0]
         let sanitized = ['point', 'tiprack', 'trough', 'tuberack'].filter((el) =>
           placeable.type.includes(el)
         )[0]
-
         placeable.sanitizedType = sanitized || 'default'
         return placeable
       },
-      deck () {
-        let tasks = this.$store.state.tasks
-        let containers = []
-        for (let inst of tasks) {
-          for (let p of inst['placeables']) {
-            let container = {}
-            let type = p.type
-            let slot = p.slot
-            let link = p.href
-            container.type = type
-            container.slot = slot
-            container.href = link
-            containers.push(container)
-          }
-        }
-        return containers
+      instrument () {
+        return this.placeable().instruments.filter((instrument) => {
+          return instrument.axis === this.params().instrument
+        })[0]
       }
     },
     computed: {
