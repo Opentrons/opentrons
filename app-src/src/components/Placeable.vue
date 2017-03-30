@@ -1,17 +1,18 @@
 <template>
 
   <div class="task">
-  <section id='task-placeable' v-if='this.instrument() && this.placeable()'>
-    <h1 class='title'>
-      Calibrate the {{this.instrument().label}} pipette to the
-      {{this.placeable().sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
-      {{this.calibrationPoint}} of your {{this.placeable.label}} container
-    </h1>
-    <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'>
-    </CalibratePlaceable>
-  </section>
-  <deck-map v-if='instrument()' :placeable='placeable()' :instrument='instrument()' :deck='deck()' ><deck-map>
-  </deck-map>
+    <deck-map v-if='instrument()' :placeable='placeable()' :instrument='instrument()' :deck='deck()' ></deck-map>
+
+    <section id='task-placeable' v-if='this.instrument() && this.placeable()'>
+      <h1 class='title'>
+        Calibrate the {{this.instrument().label}} pipette to the
+        {{this.placeable().sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
+        {{this.calibrationPoint}} of your {{this.placeable.label}} container
+      </h1>
+      <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'></CalibratePlaceable>
+    </section>
+
+  </div>
 </template>
 
 <script>

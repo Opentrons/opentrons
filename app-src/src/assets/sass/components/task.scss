@@ -2,21 +2,22 @@
         Tasks Screens
 ******************************/
 div.task{
-    width: 535px;
+    width: 720px;
     display:flex;
     flex-direction:column;
 }
 
 section#task-placeable{
-    width: 535px;
-    height: 60px;
-    padding: 20px;
+    width: 682px;
+    height: 73px;
+    padding: 18px;
+    margin-top:5px;
     background-color: $well-bg;
     border-radius: 6px;
 }
 
 section#task-pipette {
-    width: 515px;
+    width: 660px;
     height: 310px;
     padding: 30px;
     background-color: $well-bg;
