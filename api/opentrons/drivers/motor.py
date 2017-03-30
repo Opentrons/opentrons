@@ -42,7 +42,8 @@ class CNCDriver(object):
     GET_ENDSTOPS = 'M119'
     HALT = 'M112'
     CALM_DOWN = 'M999'
-    ACCELERATION = 'M204'
+    SET_SPEED = 'M203.1'
+    SET_ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
     STEPS_PER_MM = 'M92'
@@ -191,6 +192,7 @@ class CNCDriver(object):
         self.send_halt_command()
 
         self.calm_down()
+        self.set_speed()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
@@ -355,8 +357,6 @@ class CNCDriver(object):
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
-        slowest_speed = self.calculate_shared_speed(**kwargs)
-
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
         target_point = {
@@ -376,7 +376,7 @@ class CNCDriver(object):
         args = {axis.upper(): kwargs.get(axis)
                 for axis in 'xyzab'
                 if axis in kwargs}
-        args.update({"F": slowest_speed})
+        args.update({"F": max(list(self.speeds.values()))})
 
         self.consume_move_commands(args)
 
@@ -558,7 +558,7 @@ class CNCDriver(object):
             for ax, val in kwargs.items()
             if ax.upper() in 'XYZABC'
         }
-        self.send_command(self.ACCELERATION, **axis)
+        self.send_command(self.SET_ACCELERATION, **axis)
         self.wait_for_ok()
 
     def calculate_shared_speed(self, **kwargs):
@@ -574,6 +574,13 @@ class CNCDriver(object):
         for l in 'xyzab':
             if l in kwargs:
                 self.speeds[l] = int(kwargs[l])
+        if self.is_connected():
+            kwargs = {
+                key.upper(): int(val / 60)  # M203.1 is in mm/sec (not mm/min)
+                for key, val in self.speeds.items()
+            }
+            self.send_command(self.SET_SPEED, **kwargs)
+            self.wait_for_ok()
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':

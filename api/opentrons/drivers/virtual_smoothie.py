@@ -25,12 +25,12 @@ class VirtualSmoothie(object):
         self.responses = []
         self.absolute = True
         self.is_open = False
-        self.speed = {
-            'head': 0.0,
-            'plunger': {
-                'a': 0.0,
-                'b': 0.0
-            }
+        self.speeds = {
+            'x': 4000,
+            'y': 4000,
+            'x': 3000,
+            'a': 500,
+            'b': 500
         }
         self.endstop = {
             'X_min': 0,
@@ -153,13 +153,6 @@ class VirtualSmoothie(object):
                 self.endstop[axis_hit] = 1
                 break
 
-        if 'F' in arguments:
-            self.speed['head'] = arguments['F']
-
-        for axis in 'ab':
-            if axis in arguments:
-                self.speed['plunger'][axis.lower()] = arguments[axis]
-
         if axis_hit and self.limit_switches:
             # Limit switch X was hit - reset or M999 required
             return 'Limit switch {} was hit - reset or M999 required'.format(axis_hit)
@@ -183,6 +176,12 @@ class VirtualSmoothie(object):
         for axis, value in arguments.items():
             if axis.upper() in 'XYZAB':
                 self.accelerations[axis.upper()] = value
+        return 'ok\nok'
+
+    def process_speed(self, arguments):
+        for axis, value in arguments.items():
+            if axis.upper() in 'XYZAB':
+                self.speeds[axis.lower()] = value
         return 'ok\nok'
 
     def process_calm_down(self, arguments):
@@ -271,6 +270,7 @@ class VirtualSmoothie(object):
             'G4': self.process_dwell_command,
             'M114.2': self.process_get_position,
             'M114.4': self.process_get_target,
+            'M203.1': self.process_speed,
             'M204': self.process_acceleration,
             'G28.2': self.process_home_command,
             'G28.3': self.process_set_zero_command,
