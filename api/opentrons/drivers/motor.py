@@ -355,7 +355,7 @@ class CNCDriver(object):
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
-        slowest_speed = self.get_slowest_speed(*list(kwargs.keys()))
+        slowest_speed = self.calculate_shared_speed(**kwargs)
 
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
@@ -561,10 +561,8 @@ class CNCDriver(object):
         self.send_command(self.ACCELERATION, **axis)
         self.wait_for_ok()
 
-    def get_slowest_speed(self, *args):
-        received_axis = [ax for ax in 'xyzab' if ax in args]
-        their_speeds = [self.speeds.get(ax, 500) for ax in received_axis]
-        return min(their_speeds)
+    def calculate_shared_speed(self, **kwargs):
+        return min([self.speeds[key.lower()] for key in list(kwargs.keys())])
 
     def set_speed(self, *args, **kwargs):
         if len(args) > 0:

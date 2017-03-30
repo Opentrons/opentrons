@@ -75,7 +75,7 @@ class InstrumentMotor(object):
         mode : {'absolute', 'relative'}
         """
         kwargs = {self.axis: value}
-        return self.motor_driver.move_plunger(
+        self.motor_driver.move_plunger(
             mode=mode, **kwargs
         )
 
@@ -83,7 +83,7 @@ class InstrumentMotor(object):
         """
         Home plunger motor.
         """
-        return self.motor_driver.home(self.axis)
+        self.motor_driver.home(self.axis)
 
     def wait(self, seconds):
         """
@@ -468,16 +468,14 @@ class Robot(object, metaclass=Singleton):
         True
         """
         def _do():
-            if self._driver.calm_down():
-                if args:
-                    self._update_axis_homed(*args)
-                    return self._driver.home(*args)
-                else:
-                    self._update_axis_homed('xyzab')
-                    self._driver.home('z')
-                    return self._driver.home('x', 'y', 'b', 'a')
+            self._driver.calm_down()
+            if args:
+                self._update_axis_homed(*args)
+                self._driver.home(*args)
             else:
-                return False
+                self._update_axis_homed('xyzab')
+                self._driver.home('z')
+                self._driver.home('x', 'y', 'b', 'a')
 
         if kwargs.get('enqueue'):
             description = "Homing Robot"
