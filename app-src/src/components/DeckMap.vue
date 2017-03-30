@@ -1,16 +1,18 @@
 <template>
   <section id="deck-map">
-  <button  v-for="instrument in tasks" 
-  class="tab" :class="{active : activePipette(instrument)}"
-  @click="togglePipette(instrument.axis)"> 
-  {{instrument.axis}} {{instrument.label}} <span v-for="c in instrument.channels">&#9661;</span>
-  </button>
-    <div class="deck-container">
-     <div v-for="col in cols" class="deck-col">
-        <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row)}">
-            <container v-if="hasContainer(col+row)" :placeable="getContainer(col+row)"></container>
-            <div v-else class="empty"><p>{{col+row}}</p></div>
-       </div>
+    <button  v-for="instrument in tasks" 
+    class="tab" :class="{active : activePipette(instrument)}"
+    @click="togglePipette(instrument.axis)"> 
+    {{instrument.axis}} {{instrument.label}} <span v-for="c in instrument.channels">&#9661;</span>
+    </button>
+    <div class="deck-wrapper">
+      <div class="deck-container">
+       <div v-for="col in cols" class="deck-col">
+          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row)}">
+              <container v-if="hasContainer(col+row)" :placeable="getContainer(col+row)"></container>
+              <div v-else class="empty"><p>{{col+row}}</p></div>
+         </div>
+        </div>
       </div>
     </div>
   </section>
