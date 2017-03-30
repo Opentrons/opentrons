@@ -178,8 +178,6 @@ class UploadTestCase(unittest.TestCase):
             'status': 'success'
         }
 
-        from pprint import pprint
-        pprint(response)
         self.assertDictEqual(response, expected_data)
 
     def test_upload_invalid_python(self):
