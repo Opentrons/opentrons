@@ -1,17 +1,17 @@
 module.exports = {addHrefs, processProtocol, processTasks}
 
 function addHrefs (tasks) {
-  tasks.map((instrument) => {
+  tasks.deck.map((placeable) => {
+    placeable.href = '/calibrate/' + placeable.instruments[0].axis + '/' + placeable.slot + '/' + placeable.label
+  })
+  tasks.instruments.map((instrument) => {
     instrument.href = '/calibrate/' + instrument.axis
-    instrument.placeables.map((placeable) => {
-      placeable.href = '/calibrate/' + instrument.axis + '/' + placeable.slot + '/' + placeable.label
-    })
   })
 }
 
 function processProtocol (response) {
   let result = {success: true, errors: [], warnings: [], calibrations: []}
-  console.log(response)
+  // console.log(response)
   let data = response.body.data
   result.calibrations = data.calibrations || []
   if (data.errors && data.errors.length > 0) {

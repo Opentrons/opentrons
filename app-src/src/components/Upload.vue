@@ -28,7 +28,7 @@
     },
     computed: {
       taskListLen () {
-        return this.$store.state.tasks.length > 0
+        return this.$store.state.tasks.deck !== undefined
       },
       busy () {
         return this.$store.state.busy
@@ -36,9 +36,10 @@
     },
     watch: {
       taskListLen: function () {
-        var task = this.$store.state.tasks[0]
-        if (task && task.placeables && task.placeables[0]) {
-          this.$router.push(task.placeables[0].href)
+        var deck = this.$store.state.tasks.deck
+        console.log(deck[0].href)
+        if (deck && deck[0] && deck[0].slot) {
+          this.$router.push(deck[0].href)
         } else {
           this.$router.push('/')
         }
