@@ -10,20 +10,28 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'Run',
     methods: {
       runProtocol () {
         this.$store.dispatch('runProtocol')
+        trackEvent('run-protocol', {
+          'protocol-file': this.$store.state.fileName
+        })
       },
       pauseProtocol () {
         this.$store.dispatch('pauseProtocol')
+        trackEvent('pause-protocol')
       },
       resumeProtocol () {
         this.$store.dispatch('resumeProtocol')
+        trackEvent('resume-protocol')
       },
       cancelProtocol () {
         this.$store.dispatch('cancelProtocol')
+        trackEvent('cancel-protocol')
       }
     },
     computed: {
@@ -37,6 +45,7 @@
         return this.$store.state.paused
       },
       calibrated () {
+        // TODO: Move this to state
         if (!this.$store.state.isConnected) return false
         if (this.$store.state.tasks.length === 0) return false
 

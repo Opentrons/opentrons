@@ -5,6 +5,7 @@
   "description": "OT One Robot Companion Desktop App",
   "main": "main/main.js",
   "dependencies": {
+    "deskmetrics": "^2.3.0-rc7",
     "electron-json-storage": "^2.0.0",
     "electron-settings": "^2.1.1",
     "electron-squirrel-startup": "^1.0.0",

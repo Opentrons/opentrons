@@ -19,6 +19,8 @@ const router = new VueRouter({
   mode: 'history'
 })
 
+console.log('got herboooo')
+
 /* eslint-disable */
 window.onload = function () {
   // Google analytics SPA extensions: https://github.com/googleanalytics/autotrack

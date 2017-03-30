@@ -16,12 +16,16 @@ const {ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
+const deskmetrics = require('deskmetrics')
+
 let serverManager = new ServerManager()
 let mainWindow
-
+let appWindowUrl = 'http://localhost:31950/'
 
 if (process.env.NODE_ENV === 'development'){
+  // require('vue-devtools').install()
   require('electron-debug')({showDevTools: 'undocked'});
+  appWindowUrl = 'http://localhost:8090/'
 }
 
 function createWindow (windowUrl) {
@@ -51,6 +55,22 @@ function startUp () {
   createAndSetAppDataDir()
   const mainLogger = getLogger('electron-main')
 
+  deskmetrics.start({ appId: '8d9af03aa1', version:  app.getVersion()}).then(function() {
+    // Set properties
+    console.log('App version is', app.getVersion());
+    deskmetrics.setProperty('version', app.getVersion())
+    deskmetrics.setProperty('build', app.getVersion())
+  })
+  ipcMain.on('analytics', (event, appEvent, appEventMetadata) => {
+    // console.log('Sending event', appEvent, appEventMetadata)
+    deskmetrics.send(appEvent, appEventMetadata)
+  })
+
+  // NOTE: vue-devtools can only be installed after app the 'ready' event
+  if (process.env.NODE_ENV === 'development'){
+    require('vue-devtools').install()
+  }
+
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
       console.log(error)
@@ -60,7 +80,8 @@ function startUp () {
 
   serverManager.start()
   waitUntilServerResponds(
-    () => createWindow('http://localhost:31950/'),
+    //() => createWindow('http://localhost:8090/'),
+    () => createWindow(appWindowUrl),
     'http://localhost:31950/'
   )
   addMenu()
