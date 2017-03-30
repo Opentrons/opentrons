@@ -390,13 +390,13 @@ class Robot(object, metaclass=Singleton):
         """
         default_options = {
             'limit_switches': True,
-            'firmware': 'v1.0.5',
+            'firmware': 'edge-1c222d9NOMSD',
             'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.2.0',        # config version
+                'ot_version': 'one_pro_plus',
+                'version': 'v2.0.0',    # config version
                 'alpha_steps_per_mm': 80.0,
                 'beta_steps_per_mm': 80.0,
-                'gamma_steps_per_mm': 1068.7
+                'gamma_steps_per_mm': 400
             }
         }
         if options:

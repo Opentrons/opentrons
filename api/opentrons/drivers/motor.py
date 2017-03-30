@@ -36,6 +36,7 @@ class CNCDriver(object):
     MOVE = 'G0'
     DWELL = 'G4'
     HOME = 'G28.2'
+    SET_ZERO = 'G28.3'
     GET_POSITION = 'M114.2'
     GET_TARGET = 'M114.4'
     GET_ENDSTOPS = 'M119'
@@ -189,7 +190,7 @@ class CNCDriver(object):
         self.wait_for_ok()
         self.send_halt_command()
 
-        return self.calm_down()
+        self.calm_down()
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
@@ -303,7 +304,7 @@ class CNCDriver(object):
             'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
-        while self.connection.readline().decode():
+        while self.is_connected() and self.connection.readline().decode():
             time.sleep(self.serial_timeout)
 
     def readline_from_serial(self):
@@ -377,13 +378,13 @@ class CNCDriver(object):
                 if axis in kwargs}
         args.update({"F": slowest_speed})
 
-        return self.consume_move_commands(args)
+        self.consume_move_commands(args)
 
     def move_plunger(self, mode='absolute', **kwargs):
-        return self.move(mode, **kwargs)
+        self.move(mode, **kwargs)
 
     def move_head(self, mode='absolute', **kwargs):
-        return self.move(mode, **kwargs)
+        self.move(mode, **kwargs)
 
     def consume_move_commands(self, args):
         self.check_paused_stopped()
@@ -403,7 +404,6 @@ class CNCDriver(object):
             'class': type(self.connection).__name__
         }
         trace.EventBroker.get_instance().notify(arguments)
-        return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
         if not self.ot_version:
@@ -438,9 +438,6 @@ class CNCDriver(object):
             if dist_head < tolerance:
                 if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
                     arrived = True
-            else:
-                arrived = False
-        return arrived
 
     def home(self, *axis):
         axis_to_home = ''
@@ -455,6 +452,8 @@ class CNCDriver(object):
         try:
             self.send_command(self.HOME + axis_to_home)
             self.wait_for_ok()
+            self.send_command(self.SET_ZERO + axis_to_home)
+            self.wait_for_ok()
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
@@ -468,7 +467,6 @@ class CNCDriver(object):
             }
         }
         trace.EventBroker.get_instance().notify(arguments)
-        return True
 
     def wait(self, delay_time):
         start_time = time.time()
@@ -488,13 +486,12 @@ class CNCDriver(object):
             time.sleep(max(0, remaining_time))
         arguments = {'name': 'delay-finish'}
         trace.EventBroker.get_instance().notify(arguments)
-        return True
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
         if res != b'ok':
             self.wait_for_ok()
-        return self.wait_for_ok()
+        self.wait_for_ok()
 
     def send_halt_command(self):
         self.send_command(self.HALT)
@@ -553,7 +550,7 @@ class CNCDriver(object):
         current_steps_per_mm = self.get_steps_per_mm(axis)
         current_steps_per_mm *= (expected_travel / actual_travel)
         current_steps_per_mm = round(current_steps_per_mm, 2)
-        return self.set_steps_per_mm(axis, current_steps_per_mm)
+        self.set_steps_per_mm(axis, current_steps_per_mm)
 
     def set_acceleration(self, **kwargs):
         axis = {
@@ -579,7 +576,6 @@ class CNCDriver(object):
         for l in 'xyzab':
             if l in kwargs:
                 self.speeds[l] = int(kwargs[l])
-        return True
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':
@@ -613,7 +609,6 @@ class CNCDriver(object):
                     ot_version=self.ot_version
                 )
             )
-        return res
 
     def get_ot_version(self):
         res = self.get_config_value(self.OT_VERSION)
@@ -626,7 +621,7 @@ class CNCDriver(object):
         return self.ot_version
 
     def get_firmware_version(self):
-        # Build version: edge-0c9209a, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
+        # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
         #   CNC Build 6 axis
         #   6 axis
         # ok
@@ -714,19 +709,18 @@ class CNCDriver(object):
                 "Smoothie mosfet not at index {}".format(mosfet_index))
 
     def power_on(self):
-        res = self.send_command(self.MOTORS_ON)
-        return res == b'ok'
+        self.send_command(self.MOTORS_ON)
+        self.wait_for_ok()
 
     def power_off(self):
-        res = self.send_command(self.MOTORS_OFF)
-        return res == b'ok'
+        self.send_command(self.MOTORS_OFF)
+        self.wait_for_ok()
 
     def wait_for_ok(self):
         res = self.wait_for_response()
         if res != b'ok':
             raise RuntimeError(
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
-        return True
 
     def ignore_next_line(self):
         self.wait_for_response()

@@ -119,8 +119,20 @@ class VirtualSmoothie(object):
             axis_list = 'XYZAB'
 
         for axis in axis_list:
-            arguments[axis.upper()] = 0.0
+            arguments[axis.upper()] = 3.0
             self.endstop[axis.upper() + '_min'] = 0
+
+        self.set_position_from_arguments(arguments)
+
+        return 'ok\nok'
+
+    def process_set_zero_command(self, arguments):
+        axis_list = arguments.keys()
+        if len(arguments) == 0:
+            axis_list = 'XYZAB'
+
+        for axis in axis_list:
+            arguments[axis.upper()] = 0.0
 
         self.set_position_from_arguments(arguments)
 
@@ -178,6 +190,7 @@ class VirtualSmoothie(object):
 
     def process_halt(self, arguments):
         e = 'ok Emergency Stop Requested - reset or M999 required to exit HALT state'
+        e += '\nok'
         return e
 
     def process_absolute_positioning(self, arguments):
@@ -189,12 +202,14 @@ class VirtualSmoothie(object):
         return 'ok\nok'
 
     def process_version(self, arguments):
-        # Build version: edge-0c9209a, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
+        # Build version: BRANCH-HASH, Build date: MONTH DAY YEAR HOUR:MIN:SEC, MCU: LPC1769, System Clock: 120MHz
         #   CNC Build 6 axis
+        #   6 axis
         # ok
-        res = 'Build version: edge-0c9209a, '
+        res = 'Build version: {}, '.format(self.version)
         res += 'Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz'
         res += '\n  CNC Build 6 axis'
+        res += '\n  6 axis'
         return res + '\nok'
 
     def process_reset(self, arguments):
@@ -258,6 +273,7 @@ class VirtualSmoothie(object):
             'M114.4': self.process_get_target,
             'M204': self.process_acceleration,
             'G28.2': self.process_home_command,
+            'G28.3': self.process_set_zero_command,
             'M119': self.process_get_endstops,
             'M92': self.process_steps_per_mm,
             'M999': self.process_calm_down,

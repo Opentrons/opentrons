@@ -22,17 +22,16 @@ class OpenTronsTest(unittest.TestCase):
             'limit_switches': True,
             'config': {
                 'alpha_steps_per_mm': 80.0,
-                'beat_steps_per_mm': 80.0
+                'beta_steps_per_mm': 80.0
             }
         }
 
         myport = self.robot.VIRTUAL_SMOOTHIE_PORT
         self.robot.disconnect()
-        success = self.robot.connect(port=myport, options=options)
-        self.assertTrue(success)
+        self.robot.connect(port=myport, options=options)
 
     def tearDown(self):
-        pass
+        self.motor.flush_port()
 
     def test_reset(self):
         self.motor.reset()
@@ -56,12 +55,8 @@ class OpenTronsTest(unittest.TestCase):
     def test_version_compatible(self):
         self.robot.disconnect()
         self.robot.connect()
-        res = self.motor.versions_compatible()
-        self.assertEquals(res, {
-            'firmware': True,
-            'config': True,
-            'ot_version': True
-        })
+        self.motor.versions_compatible()
+
         self.robot.disconnect()
 
         kwargs = {
@@ -85,9 +80,17 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.set_plunger_speed(400, 'a')
         self.assertRaises(ValueError, self.motor.set_plunger_speed, 400, 'x')
 
-    def test_set_head_speed(self):
-        self.motor.set_head_speed(4000)
-        self.assertEquals(self.motor.head_speed, 4000)
+    def test_set_speed(self):
+        self.motor.set_speed(4000)
+        self.assertEquals(self.motor.speeds['x'], 4000)
+        self.assertEquals(self.motor.speeds['y'], 4000)
+
+        self.motor.set_speed(3000, z=2000, a=700, b=600)
+        self.assertEquals(self.motor.speeds['x'], 3000)
+        self.assertEquals(self.motor.speeds['y'], 3000)
+        self.assertEquals(self.motor.speeds['z'], 2000)
+        self.assertEquals(self.motor.speeds['a'], 700)
+        self.assertEquals(self.motor.speeds['b'], 600)
 
     def test_get_connected_port(self):
         res = self.motor.get_connected_port()
@@ -203,11 +206,14 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_home(self):
 
-        success = self.motor.home('x', 'y')
-        self.assertTrue(success)
+        self.motor.home('x', 'y')
+        pos = self.motor.get_head_position()['current']
+        self.assertEquals(pos['x'], 0)
 
-        success = self.motor.home('ba')
-        self.assertTrue(success)
+        self.motor.home('ba')
+        pos = self.motor.get_plunger_positions()['current']
+        self.assertEquals(pos['a'], 0)
+        self.assertEquals(pos['b'], 0)
 
     def test_limit_hit_exception(self):
         self.motor.home()
@@ -221,49 +227,59 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_move_x(self):
         self.motor.ot_version = None
-        success = self.motor.move_head(x=100)
-        self.assertTrue(success)
+        self.motor.move_head(x=100)
+        pos = self.motor.get_head_position()['current']
+        self.assertEquals(pos['x'], 100)
 
     def test_move_y(self):
         self.motor.ot_version = None
-        success = self.motor.move_head(y=100)
-        self.assertTrue(success)
+        self.motor.move_head(y=100)
+        pos = self.motor.get_head_position()['current']
+        self.assertEquals(pos['y'], 100)
 
     def test_move_z(self):
         self.motor.ot_version = None
-        success = self.motor.move_head(z=30)
-        self.assertTrue(success)
+        self.motor.move_head(z=30)
+        pos = self.motor.get_head_position()['current']
+        self.assertEquals(pos['z'], 30)
 
     def test_send_command(self):
-        success = self.motor.send_command('G0 X1 Y1 Z1')
-        self.assertTrue(success)
+        res = self.motor.send_command('G0 X1 Y1 Z1')
+        self.assertEquals(res, b'ok')
+        self.assertEquals(self.motor.wait_for_response(), b'ok')
+        pos = self.motor.get_head_position()['current']
+        self.assertEquals(pos['x'], 1)
+        self.assertEquals(pos['y'], 399)
+        self.assertEquals(pos['z'], 99)
 
     def test_send_command_with_kwargs(self):
-        success = self.motor.send_command('G0', x=1, y=2, z=3)
-        self.assertTrue(success)
+        res = self.motor.send_command('G0', X=1, Y=2, Z=3)
+        self.assertEquals(res, b'ok')
+        self.assertEquals(self.motor.wait_for_response(), b'ok')
+        pos = self.motor.get_head_position()['current']
+        self.assertEquals(pos['x'], 1)
+        self.assertEquals(pos['y'], 398)
+        self.assertEquals(pos['z'], 97)
 
     def test_wait(self):
         # set connection to be something other than VirtualSmoothie
         self.motor.connection = int()
         start_time = time.time()
-        success = self.motor.wait(1.234)
+        self.motor.wait(1.234)
         end_time = time.time()
         self.assertAlmostEquals(end_time - start_time, 1.234, places=1)
-        self.assertTrue(success)
 
         self.motor.connection = int()
         start_time = time.time()
-        success = self.motor.wait(1.0)
+        self.motor.wait(1.0)
         end_time = time.time()
         self.assertAlmostEquals(end_time - start_time, 1.0, places=1)
-        self.assertTrue(success)
 
     def test_wait_for_arrival(self):
         self.motor.home()
         self.motor.move_head(x=200, y=200)
         self.motor.move_head(z=30)
-        success = self.motor.wait_for_arrival()
-        self.assertTrue(success)
+        self.motor.wait_for_arrival()
 
     def test_move_relative(self):
         self.motor.home()
@@ -336,8 +352,8 @@ class OpenTronsTest(unittest.TestCase):
         self.assertRaises(IndexError, self.motor.set_mosfet, 6, True)
 
     def test_power_on_off(self):
-        res = self.motor.power_on()
-        self.assertTrue(res)
+        self.motor.power_on()
 
-        res = self.motor.power_off()
-        self.assertTrue(res)
+        self.motor.power_off()
+
+        assert True
