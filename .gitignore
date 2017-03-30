@@ -87,6 +87,8 @@ smoothie/
 !app/opentrons/config/smoothie
 */calibrations
 
+*.pid
+
 # SDK logs
 *.log
 *.log.*

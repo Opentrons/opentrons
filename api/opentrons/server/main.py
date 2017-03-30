@@ -569,20 +569,45 @@ current_protocol_step_list = None
 
 def create_step_list():
     global current_protocol_step_list
+    current_protocol_step_list = {'instruments': [], 'deck': []}
     try:
-        current_protocol_step_list = [{
-            'axis': instrument.axis,
-            'label': instrument.name,
-            'channels': instrument.channels,
-            'placeables': [
+        current_protocol_step_list['instruments'] = sorted(
+            [
                 {
-                    'type': container.get_type(),
-                    'label': container.get_name(),
-                    'slot': container.get_parent().get_name()
+                    'axis': instrument.axis,
+                    'label': instrument.name,
+                    'channels': instrument.channels
                 }
-                for container in _get_unique_containers(instrument)
-            ]
-        } for instrument in _get_all_pipettes()]
+                for instrument in _get_all_pipettes()
+            ],
+            key=lambda p: '{}-{}'.format(p['axis'], p['label'])
+        )
+
+        current_protocol_step_list['deck'] = sorted(
+            [
+                {
+                    'type': c.get_type(),
+                    'label': c.get_name(),
+                    'slot': c.get_parent().get_name(),
+                    'instruments': sorted(
+                        [
+                            {
+                                'axis': instrument.axis,
+                                'label': instrument.name
+                            }
+                            for instrument in _get_all_pipettes()
+                            for container in _get_unique_containers(instrument)
+                            if container is c
+                        ],
+                        key=lambda p: '{}-{}'.format(p['axis'], p['label'])
+                    )
+                }
+                for c in _get_all_containers()
+            ],
+            key=lambda cont: '{}-{}'.format(cont['slot'], cont['label'])
+        )
+
+
     except Exception as e:
         app.logger.exception('Error creating step list')
         emit_notifications([str(e)], 'danger')
@@ -596,10 +621,10 @@ def update_step_list():
     if current_protocol_step_list is None:
         create_step_list()
     try:
-        for step in current_protocol_step_list:
-            t_axis = str(step['axis']).upper()
+        for p in current_protocol_step_list['instruments']:
+            t_axis = str(p['axis']).upper()
             instrument = robot._instruments[t_axis]
-            step.update({
+            p.update({
                 'top': instrument.positions['top'],
                 'bottom': instrument.positions['bottom'],
                 'blow_out': instrument.positions['blow_out'],
@@ -608,12 +633,16 @@ def update_step_list():
                 'calibrated': _check_if_instrument_calibrated(instrument)
             })
 
-            for placeable_step in step['placeables']:
-                c = _get_container_from_step(placeable_step)
-                if c:
-                    placeable_step.update({
-                        'calibrated': _check_if_calibrated(instrument, c)
+        for container_json in current_protocol_step_list['deck']:
+            c = _get_container_from_step(container_json)
+            if c:
+                for p in container_json['instruments']:
+                    t_axis = str(p['axis']).upper()
+                    this_instrument = robot._instruments[t_axis]
+                    p.update({
+                        'calibrated': _check_if_calibrated(this_instrument, c)
                     })
+
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
