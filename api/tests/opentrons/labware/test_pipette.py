@@ -1249,6 +1249,63 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
+    def test_transfer_singlechannel(self):
+        self.p200.reset()
+        self.p200.channels = 1
+        self.p200.transfer(
+            200,
+            self.plate.rows('1', '2'),
+            self.plate.rows('3'),
+            touch_tip=False,
+            blow_out=False,
+            trash=False
+        )
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well A3'],
+            ['aspirating', '200', 'Well B1'],
+            ['dispensing', '200', 'Well A3'],
+            ['aspirating', '200', 'Well C1'],
+            ['dispensing', '200', 'Well B3'],
+            ['aspirating', '200', 'Well D1'],
+            ['dispensing', '200', 'Well B3'],
+            ['aspirating', '200', 'Well E1'],
+            ['dispensing', '200', 'Well C3'],
+            ['aspirating', '200', 'Well F1'],
+            ['dispensing', '200', 'Well C3'],
+            ['aspirating', '200', 'Well G1'],
+            ['dispensing', '200', 'Well D3'],
+            ['aspirating', '200', 'Well H1'],
+            ['dispensing', '200', 'Well D3'],
+            ['aspirating', '200', 'Well A2'],
+            ['dispensing', '200', 'Well E3'],
+            ['aspirating', '200', 'Well B2'],
+            ['dispensing', '200', 'Well E3'],
+            ['aspirating', '200', 'Well C2'],
+            ['dispensing', '200', 'Well F3'],
+            ['aspirating', '200', 'Well D2'],
+            ['dispensing', '200', 'Well F3'],
+            ['aspirating', '200', 'Well E2'],
+            ['dispensing', '200', 'Well G3'],
+            ['aspirating', '200', 'Well F2'],
+            ['dispensing', '200', 'Well G3'],
+            ['aspirating', '200', 'Well G2'],
+            ['dispensing', '200', 'Well H3'],
+            ['aspirating', '200', 'Well H2'],
+            ['dispensing', '200', 'Well H3'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
     def test_touch_tip(self):
         self.p200.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])

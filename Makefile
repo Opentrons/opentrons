@@ -1,4 +1,4 @@
-.PHONY: app api-exe
+.PHONY: app api-exe app-shell api-valid-exe
 
 app:
 	cd app-src &&\
@@ -13,11 +13,15 @@ api-exe:
 	cd api &&\
 		make api
 
+api-valid-exe:
+	cd api &&\
+		make api-valid-exe
+
 api-exe-win:
 	cd api &&\
 		make api-win
 
-app-shll:
+app-shell:
 	cd app-shell &&\
 		npm --version &&\
 		node --version &&\
@@ -27,7 +31,6 @@ app-shll:
 		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
-
 
 app-dev:
 	./scripts/run-dev
