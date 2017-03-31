@@ -323,11 +323,11 @@ class CNCDriver(object):
             raise RuntimeWarning('Lost connection with serial port') from e
         if msg:
             log.debug("Read: {}".format(msg))
-            self.detect_limit_hit(msg)  # raises RuntimeWarning if switch hit
+            self.detect_smoothie_error(msg)  # raises RuntimeWarning if switch hit
 
         return msg
 
-    def detect_limit_hit(self, msg):
+    def detect_smoothie_error(self, msg):
         """
         Detect if it hit a home switch
 
