@@ -333,16 +333,13 @@ class CNCDriver(object):
 
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
-        if b'!!' in msg or b'Limit' in msg:
-            log.debug('home switch hit')
+        string_msg = msg.decode()
+        if '!!' in string_msg or 'Limit' in string_msg or 'error' in string_msg:
             self.flush_port()
             self.calm_down()
-            msg = msg.decode()
-            axis = ''
-            for ax in 'xyzab':
-                if (ax.upper() + '_min') in msg:
-                    axis = ax
-            raise RuntimeWarning('{} limit switch hit'.format(axis.upper()))
+            error_msg = 'Smoothie Error: {}'.format(string_msg)
+            log.debug(error_msg)
+            raise RuntimeWarning(error_msg)
 
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
