@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "asar": "^0.13.0",
+    "auth0-lock": "^10.14.0",
     "autotrack": "1.1.0",
     "babel-preset-es2016": "^6.16.0",
     "electron-debug": "^1.0.1",

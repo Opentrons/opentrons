@@ -23,7 +23,6 @@ let mainWindow
 let appWindowUrl = 'http://localhost:31950/'
 
 if (process.env.NODE_ENV === 'development'){
-  // require('vue-devtools').install()
   require('electron-debug')({showDevTools: 'undocked'});
   appWindowUrl = 'http://localhost:8090/'
 }

@@ -41,6 +41,7 @@
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
+  // import Vue from 'vue'
 
   export default {
     components: {
@@ -76,13 +77,85 @@
         .get('http://localhost:31950/username').then((response) => {
           let username = response.body.username
           if (username !== undefined || username !== null) {
+            console.log('Starting intercom')
+            // '.intercom-launcher-open-icon'
             window.Intercom('boot', {
-              app_id: 'bsgvg3q7',
-              name: username + ' OT App', // Full name
-              email: username + '@opentrons-app.com' // Email address
+              // app_id: 'bsgvg3q7'
+              app_id: 'wbidvcze'
+              // email: username + '@opentrons-app.com' // Email address
             })
           }
         })
+
+      function askForAuthentication () {
+        window.Intercom('shutdown')
+        if (window.lock === undefined) {
+          window.lock = new window.Auth0Lock(
+           'iHhlL8Eb1z3dPKwpYITqah7ZZdyGKvvx',
+           'opentrons.auth0.com'
+          )
+        }
+        window.lock.show()
+        window.lock.on('authenticated', (authResult) => {
+          localStorage.setItem('id_token', authResult.idToken)
+          window.lock.getProfile(authResult.idToken, (err, profile) => {
+            console.log(err)
+            localStorage.setItem('profile', JSON.stringify(profile))
+            window.Intercom('boot', {
+              app_id: 'wbidvcze'
+            })
+          })
+          window.lock.hide()
+        })
+        window.lock.on('hide', () => {
+          window.Intercom('boot', {
+            app_id: 'wbidvcze'
+          })
+        })
+      }
+
+      const myConfObj = {
+        iframeMouseOver: false
+      }
+      function addIntercomListener () {
+        const intercomElm = document.querySelector('#intercom-container > div > iframe')
+        if (intercomElm !== undefined && intercomElm !== null) {
+          console.log('Adding Intercom click listener')
+          window.addEventListener('blur', function () {
+            if (myConfObj.iframeMouseOver) {
+              console.log('Wow! Iframe Click!')
+              askForAuthentication()
+            }
+          })
+          intercomElm.addEventListener('mouseover', function () {
+            myConfObj.iframeMouseOver = true
+          })
+          intercomElm.addEventListener('mouseout', function () {
+            myConfObj.iframeMouseOver = false
+          })
+          return
+        }
+        setTimeout(addIntercomListener, 300)
+      }
+      addIntercomListener()
+      /**
+      function addIntercomListener () {
+        const intercomElm = window
+          .document
+          .getElementById('intercom-container')
+        // debugger
+        console.log('Check for intercom elm', intercomElm)
+        if (intercomElm !== undefined && intercomElm !== null) {
+          console.log('Adding click listener')
+          intercomElm.addEventListener('click', askForAuthentication)
+          return
+        }
+        setTimeout(addIntercomListener, 300)
+      }
+
+      addIntercomListener()
+      */
+
       window.addEventListener('dragover', function (e) {
         e = e || event
         if (e.target.tagName !== 'INPUT') {
