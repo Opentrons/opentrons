@@ -1,17 +1,11 @@
 <template>
-
   <div class="task">
+  <div class="placeable">
     <deck-map v-if='instrument()' :placeable='placeable()' :instrument='instrument()' :deck='deck()' ></deck-map>
 
-    <section id='task-placeable' v-if='this.instrument() && this.placeable()'>
-      <h1 class='title'>
-        Calibrate the {{this.instrument().label}} pipette to the
-        {{this.placeable().sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
-        {{this.calibrationPoint}} of your {{this.placeable.label}} container
-      </h1>
-      <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'></CalibratePlaceable>
-    </section>
-
+    <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'></CalibratePlaceable>
+  </div>
+        <section id='instructions' v-if='this.instrument() && this.placeable()'></section>
   </div>
 </template>
 
@@ -51,18 +45,6 @@
     computed: {
       channels () {
         return this.instrument().channels === 1 ? 'single' : 'multi'
-      },
-      calibrationPoint () {
-        let type = this.placeable().sanitizedType
-        let position = 'of the A1 well'
-        if (type === 'trough') {
-          position = 'of the A1 slot'
-        } else if ((type === 'tiprack' || type === 'default') && this.instrument().channels === 8) {
-          position = 'of the A1 row'
-        } else if (type === 'point') {
-          position = ''
-        }
-        return position
       }
     },
     created: function () {
@@ -71,4 +53,5 @@
       }
     }
   }
+
 </script>

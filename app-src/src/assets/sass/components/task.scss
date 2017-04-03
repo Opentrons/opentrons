@@ -2,76 +2,69 @@
         Tasks Screens
 ******************************/
 div.task{
-    width: 720px;
-    display:flex;
-    flex-direction:column;
+    width: 710px;
 }
 
-section#task-placeable{
-    width: 682px;
-    height: 73px;
-    padding: 18px;
+div.placeable, div.instrument{
+    width: 720px;
+    display:flex;
+    flex-direction:row;
+}
+
+div#task-placeable, section#task-pipette{
+    margin-left:5px;
+    margin-top:40px;
+    width: 275px;
+    padding: 10px;
+    background-color: $well-bg;
+    border-radius: 6px;
+}
+
+section#instructions{
+    width:710px;
+    height:65px;
+    padding: 10px;
     margin-top:5px;
     background-color: $well-bg;
     border-radius: 6px;
 }
 
-section#task-pipette {
-    width: 660px;
-    height: 310px;
-    padding: 30px;
-    background-color: $well-bg;
-    border-radius: 6px;
-}
 
 
-
-
-
-// Will phase out and relocate to popup
-section#task,
-section#task-pipette {
-    .well-img {
-        width: 500px;
-        margin-top: 10px;
-        height: 190px;
-        img {
-            width: 100%;
-            height: auto;
-        }
-    }
-}
 section#task-pipette {
     span {
         width: 510px;
-        height: 260px;
+        //height: 260px;
         display: flex;
         flex-directon: row;
         div.calibrate-pipette {
-            width: 300px;
+            width: 275px;
             display: flex;
             flex-direction: column;
-            flex: 0 0 300px;
+            flex: 0 0 275px;
             .calibrate {
-                width: 290px;
+                width: 275px;
                 display: flex;
                 flex-direction: row;
-                justify-content: flex-end;
+                justify-content: flex-start;
                 &.top {
-                    margin-bottom: 40px;
+                    // margin-bottom: 40px;
                 }
                 &.volume {
                     justify-content: flex-start;
-                    margin-bottom: 10px;
+                    //margin-bottom: 10px;
                 }
                 span.title {
-                    flex: 0 0 90px;
+                    flex: 0 0 70px;
                     height: 50px;
-                    padding-left: 20px;
+                    //padding-left: 0px;
                     font-size: 14px;
                     font-weight: 800;
                     line-height: 40px;
                     text-align: right;
+                    &.volume{
+                        padding-left: 5px;
+                    }
                 }
             }
         }
@@ -104,12 +97,7 @@ section#task-pipette {
         }
     }
     .calibrate.tips {
-        width: 300px;
-        height: 45px;
-        padding-left: 88px;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-    
+        width: 200px;
+        padding-left: 70px;   
     }
 }

@@ -3,7 +3,7 @@
   {{pipettes}}
     <button  v-for="instrument in tasks.instruments" 
     class="tab" :class="{active : activePipette(instrument)}"  
-    > <!-- @click="togglePipette(instrument.axis)" -->
+    @click="togglePipette(instrument.axis)" > 
     {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span>
     </button>
     <div class="deck-wrapper">

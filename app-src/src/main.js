@@ -4,7 +4,7 @@ import VueResource from 'vue-resource'
 import store from './store/store'
 import {
   Placeable,
-  CalibrateInstrument,
+  InstrumentView,
   App
 } from './components/export'
 
@@ -13,7 +13,7 @@ Vue.use(VueResource)
 
 const router = new VueRouter({
   routes: [
-    { name: 'instrument', path: '/calibrate/:instrument', component: CalibrateInstrument },
+    { name: 'instrument', path: '/calibrate/:instrument', component: InstrumentView },
     { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: Placeable }
   ],
   mode: 'history'

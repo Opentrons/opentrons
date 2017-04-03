@@ -2,13 +2,13 @@
             Buttons
 ******************************/
 input {
-    flex: 0 0 $btn-size*3 - 2;
-    min-width: $btn-size*3 - 2;
+    flex: 0 0 $btn-size*2 + 2;
+    min-width: $btn-size*2 + 2;
     height: $btn-size - 2;
     line-height: $btn-size;
-    padding: 0px;
+    padding: 2px;
     border: 1px solid #999;
-    margin: $gutter-width*2 2px $gutter-width*2 1px;
+    margin: $gutter-width*2 2px $gutter-width*2 0;
     text-align: left;
     border-radius: 6px;
     text-align: center;

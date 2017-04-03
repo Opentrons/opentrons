@@ -1,5 +1,8 @@
 <template>
+
+
   <section id='task-pipette'>
+    <h1>{{currentInstrument().label}} on axis {{currentInstrument().axis}} </h1><br>
     <h1 class='title'>Calibrate the {{currentInstrument().label}} pipette on axis {{currentInstrument().axis | capitalize}} </h1>
     <span>
       <div class='calibrate-pipette'>
@@ -28,17 +31,17 @@
         </section>
 
         <section class='calibrate volume'>
-          <input v-model='volume' placeholder='SET MAX VOL'>
+          <input v-model='volume' placeholder='MAX VOL'>
           <button @click='maxVolume(currentAxis(), volume)' class='btn-calibrate save'>SAVE</button>
-          <span class='title'>{{currentInstrument().max_volume}}ul</span>
+          <span class='title volume'> {{currentInstrument().max_volume}}ul</span>
         </section>
       </div>
-      <div class='pipette-diagrams' v-bind:class='currentMode'>
+     <!--  <div class='pipette-diagrams' v-bind:class='currentMode'>
         <img src='../assets/img/pipette_top.png' class='top'/>
         <img src='../assets/img/pipette_bottom.png' class='bottom'/>
         <img src='../assets/img/pipette_blowout.png' class='blow-out'/>
         <img src='../assets/img/pipette_droptip.png' class='drop-tip'/>
-      </div>
+      </div> -->
     </span>
     <section class='calibrate tips'>
       <button @click='pickUpTip(currentAxis())' class='btn-calibrate move-to'>PICK UP TIP</button>
@@ -47,11 +50,16 @@
       <button @click='dispense(currentAxis())' class='btn-calibrate move-to'>DISPENSE</button>
     </section>
   </section>
+
 </template>
 
 <script>
+  import DeckMap from './DeckMap.vue'
   export default {
     name: 'CalibrateInstrument',
+    components: {
+      DeckMap
+    },
     data: function () {
       return {
         currentMode: 'drop-tip',
