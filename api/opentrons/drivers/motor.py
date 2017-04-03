@@ -46,7 +46,11 @@ class CNCDriver(object):
     SET_ACCELERATION = 'M204'
     MOTORS_ON = 'M17'
     MOTORS_OFF = 'M18'
+    AXIS_AMPERAGE = 'M907'
     STEPS_PER_MM = 'M92'
+
+    PUSH_SPEED = 'M120'
+    POP_SPEED = 'M121'
 
     RESET = 'reset'
 
@@ -341,6 +345,17 @@ class CNCDriver(object):
             log.debug(error_msg)
             raise RuntimeWarning(error_msg)
 
+    def _parse_axis_values(self, string):
+        try:
+            return {
+                s.split(':')[0].lower(): float(s.split(':')[1])
+                for s in string.decode('utf-8').split(' ')[2:]
+            }
+        except ValueError as e:
+            log.critical("Error parsing position string from smoothie board:")
+            log.critical(res)
+            raise ValueError(e) from e
+
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
             self.send_command(self.ABSOLUTE_POSITIONING)
@@ -534,24 +549,13 @@ class CNCDriver(object):
         # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
         current_string = self.send_command(self.GET_POSITION)
         self.wait_for_ok()
-        return self._parse_get_pos(current_string)
+        return self._parse_axis_values(current_string)
 
     def get_target_position(self):
         # ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000
         target_string = self.send_command(self.GET_TARGET)
         self.wait_for_ok()
-        return self._parse_get_pos(target_string)
-
-    def _parse_get_pos(self, string):
-        try:
-            return {
-                s.split(':')[0].lower(): float(s.split(':')[1])
-                for s in string.decode('utf-8').split(' ')[2:]
-            }
-        except ValueError as e:
-            log.critical("Error parsing position string from smoothie board:")
-            log.critical(res)
-            raise ValueError(e) from e
+        return self._parse_axis_values(target_string)
 
     def calibrate_steps_per_mm(self, axis, expected_travel, actual_travel):
         current_steps_per_mm = self.get_steps_per_mm(axis)
@@ -653,24 +657,21 @@ class CNCDriver(object):
         return self.config_file_version
 
     def get_steps_per_mm(self, axis):
-        if axis.lower() not in 'xyz':
+        if axis.lower() not in 'xyzab':
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM)
-        self.wait_for_ok()  # extra b'ok' sent from smoothie after M92
-        try:
-            value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
-            return float(value)
-        except Exception:
-            raise RuntimeError(
-                '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
+        self.wait_for_ok()
+        self.wait_for_ok()
+        return self._parse_axis_values(res).get(axis.lower())
 
     def set_steps_per_mm(self, axis, value):
         if axis.lower() not in 'xyz':
             raise ValueError('Axis {} not supported'.format(axis))
 
-        res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
-        self.wait_for_ok()  # extra b'ok' sent from smoothie after M92
+        self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
+        self.wait_for_ok()
+        self.wait_for_ok()
 
         key = self.CONFIG_STEPS_PER_MM[axis.lower()]
         try:
