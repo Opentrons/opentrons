@@ -21,8 +21,6 @@
             &.active{
                 background-color: $well-bg;            
             }
-
-
         }
         div.deck-wrapper{
             padding: 32px 20px;
@@ -69,7 +67,7 @@
                     &.active {
                         outline: 4px solid $call-to-action;
                         box-sizing: border-box;
-                        z-index: 10000;
+                        z-index: 1000;
                     }
                     &.occupied {
                         display: flex;

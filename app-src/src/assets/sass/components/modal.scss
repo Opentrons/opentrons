@@ -1,5 +1,5 @@
 .more-info{
-  margin-top:10px;
+  //margin-top:10px;
     #show-modal{
     color: $secondary-brand;
     text-decoration: underline;
@@ -34,6 +34,7 @@
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
   transition: all .3s ease;
+  z-index: 10000;
   img{
     width:100%;
     height: auto;

@@ -6,18 +6,19 @@
         {{placeable.sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
         {{calibrationPoint}} of your {{placeable.label}} container
       </h1>
-    <div class="more-info">
+    <span class="more-info">
     <a role="button" id="show-modal" @click="showModal = true">more info</a>
+    </span> <br>
 
     <modal v-if="showModal" @close="showModal = false" :placeable="placeable" :instrument="instrument">
     </modal>
-    </div>
+
     <button class='btn-calibrate save' @click='calibrate()'>SAVE</button>
     <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='moveToPosition()'>MOVE TO</button>
     <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip()'>PICK UP TIP</button>
     <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='dropTip()'>DROP TIP</button>
-  </span>
-  
+
+  </div>
 </template>
 
 <script>

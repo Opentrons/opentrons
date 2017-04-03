@@ -3,7 +3,7 @@
   {{pipettes}}
     <button  v-for="instrument in tasks.instruments" 
     class="tab" :class="{active : activePipette(instrument)}"  
-    @click="togglePipette(instrument.axis)" > 
+    @click="togglePipette(instrument.axis)"> 
     {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span>
     </button>
     <div class="deck-wrapper">
@@ -30,7 +30,8 @@
     props: ['placeable', 'instrument', 'deck'],
     data () {
       return {
-        cols: ['A', 'B', 'C', 'D', 'E']
+        cols: ['A', 'B', 'C', 'D', 'E'],
+        activeSlot: this.$route.params.slot
       }
     },
     computed: {
@@ -43,9 +44,6 @@
           }
         }
         return baseRows
-      },
-      activeSlot () {
-        return this.$route.params.slot
       },
       tasks () {
         return this.$store.state.tasks
@@ -70,7 +68,12 @@
         return instrument.axis === this.$route.params.instrument
       },
       togglePipette (axis) {
-        this.$router.push({ name: 'instrument', params: { instrument: axis } })
+        this.$router.push({ name: 'instrument', params: { instrument: axis, slot: null } })
+      }
+    },
+    watch: {
+      '$route' (to, from) {
+        this.activeSlot = to.params.slot
       }
     }
   }
