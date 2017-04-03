@@ -37,7 +37,6 @@
     watch: {
       taskListLen: function () {
         var deck = this.$store.state.tasks.deck
-        console.log(deck[0].href)
         if (deck && deck[0] && deck[0].slot) {
           this.$router.push(deck[0].href)
         } else {

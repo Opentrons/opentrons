@@ -9,7 +9,7 @@
     <div class="deck-wrapper">
       <div class="deck-container">
        <div v-for="col in cols" class="deck-col">
-          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row)}">
+          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), current: pipetteUsesContainer(col+row, $route.params.instrument)}">
               <container v-if="hasContainer(col+row)" :placeable="getContainer(col+row)"></container>
               <div v-else class="empty"><p>{{col+row}}</p></div>
          </div>
@@ -63,6 +63,14 @@
       },
       isActive (slot) {
         return slot === this.activeSlot
+      },
+      pipetteUsesContainer (slot, axis) {
+        let container = this.getContainer(slot)
+        if (container) {
+          let pcPair = container.instruments.find(element => element.axis === axis)
+          return pcPair !== undefined
+        }
+        return false
       },
       activePipette (instrument) {
         return instrument.axis === this.$route.params.instrument

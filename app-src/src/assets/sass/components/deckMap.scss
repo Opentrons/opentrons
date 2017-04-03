@@ -73,14 +73,29 @@
                         display: flex;
                         justify-content: stretch;
                         box-sizing: border-box;
+                    &.current{
+                        .placeable{
+                        background-color: $primary-brand; 
+                        border: 2px solid #68affc;
+                        svg {
+                                .well,
+                                .trough {
+                                    stroke: #004999;
+                                    stroke-width: 1px;
+                                    fill: #68affc;
+                                }
+                            }
+                        }
+
+                    }
                         .placeable {
                             flex: 1 1 100%;
                             width: 100%;
                             position: relative;
                             bottom: 0;
                             left: 0;
-                            border: 2px solid #68affc;
-                            background-color: $primary-brand;
+                            border: 2px solid #666;
+                            background-color: grey;
                             svg {
                                 box-sizing: border-box;
                                 overflow: visible;
@@ -88,9 +103,9 @@
                                 align-self: center;
                                 .well,
                                 .trough {
-                                    stroke: #004999;
+                                    stroke: #333;
                                     stroke-width: 1px;
-                                    fill: #68affc;
+                                    fill: #666;
                                     // &:hover{
                                     //     fill:$call-to-action;
                                     // }
