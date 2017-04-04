@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "unit": "karma start test/karma.conf.js --single-run",
-    "build": "webpack"
+    "build": "webpack",
+    "dev": "webpack-dev-server --port 8090 --inline --hot --content-base ./app/",
+    "unit": "karma start test/karma.conf.js --single-run"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",

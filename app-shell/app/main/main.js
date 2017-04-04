@@ -16,12 +16,13 @@ const {ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
-let serverManager = new ServerManager()
+let appWindowUrl = 'http://localhost:31950/'
 let mainWindow
-
+let serverManager = new ServerManager()
 
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
+  appWindowUrl = 'http://localhost:8090/'
 }
 
 function createWindow (windowUrl) {
@@ -60,7 +61,7 @@ function startUp () {
 
   serverManager.start()
   waitUntilServerResponds(
-    () => createWindow('http://localhost:31950/'),
+    () => createWindow(appWindowUrl),
     'http://localhost:31950/'
   )
   addMenu()
