@@ -1,37 +1,29 @@
 <template>
   <div id='run' :class="{'disabled': !calibrated}">
-    <button v-show='!running' @click='runProtocol()' class='btn-run' :class="{ greyOut: !connected }">Run Job</button>
-    <button v-show='running'@click='cancelProtocol()' class='btn-clear'>Cancel Job</button>
+    <button v-show='!running' @click='runProtocol()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Run Job</button>
+    <button v-show='running'@click='cancelProtocol()' class='btn-clear' id="cancel-job">Cancel Job</button>
     <div class='controls'>
-      <button v-show='!paused && running' @click='pauseProtocol()' class='btn btn-pause'></button>
-      <button v-show='paused && running' @click='resumeProtocol()' class='btn btn-play'></button>
+      <button v-show='!paused && running' @click='pauseProtocol()' class='btn btn-pause' id="pause-job"></button>
+      <button v-show='paused && running' @click='resumeProtocol()' class='btn btn-play' id="resume-job"></button>
     </div>
   </div>
 </template>
 
 <script>
-  import { trackEvent } from '../analytics'
-
   export default {
     name: 'Run',
     methods: {
       runProtocol () {
         this.$store.dispatch('runProtocol')
-        trackEvent('run-protocol', {
-          'protocol-file': this.$store.state.fileName
-        })
       },
       pauseProtocol () {
         this.$store.dispatch('pauseProtocol')
-        trackEvent('pause-protocol')
       },
       resumeProtocol () {
         this.$store.dispatch('resumeProtocol')
-        trackEvent('resume-protocol')
       },
       cancelProtocol () {
         this.$store.dispatch('cancelProtocol')
-        trackEvent('cancel-protocol')
       }
     },
     computed: {

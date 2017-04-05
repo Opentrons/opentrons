@@ -41,10 +41,10 @@
         var task = this.$store.state.tasks[0]
         if (task && task.placeables && task.placeables[0]) {
           this.$router.push(task.placeables[0].href)
-          trackEvent('upload-successful')
+          trackEvent('PROTOCOL_UPLOAD_SUCCESSFUL')
         } else {
           this.$router.push('/')
-          trackEvent('upload-error')
+          trackEvent('PROTOCOL_UPLOAD_ERROR')
         }
       }
     }
