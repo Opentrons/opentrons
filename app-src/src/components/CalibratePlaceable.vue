@@ -34,7 +34,7 @@
           })
         }
         if (isCalibrated.bind(this)()) {
-          trackEvent('deck-calibrated')
+          trackEvent('DECK_CALIBRATED')
         }
       },
       moveToPosition () {
