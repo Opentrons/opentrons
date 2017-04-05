@@ -56,7 +56,8 @@
     },
     data: function () {
       return {
-        version: '2.?.?'
+        version: '2.?.?',
+        username: 'NOT SET'
       }
     },
     computed: {
@@ -71,6 +72,9 @@
           let version = response.body.version
           version ? this.version = version : this.version = '2.?.?'
         })
+      window.Intercom('boot', {
+        app_id: 'bsgvg3q7'
+      })
       window.addEventListener('dragover', function (e) {
         e = e || event
         if (e.target.tagName !== 'INPUT') {

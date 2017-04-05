@@ -6,6 +6,8 @@ import appActions from './actions'
 import { createModule } from 'vuex-toast'
 import wsp from './websocket-plugin'
 const { WebSocketPlugin } = wsp
+// import intp from './intercom-plugin'
+// const { IntercomPlugin } = intp
 
 const { mutations, state } = appMutations
 const { actions } = appActions
@@ -21,6 +23,7 @@ socket.on('disconnect', function () {
   console.log('WebSocket has disconnected')
 })
 
+// const intercomPlugin = new IntercomPlugin()
 const websocketplugin = new WebSocketPlugin(socket)
 const toast = createModule({dismissInterval: 12000})
 
