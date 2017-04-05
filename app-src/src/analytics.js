@@ -1,4 +1,4 @@
-module.exports = { trackEvent }
+module.exports = { trackEvent, trackEventFromWebsocket }
 
 function intercomTrackEvent (event, metadata) {
   if (typeof window.Intercom !== 'function') {
@@ -12,27 +12,31 @@ function intercomTrackEvent (event, metadata) {
   }
 }
 
-function gaTrackEvent (event, metadata) {
-  if (typeof window.ga !== 'function') {
+function dataLayerTrackEvent (event, metadata) {
+  if (typeof window.ot_dataLayer.push !== 'function') {
     return
   }
   try {
-    window.ga('send', 'event', 'App', event)
+    let eventArg = {event: event, payload: {value: event}}
+    console.log('[dataLayer Push] ', JSON.stringify(eventArg))
+    window.ot_dataLayer.push(eventArg)
   } catch (err) {
     console.log(err)
   }
 }
 
-function dataLayerTrackEvent (event, metadata) {
-  if (typeof window.dataLayer !== 'function') {
+function trackEventFromWebsocket (data) {
+  if (!data.command_description) {
     return
   }
-  try {
-    let eventArg = {event: event, payload: {value: event }}
-    console.log(`[dataLayer Push] ${eventArg}`)
-    window.dataLayer.push(eventArg)
-  } catch (err) {
-    console.log(err)
+  if (data.command_description.startsWith('Successfully uploaded')) {
+    dataLayerTrackEvent('PROTOCOL_UPLOAD_SUCCESS')
+  }
+  if (data.command_description.startsWith('Run complete in')) {
+    dataLayerTrackEvent('PROTOCOL_RUN_SUCCESS')
+  }
+  if (data.command_description.startsWith('Error in')) {
+    dataLayerTrackEvent('PROTOCOL_UPLOAD_ERROR')
   }
 }
 

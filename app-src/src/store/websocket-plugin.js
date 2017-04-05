@@ -2,6 +2,7 @@ import { ADD_TOAST_MESSAGE } from 'vuex-toast'
 
 import * as types from './mutation-types'
 import { processTasks } from '../util'
+import { trackEventFromWebsocket } from '../analytics'
 
 function handleJupyterUpload (store, data) {
   let tasks = data.data
@@ -12,6 +13,15 @@ function handleJupyterUpload (store, data) {
 function WebSocketPlugin (socket) {
   return store => {
     socket.on('event', data => {
+      /*
+       * Send analytics event for messages that meet certain conditins.
+       * This needs to be at this top level root because certain events
+       * Are captured in the if statement for toast notification and run screen
+       * TODO: Refactor websocket events so that they are not showing up as both
+       * Toast notifications and RunLog events
+       */
+      trackEventFromWebsocket(data)
+
       if (data.type === 'connection_status') {
         if (data.isConnected === false) {
           store.commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
@@ -51,6 +61,7 @@ function WebSocketPlugin (socket) {
           data.timestamp = (new Date()).toLocaleTimeString()
           data.command_description = text
           data.notification = true
+          trackEventFromWebsocket(data)
           store.commit(types.UPDATE_RUN_LOG, data)
         }
       }

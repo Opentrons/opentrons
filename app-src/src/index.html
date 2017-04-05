@@ -6,6 +6,7 @@
     <!-- NOTE: The location of the build.js file is determined by the webpack.config.js-->
     <script>
       dataLayer = []
+      window.ot_dataLayer = dataLayer // Create global reference to dataLayer to make accessible in Vue
     </script>
     <script src="/build.js"></script>
     <!-- <script src='https://www.google&#45;analytics.com/analytics.js'></script> -->
