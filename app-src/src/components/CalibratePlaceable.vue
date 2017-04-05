@@ -22,7 +22,7 @@
 
         function isCalibrated () {
           // TODO: Add a condition in the state that tracks if deck is calibrated
-          if (this.$store.state.tasks.length === 0) return false
+          if (!this.$store.state.tasks || this.$store.state.tasks.length === 0) return false
           return this.$store.state.tasks.every((instrument) => {
             let placeableCalibrated = instrument.placeables.every((placeable) => {
               return placeable.calibrated

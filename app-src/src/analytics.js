@@ -13,7 +13,7 @@ function intercomTrackEvent (event, metadata) {
 }
 
 function dataLayerTrackEvent (event, metadata) {
-  if (typeof window.ot_dataLayer.push !== 'function') {
+  if (!window.ot_dataLayer) {
     return
   }
   try {
