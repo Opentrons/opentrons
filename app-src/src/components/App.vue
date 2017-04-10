@@ -72,9 +72,6 @@
           let version = response.body.version
           version ? this.version = version : this.version = '2.?.?'
         })
-      window.Intercom('boot', {
-        app_id: 'bsgvg3q7'
-      })
       window.addEventListener('dragover', function (e) {
         e = e || event
         if (e.target.tagName !== 'INPUT') {
