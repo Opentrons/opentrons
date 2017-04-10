@@ -9,7 +9,7 @@
     <div class="deck-wrapper">
       <div class="deck-container">
        <div v-for="col in cols" class="deck-col">
-          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), current: pipetteUsesContainer(col+row, $route.params.instrument)}">
+          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), currentPipette: pipetteUsesContainer(col+row, $route.params.instrument)}">
               <container v-if="hasContainer(col+row)" :placeable="getContainer(col+row)"></container>
               <div v-else class="empty"><p>{{col+row}}</p></div>
          </div>

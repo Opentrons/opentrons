@@ -6,23 +6,25 @@
     $deck-height: 383px * 0.9;
     $slot-height: $deck-height/3;
     section#deck-map {
-        width: 425px;     
+        width: 425px;
         border-radius: 6px;
-        display:inline-block;
+        display: inline-block;
         button.tab {
             width: 200px;
             height: 40px;
-            margin-right:5px;
+            margin-right: 5px;
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
             border: 2px solid $well-bg;
             background-color: white;
-            border-bottom-width:0px;
-            &.active{
-                background-color: $well-bg;            
+            border-bottom-width: 0px;
+            &.active {
+                background-color: $well-bg;
+                color:$secondary-brand;
+                text-shadow:1px 1px 2px rgba(0,0,0,0.3);
             }
         }
-        div.deck-wrapper{
+        div.deck-wrapper {
             padding: 32px 20px;
             background-color: $well-bg;
             border-radius: 6px;
@@ -64,51 +66,67 @@
                     &:not(.active) {
                         border: 1px solid #DDD;
                     }
-                    &.active {
-                        outline: 4px solid $call-to-action;
-                        box-sizing: border-box;
-                        z-index: 1000;
+                    // Grey By Default, Color based on Pipette Association and Active Step
+                    .placeable {
+                        flex: 1 1 100%;
+                        width: 100%;
+                        position: relative;
+                        bottom: 0;
+                        left: 0;
+                        border: 2px solid #666;
+                        background-color: grey;
+                        svg {
+                            box-sizing: border-box;
+                            overflow: visible;
+                            height: 100%;
+                            align-self: center;
+                            .well,
+                            .trough {
+                                stroke: #333;
+                                stroke-width: 1px;
+                                fill: #666;
+                            }
+                        }
                     }
+                    // Blue if associated with selected pipette
                     &.occupied {
                         display: flex;
                         justify-content: stretch;
                         box-sizing: border-box;
-                    &.current{
-                        .placeable{
-                        background-color: $primary-brand; 
-                        border: 2px solid #68affc;
-                        svg {
-                                .well,
-                                .trough {
-                                    stroke: #004999;
-                                    stroke-width: 1px;
-                                    fill: #68affc;
+                        &.currentPipette {
+                            .placeable {
+                                background-color: $primary-brand;
+                                border: 2px solid #68affc;
+                                svg {
+                                    .well,
+                                    .trough {
+                                        stroke: #004999;
+                                        stroke-width: 1px;
+                                        fill: #68affc;
+                                    }
                                 }
                             }
                         }
-
                     }
+                    // turn teal if current container/step
+                    &.active.occupied.currentPipette {
+                        z-index: 1000;
                         .placeable {
-                            flex: 1 1 100%;
-                            width: 100%;
-                            position: relative;
-                            bottom: 0;
-                            left: 0;
-                            border: 2px solid #666;
-                            background-color: grey;
+                            box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
+                            border: 5px solid $secondary-brand;
+                            //outline: 3px solid $secondary-brand;
+                            // background-color: darken($secondary-brand, 5%);
+                            // border: 2px solid darken($secondary-brand, 15%);
                             svg {
-                                box-sizing: border-box;
-                                overflow: visible;
-                                height: 100%;
-                                align-self: center;
-                                .well,
+                                .well{
+                                    &:first-child{
+                                    fill: $call-to-action
+                                    }
+                                }
                                 .trough {
-                                    stroke: #333;
-                                    stroke-width: 1px;
-                                    fill: #666;
-                                    // &:hover{
-                                    //     fill:$call-to-action;
-                                    // }
+                                    &:last-child{
+                                    fill: $call-to-action
+                                    }
                                 }
                             }
                         }
