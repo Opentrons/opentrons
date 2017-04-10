@@ -55,6 +55,7 @@
 
 <script>
   import DeckMap from './DeckMap.vue'
+  
   export default {
     name: 'CalibrateInstrument',
     components: {

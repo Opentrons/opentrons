@@ -2,7 +2,12 @@ module.exports = {addHrefs, processProtocol, processTasks}
 
 function addHrefs (tasks) {
   tasks.deck.map((placeable) => {
-    placeable.href = '/calibrate/' + placeable.instruments[0].axis + '/' + placeable.slot + '/' + placeable.label
+    placeable.href = {}
+    for (let inst of placeable.instruments) {
+      let thref = '/calibrate/' + inst.axis
+      thref += '/' + placeable.slot + '/' + placeable.label
+      placeable.href[inst.axis] = thref
+    }
   })
   tasks.instruments.map((instrument) => {
     instrument.href = '/calibrate/' + instrument.axis

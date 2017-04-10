@@ -36,12 +36,8 @@
     },
     watch: {
       taskListLen: function () {
-        var deck = this.$store.state.tasks.deck
-        if (deck && deck[0] && deck[0].slot) {
-          this.$router.push(deck[0].href)
-        } else {
-          this.$router.push('/')
-        }
+        var instHref = this.$store.state.tasks.instruments[0].href
+        this.$router.push(instHref)
       }
     }
   }

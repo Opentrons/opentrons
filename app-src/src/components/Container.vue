@@ -1,6 +1,6 @@
 <template>
   <div class='placeable'>
-    <router-link :to="placeable.href">
+    <router-link :to="link()">
     <span v-if="wells">
       <svg v-if="!drawRect" :width="width" viewBox='0 0 85.5 127.75' width='100%' preserveAspectRatio='xMinYMin meet'>
         <g>
@@ -44,6 +44,10 @@ export default {
   methods: {
     normalize (value) {
       return value * this.scaler
+    },
+    link () {
+      let axis = this.$route.params.instrument
+      return this.placeable.href[axis] || this.$route.path
     }
   },
   mounted () {
