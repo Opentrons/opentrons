@@ -8,11 +8,16 @@ import {
   App
 } from './components/export'
 
+// import { lock } from './authenticate'
+
+// window.lock = lock
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
 const router = new VueRouter({
   routes: [
+    { path: '/calibrate/:instrument', component: CalibrateInstrument },
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
     { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable }
   ],

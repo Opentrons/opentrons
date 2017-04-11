@@ -21,7 +21,6 @@ let mainWindow
 let serverManager = new ServerManager()
 
 if (process.env.NODE_ENV === 'development'){
-  // require('vue-devtools').install()
   require('electron-debug')({showDevTools: 'undocked'});
   appWindowUrl = 'http://localhost:8090/'
 }

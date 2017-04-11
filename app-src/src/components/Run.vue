@@ -12,6 +12,18 @@
 <script>
   export default {
     name: 'Run',
+    data: function () {
+      return {
+        authenticated: null,
+        email: null
+      }
+    },
+    mounted: function () {
+      this.authenticated = localStorage.getItem('id_token')
+      if (this.authenticated) {
+        this.email = JSON.parse(localStorage.getItem('profile')).email
+      }
+    },
     methods: {
       runProtocol () {
         this.$store.dispatch('runProtocol')

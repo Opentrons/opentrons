@@ -41,6 +41,7 @@
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
+  // import Vue from 'vue'
 
   export default {
     components: {
