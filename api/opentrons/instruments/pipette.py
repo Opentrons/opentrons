@@ -83,8 +83,15 @@ class Pipette(Instrument):
         self.axis = axis
         self.channels = channels
 
+        self.min_volume = min_volume
+        self.max_volume = max_volume or (min_volume + 1)
+
         if not name:
-            name = self.__class__.__name__
+            name = '{0}_{1}-channel_{2}-{3}uL'.format(
+                self.__class__.__name__,
+                self.channels,
+                self.min_volume,
+                self.max_volume)
         self.name = name
 
         if isinstance(trash_container, Container) and len(trash_container) > 0:
@@ -109,9 +116,6 @@ class Pipette(Instrument):
             'aspirate': aspirate_speed,
             'dispense': dispense_speed
         }
-
-        self.min_volume = min_volume
-        self.max_volume = max_volume or (min_volume + 1)
 
         self.positions = {
             'top': None,
