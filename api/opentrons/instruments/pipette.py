@@ -894,7 +894,7 @@ class Pipette(Instrument):
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200, tip_racks=[tiprack])
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200, tip_racks=[tiprack])  # noqa
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
