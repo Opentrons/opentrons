@@ -8,7 +8,11 @@
                 X
             </button>
             <img :src='`${placeableImages(placeable.sanitizedType, channels)}`' />
-            <p>Some more informative text coming soon!</p>
+            <p>
+        Calibrate the {{instrument.label}} pipette to the
+        {{placeable.sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
+        {{calibrationPoint}} of your {{placeable.label}} container.
+      </h1></p>
           </div>       
         </div>
       </div>
@@ -36,6 +40,18 @@
         }
         return require(`../assets/img/${imageUrls[type][channels]}.png`)
       }
+    },
+    calibrationPoint () {
+      let type = this.placeable.sanitizedType
+      let position = 'of the A1 well'
+      if (type === 'trough') {
+        position = 'of the A1 slot'
+      } else if ((type === 'tiprack' || type === 'default') && this.instrument.channels === 8) {
+        position = 'of the A1 row'
+      } else if (type === 'point') {
+        position = ''
+      }
+      return position
     }
   }
 </script>

@@ -9,7 +9,8 @@
     <div class="deck-wrapper">
       <div class="deck-container">
        <div v-for="col in cols" class="deck-col">
-          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), currentPipette: pipetteUsesContainer(col+row, $route.params.instrument)}">
+       <!-- TODO: refactor into class object -->
+          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), calibrated: isCalibrated(col+row), currentPipette: pipetteUsesContainer(col+row, axis)}">
               <container v-if="hasContainer(col+row)" :placeable="getContainer(col+row)"></container>
               <div v-else class="empty"><p>{{col+row}}</p></div>
          </div>
@@ -31,7 +32,8 @@
     data () {
       return {
         cols: ['A', 'B', 'C', 'D', 'E'],
-        activeSlot: this.$route.params.slot
+        activeSlot: this.$route.params.slot,
+        axis: this.$route.params.instrument
       }
     },
     computed: {
@@ -64,6 +66,16 @@
       isActive (slot) {
         return slot === this.activeSlot
       },
+      isCalibrated (slot) {
+        let container = this.getContainer(slot)
+        if (container) {
+          let instrument = container.instruments.find(element => element.axis === this.axis)
+          if (instrument) {
+            return instrument.calibrated
+          }
+           return false
+         }
+      },
       pipetteUsesContainer (slot, axis) {
         let container = this.getContainer(slot)
         if (container) {
@@ -73,7 +85,7 @@
         return false
       },
       activePipette (instrument) {
-        return instrument.axis === this.$route.params.instrument
+        return instrument.axis === this.axis
       },
       togglePipette (axis) {
         this.$router.push({ name: 'instrument', params: { instrument: axis, slot: null } })

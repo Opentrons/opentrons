@@ -21,7 +21,8 @@
       <div id='progress'>
         <ProgressBar></ProgressBar>
       </div>
-      <Run></Run>
+      <!-- TODO: Fix is calibrated in run to work with deck and instruments --> 
+      <!-- <Run></Run> -->
     </section>
     <main id='container'>
       <Jog :busy='robotBusy'></Jog>

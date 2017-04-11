@@ -1,14 +1,9 @@
 <template>
   <div id="task-placeable">
-      <h1>{{placeable.label}} at slot {{placeable.slot}}</h1><br>
-      <h1 class='title'>
-        Calibrate the {{instrument.label}} pipette to the
-        {{placeable.sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
-        {{calibrationPoint}} of your {{placeable.label}} container
-      </h1>
-    <span class="more-info">
-    <a role="button" id="show-modal" @click="showModal = true">more info</a>
-    </span> <br>
+      <h1>{{placeable.label}} at slot {{placeable.slot}}<span class="more-info">
+    <a role="button" id="show-modal" @click="showModal = true">?</a>
+    </span></h1>
+     
 
     <modal v-if="showModal" @close="showModal = false" :placeable="placeable" :instrument="instrument">
     </modal>
@@ -63,18 +58,6 @@
       },
       isCalibrated () {
         return this.placeable.calibrated
-      },
-      calibrationPoint () {
-        let type = this.placeable.sanitizedType
-        let position = 'of the A1 well'
-        if (type === 'trough') {
-          position = 'of the A1 slot'
-        } else if ((type === 'tiprack' || type === 'default') && this.instrument.channels === 8) {
-          position = 'of the A1 row'
-        } else if (type === 'point') {
-          position = ''
-        }
-        return position
       }
     }
   }
