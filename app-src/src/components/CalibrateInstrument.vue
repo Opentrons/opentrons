@@ -3,7 +3,7 @@
 
   <section id='task-pipette'>
     <h1>{{currentInstrument().label}} on axis {{currentInstrument().axis}} </h1><br>
-    <h1 class='title'>Calibrate the {{currentInstrument().label}} pipette on axis {{currentInstrument().axis | capitalize}} </h1>
+<!--     <h1 class='title'>Calibrate the {{currentInstrument().label}} pipette on axis {{currentInstrument().axis | capitalize}} </h1> -->
     <span>
       <div class='calibrate-pipette'>
         <section class='calibrate top' @mouseenter="toggleMode('top')">

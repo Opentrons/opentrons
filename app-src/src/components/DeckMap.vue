@@ -73,8 +73,8 @@
           if (instrument) {
             return instrument.calibrated
           }
-           return false
-         }
+          return false
+        }
       },
       pipetteUsesContainer (slot, axis) {
         let container = this.getContainer(slot)
@@ -88,12 +88,13 @@
         return instrument.axis === this.axis
       },
       togglePipette (axis) {
-        this.$router.push({ name: 'instrument', params: { instrument: axis, slot: null } })
+        this.$router.push({ name: 'instrument', params: { instrument: axis, slot: null, placeable: null } })
       }
     },
     watch: {
       '$route' (to, from) {
         this.activeSlot = to.params.slot
+        this.axis = to.params.instrument
       }
     }
   }
