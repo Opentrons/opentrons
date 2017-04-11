@@ -87,8 +87,9 @@ class Pipette(Instrument):
         self.max_volume = max_volume or (min_volume + 1)
 
         if not name:
-            name = '{0}_{1}-channel_{2}-{3}uL'.format(
+            name = '{0}-{1}_{2}-channel_{3}-{4}uL'.format(
                 self.__class__.__name__,
+                self.axis.upper(),
                 self.channels,
                 self.min_volume,
                 self.max_volume)
