@@ -6,7 +6,7 @@
       <option v-for='option in ports.options' v-bind:value='option.value'>{{ option.text }}</option>
     </select>
     <div id='indicator' :class="{'connected': connected}"></div>
-<button v-show='authenticated' @click='logout()' class='btn-run' :class="btn-run">Logout</button>
+<button @click='authenticate()' class='btn-run' :class="btn-run">Login</button>
   </nav>
 </template>
 
@@ -20,6 +20,7 @@
       return {
         ports: {
           selected: 'default',
+          authenticated: null,
           options: []
         }
       }
@@ -62,7 +63,14 @@
       disconnectRobot: function () {
         this.$store.dispatch('disconnectRobot')
       },
-      login () {
+      authenticate: function () {
+        if (this.authenticated) {
+          this.logout()
+        } else {
+          this.login()
+        }
+      },
+      login: function () {
         console.log('logging in')
         if (window.lock === undefined) {
           window.lock = new window.Auth0Lock(
