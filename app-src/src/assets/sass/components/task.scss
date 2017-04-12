@@ -12,17 +12,27 @@ div.placeable, div.instrument{
 }
 
 div#task-placeable, section#task-pipette{
+    position:relative;
     margin-left:5px;
-    margin-top:40px;
+    margin-top:45px;
     width: 275px;
     padding: 10px;
     background-color: $well-bg;
     border-radius: 6px;
+    h1.calibrated:after{
+        content: "\2713";
+        margin-left:10px;
+    }
+    h4{
+        font-size: 18px;
+    }
+
+    
 }
 
 section#instructions{
-    width:710px;
-    height:65px;
+    width:705px;
+    height:60px;
     padding: 10px;
     margin-top:5px;
     background-color: $well-bg;

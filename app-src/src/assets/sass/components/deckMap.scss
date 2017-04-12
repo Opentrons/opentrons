@@ -10,18 +10,22 @@ section#deck-map {
     border-radius: 6px;
     display: inline-block;
     button.tab {
-        width: 200px;
+        width: 210px;
         height: 40px;
-        margin-right: 5px;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
+        margin-bottom:5px;
+        // border-top-left-radius: 6px;
+        // border-top-right-radius: 6px;
+        border-radius: 6px;
         border: 2px solid $well-bg;
         background-color: white;
-        border-bottom-width: 0px;
+        //border-bottom-width: 0px;
         &.active {
             background-color: $well-bg;
-            color: $secondary-brand;
+            color: black;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        &:first-child{
+            margin-right:5px;
         }
     }
     div.deck-wrapper {

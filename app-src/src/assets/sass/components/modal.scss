@@ -1,6 +1,8 @@
 .more-info{
-  display:inline-block;
-  float:right;
+  display:block;
+  position:absolute;
+  right:10px;
+  bottom:10px;
   font-size:14px;
   width:24px;
   height:24px;
@@ -15,7 +17,7 @@
 }
 
 .modal-mask {
-  position: absolute;
+  position: fixed;
   z-index: 9998;
   top: 0;
   left: 0;

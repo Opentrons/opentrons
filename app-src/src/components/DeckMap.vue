@@ -1,6 +1,5 @@
 <template>
   <section id="deck-map">
-  {{pipettes}}
     <button  v-for="instrument in tasks.instruments" 
     class="tab" :class="{active : activePipette(instrument)}"  
     @click="togglePipette(instrument.axis)"> 

@@ -3,16 +3,23 @@
     <div class="modal-mask" @click="$emit('close')">
       <div class="modal-wrapper">
         <div class="modal-container">
-          <div class='well-img'>
+          
             <button class="modal-close-button" @click="$emit('close')">
                 X
             </button>
-            <img :src='`${placeableImages(placeable.sanitizedType, channels)}`' />
-            <p>
+            
+            <h2>
         Calibrate the {{instrument.label}} pipette to the
         {{placeable.sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
         {{calibrationPoint}} of your {{placeable.label}} container.
-      </h1></p>
+      </h2>
+      <h4>Name: {{ placeable.label }}</h4>
+    <h4>Labware Type: {{ placeable.type }}</h4>
+    <h4>Slot: {{ placeable.slot }}</h4>
+    <h4>Pipette: {{ instrument.label }} {{channels}} {{instrumentPosition}} Axis</h4>
+    <h4>Calibrated: {{instrument.calibrated}}</h4>
+    <div class='well-img'>
+    <img :src='`${placeableImages(placeable.sanitizedType, channels)}`' />
           </div>       
         </div>
       </div>
@@ -27,6 +34,9 @@
     computed: {
       channels () {
         return this.instrument.channels === 1 ? 'single' : 'multi'
+      },
+      instrumentPosition () {
+        return this.instrument.axis === 'a' ? 'Center' : 'Left'
       }
     },
     methods: {
