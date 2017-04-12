@@ -12,8 +12,6 @@ import { loginRoute, logoutRoute } from './routes'
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
-console.log(loginRoute, loginRoute)
-
 const router = new VueRouter({
   routes: [
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
@@ -27,12 +25,6 @@ const router = new VueRouter({
 
 /* eslint-disable */
 window.onload = function () {
-  // Google analytics SPA extensions: https://github.com/googleanalytics/autotrack
-  require('autotrack')
-  window.ga('require', 'eventTracker')
-  window.ga('require', 'outboundLinkTracker')
-  window.ga('require', 'urlChangeTracker')
-
   const app = new Vue({
     router,
     store,
