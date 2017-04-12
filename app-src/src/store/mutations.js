@@ -3,7 +3,7 @@ import { isAuthenticated } from '../util'
 
 const state = {
   isAuthenticated: isAuthenticated(),
-  userProfile: null,
+  userProfile: JSON.parse(localStorage.getItem('profile') || '{}'),
   isConnected: false,
   port: null,
   fileName: '',

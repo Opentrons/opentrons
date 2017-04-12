@@ -1,4 +1,15 @@
 import store from './store/store'
+import { getFakeUserID } from './util'
+
+function emitAppUserId (userId, userEmail) {
+  window.ot_dataLayer.push({UserId: userId})
+  console.log('IC', window.intercomSettings)
+  window.intercomSettings = {
+    user_id: userId,
+    user_email: userEmail
+  }
+  window.Intercom('update')
+}
 
 export const loginRoute = {
   path: '/login',
@@ -15,8 +26,8 @@ export const loginRoute = {
       localStorage.setItem('id_token', authResult.idToken)
       window.lock.getProfile(authResult.idToken, (err, profile) => {
         console.log(err)
-        window.ot_dataLayer.push({UserId: profile.user_id})
         localStorage.setItem('profile', JSON.stringify(profile))
+        emitAppUserId(profile.user_id, profile.email)
         store.commit('AUTHENTICATE', {isAuthenticated: true, userProfile: profile})
         window.lock.hide()
       })
@@ -30,6 +41,8 @@ export const logoutRoute = {
   beforeEnter: (to, from, next) => {
     localStorage.removeItem('id_token')
     localStorage.removeItem('profile')
+    const fakeId = getFakeUserID()
+    emitAppUserId(fakeId, `${fakeId}@opentrons.com`)
     store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
     next(from)  // Redirect to previous page
   }

@@ -1,4 +1,12 @@
-module.exports = {addHrefs, isAuthenticated, processProtocol, processTasks}
+module.exports = {
+  addHrefs,
+  getFakeUserID,
+  isAuthenticated,
+  processProtocol,
+  processTasks
+}
+
+import uuidV4 from 'uuid/v4'
 
 function addHrefs (tasks) {
   tasks.map((instrument) => {
@@ -7,6 +15,17 @@ function addHrefs (tasks) {
       placeable.href = '/calibrate/' + instrument.axis + '/' + placeable.slot + '/' + placeable.label
     })
   })
+}
+
+/*
+ * Returns a random UUID for the current user and stores it in localStorage
+ * Local storage is persisted throughout application updates.
+ */
+function getFakeUserID () {
+  if (!localStorage.getItem('fakeUserID')) {
+    localStorage.setItem('fakeUserID', uuidV4())
+  }
+  return localStorage.getItem('fakeUserID')
 }
 
 function isAuthenticated () {

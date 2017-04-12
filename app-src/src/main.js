@@ -11,7 +11,7 @@ import { loginRoute, logoutRoute } from './routes'
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
-
+console.log(require('uuid/v4')())
 const router = new VueRouter({
   routes: [
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
