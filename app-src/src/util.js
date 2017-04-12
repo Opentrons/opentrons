@@ -9,6 +9,14 @@ function addHrefs (tasks) {
   })
 }
 
+function isAuthenticated () {
+  const profile = localStorage.getItem('profile')
+  const idToken = localStorage.getItem('id_token')
+  if (profile == null) return false
+  if (idToken == null) return false
+  return true
+}
+
 function processProtocol (response) {
   let result = {success: true, errors: [], warnings: [], calibrations: []}
   console.log(response)
@@ -30,12 +38,4 @@ function processTasks (result, commit) {
   commit('UPDATE_FILE_NAME', {'fileName': fileName})
   commit('UPDATE_FILE_MODIFIED', {'lastModified': lastModified})
   return tasks
-}
-
-function isAuthenticated () {
-  const profile = localStorage.getItem('profile')
-  const idToken = localStorage.getItem('id_token')
-  if (profile == null) return false
-  if (idToken == null) return false
-  return true
 }
