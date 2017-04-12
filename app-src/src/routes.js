@@ -3,11 +3,15 @@ import { getFakeUserID } from './util'
 
 function emitAppUserId (userId, userEmail) {
   window.ot_dataLayer.push({UserId: userId})
-  console.log('IC', window.intercomSettings)
-  window.intercomSettings = {
-    user_id: userId,
-    user_email: userEmail
+  if (userId) {
+    window.intercomSettings = {
+      user_id: userId,
+      user_email: userEmail
+    }
+  } else {
+    window.intercomSettings = {}
   }
+  console.log('IC', window.intercomSettings)
   window.Intercom('update')
 }
 
@@ -42,7 +46,11 @@ export const logoutRoute = {
     localStorage.removeItem('id_token')
     localStorage.removeItem('profile')
     const fakeId = getFakeUserID()
-    emitAppUserId(fakeId, `${fakeId}@opentrons.com`)
+    console.log(fakeId)
+    // emitAppUserId(fakeId, `${fakeId}@opentrons.com`)
+    emitAppUserId(null, null)
+    window.Intercom('shutdown')
+    window.Intercom('boot', {app_id: 'bsgvg3q7'})
     store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
     next(from)  // Redirect to previous page
   }
