@@ -1,4 +1,4 @@
-module.exports = {addHrefs, processProtocol, processTasks}
+module.exports = {addHrefs, isAuthenticated, processProtocol, processTasks}
 
 function addHrefs (tasks) {
   tasks.map((instrument) => {
@@ -30,4 +30,12 @@ function processTasks (result, commit) {
   commit('UPDATE_FILE_NAME', {'fileName': fileName})
   commit('UPDATE_FILE_MODIFIED', {'lastModified': lastModified})
   return tasks
+}
+
+function isAuthenticated () {
+  const profile = localStorage.getItem('profile')
+  const idToken = localStorage.getItem('id_token')
+  if (profile == null) return false
+  if (idToken == null) return false
+  return true
 }

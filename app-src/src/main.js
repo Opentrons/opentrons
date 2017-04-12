@@ -7,21 +7,22 @@ import {
   CalibrateInstrument,
   App
 } from './components/export'
-
-// import { lock } from './authenticate'
-
-// window.lock = lock
+import { loginRoute, logoutRoute } from './routes'
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
+
+console.log(loginRoute, loginRoute)
 
 const router = new VueRouter({
   routes: [
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
-    { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable }
+    { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable },
+    loginRoute,
+    logoutRoute
   ],
-  mode: 'history'
+  mode: 'hash'
 })
 
 /* eslint-disable */
