@@ -27,7 +27,6 @@ function getMockStore () {
   return {
     state: {
       isConnected: false,
-      isAuthenticated: false,
       port: null
     },
     actions: {
