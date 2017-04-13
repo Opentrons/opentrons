@@ -931,7 +931,7 @@ def calibrate_placeable():
 
 
 @app.route("/api_containers", methods=["GET"])
-def calibrate_placeable():
+def api_containers():
     global containers
     try:
         api_containers = {}

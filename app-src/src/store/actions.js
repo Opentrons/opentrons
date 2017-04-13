@@ -5,10 +5,12 @@ import {processTasks} from '../util'
 
 const actions = {
   updateContainers ({commit}) {
-    let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/march-22-container-file-update/api/opentrons/config/containers/default-containers.json'
+    let url = 'http://localhost:31950/api_containers'
+    // let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/march-22-container-file-update/api/opentrons/config/containers/default-containers.json'
     let containers = {}
     Vue.http.get(url).then((response) => {
-      containers = JSON.parse(response.data).containers
+      console.log(response)
+      containers = response.body.data.containers
     }).then(() => {
       for (const c in containers) {
         let offset = {'x': 0, 'y': 0}
