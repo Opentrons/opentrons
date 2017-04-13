@@ -14,4 +14,14 @@ function getRenderedVm (Component, propsData, storeData, store, router) {
   }).$mount()
 }
 
-module.exports = { getRenderedVm }
+function renderComponentWithProps (Component, propsData, storeData, store, router) {
+  var vm = new Vue({
+    el: document.createElement('div'),
+    router: router || new VueRouter({}),
+    store: store || new Vuex.Store(storeData),
+    render: h => h(Component, {props: propsData})
+  }).$mount()
+  return vm
+}
+
+module.exports = { getRenderedVm, renderComponentWithProps }

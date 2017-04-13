@@ -4,7 +4,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import sinon from 'sinon'
-import { getRenderedVm } from '../../util'
+import { renderComponentWithProps } from '../../util'
 
 Vue.use(Vuex)
 Vue.use(Vuex)
@@ -136,14 +136,7 @@ describe('Connect.vue', () => {
   it('redirects to login route when login button is clicked', () => {
     let mockStore = getMockStore()
     let mockRouter = getMockRouter()
-    const vm = getRenderedVm(Connect, null, null, mockStore, mockRouter)
-
-    // const vm = new Vue({
-    //   store: new Vuex.Store(mockStore),
-    //   router: mockRouter,
-    //   el: document.createElement('div'),
-    //   render: h => h(Connect)
-    // }).$mount()
+    const vm = renderComponentWithProps(Connect, null, null, mockStore, mockRouter)
 
     let connect = vm.$children[0]
     connect.login()
