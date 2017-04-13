@@ -11,27 +11,51 @@ function emitAppUserId (userId, userEmail) {
   window.Intercom('update')
 }
 
+// init lock
+// activate lock
+// activate lock
+// Log user in
+// Log user out
+//
+function initLock () {
+  window.lock = new window.Auth0Lock(
+    'iHhlL8Eb1z3dPKwpYITqah7ZZdyGKvvx',
+    'opentrons.auth0.com',
+    {auth: { redirect: false }}
+  )
+}
+
+function activateLock (successCb) {
+   window.lock.show()
+   window.lock.on('authenticated', (authResult) => {
+    localStorage.setItem('id_token', authResult.idToken)
+    window.lock.getProfile(authResult.idToken, (err, profile) => {
+      console.log(err)
+      localStorage.setItem('profile', JSON.stringify(profile))
+      emitAppUserId(profile.user_id, profile.email)
+      store.commit('AUTHENTICATE', {isAuthenticated: true, userProfile: profile})
+      window.lock.hide()
+    })
+  })
+}
+
+function loginUser (profile){
+  return
+}
+
+function logoutUser () {
+  localStorage.removeItem('id_token')
+  localStorage.removeItem('profile')
+  const fakeId = getFakeUserID()
+  emitAppUserId(fakeId, `${fakeId}@opentrons.com`)
+  store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
+}
+
 export const loginRoute = {
   path: '/login',
   beforeEnter: (to, from, next) => {
-    if (window.lock === undefined) {
-      window.lock = new window.Auth0Lock(
-        'iHhlL8Eb1z3dPKwpYITqah7ZZdyGKvvx',
-        'opentrons.auth0.com',
-        {auth: { redirect: false }}
-      )
-    }
-    window.lock.show()
-    window.lock.on('authenticated', (authResult) => {
-      localStorage.setItem('id_token', authResult.idToken)
-      window.lock.getProfile(authResult.idToken, (err, profile) => {
-        console.log(err)
-        localStorage.setItem('profile', JSON.stringify(profile))
-        emitAppUserId(profile.user_id, profile.email)
-        store.commit('AUTHENTICATE', {isAuthenticated: true, userProfile: profile})
-        window.lock.hide()
-      })
-    })
+    initLock()
+    activateLock()
     next(from)  // Redirect to previous page
   }
 }
@@ -39,11 +63,7 @@ export const loginRoute = {
 export const logoutRoute = {
   path: '/logout',
   beforeEnter: (to, from, next) => {
-    localStorage.removeItem('id_token')
-    localStorage.removeItem('profile')
-    const fakeId = getFakeUserID()
-    emitAppUserId(fakeId, `${fakeId}@opentrons.com`)
-    store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
+    logoutUser()
     next(from)  // Redirect to previous page
   }
 }
