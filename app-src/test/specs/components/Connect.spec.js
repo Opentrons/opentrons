@@ -2,8 +2,10 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueRouter from 'vue-router'
 import sinon from 'sinon'
 
+Vue.use(Vuex)
 Vue.use(Vuex)
 
 const detectedPorts = ['COM1', '/dev/tty.ccu123']
@@ -24,6 +26,7 @@ function getMockStore () {
   return {
     state: {
       isConnected: false,
+      isAuthenticated: false,
       port: null
     },
     actions: {
@@ -31,6 +34,16 @@ function getMockStore () {
       disconnectRobot: sinon.spy()
     }
   }
+}
+
+function getMockRouter () {
+  return new VueRouter({
+    routes: [
+      { path: '/login'},
+      { path: '/logout'},
+    ],
+    mode: 'hash'
+  })
 }
 
 describe('Connect.vue', () => {
@@ -119,10 +132,42 @@ describe('Connect.vue', () => {
     expect(mockStore.actions.disconnectRobot.called).to.be.true
   })
 
+  it('redirects to login route when login button is clicked', done => {
+    let mockStore = getMockStore()
+    let mockRouter = getMockRouter()
+
+    const vm = new Vue({
+      store: new Vuex.Store(mockStore),
+      router: mockRouter,
+      el: document.createElement('div'),
+      render: h => h(Connect)
+    }).$mount()
+
+    // console.log(vm.$children[0].login)
+    // expect(vm.$store.state.isAuthenticated).to.be.false
+    // done()
+
+    let connect = vm.$children[0]
+    connect.login()
+    connect.logout()
+    expect(vm.$router.length).to.equal(2)
+    // connect.ports.selected = detectedPorts[0]
+    // connect.searchIfNecessary()
+    // expect(mockStore.actions.connectRobot.called).to.be.true
+    // mockStore.state.isAuthenticated = true
+
+    // Vue.nextTick(() => {
+    //   let selectEl = vm.$el.querySelector('#connections')
+    //   expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal(detectedPorts[0])
+    //   done()
+    // })
+  })
+
   it('has methods for business logic', () => {
     expect(typeof Connect.methods.getPortsList).be.a.function
     expect(typeof Connect.methods.searchIfNecessary).be.a.function
     expect(typeof Connect.methods.connectRobot).be.a.function
     expect(typeof Connect.methods.disconnectRobot).be.a.function
+    expect(typeof Connect.methods.login).be.a.function
   })
 })

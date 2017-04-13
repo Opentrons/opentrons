@@ -21,7 +21,6 @@
       return {
         ports: {
           selected: 'default',
-          authenticated: null,
           options: []
         }
       }
