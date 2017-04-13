@@ -4,6 +4,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import sinon from 'sinon'
+import { getRenderedVm } from '../../util'
 
 Vue.use(Vuex)
 Vue.use(Vuex)
@@ -39,8 +40,8 @@ function getMockStore () {
 function getMockRouter () {
   return new VueRouter({
     routes: [
-      { path: '/login'},
-      { path: '/logout'},
+      {path: '/login'},
+      {path: '/logout'}
     ],
     mode: 'hash'
   })
@@ -132,35 +133,23 @@ describe('Connect.vue', () => {
     expect(mockStore.actions.disconnectRobot.called).to.be.true
   })
 
-  it('redirects to login route when login button is clicked', done => {
+  it('redirects to login route when login button is clicked', () => {
     let mockStore = getMockStore()
     let mockRouter = getMockRouter()
+    const vm = getRenderedVm(Connect, null, null, mockStore, mockRouter)
 
-    const vm = new Vue({
-      store: new Vuex.Store(mockStore),
-      router: mockRouter,
-      el: document.createElement('div'),
-      render: h => h(Connect)
-    }).$mount()
-
-    // console.log(vm.$children[0].login)
-    // expect(vm.$store.state.isAuthenticated).to.be.false
-    // done()
+    // const vm = new Vue({
+    //   store: new Vuex.Store(mockStore),
+    //   router: mockRouter,
+    //   el: document.createElement('div'),
+    //   render: h => h(Connect)
+    // }).$mount()
 
     let connect = vm.$children[0]
     connect.login()
+    expect(vm.$router.currentRoute.path).to.equal('/login')
     connect.logout()
-    expect(vm.$router.length).to.equal(2)
-    // connect.ports.selected = detectedPorts[0]
-    // connect.searchIfNecessary()
-    // expect(mockStore.actions.connectRobot.called).to.be.true
-    // mockStore.state.isAuthenticated = true
-
-    // Vue.nextTick(() => {
-    //   let selectEl = vm.$el.querySelector('#connections')
-    //   expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal(detectedPorts[0])
-    //   done()
-    // })
+    expect(vm.$router.currentRoute.path).to.equal('/logout')
   })
 
   it('has methods for business logic', () => {
