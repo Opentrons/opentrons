@@ -1,9 +1,9 @@
 import * as types from './mutation-types'
-import { isAuthenticated } from '../util'
+import { getUserProfile, isAuthenticated } from '../util'
 
 const state = {
   isAuthenticated: isAuthenticated(),
-  userProfile: JSON.parse(localStorage.getItem('profile') || '{}'),
+  userProfile: getUserProfile(),
   isConnected: false,
   port: null,
   fileName: '',

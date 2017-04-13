@@ -1,6 +1,9 @@
 module.exports = {
   addHrefs,
   getFakeUserID,
+  getUserEmail,
+  getUserId,
+  getUserProfile,
   isAuthenticated,
   processProtocol,
   processTasks
@@ -26,6 +29,18 @@ function getFakeUserID () {
     localStorage.setItem('fakeUserID', uuidV4())
   }
   return localStorage.getItem('fakeUserID')
+}
+
+function getUserId () {
+  return getUserProfile().user_id || getFakeUserID()
+}
+
+function getUserEmail () {
+  return getUserProfile().email || getFakeUserID() + '@opentrons.com'
+}
+
+function getUserProfile () {
+  return JSON.parse(localStorage.getItem('profile') || '{}')
 }
 
 function isAuthenticated () {

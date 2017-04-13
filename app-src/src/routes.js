@@ -2,7 +2,7 @@ import store from './store/store'
 import { getFakeUserID } from './util'
 
 function emitAppUserId (userId, userEmail) {
-  window.ot_dataLayer.push({UserId: userId})
+  window.ot_dataLayer.push({userId: userId})
   console.log(window.intercomSettings)
   window.intercomSettings = {
     user_id: userId,
