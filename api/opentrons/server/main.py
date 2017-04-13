@@ -930,6 +930,29 @@ def calibrate_placeable():
     })
 
 
+@app.route("/api_containers", methods=["GET"])
+def calibrate_placeable():
+    global containers
+    try:
+        api_containers = {}
+        for container_name in containers.list():
+            container_json = containers.get_json(container_name)
+            if container_json:
+                api_containers[container_name] = container_json
+        return flask.jsonify({
+            'status': 'success',
+            'data': {
+                'containers': api_containers
+            }
+        })
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+
 def _calibrate_plunger(position, axis_name):
     axis_name = axis_name.upper()
     if axis_name not in robot._instruments:

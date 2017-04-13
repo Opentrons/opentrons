@@ -82,6 +82,10 @@ def get_persisted_container(container_name: str) -> Container:
     return create_container_obj_from_dict(container_data)
 
 
+def get_json(container_name):
+  return persisted_containers_dict.get(container_name)
+
+
 def list_container_names():
     c_list = [n for n in persisted_containers_dict.keys()]
     return sorted(c_list, key=lambda s: s.lower())
