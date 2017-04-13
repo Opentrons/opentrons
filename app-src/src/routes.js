@@ -1,6 +1,7 @@
 import store from './store/store'
 import { getFakeUserID } from './util'
 
+// TODO: consider moving to GTM tag ?
 function emitAppUserId (userId, userEmail) {
   window.ot_dataLayer.push({userId: userId})
   console.log(window.intercomSettings)
@@ -11,38 +12,59 @@ function emitAppUserId (userId, userEmail) {
   window.Intercom('update')
 }
 
-// init lock
-// activate lock
-// activate lock
-// Log user in
-// Log user out
-//
-function initLock () {
-  window.lock = new window.Auth0Lock(
-    'iHhlL8Eb1z3dPKwpYITqah7ZZdyGKvvx',
-    'opentrons.auth0.com',
-    {auth: { redirect: false }}
-  )
+/*
+ * Instatiate lock object once and persist globally
+ */
+function getLock () {
+  if (!window.lock) {
+    window.lock = new window.Auth0Lock(
+      'iHhlL8Eb1z3dPKwpYITqah7ZZdyGKvvx',
+      'opentrons.auth0.com',
+      {auth: { redirect: false }}
+    )
+  }
+  return window.lock
 }
 
-function activateLock (successCb) {
-   window.lock.show()
-   window.lock.on('authenticated', (authResult) => {
-    localStorage.setItem('id_token', authResult.idToken)
-    window.lock.getProfile(authResult.idToken, (err, profile) => {
-      console.log(err)
-      localStorage.setItem('profile', JSON.stringify(profile))
-      emitAppUserId(profile.user_id, profile.email)
-      store.commit('AUTHENTICATE', {isAuthenticated: true, userProfile: profile})
-      window.lock.hide()
+/*
+ * Displays Auth0 Lock popup, calls onSuccessfulLogin on successful login
+ * otherwise calls onErrorCb if authentication failed
+ */
+function showLockPopup (lock, onSuccessfulLogin, onErrorCb) {
+  lock.show()
+  lock.on('authenticated', (authResult) => {
+    lock.getProfile(authResult.idToken, (err, profile) => {
+      if (err) {
+        onErrorCb(err)
+      } else {
+        onSuccessfulLogin(authResult, profile)
+      }
+      lock.hide()
     })
   })
 }
 
-function loginUser (profile){
-  return
+/*
+ * Persists user login info into VueJS state and browsers localStorage
+ */
+function loginUser (authResult, profile) {
+  // Save JWT
+  localStorage.setItem('id_token', authResult.idToken)
+
+  // Save profile to browser
+  localStorage.setItem('profile', JSON.stringify(profile))
+
+  // Send data to intercom/GA
+  emitAppUserId(profile.user_id, profile.email)
+
+  // Update state
+  store.commit('AUTHENTICATE', {isAuthenticated: true, userProfile: profile})
 }
 
+/*
+ * Removes auth data from browser and updates VueJS state
+ * Updates intercom with fake login creds
+ */
 function logoutUser () {
   localStorage.removeItem('id_token')
   localStorage.removeItem('profile')
@@ -54,8 +76,7 @@ function logoutUser () {
 export const loginRoute = {
   path: '/login',
   beforeEnter: (to, from, next) => {
-    initLock()
-    activateLock()
+    showLockPopup(getLock(), loginUser, console.log)
     next(from)  // Redirect to previous page
   }
 }
