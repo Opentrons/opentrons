@@ -1,5 +1,4 @@
 import datetime as dt
-import getpass
 import json
 import logging
 import os
@@ -62,13 +61,6 @@ def welcome():
 @app.route("/exit")
 def exit():
     sys.exit()
-
-
-@app.route("/username")
-def username():
-    return flask.jsonify({
-        'username': getpass.getuser()
-    })
 
 
 def get_protocol_locals():
