@@ -48,10 +48,8 @@ function showLockPopup (lock, onSuccessfulLogin, onErrorCb) {
  * Persists user login info into VueJS state and browsers localStorage
  */
 function loginUser (authResult, profile) {
-  // Save JWT
+  // Save Auth0 data to browser
   localStorage.setItem('id_token', authResult.idToken)
-
-  // Save profile to browser
   localStorage.setItem('profile', JSON.stringify(profile))
 
   // Send data to intercom/GA
@@ -73,7 +71,7 @@ function logoutUser () {
   store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
 }
 
-export const loginRoute = {
+const loginRoute = {
   path: '/login',
   beforeEnter: (to, from, next) => {
     showLockPopup(getLock(), loginUser, console.log)
@@ -81,10 +79,12 @@ export const loginRoute = {
   }
 }
 
-export const logoutRoute = {
+const logoutRoute = {
   path: '/logout',
   beforeEnter: (to, from, next) => {
     logoutUser()
     next(from)  // Redirect to previous page
   }
 }
+
+module.exports = { loginRoute, logoutRoute, loginUser, logoutUser }
