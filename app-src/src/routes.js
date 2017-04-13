@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import store from './store/store'
 import { getFakeUserID } from './util'
 
@@ -74,7 +75,9 @@ function logoutUser () {
 const loginRoute = {
   path: '/login',
   beforeEnter: (to, from, next) => {
-    showLockPopup(getLock(), loginUser, console.log)
+    Vue.nextTick(() => {
+      showLockPopup(getLock(), loginUser, console.log)
+    })
     next(from)  // Redirect to previous page
   }
 }
