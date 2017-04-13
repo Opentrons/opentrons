@@ -188,7 +188,7 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def ignore_next_line(self):
-        self.wait_for_response()
+        self.wait_for_response(ignore_error=True)
 
     def wait_for_write(self):
         self.connection.flush()
@@ -198,13 +198,13 @@ class CNCDriver(object):
 
     def flush_input(self):
         while self.is_connected() and self.data_available():
-            connection.reset_input_buffer()
-            serial_pause()
+            self.connection.reset_input_buffer()
+            self.serial_pause()
 
     def wait_for_data(self, timeout=1):
         end_time = time.time() + timeout
         while time.time() < end_time and not self.data_available():
-            self.serial_pause()
+            pass
 
         if not self.data_available():
             raise RuntimeWarning(
@@ -213,22 +213,21 @@ class CNCDriver(object):
     def serial_pause(self):
         time.sleep(self.serial_timeout)
 
-    def readline_from_serial(self):
+    def readline_from_serial(self, ignore_error=False):
         """
         Attempt to read a line of data from serial port
 
         Raises RuntimeWarning if read fails on serial port
         """
-        try:
-            msg = self.connection.readline().strip().decode()
-            if msg:
-                log.debug("Read: {}".format(msg))
-                self.detect_smoothie_error(out)  # raises RuntimeWarning if switch hit
-                return msg
-        except Exception as e:
-            raise RuntimeWarning('Lost connection with serial port') from e
+        msg = self.connection.readline().strip().decode()
+        if msg:
+            log.debug("Read: {}".format(msg))
+            if not ignore_error:
+                self.detect_smoothie_error(str(msg))
+            return msg
+        return None
 
-    def write_to_serial(self, data, max_tries=10, try_interval=0.2):
+    def write_to_serial(self, data, read_after=True):
         """
         Sends data string to serial ports
 
@@ -237,14 +236,12 @@ class CNCDriver(object):
         Raises RuntimeError write fails or connection times out
         """
         log.debug("Write: {}".format(str(data).encode()))
-        try:
-            self.connection.write(str(data).encode())
-            self.wait_for_write()
+        self.connection.write(str(data).encode())
+        self.wait_for_write()
+        if read_after:
             return self.wait_for_response()
-        except Exception as e:
-            raise RuntimeError('Can not write to serial port') from e
 
-    def wait_for_response(self, timeout=20.0):
+    def wait_for_response(self, timeout=20.0, ignore_error=False):
         """
         Repeatedly reads from serial port until data is received,
         or timeout is exceeded
@@ -252,7 +249,7 @@ class CNCDriver(object):
         Raises RuntimeWarning() if no response was recieved before timeout
         """
         self.wait_for_data(timeout)
-        return self.readline_from_serial()
+        return self.readline_from_serial(ignore_error=ignore_error)
 
     # THREADING
     def pause(self):
@@ -285,7 +282,7 @@ class CNCDriver(object):
             raise RuntimeWarning(self.STOPPED)
 
     # SMOOTHIE METHODS
-    def send_command(self, command, **kwargs):
+    def send_command(self, command, read_after=True, **kwargs):
         """
         Sends a GCode command.  Keyword arguments will be automatically
         converted to GCode syntax.
@@ -299,8 +296,7 @@ class CNCDriver(object):
 
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
         command = '{} {}\r\n'.format(command, args)
-        response = self.write_to_serial(command)
-        return response
+        return self.write_to_serial(command, read_after=read_after)
 
     def detect_smoothie_error(self, msg):
         """
@@ -308,10 +304,10 @@ class CNCDriver(object):
 
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
-        if '!!' in msg or 'Limit' in msg or 'error' in msg:
+        if 'reset or M999 required' in msg or 'error:' in msg:
             self.flush_input()
             self.calm_down()
-            error_msg = 'Smoothie Error: {}'.format(msg)
+            error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
             raise RuntimeWarning(error_msg)
 
@@ -462,8 +458,9 @@ class CNCDriver(object):
         self.wait_for_ok()
 
     def send_halt_command(self):
-        self.send_command(self.HALT)
-        self.wait_for_ok()
+        self.send_command(self.HALT, read_after=False)
+        self.ignore_next_line()
+        self.flush_input()
 
     def reset(self):
         res = self.send_command(self.RESET)
@@ -571,7 +568,7 @@ class CNCDriver(object):
 
     def get_endstop_switches(self):
         # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 pins- (XL)P1.24:0 .......
-        endstop_values = self.send_command(self.GET_ENDSTOPS).decode()
+        endstop_values = self.send_command(self.GET_ENDSTOPS)
         self.wait_for_ok()
         self.wait_for_ok()
 
@@ -603,7 +600,7 @@ class CNCDriver(object):
         try:
             return {
                 s.split(':')[0].lower(): float(s.split(':')[1])
-                for s in string.decode('utf-8').split(' ')[2:]
+                for s in string.split(' ')[2:]
             }
         except ValueError as e:
             log.critical("Error parsing position string from smoothie board:")
@@ -611,20 +608,20 @@ class CNCDriver(object):
             raise ValueError(e) from e
 
     # SETTINGS
-    def read_config_file():
-        self.write_to_serial('cat /sd/config\r\n')
+    def read_config_file(self):
+        self.send_command('cat /sd/config', read_after=False)
+        self.wait_for_write()
         self.wait_for_data(timeout=3)
 
         self.config_file = ''
         self.config_dict = {}
 
-        count = 5  # arbitrary
+        count = 50  # arbitrary
         while count > 0:
-            if not self.data_available():
-                count -= 1
-                self.serial_pause()
-                continue
             data = self.readline_from_serial()
+            if not data:
+                count -= 1
+                continue
             if len(data) and data != 'ok':
                 self.config_file += data
                 data = data.split('#')[0].strip()
@@ -697,7 +694,7 @@ class CNCDriver(object):
         self.wait_for_ok()
 
         # use the "branch-hash" portion as the version
-        self.firmware_version = line_1.decode().split(',')[0].split(' ')[-1]
+        self.firmware_version = line_1.split(',')[0].split(' ')[-1]
 
         return self.firmware_version
 
