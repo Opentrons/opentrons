@@ -7,7 +7,6 @@ import sinon from 'sinon'
 import { getRenderedVm } from '../../util'
 
 Vue.use(Vuex)
-Vue.use(Vuex)
 
 const detectedPorts = ['COM1', '/dev/tty.ccu123']
 const ConnectInjector = require('!!vue?inject!src/components/Connect.vue')
