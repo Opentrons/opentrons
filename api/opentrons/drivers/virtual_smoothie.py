@@ -1,5 +1,4 @@
 import re
-import json
 
 from opentrons.util import log
 
@@ -256,7 +255,8 @@ class VirtualSmoothie(object):
                 self.steps_per_mm[axis.upper()] = arguments[axis]
         response = ''
         for axis in 'XYZAB':
-            response += '{}:{} '.format(axis.upper(), self.steps_per_mm[axis.upper()])
+            response += '{}:{} '.format(
+                axis.upper(), self.steps_per_mm[axis.upper()])
         response += '\nok\nok'
         return response
 
