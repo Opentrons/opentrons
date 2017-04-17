@@ -12,7 +12,7 @@ section#deck-map {
     button.tab {
         width: 210px;
         height: 40px;
-        margin-bottom:5px;
+        margin-bottom: 5px;
         // border-top-left-radius: 6px;
         // border-top-right-radius: 6px;
         border-radius: 6px;
@@ -22,10 +22,14 @@ section#deck-map {
         &.active {
             background-color: $well-bg;
             color: black;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            border: 2px solid $primary-brand;
+            //text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            &:focus{
+              border: 2px solid $secondary-brand;  
+            }
         }
-        &:first-child{
-            margin-right:5px;
+        &:first-child {
+            margin-right: 5px;
         }
     }
     div.deck-wrapper {
@@ -99,6 +103,7 @@ section#deck-map {
             display: flex;
             justify-content: stretch;
             box-sizing: border-box;
+            opacity: 0.7;
             .placeable {
                 background-color: $primary-brand;
                 border: 2px solid #68affc;
@@ -112,9 +117,7 @@ section#deck-map {
                 }
             }
             &.calibrated {
-                .placeable {
-                    border: 2px solid $call-to-action;
-                }
+                opacity: 1;
             }
         }
         // turn teal if current container/step
