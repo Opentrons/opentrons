@@ -213,7 +213,7 @@ class CNCDriver(object):
         """
         msg = self.connection.readline().strip().decode()
         if msg:
-            log.debug("Read: {}".format(msg))
+            # log.debug("Read: {}".format(msg))
             if not ignore_error:
                 self.detect_smoothie_error(str(msg))
             return msg
@@ -228,7 +228,7 @@ class CNCDriver(object):
         Raises RuntimeError write fails or connection times out
         """
         if self.is_connected():
-            log.debug("Write: {}".format(str(data).encode()))
+            # log.debug("Write: {}".format(str(data).encode()))
             self.connection.write(str(data).encode())
             self.wait_for_write()
             if read_after:
@@ -311,7 +311,7 @@ class CNCDriver(object):
         self.set_speed()
 
         current = self.get_head_position()['target']
-        log.debug('Current Head Position: {}'.format(current))
+        # log.debug('Current Head Position: {}'.format(current))
         target_point = {
             axis: kwargs.get(
                 axis,
@@ -319,7 +319,7 @@ class CNCDriver(object):
             )
             for axis in 'xyz'
         }
-        log.debug('Destination: {}'.format(target_point))
+        # log.debug('Destination: {}'.format(target_point))
 
         flipped_vector = self.flip_coordinates(
             Vector(target_point), mode)
@@ -342,7 +342,6 @@ class CNCDriver(object):
     def consume_move_commands(self, args):
         self.check_paused_stopped()
 
-        log.debug("Moving : {}".format(args))
         self.send_command(self.MOVE, **args)
         self.wait_for_ok()
 
@@ -553,9 +552,6 @@ class CNCDriver(object):
         self.wait_for_ok()
         self.wait_for_ok()
 
-        print(res)
-        print(self._parse_axis_values(res))
-
         returned_value = self._parse_axis_values(res).get(axis.lower())
         assert float(returned_value) == value
 
@@ -671,6 +667,7 @@ class CNCDriver(object):
                     ot_version=self.ot_version
                 )
             )
+        return res
 
     def get_ot_version(self):
         res = self.get_config_value(self.OT_VERSION)
@@ -679,7 +676,6 @@ class CNCDriver(object):
             log.debug('{} is not an ot_version'.format(res))
             return None
         self.ot_version = res
-        log.debug('Read ot_version {}'.format(res))
         return self.ot_version
 
     def get_firmware_version(self):

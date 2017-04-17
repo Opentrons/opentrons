@@ -218,15 +218,15 @@ class RobotTest(unittest.TestCase):
         res = self.robot.versions()
         expected = {
             'config': {
-                'version': 'v1.2.0',
+                'version': 'v2.0.0',
                 'compatible': True
             },
             'firmware': {
-                'version': 'v1.0.5',
+                'version': 'edge-1c222d9NOMSD',
                 'compatible': True
             },
             'ot_version': {
-                'version': 'one_pro',
+                'version': 'one_pro_plus',
                 'compatible': True
             }
         }

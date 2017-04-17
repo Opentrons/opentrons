@@ -827,17 +827,17 @@ class Robot(object, metaclass=Singleton):
         return self._runtime_warnings
 
     def set_connection(self, mode):
-        if mode in self.connections:
-            connection = self.connections[mode]
-            if connection:
-                self._driver.connection = connection
-            else:
-                self._driver.disconnect()
-        else:
+        if mode not in self.connections:
             raise ValueError(
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
+        connection = self.connections[mode]
+        if connection:
+            self._driver.connection = connection
+            self._driver.toggle_port()
+        else:
+            self._driver.disconnect()
 
     def disconnect(self):
         """

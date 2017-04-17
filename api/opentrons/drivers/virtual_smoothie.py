@@ -102,14 +102,15 @@ class VirtualSmoothie(object):
         return res
 
     def process_get_endstops(self, arguments):
-        # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 C_min:0 \
-        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0  # noqa
+        # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 \
+        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0  # noqa
         # ok
         # ok
         res = ''
-        for name, value in self.endstop.items():
-            res += '{}:{} '.format(name, value)
-        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0'  # noqa
+        for name in ['X', 'Y', 'Z', 'A', 'B']:
+            name += '_min'
+            res += '{}:{} '.format(name, self.endstop[name])
+        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0'  # noqa
         return res + '\nok\nok'
 
     def set_position_from_arguments(self, arguments):
@@ -325,15 +326,16 @@ class VirtualSmoothie(object):
             arguments = parsed_command['arguments']
             if command in command_mapping:
                 command_func = command_mapping[command]
-                log.debug(
-                    'Processing {} calling {}'.format(
-                        parsed_command,
-                        command_func.__name__))
+                # log.debug(
+                #     'Processing {} calling {}'.format(
+                #         parsed_command,
+                #         command_func.__name__))
                 message = command_func(arguments)
                 self.insert_response(message)
             else:
-                log.error(
-                    'Command {} is not supported'.format(command))
+                pass
+                # log.error(
+                #     'Command {} is not supported'.format(command))
 
     def write(self, data):
         if not self.isOpen():
