@@ -222,7 +222,10 @@ class OpenTronsTest(unittest.TestCase):
             self.motor.move_head(x=-100)
             self.motor.wait_for_arrival()
         except RuntimeWarning as e:
-            self.assertEqual(str(RuntimeWarning('Robot Error: limit switch hit')), str(e))
+            self.assertEqual(
+                str(
+                    RuntimeWarning(
+                        'Robot Error: limit switch hit')), str(e))
 
         self.motor.home()
 
