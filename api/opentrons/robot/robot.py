@@ -472,9 +472,7 @@ class Robot(object, metaclass=Singleton):
         --------
         >>> from opentrons import Robot
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         """
         def _do():
             self._driver.calm_down()
@@ -537,9 +535,7 @@ class Robot(object, metaclass=Singleton):
         --------
         >>> from opentrons import robot
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         >>> robot.head_speed(4500)
         >>> robot.move_head(x=200, y=200)
         """
@@ -577,9 +573,7 @@ class Robot(object, metaclass=Singleton):
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
@@ -732,9 +726,7 @@ class Robot(object, metaclass=Singleton):
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> p200 = Pipette(axis='a')
         >>> robot.move_to(plate[0])
