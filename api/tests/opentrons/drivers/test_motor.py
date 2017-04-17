@@ -31,7 +31,7 @@ class OpenTronsTest(unittest.TestCase):
         self.robot.connect(port=myport, options=options)
 
     def tearDown(self):
-        self.motor.flush_port()
+        self.motor.flush_input()
 
     def test_reset(self):
         self.motor.reset()
@@ -74,7 +74,8 @@ class OpenTronsTest(unittest.TestCase):
         self.assertRaises(ValueError, self.motor.set_coordinate_system, 'andy')
 
     def test_message_timeout(self):
-        self.assertRaises(RuntimeWarning, self.motor.wait_for_response)
+        self.motor.flush_input()
+        self.assertRaises(RuntimeWarning, self.motor.wait_for_response, 0.1)
 
     def test_set_plunger_speed(self):
         self.motor.set_plunger_speed(400, 'a')
@@ -221,7 +222,7 @@ class OpenTronsTest(unittest.TestCase):
             self.motor.move_head(x=-100)
             self.motor.wait_for_arrival()
         except RuntimeWarning as e:
-            self.assertEqual(str(RuntimeWarning('X limit switch hit')), str(e))
+            self.assertEqual(str(RuntimeWarning('Robot Error: limit switch hit')), str(e))
 
         self.motor.home()
 
@@ -245,8 +246,8 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_send_command(self):
         res = self.motor.send_command('G0 X1 Y1 Z1')
-        self.assertEquals(res, b'ok')
-        self.assertEquals(self.motor.wait_for_response(), b'ok')
+        self.assertEquals(res, 'ok')
+        self.assertEquals(self.motor.wait_for_response(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 399)
@@ -254,8 +255,8 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_send_command_with_kwargs(self):
         res = self.motor.send_command('G0', X=1, Y=2, Z=3)
-        self.assertEquals(res, b'ok')
-        self.assertEquals(self.motor.wait_for_response(), b'ok')
+        self.assertEquals(res, 'ok')
+        self.assertEquals(self.motor.wait_for_response(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 398)
@@ -291,7 +292,7 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.home()
         self.motor.set_steps_per_mm('x', 80.0)
         self.motor.set_steps_per_mm('y', 80.0)
-        self.motor.set_steps_per_mm('z', 1068.7)
+        self.motor.set_steps_per_mm('z', 400)
         self.motor.move_head(x=200, y=200)
 
         self.motor.calibrate_steps_per_mm('x', 200, 198)
@@ -304,18 +305,18 @@ class OpenTronsTest(unittest.TestCase):
 
         exptected_x = round((200 / 198) * 80.0, 2)
         exptected_y = round((200 / 202) * 80.0, 2)
-        exptected_z = round((100 / 101) * 1068.7, 2)
+        exptected_z = round((100 / 101) * 400, 2)
 
         self.assertEqual(exptected_x, new_x_steps)
         self.assertEqual(exptected_y, new_y_steps)
         self.assertEqual(exptected_z, new_z_steps)
 
-        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'a')
-        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'a', 80.0)
+        self.assertRaises(ValueError, self.motor.get_steps_per_mm, 'd')
+        self.assertRaises(ValueError, self.motor.set_steps_per_mm, 'd', 80.0)
 
         self.motor.set_steps_per_mm('x', 80.0)
         self.motor.set_steps_per_mm('y', 80.0)
-        self.motor.set_steps_per_mm('z', 1068.7)
+        self.motor.set_steps_per_mm('z', 400)
 
     def test_get_endstop_switches(self):
         res = self.motor.get_endstop_switches()

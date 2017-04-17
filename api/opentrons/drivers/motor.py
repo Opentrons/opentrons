@@ -227,11 +227,14 @@ class CNCDriver(object):
 
         Raises RuntimeError write fails or connection times out
         """
-        log.debug("Write: {}".format(str(data).encode()))
-        self.connection.write(str(data).encode())
-        self.wait_for_write()
-        if read_after:
-            return self.wait_for_response()
+        if self.is_connected():
+            log.debug("Write: {}".format(str(data).encode()))
+            self.connection.write(str(data).encode())
+            self.wait_for_write()
+            if read_after:
+                return self.wait_for_response()
+        else:
+            raise RuntimeError('Not connected to robot')
 
     def wait_for_response(self, timeout=20.0, ignore_error=False):
         """
@@ -240,7 +243,7 @@ class CNCDriver(object):
 
         Raises RuntimeWarning() if no response was recieved before timeout
         """
-        self.wait_for_data(timeout)
+        self.wait_for_data(timeout=timeout)
         return self.readline_from_serial(ignore_error=ignore_error)
 
     # THREADING
@@ -550,6 +553,9 @@ class CNCDriver(object):
         self.wait_for_ok()
         self.wait_for_ok()
 
+        print(res)
+        print(self._parse_axis_values(res))
+
         returned_value = self._parse_axis_values(res).get(axis.lower())
         assert float(returned_value) == value
 
@@ -589,9 +595,12 @@ class CNCDriver(object):
 
     def _parse_axis_values(self, string):
         try:
+            parsed_values = string.split(' ')
+            if parsed_values[0] == 'ok':
+                parsed_values = parsed_values[2:]
             return {
                 s.split(':')[0].lower(): float(s.split(':')[1])
-                for s in string.split(' ')[2:]
+                for s in parsed_values
             }
         except ValueError as e:
             log.critical("Error parsing position string from smoothie board:")

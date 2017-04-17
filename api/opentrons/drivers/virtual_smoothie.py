@@ -252,10 +252,12 @@ class VirtualSmoothie(object):
 
     def process_steps_per_mm(self, arguments):
         for axis in arguments.keys():
-            if axis.upper() in 'XYZ':
+            if axis.upper() in 'XYZAB':
                 self.steps_per_mm[axis.upper()] = arguments[axis]
-        response = json.dumps({'M92': self.steps_per_mm})
-        response += '\nok'
+        response = ''
+        for axis in 'XYZAB':
+            response += '{}:{} '.format(axis.upper(), self.steps_per_mm[axis.upper()])
+        response += '\nok\nok'
         return response
 
     def process_dwell_command(self, arguments):
@@ -335,7 +337,7 @@ class VirtualSmoothie(object):
 
     def write(self, data):
         if not self.isOpen():
-            raise Exception('Virtual Smoothie no currently connected')
+            raise RuntimeError('Virtual Smoothie not currently connected')
         if not isinstance(data, str):
             data = data.decode('utf-8')
         # make it async later
@@ -343,7 +345,7 @@ class VirtualSmoothie(object):
 
     def readline(self):
         if not self.isOpen():
-            raise Exception('Virtual Smoothie no currently connected')
+            raise RuntimeError('Virtual Smoothie not currently connected')
         if len(self.responses) > 0:
             return self.responses.pop().encode('utf-8')
         else:
