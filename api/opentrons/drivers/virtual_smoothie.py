@@ -23,6 +23,7 @@ class VirtualSmoothie(object):
         self.config = options['config']
         self.version = options['firmware']
         self.responses = []
+        self.in_waiting = 0
         self.absolute = True
         self.is_open = False
         self.speeds = {
@@ -329,3 +330,12 @@ class VirtualSmoothie(object):
             return self.responses.pop().encode('utf-8')
         else:
             return b''
+
+    def in_waiting(self):
+        return sum([len(s) for s in self.responses])
+
+    def flush(self):
+        pass
+
+    def reset_input_buffer(self):
+        self.responses = []
