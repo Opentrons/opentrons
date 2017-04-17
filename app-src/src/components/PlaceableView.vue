@@ -14,7 +14,7 @@
   import DeckMap from './DeckMap.vue'
 
   export default {
-    name: 'Placeable',
+    name: 'PlaceableView',
     components: {
       CalibratePlaceable,
       DeckMap
