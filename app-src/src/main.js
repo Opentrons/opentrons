@@ -16,7 +16,6 @@ Vue.use(VueResource)
 const router = new VueRouter({
   routes: [
     { path: '/calibrate/:instrument', component: CalibrateInstrument },
-    { path: '/calibrate/:instrument', component: CalibrateInstrument },
     { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable },
     loginRoute,
     logoutRoute
