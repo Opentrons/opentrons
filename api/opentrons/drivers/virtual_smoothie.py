@@ -26,6 +26,13 @@ class VirtualSmoothie(object):
         self.in_waiting = 0
         self.absolute = True
         self.is_open = False
+
+        file_path = options.get('config_file_path')
+        self.config_file_string = ''
+        if file_path:
+            with open(file_path) as f:
+                self.config_file_string = str(f.read())
+
         self.speeds = {
             'x': 4000,
             'y': 4000,
@@ -234,6 +241,12 @@ class VirtualSmoothie(object):
         return '{0}: {1} has been set to {2}\nok'.format(
             folder, setting, value)
 
+    def process_cat_file(self, arguments):
+        file_path = arguments[0]
+        if 'sd/config' not in file_path:
+            return 'File not found: {}\nok'.format(arguments[0])
+        return '\n{}\nok'.format(self.config_file_string)
+
     def process_steps_per_mm(self, arguments):
         for axis in arguments.keys():
             if axis.upper() in 'XYZ':
@@ -260,6 +273,7 @@ class VirtualSmoothie(object):
     def insert_response(self, message):
         messages = message.split('\n')
         self.responses = list(reversed(messages)) + self.responses
+        self.in_waiting = sum([len(s) for s in self.responses])
 
     def process_command(self, command):
         parsed_command = self.parse_command(command)
@@ -298,7 +312,8 @@ class VirtualSmoothie(object):
             'version': self.process_version,
             'reset': self.process_reset,
             'config-get': self.process_config_get,
-            'config-set': self.process_config_set
+            'config-set': self.process_config_set,
+            'cat': self.process_cat_file
         }
         if parsed_command:
             command = parsed_command['command']
@@ -331,11 +346,9 @@ class VirtualSmoothie(object):
         else:
             return b''
 
-    def in_waiting(self):
-        return sum([len(s) for s in self.responses])
-
     def flush(self):
         pass
 
     def reset_input_buffer(self):
         self.responses = []
+        self.in_waiting = 0

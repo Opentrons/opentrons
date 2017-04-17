@@ -1,5 +1,6 @@
 import copy
 import os
+import pkg_resources
 from threading import Event
 
 import dill
@@ -19,6 +20,11 @@ from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
 from opentrons.util.environment import settings
 
+
+SMOOTHIE_DEFAULTS_DIR = pkg_resources.resource_filename(
+    'opentrons.config', 'smoothie')
+SMOOTHIE_DEFAULTS_FILE = os.path.join(SMOOTHIE_DEFAULTS_DIR, 'smoothie-defaults.ini')
+SMOOTHIE_VIRTUAL_CONFIG_FILE = os.path.join(SMOOTHIE_DEFAULTS_DIR, 'config_one_pro_plus')
 
 log = get_logger(__name__)
 
@@ -186,7 +192,7 @@ class Robot(object, metaclass=Singleton):
                 options={'limit_switches': True}
             )
         }
-        self._driver = motor_drivers.CNCDriver()
+        self._driver = motor_drivers.CNCDriver(SMOOTHIE_DEFAULTS_FILE)
         self.reset()
 
     @classmethod
@@ -389,6 +395,7 @@ class Robot(object, metaclass=Singleton):
 
         """
         default_options = {
+            'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
             'limit_switches': True,
             'firmware': 'edge-1c222d9NOMSD',
             'config': {
@@ -588,6 +595,7 @@ class Robot(object, metaclass=Singleton):
             coordinates = instrument.calibrator.convert(
                 placeable,
                 coordinates)
+            print(coordinates)
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 

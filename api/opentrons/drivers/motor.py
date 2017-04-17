@@ -3,7 +3,6 @@ import glob
 import json
 import math
 import os
-import pkg_resources
 import sys
 import time
 from threading import Event
@@ -16,13 +15,6 @@ from opentrons.drivers.virtual_smoothie import VirtualSmoothie
 
 from opentrons.util import trace
 
-
-DEFAULTS_DIR_PATH = pkg_resources.resource_filename(
-    'opentrons.config', 'smoothie')
-DEFAULTS_FILE_PATH = os.path.join(DEFAULTS_DIR_PATH, 'smoothie-defaults.ini')
-CONFIG_DIR_PATH = os.environ.get('APP_DATA_DIR', os.getcwd())
-CONFIG_DIR_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie')
-CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 
 log = get_logger(__name__)
 
@@ -89,7 +81,7 @@ class CNCDriver(object):
     config_version = None
     ot_version = None
 
-    def __init__(self):
+    def __init__(self, defaults_file_path):
         self.halted = Event()
         self.stopped = Event()
         self.do_not_pause = Event()
@@ -106,7 +98,7 @@ class CNCDriver(object):
         self.config_dict = {}
 
         self.defaults = configparser.ConfigParser()
-        self.defaults.read(DEFAULTS_FILE_PATH)
+        self.defaults.read(defaults_file_path)
         self._apply_defaults()
 
     # PORT METHODS
