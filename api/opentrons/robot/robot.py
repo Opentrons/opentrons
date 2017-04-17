@@ -23,8 +23,10 @@ from opentrons.util.environment import settings
 
 SMOOTHIE_DEFAULTS_DIR = pkg_resources.resource_filename(
     'opentrons.config', 'smoothie')
-SMOOTHIE_DEFAULTS_FILE = os.path.join(SMOOTHIE_DEFAULTS_DIR, 'smoothie-defaults.ini')
-SMOOTHIE_VIRTUAL_CONFIG_FILE = os.path.join(SMOOTHIE_DEFAULTS_DIR, 'config_one_pro_plus')
+SMOOTHIE_DEFAULTS_FILE = os.path.join(
+    SMOOTHIE_DEFAULTS_DIR, 'smoothie-defaults.ini')
+SMOOTHIE_VIRTUAL_CONFIG_FILE = os.path.join(
+    SMOOTHIE_DEFAULTS_DIR, 'config_one_pro_plus')
 
 log = get_logger(__name__)
 

@@ -2,7 +2,6 @@ import configparser
 import glob
 import json
 import math
-import os
 import sys
 import time
 from threading import Event
@@ -200,7 +199,8 @@ class CNCDriver(object):
 
         if not self.data_available():
             raise RuntimeWarning(
-                'No response from serial port after {} seconds'.format(timeout))
+                'No response from serial port after {} seconds'.format(
+                    timeout))
 
     def serial_pause(self):
         time.sleep(self.serial_timeout)
@@ -394,7 +394,6 @@ class CNCDriver(object):
         if not axis_to_home:
             return
 
-        res = None
         try:
             self.send_command(self.HOME + axis_to_home)
             self.wait_for_ok()
@@ -596,7 +595,7 @@ class CNCDriver(object):
             }
         except ValueError as e:
             log.critical("Error parsing position string from smoothie board:")
-            log.critical(res)
+            log.critical(string)
             raise ValueError(e) from e
 
     # SETTINGS
@@ -631,9 +630,8 @@ class CNCDriver(object):
         return self.config_dict.get(key)
 
     def set_config_value(self, key, value):
-        success = True
         command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
-        res = self.send_command(command)
+        self.send_command(command)
         self.wait_for_ok()  # ignore second 'ok'
         self.read_config_file()
 
@@ -676,7 +674,7 @@ class CNCDriver(object):
         return self.ot_version
 
     def get_firmware_version(self):
-        # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz
+        # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa
         #   CNC Build 6 axis
         #   6 axis
         # ok

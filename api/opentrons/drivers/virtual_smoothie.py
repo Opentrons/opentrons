@@ -36,7 +36,7 @@ class VirtualSmoothie(object):
         self.speeds = {
             'x': 4000,
             'y': 4000,
-            'x': 3000,
+            'z': 3000,
             'a': 500,
             'b': 500
         }
@@ -104,13 +104,13 @@ class VirtualSmoothie(object):
 
     def process_get_endstops(self, arguments):
         # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 C_min:0 \
-        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0 
+        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0  # noqa
         # ok
         # ok
         res = ''
         for name, value in self.endstop.items():
             res += '{}:{} '.format(name, value)
-        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0'
+        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0 (CL)P1.30:0'  # noqa
         return res + '\nok\nok'
 
     def set_position_from_arguments(self, arguments):
@@ -163,21 +163,24 @@ class VirtualSmoothie(object):
 
         if axis_hit and self.limit_switches:
             # Limit switch X was hit - reset or M999 required
-            return 'Limit switch {} was hit - reset or M999 required'.format(axis_hit)
+            return 'Limit switch {} was hit - reset or M999 required'.format(
+                axis_hit)
         return 'ok\nok'
 
     def process_get_position(self, arguments):
         # ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
         res = 'ok MCS:'
         for axis in 'XYZAB':
-            res += ' {}:{}'.format(axis, self.coordinates['current'][axis.lower()])
+            res += ' {}:{}'.format(
+                axis, self.coordinates['current'][axis.lower()])
         return '{}\nok'.format(res)
 
     def process_get_target(self, arguments):
         # ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
         res = 'ok MP:'
         for axis in 'XYZAB':
-            res += ' {}:{}'.format(axis, self.coordinates['target'][axis.lower()])
+            res += ' {}:{}'.format(
+                axis, self.coordinates['target'][axis.lower()])
         return '{}\nok'.format(res)
 
     def process_acceleration(self, arguments):
@@ -196,7 +199,7 @@ class VirtualSmoothie(object):
         return 'ok\nok'
 
     def process_halt(self, arguments):
-        e = 'ok Emergency Stop Requested - reset or M999 required to exit HALT state'
+        e = 'ok Emergency Stop Requested - reset or M999 required to exit HALT state'  # noqa
         e += '\nok'
         return e
 
@@ -209,12 +212,12 @@ class VirtualSmoothie(object):
         return 'ok\nok'
 
     def process_version(self, arguments):
-        # Build version: BRANCH-HASH, Build date: MONTH DAY YEAR HOUR:MIN:SEC, MCU: LPC1769, System Clock: 120MHz
+        # Build version: BRANCH-HASH, Build date: MONTH DAY YEAR HOUR:MIN:SEC, MCU: LPC1769, System Clock: 120MHz   # noqa
         #   CNC Build 6 axis
         #   6 axis
         # ok
         res = 'Build version: {}, '.format(self.version)
-        res += 'Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz'
+        res += 'Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz'  # noqa
         res += '\n  CNC Build 6 axis'
         res += '\n  6 axis'
         return res + '\nok'
