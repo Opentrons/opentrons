@@ -1,6 +1,8 @@
 import Vue from 'vue'
-import store from './store/store'
+
+import config from './config'
 import { getFakeUserID } from './util'
+import store from './store/store'
 
 // TODO: consider moving to GTM tag ?
 function emitAppUserId (userId, userEmail) {
@@ -19,8 +21,8 @@ function emitAppUserId (userId, userEmail) {
 function getLock () {
   if (!window.lock) {
     window.lock = new window.Auth0Lock(
-      'iHhlL8Eb1z3dPKwpYITqah7ZZdyGKvvx',
-      'opentrons.auth0.com',
+      config.AUTH0_CLIENT_ID,
+      config.AUTH0_DOMAIN,
       {auth: { redirect: false }}
     )
   }
