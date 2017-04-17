@@ -25,6 +25,7 @@ const router = new VueRouter({
 
 /* eslint-disable */
 window.onload = function () {
+  console.log(getUserId, getUserEmail)
   window.ot_dataLayer.push({userId: getUserId()})
   window.ot_dataLayer.push({userEmail: getUserEmail()})
   const app = new Vue({
