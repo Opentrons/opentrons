@@ -595,7 +595,6 @@ class Robot(object, metaclass=Singleton):
             coordinates = instrument.calibrator.convert(
                 placeable,
                 coordinates)
-            print(coordinates)
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 
