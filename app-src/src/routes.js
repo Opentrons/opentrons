@@ -3,9 +3,8 @@ import Vue from 'vue'
 import config from './config'
 import store from './store/store'
 
-console.log(config.AUTH0_DOMAIN, config.INTERCOM_APP_ID)
 
-// This is not in GTM because sending email data to GTM violoates
+// Note: This is not in GTM because sending email data to GTM violoates
 // the GTM User Policy
 function emitAppUserInfo (userId, userEmail) {
   window.ot_dataLayer.push({userId: userId})
