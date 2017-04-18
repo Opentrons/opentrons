@@ -1,7 +1,7 @@
 <template>
   <div class="task">
   <div class="placeable">
-    <deck-map v-if='instrument()' :placeable='placeable()' :instrument='instrument()' :deck='deck()' ></deck-map>
+    <deck-map v-if='instrument()' :instrument='instrument()' :deck='deck()' ></deck-map>
 
     <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'></CalibratePlaceable>
   </div>

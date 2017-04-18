@@ -28,7 +28,7 @@
     components: {
       Container
     },
-    props: ['placeable', 'instrument', 'deck'],
+    props: ['instrument', 'deck'],
     data () {
       return {
         cols: ['A', 'B', 'C', 'D', 'E'],
@@ -49,9 +49,6 @@
       },
       tasks () {
         return this.$store.state.tasks
-      },
-      pipettes () {
-        return this.$store.state.tasks.pipettes
       }
     },
     methods: {
