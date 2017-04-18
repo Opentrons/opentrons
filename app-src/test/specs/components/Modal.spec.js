@@ -28,9 +28,9 @@ const propsData = { placeable, instrument }
 let modal = getRenderedVm(Modal, propsData, mockStore)
 
 describe('modal', () => {
-  it('receives a placeable and intrument objects as a props', () => {
+  it('receives a placeable and instrument objects as a props', () => {
     expect(typeof modal.placeable).to.equal('object')
-    expect(modal.instrument).to.exisit
+    expect(modal.instrument).to.exist
   })
 
   it('correctly generates a placeableImage URL based on channels', () => {

@@ -28,7 +28,7 @@
     components: {
       Container
     },
-    props: ['instrument', 'deck'],
+    props: ['deck'],
     data () {
       return {
         cols: ['A', 'B', 'C', 'D', 'E'],
