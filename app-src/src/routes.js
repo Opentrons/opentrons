@@ -3,6 +3,8 @@ import Vue from 'vue'
 import config from './config'
 import store from './store/store'
 
+console.log(config.AUTH0_DOMAIN, config.INTERCOM_APP_ID)
+
 // This is not in GTM because sending email data to GTM violoates
 // the GTM User Policy
 function emitAppUserInfo (userId, userEmail) {
@@ -16,6 +18,7 @@ function emitAppUserInfo (userId, userEmail) {
 }
 
 function restartIntercom () {
+  console.log('[Intercom] Restarting Intercom in guest mode')
   window.Intercom('shutdown')
   window.Intercom('boot', {app_id: config.INTERCOM_APP_ID})
 }
