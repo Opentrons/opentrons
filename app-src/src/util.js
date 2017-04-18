@@ -32,11 +32,11 @@ function getFakeUserID () {
 }
 
 function getUserId () {
-  return getUserProfile().user_id || getFakeUserID()
+  return getUserProfile().user_id || null
 }
 
 function getUserEmail () {
-  return getUserProfile().email || getFakeUserID() + '@opentrons.com'
+  return getUserProfile().email || null
 }
 
 function getUserProfile () {

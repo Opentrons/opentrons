@@ -1,11 +1,11 @@
 import Vue from 'vue'
 
 import config from './config'
-import { getFakeUserID } from './util'
 import store from './store/store'
 
-// TODO: consider moving to GTM tag ?
-function emitAppUserId (userId, userEmail) {
+// This is not in GTM because sending email data to GTM violoates
+// the GTM User Policy
+function emitAppUserInfo (userId, userEmail) {
   window.ot_dataLayer.push({userId: userId})
   console.log(window.intercomSettings)
   window.intercomSettings = {
@@ -13,6 +13,11 @@ function emitAppUserId (userId, userEmail) {
     email: userEmail
   }
   window.Intercom('update')
+}
+
+function restartIntercom () {
+  window.Intercom('shutdown')
+  window.Intercom('boot', {app_id: config.INTERCOM_APP_ID})
 }
 
 /*
@@ -56,7 +61,7 @@ function loginUser (authResult, profile) {
   localStorage.setItem('profile', JSON.stringify(profile))
 
   // Send data to intercom/GA
-  emitAppUserId(profile.user_id, profile.email)
+  emitAppUserInfo(profile.user_id, profile.email)
 
   // Update state
   store.commit('AUTHENTICATE', {isAuthenticated: true, userProfile: profile})
@@ -69,9 +74,11 @@ function loginUser (authResult, profile) {
 function logoutUser () {
   localStorage.removeItem('id_token')
   localStorage.removeItem('profile')
-  const fakeId = getFakeUserID()
-  emitAppUserId(fakeId, `${fakeId}@opentrons.com`)
+  // const fakeId = getFakeUserID()
+  // emitAppUserInfo(fakeId, `${fakeId}@opentrons.com`)
   store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
+  emitAppUserInfo()
+  restartIntercom()
 }
 
 const loginRoute = {
