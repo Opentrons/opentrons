@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store/store'
-import { getUserEmail, getUserId } from './util'
+import { getUserId } from './util'
 import {
   Placeable,
   CalibrateInstrument,
@@ -25,9 +25,7 @@ const router = new VueRouter({
 
 /* eslint-disable */
 window.onload = function () {
-  console.log(getUserId, getUserEmail)
-  window.ot_dataLayer.push({userId: getUserId()})
-  window.ot_dataLayer.push({userEmail: getUserEmail()})
+  if getUserId(): window.ot_dataLayer.push({userId: getUserId()})
   const app = new Vue({
     router,
     store,
