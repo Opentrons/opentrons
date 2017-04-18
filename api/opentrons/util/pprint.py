@@ -25,9 +25,11 @@ def format_slot(slot, height, width, top_margin):
     for _ in range(top_margin-1):
         res += [content_string.format('')]
 
-    res += [content_string.format(slot.get_name())]
-    res += [content_string.format(container_name(slot))]
-    res += [content_string.format(container_type(slot))]
+    res += [
+        content_string.format(slot.get_name()),
+        content_string.format(container_name(slot)),
+        content_string.format(container_type(slot))
+    ]
 
     res += divider
     
