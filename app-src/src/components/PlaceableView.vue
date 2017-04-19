@@ -12,13 +12,13 @@
 
 <script>
   import CalibratePlaceable from './CalibratePlaceable.vue'
-  import DeckMap from './DeckMap.vue'
+  import DeckNavigation from './DeckNavigation.vue'
 
   export default {
     name: 'PlaceableView',
     components: {
       CalibratePlaceable,
-      DeckMap
+      DeckNavigation
     },
     methods: {
       params () {

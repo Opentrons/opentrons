@@ -2,13 +2,19 @@
     Deck Map
 ******************************/
 
-$deck-width: 428px * 0.9;
-$deck-height: 383px * 0.9;
+$deck-width: 428px * 0.7;
+$deck-height: 383px * 0.7;
 $slot-height: $deck-height/3;
 section#deck-map {
-    width: 425px;
+    width: 100%;
     border-radius: 6px;
     display: inline-block;
+    h1{
+        visibility: hidden;
+        &.active{
+            visibility: visible;
+        }
+    }
     button.tab {
         width: 210px;
         height: 40px;

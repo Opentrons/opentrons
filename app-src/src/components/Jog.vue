@@ -38,9 +38,9 @@
       </span>
     </section>
 
-    <h2 class='title'>Move to Slot</h2>
+    <!-- <h2 class='title'>Move to Slot</h2>
     <hr>
-    <DeckSlot :busy='busy'></DeckSlot>
+    <DeckSlot :busy='busy'></DeckSlot> -->
   </aside>
 </template>
 

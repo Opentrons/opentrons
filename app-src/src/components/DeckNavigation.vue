@@ -1,18 +1,18 @@
 <template>
   <section id="deck-map">
-  <h1 v-if="$route.params.placeable" :class="{calibrated : instrument.calibrated }">{{$route.params.placeable}}</h1>
+  <h1 :class="{calibrated : instrument.calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.placeable}}</h1>
 
   <!-- TODO: a axis on right -->
-    <button  v-for="instrument in tasks.instruments" 
+<!--     <button  v-for="instrument in tasks.instruments" 
     class="tab" :class="{active : activePipette(instrument)}"  
     @click="togglePipette(instrument.axis)"> 
     {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span>
-    </button>
+    </button> -->
     <div class="deck-wrapper">
       <div class="deck-container">
        <div v-for="col in cols" class="deck-col">
        <!-- TODO: refactor into class object -->
-          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), calibrated: isCalibrated(col+row), currentPipette: pipetteUsesContainer(col+row, axis)}">
+          <div v-for="row in rows" class="deck-slot" :id="col+row" :class="{active : isActive(col+row), occupied: hasContainer(col+row), calibrated: isCalibrated(col+row), currentPipette: pipetteUsesContainer(col+row, axis)}" >
               <container v-if="hasContainer(col+row)" :placeable="getContainer(col+row)"></container>
               <div v-else class="empty"><p>{{col+row}}</p></div>
          </div>
@@ -26,11 +26,11 @@
   import Container from './Container'
 
   export default{
-    name: 'DeckMap',
+    name: 'DeckNavigation',
     components: {
       Container
     },
-    props: ['deck', 'instrument', 'placeable'],
+    props: ['deck', 'instrument'],
     data () {
       return {
         cols: ['A', 'B', 'C', 'D', 'E'],

@@ -25,7 +25,8 @@
     </section>
     <main id='container'>
       <Jog :busy='robotBusy'></Jog>
-      <TaskPane :busy='robotBusy'>
+      <!-- <TaskView :busy='robotBusy'> -->
+      <router-view></router-view>
     </main>
   <div>
 </template>
@@ -36,7 +37,7 @@
   import Home from './Home.vue'
   import Jog from './Jog.vue'
   import Upload from './Upload.vue'
-  import TaskPane from './TaskPane.vue'
+  // import TaskView from './TaskView.vue'
   import Run from './Run.vue'
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
@@ -49,7 +50,7 @@
       Home,
       Jog,
       Upload,
-      TaskPane,
+      // TaskView,
       Run,
       Protocol,
       ProgressBar

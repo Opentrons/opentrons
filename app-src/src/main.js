@@ -3,8 +3,8 @@ import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store/store'
 import {
-  PlaceableView,
-  InstrumentView,
+  TaskView,
+  WelcomeView,
   App
 } from './components/export'
 
@@ -13,8 +13,9 @@ Vue.use(VueResource)
 
 const router = new VueRouter({
   routes: [
-    { name: 'instrument', path: '/calibrate/:instrument', component: InstrumentView },
-    { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: PlaceableView }
+    { name: 'welcome', path: '/', component: WelcomeView },
+    { name: 'instrument', path: '/calibrate/:instrument', component: TaskView },
+    { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: TaskView }
   ],
   mode: 'history'
 })
