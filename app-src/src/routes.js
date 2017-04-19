@@ -3,7 +3,6 @@ import Vue from 'vue'
 import config from './config'
 import store from './store/store'
 
-
 // Note: This is not in GTM because sending email data to GTM violoates
 // the GTM User Policy
 function emitAppUserInfo (userId, userEmail) {

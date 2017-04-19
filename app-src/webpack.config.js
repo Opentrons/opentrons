@@ -88,9 +88,12 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
-  headers: { 'Access-Control-Allow-Origin': 'http://localhost:8090', 'Access-Control-Allow-Credentials': 'true' },
+  headers: {
+    'Access-Control-Allow-Origin': 'http://localhost:8090',
+    'Access-Control-Allow-Credentials': 'true'
+  },
   devtool: '#eval-source-map',
-  target: 'electron',  // process.env['APP_TARGET'] (TODO: bring back),
+  target: 'web',  // process.env['APP_TARGET'] (TODO: bring back),
   plugins: [
       new CopyWebpackPlugin([
           {from: 'src/index.html', to: 'index.html'}
