@@ -58,13 +58,16 @@ def get_build_tag(os_type):
     ci_tag = None
 
     if os_type in {"mac", "linux"}:
-        print(script_tag + "Checking Travis-CI environment variables for tag:")
-        ci_tag = tag_from_ci_env_vars(
-            ci_name='Travis-CI',
-            pull_request_var='TRAVIS_PULL_REQUEST',
-            branch_var='TRAVIS_BRANCH',
-            commit_var='TRAVIS_COMMIT'
-        )
+        if os.environ.get('TEAMCITY_VERSION'):
+            ci_tag = get_teamcity_ci_tag()
+        else:
+            print(script_tag + "Checking Travis-CI environment variables for tag:")
+            ci_tag = tag_from_ci_env_vars(
+                ci_name='Travis-CI',
+                pull_request_var='TRAVIS_PULL_REQUEST',
+                branch_var='TRAVIS_BRANCH',
+                commit_var='TRAVIS_COMMIT'
+            )
 
     if os_type == "win":
         print(script_tag + "Checking Appveyor-CI enironment variables for tag:")
@@ -120,6 +123,16 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
 
     return None
 
+def get_cmd_value(cmd):
+    return subprocess.check_output(cmd, shell=True).decode()
+
+
+def get_teamcity_ci_tag():
+    branch = get_cmd_value("git branch | grep \* | cut -d ' ' -f2")
+    commit = get_cmd_value('git rev-parse HEAD')
+    build_number = int(os.environ.get('BUILD_NUMBER', 0))
+    return 'TC{}_{}_{}'.format(build_number, branch, commit[:10])
+
 
 def which(pgm):
     path = os.getenv('PATH')
@@ -153,6 +166,7 @@ def build_electron_app():
         raise SystemExit(script_tag + 'Failed to properly build electron app')
 
     print(script_tab + 'electron-builder process completed successfully')
+
 
 def clean_build_dist(build_tag):
     """
