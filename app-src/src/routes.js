@@ -29,7 +29,13 @@ function getLock () {
     window.lock = new window.Auth0Lock(
       config.AUTH0_CLIENT_ID,
       config.AUTH0_DOMAIN,
-      {auth: { redirect: false }}
+      {
+        auth: { redirect: false },
+        theme: {
+          logo: '/auth0_opentrons_logo.png',
+          primaryColor: '#006FFF'
+        }
+      }
     )
   }
   return window.lock
