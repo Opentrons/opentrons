@@ -1,7 +1,5 @@
 <template>
-  <div id="task-placeable">
-      <h1 :class="{calibrated : instrument.calibrated }">{{placeable.label}} at slot {{placeable.slot}}</h1>
-     
+  <div id="task-placeable">     
     <modal v-if="showModal" @close="showModal = false" :placeable="placeable" :instrument="instrument">
     </modal>
 
@@ -13,8 +11,8 @@
 
     <button class='btn-calibrate save' @click='calibrate()'>SAVE</button>
     <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='moveToPosition()'>MOVE TO</button>
-    <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip()'>PICK UP TIP</button>
-    <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='dropTip()'>DROP TIP</button>
+<!--     <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='pickUpTip()'>PICK UP TIP</button>
+    <button v-if='isTiprack' :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='dropTip()'>DROP TIP</button> -->
     
 
     <span class="more-info">

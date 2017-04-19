@@ -1,11 +1,12 @@
 <template>
   <div class="task">
   <div class="placeable">
+
     <deck-map v-if='instrument()' :instrument='instrument()' :deck='deck()' ></deck-map>
 
     <CalibratePlaceable :placeable='placeable()' :instrument='instrument()'></CalibratePlaceable>
   </div>
-        <section id='instructions' v-if='this.instrument() && this.placeable()'></section>
+        <!-- <section id='instructions' v-if='this.instrument() && this.placeable()'></section> -->
   </div>
 </template>
 

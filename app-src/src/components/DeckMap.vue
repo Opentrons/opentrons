@@ -1,5 +1,7 @@
 <template>
   <section id="deck-map">
+  <h1 v-if="$route.params.placeable" :class="{calibrated : instrument.calibrated }">{{$route.params.placeable}}</h1>
+
   <!-- TODO: a axis on right -->
     <button  v-for="instrument in tasks.instruments" 
     class="tab" :class="{active : activePipette(instrument)}"  
@@ -28,7 +30,7 @@
     components: {
       Container
     },
-    props: ['deck'],
+    props: ['deck', 'instrument', 'placeable'],
     data () {
       return {
         cols: ['A', 'B', 'C', 'D', 'E'],
