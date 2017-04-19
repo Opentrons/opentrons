@@ -53,6 +53,9 @@ class Connection(object):
         self.serial_port.baudrate = baudrate
         self.serial_port.timeout = timeout
 
+    def device(self):
+        return self.serial_port
+
     def name(self):
         return str(self.serial_port.port)
 
@@ -86,7 +89,7 @@ class Connection(object):
         if timeout and isinstance(timeout, (float, int, complex)):
             end_time = time.time() + timeout
         while not self.data_available():
-            if end_time < time.time():
+            if end_time and end_time < time.time():
                 raise RuntimeWarning(
                     'No response after {} second(s)'.format(timeout))
 

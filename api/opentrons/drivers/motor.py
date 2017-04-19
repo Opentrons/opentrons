@@ -351,7 +351,7 @@ class CNCDriver(object):
         end_time = start_time + delay_time
         arguments = {'name': 'delay-start', 'time': delay_time}
         trace.EventBroker.get_instance().notify(arguments)
-        if not isinstance(self.connection, VirtualSmoothie):
+        if not isinstance(self.connection.device(), VirtualSmoothie):
             while time.time() + 1.0 < end_time:
                 self.check_paused_stopped()
                 time.sleep(1)

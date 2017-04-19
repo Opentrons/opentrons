@@ -263,18 +263,23 @@ class OpenTronsTest(unittest.TestCase):
         self.assertEquals(pos['z'], 97)
 
     def test_wait(self):
-        # set connection to be something other than VirtualSmoothie
-        self.motor.connection = int()
+        # do not use Virtual Smoothie for this test
+        old_method = getattr(self.motor.connection, 'device')
+        def _temp():
+            return int()
+        setattr(self.motor.connection, 'device', _temp)
+
         start_time = time.time()
         self.motor.wait(1.234)
         end_time = time.time()
         self.assertAlmostEquals(end_time - start_time, 1.234, places=1)
 
-        self.motor.connection = int()
         start_time = time.time()
         self.motor.wait(1.0)
         end_time = time.time()
         self.assertAlmostEquals(end_time - start_time, 1.0, places=1)
+
+        setattr(self.motor.connection, 'device', old_method)
 
     def test_wait_for_arrival(self):
         self.motor.home()
