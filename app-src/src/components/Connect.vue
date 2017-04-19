@@ -67,10 +67,10 @@
         this.$store.dispatch('disconnectRobot')
       },
       login: function () {
-        this.$router.push('login')
+        this.$router.push('/login')
       },
       logout: function () {
-        this.$router.push('logout')
+        this.$router.push('/logout')
       }
     },
     beforeMount: function () {
