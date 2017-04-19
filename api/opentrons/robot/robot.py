@@ -10,6 +10,7 @@ import serial
 from opentrons import containers
 from opentrons.drivers import motor as motor_drivers
 from opentrons.drivers.virtual_smoothie import VirtualSmoothie
+from opentrons.drivers import connection
 from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.vector import Vector
@@ -354,7 +355,8 @@ class Robot(object, metaclass=Singleton):
         Serial device instance to be supplied to :func:`connect`
         """
         try:
-            device = serial.Serial(
+            device = connection.Connection(
+                serial.Serial(),
                 port=port,
                 baudrate=self._driver.serial_baudrate,
                 timeout=self._driver.serial_timeout
@@ -412,7 +414,9 @@ class Robot(object, metaclass=Singleton):
             default_options['config'].update(options.get('config', {}))
             options['config'] = default_options['config']
             default_options.update(options)
-        return VirtualSmoothie(port=port, options=default_options)
+        return connection.Connection(
+            VirtualSmoothie(options=default_options),
+            port=port)
 
     def connect(self, port=None, options=None):
         """
@@ -977,7 +981,7 @@ class Robot(object, metaclass=Singleton):
         # TODO: Store these settings in config
         if os.environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             ports = [self.VIRTUAL_SMOOTHIE_PORT]
-        ports.extend(self._driver.get_serial_ports_list())
+        ports.extend(connection.get_serial_ports_list())
         return ports
 
     def is_connected(self):

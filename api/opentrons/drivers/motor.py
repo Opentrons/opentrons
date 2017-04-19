@@ -1,12 +1,8 @@
 import configparser
-import glob
 import json
 import math
-import sys
 import time
 from threading import Event
-
-import serial
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
@@ -100,40 +96,6 @@ class CNCDriver(object):
         self.defaults.read(defaults_file_path)
         self._apply_defaults()
 
-    # PORT METHODS
-    def get_serial_ports_list(self):
-        """ Lists serial port names
-
-            :raises EnvironmentError:
-                On unsupported or unknown platforms
-            :returns:
-                A list of the serial ports available on the system
-        """
-        if sys.platform.startswith('win'):
-            ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif (sys.platform.startswith('linux') or
-              sys.platform.startswith('cygwin')):
-            # this excludes your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty*')
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
-
-        result = []
-        port_filter = {'usbmodem', 'COM', 'ACM', 'USB'}
-        for port in ports:
-            try:
-                if any([f in port for f in port_filter]):
-                    s = serial.Serial(port)
-                    s.close()
-                    result.append(port)
-            except Exception as e:
-                log.debug(
-                    'Exception in testing port {}'.format(port))
-                log.debug(e)
-        return result
-
     def get_connected_port(self):
         """
         Returns the port the driver is currently connected to
@@ -141,36 +103,39 @@ class CNCDriver(object):
         """
         if not self.connection:
             return
-        return self.connection.port
+        return self.connection.name()
 
     def disconnect(self):
-        if self.is_connected() and self.connection:
+        if self.is_connected():
             self.connection.close()
         self.connection = None
 
-    def connect(self, device):
-        self.connection = device
+    def connect(self, smoothie_connection):
+        self.connection = smoothie_connection
         self.toggle_port()
-        log.debug("Connected to {}".format(device))
+        log.debug("Connected to {}".format(smoothie_connection.name()))
 
         self.versions_compatible()
 
-        # TODO: (andy) smoothieware edge has this weird bug,
+        # TODO: (andy) Smoothieware EDGE has this weird bug,
         # seems to require the following commands to run after Smoothieboard
-        # boots, or else all motors freeze up and make high-pitch sounds
-        self.write_to_serial('G91 G0 X0.001\r\n')
+        # boots, or else all motors freeze up and make high-pitch sounds.
+        # This is simply sending a tiny move command, then halt, then resume
+        self.send_command('G91 G0 X0.001', read_after=False)
         self.wait_for_ok()
         self.send_halt_command()
 
         self.calm_down()
 
     def is_connected(self):
-        return self.connection and self.connection.isOpen()
+        if self.connection:
+            return self.connection.isOpen()
+        return False
 
     def toggle_port(self):
         self.connection.close()
         self.connection.open()
-        self.flush_input()
+        self.connection.flush_input()
 
     def wait_for_ok(self):
         res = self.wait_for_response()
@@ -181,60 +146,18 @@ class CNCDriver(object):
     def ignore_next_line(self):
         self.wait_for_response(ignore_error=True)
 
-    def wait_for_write(self):
-        self.connection.flush()
-
-    def data_available(self):
-        return bool(self.connection.in_waiting)
-
-    def flush_input(self):
-        while self.is_connected() and self.data_available():
-            self.connection.reset_input_buffer()
-            self.serial_pause()
-
-    def wait_for_data(self, timeout=1):
-        end_time = time.time() + timeout
-        while time.time() < end_time and not self.data_available():
-            pass
-
-        if not self.data_available():
-            raise RuntimeWarning(
-                'No response from serial port after {} seconds'.format(
-                    timeout))
-
-    def serial_pause(self):
-        time.sleep(self.serial_timeout)
-
     def readline_from_serial(self, ignore_error=False):
         """
         Attempt to read a line of data from serial port
 
         Raises RuntimeWarning if read fails on serial port
         """
-        msg = self.connection.readline().strip().decode()
+        msg = self.connection.readline_string()
         if msg:
-            # log.debug("Read: {}".format(msg))
+            log.debug("Read: {}".format(msg))
             if not ignore_error:
                 self.detect_smoothie_error(str(msg))
-            return msg
-        return None
-
-    def write_to_serial(self, data, read_after=True):
-        """
-        Sends data string to serial ports
-
-        Returns data immediately read from port after write
-
-        Raises RuntimeError write fails or connection times out
-        """
-        if self.is_connected():
-            # log.debug("Write: {}".format(str(data).encode()))
-            self.connection.write(str(data).encode())
-            self.wait_for_write()
-            if read_after:
-                return self.wait_for_response()
-        else:
-            raise RuntimeError('Not connected to robot')
+        return msg
 
     def wait_for_response(self, timeout=20.0, ignore_error=False):
         """
@@ -243,7 +166,7 @@ class CNCDriver(object):
 
         Raises RuntimeWarning() if no response was recieved before timeout
         """
-        self.wait_for_data(timeout=timeout)
+        self.connection.wait_for_data(timeout=timeout)
         return self.readline_from_serial(ignore_error=ignore_error)
 
     # THREADING
@@ -291,7 +214,13 @@ class CNCDriver(object):
 
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
         command = '{} {}\r\n'.format(command, args)
-        return self.write_to_serial(command, read_after=read_after)
+        if self.is_connected():
+            log.debug("Write: {}".format(command))
+            self.connection.write_string(command)
+            if read_after:
+                return self.wait_for_response()
+        else:
+            raise RuntimeError('Not connected to robot')
 
     def detect_smoothie_error(self, msg):
         """
@@ -299,8 +228,8 @@ class CNCDriver(object):
 
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
-        if 'reset or M999 required' in msg or 'error:' in msg:
-            self.flush_input()
+        if 'reset or M999' in msg or 'error:' in msg:
+            self.connection.flush_input()
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -311,7 +240,6 @@ class CNCDriver(object):
         self.set_speed()
 
         current = self.get_head_position()['target']
-        # log.debug('Current Head Position: {}'.format(current))
         target_point = {
             axis: kwargs.get(
                 axis,
@@ -319,7 +247,6 @@ class CNCDriver(object):
             )
             for axis in 'xyz'
         }
-        # log.debug('Destination: {}'.format(target_point))
 
         flipped_vector = self.flip_coordinates(
             Vector(target_point), mode)
@@ -331,20 +258,9 @@ class CNCDriver(object):
                 if axis in kwargs}
         args.update({"F": max(list(self.speeds.values()))})
 
-        self.consume_move_commands(args)
-
-    def move_plunger(self, mode='absolute', **kwargs):
-        self.move(mode, **kwargs)
-
-    def move_head(self, mode='absolute', **kwargs):
-        self.move(mode, **kwargs)
-
-    def consume_move_commands(self, args):
         self.check_paused_stopped()
-
         self.send_command(self.MOVE, **args)
         self.wait_for_ok()
-
         self.wait_for_arrival()
 
         arguments = {
@@ -357,6 +273,12 @@ class CNCDriver(object):
         }
         trace.EventBroker.get_instance().notify(arguments)
 
+    def move_plunger(self, mode='absolute', **kwargs):
+        self.move(mode, **kwargs)
+
+    def move_head(self, mode='absolute', **kwargs):
+        self.move(mode, **kwargs)
+
     def flip_coordinates(self, coordinates, mode='absolute'):
         if not self.ot_version:
             self.get_ot_version()
@@ -366,7 +288,7 @@ class CNCDriver(object):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=0.5):
+    def wait_for_arrival(self, tolerance=0.1):
         target = self.get_target_position()
 
         while True:
@@ -401,7 +323,6 @@ class CNCDriver(object):
             self.wait_for_ok()
             self.send_command(self.SET_ZERO + axis_to_home)
             self.wait_for_ok()
-            self.power_off()
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
@@ -452,8 +373,7 @@ class CNCDriver(object):
 
     def send_halt_command(self):
         self.send_command(self.HALT, read_after=False)
-        self.ignore_next_line()
-        self.flush_input()
+        self.connection.flush_input()
 
     def reset(self):
         res = self.send_command(self.RESET)
@@ -606,8 +526,7 @@ class CNCDriver(object):
     # SETTINGS
     def read_config_file(self):
         self.send_command('cat /sd/config', read_after=False)
-        self.wait_for_write()
-        self.wait_for_data(timeout=3)
+        self.connection.wait_for_data(timeout=3)
 
         self.config_file = ''
         self.config_dict = {}
@@ -626,7 +545,7 @@ class CNCDriver(object):
                 data = [d.strip() for d in data.split(' ') if len(d)]
                 self.config_dict[data[0]] = data[-1]
             elif data == 'ok':
-                self.flush_input()
+                self.connection.flush_input()
                 break
 
     def get_config_value(self, key):

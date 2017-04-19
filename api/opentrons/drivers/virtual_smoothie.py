@@ -16,8 +16,11 @@ class VirtualSmoothie(object):
             self.coordinates['current'][axis] = 0.0
             self.coordinates['target'][axis] = 0.0
 
-    def __init__(self, port, options):
-        self.port = port
+    def __init__(self, options):
+        self.port = None
+        self.baudrate = None
+        self.timeout = None
+
         self.limit_switches = options['limit_switches']
         self.config = options['config']
         self.version = options['firmware']

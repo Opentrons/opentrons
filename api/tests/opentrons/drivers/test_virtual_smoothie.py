@@ -14,7 +14,7 @@ class VirtualSmoothieTestCase(unittest.TestCase):
                 'version': 'v2.0.0'
             }
         }
-        self.s = VirtualSmoothie(port=None, options=options)
+        self.s = VirtualSmoothie(options=options)
         self.s.open()
 
     def test_version(self):

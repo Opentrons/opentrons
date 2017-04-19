@@ -30,15 +30,12 @@ class OpenTronsTest(unittest.TestCase):
         self.robot.disconnect()
         self.robot.connect(port=myport, options=options)
 
-    def tearDown(self):
-        self.motor.flush_input()
-
     def test_reset(self):
         self.motor.reset()
         self.assertEquals(self.motor.connection, None)
 
     def test_write_with_lost_connection(self):
-        self.motor.connection.is_open = False
+        self.motor.connection.serial_port.is_open = False
         old_method = getattr(self.motor, 'is_connected')
 
         def _temp():
@@ -74,7 +71,7 @@ class OpenTronsTest(unittest.TestCase):
         self.assertRaises(ValueError, self.motor.set_coordinate_system, 'andy')
 
     def test_message_timeout(self):
-        self.motor.flush_input()
+        self.robot._driver.connection.flush_input()
         self.assertRaises(RuntimeWarning, self.motor.wait_for_response, 0.1)
 
     def test_set_plunger_speed(self):
