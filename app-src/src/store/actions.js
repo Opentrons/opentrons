@@ -43,7 +43,7 @@ const actions = {
         true: analyticsEventTypes.PROTOCOL_UPLOAD_SUCCESS,
         false: analyticsEventTypes.PROTOCOL_UPLOAD_ERROR
       }[result.success]
-      trackEvent(analyticsEventType, result)
+      trackEvent(analyticsEventType, result.fileName)
 
       commit(types.UPDATE_WARNINGS, {warning: result.warnings})
       commit(types.UPDATE_ERROR, {errors: result.errors})
