@@ -265,8 +265,10 @@ class OpenTronsTest(unittest.TestCase):
     def test_wait(self):
         # do not use Virtual Smoothie for this test
         old_method = getattr(self.motor.connection, 'device')
+
         def _temp():
             return int()
+
         setattr(self.motor.connection, 'device', _temp)
 
         start_time = time.time()
