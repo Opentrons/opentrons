@@ -216,6 +216,7 @@ class CNCDriver(object):
         command = '{} {}\r\n'.format(command, args)
         if self.is_connected():
             log.debug("Write: {}".format(command))
+            self.connection.flush_input()
             self.connection.write_string(command)
             if read_after:
                 return self.wait_for_response()
@@ -229,7 +230,6 @@ class CNCDriver(object):
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
         if 'reset or M999' in msg or 'error:' in msg:
-            self.connection.flush_input()
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -288,7 +288,7 @@ class CNCDriver(object):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=0.1):
+    def wait_for_arrival(self, tolerance=0.5):
         target = self.get_target_position()
 
         while True:
@@ -373,6 +373,7 @@ class CNCDriver(object):
 
     def send_halt_command(self):
         self.send_command(self.HALT, read_after=False)
+        self.connection.serial_pause()
         self.connection.flush_input()
 
     def reset(self):

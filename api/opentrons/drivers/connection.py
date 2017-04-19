@@ -86,7 +86,7 @@ class Connection(object):
         if timeout and isinstance(timeout, (float, int, complex)):
             end_time = time.time() + timeout
         while not self.data_available():
-            if end_time and end_time > time.time():
+            if end_time < time.time():
                 raise RuntimeWarning(
                     'No response after {} second(s)'.format(timeout))
 
