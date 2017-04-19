@@ -95,3 +95,4 @@ app-src/test/coverage
 
 # app api assets
 api/opentrons/server/templates/
+*.pid
