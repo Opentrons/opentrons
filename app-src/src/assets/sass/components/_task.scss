@@ -1,41 +1,42 @@
-section#welcome-view{
+section#welcome-view {
     width: 700px;
     height: 347px;
-    padding:10px;
-    margin-left:5px;
+    padding: 10px;
+    margin-left: 5px;
     border: 2px solid $well-bg;
-    border-radius:6px;
+    border-radius: 6px;
 }
 
 section#task-view {
-width: 725px;
-height: 375px;
-display: flex;
-flex-direction: row;
-section#placeable-pane,
-section#instrument-pane {
-    flex: 1 1 370px;
-    background-color: $well-bg;
-    border-radius: 6px;
-    border: 2px solid $well-bg;
-    margin: 0 5px 5px 5px;
-    h1 {
-        padding-top: 10px;
-        padding-left: 10px;
-    }
-}
-section#instrument-pane {
-    margin: 0 0 5px 0;
-}
-  section#placeable-pane {
-    h1 {
-        visibility: hidden;
-        &.active {
-            visibility: visible;
+    width: 725px;
+    height: 375px;
+    display: flex;
+    flex-direction: row;
+    section#placeable-pane,
+    section#instrument-pane {
+        flex: 1 1 370px;
+        background-color: $well-bg;
+        border-radius: 6px;
+        border: 2px solid $well-bg;
+        margin: 0 5px 5px 5px;
+        h1 {
+            padding-top: 10px;
+            padding-left: 10px;
         }
     }
-  }
+    section#instrument-pane {
+        margin: 0 0 5px 0;
+    }
+    section#placeable-pane {
+        h1 {
+            visibility: hidden;
+            &.active {
+                visibility: visible;
+            }
+        }
+    }
 }
+
 button.tab {
     width: 170px;
     height: 40px;
@@ -51,7 +52,76 @@ button.tab {
         //     border: 2px solid $secondary-brand;
         // }
     }
-    &:first-child {
+    &:first-child {}
+}
 
+div.pipette-modal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.plunger-nav {
+        flex: 1 1 100px;
+        display: inline-block;
+        height: 190px;
+        ul {
+            list-style-type: none;
+            padding-left:5px;
+            margin:0;
+            li {
+                line-height: 47px;
+                font-size: 14px;
+                color: $secondary-brand;
+                text-decoration: underline;
+                padding-left:20px;
+
+            }
+        }
+    }
+    div.plunger-img {
+        flex: 1 1 200px;
+        margin-right: 5px;
+        height: 188px;
+        display: inline-block;
+        background-color: white;
+    }
+}
+
+// modal logic
+div.pipette-modal {
+    img {
+        display: none;
+        height: 100%;
+    }
+    &.mode-top {
+        li.top {
+            background-color: white
+        }
+        img.top {
+            display: block;
+        }
+    }
+    &.mode-bottom {
+        li.bottom {
+            background-color: white
+        }
+        img.bottom {
+            display: block;
+        }
+    }
+    &.mode-blowout {
+        li.blowout {
+            background-color: white
+        }
+        img.blowout {
+            display: block;
+        }
+    }
+    &.mode-droptip {
+        li.droptip {
+            background-color: white
+        }
+        img.droptip {
+            display: block;
+        }
     }
 }
