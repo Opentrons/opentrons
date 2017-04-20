@@ -1,41 +1,36 @@
-module.exports = { trackEvent }
+module.exports = { dataLayerTrackEvent, trackEvent, trackEventFromWebsocket }
 
-const ipcRenderer = require('electron').ipcRenderer
-
-function deskmetricsTrackEvent (ourEvent, metadata) {
+function dataLayerTrackEvent (event, payloadValue) {
+  if (!window.ot_dataLayer) {
+    return
+  }
   try {
-    ipcRenderer.send('analytics', ourEvent, metadata)
+    let eventArg = {event: event, payload: {value: payloadValue || event}}
+    console.log('[dataLayer Push] ', JSON.stringify(eventArg))
+    window.ot_dataLayer.push(eventArg)
   } catch (err) {
     console.log(err)
   }
 }
 
-function intercomTrackEvent (event, metadata) {
-  if (typeof window.Intercom !== 'function') {
+function trackEventFromWebsocket (data) {
+  if (!data.command_description) {
     return
   }
-  // Intercom will throw an error after 180 are sent
-  try {
-    window.Intercom(event, metadata)
-  } catch (err) {
-    console.log(err)
+  if (data.command_description.startsWith('Run complete in')) {
+    dataLayerTrackEvent('PROTOCOL_RUN_SUCCESS')
   }
-}
-
-function gaTrackEvent (event, metadata) {
-  if (typeof window.ga !== 'function') {
-    return
-  }
-  try {
-    window.ga('send', 'event', 'App', event)
-  } catch (err) {
-    console.log(err)
+  if (data.name === 'command-run') {
+    if (data.caller === 'ui') {
+      if (data.command_description.startsWith('Error in')) {
+        dataLayerTrackEvent('PROTOCOL_RUN_ERROR')
+      }
+    }
   }
 }
 
 function trackEvent (event, metadata) {
-  console.log(`[Event] ${event} Metadata: ${metadata}`)
-  intercomTrackEvent(event, metadata)
-  gaTrackEvent(event, metadata)
-  deskmetricsTrackEvent(event, metadata)
+  const metadataStr = JSON.stringify(metadata)
+  console.log(`[Event] ${event} Metadata: ${metadataStr}`)
+  dataLayerTrackEvent(event, metadata)
 }

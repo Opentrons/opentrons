@@ -73,17 +73,6 @@
           let version = response.body.version
           version ? this.version = version : this.version = '2.?.?'
         })
-      this.$http
-        .get('http://localhost:31950/username').then((response) => {
-          let username = response.body.username
-          if (username !== undefined || username !== null) {
-            console.log('Starting intercom')
-            window.Intercom('boot', {
-              app_id: 'wbidvcze'
-            })
-          }
-        })
-
       window.addEventListener('dragover', function (e) {
         e = e || event
         if (e.target.tagName !== 'INPUT') {

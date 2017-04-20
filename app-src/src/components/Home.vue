@@ -1,12 +1,12 @@
 <template>
   <nav class='home' :class="{'disabled': busy}">
     <span class='label'>HOME: </span>
-    <span @click='home("all")' class='btn-home'>ALL</span>
-    <span @click='home("x")' class='btn-home'>X</span>
-    <span @click='home("y")' class='btn-home'>Y</span>
-    <span @click='home("z")' class='btn-home'>Z</span>
-    <span @click='home("b")' class='btn-home'>B</span>
-    <span @click='home("a")' class='btn-home'>A</span>
+    <span @click='home("all")' class='btn-home' id="home-all">ALL</span>
+    <span @click='home("x")' class='btn-home' id="home-x">X</span>
+    <span @click='home("y")' class='btn-home' id="home-y">Y</span>
+    <span @click='home("z")' class='btn-home' id="home-z">Z</span>
+    <span @click='home("b")' class='btn-home' id="home-b">B</span>
+    <span @click='home("a")' class='btn-home' id="home-a">A</span>
   </nav>
 </template>
 
