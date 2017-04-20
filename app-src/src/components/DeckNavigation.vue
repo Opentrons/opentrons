@@ -1,14 +1,9 @@
 <template>
   <section id="deck-map">
-  <h1 :class="{calibrated : instrument.calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.placeable}}</h1>
 
-  <!-- TODO: a axis on right -->
-<!--     <button  v-for="instrument in tasks.instruments" 
-    class="tab" :class="{active : activePipette(instrument)}"  
-    @click="togglePipette(instrument.axis)"> 
-    {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span>
-    </button> -->
+
     <div class="deck-wrapper">
+
       <div class="deck-container">
        <div v-for="col in cols" class="deck-col">
        <!-- TODO: refactor into class object -->

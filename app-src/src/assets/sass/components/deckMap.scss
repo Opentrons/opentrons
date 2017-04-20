@@ -9,37 +9,10 @@ section#deck-map {
     width: 100%;
     border-radius: 6px;
     display: inline-block;
-    h1{
-        visibility: hidden;
-        &.active{
-            visibility: visible;
-        }
-    }
-    button.tab {
-        width: 210px;
-        height: 40px;
-        margin-bottom: 5px;
-        // border-top-left-radius: 6px;
-        // border-top-right-radius: 6px;
-        border-radius: 6px;
-        border: 2px solid $well-bg;
-        background-color: white;
-        //border-bottom-width: 0px;
-        &.active {
-            background-color: $well-bg;
-            color: black;
-            border: 2px solid $primary-brand;
-            //text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            &:focus{
-              border: 2px solid $secondary-brand;  
-            }
-        }
-        &:first-child {
-            margin-right: 5px;
-        }
-    }
+
+
     div.deck-wrapper {
-        padding: 32px 20px;
+        padding: 20px 20px;
         background-color: $well-bg;
         border-radius: 6px;
         border-top-left-radius: 0px;

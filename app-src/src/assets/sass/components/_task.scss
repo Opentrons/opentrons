@@ -1,17 +1,48 @@
-section#task-view{
-  width: 725px;
-  height:375px;
-  display:flex;
-  flex-direction:row;
-  section#placeable-pane, section#instrument-pane{
-    flex:1 1 370px;
+section#task-view {
+width: 725px;
+height: 375px;
+display: flex;
+flex-direction: row;
+section#placeable-pane,
+section#instrument-pane {
+    flex: 1 1 370px;
     background-color: $well-bg;
     border-radius: 6px;
-    border:2px solid $well-bg;
-    margin:0 5px 5px 5px;
-  }
-  section#instrument-pane{
+    border: 2px solid $well-bg;
+    margin: 0 5px 5px 5px;
+    h1 {
+        padding-top: 10px;
+        padding-left: 10px;
+    }
+}
+section#instrument-pane {
     margin: 0 0 5px 0;
+}
+  section#placeable-pane {
+    h1 {
+        visibility: hidden;
+        &.active {
+            visibility: visible;
+        }
+    }
   }
 }
+button.tab {
+    width: 170px;
+    height: 40px;
+    margin: 20px 0 5px 5px;
+    border-radius: 6px;
+    border: 2px solid $well-bg;
+    background-color: white;
+    &.active {
+        background-color: $well-bg;
+        color: black;
+        border: 2px solid $primary-brand;
+        // &:focus {
+        //     border: 2px solid $secondary-brand;
+        // }
+    }
+    &:first-child {
 
+    }
+}
