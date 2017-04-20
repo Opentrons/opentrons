@@ -30,8 +30,8 @@ function getLock () {
       config.AUTH0_CLIENT_ID,
       config.AUTH0_DOMAIN,
       {
-        loginAfterSignUp: false,
-        auth: { redirect: false },
+        loginAfterSignUp: true,
+        auth: { redirect: false, sso: false },
         theme: {
           logo: '/auth0_opentrons_logo_drop_small.png',
           primaryColor: '#006FFF'
@@ -49,14 +49,16 @@ function getLock () {
 function showLockPopup (lock, onSuccessfulLogin, onErrorCb) {
   lock.show()
   lock.on('authenticated', (authResult) => {
+    localStorage.setItem('id_token', authResult.idToken)
+    console.log('got here..')
     lock.getProfile(authResult.idToken, (err, profile) => {
       if (err) {
         onErrorCb(err)
       } else {
         onSuccessfulLogin(authResult, profile)
       }
-      lock.hide()
     })
+    lock.hide()
   })
 }
 
