@@ -44,12 +44,11 @@ function WebSocketPlugin (socket) {
         if (data.text.length > 0) {
           let {text, type} = data
           text = `${text}`
-          
-          console.log(text, type)
-
+          console.log(type)
           data.timestamp = (new Date()).toLocaleTimeString()
           data.command_description = text
           data.notification = true
+          data.type = type
           store.commit(types.UPDATE_RUN_LOG, data)
         }
       }

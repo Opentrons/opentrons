@@ -27,6 +27,7 @@
       <!-- <TaskView :busy='robotBusy'> -->
       <router-view></router-view>
     </main>
+    <console></console>
   <div>
 </template>
 
@@ -40,6 +41,7 @@
   import Run from './Run.vue'
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
+  import Console from './Console'
 
   export default {
     components: {
@@ -50,7 +52,8 @@
       // TaskView,
       Run,
       Protocol,
-      ProgressBar
+      ProgressBar,
+      Console
     },
     data: function () {
       return {

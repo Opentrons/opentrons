@@ -1,22 +1,55 @@
 /******************************
 Run Screen
 ******************************/
-.runScreen {
+
+// .runScreen {
+//     .runCommand {
+//         padding-bottom: 0px;
+//         margin: 5px;
+//         &:last-child {
+//             color: $primary-brand;
+//         }
+//     }
+//     #exit {
+//         position: fixed;
+//         top: auto;
+//         padding-left: 685px;
+//         padding-right: 10px;
+//         font-size: xx-large;
+//         font-weight: bold;
+//         cursor: pointer;
+//         color: $secondary-brand;
+//     }
+// }
+
+/******************************
+Console
+******************************/
+section#console {
+    width: 1024px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    height: 175px;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    background-color: $well-bg;
+    border-radius: 6px;
+    padding: 10px;
+    padding-bottom:30px;
     .runCommand {
-        padding-bottom: 0px;
-        margin: 5px;
         &:last-child {
             color: $primary-brand;
+            background: rgba(0,0,0,0.1);
         }
-    }
-    #exit {
-        position: fixed;
-        top: auto;
-        padding-left: 685px;
-        padding-right: 10px;
-        font-size: xx-large;
-        font-weight: bold;
-        cursor: pointer;
-        color: $secondary-brand;
+        &.info{
+            color: $primary-brand;
+        }
+        &.success{
+            color: $primary-brand;
+        }
+        &.danger{
+            color: #f33b59;
+        }
     }
 }
