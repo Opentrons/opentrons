@@ -20,6 +20,13 @@ function trackEventFromWebsocket (data) {
   if (data.command_description.startsWith('Run complete in')) {
     dataLayerTrackEvent('PROTOCOL_RUN_SUCCESS')
   }
+  if (data.name === 'command-run') {
+    if (data.caller === 'ui') {
+      if (data.command_description.startsWith('Error in')) {
+        dataLayerTrackEvent('PROTOCOL_RUN_ERROR')
+      }
+    }
+  }
 }
 
 function trackEvent (event, metadata) {

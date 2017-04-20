@@ -82,8 +82,6 @@ function loginUser (authResult, profile) {
 function logoutUser () {
   localStorage.removeItem('id_token')
   localStorage.removeItem('profile')
-  // const fakeId = getFakeUserID()
-  // emitAppUserInfo(fakeId, `${fakeId}@opentrons.com`)
   store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
   emitAppUserInfo()
   restartIntercom()
