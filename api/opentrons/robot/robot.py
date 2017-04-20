@@ -415,7 +415,8 @@ class Robot(object, metaclass=Singleton):
             options['config'] = default_options['config']
             default_options.update(options)
         v_smoothie = VirtualSmoothie(options=default_options)
-        return connection.Connection(v_smoothie, port='Virtual Smoothie', timeout=0)
+        return connection.Connection(
+            v_smoothie, port='Virtual Smoothie', timeout=0)
 
     def connect(self, port=None, options=None):
         """
