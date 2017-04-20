@@ -30,9 +30,10 @@ function getLock () {
       config.AUTH0_CLIENT_ID,
       config.AUTH0_DOMAIN,
       {
+        loginAfterSignUp: false,
         auth: { redirect: false },
         theme: {
-          logo: '/auth0_opentrons_logo.png',
+          logo: '/auth0_opentrons_logo_drop_small.png',
           primaryColor: '#006FFF'
         }
       }
