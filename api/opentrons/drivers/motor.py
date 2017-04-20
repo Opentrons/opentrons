@@ -89,7 +89,6 @@ class CNCDriver(object):
 
         self.ignore_smoothie_sd = False
 
-        self.config_file = ''
         self.config_dict = {}
 
         self.defaults = configparser.ConfigParser()
@@ -138,36 +137,26 @@ class CNCDriver(object):
         self.connection.flush_input()
 
     def wait_for_ok(self):
-        res = self.wait_for_response()
+        res = self.readline_from_serial()
         if res != 'ok':
             raise RuntimeError(
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def ignore_next_line(self):
-        self.wait_for_response(ignore_error=True)
+        self.connection.readline_string()
 
-    def readline_from_serial(self, ignore_error=False):
+    def readline_from_serial(self, timeout=3):
         """
         Attempt to read a line of data from serial port
 
         Raises RuntimeWarning if read fails on serial port
         """
+        self.connection.wait_for_data(timeout=timeout)
         msg = self.connection.readline_string()
         if msg:
             log.debug("Read: {}".format(msg))
-            if not ignore_error:
-                self.detect_smoothie_error(str(msg))
+            self.detect_smoothie_error(str(msg))
         return msg
-
-    def wait_for_response(self, timeout=20.0, ignore_error=False):
-        """
-        Repeatedly reads from serial port until data is received,
-        or timeout is exceeded
-
-        Raises RuntimeWarning() if no response was recieved before timeout
-        """
-        self.connection.wait_for_data(timeout=timeout)
-        return self.readline_from_serial(ignore_error=ignore_error)
 
     # THREADING
     def pause(self):
@@ -219,7 +208,7 @@ class CNCDriver(object):
             self.connection.flush_input()
             self.connection.write_string(command)
             if read_after:
-                return self.wait_for_response()
+                return self.readline_from_serial()
         else:
             raise RuntimeError('Not connected to robot')
 
@@ -429,14 +418,8 @@ class CNCDriver(object):
 
     def set_speed(self, *args, **kwargs):
         if len(args) > 0:
-            self.speeds['x'] = args[0]
-            self.speeds['y'] = args[0]
-        if 'xy' in kwargs:
-            self.speeds['x'] = kwargs['xy']
-            self.speeds['y'] = kwargs['xy']
-        for l in 'xyzab':
-            if l in kwargs:
-                self.speeds[l] = int(kwargs[l])
+            kwargs.update({'x': args[0], 'y': args[0]})
+        self.speeds.update({l: kwargs[l] for l in 'xyzab' if l in kwargs})
         if self.is_connected():
             kwargs = {
                 key.upper(): int(val / 60)  # M203.1 is in mm/sec (not mm/min)
@@ -527,30 +510,22 @@ class CNCDriver(object):
     # SETTINGS
     def read_config_file(self):
         self.send_command('cat /sd/config', read_after=False)
-        self.connection.wait_for_data(timeout=3)
 
-        self.config_file = ''
         self.config_dict = {}
 
-        count = 50  # arbitrary
-        while count > 0:
+        while True:
             data = self.readline_from_serial()
-            if not data:
-                count -= 1
-                continue
-            if len(data) and data != 'ok':
-                self.config_file += data
-                data = data.split('#')[0].strip()
-                if not len(data):
-                    continue
-                data = [d.strip() for d in data.split(' ') if len(d)]
-                self.config_dict[data[0]] = data[-1]
-            elif data == 'ok':
+            if data == 'ok':
                 self.connection.flush_input()
-                break
+                return
+            if len(data):
+                data = data.split('#')[0].strip()
+                data = [d.strip() for d in data.split(' ') if len(d)]
+                if len(data):
+                    self.config_dict[data[0]] = data[-1]
 
     def get_config_value(self, key):
-        if not self.config_file:
+        if not self.config_dict:
             self.read_config_file()
         return self.config_dict.get(key)
 

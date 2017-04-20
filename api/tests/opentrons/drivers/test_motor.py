@@ -72,7 +72,7 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_message_timeout(self):
         self.robot._driver.connection.flush_input()
-        self.assertRaises(RuntimeWarning, self.motor.wait_for_response, 0.1)
+        self.assertRaises(RuntimeWarning, self.motor.readline_from_serial, 0.1)
 
     def test_set_plunger_speed(self):
         self.motor.set_plunger_speed(400, 'a')
@@ -247,7 +247,7 @@ class OpenTronsTest(unittest.TestCase):
     def test_send_command(self):
         res = self.motor.send_command('G0 X1 Y1 Z1')
         self.assertEquals(res, 'ok')
-        self.assertEquals(self.motor.wait_for_response(), 'ok')
+        self.assertEquals(self.motor.readline_from_serial(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 399)
@@ -256,7 +256,7 @@ class OpenTronsTest(unittest.TestCase):
     def test_send_command_with_kwargs(self):
         res = self.motor.send_command('G0', X=1, Y=2, Z=3)
         self.assertEquals(res, 'ok')
-        self.assertEquals(self.motor.wait_for_response(), 'ok')
+        self.assertEquals(self.motor.readline_from_serial(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 398)

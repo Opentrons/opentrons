@@ -46,7 +46,7 @@ def get_serial_ports_list():
 
 class Connection(object):
 
-    def __init__(self, device, port, baudrate=115200, timeout=0.02):
+    def __init__(self, device, port='', baudrate=115200, timeout=0.02):
         self.serial_timeout = timeout
         self.serial_port = device
         self.serial_port.port = port

@@ -414,11 +414,8 @@ class Robot(object, metaclass=Singleton):
             default_options['config'].update(options.get('config', {}))
             options['config'] = default_options['config']
             default_options.update(options)
-        return connection.Connection(
-            VirtualSmoothie(options=default_options),
-            port=port,
-            baudrate=115200,
-            timeout=0)
+        v_smoothie = VirtualSmoothie(options=default_options)
+        return connection.Connection(v_smoothie, port='Virtual Smoothie', timeout=0)
 
     def connect(self, port=None, options=None):
         """
@@ -977,6 +974,13 @@ class Robot(object, metaclass=Singleton):
         """
         self.can_pop_command.set()
         self._driver.resume()
+
+    def halt(self):
+        """
+        Stops execution of both the protocol and the Smoothie board immediately
+        """
+        self._driver.halt()
+        self.can_pop_command.set()
 
     def get_serial_ports_list(self):
         ports = []
