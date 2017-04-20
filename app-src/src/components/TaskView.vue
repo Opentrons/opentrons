@@ -1,7 +1,6 @@
 <template>
   
     <section id="task-view">
-
       <section id="placeable-pane">  
             <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}</h1>
         <deck-navigation  :instrument='instrument()' :deck='deck()'></deck-navigation>  
