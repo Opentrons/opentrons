@@ -1,6 +1,5 @@
 <template>
   <div>
-    <toast position='n'></toast>
     <header id='home-connect'>
       <Home :busy='robotBusy'></Home>
       <div class='brand'>
@@ -41,11 +40,9 @@
   import Run from './Run.vue'
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
-  import { Toast } from 'vuex-toast'
 
   export default {
     components: {
-      Toast,
       Connect,
       Home,
       Jog,
@@ -91,5 +88,4 @@
 
 <style lang='sass'>
   @import "../assets/sass/main.scss";
-  @import "../../node_modules/vuex-toast/dist/vuex-toast.css";
 </style>
