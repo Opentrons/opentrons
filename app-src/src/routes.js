@@ -50,7 +50,6 @@ function showLockPopup (lock, onSuccessfulLogin, onErrorCb) {
   lock.show()
   lock.on('authenticated', (authResult) => {
     localStorage.setItem('id_token', authResult.idToken)
-    console.log('got here..')
     lock.getProfile(authResult.idToken, (err, profile) => {
       if (err) {
         onErrorCb(err)
