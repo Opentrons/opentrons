@@ -308,10 +308,12 @@ class CNCDriver(object):
             return
 
         try:
-            self.send_command(self.HOME + axis_to_home)
-            self.wait_for_ok()
-            self.send_command(self.SET_ZERO + axis_to_home)
-            self.wait_for_ok()
+            self.send_command(self.HOME + axis_to_home, read_after=False)
+            self.connection.wait_for_data(timeout=20)
+            self.connection.flush_input()
+            self.send_command(self.SET_ZERO + axis_to_home, read_after=False)
+            self.connection.wait_for_data(timeout=20)
+            self.connection.flush_input()
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
