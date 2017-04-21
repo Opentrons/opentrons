@@ -239,6 +239,7 @@ class CNCDriver(object):
             self.send_command(line, read_after=False)
         self.send_command('\x04', read_after=False)
         self.send_command('play /sd/protocol.gcode')
+        self.connection.flush_input()
 
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, **kwargs):
