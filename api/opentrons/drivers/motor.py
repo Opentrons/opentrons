@@ -64,6 +64,22 @@ class CNCDriver(object):
         {True: 'M51', False: 'M50'}
     ]
 
+    COMMANDS_TO_RECORD = [
+        MOVE,
+        DWELL,
+        HOME,
+        SET_ZERO,
+        SET_SPEED,
+        SET_ACCELERATION,
+        MOTORS_ON,
+        MOTORS_OFF,
+        AXIS_AMPERAGE,
+        PUSH_SPEED,
+        POP_SPEED,
+        ABSOLUTE_POSITIONING,
+        RELATIVE_POSITIONING
+    ]
+
     """
     Serial port connection to talk to the device.
     """
@@ -94,6 +110,9 @@ class CNCDriver(object):
         self.defaults = configparser.ConfigParser()
         self.defaults.read(defaults_file_path)
         self._apply_defaults()
+
+        self.save_gcode_commands = False
+        self.gcode_commands_sent = []
 
     def get_connected_port(self):
         """
@@ -135,6 +154,7 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         self.connection.flush_input()
+        self.gcode_commands_sent = []
 
     def wait_for_ok(self):
         res = self.readline_from_serial()
@@ -188,6 +208,38 @@ class CNCDriver(object):
             self.resume()
             raise RuntimeWarning(self.STOPPED)
 
+    def is_simulating(self):
+        return bool(isinstance(
+            self.connection.device(), VirtualSmoothie))
+
+    def is_recording(self):
+        return bool(self.save_gcode_commands)
+
+    def get_recorded_commands(self):
+        return list(self.gcode_commands_sent)
+
+    def record_erase(self):
+        self.gcode_commands_sent = []
+
+    def record_start(self):
+        self.record_erase()
+        self.save_gcode_commands = True
+
+    def record_stop(self):
+        self.save_gcode_commands = False
+
+    def record_command(self, command, data):
+        if self.is_simulating() and self.is_recording():
+            if command in self.COMMANDS_TO_RECORD:
+                self.gcode_commands_sent.append(data)
+
+    def play_recording(self):
+        self.send_command('upload /sd/protocol.gcode')
+        for line in self.get_recorded_commands():
+            self.send_command(line, read_after=False)
+        self.send_command('\x04', read_after=False)
+        self.send_command('play /sd/protocol.gcode')
+
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, **kwargs):
         """
@@ -202,11 +254,14 @@ class CNCDriver(object):
         """
 
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
-        command = '{} {}\r\n'.format(command, args)
+        gcode_line = '{} {}\r\n'.format(command, args)
         if self.is_connected():
-            log.debug("Write: {}".format(command))
+            log.debug("Write: {}".format(gcode_line))
             self.connection.flush_input()
-            self.connection.write_string(command)
+            self.connection.write_string(gcode_line)
+
+            self.record_command(command, gcode_line)
+
             if read_after:
                 return self.readline_from_serial()
         else:
@@ -338,23 +393,37 @@ class CNCDriver(object):
         self.wait_for_ok()
 
     def wait(self, delay_time):
-        start_time = time.time()
-        end_time = start_time + delay_time
-        arguments = {'name': 'delay-start', 'time': delay_time}
-        trace.EventBroker.get_instance().notify(arguments)
-        if not isinstance(self.connection.device(), VirtualSmoothie):
-            while time.time() + 1.0 < end_time:
-                self.check_paused_stopped()
-                time.sleep(1)
-                arguments = {
-                    'name': 'countdown',
-                    'countdown': int(end_time - time.time())
-                }
-                trace.EventBroker.get_instance().notify(arguments)
-            remaining_time = end_time - time.time()
-            time.sleep(max(0, remaining_time))
-        arguments = {'name': 'delay-finish'}
-        trace.EventBroker.get_instance().notify(arguments)
+        _simulated_time = time.time()
+
+        def _current_time():
+            nonlocal _simulated_time
+            if self.is_simulating():
+                return _simulated_time
+            return time.time()
+
+        def _sleep(delay_time):
+            nonlocal _simulated_time
+            if self.is_simulating():
+                _simulated_time += delay_time
+            else:
+                time.sleep(delay_time)
+
+        end_time = _current_time() + delay_time
+        trace.EventBroker.get_instance().notify({
+            'name': 'delay-start',
+            'time': delay_time
+        })
+        while end_time > _current_time():
+            self.check_paused_stopped()
+            _sleep(min(1, end_time - _current_time()))
+
+            trace.EventBroker.get_instance().notify({
+                'name': 'countdown',
+                'countdown': int(end_time - time.time())
+            })
+        trace.EventBroker.get_instance().notify({
+            'name': 'delay-finish'
+        })
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
@@ -509,22 +578,28 @@ class CNCDriver(object):
             log.critical(string)
             raise ValueError(e) from e
 
-    # SETTINGS
     def read_config_file(self):
-        self.send_command('cat /sd/config', read_after=False)
-
         self.config_dict = {}
-
-        while True:
-            data = self.readline_from_serial()
-            if data == 'ok':
-                self.connection.flush_input()
-                return
+        for line in self.read_sd_file('config').split('\n'):
+            data = line.split('#')[0].strip()
+            data = [d.strip() for d in data.split(' ') if len(d)]
             if len(data):
-                data = data.split('#')[0].strip()
-                data = [d.strip() for d in data.split(' ') if len(d)]
-                if len(data):
-                    self.config_dict[data[0]] = data[-1]
+                self.config_dict[data[0]] = data[-1]
+
+    def read_sd_file(self, filename, timeout=30):
+        self.send_command(
+            'cat /sd/{}'.format(filename),
+            read_after=False)
+
+        file_string = ''
+        end_time = time.time() + timeout
+        while end_time > time.time():
+            data = self.readline_from_serial()
+            if 'file not found' in data.lower():
+                raise RuntimeError('Smoothie Error: {}'.format(data))
+            elif data == 'ok':
+                return file_string
+            file_string += '{}\r\n'.format(data)
 
     def get_config_value(self, key):
         if not self.config_dict:

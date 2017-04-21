@@ -742,8 +742,7 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event.update(kwargs)
 
         mode = 'live'
-        if isinstance(self._driver.connection,
-                      virtual_smoothie.VirtualSmoothie):
+        if self._driver.is_simulating():
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
@@ -771,6 +770,12 @@ class Robot(object, metaclass=Singleton):
                         i, command.description, str(e))) from e
 
         return self._runtime_warnings
+
+    def run_detached(self):
+        self._driver.record_start()
+        self.simulate()
+        self._driver.record_stop()
+        self._driver.play_recording()
 
     def send_to_app(self):
         robot_as_bytes = dill.dumps(self)
