@@ -84,14 +84,13 @@ class Connection(object):
             self.serial_port.reset_input_buffer()
             self.serial_pause()
 
-    def wait_for_data(self, timeout=None):
-        end_time = None
-        if timeout and isinstance(timeout, (float, int, complex)):
-            end_time = time.time() + timeout
-        while not self.data_available():
-            if end_time and end_time < time.time():
-                raise RuntimeWarning(
-                    'No response after {} second(s)'.format(timeout))
+    def wait_for_data(self, timeout=30):
+        end_time = time.time() + timeout
+        while end_time > time.time():
+            if self.data_available():
+                return
+        raise RuntimeWarning(
+            'No response after {} second(s)'.format(timeout))
 
     def readline_string(self):
         return str(self.serial_port.readline().decode().strip())
