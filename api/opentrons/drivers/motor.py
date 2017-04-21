@@ -154,7 +154,6 @@ class CNCDriver(object):
         self.connection.close()
         self.connection.open()
         self.connection.flush_input()
-        self.gcode_commands_sent = []
 
     def wait_for_ok(self):
         res = self.readline_from_serial()
@@ -237,7 +236,7 @@ class CNCDriver(object):
         self.send_command('upload /sd/protocol.gcode')
         for line in self.get_recorded_commands():
             self.send_command(line, read_after=False)
-        self.send_command('\x04', read_after=False)
+        self.send_command('\x04')
         self.send_command('play /sd/protocol.gcode')
         self.connection.flush_input()
 
