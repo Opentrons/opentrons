@@ -229,19 +229,49 @@ class CNCDriver(object):
 
     def record_command(self, command, data):
         if self.is_simulating() and self.is_recording():
-            if command in self.COMMANDS_TO_RECORD:
-                self.gcode_commands_sent.append(data)
+            for c in self.COMMANDS_TO_RECORD:
+                if c in command:
+                    self.gcode_commands_sent.append(data)
 
-    def play_recording(self):
+    def player_play(self):
+        self.player_pause()
+        self.player_resume()
+        self.player_stop()
         self.send_command('upload /sd/protocol.gcode')
         for line in self.get_recorded_commands():
             self.send_command(line, read_after=False)
         self.send_command('\x04')
         self.send_command('play /sd/protocol.gcode')
+        self.ignore_next_line()
+        self.wait_for_ok()
+
+    def player_progress(self):
+        self.connection.flush_input()
+        progress_data = self.send_command('progress', timeout=30)
+        self.wait_for_ok()
+        progress_bytes = self.send_command('M27', timeout=30)
+        self.wait_for_ok()
+        self.wait_for_ok()
+        return self._parse_progress_data(progress_data, progress_bytes)
+
+    def player_pause(self):
+        res = self.send_command('suspend', timeout=30)
+        if 'waiting for queue to empty...' in res:
+            self.ignore_next_line()
+            self.ignore_next_line()
+            self.readline_from_serial(timeout=60)
+        self.connection.flush_input()
+
+    def player_resume(self):
+        self.send_command('resume', timeout=30)
+        self.connection.flush_input()
+
+    def player_stop(self):
+        self.send_command('abort', timeout=30)
         self.connection.flush_input()
 
     # SMOOTHIE METHODS
-    def send_command(self, command, read_after=True, **kwargs):
+    def send_command(self, command, read_after=True, timeout=3, **kwargs):
         """
         Sends a GCode command.  Keyword arguments will be automatically
         converted to GCode syntax.
@@ -263,7 +293,7 @@ class CNCDriver(object):
             self.record_command(command, gcode_line)
 
             if read_after:
-                return self.readline_from_serial()
+                return self.readline_from_serial(timeout=timeout)
         else:
             raise RuntimeError('Not connected to robot')
 
@@ -405,6 +435,8 @@ class CNCDriver(object):
             nonlocal _simulated_time
             if self.is_simulating():
                 _simulated_time += delay_time
+                self.send_command('{} S{} P{}'.format(
+                    self.DWELL, int(delay_time), round(delay_time % 1, 2)))
             else:
                 time.sleep(delay_time)
 
@@ -564,20 +596,6 @@ class CNCDriver(object):
         self.send_command(self.MOTORS_OFF)
         self.wait_for_ok()
 
-    def _parse_axis_values(self, string):
-        try:
-            parsed_values = string.split(' ')
-            if parsed_values[0] == 'ok':
-                parsed_values = parsed_values[2:]
-            return {
-                s.split(':')[0].lower(): float(s.split(':')[1])
-                for s in parsed_values
-            }
-        except ValueError as e:
-            log.critical("Error parsing position string from smoothie board:")
-            log.critical(string)
-            raise ValueError(e) from e
-
     def read_config_file(self):
         self.config_dict = {}
         for line in self.read_sd_file('config').split('\n'):
@@ -697,3 +715,59 @@ class CNCDriver(object):
         for key in self.ot_one_dimensions.keys():
             axis_size = Vector(self.ot_one_dimensions[key])
             self.ot_one_dimensions[key] = axis_size
+
+    def _parse_axis_values(self, string):
+        try:
+            parsed_values = string.split(' ')
+            if parsed_values[0] == 'ok':
+                parsed_values = parsed_values[2:]
+            return {
+                s.split(':')[0].lower(): float(s.split(':')[1])
+                for s in parsed_values
+            }
+        except ValueError as e:
+            log.critical("Error parsing position string from smoothie board:")
+            log.critical(string)
+            raise ValueError(e) from e
+
+    def _parse_progress_data(self, progress_a, progress_b):
+        progress_info = {
+            'file': None,
+            'percentage': None,
+            'elapsed_time': None,
+            'estimated_time': None,
+            'current_byte': None,
+            'total_bytes': None
+        }
+        if progress_a != 'Not currently playing' and progress_b != 'Not currently playing':
+            try:
+                # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa
+                split_data = progress_a.split(',')
+
+                progress_info['file'] = split_data[0].strip().split(' ')[-1].split('/')[-1]
+                progress_info['percentage'] = float(split_data[1].split('%')[0].strip()) / 100.0
+
+                elapsed_time = split_data[2].split(':')
+                progress_info['elapsed_time'] = int(elapsed_time[-1].strip())
+                progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
+                progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
+
+                # estimated time is not there in the beginning of a job
+                estimated_time = None
+                if len(split_data) > 3:
+                    estimated_time = split_data[3].split(':')
+                    progress_info['elapsed_time'] = int(elapsed_time[-1].strip())
+                    progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
+                    progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
+            except:
+                raise RuntimeError('Error parsing progress: {}'.format(progress_data))
+
+            try:
+                # SD printing byte 3980/53182
+                byte_data = progress_b.strip().split(' ')[-1].split('/')
+                progress_info['current_byte'] = int(byte_data[0])
+                progress_info['total_bytes'] = int(byte_data[1])
+            except:
+                raise RuntimeError('Error parsing progress: {}'.format(progress_data))
+
+        return progress_info

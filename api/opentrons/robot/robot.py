@@ -774,7 +774,7 @@ class Robot(object, metaclass=Singleton):
         self._driver.record_start()
         self.simulate()
         self._driver.record_stop()
-        self._driver.play_recording()
+        self._driver.player_play()
 
     def send_to_app(self):
         robot_as_bytes = dill.dumps(self)
