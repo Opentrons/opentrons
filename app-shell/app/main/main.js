@@ -38,6 +38,12 @@ function createWindow (windowUrl) {
     mainWindow = null
     app.quit()
   })
+  // Note: Auth0 pop window does not close itself, this will this window when it pops up
+  setInterval(() => {
+    BrowserWindow.getAllWindows()
+      .filter(win => win.frameName === 'auth0_signup_popup')
+      .map(win => win.close())
+  }, 3000)
   return mainWindow
 }
 
