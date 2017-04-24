@@ -67,7 +67,7 @@
     },
     mounted: function () {
       this.$http
-        .get('http://localhost:31950/app_version').then((response) => {
+        .get('http://ot-two:31950/app_version').then((response) => {
           let version = response.body.version
           version ? this.version = version : this.version = '2.?.?'
         })

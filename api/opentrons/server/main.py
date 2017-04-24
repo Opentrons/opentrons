@@ -36,7 +36,7 @@ app = Flask(__name__,
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
-socketio = SocketIO(app, async_mode='gevent')
+socketio = SocketIO(app)
 
 filename = "N/A"
 last_modified = "N/A"
@@ -969,7 +969,7 @@ def log_after_request(response):
     return response
 
 
-def start():
+def start(host='127.0.0.1', port=31950):
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
@@ -983,12 +983,8 @@ def start():
 
     socketio.run(
         app,
-        debug=False,
-        logger=False,
-        use_reloader=False,
-        log_output=False,
-        engineio_logger=False,
-        port=31950
+        host=host,
+        port=port
     )
 
 
