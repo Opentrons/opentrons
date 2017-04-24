@@ -604,7 +604,7 @@ class CNCDriver(object):
             data = line.split('#')[0].strip()
             data = [d.strip() for d in data.split(' ') if len(d)]
             if len(data):
-                self.config_dict[data[0]] = data[-1]
+                self.config_dict[data[0]] = data[1]
 
     def read_sd_file(self, filename, timeout=30):
         self.send_command(
