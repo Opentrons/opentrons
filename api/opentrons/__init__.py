@@ -7,9 +7,9 @@ from ._version import get_versions
 
 
 version = sys.version_info[0:2]
-if version < (3, 5):
+if version < (3, 4):
     raise RuntimeError(
-        'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
+        'opentrons requires Python 3.4 or above, this is {0}.{1}'.format(
             version[0], version[1]))
 
 robot = Robot()
