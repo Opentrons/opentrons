@@ -153,6 +153,7 @@ class CNCDriver(object):
     def toggle_port(self):
         self.connection.close()
         self.connection.open()
+        self.connection.serial_pause()
         self.connection.flush_input()
 
     def wait_for_ok(self):
@@ -239,7 +240,7 @@ class CNCDriver(object):
         self.player_stop()
         self.send_command('upload /sd/protocol.gcode')
         for line in self.get_recorded_commands():
-            self.send_command(line, read_after=False)
+            self.connection.write_string(line)
         self.send_command('\x04')
         self.send_command('play /sd/protocol.gcode')
         self.ignore_next_line()
@@ -248,10 +249,11 @@ class CNCDriver(object):
     def player_progress(self):
         self.connection.flush_input()
         progress_data = self.send_command('progress', timeout=30)
-        self.wait_for_ok()
+        self.connection.wait_for_data(timeout=30)
+        self.connection.flush_input()
         progress_bytes = self.send_command('M27', timeout=30)
-        self.wait_for_ok()
-        self.wait_for_ok()
+        self.connection.wait_for_data(timeout=30)
+        self.connection.flush_input()
         return self._parse_progress_data(progress_data, progress_bytes)
 
     def player_pause(self):
@@ -760,7 +762,7 @@ class CNCDriver(object):
                     progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
                     progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
             except:
-                raise RuntimeError('Error parsing progress: {}'.format(progress_data))
+                raise RuntimeError('Error parsing progress: {}'.format(progress_a))
 
             try:
                 # SD printing byte 3980/53182
@@ -768,6 +770,6 @@ class CNCDriver(object):
                 progress_info['current_byte'] = int(byte_data[0])
                 progress_info['total_bytes'] = int(byte_data[1])
             except:
-                raise RuntimeError('Error parsing progress: {}'.format(progress_data))
+                raise RuntimeError('Error parsing progress: {}'.format(progress_b))
 
         return progress_info
