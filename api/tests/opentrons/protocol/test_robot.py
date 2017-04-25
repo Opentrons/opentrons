@@ -13,9 +13,14 @@ class RobotTest(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
+        self.smoothie_version = 'edge-1c222d9NOMSD'
+
         self.robot.reset()
-        self.robot.connect()
+        self.robot.connect(options={'firmware': self.smoothie_version})
         self.robot.home(enqueue=False)
+
+    def test_firmware_verson(self):
+        self.assertEquals(self.smoothie_version, self.robot._driver.firmware_version)
 
     def test_add_container(self):
         c1 = self.robot.add_container('96-flat', 'A1')
@@ -222,7 +227,7 @@ class RobotTest(unittest.TestCase):
                 'compatible': True
             },
             'firmware': {
-                'version': 'edge-1c222d9NOMSD',
+                'version': self.smoothie_version,
                 'compatible': True
             },
             'ot_version': {

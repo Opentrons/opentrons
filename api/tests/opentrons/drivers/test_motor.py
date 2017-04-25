@@ -14,10 +14,8 @@ class OpenTronsTest(unittest.TestCase):
     def setUp(self):
         global reset_time
         setup_time = time.time()
-        print('\nstarting', round(setup_time - reset_time, 4))
         self.robot = Robot.get_instance()
         init_time = time.time()
-        print('init_time', round(init_time - setup_time, 4))
 
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
@@ -229,8 +227,7 @@ class OpenTronsTest(unittest.TestCase):
         except RuntimeWarning as e:
             self.assertEqual(
                 str(
-                    RuntimeWarning(
-                        'Robot Error: limit switch hit')), str(e))
+                    RuntimeWarning('Robot Error: limit switch hit')), str(e))
 
         self.motor.home()
 
@@ -255,7 +252,8 @@ class OpenTronsTest(unittest.TestCase):
     def test_send_command(self):
         res = self.motor.send_command('G0 X1 Y1 Z1')
         self.assertEquals(res, 'ok')
-        self.assertEquals(self.motor.readline_from_serial(), 'ok')
+        if self.motor.firmware_version != 'v1.0.5':
+            self.assertEquals(self.motor.readline_from_serial(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 399)
@@ -264,7 +262,8 @@ class OpenTronsTest(unittest.TestCase):
     def test_send_command_with_kwargs(self):
         res = self.motor.send_command('G0', X=1, Y=2, Z=3)
         self.assertEquals(res, 'ok')
-        self.assertEquals(self.motor.readline_from_serial(), 'ok')
+        if self.motor.firmware_version != 'v1.0.5':
+            self.assertEquals(self.motor.readline_from_serial(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 398)

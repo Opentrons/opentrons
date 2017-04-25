@@ -18,14 +18,14 @@ class VirtualSmoothie_1_2_0(VirtualSmoothie):
             self.coordinates['current'][axis] = 0.0
             self.coordinates['target'][axis] = 0.0
 
-    def __init__(self, port, options):
-        self.port = port
+    def __init__(self, options):
         self.limit_switches = options['limit_switches']
         self.config = options['config']
         self.version = options['firmware']
         self.responses = []
         self.absolute = True
         self.is_open = False
+        self.in_waiting = 0
         self.name = 'Andy'
         self.speed = {
             'head': 0.0,
@@ -99,7 +99,6 @@ class VirtualSmoothie_1_2_0(VirtualSmoothie):
                 target[axis.lower()] = arguments[axis]
                 current = self.coordinates['current']
                 current[axis.lower()] = arguments[axis]
-
         return 'ok'
 
     def process_home_command(self, arguments):
@@ -145,7 +144,7 @@ class VirtualSmoothie_1_2_0(VirtualSmoothie):
         res = {}
         for axis in 'xyzab':
             res[axis.upper()] = self.coordinates['target'][axis]
-            res[axis] = self.coordinates['current'][axis]
+            res[axis.lower()] = self.coordinates['current'][axis]
         res = {'M114': res}
         return 'ok {}'.format(json.dumps(res))
 
@@ -216,6 +215,7 @@ class VirtualSmoothie_1_2_0(VirtualSmoothie):
     def insert_response(self, message):
         messages = message.split('\n')
         self.responses = list(reversed(messages)) + self.responses
+        self.in_waiting = sum([len(s) for s in self.responses])
 
     def process_command(self, command):
         parsed_command = self.parse_command(command)
@@ -284,3 +284,10 @@ class VirtualSmoothie_1_2_0(VirtualSmoothie):
             return self.responses.pop().encode('utf-8')
         else:
             return b''
+
+    def flush(self):
+        pass
+
+    def reset_input_buffer(self):
+        self.responses = []
+        self.in_waiting = 0
