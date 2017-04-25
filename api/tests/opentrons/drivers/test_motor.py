@@ -2,21 +2,26 @@ import time
 from threading import Thread
 import unittest
 
-from opentrons import Robot
+from opentrons import Robot, drivers
 from opentrons.util.vector import Vector
+
+
+reset_time = time.time()
 
 
 class OpenTronsTest(unittest.TestCase):
 
     def setUp(self):
-
+        global reset_time
+        setup_time = time.time()
+        print('\nstarting', round(setup_time - reset_time, 4))
         self.robot = Robot.get_instance()
+        init_time = time.time()
+        print('init_time', round(init_time - setup_time, 4))
 
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
         # and serial handshakes to be tested
-
-        self.motor = self.robot._driver
 
         options = {
             'limit_switches': True,
@@ -26,13 +31,18 @@ class OpenTronsTest(unittest.TestCase):
             }
         }
 
-        myport = self.robot.VIRTUAL_SMOOTHIE_PORT
         self.robot.disconnect()
-        self.robot.connect(port=myport, options=options)
+        self.robot.connect(options=options)
+
+        connect_time = time.time()
+
+        self.motor = self.robot._driver
 
     def test_reset(self):
+        global reset_time
         self.motor.reset()
         self.assertEquals(self.motor.connection, None)
+        reset_time = time.time()
 
     def test_write_with_lost_connection(self):
         self.motor.connection.serial_port.is_open = False
@@ -40,7 +50,9 @@ class OpenTronsTest(unittest.TestCase):
 
         def _temp():
             return True
+
         setattr(self.motor, 'is_connected', _temp)
+
         self.assertTrue(self.motor.is_connected())
         self.assertRaises(RuntimeError, self.motor.calm_down)
         setattr(self.motor, 'is_connected', old_method)
@@ -50,11 +62,7 @@ class OpenTronsTest(unittest.TestCase):
         self.assertRaises(RuntimeError, self.motor.calm_down)
 
     def test_version_compatible(self):
-        self.robot.disconnect()
-        self.robot.connect()
         self.motor.versions_compatible()
-
-        self.robot.disconnect()
 
         kwargs = {
             'options': {
@@ -92,7 +100,7 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.motor.get_connected_port()
-        self.assertEquals(res, self.robot.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
         self.motor.disconnect()
         res = self.motor.get_connected_port()
         self.assertEquals(res, None)

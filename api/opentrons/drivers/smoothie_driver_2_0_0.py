@@ -1,4 +1,3 @@
-import configparser
 import json
 import math
 import time
@@ -6,7 +5,7 @@ from threading import Event
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
-from opentrons.drivers.virtual_smoothie import VirtualSmoothie
+from opentrons.drivers.connection import VirtualSmoothie, SmoothieDriver
 
 from opentrons.util import trace
 
@@ -14,7 +13,7 @@ from opentrons.util import trace
 log = get_logger(__name__)
 
 
-class CNCDriver(object):
+class SmoothieDriver_2_0_0(SmoothieDriver):
 
     """
     This object outputs raw GCode commands to perform high-level tasks.
@@ -85,14 +84,11 @@ class CNCDriver(object):
     """
     connection = None
 
-    serial_timeout = None
-    serial_baudrate = None
-
     firmware_version = None
     config_version = None
     ot_version = None
 
-    def __init__(self, defaults_file_path):
+    def __init__(self, defaults):
         self.halted = Event()
         self.stopped = Event()
         self.do_not_pause = Event()
@@ -107,9 +103,7 @@ class CNCDriver(object):
 
         self.config_dict = {}
 
-        self.defaults = configparser.ConfigParser()
-        self.defaults.read(defaults_file_path)
-        self._apply_defaults()
+        self._apply_defaults(defaults)
 
         self.save_gcode_commands = False
         self.gcode_commands_sent = []
@@ -562,11 +556,8 @@ class CNCDriver(object):
         self.wait_for_ok()
 
         returned_value = self._parse_axis_values(res).get(axis.lower())
-        assert float(returned_value) == value
-
         key = self.CONFIG_STEPS_PER_MM[axis.lower()]
         self.set_config_value(key, str(returned_value))
-        assert float(returned_value) == value
 
     def get_endstop_switches(self):
         # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 pins- (XL)P1.24:0 .......
@@ -680,7 +671,7 @@ class CNCDriver(object):
         self.ignore_next_line()
         self.wait_for_ok()
 
-        # use the "branch-hash" portion as the version
+        # uses the "branch-hash" portion as the version response
         self.firmware_version = line_1.split(',')[0].split(' ')[-1]
 
         return self.firmware_version
@@ -695,25 +686,30 @@ class CNCDriver(object):
             self.get_ot_version()
         return self.ot_one_dimensions[self.ot_version]
 
-    def _apply_defaults(self):
-        self.serial_timeout = float(
-            self.defaults['serial'].get('timeout', 0.02))
-        self.serial_baudrate = int(
-            self.defaults['serial'].get('baudrate', 115200))
+    def get_baudrate(self):
+        return int(self.connection.serial_port.baudrate)
+
+    def get_timeout(self):
+        return float(self.connection.serial_port.timeout)
+
+    def get_port(self):
+        return str(self.connection.serial_port.port)
+
+    def _apply_defaults(self, defaults_file):
 
         self.speeds = json.loads(
-            self.defaults['state'].get(
+            defaults_file['state'].get(
                 'speeds',
                 '{"x": 3000, "y":3000, "z": 1600, "a": 300, "b": 300}'
             )
         )
 
         self.COMPATIBLE_FIRMARE = json.loads(
-            self.defaults['versions'].get('firmware', '[]'))
+            defaults_file['versions'].get('firmware', '[]'))
         self.COMPATIBLE_CONFIG = json.loads(
-            self.defaults['versions'].get('config', '[]'))
+            defaults_file['versions'].get('config', '[]'))
         self.ot_one_dimensions = json.loads(
-            self.defaults['versions'].get('ot_versions', '{}'))
+           defaults_file['versions'].get('ot_versions', '{}'))
         for key in self.ot_one_dimensions.keys():
             axis_size = Vector(self.ot_one_dimensions[key])
             self.ot_one_dimensions[key] = axis_size

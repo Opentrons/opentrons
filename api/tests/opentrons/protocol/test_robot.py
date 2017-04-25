@@ -49,7 +49,7 @@ class RobotTest(unittest.TestCase):
         p200.aspirate().dispense()
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
-        self.assertEquals(self.robot.connections['live'], None)
+        self.assertEquals(self.robot.smoothie_drivers['live'], None)
 
     def test_stop_run(self):
         p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
