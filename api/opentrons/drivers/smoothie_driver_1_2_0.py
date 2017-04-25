@@ -306,7 +306,7 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
     def flush_port(self):
         self.connection.flush_input()
 
-    def readline_from_serial(self, timeout=3):
+    def readline_from_serial(self, timeout=20):
         """
         Attempt to read a line of data from serial port
 
@@ -354,6 +354,8 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
+        axis_called = [ax for ax in 'xyz' if ax in kwargs]
+
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
         target_point = {
@@ -373,7 +375,10 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         args = {axis.upper(): kwargs.get(axis)
                 for axis in 'xyzab'
                 if axis in kwargs}
-        args.update({"F": min(self.speeds['x'], self.speeds['y'], self.speeds['z'])})
+
+
+        this_head_speed = min([self.speeds[l] for l in axis_called])
+        args.update({"F": this_head_speed})
         args.update({"a": self.speeds['a']})
         args.update({"b": self.speeds['b']})
 

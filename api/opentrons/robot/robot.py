@@ -6,8 +6,7 @@ import dill
 import requests
 import serial
 
-from opentrons import containers
-from opentrons import drivers
+from opentrons import containers, drivers
 from opentrons.drivers import connection
 from opentrons.robot.command import Command
 from opentrons.util import trace
@@ -347,7 +346,7 @@ class Robot(object, metaclass=Singleton):
         ``True`` for success, ``False`` for failure.
         """
         device = None
-        if not port or port == self.drivers.VIRTUAL_SMOOTHIE_PORT:
+        if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
             device = drivers.get_virtual_driver(options)
         else:
             device = drivers.get_serial_driver(port)
