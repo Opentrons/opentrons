@@ -4,7 +4,7 @@ from unittest import mock
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.placeable import Deck
-from opentrons import instruments, containers
+from opentrons import instruments, containers, drivers
 from opentrons.util.vector import Vector
 
 
@@ -132,7 +132,7 @@ class RobotTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.robot.get_connected_port()
-        self.assertEquals(res, self.robot.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
 
     def test_robot_move_to(self):
         self.robot.move_to((Deck(), (100, 0, 0)))

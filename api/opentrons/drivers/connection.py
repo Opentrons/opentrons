@@ -23,7 +23,7 @@ class Connection(object):
     def __init__(self, sp, port='', baudrate=115200, timeout=0.02):
         sp.port = port
         sp.baudrate = baudrate
-        sp.timeout = 0.02
+        sp.timeout = timeout
         self.serial_port = sp
 
     def device(self):

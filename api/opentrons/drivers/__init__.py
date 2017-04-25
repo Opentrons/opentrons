@@ -27,6 +27,7 @@ virtual_smoothies_by_version = {
     'edge-1c222d9NOMSD': VirtualSmoothie_2_0_0
 }
 
+
 VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
 
 SMOOTHIE_DEFAULTS_DIR = pkg_resources.resource_filename(
@@ -39,16 +40,16 @@ SMOOTHIE_DEFAULTS = configparser.ConfigParser()
 SMOOTHIE_DEFAULTS.read(SMOOTHIE_DEFAULTS_FILE)
 defaults = {
     'speeds': json.loads(
-        defaults_file['state'].get(
+        SMOOTHIE_DEFAULTS['state'].get(
             'speeds',
             '{"x": 3000, "y":3000, "z": 1600, "a": 300, "b": 300}'
         )
     ),
     'compatible_firmware': json.loads(
-        defaults_file['versions'].get('firmware', '[]')
+        SMOOTHIE_DEFAULTS['versions'].get('firmware', '[]')
     ),
     'ot_one_dimensions': json.loads(
-        defaults_file['versions'].get('config', '[]')
+        SMOOTHIE_DEFAULTS['versions'].get('config', '[]')
     )
 }
 
@@ -117,13 +118,20 @@ def get_virtual_driver(options):
 
     vs = vs_class(default_options)
     c = connection.Connection(vs, port=VIRTUAL_SMOOTHIE_PORT, timeout=0)
-    return _initialize_driver(c)
+    return initialize_driver(c)
 
 
 def get_serial_driver(port):
     s = serial.Serial()
     c = connection.Connection(s, port=port, baudrate=115200, timeout=0.01)
-    return _initialize_driver(c)
+    return initialize_driver(c)
+
+
+def initialize_driver(c):
+    driver_class = get_driver_from_version(c)
+    d = driver_class(SMOOTHIE_DEFAULTS)
+    d.connect(c)
+    return d
 
 
 def get_driver_from_version(c):
@@ -153,9 +161,3 @@ def get_driver_from_version(c):
 
     return driver_class
 
-
-def _initialize_driver(c):
-    driver_class = get_driver_from_version(c)
-    d = driver_class(SMOOTHIE_DEFAULTS)
-    d.connect(c)
-    return d

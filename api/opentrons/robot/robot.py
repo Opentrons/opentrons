@@ -353,7 +353,6 @@ class Robot(object, metaclass=Singleton):
             device = drivers.get_serial_driver(port)
 
         self._driver = device
-        del self.smoothie_drivers['live']
         self.smoothie_drivers['live'] = device
 
     def _update_axis_homed(self, *args):

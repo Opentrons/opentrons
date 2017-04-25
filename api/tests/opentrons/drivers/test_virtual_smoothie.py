@@ -6,7 +6,18 @@ from opentrons.drivers import virtual_smoothies_by_version
 class VirtualSmoothieTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.s = virtual_smoothies_by_version.get('edge-1c222d9NOMSD')
+        options = {
+            'limit_switches': True,
+            'firmware': 'edge-1c222d9NOMSD',
+            'config': {
+                'ot_version': 'one_pro_plus',
+                'version': 'v2.0.0',    # config version
+                'alpha_steps_per_mm': 80.0,
+                'beta_steps_per_mm': 80.0,
+                'gamma_steps_per_mm': 400
+            }
+        }
+        self.s = virtual_smoothies_by_version.get('edge-1c222d9NOMSD')(options)
         self.s.open()
 
     def test_version(self):
