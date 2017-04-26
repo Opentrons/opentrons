@@ -20,7 +20,8 @@ class RobotTest(unittest.TestCase):
         self.robot.home(enqueue=False)
 
     def test_firmware_verson(self):
-        self.assertEquals(self.smoothie_version, self.robot._driver.firmware_version)
+        self.assertEquals(
+            self.smoothie_version, self.robot._driver.firmware_version)
 
     def test_add_container(self):
         c1 = self.robot.add_container('96-flat', 'A1')

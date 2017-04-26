@@ -737,35 +737,43 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             'current_byte': None,
             'total_bytes': None
         }
-        if progress_a != 'Not currently playing' and progress_b != 'Not currently playing':
+        e = 'Not currently playing'
+        if progress_a != e and progress_b != e:
             try:
                 # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa
                 split_data = progress_a.split(',')
 
-                progress_info['file'] = split_data[0].strip().split(' ')[-1].split('/')[-1]
-                progress_info['percentage'] = float(split_data[1].split('%')[0].strip()) / 100.0
+                file = split_data[0].strip().split(' ')[-1]
+                progress_info['file'] = file.split('/')[-1]
+                perc = split_data[1].split('%')[0].strip()
+                progress_info['percentage'] = float(perc) / 100.0
 
                 elapsed_time = split_data[2].split(':')
-                progress_info['elapsed_time'] = int(elapsed_time[-1].strip())
-                progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
-                progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
+                t = int(elapsed_time[-1].strip())
+                t += (int(elapsed_time[-2].strip()) * 60)
+                t += (int(elapsed_time[-3].strip()) * 60 * 60)
+                progress_info['elapsed_time'] = t
 
                 # estimated time is not there in the beginning of a job
                 estimated_time = None
                 if len(split_data) > 3:
                     estimated_time = split_data[3].split(':')
-                    progress_info['elapsed_time'] = int(elapsed_time[-1].strip())
-                    progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
-                    progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
-            except:
-                raise RuntimeError('Error parsing progress: {}'.format(progress_a))
+                    est = int(estimated_time[-1].strip())
+                    est = int(estimated_time[-1].strip())
+                    est += (int(estimated_time[-2].strip()) * 60)
+                    est += (int(estimated_time[-3].strip()) * 60 * 60)
+                    progress_info['estimated_time'] = est
+            except Exception:
+                raise RuntimeError(
+                    'Error parsing progress: {}'.format(progress_a))
 
             try:
                 # SD printing byte 3980/53182
                 byte_data = progress_b.strip().split(' ')[-1].split('/')
                 progress_info['current_byte'] = int(byte_data[0])
                 progress_info['total_bytes'] = int(byte_data[1])
-            except:
-                raise RuntimeError('Error parsing progress: {}'.format(progress_b))
+            except Exception:
+                raise RuntimeError(
+                    'Error parsing progress: {}'.format(progress_b))
 
         return progress_info

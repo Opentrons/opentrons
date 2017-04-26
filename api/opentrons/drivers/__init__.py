@@ -1,6 +1,5 @@
 import configparser
 import glob
-import json
 import os
 import pkg_resources
 import sys
@@ -8,10 +7,15 @@ import sys
 import serial
 
 from opentrons.util.log import get_logger
-from opentrons.drivers.smoothie_drivers.v1_2_0.driver import SmoothieDriver_1_2_0
-from opentrons.drivers.smoothie_drivers.v2_0_0.driver import SmoothieDriver_2_0_0
-from opentrons.drivers.smoothie_drivers.v1_2_0.virtual_smoothie import VirtualSmoothie_1_2_0
-from opentrons.drivers.smoothie_drivers.v2_0_0.virtual_smoothie import VirtualSmoothie_2_0_0
+from opentrons.drivers import connection
+from opentrons.drivers.smoothie_drivers.v1_2_0.driver \
+    import SmoothieDriver_1_2_0
+from opentrons.drivers.smoothie_drivers.v2_0_0.driver \
+    import SmoothieDriver_2_0_0
+from opentrons.drivers.smoothie_drivers.v1_2_0.virtual_smoothie \
+    import VirtualSmoothie_1_2_0
+from opentrons.drivers.smoothie_drivers.v2_0_0.virtual_smoothie \
+    import VirtualSmoothie_2_0_0
 
 
 __all__ = [
@@ -68,7 +72,8 @@ def get_serial_ports_list():
         try:
             if any([f in port for f in port_filter]):
                 s = serial.Serial()
-                c = connection.Connection(s, port=port, baudrate=115200, timeout=0.01)
+                c = connection.Connection(
+                    s, port=port, baudrate=115200, timeout=0.01)
                 assert get_version(c) in drivers_by_version
                 result.append(port)
         except Exception as e:
@@ -101,7 +106,8 @@ def get_virtual_driver(options):
     version_name = default_options.get('firmware')
     vs_class = virtual_smoothies_by_version.get(version_name)
     if not vs_class:
-        raise RuntimeError('No virtual smoothie version {}'.format(version_name))
+        raise RuntimeError(
+            'No virtual smoothie version {}'.format(version_name))
 
     vs = vs_class(default_options)
     c = connection.Connection(vs, port=VIRTUAL_SMOOTHIE_PORT, timeout=0)
@@ -117,7 +123,8 @@ def get_serial_driver(port):
 def get_driver(c):
     driver_class = drivers_by_version.get(get_version(c))
     if not driver_class:
-        raise RuntimeError('Can not read version from port {}'.format(c.name()))
+        raise RuntimeError(
+            'Can not read version from port {}'.format(c.name()))
     d = driver_class(SMOOTHIE_DEFAULTS)
     d.connect(c)
     return d
@@ -130,7 +137,7 @@ def get_version(c):
     c.wait_for_data(timeout=3)
     response = c.readline_string()
     c.flush_input()
-    
+
     # {"version":v1.0.5}
     v = response.split(':')[-1][:-1]
     if v in drivers_by_version:
@@ -140,7 +147,6 @@ def get_version(c):
     #   CNC Build 6 axis
     #   6 axis
     # ok
-    v = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH portion of response
+    v = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH
     if v in drivers_by_version:
         return v
-

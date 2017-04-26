@@ -2,11 +2,8 @@ import json
 import math
 import os
 import pkg_resources
-import sys
 import time
 from threading import Event
-
-import serial
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
@@ -299,11 +296,6 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             log.debug('home switch hit')
             self.flush_port()
             self.calm_down()
-            msg = msg
-            axis = ''
-            for ax in 'xyzab':
-                if ('min_' + ax) in msg:
-                    axis = ax
             raise RuntimeWarning('Robot Error: limit switch hit')
 
     def set_coordinate_system(self, mode):
@@ -338,7 +330,6 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         args = {axis.upper(): kwargs.get(axis)
                 for axis in 'xyzab'
                 if axis in kwargs}
-
 
         this_head_speed = min([self.speeds[l] for l in axis_called])
         args.update({"F": this_head_speed})
@@ -391,7 +382,8 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             coords = self.get_position()
             diff = {}
             for axis in coords.get('target', {}):
-                diff[axis.lower()] = coords['current'][axis] - coords['target'][axis]
+                axis_diff = coords['current'][axis] - coords['target'][axis]
+                diff[axis.lower()] = axis_diff
 
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
             dist_head = math.sqrt(dist)

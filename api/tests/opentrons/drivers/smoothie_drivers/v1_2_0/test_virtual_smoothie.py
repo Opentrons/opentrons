@@ -142,8 +142,6 @@ class VirtualSmoothieTestCase(unittest.TestCase):
         response = self.s.readline().decode()
         self.assertEqual(response, 'ok')
 
-        expected_result = 'ok MCS: X:3.0 Y:3.0 Z:3.0 A:3.0 B:3.0'
-
         self.s.reset_input_buffer()
         self.s.write('M114.2')
         response = self.s.readline().decode()

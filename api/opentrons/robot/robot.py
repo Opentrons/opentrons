@@ -4,10 +4,8 @@ from threading import Event
 
 import dill
 import requests
-import serial
 
 from opentrons import containers, drivers
-from opentrons.drivers import connection
 from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.vector import Vector

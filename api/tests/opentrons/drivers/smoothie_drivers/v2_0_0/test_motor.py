@@ -6,16 +6,10 @@ from opentrons import Robot, drivers
 from opentrons.util.vector import Vector
 
 
-reset_time = time.time()
-
-
 class OpenTronsTest(unittest.TestCase):
 
     def setUp(self):
-        global reset_time
-        setup_time = time.time()
         self.robot = Robot.get_instance()
-        init_time = time.time()
 
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
@@ -33,15 +27,11 @@ class OpenTronsTest(unittest.TestCase):
         self.robot.disconnect()
         self.robot.connect(options=options)
 
-        connect_time = time.time()
-
         self.motor = self.robot._driver
 
     def test_reset(self):
-        global reset_time
         self.motor.reset()
         self.assertEquals(self.motor.connection, None)
-        reset_time = time.time()
 
     def test_write_with_lost_connection(self):
         self.motor.connection.serial_port.is_open = False
