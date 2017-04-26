@@ -132,9 +132,8 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         return self.ot_one_dimensions[self.ot_version]
 
     def disconnect(self):
-        if self.is_connected() and self.connection:
+        if self.is_connected():
             self.connection.close()
-        self.connection = None
 
     def connect(self, device):
         self.connection = device

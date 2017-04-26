@@ -32,24 +32,21 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_reset(self):
         self.motor.reset()
-        self.assertEquals(self.motor.connection, None)
+        self.assertFalse(self.motor.is_connected())
 
     def test_write_with_lost_connection(self):
-        self.motor.connection.serial_port.is_open = False
-        old_method = getattr(self.motor, 'is_connected')
+        self.motor.connection.serial_port.close()
 
         def _temp():
             return True
 
+        old_method = getattr(self.motor, 'is_connected')
         setattr(self.motor, 'is_connected', _temp)
 
         self.assertTrue(self.motor.is_connected())
         self.assertRaises(RuntimeError, self.motor.calm_down)
-        setattr(self.motor, 'is_connected', old_method)
 
-    def test_write_after_disconnect(self):
-        self.motor.disconnect()
-        self.assertRaises(RuntimeError, self.motor.calm_down)
+        setattr(self.motor, 'is_connected', old_method)
 
     def test_version_compatible(self):
         self.motor.versions_compatible()
@@ -93,7 +90,8 @@ class OpenTronsTest(unittest.TestCase):
         self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
         self.motor.disconnect()
         res = self.motor.get_connected_port()
-        self.assertEquals(res, None)
+        self.assertEquals(res, 'Virtual Smoothie')
+        self.assertFalse(self.motor.is_connected())
 
     def test_get_dimensions(self):
         self.motor.ot_version = None
