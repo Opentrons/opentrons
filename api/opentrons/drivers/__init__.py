@@ -8,10 +8,10 @@ import sys
 import serial
 
 from opentrons.util.log import get_logger
-from opentrons.drivers.smoothie_driver_1_2_0 import SmoothieDriver_1_2_0
-from opentrons.drivers.smoothie_driver_2_0_0 import SmoothieDriver_2_0_0
-from opentrons.drivers.virtual_smoothie_1_2_0 import VirtualSmoothie_1_2_0
-from opentrons.drivers.virtual_smoothie_2_0_0 import VirtualSmoothie_2_0_0
+from opentrons.drivers.smoothie_drivers.v1_2_0.driver import SmoothieDriver_1_2_0
+from opentrons.drivers.smoothie_drivers.v2_0_0.driver import SmoothieDriver_2_0_0
+from opentrons.drivers.smoothie_drivers.v1_2_0.virtual_smoothie import VirtualSmoothie_1_2_0
+from opentrons.drivers.smoothie_drivers.v2_0_0.virtual_smoothie import VirtualSmoothie_2_0_0
 
 
 __all__ = [
@@ -38,20 +38,6 @@ SMOOTHIE_VIRTUAL_CONFIG_FILE = os.path.join(
     SMOOTHIE_DEFAULTS_DIR, 'config_one_pro_plus')
 SMOOTHIE_DEFAULTS = configparser.ConfigParser()
 SMOOTHIE_DEFAULTS.read(SMOOTHIE_DEFAULTS_FILE)
-defaults = {
-    'speeds': json.loads(
-        SMOOTHIE_DEFAULTS['state'].get(
-            'speeds',
-            '{"x": 3000, "y":3000, "z": 1600, "a": 300, "b": 300}'
-        )
-    ),
-    'compatible_firmware': json.loads(
-        SMOOTHIE_DEFAULTS['versions'].get('firmware', '[]')
-    ),
-    'ot_one_dimensions': json.loads(
-        SMOOTHIE_DEFAULTS['versions'].get('config', '[]')
-    )
-}
 
 
 log = get_logger(__name__)
@@ -81,8 +67,9 @@ def get_serial_ports_list():
     for port in ports:
         try:
             if any([f in port for f in port_filter]):
-                s = serial.Serial(port)
-                s.close()
+                s = serial.Serial()
+                c = connection.Connection(s, port=port, baudrate=115200, timeout=0.01)
+                assert get_version(c) in drivers_by_version
                 result.append(port)
         except Exception as e:
             log.debug(
@@ -118,46 +105,42 @@ def get_virtual_driver(options):
 
     vs = vs_class(default_options)
     c = connection.Connection(vs, port=VIRTUAL_SMOOTHIE_PORT, timeout=0)
-    return initialize_driver(c)
+    return get_driver(c)
 
 
 def get_serial_driver(port):
     s = serial.Serial()
     c = connection.Connection(s, port=port, baudrate=115200, timeout=0.01)
-    return initialize_driver(c)
+    return get_driver(c)
 
 
-def initialize_driver(c):
-    driver_class = get_driver_from_version(c)
+def get_driver(c):
+    driver_class = drivers_by_version.get(get_version(c))
+    if not driver_class:
+        raise RuntimeError('Can not read version from port {}'.format(c.name()))
     d = driver_class(SMOOTHIE_DEFAULTS)
     d.connect(c)
     return d
 
 
-def get_driver_from_version(c):
+def get_version(c):
     c.open()
     c.flush_input()
     c.write_string('version \r\n')
-    c.wait_for_data(timeout=0.5)
+    c.wait_for_data(timeout=3)
     response = c.readline_string()
     c.flush_input()
     
     # {"version":v1.0.5}
-    version_1_2_0 = response.split(':')[-1][:-1]
+    v = response.split(':')[-1][:-1]
+    if v in drivers_by_version:
+        return v
 
     # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa
     #   CNC Build 6 axis
     #   6 axis
     # ok
-    version_2_0_0 = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH portion of response
-
-    driver_class = None
-    if version_1_2_0 in drivers_by_version:
-        driver_class = drivers_by_version[version_1_2_0]
-    elif version_2_0_0 in drivers_by_version:
-        driver_class = drivers_by_version[version_2_0_0]
-    if not driver_class:
-        raise RuntimeError('Unknown Smoothie version response: {}'.format(response))
-
-    return driver_class
+    v = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH portion of response
+    if v in drivers_by_version:
+        return v
 

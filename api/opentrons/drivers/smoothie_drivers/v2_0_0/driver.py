@@ -5,7 +5,7 @@ from threading import Event
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
-from opentrons.drivers.connection import VirtualSmoothie, SmoothieDriver
+from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 
 from opentrons.util import trace
 

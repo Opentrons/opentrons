@@ -6,18 +6,6 @@ from opentrons.util.log import get_logger
 log = get_logger(__name__)
 
 
-class SmoothieDriver(object):
-
-    def __init__(self):
-        pass
-
-
-class VirtualSmoothie(object):
-
-    def __init__(self):
-        pass
-
-
 class Connection(object):
 
     def __init__(self, sp, port='', baudrate=115200, timeout=0.02):

@@ -1,7 +1,7 @@
 import re
 import json
 
-from opentrons.drivers.connection import VirtualSmoothie
+from opentrons.drivers.smoothie_drivers import VirtualSmoothie
 from opentrons.util import log
 
 log = log.get_logger(__name__)
