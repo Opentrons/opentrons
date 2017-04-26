@@ -735,12 +735,7 @@ class Robot(object, metaclass=Singleton):
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
-        d = self.smoothie_drivers[mode]
-        if d:
-            self._driver = d
-            self._driver.toggle_port()
-        else:
-            self._driver.disconnect()
+        self._driver = self.smoothie_drivers[mode]
 
     def disconnect(self):
         """

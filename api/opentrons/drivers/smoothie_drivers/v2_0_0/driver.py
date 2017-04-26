@@ -120,7 +120,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def disconnect(self):
         if self.is_connected():
             self.connection.close()
-        self.connection = None
 
     def connect(self, smoothie_connection):
         self.connection = smoothie_connection
