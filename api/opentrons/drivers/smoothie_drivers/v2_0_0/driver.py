@@ -128,6 +128,11 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         self.versions_compatible()
 
+        self.prevent_squeal()
+
+        self.calm_down()
+
+    def prevent_squeal(self):
         # TODO: (andy) Smoothieware EDGE has this weird bug,
         # seems to require the following commands to run after Smoothieboard
         # boots, or else all motors freeze up and make high-pitch sounds.
@@ -135,7 +140,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.send_command('G91 G0 X0.001', read_after=False)
         self.wait_for_ok()
         self.send_halt_command()
-
         self.calm_down()
 
     def is_connected(self):
@@ -305,6 +309,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             raise RuntimeWarning(error_msg)
 
     def move(self, mode='absolute', **kwargs):
+        print(kwargs)
         self.set_coordinate_system(mode)
         self.set_speed()
 
@@ -328,6 +333,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         args.update({"F": max(list(self.speeds.values()))})
 
         self.check_paused_stopped()
+        print(args)
         self.send_command(self.MOVE, **args)
         self.wait_for_ok()
         self.wait_for_arrival()
@@ -397,6 +403,17 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
+
+        # TODO: (andy) Smoothieware EDGE has this weird bug,
+        # after homing an axis, trying to do an absolute (G90) move
+        # on that axis will create a high-pitched squeel. Then
+        # following command will work fine
+        # The below move commands are meant to force Smoothieware
+        # through this bug without affecting the robot's physical position
+        for ax in axis_to_home:
+            kwargs = {}
+            kwargs[ax.lower()] = 0.001
+            self.move(**kwargs)
 
         arguments = {
             'name': 'home',
