@@ -411,7 +411,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         for ax in axis_to_home:
             if ax in 'AB':
                 kwargs = {}
-                kwargs[ax.lower()] = 0.001
+                kwargs[ax.lower()] = 1 / 1600
+                self.move(**kwargs)
+                kwargs[ax.lower()] = 0.0
                 self.move(**kwargs)
 
         arguments = {
