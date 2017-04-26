@@ -1,3 +1,4 @@
+import io
 import re
 
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie
@@ -23,7 +24,7 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
         file_path = options.get('config_file_path')
         self.config_file_string = ''
         if file_path:
-            with open(file_path) as f:
+            with io.open(file_path, 'r', encoding='utf-8') as f:
                 self.config_file_string = str(f.read())
 
         self.speeds = {
