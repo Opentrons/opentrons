@@ -22,6 +22,7 @@ class OpenTronsTest(unittest.TestCase):
         # and serial handshakes to be tested
 
         options = {
+            'firmware': 'v1.0.5',
             'limit_switches': True,
             'config': {
                 'alpha_steps_per_mm': 80.0,
