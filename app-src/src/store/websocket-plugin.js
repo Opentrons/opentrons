@@ -14,7 +14,7 @@ function WebSocketPlugin (socket) {
   return store => {
     socket.on('event', data => {
       /*
-       * Send analytics event for messages that meet certain conditins.
+       * Send analytics event for messages that meet certain conditions.
        * This needs to be at this top level root because certain events
        * Are captured in the if statement for toast notification and run screen
        * TODO: Refactor websocket events so that they are not showing up as both
