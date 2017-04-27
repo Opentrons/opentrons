@@ -103,6 +103,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         self.config_dict = {}
 
+        self.default_speeds = {}
+        self.ot_one_dimensions = {}
+        self.speeds = {}
+
         self._apply_defaults(defaults)
 
         self.save_gcode_commands = False
@@ -649,9 +653,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             'config': True,
             'ot_version': True
         }
-        if self.firmware_version not in self.COMPATIBLE_FIRMARE:
+        if self.firmware_version not in self.compatible_firmware:
             res['firmware'] = False
-        if self.config_file_version not in self.COMPATIBLE_CONFIG:
+        if self.config_file_version not in self.compatible_config:
             res['config'] = False
         if self.ot_version not in self.ot_one_dimensions:
             res['ot_version'] = False
@@ -676,6 +680,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             log.debug('{} is not an ot_version'.format(res))
             return None
         self.ot_version = res
+        self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):
@@ -714,22 +719,16 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
     def _apply_defaults(self, defaults_file):
 
-        self.speeds = json.loads(
-            defaults_file['state'].get(
-                'speeds',
-                '{"x": 3000, "y":3000, "z": 1600, "a": 300, "b": 300}'
-            )
-        )
+        DEFAULT_VERSIONS = defaults_file['versions']
+        DEFAULT_MODELS = json.loads(defaults_file['models']['ot_versions'])
 
-        self.COMPATIBLE_FIRMARE = json.loads(
-            defaults_file['versions'].get('firmware', '[]'))
-        self.COMPATIBLE_CONFIG = json.loads(
-            defaults_file['versions'].get('config', '[]'))
-        self.ot_one_dimensions = json.loads(
-           defaults_file['versions'].get('ot_versions', '{}'))
-        for key in self.ot_one_dimensions.keys():
-            axis_size = Vector(self.ot_one_dimensions[key])
+        self.compatible_firmware = json.loads(DEFAULT_VERSIONS['firmware'])
+        self.compatible_config = json.loads(DEFAULT_VERSIONS['config'])
+
+        for key in DEFAULT_MODELS.keys():
+            axis_size = Vector(DEFAULT_MODELS[key]['dimensions'])
             self.ot_one_dimensions[key] = axis_size
+            self.default_speeds[key] = DEFAULT_MODELS[key]['speeds']
 
     def _parse_axis_values(self, string):
         try:
