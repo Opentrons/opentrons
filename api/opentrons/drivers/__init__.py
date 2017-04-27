@@ -74,7 +74,7 @@ def get_serial_ports_list():
                 s = serial.Serial()
                 c = connection.Connection(
                     s, port=port, baudrate=115200, timeout=0.01)
-                assert get_version(c) in drivers_by_version
+                # assert get_version(c) in drivers_by_version
                 result.append(port)
         except Exception as e:
             log.debug(
