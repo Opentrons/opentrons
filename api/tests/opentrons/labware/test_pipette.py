@@ -13,8 +13,7 @@ class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset_for_tests()
-        myport = self.robot.VIRTUAL_SMOOTHIE_PORT
-        self.robot.connect(port=myport)
+        self.robot.connect()
         self.robot.home()
 
         self.trash = containers.load('point', 'A1')
@@ -280,9 +279,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_non_empty_aspirate(self):
 
-        self.p200.aspirate(100)
-        self.p200.aspirate(20)
-        self.robot.run()
+        self.p200.aspirate(100, enqueue=False)
+        self.p200.aspirate(20, enqueue=False)
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
