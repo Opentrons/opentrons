@@ -82,9 +82,6 @@ sample_protocol.py
 
 # Local Calibration Data
 calibrations/
-smoothie/
-!app/smoothie
-!app/opentrons/config/smoothie
 */calibrations
 
 # SDK logs
@@ -98,3 +95,4 @@ app-src/test/coverage
 
 # app api assets
 api/opentrons/server/templates/
+*.pid
