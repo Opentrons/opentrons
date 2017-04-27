@@ -24,12 +24,13 @@ from opentrons.server.process_manager import run_once
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
-STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'static')
+STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
-            template_folder=TEMPLATES_FOLDER
+            template_folder=TEMPLATES_FOLDER,
+            static_url_path=''
             )
 
 
