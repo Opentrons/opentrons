@@ -11,6 +11,7 @@ describe('Login Routes', () => {
     loginUser({idToken: '123'}, userProfile)
     expect(window.localStorage.getItem('id_token')).to.equal('123')
     expect(window.localStorage.getItem('profile')).to.equal(JSON.stringify(userProfile))
+    console.log(window.ot_dataLayer)
     expect(window.ot_dataLayer.length).to.equal(1)
     delete window.ot_dataLayer
   })
@@ -22,6 +23,7 @@ describe('Login Routes', () => {
     logoutUser()
     expect(window.localStorage.getItem('id_token')).to.null
     expect(window.localStorage.getItem('profile')).to.null
+    console.log(window.ot_dataLayer)
     expect(window.ot_dataLayer.length).to.equal(2)
     delete window.ot_dataLayer
   })
