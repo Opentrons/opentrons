@@ -70,7 +70,7 @@ def get_serial_ports_list():
     port_filter = {'usbmodem', 'COM', 'ACM', 'USB'}
     for port in ports:
         try:
-            if any([f in port for f in port_filter]):
+            if any([f.lower() in port.lower() for f in port_filter]):
                 s = serial.Serial()
                 c = connection.Connection(
                     s, port=port, baudrate=115200, timeout=0.01)
