@@ -31,3 +31,6 @@ app-shell:
 		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
+
+app-dev:
+	./scripts/run-dev

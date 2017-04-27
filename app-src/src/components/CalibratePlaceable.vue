@@ -8,6 +8,8 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'CalibratePlaceable',
     props: ['instrument', 'placeable'],
@@ -17,6 +19,20 @@
         let label = this.placeable.label
         let axis = this.instrument.axis
         this.$store.dispatch('calibrate', {slot, label, axis})
+
+        function isCalibrated () {
+          // TODO: Add a condition in the state that tracks if deck is calibrated
+          if (!this.$store.state.tasks || this.$store.state.tasks.length === 0) return false
+          return this.$store.state.tasks.every((instrument) => {
+            let placeableCalibrated = instrument.placeables.every((placeable) => {
+              return placeable.calibrated
+            })
+            return instrument.calibrated && placeableCalibrated
+          })
+        }
+        if (isCalibrated.bind(this)()) {
+          trackEvent('DECK_CALIBRATED')
+        }
       },
       moveToPosition () {
         let slot = this.placeable.slot
