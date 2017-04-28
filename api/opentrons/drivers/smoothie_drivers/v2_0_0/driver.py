@@ -107,10 +107,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.ot_one_dimensions = {}
         self.speeds = {}
 
-        self._apply_defaults(defaults)
+        self.smoothie_player = SmoothiePlayer_2_0_0()
 
-        self.save_gcode_commands = False
-        self.gcode_commands_sent = []
+        self._apply_defaults(defaults)
 
     def get_connected_port(self):
         """
@@ -128,15 +127,13 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def connect(self, smoothie_connection):
         self.connection = smoothie_connection
         self.toggle_port()
-        log.debug("Connected to {}".format(smoothie_connection.name()))
-
+        self.set_smoothie_defaults()
         self.versions_compatible()
-
-        self.prevent_squeal()
-
+        self.prevent_squeal_on_boot()
         self.calm_down()
+        log.debug("Connected to {}".format(self.connection.name()))
 
-    def prevent_squeal(self):
+    def prevent_squeal_on_boot(self):
         # TODO: (andy) Smoothieware EDGE has this weird bug,
         # seems to require the following commands to run after Smoothieboard
         # boots, or else all motors freeze up and make high-pitch sounds.
@@ -145,6 +142,18 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.wait_for_ok()
         self.send_halt_command()
         self.calm_down()
+
+    def prevent_squeal_after_home(self, axis):
+        # TODO: (andy) Smoothieware EDGE has this weird bug,
+        # after homing an AB axis, trying to do an absolute (G90) move
+        # on that axis will create a high-pitched squeel. Then
+        # any following command will work fine.
+        # The below move commands are meant to force Smoothieware
+        # through this bug without affecting the robot's physical position
+        axis = [ax for ax in axis if ax.upper() in 'AB']
+        for ax in axis:
+            self.move(**{ax.lower(): 1 / 1600})
+            self.move(**{ax.lower(): 0.0})
 
     def is_connected(self):
         if self.connection:
@@ -214,64 +223,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.connection.device(), VirtualSmoothie))
 
     def is_recording(self):
-        return bool(self.save_gcode_commands)
-
-    def get_recorded_commands(self):
-        return list(self.gcode_commands_sent)
-
-    def record_erase(self):
-        self.gcode_commands_sent = []
-
-    def record_start(self):
-        self.record_erase()
-        self.save_gcode_commands = True
-
-    def record_stop(self):
-        self.save_gcode_commands = False
-
-    def record_command(self, command, data):
-        if self.is_simulating() and self.is_recording():
-            for c in self.COMMANDS_TO_RECORD:
-                if c in command:
-                    self.gcode_commands_sent.append(data)
-
-    def player_play(self):
-        self.player_pause()
-        self.player_resume()
-        self.player_stop()
-        self.send_command('upload /sd/protocol.gcode')
-        for line in self.get_recorded_commands():
-            self.connection.write_string(line)
-        self.send_command('\x04')
-        self.send_command('play /sd/protocol.gcode')
-        self.ignore_next_line()
-        self.wait_for_ok()
-
-    def player_progress(self):
-        self.connection.flush_input()
-        progress_data = self.send_command('progress', timeout=30)
-        self.connection.wait_for_data(timeout=30)
-        self.connection.flush_input()
-        progress_bytes = self.send_command('M27', timeout=30)
-        self.connection.wait_for_data(timeout=30)
-        self.connection.flush_input()
-        return self._parse_progress_data(progress_data, progress_bytes)
-
-    def player_pause(self):
-        res = self.send_command('suspend', timeout=30)
-        if 'waiting for queue to empty...' in res:
-            self.ignore_next_line()
-            self.ignore_next_line()
-            self.readline_from_serial(timeout=60)
-        self.connection.flush_input()
-
-    def player_resume(self):
-        self.send_command('resume', timeout=30)
-        self.connection.flush_input()
-
-    def player_stop(self):
-        self.send_command('abort', timeout=30)
-        self.connection.flush_input()
+        return self.smoothie_player.is_recording()
 
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, timeout=3, **kwargs):
@@ -293,7 +245,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.connection.flush_input()
             self.connection.write_string(gcode_line)
 
-            self.record_command(command, gcode_line)
+            self.smoothie_player.record_command(command, gcode_line)
 
             if read_after:
                 return self.readline_from_serial(timeout=timeout)
@@ -406,19 +358,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
 
-        # TODO: (andy) Smoothieware EDGE has this weird bug,
-        # after homing an AB axis, trying to do an absolute (G90) move
-        # on that axis will create a high-pitched squeel. Then
-        # any following command will work fine.
-        # The below move commands are meant to force Smoothieware
-        # through this bug without affecting the robot's physical position
-        for ax in axis_to_home:
-            if ax in 'AB':
-                kwargs = {}
-                kwargs[ax.lower()] = 1 / 1600
-                self.move(**kwargs)
-                kwargs[ax.lower()] = 0.0
-                self.move(**kwargs)
+        self.prevent_squeal_after_home(axis_to_home)
 
         arguments = {
             'name': 'home',
@@ -743,53 +683,3 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             log.critical("Error parsing position string from smoothie board:")
             log.critical(string)
             raise ValueError(e) from e
-
-    def _parse_progress_data(self, progress_a, progress_b):
-        progress_info = {
-            'file': None,
-            'percentage': None,
-            'elapsed_time': None,
-            'estimated_time': None,
-            'current_byte': None,
-            'total_bytes': None
-        }
-        e = 'Not currently playing'
-        if progress_a != e and progress_b != e:
-            try:
-                # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa
-                split_data = progress_a.split(',')
-
-                file = split_data[0].strip().split(' ')[-1]
-                progress_info['file'] = file.split('/')[-1]
-                perc = split_data[1].split('%')[0].strip()
-                progress_info['percentage'] = float(perc) / 100.0
-
-                elapsed_time = split_data[2].split(':')
-                t = int(elapsed_time[-1].strip())
-                t += (int(elapsed_time[-2].strip()) * 60)
-                t += (int(elapsed_time[-3].strip()) * 60 * 60)
-                progress_info['elapsed_time'] = t
-
-                # estimated time is not there in the beginning of a job
-                estimated_time = None
-                if len(split_data) > 3:
-                    estimated_time = split_data[3].split(':')
-                    est = int(estimated_time[-1].strip())
-                    est = int(estimated_time[-1].strip())
-                    est += (int(estimated_time[-2].strip()) * 60)
-                    est += (int(estimated_time[-3].strip()) * 60 * 60)
-                    progress_info['estimated_time'] = est
-            except Exception:
-                raise RuntimeError(
-                    'Error parsing progress: {}'.format(progress_a))
-
-            try:
-                # SD printing byte 3980/53182
-                byte_data = progress_b.strip().split(' ')[-1].split('/')
-                progress_info['current_byte'] = int(byte_data[0])
-                progress_info['total_bytes'] = int(byte_data[1])
-            except Exception:
-                raise RuntimeError(
-                    'Error parsing progress: {}'.format(progress_b))
-
-        return progress_info

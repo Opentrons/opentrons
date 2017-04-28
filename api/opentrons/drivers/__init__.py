@@ -12,6 +12,8 @@ from opentrons.drivers.smoothie_drivers.v1_2_0.driver \
     import SmoothieDriver_1_2_0
 from opentrons.drivers.smoothie_drivers.v2_0_0.driver \
     import SmoothieDriver_2_0_0
+from opentrons.drivers.smoothie_drivers.v2_0_0.player \
+    import SmoothiePlayer_2_0_0
 from opentrons.drivers.smoothie_drivers.v1_2_0.virtual_smoothie \
     import VirtualSmoothie_1_2_0
 from opentrons.drivers.smoothie_drivers.v2_0_0.virtual_smoothie \
@@ -24,7 +26,8 @@ __all__ = [
 
 drivers_by_version = {
     'v1.0.5': SmoothieDriver_1_2_0,
-    'edge-1c222d9NOMSD': SmoothieDriver_2_0_0
+    'edge-1c222d9NOMSD': SmoothieDriver_2_0_0,
+    'player': SmoothiePlayer
 }
 virtual_smoothies_by_version = {
     'v1.0.5': VirtualSmoothie_1_2_0,
@@ -123,8 +126,11 @@ def get_serial_driver(port):
 def get_driver(c):
     driver_class = drivers_by_version.get(get_version(c))
     if not driver_class:
-        raise RuntimeError(
-            'Can not read version from port {}'.format(c.name()))
+        if is_playing(c):
+            driver_class = 'player'
+        else:
+            raise RuntimeError(
+                'Can not read version from port {}'.format(c.name()))
     d = driver_class(SMOOTHIE_DEFAULTS)
     d.connect(c)
     return d
@@ -150,3 +156,19 @@ def get_version(c):
     v = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH
     if v in drivers_by_version:
         return v
+
+
+def is_playing(c, timeout=5):
+    c.flush_input()
+    c.write_string('progress\r\n')
+    p_data = ''
+    while 'play' not in p_data.lower() and 'file' not in p_data.lower():
+        print('Unexpected response:', p_data)
+        c.wait_for_data(timeout=timeout)
+        p_data = c.readline_string()
+    c.wait_for_data(timeout=timeout)
+    c.readline_string()
+    c.flush_input()
+    if not p_data or p_data == 'Not currently playing':
+        return False
+    return True
