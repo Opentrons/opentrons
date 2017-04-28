@@ -983,7 +983,7 @@ class Pipette(Instrument):
 
             self.current_volume = 0
 
-            if not presses or not isinstance(presses, (int, float, complex)) or presses < 1:
+            if not isinstance(presses, (int, float, complex)) or presses < 1:
                 presses = 1
 
         def _do():
