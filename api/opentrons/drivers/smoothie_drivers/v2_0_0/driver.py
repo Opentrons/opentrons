@@ -307,7 +307,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         """
         if 'reset or M999' in msg or 'error:' in msg:
             self.calm_down()
-            time.sleep(0.2)  # necessary pause for Smoothie's internal state change
+            time.sleep(0.2)  # pause for Smoothie's internal state change
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -477,7 +477,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
     def calm_down(self):
         self.connection.serial_pause()
-        res = self.send_command(self.CALM_DOWN, read_after=False)
+        self.send_command(self.CALM_DOWN, read_after=False)
         self.ignore_next_line()
         self.ignore_next_line()
         self.connection.serial_pause()
