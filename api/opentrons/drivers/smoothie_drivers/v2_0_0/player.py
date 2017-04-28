@@ -6,6 +6,8 @@ class SmoothiePlayer_2_0_0(SmoothieDriver):
 
     def connect(self, c):
     	self.connection = c
+        self.connection.open()
+        self.connection.flush_input()
 
 	def get_recorded_commands(self):
         return list(self.gcode_commands_sent)
@@ -64,31 +66,29 @@ class SmoothiePlayer_2_0_0(SmoothieDriver):
 	def player_progress(self):
         self.connection.flush_input()
         s_t = time.time()
-        self.connection.write_string('progress\r\n')
-        self.connection.wait_for_data()
-        print('\t1/5', time.time() - s_t)
-        p_data = self.connection.readline_string()
+        p_data = self.send_command('progress')
         while 'play' not in p_data.lower() and 'file' not in p_data.lower():
-            print('Unexpected response:', p_data)
-            self.connection.wait_for_data()
-            p_data = self.connection.readline_string()
-        self.connection.wait_for_data()
-        print('\t2/5')
-        self.connection.readline_string()
-        self.connection.flush_input()
+            p_data = self.read_next_line()
+        self.ignore_next_line(lines=1)
 
-        self.connection.write_string('M27\r\n')
-        self.connection.wait_for_data()
-        print('\t3/5')
-        p_bytes = self.connection.readline_string()
-        self.connection.wait_for_data()
-        print('\t4/5')
-        self.connection.readline_string()
-        self.connection.wait_for_data()
-        print('\t5/5')
-        self.connection.readline_string()
-        self.connection.flush_input()
+        p_bytes = self.send_command('M27')
+        self.ignore_next_line(lines=2)
         return self._parse_progress_data(p_data, p_bytes)
+
+    def send_command(self, data, read_after=True):
+        data += '\r\n'
+        self.connection.write_string(data)
+        if read_after:
+            return self.read_next_line()
+
+    def read_next_line(self):
+        self.connection.wait_for_data()
+        return self.connection.readline_string()
+
+    def ignore_next_line(self, lines=1):
+        for i in range(lines):
+            self.read_next_line()
+        self.connection.flush_input()
 
 	def _parse_progress_data(self, progress_a, progress_b):
         progress_info = {
