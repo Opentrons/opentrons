@@ -92,7 +92,7 @@ class OpenTronsTest(unittest.TestCase):
         self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
         self.motor.disconnect()
         res = self.motor.get_connected_port()
-        self.assertEquals(res, 'Virtual Smoothie')
+        self.assertEquals(res, None)
         self.assertFalse(self.motor.is_connected())
 
     def test_get_dimensions(self):

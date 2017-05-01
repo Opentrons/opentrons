@@ -922,7 +922,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def pick_up_tip(self, location=None, enqueue=True):
+    def pick_up_tip(self, location=None, presses=3, enqueue=True):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -968,7 +968,7 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         def _setup():
-            nonlocal location
+            nonlocal location, presses
             if not location:
                 location = self.get_next_tip()
             self.current_tip(None)
@@ -983,18 +983,22 @@ class Pipette(Instrument):
 
             self.current_volume = 0
 
+            if not isinstance(presses, (int, float, complex)) or presses < 1:
+                presses = 1
+
         def _do():
-            nonlocal location
+            nonlocal location, presses
 
             if location:
                 self.move_to(location, strategy='arc', enqueue=False)
 
             tip_plunge = 6
 
-            self.robot.move_head(z=tip_plunge, mode='relative')
-            self.robot.move_head(z=-tip_plunge - 1, mode='relative')
-            self.robot.move_head(z=tip_plunge + 1, mode='relative')
-            self.robot.move_head(z=-tip_plunge, mode='relative')
+            for i in range(int(presses) - 1):
+                self.robot.move_head(z=tip_plunge, mode='relative')
+                self.robot.move_head(z=-tip_plunge - 1, mode='relative')
+                self.robot.move_head(z=tip_plunge + 1, mode='relative')
+                self.robot.move_head(z=-tip_plunge, mode='relative')
 
         _description = "Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')

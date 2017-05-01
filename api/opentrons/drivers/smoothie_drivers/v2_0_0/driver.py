@@ -63,22 +63,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         {True: 'M51', False: 'M50'}
     ]
 
-    COMMANDS_TO_RECORD = [
-        MOVE,
-        DWELL,
-        HOME,
-        SET_ZERO,
-        SET_SPEED,
-        SET_ACCELERATION,
-        MOTORS_ON,
-        MOTORS_OFF,
-        AXIS_AMPERAGE,
-        PUSH_SPEED,
-        POP_SPEED,
-        ABSOLUTE_POSITIONING,
-        RELATIVE_POSITIONING
-    ]
-
     """
     Serial port connection to talk to the device.
     """
@@ -122,8 +106,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return self.connection.name()
 
     def disconnect(self):
-        if self.is_connected():
+        if self.connection:
             self.connection.close()
+        self.connection = None
 
     def connect(self, smoothie_connection):
         self.connection = smoothie_connection
@@ -132,9 +117,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         self.versions_compatible()
 
-        self.prevent_squeal()
-
         self.calm_down()
+        self.prevent_squeal()
 
     def prevent_squeal(self):
         # TODO: (andy) Smoothieware EDGE has this weird bug,
@@ -152,6 +136,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return False
 
     def toggle_port(self):
+        if not self.connection:
+            raise RuntimeError('Not connected to robot')
         self.connection.close()
         self.connection.open()
         self.connection.serial_pause()
@@ -213,66 +199,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return bool(isinstance(
             self.connection.device(), VirtualSmoothie))
 
-    def is_recording(self):
-        return bool(self.save_gcode_commands)
-
-    def get_recorded_commands(self):
-        return list(self.gcode_commands_sent)
-
-    def record_erase(self):
-        self.gcode_commands_sent = []
-
-    def record_start(self):
-        self.record_erase()
-        self.save_gcode_commands = True
-
-    def record_stop(self):
-        self.save_gcode_commands = False
-
-    def record_command(self, command, data):
-        if self.is_simulating() and self.is_recording():
-            for c in self.COMMANDS_TO_RECORD:
-                if c in command:
-                    self.gcode_commands_sent.append(data)
-
-    def player_play(self):
-        self.player_pause()
-        self.player_resume()
-        self.player_stop()
-        self.send_command('upload /sd/protocol.gcode')
-        for line in self.get_recorded_commands():
-            self.connection.write_string(line)
-        self.send_command('\x04')
-        self.send_command('play /sd/protocol.gcode')
-        self.ignore_next_line()
-        self.wait_for_ok()
-
-    def player_progress(self):
-        self.connection.flush_input()
-        progress_data = self.send_command('progress', timeout=30)
-        self.connection.wait_for_data(timeout=30)
-        self.connection.flush_input()
-        progress_bytes = self.send_command('M27', timeout=30)
-        self.connection.wait_for_data(timeout=30)
-        self.connection.flush_input()
-        return self._parse_progress_data(progress_data, progress_bytes)
-
-    def player_pause(self):
-        res = self.send_command('suspend', timeout=30)
-        if 'waiting for queue to empty...' in res:
-            self.ignore_next_line()
-            self.ignore_next_line()
-            self.readline_from_serial(timeout=60)
-        self.connection.flush_input()
-
-    def player_resume(self):
-        self.send_command('resume', timeout=30)
-        self.connection.flush_input()
-
-    def player_stop(self):
-        self.send_command('abort', timeout=30)
-        self.connection.flush_input()
-
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, timeout=3, **kwargs):
         """
@@ -286,19 +212,18 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         G0 X100 Y100
         """
 
+        if not self.is_connected():
+            self.toggle_port()
+
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
         gcode_line = '{} {}\r\n'.format(command, args)
-        if self.is_connected():
-            log.debug("Write: {}".format(gcode_line))
-            self.connection.flush_input()
-            self.connection.write_string(gcode_line)
+        log.debug("Write: {}".format(gcode_line))
 
-            self.record_command(command, gcode_line)
+        self.connection.flush_input()
+        self.connection.write_string(gcode_line)
 
-            if read_after:
-                return self.readline_from_serial(timeout=timeout)
-        else:
-            raise RuntimeError('Not connected to robot')
+        if read_after:
+            return self.readline_from_serial(timeout=timeout)
 
     def detect_smoothie_error(self, msg):
         """
@@ -307,6 +232,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
         if 'reset or M999' in msg or 'error:' in msg:
+            self.calm_down()
+            time.sleep(0.2)  # pause for Smoothie's internal state change
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -475,10 +402,11 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         })
 
     def calm_down(self):
-        res = self.send_command(self.CALM_DOWN)
-        if res != 'ok':
-            self.wait_for_ok()
-        self.wait_for_ok()
+        self.send_command(self.CALM_DOWN, read_after=False)
+        self.ignore_next_line()
+        self.ignore_next_line()
+        self.connection.serial_pause()
+        self.connection.flush_input()
 
     def send_halt_command(self):
         self.send_command(self.HALT, read_after=False)
@@ -538,7 +466,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
     def set_speed(self, *args, **kwargs):
         if len(args) > 0:
-            kwargs.update({'x': args[0], 'y': args[0]})
+            self.speeds.update({'x': args[0], 'y': args[0]})
         self.speeds.update({l: kwargs[l] for l in 'xyzab' if l in kwargs})
         if self.is_connected():
             kwargs = {
@@ -743,53 +671,3 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             log.critical("Error parsing position string from smoothie board:")
             log.critical(string)
             raise ValueError(e) from e
-
-    def _parse_progress_data(self, progress_a, progress_b):
-        progress_info = {
-            'file': None,
-            'percentage': None,
-            'elapsed_time': None,
-            'estimated_time': None,
-            'current_byte': None,
-            'total_bytes': None
-        }
-        e = 'Not currently playing'
-        if progress_a != e and progress_b != e:
-            try:
-                # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa
-                split_data = progress_a.split(',')
-
-                file = split_data[0].strip().split(' ')[-1]
-                progress_info['file'] = file.split('/')[-1]
-                perc = split_data[1].split('%')[0].strip()
-                progress_info['percentage'] = float(perc) / 100.0
-
-                elapsed_time = split_data[2].split(':')
-                t = int(elapsed_time[-1].strip())
-                t += (int(elapsed_time[-2].strip()) * 60)
-                t += (int(elapsed_time[-3].strip()) * 60 * 60)
-                progress_info['elapsed_time'] = t
-
-                # estimated time is not there in the beginning of a job
-                estimated_time = None
-                if len(split_data) > 3:
-                    estimated_time = split_data[3].split(':')
-                    est = int(estimated_time[-1].strip())
-                    est = int(estimated_time[-1].strip())
-                    est += (int(estimated_time[-2].strip()) * 60)
-                    est += (int(estimated_time[-3].strip()) * 60 * 60)
-                    progress_info['estimated_time'] = est
-            except Exception:
-                raise RuntimeError(
-                    'Error parsing progress: {}'.format(progress_a))
-
-            try:
-                # SD printing byte 3980/53182
-                byte_data = progress_b.strip().split(' ')[-1].split('/')
-                progress_info['current_byte'] = int(byte_data[0])
-                progress_info['total_bytes'] = int(byte_data[1])
-            except Exception:
-                raise RuntimeError(
-                    'Error parsing progress: {}'.format(progress_b))
-
-        return progress_info
