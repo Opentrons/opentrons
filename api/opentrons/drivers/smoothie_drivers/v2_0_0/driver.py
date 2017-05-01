@@ -44,6 +44,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
+    COMMANDS_TO_RECORD = [
+        ABSOLUTE_POSITIONING, RELATIVE_POSITIONING, MOVE, DWELL, HOME,
+        SET_ZERO, SET_SPEED, SET_ACCELERATION, PUSH_SPEED, POP_SPEED,
+        MOTORS_ON, MOTORS_OFF, AXIS_AMPERAGE
+    ]
+
     CONFIG_GET = 'config-get sd'
     CONFIG_SET = 'config-set sd'
     OT_VERSION = 'ot_version'
@@ -62,22 +68,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         {True: 'M47', False: 'M46'},
         {True: 'M49', False: 'M48'},
         {True: 'M51', False: 'M50'}
-    ]
-
-    COMMANDS_TO_RECORD = [
-        MOVE,
-        DWELL,
-        HOME,
-        SET_ZERO,
-        SET_SPEED,
-        SET_ACCELERATION,
-        MOTORS_ON,
-        MOTORS_OFF,
-        AXIS_AMPERAGE,
-        PUSH_SPEED,
-        POP_SPEED,
-        ABSOLUTE_POSITIONING,
-        RELATIVE_POSITIONING
     ]
 
     """
@@ -122,8 +112,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return self.connection.name()
 
     def disconnect(self):
-        if self.is_connected():
+        if self.connection:
             self.connection.close()
+        self.connection = None
 
     def connect(self, smoothie_connection):
         self.connection = smoothie_connection
@@ -161,6 +152,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return False
 
     def toggle_port(self):
+        if not self.connection:
+            raise RuntimeError('Not connected to robot')
         self.connection.close()
         self.connection.open()
         self.connection.serial_pause()
@@ -255,19 +248,20 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         G0 X100 Y100
         """
 
+        if not self.is_connected():
+            self.toggle_port()
+
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
         gcode_line = '{} {}\r\n'.format(command, args)
-        if self.is_connected():
-            log.debug("Write: {}".format(gcode_line))
-            self.connection.flush_input()
-            self.connection.write_string(gcode_line)
+        log.debug("Write: {}".format(gcode_line))
 
-            self.record(command, gcode_line)
+        self.connection.flush_input()
+        self.connection.write_string(gcode_line)
 
-            if read_after:
-                return self.readline_from_serial(timeout=timeout)
-        else:
-            raise RuntimeError('Not connected to robot')
+        self.record(command, gcode_line)
+
+        if read_after:
+            return self.readline_from_serial(timeout=timeout)
 
     def detect_smoothie_error(self, msg):
         """
@@ -276,6 +270,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
         if 'reset or M999' in msg or 'error:' in msg:
+            self.calm_down()
+            time.sleep(0.2)  # pause for Smoothie's internal state change
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -432,10 +428,11 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         })
 
     def calm_down(self):
-        res = self.send_command(self.CALM_DOWN)
-        if res != 'ok':
-            self.wait_for_ok()
-        self.wait_for_ok()
+        self.send_command(self.CALM_DOWN, read_after=False)
+        self.ignore_next_line()
+        self.ignore_next_line()
+        self.connection.serial_pause()
+        self.connection.flush_input()
 
     def send_halt_command(self):
         self.send_command(self.HALT, read_after=False)
@@ -495,7 +492,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
     def set_speed(self, *args, **kwargs):
         if len(args) > 0:
-            kwargs.update({'x': args[0], 'y': args[0]})
+            self.speeds.update({'x': args[0], 'y': args[0]})
         self.speeds.update({l: kwargs[l] for l in 'xyzab' if l in kwargs})
         if self.is_connected():
             kwargs = {
