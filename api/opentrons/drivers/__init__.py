@@ -27,7 +27,7 @@ __all__ = [
 drivers_by_version = {
     'v1.0.5': SmoothieDriver_1_2_0,
     'edge-1c222d9NOMSD': SmoothieDriver_2_0_0,
-    'player': SmoothiePlayer
+    'player': SmoothiePlayer_2_0_0
 }
 virtual_smoothies_by_version = {
     'v1.0.5': VirtualSmoothie_1_2_0,
@@ -86,7 +86,7 @@ def get_serial_ports_list():
     return result
 
 
-def get_virtual_driver(options):
+def get_virtual_driver(options={}):
 
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,

@@ -6,6 +6,7 @@ from threading import Event
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
+from opentrons.drivers.smoothie_drivers.v2_0_0.player import SmoothiePlayer_2_0_0
 
 from opentrons.util import trace
 
@@ -107,7 +108,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.ot_one_dimensions = {}
         self.speeds = {}
 
-        self.smoothie_player = SmoothiePlayer_2_0_0()
+        self.smoothie_player = None
 
         self._apply_defaults(defaults)
 
@@ -127,7 +128,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def connect(self, smoothie_connection):
         self.connection = smoothie_connection
         self.toggle_port()
-        self.set_smoothie_defaults()
         self.versions_compatible()
         self.prevent_squeal_on_boot()
         self.calm_down()
@@ -223,7 +223,24 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.connection.device(), VirtualSmoothie))
 
     def is_recording(self):
-        return self.smoothie_player.is_recording()
+        if not self.smoothie_player:
+            return False
+        return bool(self.smoothie_player.is_recording)
+
+    def record_start(self, player):
+        self.smoothie_player = player
+        self.smoothie_player.record_start(self.COMMANDS_TO_RECORD)
+
+    def record_stop(self):
+        self.smoothie_player.record_stop()
+
+    def record(self, command, data):
+        if self.is_simulating() and self.is_recording():
+            self.smoothie_player.record(command, data)
+
+    def play(self, player):
+        self.smoothie_player = player
+        self.smoothie_player.play(self.connection)
 
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, timeout=3, **kwargs):
@@ -245,7 +262,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.connection.flush_input()
             self.connection.write_string(gcode_line)
 
-            self.smoothie_player.record_command(command, gcode_line)
+            self.record(command, gcode_line)
 
             if read_after:
                 return self.readline_from_serial(timeout=timeout)
@@ -629,8 +646,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         #   6 axis
         # ok
         line_1 = self.send_command(self.GET_FIRMWARE_VERSION)
-        self.ignore_next_line()
-        self.ignore_next_line()
+        self.connection.readline_string()
+        self.connection.readline_string()
         self.wait_for_ok()
 
         # uses the "branch-hash" portion as the version response

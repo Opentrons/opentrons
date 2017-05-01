@@ -1,96 +1,107 @@
-class SmoothiePlayer_2_0_0(SmoothieDriver):
+class SmoothiePlayer_2_0_0(object):
 
-	def __init__(self, *args, **kwargs):
-		self.save_gcode_commands = False
-        self.gcode_commands_sent = []
+    def __init__(self, *args, **kwargs):
+        self.is_recording = False
+        self.recorded_commands = []
+        self.connection = None
+        self.whitelist = []
+
+    def get_connected_port(self):
+        """
+        Returns the port the driver is currently connected to
+        :return:
+        """
+        if not self.connection:
+            return
+        return self.connection.name()
 
     def connect(self, c):
-    	self.connection = c
+        self.connection = c
+        self.connection.close()
         self.connection.open()
+        self.connection.serial_pause()
         self.connection.flush_input()
 
-	def get_recorded_commands(self):
-        return list(self.gcode_commands_sent)
+    def disconnect(self):
+        if self.is_connected():
+            self.connection.close()
+
+    def is_connected(self):
+        if self.connection:
+            return self.connection.isOpen()
+        return False
+
+    def is_simulating(self):
+        return bool(isinstance(
+            self.connection.device(), VirtualSmoothie))
+
+    def get_recorded_commands(self):
+        return list(self.recorded_commands)
 
     def record_erase(self):
-        self.gcode_commands_sent = []
+        self.recorded_commands = []
 
-    def record_start(self):
+    def record_start(self, whitelist):
+        self.whitelist = whitelist
         self.record_erase()
-        self.save_gcode_commands = True
+        self.is_recording = True
 
     def record_stop(self):
-        self.save_gcode_commands = False
+        self.is_recording = False
 
-    def record_command(self, command, data):
-        if self.is_simulating() and self.is_recording():
-            for c in self.COMMANDS_TO_RECORD:
+    def record(self, command, data):
+        if self.is_recording:
+            for c in self.whitelist:
                 if c in command:
-                    self.gcode_commands_sent.append(data)
+                    self.recorded_commands.append(data)
 
-    def player_is_playing(self):
-        p = bool(self.player_progress())
-        if self.is_playing and not p:
-            self.set_smoothie_defaults()
-        self.is_playing = p
-        return bool(self.is_playing)
-
-    def player_play(self):
-        self.player_pause()
-        self.player_resume()
-        self.player_stop()
+    def play(self, c):
+        self.connect(c)
+        self.pause()
+        self.resume()
+        self.abort()
         self.send_command('upload /sd/protocol.gcode')
         for line in self.get_recorded_commands():
             self.connection.write_string(line)
         self.send_command('\x04')
         self.send_command('play /sd/protocol.gcode')
-        self.ignore_next_line()
-        self.wait_for_ok()
+        self.connection.readline_string()
+        self.connection.readline_string()
 
-	def player_pause(self):
+    def pause(self):
         res = self.send_command('suspend', timeout=30)
         if 'waiting for queue to empty...' in res:
-            self.ignore_next_line()
-            self.ignore_next_line()
-            self.readline_from_serial(timeout=60)
+            self.connection.readline_string(timeout=20)
+            self.connection.readline_string(timeout=20)
+            self.connection.readline_string(timeout=20)
         self.connection.flush_input()
 
-    def player_resume(self):
+    def resume(self):
         self.send_command('resume', timeout=30)
         self.connection.flush_input()
 
-    def player_stop(self):
+    def abort(self):
         self.send_command('abort', timeout=30)
         self.connection.flush_input()
 
-	def player_progress(self):
+    def progress(self):
         self.connection.flush_input()
-        s_t = time.time()
         p_data = self.send_command('progress')
         while 'play' not in p_data.lower() and 'file' not in p_data.lower():
-            p_data = self.read_next_line()
-        self.ignore_next_line(lines=1)
+            p_data = self.connection.readline_string()
+        self.connection.readline_string()
 
         p_bytes = self.send_command('M27')
-        self.ignore_next_line(lines=2)
+        self.connection.readline_string()
         return self._parse_progress_data(p_data, p_bytes)
 
-    def send_command(self, data, read_after=True):
+    def send_command(self, data, read_after=True, timeout=20):
         data += '\r\n'
         self.connection.write_string(data)
         if read_after:
-            return self.read_next_line()
+            return self.connection.readline_string(timeout=timeout)
 
-    def read_next_line(self):
-        self.connection.wait_for_data()
-        return self.connection.readline_string()
-
-    def ignore_next_line(self, lines=1):
-        for i in range(lines):
-            self.read_next_line()
-        self.connection.flush_input()
-
-	def _parse_progress_data(self, progress_a, progress_b):
+    def _parse_progress_data(self, progress_a, progress_b):
         progress_info = {
             'file': None,
             'percentage': None,

@@ -34,11 +34,8 @@ class Connection(object):
     def serial_pause(self):
         time.sleep(self.serial_port.timeout)
 
-    def wait_for_write(self):
-        self.serial_port.flush()
-
     def data_available(self):
-        return bool(self.serial_port.in_waiting)
+        return int(self.serial_port.in_waiting)
 
     def flush_input(self):
         while self.data_available():
@@ -53,9 +50,16 @@ class Connection(object):
         raise RuntimeWarning(
             'No data after {} second(s)'.format(timeout))
 
-    def readline_string(self):
-        return str(self.serial_port.readline().decode().strip())
+    def readline_string(self, timeout=30):
+        end_time = time.time() + timeout
+        while end_time > time.time():
+            self.wait_for_data(timeout=timeout)
+            res = str(self.serial_port.readline().decode().strip())
+            if res:
+                return res
+        raise RuntimeWarning(
+            'No new line from Smoothie after {} second(s)'.format(timeout))
 
     def write_string(self, data_string):
         self.serial_port.write(data_string.encode())
-        self.wait_for_write()
+        self.serial_port.flush()
