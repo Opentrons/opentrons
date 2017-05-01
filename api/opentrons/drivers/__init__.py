@@ -67,14 +67,14 @@ def get_serial_ports_list():
         raise EnvironmentError('Unsupported platform')
 
     result = []
-    port_filter = {'usbmodem', 'COM', 'ACM', 'USB'}
+    port_filter = {'usbmodem', 'usbserial', 'COM', 'ACM', 'USB'}
     for port in ports:
         try:
-            if any([f.lower() in port.lower() for f in port_filter]):
-                # s = serial.Serial()
-                # c = connection.Connection(
-                #     s, port=port, baudrate=115200, timeout=0.01)
-                # assert get_version(c) in drivers_by_version
+            if any([f in port for f in port_filter]):
+                s = serial.Serial()
+                c = connection.Connection(
+                    s, port=port, baudrate=115200, timeout=0.01)
+                c.open()
                 result.append(port)
         except Exception as e:
             log.debug(
