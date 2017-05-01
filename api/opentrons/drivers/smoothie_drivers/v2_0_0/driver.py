@@ -402,7 +402,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         })
 
     def calm_down(self):
-        self.connection.serial_pause()
         self.send_command(self.CALM_DOWN, read_after=False)
         self.ignore_next_line()
         self.ignore_next_line()
