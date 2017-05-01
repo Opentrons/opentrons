@@ -28,6 +28,7 @@ app-shell:
 		npm config get python &&\
 		npm i &&\
 		npm run unit-main &&\
+		npm run e2e &&\
 		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
