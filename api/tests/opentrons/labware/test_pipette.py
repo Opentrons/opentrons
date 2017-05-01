@@ -354,6 +354,24 @@ class PipetteTest(unittest.TestCase):
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
 
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses=0)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses='a')
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
     def test_drop_tip(self):
         self.p200.drop_tip()
 

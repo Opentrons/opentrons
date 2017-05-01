@@ -117,9 +117,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         self.versions_compatible()
 
-        self.prevent_squeal()
-
         self.calm_down()
+        self.prevent_squeal()
 
     def prevent_squeal(self):
         # TODO: (andy) Smoothieware EDGE has this weird bug,
@@ -233,6 +232,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
         if 'reset or M999' in msg or 'error:' in msg:
+            self.calm_down()
+            time.sleep(0.2)  # pause for Smoothie's internal state change
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -401,10 +402,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         })
 
     def calm_down(self):
-        res = self.send_command(self.CALM_DOWN)
-        if res != 'ok':
-            self.wait_for_ok()
-        self.wait_for_ok()
+        self.connection.serial_pause()
+        self.send_command(self.CALM_DOWN, read_after=False)
+        self.ignore_next_line()
+        self.ignore_next_line()
+        self.connection.serial_pause()
+        self.connection.flush_input()
 
     def send_halt_command(self):
         self.send_command(self.HALT, read_after=False)
@@ -464,7 +467,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
     def set_speed(self, *args, **kwargs):
         if len(args) > 0:
-            kwargs.update({'x': args[0], 'y': args[0]})
+            self.speeds.update({'x': args[0], 'y': args[0]})
         self.speeds.update({l: kwargs[l] for l in 'xyzab' if l in kwargs})
         if self.is_connected():
             kwargs = {
