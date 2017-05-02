@@ -1,18 +1,13 @@
-import configparser
-import glob
 import json
 import math
 import os
 import pkg_resources
-import sys
 import time
 from threading import Event
 
-import serial
-
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
-from opentrons.drivers.virtual_smoothie import VirtualSmoothie
+from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 
 from opentrons.util import trace
 
@@ -27,7 +22,7 @@ CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 log = get_logger(__name__)
 
 
-class CNCDriver(object):
+class SmoothieDriver_1_2_0(SmoothieDriver):
 
     """
     This object outputs raw GCode commands to perform high-level tasks.
@@ -86,12 +81,16 @@ class CNCDriver(object):
     config_version = None
     ot_version = None
 
-    def __init__(self):
+    def __init__(self, defaults):
         self.halted = Event()
         self.stopped = Event()
         self.do_not_pause = Event()
         self.resume()
         self.current_commands = []
+
+        self.ot_one_dimensions = {}
+        self.default_speeds = {}
+        self.speeds = {}
 
         self.SMOOTHIE_SUCCESS = 'Success'
         self.SMOOTHIE_ERROR = 'Received unexpected response from Smoothie'
@@ -99,56 +98,20 @@ class CNCDriver(object):
 
         self.ignore_smoothie_sd = False
 
-        self.defaults = configparser.ConfigParser()
-        self.defaults.read(DEFAULTS_FILE_PATH)
-        self._create_saved_settings_file()
-        self.saved_settings = configparser.ConfigParser()
-        self.saved_settings.read(CONFIG_FILE_PATH)
-        self._copy_defaults_to_settings()
-        self._apply_settings()
+        self._apply_defaults(defaults)
 
-    def _create_saved_settings_file(self):
-        if not os.path.isdir(CONFIG_DIR_PATH):
-            os.mkdir(CONFIG_DIR_PATH)
-        if not os.path.isfile(CONFIG_FILE_PATH):
-            with open(CONFIG_FILE_PATH, 'w') as configfile:
-                configfile.write('')
+    def _apply_defaults(self, defaults_file):
 
-    def _copy_defaults_to_settings(self):
-        for n in self.defaults.sections():
-            if n not in self.saved_settings:
-                self.saved_settings[n] = self.defaults[n]
-            for key, val in self.defaults[n].items():
-                if key not in self.saved_settings[n]:
-                    self.saved_settings[n][key] = val
+        DEFAULT_VERSIONS = defaults_file['versions']
+        DEFAULT_MODELS = json.loads(defaults_file['models']['ot_versions'])
 
-    def _set_step_per_mm_from_config(self):
-        for axis in 'xyz':
-            value = self.saved_settings['config'].get(
-                self.CONFIG_STEPS_PER_MM[axis])
-            self.set_steps_per_mm(axis, value)
+        self.compatible_firmware = json.loads(DEFAULT_VERSIONS['firmware'])
+        self.compatible_config = json.loads(DEFAULT_VERSIONS['config'])
 
-    def _apply_settings(self):
-        self.serial_timeout = float(
-            self.saved_settings['serial'].get('timeout', 0.1))
-        self.serial_baudrate = int(
-            self.saved_settings['serial'].get('baudrate', 115200))
-
-        self.head_speed = int(
-            self.saved_settings['state'].get('head_speed', 3000))
-        self.plunger_speed = json.loads(
-            self.saved_settings['state'].get(
-                'plunger_speed', '{"a":300,"b",300}'))
-
-        self.COMPATIBLE_FIRMARE = json.loads(
-            self.saved_settings['versions'].get('firmware', '[]'))
-        self.COMPATIBLE_CONFIG = json.loads(
-            self.saved_settings['versions'].get('config', '[]'))
-        self.ot_one_dimensions = json.loads(
-            self.saved_settings['versions'].get('ot_versions', '{}'))
-        for key in self.ot_one_dimensions.keys():
-            axis_size = Vector(self.ot_one_dimensions[key])
+        for key in DEFAULT_MODELS.keys():
+            axis_size = Vector(DEFAULT_MODELS[key]['dimensions'])
             self.ot_one_dimensions[key] = axis_size
+            self.default_speeds[key] = DEFAULT_MODELS[key]['speeds']
 
     def get_connected_port(self):
         """
@@ -157,52 +120,16 @@ class CNCDriver(object):
         """
         if not self.connection:
             return
-        return self.connection.port
+        return self.connection.name()
 
     def get_dimensions(self):
         if not self.ot_version:
             self.get_ot_version()
         return self.ot_one_dimensions[self.ot_version]
 
-    def get_serial_ports_list(self):
-        """ Lists serial port names
-
-            :raises EnvironmentError:
-                On unsupported or unknown platforms
-            :returns:
-                A list of the serial ports available on the system
-        """
-        if sys.platform.startswith('win'):
-            ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif (sys.platform.startswith('linux') or
-              sys.platform.startswith('cygwin')):
-            # this excludes your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty*')
-            # ignore Smoothie's local storage if linux (temporary work-around)
-            self.ignore_smoothie_sd = True
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
-
-        result = []
-        port_filter = {'usbmodem', 'COM', 'ACM', 'USB'}
-        for port in ports:
-            try:
-                if any([f in port for f in port_filter]):
-                    s = serial.Serial(port)
-                    s.close()
-                    result.append(port)
-            except Exception as e:
-                log.debug(
-                    'Exception in testing port {}'.format(port))
-                log.debug(e)
-        return result
-
     def disconnect(self):
-        if self.is_connected() and self.connection:
+        if self.is_connected():
             self.connection.close()
-        self.connection = None
 
     def connect(self, device):
         self.connection = device
@@ -218,6 +145,10 @@ class CNCDriver(object):
 
     def is_connected(self):
         return self.connection and self.connection.isOpen()
+
+    def is_simulating(self):
+        return bool(isinstance(
+            self.connection.device(), VirtualSmoothie))
 
     def toggle_port(self):
         self.connection.close()
@@ -281,7 +212,7 @@ class CNCDriver(object):
         log.debug("Write: {}".format(str(data).encode()))
         if self.is_connected():
             try:
-                self.connection.write(str(data).encode())
+                self.connection.write_string(data)
             except Exception as e:
                 self.disconnect()
                 raise RuntimeError('Lost connection with serial port') from e
@@ -297,7 +228,7 @@ class CNCDriver(object):
             )
         else:
             msg = "Cannot connect to serial port {}".format(
-                self.connection.port)
+                self.connection.name())
             log.error(msg)
             raise RuntimeError(msg)
 
@@ -309,8 +240,8 @@ class CNCDriver(object):
         Raises RuntimeWarning() if no response was recieved before timeout
         """
         count = 0
-        max_retries = int(timeout / self.serial_timeout)
-        while self.is_connected() and count < max_retries:
+        end_time = time.time() + timeout
+        while self.is_connected() and end_time > time.time():
             count = count + 1
             out = self.readline_from_serial()
             if out:
@@ -328,18 +259,18 @@ class CNCDriver(object):
             'No response from serial port after {} seconds'.format(timeout))
 
     def flush_port(self):
-        while self.connection.readline():
-            time.sleep(self.serial_timeout)
+        self.connection.flush_input()
 
-    def readline_from_serial(self):
+    def readline_from_serial(self, timeout=20):
         """
         Attempt to read a line of data from serial port
 
         Raises RuntimeWarning if read fails on serial port
         """
-        msg = b''
+        msg = ''
         try:
-            msg = self.connection.readline()
+            self.connection.wait_for_data(timeout=timeout)
+            msg = self.connection.readline_string()
             msg = msg.strip()
         except Exception as e:
             self.disconnect()
@@ -356,16 +287,11 @@ class CNCDriver(object):
 
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
-        if b'!!' in msg or b'limit' in msg:
+        if '!!' in msg or 'limit' in msg:
             log.debug('home switch hit')
             self.flush_port()
             self.calm_down()
-            msg = msg.decode()
-            axis = ''
-            for ax in 'xyzab':
-                if ('min_' + ax) in msg:
-                    axis = ax
-            raise RuntimeWarning('{} limit switch hit'.format(axis.upper()))
+            raise RuntimeWarning('Robot Error: limit switch hit')
 
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
@@ -377,6 +303,8 @@ class CNCDriver(object):
 
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
+
+        axis_called = [ax for ax in 'xyz' if ax in kwargs]
 
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
@@ -397,9 +325,11 @@ class CNCDriver(object):
         args = {axis.upper(): kwargs.get(axis)
                 for axis in 'xyzab'
                 if axis in kwargs}
-        args.update({"F": self.head_speed})
-        args.update({"a": self.plunger_speed['a']})
-        args.update({"b": self.plunger_speed['b']})
+
+        this_head_speed = min([self.speeds[l] for l in axis_called])
+        args.update({"F": this_head_speed})
+        args.update({"a": self.speeds['a']})
+        args.update({"b": self.speeds['b']})
 
         return self.consume_move_commands(args)
 
@@ -414,7 +344,7 @@ class CNCDriver(object):
 
         log.debug("Moving : {}".format(args))
         res = self.send_command(self.MOVE, **args)
-        if res != b'ok':
+        if res != 'ok':
             return (False, self.SMOOTHIE_ERROR)
 
         self.wait_for_arrival()
@@ -447,7 +377,8 @@ class CNCDriver(object):
             coords = self.get_position()
             diff = {}
             for axis in coords.get('target', {}):
-                diff[axis] = coords['current'][axis] - coords['target'][axis]
+                axis_diff = coords['current'][axis] - coords['target'][axis]
+                diff[axis.lower()] = axis_diff
 
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
             dist_head = math.sqrt(dist)
@@ -480,7 +411,7 @@ class CNCDriver(object):
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
-        if res == b'ok':
+        if res == 'ok':
             # the axis aren't necessarily set to 0.0
             # values after homing, so force it
             pos_args = {}
@@ -522,11 +453,11 @@ class CNCDriver(object):
 
     def calm_down(self):
         res = self.send_command(self.CALM_DOWN)
-        return res == b'ok'
+        return res == 'ok'
 
     def reset(self):
         res = self.send_command(self.RESET)
-        if b'Rebooting' in res:
+        if 'Rebooting' in res:
             self.disconnect()
 
     def set_position(self, **kwargs):
@@ -534,7 +465,7 @@ class CNCDriver(object):
         for key in kwargs:
             uppercase_args[key.upper()] = kwargs[key]
         res = self.send_command(self.SET_POSITION, **uppercase_args)
-        return res == b'ok'
+        return res == 'ok'
 
     def get_head_position(self):
         coords = self.get_position()
@@ -557,7 +488,7 @@ class CNCDriver(object):
     def get_position(self):
         res = self.send_command(self.GET_POSITION)
         # remove the "ok " from beginning of response
-        res = res.decode('utf-8')[3:]
+        res = res[3:]
         coords = {}
         try:
             response_dict = json.loads(res).get(self.GET_POSITION)
@@ -576,9 +507,9 @@ class CNCDriver(object):
 
     def turn_off_feedback(self):
         res = self.send_command(self.DISENGAGE_FEEDBACK)
-        if res == b'feedback disengaged':
+        if res == 'feedback disengaged':
             res = self.wait_for_response()
-            return res == b'ok'
+            return res == 'ok'
         else:
             return False
 
@@ -590,16 +521,19 @@ class CNCDriver(object):
 
     def set_head_speed(self, rate=None):
         if rate:
-            self.head_speed = rate
-            self.saved_settings['state']['head_speed'] = str(self.head_speed)
-            with open(CONFIG_FILE_PATH, 'w') as configfile:
-                self.saved_settings.write(configfile)
+            self.speeds['x'] = rate
+            self.speeds['y'] = rate
         return True
 
     def set_plunger_speed(self, rate, axis):
         if axis.lower() not in 'ab':
             raise ValueError('Axis {} not supported'.format(axis))
-        self.plunger_speed[axis] = rate
+        self.speeds[axis.lower()] = rate
+
+    def set_speed(self, *args, **kwargs):
+        if len(args) > 0:
+            kwargs.update({'x': args[0], 'y': args[0]})
+        self.speeds.update({l: kwargs[l] for l in 'xyzab' if l in kwargs})
 
     def versions_compatible(self):
         self.get_ot_version()
@@ -610,9 +544,9 @@ class CNCDriver(object):
             'config': True,
             'ot_version': True
         }
-        if self.firmware_version not in self.COMPATIBLE_FIRMARE:
+        if self.firmware_version not in self.compatible_firmware:
             res['firmware'] = False
-        if self.config_file_version not in self.COMPATIBLE_CONFIG:
+        if self.config_file_version not in self.compatible_config:
             res['config'] = False
         if not self.ot_version:
             res['ot_version'] = False
@@ -637,12 +571,12 @@ class CNCDriver(object):
             log.debug('{} is not an ot_version'.format(res))
             return None
         self.ot_version = res
-        log.debug('Read ot_version {}'.format(res))
+        self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):
         res = self.send_command(self.GET_FIRMWARE_VERSION)
-        res = res.decode().split(' ')[-1]
+        res = res.split(' ')[-1]
         # the version is returned as a JSON dict, the version is a string
         # but not wrapped in double-quotes as JSON requires...
         # aka --> {"version":v1.0.5}
@@ -659,9 +593,9 @@ class CNCDriver(object):
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM)
-        self.wait_for_response()  # extra b'ok' sent from smoothie after M92
+        self.wait_for_response()  # extra 'ok' sent from smoothie after M92
         try:
-            value = json.loads(res.decode())[self.STEPS_PER_MM][axis.upper()]
+            value = json.loads(res)[self.STEPS_PER_MM][axis.upper()]
             return float(value)
         except Exception:
             raise RuntimeError(
@@ -672,11 +606,11 @@ class CNCDriver(object):
             raise ValueError('Axis {} not supported'.format(axis))
 
         res = self.send_command(self.STEPS_PER_MM, **{axis.upper(): value})
-        self.wait_for_response()  # extra b'ok' sent from smoothie after M92
+        self.wait_for_response()  # extra 'ok' sent from smoothie after M92
 
         key = self.CONFIG_STEPS_PER_MM[axis.lower()]
         try:
-            response_dict = json.loads(res.decode())
+            response_dict = json.loads(res)
             returned_value = response_dict[self.STEPS_PER_MM][axis.upper()]
             self.set_config_value(key, str(returned_value))
             return float(returned_value) == value
@@ -685,28 +619,20 @@ class CNCDriver(object):
                 '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
 
     def get_config_value(self, key):
-        res = self.saved_settings['config'].get(key)
-        if not self.ignore_smoothie_sd:
-            command = '{0} {1}'.format(self.CONFIG_GET, key)
-            res = self.send_command(command).decode().split(' ')[-1]
-        return res
+        command = '{0} {1}'.format(self.CONFIG_GET, key)
+        return self.send_command(command).split(' ')[-1]
 
     def set_config_value(self, key, value):
-        success = True
-        if not self.ignore_smoothie_sd:
-            command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
-            res = self.send_command(command)
-            success = res.decode().split(' ')[-1] == str(value)
-        self.saved_settings['config'][key] = value
-        with open(CONFIG_FILE_PATH, 'w') as configfile:
-            self.saved_settings.write(configfile)
+        command = '{0} {1} {2}'.format(self.CONFIG_SET, key, value)
+        res = self.send_command(command)
+        success = res.split(' ')[-1] == str(value)
         return success
 
     def get_endstop_switches(self):
         first_line = self.send_command(self.GET_ENDSTOPS)
         second_line = self.wait_for_response()
-        if second_line == b'ok':
-            res = json.loads(first_line.decode())
+        if second_line == 'ok':
+            res = json.loads(first_line)
             res = res.get(self.GET_ENDSTOPS)
             obj = {}
             for axis in 'xyzab':
@@ -719,15 +645,15 @@ class CNCDriver(object):
         try:
             command = self.MOSFET[mosfet_index][bool(state)]
             res = self.send_command(command)
-            return res == b'ok'
+            return res == 'ok'
         except IndexError:
             raise IndexError(
                 "Smoothie mosfet not at index {}".format(mosfet_index))
 
     def power_on(self):
         res = self.send_command(self.MOTORS_ON)
-        return res == b'ok'
+        return res == 'ok'
 
     def power_off(self):
         res = self.send_command(self.MOTORS_OFF)
-        return res == b'ok'
+        return res == 'ok'

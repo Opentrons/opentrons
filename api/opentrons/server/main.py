@@ -24,12 +24,13 @@ from opentrons.server.process_manager import run_once
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
-STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'static')
+STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
-            template_folder=TEMPLATES_FOLDER
+            template_folder=TEMPLATES_FOLDER,
+            static_url_path=''
             )
 
 
@@ -298,6 +299,20 @@ def resume():
 def stop():
     result = robot.stop()
     emit_notifications(['Protocol stopped'], 'info')
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': result
+    })
+
+
+@app.route("/halt", methods=["GET"])
+def halt():
+    result = robot.halt()
+    emit_notifications(
+        ['Robot halted suddenly, please HOME ALL before running again'],
+        'info'
+    )
 
     return flask.jsonify({
         'status': 'success',

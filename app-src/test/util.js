@@ -5,14 +5,12 @@ import VueRouter from 'vue-router'
 Vue.use(Vuex)
 Vue.use(VueRouter)
 
-function getRenderedVm (Component, propsData, storeData) {
+function getRenderedVm (Component, propsData, storeData, store, router) {
   const Ctor = Vue.extend(Component)
-  const store = new Vuex.Store(storeData)
-  const router = new VueRouter({})
   return new Ctor({
     propsData,
-    store,
-    router
+    store: store || new Vuex.Store(storeData),
+    router: router || new VueRouter({})
   }).$mount()
 }
 
