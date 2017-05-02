@@ -431,7 +431,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         plunger_coords = {}
         for state in ['current', 'target']:
             plunger_coords[state] = {
-                axis: coords[state][axis]
+                axis: coords[state].get(axis, 0)
                 for axis in 'ab'
             }
 
