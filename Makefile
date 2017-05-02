@@ -19,7 +19,7 @@ api-valid-exe:
 
 # Note(ahmed) Integration tests do not pass on windows
 app-shell: app-shell-setup app-shell-e2e-test app-shell-build
-app-shell-win: app-shell-setup app-shell-build
+app-shell-win: app-shell-setup app-shell-e2e-test app-shell-build
 
 app-shell-setup:
 	cd app-shell &&\
