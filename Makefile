@@ -17,18 +17,25 @@ api-valid-exe:
 	cd api &&\
 		make api-valid-exe
 
-api-exe-win:
-	cd api &&\
-		make api-win
+# Note(ahmed) Integration tests do not pass on windows
+app-shell: app-shell-setup app-shell-e2e-test app-shell-build
+app-shell-win: app-shell-setup app-shell-build
 
-app-shell:
+app-shell-setup:
 	cd app-shell &&\
 		npm --version &&\
 		node --version &&\
 		npm config get python &&\
 		npm i &&\
-		npm run unit-main &&\
-		npm run e2e &&\
+		npm run unit-main
+
+app-shell-build:
+	cd app-shell &&\
 		npm run build:frontend &&\
 		ls dist/* &&\
 		ls releases
+
+
+app-shell-e2e-test:
+	cd app-shell &&\
+		npm run e2e
