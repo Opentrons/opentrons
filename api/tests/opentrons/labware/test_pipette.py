@@ -13,8 +13,7 @@ class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset_for_tests()
-        myport = self.robot.VIRTUAL_SMOOTHIE_PORT
-        self.robot.connect(port=myport)
+        self.robot.connect()
         self.robot.home()
 
         self.trash = containers.load('point', 'A1')
@@ -280,9 +279,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_non_empty_aspirate(self):
 
-        self.p200.aspirate(100)
-        self.p200.aspirate(20)
-        self.robot.run()
+        self.p200.aspirate(100, enqueue=False)
+        self.p200.aspirate(20, enqueue=False)
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -352,6 +350,24 @@ class PipetteTest(unittest.TestCase):
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses=0)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses='a')
         self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)

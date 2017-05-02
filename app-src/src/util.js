@@ -1,4 +1,12 @@
-module.exports = {addHrefs, processProtocol, processTasks}
+module.exports = {
+  addHrefs,
+  getUserEmail,
+  getUserId,
+  getUserProfile,
+  isAuthenticated,
+  processProtocol,
+  processTasks
+}
 
 function addHrefs (tasks) {
   tasks.map((instrument) => {
@@ -9,6 +17,26 @@ function addHrefs (tasks) {
   })
 }
 
+function getUserId () {
+  return getUserProfile().user_id || null
+}
+
+function getUserEmail () {
+  return getUserProfile().email || null
+}
+
+function getUserProfile () {
+  return JSON.parse(localStorage.getItem('profile') || '{}')
+}
+
+function isAuthenticated () {
+  const profile = localStorage.getItem('profile')
+  const idToken = localStorage.getItem('id_token')
+  if (profile == null) return false
+  if (idToken == null) return false
+  return true
+}
+
 function processProtocol (response) {
   let result = {success: true, errors: [], warnings: [], calibrations: []}
   console.log(response)
@@ -16,6 +44,7 @@ function processProtocol (response) {
   result.calibrations = data.calibrations || []
   if (data.errors && data.errors.length > 0) {
     result.success = false
+    result.errors = data.errors
   }
   result.fileName = data.fileName
   result.lastModified = data.lastModified

@@ -35,7 +35,6 @@ app-shell-build:
 		ls dist/* &&\
 		ls releases
 
-
 app-shell-e2e-test:
 	cd app-shell &&\
 		npm run e2e
