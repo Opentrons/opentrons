@@ -10,7 +10,7 @@
     "release:win": "npm run build:env:win && npm run build:backend:win && npm run build:frontend:win",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
     "unit-main": "mocha test/main/",
-    "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js",
+    "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
