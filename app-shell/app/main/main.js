@@ -28,10 +28,7 @@ if (process.env.NODE_ENV === 'development'){
 function createWindow (windowUrl) {
   mainWindow = new BrowserWindow({
     width: 1060,
-    height: 750  // ,
-    // webPreferences: {
-    //   nodeIntegration: false
-    // }
+    height: 750
   })
   mainWindow.loadURL(windowUrl)
   mainWindow.on('closed', function () {
