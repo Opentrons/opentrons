@@ -2,7 +2,13 @@
   
     <section id="task-view">
       <section id="placeable-pane">  
-        <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}</h1>
+        <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}</h1> 
+        <!-- <span class="more-info">
+        <a role="button" id="show-modal" @click="showModal = true">?</a>
+        </span> -->
+<!--         <modal v-if="showModal" @close="showModal = false" :placeable="placeable($route.params.slot)" :instrument="instrument()">
+        </modal> -->
+
         <deck-navigation  :instrument='instrument()' :deck='deck()'></deck-navigation>  
       </section>
 
@@ -28,6 +34,9 @@
           <img src='../assets/img/pipette_blowout.png' class='blowout'/>
           <img src='../assets/img/pipette_droptip.png' class='droptip'/>
         </div>
+        </div>
+        <button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class='btn-calibrate save'>SAVE</button>
+          <button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
         </section>
 
       </section>
@@ -41,17 +50,20 @@
 <script>
   // import RunScreen from './RunScreen.vue'
   import DeckNavigation from './DeckNavigation'
+  import Modal from './Modal.vue'
 
   export default {
     props: ['busy'],
     data () {
       return {
         axis: this.$route.params.instrument,
-        plungerMode: 'mode-top'
+        plungerMode: 'mode-top',
+        showModal: false
       }
     },
     components: {
-      DeckNavigation
+      DeckNavigation,
+      Modal
     },
     computed: {
       channels () {
@@ -62,6 +74,10 @@
       }
     },
     methods: {
+      placeable (slot) {
+        let container = this.deck().find(element => element.slot === slot)
+        return container
+      },
       params () {
         return this.$route.params
       },
@@ -83,6 +99,14 @@
       },
       modePlunger (mode) {
         this.plungerMode = 'mode-' + mode
+      },
+      calibrateInstrument (position) {
+        let axis = this.axis
+        this.$store.dispatch('calibrate', {axis, position})
+      },
+      moveToPlungerPosition (position) {
+        let axis = this.axis
+        this.$store.dispatch('moveToPosition', {axis, position})
       },
       running () {
         return this.$store.state.running || this.$store.state.protocolFinished
