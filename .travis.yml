@@ -46,7 +46,6 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - ./scripts/setup-node_modules-dir.sh
   -  ./scripts/with-nodenv "make app"
   - make api-exe
   -  ./scripts/with-nodenv "make app-shell"
