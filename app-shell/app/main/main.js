@@ -26,12 +26,24 @@ if (process.env.NODE_ENV === 'development'){
 }
 
 function createWindow (windowUrl) {
-  mainWindow = new BrowserWindow({width: 1060, height: 750})
+  mainWindow = new BrowserWindow({
+    width: 1060,
+    height: 750,
+    webPreferences: {
+      nodeIntegration: false
+    }
+  })
   mainWindow.loadURL(windowUrl)
   mainWindow.on('closed', function () {
     mainWindow = null
     app.quit()
   })
+  // Note: Auth0 pop window does not close itself, this will this window when it pops up
+  setInterval(() => {
+    BrowserWindow.getAllWindows()
+      .filter(win => win.frameName === 'auth0_signup_popup')
+      .map(win => win.close())
+  }, 3000)
   return mainWindow
 }
 

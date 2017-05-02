@@ -8,7 +8,7 @@ import {
   CalibrateInstrument,
   App
 } from './components/export'
-import { loginRoute, logoutRoute } from './routes'
+import { loginRoute, logoutRoute } from './login-routes'
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
