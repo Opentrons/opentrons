@@ -46,8 +46,7 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - git remote set-branches --add origin $STABLE_BRANCH
-  - git fetch
+  - ./scripts/setup-node_modules-dir.sh
   -  ./scripts/with-nodenv "make app"
   - make api-exe
   -  ./scripts/with-nodenv "make app-shell"
