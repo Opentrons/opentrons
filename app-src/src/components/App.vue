@@ -41,7 +41,6 @@
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
   import { Toast } from 'vuex-toast'
-  // import Vue from 'vue'
 
   export default {
     components: {
@@ -57,8 +56,7 @@
     },
     data: function () {
       return {
-        version: '2.?.?',
-        username: 'NOT SET'
+        version: '2.?.?'
       }
     },
     computed: {
