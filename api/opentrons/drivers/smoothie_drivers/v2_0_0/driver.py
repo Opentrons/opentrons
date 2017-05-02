@@ -306,8 +306,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             dist_head = math.sqrt(dist)
 
             if dist_head < tolerance:
-                if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
-                    break
+                if abs(diff['a']) < tolerance:
+                    if abs(diff.get('b', 0)) < tolerance:
+                        break
 
     def home(self, *axis):
 
