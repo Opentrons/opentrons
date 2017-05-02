@@ -104,6 +104,6 @@
     "babel-preset-es2016": "^6.16.0",
     "electron-debug": "^1.0.1",
     "sinon": "^1.17.6",
-    "underscore.string": "^3.3.4",
+    "underscore.string": "^3.3.4"
   }
 }
