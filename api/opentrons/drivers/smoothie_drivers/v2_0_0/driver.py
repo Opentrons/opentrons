@@ -303,12 +303,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             for axis in list(target.keys()):
                 diff[axis] = current[axis] - target[axis]
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            dist_head = math.sqrt(dist)
+            diff_head = math.sqrt(dist)
+            diff_a = abs(diff.get('a', 0))
+            diff_b = abs(diff.get('b', 0))
 
-            if dist_head < tolerance:
-                if abs(diff['a']) < tolerance:
-                    if abs(diff.get('b', 0)) < tolerance:
-                        break
+            if max(diff_head, diff_a, diff_b) < tolerance:
+                return
 
     def home(self, *axis):
 
