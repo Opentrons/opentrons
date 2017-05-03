@@ -3,9 +3,14 @@ import json
 import os
 import unittest
 
-from opentrons import containers
+from opentrons.containers import (
+    create as containers_create,
+    load as containers_load,
+    list as containers_list
+)
 from opentrons.util import environment
 from opentrons import Robot
+from opentrons.containers import placeable
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -35,7 +40,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_containers_create(self):
         container_name = 'plate_for_testing_containers_create'
-        containers.create(
+        containers_create(
             name=container_name,
             grid=(8, 12),
             spacing=(9, 9),
@@ -43,7 +48,7 @@ class ContainerTestCase(unittest.TestCase):
             depth=8,
             volume=1000)
 
-        p = containers.load(self.robot, container_name, 'A1')
+        p = containers_load(self.robot, container_name, 'A1')
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
@@ -65,12 +70,12 @@ class ContainerTestCase(unittest.TestCase):
             os.remove(environment.get_path('CONTAINERS_FILE'))
 
     def test_containers_list(self):
-        res = containers.list()
+        res = containers_list()
         self.assertTrue(len(res))
 
     def test_bad_unpack_containers(self):
         self.assertRaises(
-            ValueError, containers.placeable.unpack_location, 1)
+            ValueError, placeable.unpack_location, 1)
 
     def test_iterate_without_parent(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)

@@ -268,6 +268,6 @@ class Instrument(object):
                     pass
         return obj
 
-    @property
-    def robot(self):
-        return Robot.get_instance()
+    # @property
+    # def robot(self):
+    #     return Robot.get_instance()

@@ -1,6 +1,7 @@
 import unittest
 
-from opentrons import containers
+# from opentrons import containers
+from opentrons.containers import load
 from opentrons import instruments
 from opentrons import Robot
 
@@ -8,7 +9,7 @@ from opentrons import Robot
 class GridTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
-        self.plate = containers.load(self.robot, '96-flat', 'A2')
+        self.plate = load(self.robot, '96-flat', 'A2')
 
     def tearDown(self):
         del self.robot
@@ -36,12 +37,12 @@ class GridTestCase(unittest.TestCase):
 
         slot = 'B1'
 
-        plate = containers.load('96-flat', slot, 'plate')
+        plate = load(self.robot, '96-flat', slot, 'plate')
         self.assertEquals(len(robot.containers()), 1)
         plate.get_parent().remove_child(plate.get_name())
         self.assertEquals(len(robot.containers()), 0)
 
-        plate = containers.load('96-flat', slot, 'plate')
+        plate = load(self.robot, '96-flat', slot, 'plate')
         self.assertEquals(len(robot.containers()), 1)
         robot.deck[slot].remove_child(plate.get_name())
         self.assertEquals(len(robot.containers()), 0)
@@ -54,28 +55,28 @@ class GridTestCase(unittest.TestCase):
                          plate.cols[0].center(plate))
 
     def test_serial_dilution(self):
-        plate = containers.load(
+        plate = load(
             self.robot,
             '96-flat',
             'B1',
             'plate'
         )
 
-        tiprack = containers.load(
+        tiprack = load(
             self.robot,
             'tiprack-200ul',  # container type from library
             'A1',             # slot on deck
             'tiprack'         # calibration reference for 1.2 compatibility
         )
 
-        trough = containers.load(
+        trough = load(
             self.robot,
             'trough-12row',
             'B1',
             'trough'
         )
 
-        trash = containers.load(
+        trash = load(
             self.robot,
             'point',
             'A2',
