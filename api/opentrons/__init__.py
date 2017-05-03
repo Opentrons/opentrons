@@ -1,7 +1,6 @@
 import sys
 
 from opentrons.robot.robot import Robot
-# from opentrons.robot.command import Command
 from opentrons import instruments as inst, containers as cnt
 
 from ._version import get_versions

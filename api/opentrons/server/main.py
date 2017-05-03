@@ -36,7 +36,7 @@ app = Flask(__name__,
 
 CORS(app)
 app.jinja_env.autoescape = False
-app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
+app.config['ALLOWED_EXTENSIONS'] = set(['py'])
 socketio = SocketIO(app, async_mode='gevent')
 
 filename = "N/A"
@@ -70,7 +70,6 @@ def get_protocol_locals():
 
 def load_python(stream):
     global robot
-    robot = Robot.get_instance()
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
@@ -134,9 +133,6 @@ def upload():
     api_response = None
     if extension == 'py':
         api_response = load_python(file.stream)
-    elif extension == 'json':
-        api_response = helpers.load_json(file.stream)
-    else:
         return flask.jsonify({
             'status': 'error',
             'data': '{} is not a valid extension. Expected'
@@ -170,7 +166,6 @@ def upload():
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
     global robot, filename, last_modified, current_protocol_step_list
-    robot = Robot.get_instance()
 
     try:
         jupyter_robot = dill.loads(request.data)
@@ -234,7 +229,7 @@ def emit_notifications(notifications, _type):
 
 
 def _run_commands(should_home_first=True):
-    robot = Robot.get_instance()
+    global robot
 
     start_time = time.time()
 
@@ -272,7 +267,7 @@ def run():
 
 @app.route("/run_home", methods=["GET"])
 def run_home():
-    robot = Robot.get_instance()
+    global robot
     robot.home()
     return run()
 
@@ -331,7 +326,7 @@ def script_loader(filename):
 
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
-    robot = Robot.get_instance()
+    global robot
     return flask.jsonify({
         'ports': robot.get_serial_ports_list()
     })
@@ -339,7 +334,7 @@ def get_serial_ports_list():
 
 @app.route("/robot/serial/is_connected")
 def is_connected():
-    robot = Robot.get_instance()
+    global robot
     return flask.jsonify({
         'is_connected': robot.is_connected(),
         'port': robot.get_connected_port()
@@ -348,7 +343,7 @@ def is_connected():
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
-    robot = Robot.get_instance()
+    global robot
     return flask.jsonify({
         'coords': robot._driver.get_position().get("target")
     })
@@ -356,7 +351,7 @@ def get_coordinates():
 
 @app.route("/robot/diagnostics")
 def diagnostics():
-    robot = Robot.get_instance()
+    global robot
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -364,7 +359,7 @@ def diagnostics():
 
 @app.route("/robot/versions")
 def get_versions():
-    robot = Robot.get_instance()
+    global robot
     return flask.jsonify({
         'versions': robot.versions()
     })
@@ -379,13 +374,13 @@ def app_version():
 
 @app.route("/robot/serial/connect", methods=["POST"])
 def connectRobot():
+    global robot
     port = request.json.get('port')
     options = request.json.get('options', {'limit_switches': False})
 
     status = 'success'
     data = None
 
-    robot = Robot.get_instance()
     try:
         robot.connect(port, options=options)
     except Exception as e:
@@ -404,7 +399,7 @@ def connectRobot():
 
 
 def _start_connection_watcher():
-    robot = Robot.get_instance()
+    global robot
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -438,10 +433,10 @@ def _start_connection_watcher():
 
 @app.route("/robot/serial/disconnect")
 def disconnectRobot():
+    global robot
     status = 'success'
     data = None
 
-    robot = Robot.get_instance()
     try:
         robot.disconnect()
         emit_notifications(["Successfully disconnected"], 'info')
@@ -496,7 +491,7 @@ def _sort_containers(container_list):
 
 
 def _get_all_pipettes():
-    robot = Robot.get_instance()
+    global robot
     pipette_list = []
     for _, p in robot.get_instruments():
         if isinstance(p, instruments.Pipette):
@@ -511,8 +506,8 @@ def _get_all_containers():
     """
     Returns all containers currently on the deck
     """
+    global robot
     all_containers = list()
-    robot = Robot.get_instance()
     for slot in robot._deck:
         if slot.has_children():
             all_containers += slot.get_children_list()
@@ -605,8 +600,8 @@ def create_step_list():
 
 
 def update_step_list():
-    global current_protocol_step_list
-    robot = Robot.get_instance()
+    # TODO: This global stuff really needs to go away...
+    global current_protocol_step_list, robot
     if current_protocol_step_list is None:
         create_step_list()
     try:
@@ -657,7 +652,7 @@ def home(axis):
 
 @app.route('/jog', methods=["POST"])
 def jog():
-    robot = Robot.get_instance()
+    global robot
     coords = request.json
 
     status = 'success'
@@ -680,7 +675,7 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
-    robot = Robot.get_instance()
+    global robot
     status = 'success'
     result = ''
     try:
@@ -706,7 +701,7 @@ def move_to_slot():
 
 @app.route('/move_to_container', methods=["POST"])
 def move_to_container():
-    robot = Robot.get_instance()
+    global robot
     slot = request.json.get("slot")
     name = request.json.get("label")
     axis = request.json.get("axis")
@@ -737,7 +732,7 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
-    robot = Robot.get_instance()
+    global robot
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -758,7 +753,7 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
-    robot = Robot.get_instance()
+    global robot
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -865,7 +860,7 @@ def set_max_volume():
 
 
 def _calibrate_placeable(container_name, parent_slot, axis_name):
-    robot = Robot.get_instance()
+    global robot
     deck = robot._deck
     this_container = deck[parent_slot].get_child_by_name(container_name)
     axis_name = axis_name.upper()
@@ -998,7 +993,7 @@ def start():
 
     socketio.run(
         app,
-        debug=False,
+        debug=True,
         logger=False,
         use_reloader=False,
         log_output=False,

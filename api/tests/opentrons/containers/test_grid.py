@@ -1,8 +1,7 @@
 import unittest
 
-# from opentrons import containers
 from opentrons.containers import load
-from opentrons import instruments
+from opentrons.instruments import pipette
 from opentrons import Robot
 
 
@@ -83,7 +82,8 @@ class GridTestCase(unittest.TestCase):
             'trash'
         )
 
-        p200 = instruments.Pipette(
+        p200 = pipette.Pipette(
+            self.robot,
             trash_container=trash,
             tip_racks=[tiprack],
             max_volume=200,
