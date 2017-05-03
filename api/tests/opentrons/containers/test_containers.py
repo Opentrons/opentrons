@@ -1,8 +1,11 @@
-import unittest
 import math
+import json
+import os
+import unittest
 
 from opentrons import containers
 from opentrons.util import environment
+from opentrons import Robot
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -11,6 +14,12 @@ from opentrons.containers.placeable import (
 
 
 class ContainerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.robot = Robot()
+
+    def tearDown(self):
+        del self.robot
+
     def generate_plate(self, wells, cols, spacing, offset, radius):
         c = Container()
 
@@ -25,9 +34,6 @@ class ContainerTestCase(unittest.TestCase):
         return c
 
     def test_containers_create(self):
-        import os
-        import json
-        from opentrons import Robot
         container_name = 'plate_for_testing_containers_create'
         containers.create(
             name=container_name,
@@ -37,12 +43,12 @@ class ContainerTestCase(unittest.TestCase):
             depth=8,
             volume=1000)
 
-        p = containers.load(container_name, 'A1')
+        p = containers.load(self.robot, container_name, 'A1')
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
         self.assertEquals(
-            p.get_parent(), Robot.get_instance().deck['A1'])
+            p.get_parent(), self.robot.deck['A1'])
         self.assertEquals(p['C3'], p[18])
         self.assertEquals(p['C3'].max_volume(), 1000)
         for i, w in enumerate(p):

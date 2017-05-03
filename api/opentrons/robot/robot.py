@@ -12,7 +12,7 @@ from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
-from opentrons.util.singleton import Singleton
+# from opentrons.util.singleton import Singleton
 from opentrons.util.environment import settings
 
 
@@ -104,7 +104,7 @@ class InstrumentMotor(object):
         return self
 
 
-class Robot(object, metaclass=Singleton):
+class Robot(object):
     """
     This class is the main interface to the robot.
 
@@ -153,7 +153,7 @@ class Robot(object, metaclass=Singleton):
     """
 
     _commands = None  # []
-    _instance = None
+    # _instance = None
 
     def __init__(self):
         """
@@ -184,30 +184,30 @@ class Robot(object, metaclass=Singleton):
         self.set_connection('simulate')
         self.reset()
 
-    @classmethod
-    def get_instance(cls):
-        """
-        Deprecated. Use Robot() instead.
+    # @classmethod
+    # def get_instance(cls):
+    #     """
+    #     Deprecated. Use Robot() instead.
+    #
+    #     Returns
+    #     -------
+    #     An instance of a robot.
+    #     """
+    #
+    #     # leaving this method for backwards compatibility
+    #     # before Singleton meta-class was introduced
+    #     #
+    #     # TODO: remove method, refactor dependencies
+    #     return Robot()
 
-        Returns
-        -------
-        An instance of a robot.
-        """
-
-        # leaving this method for backwards compatibility
-        # before Singleton meta-class was introduced
-        #
-        # TODO: remove method, refactor dependencies
-        return Robot()
-
-    @classmethod
-    def reset_for_tests(cls):
-        """
-        Deprecated.
-        """
-        del Singleton._instances[cls]
-        robot = Robot.get_instance()
-        return robot
+    # @classmethod
+    # def reset_for_tests(cls):
+    #     """
+    #     Deprecated.
+    #     """
+    #     del Singleton._instances[cls]
+    #     robot = Robot.get_instance()
+    #     return robot
 
     def reset(self):
         """
