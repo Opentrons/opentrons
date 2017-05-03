@@ -37,8 +37,6 @@ class Instrument(object):
     persisted_attributes = []
     persisted_defaults = {}
 
-    calibrator = Calibrator(Robot()._deck, {})
-
     def reset(self):
         """
         Placeholder for instruments to reset their state between runs
@@ -101,7 +99,7 @@ class Instrument(object):
         command = Command(do=do, setup=setup, description=description)
 
         if enqueue:
-            Robot().add_command(command)
+            self.robot.add_command(command)
         else:
             command()
 
@@ -267,7 +265,3 @@ class Instrument(object):
                 except JSON_ERROR:
                     pass
         return obj
-
-    # @property
-    # def robot(self):
-    #     return Robot.get_instance()

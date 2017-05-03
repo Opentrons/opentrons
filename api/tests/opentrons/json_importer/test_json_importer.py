@@ -17,10 +17,12 @@ def get_name_from_closure(ftn):
 
 class JSONIngestorTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.reset_for_tests()
-        self.robot = Robot.get_instance()
+        self.robot = Robot()
         self.robot.connect()
         self.protocol = None
+
+    def tearDown(self):
+        del self.robot
 
     def get_protocol(self):
         protocol = """{
@@ -129,7 +131,7 @@ class JSONIngestorTestCase(unittest.TestCase):
     def test_deck(self):
         protocol = self.get_protocol()
         deck_dict = protocol['deck']
-        jpp = JSONProtocolProcessor(protocol)
+        jpp = JSONProtocolProcessor(self.robot, protocol)
         jpp.process_deck()
 
         robot_deck = self.robot._deck
@@ -212,7 +214,7 @@ class JSONIngestorTestCase(unittest.TestCase):
 
     def test_validate_protocol(self):
         protocol = self.get_protocol()
-        jpp = JSONProtocolProcessor(protocol)
+        jpp = JSONProtocolProcessor(self.robot, protocol)
         jpp.validate()
         self.assertEqual(jpp.errors, [])
         self.assertEqual(
@@ -221,12 +223,12 @@ class JSONIngestorTestCase(unittest.TestCase):
         )
 
         protocol = self.get_protocol()
-        jpp = JSONProtocolProcessor(protocol)
+        jpp = JSONProtocolProcessor(self.robot, protocol)
         del jpp.protocol['head']
         self.assertRaises(JSONProcessorValidationError, jpp.validate)
 
         protocol = self.get_protocol()
-        jpp = JSONProtocolProcessor(protocol)
+        jpp = JSONProtocolProcessor(self.robot, protocol)
         del jpp.protocol['deck']
         self.assertRaises(JSONProcessorValidationError, jpp.validate)
 
@@ -237,7 +239,7 @@ class JSONIngestorTestCase(unittest.TestCase):
 
     def test_process_instructions(self):
         protocol = self.get_protocol()
-        jpp = JSONProtocolProcessor(protocol)
+        jpp = JSONProtocolProcessor(self.robot, protocol)
         jpp.process_deck()
         jpp.process_head()
         jpp.process_instructions()
