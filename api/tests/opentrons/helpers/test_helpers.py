@@ -10,6 +10,8 @@ from opentrons.util.vector import Vector
 class HelpersTest(unittest.TestCase):
 
     def setUp(self):
+        # TODO(Ahmed): Why does this test setup a plate, robot, container
+        # when it doesnt use them in any test cases?
         self.robot = Robot()
         self.p200 = pipette.Pipette(self.robot, axis='b', max_volume=200)
         self.plate = containers_load(self.robot, '96-flat', 'C1')
