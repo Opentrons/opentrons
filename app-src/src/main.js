@@ -17,7 +17,7 @@ const router = new VueRouter({
   routes: [
     { name: 'welcome', path: '/', component: WelcomeView },
     { name: 'instrument', path: '/calibrate/:instrument', component: TaskView },
-    { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: TaskView }
+    { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: TaskView },
     loginRoute,
     logoutRoute
   ],

@@ -54,12 +54,12 @@
 </template>
 
 <script>
-  import DeckMap from './DeckMap.vue'
-  
+  import DeckNavigation from './DeckNavigation.vue'
+
   export default {
     name: 'CalibrateInstrument',
     components: {
-      DeckMap
+      DeckNavigation
     },
     data: function () {
       return {
