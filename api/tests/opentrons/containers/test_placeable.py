@@ -225,6 +225,20 @@ class PlaceableTestCase(unittest.TestCase):
             plate['A1'].top(10),
             (plate['A1'], Vector(5, 5, 20)))
 
+        self.assertEqual(
+            plate['A1'].bottom(10, radius=1.0, degrees=90),
+            (plate['A1'], Vector(5, 10, 10)))
+        self.assertEqual(
+            plate['A1'].top(10, radius=1.0, degrees=90),
+            (plate['A1'], Vector(5, 10, 20)))
+
+        self.assertEqual(
+            plate['A1'].bottom(10, radius=0.5, degrees=270),
+            (plate['A1'], Vector(5, 2.5, 10.00)))
+        self.assertEqual(
+            plate['A1'].top(10, radius=0.5, degrees=270),
+            (plate['A1'], Vector(5, 2.5, 20.00)))
+
     def test_slice_with_strings(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
         self.assertWellSeriesEqual(c['A1':'A2'], c[0:8])

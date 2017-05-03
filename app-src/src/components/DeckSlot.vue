@@ -23,7 +23,7 @@
         ]
         if (this.$store.state.versions.ot_version) {
           let version = this.$store.state.versions.ot_version.version
-          if (version !== 'hood') {
+          if (version.indexOf('hood') < 0) {
             baseSlots.unshift('A3', 'B3', 'C3', 'D3', 'E3')
           }
         }

@@ -1,7 +1,10 @@
 import * as types from './mutation-types'
+import { getUserProfile, isAuthenticated } from '../util'
 
 const state = {
   apiContainers: {},
+  isAuthenticated: isAuthenticated(),
+  userProfile: getUserProfile(),
   isConnected: false,
   port: null,
   fileName: '',
@@ -25,6 +28,10 @@ const state = {
 const mutations = {
   [types.UPDATE_CONTAINERS] (state, payload) {
     state.apiContainers = payload.containers
+  },
+  [types.AUTHENTICATE] (state, payload) {
+    state.isAuthenticated = payload.isAuthenticated
+    state.userProfile = payload.userProfile
   },
   [types.UPDATE_ROBOT_CONNECTION] (state, payload) {
     state.isConnected = payload.isConnected

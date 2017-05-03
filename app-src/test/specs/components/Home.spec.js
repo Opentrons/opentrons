@@ -19,6 +19,7 @@ describe('Home.vue', () => {
   })
 
   it('has each button send a home dispatch with the correct axis', () => {
+    window.Intercom = function () {}
     let buttons = [].slice.call(home.$el.querySelectorAll('.btn-home'))
     expect(mockStore.actions.home.called).to.be.false
     buttons.map((button, i) => {
@@ -27,5 +28,6 @@ describe('Home.vue', () => {
       expect(homeArgs.axis).to.equal(button.textContent.toLowerCase())
     })
     expect(mockStore.actions.home.callCount).to.equal(6)
+    delete window.Intercom
   })
 })

@@ -1,4 +1,4 @@
-.PHONY: app api-exe app-shell app-shell-win
+.PHONY: app api-exe app-shell api-valid-exe
 
 app:
 	cd app-src &&\
@@ -13,11 +13,14 @@ api-exe:
 	cd api &&\
 		make api
 
+api-valid-exe:
+	cd api &&\
+		make api-valid-exe
+
 api-exe-win:
 	cd api &&\
 		make api-win
 
-# TODO(Ahmed): turn on integration tests; "npm run e2e"
 app-shell:
 	cd app-shell &&\
 		npm --version &&\
@@ -29,14 +32,5 @@ app-shell:
 		ls dist/* &&\
 		ls releases
 
-# Same as "app-shell" except don't run unit tests
-app-shell-win:
-	cd app-shell &&\
-		npm --version &&\
-		node --version &&\
-		npm config get python &&\
-		npm i &&\
-		npm run unit-main &&\
-		npm run build:frontend &&\
-		ls dist/* &&\
-		ls releases
+app-dev:
+	./scripts/run-dev

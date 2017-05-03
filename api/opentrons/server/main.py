@@ -306,6 +306,20 @@ def stop():
     })
 
 
+@app.route("/halt", methods=["GET"])
+def halt():
+    result = robot.halt()
+    emit_notifications(
+        ['Robot halted suddenly, please HOME ALL before running again'],
+        'info'
+    )
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': result
+    })
+
+
 @app.route('/dist/<path:filename>')
 def script_loader(filename):
     root = helpers.get_frozen_root() or app.root_path

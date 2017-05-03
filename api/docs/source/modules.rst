@@ -1,13 +1,14 @@
 .. _modules:
 
-=======
-Modules
-=======
+################
+Hardware Modules
+################
 
 **********************
 
+**********
 Heat Deck
----------
+**********
 
 The heat deck runs off the opensource platform Arduino, which is how you can control it's temperature. Our heat decks come automatically set to reach a temperature of 55 deg Celsius, but you can edit this value by editing the Arduino file.
 
@@ -23,8 +24,9 @@ Open the file, and you will see detailed instruction for how to update the tempe
 
 **********************
 
+**********
 Magbead
--------
+**********
 
 Setting up Hardware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -33,7 +35,7 @@ Use your included DIY Mag Bead kit to configure the motor control board (see kit
 
 
 Initializing Module in API
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 Just like a pipette, you need to set up and name your module.
 
@@ -53,7 +55,7 @@ Just like a pipette, you need to set up and name your module.
 	mag_deck = instruments.Magbead(name='mag_deck')
 
 Activate and Deactivate Magnets 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+================================
 
 To activate the magnets and raise the module's platform, run ``.engage()``:
 
@@ -72,7 +74,7 @@ To deactivate the magnets and lower the module's platform, run ``.disengage()``:
 	mag_deck.disengage()
 
 Chain Other Commands
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 Just like ``aspirate()`` and ``dispense()`` can be chained, you can chain ``engage()`` and ``disengage()``, as well as the ``delay()`` if you don't want to do anything between engaging and disengaging the magnets.
 

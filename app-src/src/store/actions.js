@@ -1,7 +1,10 @@
 import Vue from 'vue'
+
 import * as types from './mutation-types'
+import * as analyticsEventTypes from '../analytics-events'
+import { trackEvent } from '../analytics'
 import Opentrons from '../rest_api_wrapper'
-import {processTasks} from '../util'
+import { processTasks } from '../util'
 
 const actions = {
   updateContainers ({commit}) {
@@ -61,6 +64,12 @@ const actions = {
       } else {
         tasks = []
       }
+      const analyticsEventType = {
+        true: analyticsEventTypes.PROTOCOL_UPLOAD_SUCCESS,
+        false: analyticsEventTypes.PROTOCOL_UPLOAD_ERROR
+      }[result.success]
+      trackEvent(analyticsEventType, result.fileName)
+
       commit(types.UPDATE_WARNINGS, {warning: result.warnings})
       commit(types.UPDATE_ERROR, {errors: result.errors})
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
