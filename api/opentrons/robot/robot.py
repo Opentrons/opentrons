@@ -4,16 +4,12 @@ from threading import Event
 
 import dill
 import requests
-import serial
 
-from opentrons import containers
-from opentrons.drivers import motor as motor_drivers
-from opentrons.drivers.virtual_smoothie import VirtualSmoothie
+from opentrons import containers, drivers
 from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.drivers import virtual_smoothie
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
@@ -75,7 +71,7 @@ class InstrumentMotor(object):
         mode : {'absolute', 'relative'}
         """
         kwargs = {self.axis: value}
-        return self.motor_driver.move_plunger(
+        self.motor_driver.move_plunger(
             mode=mode, **kwargs
         )
 
@@ -83,7 +79,7 @@ class InstrumentMotor(object):
         """
         Home plunger motor.
         """
-        return self.motor_driver.home(self.axis)
+        self.motor_driver.home(self.axis)
 
     def wait(self, seconds):
         """
@@ -159,8 +155,6 @@ class Robot(object, metaclass=Singleton):
     _commands = None  # []
     _instance = None
 
-    VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
-
     def __init__(self):
         """
         Initializes a robot instance.
@@ -177,16 +171,17 @@ class Robot(object, metaclass=Singleton):
         self.can_pop_command = Event()
         self.can_pop_command.set()
 
-        self.connections = {
+        self.smoothie_drivers = {
             'live': None,
-            'simulate': self.get_virtual_device(
+            'simulate': drivers.get_virtual_driver(
                 options={'limit_switches': False}
             ),
-            'simulate_switches': self.get_virtual_device(
+            'simulate_switches': drivers.get_virtual_driver(
                 options={'limit_switches': True}
             )
         }
-        self._driver = motor_drivers.CNCDriver()
+        self._driver = None
+        self.set_connection('simulate')
         self.reset()
 
     @classmethod
@@ -332,79 +327,6 @@ class Robot(object, metaclass=Singleton):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
-    def get_serial_device(self, port):
-        """
-        Connect to a serial CNC device.
-
-        Parameters
-        ----------
-        port : str
-            OS-specific port name.
-
-        Returns
-        -------
-        Serial device instance to be supplied to :func:`connect`
-        """
-        try:
-            device = serial.Serial(
-                port=port,
-                baudrate=self._driver.serial_baudrate,
-                timeout=self._driver.serial_timeout
-            )
-            return device
-        except serial.SerialException as e:
-            log.debug(
-                "Error connecting to {}".format(port))
-            log.error(e)
-
-        return None
-
-    def get_virtual_device(self, port=None, options=None):
-        """
-        Connect to a :class:`VirtualSmoothie` to simulate behavior of
-        a Smoothieboard
-
-        Parameters
-        ----------
-        port : str
-            Port name. Could be `None` or anything.
-        options : dict
-            Options to be passed to :class:`VirtualSmoothie`.
-
-            Default:
-
-            ::
-
-                default_options = {
-                    'limit_switches': True,
-                    'firmware': 'v1.0.5',
-                    'config': {
-                        'ot_version': 'one_pro',
-                        'version': 'v1.0.3',        # config version
-                        'alpha_steps_per_mm': 80.0,
-                        'beta_steps_per_mm': 80.0,
-                        'gamma_steps_per_mm': 1068.7
-                    }
-                }
-
-        """
-        default_options = {
-            'limit_switches': True,
-            'firmware': 'v1.0.5',
-            'config': {
-                'ot_version': 'one_pro',
-                'version': 'v1.2.0',        # config version
-                'alpha_steps_per_mm': 80.0,
-                'beta_steps_per_mm': 80.0,
-                'gamma_steps_per_mm': 1068.7
-            }
-        }
-        if options:
-            default_options['config'].update(options.get('config', {}))
-            options['config'] = default_options['config']
-            default_options.update(options)
-        return VirtualSmoothie(port=port, options=default_options)
-
     def connect(self, port=None, options=None):
         """
         Connects the robot to a serial port.
@@ -422,18 +344,13 @@ class Robot(object, metaclass=Singleton):
         ``True`` for success, ``False`` for failure.
         """
         device = None
-        if not port or port == self.VIRTUAL_SMOOTHIE_PORT:
-            device = self.get_virtual_device(
-                port=self.VIRTUAL_SMOOTHIE_PORT, options=options)
+        if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
+            device = drivers.get_virtual_driver(options)
         else:
-            device = self.get_serial_device(port)
+            device = drivers.get_serial_driver(port)
 
-        res = self._driver.connect(device)
-
-        if res:
-            self.connections['live'] = device
-
-        return res
+        self._driver = device
+        self.smoothie_drivers['live'] = device
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -467,21 +384,17 @@ class Robot(object, metaclass=Singleton):
         --------
         >>> from opentrons import Robot
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         """
         def _do():
-            if self._driver.calm_down():
-                if args:
-                    self._update_axis_homed(*args)
-                    return self._driver.home(*args)
-                else:
-                    self._update_axis_homed('xyzab')
-                    self._driver.home('z')
-                    return self._driver.home('x', 'y', 'b', 'a')
+            self._driver.calm_down()
+            if args:
+                self._update_axis_homed(*args)
+                self._driver.home(*args)
             else:
-                return False
+                self._update_axis_homed('xyzab')
+                self._driver.home('z')
+                self._driver.home('x', 'y', 'b', 'a')
 
         if kwargs.get('enqueue'):
             description = "Homing Robot"
@@ -519,7 +432,7 @@ class Robot(object, metaclass=Singleton):
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
-    def head_speed(self, rate):
+    def head_speed(self, *args, **kwargs):
         """
         Set the XY axis speeds of the robot, set in millimeters per minute
 
@@ -534,13 +447,11 @@ class Robot(object, metaclass=Singleton):
         --------
         >>> from opentrons import robot
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         >>> robot.head_speed(4500)
         >>> robot.move_head(x=200, y=200)
         """
-        self._driver.set_head_speed(rate)
+        self._driver.set_speed(*args, **kwargs)
 
     @traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
@@ -574,9 +485,7 @@ class Robot(object, metaclass=Singleton):
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
@@ -708,7 +617,7 @@ class Robot(object, metaclass=Singleton):
         """
         Internal. Prepare for a Robot's run.
         """
-        if not self._driver.connection:
+        if not self._driver.is_connected():
             raise RuntimeWarning('Please connect to the robot')
 
         self._runtime_warnings = []
@@ -738,9 +647,7 @@ class Robot(object, metaclass=Singleton):
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
-        True
         >>> robot.home()
-        True
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> p200 = Pipette(axis='a')
         >>> robot.move_to(plate[0])
@@ -752,8 +659,7 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event.update(kwargs)
 
         mode = 'live'
-        if isinstance(self._driver.connection,
-                      virtual_smoothie.VirtualSmoothie):
+        if self._driver.is_simulating():
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
@@ -833,17 +739,12 @@ class Robot(object, metaclass=Singleton):
         return self._runtime_warnings
 
     def set_connection(self, mode):
-        if mode in self.connections:
-            connection = self.connections[mode]
-            if connection:
-                self._driver.connection = connection
-            else:
-                self._driver.disconnect()
-        else:
+        if mode not in self.smoothie_drivers:
             raise ValueError(
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
+        self._driver = self.smoothie_drivers[mode]
 
     def disconnect(self):
         """
@@ -855,11 +756,12 @@ class Robot(object, metaclass=Singleton):
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
-        self.connections['live'] = None
+        del self.smoothie_drivers['live']
+        self.smoothie_drivers['live'] = None
 
     def containers(self):
         """
-        Returns the list of the containers on the deck.
+        Returns the dict with all of the containers on the deck.
         """
         return self._deck.containers()
 
@@ -934,7 +836,15 @@ class Robot(object, metaclass=Singleton):
         if name:
             return self.get_instruments_by_name(name)
 
-        return sorted(self._instruments.items())
+        return sorted(
+            self._instruments.items(), key=lambda s: s[0].lower())
+
+    def get_containers(self):
+        """
+        Returns the list of the containers on the deck.
+        """
+        return sorted(
+            self._deck.containers().items(), key=lambda s: s[0].lower())
 
     def add_container(self, container_name, slot, label=None):
         if not label:
@@ -942,6 +852,12 @@ class Robot(object, metaclass=Singleton):
         container = containers.get_persisted_container(container_name)
         container.properties['type'] = container_name
         self._deck[slot].add(container, label)
+
+        # if a container is added to Deck AFTER a Pipette, the Pipette's
+        # Calibrator must update to include all children of Deck
+        for _, instr in self.get_instruments():
+            if hasattr(instr, 'update_calibrator'):
+                instr.update_calibrator()
         return container
 
     def clear_commands(self):
@@ -972,12 +888,19 @@ class Robot(object, metaclass=Singleton):
         self.can_pop_command.set()
         self._driver.resume()
 
+    def halt(self):
+        """
+        Stops execution of both the protocol and the Smoothie board immediately
+        """
+        self._driver.halt()
+        self.can_pop_command.set()
+
     def get_serial_ports_list(self):
         ports = []
         # TODO: Store these settings in config
         if os.environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             ports = [self.VIRTUAL_SMOOTHIE_PORT]
-        ports.extend(self._driver.get_serial_ports_list())
+        ports.extend(drivers.get_serial_ports_list())
         return ports
 
     def is_connected(self):

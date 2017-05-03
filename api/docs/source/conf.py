@@ -143,7 +143,7 @@ html_theme_options = {
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
     'logo': 'logo.png',
-    'fixed_sidebar': 'True',
+    'fixed_sidebar': 'False',
     'github_user': 'OpenTrons',
     'github_repo': 'opentrons-api',
     'github_button': 'True',

@@ -223,8 +223,7 @@ class Placeable(object):
             name = str(child)
 
         if name in self.children_by_name:
-            raise Exception('Child with the name {} already exists'
-                            .format(name))
+            del self.children_by_name[name]
 
         child._coordinates = Vector(coordinates)
         child.parent = self
@@ -404,7 +403,7 @@ class Placeable(object):
         """
         return self.from_center(x=0.0, y=0.0, z=0.0, reference=reference)
 
-    def bottom(self, z=0, reference=None):
+    def bottom(self, z=0, radius=0, degrees=0, reference=None):
         """
         Returns (:Placeable, :Vector:) tuple where :Vector:
         corresponds to the bottom of a :Placeable:
@@ -412,10 +411,14 @@ class Placeable(object):
         If :reference: :Placeable: is provided, returns
         the :Vector: within :reference: coordinate system
         """
-        coordinates = self.from_center(x=0, y=0, z=-1, reference=reference)
+        coordinates = self.from_center(
+            r=radius,
+            theta=(degrees / 180) * math.pi,
+            h=-1,
+            reference=reference)
         return (self, coordinates + (0, 0, z))
 
-    def top(self, z=0, reference=None):
+    def top(self, z=0, radius=0, degrees=0, reference=None):
         """
         Returns (:Placeable, :Vector:) tuple where :Vector:
         corresponds to the top of a :Placeable:
@@ -424,7 +427,11 @@ class Placeable(object):
         the :Vector: within :reference: coordinate system
         """
 
-        coordinates = self.from_center(x=0, y=0, z=1, reference=reference)
+        coordinates = self.from_center(
+            r=radius,
+            theta=(degrees / 180) * math.pi,
+            h=1,
+            reference=reference)
         return (self, coordinates + (0, 0, z))
 
     def from_center(self, x=None, y=None, z=None, r=None,
@@ -456,11 +463,11 @@ class Deck(Placeable):
         """
         Returns all containers on a deck as a name:placeable dict
         """
-        containers = []
+        containers = OrderedDict()
         for slot in self:
             for container in slot:
-                containers.append(container)
-        return {c.get_name(): c for c in containers}
+                containers[container.get_name()] = container
+        return containers
 
     def has_container(self, container_instance):
         """

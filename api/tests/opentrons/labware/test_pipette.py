@@ -13,8 +13,7 @@ class PipetteTest(unittest.TestCase):
 
     def setUp(self):
         self.robot = Robot.reset_for_tests()
-        myport = self.robot.VIRTUAL_SMOOTHIE_PORT
-        self.robot.connect(port=myport)
+        self.robot.connect()
         self.robot.home()
 
         self.trash = containers.load('point', 'A1')
@@ -280,9 +279,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_non_empty_aspirate(self):
 
-        self.p200.aspirate(100)
-        self.p200.aspirate(20)
-        self.robot.run()
+        self.p200.aspirate(100, enqueue=False)
+        self.p200.aspirate(20, enqueue=False)
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -352,6 +350,24 @@ class PipetteTest(unittest.TestCase):
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses=0)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses='a')
         self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
@@ -1224,6 +1240,63 @@ class PipetteTest(unittest.TestCase):
             ['pick'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well A2'],
+            ['return'],
+            ['drop']
+        ]
+        self.assertEqual(len(self.robot.commands()), len(expected))
+        for i, c in enumerate(self.robot.commands()):
+            for s in expected[i]:
+                self.assertTrue(s.lower() in c.lower())
+        self.robot.clear_commands()
+
+    def test_transfer_singlechannel(self):
+        self.p200.reset()
+        self.p200.channels = 1
+        self.p200.transfer(
+            200,
+            self.plate.rows('1', '2'),
+            self.plate.rows('3'),
+            touch_tip=False,
+            blow_out=False,
+            trash=False
+        )
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
+        expected = [
+            ['pick'],
+            ['aspirating', '200', 'Well A1'],
+            ['dispensing', '200', 'Well A3'],
+            ['aspirating', '200', 'Well B1'],
+            ['dispensing', '200', 'Well A3'],
+            ['aspirating', '200', 'Well C1'],
+            ['dispensing', '200', 'Well B3'],
+            ['aspirating', '200', 'Well D1'],
+            ['dispensing', '200', 'Well B3'],
+            ['aspirating', '200', 'Well E1'],
+            ['dispensing', '200', 'Well C3'],
+            ['aspirating', '200', 'Well F1'],
+            ['dispensing', '200', 'Well C3'],
+            ['aspirating', '200', 'Well G1'],
+            ['dispensing', '200', 'Well D3'],
+            ['aspirating', '200', 'Well H1'],
+            ['dispensing', '200', 'Well D3'],
+            ['aspirating', '200', 'Well A2'],
+            ['dispensing', '200', 'Well E3'],
+            ['aspirating', '200', 'Well B2'],
+            ['dispensing', '200', 'Well E3'],
+            ['aspirating', '200', 'Well C2'],
+            ['dispensing', '200', 'Well F3'],
+            ['aspirating', '200', 'Well D2'],
+            ['dispensing', '200', 'Well F3'],
+            ['aspirating', '200', 'Well E2'],
+            ['dispensing', '200', 'Well G3'],
+            ['aspirating', '200', 'Well F2'],
+            ['dispensing', '200', 'Well G3'],
+            ['aspirating', '200', 'Well G2'],
+            ['dispensing', '200', 'Well H3'],
+            ['aspirating', '200', 'Well H2'],
+            ['dispensing', '200', 'Well H3'],
             ['return'],
             ['drop']
         ]

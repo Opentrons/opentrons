@@ -4,7 +4,7 @@ from unittest import mock
 
 from opentrons.robot.robot import Robot
 from opentrons.containers.placeable import Deck
-from opentrons import instruments, containers
+from opentrons import instruments, containers, drivers
 from opentrons.util.vector import Vector
 
 
@@ -13,9 +13,15 @@ class RobotTest(unittest.TestCase):
         Robot.reset_for_tests()
         self.robot = Robot.get_instance()
 
+        self.smoothie_version = 'edge-1c222d9NOMSD'
+
         self.robot.reset()
-        self.robot.connect()
+        self.robot.connect(options={'firmware': self.smoothie_version})
         self.robot.home(enqueue=False)
+
+    def test_firmware_verson(self):
+        self.assertEquals(
+            self.smoothie_version, self.robot._driver.firmware_version)
 
     def test_add_container(self):
         c1 = self.robot.add_container('96-flat', 'A1')
@@ -49,7 +55,7 @@ class RobotTest(unittest.TestCase):
         p200.aspirate().dispense()
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
-        self.assertEquals(self.robot.connections['live'], None)
+        self.assertEquals(self.robot.smoothie_drivers['live'], None)
 
     def test_stop_run(self):
         p200 = instruments.Pipette(axis='b', name='my-fancy-pancy-pipette')
@@ -132,7 +138,7 @@ class RobotTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.robot.get_connected_port()
-        self.assertEquals(res, self.robot.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
 
     def test_robot_move_to(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
@@ -218,15 +224,15 @@ class RobotTest(unittest.TestCase):
         res = self.robot.versions()
         expected = {
             'config': {
-                'version': 'v1.2.0',
+                'version': 'v2.0.0',
                 'compatible': True
             },
             'firmware': {
-                'version': 'v1.0.5',
+                'version': self.smoothie_version,
                 'compatible': True
             },
             'ot_version': {
-                'version': 'one_pro',
+                'version': 'one_pro_plus',
                 'compatible': True
             }
         }

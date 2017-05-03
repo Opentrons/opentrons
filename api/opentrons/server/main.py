@@ -13,9 +13,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons import robot, Robot
-from opentrons.containers import placeable
-from opentrons.instruments import Pipette
+from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
@@ -26,12 +24,13 @@ from opentrons.server.process_manager import run_once
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
-STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'static')
+STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
-            template_folder=TEMPLATES_FOLDER
+            template_folder=TEMPLATES_FOLDER,
+            static_url_path=''
             )
 
 
@@ -59,6 +58,11 @@ def welcome():
     return render_template("index.html")
 
 
+@app.route("/exit")
+def exit():
+    sys.exit()
+
+
 def get_protocol_locals():
     from opentrons import robot, containers, instruments  # NOQA
     return locals()
@@ -77,7 +81,7 @@ def load_python(stream):
     )
     try:
         try:
-            exec(code, globals(), get_protocol_locals())
+            exec(code, globals())
         except Exception as e:
             tb = e.__traceback__
             stack_list = traceback.extract_tb(tb)
@@ -93,7 +97,7 @@ def load_python(stream):
             )
 
         robot = restore_patched_robot()
-        robot.simulate()
+        # robot.simulate()
         if len(robot._commands) == 0:
             error = (
                 "This protocol does not contain any commands for the robot."
@@ -229,7 +233,7 @@ def emit_notifications(notifications, _type):
         })
 
 
-def _run_commands():
+def _run_commands(should_home_first=True):
     robot = Robot.get_instance()
 
     start_time = time.time()
@@ -238,7 +242,6 @@ def _run_commands():
 
     try:
         robot.resume()
-        robot.home()
         robot.run(caller='ui')
         if len(robot._commands) == 0:
             error = \
@@ -267,6 +270,13 @@ def run():
     return flask.jsonify({'status': 'success', 'data': {}})
 
 
+@app.route("/run_home", methods=["GET"])
+def run_home():
+    robot = Robot.get_instance()
+    robot.home()
+    return run()
+
+
 @app.route("/pause", methods=["GET"])
 def pause():
     result = robot.pause()
@@ -289,6 +299,20 @@ def resume():
 def stop():
     result = robot.stop()
     emit_notifications(['Protocol stopped'], 'info')
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': result
+    })
+
+
+@app.route("/halt", methods=["GET"])
+def halt():
+    result = robot.halt()
+    emit_notifications(
+        ['Robot halted suddenly, please HOME ALL before running again'],
+        'info'
+    )
 
     return flask.jsonify({
         'status': 'success',
@@ -453,7 +477,7 @@ def _sort_containers(container_list):
     _tipracks = []
     _other = []
     for c in container_list:
-        _type = c.properties['type'].lower()
+        _type = c.get_type().lower()
         if 'tip' in _type:
             _tipracks.append(c)
         else:
@@ -475,7 +499,7 @@ def _get_all_pipettes():
     robot = Robot.get_instance()
     pipette_list = []
     for _, p in robot.get_instruments():
-        if isinstance(p, Pipette):
+        if isinstance(p, instruments.Pipette):
             pipette_list.append(p)
     return sorted(
         pipette_list,
@@ -502,9 +526,11 @@ def _get_unique_containers(instrument):
     """
     unique_containers = set()
     for location in instrument.placeables:
-        containers = [c for c in location.get_trace() if isinstance(
-            c, placeable.Container)]
-        unique_containers.add(containers[0])
+        if isinstance(location, containers.placeable.WellSeries):
+            location = location[0]
+        for c in location.get_trace():
+            if isinstance(c, containers.placeable.Container):
+                unique_containers.add(c)
 
     return _sort_containers(list(unique_containers))
 
@@ -524,7 +550,7 @@ def _check_if_calibrated(instrument, container):
 
 def _check_if_instrument_calibrated(instrument):
     # TODO: rethink calibrating instruments other than Pipette
-    if not isinstance(instrument, Pipette):
+    if not isinstance(instrument, instruments.Pipette):
         return True
 
     positions = instrument.positions
@@ -544,7 +570,7 @@ def _get_container_from_step(step):
         match = [
             container.get_name() == step['label'],
             container.get_parent().get_name() == step['slot'],
-            container.properties['type'] == step['type']
+            container.get_type() == step['type']
 
         ]
         if all(match):
@@ -564,7 +590,7 @@ def create_step_list():
             'channels': instrument.channels,
             'placeables': [
                 {
-                    'type': container.properties['type'],
+                    'type': container.get_type(),
                     'label': container.get_name(),
                     'slot': container.get_parent().get_name()
                 }
@@ -580,11 +606,13 @@ def create_step_list():
 
 def update_step_list():
     global current_protocol_step_list
+    robot = Robot.get_instance()
     if current_protocol_step_list is None:
         create_step_list()
     try:
         for step in current_protocol_step_list:
-            _, instrument = robot.get_instruments_by_name(step['label'])[0]
+            t_axis = str(step['axis']).upper()
+            instrument = robot._instruments[t_axis]
             step.update({
                 'top': instrument.positions['top'],
                 'bottom': instrument.positions['bottom'],
@@ -685,7 +713,15 @@ def move_to_container():
     try:
         instrument = robot._instruments[axis.upper()]
         container = robot._deck[slot].get_child_by_name(name)
-        instrument.move_to(container[0].bottom(), enqueue=False)
+        well_x, well_y, well_z = tuple(instrument.calibrator.convert(
+            container[0],
+            container[0].bottom()[1]))
+        _, _, robot_max_z = robot._driver.get_dimensions()
+
+        # move to max Z to avoid collisions while calibrating
+        robot.move_head(z=robot_max_z)
+        robot.move_head(x=well_x, y=well_y)
+        robot.move_head(z=well_z)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -828,24 +864,24 @@ def set_max_volume():
     })
 
 
-def _calibrate_placeable(container_name, axis_name):
+def _calibrate_placeable(container_name, parent_slot, axis_name):
     robot = Robot.get_instance()
     deck = robot._deck
-    containers = deck.containers()
+    this_container = deck[parent_slot].get_child_by_name(container_name)
     axis_name = axis_name.upper()
 
-    if container_name not in containers:
-        raise ValueError('Container {} is not defined'.format(container_name))
+    if not this_container:
+        raise ValueError('Container {0} not found in slot {1}'.format(
+            container_name, parent_slot))
 
     if axis_name not in robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
     instrument = robot._instruments[axis_name]
-    container = containers[container_name]
 
-    well = container[0]
-    pos = well.from_center(x=0, y=0, z=-1, reference=container)
-    location = (container, pos)
+    well = this_container[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=this_container)
+    location = (this_container, pos)
 
     instrument.calibrate_position(location)
     return instrument.calibration_data
@@ -855,8 +891,9 @@ def _calibrate_placeable(container_name, axis_name):
 def calibrate_placeable():
     name = request.json.get("label")
     axis = request.json.get("axis")
+    slot = request.json.get("slot")
     try:
-        _calibrate_placeable(name, axis)
+        _calibrate_placeable(name, slot, axis)
         calibrations = update_step_list()
         emit_notifications([
             'Saved {0} for the {1} axis'.format(name, axis)], 'success')

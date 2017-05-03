@@ -3,157 +3,145 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. testsetup:: index_main
-
-  from opentrons import robot, containers, instruments
-
-  robot.reset()             # clear robot's state first
-
-  tiprack = containers.load(
-      'tiprack-200ul',  # container type
-      'A1',             # slot
-      'tiprack-test-setup'         # user-defined name
-  )
-  plate = containers.load('96-flat', 'B1', 'plate-for-test')
-  trough = containers.load('trough-12row', 'B2', 'trough-for-test')
-
-  tube_1 = plate[0]
-  tube_2 = plate[1]
-
-  well_1 = plate[0]
-  well_2 = plate[1]
-  well_3 = plate[2]
-  well_4 = plate[3]
-
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume = 1000
-  )
-
-  pipette = p200
-
-.. testsetup:: index_long
-
-  from opentrons import robot
-  robot.reset()
-
-Opentrons API:|br| Simple Biology Lab Protocol Coding
-===========================================================
-
-Introduction
-------------
+===============
+Opentrons API
+===============
 
 The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
 
-We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
+We’ve designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
-.. testcode:: index_main
+`View source code on GitHub`__
 
-   pipette.aspirate(tube_1).dispense(tube_2)
+__ https://github.com/opentrons/opentrons-api
 
-That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one.
+**********************
 
-You string these commands into full protocols that anyone with Opentrons can run. This one way to program the robot to use a p200 pipette to pick up 200ul (its full volume) and dispense 50ul into the first four wells in a 96 well plate called 'plate.'
+.. testsetup::  helloworld
 
-.. testcode:: index_main
+    from opentrons import containers, instruments, robot
 
-   p200.aspirate(trough[1])
-   p200.dispense(50, plate[0])
-   p200.dispense(50, plate[1])
-   p200.dispense(50, plate[2])
-   p200.dispense(50, plate[3])
+    robot.reset()
 
-If you wanted to do this 96 times, you could write it like this:
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    plate = containers.load('96-flat', 'B1')
 
-.. testcode:: index_main
+    pipette = instruments.Pipette(axis='b', max_volume=200)
 
-  for i in range(96):
-      if p200.current_volume < 50:
-          p200.aspirate(trough[1])
-      p200.dispense(50, plate[i])
+How it Looks
+---------------
+
+The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instruction to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
+
+.. code-block:: none
+
+    Use the Opentrons API's containers and instruments
+
+    Add a 96 well plate, and place it in slot 'B1'
+    Add a 200uL tip rack, and place it in slot 'A1'
+
+    Add a 200uL pipette to axis 'b', and tell it to use that tip rack
+
+    Transfer 100uL from the plate's 'A1' well to it's 'A2' well
+
+If we were to rewrite this with the Opentrons API, it would look like the following:
+
+.. testcode::  helloworld
+
+    # imports
+    from opentrons import containers, instruments
+
+    # containers
+    plate = containers.load('96-flat', 'B1')
+    tiprack = containers.load('tiprack-200ul', 'A1')
+
+    # pipettes
+    pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
+
+    # commands
+    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+
+**********************
+
+How it's Organized
+------------------
+
+When writing protocols using the Opentrons API, there are generally three sections:
+
+1) Imports
+2) Containers
+3) Pipettes
+4) Commands
+
+Imports
+^^^^^^^
+
+When writing in Python, you must always include the Opentrons API within your file. We most commonly use the ``containers`` and ``instruments`` sections of the API.
+
+From the example above, the "imports" section looked like:
+
+.. code-block::  python
+
+    from opentrons import containers, instruments
 
 
-Basic Principles
-----------------
+Containers
+^^^^^^^^^^
 
-**Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
+While the imports section is usually the same across protocols, the containers section is different depending on the tip racks, well plates, troughs, or tubes you're using on the robot.
 
-.. testcode:: index_main
+Each container is given a type (ex: ``'96-flat'``), and the slot on the robot it will be placed (ex: ``'B1'``).
 
-  p200.aspirate(100, plate['A1']).dispense(plate['A2'])
+From the example above, the "containers" section looked like:
 
-Is exactly what you think it would do:
-  * Take p200 pipette
-  * Aspirate 100 uL from well A1 on your plate
-  * Dispense everything into well A2 on the same plate
+.. code-block::  python
 
-**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them.
-For example:
+    plate = containers.load('96-flat', 'B1')
+    tiprack = containers.load('tiprack-200ul', 'A1')
 
-.. testcode:: index_main
+Pipettes
+^^^^^^^^
 
-  p200.aspirate(100, plate[0]).dispense(plate[1])
+Next, pipettes are created and attached to a specific axis on the OT-One (``'a'`` or ``'b'``). Axis ``'a'`` is on the center of the head, while axis ``'b'`` is on the left.
 
-while using 0 or 1 instead of 'A1' and 'B1' will do just the same.
+There are other parameters for pipettes, but the most important are the ``max_volume`` to set it's size, and the tip rack(s) it will use during the protocol.
 
-or
+From the example above, the "pipettes" section looked like:
 
-.. testcode:: index_main
+.. code-block::  python
 
-  p200.aspirate(100, plate[0].bottom())
+    pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
-will aspirate 100, from the bottom of a well.
+Commands
+^^^^^^^^
 
+And finally, the most fun section, the actual protocol commands! The most common commands are ``transfer()``, ``aspirate()``, ``dispense()``, ``pick_up_tip()``, ``drop_tip()``, and much more.
 
-Hello World
------------
+This section can tend to get long, relative to the complexity of your protocol. However, with a better understanding of Python you can learn to compress and simplify even the most complex-seeming protocols.
 
-Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
+From the example above, the "commands" section looked like:
 
-.. testcode:: index_long
+.. code-block:: python
 
-  from opentrons import robot
-  from opentrons import containers, instruments
+    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
-  tiprack = containers.load(
-      'tiprack-200ul',  # container type
-      'A1',             # slot
-      'tiprack'         # user-defined name
-  )
-
-  plate = containers.load('96-flat', 'B1', 'plate')
-
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume=200
-  )
-
-  p200.pick_up_tip(tiprack[0])
-
-  for i in range(95):
-      p200.aspirate(100, plate[i])
-      p200.dispense(plate[i + 1])
-
-  p200.return_tip()
-
-  robot.simulate()
 
 Table of Contents
 -----------------
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 3
 
-  updating_firmware
-  setup
-  getting_started
-  well_access
-  labware_library
-  custom_containers
-  running_app
-  tips_and_tricks
-  module
+  writing
+  containers
+  pipettes
+  transfer
+  robot
+  modules
+  examples
   api
+  calibration
+  firmware
 
 .. |br| raw:: html
 
