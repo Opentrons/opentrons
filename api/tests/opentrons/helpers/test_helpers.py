@@ -1,15 +1,18 @@
 import unittest
-from opentrons.util.vector import Vector
+from opentrons import Robot
+from opentrons.containers import load as containers_load
 from opentrons.helpers import helpers
-from opentrons import instruments, containers, Robot
+from opentrons.instruments import pipette
+from opentrons.util.vector import Vector
+
 
 
 class HelpersTest(unittest.TestCase):
 
     def setUp(self):
-        self.robot = Robot.reset_for_tests()
-        self.p200 = instruments.Pipette(axis='b', max_volume=200)
-        self.plate = containers.load('96-flat', 'C1')
+        self.robot = Robot()
+        self.p200 = pipette.Pipette(self.robot, axis='b', max_volume=200)
+        self.plate = containers_load(self.robot, '96-flat', 'C1')
 
     def test_break_down_travel(self):
         # with 3-dimensional points
