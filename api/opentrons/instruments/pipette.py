@@ -70,6 +70,7 @@ class Pipette(Instrument):
 
     def __init__(
             self,
+            robot,
             axis,
             name=None,
             channels=1,
@@ -80,6 +81,7 @@ class Pipette(Instrument):
             aspirate_speed=300,
             dispense_speed=500):
 
+        self.robot = robot
         self.axis = axis
         self.channels = channels
 
