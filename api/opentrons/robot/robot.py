@@ -700,7 +700,7 @@ class Robot(object, metaclass=Singleton):
         if not resp.ok:
             raise Exception('App failed to accept protocol upload')
 
-    def simulate(self, switches=False):
+    def simulate(self, switches=False, record=False):
         """
         Simulate a protocol run on a virtual robot.
 

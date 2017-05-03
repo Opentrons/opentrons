@@ -9,6 +9,7 @@ class Opentrons {
     this.jogUrl = this.baseUrl + '/jog'
     this.jogToSlotUrl = this.baseUrl + '/move_to_slot'
     this.runProtocolUrl = this.baseUrl + '/run'
+    this.runDetachedUrl = this.baseUrl + '/run_detached'
     this.runHomeProtocolUrl = this.baseUrl + '/run_home'
     this.jogToContainerUrl = this.baseUrl + '/move_to_container'
     this.jogToPlungerUrl = this.baseUrl + '/move_to_plunger_position'
@@ -125,6 +126,16 @@ class Opentrons {
       }, (response) => {
         console.log('Failed to upload protocol', response)
         return {success: false}
+      })
+  }
+
+  runDetached () {
+    return Vue.http
+      .get(this.runDetachedUrl)
+      .then((response) => {
+        console.log('Protocol run successfully initiated', response)
+      }, (response) => {
+        console.log('Protocol run failed to execute', response)
       })
   }
 

@@ -1,5 +1,6 @@
 <template>
   <div id='run' :class="{'disabled': !calibrated}">
+    <button v-show='!running' @click='runDetached()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Run Detached</button>
     <button v-show='!running' @click='runProtocol()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Run Job</button>
     <button v-show='running'@click='cancelProtocol()' class='btn-clear' id="cancel-job">Cancel Job</button>
     <div class='controls'>
@@ -13,6 +14,9 @@
   export default {
     name: 'Run',
     methods: {
+      runDetached () {
+        this.$store.dispatch('runDetached')
+      },
       runProtocol () {
         this.$store.dispatch('runProtocol')
       },
