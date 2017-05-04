@@ -498,7 +498,7 @@ class Pipette(Instrument):
         # first go to the destination
         if location:
             placeable, _ = containers.unpack_location(location)
-            self.move_to(placeable.top(), strategy='arc', enqueue=False)
+            self.move_to(placeable.top(), strategy='arc')
 
         # setup the plunger above the liquid
         if plunger_empty:
@@ -508,15 +508,14 @@ class Pipette(Instrument):
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(1)
-            self.move_to(location, strategy='direct', enqueue=False)
+            self.move_to(location, strategy='direct')
 
     # QUEUEABLE
     def mix(self,
             repetitions=1,
             volume=None,
             location=None,
-            rate=1.0,
-            enqueue=True):
+            rate=1.0):
         """
         Mix a volume of liquid (in microliters/uL) using this pipette
 
@@ -569,40 +568,23 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            nonlocal volume
-            nonlocal location
-            nonlocal repetitions
+        if volume is None:
+            volume = self.max_volume
 
-            if volume is None:
-                volume = self.max_volume
-
-            self._associate_placeable(location)
-
-        def _do():
-            # plunger movements are handled w/ aspirate/dispense
-            # using Command for printing description
-            pass
+        self._associate_placeable(location)
 
         _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, self.max_volume if volume is None else volume
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
-        self.aspirate(location=location,
-                      volume=volume,
-                      rate=rate,
-                      enqueue=enqueue)
+
+        self.aspirate(location=location, volume=volume, rate=rate)
         for i in range(repetitions - 1):
-            self.dispense(volume, rate=rate, enqueue=enqueue)
-            self.aspirate(volume, rate=rate, enqueue=enqueue)
-        self.dispense(volume, rate=rate, enqueue=enqueue)
+            self.dispense(volume, rate=rate)
+            self.aspirate(volume, rate=rate)
+        self.dispense(volume, rate=rate)
 
         return self
 
@@ -642,24 +624,16 @@ class Pipette(Instrument):
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            self.current_volume = 0
-            self._associate_placeable(location)
 
-        def _do():
-            nonlocal location
-            self.move_to(location, strategy='arc', enqueue=False)
-            self.motor.move(self._get_plunger_position('blow_out'))
+        self.current_volume = 0
+        self._associate_placeable(location)
+
+        self.move_to(location, strategy='arc')
+        self.motor.move(self._get_plunger_position('blow_out'))
 
         _description = "Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
         return self
 
     # QUEUEABLE
