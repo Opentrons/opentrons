@@ -74,16 +74,19 @@ def create(name, grid, spacing, diameter, depth, volume=0):
 
 
 def container_to_json(c, name):
-    locations = OrderedDict()
+    locations = []
     for w in c:
         x, y, z = w.coordinates()
-        locations[w.get_name()] = {
-            'x': x, 'y': y, 'z': z,
-            'depth': w.z_size(),
-            'diameter': w.x_size(),
-            'total-liquid-volume': w.max_volume()
-        }
-    return {name: {'locations': locations}}
+        locations.append((
+            w.get_name(),
+            {
+                'x': x, 'y': y, 'z': z,
+                'depth': w.z_size(),
+                'diameter': w.x_size(),
+                'total-liquid-volume': w.max_volume()
+            }
+        ))
+    return {name: {'locations': OrderedDict(locations)}}
 
 
 def save_custom_container(data):
