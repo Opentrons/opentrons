@@ -2,47 +2,54 @@
   
     <section id="task-view">
       <section id="placeable-pane">  
+        <!-- Placeable Info -->
         <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}
-        <span class="more-info">
-        <a role="button" id="show-modal" @click="showModal = true">?</a>
-        </span>
+          <span class="more-info">
+          <a role="button" id="show-modal" @click="showModal = true">?</a>
+          </span>
         </h1> 
-        <!-- placeable modal -->
+
+        <!-- Placeable Modal -->
         <modal v-if="showModalPlaceable" @close="showModalPlaceable = false" :placeable="placeable($route.params.slot)" :instrument="instrument()">
         </modal>
 
-        <deck-navigation  :instrument='instrument()' :deck='deck()'></deck-navigation>  
+        <!-- Placeable Nav / Deck Map -->
+        <deck-navigation  :instrument='instrument()' :deck='deck()'></deck-navigation>
+        
+        <!-- Placeable Calibration -->
+        <placeable-calibration v-if="$route.params.placeable" :instrument='instrument()' :deck='deck()'></placeable-calibration>
       </section>
 
       <section id="instrument-pane">
+        <!-- Instrument Info -->
         <h1>{{instrument().label}} {{channels}} [{{instrumentLocation}}]</h1>
-        <!-- TODO: Refactor into PipetteNavigation Component w/props -->
+        <!-- Instrument Toggle / Nav -->
         <button  v-for="instrument in tasks().instruments" 
         class="tab" :class="{active : activePipette(instrument)}"  
         @click="togglePipette(instrument.axis)"> 
         {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span></button>
 
         <div class="pipette-modal" :class="plungerMode">
-        <div class="plunger-nav">
-          <ul>
-            <li @click="modePlunger('top')" class="top">Top</li>
-            <li @click="modePlunger('bottom')" class="bottom">Bottom</li>
-            <li @click="modePlunger('blowout')" class="blowout">Blowout</li>
-            <li @click="modePlunger('drop_tip')" class="droptip">Drop Tip</li>
-          </ul>
+          <div class="plunger-nav">
+            <ul>
+              <li @click="modePlunger(instrument().axis, 'top')" class="top">Top</li>
+              <li @click="modePlunger(instrument().axis, 'bottom')" class="bottom">Bottom</li>
+              <li @click="modePlunger(instrument().axis, 'blowout')" class="blowout">Blowout</li>
+              <li @click="modePlunger(instrument().axis, 'drop_tip')" class="droptip">Drop Tip</li>
+            </ul>
+          </div>
+          <div class="plunger-img">
+            <img src='../assets/img/pipette_top.png' class='top'/>
+            <img src='../assets/img/pipette_bottom.png' class='bottom'/>
+            <img src='../assets/img/pipette_blowout.png' class='blowout'/>
+            <img src='../assets/img/pipette_drop_tip.png' class='drop_tip'/>
+          </div>
         </div>
-        <div class="plunger-img">
-          <img src='../assets/img/pipette_top.png' class='top'/>
-          <img src='../assets/img/pipette_bottom.png' class='bottom'/>
-          <img src='../assets/img/pipette_blowout.png' class='blowout'/>
-          <img src='../assets/img/pipette_drop_tip.png' class='drop_tip'/>
-        </div>
-        </div>
-        <!-- TODO: Move to Separate Component and wire up -->
-        <button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class='btn-calibrate save'>SAVE</button>
-        <button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
-        </section>
+        <!--- Instrument Calibration -->
+        <!-- v-if="!$route.params.placeable" -->
+        <instrument-calibration :instrument="instrument()" :position="plungerPos"></instrument-calibration>
 
+        </section>
       </section>
 
     </section>
@@ -53,10 +60,13 @@
 
 <script>
   // import RunScreen from './RunScreen.vue'
+  import PlaceableCalibration from './PlaceableCalibration'
   import DeckNavigation from './DeckNavigation'
   import Modal from './Modal.vue'
+  import InstrumentCalibration from './InstrumentCalibration'
 
   export default {
+    name: 'TaskView',
     props: ['busy'],
     data () {
       return {
@@ -68,7 +78,9 @@
     },
     components: {
       DeckNavigation,
-      Modal
+      PlaceableCalibration,
+      Modal,
+      InstrumentCalibration
     },
     computed: {
       channels () {
@@ -102,17 +114,10 @@
       togglePipette (axis) {
         this.$router.push({ name: 'instrument', params: { instrument: axis, slot: null, placeable: null } })
       },
-      modePlunger (mode) {
+      modePlunger (axis, mode) {
         this.plungerMode = 'mode-' + mode
         this.plungerPos = mode
-      },
-      calibrateInstrument (position) {
-        let axis = this.axis
-        this.$store.dispatch('calibrate', {axis, position})
-      },
-      moveToPlungerPosition (position) {
-        let axis = this.axis
-        this.$store.dispatch('moveToPosition', {axis, position})
+        this.togglePipette(axis)
       },
       running () {
         return this.$store.state.running || this.$store.state.protocolFinished

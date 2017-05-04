@@ -11,6 +11,7 @@
   import RunScreen from './RunScreen.vue'
 
   export default {
+    name: 'TaskPane',
     props: ['busy'],
     components: {
       RunScreen
