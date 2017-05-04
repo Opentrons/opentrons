@@ -395,6 +395,18 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 10.0}
         )
 
+        self.robot.clear_commands()
+        self.p200.reset()
+        self.p200.drop_tip(home_after=False)
+
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_plunger_positions()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'a': 0, 'b': 10.0}
+        )
+
     def test_delay(self):
         self.p200.delay(1)
 
@@ -1586,8 +1598,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.return_tip()
 
         expected = [
-            mock.call(self.tiprack1[0], enqueue=True),
-            mock.call(self.tiprack1[1], enqueue=True)
+            mock.call(self.tiprack1[0], home_after=True, enqueue=True),
+            mock.call(self.tiprack1[1], home_after=True, enqueue=True)
         ]
 
         self.assertEqual(
