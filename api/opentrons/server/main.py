@@ -14,6 +14,8 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons import robot, Robot, containers, instruments
+from opentrons.instruments import pipette
+from opentrons.containers import placeable
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
@@ -133,6 +135,7 @@ def upload():
     api_response = None
     if extension == 'py':
         api_response = load_python(file.stream)
+    else:
         return flask.jsonify({
             'status': 'error',
             'data': '{} is not a valid extension. Expected'
@@ -494,7 +497,7 @@ def _get_all_pipettes():
     global robot
     pipette_list = []
     for _, p in robot.get_instruments():
-        if isinstance(p, instruments.Pipette):
+        if isinstance(p, pipette.Pipette):
             pipette_list.append(p)
     return sorted(
         pipette_list,
@@ -521,10 +524,10 @@ def _get_unique_containers(instrument):
     """
     unique_containers = set()
     for location in instrument.placeables:
-        if isinstance(location, containers.placeable.WellSeries):
+        if isinstance(location, placeable.WellSeries):
             location = location[0]
         for c in location.get_trace():
-            if isinstance(c, containers.placeable.Container):
+            if isinstance(c, placeable.Container):
                 unique_containers.add(c)
 
     return _sort_containers(list(unique_containers))
@@ -545,7 +548,7 @@ def _check_if_calibrated(instrument, container):
 
 def _check_if_instrument_calibrated(instrument):
     # TODO: rethink calibrating instruments other than Pipette
-    if not isinstance(instrument, instruments.Pipette):
+    if not isinstance(instrument, pipette.Pipette):
         return True
 
     positions = instrument.positions
