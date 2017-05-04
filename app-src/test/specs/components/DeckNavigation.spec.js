@@ -1,6 +1,6 @@
 /* global describe, it */
 import { expect } from 'chai'
-import DeckMap from 'src/components/DeckMap.vue'
+import DeckNavigation from 'src/components/DeckNavigation.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {
@@ -94,9 +94,9 @@ let deck = [
 
 const mockStore = getMockStore()
 const propsData = { instrument, deck }
-let deckMap = getRenderedVm(DeckMap, propsData, mockStore)
+let deckMap = getRenderedVm(DeckNavigation, propsData, mockStore)
 
-describe('DeckMap.vue', () => {
+describe('DeckNavigation.vue', () => {
   it('receives deck and instrument as props', () => {
     expect(typeof deckMap.deck[0]).to.equal('object')
   })

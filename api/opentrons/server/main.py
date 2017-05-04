@@ -17,6 +17,7 @@ from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
+from opentrons.drivers.smoothie_drivers.v2_0_0 import player
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from opentrons.server import helpers
@@ -226,6 +227,7 @@ def load():
 
 def emit_notifications(notifications, _type):
     for notification in notifications:
+        print(notification)
         socketio.emit('event', {
             'name': 'notification',
             'text': notification,
@@ -233,7 +235,7 @@ def emit_notifications(notifications, _type):
         })
 
 
-def _run_commands(should_home_first=True):
+def _run_commands():
     robot = Robot.get_instance()
 
     start_time = time.time()
@@ -277,6 +279,33 @@ def run_home():
     return run()
 
 
+def _run_detached():
+    robot = Robot.get_instance()
+    emit_notifications(["Preparing to run detached:"], 'info')
+    robot.home()
+    p = player.SmoothiePlayer_2_0_0()
+
+    emit_notifications(["Simulating, please wait..."], 'info')
+    robot.smoothie_drivers['simulate'].record_start(p)
+    robot.simulate()
+    robot.smoothie_drivers['simulate'].record_stop()
+
+    emit_notifications(["Saving file to robot, please wait..."], 'info')
+    robot._driver.play(p)
+
+    while True:
+        res = robot._driver.smoothie_player.progress()
+        if not res.get('file'):
+            return
+        emit_notifications([str(res)], 'info')
+
+
+@app.route("/run_detached", methods=["GET"])
+def run_detached():
+    threading.Thread(target=_run_detached).start()
+    return flask.jsonify({'status': 'success', 'data': {}})
+
+
 @app.route("/pause", methods=["GET"])
 def pause():
     result = robot.pause()
@@ -299,6 +328,20 @@ def resume():
 def stop():
     result = robot.stop()
     emit_notifications(['Protocol stopped'], 'info')
+
+    return flask.jsonify({
+        'status': 'success',
+        'data': result
+    })
+
+
+@app.route("/halt", methods=["GET"])
+def halt():
+    result = robot.halt()
+    emit_notifications(
+        ['Robot halted suddenly, please HOME ALL before running again'],
+        'info'
+    )
 
     return flask.jsonify({
         'status': 'success',

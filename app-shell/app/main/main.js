@@ -16,21 +16,34 @@ const {ServerManager} = require('./servermanager.js')
 const {PythonEnvManager} = require('./envmanager.js')
 const {waitUntilServerResponds} = require('./util.js')
 
-let serverManager = new ServerManager()
+let appWindowUrl = 'http://localhost:31950/'
 let mainWindow
-
+let serverManager = new ServerManager()
 
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
+  appWindowUrl = 'http://localhost:8090/'
 }
 
 function createWindow (windowUrl) {
-  mainWindow = new BrowserWindow({width: 1060, height: 750})
+  mainWindow = new BrowserWindow({
+    width: 1060,
+    height: 750,
+    webPreferences: {
+      nodeIntegration: false
+    }
+  })
   mainWindow.loadURL(windowUrl)
   mainWindow.on('closed', function () {
     mainWindow = null
     app.quit()
   })
+  // Note: Auth0 pop window does not close itself, this will this window when it pops up
+  setInterval(() => {
+    BrowserWindow.getAllWindows()
+      .filter(win => win.frameName === 'auth0_signup_popup')
+      .map(win => win.close())
+  }, 3000)
   return mainWindow
 }
 
@@ -65,8 +78,7 @@ function startUp () {
 
   serverManager.start()
   waitUntilServerResponds(
-    () => createWindow('http://localhost:8090/'),
-    // () => createWindow('http://localhost:31950/'),
+    () => createWindow(appWindowUrl),
     'http://localhost:31950/'
   )
   addMenu()

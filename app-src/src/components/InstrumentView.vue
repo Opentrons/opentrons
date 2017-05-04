@@ -11,13 +11,13 @@
 
 <script>
   import CalibrateInstrument from './CalibrateInstrument.vue'
-  import DeckMap from './DeckMap.vue'
+  import DeckNavigation from './DeckNavigation.vue'
 
   export default {
     name: 'Instrument',
     components: {
       CalibrateInstrument,
-      DeckMap
+      DeckNavigation
     },
     methods: {
       params () {

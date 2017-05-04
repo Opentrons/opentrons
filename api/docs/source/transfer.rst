@@ -1,12 +1,11 @@
 .. _transfer:
 
-**********************
-
 .. testsetup:: transfer
 
     from opentrons import robot, containers, instruments
 
     robot.reset()
+    robot.clear_commands()
 
     plate = containers.load('96-flat', 'B1')
 
@@ -19,19 +18,16 @@
         tip_racks=[tiprack],
         trash_container=trash)
 
-===========
-Transfer
-===========
+#######################
+Transfer Shortcuts
+#######################
 
-The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write ``loop``s and ``if`` statements, we can simply use the ``transfer()`` command, making Python protocol both easier to write and read!
+The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write ``loop`` and ``if`` statements, we can simply use the ``transfer()`` command, making Python protocol both easier to write and read!
 
-.. toctree::
-    :maxdepth: 3
-
-    transfer
+**********************
 
 Transfer
---------
+========
 
 Most of time, a protocol is really just looping over some wells, aspirating, and then dispensing. Even though they are simple in nature, these loops take up a lot of space. The ``pipette.transfer()`` command takes care of those common loops. It will combine aspirates and dispenses automatically, making your protocol easier to read and edit.
 
@@ -54,9 +50,27 @@ Most of time, a protocol is really just looping over some wells, aspirating, and
         trash_container=trash)
 
 Basic
-^^^^^
+-----
 
 The example below will transfer 100 uL from well ``'A1'`` to well ``'B1'``, automatically picking up a new tip and then dropping it when finished.
+
+.. testsetup:: transfer
+
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
+    robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
 
 .. testcode:: transfer
 
@@ -80,13 +94,29 @@ will print out...
     Drop_tip 
 
 Large Volumes
-^^^^^^^^^^^^^
+-------------
 
 Volumes larger than the pipette's ``max_volume`` will automatically divide into smaller transfers.
 
-.. testcode:: transfer
+.. testsetup:: transfer_1
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: transfer_1
 
     pipette.transfer(700, plate.wells('A2'), plate.wells('B2'))
 
@@ -95,7 +125,7 @@ Volumes larger than the pipette's ``max_volume`` will automatically divide into 
 
 will print out...
 
-.. testoutput:: transfer
+.. testoutput:: transfer_1
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
     
     Picking up tip 
@@ -110,13 +140,29 @@ will print out...
     Drop_tip 
 
 Multiple Wells
-^^^^^^^^^^^^^^
+--------------
 
 Transfer commands are most useful when moving liquid between multiple wells.
 
-.. testcode:: transfer
+.. testsetup:: transfer_2
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: transfer_2
 
     pipette.transfer(100, plate.cols('A'), plate.cols('B'))
 
@@ -125,7 +171,7 @@ Transfer commands are most useful when moving liquid between multiple wells.
    
 will print out...
 
-.. testoutput:: transfer
+.. testoutput:: transfer_2
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
     
     Picking up tip 
@@ -156,13 +202,29 @@ will print out...
     Drop_tip 
 
 One to Many
-^^^^^^^^^^^
+-------------
 
 You can transfer from a single source to multiple destinations, and the other way around (many sources to one destination).
 
-.. testcode:: transfer
+.. testsetup:: transfer_3
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: transfer_3
 
     pipette.transfer(100, plate.wells('A1'), plate.rows('2'))
 
@@ -171,7 +233,7 @@ You can transfer from a single source to multiple destinations, and the other wa
 
 will print out...
 
-.. testoutput:: transfer
+.. testoutput:: transfer_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -194,13 +256,29 @@ will print out...
     Drop_tip
 
 Few to Many
-^^^^^^^^^^^
+-------------
 
 What happens if, for example, you tell your pipette to transfer from 4 source wells to 2 destination wells? The transfer command will attempt to divide the wells evenly, or raise an error if the number of wells aren't divisible.
 
-.. testcode:: transfer
+.. testsetup:: transfer_4
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: transfer_4
 
     pipette.transfer(
         100,
@@ -212,7 +290,7 @@ What happens if, for example, you tell your pipette to transfer from 4 source we
 
 will print out...
 
-.. testoutput:: transfer
+.. testoutput:: transfer_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -227,13 +305,29 @@ will print out...
     Drop_tip 
 
 List of Volumes
-^^^^^^^^^^^^^^^
+---------------
 
 Instead of applying a single volume amount to all source/destination wells, you can instead pass a list of volumes.
 
-.. testcode:: transfer
+.. testsetup:: transfer_5
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: transfer_5
 
     pipette.transfer(
         [20, 40, 60],
@@ -245,7 +339,7 @@ Instead of applying a single volume amount to all source/destination wells, you 
 
 will print out...
 
-.. testoutput:: transfer
+.. testoutput:: transfer_5
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -258,13 +352,29 @@ will print out...
     Drop_tip 
 
 Volume Gradient
-^^^^^^^^^^^^^^^
+---------------
 
 Create a linear gradient between a start and ending volume (uL). The start and ending volumes must be the first and second elements of a tuple.
 
-.. testcode:: transfer
+.. testsetup:: transfer_6
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: transfer_6
 
     pipette.transfer(
         (100, 30),
@@ -276,7 +386,7 @@ Create a linear gradient between a start and ending volume (uL). The start and e
 
 will print out...
 
-.. testoutput:: transfer
+.. testoutput:: transfer_6
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -305,6 +415,7 @@ will print out...
     from opentrons import robot, containers, instruments
 
     robot.reset()
+    robot.clear_commands()
 
     plate = containers.load('96-flat', 'B1')
 
@@ -318,7 +429,7 @@ will print out...
         trash_container=trash)
 
 Distribute and Consolidate
---------------------------
+==========================
 
 Save time and tips with the ``distribute()`` and ``consolidate()`` commands. These are nearly identical to ``transfer()``, except that they will combine multiple transfer's into a single tip.
 
@@ -341,13 +452,29 @@ Save time and tips with the ``distribute()`` and ``consolidate()`` commands. The
         trash_container=trash)
 
 Consolidate
-^^^^^^^^^^^
+-----------
 
 Volumes going to the same destination well are combined within the same tip, so that multiple aspirates can be combined to a single dispense.
 
-.. testcode:: distributeconsolidate
+.. testsetup:: distributeconsolidate_1
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: distributeconsolidate_1
 
     pipette.consolidate(30, plate.rows('2'), plate.wells('A1'))
 
@@ -356,7 +483,7 @@ Volumes going to the same destination well are combined within the same tip, so 
 
 will print out...
 
-.. testoutput:: distributeconsolidate
+.. testoutput:: distributeconsolidate_1
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -374,9 +501,25 @@ will print out...
 
 If there are multiple destination wells, the pipette will never combine their volumes into the same tip.
 
-.. testcode:: distributeconsolidate
+.. testsetup:: distributeconsolidate_2
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: distributeconsolidate_2
 
     pipette.consolidate(30, plate.rows('2'), plate.wells('A1', 'A2'))
 
@@ -385,7 +528,7 @@ If there are multiple destination wells, the pipette will never combine their vo
 
 will print out...
 
-.. testoutput:: distributeconsolidate
+.. testoutput:: distributeconsolidate_2
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -402,13 +545,29 @@ will print out...
     Drop_tip 
 
 Distribute
-^^^^^^^^^^
+-----------
 
 Volumes from the same source well are combined within the same tip, so that one aspirate can provide for multiple dispenses.
 
-.. testcode:: distributeconsolidate
+.. testsetup:: distributeconsolidate_3
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: distributeconsolidate_3
 
     pipette.distribute(55, plate.wells('A1'), plate.rows('2'))
 
@@ -417,7 +576,7 @@ Volumes from the same source well are combined within the same tip, so that one 
 
 will print out...
 
-.. testoutput:: distributeconsolidate
+.. testoutput:: distributeconsolidate_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -436,9 +595,25 @@ will print out...
 
 If there are multiple source wells, the pipette will never combine their volumes into the same tip.
 
-.. testcode:: distributeconsolidate
+.. testsetup:: distributeconsolidate_4
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: distributeconsolidate_4
 
     pipette.distribute(30, plate.wells('A1', 'A2'), plate.rows('2'))
 
@@ -447,7 +622,7 @@ If there are multiple source wells, the pipette will never combine their volumes
 
 will print out...
 
-.. testoutput:: distributeconsolidate
+.. testoutput:: distributeconsolidate_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -464,13 +639,29 @@ will print out...
     Drop_tip 
 
 Disposal Volume
-^^^^^^^^^^^^^^^
+---------------
 
 When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added ``disposal_vol`` can be set as an optional argument.
 
-.. testcode:: distributeconsolidate
+.. testsetup:: distributeconsolidate_5
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: distributeconsolidate_5
 
     pipette.distribute(
         30,
@@ -483,7 +674,7 @@ When dispensing multiple times from the same tip, it is recommended to aspirate 
 
 will print out...
 
-.. testoutput:: distributeconsolidate
+.. testoutput:: distributeconsolidate_5
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -505,9 +696,25 @@ will print out...
 
     If you do not specify a ``disposal_vol``, the pipette will by default use a ``disposal_vol`` equal to it's ``min_volume``. This tutorial has not given the pipette any ``min_volume``, so below is an example of allowing the pipette's ``min_volume`` to be used as a default for ``disposal_vol``.
 
-.. testcode:: distributeconsolidate
+.. testsetup:: distributeconsolidate_6
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: distributeconsolidate_6
 
     pipette.min_volume = 20  # `min_volume` is used as default to `disposal_vol`
 
@@ -521,7 +728,7 @@ will print out...
 
 will print out...
 
-.. testoutput:: distributeconsolidate
+.. testoutput:: distributeconsolidate_6
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -546,6 +753,7 @@ will print out...
     from opentrons import robot, containers, instruments
 
     robot.reset()
+    robot.clear_commands()
 
     plate = containers.load('96-flat', 'B1')
 
@@ -559,7 +767,7 @@ will print out...
         trash_container=trash)
 
 Transfer Options
-----------------
+================
 
 There are other options for customizing your transfer command:
 
@@ -582,15 +790,31 @@ There are other options for customizing your transfer command:
         trash_container=trash)
 
 Always Get a New Tip
-^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 Transfer commands will by default use the same one tip for each well, then finally drop it in the trash once finished.
 
 The pipette can optionally get a new tip at the beginning of each aspirate, to help avoid cross contamination.
 
-.. testcode:: options
+.. testsetup:: options_1
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_1
 
     pipette.transfer(
         100,
@@ -603,7 +827,7 @@ The pipette can optionally get a new tip at the beginning of each aspirate, to h
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_1
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -620,13 +844,29 @@ will print out...
     Drop_tip 
 
 Never Get a New Tip
-^^^^^^^^^^^^^^^^^^^
+------------------------
 
 For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()`` elsewhere in your protocol, the transfer command can ignore picking up or dropping tips.
 
-.. testcode:: options
+.. testsetup:: options_2
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_2
 
     pipette.transfer(
         100,
@@ -639,7 +879,7 @@ For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()``
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_2
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
@@ -650,13 +890,29 @@ will print out...
     Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B3>
 
 Trash or Return Tip
-^^^^^^^^^^^^^^^^^^^
+------------------------
 
 By default, the transfer command will drop the pipette's tips in the trash container. However, if you wish to instead return the tip to it's tip rack, you can set ``trash=False``.
 
-.. testcode:: options
+.. testsetup:: options_3
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_3
 
     pipette.transfer(
         100,
@@ -669,23 +925,39 @@ By default, the transfer command will drop the pipette's tips in the trash conta
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
     Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
     Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
     Returning tip
-    Drop_tip at <Deck><Slot A1><Container tiprack-200ul><Well D1>
+    Drop_tip at <Deck><Slot A1><Container tiprack-200ul><Well A1>
 
 Touch Tip
-^^^^^^^^^
+---------
 
 A touch-tip can be performed after every aspirate and dispense by setting ``touch_tip=True``.
 
-.. testcode:: options
+.. testsetup:: options_4
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_4
 
     pipette.transfer(
         100,
@@ -698,7 +970,7 @@ A touch-tip can be performed after every aspirate and dispense by setting ``touc
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -709,13 +981,29 @@ will print out...
     Drop_tip 
 
 Blow Out
-^^^^^^^^
+--------
 
 A blow-out can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
 
-.. testcode:: options
+.. testsetup:: options_5
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_5
 
     pipette.transfer(
         100,
@@ -728,7 +1016,7 @@ A blow-out can be performed after every dispense that leaves the tip empty by se
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_5
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -738,13 +1026,29 @@ will print out...
     Drop_tip
 
 Mix Before/After
-^^^^^^^^^^^^^^^^
+----------------
 
 A mix can be performed before every aspirate by setting ``mix_before=``. The value of ``mix_before=`` must be a tuple, the 1st value is the number of repetitions, the 2nd value is the amount of liquid to mix.
 
-.. testcode:: options
+.. testsetup:: options_6
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_6
 
     pipette.transfer(
         100,
@@ -758,7 +1062,7 @@ A mix can be performed before every aspirate by setting ``mix_before=``. The val
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_6
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
@@ -779,13 +1083,29 @@ will print out...
     Drop_tip 
 
 Air Gap
-^^^^^^^
+-------
 
 An air gap can be performed after every aspirate by setting ``air_gap=int``, where the value is the volume of air in microliters to aspirate after aspirating the liquid.
 
-.. testcode:: options
+.. testsetup:: options_7
 
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
     robot.clear_commands()
+
+    plate = containers.load('96-flat', 'B1')
+
+    tiprack = containers.load('tiprack-200ul', 'A1')
+    trash = containers.load('point', 'D2')
+
+    pipette = instruments.Pipette(
+        axis='b',
+        max_volume=200,
+        tip_racks=[tiprack],
+        trash_container=trash)
+
+.. testcode:: options_7
 
     pipette.transfer(
         100,
@@ -798,7 +1118,7 @@ An air gap can be performed after every aspirate by setting ``air_gap=int``, whe
 
 will print out...
 
-.. testoutput:: options
+.. testoutput:: options_7
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     Picking up tip 
