@@ -9,7 +9,8 @@ api-install:
 	python3 setup.py install
 
 api-test:
-	nosetests --with-coverage
+	nosetests tests --with-coverage &&\
+		nosetests opentrons/server/tests --with-coverage
 
 api-lint:
 	pylama
