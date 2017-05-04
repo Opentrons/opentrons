@@ -36,18 +36,15 @@ app = Flask(__name__,
             )
 
 # TODO: These globals are terrible and they must go away
-
-def reset_globals(app):
-    app.current_protocol_step_list = None
-    app.filename = "N/A"
-    app.last_modified = "N/A"
+current_protocol_step_list = None
+filename = "N/A"
+last_modified = "N/A"
 
 # Attach all globals to flask app
 app.robot = robot
-app.reset_globals = reset_globals
-# app.current_protocol_step_list = current_protocol_step_list
-# app.filename = filename
-# app.last_modified = last_modified
+app.current_protocol_step_list = current_protocol_step_list
+app.filename = filename
+app.last_modified = last_modified
 
 
 CORS(app)
@@ -400,8 +397,7 @@ def app_version():
 
 @app.route("/robot/serial/connect", methods=["POST"])
 def connectRobot():
-    # global robot
-    robot = app.robot
+    global robot
     port = request.json.get('port')
     options = request.json.get('options', {'limit_switches': False})
 
@@ -426,8 +422,7 @@ def connectRobot():
 
 
 def _start_connection_watcher():
-    # global robot
-    robot = app.robot
+    global robot
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -461,8 +456,7 @@ def _start_connection_watcher():
 
 @app.route("/robot/serial/disconnect")
 def disconnectRobot():
-    # global robot
-    robot = app.robot
+    global robot
     status = 'success'
     data = None
 
@@ -520,8 +514,7 @@ def _sort_containers(container_list):
 
 
 def _get_all_pipettes():
-    # global robot
-    robot = app.robot
+    global robot
     pipette_list = []
     for _, p in robot.get_instruments():
         if isinstance(p, pipette.Pipette):
@@ -536,8 +529,7 @@ def _get_all_containers():
     """
     Returns all containers currently on the deck
     """
-    # global robot
-    robot = app.robot
+    global robot
     all_containers = list()
     for slot in robot._deck:
         if slot.has_children():
@@ -605,8 +597,7 @@ def _get_container_from_step(step):
 
 
 def create_step_list():
-    # global current_protocol_step_list
-    current_protocol_step_list = app.current_protocol_step_list
+    global current_protocol_step_list
     try:
         current_protocol_step_list = [{
             'axis': instrument.axis,
@@ -630,9 +621,7 @@ def create_step_list():
 
 def update_step_list():
     # TODO: This global stuff really needs to go away...
-    # global current_protocol_step_list, robot
-    robot = app.robot
-    current_protocol_step_list = app.current_protocol_step_list
+    global current_protocol_step_list, robot
     if current_protocol_step_list is None:
         create_step_list()
     try:
@@ -683,8 +672,7 @@ def home(axis):
 
 @app.route('/jog', methods=["POST"])
 def jog():
-    # global robot
-    robot = app.robot
+    global robot
     coords = request.json
 
     status = 'success'
@@ -707,8 +695,7 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
-    # global robot
-    robot = app.robot
+    global robot
     status = 'success'
     result = ''
     try:
@@ -734,8 +721,7 @@ def move_to_slot():
 
 @app.route('/move_to_container', methods=["POST"])
 def move_to_container():
-    # global robot
-    robot = app.robot
+    global robot
     slot = request.json.get("slot")
     name = request.json.get("label")
     axis = request.json.get("axis")
@@ -766,8 +752,7 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
-    # global robot
-    robot = app.robot
+    global robot
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -788,8 +773,7 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
-    # global robot
-    robot =  app.robot
+    global robot
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -896,8 +880,7 @@ def set_max_volume():
 
 
 def _calibrate_placeable(container_name, parent_slot, axis_name):
-    # global robot
-    robot = app.robot
+    global robot
     deck = robot._deck
     this_container = deck[parent_slot].get_child_by_name(container_name)
     axis_name = axis_name.upper()

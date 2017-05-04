@@ -16,8 +16,6 @@ class CalibrationTestCase(unittest.TestCase):
             os.path.dirname(__file__) + '/data/'
         )
         # self.robot = Robot.get_instance()
-        app.reset_globals(app)
-        # app.robot = Robot()
         self.robot = app.robot
 
     def test_move_to_slot(self):
@@ -39,7 +37,6 @@ class CalibrationTestCase(unittest.TestCase):
             data=json.dumps(dict(arguments)),
             content_type='application/json')
         status = json.loads(response.data.decode())['status']
-        import pdb; pdb.set_trace()
         self.assertEqual(status, 'error')
 
     def test_aspirate_dispense(self):
