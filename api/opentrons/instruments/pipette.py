@@ -900,7 +900,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def drop_tip(self, location=None, enqueue=True):
+    def drop_tip(self, location=None):
         """
         Drop the pipette's current tip
 
@@ -946,44 +946,34 @@ class Pipette(Instrument):
         >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            if not location and self.trash_container:
-                location = self.trash_container
 
-            if isinstance(location, Placeable):
-                # give space for the drop-tip mechanism
-                location = location.bottom(self._drop_tip_offset)
+        if not location and self.trash_container:
+            location = self.trash_container
 
-            self._associate_placeable(location)
-            self.current_tip(None)
+        if isinstance(location, Placeable):
+            # give space for the drop-tip mechanism
+            location = location.bottom(self._drop_tip_offset)
 
-            self.current_volume = 0
+        self._associate_placeable(location)
+        self.current_tip(None)
 
-        def _do():
-            nonlocal location
+        self.current_volume = 0
 
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
+        if location:
+            self.move_to(location, strategy='arc')
 
-            self.motor.move(self._get_plunger_position('drop_tip'))
-            self.motor.home()
+        self.motor.move(self._get_plunger_position('drop_tip'))
+        self.motor.home()
 
-            self.motor.move(self._get_plunger_position('bottom'))
+        self.motor.move(self._get_plunger_position('bottom'))
 
         _description = "Drop_tip {}".format(
             ('at ' + humanize_location(location) if location else '')
         )
-
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
         return self
 
     # QUEUEABLE
-    def home(self, enqueue=True):
+    def home(self):
 
         """
         Home the pipette's plunger axis during a protocol run
@@ -1014,18 +1004,11 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            self.current_volume = 0
-
-        def _do():
-            self.motor.home()
-
-        _description = "Homing pipette plunger on axis {}".format(self.axis)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        self.current_volume = 0
+        self.motor.home()
+        _description = "Homing pipette plunger on axis {}".format(
+            self.axis
+        )  # NOQA
         return self
 
     # QUEUEABLE
