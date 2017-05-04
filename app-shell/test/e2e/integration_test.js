@@ -143,4 +143,10 @@ describe('application launch', function () {
       .getText('.toast-message-text')
       .then(assertText.bind(null, expectedText))
   })
+
+  it('opens login dialog when login is clicked', function () {
+    return this.app.client.waitUntilWindowLoaded(31950)
+      .click('//*[@id="login"]')
+      .waitForExist('//*[@id="auth0-lock-container-1"]/div/div[2]/form')
+  })
 })
