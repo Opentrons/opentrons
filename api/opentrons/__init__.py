@@ -30,8 +30,8 @@ class InstrumentsWrapper(object):
     def Pipette(self, *args, **kwargs):
         return inst.Pipette(self.robot, *args, **kwargs)
 
-    def MagBead(self, name):
-        pass
+    def MagBead(self, *args, **kwargs):
+        return inst.Pipette(self.robot, *args, **kwargs)
 
 
 instruments = InstrumentsWrapper(robot)

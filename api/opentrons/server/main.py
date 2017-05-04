@@ -35,14 +35,25 @@ app = Flask(__name__,
             static_url_path=''
             )
 
+# TODO: These globals are terrible and they must go away
+
+def reset_globals(app):
+    app.current_protocol_step_list = None
+    app.filename = "N/A"
+    app.last_modified = "N/A"
+
+# Attach all globals to flask app
+app.robot = robot
+app.reset_globals = reset_globals
+# app.current_protocol_step_list = current_protocol_step_list
+# app.filename = filename
+# app.last_modified = last_modified
+
 
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['py'])
 socketio = SocketIO(app, async_mode='gevent')
-
-filename = "N/A"
-last_modified = "N/A"
 
 
 def notify(info):
@@ -71,7 +82,7 @@ def get_protocol_locals():
 
 
 def load_python(stream):
-    global robot
+    robot = app.robot
     code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
@@ -117,8 +128,9 @@ def load_python(stream):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    global filename
-    global last_modified
+    # global filename
+    # global last_modified
+    filename, last_modified = app.filename, app.last_modified
 
     file = request.files.get('file')
     filename = file.filename
@@ -168,7 +180,12 @@ def upload():
 
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
-    global robot, filename, last_modified, current_protocol_step_list
+    # global robot, filename, last_modified, current_protocol_step_list
+    robot = app.robot
+    current_protocol_step_list = app.current_protocol_step_list
+    filename = app.filename
+    last_modified = app.last_modified
+    current_protocol_step_list = app.current_protocol_step_list
 
     try:
         jupyter_robot = dill.loads(request.data)
@@ -270,7 +287,8 @@ def run():
 
 @app.route("/run_home", methods=["GET"])
 def run_home():
-    global robot
+    # global robot
+    robot = app.robot
     robot.home()
     return run()
 
@@ -329,7 +347,8 @@ def script_loader(filename):
 
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
-    global robot
+    # global robot
+    robot = app.robot
     return flask.jsonify({
         'ports': robot.get_serial_ports_list()
     })
@@ -337,7 +356,8 @@ def get_serial_ports_list():
 
 @app.route("/robot/serial/is_connected")
 def is_connected():
-    global robot
+    # global robot
+    robot = app.robot
     return flask.jsonify({
         'is_connected': robot.is_connected(),
         'port': robot.get_connected_port()
@@ -346,7 +366,8 @@ def is_connected():
 
 @app.route("/robot/get_coordinates")
 def get_coordinates():
-    global robot
+    # global robot
+    robot = app.robot
     return flask.jsonify({
         'coords': robot._driver.get_position().get("target")
     })
@@ -354,7 +375,8 @@ def get_coordinates():
 
 @app.route("/robot/diagnostics")
 def diagnostics():
-    global robot
+    # global robot
+    robot = app.robot
     return flask.jsonify({
         'diagnostics': robot.diagnostics()
     })
@@ -362,7 +384,8 @@ def diagnostics():
 
 @app.route("/robot/versions")
 def get_versions():
-    global robot
+    # global robot
+    robot = app.robot
     return flask.jsonify({
         'versions': robot.versions()
     })
@@ -377,7 +400,8 @@ def app_version():
 
 @app.route("/robot/serial/connect", methods=["POST"])
 def connectRobot():
-    global robot
+    # global robot
+    robot = app.robot
     port = request.json.get('port')
     options = request.json.get('options', {'limit_switches': False})
 
@@ -402,7 +426,8 @@ def connectRobot():
 
 
 def _start_connection_watcher():
-    global robot
+    # global robot
+    robot = app.robot
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
         (None, None)
@@ -436,7 +461,8 @@ def _start_connection_watcher():
 
 @app.route("/robot/serial/disconnect")
 def disconnectRobot():
-    global robot
+    # global robot
+    robot = app.robot
     status = 'success'
     data = None
 
@@ -494,7 +520,8 @@ def _sort_containers(container_list):
 
 
 def _get_all_pipettes():
-    global robot
+    # global robot
+    robot = app.robot
     pipette_list = []
     for _, p in robot.get_instruments():
         if isinstance(p, pipette.Pipette):
@@ -509,7 +536,8 @@ def _get_all_containers():
     """
     Returns all containers currently on the deck
     """
-    global robot
+    # global robot
+    robot = app.robot
     all_containers = list()
     for slot in robot._deck:
         if slot.has_children():
@@ -576,11 +604,9 @@ def _get_container_from_step(step):
     return None
 
 
-current_protocol_step_list = None
-
-
 def create_step_list():
-    global current_protocol_step_list
+    # global current_protocol_step_list
+    current_protocol_step_list = app.current_protocol_step_list
     try:
         current_protocol_step_list = [{
             'axis': instrument.axis,
@@ -604,7 +630,9 @@ def create_step_list():
 
 def update_step_list():
     # TODO: This global stuff really needs to go away...
-    global current_protocol_step_list, robot
+    # global current_protocol_step_list, robot
+    robot = app.robot
+    current_protocol_step_list = app.current_protocol_step_list
     if current_protocol_step_list is None:
         create_step_list()
     try:
@@ -655,7 +683,8 @@ def home(axis):
 
 @app.route('/jog', methods=["POST"])
 def jog():
-    global robot
+    # global robot
+    robot = app.robot
     coords = request.json
 
     status = 'success'
@@ -678,7 +707,8 @@ def jog():
 
 @app.route('/move_to_slot', methods=["POST"])
 def move_to_slot():
-    global robot
+    # global robot
+    robot = app.robot
     status = 'success'
     result = ''
     try:
@@ -704,7 +734,8 @@ def move_to_slot():
 
 @app.route('/move_to_container', methods=["POST"])
 def move_to_container():
-    global robot
+    # global robot
+    robot = app.robot
     slot = request.json.get("slot")
     name = request.json.get("label")
     axis = request.json.get("axis")
@@ -735,7 +766,8 @@ def move_to_container():
 
 @app.route('/pick_up_tip', methods=["POST"])
 def pick_up_tip():
-    global robot
+    # global robot
+    robot = app.robot
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -756,7 +788,8 @@ def pick_up_tip():
 
 @app.route('/drop_tip', methods=["POST"])
 def drop_tip():
-    global robot
+    # global robot
+    robot =  app.robot
     try:
         axis = request.json.get("axis")
         instrument = robot._instruments[axis.upper()]
@@ -863,7 +896,8 @@ def set_max_volume():
 
 
 def _calibrate_placeable(container_name, parent_slot, axis_name):
-    global robot
+    # global robot
+    robot = app.robot
     deck = robot._deck
     this_container = deck[parent_slot].get_child_by_name(container_name)
     axis_name = axis_name.upper()

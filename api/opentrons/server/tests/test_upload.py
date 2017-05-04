@@ -14,7 +14,11 @@ class UploadTestCase(unittest.TestCase):
         self.data_path = os.path.join(
             os.path.dirname(__file__) + '/data/'
         )
-        # self.robot = Robot.get_instance()
+        self.robot = app.robot
+
+    def tearDown(self):
+        del self.robot
+        del self.app
 
     def test_upload_and_run(self):
         response = self.app.post('/upload', data={
