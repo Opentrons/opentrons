@@ -1,5 +1,6 @@
 import copy
 import itertools
+import numbers
 
 from opentrons import containers
 from opentrons.containers.calibrator import Calibrator
@@ -288,8 +289,7 @@ class Pipette(Instrument):
     def aspirate(self,
                  volume=None,
                  location=None,
-                 rate=1.0,
-                 enqueue=True):
+                 rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
 
@@ -347,71 +347,57 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        # set True if volume before this aspirate was 0uL
-        plunger_empty = False
 
-        def _setup():
-            nonlocal volume
-            nonlocal location
-            nonlocal rate
-            nonlocal plunger_empty
-            if not isinstance(volume, (int, float, complex)):
-                if volume and not location:
-                    location = volume
-                volume = self.max_volume - self.current_volume
-
-            if self.current_volume + volume > self.max_volume:
-                raise RuntimeWarning(
-                    'Pipette ({0}) cannot hold volume {1}'
-                    .format(
-                        self.max_volume,
-                        self.current_volume + volume)
-                )
-
-            if self.current_volume == 0:
-                plunger_empty = True
-            self.current_volume += volume
-
-            self._associate_placeable(location)
-
-        def _do():
-            nonlocal volume
-            nonlocal location
-            nonlocal rate
-            nonlocal plunger_empty
-            distance = self._plunge_distance(self.current_volume)
-            bottom = self._get_plunger_position('bottom')
-            destination = bottom - distance
-
-            speed = self.speeds['aspirate'] * rate
-
-            self._position_for_aspirate(location, plunger_empty)
-
-            self.motor.speed(speed)
-            self.motor.move(destination)
+        # Note: volume positional argument may not be passed. if it isn't then
+        # assume the first positional argument is the location
+        if not isinstance(volume, numbers.Number):
+            if volume and not location:
+                location = volume
+            volume = self.max_volume - self.current_volume
 
         # if volume is specified as 0uL, then do nothing
-        if volume is 0:
+        if volume == 0:
             return self
 
+        if self.current_volume + volume > self.max_volume:
+            raise RuntimeWarning(
+                'Pipette ({0}) cannot hold volume {1}'
+                .format(
+                    self.max_volume,
+                    self.current_volume + volume)
+            )
+
+        # set True if volume before this aspirate was 0uL
+        is_plunger_empty = (self.current_volume == 0)
+        self.current_volume += volume
+
+        self._associate_placeable(location)
+
+        distance = self._plunge_distance(self.current_volume)
+        bottom = self._get_plunger_position('bottom')
+        destination = bottom - distance
+        speed = self.speeds['aspirate'] * rate
+
+
+        """
+        TODO: emit the description asynchronously
+        e.g. loop.call_soon(...)
+        """
         _description = "Aspirating {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        )  # NOQA
 
+        self._position_for_aspirate(location, is_plunger_empty)
+        self.motor.speed(speed)
+        self.motor.move(destination)
         return self
 
     # QUEUEABLE
     def dispense(self,
                  volume=None,
                  location=None,
-                 rate=1.0,
-                 enqueue=True):
+                 rate=1.0):
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
 
@@ -470,55 +456,37 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            nonlocal volume
-            nonlocal rate
+        if not isinstance(volume, numbers.Number):
+            if volume and not location:
+                location = volume
+            volume = self.current_volume
 
-            if not isinstance(volume, (int, float, complex)):
-                if volume and not location:
-                    location = volume
-                volume = self.current_volume
-
-            if volume is None or (self.current_volume - volume < 0):
-                volume = self.current_volume
-
-            if isinstance(location, Placeable):
-                location = location.bottom(1)
-
-            self.current_volume -= volume
-
-            self._associate_placeable(location)
-
-        def _do():
-            nonlocal location
-            nonlocal volume
-            nonlocal rate
-
-            self.move_to(location, strategy='arc', enqueue=False)
-
-            distance = self._plunge_distance(self.current_volume)
-            bottom = self._get_plunger_position('bottom')
-            destination = bottom - distance
-
-            speed = self.speeds['dispense'] * rate
-
-            self.motor.speed(speed)
-            self.motor.move(destination)
+        # Ensure we don't dispense more than the current volume
+        volume = min(self.current_volume, volume)
 
         # if volume is specified as 0uL, then do nothing
-        if volume is 0:
+        if volume == 0:
             return self
+
+        self.current_volume -= volume
+
+        self._associate_placeable(location)
+
+        self.move_to(location, strategy='arc')  # position robot above location
+
+        # TODO(ahmed): revisit this
+        distance = self._plunge_distance(self.current_volume)
+        bottom = self._get_plunger_position('bottom')
+        destination = bottom - distance
+        speed = self.speeds['dispense'] * rate
+
+        self.motor.speed(speed)
+        self.motor.move(destination)
 
         _description = "Dispensing {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        )  # NOQA
         return self
 
     def _position_for_aspirate(self, location=None, plunger_empty=False):
