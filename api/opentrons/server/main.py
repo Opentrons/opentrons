@@ -20,7 +20,6 @@ from opentrons.util.singleton import Singleton
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from opentrons.server import helpers
-from opentrons.server.process_manager import run_once
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
@@ -986,8 +985,6 @@ def log_after_request(response):
 def start(host='127.0.0.1', port=31950):
     data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
-    if not IS_DEBUG:
-        run_once(data_dir)
     _start_connection_watcher()
 
     from opentrons.server import log  # NOQA
