@@ -209,6 +209,7 @@ class Pipette(Instrument):
             self.tip_rack_iter = itertools.chain(iterables)
 
     def current_tip(self, *args):
+        # TODO(ahmed): revisit
         if len(args) and (isinstance(args[0], Placeable) or args[0] is None):
             self.current_tip_home_well = args[0]
         return self.current_tip_home_well
@@ -719,7 +720,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def air_gap(self, volume=None, height=None, enqueue=True):
+    def air_gap(self, volume=None, height=None):
         """
         Pull air into the :any:`Pipette` current tip
 
@@ -754,36 +755,24 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            pass
-
-        def _do():
-            pass
-
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
             return self
 
         _description = 'Air gap'
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
 
         if height is None:
-            height = 20
+            height = 5
 
         location = self.previous_placeable.top(height)
         # "move_to" separate from aspirate command
         # so "_position_for_aspirate" isn't executed
-        self.move_to(location, enqueue=enqueue)
-        self.aspirate(volume, enqueue=enqueue)
-
+        self.move_to(location)
+        self.aspirate(volume)
         return self
 
     # QUEUEABLE
-    def return_tip(self, enqueue=True):
+    def return_tip(self):
         """
         Drop the pipette's current tip to it's originating tip rack
 
@@ -822,29 +811,17 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            pass
-
-        def _do():
-            pass
-
         _description = "Returning tip"
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
 
         if not self.current_tip():
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.drop_tip(self.current_tip(), enqueue=enqueue)
-
+        self.drop_tip(self.current_tip())
         return self
 
     # QUEUEABLE
-    def pick_up_tip(self, location=None, presses=3, enqueue=True):
+    def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -889,47 +866,37 @@ class Pipette(Instrument):
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location, presses
-            if not location:
-                location = self.get_next_tip()
-            self.current_tip(None)
-            if location:
-                placeable, _ = containers.unpack_location(location)
-                self.current_tip(placeable)
 
-            if isinstance(location, Placeable):
-                location = location.bottom()
+        if not location:
+            location = self.get_next_tip()
+        self.current_tip(None)
+        if location:
+            placeable, _ = containers.unpack_location(location)
+            self.current_tip(placeable)
 
-            self._associate_placeable(location)
+        if isinstance(location, Placeable):
+            location = location.bottom()
 
-            self.current_volume = 0
+        self._associate_placeable(location)
 
-            if not isinstance(presses, (int, float, complex)) or presses < 1:
-                presses = 1
+        self.current_volume = 0
 
-        def _do():
-            nonlocal location, presses
+        presses = (1 if not is_number(presses) else presses)
 
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
+        if location:
+            self.move_to(location, strategy='arc', enqueue=False)
 
-            tip_plunge = 6
+        tip_plunge = 6
 
-            for i in range(int(presses) - 1):
-                self.robot.move_head(z=tip_plunge, mode='relative')
-                self.robot.move_head(z=-tip_plunge - 1, mode='relative')
-                self.robot.move_head(z=tip_plunge + 1, mode='relative')
-                self.robot.move_head(z=-tip_plunge, mode='relative')
+        for i in range(int(presses) - 1):
+            self.robot.move_head(z=tip_plunge, mode='relative')
+            self.robot.move_head(z=-tip_plunge - 1, mode='relative')
+            self.robot.move_head(z=tip_plunge + 1, mode='relative')
+            self.robot.move_head(z=-tip_plunge, mode='relative')
 
         _description = "Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')
-        )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        )  # NOQA
         return self
 
     # QUEUEABLE
