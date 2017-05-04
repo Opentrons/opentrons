@@ -274,6 +274,7 @@ class Pipette(Instrument):
         if not location:
             return self
 
+        self._associate_placeable(location)
         self.robot.move_to(location, instrument=self, strategy=strategy)
 
         return self
@@ -354,8 +355,6 @@ class Pipette(Instrument):
         # set True if volume before this aspirate was 0uL
         is_plunger_empty = (self.current_volume == 0)
         self.current_volume += volume
-
-        self._associate_placeable(location)
 
         distance = self._plunge_distance(self.current_volume)
         bottom = self._get_plunger_position('bottom')
@@ -447,8 +446,6 @@ class Pipette(Instrument):
             return self
 
         self.current_volume -= volume
-
-        self._associate_placeable(location)
 
         self.move_to(location, strategy='arc')  # position robot above location
 
@@ -543,8 +540,6 @@ class Pipette(Instrument):
         if volume is None:
             volume = self.max_volume
 
-        self._associate_placeable(location)
-
         _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, self.max_volume if volume is None else volume
         )
@@ -592,7 +587,6 @@ class Pipette(Instrument):
         """
 
         self.current_volume = 0
-        self._associate_placeable(location)
 
         self.move_to(location, strategy='arc')
         self.motor.move(self._get_plunger_position('blow_out'))
@@ -646,8 +640,6 @@ class Pipette(Instrument):
         if is_number(location):
             height_offset = location
             location = self.previous_placeable
-        self._associate_placeable(location)
-
 
         # if no location specified, use the previously
         # associated placeable to get Well dimensions
@@ -817,8 +809,6 @@ class Pipette(Instrument):
         if isinstance(location, Placeable):
             location = location.bottom()
 
-        self._associate_placeable(location)
-
         self.current_volume = 0
 
         presses = (1 if not is_number(presses) else presses)
@@ -888,7 +878,6 @@ class Pipette(Instrument):
             # give space for the drop-tip mechanism
             location = location.bottom(self._drop_tip_offset)
 
-        self._associate_placeable(location)
         self.current_tip(None)
 
         self.current_volume = 0
