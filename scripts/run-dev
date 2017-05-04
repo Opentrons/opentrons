@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-export NODE_ENV=development
-
-python -c "from opentrons import server; server.start()" &
-
-cd app-src && npm run dev &
-
-cd app-shell && npm start &
