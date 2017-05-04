@@ -1,9 +1,10 @@
 import unittest
-from opentrons.containers import load as containers_load
 
 from opentrons import Robot
+from opentrons.containers import load as containers_load
 from opentrons.containers.placeable import Container, Deck
 from opentrons.instruments import pipette
+
 
 # TODO: Refactor this into a standalone protocol script thats invoked by test
 class ProtocolTestCase(unittest.TestCase):

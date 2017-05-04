@@ -6,7 +6,6 @@ from opentrons.instruments import pipette
 from opentrons.util.vector import Vector
 
 
-
 class HelpersTest(unittest.TestCase):
 
     def setUp(self):

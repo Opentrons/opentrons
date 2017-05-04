@@ -2,11 +2,11 @@ import threading
 import unittest
 from unittest import mock
 
-from opentrons.robot.robot import Robot
-from opentrons.containers.placeable import Deck
 from opentrons import drivers
-from opentrons.instruments import pipette
 from opentrons.containers import load as containers_load
+from opentrons.containers.placeable import Deck
+from opentrons.instruments import pipette
+from opentrons.robot.robot import Robot
 from opentrons.util.vector import Vector
 
 
@@ -52,14 +52,18 @@ class RobotTest(unittest.TestCase):
 
     def test_simulate(self):
         self.robot.disconnect()
-        p200 = pipette.Pipette(self.robot, axis='b', name='my-fancy-pancy-pipette')
+        p200 = pipette.Pipette(
+            self.robot, axis='b', name='my-fancy-pancy-pipette'
+        )
         p200.aspirate().dispense()
         self.robot.simulate()
         self.assertEquals(len(self.robot._commands), 2)
         self.assertEquals(self.robot.smoothie_drivers['live'], None)
 
     def test_stop_run(self):
-        p200 = pipette.Pipette(self.robot, axis='b', name='my-fancy-pancy-pipette')
+        p200 = pipette.Pipette(
+            self.robot, axis='b', name='my-fancy-pancy-pipette'
+        )
         p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
 
         for i in range(1000):
@@ -79,7 +83,9 @@ class RobotTest(unittest.TestCase):
         thread.join()
 
     def test_exceptions_during_run(self):
-        p200 = pipette.Pipette(self.robot, axis='b', name='my-fancy-pancy-pipette')
+        p200 = pipette.Pipette(
+            self.robot, axis='b', name='my-fancy-pancy-pipette'
+        )
 
         def _do():
             return 'hello' / 3
@@ -96,7 +102,9 @@ class RobotTest(unittest.TestCase):
         res = self.robot._calibrated_max_dimension()
         self.assertEquals(res, expected)
 
-        p200 = pipette.Pipette(self.robot, axis='b', name='my-fancy-pancy-pipette')
+        p200 = pipette.Pipette(
+            self.robot, axis='b', name='my-fancy-pancy-pipette'
+        )
         plate = containers_load(self.robot, '96-flat', 'A1')
         self.robot.move_head(x=10, y=10, z=10)
         p200.calibrate_position((plate, Vector(0, 0, 0)))
@@ -107,7 +115,9 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(res, expected)
 
     def test_create_arc(self):
-        p200 = pipette.Pipette(self.robot, axis='b', name='my-fancy-pancy-pipette')
+        p200 = pipette.Pipette(
+            self.robot, axis='b', name='my-fancy-pancy-pipette'
+        )
         plate = containers_load(self.robot, '96-flat', 'A1')
         plate2 = containers_load(self.robot, '96-flat', 'B1')
 

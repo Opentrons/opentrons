@@ -13,7 +13,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons import robot, Robot, containers, instruments
+from opentrons import robot, Robot  # NOQA
 from opentrons.instruments import pipette
 from opentrons.containers import placeable
 from opentrons.util import trace
@@ -199,13 +199,13 @@ def upload_jupyter():
         [instr.update_calibrator()
             for _, instr in jupyter_robot.get_instruments()]
 
-        current_protocol_step_list = None
+        current_protocol_step_list = None  # NOQA
         calibrations = update_step_list()
         filename = 'JUPYTER UPLOAD'
         last_modified = dt.datetime.now().strftime('%a %b %d %Y')
         upload_data = {
             'calibrations': calibrations,
-            'fileName': 'Jupyter Upload',
+            'fileName': filename.title(),
             'lastModified': last_modified
         }
         app.logger.info('Successfully deserialized robot for jupyter upload')

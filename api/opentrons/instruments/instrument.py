@@ -3,13 +3,10 @@ import json
 import os
 import sys
 
-from opentrons.containers.calibrator import Calibrator
-from opentrons.util.vector import (Vector, VectorEncoder)
 from opentrons.util import environment
-from opentrons.robot.command import Command
-from opentrons import Robot
-
 from opentrons.util.log import get_logger
+from opentrons.util.vector import Vector, VectorEncoder
+from opentrons.robot.command import Command
 
 
 JSON_ERROR = None

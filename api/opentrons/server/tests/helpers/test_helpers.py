@@ -1,10 +1,8 @@
 import io
-import os
 import unittest
 from unittest import mock
 
 from opentrons.robot import Robot
-
 from opentrons.server import helpers
 
 

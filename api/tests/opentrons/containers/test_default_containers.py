@@ -9,8 +9,12 @@ class DefaultContainersTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
         self.trash_box = containers_load(self.robot, 'trash-box', 'A1')
-        self.wheaton_vial_rack = containers_load(self.robot, 'wheaton_vial_rack', 'A2')
-        self.tube_rack_80well = containers_load(self.robot, 'tube-rack-80well', 'A3')
+        self.wheaton_vial_rack = containers_load(
+            self.robot, 'wheaton_vial_rack', 'A2'
+        )
+        self.tube_rack_80well = containers_load(
+            self.robot, 'tube-rack-80well', 'A3'
+        )
         self.T75_flask = containers_load(self.robot, 'T75-flask', 'B1')
         self.T25_flask = containers_load(self.robot, 'T25-flask', 'B2')
 

@@ -1,9 +1,9 @@
 import unittest
 from unittest import mock
-from opentrons.containers import load as containers_load
 
-from opentrons.instruments import pipette, magbead
 from opentrons import Robot
+from opentrons.containers import load as containers_load
+from opentrons.instruments import magbead
 
 
 class MagbeadTest(unittest.TestCase):
@@ -17,7 +17,9 @@ class MagbeadTest(unittest.TestCase):
         self.robot.home()
 
         self.plate = containers_load(self.robot, '96-flat', 'A2')
-        self.magbead = magbead.Magbead(self.robot, mosfet=0, container=self.plate)
+        self.magbead = magbead.Magbead(
+            self.robot, mosfet=0, container=self.plate
+        )
 
         self.robot._driver.set_mosfet = mock.Mock()
         self.robot._driver.wait = mock.Mock()

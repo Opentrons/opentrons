@@ -4,7 +4,6 @@ import unittest
 from opentrons import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
-from opentrons.util.singleton import Singleton
 
 
 class RobotSerializationTestCase(unittest.TestCase):
