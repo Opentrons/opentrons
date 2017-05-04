@@ -322,6 +322,11 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 6.0}
         )
 
+        self.robot.clear_commands()
+        self.p200.reset()
+        self.p200.aspirate().dispense(0)
+        self.assertEquals(len(self.robot.commands()), 1)
+
     def test_dispense_no_args(self):
         self.p200.aspirate(100)
         self.p200.dispense()
@@ -371,6 +376,13 @@ class PipetteTest(unittest.TestCase):
         self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
+
+        self.p200.reset()
+        self.p200.tip_racks = []
+        self.robot.clear_commands()
+        self.assertEquals(len(self.robot.get_warnings()), 0)
+        self.p200.pick_up_tip()
+        self.assertEquals(len(self.robot.get_warnings()), 1)
 
     def test_drop_tip(self):
         self.p200.drop_tip()
