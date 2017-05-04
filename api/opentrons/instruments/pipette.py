@@ -10,6 +10,11 @@ from opentrons.instruments.instrument import Instrument
 from opentrons.helpers import helpers
 
 
+# TODO: move to helpers
+def is_number(obj):
+    return isinstance(obj, numbers.Number)
+
+
 class Pipette(Instrument):
 
     """
@@ -350,7 +355,7 @@ class Pipette(Instrument):
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
-        if not isinstance(volume, numbers.Number):
+        if not is_number(volume):
             if volume and not location:
                 location = volume
             volume = self.max_volume - self.current_volume
@@ -456,7 +461,7 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        if not isinstance(volume, numbers.Number):
+        if not is_number(volume):
             if volume and not location:
                 location = volume
             volume = self.current_volume
@@ -589,7 +594,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def blow_out(self, location=None, enqueue=True):
+    def blow_out(self, location=None):
         """
         Force any remaining liquid to dispense, by moving
         this pipette's plunger to the calibrated `blow_out` position
@@ -637,7 +642,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def touch_tip(self, location=None, radius=1.0, enqueue=True):
+    def touch_tip(self, location=None, radius=1.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -683,61 +688,34 @@ class Pipette(Instrument):
         """
         height_offset = 0
 
-        def _setup():
-            nonlocal location, height_offset
-            if isinstance(location, (int, float, complex)):
-                height_offset = location
-                location = self.previous_placeable
-            self._associate_placeable(location)
+        if is_number(location):
+            height_offset = location
+            location = self.previous_placeable
+        self._associate_placeable(location)
 
-        def _do():
-            nonlocal location, radius
 
-            # if no location specified, use the previously
-            # associated placeable to get Well dimensions
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
-            else:
-                location = self.previous_placeable
+        # if no location specified, use the previously
+        # associated placeable to get Well dimensions
+        if location:
+            self.move_to(location, strategy='arc')
+        else:
+            location = self.previous_placeable
 
-            v_offset = (0, 0, height_offset)
+        v_offset = (0, 0, height_offset)
 
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=radius, y=0, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=radius * -1, y=0, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=0, y=radius, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=0, y=radius * -1, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
+        well_edges = [
+            location.from_center(x=radius, y=0, z=1),  # right edge
+            location.from_center(x=radius * -1, y=0, z=1), # left edge
+            location.from_center(x=0, y=radius, z=1),  # back edge
+            location.from_center(x=0, y=radius * -1, z=1) # front edge
+        ]
+
+        # Apply vertical offset to well edges
+        well_edges = map(well_edges, lambda x: x + v_offset)
+
+        [self.move_to((location, e), strategy='direct') for e in well_edges]
 
         _description = 'Touching tip'
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
-
         return self
 
     # QUEUEABLE
@@ -1444,7 +1422,7 @@ class Pipette(Instrument):
         """
         try:
             value = self.positions[position]
-            if isinstance(value, (int, float, complex)):
+            if is_number(value):
                 return value
             else:
                 raise RuntimeError(
