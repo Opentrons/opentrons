@@ -8,7 +8,6 @@
 </template>
 
 <script>
-  // import StepList from './StepList.vue'
   import RunScreen from './RunScreen.vue'
 
   export default {

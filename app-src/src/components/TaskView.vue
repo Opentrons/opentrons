@@ -2,12 +2,14 @@
   
     <section id="task-view">
       <section id="placeable-pane">  
-        <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}</h1> 
-        <!-- <span class="more-info">
+        <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}
+        <span class="more-info">
         <a role="button" id="show-modal" @click="showModal = true">?</a>
-        </span> -->
-<!--         <modal v-if="showModal" @close="showModal = false" :placeable="placeable($route.params.slot)" :instrument="instrument()">
-        </modal> -->
+        </span>
+        </h1> 
+        <!-- placeable modal -->
+        <modal v-if="showModalPlaceable" @close="showModalPlaceable = false" :placeable="placeable($route.params.slot)" :instrument="instrument()">
+        </modal>
 
         <deck-navigation  :instrument='instrument()' :deck='deck()'></deck-navigation>  
       </section>
@@ -19,24 +21,26 @@
         class="tab" :class="{active : activePipette(instrument)}"  
         @click="togglePipette(instrument.axis)"> 
         {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span></button>
+
         <div class="pipette-modal" :class="plungerMode">
         <div class="plunger-nav">
           <ul>
             <li @click="modePlunger('top')" class="top">Top</li>
             <li @click="modePlunger('bottom')" class="bottom">Bottom</li>
             <li @click="modePlunger('blowout')" class="blowout">Blowout</li>
-            <li @click="modePlunger('droptip')" class="droptip">Drop Tip</li>
+            <li @click="modePlunger('drop_tip')" class="droptip">Drop Tip</li>
           </ul>
         </div>
         <div class="plunger-img">
           <img src='../assets/img/pipette_top.png' class='top'/>
           <img src='../assets/img/pipette_bottom.png' class='bottom'/>
           <img src='../assets/img/pipette_blowout.png' class='blowout'/>
-          <img src='../assets/img/pipette_droptip.png' class='droptip'/>
+          <img src='../assets/img/pipette_drop_tip.png' class='drop_tip'/>
         </div>
         </div>
+        <!-- TODO: Move to Separate Component and wire up -->
         <button @click="calibrateInstrument(currentAxis(), 'drop_tip')" class='btn-calibrate save'>SAVE</button>
-          <button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
+        <button @click="moveToPlungerPosition(currentAxis(), 'drop_tip')" class="btn-calibrate move-to">MOVE TO</button>
         </section>
 
       </section>
@@ -58,7 +62,8 @@
       return {
         axis: this.$route.params.instrument,
         plungerMode: 'mode-top',
-        showModal: false
+        plungerPos: 'top',
+        showModalPlaceable: false
       }
     },
     components: {
@@ -99,6 +104,7 @@
       },
       modePlunger (mode) {
         this.plungerMode = 'mode-' + mode
+        this.plungerPos = mode
       },
       calibrateInstrument (position) {
         let axis = this.axis

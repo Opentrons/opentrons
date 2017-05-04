@@ -4,23 +4,22 @@
       <div class="modal-wrapper">
         <div class="modal-container">
           
-            <button class="modal-close-button" @click="$emit('close')">
-                X
-            </button>
-            
-            <h2>
-        Calibrate the {{instrument.label}} pipette to the
-        {{placeable.sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
-        {{calibrationPoint}} of your {{placeable.label}} container.
-      </h2>
-      <h4>Name: {{ placeable.label }}</h4>
-    <h4>Labware Type: {{ placeable.type }}</h4>
-    <h4>Slot: {{ placeable.slot }}</h4>
-    <h4>Pipette: {{ instrument.label }} {{channels}} {{instrumentPosition}} Axis</h4>
-    <h4>Calibrated: {{instrument.calibrated}}</h4>
-    <div class='well-img'>
-    <img :src='`${placeableImages(placeable.sanitizedType, channels)}`' />
-          </div>       
+          <button class="modal-close-button" @click="$emit('close')">
+              X
+          </button>
+         <h2>
+            Calibrate the {{instrument.label}} pipette to the
+            {{placeable.sanitizedType === 'tiprack' ? 'center' : 'bottom'}}
+            {{calibrationPoint}} of your {{placeable.label}} container.
+          </h2> 
+          <h4>Name: {{ placeable.label }}</h4>
+          <h4>Labware Type: {{ placeable.type }}</h4>
+          <h4>Slot: {{ placeable.slot }}</h4>
+          <h4>Pipette: {{ instrument.label }} {{channels}} {{instrumentPosition}} Axis</h4>
+          <h4>Calibrated: {{instrument.calibrated}}</h4>
+<!--           <div class='well-img'>
+            <img :src='`${placeableImages(placeable.sanitizedType, channels)}`' />
+          </div> -->        
         </div>
       </div>
     </div>

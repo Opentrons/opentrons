@@ -32,6 +32,7 @@ section#task-view {
             visibility: hidden;
             &.active {
                 visibility: visible;
+                position: relative;
             }
         }
     }
@@ -116,11 +117,11 @@ div.pipette-modal {
             display: block;
         }
     }
-    &.mode-droptip {
-        li.droptip {
+    &.mode-drop_tip {
+        li.drop_tip {
             background-color: white
         }
-        img.droptip {
+        img.drop_tip {
             display: block;
         }
     }
