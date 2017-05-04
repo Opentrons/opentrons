@@ -245,10 +245,7 @@ class Pipette(Instrument):
             self.placeables.append(placeable)
 
     # QUEUEABLE
-    def move_to(self,
-                location,
-                strategy='arc',
-                enqueue=True):
+    def move_to(self, location, strategy='arc'):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -269,12 +266,6 @@ class Pipette(Instrument):
             "direct" strategies will simply move in a straight line from
             the current position
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -283,19 +274,12 @@ class Pipette(Instrument):
         if not location:
             return self
 
-        self.robot.move_to(
-            location,
-            instrument=self,
-            strategy=strategy,
-            enqueue=enqueue)
+        self.robot.move_to(location, instrument=self, strategy=strategy)
 
         return self
 
     # QUEUEABLE
-    def aspirate(self,
-                 volume=None,
-                 location=None,
-                 rate=1.0):
+    def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
 
@@ -318,12 +302,6 @@ class Pipette(Instrument):
         rate : float
             Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed (see :meth:`set_speed`)
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -425,12 +403,6 @@ class Pipette(Instrument):
         rate : float
             Set plunger speed for this dispense, where
             speed = rate * dispense_speed (see :meth:`set_speed`)
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -549,12 +521,6 @@ class Pipette(Instrument):
             speed = rate * (aspirate_speed or dispense_speed)
             (see :meth:`set_speed`)
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -612,12 +578,6 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -666,12 +626,6 @@ class Pipette(Instrument):
             :any:`touch_tip()` will move to 100% of the wells radius. When
             radius=0.5, :any:`touch_tip()` will move to 50% of the wells
             radius.
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -781,14 +735,6 @@ class Pipette(Instrument):
         This method requires one or more tip-rack :any:`Container`
         to be in this Pipette's `tip_racks` list (see :any:`Pipette`)
 
-        Parameters
-        ----------
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -838,12 +784,6 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -884,7 +824,7 @@ class Pipette(Instrument):
         presses = (1 if not is_number(presses) else presses)
 
         if location:
-            self.move_to(location, strategy='arc', enqueue=False)
+            self.move_to(location, strategy='arc')
 
         tip_plunge = 6
 
@@ -915,12 +855,6 @@ class Pipette(Instrument):
             The :any:`Placeable` (:any:`Well`) to perform the drop_tip.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -980,16 +914,8 @@ class Pipette(Instrument):
 
         Notes
         -----
-        `Pipette.home()` enqueues to `Robot` commands
+        `Pipette.home()` homes the `Robot`
         (see :any:`run` and :any:`simulate`)
-
-        Parameters
-        ----------
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -1178,38 +1104,23 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def delay(self, seconds=0, minutes=0, enqueue=True):
+    def delay(self, seconds=0, minutes=0):
         """
         Parameters
         ----------
 
         seconds: float
             The number of seconds to freeeze in place.
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
         """
 
-        def _setup():
-            pass
-
-        def _do():
-            nonlocal seconds
-            self.motor.wait(seconds)
 
         minutes += int(seconds / 60)
         seconds = seconds % 60
         _description = "Delaying {} minutes and {} seconds".format(
-            minutes, seconds)
+            minutes, seconds)  # NOQA
         seconds += float(minutes * 60)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+
+        self.motor.wait(seconds)
         return self
 
     def calibrate(self, position):
@@ -1463,7 +1374,6 @@ class Pipette(Instrument):
         return transfer_plan
 
     def _run_transfer_plan(self, tips, plan, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
         air_gap = kwargs.get('air_gap', 0)
         touch_tip = kwargs.get('touch_tip', -1)
 
@@ -1482,7 +1392,7 @@ class Pipette(Instrument):
                 self._dispense_during_transfer(
                     dispense['volume'], dispense['location'], **kwargs)
                 if touch_tip or touch_tip is 0:
-                    self.touch_tip(touch_tip, enqueue=enqueue)
+                    self.touch_tip(touch_tip)
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
@@ -1490,23 +1400,21 @@ class Pipette(Instrument):
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
-                        self.air_gap(air_gap, enqueue=enqueue)
+                        self.air_gap(air_gap)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """
         Performs a :any:`pick_up_tip` when running a :any:`transfer`,
         :any:`distribute`, or :any:`consolidate`.
         """
-        enqueue = kwargs.get('enqueue', True)
         if self.has_tip_rack() and tips > 0 and not self.current_tip():
-            self.pick_up_tip(enqueue=enqueue)
+            self.pick_up_tip()
 
     def _aspirate_during_transfer(self, vol, loc, **kwargs):
         """
         Performs an :any:`aspirate` when running a :any:`transfer`, and
         optionally a :any:`touch_tip` afterwards.
         """
-        enqueue = kwargs.get('enqueue', True)
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix', kwargs.get('mix_before', (0, 0)))
         air_gap = kwargs.get('air_gap', 0)
@@ -1514,11 +1422,11 @@ class Pipette(Instrument):
 
         if self.current_volume == 0:
             self._mix_during_transfer(mix_before, loc, **kwargs)
-        self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
+        self.aspirate(vol, loc, rate=rate)
         if touch_tip or touch_tip is 0:
-            self.touch_tip(touch_tip, enqueue=enqueue)
+            self.touch_tip(touch_tip)
         if air_gap:
-            self.air_gap(air_gap, enqueue=enqueue)
+            self.air_gap(air_gap)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
         """
@@ -1526,31 +1434,28 @@ class Pipette(Instrument):
         optionally a :any:`mix`, :any:`touch_tip`, and/or
         :any:`blow_out` afterwards.
         """
-        enqueue = kwargs.get('enqueue', True)
         mix_after = kwargs.get('mix_after', (0, 0))
         rate = kwargs.get('rate', 1)
         air_gap = kwargs.get('air_gap', 0)
 
         if air_gap:
-            self.dispense(air_gap, loc, rate=rate, enqueue=enqueue)
-        self.dispense(vol, loc, rate=rate, enqueue=enqueue)
+            self.dispense(air_gap, loc, rate=rate)
+        self.dispense(vol, loc, rate=rate)
         self._mix_during_transfer(mix_after, loc, **kwargs)
 
     def _mix_during_transfer(self, mix, loc, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
         if self.current_volume == 0 and isinstance(mix, (tuple, list)):
             if len(mix) == 2 and 0 not in mix:
-                self.mix(mix[0], mix[1], loc, enqueue=enqueue)
+                self.mix(mix[0], mix[1], loc)
 
     def _blowout_during_transfer(self, loc, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
         blow_out = kwargs.get('blow_out', False)
         if self.current_volume > 0 or blow_out:
             if not isinstance(blow_out, Placeable):
                 blow_out = self.trash_container
                 if self.current_volume == 0:
                     blow_out = None
-            self.blow_out(blow_out, enqueue=enqueue)
+            self.blow_out(blow_out)
             self._mix_during_transfer(
                 kwargs.get('mix_after', (0, 0)),
                 loc,
@@ -1561,13 +1466,12 @@ class Pipette(Instrument):
         Performs a :any:`drop_tip` or :any:`return_tip` when
         running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
         """
-        enqueue = kwargs.get('enqueue', True)
         trash = kwargs.get('trash', True)
         if tips > 1 or (i + 1 == total and tips > 0):
             if trash and self.trash_container:
-                self.drop_tip(enqueue=enqueue)
+                self.drop_tip()
             else:
-                self.return_tip(enqueue=enqueue)
+                self.return_tip()
             tips -= 1
         return tips
 
