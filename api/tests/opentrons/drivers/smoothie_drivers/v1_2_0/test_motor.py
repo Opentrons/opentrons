@@ -224,12 +224,12 @@ class OpenTronsTest(unittest.TestCase):
     def test_move(self):
         self.motor.ot_version = None
         for axis in 'xyz':
-            self.motor.move(**{axis:30})
+            self.motor.move(**{axis: 30})
             pos = self.motor.get_head_position()['current']
             self.assertEquals(pos[axis], 30)
 
         for axis in 'ab':
-            self.motor.move(**{axis:30})
+            self.motor.move(**{axis: 30})
             pos = self.motor.get_plunger_positions()['current']
             self.assertEquals(pos[axis], 30)
 
