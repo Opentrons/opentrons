@@ -1,13 +1,54 @@
 import os
+import sys
 
 settings = {}
+
+IS_WIN = sys.platform.startswith('win')
+IS_OSX = sys.platform == 'darwin'
+IS_LINUX = sys.platform == 'linux'
+
+
+def infer_app_data_dir():
+    home = os.path.expanduser('~')
+    app_names = {
+        'win': 'ot',
+        'osx': 'OT One App 2',
+        'linux': 'OT One App 2'
+    }
+
+    app_data = None
+    if IS_OSX:
+        app_data = os.path.join(
+            home,
+            'Library',
+            'Application Support',
+            app_names['osx']
+        )
+    # Note: this might be %APPDATA%
+    if IS_WIN:
+        app_data = os.path.join(
+            home,
+            'AppData',
+            'Local',
+            app_names['win']
+        )
+
+    if IS_LINUX:
+        app_data = os.path.join('.config', 'ot')
+
+    if not app_data:
+        return os.getcwd()
+
+    app_data = os.path.join(app_data, 'otone_data')
+
+    return (app_data if os.path.exists(app_data) else os.getcwd())
 
 
 def refresh():
     """
     Refresh environment.settings dict
     """
-    APP_DATA_DIR = os.environ.get('APP_DATA_DIR', os.getcwd())
+    APP_DATA_DIR = os.environ.get('APP_DATA_DIR', infer_app_data_dir())
     settings.clear()
 
     settings.update({
