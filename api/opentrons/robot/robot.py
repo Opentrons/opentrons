@@ -197,15 +197,6 @@ class Robot(object):
     #     # TODO: remove method, refactor dependencies
     #     return Robot()
 
-    # @classmethod
-    # def reset_for_tests(cls):
-    #     """
-    #     Deprecated.
-    #     """
-    #     del Singleton._instances[cls]
-    #     robot = Robot.get_instance()
-    #     return robot
-
     def reset(self):
         """
         Resets the state of the robot and clears:
