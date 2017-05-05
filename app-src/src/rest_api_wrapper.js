@@ -3,7 +3,7 @@ import {addHrefs, processProtocol} from './util'
 
 class Opentrons {
   constructor (baseUrl) {
-    this.baseUrl = baseUrl || 'http://ot-two:31950'
+    this.baseUrl = baseUrl || 'http://ot-two.local:31950'
     this.connectUrl = this.baseUrl + '/robot/serial/connect'
     this.disconnectUrl = this.baseUrl + '/robot/serial/disconnect'
     this.jogUrl = this.baseUrl + '/jog'
@@ -108,7 +108,7 @@ class Opentrons {
 
   uploadProtocol (formData) {
     return Vue.http
-      .post('http://ot-two:31950/upload', formData)
+      .post('http://ot-two.local:31950/upload', formData)
       .then((response) => {
         return processProtocol(response)
       }, (response) => {
@@ -119,7 +119,7 @@ class Opentrons {
 
   loadProtocol () {
     return Vue.http
-      .get('http://ot-two:31950/load')
+      .get('http://ot-two.local:31950/load')
       .then((response) => {
         return processProtocol(response)
       }, (response) => {
@@ -269,4 +269,4 @@ class Opentrons {
   }
 }
 
-export default new Opentrons('http://ot-two:31950')
+export default new Opentrons('http://ot-two.local:31950')
