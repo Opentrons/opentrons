@@ -10,8 +10,7 @@ IS_LINUX = sys.platform == 'linux'
 
 def infer_app_data_dir():
     home = os.path.expanduser('~')
-    APP_NAME = 'OT One App 2'
-    app_data_dir_suffix = [APP_NAME, 'otone_data']
+    app_data_dir_suffix = ['OT One App 2', 'otone_data']
 
     app_data = None
     if IS_OSX:
