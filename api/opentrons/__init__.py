@@ -12,12 +12,22 @@ if version < (3, 5):
         'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
             version[0], version[1]))
 
+
 robot = Robot()
+
+def reset():
+    robot = Robot()
 
 
 class ContainersWrapper(object):
     def __init__(self, robot):
         self.robot = robot
+
+    def create(self, *args, **kwargs):
+        return cnt.create(*args, **kwargs)
+
+    def list(self, *args, **kwargs):
+        return cnt.list(*args, **kwargs)
 
     def load(self, *args, **kwargs):
         return cnt.load(self.robot, *args, **kwargs)
@@ -30,15 +40,15 @@ class InstrumentsWrapper(object):
     def Pipette(self, *args, **kwargs):
         return inst.Pipette(self.robot, *args, **kwargs)
 
-    def MagBead(self, *args, **kwargs):
-        return inst.Pipette(self.robot, *args, **kwargs)
+    def Magbead(self, *args, **kwargs):
+        return inst.Magbead(self.robot, *args, **kwargs)
 
 
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 
 # __all__ = [Robot, Command, robot]
-__all__ = [containers, instruments, robot]
+__all__ = [containers, instruments, robot, reset]
 
 
 __version__ = get_versions()['version']

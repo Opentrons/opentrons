@@ -136,9 +136,7 @@ class Robot(object):
 
     Examples
     --------
-    >>> from opentrons import Robot
-    >>> from opentrons import instruments, containers
-    >>> robot = Robot()
+    >>> from opentrons import robot, instruments, containers
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
     >>> plate = containers.load('96-flat', 'A1', 'plate')
@@ -633,13 +631,12 @@ class Robot(object):
         --------
         ..
         >>> from opentrons import Robot
+        >>> robot = Robot()
         >>> from opentrons.instruments.pipette import Pipette
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
-        >>> p200 = Pipette(axis='a')
+        >>> p200 = Pipette(robot, axis='a')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
         """

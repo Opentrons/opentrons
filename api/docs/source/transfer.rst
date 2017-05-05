@@ -2,17 +2,21 @@
 
 .. testsetup:: transfer
 
-    from opentrons import robot, containers, instruments
+    from opentrons import robot, Robot, containers, instruments
+    from opentrons.instruments import pipette as _pipette
 
     robot.reset()
     robot.clear_commands()
 
-    plate = containers.load('96-flat', 'B1')
+    robot = Robot()
 
-    tiprack = containers.load('tiprack-200ul', 'A1')
-    trash = containers.load('point', 'D2')
+    plate = robot.add_container('96-flat', 'B1')
 
-    pipette = instruments.Pipette(
+    tiprack = robot.add_container('tiprack-200ul', 'A1')
+    trash = robot.add_container('point', 'D2')
+
+    pipette = _pipette.Pipette(
+        robot,
         axis='b',
         max_volume=200,
         tip_racks=[tiprack],
