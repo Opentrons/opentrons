@@ -177,7 +177,7 @@ def upload_jupyter():
         jupyter_robot = dill.loads(request.data)
         # These attributes need to be persisted from existing robot
         jupyter_robot._driver = robot._driver
-        jupyter_robot.connections = robot.connections
+        jupyter_robot.smoothie_drivers = robot.smoothie_drivers
         jupyter_robot.can_pop_command = robot.can_pop_command
         Singleton._instances[Robot] = jupyter_robot
         robot = jupyter_robot
