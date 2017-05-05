@@ -297,7 +297,7 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
 
-        axis_called = [ax for ax in 'xyz' if ax in kwargs]
+        # axis_called = [ax for ax in 'xyz' if ax in kwargs]
 
         current = self.get_head_position()['target']
         log.debug('Current Head Position: {}'.format(current))
@@ -319,10 +319,10 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                 for axis in 'xyzab'
                 if axis in kwargs}
 
-        this_head_speed = min([self.speeds[l] for l in axis_called])
-        args.update({"F": this_head_speed})
-        args.update({"a": self.speeds['a']})
-        args.update({"b": self.speeds['b']})
+        # this_head_speed = min([self.speeds[l] for l in axis_called])
+        # args.update({"F": this_head_speed})
+        # args.update({"a": self.speeds['a']})
+        # args.update({"b": self.speeds['b']})
 
         return self.consume_move_commands(args)
 
