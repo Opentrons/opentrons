@@ -1,6 +1,5 @@
 import copy
 import os
-import pkg_resources
 from threading import Event
 
 import dill
@@ -16,13 +15,6 @@ from opentrons.util.trace import traceable
 from opentrons.util.singleton import Singleton
 from opentrons.util.environment import settings
 
-
-SMOOTHIE_DEFAULTS_DIR = pkg_resources.resource_filename(
-    'opentrons.config', 'smoothie')
-SMOOTHIE_DEFAULTS_FILE = os.path.join(
-    SMOOTHIE_DEFAULTS_DIR, 'smoothie-defaults.ini')
-SMOOTHIE_VIRTUAL_CONFIG_FILE = os.path.join(
-    SMOOTHIE_DEFAULTS_DIR, 'config_one_pro_plus')
 
 log = get_logger(__name__)
 
@@ -470,7 +462,7 @@ class Robot(object, metaclass=Singleton):
         Parameters
         ----------
         location : one of the following:
-            1. :class:`Placeable` (i.e. Container, Deck, Slot, Well) — will
+            1. :class:`Placeable` (i.e. Container, Deck, Slot, Well) — will
             move to the origin of a container.
             2. :class:`Vector` move to the given coordinate in Deck coordinate
             system.
@@ -695,12 +687,6 @@ class Robot(object, metaclass=Singleton):
                         i, command.description, str(e))) from e
 
         return self._runtime_warnings
-
-    def run_detached(self):
-        self._driver.record_start()
-        self.simulate()
-        self._driver.record_stop()
-        self._driver.player_play()
 
     def send_to_app(self):
         robot_as_bytes = dill.dumps(self)
@@ -950,7 +936,7 @@ class Robot(object, metaclass=Singleton):
         Dictionary with the following keys:
             * ``axis_homed`` — axis that are currently in home position.
             * ``switches`` — end stop switches currently hit.
-            * ``steps_per_mm`` — steps per millimeter calibration
+            * ``steps_per_mm`` — steps per millimeter calibration
             values for ``x`` and ``y`` axis.
         """
         # TODO: Store these versions in config
