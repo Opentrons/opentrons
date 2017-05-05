@@ -219,6 +219,11 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             return False
         return bool(self.smoothie_player.is_recording)
 
+    def is_playing(self):
+        if not self.smoothie_player:
+            return False
+        return bool(self.smoothie_player.is_playing())
+
     def record_start(self, player):
         self.smoothie_player = player
         self.smoothie_player.record_start(self.COMMANDS_TO_RECORD)

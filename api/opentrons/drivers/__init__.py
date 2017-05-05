@@ -125,15 +125,20 @@ def get_serial_driver(port):
 
 def get_driver(c):
     driver_class = drivers_by_version.get(get_version(c))
-    if not driver_class:
-        if is_playing(c):
-            driver_class = 'player'
-        else:
-            raise RuntimeError(
-                'Can not read version from port {}'.format(c.name()))
-    d = driver_class(SMOOTHIE_DEFAULTS)
-    d.connect(c)
-    return d
+    if driver_class:
+        d = driver_class(SMOOTHIE_DEFAULTS)
+        d.connect(c)
+        return d
+
+    p = get_player(c)
+    if p:
+        d = SmoothieDriver_2_0_0(SMOOTHIE_DEFAULTS)
+        d.connection = c
+        d.smoothie_player = p
+        return d
+    else:
+        raise RuntimeError(
+            'Can not read version from port {}'.format(c.name()))
 
 
 def get_version(c):
@@ -158,17 +163,12 @@ def get_version(c):
         return v
 
 
-def is_playing(c, timeout=5):
-    c.flush_input()
-    c.write_string('progress\r\n')
-    p_data = ''
-    while 'play' not in p_data.lower() and 'file' not in p_data.lower():
-        print('Unexpected response:', p_data)
-        c.wait_for_data(timeout=timeout)
-        p_data = c.readline_string()
-    c.wait_for_data(timeout=timeout)
-    c.readline_string()
-    c.flush_input()
-    if not p_data or p_data == 'Not currently playing':
-        return False
-    return True
+def get_player(c):
+
+    p = SmoothiePlayer_2_0_0()
+    p.connect(c)
+    try:
+        if p.progress()['file']:
+            return p
+    except Exception:
+        return None

@@ -227,7 +227,6 @@ def load():
 
 def emit_notifications(notifications, _type):
     for notification in notifications:
-        print(notification)
         socketio.emit('event', {
             'name': 'notification',
             'text': notification,
@@ -279,6 +278,15 @@ def run_home():
     return run()
 
 
+def _detached_progress():
+    robot = Robot.get_instance()
+    while True:
+        res = robot._driver.smoothie_player.progress()
+        if not res.get('file'):
+            return
+        emit_notifications([str(res)], 'info')
+
+
 def _run_detached():
     robot = Robot.get_instance()
     emit_notifications(["Preparing to run detached:"], 'info')
@@ -293,11 +301,7 @@ def _run_detached():
     emit_notifications(["Saving file to robot, please wait..."], 'info')
     robot._driver.play(p)
 
-    while True:
-        res = robot._driver.smoothie_player.progress()
-        if not res.get('file'):
-            return
-        emit_notifications([str(res)], 'info')
+    _detached_progress()
 
 
 @app.route("/run_detached", methods=["GET"])
@@ -417,6 +421,8 @@ def connectRobot():
     robot = Robot.get_instance()
     try:
         robot.connect(port, options=options)
+        if robot._driver.is_playing():
+            threading.Thread(target=_detached_progress).start()
     except Exception as e:
         # any robot version incompatibility will be caught here
         robot.disconnect()
@@ -433,36 +439,37 @@ def connectRobot():
 
 
 def _start_connection_watcher():
-    robot = Robot.get_instance()
-    connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
-        'CONNECTION_STATE_WATCHER',
-        (None, None)
-    )
+    pass
+#     robot = Robot.get_instance()
+#     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
+#         'CONNECTION_STATE_WATCHER',
+#         (None, None)
+#     )
 
-    if connection_state_watcher and watcher_should_run:
-        watcher_should_run.set()
+#     if connection_state_watcher and watcher_should_run:
+#         watcher_should_run.set()
 
-    watcher_should_run = threading.Event()
+#     watcher_should_run = threading.Event()
 
-    def watch_connection_state(should_run):
-        while not should_run.is_set():
-            socketio.emit(
-                'event',
-                {
-                    'type': 'connection_status',
-                    'is_connected': robot.is_connected()
-                }
-            )
-            socketio.sleep(1.5)
+#     def watch_connection_state(should_run):
+#         while not should_run.is_set():
+#             socketio.emit(
+#                 'event',
+#                 {
+#                     'type': 'connection_status',
+#                     'is_connected': robot.is_connected()
+#                 }
+#             )
+#             socketio.sleep(1.5)
 
-    connection_state_watcher = socketio.start_background_task(
-        watch_connection_state,
-        (watcher_should_run)
-    )
-    BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (
-        connection_state_watcher,
-        watcher_should_run
-    )
+#     connection_state_watcher = socketio.start_background_task(
+#         watch_connection_state,
+#         (watcher_should_run)
+#     )
+#     BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (
+#         connection_state_watcher,
+#         watcher_should_run
+#     )
 
 
 @app.route("/robot/serial/disconnect")

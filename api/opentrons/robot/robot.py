@@ -351,6 +351,7 @@ class Robot(object, metaclass=Singleton):
 
         self._driver = device
         self.smoothie_drivers['live'] = device
+        self.set_connection('live')
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -745,6 +746,8 @@ class Robot(object, metaclass=Singleton):
                 'or "simulate", {} provided'.format(mode)
             )
         self._driver = self.smoothie_drivers[mode]
+        if not self._driver.is_connected():
+            self._driver.toggle_port()
 
     def disconnect(self):
         """

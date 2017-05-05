@@ -53,6 +53,9 @@ class SmoothiePlayer_2_0_0(object):
         return bool(isinstance(
             self.connection.device(), VirtualSmoothie))
 
+    def is_playing(self):
+        return bool(self.progress_info['file'])
+
     def get_recorded_commands(self):
         return list(self.recorded_commands)
 
@@ -124,15 +127,17 @@ class SmoothiePlayer_2_0_0(object):
         self.wait_for_ok_response(timeout=5)
         self.erase_progress_info()
 
-    def progress(self):
+    def progress(self, timeout=5):
         self.connection.flush_input()
-        p_data = self.send_command('progress')
+        p_data = self.send_command('progress', timeout=timeout)
         while 'play' not in p_data.lower() and 'file' not in p_data.lower() and 'paused' not in p_data.lower():
-            p_data = self.connection.readline_string()
-        self.wait_for_ok_response()
+            self.connection.wait_for_data(timeout=timeout)
+            self.connection.serial_pause()
+            p_data = self.connection.readline_string(timeout=timeout)
+        self.wait_for_ok_response(timeout=timeout)
 
-        p_bytes = self.send_command('M27')
-        self.wait_for_ok_response()
+        p_bytes = self.send_command('M27', timeout=timeout)
+        self.wait_for_ok_response(timeout=timeout)
         self._parse_progress_data(p_data, p_bytes)
         return dict(self.progress_info)
 
