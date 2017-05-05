@@ -47,7 +47,6 @@ class InstrumentsWrapper(object):
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 
-# __all__ = [Robot, Command, robot]
 __all__ = [containers, instruments, robot, reset]
 
 

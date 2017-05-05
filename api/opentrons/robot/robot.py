@@ -149,9 +149,6 @@ class Robot(object):
     []
     """
 
-    _commands = None  # []
-    # _instance = None
-
     def __init__(self):
         """
         Initializes a robot instance.
@@ -163,6 +160,7 @@ class Robot(object):
         only once instance of a robot.
         """
 
+        self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
