@@ -2,23 +2,22 @@ import time
 from threading import Thread
 import unittest
 
-from opentrons import Robot
+from opentrons import Robot, drivers
 from opentrons.util.vector import Vector
 
 
 class OpenTronsTest(unittest.TestCase):
 
     def setUp(self):
-
+        global reset_time
         self.robot = Robot.get_instance()
 
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
         # and serial handshakes to be tested
 
-        self.motor = self.robot._driver
-
         options = {
+            'firmware': 'v1.0.5',
             'limit_switches': True,
             'config': {
                 'alpha_steps_per_mm': 80.0,
@@ -26,35 +25,31 @@ class OpenTronsTest(unittest.TestCase):
             }
         }
 
-        myport = self.robot.VIRTUAL_SMOOTHIE_PORT
         self.robot.disconnect()
-        self.robot.connect(port=myport, options=options)
+        self.robot.connect(options=options)
+
+        self.motor = self.robot._driver
 
     def test_reset(self):
         self.motor.reset()
-        self.assertEquals(self.motor.connection, None)
+        self.assertFalse(self.motor.is_connected())
 
     def test_write_with_lost_connection(self):
-        self.motor.connection.serial_port.is_open = False
-        old_method = getattr(self.motor, 'is_connected')
+        self.motor.connection.serial_port.close()
 
         def _temp():
             return True
+
+        old_method = getattr(self.motor, 'is_connected')
         setattr(self.motor, 'is_connected', _temp)
+
         self.assertTrue(self.motor.is_connected())
         self.assertRaises(RuntimeError, self.motor.calm_down)
+
         setattr(self.motor, 'is_connected', old_method)
 
-    def test_write_after_disconnect(self):
-        self.motor.disconnect()
-        self.assertRaises(RuntimeError, self.motor.calm_down)
-
     def test_version_compatible(self):
-        self.robot.disconnect()
-        self.robot.connect()
         self.motor.versions_compatible()
-
-        self.robot.disconnect()
 
         kwargs = {
             'options': {
@@ -92,10 +87,11 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.motor.get_connected_port()
-        self.assertEquals(res, self.robot.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
         self.motor.disconnect()
         res = self.motor.get_connected_port()
-        self.assertEquals(res, None)
+        self.assertEquals(res, 'Virtual Smoothie')
+        self.assertFalse(self.motor.is_connected())
 
     def test_get_dimensions(self):
         self.motor.ot_version = None
@@ -221,8 +217,7 @@ class OpenTronsTest(unittest.TestCase):
         except RuntimeWarning as e:
             self.assertEqual(
                 str(
-                    RuntimeWarning(
-                        'Robot Error: limit switch hit')), str(e))
+                    RuntimeWarning('Robot Error: limit switch hit')), str(e))
 
         self.motor.home()
 
@@ -247,7 +242,8 @@ class OpenTronsTest(unittest.TestCase):
     def test_send_command(self):
         res = self.motor.send_command('G0 X1 Y1 Z1')
         self.assertEquals(res, 'ok')
-        self.assertEquals(self.motor.readline_from_serial(), 'ok')
+        if self.motor.firmware_version != 'v1.0.5':
+            self.assertEquals(self.motor.readline_from_serial(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 399)
@@ -256,7 +252,8 @@ class OpenTronsTest(unittest.TestCase):
     def test_send_command_with_kwargs(self):
         res = self.motor.send_command('G0', X=1, Y=2, Z=3)
         self.assertEquals(res, 'ok')
-        self.assertEquals(self.motor.readline_from_serial(), 'ok')
+        if self.motor.firmware_version != 'v1.0.5':
+            self.assertEquals(self.motor.readline_from_serial(), 'ok')
         pos = self.motor.get_head_position()['current']
         self.assertEquals(pos['x'], 1)
         self.assertEquals(pos['y'], 398)

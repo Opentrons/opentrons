@@ -279,9 +279,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_non_empty_aspirate(self):
 
-        self.p200.aspirate(100)
-        self.p200.aspirate(20)
-        self.robot.run()
+        self.p200.aspirate(100, enqueue=False)
+        self.p200.aspirate(20, enqueue=False)
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -323,6 +322,11 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 6.0}
         )
 
+        self.robot.clear_commands()
+        self.p200.reset()
+        self.p200.aspirate().dispense(0)
+        self.assertEquals(len(self.robot.commands()), 1)
+
     def test_dispense_no_args(self):
         self.p200.aspirate(100)
         self.p200.dispense()
@@ -355,8 +359,45 @@ class PipetteTest(unittest.TestCase):
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
 
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses=0)
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        last_well = self.tiprack1[-1]
+        target_pos = last_well.from_center(
+            x=0, y=0, z=-1,
+            reference=self.robot._deck)
+        self.p200.pick_up_tip(last_well, presses='a')
+        self.robot.run()
+        current_pos = self.robot._driver.get_head_position()['current']
+        self.assertEqual(current_pos, target_pos)
+
+        self.p200.reset()
+        self.p200.tip_racks = []
+        self.robot.clear_commands()
+        self.assertEquals(len(self.robot.get_warnings()), 0)
+        self.p200.pick_up_tip()
+        self.assertEquals(len(self.robot.get_warnings()), 1)
+
     def test_drop_tip(self):
         self.p200.drop_tip()
+
+        self.robot.run()
+
+        current_pos = self.robot._driver.get_plunger_positions()['current']
+        self.assertDictEqual(
+            current_pos,
+            {'a': 0, 'b': 10.0}
+        )
+
+        self.robot.clear_commands()
+        self.p200.reset()
+        self.p200.drop_tip(home_after=False)
 
         self.robot.run()
 
@@ -638,75 +679,75 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['pick'],
             ['aspirating', '30', 'Well A1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well B1'],
             ['dispensing', '30', 'Well B1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well B1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well C1'],
             ['dispensing', '30', 'Well C1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well C1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well D1'],
             ['dispensing', '30', 'Well D1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well D1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well E1'],
             ['dispensing', '30', 'Well E1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well E1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well F1'],
             ['dispensing', '30', 'Well F1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well F1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well G1'],
             ['dispensing', '30', 'Well G1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well G1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well H1'],
             ['dispensing', '30', 'Well H1'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well H1'],
-            ['touch'],
             ['air'], ['moving'], ['aspirating', '10'],
+            ['touch'],
             ['dispensing', '10', 'Well A2'],
             ['dispensing', '30', 'Well A2'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -955,62 +996,46 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['pick'],
             ['aspirating', '160', 'Well A1'],
+            ['air'], ['moving', 'A1'], ['aspirating', '20'],
             ['touch'],
-            ['air'],
-            ['moving', 'A1'],
-            ['aspirating', '20'],
             ['dispensing', '20', 'Well A2'],
             ['dispensing', '80', 'Well A2'],
+            ['air'], ['moving', 'A2'], ['aspirating', '20'],
             ['touch'],
-            ['air'],
-            ['moving', 'A2'],
-            ['aspirating', '20'],
             ['dispensing', '20', 'Well B2'],
             ['dispensing', '70', 'Well B2'],
-            ['touch'],
             ['blow', 'point'],
-            ['aspirating', '160', 'Well A1'],
             ['touch'],
-            ['air'],
-            ['moving', 'A1'],
-            ['aspirating', '20'],
+            ['aspirating', '160', 'Well A1'],
+            ['air'], ['moving', 'A1'], ['aspirating', '20'],
+            ['touch'],
             ['dispensing', '20', 'Well C2'],
             ['dispensing', '60', 'Well C2'],
+            ['air'], ['moving', 'C2'], ['aspirating', '20'],
             ['touch'],
-            ['air'],
-            ['moving', 'C2'],
-            ['aspirating', '20'],
             ['dispensing', '20', 'Well D2'],
             ['dispensing', '50', 'Well D2'],
+            ['air'], ['moving', 'D2'], ['aspirating', '20'],
             ['touch'],
-            ['air'],
-            ['moving', 'D2'],
-            ['aspirating', '20'],
             ['dispensing', '20', 'Well E2'],
             ['dispensing', '40', 'Well E2'],
-            ['touch'],
             ['blow'],
-            ['aspirating', '70', 'Well A1'],
             ['touch'],
-            ['air'],
-            ['moving', 'A1'],
-            ['aspirating', '20'],
+            ['aspirating', '70', 'Well A1'],
+            ['air'], ['moving', 'A1'], ['aspirating', '20'],
+            ['touch'],
             ['dispensing', '20', 'Well F2'],
             ['dispensing', '30', 'Well F2'],
+            ['air'], ['moving', 'F2'], ['aspirating', '20'],
             ['touch'],
-            ['air'],
-            ['moving', 'F2'],
-            ['aspirating', '20'],
             ['dispensing', '20', 'Well G2'],
             ['dispensing', '20', 'Well G2'],
+            ['air'], ['moving', 'G2'], ['aspirating', '20'],
             ['touch'],
-            ['air'],
-            ['moving', 'G2'],
-            ['aspirating', '20'],
             ['dispensing', '20', 'Well H2'],
             ['dispensing', '10', 'Well H2'],
-            ['touch'],
             ['blow'],
+            ['touch'],
             ['drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
@@ -1309,7 +1334,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])
         self.p200.touch_tip(-3)
-        self.p200.touch_tip(-3, radius=0.5)
+        self.p200.touch_tip(self.plate[1], radius=0.5)
 
         self.robot.simulate()
 
@@ -1327,7 +1352,6 @@ class PipetteTest(unittest.TestCase):
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
                 enqueue=False, strategy='direct'),
-            mock.call(self.plate[0], enqueue=False, strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
                 enqueue=False, strategy='direct'),
@@ -1340,18 +1364,18 @@ class PipetteTest(unittest.TestCase):
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
                 enqueue=False, strategy='direct'),
-            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(self.plate[1], enqueue=False, strategy='arc'),
             mock.call(
-                (self.plate[0], (4.80, 3.20, 7.50)),
+                (self.plate[1], (4.80, 3.20, 10.50)),
                 enqueue=False, strategy='direct'),
             mock.call(
-                (self.plate[0], (1.60, 3.20, 7.50)),
+                (self.plate[1], (1.60, 3.20, 10.50)),
                 enqueue=False, strategy='direct'),
             mock.call(
-                (self.plate[0], (3.20, 4.80, 7.50)),
+                (self.plate[1], (3.20, 4.80, 10.50)),
                 enqueue=False, strategy='direct'),
             mock.call(
-                (self.plate[0], (3.20, 1.60, 7.50)),
+                (self.plate[1], (3.20, 1.60, 10.50)),
                 enqueue=False, strategy='direct')
         ]
 
@@ -1574,8 +1598,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.return_tip()
 
         expected = [
-            mock.call(self.tiprack1[0], enqueue=True),
-            mock.call(self.tiprack1[1], enqueue=True)
+            mock.call(self.tiprack1[0], home_after=True, enqueue=True),
+            mock.call(self.tiprack1[1], home_after=True, enqueue=True)
         ]
 
         self.assertEqual(

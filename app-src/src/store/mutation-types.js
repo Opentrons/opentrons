@@ -1,3 +1,4 @@
+export const AUTHENTICATE = 'AUTHENTICATE'
 export const RESET_RUN_LOG = 'RESET_RUN_LOG'
 export const UPDATE_ERROR = 'UPDATE_ERROR'
 export const UPDATE_FILE_NAME = 'UPDATE_FILE_NAME'

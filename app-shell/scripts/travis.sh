@@ -33,10 +33,6 @@ execute_mac ()
     pip3 install pyinstaller
     pyinstaller --version
   fi
-
-  if [ "$1" == "install" ]; then
-    run_install "mac"
-  fi
 }
 
 execute_linux ()
@@ -62,10 +58,6 @@ execute_linux ()
     # sudo apt-get install xvfb
 
     export PATH=$PATH:$(pwd)/node_modules/.bin/
-  fi
-
-  if [ "$1" == "install" ]; then
-    run_install "linux"
   fi
 }
 

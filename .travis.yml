@@ -46,36 +46,33 @@ before_install:
 install:
   - python --version
   - python3 --version
-  - git remote set-branches --add origin $STABLE_BRANCH
-  - git fetch
-  -  ./scripts/with-nodenv-linux "make app"
+  -  ./scripts/with-nodenv "make app"
   - make api-exe
-  -  ./scripts/with-nodenv-linux "make app-shell"
+  -  ./scripts/with-nodenv "make app-shell"
 
 script:
   - echo "Skipping Travis scripts"
 
 # Deploy the build version in an S3 bucket
 deploy:
-  provider: s3
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
-  bucket: ot-app-builds
-  skip_cleanup: true
-  local-dir: app-shell/releases
-  upload-dir: $OPENTRONS_APP_UPLOAD_DIR
-  acl: public_read
-  on:
-    repo: OpenTrons/opentrons-api
-    all_branches: true
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: ot-app-builds
+    skip_cleanup: true
+    local-dir: app-shell/releases
+    upload-dir: $OPENTRONS_APP_UPLOAD_DIR
+    acl: public_read
+    on:
+      repo: OpenTrons/opentrons-api
+      all_branches: true
 
-# # Publish API to PyPI and Anaconda
-# deploy:
-#   provider: script
-#   skip_cleanup: true
-#   script: api/scripts/publish.sh
-#   on:
-#     tags: true
+  # Publish API to PyPI and Anaconda
+  - provider: script
+    skip_cleanup: true
+    script: api/scripts/publish.sh
+    on:
+      tags: true
 
 env:
   global:
@@ -88,4 +85,4 @@ notifications:
     on_success: change
     on_failure: change
 
-after_success: coveralls
+after_success: cd api && coveralls && cd ..

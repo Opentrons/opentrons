@@ -1,4 +1,3 @@
-import configparser
 import json
 import math
 import time
@@ -6,7 +5,7 @@ from threading import Event
 
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
-from opentrons.drivers.virtual_smoothie import VirtualSmoothie
+from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 
 from opentrons.util import trace
 
@@ -14,7 +13,7 @@ from opentrons.util import trace
 log = get_logger(__name__)
 
 
-class CNCDriver(object):
+class SmoothieDriver_2_0_0(SmoothieDriver):
 
     """
     This object outputs raw GCode commands to perform high-level tasks.
@@ -64,35 +63,16 @@ class CNCDriver(object):
         {True: 'M51', False: 'M50'}
     ]
 
-    COMMANDS_TO_RECORD = [
-        MOVE,
-        DWELL,
-        HOME,
-        SET_ZERO,
-        SET_SPEED,
-        SET_ACCELERATION,
-        MOTORS_ON,
-        MOTORS_OFF,
-        AXIS_AMPERAGE,
-        PUSH_SPEED,
-        POP_SPEED,
-        ABSOLUTE_POSITIONING,
-        RELATIVE_POSITIONING
-    ]
-
     """
     Serial port connection to talk to the device.
     """
     connection = None
 
-    serial_timeout = None
-    serial_baudrate = None
-
     firmware_version = None
     config_version = None
     ot_version = None
 
-    def __init__(self, defaults_file_path):
+    def __init__(self, defaults):
         self.halted = Event()
         self.stopped = Event()
         self.do_not_pause = Event()
@@ -107,9 +87,11 @@ class CNCDriver(object):
 
         self.config_dict = {}
 
-        self.defaults = configparser.ConfigParser()
-        self.defaults.read(defaults_file_path)
-        self._apply_defaults()
+        self.default_speeds = {}
+        self.ot_one_dimensions = {}
+        self.speeds = {}
+
+        self._apply_defaults(defaults)
 
         self.save_gcode_commands = False
         self.gcode_commands_sent = []
@@ -124,7 +106,7 @@ class CNCDriver(object):
         return self.connection.name()
 
     def disconnect(self):
-        if self.is_connected():
+        if self.connection:
             self.connection.close()
         self.connection = None
 
@@ -135,6 +117,10 @@ class CNCDriver(object):
 
         self.versions_compatible()
 
+        self.calm_down()
+        self.prevent_squeal()
+
+    def prevent_squeal(self):
         # TODO: (andy) Smoothieware EDGE has this weird bug,
         # seems to require the following commands to run after Smoothieboard
         # boots, or else all motors freeze up and make high-pitch sounds.
@@ -142,7 +128,6 @@ class CNCDriver(object):
         self.send_command('G91 G0 X0.001', read_after=False)
         self.wait_for_ok()
         self.send_halt_command()
-
         self.calm_down()
 
     def is_connected(self):
@@ -151,6 +136,8 @@ class CNCDriver(object):
         return False
 
     def toggle_port(self):
+        if not self.connection:
+            raise RuntimeError('Not connected to robot')
         self.connection.close()
         self.connection.open()
         self.connection.serial_pause()
@@ -212,66 +199,6 @@ class CNCDriver(object):
         return bool(isinstance(
             self.connection.device(), VirtualSmoothie))
 
-    def is_recording(self):
-        return bool(self.save_gcode_commands)
-
-    def get_recorded_commands(self):
-        return list(self.gcode_commands_sent)
-
-    def record_erase(self):
-        self.gcode_commands_sent = []
-
-    def record_start(self):
-        self.record_erase()
-        self.save_gcode_commands = True
-
-    def record_stop(self):
-        self.save_gcode_commands = False
-
-    def record_command(self, command, data):
-        if self.is_simulating() and self.is_recording():
-            for c in self.COMMANDS_TO_RECORD:
-                if c in command:
-                    self.gcode_commands_sent.append(data)
-
-    def player_play(self):
-        self.player_pause()
-        self.player_resume()
-        self.player_stop()
-        self.send_command('upload /sd/protocol.gcode')
-        for line in self.get_recorded_commands():
-            self.connection.write_string(line)
-        self.send_command('\x04')
-        self.send_command('play /sd/protocol.gcode')
-        self.ignore_next_line()
-        self.wait_for_ok()
-
-    def player_progress(self):
-        self.connection.flush_input()
-        progress_data = self.send_command('progress', timeout=30)
-        self.connection.wait_for_data(timeout=30)
-        self.connection.flush_input()
-        progress_bytes = self.send_command('M27', timeout=30)
-        self.connection.wait_for_data(timeout=30)
-        self.connection.flush_input()
-        return self._parse_progress_data(progress_data, progress_bytes)
-
-    def player_pause(self):
-        res = self.send_command('suspend', timeout=30)
-        if 'waiting for queue to empty...' in res:
-            self.ignore_next_line()
-            self.ignore_next_line()
-            self.readline_from_serial(timeout=60)
-        self.connection.flush_input()
-
-    def player_resume(self):
-        self.send_command('resume', timeout=30)
-        self.connection.flush_input()
-
-    def player_stop(self):
-        self.send_command('abort', timeout=30)
-        self.connection.flush_input()
-
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, timeout=3, **kwargs):
         """
@@ -285,19 +212,18 @@ class CNCDriver(object):
         G0 X100 Y100
         """
 
+        if not self.is_connected():
+            self.toggle_port()
+
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
         gcode_line = '{} {}\r\n'.format(command, args)
-        if self.is_connected():
-            log.debug("Write: {}".format(gcode_line))
-            self.connection.flush_input()
-            self.connection.write_string(gcode_line)
+        log.debug("Write: {}".format(gcode_line))
 
-            self.record_command(command, gcode_line)
+        self.connection.flush_input()
+        self.connection.write_string(gcode_line)
 
-            if read_after:
-                return self.readline_from_serial(timeout=timeout)
-        else:
-            raise RuntimeError('Not connected to robot')
+        if read_after:
+            return self.readline_from_serial(timeout=timeout)
 
     def detect_smoothie_error(self, msg):
         """
@@ -306,6 +232,8 @@ class CNCDriver(object):
         Raises RuntimeWarning if Smoothie reports a limit hit
         """
         if 'reset or M999' in msg or 'error:' in msg:
+            self.calm_down()
+            time.sleep(0.2)  # pause for Smoothie's internal state change
             self.calm_down()
             error_msg = 'Robot Error: limit switch hit'
             log.debug(error_msg)
@@ -375,11 +303,12 @@ class CNCDriver(object):
             for axis in list(target.keys()):
                 diff[axis] = current[axis] - target[axis]
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            dist_head = math.sqrt(dist)
+            diff_head = math.sqrt(dist)
+            diff_a = abs(diff.get('a', 0))
+            diff_b = abs(diff.get('b', 0))
 
-            if dist_head < tolerance:
-                if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
-                    break
+            if max(diff_head, diff_a, diff_b) < tolerance:
+                return
 
     def home(self, *axis):
 
@@ -404,6 +333,20 @@ class CNCDriver(object):
         except Exception:
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
+
+        # TODO: (andy) Smoothieware EDGE has this weird bug,
+        # after homing an AB axis, trying to do an absolute (G90) move
+        # on that axis will create a high-pitched squeel. Then
+        # any following command will work fine.
+        # The below move commands are meant to force Smoothieware
+        # through this bug without affecting the robot's physical position
+        for ax in axis_to_home:
+            if ax in 'AB':
+                kwargs = {}
+                kwargs[ax.lower()] = 1 / 1600
+                self.move(**kwargs)
+                kwargs[ax.lower()] = 0.0
+                self.move(**kwargs)
 
         arguments = {
             'name': 'home',
@@ -460,10 +403,11 @@ class CNCDriver(object):
         })
 
     def calm_down(self):
-        res = self.send_command(self.CALM_DOWN)
-        if res != 'ok':
-            self.wait_for_ok()
-        self.wait_for_ok()
+        self.send_command(self.CALM_DOWN, read_after=False)
+        self.ignore_next_line()
+        self.ignore_next_line()
+        self.connection.serial_pause()
+        self.connection.flush_input()
 
     def send_halt_command(self):
         self.send_command(self.HALT, read_after=False)
@@ -488,7 +432,7 @@ class CNCDriver(object):
         plunger_coords = {}
         for state in ['current', 'target']:
             plunger_coords[state] = {
-                axis: coords[state][axis]
+                axis: coords[state].get(axis, 0)
                 for axis in 'ab'
             }
 
@@ -523,7 +467,7 @@ class CNCDriver(object):
 
     def set_speed(self, *args, **kwargs):
         if len(args) > 0:
-            kwargs.update({'x': args[0], 'y': args[0]})
+            self.speeds.update({'x': args[0], 'y': args[0]})
         self.speeds.update({l: kwargs[l] for l in 'xyzab' if l in kwargs})
         if self.is_connected():
             kwargs = {
@@ -562,11 +506,8 @@ class CNCDriver(object):
         self.wait_for_ok()
 
         returned_value = self._parse_axis_values(res).get(axis.lower())
-        assert float(returned_value) == value
-
         key = self.CONFIG_STEPS_PER_MM[axis.lower()]
         self.set_config_value(key, str(returned_value))
-        assert float(returned_value) == value
 
     def get_endstop_switches(self):
         # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 pins- (XL)P1.24:0 .......
@@ -641,9 +582,9 @@ class CNCDriver(object):
             'config': True,
             'ot_version': True
         }
-        if self.firmware_version not in self.COMPATIBLE_FIRMARE:
+        if self.firmware_version not in self.compatible_firmware:
             res['firmware'] = False
-        if self.config_file_version not in self.COMPATIBLE_CONFIG:
+        if self.config_file_version not in self.compatible_config:
             res['config'] = False
         if self.ot_version not in self.ot_one_dimensions:
             res['ot_version'] = False
@@ -668,6 +609,7 @@ class CNCDriver(object):
             log.debug('{} is not an ot_version'.format(res))
             return None
         self.ot_version = res
+        self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):
@@ -680,7 +622,7 @@ class CNCDriver(object):
         self.ignore_next_line()
         self.wait_for_ok()
 
-        # use the "branch-hash" portion as the version
+        # uses the "branch-hash" portion as the version response
         self.firmware_version = line_1.split(',')[0].split(' ')[-1]
 
         return self.firmware_version
@@ -695,28 +637,27 @@ class CNCDriver(object):
             self.get_ot_version()
         return self.ot_one_dimensions[self.ot_version]
 
-    def _apply_defaults(self):
-        self.serial_timeout = float(
-            self.defaults['serial'].get('timeout', 0.02))
-        self.serial_baudrate = int(
-            self.defaults['serial'].get('baudrate', 115200))
+    def get_baudrate(self):
+        return int(self.connection.serial_port.baudrate)
 
-        self.speeds = json.loads(
-            self.defaults['state'].get(
-                'speeds',
-                '{"x": 3000, "y":3000, "z": 1600, "a": 300, "b": 300}'
-            )
-        )
+    def get_timeout(self):
+        return float(self.connection.serial_port.timeout)
 
-        self.COMPATIBLE_FIRMARE = json.loads(
-            self.defaults['versions'].get('firmware', '[]'))
-        self.COMPATIBLE_CONFIG = json.loads(
-            self.defaults['versions'].get('config', '[]'))
-        self.ot_one_dimensions = json.loads(
-            self.defaults['versions'].get('ot_versions', '{}'))
-        for key in self.ot_one_dimensions.keys():
-            axis_size = Vector(self.ot_one_dimensions[key])
+    def get_port(self):
+        return str(self.connection.serial_port.port)
+
+    def _apply_defaults(self, defaults_file):
+
+        DEFAULT_VERSIONS = defaults_file['versions']
+        DEFAULT_MODELS = json.loads(defaults_file['models']['ot_versions'])
+
+        self.compatible_firmware = json.loads(DEFAULT_VERSIONS['firmware'])
+        self.compatible_config = json.loads(DEFAULT_VERSIONS['config'])
+
+        for key in DEFAULT_MODELS.keys():
+            axis_size = Vector(DEFAULT_MODELS[key]['dimensions'])
             self.ot_one_dimensions[key] = axis_size
+            self.default_speeds[key] = DEFAULT_MODELS[key]['speeds']
 
     def _parse_axis_values(self, string):
         try:
@@ -731,45 +672,3 @@ class CNCDriver(object):
             log.critical("Error parsing position string from smoothie board:")
             log.critical(string)
             raise ValueError(e) from e
-
-    def _parse_progress_data(self, progress_a, progress_b):
-        progress_info = {
-            'file': None,
-            'percentage': None,
-            'elapsed_time': None,
-            'estimated_time': None,
-            'current_byte': None,
-            'total_bytes': None
-        }
-        if progress_a != 'Not currently playing' and progress_b != 'Not currently playing':
-            try:
-                # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa
-                split_data = progress_a.split(',')
-
-                progress_info['file'] = split_data[0].strip().split(' ')[-1].split('/')[-1]
-                progress_info['percentage'] = float(split_data[1].split('%')[0].strip()) / 100.0
-
-                elapsed_time = split_data[2].split(':')
-                progress_info['elapsed_time'] = int(elapsed_time[-1].strip())
-                progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
-                progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
-
-                # estimated time is not there in the beginning of a job
-                estimated_time = None
-                if len(split_data) > 3:
-                    estimated_time = split_data[3].split(':')
-                    progress_info['elapsed_time'] = int(elapsed_time[-1].strip())
-                    progress_info['elapsed_time'] += (int(elapsed_time[-2].strip()) * 60)
-                    progress_info['elapsed_time'] += (int(elapsed_time[-3].strip()) * 60 * 60)
-            except:
-                raise RuntimeError('Error parsing progress: {}'.format(progress_a))
-
-            try:
-                # SD printing byte 3980/53182
-                byte_data = progress_b.strip().split(' ')[-1].split('/')
-                progress_info['current_byte'] = int(byte_data[0])
-                progress_info['total_bytes'] = int(byte_data[1])
-            except:
-                raise RuntimeError('Error parsing progress: {}'.format(progress_b))
-
-        return progress_info

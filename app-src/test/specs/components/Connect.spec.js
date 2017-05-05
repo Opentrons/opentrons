@@ -2,7 +2,9 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueRouter from 'vue-router'
 import sinon from 'sinon'
+import { getRenderedVm } from '../../util'
 
 Vue.use(Vuex)
 
@@ -33,67 +35,64 @@ function getMockStore () {
   }
 }
 
+function getMockRouter () {
+  return new VueRouter({
+    routes: [
+      {path: '/login'},
+      {path: '/logout'}
+    ],
+    mode: 'hash'
+  })
+}
+
 describe('Connect.vue', () => {
   it('renders with drop down', () => {
-    let mockStore = getMockStore()
-    const vm = new Vue({
-      store: new Vuex.Store(mockStore),
-      el: document.createElement('div'),
-      render: h => h(Connect)
-    }).$mount()
+    let mockStoreData = getMockStore()
+    const connect = getRenderedVm(Connect, null, mockStoreData)
 
-    let options = vm.$el.querySelectorAll('nav.connect select#connections option')
+    let options = connect.$el.querySelectorAll('nav.connect select#connections option')
     let dropdownPorts = []
     options.forEach(el => dropdownPorts.push(el.textContent))
-    expect(vm.$el.querySelector('nav.connect select#connections').length).to.equal(4)
+    expect(connect.$el.querySelector('nav.connect select#connections').length).to.equal(4)
     expect(dropdownPorts[2]).to.equal(detectedPorts[0])
     expect(dropdownPorts[3]).to.equal(detectedPorts[1])
   })
 
   it('connects to a robot', done => {
-    let mockStore = getMockStore()
-    const vm = new Vue({
-      store: new Vuex.Store(mockStore),
-      el: document.createElement('div'),
-      render: h => h(Connect)
-    }).$mount()
-    expect(vm.$store.state.isConnected).to.be.false
+    let mockStoreData = getMockStore()
+    const connect = getRenderedVm(Connect, null, mockStoreData)
 
-    let connect = vm.$children[0]
+    expect(connect.$store.state.isConnected).to.be.false
+
     connect.ports.selected = detectedPorts[0]
     connect.searchIfNecessary()
-    expect(mockStore.actions.connectRobot.called).to.be.true
-    mockStore.state.port = detectedPorts
+    expect(mockStoreData.actions.connectRobot.called).to.be.true
+    mockStoreData.state.port = detectedPorts
 
     Vue.nextTick(() => {
-      let selectEl = vm.$el.querySelector('select#connections')
+      let selectEl = connect.$el.querySelector('select#connections')
       expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal(detectedPorts[0])
       done()
     })
   })
 
   it('disconnects from robot', done => {
-    let mockStore = getMockStore()
-    mockStore.state.isConnected = true
-    mockStore.state.port = detectedPorts[0]
+    let mockStoreData = getMockStore()
+    mockStoreData.state.isConnected = true
+    mockStoreData.state.port = detectedPorts[0]
 
-    const vm = new Vue({
-      store: new Vuex.Store(mockStore),
-      el: document.createElement('div'),
-      render: h => h(Connect)
-    }).$mount()
+    const connect = getRenderedVm(Connect, null, mockStoreData)
 
-    expect(vm.$children[0].connected).to.be.true
-    let connect = vm.$children[0]
+    expect(connect.connected).to.be.true
     connect.selected = detectedPorts[0]
     connect.disconnectRobot()
-    expect(mockStore.actions.disconnectRobot.called).to.be.true
-    mockStore.state.port = null
-    mockStore.state.isConnected = false
+    expect(mockStoreData.actions.disconnectRobot.called).to.be.true
+    mockStoreData.state.port = null
+    mockStoreData.state.isConnected = false
 
     // Ensure that HTML is rendered correctly after state is updated after disconnect
     Vue.nextTick(() => {
-      let selectEl = vm.$el.querySelector('select#connections')
+      let selectEl = connect.$el.querySelector('select#connections')
       let msg = 'Select a port'
       expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal(msg)
       expect(selectEl.options[selectEl.selectedIndex].textContent).to.equal('Select a port')
@@ -102,21 +101,27 @@ describe('Connect.vue', () => {
   })
 
   it('does not change connected port after refresh', () => {
-    let mockStore = getMockStore()
-    mockStore.state.isConnected = true
-    mockStore.state.port = detectedPorts[0]
+    let mockStoreData = getMockStore()
+    mockStoreData.state.isConnected = true
+    mockStoreData.state.port = detectedPorts[0]
 
-    const vm = new Vue({
-      store: new Vuex.Store(mockStore),
-      el: document.createElement('div'),
-      render: h => h(Connect)
-    }).$mount()
-    expect(vm.$children[0].connected).to.be.true
+    const connect = getRenderedVm(Connect, null, mockStoreData)
+    expect(connect.connected).to.be.true
 
-    let connect = vm.$children[0]
     connect.selected = detectedPorts[0]
     connect.searchIfNecessary()
-    expect(mockStore.actions.disconnectRobot.called).to.be.true
+    expect(mockStoreData.actions.disconnectRobot.called).to.be.true
+  })
+
+  it('redirects to login route when login button is clicked', () => {
+    let mockStore = getMockStore()
+    let mockRouter = getMockRouter()
+    const connect = getRenderedVm(Connect, null, null, mockStore, mockRouter)
+
+    connect.login()
+    expect(connect.$router.currentRoute.path).to.equal('/login')
+    connect.logout()
+    expect(connect.$router.currentRoute.path).to.equal('/logout')
   })
 
   it('has methods for business logic', () => {
@@ -124,5 +129,6 @@ describe('Connect.vue', () => {
     expect(typeof Connect.methods.searchIfNecessary).be.a.function
     expect(typeof Connect.methods.connectRobot).be.a.function
     expect(typeof Connect.methods.disconnectRobot).be.a.function
+    expect(typeof Connect.methods.login).be.a.function
   })
 })

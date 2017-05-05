@@ -6,6 +6,8 @@
       <option v-for='option in ports.options' v-bind:value='option.value'>{{ option.text }}</option>
     </select>
     <div id='indicator' :class="{'connected': connected}"></div>
+    <button v-if="!isAuthenticated" id="login" @click='login()' class='btn-run' :class="btn-run">Login</button>
+    <button v-else id="logout" @click='logout()' class='btn-run' :class="btn-run">Logout</button>
   </nav>
 </template>
 
@@ -24,6 +26,9 @@
       }
     },
     computed: {
+      isAuthenticated () {
+        return this.$store.state.isAuthenticated
+      },
       connected () {
         return this.$store.state.isConnected
       },
@@ -60,6 +65,12 @@
       },
       disconnectRobot: function () {
         this.$store.dispatch('disconnectRobot')
+      },
+      login: function () {
+        this.$router.push('/login')
+      },
+      logout: function () {
+        this.$router.push('/logout')
       }
     },
     beforeMount: function () {

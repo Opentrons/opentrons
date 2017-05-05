@@ -23,12 +23,13 @@ from opentrons.server import helpers
 
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
-STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'static')
+STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 BACKGROUND_TASKS = {}
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
-            template_folder=TEMPLATES_FOLDER
+            template_folder=TEMPLATES_FOLDER,
+            static_url_path=''
             )
 
 
@@ -174,7 +175,7 @@ def upload_jupyter():
         jupyter_robot = dill.loads(request.data)
         # These attributes need to be persisted from existing robot
         jupyter_robot._driver = robot._driver
-        jupyter_robot.connections = robot.connections
+        jupyter_robot.smoothie_drivers = robot.smoothie_drivers
         jupyter_robot.can_pop_command = robot.can_pop_command
         Singleton._instances[Robot] = jupyter_robot
         robot = jupyter_robot
