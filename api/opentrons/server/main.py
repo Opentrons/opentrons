@@ -18,7 +18,6 @@ from opentrons.instruments import pipette
 from opentrons.containers import placeable
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
-from opentrons.util.singleton import Singleton
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from opentrons.server import helpers
@@ -169,20 +168,15 @@ def upload():
             'errors': api_response['errors'],
             'warnings': api_response['warnings'],
             'calibrations': calibrations,
-            'fileName': api.filename,
-            'lastModified': api.last_modified
+            'fileName': app.filename,
+            'lastModified': app.last_modified
         }
     })
 
 
 @app.route("/upload-jupyter", methods=["POST"])
 def upload_jupyter():
-    # global robot, filename, last_modified, current_protocol_step_list
     robot = app.robot
-    # current_protocol_step_list = app.current_protocol_step_list
-    # app.filename
-    # lapp.last_modified
-    # current_protocol_step_list = app.current_protocol_step_list
 
     try:
         jupyter_robot = dill.loads(request.data)
@@ -190,7 +184,6 @@ def upload_jupyter():
         jupyter_robot._driver = robot._driver
         jupyter_robot.smoothie_drivers = robot.smoothie_drivers
         jupyter_robot.can_pop_command = robot.can_pop_command
-        # Singleton._instances[Robot] = jupyter_robot
         app.robot = jupyter_robot
 
         # Reload instrument calibrations
@@ -220,6 +213,7 @@ def upload_jupyter():
 @app.route("/load")
 def load():
     status = "success"
+    calibrations = None
     try:
         calibrations = update_step_list()
     except Exception as e:
@@ -231,7 +225,7 @@ def load():
         'data': {
             'calibrations': calibrations,
             'fileName': app.filename,
-            'lastModified': last_modified
+            'lastModified': app.last_modified
         }
     })
 
