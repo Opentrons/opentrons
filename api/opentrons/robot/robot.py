@@ -181,22 +181,6 @@ class Robot(object):
         self.set_connection('simulate')
         self.reset()
 
-    # @classmethod
-    # def get_instance(cls):
-    #     """
-    #     Deprecated. Use Robot() instead.
-    #
-    #     Returns
-    #     -------
-    #     An instance of a robot.
-    #     """
-    #
-    #     # leaving this method for backwards compatibility
-    #     # before Singleton meta-class was introduced
-    #     #
-    #     # TODO: remove method, refactor dependencies
-    #     return Robot()
-
     def reset(self):
         """
         Resets the state of the robot and clears:
