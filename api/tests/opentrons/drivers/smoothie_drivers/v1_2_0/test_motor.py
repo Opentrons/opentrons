@@ -221,23 +221,17 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor.home()
 
-    def test_move_x(self):
+    def test_move(self):
         self.motor.ot_version = None
-        self.motor.move_head(x=100)
-        pos = self.motor.get_head_position()['current']
-        self.assertEquals(pos['x'], 100)
+        for axis in 'xyz':
+            self.motor.move(**{axis: 30})
+            pos = self.motor.get_head_position()['current']
+            self.assertEquals(pos[axis], 30)
 
-    def test_move_y(self):
-        self.motor.ot_version = None
-        self.motor.move_head(y=100)
-        pos = self.motor.get_head_position()['current']
-        self.assertEquals(pos['y'], 100)
-
-    def test_move_z(self):
-        self.motor.ot_version = None
-        self.motor.move_head(z=30)
-        pos = self.motor.get_head_position()['current']
-        self.assertEquals(pos['z'], 30)
+        for axis in 'ab':
+            self.motor.move(**{axis: 30})
+            pos = self.motor.get_plunger_positions()['current']
+            self.assertEquals(pos[axis], 30)
 
     def test_send_command(self):
         res = self.motor.send_command('G0 X1 Y1 Z1')
