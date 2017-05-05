@@ -326,8 +326,9 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                 for axis in 'xyzab'
                 if axis in kwargs}
 
-        this_head_speed = min([self.speeds[l] for l in axis_called])
-        args.update({"F": this_head_speed})
+        if axis_called:
+            this_head_speed = min([self.speeds[l] for l in axis_called])
+            args.update({"F": this_head_speed})
         args.update({"a": self.speeds['a']})
         args.update({"b": self.speeds['b']})
 
