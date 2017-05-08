@@ -136,9 +136,7 @@ class Robot(object):
 
     Examples
     --------
-    >>> from opentrons import Robot
-    >>> from opentrons import instruments, containers
-    >>> robot = Robot()
+    >>> from opentrons import robot, instruments, containers
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
     >>> plate = containers.load('96-flat', 'A1', 'plate')
@@ -151,9 +149,6 @@ class Robot(object):
     []
     """
 
-    _commands = None  # []
-    # _instance = None
-
     def __init__(self):
         """
         Initializes a robot instance.
@@ -165,6 +160,7 @@ class Robot(object):
         only once instance of a robot.
         """
 
+        self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
@@ -182,31 +178,6 @@ class Robot(object):
         self._driver = None
         self.set_connection('simulate')
         self.reset()
-
-    # @classmethod
-    # def get_instance(cls):
-    #     """
-    #     Deprecated. Use Robot() instead.
-    #
-    #     Returns
-    #     -------
-    #     An instance of a robot.
-    #     """
-    #
-    #     # leaving this method for backwards compatibility
-    #     # before Singleton meta-class was introduced
-    #     #
-    #     # TODO: remove method, refactor dependencies
-    #     return Robot()
-
-    # @classmethod
-    # def reset_for_tests(cls):
-    #     """
-    #     Deprecated.
-    #     """
-    #     del Singleton._instances[cls]
-    #     robot = Robot.get_instance()
-    #     return robot
 
     def reset(self):
         """
@@ -507,7 +478,8 @@ class Robot(object):
 
         def _do():
             if strategy == 'arc':
-                arc_coords = self._create_arc(coordinates, placeable)
+                arc_coords = self._create_arc(
+                    coordinates, placeable, instrument)
                 for coord in arc_coords:
                     self._driver.move_head(**coord)
             elif strategy == 'direct':
@@ -526,7 +498,7 @@ class Robot(object):
         else:
             _do()
 
-    def _calibrated_max_dimension(self, container=None):
+    def _calibrated_max_dimension(self, container=None, instrument=None):
         """
         Returns a Vector, each axis being the calibrated maximum
         for all instruments
@@ -536,11 +508,18 @@ class Robot(object):
                 return container.max_dimensions(self._deck)
             return self._deck.max_dimensions(self._deck)
 
-        def _max_per_instrument(placeable):
+        def _max_per_instrument(placeable, inst):
             """
             Returns list of Vectors, one for each Instrument's farthest
             calibrated coordinate for the supplied placeable
             """
+            if inst:
+                return [
+                    instrument.calibrator.convert(
+                        placeable,
+                        placeable.max_dimensions(placeable)
+                    )
+                ]
             return [
                 instrument.calibrator.convert(
                     placeable,
@@ -551,10 +530,10 @@ class Robot(object):
 
         container_max_coords = []
         if container:
-            container_max_coords = _max_per_instrument(container)
+            container_max_coords = _max_per_instrument(container, instrument)
         else:
             for c in self.containers().values():
-                container_max_coords += _max_per_instrument(c)
+                container_max_coords += _max_per_instrument(c, instrument)
 
         max_coords = [
             max(
@@ -566,7 +545,7 @@ class Robot(object):
 
         return Vector(max_coords)
 
-    def _create_arc(self, destination, placeable=None):
+    def _create_arc(self, destination, placeable=None, instrument=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -582,7 +561,8 @@ class Robot(object):
         if this_container and (self._previous_container == this_container):
             ref_container = this_container
 
-        _, _, tallest_z = self._calibrated_max_dimension(ref_container)
+        _, _, tallest_z = self._calibrated_max_dimension(
+            ref_container, instrument)
         tallest_z += 5
 
         _, _, robot_max_z = self._driver.get_dimensions()
@@ -633,13 +613,12 @@ class Robot(object):
         --------
         ..
         >>> from opentrons import Robot
+        >>> robot = Robot()
         >>> from opentrons.instruments.pipette import Pipette
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
-        >>> p200 = Pipette(axis='a')
+        >>> p200 = Pipette(robot, axis='a')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
         """

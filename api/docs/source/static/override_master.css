@@ -9,8 +9,12 @@ div#nav-spacer {
 
 div#nav-spacer.nav-open {
     height: 150px;
+    text-decoration: none;
 }
 
+header nav ul li a.active{
+  text-decoration: none;
+}
 @media screen and (max-width: 875px),
 (max-device-width: 767px) {
 	header{

@@ -303,11 +303,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             for axis in list(target.keys()):
                 diff[axis] = current[axis] - target[axis]
             dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            dist_head = math.sqrt(dist)
+            diff_head = math.sqrt(dist)
+            diff_a = abs(diff.get('a', 0))
+            diff_b = abs(diff.get('b', 0))
 
-            if dist_head < tolerance:
-                if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
-                    break
+            if max(diff_head, diff_a, diff_b) < tolerance:
+                return
 
     def home(self, *axis):
 
@@ -431,7 +432,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         plunger_coords = {}
         for state in ['current', 'target']:
             plunger_coords[state] = {
-                axis: coords[state][axis]
+                axis: coords[state].get(axis, 0)
                 for axis in 'ab'
             }
 
