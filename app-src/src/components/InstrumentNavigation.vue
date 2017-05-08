@@ -32,7 +32,8 @@
     props: ['instrument'],
     data () {
       return {
-        plungerMode: 'mode-top'
+        plungerMode: 'mode-top',
+        axis: this.$route.params.instrument
       }
     },
     methods: {
