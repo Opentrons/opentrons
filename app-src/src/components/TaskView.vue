@@ -23,28 +23,9 @@
       <section id="instrument-pane">
         <!-- Instrument Info -->
         <h1>{{instrument().label}} {{channels}} [{{instrumentLocation}}]</h1>
-        <!-- Instrument Toggle / Nav -->
-        <button  v-for="instrument in tasks().instruments" 
-        class="tab" :class="{active : activePipette(instrument)}"  
-        @click="togglePipette(instrument.axis)"> 
-        {{instrument.axis}} {{instrument.label}}<span v-for="c in instrument.channels">&#9661;</span></button>
+        
+        <instrument-navigation :instrument='instrument()' ></instrument-navigation>
 
-        <div class="pipette-modal" :class="plungerMode">
-          <div class="plunger-nav">
-            <ul>
-              <li @click="modePlunger(instrument().axis, 'top')" class="top">Top</li>
-              <li @click="modePlunger(instrument().axis, 'bottom')" class="bottom">Bottom</li>
-              <li @click="modePlunger(instrument().axis, 'blowout')" class="blowout">Blowout</li>
-              <li @click="modePlunger(instrument().axis, 'drop_tip')" class="droptip">Drop Tip</li>
-            </ul>
-          </div>
-          <div class="plunger-img">
-            <img src='../assets/img/pipette_top.png' class='top'/>
-            <img src='../assets/img/pipette_bottom.png' class='bottom'/>
-            <img src='../assets/img/pipette_blowout.png' class='blowout'/>
-            <img src='../assets/img/pipette_drop_tip.png' class='drop_tip'/>
-          </div>
-        </div>
         <!--- Instrument Calibration -->
         <!-- v-if="!$route.params.placeable" -->
         <instrument-calibration :instrument="instrument()" :position="plungerPos"></instrument-calibration>
@@ -63,6 +44,7 @@
   import PlaceableCalibration from './PlaceableCalibration'
   import DeckNavigation from './DeckNavigation'
   import Modal from './Modal.vue'
+  import InstrumentNavigation from './InstrumentNavigation'
   import InstrumentCalibration from './InstrumentCalibration'
 
   export default {
@@ -71,7 +53,6 @@
     data () {
       return {
         axis: this.$route.params.instrument,
-        plungerMode: 'mode-top',
         plungerPos: 'top',
         showModalPlaceable: false
       }
@@ -80,7 +61,8 @@
       DeckNavigation,
       PlaceableCalibration,
       Modal,
-      InstrumentCalibration
+      InstrumentCalibration,
+      InstrumentNavigation
     },
     computed: {
       channels () {
@@ -98,26 +80,12 @@
       params () {
         return this.$route.params
       },
-      tasks () {
-        return this.$store.state.tasks
-      },
       deck () {
         return this.$store.state.tasks.deck
       },
       instrument () {
         let instrument = this.$store.state.tasks.instruments.find(element => element.axis === this.axis)
         return instrument
-      },
-      activePipette (instrument) {
-        return instrument.axis === this.axis
-      },
-      togglePipette (axis) {
-        this.$router.push({ name: 'instrument', params: { instrument: axis, slot: null, placeable: null } })
-      },
-      modePlunger (axis, mode) {
-        this.plungerMode = 'mode-' + mode
-        this.plungerPos = mode
-        this.togglePipette(axis)
       },
       running () {
         return this.$store.state.running || this.$store.state.protocolFinished
