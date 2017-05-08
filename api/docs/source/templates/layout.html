@@ -72,9 +72,9 @@ window.intercomSettings = {
             <ul class="products">
                 <li class="mobile">Products</li>
                 <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
                 <li><a href="https://opentrons.com/ot-app">OT App</a></li>
                 <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
-                <li>&nbsp;</li>
                 <li>&nbsp;</li>
             </ul>
             <ul class="company">
@@ -104,6 +104,15 @@ window.intercomSettings = {
         $('#nav-collapse').click(function(event) {
             $(this).toggleClass('change');
             $('#dropdown').slideToggle(500);
+        });
+
+        $('#dropdown ul').mouseenter(function(event) {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#dropdown ul').mouseleave(function(event) {
+            $('*').removeClass('active');
         });
 
         $('.menu-toggle').mouseenter(function(event) {
@@ -170,6 +179,7 @@ window.intercomSettings = {
             <span class="link-title">PRODUCTS</span>
             <ul class="products-list">
                 <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
                 <li><a href="https://opentrons.com/ot-app">OT App</a></li>
                 <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
             </ul>
