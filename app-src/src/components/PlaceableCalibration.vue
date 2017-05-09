@@ -19,15 +19,14 @@
         let slot = this.placeable.slot
         let label = this.placeable.label
         let axis = this.instrument.axis
-        console.log(this.placeable.slot)
         this.$store.dispatch('calibrate', {slot, label, axis})
 
         function deckCalibrated () {
           // TODO: Add a condition in the state that tracks if deck is calibrated
-          if (!this.$store.state.tasks || this.$store.state.tasks.length === 0) return false
+          if (!this.$store.state.tasks || this.$store.state.tasks.deck.length === 0) return false
 
           let deckCalibrated = this.$store.state.tasks.deck.every((placeable) => {
-            placeable.instruments.every((instrument) => {
+            return placeable.instruments.every((instrument) => {
               return instrument.calibrated
             })
           })
