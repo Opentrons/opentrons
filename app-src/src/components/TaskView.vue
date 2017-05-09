@@ -1,6 +1,6 @@
 <template>
   
-    <section id="task-view">
+    <section id="task-view" >
       <section id="placeable-pane">  
         <!-- Placeable Info -->
         <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}
@@ -10,25 +10,25 @@
         </h1> 
 
         <!-- Placeable Modal -->
-        <modal v-if="showModalPlaceable" @close="showModalPlaceable = false" :placeable="placeable($route.params.slot)" :instrument="instrument()">
+        <modal v-if="showModalPlaceable" @close="showModalPlaceable = false" :placeable="placeable()" :instrument="instrument()">
         </modal>
 
         <!-- Placeable Nav / Deck Map -->
         <deck-navigation  :instrument='instrument()' :deck='deck()'></deck-navigation>
         
         <!-- Placeable Calibration -->
-        <placeable-calibration v-if="$route.params.placeable" :instrument='instrument()' :deck='deck()'></placeable-calibration>
+        <placeable-calibration v-if="$route.params.placeable" :instrument='instrument()' :deck='deck()' :placeable="placeable()"></placeable-calibration>
       </section>
 
       <section id="instrument-pane">
         <!-- Instrument Info -->
         <h1>{{instrument().label}} {{channels}} [{{instrumentLocation}}]</h1>
         
-        <instrument-navigation :instrument='instrument()' ></instrument-navigation>
+        <instrument-navigation :instrument='instrument()' @updatePos="plungerPos = $event" ></instrument-navigation>
 
         <!--- Instrument Calibration -->
         <!-- v-if="!$route.params.placeable" -->
-        <instrument-calibration :instrument="instrument()" :position="plungerPos"></instrument-calibration>
+        <instrument-calibration v-if="!$route.params.placeable" :instrument="instrument()" :position="plungerPos"></instrument-calibration>
 
         </section>
       </section>
@@ -73,8 +73,8 @@
       }
     },
     methods: {
-      placeable (slot) {
-        let container = this.deck().find(element => element.slot === slot)
+      placeable () {
+        let container = this.deck().find(element => element.slot === this.$route.params.slot)
         return container
       },
       params () {

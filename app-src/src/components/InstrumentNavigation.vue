@@ -48,9 +48,7 @@
       },
       modePlunger (axis, mode) {
         this.plungerMode = 'mode-' + mode
-        console.log(mode)
-        this.$emit('update:plungerPos', mode)
-        // this.plungerPos = mode
+        this.$emit('updatePos', mode)
         this.togglePipette(axis)
       }
     }

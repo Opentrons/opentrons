@@ -1,7 +1,7 @@
 <template>
   <div class="placeable-calibration">
-    <button class='btn-calibrate save' @click='calibrate()'>SAVE</button>
-    <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='moveToPosition()'>MOVE TO</button>
+    <button class='btn-calibrate save' @click='calibrate()'>SAVE {{placeable.label}}</button>
+    <button :class="[{'disabled': !isCalibrated}, 'btn-calibrate', 'move-to']" @click='moveToPosition()'>MOVE TO {{placeable.label }}</button>
   </div>
 </template>
 
@@ -11,7 +11,6 @@
     name: 'PlaceableCalibration',
     data () {
       return {
-
       }
     },
     props: ['instrument', 'placeable'],
@@ -20,6 +19,7 @@
         let slot = this.placeable.slot
         let label = this.placeable.label
         let axis = this.instrument.axis
+        console.log(this.placeable.slot)
         this.$store.dispatch('calibrate', {slot, label, axis})
 
         function isCalibrated () {

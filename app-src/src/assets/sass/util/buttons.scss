@@ -83,7 +83,7 @@ button {
 
 .btn-calibrate {
     flex: 0 0;
-    min-width: $btn-size*3;
+    min-width: 47%;
     height: $btn-size;
     line-height: $btn-size;
     padding: 0px 15px;
@@ -92,6 +92,7 @@ button {
     border-radius: 6px;
     text-align: center;
     color: white;
+    text-transform: uppercase;
 }
 
 .save {

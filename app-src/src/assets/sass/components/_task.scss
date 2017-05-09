@@ -1,6 +1,6 @@
 section#welcome-view {
     width: 700px;
-    height: 347px;
+    height: 400px;
     padding: 10px;
     margin-left: 5px;
     border: 2px solid $well-bg;
@@ -9,7 +9,7 @@ section#welcome-view {
 
 section#task-view {
     width: 725px;
-    height: 375px;
+    height: 400px;
     display: flex;
     flex-direction: row;
     section#placeable-pane,
@@ -125,4 +125,12 @@ div.pipette-modal {
             display: block;
         }
     }
+}
+
+.instrument-calibration{ 
+    padding:45px 5px 5px;
+}
+
+.placeable-calibration{
+     padding:0 5px;
 }

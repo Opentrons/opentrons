@@ -1,7 +1,7 @@
 <template>
   <div class="instrument-calibration" >
-    <button @click="calibrateInstrument(instrument.axis, position)" class='btn-calibrate save'>SAVE</button>
-    <button @click="moveToPlungerPosition(instrument.axis, position)" class="btn-calibrate move-to">MOVE TO</button>
+    <button @click="calibrateInstrument(instrument.axis, position)" class='btn-calibrate save'>SAVE {{position | prettify}}</button>
+    <button @click="moveToPlungerPosition(instrument.axis, position)" class="btn-calibrate move-to">MOVE TO {{position | prettify}}</button>
   </div>
 </template>
 
@@ -12,6 +12,13 @@
     data () {
       return {
 
+      }
+    },
+    filters: {
+      prettify: function (value) {
+        if (!value) return ''
+        value = value.toString()
+        return value.replace('_', ' ')
       }
     },
     methods: {
