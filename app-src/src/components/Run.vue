@@ -43,7 +43,8 @@
       calibrated () {
         // TODO: Move this to state
         if (!this.$store.state.isConnected) return false
-        if (this.$store.state.tasks.length === 0) return false
+        if (this.$store.state.tasks.deck.length === 0) return false
+        if (this.$store.state.tasks.instruments.length === 0) return false
 
         let placeableCalibrated = this.$store.state.tasks.deck.every((placeable) => {
           placeable.instruments.every((instrument) => {
@@ -53,6 +54,7 @@
         let instrumentCalibrated = this.$store.state.tasks.instruments.every((instrument) => {
           return instrument.calibrated
         })
+        console.log()
         return placeableCalibrated && instrumentCalibrated
       }
     }
