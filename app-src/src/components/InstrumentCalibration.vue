@@ -6,6 +6,8 @@
 </template>
 
 <script>
+  import { trackEvent } from '../analytics'
+
   export default {
     name: 'InstrumentCalibration',
     props: ['instrument', 'position'],
@@ -24,6 +26,17 @@
     methods: {
       calibrateInstrument (axis, position) {
         this.$store.dispatch('calibrate', {axis, position})
+        function instrumentsCalibrated () {
+          // TODO: Add a condition in the state that tracks if deck is calibrated
+          if (!this.$store.state.tasks || this.$store.state.tasks.length === 0) return false
+          let pipettesCalibrated = this.$store.state.tasks.instruments.every((plunger) => {
+            return plunger.calibrated
+          })
+          return pipettesCalibrated
+        }
+        if (instrumentsCalibrated.bind(this)()) {
+          trackEvent('INSTRUMENTS_CALIBRATED')
+        }
       },
       moveToPlungerPosition (axis, position) {
         this.$store.dispatch('moveToPosition', {axis, position})
