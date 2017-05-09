@@ -304,7 +304,6 @@ def _detached_progress():
             h, m, s = _seconds_to_string(res.get('estimated_time'))
             progress_data += ' - Estimated Time Left {}:{}:{}'.format(h, m, s)
 
-        print(progress_data)
         emit_notifications([progress_data], 'info')
 
 

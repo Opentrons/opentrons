@@ -24,21 +24,21 @@ class InstrumentMosfet(object):
     Provides access to MagBead's MOSFET.
     """
 
-    def __init__(self, driver, mosfet_index):
-        self.motor_driver = driver
+    def __init__(self, robot, mosfet_index):
+        self.robot = robot
         self.mosfet_index = mosfet_index
 
     def engage(self):
         """
         Engages the MOSFET.
         """
-        self.motor_driver.set_mosfet(self.mosfet_index, True)
+        self.robot._driver.set_mosfet(self.mosfet_index, True)
 
     def disengage(self):
         """
         Disengages the MOSFET.
         """
-        self.motor_driver.set_mosfet(self.mosfet_index, False)
+        self.robot._driver.set_mosfet(self.mosfet_index, False)
 
     def wait(self, seconds):
         """
@@ -49,15 +49,15 @@ class InstrumentMosfet(object):
         seconds : int
             Number of seconds to pause for.
         """
-        self.motor_driver.wait(seconds)
+        self.robot._driver.wait(seconds)
 
 
 class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
-    def __init__(self, driver, axis):
-        self.motor_driver = driver
+    def __init__(self, robot, axis):
+        self.robot = robot
         self.axis = axis
 
     def move(self, value, mode='absolute'):
@@ -71,7 +71,7 @@ class InstrumentMotor(object):
         mode : {'absolute', 'relative'}
         """
         kwargs = {self.axis: value}
-        self.motor_driver.move_plunger(
+        self.robot._driver.move_plunger(
             mode=mode, **kwargs
         )
 
@@ -79,7 +79,7 @@ class InstrumentMotor(object):
         """
         Home plunger motor.
         """
-        self.motor_driver.home(self.axis)
+        self.robot._driver.home(self.axis)
 
     def wait(self, seconds):
         """
@@ -90,7 +90,7 @@ class InstrumentMotor(object):
         seconds : int
             Number of seconds to pause for.
         """
-        self.motor_driver.wait(seconds)
+        self.robot._driver.wait(seconds)
 
     def speed(self, rate):
         """
@@ -100,8 +100,7 @@ class InstrumentMotor(object):
         ----------
         rate : int
         """
-        self.motor_driver.set_plunger_speed(rate, self.axis)
-        return self
+        self.robot._driver.set_plunger_speed(rate, self.axis)
 
 
 class Robot(object, metaclass=Singleton):
@@ -296,7 +295,7 @@ class Robot(object, metaclass=Singleton):
 
         motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
         if not motor_obj:
-            motor_obj = InstrumentMosfet(self._driver, mosfet_index)
+            motor_obj = InstrumentMosfet(self, mosfet_index)
             self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
         return motor_obj
 
@@ -314,7 +313,7 @@ class Robot(object, metaclass=Singleton):
 
         motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
         if not motor_obj:
-            motor_obj = InstrumentMotor(self._driver, axis)
+            motor_obj = InstrumentMotor(self, axis)
             self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
         return motor_obj
 
@@ -756,7 +755,6 @@ class Robot(object, metaclass=Singleton):
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
-        del self.smoothie_drivers['live']
         self.smoothie_drivers['live'] = None
 
     def containers(self):

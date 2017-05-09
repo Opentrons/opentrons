@@ -1,5 +1,7 @@
 import time
 
+from serial import SerialException
+
 from opentrons.util.log import get_logger
 
 
@@ -21,12 +23,10 @@ class Connection(object):
         return str(self.serial_port.port)
 
     def open(self):
-        if not self.serial_port.isOpen():
-            self.serial_port.open()
+        self.serial_port.open()
 
     def close(self):
-        if self.serial_port.isOpen():
-            self.serial_port.close()
+        self.serial_port.close()
 
     def isOpen(self):
         return self.serial_port.isOpen()
@@ -54,7 +54,12 @@ class Connection(object):
         end_time = time.time() + timeout
         while end_time > time.time():
             self.wait_for_data(timeout=timeout)
-            res = str(self.serial_port.readline().decode().strip())
+            try:
+                res = str(self.serial_port.readline().decode().strip())
+            except SerialException:
+                self.close()
+                self.open()
+                return self.readline_string(timeout=end_time - time.time())
             if res:
                 return res
         raise RuntimeWarning(
