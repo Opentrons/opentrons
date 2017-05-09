@@ -12,7 +12,6 @@ const actions = {
     // let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/march-22-container-file-update/api/opentrons/config/containers/default-containers.json'
     let containers = {}
     Vue.http.get(url).then((response) => {
-      console.log(response)
       containers = response.body.data.containers
     }).then(() => {
       for (const c in containers) {
@@ -120,10 +119,8 @@ const actions = {
     .post('http://localhost:31950/move_to_container', JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      console.log('success', response)
     }, (response) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-      console.log('failed', response)
     })
   },
   runDetached ({ commit }) {
@@ -138,16 +135,13 @@ const actions = {
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     if (window.confirm('About to run protocol. Home robot before running?')) {
-      console.log('one')
       Opentrons.runHomeProtocol()
     } else {
-      console.log('two')
       Opentrons.runProtocol()
     }
   },
   pauseProtocol ({ commit }) {
     Opentrons.pauseProtocol().then((wasSuccessful) => {
-      console.log(wasSuccessful)
       if (wasSuccessful) {
         commit(types.UPDATE_PAUSED, wasSuccessful)
       }
@@ -155,7 +149,6 @@ const actions = {
   },
   resumeProtocol ({ commit }) {
     Opentrons.resumeProtocol().then((wasSuccessful) => {
-      console.log(wasSuccessful)
       if (wasSuccessful) {
         commit(types.UPDATE_PAUSED, !wasSuccessful)
       }
