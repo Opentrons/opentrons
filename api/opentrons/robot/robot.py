@@ -659,19 +659,16 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event = {}
         cmd_run_event.update(kwargs)
 
-        mode = 'live'
-        if self._driver.is_simulating():
-            mode = 'simulate'
-
-        cmd_run_event['mode'] = mode
+        cmd_run_event['mode'] = 'live'
         cmd_run_event['name'] = 'command-run'
         for i, command in enumerate(self._commands):
-            cmd_run_event.update({
-                'command_description': command.description,
-                'command_index': i,
-                'commands_total': len(self._commands)
-            })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
+            if not self._driver.is_simulating():
+                cmd_run_event.update({
+                    'command_description': command.description,
+                    'command_index': i,
+                    'commands_total': len(self._commands)
+                })
+                trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
                 if command.description:
@@ -679,7 +676,7 @@ class Robot(object, metaclass=Singleton):
                 command()
             except Exception as e:
                 trace.EventBroker.get_instance().notify({
-                    'mode': mode,
+                    'mode': 'live',
                     'name': 'command-failed',
                     'error': str(e)
                 })
@@ -915,20 +912,21 @@ class Robot(object, metaclass=Singleton):
     def versions(self):
         # TODO: Store these versions in config
         compatible = self._driver.versions_compatible()
-        return {
+        res = {
             'firmware': {
                 'version': self._driver.get_firmware_version(),
-                'compatible': compatible['firmware']
+                'compatible': compatible.get('firmware')
             },
             'config': {
                 'version': self._driver.get_config_version(),
-                'compatible': compatible['config']
+                'compatible': compatible.get('config')
             },
             'ot_version': {
                 'version': self._driver.get_ot_version(),
-                'compatible': compatible['ot_version']
+                'compatible': compatible.get('ot_version')
             }
         }
+        return res
 
     def diagnostics(self):
         """
