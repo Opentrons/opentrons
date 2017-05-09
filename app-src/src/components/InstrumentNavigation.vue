@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <div>
   <!-- Instrument Toggle / Nav -->
   <!-- TODO: better active button state style, multi/single icon -->
   <div class="pipette-btns">
@@ -26,7 +26,7 @@
       <img src='../assets/img/pipette_drop_tip.png' class='drop_tip'/>
     </div>
   </div>
-  </span>
+  </div>
 </template>
 
 <script>
@@ -65,13 +65,6 @@
 </script>
 
 <style scoped>
-  .pipette-btns:after{
-    content: '';
-    clear: both;
-
-  }
-  #a{
-    float: right;
-  }
+  
 
 </style>

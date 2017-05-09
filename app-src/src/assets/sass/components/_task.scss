@@ -1,6 +1,6 @@
 section#welcome-view {
     width: 700px;
-    height: 400px;
+    height: 376px;
     padding: 10px;
     margin-left: 5px;
     border: 2px solid $well-bg;
@@ -18,14 +18,27 @@ section#task-view {
         background-color: $well-bg;
         border-radius: 6px;
         border: 2px solid $well-bg;
-        margin: 0 5px 5px 5px;
+        margin: 0 5px;
         h1 {
             padding-top: 10px;
             padding-left: 10px;
         }
     }
     section#instrument-pane {
-        margin: 0 0 5px 0;
+            margin: 0;
+        .pipette-btns{
+            display: block;
+            width:100%;
+            clear: both;
+        }
+        .pipette-btns:after{
+            content: '';
+            clear: both;
+
+        }
+        #a{
+            float: right;
+        }
     }
     section#placeable-pane {
         h1 {
@@ -57,6 +70,7 @@ button.tab {
 }
 
 div.pipette-modal {
+    width:100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
