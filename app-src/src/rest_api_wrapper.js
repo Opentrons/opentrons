@@ -265,7 +265,7 @@ class Opentrons {
           console.log(response)
           console.log(`Homing ${axis}`)
         }, (response) => {
-          console.log('failed to home', response)
+          console.log('failed to home: ', response)
         })
   }
 
@@ -275,7 +275,7 @@ class Opentrons {
         .then((response) => {
           return response.body.versions
         }, (response) => {
-          console.log('failed to home', response)
+          console.log('failed to get versions: ', response)
         })
   }
 }

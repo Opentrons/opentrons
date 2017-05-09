@@ -36,12 +36,12 @@ const actions = {
     Opentrons.connect(port).then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
-        if (window.confirm('Successfully Connected. Do you want to home now?')) {
-          Opentrons.home('all')
-        }
         Opentrons.getVersions().then((result) => {
           let versions = result
           commit(types.UPDATE_ROBOT_VERSIONS, {versions})
+          if (window.confirm('Successfully Connected. Do you want to home now?')) {
+            Opentrons.home('all')
+          }
         })
       }
     })
