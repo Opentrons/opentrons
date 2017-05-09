@@ -12,6 +12,7 @@ import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
+import gevent
 
 from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
@@ -38,7 +39,7 @@ app = Flask(__name__,
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
-socketio = SocketIO(app, async_mode='gevent')
+socketio = SocketIO(app, async_mode='threading')
 
 filename = "N/A"
 last_modified = "N/A"
@@ -281,18 +282,37 @@ def run_home():
 def _detached_progress():
     robot = Robot.get_instance()
     while True:
-        res = robot._driver.smoothie_player.progress()
+        res = robot._driver.smoothie_player.progress(timeout=20)
         if not res.get('file'):
             return
-        emit_notifications([str(res)], 'info')
+        percentage = '{}%'.format(round(res.get('percentage', 0) * 100, 2))
+
+        def _seconds_to_string(sec):
+            hours = int(sec / (60 * 60))
+            hours  = str(hours) if hours > 9 else '0{}'.format(hours)
+            minutes = int(sec / 60) % 60
+            minutes  = str(minutes) if minutes > 9 else '0{}'.format(minutes)
+            seconds = sec % 60
+            seconds  = str(seconds) if seconds > 9 else '0{}'.format(seconds)
+            return (hours, minutes, seconds)
+
+        h, m, s = _seconds_to_string(res.get('elapsed_time'))
+        progress_data = 'Protocol {} Complete - Elapsed Time {}:{}:{}'.format(
+            percentage, h, m, s)
+
+        if res.get('estimated_time'):
+            h, m, s = _seconds_to_string(res.get('estimated_time'))
+            progress_data += ' - Estimated Time Left {}:{}:{}'.format(h, m, s)
+
+        print(progress_data)
+        emit_notifications([progress_data], 'info')
 
 
 def _run_detached():
     robot = Robot.get_instance()
-    emit_notifications(["Preparing to run detached:"], 'info')
-    robot.home()
     p = player.SmoothiePlayer_2_0_0()
 
+    emit_notifications(["Preparing to run detached:"], 'info')
     emit_notifications(["Simulating, please wait..."], 'info')
     robot.smoothie_drivers['simulate'].record_start(p)
     robot.simulate()
@@ -421,11 +441,10 @@ def connectRobot():
     robot = Robot.get_instance()
     try:
         robot.connect(port, options=options)
-        if robot._driver.is_playing():
-            threading.Thread(target=_detached_progress).start()
+        emit_notifications(["Successfully connected"], 'info')
     except Exception as e:
         # any robot version incompatibility will be caught here
-        robot.disconnect()
+        disconnectRobot()
         status = 'error'
         data = str(e)
         if "versions are incompatible" in data:
@@ -439,37 +458,36 @@ def connectRobot():
 
 
 def _start_connection_watcher():
-    pass
-#     robot = Robot.get_instance()
-#     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
-#         'CONNECTION_STATE_WATCHER',
-#         (None, None)
-#     )
+    robot = Robot.get_instance()
+    connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
+        'CONNECTION_STATE_WATCHER',
+        (None, None)
+    )
 
-#     if connection_state_watcher and watcher_should_run:
-#         watcher_should_run.set()
+    if connection_state_watcher and watcher_should_run:
+        watcher_should_run.set()
 
-#     watcher_should_run = threading.Event()
+    watcher_should_run = threading.Event()
 
-#     def watch_connection_state(should_run):
-#         while not should_run.is_set():
-#             socketio.emit(
-#                 'event',
-#                 {
-#                     'type': 'connection_status',
-#                     'is_connected': robot.is_connected()
-#                 }
-#             )
-#             socketio.sleep(1.5)
+    def watch_connection_state(should_run):
+        while not should_run.is_set():
+            socketio.emit(
+                'event',
+                {
+                    'type': 'connection_status',
+                    'is_connected': robot.is_connected()
+                }
+            )
+            socketio.sleep(1.5)
 
-#     connection_state_watcher = socketio.start_background_task(
-#         watch_connection_state,
-#         (watcher_should_run)
-#     )
-#     BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (
-#         connection_state_watcher,
-#         watcher_should_run
-#     )
+    connection_state_watcher = socketio.start_background_task(
+        watch_connection_state,
+        (watcher_should_run)
+    )
+    BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (
+        connection_state_watcher,
+        watcher_should_run
+    )
 
 
 @app.route("/robot/serial/disconnect")
@@ -1087,10 +1105,8 @@ def start():
     socketio.run(
         app,
         debug=False,
-        logger=False,
         use_reloader=False,
         log_output=False,
-        engineio_logger=False,
         port=31950
     )
 
