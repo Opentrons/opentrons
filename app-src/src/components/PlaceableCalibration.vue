@@ -31,11 +31,7 @@
               return instrument.calibrated
             })
           })
-          // this should be tracked in pipette calibration ?
-          let instrumentsCalibrated = this.$store.state.tasks.instruments.every((plunger) => {
-            return plunger.calibrated
-          })
-          return deckCalibrated && instrumentsCalibrated
+          return deckCalibrated
         }
 
         if (deckCalibrated.bind(this)()) {
