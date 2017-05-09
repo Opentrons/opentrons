@@ -12,8 +12,6 @@ from opentrons.drivers.smoothie_drivers.v1_2_0.driver \
     import SmoothieDriver_1_2_0
 from opentrons.drivers.smoothie_drivers.v2_0_0.driver \
     import SmoothieDriver_2_0_0
-from opentrons.drivers.smoothie_drivers.v2_0_0.player \
-    import SmoothiePlayer_2_0_0
 from opentrons.drivers.smoothie_drivers.v1_2_0.virtual_smoothie \
     import VirtualSmoothie_1_2_0
 from opentrons.drivers.smoothie_drivers.v2_0_0.virtual_smoothie \
@@ -26,8 +24,7 @@ __all__ = [
 
 drivers_by_version = {
     'v1.0.5': SmoothieDriver_1_2_0,
-    'edge-1c222d9NOMSD': SmoothieDriver_2_0_0,
-    'player': SmoothiePlayer_2_0_0
+    'edge-1c222d9NOMSD': SmoothieDriver_2_0_0
 }
 virtual_smoothies_by_version = {
     'v1.0.5': VirtualSmoothie_1_2_0,
@@ -129,16 +126,9 @@ def get_driver(c):
         d = driver_class(SMOOTHIE_DEFAULTS)
         d.connect(c)
         return d
-
-    p = get_player(c)
-    if p:
-        d = SmoothieDriver_2_0_0(SMOOTHIE_DEFAULTS)
-        d.connection = c
-        d.smoothie_player = p
-        return d
     else:
         raise RuntimeError(
-            'Can not read version from port {}'.format(c.name()))
+            'Can not read version from port "{}"'.format(c.name()))
 
 
 def get_version(c):
@@ -162,13 +152,3 @@ def get_version(c):
     if v in drivers_by_version:
         return v
 
-
-def get_player(c):
-
-    p = SmoothiePlayer_2_0_0()
-    p.connect(c)
-    try:
-        if p.progress()['file']:
-            return p
-    except Exception:
-        return None
