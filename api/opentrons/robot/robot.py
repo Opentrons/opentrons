@@ -741,7 +741,17 @@ class Robot(object, metaclass=Singleton):
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
-        self._driver = self.smoothie_drivers[mode]
+
+        d = self.smoothie_drivers[mode]
+
+        # set VirtualSmoothie's coordinates to be the same as physical robot
+        if self._driver and d.is_simulating():
+            d.connection.serial_port.set_position_from_arguments({
+                ax.upper(): value
+                for ax, value in self._driver.get_current_position().items()
+            })
+
+        self._driver = d
         if not self._driver.is_connected():
             self._driver.toggle_port()
 
