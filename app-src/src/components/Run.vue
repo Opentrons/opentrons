@@ -47,7 +47,7 @@
         if (this.$store.state.tasks.instruments.length === 0) return false
 
         let placeableCalibrated = this.$store.state.tasks.deck.every((placeable) => {
-          placeable.instruments.every((instrument) => {
+          return placeable.instruments.every((instrument) => {
             return instrument.calibrated
           })
         })
