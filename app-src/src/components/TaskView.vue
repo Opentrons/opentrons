@@ -5,7 +5,7 @@
         <!-- Placeable Info -->
         <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}
           <span class="more-info">
-          <a role="button" id="show-modal" @click="showModal = true">?</a>
+          <a role="button" id="show-modal" @click="showModalPlaceable = true">?</a>
           </span>
         </h1> 
 
