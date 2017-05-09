@@ -352,6 +352,13 @@ class Robot(object, metaclass=Singleton):
         self.smoothie_drivers['live'] = device
         self.set_connection('live')
 
+        # overwrite VirtualSmoothie to share same versions as live robot
+        for d in self.smoothie_drivers.values():
+            if d.is_simulating():
+                d.ot_version = self._driver.get_ot_version()
+                d.firmware_version = self._driver.get_firmware_version()
+                d.config_file_version = self._driver.get_config_version()
+
     def _update_axis_homed(self, *args):
         for a in args:
             for letter in a:
