@@ -89,7 +89,14 @@ def load_python(stream):
     )
     try:
         try:
+            robot.set_connection('simulate')
+            # for instrument in robot._instruments.values():
+            #     instrument.setup_simulate()
+            # import pdb; pdb.set_trace()
+
+            print(id(robot))
             exec(code, globals())
+            robot.set_connection('live')
         except Exception as e:
             tb = e.__traceback__
             stack_list = traceback.extract_tb(tb)

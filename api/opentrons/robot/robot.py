@@ -356,45 +356,45 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        def _do():
-            self._driver.calm_down()
-            if args:
-                self._update_axis_homed(*args)
-                self._driver.home(*args)
-            else:
-                self._update_axis_homed('xyzab')
-                self._driver.home('z')
-                self._driver.home('x', 'y', 'b', 'a')
-
-        if kwargs.get('enqueue'):
-            description = "Homing Robot"
-            self.add_command(Command(do=_do, description=description))
+        # def _do():
+        self._driver.calm_down()
+        if args:
+            self._update_axis_homed(*args)
+            self._driver.home(*args)
         else:
-            log.info('Executing: Home now')
-            return _do()
+            self._update_axis_homed('xyzab')
+            self._driver.home('z')
+            self._driver.home('x', 'y', 'b', 'a')
 
-    def comment(self, description):
-        def _do():
-            pass
+        # if kwargs.get('enqueue'):
+        #     description = "Homing Robot"
+        #     self.add_command(Command(do=_do, description=description))
+        # else:
+        #     log.info('Executing: Home now')
+        #     return _do()
 
-        def _setup():
-            pass
+    # def comment(self, description):
+    #     def _do():
+    #         pass
+    #
+    #     def _setup():
+    #         pass
+    #
+    #     c = Command(do=_do, setup=_setup, description=description)
+    #     self.add_command(c)
 
-        c = Command(do=_do, setup=_setup, description=description)
-        self.add_command(c)
+    # def add_command(self, command):
+    #
+    #     if command.description:
+    #         log.info("Enqueuing: {}".format(command.description))
+    #     if command.setup:
+    #         command.setup()
+    #     self._commands.append(command)
 
-    def add_command(self, command):
-
-        if command.description:
-            log.info("Enqueuing: {}".format(command.description))
-        if command.setup:
-            command.setup()
-        self._commands.append(command)
-
-    def register(self, name, callback):
-        def commandable():
-            self.add_command(Command(do=callback))
-        setattr(self, name, commandable)
+    # def register(self, name, callback):
+    #     def commandable():
+    #         self.add_command(Command(do=callback))
+    #     setattr(self, name, commandable)
 
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
@@ -461,11 +461,11 @@ class Robot(object):
         >>> robot.move_to(plate[0].top())
         """
 
-        enqueue = kwargs.get('enqueue', False)
+        # enqueue = kwargs.get('enqueue', False)
         # Adding this for backwards compatibility with old move_to(now=False)
         # convention.
-        if 'now' in kwargs:
-            enqueue = not kwargs.get('now')
+        # if 'now' in kwargs:
+        #     enqueue = not kwargs.get('now')
 
         placeable, coordinates = containers.unpack_location(location)
 
@@ -476,27 +476,26 @@ class Robot(object):
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 
-        def _do():
-            if strategy == 'arc':
-                arc_coords = self._create_arc(
-                    coordinates, placeable, instrument)
-                for coord in arc_coords:
-                    self._driver.move_head(**coord)
-            elif strategy == 'direct':
-                self._driver.move_head(
-                    x=coordinates[0],
-                    y=coordinates[1],
-                    z=coordinates[2]
-                )
-            else:
-                raise RuntimeError(
-                    'Unknown move strategy: {}'.format(strategy))
-
-        if enqueue:
-            _description = 'Moving to {}'.format(placeable)
-            self.add_command(Command(do=_do, description=_description))
+        # def _do():
+        if strategy == 'arc':
+            arc_coords = self._create_arc(coordinates, placeable, instrument)
+            for coord in arc_coords:
+                self._driver.move_head(**coord)
+        elif strategy == 'direct':
+            self._driver.move_head(
+                x=coordinates[0],
+                y=coordinates[1],
+                z=coordinates[2]
+            )
         else:
-            _do()
+            raise RuntimeError(
+                'Unknown move strategy: {}'.format(strategy))
+
+        # if enqueue:
+        #     _description = 'Moving to {}'.format(placeable)
+        #     self.add_command(Command(do=_do, description=_description))
+        # else:
+        #     _do()
 
     def _calibrated_max_dimension(self, container=None, instrument=None):
         """
