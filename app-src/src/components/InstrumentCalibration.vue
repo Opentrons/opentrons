@@ -1,7 +1,7 @@
 <template>
   <div class="instrument-calibration" >
     <button @click="calibrateInstrument(instrument.axis, position)" class='btn-calibrate save'>SAVE {{position | prettify}}</button>
-    <button @click="moveToPlungerPosition(instrument.axis, position)" class="btn-calibrate move-to">MOVE TO {{position | prettify}}</button>
+    <button @click="moveToPlungerPosition(instrument.axis, position)" :class="[{'disabled': !instrument.calibrated}, 'btn-calibrate', 'move-to']">MOVE TO {{position | prettify}}</button>
   </div>
 </template>
 
