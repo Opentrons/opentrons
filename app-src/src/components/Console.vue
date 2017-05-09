@@ -18,7 +18,6 @@
     watch: {
       runLog: function (val, oldVal) {
         this.$refs.commands.scrollTop = this.$refs.commands.scrollHeight
-        console.log(this.$refs.commands.scrollHeight)
       }
     }
   }

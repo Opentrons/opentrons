@@ -54,7 +54,6 @@ function WebSocketPlugin (socket) {
         if (data.text.length > 0) {
           let {text, type} = data
           text = `${text}`
-          console.log(type)
           data.timestamp = (new Date()).toLocaleTimeString()
           data.command_description = text
           data.notification = true
