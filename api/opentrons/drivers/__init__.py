@@ -133,11 +133,12 @@ def get_driver(c):
 
 def get_version(c):
     c.open()
+    c.serial_pause()
     c.flush_input()
     c.write_string('version \r\n')
-    c.wait_for_data(timeout=3)
-    response = c.readline_string()
+    response = c.readline_string(timeout=3)
     c.flush_input()
+    c.close()
 
     # {"version":v1.0.5}
     v = response.split(':')[-1][:-1]

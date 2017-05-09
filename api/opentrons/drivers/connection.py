@@ -23,6 +23,8 @@ class Connection(object):
         return str(self.serial_port.port)
 
     def open(self):
+        if self.serial_port.isOpen():
+            self.serial_port.close()
         self.serial_port.open()
 
     def close(self):
