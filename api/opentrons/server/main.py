@@ -74,9 +74,8 @@ def get_protocol_locals():
     return locals()
 
 
-def load_python(stream):
+def load_python(code : str):
     robot = app.robot
-    code = helpers.convert_byte_stream_to_str(stream)
     api_response = {'errors': [], 'warnings': []}
 
     robot.reset()
@@ -89,12 +88,9 @@ def load_python(stream):
             # robot.set_connection('simulate')
             # for instrument in robot._instruments.values():
             #     instrument.setup_simulate()
-            # import pdb; pdb.set_trace()
-
-            print(id(robot))
             exec(code, globals())
-            # robot.set_connection('live')
         except Exception as e:
+            app.logger.exception('Protocol exec failed')
             tb = e.__traceback__
             stack_list = traceback.extract_tb(tb)
             _, line, name, text = stack_list[-1]
@@ -128,10 +124,12 @@ def load_python(stream):
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    # TODO: refactor and persist upload history?
     file = request.files.get('file')
     app.file = file
     app.filename = file.filename
     app.last_modified = request.form.get('lastModified')
+    app.code = helpers.convert_byte_stream_to_str(file.stream)
 
     if not file:
         return flask.jsonify({
@@ -143,7 +141,7 @@ def upload():
 
     api_response = None
     if extension == 'py':
-        api_response = load_python(file.stream)
+        api_response = load_python(app.code)
     else:
         return flask.jsonify({
             'status': 'error',
@@ -275,9 +273,8 @@ def run():
     # if not app.file_stream:
     #     return flask.jsonify({'status': 'failure', 'data': {}})
 
-    import pdb; pdb.set_trace()
     # app.file_stream.seek(0)
-    load_python(app.file_stream)
+    load_python(app.code)
 
     return flask.jsonify({'status': 'success', 'data': {}})
 
