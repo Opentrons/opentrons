@@ -34,13 +34,10 @@ app = Flask(__name__,
             static_url_path=''
             )
 
-# # TODO: These globals are terrible and they must go away
-# current_protocol_step_list = None
-# filename = "N/A"
-# last_modified = "N/A"
-
+# TODO: These globals are terrible and they must go away
 # Attach all globals to flask app
 app.robot = robot
+app.file_stream = None
 app.current_protocol_step_list = None  # current_protocol_step_list
 app.filename = 'N/A'  # filename
 app.last_modified = 'N/A'  # last_modified
@@ -89,14 +86,14 @@ def load_python(stream):
     )
     try:
         try:
-            robot.set_connection('simulate')
+            # robot.set_connection('simulate')
             # for instrument in robot._instruments.values():
             #     instrument.setup_simulate()
             # import pdb; pdb.set_trace()
 
             print(id(robot))
             exec(code, globals())
-            robot.set_connection('live')
+            # robot.set_connection('live')
         except Exception as e:
             tb = e.__traceback__
             stack_list = traceback.extract_tb(tb)
@@ -132,6 +129,7 @@ def load_python(stream):
 @app.route("/upload", methods=["POST"])
 def upload():
     file = request.files.get('file')
+    app.file = file
     app.filename = file.filename
     app.last_modified = request.form.get('lastModified')
 
@@ -273,7 +271,14 @@ def _run_commands(should_home_first=True):
 
 @app.route("/run", methods=["GET"])
 def run():
-    threading.Thread(target=_run_commands).start()
+    # threading.Thread(target=_run_commands).start()
+    # if not app.file_stream:
+    #     return flask.jsonify({'status': 'failure', 'data': {}})
+
+    import pdb; pdb.set_trace()
+    # app.file_stream.seek(0)
+    load_python(app.file_stream)
+
     return flask.jsonify({'status': 'success', 'data': {}})
 
 

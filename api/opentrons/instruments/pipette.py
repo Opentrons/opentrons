@@ -121,12 +121,20 @@ class Pipette(Instrument):
         self.min_volume = min_volume
         self.max_volume = max_volume or (min_volume + 1)
 
-        self.positions = {
-            'top': None,
-            'bottom': None,
-            'blow_out': None,
-            'drop_tip': None
-        }
+        # NOTE: positions set to none in order to determine calibration state..?
+        # self.positions = {
+        #     'top': None,
+        #     'bottom': None,
+        #     'blow_out': None,
+        #     'drop_tip': None
+        # }
+
+        # FIXME
+        self.positions = {}
+        self.positions['top'] = 0
+        self.positions['bottom'] = 10
+        self.positions['blow_out'] = 12
+        self.positions['drop_tip'] = 14
         self.calibrated_positions = copy.deepcopy(self.positions)
 
         self.calibration_data = {}
@@ -374,6 +382,7 @@ class Pipette(Instrument):
         self._position_for_aspirate(location, is_plunger_empty)
         self.motor.speed(speed)
         self.motor.move(destination)
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -462,6 +471,7 @@ class Pipette(Instrument):
             volume,
             ('at ' + humanize_location(location) if location else '')
         )  # NOQA
+        self.robot._commands.append(_description)
         return self
 
     def _position_for_aspirate(self, location=None, plunger_empty=False):
@@ -553,6 +563,7 @@ class Pipette(Instrument):
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
 
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -594,6 +605,7 @@ class Pipette(Instrument):
         _description = "Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
         )
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -663,6 +675,7 @@ class Pipette(Instrument):
         [self.move_to((location, e), strategy='direct') for e in well_edges]
 
         _description = 'Touching tip'
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -715,6 +728,7 @@ class Pipette(Instrument):
         # so "_position_for_aspirate" isn't executed
         self.move_to(location)
         self.aspirate(volume)
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -756,6 +770,7 @@ class Pipette(Instrument):
                 'Pipette has no tip to return, dropping in place')
 
         self.drop_tip(self.current_tip())
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -827,6 +842,8 @@ class Pipette(Instrument):
         _description = "Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')
         )  # NOQA
+
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -893,6 +910,7 @@ class Pipette(Instrument):
         _description = "Drop_tip {}".format(
             ('at ' + humanize_location(location) if location else '')
         )
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -924,6 +942,8 @@ class Pipette(Instrument):
         _description = "Homing pipette plunger on axis {}".format(
             self.axis
         )  # NOQA
+
+        self.robot._commands.append(_description)
         return self
 
     # QUEUEABLE
@@ -950,6 +970,8 @@ class Pipette(Instrument):
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
+
+        self.robot._commands.append(_description)
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -976,6 +998,7 @@ class Pipette(Instrument):
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
+
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1110,6 +1133,8 @@ class Pipette(Instrument):
         seconds += float(minutes * 60)
 
         self.motor.wait(seconds)
+
+        self.robot._commands.append(_description)
         return self
 
     def calibrate(self, position):

@@ -21,7 +21,6 @@ p200rack = containers.load('tiprack-200ul', 'B1', 'tiprack')
 
 # create a p200 pipette on robot axis B
 p200 = instruments.Pipette(
-    name="p200",
     axis="b",
     min_volume=20,
     max_volume=200,
