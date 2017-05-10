@@ -3,7 +3,8 @@
     <section id="task-view" >
       <section id="placeable-pane">  
         <!-- Placeable Info -->
-        <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">{{$route.params.placeable}} at slot {{$route.params.slot}}
+        <h1 :class="{calibrated : instrument().calibrated,  active: $route.params.placeable }">
+          {{$route.params.placeable}} at slot {{$route.params.slot}}
           <span class="more-info">
           <a role="button" id="show-modal" @click="showModalPlaceable = true">?</a>
           </span>
@@ -86,9 +87,6 @@
       instrument () {
         let instrument = this.$store.state.tasks.instruments.find(element => element.axis === this.axis)
         return instrument
-      },
-      running () {
-        return this.$store.state.running || this.$store.state.protocolFinished
       }
     },
     watch: {

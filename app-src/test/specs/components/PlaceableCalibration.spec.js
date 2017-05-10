@@ -54,6 +54,5 @@ describe('PlaceableCalibration.vue', () => {
 
     expect(mockStore.actions.calibrate.called).to.be.true
     expect(mockStore.actions.moveToPosition.called).to.be.true
-    
   })
 })
