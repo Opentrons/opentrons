@@ -15,7 +15,7 @@
       <ul>
         <li @click="modePlunger(instrument.axis, 'top')" class="top">Top</li>
         <li @click="modePlunger(instrument.axis, 'bottom')" class="bottom">Bottom</li>
-        <li @click="modePlunger(instrument.axis, 'blow_out')" class="blowout">Blowout</li>
+        <li @click="modePlunger(instrument.axis, 'blow_out')" class="blow_out">Blowout</li>
         <li @click="modePlunger(instrument.axis, 'drop_tip')" class="drop_tip">Drop Tip</li>
       </ul>
     </div>
