@@ -80,14 +80,21 @@ def load_python(code : str):
 
     robot.reset()
 
+    """
+    TODO: a perhaps cleaner work around to jailing certain robot
+    methods during runtime is to use a flag and make decision as to whether
+    or not they should run. Optionally we can decorate these methods. e.g.:
+
+    @not_run_safe
+    def foo(self, args):
+       pass
+
     patched_robot, restore_patched_robot = (
         helpers.get_upload_proof_robot(robot)
     )
+    """
     try:
         try:
-            # robot.set_connection('simulate')
-            # for instrument in robot._instruments.values():
-            #     instrument.setup_simulate()
             exec(code, globals())
         except Exception as e:
             app.logger.exception('Protocol exec failed')
@@ -104,7 +111,7 @@ def load_python(code : str):
                 )
             )
 
-        robot = restore_patched_robot()
+        # robot = restore_patched_robot()
 
         if len(robot._commands) == 0:
             error = (
@@ -115,7 +122,8 @@ def load_python(code : str):
         app.logger.error(e)
         api_response['errors'] = [str(e)]
     finally:
-        robot = restore_patched_robot()
+        # robot = restore_patched_robot()
+        pass
 
     api_response['warnings'] = robot.get_warnings() or []
 
@@ -269,14 +277,9 @@ def _run_commands(should_home_first=True):
 
 @app.route("/run", methods=["GET"])
 def run():
-    # threading.Thread(target=_run_commands).start()
-    # if not app.file_stream:
-    #     return flask.jsonify({'status': 'failure', 'data': {}})
-
-    # app.file_stream.seek(0)
-    robot.register_notify(notify)
+    # root.mode ??
+    robot.notify = notify
     load_python(app.code)
-
     return flask.jsonify({'status': 'success', 'data': {}})
 
 

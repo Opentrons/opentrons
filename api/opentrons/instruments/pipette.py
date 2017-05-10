@@ -382,7 +382,7 @@ class Pipette(Instrument):
         self._position_for_aspirate(location, is_plunger_empty)
         self.motor.speed(speed)
         self.motor.move(destination)
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -471,7 +471,7 @@ class Pipette(Instrument):
             volume,
             ('at ' + humanize_location(location) if location else '')
         )  # NOQA
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     def _position_for_aspirate(self, location=None, plunger_empty=False):
@@ -563,7 +563,7 @@ class Pipette(Instrument):
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
 
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -605,7 +605,7 @@ class Pipette(Instrument):
         _description = "Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
         )
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -675,7 +675,7 @@ class Pipette(Instrument):
         [self.move_to((location, e), strategy='direct') for e in well_edges]
 
         _description = 'Touching tip'
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -728,7 +728,7 @@ class Pipette(Instrument):
         # so "_position_for_aspirate" isn't executed
         self.move_to(location)
         self.aspirate(volume)
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -770,7 +770,7 @@ class Pipette(Instrument):
                 'Pipette has no tip to return, dropping in place')
 
         self.drop_tip(self.current_tip())
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -843,7 +843,7 @@ class Pipette(Instrument):
             ('from ' + humanize_location(location) if location else '')
         )  # NOQA
 
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -910,7 +910,7 @@ class Pipette(Instrument):
         _description = "Drop_tip {}".format(
             ('at ' + humanize_location(location) if location else '')
         )
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -943,7 +943,7 @@ class Pipette(Instrument):
             self.axis
         )  # NOQA
 
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -971,7 +971,7 @@ class Pipette(Instrument):
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
 
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
@@ -1125,7 +1125,6 @@ class Pipette(Instrument):
             The number of seconds to freeeze in place.
         """
 
-
         minutes += int(seconds / 60)
         seconds = seconds % 60
         _description = "Delaying {} minutes and {} seconds".format(
@@ -1134,7 +1133,7 @@ class Pipette(Instrument):
 
         self.motor.wait(seconds)
 
-        self.robot._commands.append(_description)
+        self.robot.add_command(_description)
         return self
 
     def calibrate(self, position):
