@@ -274,6 +274,7 @@ def run():
     #     return flask.jsonify({'status': 'failure', 'data': {}})
 
     # app.file_stream.seek(0)
+    robot.register_notify(notify)
     load_python(app.code)
 
     return flask.jsonify({'status': 'success', 'data': {}})

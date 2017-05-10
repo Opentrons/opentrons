@@ -366,35 +366,8 @@ class Robot(object):
             self._driver.home('z')
             self._driver.home('x', 'y', 'b', 'a')
 
-        # if kwargs.get('enqueue'):
-        #     description = "Homing Robot"
-        #     self.add_command(Command(do=_do, description=description))
-        # else:
-        #     log.info('Executing: Home now')
-        #     return _do()
-
-    # def comment(self, description):
-    #     def _do():
-    #         pass
-    #
-    #     def _setup():
-    #         pass
-    #
-    #     c = Command(do=_do, setup=_setup, description=description)
-    #     self.add_command(c)
-
-    # def add_command(self, command):
-    #
-    #     if command.description:
-    #         log.info("Enqueuing: {}".format(command.description))
-    #     if command.setup:
-    #         command.setup()
-    #     self._commands.append(command)
-
-    # def register(self, name, callback):
-    #     def commandable():
-    #         self.add_command(Command(do=callback))
-    #     setattr(self, name, commandable)
+    def add_command(self, command):
+        self._commands.append(command)
 
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
