@@ -239,35 +239,6 @@ def emit_notifications(notifications, _type):
         })
 
 
-def _run_commands(should_home_first=True):
-    start_time = time.time()
-
-    api_response = {'errors': [], 'warnings': []}
-
-    try:
-        app.robot.resume()
-        robot.run(caller='ui')
-        if len(app.robot._commands) == 0:
-            error = \
-                "This protocol does not contain any commands for the robot."
-            api_response['errors'] = [error]
-    except Exception as e:
-        api_response['errors'] = [str(e)]
-
-    api_response['warnings'] = app.robot.get_warnings() or []
-    api_response['name'] = 'run exited'
-    end_time = time.time()
-    emit_notifications(api_response['warnings'], 'warning')
-    emit_notifications(api_response['errors'], 'danger')
-    seconds = end_time - start_time
-    minutes, seconds = divmod(seconds, 60)
-    hours, minutes = divmod(minutes, 60)
-    run_time = "%d:%02d:%02d" % (hours, minutes, seconds)
-    result = "Run complete in {}".format(run_time)
-    emit_notifications([result], 'success')
-    socketio.emit('event', {'name': 'run-finished'})
-
-
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
@@ -275,6 +246,7 @@ def run():
         robot.notify = notify
         robot.cmds_total = len(robot._commands)
         robot._commands = []
+        robot.resume()
 
         start_time = time.time()
         load_python(app.code)
