@@ -57,7 +57,7 @@ def simulate_protocol(robot, code : str):
     """
     pass
 
-def timestamp(seconds : int)
+def timestamp(seconds : int):
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     return "%d:%02d:%02d" % (hours, minutes, seconds)
