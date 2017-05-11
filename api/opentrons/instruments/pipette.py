@@ -130,12 +130,16 @@ class Pipette(Instrument):
         # }
 
         # FIXME
+        default_positions =  {
+            'top': 0,
+            'bottom': 10,
+            'blow_out': 12,
+            'drop_tip': 14
+        }
         self.positions = {}
-        self.positions['top'] = 0
-        self.positions['bottom'] = 10
-        self.positions['blow_out'] = 12
-        self.positions['drop_tip'] = 14
-        self.calibrated_positions = copy.deepcopy(self.positions)
+        self.positions.update(default_positions)
+
+        self.calibrated_positions = copy.deepcopy(default_positions)
 
         self.calibration_data = {}
 
@@ -149,6 +153,10 @@ class Pipette(Instrument):
             key=persisted_key,
             attributes=persisted_attributes)
         self.load_persisted_data()
+
+        for key, val in self.positions.items():
+            if val is None:
+                self.positions[key] = default_positions[key]
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
@@ -170,23 +178,6 @@ class Pipette(Instrument):
         self.previous_placeable = None
         self.current_volume = 0
         self.reset_tip_tracking()
-
-    def setup_simulate(self, **kwargs):
-        """
-        Overwrites :any:`Instrument` method, setting the plunger positions
-        to simulation defaults
-        """
-        self.calibrated_positions = copy.deepcopy(self.positions)
-        self.positions['top'] = 0
-        self.positions['bottom'] = 10
-        self.positions['blow_out'] = 12
-        self.positions['drop_tip'] = 14
-
-    def teardown_simulate(self):
-        """
-        Re-assigns any previously-calibrated plunger positions
-        """
-        self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
         """

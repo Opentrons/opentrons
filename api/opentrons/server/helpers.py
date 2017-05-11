@@ -47,3 +47,17 @@ def get_upload_proof_robot(robot):
 
     patched_robot = robot
     return (patched_robot, restore)
+
+
+def simulate_protocol(robot, code : str):
+    """
+    :param robot: robot instance for protocol
+    :param code: str of protocol
+    :return:
+    """
+    pass
+
+def timestamp(seconds : int)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return "%d:%02d:%02d" % (hours, minutes, seconds)

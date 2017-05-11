@@ -50,6 +50,7 @@ socketio = SocketIO(app, async_mode='gevent')
 
 
 def notify(info):
+    print('[notify]', info)
     s = json.dumps(info, cls=VectorEncoder)
     name = json.loads(s).get('name')
     if name != 'move-finished' and name != 'move-to':
@@ -94,38 +95,30 @@ def load_python(code : str):
     )
     """
     try:
-        try:
-            exec(code, globals())
-        except Exception as e:
-            app.logger.exception('Protocol exec failed')
-            tb = e.__traceback__
-            stack_list = traceback.extract_tb(tb)
-            _, line, name, text = stack_list[-1]
-            if 'exec' in text:
-                text = None
-            raise Exception(
-                'Error in protocol file line {} : {}\n{}'.format(
-                    line,
-                    str(e),
-                    text or ''
-                )
-            )
-
-        # robot = restore_patched_robot()
-
-        if len(robot._commands) == 0:
-            error = (
-                "This protocol does not contain any commands for the robot."
-            )
-            api_response['errors'] = [error]
+        app.robot.set_connection('simulate')
+        app.robot.reset()
+        exec(code, globals())
     except Exception as e:
-        app.logger.error(e)
-        api_response['errors'] = [str(e)]
-    finally:
-        # robot = restore_patched_robot()
-        pass
+        app.logger.exception('Protocol exec failed')
+        tb = e.__traceback__
+        stack_list = traceback.extract_tb(tb)
+        _, line, name, text = stack_list[-1]
+        if 'exec' in text:
+            text = None
+        raise Exception(
+            'Error in protocol file line {} : {}\n{}'.format(
+                line,
+                str(e),
+                text or ''
+            )
+        )
 
-    api_response['warnings'] = robot.get_warnings() or []
+    if len(robot._commands) == 0:
+        error = (
+            "This protocol does not contain any commands for the robot."
+        )
+        api_response['errors'] = [error]
+
 
     return api_response
 
@@ -277,9 +270,21 @@ def _run_commands(should_home_first=True):
 
 @app.route("/run", methods=["GET"])
 def run():
-    # root.mode ??
-    robot.notify = notify
-    load_python(app.code)
+    def _run():
+        robot.mode = 'live'
+        robot.notify = notify
+        robot.cmds_total = len(robot._commands)
+        robot._commands = []
+
+        start_time = time.time()
+        load_python(app.code)
+        end_time = time.time()
+
+        run_time = helpers.timestamp(end_time - start_time)
+        result = "Run complete in {}".format(run_time)
+        emit_notifications([result], 'success')
+        socketio.emit('event', {'name': 'run-finished'})
+    threading.Thread(target=_run, args=()).start()
     return flask.jsonify({'status': 'success', 'data': {}})
 
 

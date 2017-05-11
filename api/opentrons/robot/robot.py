@@ -369,23 +369,17 @@ class Robot(object):
             self._driver.home('x', 'y', 'b', 'a')
 
     def add_command(self, command):
-        # if self.notify and callable(self.notify):
-        #     print('calling notify..')
-        #     self.notify(command)
-
-        if self.mode != 'live':
-            self._commands.append(command)
-            return
-
-        cmd_run_event = {}
-        cmd_run_event['mode'] = 'live'
-        cmd_run_event['name'] = 'command-run'
-        cmd_run_event.update({
-            'command_description': command.description,
-            # 'command_index': i,
-            # 'commands_total': len(self._commands)
-        })
-        trace.EventBroker.get_instance().notify(cmd_run_event)
+        if self.mode == 'live':
+            print('saving cmd', command)
+            cmd_run_event = {'caller': 'ui'}
+            cmd_run_event['mode'] = 'live'
+            cmd_run_event['name'] = 'command-run'
+            cmd_run_event.update({
+                'command_description': command,
+                'command_index': len(self._commands),
+                'commands_total': self.cmds_total
+            })
+            trace.EventBroker.get_instance().notify(cmd_run_event)
         self._commands.append(command)
 
     def move_head(self, *args, **kwargs):
