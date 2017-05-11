@@ -242,9 +242,9 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
+        commands = helpers.simulate_protocol(app.robot, app.code)
         robot.mode = 'live'
-        robot.notify = notify
-        robot.cmds_total = len(robot._commands)
+        robot.cmds_total = len(commands)
         robot._commands = []
         robot.resume()
 

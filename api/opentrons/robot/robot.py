@@ -161,7 +161,6 @@ class Robot(object):
         """
 
         self._commands = None  # []
-        self.notify = None
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
