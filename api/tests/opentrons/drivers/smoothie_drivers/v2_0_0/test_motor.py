@@ -292,10 +292,11 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.wait_for_arrival()
 
         old_coords = dict(self.motor.connection.serial_port.coordinates)
-        for ax in self.motor.connection.serial_port.coordinates['target'].keys():
-            self.motor.connection.serial_port.coordinates['target'][ax] += 10
+        vs = self.motor.connection.serial_port
+        for ax in vs.coordinates['target'].keys():
+            vs.coordinates['target'][ax] += 10
         self.assertRaises(RuntimeError, self.motor.wait_for_arrival)
-        self.motor.connection.serial_port.coordinates = old_coords
+        vs.coordinates = old_coords
 
     def test_move_relative(self):
         self.motor.home()
