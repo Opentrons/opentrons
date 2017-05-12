@@ -320,7 +320,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             if time.time() - did_move_timestamp > 1.0:
                 raise RuntimeError('Expected robot to move, please reconnect')
 
-
     def home(self, *axis):
 
         self.send_halt_command()
