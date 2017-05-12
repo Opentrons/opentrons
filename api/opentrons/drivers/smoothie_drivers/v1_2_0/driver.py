@@ -375,9 +375,11 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         return coordinates
 
     def wait_for_arrival(self, tolerance=0.1):
-        arrived = False
         coords = self.get_position()
-        while not arrived:
+
+        prev_max_diff = 0
+        did_move_timestamp = time.time()
+        while True:
             self.check_paused_stopped()
             self.connection.serial_pause()
             coords = self.get_position()
@@ -395,12 +397,14 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             the robot's physical resolution is found with:
             1mm / config_steps_per_mm
             """
-            if dist_head < tolerance:
-                if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
-                    arrived = True
-            else:
-                arrived = False
-        return arrived
+            max_diff = max(dist_head, abs(diff['a']), abs(diff['b']))
+            if max_diff < tolerance:
+                return
+            if max_diff != prev_max_diff:
+                did_move_timestamp = time.time()
+            prev_max_diff = max_diff
+            if time.time() - did_move_timestamp > 1.0:
+                raise RuntimeError('Expected robot to move, please reconnect')
 
     def home(self, *axis):
         axis_to_home = ''

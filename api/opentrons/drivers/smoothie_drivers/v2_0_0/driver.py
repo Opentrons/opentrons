@@ -295,6 +295,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def wait_for_arrival(self, tolerance=0.5):
         target = self.get_target_position()
 
+        prev_max_diff = 0
+        did_move_timestamp = time.time()
         while True:
             self.check_paused_stopped()
             self.connection.serial_pause()
@@ -308,8 +310,16 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             diff_a = abs(diff.get('a', 0))
             diff_b = abs(diff.get('b', 0))
 
-            if max(diff_head, diff_a, diff_b) < tolerance:
+            max_diff = max(diff_head, diff_a, diff_b)
+
+            if max_diff < tolerance:
                 return
+            if max_diff != prev_max_diff:
+                did_move_timestamp = time.time()
+            prev_max_diff = max_diff
+            if time.time() - did_move_timestamp > 1.0:
+                raise RuntimeError('Expected robot to move, please reconnect')
+
 
     def home(self, *axis):
 
