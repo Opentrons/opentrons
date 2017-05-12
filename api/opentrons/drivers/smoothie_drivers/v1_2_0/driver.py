@@ -289,8 +289,12 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         """
         if '!!' in msg or 'limit' in msg:
             log.debug('home switch hit')
+            time.sleep(0.5)
             self.flush_port()
             self.calm_down()
+            self.set_position(
+                **self.get_position().get('current', {l: 0 for l in 'xyzab'})
+            )
             raise RuntimeWarning('Robot Error: limit switch hit')
 
     def set_coordinate_system(self, mode):
@@ -375,6 +379,7 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         coords = self.get_position()
         while not arrived:
             self.check_paused_stopped()
+            self.connection.serial_pause()
             coords = self.get_position()
             diff = {}
             for axis in coords.get('target', {}):
@@ -413,12 +418,6 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
         if res == 'ok':
-            # the axis aren't necessarily set to 0.0
-            # values after homing, so force it
-            pos_args = {}
-            for l in axis_to_home:
-                pos_args[l] = 0
-
             arguments = {
                 'name': 'home',
                 'axis': axis_to_home,
@@ -428,6 +427,11 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                 }
             }
             trace.EventBroker.get_instance().notify(arguments)
+            # the axis aren't necessarily set to 0.0
+            # values after homing, so force it
+            pos_args = {}
+            for l in axis_to_home:
+                pos_args[l] = 0
             return self.set_position(**pos_args)
         else:
             return False

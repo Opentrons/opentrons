@@ -297,6 +297,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         while True:
             self.check_paused_stopped()
+            self.connection.serial_pause()
 
             current = self.get_current_position()
             diff = {}
