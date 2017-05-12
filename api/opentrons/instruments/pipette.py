@@ -998,8 +998,6 @@ class Pipette(Instrument):
 
             for i in range(int(presses) - 1):
                 self.robot.move_head(z=tip_plunge, mode='relative')
-                self.robot.move_head(z=-tip_plunge - 1, mode='relative')
-                self.robot.move_head(z=tip_plunge + 1, mode='relative')
                 self.robot.move_head(z=-tip_plunge, mode='relative')
 
         _description = "Picking up tip {0}".format(
