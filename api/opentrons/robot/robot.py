@@ -23,9 +23,8 @@ class InstrumentMosfet(object):
     """
     Provides access to MagBead's MOSFET.
     """
-
-    def __init__(self, robot, mosfet_index):
-        self.robot = robot
+    def __init__(self, this_robot, mosfet_index):
+        self.robot = this_robot
         self.mosfet_index = mosfet_index
 
     def engage(self):
@@ -56,8 +55,8 @@ class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
-    def __init__(self, robot, axis):
-        self.robot = robot
+    def __init__(self, this_robot, axis):
+        self.robot = this_robot
         self.axis = axis
 
     def move(self, value, mode='absolute'):
