@@ -88,7 +88,15 @@ div.pipette-modal {
                 color: $secondary-brand;
                 text-decoration: underline;
                 padding-left:20px;
-
+                cursor: pointer;
+                &.calibrated:after{
+                    content: "\2713";
+                    font-size: 16px;
+                    color: $secondary-brand;
+                    float:right;
+                    padding-right:20px;
+                    text-decoration: none;
+                }
             }
         }
     }
