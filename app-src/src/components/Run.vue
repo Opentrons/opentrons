@@ -1,7 +1,7 @@
 <template>
   <div id='run' :class="{'disabled': !calibrated}">
     <button v-show='!running' @click='runProtocol()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Run Job</button>
-    <button v-show='!running' @click='runDetached()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Detached</button>
+    <!-- <button v-show='!running' @click='runDetached()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Detached</button> -->
     <button v-show='running'@click='cancelProtocol()' class='btn-clear' id="cancel-job">Cancel Job</button>
     <div class='controls'>
       <button v-show='!paused && running' @click='pauseProtocol()' class='btn btn-pause' id="pause-job"></button>
