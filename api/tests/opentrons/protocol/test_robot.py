@@ -44,21 +44,11 @@ class RobotTest(unittest.TestCase):
         self.robot.clear_commands()
         self.robot.comment('hello')
         self.assertEquals(len(self.robot.commands()), 1)
-        self.assertEquals(self.robot._commands[0].description, 'hello')
+        self.assertEquals(self.robot._commands[0], 'hello')
 
     def test_home_after_disconnect(self):
         self.robot.disconnect()
         self.assertRaises(RuntimeError, self.robot.home)
-
-    def test_simulate(self):
-        self.robot.disconnect()
-        p200 = pipette.Pipette(
-            self.robot, axis='b', name='my-fancy-pancy-pipette'
-        )
-        p200.aspirate().dispense()
-        self.robot.simulate()
-        self.assertEquals(len(self.robot._commands), 2)
-        self.assertEquals(self.robot.smoothie_drivers['live'], None)
 
     def test_stop_run(self):
         p200 = pipette.Pipette(
@@ -153,7 +143,6 @@ class RobotTest(unittest.TestCase):
 
     def test_robot_move_to(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.run()
         position = self.robot._driver.get_head_position()['current']
         self.assertEqual(position, (100, 0, 0))
 
@@ -166,25 +155,27 @@ class RobotTest(unittest.TestCase):
         self.robot.disconnect()
         self.robot.connect()
 
+        # Check that all axes are marked as not homed
         self.assertDictEqual(self.robot.axis_homed, {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False
         })
 
-        self.robot.clear_commands()
-        self.robot.home('xa', enqueue=True)
-        self.assertDictEqual(self.robot.axis_homed, {
-            'x': False, 'y': False, 'z': False, 'a': False, 'b': False
-        })
-        self.assertEquals(len(self.robot._commands), 1)
-        self.robot.run()
+        # self.robot.clear_commands()
+        # Home X & Y axes
+        self.robot.home('xa')
+        # self.assertDictEqual(self.robot.axis_homed, {
+        #     'x': False, 'y': False, 'z': False, 'a': False, 'b': False
+        # })
+
+        # Verify X & Y axes are marked as homed
         self.assertDictEqual(self.robot.axis_homed, {
             'x': True, 'y': False, 'z': False, 'a': True, 'b': False
         })
 
-        self.robot.clear_commands()
-        self.robot.home(enqueue=False)
-        self.assertEquals(len(self.robot._commands), 0)
+        # Home all axes
+        self.robot.home()
 
+        # Verify all axes are marked as homed
         self.assertDictEqual(self.robot.axis_homed, {
             'x': True, 'y': True, 'z': True, 'a': True, 'b': True
         })
@@ -194,41 +185,46 @@ class RobotTest(unittest.TestCase):
         self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
         self.assertEqual(len(self.robot._commands), 2)
 
-        self.robot.pause()
+        #
+        # FIXME: pause and resume can't be measured based on whether commands
+        # in the command queue are executed since all robot actions will be called immediately
+        #
 
-        def _run():
-            self.robot.run()
-
-        thread = threading.Thread(target=_run)
-        thread.start()
-        self.robot.resume()
-        thread.join(0.5)
-
-        self.assertEquals(thread.is_alive(), False)
-        self.assertEqual(len(self.robot._commands), 2)
-
-        self.robot.clear_commands()
-        self.assertEqual(len(self.robot._commands), 0)
-
-        self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
-        self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
-
-        def _run():
-            self.robot.run()
-
-        self.robot.pause()
-
-        thread = threading.Thread(target=_run)
-        thread.start()
-        thread.join(0.01)
-
-        self.assertEquals(thread.is_alive(), True)
-        self.assertEqual(len(self.robot._commands) > 0, True)
-
-        self.robot.resume()
-
-        thread.join(1)
-        self.assertEqual(len(self.robot._commands), 2)
+        # self.robot.pause()
+        #
+        # def _run():
+        #     self.robot.run()
+        #
+        # thread = threading.Thread(target=_run)
+        # thread.start()
+        # self.robot.resume()
+        # thread.join(0.5)
+        #
+        # self.assertEquals(thread.is_alive(), False)
+        # self.assertEqual(len(self.robot._commands), 2)
+        #
+        # self.robot.clear_commands()
+        # self.assertEqual(len(self.robot._commands), 0)
+        #
+        # self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
+        # self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
+        #
+        # def _run():
+        #     self.robot.run()
+        #
+        # self.robot.pause()
+        #
+        # thread = threading.Thread(target=_run)
+        # thread.start()
+        # thread.join(0.01)
+        #
+        # self.assertEquals(thread.is_alive(), True)
+        # self.assertEqual(len(self.robot._commands) > 0, True)
+        #
+        # self.robot.resume()
+        #
+        # thread.join(1)
+        # self.assertEqual(len(self.robot._commands), 2)
 
     def test_versions(self):
         res = self.robot.versions()

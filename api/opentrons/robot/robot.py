@@ -912,4 +912,7 @@ class Robot(object):
 
         ``'Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>'``
         """
-        return [c.description for c in self._commands]
+        return self._commands
+
+    def comment(self, msg):
+        self.add_command(msg)
