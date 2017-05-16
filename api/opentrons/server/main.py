@@ -319,6 +319,7 @@ def script_loader(filename):
     )
 
 
+# TODO: move to robot.get_state()
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
     robot = app.robot
@@ -327,6 +328,7 @@ def get_serial_ports_list():
     })
 
 
+# TODO: move to robot.get_state()
 @app.route("/robot/serial/is_connected")
 def is_connected():
     robot = app.robot
@@ -336,6 +338,7 @@ def is_connected():
     })
 
 
+# TODO: move to robot.get_state()
 @app.route("/robot/get_coordinates")
 def get_coordinates():
     robot = app.robot
@@ -344,6 +347,7 @@ def get_coordinates():
     })
 
 
+# TODO: move to robot.get_state()
 @app.route("/robot/diagnostics")
 def diagnostics():
     robot = app.robot
@@ -352,6 +356,7 @@ def diagnostics():
     })
 
 
+# TODO: move to robot.get_state()
 @app.route("/robot/versions")
 def get_versions():
     robot = app.robot
@@ -392,6 +397,7 @@ def connectRobot():
     })
 
 
+# FIXME: this is currently broken
 def _start_connection_watcher():
     connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
         'CONNECTION_STATE_WATCHER',
@@ -443,6 +449,7 @@ def disconnectRobot():
     })
 
 
+# TODO: move to robot.get_state()
 @app.route("/instruments/placeables")
 def placeables():
     data = None
@@ -457,6 +464,7 @@ def placeables():
     })
 
 
+# TODO: move to robot.get_state()
 def _sort_containers(container_list):
     """
     Returns the passed container list, sorted with tipracks first
@@ -483,6 +491,7 @@ def _sort_containers(container_list):
     return _tipracks + _other
 
 
+# TODO: move to robot.get_state()
 def _get_all_pipettes():
     pipette_list = []
     for _, p in app.robot.get_instruments():
@@ -494,6 +503,7 @@ def _get_all_pipettes():
     )
 
 
+# TODO: move to robot.get_state()
 def _get_all_containers():
     """
     Returns all containers currently on the deck
@@ -506,6 +516,7 @@ def _get_all_containers():
     return _sort_containers(all_containers)
 
 
+# TODO: move to robot.get_state()
 def _get_unique_containers(instrument):
     """
     Returns all associated containers for an instrument
@@ -521,6 +532,7 @@ def _get_unique_containers(instrument):
     return _sort_containers(list(unique_containers))
 
 
+# TODO: move to robot.get_state()
 def _check_if_calibrated(instrument, container):
     """
     Returns True if instrument holds calibration data for a Container
@@ -534,6 +546,7 @@ def _check_if_calibrated(instrument, container):
     return False
 
 
+# TODO: move to robot.get_state()
 def _check_if_instrument_calibrated(instrument):
     # TODO: rethink calibrating instruments other than Pipette
     if not isinstance(instrument, pipette.Pipette):
@@ -547,6 +560,7 @@ def _check_if_instrument_calibrated(instrument):
     return True
 
 
+# TODO: move to robot.get_state()
 def _get_container_from_step(step):
     """
     Retruns the matching Container for a given placeable step in the step-list
@@ -564,6 +578,7 @@ def _get_container_from_step(step):
     return None
 
 
+# TODO: move to robot.get_state()
 def create_step_list():
     global current_protocol_step_list
     try:
@@ -587,6 +602,7 @@ def create_step_list():
     return update_step_list()
 
 
+# TODO: This needs thought
 def update_step_list():
     # TODO: This global stuff really needs to go away...
     global current_protocol_step_list, robot

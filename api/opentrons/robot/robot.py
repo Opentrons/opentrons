@@ -6,7 +6,6 @@ import dill
 import requests
 
 from opentrons import containers, drivers
-from opentrons.robot.command import Command
 from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
@@ -476,8 +475,9 @@ class Robot(object):
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
+        _description = 'Moving to {}'.format(placeable)
+        self.add_command(_description)
         # if enqueue:
-        #     _description = 'Moving to {}'.format(placeable)
         #     self.add_command(Command(do=_do, description=_description))
         # else:
         #     _do()
