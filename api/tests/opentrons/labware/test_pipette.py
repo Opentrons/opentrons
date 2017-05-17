@@ -8,6 +8,8 @@ from opentrons.util.vector import Vector
 
 from opentrons.containers.placeable import unpack_location, Container, Well
 
+from pprint import pprint as pp
+
 
 class PipetteTest(unittest.TestCase):
     def setUp(self):
@@ -34,7 +36,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.reset()
 
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
-        self.robot.home(enqueue=False)
+        self.robot.home()
         _, _, starting_z = self.robot._driver.get_head_position()['current']
 
     def tearDown(self):
@@ -473,9 +475,9 @@ class PipetteTest(unittest.TestCase):
             self.plate[1:9],
             new_tip='never'
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(len(self.robot.commands()))
         expected = [
             ['aspirating', '190', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
@@ -931,6 +933,7 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '199', 'Well B1'],
             ['drop']
         ]
+        print(self.robot.commands())
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
@@ -1085,13 +1088,14 @@ class PipetteTest(unittest.TestCase):
             self.plate[1],
             air_gap=20
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
+        from pprint import pprint
+        print('\n\n***\n')
+        pprint(self.robot.commands())
         expected = [
             ['pick'],
             ['aspirating', '120', 'Well A1'],
-            ['air gap'], ['moving'], ['aspirating', '20'],
+            ['air gap'],
+            ['aspirating', '20'],
             ['dispensing', '20', 'Well B1'],
             ['dispensing', '120', 'Well B1'],
             ['drop']
@@ -1099,6 +1103,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
+                print(s.lower(), '|', c.lower())
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
@@ -1276,7 +1281,7 @@ class PipetteTest(unittest.TestCase):
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
-    def test_transfer_singlechannel(self):
+    def test_transfer_single_channel(self):
         self.p200.reset()
         self.p200.channels = 1
         self.p200.transfer(
@@ -1392,26 +1397,19 @@ class PipetteTest(unittest.TestCase):
         self.p200.dispense = mock.Mock()
         self.p200.mix(3, 100, self.plate[1])
 
-        self.assertEqual(
-            self.p200.dispense.mock_calls,
-            [
-                mock.call.dispense(100, rate=1.0, enqueue=True),
-                mock.call.dispense(100, rate=1.0, enqueue=True),
-                mock.call.dispense(100, rate=1.0, enqueue=True)
-            ]
-        )
-        self.assertEqual(
-            self.p200.aspirate.mock_calls,
-            [
-                mock.call.aspirate(
-                    volume=100,
-                    location=self.plate[1],
-                    rate=1.0,
-                    enqueue=True),
-                mock.call.aspirate(100, rate=1.0, enqueue=True),
-                mock.call.aspirate(100, rate=1.0, enqueue=True)
-            ]
-        )
+        dispense_expected = [
+            mock.call.dispense(100, rate=1.0),
+            mock.call.dispense(100, rate=1.0),
+            mock.call.dispense(100, rate=1.0)
+        ]
+        self.assertEqual(self.p200.dispense.mock_calls, dispense_expected)
+
+        aspirate_expected = [
+            mock.call.aspirate(volume=100, location=self.plate[1], rate=1.0),
+            mock.call.aspirate(100, rate=1.0),
+            mock.call.aspirate(100, rate=1.0)
+        ]
+        self.assertEqual(self.p200.aspirate.mock_calls, aspirate_expected)
 
     def test_air_gap(self):
         self.p200.aspirate(50, self.plate[0])
@@ -1603,12 +1601,11 @@ class PipetteTest(unittest.TestCase):
         self.p200.return_tip()
 
         expected = [
-            mock.call(self.tiprack1[0], home_after=True, enqueue=True),
-            mock.call(self.tiprack1[1], home_after=True, enqueue=True)
+            mock.call(self.tiprack1[0]),
+            mock.call(self.tiprack1[1])
         ]
 
-        self.assertEqual(
-            self.p200.drop_tip.mock_calls, expected)
+        self.assertEqual(self.p200.drop_tip.mock_calls, expected)
 
     def build_move_to_bottom(self, well):
         return mock.call(

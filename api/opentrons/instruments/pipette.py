@@ -544,6 +544,7 @@ class Pipette(Instrument):
         _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, self.max_volume if volume is None else volume
         )
+        self.robot.add_command(_description)
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
@@ -554,7 +555,6 @@ class Pipette(Instrument):
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
 
-        self.robot.add_command(_description)
         return self
 
     # QUEUEABLE
@@ -718,8 +718,8 @@ class Pipette(Instrument):
         # "move_to" separate from aspirate command
         # so "_position_for_aspirate" isn't executed
         self.move_to(location)
-        self.aspirate(volume)
         self.robot.add_command(_description)
+        self.aspirate(volume)
         return self
 
     # QUEUEABLE
@@ -760,8 +760,8 @@ class Pipette(Instrument):
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.drop_tip(self.current_tip())
         self.robot.add_command(_description)
+        self.drop_tip(self.current_tip())
         return self
 
     # QUEUEABLE

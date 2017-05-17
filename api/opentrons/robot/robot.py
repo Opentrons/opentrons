@@ -475,8 +475,8 @@ class Robot(object):
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
-        _description = 'Moving to {}'.format(placeable)
-        self.add_command(_description)
+        # _description = 'Moving to {}'.format(placeable)
+        # self.add_command(_description)
         # if enqueue:
         #     self.add_command(Command(do=_do, description=_description))
         # else:
