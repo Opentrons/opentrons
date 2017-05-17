@@ -661,7 +661,7 @@ class Pipette(Instrument):
         ]
 
         # Apply vertical offset to well edges
-        well_edges = map(well_edges, lambda x: x + v_offset)
+        well_edges = map(lambda x: x + v_offset, well_edges)
 
         [self.move_to((location, e), strategy='direct') for e in well_edges]
 
@@ -961,8 +961,6 @@ class Pipette(Instrument):
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
-
-        self.robot.add_command(_description)
         return self.transfer(*args, **kwargs)
 
     # QUEUEABLE
