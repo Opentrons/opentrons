@@ -29,6 +29,9 @@ class OpenTronsTest(unittest.TestCase):
 
         self.motor = self.robot._driver
 
+    def test_is_simulating(self):
+        self.assertTrue(self.motor.is_simulating())
+
     def test_reset(self):
         self.motor.reset()
         self.assertFalse(self.motor.is_connected())
@@ -287,6 +290,13 @@ class OpenTronsTest(unittest.TestCase):
         self.motor.move_head(x=200, y=200)
         self.motor.move_head(z=30)
         self.motor.wait_for_arrival()
+
+        old_coords = dict(self.motor.connection.serial_port.coordinates)
+        vs = self.motor.connection.serial_port
+        for ax in vs.coordinates['target'].keys():
+            vs.coordinates['target'][ax] += 10
+        self.assertRaises(RuntimeError, self.motor.wait_for_arrival)
+        vs.coordinates = old_coords
 
     def test_move_relative(self):
         self.motor.home()

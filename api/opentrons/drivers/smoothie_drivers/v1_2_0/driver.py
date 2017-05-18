@@ -289,8 +289,12 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         """
         if '!!' in msg or 'limit' in msg:
             log.debug('home switch hit')
+            time.sleep(0.5)
             self.flush_port()
             self.calm_down()
+            self.set_position(
+                **self.get_position().get('current', {l: 0 for l in 'xyzab'})
+            )
             raise RuntimeWarning('Robot Error: limit switch hit')
 
     def set_coordinate_system(self, mode):
@@ -326,8 +330,9 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                 for axis in 'xyzab'
                 if axis in kwargs}
 
-        this_head_speed = min([self.speeds[l] for l in axis_called])
-        args.update({"F": this_head_speed})
+        if axis_called:
+            this_head_speed = min([self.speeds[l] for l in axis_called])
+            args.update({"F": this_head_speed})
         args.update({"a": self.speeds['a']})
         args.update({"b": self.speeds['b']})
 
@@ -370,10 +375,13 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         return coordinates
 
     def wait_for_arrival(self, tolerance=0.1):
-        arrived = False
         coords = self.get_position()
-        while not arrived:
+
+        prev_max_diff = 0
+        did_move_timestamp = time.time()
+        while True:
             self.check_paused_stopped()
+            self.connection.serial_pause()
             coords = self.get_position()
             diff = {}
             for axis in coords.get('target', {}):
@@ -389,12 +397,14 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             the robot's physical resolution is found with:
             1mm / config_steps_per_mm
             """
-            if dist_head < tolerance:
-                if abs(diff['a']) < tolerance and abs(diff['b']) < tolerance:
-                    arrived = True
-            else:
-                arrived = False
-        return arrived
+            max_diff = max(dist_head, abs(diff['a']), abs(diff['b']))
+            if max_diff < tolerance:
+                return
+            if max_diff != prev_max_diff:
+                did_move_timestamp = time.time()
+            prev_max_diff = max_diff
+            if time.time() - did_move_timestamp > 1.0:
+                raise RuntimeError('Expected robot to move, please reconnect')
 
     def home(self, *axis):
         axis_to_home = ''
@@ -412,12 +422,6 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
         if res == 'ok':
-            # the axis aren't necessarily set to 0.0
-            # values after homing, so force it
-            pos_args = {}
-            for l in axis_to_home:
-                pos_args[l] = 0
-
             arguments = {
                 'name': 'home',
                 'axis': axis_to_home,
@@ -427,6 +431,11 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                 }
             }
             trace.EventBroker.get_instance().notify(arguments)
+            # the axis aren't necessarily set to 0.0
+            # values after homing, so force it
+            pos_args = {}
+            for l in axis_to_home:
+                pos_args[l] = 0
             return self.set_position(**pos_args)
         else:
             return False
