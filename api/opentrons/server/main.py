@@ -17,6 +17,7 @@ from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
+from opentrons.drivers.smoothie_drivers.v2_0_0 import player
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from opentrons.server import helpers
@@ -275,6 +276,56 @@ def run_home():
     robot = Robot.get_instance()
     robot.home()
     return run()
+
+
+def _detached_progress():
+    robot = Robot.get_instance()
+    while True:
+        res = robot._driver.smoothie_player.progress(timeout=20)
+        if not res.get('file'):
+            return
+        percentage = '{}%'.format(round(res.get('percentage', 0) * 100, 2))
+
+        def _seconds_to_string(sec):
+            hours = int(sec / (60 * 60))
+            hours  = str(hours) if hours > 9 else '0{}'.format(hours)
+            minutes = int(sec / 60) % 60
+            minutes  = str(minutes) if minutes > 9 else '0{}'.format(minutes)
+            seconds = sec % 60
+            seconds  = str(seconds) if seconds > 9 else '0{}'.format(seconds)
+            return (hours, minutes, seconds)
+
+        h, m, s = _seconds_to_string(res.get('elapsed_time'))
+        progress_data = 'Protocol {} Complete - Elapsed Time {}:{}:{}'.format(
+            percentage, h, m, s)
+
+        if res.get('estimated_time'):
+            h, m, s = _seconds_to_string(res.get('estimated_time'))
+            progress_data += ' - Estimated Time Left {}:{}:{}'.format(h, m, s)
+
+        emit_notifications([progress_data], 'info')
+
+
+def _run_detached():
+    robot = Robot.get_instance()
+    p = player.SmoothiePlayer_2_0_0()
+
+    emit_notifications(["Preparing to run detached:"], 'info')
+    emit_notifications(["Simulating, please wait..."], 'info')
+    robot.smoothie_drivers['simulate'].record_start(p)
+    robot.simulate()
+    robot.smoothie_drivers['simulate'].record_stop()
+
+    emit_notifications(["Saving file to robot, please wait..."], 'info')
+    robot._driver.play(p)
+
+    _detached_progress()
+
+
+@app.route("/run_detached", methods=["GET"])
+def run_detached():
+    threading.Thread(target=_run_detached).start()
+    return flask.jsonify({'status': 'success', 'data': {}})
 
 
 @app.route("/pause", methods=["GET"])
