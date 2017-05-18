@@ -110,8 +110,6 @@ class PipetteTest(unittest.TestCase):
             self.plate[1]
         ]
 
-        self.robot.run()
-
         self.assertEquals(self.p200.placeables, expected)
 
     def test_unpack_location(self):
@@ -155,7 +153,6 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
         self.p200.motor.speed = mock.Mock()
         self.p200.aspirate(100, rate=2.0).dispense(rate=.5)
-        self.robot.run()
         expected = [
             mock.call(600.0),
             mock.call(250.0)
@@ -173,7 +170,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_position(location)
 
         self.p200.aspirate(100, location)
-        self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(
@@ -202,7 +198,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.aspirate(100, location)
         self.p200.dispense(100, location)
-        self.robot.run()
 
         driver = self.robot._driver
 
@@ -229,7 +224,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_position(location)
 
         self.p200.blow_out(location)
-        self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
 
@@ -256,7 +250,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_position(location)
 
         self.p200.drop_tip(self.plate[0])
-        self.robot.run()
 
         current_pos = self.robot._driver.get_head_position()['current']
 
@@ -273,8 +266,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.aspirate(100)
 
-        self.robot.run()
-
         current_pos = self.robot._driver.get_plunger_positions()['current']
 
         self.assertDictEqual(
@@ -284,8 +275,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_non_empty_aspirate(self):
 
-        self.p200.aspirate(100, enqueue=False)
-        self.p200.aspirate(20, enqueue=False)
+        self.p200.aspirate(100)
+        self.p200.aspirate(20)
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -295,7 +286,6 @@ class PipetteTest(unittest.TestCase):
 
     def test_aspirate_no_args(self):
         self.p200.aspirate()
-        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -318,8 +308,6 @@ class PipetteTest(unittest.TestCase):
     def test_dispense(self):
         self.p200.aspirate(100)
         self.p200.dispense(20)
-        #
-        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -346,7 +334,6 @@ class PipetteTest(unittest.TestCase):
 
     def test_blow_out(self):
         self.p200.blow_out()
-        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -360,7 +347,6 @@ class PipetteTest(unittest.TestCase):
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well)
-        self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
 
@@ -369,7 +355,6 @@ class PipetteTest(unittest.TestCase):
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well, presses=0)
-        self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
 
@@ -378,7 +363,6 @@ class PipetteTest(unittest.TestCase):
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well, presses='a')
-        self.robot.run()
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(current_pos, target_pos)
 
@@ -392,8 +376,6 @@ class PipetteTest(unittest.TestCase):
     def test_drop_tip(self):
         self.p200.drop_tip()
 
-        self.robot.run()
-
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
             current_pos,
@@ -403,8 +385,6 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
         self.p200.reset()
         self.p200.drop_tip(home_after=False)
-
-        self.robot.run()
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
         self.assertDictEqual(
@@ -684,7 +664,8 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['pick'],
             ['aspirating', '30', 'Well A1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well B1'],
             ['dispensing', '30', 'Well B1'],
@@ -693,7 +674,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well B1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well C1'],
             ['dispensing', '30', 'Well C1'],
@@ -702,7 +684,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well C1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well D1'],
             ['dispensing', '30', 'Well D1'],
@@ -711,7 +694,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well D1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well E1'],
             ['dispensing', '30', 'Well E1'],
@@ -720,7 +704,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well E1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well F1'],
             ['dispensing', '30', 'Well F1'],
@@ -729,7 +714,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well F1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well G1'],
             ['dispensing', '30', 'Well G1'],
@@ -738,7 +724,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well G1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well H1'],
             ['dispensing', '30', 'Well H1'],
@@ -747,7 +734,8 @@ class PipetteTest(unittest.TestCase):
             ['drop'],
             ['pick'],
             ['aspirating', '30', 'Well H1'],
-            ['air'], ['moving'], ['aspirating', '10'],
+            ['air'],
+            ['aspirating', '10'],
             ['touch'],
             ['dispensing', '10', 'Well A2'],
             ['dispensing', '30', 'Well A2'],
@@ -1154,10 +1142,12 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['pick'],
             ['aspirating', '130', 'Well C1'],
-            ['air gap'], ['moving to'], ['aspirating', '20'],
+            ['air gap'],
+            ['aspirating', '20'],
             ['dispensing', '20'],
             ['dispensing', '60', 'Well A1'],
-            ['air gap'], ['moving to'], ['aspirating', '20'],
+            ['air gap'],
+            ['aspirating', '20'],
             ['dispensing', '20'],
             ['dispensing', '60', 'Well B1'],
             ['blow', 'point'],
@@ -1350,56 +1340,53 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
     def test_touch_tip(self):
-        self.p200.move_to = mock.Mock()
+        self.p200.robot.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])
         self.p200.touch_tip(-3)
         self.p200.touch_tip(self.plate[1], radius=0.5)
 
-        self.robot.simulate()
-
         expected = [
-            mock.call(self.plate[0], enqueue=False, strategy='arc'),
+            mock.call(self.plate[0], instrument=self.p200, strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 7.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 7.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
-                enqueue=False, strategy='direct'),
-            mock.call(self.plate[1], enqueue=False, strategy='arc'),
+                instrument=self.p200, strategy='direct'),
+            mock.call(self.plate[1], instrument=self.p200, strategy='arc'),
             mock.call(
                 (self.plate[1], (4.80, 3.20, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[1], (1.60, 3.20, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 4.80, 10.50)),
-                enqueue=False, strategy='direct'),
+                instrument=self.p200, strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 1.60, 10.50)),
-                enqueue=False, strategy='direct')
+                instrument=self.p200, strategy='direct')
         ]
 
-        print(self.p200.move_to.mock_calls)
-        self.assertEquals(expected, self.p200.move_to.mock_calls)
+        self.assertEquals(expected, self.p200.robot.move_to.mock_calls)
 
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
@@ -1452,7 +1439,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.mix(volume=50, repetitions=2)
-        self.robot.run()
 
         self.assertEqual(
             self.p200.dispense.mock_calls,
@@ -1476,8 +1462,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.move_to = mock.Mock()
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
-
-        self.robot.simulate()
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
@@ -1545,8 +1529,6 @@ class PipetteTest(unittest.TestCase):
         for _ in range(0, total_tips_per_plate * 2):
             self.p200.pick_up_tip()
 
-        self.robot.simulate()
-
         expected = []
         for i in range(0, total_tips_per_plate):
             expected.append(self.build_move_to_bottom(self.tiprack1[i]))
@@ -1583,8 +1565,6 @@ class PipetteTest(unittest.TestCase):
 
         for _ in range(0, 12 * 2):
             p200_multi.pick_up_tip()
-
-        self.robot.simulate()
 
         expected = []
         for i in range(0, 12):
@@ -1627,7 +1607,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.pick_up_tip()
         self.p200.drop_tip()
-        self.robot.simulate()
 
         self.assertEqual(
             self.p200.move_to.mock_calls,

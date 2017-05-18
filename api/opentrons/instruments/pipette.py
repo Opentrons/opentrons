@@ -2,7 +2,7 @@ import copy
 import itertools
 import numbers
 
-from opentrons import containers
+from opentrons.containers import unpack_location
 from opentrons.containers.calibrator import Calibrator
 from opentrons.containers.placeable import Placeable, WellSeries, Container
 from opentrons.containers.placeable import humanize_location
@@ -238,7 +238,7 @@ class Pipette(Instrument):
         if not location:
             return
 
-        placeable, _ = containers.unpack_location(location)
+        placeable, _ = unpack_location(location)
         self.previous_placeable = placeable
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
@@ -473,7 +473,7 @@ class Pipette(Instrument):
 
         # first go to the destination
         if location:
-            placeable, _ = containers.unpack_location(location)
+            placeable, _ = unpack_location(location)
             self.move_to(placeable.top(), strategy='arc')
 
         # setup the plunger above the liquid
@@ -642,7 +642,7 @@ class Pipette(Instrument):
 
         if is_number(location):
             height_offset = location
-            location = self.previous_placeable
+            location = None
 
         # if no location specified, use the previously
         # associated placeable to get Well dimensions
@@ -809,7 +809,7 @@ class Pipette(Instrument):
             location = self.get_next_tip()
         self.current_tip(None)
         if location:
-            placeable, _ = containers.unpack_location(location)
+            placeable, _ = unpack_location(location)
             self.current_tip(placeable)
 
         if isinstance(location, Placeable):
@@ -1392,16 +1392,18 @@ class Pipette(Instrument):
             if dispense:
                 self._dispense_during_transfer(
                     dispense['volume'], dispense['location'], **kwargs)
-                if touch_tip or touch_tip is 0:
-                    self.touch_tip(touch_tip)
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
+                    if touch_tip or touch_tip is 0:
+                        self.touch_tip(touch_tip)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
                         self.air_gap(air_gap)
+                    if touch_tip or touch_tip is 0:
+                        self.touch_tip(touch_tip)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """
@@ -1421,13 +1423,15 @@ class Pipette(Instrument):
         air_gap = kwargs.get('air_gap', 0)
         touch_tip = kwargs.get('touch_tip', False)
 
+        well, _ = unpack_location(loc)
+
         if self.current_volume == 0:
-            self._mix_during_transfer(mix_before, loc, **kwargs)
+            self._mix_during_transfer(mix_before, well, **kwargs)
         self.aspirate(vol, loc, rate=rate)
-        if touch_tip or touch_tip is 0:
-            self.touch_tip(touch_tip)
         if air_gap:
             self.air_gap(air_gap)
+        if touch_tip or touch_tip is 0:
+            self.touch_tip(touch_tip)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
         """
@@ -1439,10 +1443,12 @@ class Pipette(Instrument):
         rate = kwargs.get('rate', 1)
         air_gap = kwargs.get('air_gap', 0)
 
+        well, _ = unpack_location(loc)
+
         if air_gap:
-            self.dispense(air_gap, loc, rate=rate)
+            self.dispense(air_gap, well.top(5), rate=rate)
         self.dispense(vol, loc, rate=rate)
-        self._mix_during_transfer(mix_after, loc, **kwargs)
+        self._mix_during_transfer(mix_after, well, **kwargs)
 
     def _mix_during_transfer(self, mix, loc, **kwargs):
         if self.current_volume == 0 and isinstance(mix, (tuple, list)):
