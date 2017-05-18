@@ -73,7 +73,7 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.p200 = pipette.Pipette(self.robot, name="p200", axis="b")
         self.assertDictEqual(self.p200.calibration_data, {})
         self.assertDictEqual(self.p200.positions, {
-            'top': None, 'bottom': None, 'blow_out': None, 'drop_tip': None
+            'top': 0, 'bottom': 10, 'blow_out': 12, 'drop_tip': 14
         })
 
     def test_delete_old_calibration_file(self):

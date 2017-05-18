@@ -723,7 +723,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def return_tip(self):
+    def return_tip(self, home_after=True):
         """
         Drop the pipette's current tip to it's originating tip rack
 
@@ -761,7 +761,7 @@ class Pipette(Instrument):
                 'Pipette has no tip to return, dropping in place')
 
         self.robot.add_command(_description)
-        self.drop_tip(self.current_tip())
+        self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
     # QUEUEABLE
@@ -837,7 +837,7 @@ class Pipette(Instrument):
         return self
 
     # QUEUEABLE
-    def drop_tip(self, location=None):
+    def drop_tip(self, location=None, home_after=True):
         """
         Drop the pipette's current tip
 
@@ -893,7 +893,8 @@ class Pipette(Instrument):
             self.move_to(location, strategy='arc')
 
         self.motor.move(self._get_plunger_position('drop_tip'))
-        self.motor.home()
+        if home_after:
+            self.motor.home()
 
         self.motor.move(self._get_plunger_position('bottom'))
 
