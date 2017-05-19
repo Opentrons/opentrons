@@ -38,7 +38,7 @@ def get_unique_containers(instrument):
             if isinstance(c, placeable.Container):
                 unique_containers.add(c)
 
-    return _sort_containers(list(unique_containers))
+    return sort_containers(list(unique_containers))
 
 
 def is_inst_calibrated_to_container(instrument, container):
@@ -68,14 +68,15 @@ def are_instrument_positions_calibrated(instrument):
 
 
 def get_all_pipettes(robot):
-    pipette_list = []
-    for _, p in robot.get_instruments():
-        if isinstance(p, pipette.Pipette):
-            pipette_list.append(p)
-    return sorted(
-        pipette_list,
-        key=lambda p: p.name.lower()
-    )
+    """
+    Returns all pipettes attached to robot
+    """
+    pipettes = [
+        inst
+        for _, inst in robot.get_instruments()
+        if isinstance(inst, pipette.Pipette)
+    ]
+    return sorted(pipettes, key=lambda p: p.name.lower())
 
 
 def _get_all_containers(robot):
@@ -87,30 +88,25 @@ def _get_all_containers(robot):
         if slot.has_children():
             all_containers += slot.get_children_list()
 
-    return _sort_containers(all_containers)
+    return sort_containers(all_containers)
 
 
-def _sort_containers(container_list):
+def sort_containers(container_list):
     """
     Returns the passed container list, sorted with tipracks first
     then alphabetically by name
     """
-    tipracks = []
-    other = []
-    # TODO: refactor into a filter/lambda
-    for c in container_list:
-        _type = c.get_type().lower()
-        if 'tip' in _type:
-            tipracks.append(c)
-        else:
-            other.append(c)
+    is_tiprack = lambda c: 'tip' in c.get_type().lower()
+
+    tiprack_containers = filter(container_list, is_tiprack)
+    other_containers = filter(container_list, lambda c: not is_tiprack(c))
 
     tipracks = sorted(
-        tipracks,
+        tiprack_containers,
         key=lambda c: c.get_name().lower()
     )
     other = sorted(
-        other,
+        other_containers,
         key=lambda c: c.get_name().lower()
     )
     return tipracks + other
