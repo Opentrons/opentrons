@@ -181,9 +181,9 @@ class RobotTest(unittest.TestCase):
         })
 
     def test_robot_pause_and_resume(self):
-        self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
-        self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
-        self.assertEqual(len(self.robot._commands), 2)
+        self.robot.move_to((Deck(), (100, 0, 0)))
+        self.robot.move_to((Deck(), (101, 0, 0)))
+        self.assertEqual(len(self.robot._commands), 0)
 
         #
         # FIXME: pause and resume can't be measured based on whether commands
