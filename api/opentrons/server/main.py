@@ -213,7 +213,7 @@ def load():
     status = "success"
     calibrations = None
     try:
-        calibrations = update_step_list()
+        calibrations = robot_state.get_state(app.robot)
     except Exception as e:
         emit_notifications([str(e)], "danger")
         status = 'error'
@@ -717,7 +717,7 @@ def calibrate_placeable():
     slot = request.json.get("slot")
     try:
         _calibrate_placeable(name, slot, axis)
-        calibrations = update_step_list()
+        calibrations = robot_state.get_state()
         emit_notifications([
             'Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:
@@ -765,7 +765,7 @@ def calibrate_plunger():
             'data': str(e)
         })
 
-    calibrations = update_step_list()
+    calibrations = robot_state.get_state(app.robot)
 
     # TODO change calibration key to steplist
     return flask.jsonify({
