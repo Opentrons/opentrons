@@ -98,8 +98,8 @@ def sort_containers(container_list):
     """
     is_tiprack = lambda c: 'tip' in c.get_type().lower()
 
-    tiprack_containers = filter(container_list, is_tiprack)
-    other_containers = filter(container_list, lambda c: not is_tiprack(c))
+    tiprack_containers = filter(is_tiprack, container_list)
+    other_containers = filter(lambda c: not is_tiprack(c), container_list)
 
     tipracks = sorted(
         tiprack_containers,

@@ -14,9 +14,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons import robot, Robot  # NOQA
-from opentrons.instruments import pipette
-from opentrons.containers import placeable
-from opentrons.util import trace
+from opentrons.util import trace, state as robot_state
 from opentrons.util.vector import VectorEncoder
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
@@ -160,7 +158,7 @@ def upload():
         emit_notifications(
             ["Successfully uploaded {}".format(file.filename)], 'success')
         status = 'success'
-        calibrations = create_step_list()
+        calibrations = robot_state.get_state(app.robot)
 
     return flask.jsonify({
         'status': status,
@@ -193,7 +191,7 @@ def upload_jupyter():
             for _, instr in jupyter_robot.get_instruments()]
 
         app.current_protocol_step_list = None  # NOQA
-        calibrations = update_step_list()
+        calibrations = robot_state.get_state(app.robot)
         app.filename = 'JUPYTER UPLOAD'
         app.last_modified = dt.datetime.now().strftime('%a %b %d %Y')
         upload_data = {
@@ -454,7 +452,7 @@ def disconnectRobot():
 def placeables():
     data = None
     try:
-        data = update_step_list()
+        data = robot_state.get_state(app.robot)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
@@ -462,175 +460,6 @@ def placeables():
         'status': 'success',
         'data': data
     })
-
-
-# TODO: move to robot.get_state()
-def _sort_containers(container_list):
-    """
-    Returns the passed container list, sorted with tipracks first
-    then alphabetically by name
-    """
-    _tipracks = []
-    _other = []
-    for c in container_list:
-        _type = c.get_type().lower()
-        if 'tip' in _type:
-            _tipracks.append(c)
-        else:
-            _other.append(c)
-
-    _tipracks = sorted(
-        _tipracks,
-        key=lambda c: c.get_name().lower()
-    )
-    _other = sorted(
-        _other,
-        key=lambda c: c.get_name().lower()
-    )
-
-    return _tipracks + _other
-
-
-# TODO: move to robot.get_state()
-def _get_all_pipettes():
-    pipette_list = []
-    for _, p in app.robot.get_instruments():
-        if isinstance(p, pipette.Pipette):
-            pipette_list.append(p)
-    return sorted(
-        pipette_list,
-        key=lambda p: p.name.lower()
-    )
-
-
-# TODO: move to robot.get_state()
-def _get_all_containers():
-    """
-    Returns all containers currently on the deck
-    """
-    all_containers = list()
-    for slot in app.robot._deck:
-        if slot.has_children():
-            all_containers += slot.get_children_list()
-
-    return _sort_containers(all_containers)
-
-
-# TODO: move to robot.get_state()
-def _get_unique_containers(instrument):
-    """
-    Returns all associated containers for an instrument
-    """
-    unique_containers = set()
-    for location in instrument.placeables:
-        if isinstance(location, placeable.WellSeries):
-            location = location[0]
-        for c in location.get_trace():
-            if isinstance(c, placeable.Container):
-                unique_containers.add(c)
-
-    return _sort_containers(list(unique_containers))
-
-
-# TODO: move to robot.get_state()
-def _check_if_calibrated(instrument, container):
-    """
-    Returns True if instrument holds calibration data for a Container
-    """
-    slot = container.get_parent().get_name()
-    label = container.get_name()
-    data = instrument.calibration_data
-    if slot in data:
-        if label in data[slot].get('children'):
-            return True
-    return False
-
-
-# TODO: move to robot.get_state()
-def _check_if_instrument_calibrated(instrument):
-    # TODO: rethink calibrating instruments other than Pipette
-    if not isinstance(instrument, pipette.Pipette):
-        return True
-
-    positions = instrument.positions
-    for p in positions:
-        if positions.get(p) is None:
-            return False
-
-    return True
-
-
-# TODO: move to robot.get_state()
-def _get_container_from_step(step):
-    """
-    Retruns the matching Container for a given placeable step in the step-list
-    """
-    all_containers = _get_all_containers()
-    for container in all_containers:
-        match = [
-            container.get_name() == step['label'],
-            container.get_parent().get_name() == step['slot'],
-            container.get_type() == step['type']
-
-        ]
-        if all(match):
-            return container
-    return None
-
-
-# TODO: move to robot.get_state()
-def create_step_list():
-    global current_protocol_step_list
-    try:
-        current_protocol_step_list = [{
-            'axis': instrument.axis,
-            'label': instrument.name,
-            'channels': instrument.channels,
-            'placeables': [
-                {
-                    'type': container.get_type(),
-                    'label': container.get_name(),
-                    'slot': container.get_parent().get_name()
-                }
-                for container in _get_unique_containers(instrument)
-            ]
-        } for instrument in _get_all_pipettes()]
-    except Exception as e:
-        app.logger.exception('Error creating step list')
-        emit_notifications([str(e)], 'danger')
-
-    return update_step_list()
-
-
-# TODO: This needs thought
-def update_step_list():
-    # TODO: This global stuff really needs to go away...
-    global current_protocol_step_list, robot
-    if current_protocol_step_list is None:
-        create_step_list()
-    try:
-        for step in current_protocol_step_list:
-            t_axis = str(step['axis']).upper()
-            instrument = app.robot._instruments[t_axis]
-            step.update({
-                'top': instrument.positions['top'],
-                'bottom': instrument.positions['bottom'],
-                'blow_out': instrument.positions['blow_out'],
-                'drop_tip': instrument.positions['drop_tip'],
-                'max_volume': instrument.max_volume,
-                'calibrated': _check_if_instrument_calibrated(instrument)
-            })
-
-            for placeable_step in step['placeables']:
-                c = _get_container_from_step(placeable_step)
-                if c:
-                    placeable_step.update({
-                        'calibrated': _check_if_calibrated(instrument, c)
-                    })
-    except Exception as e:
-        emit_notifications([str(e)], 'danger')
-
-    return current_protocol_step_list
 
 
 @app.route('/home/<axis>')
