@@ -10,6 +10,8 @@ class Opentrons {
     this.jogToSlotUrl = this.baseUrl + '/move_to_slot'
     this.runProtocolUrl = this.baseUrl + '/run'
     this.runHomeProtocolUrl = this.baseUrl + '/run_home'
+    this.runDetachedUrl = this.baseUrl + '/run_detached'
+    this.runHomeDetachedUrl = this.baseUrl + '/run_home_detached'
     this.jogToContainerUrl = this.baseUrl + '/move_to_container'
     this.jogToPlungerUrl = this.baseUrl + '/move_to_plunger_position'
     this.pickUpTipUrl = this.baseUrl + '/pick_up_tip'
@@ -141,6 +143,26 @@ class Opentrons {
   runHomeProtocol () {
     return Vue.http
       .get(this.runHomeProtocolUrl)
+      .then((response) => {
+        console.log('Protocol run successfully initiated', response)
+      }, (response) => {
+        console.log('Protocol run failed to execute', response)
+      })
+  }
+
+  runDetached () {
+    return Vue.http
+      .get(this.runDetachedUrl)
+      .then((response) => {
+        console.log('Protocol run successfully initiated', response)
+      }, (response) => {
+        console.log('Protocol run failed to execute', response)
+      })
+  }
+
+  runHomeDetached () {
+    return Vue.http
+      .get(this.runHomeDetachedUrl)
       .then((response) => {
         console.log('Protocol run successfully initiated', response)
       }, (response) => {

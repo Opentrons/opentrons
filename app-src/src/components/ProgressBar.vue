@@ -24,7 +24,8 @@
         return `width:${this.runPercent()}%;`
       },
       running () {
-        return this.$store.state.running || this.$store.state.protocolFinished
+        let s = this.$store.state
+        return (s.running || s.protocolFinished) && !s.detached
       }
     }
   }

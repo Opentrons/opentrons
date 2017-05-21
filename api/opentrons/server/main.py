@@ -281,7 +281,10 @@ def run_home():
 def _detached_progress():
     robot = Robot.get_instance()
     while True:
-        res = robot._driver.smoothie_player.progress(timeout=20)
+        try:
+            res = robot._driver.smoothie_player.progress(timeout=20)
+        except Exception:
+            return
         if not res.get('file'):
             return
         percentage = '{}%'.format(round(res.get('percentage', 0) * 100, 2))
@@ -303,21 +306,50 @@ def _detached_progress():
             h, m, s = _seconds_to_string(res.get('estimated_time'))
             progress_data += ' - Estimated Time Left {}:{}:{}'.format(h, m, s)
 
-        emit_notifications([progress_data], 'info')
+        d = {
+            'caller': 'ui',
+            'mode': 'live',
+            'name': 'command-run',
+            'command_description': progress_data
+        }
+        notify(d)
 
 
 def _run_detached():
     robot = Robot.get_instance()
     p = player.SmoothiePlayer_2_0_0()
 
-    emit_notifications(["Preparing to run detached:"], 'info')
-    emit_notifications(["Simulating, please wait..."], 'info')
+    notify({
+        'caller': 'ui',
+        'mode': 'live',
+        'name': 'command-run',
+        'command_description': 'Simulating, please wait...'
+    })
     robot.smoothie_drivers['simulate'].record_start(p)
     robot.simulate()
     robot.smoothie_drivers['simulate'].record_stop()
 
-    emit_notifications(["Saving file to robot, please wait..."], 'info')
+    notify({
+        'caller': 'ui',
+        'mode': 'live',
+        'name': 'command-run',
+        'command_description': 'Saving file to robot, please wait...'
+    })
     robot._driver.play(p)
+
+    notify({
+        'caller': 'ui',
+        'mode': 'live',
+        'name': 'command-run',
+        'command_description': 'Protocol running, you can unplug USB cable at any time.'
+    })
+
+    notify({
+        'caller': 'ui',
+        'mode': 'live',
+        'name': 'command-run',
+        'command_description': 'To stop robot, unplug USB and power robot OFF'
+    })
 
     _detached_progress()
 
@@ -326,6 +358,13 @@ def _run_detached():
 def run_detached():
     threading.Thread(target=_run_detached).start()
     return flask.jsonify({'status': 'success', 'data': {}})
+
+
+@app.route("/run_home_detached", methods=["GET"])
+def run_home_detached():
+    robot = Robot.get_instance()
+    robot.home()
+    return run_detached()
 
 
 @app.route("/pause", methods=["GET"])
