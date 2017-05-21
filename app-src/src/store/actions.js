@@ -8,6 +8,7 @@ import { processTasks } from '../util'
 
 const actions = {
   connectRobot ({ commit }, port) {
+    commit(types.UPDATE_DETACHED, {'detached': false})
     const payload = {isConnected: true, port}
     Opentrons.connect(port).then((wasSuccessful) => {
       if (wasSuccessful) {
@@ -23,6 +24,7 @@ const actions = {
     })
   },
   disconnectRobot ({ commit }) {
+    commit(types.UPDATE_DETACHED, {'detached': false})
     Opentrons.disconnect().then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
@@ -112,6 +114,20 @@ const actions = {
     } else {
       console.log('two')
       Opentrons.runProtocol()
+    }
+  },
+  runDetached ({ commit }) {
+    commit(types.UPDATE_RUNNING, {'running': false})
+    commit(types.UPDATE_PROTOCOL_FINISHED, {'running': true})
+    commit(types.UPDATE_DETACHED, {'detached': true})
+    commit(types.RESET_RUN_LOG)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    if (window.confirm('About to run protocol. Home robot before running?')) {
+      console.log('one')
+      Opentrons.runHomeDetached()
+    } else {
+      console.log('two')
+      Opentrons.runDetached()
     }
   },
   pauseProtocol ({ commit }) {
