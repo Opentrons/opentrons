@@ -291,11 +291,11 @@ def _detached_progress():
 
         def _seconds_to_string(sec):
             hours = int(sec / (60 * 60))
-            hours  = str(hours) if hours > 9 else '0{}'.format(hours)
+            hours = str(hours) if hours > 9 else '0{}'.format(hours)
             minutes = int(sec / 60) % 60
-            minutes  = str(minutes) if minutes > 9 else '0{}'.format(minutes)
+            minutes = str(minutes) if minutes > 9 else '0{}'.format(minutes)
             seconds = sec % 60
-            seconds  = str(seconds) if seconds > 9 else '0{}'.format(seconds)
+            seconds = str(seconds) if seconds > 9 else '0{}'.format(seconds)
             return (hours, minutes, seconds)
 
         h, m, s = _seconds_to_string(res.get('elapsed_time'))
@@ -341,7 +341,7 @@ def _run_detached():
         'caller': 'ui',
         'mode': 'live',
         'name': 'command-run',
-        'command_description': 'Protocol running, you can unplug USB cable at any time.'
+        'command_description': 'Protocol running, unplug USB at any time.'
     })
 
     notify({
