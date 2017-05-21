@@ -152,4 +152,3 @@ def get_version(c):
     v = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH
     if v in drivers_by_version:
         return v
-

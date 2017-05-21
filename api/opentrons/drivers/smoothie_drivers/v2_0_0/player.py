@@ -120,7 +120,7 @@ class SmoothiePlayer_2_0_0(object):
         // action:resume
         ok
         '''
-        res = self.send_command('resume', timeout=5)
+        self.send_command('resume', timeout=5)
         self.wait_for_ok_response(timeout=5)
 
     def abort(self):
@@ -131,7 +131,8 @@ class SmoothiePlayer_2_0_0(object):
     def progress(self, timeout=5):
         self.connection.flush_input()
         p_data = self.send_command('progress', timeout=timeout)
-        while 'play' not in p_data.lower() and 'file' not in p_data.lower() and 'paused' not in p_data.lower():
+        words = ['play', 'file', 'paused']
+        while len([s for s in words if s not in p_data.lower()]) == len(words):
             self.connection.wait_for_data(timeout=timeout)
             self.connection.serial_pause()
             p_data = self.connection.readline_string(timeout=timeout)
