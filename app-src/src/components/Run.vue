@@ -1,6 +1,7 @@
 <template>
   <div id='run' :class="{'disabled': !calibrated}">
     <button v-show='!running' @click='runProtocol()' class='btn-run' :class="{ greyOut: !connected }" id="run-job">Run Job</button>
+    <button v-show='!running' @click='runDetached()' class='btn-run' :class="{ greyOut: !connected }" id="run-detached">Detached</button>
     <button v-show='running'@click='cancelProtocol()' class='btn-clear' id="cancel-job">Cancel Job</button>
     <div class='controls'>
       <button v-show='!paused && running' @click='pauseProtocol()' class='btn btn-pause' id="pause-job"></button>
@@ -15,6 +16,9 @@
     methods: {
       runProtocol () {
         this.$store.dispatch('runProtocol')
+      },
+      runDetached () {
+        this.$store.dispatch('runDetached')
       },
       pauseProtocol () {
         this.$store.dispatch('pauseProtocol')
@@ -31,7 +35,7 @@
         return this.$store.state.running
       },
       connected () {
-        return this.$store.state.isConnected
+        return this.$store.state.isConnected && !this.$store.state.detached
       },
       paused () {
         return this.$store.state.paused
