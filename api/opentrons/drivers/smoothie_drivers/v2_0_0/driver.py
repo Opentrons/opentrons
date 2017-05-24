@@ -341,24 +341,27 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         did_move_timestamp = time.time()
         while True:
             self.check_paused_stopped()
-            self.connection.serial_pause()
 
-            current = self.get_current_position()
-            diff = {}
-            for axis in list(target.keys()):
-                diff[axis] = current[axis] - target[axis]
-            dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            diff_head = math.sqrt(dist)
-            diff_a = abs(diff.get('a', 0))
-            diff_b = abs(diff.get('b', 0))
+            try:
+                self.connection.serial_pause()
+                current = self.get_current_position()
+                diff = {}
+                for axis in list(target.keys()):
+                    diff[axis] = current[axis] - target[axis]
+                dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
+                diff_head = math.sqrt(dist)
+                diff_a = abs(diff.get('a', 0))
+                diff_b = abs(diff.get('b', 0))
+                max_diff = max(diff_head, diff_a, diff_b)
+                if max_diff < tolerance:
+                    return
+                if max_diff != prev_max_diff:
+                    did_move_timestamp = time.time()
+                prev_max_diff = max_diff
+            except Exception:
+                self.connection.serial_pause()
+                self.connection.flush_input()
 
-            max_diff = max(diff_head, diff_a, diff_b)
-
-            if max_diff < tolerance:
-                return
-            if max_diff != prev_max_diff:
-                did_move_timestamp = time.time()
-            prev_max_diff = max_diff
             if time.time() - did_move_timestamp > 1.0:
                 raise RuntimeError('Expected robot to move, please reconnect')
 

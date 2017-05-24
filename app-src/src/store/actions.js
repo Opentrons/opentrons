@@ -9,6 +9,7 @@ import { processTasks } from '../util'
 const actions = {
   connectRobot ({ commit }, port) {
     commit(types.UPDATE_DETACHED, {'detached': false})
+    commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     const payload = {isConnected: true, port}
     Opentrons.connect(port).then((wasSuccessful) => {
       if (wasSuccessful) {
@@ -25,6 +26,7 @@ const actions = {
   },
   disconnectRobot ({ commit }) {
     commit(types.UPDATE_DETACHED, {'detached': false})
+    commit(types.UPDATE_ROBOT_STATE, {'busy': false})
     Opentrons.disconnect().then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
