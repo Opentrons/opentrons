@@ -18,9 +18,8 @@ const {waitUntilServerResponds} = require('./util.js')
 
 let appWindowUrl = 'http://localhost:31950/'
 let mainWindow
+let mainLogger
 let serverManager = new ServerManager()
-
-const mainLogger = getLogger('electron-main')
 
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
@@ -36,13 +35,14 @@ function createWindow (windowUrl) {
   mainWindow.loadURL(windowUrl)
   mainWindow.on('closed', function () {
     mainLogger.info('Electron App window closed, quitting App')
-    mainWindow = null
     rp(windowUrl + 'exit')
       .then((html) => {
+        mainWindow = null
         app.quit()
       })
       .catch((err) => {
         mainLogger.info(err)
+        mainWindow = null
         app.quit()
       })
   })
@@ -70,6 +70,7 @@ function createAndSetAppDataDir () {
 function startUp () {
   // Prepare app data dir (necessary for logging errors that occur during setup)
   createAndSetAppDataDir()
+  mainLogger = getLogger('electron-main')
   mainLogger.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event
