@@ -20,20 +20,31 @@ let appWindowUrl = 'http://localhost:31950/'
 let mainWindow
 let serverManager = new ServerManager()
 
+const mainLogger = getLogger('electron-main')
+
 if (process.env.NODE_ENV === 'development'){
   require('electron-debug')({showDevTools: 'undocked'});
   appWindowUrl = 'http://localhost:8090/'
 }
 
 function createWindow (windowUrl) {
+  mainLogger.info('Creating Electron App window at ' + windowUrl)
   mainWindow = new BrowserWindow({
     width: 1060,
     height: 750
   })
   mainWindow.loadURL(windowUrl)
   mainWindow.on('closed', function () {
+    mainLogger.info('Electron App window closed, quitting App')
     mainWindow = null
-    app.quit()
+    rp(windowUrl + 'exit')
+      .then((html) => {
+        app.quit()
+      })
+      .catch((err) => {
+        mainLogger.info(err)
+        app.quit()
+      })
   })
   // Note: Auth0 pop window does not close itself, this will this window when it pops up
   setInterval(() => {
@@ -59,7 +70,7 @@ function createAndSetAppDataDir () {
 function startUp () {
   // Prepare app data dir (necessary for logging errors that occur during setup)
   createAndSetAppDataDir()
-  const mainLogger = getLogger('electron-main')
+  mainLogger.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event
   if (process.env.NODE_ENV === 'development'){
