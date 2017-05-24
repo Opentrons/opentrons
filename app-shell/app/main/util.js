@@ -1,9 +1,8 @@
 const {getLogger} = require('./logging.js')
 const rp = require('request-promise')
 
-const mainLogger = getLogger('electron-main')
-
 function waitUntilServerResponds (createWindow, windowUrl) {
+  const mainLogger = getLogger('electron-main')
   mainLogger.info('Pinging ' + windowUrl)
   rp(windowUrl)
     .then((html) => {
