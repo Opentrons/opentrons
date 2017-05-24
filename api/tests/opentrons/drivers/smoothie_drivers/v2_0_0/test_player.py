@@ -1,5 +1,4 @@
 import unittest
-import time
 
 from opentrons import drivers
 from opentrons.drivers.smoothie_drivers.v2_0_0 import player

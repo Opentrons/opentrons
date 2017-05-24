@@ -83,7 +83,7 @@ def get_persisted_container(container_name: str) -> Container:
 
 
 def get_json(container_name):
-  return persisted_containers_dict.get(container_name)
+    return persisted_containers_dict.get(container_name)
 
 
 def list_container_names():

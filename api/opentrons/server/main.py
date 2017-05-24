@@ -12,7 +12,6 @@ import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
-import gevent
 
 from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
@@ -289,11 +288,11 @@ def _detached_progress():
 
         def _seconds_to_string(sec):
             hours = int(sec / (60 * 60))
-            hours  = str(hours) if hours > 9 else '0{}'.format(hours)
+            hours = str(hours) if hours > 9 else '0{}'.format(hours)
             minutes = int(sec / 60) % 60
-            minutes  = str(minutes) if minutes > 9 else '0{}'.format(minutes)
+            minutes = str(minutes) if minutes > 9 else '0{}'.format(minutes)
             seconds = sec % 60
-            seconds  = str(seconds) if seconds > 9 else '0{}'.format(seconds)
+            seconds = str(seconds) if seconds > 9 else '0{}'.format(seconds)
             return (hours, minutes, seconds)
 
         h, m, s = _seconds_to_string(res.get('elapsed_time'))
@@ -673,8 +672,6 @@ def create_step_list():
             ],
             key=lambda cont: '{}-{}'.format(cont['slot'], cont['label'])
         )
-
-
     except Exception as e:
         app.logger.exception('Error creating step list')
         emit_notifications([str(e)], 'danger')
