@@ -337,27 +337,30 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def wait_for_arrival(self, tolerance=0.5):
         target = self.get_target_position()
 
-        prev_max_diff = 0
+        prev_diff = 0
         did_move_timestamp = time.time()
+
+        def _get_difference(c, t):
+            diff = {}
+            for axis in list(t.keys()):
+                diff[axis] = c.get(axis, t[axis]) - t[axis]
+            dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
+            diff_head = math.sqrt(dist)
+            diff_a = abs(diff.get('a', 0))
+            diff_b = abs(diff.get('b', 0))
+            return max(diff_head, diff_a, diff_b)
+
         while True:
             self.check_paused_stopped()
-
             try:
                 self.connection.serial_pause()
                 current = self.get_current_position()
-                diff = {}
-                for axis in list(target.keys()):
-                    diff[axis] = current[axis] - target[axis]
-                dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-                diff_head = math.sqrt(dist)
-                diff_a = abs(diff.get('a', 0))
-                diff_b = abs(diff.get('b', 0))
-                max_diff = max(diff_head, diff_a, diff_b)
-                if max_diff < tolerance:
+                diff = _get_difference(current, target)
+                if diff < tolerance:
                     return
-                if max_diff != prev_max_diff:
+                if diff != prev_diff:
                     did_move_timestamp = time.time()
-                prev_max_diff = max_diff
+                prev_diff = diff
             except Exception:
                 self.connection.serial_pause()
                 self.connection.flush_input()
