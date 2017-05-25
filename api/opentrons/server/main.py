@@ -26,7 +26,9 @@ from opentrons.server.process_manager import run_once
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
-BACKGROUND_TASKS = {}
+
+exit_threads = threading.Event()
+exit_threads.clear()
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
@@ -61,7 +63,14 @@ def welcome():
 
 @app.route("/exit")
 def exit():
-    sys.exit()
+    # stop any active threads
+    exit_threads.set() # stop detached run thread
+    Robot.get_instance().stop()  # stops attached run thread
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+    return 'Server shutting down...'
 
 
 def get_protocol_locals():
@@ -280,7 +289,7 @@ def run_home():
 
 def _detached_progress():
     robot = Robot.get_instance()
-    while True:
+    while not exit_threads.is_set():
         res = robot._driver.smoothie_player.progress(timeout=20)
         if not res.get('file'):
             return
@@ -487,39 +496,6 @@ def connectRobot():
         'status': status,
         'data': data
     })
-
-
-def _start_connection_watcher():
-    robot = Robot.get_instance()
-    connection_state_watcher, watcher_should_run = BACKGROUND_TASKS.get(
-        'CONNECTION_STATE_WATCHER',
-        (None, None)
-    )
-
-    if connection_state_watcher and watcher_should_run:
-        watcher_should_run.set()
-
-    watcher_should_run = threading.Event()
-
-    def watch_connection_state(should_run):
-        while not should_run.is_set():
-            socketio.emit(
-                'event',
-                {
-                    'type': 'connection_status',
-                    'is_connected': robot.is_connected()
-                }
-            )
-            socketio.sleep(1.5)
-
-    connection_state_watcher = socketio.start_background_task(
-        watch_connection_state,
-        (watcher_should_run)
-    )
-    BACKGROUND_TASKS['CONNECTION_STATE_WATCHER'] = (
-        connection_state_watcher,
-        watcher_should_run
-    )
 
 
 @app.route("/robot/serial/disconnect")
@@ -1075,7 +1051,6 @@ def start():
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
-    _start_connection_watcher()
 
     from opentrons.server import log  # NOQA
     lg = logging.getLogger('opentrons-app')
