@@ -64,7 +64,7 @@ def welcome():
 @app.route("/exit")
 def exit():
     # stop any active threads
-    exit_threads.set() # stop detached run thread
+    exit_threads.set()  # stop detached run thread
     Robot.get_instance().stop()  # stops attached run thread
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:

@@ -748,14 +748,15 @@ class Robot(object, metaclass=Singleton):
         d = self.smoothie_drivers[mode]
 
         # set VirtualSmoothie's coordinates to be the same as physical robot
-        if self._driver and d.is_simulating():
-            d.connection.serial_port.set_position_from_arguments({
-                ax.upper(): value
-                for ax, value in self._driver.get_current_position().items()
-            })
+        if d and d.is_simulating():
+            if self._driver and self._driver.is_connected():
+                d.connection.serial_port.set_position_from_arguments({
+                    ax.upper(): val
+                    for ax, val in self._driver.get_current_position().items()
+                })
 
         self._driver = d
-        if not self._driver.is_connected():
+        if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
     def disconnect(self):
