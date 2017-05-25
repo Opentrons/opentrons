@@ -134,8 +134,9 @@ def build_electron_app():
 
     platform_type = util.get_os()
     process_args = [
-        which("build"),
-        os.path.join(project_root_dir, "app"),
+        # which("build"),
+        os.path.join(project_root_dir, 'node_modules', '.bin', 'build'),
+        os.path.join(project_root_dir, 'app'),
         "--{}".format(platform_type),
         "--{}".format(util.get_arch()),
     ]
