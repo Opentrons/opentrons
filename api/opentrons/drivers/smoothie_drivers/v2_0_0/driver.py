@@ -334,39 +334,40 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=0.5):
+    def wait_for_arrival(self, tolerance=1):
         target = self.get_target_position()
 
         prev_diff = 0
         did_move_timestamp = time.time()
 
-        def _get_difference(c, t):
-            diff = {}
-            for axis in list(t.keys()):
-                diff[axis] = c.get(axis, t[axis]) - t[axis]
-            dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            diff_head = math.sqrt(dist)
-            diff_a = abs(diff.get('a', 0))
-            diff_b = abs(diff.get('b', 0))
-            return max(diff_head, diff_a, diff_b)
-
         while True:
             self.check_paused_stopped()
             try:
-                self.connection.serial_pause()
                 current = self.get_current_position()
-                diff = _get_difference(current, target)
+                diff = self._get_difference(current, target)
                 if diff < tolerance:
                     return
                 if diff != prev_diff:
                     did_move_timestamp = time.time()
                 prev_diff = diff
+                if diff > tolerance * 5:
+                    self.connection.serial_pause()
             except Exception:
                 self.connection.serial_pause()
                 self.connection.flush_input()
 
             if time.time() - did_move_timestamp > 1.0:
                 raise RuntimeError('Expected robot to move, please reconnect')
+
+    def _get_difference(self, c, t):
+        diff = {}
+        for axis in list(t.keys()):
+            diff[axis] = c.get(axis, t[axis]) - t[axis]
+        dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
+        diff_head = math.sqrt(dist)
+        diff_a = abs(diff.get('a', 0))
+        diff_b = abs(diff.get('b', 0))
+        return max(diff_head, diff_a, diff_b)
 
     def home(self, *axis):
 
