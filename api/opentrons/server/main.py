@@ -281,10 +281,7 @@ def run_home():
 def _detached_progress():
     robot = Robot.get_instance()
     while True:
-        try:
-            res = robot._driver.smoothie_player.progress(timeout=20)
-        except Exception:
-            return
+        res = robot._driver.smoothie_player.progress(timeout=20)
         if not res.get('file'):
             return
         percentage = '{}%'.format(round(res.get('percentage', 0) * 100, 2))
@@ -316,42 +313,41 @@ def _detached_progress():
 
 
 def _run_detached():
-    robot = Robot.get_instance()
-    p = player.SmoothiePlayer_2_0_0()
+    try:
+        robot = Robot.get_instance()
+        p = player.SmoothiePlayer_2_0_0()
 
-    notify({
-        'caller': 'ui',
-        'mode': 'live',
-        'name': 'command-run',
-        'command_description': 'Simulating, please wait...'
-    })
-    robot.smoothie_drivers['simulate'].record_start(p)
-    robot.simulate()
-    robot.smoothie_drivers['simulate'].record_stop()
+        d = {'caller': 'ui', 'mode': 'live', 'name': 'command-run'}
+        d.update({
+            'command_description': 'Simulating, please wait...'
+        })
+        notify(d)
 
-    notify({
-        'caller': 'ui',
-        'mode': 'live',
-        'name': 'command-run',
-        'command_description': 'Saving file to robot, please wait...'
-    })
-    robot._driver.play(p)
+        robot.smoothie_drivers['simulate'].record_start(p)
+        robot.simulate()
+        robot.smoothie_drivers['simulate'].record_stop()
 
-    notify({
-        'caller': 'ui',
-        'mode': 'live',
-        'name': 'command-run',
-        'command_description': 'Protocol running, unplug USB at any time.'
-    })
+        d.update({
+            'command_description': 'Saving file to robot, please wait...'
+        })
+        notify(d)
 
-    notify({
-        'caller': 'ui',
-        'mode': 'live',
-        'name': 'command-run',
-        'command_description': 'To stop robot, unplug USB and power robot OFF'
-    })
+        robot._driver.play(p)
 
-    _detached_progress()
+        d.update({
+            'command_description': 'Protocol running, unplug USB at any time.'
+        })
+        notify(d)
+        d.update({
+            'command_description': 'To stop, unplug USB and power robot OFF'
+        })
+        notify(d)
+
+        _detached_progress()
+
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+    socketio.emit('event', {'name': 'run-finished'})
 
 
 @app.route("/run_detached", methods=["GET"])
