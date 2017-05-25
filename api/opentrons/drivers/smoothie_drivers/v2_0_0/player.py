@@ -88,7 +88,6 @@ class SmoothiePlayer_2_0_0(object):
         self.send_command('upload /sd/protocol.gcode')
         for line in self.get_recorded_commands():
             self.connection.write_string(line)
-        self.connection.write_string('reset\r\n')  # reset smoothie
         self.send_command('\x04')
         time.sleep(0.5)
         self.connection.flush_input()
