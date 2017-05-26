@@ -1,11 +1,17 @@
 const electron = require('electron')
-const {app, dialog, autoUpdater} = electron
+const {app, dialog} = electron
+const {autoUpdater} = require('electron-updater')
 const {getSetting} = require('./preferences')
 const {getLogger} = require('./logging.js')
 
-var UPDATE_SERVER_URL = 'http://ot-app-releases-2.herokuapp.com'
+autoUpdater.allowDowngrade = true
 
 function initAutoUpdater () {
+  // Log whats happening
+  const log = require('electron-log')
+  log.transports.file.level = 'info'
+  autoUpdater.logger = log
+
   const mainLogger = getLogger('electron-main')
   mainLogger.info('starting ')
 
@@ -13,6 +19,13 @@ function initAutoUpdater () {
     'error',
     (err) => mainLogger.info(`Update error: ${err.message}`)
   )
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')'
+    console.log(log_message);
+  })
 
   autoUpdater.on(
     'checking-for-update',
@@ -51,15 +64,13 @@ function initAutoUpdater () {
    }
   )
 
-  var AUTO_UPDATE_URL = UPDATE_SERVER_URL + '?version=' + app.getVersion()
+  autoUpdater.setFeedURL({
+    provider: 's3',
+    bucket: 'ot-app-builds',
+    path: 'test',
+    channel: 'latest'
+  })
 
-  //  If platform is Windows, use S3 file server instead of update server.
-  //  please see /docs/windows_updating.txt for more information
-  if (process.platform === 'win32') {
-    AUTO_UPDATE_URL = 'https://s3.amazonaws.com/ot-app-win-updates-2/'
-  }
-  autoUpdater.setFeedURL(AUTO_UPDATE_URL)
-  mainLogger.info('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
   if (getSetting('autoUpdate')) {
     mainLogger.info('Auto updating is enabled, checking for updates')
     autoUpdater.checkForUpdates()

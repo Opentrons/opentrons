@@ -45,7 +45,6 @@
     },
     "mac": {
       "target": [
-        "dmg",
         "zip"
       ],
       "category": "productivity"
@@ -57,11 +56,17 @@
     "linux": {
       "category": "Science",
       "target": "deb"
+    },
+    "publish": {
+      "provider": "s3",
+      "bucket": "ot-app-builds",
+      "path": "test",
+      "channel": "latest"
     }
   },
   "dependencies": {
     "asar": "^0.13.0",
     "autotrack": "1.1.0",
-    "electron-debug": "^1.0.1",
+    "electron-debug": "^1.0.1"
   }
 }

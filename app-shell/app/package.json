@@ -1,13 +1,15 @@
 {
   "name": "ot-one-desktop-app",
   "productName": "OT One App 2",
-  "version": "2.4.0",
+  "version": "2.2.0",
   "description": "OT One Robot Companion Desktop App",
   "main": "main/main.js",
   "dependencies": {
+    "electron-log": "^2.2.6",
     "electron-json-storage": "^2.0.0",
     "electron-settings": "^2.1.1",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^1.16.0",
     "fs": "0.0.2",
     "moment-timezone": "^0.5.9",
     "request": "^2.78.0",
@@ -20,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Opentrons/robot_frontend_v2.git"
+    "url": "https://github.com/Opentrons/opentrons-api.git"
   },
   "author": {
     "name": "engineering@opentrons.com",
@@ -28,7 +30,7 @@
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Opentrons/robot_frontend_v2/issues"
+    "url": "https://github.com/Opentrons/opentrons-api/issues"
   },
-  "homepage": "https://github.com/Opentrons/robot_frontend_v2"
+  "homepage": "https://github.com/Opentrons/opentrons-api"
 }
