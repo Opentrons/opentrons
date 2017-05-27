@@ -371,7 +371,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
     def home(self, *axis):
 
-        self.send_halt_command()
         self.calm_down()
 
         axis_to_home = ''
