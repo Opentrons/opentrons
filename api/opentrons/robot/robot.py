@@ -352,6 +352,11 @@ class Robot(object, metaclass=Singleton):
         self._driver = device
         self.smoothie_drivers['live'] = device
 
+        # set virtual smoothie do have same dimensions as real smoothie
+        ot_v = device.ot_version
+        self.smoothie_drivers['simulate'].ot_version = ot_v
+        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
+
     def _update_axis_homed(self, *args):
         for a in args:
             for letter in a:
