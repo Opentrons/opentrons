@@ -60,8 +60,8 @@
     "publish": {
       "provider": "s3",
       "bucket": "ot-app-builds",
-      "path": "test/${os}/${env.CHANNEL}",
-      "channel": "latest"
+      "path": "test/${env.CHANNEL}",
+      "channel": "${env.CHANNEL}"
     }
   },
   "dependencies": {
