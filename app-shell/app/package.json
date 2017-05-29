@@ -32,5 +32,6 @@
   "main": "main/main.js",
   "license": "ISC",
   "productName": "OT One App 2",
-  "version": "2.4.0+4"
+  "version": "2.2.2",
+  "buildNumber": 5
 }

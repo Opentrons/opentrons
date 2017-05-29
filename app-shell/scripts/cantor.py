@@ -6,7 +6,7 @@ def cantor_calculate(x, y):
     Returns cantor value of 'x' & 'y'
     https://en.wikipedia.org/wiki/Pairing_function
     """
-    return (((x + y)*(x + y + 1))/2) + y
+    return int((((x + y)*(x + y + 1))/2) + y)
 
 
 def cantor_reverse(z):
@@ -18,4 +18,4 @@ def cantor_reverse(z):
     t = ((w**2) + w)/2
     y = z - t
     x = w - y
-    return (math.floor(x), math.floor(y))
+    return (int(x), int(y))

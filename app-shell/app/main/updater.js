@@ -70,7 +70,7 @@ function initAutoUpdater () {
   autoUpdater.setFeedURL({
     provider: 's3',
     bucket: 'ot-app-builds',
-    path: `test/${os}/${channel}`,
+    path: `test/${channel}`,
     channel: channel
   })
 
