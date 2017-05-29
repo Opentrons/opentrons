@@ -60,7 +60,7 @@
     "publish": {
       "provider": "s3",
       "bucket": "ot-app-builds",
-      "path": "test",
+      "path": "test/${os}/${env.CHANNEL}",
       "channel": "latest"
     }
   },
