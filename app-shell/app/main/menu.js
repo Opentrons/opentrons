@@ -35,6 +35,12 @@ function addMenu () {
           click () { toggleSetting('autoUpdate') }
         },
         {
+          label: 'Use Beta App',
+          type: 'checkbox',
+          checked: getSetting('useBetaApp'),
+          click () { toggleSetting('useBetaApp') }
+        },
+        {
           label: 'Enable Anonymous Crash Reporting',
           type: 'checkbox',
           checked: getSetting('crashReport'),

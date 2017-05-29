@@ -29,9 +29,17 @@ def get_app_version():
     :return: string of app version
     """
 
+    import opentrons
+    semver_match = re.match(r'[(\d+)\.]+\+(\d+)', opentrons.__version__)
+    app_version = semver_match.group(0)
+
     app_json_path = os.path.join(project_root_dir, "app", "package.json")
     with open(app_json_path, 'r') as json_file:
-        return json.load(json_file).get('version')
+        app_json = json.load(json_file)
+
+    app_json['version'] = app_version
+    with open(app_json_path, 'w') as json_file:
+        json.dump(app_json, json_file, indent=2)
 
 
 def remove_directory(dir_to_remove):
@@ -139,6 +147,7 @@ def build_electron_app():
         os.path.join(project_root_dir, 'app'),
         "--{}".format(platform_type),
         "--{}".format(util.get_arch()),
+        "-p", "always"
     ]
 
     print(process_args)
@@ -233,6 +242,7 @@ def clean_build_dist(build_tag):
 
 
 if __name__ == '__main__':
+    get_app_version()
     build_electron_app()
-    build_tag = get_build_tag(util.get_os())
-    clean_build_dist(build_tag)
+    # build_tag = get_build_tag(util.get_os())
+    # clean_build_dist(build_tag)
