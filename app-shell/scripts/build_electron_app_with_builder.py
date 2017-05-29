@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from collections import OrderedDict
 import glob
 import json
 import os
@@ -11,6 +12,7 @@ import time
 
 
 import util
+import cantor
 
 
 script_tag = "[OT-App frontend build] "
@@ -32,12 +34,20 @@ def get_app_version():
     import opentrons
     semver_match = re.match(r'[(\d+)\.]+\+(\d+)', opentrons.__version__)
     app_version = semver_match.group(0)
+    version, build = app_version.split('+')
+    build = int(build)
+    major, minor, patch = version.split('.')
+    patch = int(patch)
+
+    # encode patch/build
+    fake_patch = cantor.cantor_calculate(patch, build)
+    fake_app_version = '{}.{}.{}'.format(major, minor, fake_patch)
 
     app_json_path = os.path.join(project_root_dir, "app", "package.json")
     with open(app_json_path, 'r') as json_file:
-        app_json = json.load(json_file)
+        app_json = json.load(json_file, object_pairs_hook=OrderedDict)
 
-    app_json['version'] = app_version
+    app_json['version'] = fake_app_version
     with open(app_json_path, 'w') as json_file:
         json.dump(app_json, json_file, indent=2)
 
