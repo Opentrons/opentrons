@@ -15,7 +15,13 @@
     methods: {
       runProtocol (e) {
         if (e.shiftKey) {
-          this.$store.dispatch('runDetached')
+          if (this.$store.state.versions.firmware) {
+            if (this.$store.state.versions.firmware.version === 'edge-1c222d9NOMSD') {
+              this.$store.dispatch('runDetached')
+              return
+            }
+          }
+          window.alert('Please update robot firmware in order to run detached')
         } else {
           this.$store.dispatch('runProtocol')
         }
