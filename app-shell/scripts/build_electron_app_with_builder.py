@@ -169,7 +169,9 @@ def build_electron_app():
     if platform_type in {'mac'}:
         electron_builder_process = subprocess.Popen(process_args)
     elif platform_type in {'win', 'linux'}:
-        electron_builder_process = subprocess.Popen(process_args, shell=True)
+        electron_builder_process = subprocess.Popen(
+            process_args, shell=True, env=os.environ.copy()
+        )
 
     electron_builder_process.communicate()
 
