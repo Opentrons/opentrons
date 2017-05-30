@@ -260,6 +260,7 @@ def clean_build_dist(build_tag):
 
 
 if __name__ == '__main__':
+    print('Detected branch is', util.get_branch(), util.get_branch() == 'master')
     get_app_version()
     build_electron_app()
     build_tag = get_build_tag(util.get_os())
