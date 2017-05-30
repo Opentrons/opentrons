@@ -18,7 +18,11 @@ def get_branch():
     """
     Returns current branch in repo
     """
-    return get_cmd_value("git branch | grep \* | cut -d ' ' -f2")
+    return (
+        os.environ.get('APPVEYOR_REPO_BRANCH') or
+        os.environ.get('TRAVIS_BRANCH') or
+        get_cmd_value("git branch | grep \* | cut -d ' ' -f2").strip()  # TeamCity
+    )
 
 
 def get_cmd_value(cmd):
