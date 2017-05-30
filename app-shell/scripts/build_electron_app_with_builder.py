@@ -153,19 +153,16 @@ def build_electron_app():
 
     platform_type = util.get_os()
     process_args = [
-        # which("build"),
         os.path.join(project_root_dir, 'node_modules', '.bin', 'build'),
         os.path.join(project_root_dir, 'app'),
         "--{}".format(platform_type),
         "--{}".format(util.get_arch())
     ]
 
-    if 'CHANNEL' not in os.environ:
-        os.environ['CHANNEL'] = 'beta'
-    # if util.get_branch() == 'master' or os.environ.get('PUBLISH'):
-    #     if 'CHANNEL' not in os.environ:
-    #         os.environ['CHANNEL'] = 'beta'
-    #     process_args.extend(["-p", "always"])
+    if util.get_branch() == 'master' or os.environ.get('PUBLISH'):
+        if 'CHANNEL' not in os.environ:
+            os.environ['CHANNEL'] = 'beta'
+        process_args.extend(["-p", "always"])
 
     print(process_args)
 
