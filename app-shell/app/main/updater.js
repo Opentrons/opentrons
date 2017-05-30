@@ -6,7 +6,7 @@ const {getLogger} = require('./logging.js')
 
 autoUpdater.allowDowngrade = true
 
-let channel = getSetting('useBetaApp') ? 'beta' : 'release'
+let channel = getSetting('useBetaApp') ? 'beta' : 'stable'
 
 function initAutoUpdater () {
   // Log whats happening
@@ -21,14 +21,6 @@ function initAutoUpdater () {
     'error',
     (err) => mainLogger.info(`Update error: ${err.message}`)
   )
-
-  // TODO: Remove me?
-  // autoUpdater.on('download-progress', (progressObj) => {
-  //   let log_message = "Download speed: " + progressObj.bytesPerSecond
-  //   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
-  //   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')'
-  //   console.log(log_message);
-  // })
 
   autoUpdater.on(
     'checking-for-update',
