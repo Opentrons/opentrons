@@ -45,9 +45,12 @@ def get_app_version():
     with open(app_json_path, 'r') as json_file:
         app_json = json.load(json_file, object_pairs_hook=OrderedDict)
 
+    real_app_version = app_json['version']
     app_json['version'] = fake_app_version
     with open(app_json_path, 'w') as json_file:
         json.dump(app_json, json_file, indent=2)
+
+    return real_app_version
 
 
 def remove_directory(dir_to_remove):
@@ -154,9 +157,12 @@ def build_electron_app():
         os.path.join(project_root_dir, 'node_modules', '.bin', 'build'),
         os.path.join(project_root_dir, 'app'),
         "--{}".format(platform_type),
-        "--{}".format(util.get_arch()),
-        "-p", "always"
+        "--{}".format(util.get_arch())
     ]
+
+    if util.get_branch() == 'master' or os.environ.get('PUBLISH'):
+        os.environ['CHANNEL'] = 'beta'
+        process_args.extend(["-p", "always"])
 
     print(process_args)
 

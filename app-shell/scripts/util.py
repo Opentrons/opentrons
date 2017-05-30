@@ -1,6 +1,7 @@
 import platform
 import os
 import re
+import subprocess
 import time
 
 
@@ -11,6 +12,17 @@ def get_arch():
         return 'x64'
     if cpu_word_size == 32:
         return 'ia32'
+
+
+def get_branch():
+    """
+    Returns current branch in repo
+    """
+    return get_cmd_value("git branch | grep \* | cut -d ' ' -f2")
+
+
+def get_cmd_value(cmd):
+    return subprocess.check_output(cmd, shell=True).decode()
 
 
 def get_os():
@@ -90,5 +102,3 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
     if branch and commit:
         return "{}_{}".format(branch, commit[:10])
     return None
-
-
