@@ -159,7 +159,7 @@ def build_electron_app():
         "--{}".format(util.get_arch())
     ]
 
-    if util.get_branch() == 'master' or os.environ.get('PUBLISH'):
+    if util.get_branch().strip() == 'master' or os.environ.get('PUBLISH'):
         if 'CHANNEL' not in os.environ:
             os.environ['CHANNEL'] = 'beta'
         process_args.extend(["-p", "always"])
