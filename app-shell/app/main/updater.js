@@ -46,31 +46,32 @@ function initAutoUpdater () {
   )
 
   autoUpdater.on(
-    'update-downloaded',
-   function (e, releaseNotes, releaseName, date, url) {
-     mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
-     mainLogger.info(`Update Info: ${releaseNotes}`)
+    'update-downloaded', (e, info) => {
+      mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
+      mainLogger.info(`Update Info: ${releaseNotes}`)
 
-     var index = dialog.showMessageBox({
-       type: 'info',
-       buttons: ['Restart', 'Later'],
-       title: 'OT App', // TODO: Make this a config
-       message: 'The new version has been downloaded. Please restart the application to apply the updates.',
-       detail: releaseName + '\n\n' + releaseNotes
-     })
-
-     if (index === 1) {
-       return
-     }
-
-     autoUpdater.quitAndInstall()
-   }
+      if (channel === 'beta') {
+        setTimeout(() => autoUpdater.quitAndInstall(), 1);
+        return
+      }
+      dialog.showMessageBox({
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'OT App', // TODO: Make this a config
+        message: 'The new version has been downloaded. Please restart the application to apply the updates.',
+        detail: releaseName + '\n\n' + releaseNotes
+      }, response => {
+        if (response === 0) {
+          setTimeout(() => autoUpdater.quitAndInstall(), 1);
+        }
+      })
+    }
   )
 
   autoUpdater.setFeedURL({
     provider: 's3',
     bucket: 'ot-app-builds',
-    path: `test/${channel}`,
+    path: `channels/${channel}`,
     channel: channel
   })
 
