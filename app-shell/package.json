@@ -46,6 +46,7 @@
     },
     "mac": {
       "target": [
+        "dmg",
         "zip"
       ],
       "category": "productivity"
@@ -62,7 +63,7 @@
       "provider": "s3",
       "bucket": "ot-app-builds",
       "path": "channels/${env.CHANNEL}",
-      "channel": "${env.CHANNEL}",
+      "channel": "${env.CHANNEL}"
     }
   },
   "dependencies": {
