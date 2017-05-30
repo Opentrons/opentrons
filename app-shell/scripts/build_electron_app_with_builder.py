@@ -198,7 +198,7 @@ def clean_build_dist(build_tag):
 
     platform_type = util.get_os()
     if platform_type == "win":
-        platform_dist_dir = "win"
+        platform_dist_dir = ""
     elif platform_type == "linux":
         platform_dist_dir = "linux-unpacked"
     elif platform_type == "mac":
