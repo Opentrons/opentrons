@@ -202,7 +202,7 @@ def clean_build_dist(build_tag):
     elif platform_type == "linux":
         platform_dist_dir = "linux-unpacked"
     elif platform_type == "mac":
-        platform_dist_dir = "mac"
+        platform_dist_dir = ""
 
     electron_builder_dist = os.path.join(project_root_dir, "dist", platform_dist_dir)
     print(script_tab + 'Contents electron-builder dist dir: {}'.format(
