@@ -161,13 +161,16 @@ def build_electron_app():
     ]
 
     if util.get_branch() == 'master' or os.environ.get('PUBLISH'):
-        os.environ['CHANNEL'] = 'beta'
+        if 'CHANNEL' not in os.environ:
+            os.environ['CHANNEL'] = 'beta'
         process_args.extend(["-p", "always"])
 
     print(process_args)
 
     if platform_type in {'mac'}:
-        electron_builder_process = subprocess.Popen(process_args)
+        electron_builder_process = subprocess.Popen(
+            process_args, env=os.environ.copy()
+        )
     elif platform_type in {'win', 'linux'}:
         electron_builder_process = subprocess.Popen(
             process_args, shell=True, env=os.environ.copy()
@@ -260,5 +263,5 @@ def clean_build_dist(build_tag):
 if __name__ == '__main__':
     get_app_version()
     build_electron_app()
-    # build_tag = get_build_tag(util.get_os())
-    # clean_build_dist(build_tag)
+    build_tag = get_build_tag(util.get_os())
+    clean_build_dist(build_tag)
