@@ -42,7 +42,8 @@ function initAutoUpdater () {
       mainLogger.info(`Update downloaded: ${info}`)
 
       if (channel === 'beta') {
-        setTimeout(() => autoUpdater.quitAndInstall(), 1);
+        // Do not automatically quit
+        // setTimeout(() => autoUpdater.quitAndInstall(), 1);
         return
       }
       dialog.showMessageBox({
