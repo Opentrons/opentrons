@@ -119,8 +119,8 @@ def republish_win_s3(yml_file, exe_file):
         '[Electron-S3-Republish] attempint to republish', yml_file, exe_file)
 
     conn = tinys3.Connection(
-        os.environ.get('S3_ACCESS_KEY'),
-        os.environ.get('S3_SECRET_KEY'),
+        os.environ.get('AWS_ACCESS_KEY'),
+        os.environ.get('AWS_SECRET_KEY'),
         tls=True
     )
     channel = os.environ.get('CHANNEL')
