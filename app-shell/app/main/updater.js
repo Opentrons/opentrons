@@ -39,8 +39,7 @@ function initAutoUpdater () {
 
   autoUpdater.on(
     'update-downloaded', (e, info) => {
-      mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
-      mainLogger.info(`Update Info: ${releaseNotes}`)
+      mainLogger.info(`Update downloaded: ${info}`)
 
       if (channel === 'beta') {
         setTimeout(() => autoUpdater.quitAndInstall(), 1);
@@ -51,7 +50,7 @@ function initAutoUpdater () {
         buttons: ['Restart', 'Later'],
         title: 'OT App', // TODO: Make this a config
         message: 'The new version has been downloaded. Please restart the application to apply the updates.',
-        detail: releaseName + '\n\n' + releaseNotes
+        detail: ''  // info.releaseName + '\n\n' + info.releaseNotes
       }, response => {
         if (response === 0) {
           setTimeout(() => autoUpdater.quitAndInstall(), 1);
