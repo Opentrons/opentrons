@@ -182,6 +182,7 @@ def build_electron_app():
 
     # Run windows repulish
     if platform_type == 'win' and 'always' in process_args:
+        print(os.listdir(os.path.join(project_root_dir, 'dist')))
         yml_file = os.path.join(
             project_root_dir, 'dist', '{}.yml'.format(os.environ['CHANNEL'])
         )
