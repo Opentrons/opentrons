@@ -125,16 +125,14 @@ def republish_win_s3(yml_file, exe_file):
     )
     channel = os.environ.get('CHANNEL')
 
-    with open(yml_file, 'rb') as f:
-        conn.upload(
-            'channels/{}/{}'.format(channel, os.path.basename(yml_file)),
-            f,
-            'ot-app-builds'
-        )
+    conn.upload(
+        'channels/{}/{}'.format(channel, os.path.basename(yml_file)),
+        open(yml_file, 'rb'),
+        'ot-app-builds'
+    )
 
-    with open(exe_file, 'rb') as f:
-        conn.upload(
-            'channels/{}/{}'.format(channel, os.path.basename(exe_file)),
-            f,
-            'ot-app-builds'
-        )
+    conn.upload(
+        'channels/{}/{}'.format(channel, os.path.basename(exe_file)),
+        open(exe_file, 'rb'),
+        'ot-app-builds'
+    )
