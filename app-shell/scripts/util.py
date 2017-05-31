@@ -4,6 +4,8 @@ import re
 import subprocess
 import time
 
+import tinys3
+
 
 def get_arch():
     # Note: forcing arch to be 64 bit
@@ -106,3 +108,33 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
     if branch and commit:
         return "{}_{}".format(branch, commit[:10])
     return None
+
+
+def republish_win_s3(yml_file, exe_file):
+    """
+    Temporary fix for: https://github.com/electron-userland/electron-builder/issues/1582
+    """
+
+    print(
+        '[Electron-S3-Republish] attempint to republish', yml_file, exe_file)
+
+    conn = tinys3.Connection(
+        os.environ.get('S3_ACCESS_KEY'),
+        os.environ.get('S3_SECRET_KEY'),
+        tls=True
+    )
+    channel = os.environ.get('CHANNEL')
+
+    with open(yml_file) as f:
+        conn.upload(
+            'channels/{}/{}'.format(channel, os.path.basename(yml_file)),
+            f,
+            'ot-app-builds'
+        )
+
+    with open(exe_file) as f:
+        conn.upload(
+            'channels/{}/{}'.format(channel, os.path.basename(exe_file)),
+            f,
+            'ot-app-builds'
+        )

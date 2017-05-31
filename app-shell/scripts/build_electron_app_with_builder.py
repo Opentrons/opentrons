@@ -175,10 +175,20 @@ def build_electron_app():
             process_args, shell=True, env=os.environ.copy()
         )
 
-    electron_builder_process.communicate()
+    # electron_builder_process.communicate()
 
     if electron_builder_process.returncode != 0:
         raise SystemExit(script_tag + 'Failed to properly build electron app')
+
+    # Run windows repulish
+    if platform_type == 'win' and 'always' in process_args:
+        yml_file = os.path.join(
+            project_root_dir, 'dist', '{}.yml'.format(os.environ['CHANNEL'])
+        )
+        exe_file = glob.glob(
+            os.path.join(project_root_dir, 'dist', '*.exe')
+        )[0]
+        util.republish_win_s3(yml_file, exe_file)
 
     print(script_tab + 'electron-builder process completed successfully')
 
