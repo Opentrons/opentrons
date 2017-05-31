@@ -175,7 +175,7 @@ def build_electron_app():
             process_args, shell=True, env=os.environ.copy()
         )
 
-    # electron_builder_process.communicate()
+    electron_builder_process.communicate()
 
     if electron_builder_process.returncode != 0:
         raise SystemExit(script_tag + 'Failed to properly build electron app')
