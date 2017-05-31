@@ -4,8 +4,6 @@ import re
 import subprocess
 import time
 
-import tinys3
-
 
 def get_arch():
     # Note: forcing arch to be 64 bit
@@ -115,6 +113,7 @@ def republish_win_s3(yml_file, exe_file):
     Temporary fix for: https://github.com/electron-userland/electron-builder/issues/1582
     """
 
+    import tinys3
     print(
         '[Electron-S3-Republish] attempint to republish', yml_file, exe_file)
 
