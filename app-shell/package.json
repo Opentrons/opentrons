@@ -2,7 +2,7 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "clean": "rm -rf ./out && rm -rf ./releases/*",
-    "build:frontend": "python scripts/build_electron_app_with_builder.py",
+    "build:frontend": "python3 scripts/build_electron_app_with_builder.py",
     "release": "npm run build:backend && npm run build:frontend",
     "build:frontend:posix": "python3 scripts/build_electron_app_with_builder.py",
     "build:frontend:win": "C:\\Python35\\python scripts\\build_electron_app_with_builder.py",
