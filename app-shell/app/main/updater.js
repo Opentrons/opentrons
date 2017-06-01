@@ -1,11 +1,19 @@
 const electron = require('electron')
-const {app, dialog, autoUpdater} = electron
+const {app, dialog} = electron
+const {autoUpdater} = require('electron-updater')
 const {getSetting} = require('./preferences')
 const {getLogger} = require('./logging.js')
 
-var UPDATE_SERVER_URL = 'http://ot-app-releases-2.herokuapp.com'
+autoUpdater.allowDowngrade = true
+
+let channel = getSetting('useBetaApp') ? 'beta' : 'stable'
 
 function initAutoUpdater () {
+  // Log whats happening
+  const log = require('electron-log')
+  log.transports.file.level = 'info'
+  autoUpdater.logger = log
+
   const mainLogger = getLogger('electron-main')
   mainLogger.info('starting ')
 
@@ -30,36 +38,35 @@ function initAutoUpdater () {
   )
 
   autoUpdater.on(
-    'update-downloaded',
-   function (e, releaseNotes, releaseName, date, url) {
-     mainLogger.info(`Update downloaded: ${releaseName}: ${url}`)
-     mainLogger.info(`Update Info: ${releaseNotes}`)
+    'update-downloaded', (e, info) => {
+      mainLogger.info(`Update downloaded: ${info}`)
 
-     var index = dialog.showMessageBox({
-       type: 'info',
-       buttons: ['Restart', 'Later'],
-       title: 'OT App', // TODO: Make this a config
-       message: 'The new version has been downloaded. Please restart the application to apply the updates.',
-       detail: releaseName + '\n\n' + releaseNotes
-     })
-
-     if (index === 1) {
-       return
-     }
-
-     autoUpdater.quitAndInstall()
-   }
+      if (channel === 'beta') {
+        // Do not automatically quit
+        // setTimeout(() => autoUpdater.quitAndInstall(), 1);
+        return
+      }
+      dialog.showMessageBox({
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'OT App', // TODO: Make this a config
+        message: 'The new version has been downloaded. Please restart the application to apply the updates.',
+        detail: ''  // info.releaseName + '\n\n' + info.releaseNotes
+      }, response => {
+        if (response === 0) {
+          setTimeout(() => autoUpdater.quitAndInstall(), 1);
+        }
+      })
+    }
   )
 
-  var AUTO_UPDATE_URL = UPDATE_SERVER_URL + '?version=' + app.getVersion()
+  autoUpdater.setFeedURL({
+    provider: 's3',
+    bucket: 'ot-app-builds',
+    path: `channels/${channel}`,
+    channel: channel
+  })
 
-  //  If platform is Windows, use S3 file server instead of update server.
-  //  please see /docs/windows_updating.txt for more information
-  if (process.platform === 'win32') {
-    AUTO_UPDATE_URL = 'https://s3.amazonaws.com/ot-app-win-updates-2/'
-  }
-  autoUpdater.setFeedURL(AUTO_UPDATE_URL)
-  mainLogger.info('Setting AUTO UPDATE URL to ' + AUTO_UPDATE_URL)
   if (getSetting('autoUpdate')) {
     mainLogger.info('Auto updating is enabled, checking for updates')
     autoUpdater.checkForUpdates()
