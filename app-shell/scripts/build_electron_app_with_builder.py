@@ -14,8 +14,6 @@ import time
 import util
 import cantor
 
-import opentrons
-
 
 script_tag = "[OT-App frontend build] "
 script_tab = "                        "
@@ -33,6 +31,7 @@ def get_app_version():
     :return: string of app version
     """
 
+    import opentrons
     semver_match = re.match(r'[(\d+)\.]+\+(\d+)', opentrons.__version__)
     app_version = semver_match.group(0)
     version, build = app_version.split('+')
