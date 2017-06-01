@@ -55,7 +55,7 @@ init:
   - cmd: set PATH=c:\MinGW\bin;%PATH%
   - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
   - cmd: ECHO Path - %PATH%
-  - ps: cp C:\Python35\python.exe C:\Python35\python3
+  - ps: copy C:\Python35\python.exe C:\Python35\python3
 
 install:
   - cmd: "%PIP2% freeze"
