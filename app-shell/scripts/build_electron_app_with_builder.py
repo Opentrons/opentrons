@@ -163,6 +163,8 @@ def build_electron_app():
         if 'CHANNEL' not in os.environ:
             os.environ['CHANNEL'] = 'beta'
         process_args.extend(["-p", "always"])
+    if 'CHANNEL' not in os.environ:
+        os.environ['CHANNEL'] = util.get_branch().strip()
 
     print(process_args)
 
