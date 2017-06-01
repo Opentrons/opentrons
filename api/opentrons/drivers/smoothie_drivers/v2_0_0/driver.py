@@ -655,7 +655,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 log.debug('{} is not an ot_version'.format(res))
                 return None
             self.ot_version = res
-            self.speeds = self.default_speeds[self.ot_version]
+            if not self.speeds:
+                self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):
