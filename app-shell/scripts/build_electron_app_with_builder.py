@@ -12,6 +12,8 @@ import time
 
 import util
 
+import opentrons
+
 
 script_tag = "[OT-App frontend build] "
 script_tab = "                        "
@@ -28,7 +30,6 @@ def get_app_version():
     Get the OT App version as specified in the electron package.json file
     :return: string of app version
     """
-
     app_json_path = os.path.join(project_root_dir, "app", "package.json")
     with open(app_json_path, 'r') as json_file:
         return json.load(json_file).get('version')
