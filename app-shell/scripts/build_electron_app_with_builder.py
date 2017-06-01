@@ -139,7 +139,6 @@ def build_electron_app():
         "--{}".format(platform_type),
         "--{}".format(util.get_arch()),
     ]
-
     print(process_args)
 
     if platform_type in {'mac'}:
