@@ -18,7 +18,7 @@ Power off your Opentrons liquid handler, remove the microSD card from the Smooth
 
 ![Select Config File](img/Update-Firmware/firmware_files.png)
 
-Open the Smoothie's storage device to see it's `FIRMWARE.CUR` and `config` files. There might be other files there, but the two you need to worry about are `FIRMWARE.CUR` and `config`, because these are what we will be replacing.
+Open the microSD card drive on your computer to see it's `FIRMWARE.CUR` and `config` files. There might be other files there, but the two you need to worry about are `FIRMWARE.CUR` and `config`, because these are what we will be replacing.
 
 ##Step 3
 ###Select Your Opentrons Model Config
@@ -33,11 +33,11 @@ Drag both the `config` and `firmware.bin` files from the correct folder and to t
 
 ![Select Config File](img/Update-Firmware/replaceConfig.png)
 
-Your drive should now look like the following:
+Your microSD card drive should now look like the following:
 
 ![Select Config File](img/Update-Firmware/dragFirmwareBin.png)
 
 ##Step 4
 ###Restart
 
-Unmount the Smoothie's driver from your computer, and power cycle the robot. When the Smoothieboard powers on, it will read the `firmware.bin` file, then save it as `FIRMWARE.CUR`. It will then read the new `config` file, and your liquid handler now has updated firmware.
+With the robot powered off, connect the microSD card. When the Smoothieboard powers on, it will read the `firmware.bin` file, then save it as `FIRMWARE.CUR`. It will then read the new `config` file, and your liquid handler now has updated firmware.
