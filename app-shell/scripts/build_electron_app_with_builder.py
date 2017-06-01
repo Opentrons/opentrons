@@ -12,8 +12,6 @@ import time
 
 import util
 
-import opentrons
-
 
 script_tag = "[OT-App frontend build] "
 script_tab = "                        "
