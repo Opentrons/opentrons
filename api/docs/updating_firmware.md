@@ -33,7 +33,7 @@ Drag both the `config` and `firmware.bin` files from the correct folder and to t
 
 ![Select Config File](img/Update-Firmware/replaceConfig.png)
 
-Your drive should now look like the following:
+Your microSD card drive should now look like the following:
 
 ![Select Config File](img/Update-Firmware/dragFirmwareBin.png)
 
