@@ -31,14 +31,14 @@
         return this.$store.state.running
       },
       connected () {
-        return this.$store.state.isConnected
+        return !!this.$store.state.connectedRobot
       },
       paused () {
         return this.$store.state.paused
       },
       calibrated () {
         // TODO: Move this to state
-        if (!this.$store.state.isConnected) return false
+        if (!this.$store.state.connectedRobot) return false
         if (this.$store.state.tasks.length === 0) return false
 
         return this.$store.state.tasks.every((instrument) => {

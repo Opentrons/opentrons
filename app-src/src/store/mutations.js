@@ -22,7 +22,7 @@ const state = {
   protocolFinished: false,
   paused: false,
   selectedRobot: 'ot-two.local:31950',
-  connectedRobot: '',
+  connectedRobot: 'ot-two.local:31950', // TODO: default to blank
   robots: []
 }
 

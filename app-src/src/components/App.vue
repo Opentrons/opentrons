@@ -66,7 +66,7 @@
     },
     mounted: function () {
       this.$http
-        .get(`http://${this.$state.connectedRobotUrl}/app_version`).then((response) => {
+        .get(`http://${this.$state.connectedRobot}/app_version`).then((response) => {
           this.version = response.body.version || this.version
         })
       window.addEventListener('dragover', function (e) {

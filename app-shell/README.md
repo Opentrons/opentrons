@@ -38,9 +38,11 @@ To download, visit (our app page)[http://opentrons.com/ot-app]. To build locally
 
 `npm install webpack -g`
 
-`virtualenv -p python3 env` OR `pyenv local 3.4.3` - this step requires Virtualenv or Pyenv, as Python 3+ is necessary for this project.
+`virtualenv -p python3 env` OR `pyenv local 3.5.3` - this step requires Virtualenv or Pyenv, as Python 3+ is necessary for this project. You can use a package manager to install Pyenv if you don't have it. For example, to install Pyenv using homebrew simply run `brew install pyenv`
 
 `source env/bin/activate` is necessary to run if using Virtualenv.
+
+If using Pyenv, run `eval $(pyenv init -)` to allow Pyenv commands to alter the default python version in the current directory.
 
 `pip install -r requirements.txt`
 
@@ -59,6 +61,6 @@ You will need to activate your Virtualenv or Pyenv here - refer to the above com
 
 At this point, the Flask server that serves up the Single Page Application and hosts the REST API for interacting with your Opentrons robot over HTTP is running.
 
-You can now open the OT App in your web browser by navigating to 127.0.0.1:5000. You can also open the app in Electron by running `npm start` from the root directory of this folder.
+You can now open the OT App in your web browser by navigating to 127.0.0.1:31950. You can also open the app in Electron by running `npm start` from the root directory of this folder.
 
 If you would like to interface with the Virtual Smoothieboard (as opposed to the actual robot), you can execute `export ENABLE_VIRTUAL_SMOOTHIE=True` before running `python main.py`.

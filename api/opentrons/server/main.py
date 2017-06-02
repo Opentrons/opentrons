@@ -366,11 +366,11 @@ def diagnostics():
 @app.route("/robot/versions")
 def get_versions():
     if not CACHED_ROBOT_VERSIONS:
-	robot = Robot.get_instance()
-	CACHED_ROBOT_VERSIONS = robot.versions()
+       robot = Robot.get_instance()
+       CACHED_ROBOT_VERSIONS = robot.versions()
     return flask.jsonify({
-    	'versions': CACHED_ROBOT_VERSIONS 
-    })
+       'versions': CACHED_ROBOT_VERSIONS 
+       })
 
 
 @app.route("/app_version")
