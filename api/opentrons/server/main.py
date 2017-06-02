@@ -25,6 +25,7 @@ from opentrons.server import helpers
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 BACKGROUND_TASKS = {}
+CACHED_ROBOT_VERSIONS = ''
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
@@ -360,12 +361,15 @@ def diagnostics():
         'diagnostics': robot.diagnostics()
     })
 
-
+#NOTE: caching used here is hackey
+#Just a solution until better smoothie async handling implemented
 @app.route("/robot/versions")
 def get_versions():
-    robot = Robot.get_instance()
+    if not CACHED_ROBOT_VERSIONS:
+	robot = Robot.get_instance()
+	CACHED_ROBOT_VERSIONS = robot.versions()
     return flask.jsonify({
-        'versions': robot.versions()
+    	'versions': CACHED_ROBOT_VERSIONS 
     })
 
 
