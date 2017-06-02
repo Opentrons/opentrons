@@ -365,6 +365,7 @@ def diagnostics():
 #Just a solution until better smoothie async handling implemented
 @app.route("/robot/versions")
 def get_versions():
+    global CACHED_ROBOT_VERSIONS
     if not CACHED_ROBOT_VERSIONS:
        robot = Robot.get_instance()
        CACHED_ROBOT_VERSIONS = robot.versions()
