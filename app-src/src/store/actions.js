@@ -7,28 +7,6 @@ import Opentrons from '../rest_api_wrapper'
 import { processTasks } from '../util'
 
 const actions = {
-  connectRobot ({ commit }, port) {
-    const payload = {isConnected: true, port}
-    Opentrons.connect(port).then((wasSuccessful) => {
-      if (wasSuccessful) {
-        commit(types.UPDATE_ROBOT_CONNECTION, payload)
-        if (window.confirm('Successfully Connected. Do you want to home now?')) {
-          Opentrons.home('all')
-        }
-        Opentrons.getVersions().then((result) => {
-          let versions = result
-          commit(types.UPDATE_ROBOT_VERSIONS, {versions})
-        })
-      }
-    })
-  },
-  disconnectRobot ({ commit }) {
-    Opentrons.disconnect().then((wasSuccessful) => {
-      if (wasSuccessful) {
-        commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
-      }
-    })
-  },
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     commit(types.UPLOADING, {'uploading': true})

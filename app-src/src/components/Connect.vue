@@ -1,10 +1,5 @@
 <template>
   <nav class='connect'>
-    <select @change='searchIfNecessary()' v-model='ports.selected' id='connections'>
-      <option value='default'>{{defaultOption}}</option>
-      <option value='refresh-list'>&#8635 refresh</option>
-      <option v-for='option in ports.options' v-bind:value='option.value'>{{ option.text }}</option>
-    </select>
     <div id='indicator' :class="{'connected': connected}"></div>
     <button v-if="!isAuthenticated" id="login" @click='login()' class='btn-run' :class="btn-run">Login</button>
     <button v-else id="logout" @click='logout()' class='btn-run' :class="btn-run">Logout</button>
@@ -13,53 +8,40 @@
 
 
 <script>
-  import Opentrons from '../rest_api_wrapper'
+  import config from 'src/config'
+  import * as types from 'src/store/mutation-types'
 
   export default {
     name: 'Connect',
-    data: function () {
-      return {
-        ports: {
-          selected: 'default',
-          options: []
-        }
-      }
-    },
     computed: {
       isAuthenticated () {
         return this.$store.state.isAuthenticated
       },
       connected () {
-        return this.$store.state.isConnected
-      },
-      port () {
-        return this.$store.state.port
-      },
-      defaultOption () {
-        return this.connected ? 'Disconnect' : 'Select a port'
+        return !!this.$store.state.connectedRobot
       }
     },
+    mounted () {
+      // Keep pinging the robot
+      var that = this
+      window.setInterval(
+        () => {
+          that.$http
+            .get(`http://${that.$store.state.selectedRobot}/robot/versions`)
+            .then((response) => {
+              that.$store.state.connectedRobot ||
+              that.$store.commit(types.UPDATE_ROBOT_CONNECTION, that.$store.state.selectedRobot)
+              console.log(`Connected to ot-two: ${response}`)
+            }, (response) => {
+              !that.$store.state.connectedRobot ||
+              that.$store.commit(types.UPDATE_ROBOT_CONNECTION, '')
+              console.log(`Failed to connect to ot-two: ${response}`)
+            })
+        },
+        config.NETWORK_SCAN_TIMEOUT
+      )
+    },
     methods: {
-      getPortsList: function () {
-        this.ports = {
-          selected: 'default',
-          options: []
-        }
-        Opentrons.getPortsList().then((ports) => {
-          this.ports.options = ports.map((port) => ({text: port, value: port}))
-        })
-      },
-      searchIfNecessary: function () {
-        let selected = this.ports.selected
-        if (selected === 'refresh-list' || selected === null) {
-          this.getPortsList()
-          if (this.$store.state.isConnected) this.ports.selected = this.$store.state.port
-        } else if (selected === 'default') {
-          this.disconnectRobot()
-        } else {
-          this.connectToRobot()
-        }
-      },
       connectToRobot: function () {
         this.$store.dispatch('connectRobot', this.ports.selected)
       },
@@ -72,9 +54,6 @@
       logout: function () {
         this.$router.push('/logout')
       }
-    },
-    beforeMount: function () {
-      this.getPortsList()
     }
   }
 </script>

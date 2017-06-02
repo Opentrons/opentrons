@@ -61,15 +61,13 @@
     },
     computed: {
       robotBusy () {
-        if (!this.$store.state.isConnected) return true
-        return this.$store.state.busy
+        return !this.$store.state.connectedRobot || this.$store.state.busy
       }
     },
     mounted: function () {
       this.$http
-        .get('http://ot-two.local:31950/app_version').then((response) => {
-          let version = response.body.version
-          version ? this.version = version : this.version = '2.?.?'
+        .get(`http://${this.$state.connectedRobotUrl}/app_version`).then((response) => {
+          this.version = response.body.version || this.version
         })
       window.addEventListener('dragover', function (e) {
         e = e || event

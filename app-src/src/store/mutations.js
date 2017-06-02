@@ -4,7 +4,6 @@ import { getUserProfile, isAuthenticated } from '../util'
 const state = {
   isAuthenticated: isAuthenticated(),
   userProfile: getUserProfile(),
-  isConnected: false,
   port: null,
   fileName: '',
   lastModified: '',
@@ -21,17 +20,25 @@ const state = {
   uploading: false,
   running: false,
   protocolFinished: false,
-  paused: false
+  paused: false,
+  selectedRobot: 'ot-two.local:31950',
+  connectedRobot: '',
+  robots: []
 }
 
 const mutations = {
+  [types.SET_SELECTED_ROBOT] (state, address) {
+    state.selectedRobot = address
+  },
+  [types.UPDATE_ROBOT_URLS] (state, robots) {
+    state.robots = robots
+  },
+  [types.UPDATE_ROBOT_CONNECTION] (state, address) {
+    state.connectedRobot = address
+  },
   [types.AUTHENTICATE] (state, payload) {
     state.isAuthenticated = payload.isAuthenticated
     state.userProfile = payload.userProfile
-  },
-  [types.UPDATE_ROBOT_CONNECTION] (state, payload) {
-    state.isConnected = payload.isConnected
-    state.port = payload.port
   },
   [types.UPDATE_TASK_LIST] (state, payload) {
     state.tasks = payload.tasks
