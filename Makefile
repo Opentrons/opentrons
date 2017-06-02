@@ -35,6 +35,15 @@ app-shell-build:
 		ls dist/* &&\
 		ls releases
 
+<<<<<<< HEAD
+=======
+app-shell-build-win:
+	cd app-shell &&\
+		npm run build:frontend:win &&\
+		ls dist/* &&\
+		ls releases
+
+>>>>>>> run-usb-detached-rebased
 app-shell-e2e-test:
 	cd app-shell &&\
 		npm run e2e
