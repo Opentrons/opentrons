@@ -12,7 +12,6 @@ from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
-from opentrons.util.singleton import Singleton
 from opentrons.util.environment import settings
 
 
@@ -104,7 +103,7 @@ class InstrumentMotor(object):
         return self
 
 
-class Robot(object, metaclass=Singleton):
+class Robot(object):
     """
     This class is the main interface to the robot.
 
@@ -137,9 +136,7 @@ class Robot(object, metaclass=Singleton):
 
     Examples
     --------
-    >>> from opentrons import Robot
-    >>> from opentrons import instruments, containers
-    >>> robot = Robot()
+    >>> from opentrons import robot, instruments, containers
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
     >>> plate = containers.load('96-flat', 'A1', 'plate')
@@ -152,9 +149,6 @@ class Robot(object, metaclass=Singleton):
     []
     """
 
-    _commands = None  # []
-    _instance = None
-
     def __init__(self):
         """
         Initializes a robot instance.
@@ -166,6 +160,7 @@ class Robot(object, metaclass=Singleton):
         only once instance of a robot.
         """
 
+        self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
@@ -183,31 +178,6 @@ class Robot(object, metaclass=Singleton):
         self._driver = None
         self.set_connection('simulate')
         self.reset()
-
-    @classmethod
-    def get_instance(cls):
-        """
-        Deprecated. Use Robot() instead.
-
-        Returns
-        -------
-        An instance of a robot.
-        """
-
-        # leaving this method for backwards compatibility
-        # before Singleton meta-class was introduced
-        #
-        # TODO: remove method, refactor dependencies
-        return Robot()
-
-    @classmethod
-    def reset_for_tests(cls):
-        """
-        Deprecated.
-        """
-        del Singleton._instances[cls]
-        robot = Robot.get_instance()
-        return robot
 
     def reset(self):
         """
@@ -643,13 +613,12 @@ class Robot(object, metaclass=Singleton):
         --------
         ..
         >>> from opentrons import Robot
+        >>> robot = Robot()
         >>> from opentrons.instruments.pipette import Pipette
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
-        >>> p200 = Pipette(axis='a')
+        >>> p200 = Pipette(robot, axis='a')
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
         """

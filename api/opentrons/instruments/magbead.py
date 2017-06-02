@@ -7,9 +7,10 @@ class Magbead(Instrument):
         * Control the Magbead module to :meth:`engage` or :meth:`disengage`
     """
 
-    def __init__(self, name=None, mosfet=0, container=None):
+    def __init__(self, robot, name=None, mosfet=0, container=None):
         self.axis = 'M{}'.format(mosfet)
         self.mosfet_index = mosfet
+        self.robot = robot
 
         self.robot.add_instrument(self.axis, self)
 

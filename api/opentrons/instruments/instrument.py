@@ -3,13 +3,10 @@ import json
 import os
 import sys
 
-from opentrons.containers.calibrator import Calibrator
-from opentrons.util.vector import (Vector, VectorEncoder)
 from opentrons.util import environment
-from opentrons.robot.command import Command
-from opentrons import Robot
-
 from opentrons.util.log import get_logger
+from opentrons.util.vector import Vector, VectorEncoder
+from opentrons.robot.command import Command
 
 
 JSON_ERROR = None
@@ -36,8 +33,6 @@ class Instrument(object):
     calibration_key = "unique_name"
     persisted_attributes = []
     persisted_defaults = {}
-
-    calibrator = Calibrator(Robot()._deck, {})
 
     def reset(self):
         """
@@ -101,7 +96,7 @@ class Instrument(object):
         command = Command(do=do, setup=setup, description=description)
 
         if enqueue:
-            Robot().add_command(command)
+            self.robot.add_command(command)
         else:
             command()
 
@@ -267,7 +262,3 @@ class Instrument(object):
                 except JSON_ERROR:
                     pass
         return obj
-
-    @property
-    def robot(self):
-        return Robot.get_instance()

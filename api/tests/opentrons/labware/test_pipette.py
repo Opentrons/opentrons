@@ -1,28 +1,28 @@
 import unittest
 from unittest import mock
-from opentrons import containers
 
-from opentrons import instruments
 from opentrons import Robot
+from opentrons.containers import load as containers_load
+from opentrons.instruments import pipette
 from opentrons.util.vector import Vector
 
 from opentrons.containers.placeable import unpack_location, Container, Well
 
 
 class PipetteTest(unittest.TestCase):
-
     def setUp(self):
-        self.robot = Robot.reset_for_tests()
+        self.robot = Robot()
         self.robot.connect()
         self.robot.home()
 
-        self.trash = containers.load('point', 'A1')
-        self.tiprack1 = containers.load('tiprack-10ul', 'B2')
-        self.tiprack2 = containers.load('tiprack-10ul', 'B3')
+        self.trash = containers_load(self.robot, 'point', 'A1')
+        self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', 'B2')
+        self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', 'B3')
 
-        self.plate = containers.load('96-flat', 'A2')
+        self.plate = containers_load(self.robot, '96-flat', 'A2')
 
-        self.p200 = instruments.Pipette(
+        self.p200 = pipette.Pipette(
+            self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
             max_volume=200,
@@ -36,6 +36,9 @@ class PipetteTest(unittest.TestCase):
         self.p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)
         self.robot.home(enqueue=False)
         _, _, starting_z = self.robot._driver.get_head_position()['current']
+
+    def tearDown(self):
+        del self.robot
 
     def test_bad_volume_percentage(self):
         self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
@@ -79,7 +82,8 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.p200.positions['bottom'], 9)
 
     def test_get_instruments_by_name(self):
-        self.p1000 = instruments.Pipette(
+        self.p1000 = pipette.Pipette(
+            self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1],
             min_volume=10,  # These are variable
@@ -93,7 +97,6 @@ class PipetteTest(unittest.TestCase):
         self.assertListEqual(result, [('A', self.p1000)])
 
     def test_placeables_reference(self):
-
         self.p200.aspirate(100, self.plate[0])
         self.p200.dispense(100, self.plate[0])
         self.p200.aspirate(100, self.plate[20])
@@ -1521,7 +1524,8 @@ class PipetteTest(unittest.TestCase):
         self.robot._deck['A1'].add(self.tiprack1, 'tiprack1')
         self.robot._deck['B1'].add(self.tiprack2, 'tiprack2')
 
-        self.p200 = instruments.Pipette(
+        self.p200 = pipette.Pipette(
+            self.robot,
             axis='b',
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1
@@ -1554,7 +1558,8 @@ class PipetteTest(unittest.TestCase):
         self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
     def test_tip_tracking_chain_multi_channel(self):
-        p200_multi = instruments.Pipette(
+        p200_multi = pipette.Pipette(
+            self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
             max_volume=200,
