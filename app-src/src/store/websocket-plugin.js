@@ -68,6 +68,7 @@ function WebSocketPlugin (socket) {
       if (data.name === 'run-finished') {
         store.commit(types.UPDATE_ROBOT_STATE, {'busy': false})
         store.commit(types.UPDATE_RUNNING, {'running': false})
+        store.commit(types.UPDATE_DETACHED, {'detached': false})
       }
       if (data.name === 'jupyter-upload') {
         console.log('JUPYTER UPLOAD HANDLER DISPATCHED W/', data)

@@ -78,7 +78,7 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
     serial_baudrate = None
 
     firmware_version = None
-    config_version = None
+    config_file_version = None
     ot_version = None
 
     def __init__(self, defaults):
@@ -366,11 +366,10 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
-        if not self.ot_version:
-            self.get_ot_version()
         coordinates = Vector(coordinates) * Vector(1, -1, -1)
         if mode == 'absolute':
-            offset = Vector(0, 1, 1) * self.ot_one_dimensions[self.ot_version]
+            offset = Vector(0, 1, 1)
+            offset *= self.ot_one_dimensions[self.get_ot_version()]
             coordinates += offset
         return coordinates
 
@@ -574,27 +573,29 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         return res
 
     def get_ot_version(self):
-        res = self.get_config_value(self.OT_VERSION)
-        self.ot_version = None
-        if res not in self.ot_one_dimensions:
-            log.debug('{} is not an ot_version'.format(res))
-            return None
-        self.ot_version = res
-        self.speeds = self.default_speeds[self.ot_version]
+        if not self.ot_version:
+            res = self.get_config_value(self.OT_VERSION)
+            if res not in self.ot_one_dimensions:
+                log.debug('{} is not an ot_version'.format(res))
+                return None
+            self.ot_version = res
+            self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):
-        res = self.send_command(self.GET_FIRMWARE_VERSION)
-        res = res.split(' ')[-1]
-        # the version is returned as a JSON dict, the version is a string
-        # but not wrapped in double-quotes as JSON requires...
-        # aka --> {"version":v1.0.5}
-        self.firmware_version = res.split(':')[-1][:-1]
+        if not self.firmware_version:
+            res = self.send_command(self.GET_FIRMWARE_VERSION)
+            res = res.split(' ')[-1]
+            # the version is returned as a JSON dict, the version is a string
+            # but not wrapped in double-quotes as JSON requires...
+            # aka --> {"version":v1.0.5}
+            self.firmware_version = res.split(':')[-1][:-1]
         return self.firmware_version
 
     def get_config_version(self):
-        res = self.get_config_value(self.CONFIG_VERSION)
-        self.config_file_version = res
+        if not self.config_file_version:
+            res = self.get_config_value(self.CONFIG_VERSION)
+            self.config_file_version = res
         return self.config_file_version
 
     def get_steps_per_mm(self, axis):

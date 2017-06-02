@@ -352,6 +352,11 @@ class Robot(object, metaclass=Singleton):
         self._driver = device
         self.smoothie_drivers['live'] = device
 
+        # set virtual smoothie do have same dimensions as real smoothie
+        ot_v = device.ot_version
+        self.smoothie_drivers['simulate'].ot_version = ot_v
+        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
+
     def _update_axis_homed(self, *args):
         for a in args:
             for letter in a:
@@ -744,7 +749,20 @@ class Robot(object, metaclass=Singleton):
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
-        self._driver = self.smoothie_drivers[mode]
+
+        d = self.smoothie_drivers[mode]
+
+        # set VirtualSmoothie's coordinates to be the same as physical robot
+        if d and d.is_simulating():
+            if self._driver and self._driver.is_connected():
+                d.connection.serial_port.set_position_from_arguments({
+                    ax.upper(): val
+                    for ax, val in self._driver.get_current_position().items()
+                })
+
+        self._driver = d
+        if self._driver and not self._driver.is_connected():
+            self._driver.toggle_port()
 
     def disconnect(self):
         """
