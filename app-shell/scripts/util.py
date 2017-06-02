@@ -1,6 +1,7 @@
 import platform
 import os
 import re
+import subprocess
 import time
 
 
@@ -11,6 +12,21 @@ def get_arch():
         return 'x64'
     if cpu_word_size == 32:
         return 'ia32'
+
+
+def get_branch():
+    """
+    Returns current branch in repo
+    """
+    return (
+        os.environ.get('APPVEYOR_REPO_BRANCH') or
+        os.environ.get('TRAVIS_BRANCH') or
+        get_cmd_value("git branch | grep \* | cut -d ' ' -f2").strip()  # TeamCity
+    )
+
+
+def get_cmd_value(cmd):
+    return subprocess.check_output(cmd, shell=True).decode()
 
 
 def get_os():
@@ -92,3 +108,30 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
     return None
 
 
+def republish_win_s3(yml_file, exe_file):
+    """
+    Temporary fix for: https://github.com/electron-userland/electron-builder/issues/1582
+    """
+
+    import tinys3
+    print(
+        '[Electron-S3-Republish] attempint to republish', yml_file, exe_file)
+
+    conn = tinys3.Connection(
+        os.environ.get('AWS_ACCESS_KEY'),
+        os.environ.get('AWS_SECRET_KEY'),
+        tls=True
+    )
+    channel = os.environ.get('CHANNEL')
+
+    conn.upload(
+        'channels/{}/{}'.format(channel, os.path.basename(yml_file)),
+        open(yml_file, 'rb'),
+        'ot-app-builds'
+    )
+
+    conn.upload(
+        'channels/{}/{}'.format(channel, os.path.basename(exe_file)),
+        open(exe_file, 'rb'),
+        'ot-app-builds'
+    )
