@@ -88,7 +88,6 @@ class SmoothiePlayer_2_0_0(object):
         self.send_command('upload /sd/protocol.gcode')
         for line in self.get_recorded_commands():
             self.connection.write_string(line)
-        self.connection.write_string('reset\r\n')  # reset smoothie
         self.send_command('\x04')
         time.sleep(0.5)
         self.connection.flush_input()
@@ -131,9 +130,8 @@ class SmoothiePlayer_2_0_0(object):
     def progress(self, timeout=5):
         self.connection.flush_input()
         p_data = self.send_command('progress', timeout=timeout)
-        while ('play' not in p_data.lower()
-                and 'file' not in p_data.lower()
-                and 'paused' not in p_data.lower()):
+        words = ['play', 'file', 'paused']
+        while len([s for s in words if s not in p_data.lower()]) == len(words):
             self.connection.wait_for_data(timeout=timeout)
             self.connection.serial_pause()
             p_data = self.connection.readline_string(timeout=timeout)

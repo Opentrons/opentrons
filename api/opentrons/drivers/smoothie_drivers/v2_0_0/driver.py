@@ -334,37 +334,43 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=0.5):
+    def wait_for_arrival(self, tolerance=1):
         target = self.get_target_position()
 
-        prev_max_diff = 0
+        prev_diff = 0
         did_move_timestamp = time.time()
+
         while True:
             self.check_paused_stopped()
-            self.connection.serial_pause()
+            try:
+                current = self.get_current_position()
+                diff = self._get_difference(current, target)
+                if diff < tolerance:
+                    return
+                if diff != prev_diff:
+                    did_move_timestamp = time.time()
+                prev_diff = diff
+                if diff > tolerance * 5:
+                    self.connection.serial_pause()
+            except Exception:
+                self.connection.serial_pause()
+                self.connection.flush_input()
 
-            current = self.get_current_position()
-            diff = {}
-            for axis in list(target.keys()):
-                diff[axis] = current[axis] - target[axis]
-            dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            diff_head = math.sqrt(dist)
-            diff_a = abs(diff.get('a', 0))
-            diff_b = abs(diff.get('b', 0))
-
-            max_diff = max(diff_head, diff_a, diff_b)
-
-            if max_diff < tolerance:
-                return
-            if max_diff != prev_max_diff:
-                did_move_timestamp = time.time()
-            prev_max_diff = max_diff
             if time.time() - did_move_timestamp > 1.0:
                 raise RuntimeError('Expected robot to move, please reconnect')
 
+    def _get_difference(self, c, t):
+        diff = {}
+        for axis in list(t.keys()):
+            diff[axis] = c.get(axis, t[axis]) - t[axis]
+        dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
+        diff_head = math.sqrt(dist)
+        diff_a = abs(diff.get('a', 0))
+        diff_b = abs(diff.get('b', 0))
+        return max(diff_head, diff_a, diff_b)
+
     def home(self, *axis):
 
-        self.send_halt_command()
         self.calm_down()
 
         axis_to_home = ''
@@ -649,7 +655,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 log.debug('{} is not an ot_version'.format(res))
                 return None
             self.ot_version = res
-            self.speeds = self.default_speeds[self.ot_version]
+            if not self.speeds:
+                self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):

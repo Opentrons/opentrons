@@ -31,7 +31,7 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'dill==0.2.5',
-    'requests>=2.12.4',
+    'requests==2.14.2',
     'pyserial==3.2.1']
 TEST_SUITE = 'nose.collector'
 

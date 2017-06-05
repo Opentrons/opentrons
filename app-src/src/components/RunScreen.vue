@@ -17,6 +17,9 @@
     methods: {
       clearRunScreen () {
         this.$store.dispatch('finishRun')
+        if (this.$store.state.detached) {
+          this.$store.dispatch('disconnectRobot')
+        }
       }
     },
     watch: {
