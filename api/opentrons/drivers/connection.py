@@ -8,7 +8,7 @@ log = get_logger(__name__)
 
 class Connection(object):
 
-    def __init__(self, sp, port='', baudrate=115200, timeout=0.02):
+    def __init__(self, sp, port='', baudrate=9600, timeout=0.02):
         sp.port = port
         sp.baudrate = baudrate
         sp.timeout = timeout

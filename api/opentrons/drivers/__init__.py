@@ -73,7 +73,7 @@ def get_serial_ports_list():
             if any([f in port for f in port_filter]):
                 s = serial.Serial()
                 c = connection.Connection(
-                    s, port=port, baudrate=115200, timeout=0.01)
+                    s, port=port, baudrate=9600, timeout=0.01)
                 c.open()
                 result.append(port)
         except Exception as e:
@@ -116,7 +116,7 @@ def get_virtual_driver(options):
 
 def get_serial_driver(port):
     s = serial.Serial()
-    c = connection.Connection(s, port=port, baudrate=115200, timeout=0.01)
+    c = connection.Connection(s, port=port, baudrate=9600, timeout=0.01)
     return get_driver(c)
 
 
