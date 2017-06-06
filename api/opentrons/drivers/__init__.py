@@ -122,6 +122,7 @@ def get_serial_driver(port):
 
 def get_driver(c):
     driver_class = drivers_by_version.get(get_version(c))
+    log.debug(driver_class)
     if not driver_class:
         raise RuntimeError(
             'Can not read version from port {}'.format(c.name()))
