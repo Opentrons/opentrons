@@ -181,6 +181,7 @@ class Robot(object, metaclass=Singleton):
             )
         }
         self._driver = None
+        self.arc_height = 5
         self.set_connection('simulate')
         self.reset()
 
@@ -598,7 +599,7 @@ class Robot(object, metaclass=Singleton):
 
         _, _, tallest_z = self._calibrated_max_dimension(
             ref_container, instrument)
-        tallest_z += 5
+        tallest_z += self.arc_height
 
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(tallest_z, robot_max_z)
@@ -664,7 +665,7 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event.update(kwargs)
 
         mode = 'live'
-        if self._driver.is_simulating():
+        if self.is_simulating():
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
@@ -923,6 +924,11 @@ class Robot(object, metaclass=Singleton):
 
     def is_connected(self):
         return self._driver.is_connected()
+
+    def is_simulating(self):
+        if not self._driver:
+            return False
+        return self._driver.is_simulating()
 
     def get_connected_port(self):
         return self._driver.get_connected_port()

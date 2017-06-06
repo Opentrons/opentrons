@@ -15,37 +15,40 @@ Download the zipped files from here:
 
 https://github.com/OpenTrons/smoothie-config/archive/2.0.0.zip
 
-After downloading, unpack the zip file to view its contents.
+After downloading, unpack the zip file to view its contents. The latest firmware files are found in folder "v2.0.0".
 
-Open the Smoothie's microSD Card
+Open the Smoothie's MicroSD Card
 ---------------------------------
 
-Power off your Opentrons liquid handler, remove the microSD card from the Smoothieboard. You will notice the microSD card shows up on the computer as a Mass Storage Device, like an external hard drive or flash drive.
+Power OFF and unplug your Opentrons liquid handler's USB cable. Remove the microSD card from Smoothieboard (just above the USB connector on the robot), and connect it to your personal computer or laptop. It will show up as a storage device on your computer.
 
 .. image:: img/update-firmware/firmware_files.png
 
-Open the microSD card drive on your computer to see it's ``FIRMWARE.CUR`` and ``config`` files. There might be other files there, but the two you need to worry about are ``FIRMWARE.CUR`` and ``config``, because these are what we will be replacing.
+Open the microSD storage device to see it's ``FIRMWARE.CUR`` and ``config`` files. There might be other files there, but the two you need to worry about are ``FIRMWARE.CUR`` and ``config``, because these are what we will be replacing.
 
-Select Your Robot's Model
+Select Your Model's Config
 ----------------------------------
 
-Opentrons `come in three models`__, the Standard, Pro, and Hood. Also, Opentrons has release the "plus" models which have faster motors than our previous robots. The "plus" models have an all black Z motor (up/down), while the original versions have a Z motor that looks similar to the rest of the robot's motors.
-
-If you received an OT-One after April 2015, then you have a "plus" model.
+Opentrons `come in three models`__, the Standard, Pro, and Hood. Each model requires a unique ``config`` and ``firmware.bin`` file to go along with it. Find the files that matches your robot (the folders are named after each model).
 
 __ https://opentrons.com/robots
 
+** Note: We have release a "Plus" version of our robots, which have faster motors. If you received a robot after April 2017, and if your robot's Z motor is all black (no silver on the outside) than you have a "Plus" model.
+
 .. image:: img/update-firmware/SelectConfigFile.png
 
-Drag both the ``config`` and ``firmware.bin`` files from the correct folder and to the Smoothie's microSD card driver. You will be overwriting the old ``config`` file, so your computer may ask if you would like to proceed with replacing it.
+Copy Over Files
+---------------------------------
+
+Drag both the ``config`` file and ``firmware.bin`` from the correct folder onto the microSD card. You will be overwriting the old ``config`` file, so your computer may ask if you would like to proceed with replacing it.
 
 .. image:: img/update-firmware/replaceConfig.png
 
-Your microSD card drive should now look like the following:
+The contents of the microSD card should now look like this:
 
 .. image:: img/update-firmware/dragFirmwareBin.png
 
-Update Robot
+Restart
 ---------------
 
-With the robot powered off, connect the microSD card. When the robots powers on, it will read the ``firmware.bin`` file, then save it as `FIRMWARE.CUR`. It will then read the new ``config`` file, and your liquid handler now has updated firmware. Celebrate with a cold beverage!
+Unmount the Smoothie's microSD card from your computer, and connect it back to your powered OFF robot. When the robot powers on, it will read the ``firmware.bin`` file, then save it as ``FIRMWARE.CUR``. It will then read the new ``config`` file, and your liquid handler now has updated firmware.
