@@ -137,6 +137,7 @@ def get_version(c):
     c.write_string('version \r\n')
     c.wait_for_data(timeout=3)
     response = c.readline_string()
+    log.debug("VERSION RESPONSE: %s" % response)
     c.flush_input()
 
     # {"version":v1.0.5}
