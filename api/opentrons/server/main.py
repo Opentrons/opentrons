@@ -17,6 +17,7 @@ from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
+from opentrons.drivers.smoothie_drivers.v2_0_0 import player
 
 sys.path.insert(0, os.path.abspath('..'))  # NOQA
 from opentrons.server import helpers
@@ -24,8 +25,12 @@ from opentrons.server import helpers
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
+
 BACKGROUND_TASKS = {}
 CACHED_ROBOT_VERSIONS = ''
+
+exit_threads = threading.Event()
+exit_threads.clear()
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
@@ -60,7 +65,14 @@ def welcome():
 
 @app.route("/exit")
 def exit():
-    sys.exit()
+    # stop any active threads
+    exit_threads.set()  # stop detached run thread
+    Robot.get_instance().stop()  # stops attached run thread
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        sys.exit()
+    func()
+    return 'Server shutting down...'
 
 
 def get_protocol_locals():
@@ -275,6 +287,91 @@ def run_home():
     robot = Robot.get_instance()
     robot.home()
     return run()
+
+
+def _detached_progress():
+    robot = Robot.get_instance()
+    while not exit_threads.is_set():
+        res = robot._driver.smoothie_player.progress(timeout=20)
+        if not res.get('file'):
+            return
+        percentage = '{}%'.format(round(res.get('percentage', 0) * 100, 2))
+
+        def _seconds_to_string(sec):
+            hours = int(sec / (60 * 60))
+            hours = str(hours) if hours > 9 else '0{}'.format(hours)
+            minutes = int(sec / 60) % 60
+            minutes = str(minutes) if minutes > 9 else '0{}'.format(minutes)
+            seconds = sec % 60
+            seconds = str(seconds) if seconds > 9 else '0{}'.format(seconds)
+            return (hours, minutes, seconds)
+
+        h, m, s = _seconds_to_string(res.get('elapsed_time'))
+        progress_data = 'Protocol {} Complete - Elapsed Time {}:{}:{}'.format(
+            percentage, h, m, s)
+
+        if res.get('estimated_time'):
+            h, m, s = _seconds_to_string(res.get('estimated_time'))
+            progress_data += ' - Estimated Time Left {}:{}:{}'.format(h, m, s)
+
+        d = {
+            'caller': 'ui',
+            'mode': 'live',
+            'name': 'command-run',
+            'command_description': progress_data
+        }
+        notify(d)
+
+
+def _run_detached():
+    try:
+        robot = Robot.get_instance()
+        p = player.SmoothiePlayer_2_0_0()
+
+        d = {'caller': 'ui', 'mode': 'live', 'name': 'command-run'}
+        d.update({
+            'command_description': 'Simulating, please wait...'
+        })
+        notify(d)
+
+        robot.smoothie_drivers['simulate'].record_start(p)
+        robot.simulate()
+        robot.smoothie_drivers['simulate'].record_stop()
+
+        d.update({
+            'command_description': 'Saving file to robot, please wait...'
+        })
+        notify(d)
+
+        robot._driver.play(p)
+
+        d.update({
+            'command_description': 'Protocol running, unplug USB at any time.'
+        })
+        notify(d)
+        d.update({
+            'command_description': 'To stop, unplug USB and power robot OFF'
+        })
+        notify(d)
+
+        _detached_progress()
+
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+    socketio.emit('event', {'name': 'run-finished'})
+
+
+@app.route("/run_detached", methods=["GET"])
+def run_detached():
+    threading.Thread(target=_run_detached).start()
+    return flask.jsonify({'status': 'success', 'data': {}})
+
+
+@app.route("/run_home_detached", methods=["GET"])
+def run_home_detached():
+    robot = Robot.get_instance()
+    robot.home()
+    return run_detached()
 
 
 @app.route("/pause", methods=["GET"])

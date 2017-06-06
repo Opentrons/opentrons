@@ -19,7 +19,7 @@ api-valid-exe:
 
 # Note(ahmed) Integration tests do not pass on windows
 app-shell: app-shell-setup app-shell-e2e-test app-shell-build
-app-shell-win: app-shell-setup app-shell-build
+app-shell-win: app-shell-setup app-shell-build-win
 
 app-shell-setup:
 	cd app-shell &&\
@@ -32,6 +32,12 @@ app-shell-setup:
 app-shell-build:
 	cd app-shell &&\
 		npm run build:frontend &&\
+		ls dist/* &&\
+		ls releases
+
+app-shell-build-win:
+	cd app-shell &&\
+		npm run build:frontend:win &&\
 		ls dist/* &&\
 		ls releases
 

@@ -12,9 +12,16 @@ div#nav-spacer.nav-open {
     text-decoration: none;
 }
 
-header nav ul li a.active{
+header nav ul li ul li a:hover, header nav ul li ul li a.active:hover{
   text-decoration: none;
+  color: black;
 }
+
+header nav ul li a:hover, header nav ul li a.active:hover{
+  text-decoration: none;
+  color: black;
+}
+
 @media screen and (max-width: 875px),
 (max-device-width: 767px) {
 	header{

@@ -160,11 +160,16 @@ class Pipette(Instrument):
         Overwrites :any:`Instrument` method, setting the plunger positions
         to simulation defaults
         """
+        defaults = {
+            'top': 0,
+            'bottom': 10,
+            'blow_out': 12,
+            'drop_tip': 14
+        }
         self.calibrated_positions = copy.deepcopy(self.positions)
-        self.positions['top'] = 0
-        self.positions['bottom'] = 10
-        self.positions['blow_out'] = 12
-        self.positions['drop_tip'] = 14
+        for i, p in enumerate(defaults.keys()):
+            if self.positions.get(p) is None:
+                self.positions[p] = defaults[p]
 
     def teardown_simulate(self):
         """
@@ -998,8 +1003,6 @@ class Pipette(Instrument):
 
             for i in range(int(presses) - 1):
                 self.robot.move_head(z=tip_plunge, mode='relative')
-                self.robot.move_head(z=-tip_plunge - 1, mode='relative')
-                self.robot.move_head(z=tip_plunge + 1, mode='relative')
                 self.robot.move_head(z=-tip_plunge, mode='relative')
 
         _description = "Picking up tip {0}".format(

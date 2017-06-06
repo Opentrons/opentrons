@@ -85,11 +85,21 @@ const actions = {
     commit(types.RESET_RUN_LOG)
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     if (window.confirm('About to run protocol. Home robot before running?')) {
-      console.log('one')
       Opentrons.runHomeProtocol()
     } else {
-      console.log('two')
       Opentrons.runProtocol()
+    }
+  },
+  runDetached ({ commit }) {
+    commit(types.UPDATE_RUNNING, {'running': false})
+    commit(types.UPDATE_PROTOCOL_FINISHED, {'running': true})
+    commit(types.UPDATE_DETACHED, {'detached': true})
+    commit(types.RESET_RUN_LOG)
+    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
+    if (window.confirm('About to run protocol. Home robot before running?')) {
+      Opentrons.runHomeDetached()
+    } else {
+      Opentrons.runDetached()
     }
   },
   pauseProtocol ({ commit }) {

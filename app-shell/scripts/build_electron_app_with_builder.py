@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from collections import OrderedDict
 import glob
 import json
 import os
@@ -11,6 +12,7 @@ import time
 
 
 import util
+import cantor
 
 
 script_tag = "[OT-App frontend build] "
@@ -28,10 +30,16 @@ def get_app_version():
     Get the OT App version as specified in the electron package.json file
     :return: string of app version
     """
-
     app_json_path = os.path.join(project_root_dir, "app", "package.json")
     with open(app_json_path, 'r') as json_file:
-        return json.load(json_file).get('version')
+        app_json = json.load(json_file, object_pairs_hook=OrderedDict)
+
+    real_app_version = app_json['version']
+    app_json['version'] = fake_app_version
+    with open(app_json_path, 'w') as json_file:
+        json.dump(app_json, json_file, indent=2)
+
+    return real_app_version
 
 
 def remove_directory(dir_to_remove):
@@ -134,23 +142,36 @@ def build_electron_app():
 
     platform_type = util.get_os()
     process_args = [
-        which("build"),
-        os.path.join(project_root_dir, "app"),
+        os.path.join(project_root_dir, 'app'),
         "--{}".format(platform_type),
-        "--{}".format(util.get_arch()),
+        "--{}".format(util.get_arch())
     ]
-
     print(process_args)
 
     if platform_type in {'mac'}:
-        electron_builder_process = subprocess.Popen(process_args)
+        electron_builder_process = subprocess.Popen(
+            process_args, env=os.environ.copy()
+        )
     elif platform_type in {'win', 'linux'}:
-        electron_builder_process = subprocess.Popen(process_args, shell=True)
+        electron_builder_process = subprocess.Popen(
+            process_args, shell=True, env=os.environ.copy()
+        )
 
     electron_builder_process.communicate()
 
     if electron_builder_process.returncode != 0:
         raise SystemExit(script_tag + 'Failed to properly build electron app')
+
+    # Run windows repulish
+    if platform_type == 'win' and 'always' in process_args:
+        print(os.listdir(os.path.join(project_root_dir, 'dist')))
+        yml_file = os.path.join(
+            project_root_dir, 'dist', '{}.yml'.format(os.environ['CHANNEL'])
+        )
+        exe_file = glob.glob(
+            os.path.join(project_root_dir, 'dist', '*.exe')
+        )[0]
+        util.republish_win_s3(yml_file, exe_file)
 
     print(script_tab + 'electron-builder process completed successfully')
 
@@ -167,11 +188,11 @@ def clean_build_dist(build_tag):
 
     platform_type = util.get_os()
     if platform_type == "win":
-        platform_dist_dir = "win"
+        platform_dist_dir = ""
     elif platform_type == "linux":
         platform_dist_dir = "linux-unpacked"
     elif platform_type == "mac":
-        platform_dist_dir = "mac"
+        platform_dist_dir = ""
 
     electron_builder_dist = os.path.join(project_root_dir, "dist", platform_dist_dir)
     print(script_tab + 'Contents electron-builder dist dir: {}'.format(
@@ -232,6 +253,8 @@ def clean_build_dist(build_tag):
 
 
 if __name__ == '__main__':
+    print('Detected branch is', util.get_branch(), util.get_branch() == 'master')
+    get_app_version()
     build_electron_app()
     build_tag = get_build_tag(util.get_os())
     clean_build_dist(build_tag)

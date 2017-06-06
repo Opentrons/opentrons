@@ -1,5 +1,7 @@
 import time
 
+from serial import SerialException
+
 from opentrons.util.log import get_logger
 
 
@@ -21,12 +23,12 @@ class Connection(object):
         return str(self.serial_port.port)
 
     def open(self):
-        if not self.serial_port.isOpen():
-            self.serial_port.open()
-
-    def close(self):
         if self.serial_port.isOpen():
             self.serial_port.close()
+        self.serial_port.open()
+
+    def close(self):
+        self.serial_port.close()
 
     def isOpen(self):
         return self.serial_port.isOpen()
@@ -34,11 +36,8 @@ class Connection(object):
     def serial_pause(self):
         time.sleep(self.serial_port.timeout)
 
-    def wait_for_write(self):
-        self.serial_port.flush()
-
     def data_available(self):
-        return bool(self.serial_port.in_waiting)
+        return int(self.serial_port.in_waiting)
 
     def flush_input(self):
         while self.data_available():
@@ -53,9 +52,21 @@ class Connection(object):
         raise RuntimeWarning(
             'No data after {} second(s)'.format(timeout))
 
-    def readline_string(self):
-        return str(self.serial_port.readline().decode().strip())
+    def readline_string(self, timeout=30):
+        end_time = time.time() + timeout
+        while end_time > time.time():
+            self.wait_for_data(timeout=timeout)
+            try:
+                res = str(self.serial_port.readline().decode().strip())
+            except SerialException:
+                self.close()
+                self.open()
+                return self.readline_string(timeout=end_time - time.time())
+            if res:
+                return res
+        raise RuntimeWarning(
+            'No new line from Smoothie after {} second(s)'.format(timeout))
 
     def write_string(self, data_string):
         self.serial_port.write(data_string.encode())
-        self.wait_for_write()
+        self.serial_port.flush()

@@ -24,21 +24,21 @@ class InstrumentMosfet(object):
     Provides access to MagBead's MOSFET.
     """
 
-    def __init__(self, driver, mosfet_index):
-        self.motor_driver = driver
+    def __init__(self, this_robot, mosfet_index):
+        self.robot = this_robot
         self.mosfet_index = mosfet_index
 
     def engage(self):
         """
         Engages the MOSFET.
         """
-        self.motor_driver.set_mosfet(self.mosfet_index, True)
+        self.robot._driver.set_mosfet(self.mosfet_index, True)
 
     def disengage(self):
         """
         Disengages the MOSFET.
         """
-        self.motor_driver.set_mosfet(self.mosfet_index, False)
+        self.robot._driver.set_mosfet(self.mosfet_index, False)
 
     def wait(self, seconds):
         """
@@ -49,15 +49,15 @@ class InstrumentMosfet(object):
         seconds : int
             Number of seconds to pause for.
         """
-        self.motor_driver.wait(seconds)
+        self.robot._driver.wait(seconds)
 
 
 class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
-    def __init__(self, driver, axis):
-        self.motor_driver = driver
+    def __init__(self, this_robot, axis):
+        self.robot = this_robot
         self.axis = axis
 
     def move(self, value, mode='absolute'):
@@ -71,7 +71,7 @@ class InstrumentMotor(object):
         mode : {'absolute', 'relative'}
         """
         kwargs = {self.axis: value}
-        self.motor_driver.move_plunger(
+        self.robot._driver.move_plunger(
             mode=mode, **kwargs
         )
 
@@ -79,7 +79,7 @@ class InstrumentMotor(object):
         """
         Home plunger motor.
         """
-        self.motor_driver.home(self.axis)
+        self.robot._driver.home(self.axis)
 
     def wait(self, seconds):
         """
@@ -90,7 +90,7 @@ class InstrumentMotor(object):
         seconds : int
             Number of seconds to pause for.
         """
-        self.motor_driver.wait(seconds)
+        self.robot._driver.wait(seconds)
 
     def speed(self, rate):
         """
@@ -100,7 +100,7 @@ class InstrumentMotor(object):
         ----------
         rate : int
         """
-        self.motor_driver.set_plunger_speed(rate, self.axis)
+        self.robot._driver.set_plunger_speed(rate, self.axis)
         return self
 
 
@@ -181,6 +181,7 @@ class Robot(object, metaclass=Singleton):
             )
         }
         self._driver = None
+        self.arc_height = 5
         self.set_connection('simulate')
         self.reset()
 
@@ -296,7 +297,7 @@ class Robot(object, metaclass=Singleton):
 
         motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
         if not motor_obj:
-            motor_obj = InstrumentMosfet(self._driver, mosfet_index)
+            motor_obj = InstrumentMosfet(self, mosfet_index)
             self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
         return motor_obj
 
@@ -314,7 +315,7 @@ class Robot(object, metaclass=Singleton):
 
         motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
         if not motor_obj:
-            motor_obj = InstrumentMotor(self._driver, axis)
+            motor_obj = InstrumentMotor(self, axis)
             self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
         return motor_obj
 
@@ -351,6 +352,11 @@ class Robot(object, metaclass=Singleton):
 
         self._driver = device
         self.smoothie_drivers['live'] = device
+
+        # set virtual smoothie do have same dimensions as real smoothie
+        ot_v = device.ot_version
+        self.smoothie_drivers['simulate'].ot_version = ot_v
+        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -593,7 +599,7 @@ class Robot(object, metaclass=Singleton):
 
         _, _, tallest_z = self._calibrated_max_dimension(
             ref_container, instrument)
-        tallest_z += 5
+        tallest_z += self.arc_height
 
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(tallest_z, robot_max_z)
@@ -659,7 +665,7 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event.update(kwargs)
 
         mode = 'live'
-        if self._driver.is_simulating():
+        if self.is_simulating():
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
@@ -744,7 +750,20 @@ class Robot(object, metaclass=Singleton):
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
-        self._driver = self.smoothie_drivers[mode]
+
+        d = self.smoothie_drivers[mode]
+
+        # set VirtualSmoothie's coordinates to be the same as physical robot
+        if d and d.is_simulating():
+            if self._driver and self._driver.is_connected():
+                d.connection.serial_port.set_position_from_arguments({
+                    ax.upper(): val
+                    for ax, val in self._driver.get_current_position().items()
+                })
+
+        self._driver = d
+        if self._driver and not self._driver.is_connected():
+            self._driver.toggle_port()
 
     def disconnect(self):
         """
@@ -905,6 +924,11 @@ class Robot(object, metaclass=Singleton):
 
     def is_connected(self):
         return self._driver.is_connected()
+
+    def is_simulating(self):
+        if not self._driver:
+            return False
+        return self._driver.is_simulating()
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
