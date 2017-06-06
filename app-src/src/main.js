@@ -6,6 +6,7 @@ import { getUserId } from './util'
 import {
   TaskView,
   WelcomeView,
+  VolumeView,
   App
 } from './components/export'
 import { loginRoute, logoutRoute } from './login-routes'
@@ -18,6 +19,7 @@ const router = new VueRouter({
     { name: 'welcome', path: '/', component: WelcomeView },
     { name: 'instrument', path: '/calibrate/:instrument', component: TaskView },
     { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: TaskView },
+    { name: 'placeable', path: '/volume/:instrument', component: VolumeView },
     loginRoute,
     logoutRoute
   ],

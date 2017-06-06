@@ -14,3 +14,4 @@ export {default as Run} from './Run.vue'
 
 export {default as TaskView} from './TaskView.vue'
 export {default as WelcomeView} from './WelcomeView.vue'
+export {default as VolumeView} from './VolumeView.vue'

@@ -1,4 +1,4 @@
-section#welcome-view {
+section#welcome-view, section#volume-view {
     width: 700px;
     height: 376px;
     padding: 10px;
@@ -6,6 +6,14 @@ section#welcome-view {
     border: 2px solid $well-bg;
     border-radius: 6px;
 }
+
+section#volume-view{
+    button{
+        min-width: $btn-size*2;
+    }
+}
+
+
 
 section#task-view {
     width: 725px;

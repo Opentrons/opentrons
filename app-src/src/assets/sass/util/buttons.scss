@@ -51,7 +51,8 @@ button {
 .btn-run,
 .btn-play,
 .btn-pause,
-.btn-clear {
+.btn-clear,
+.btn-vol {
     min-width: $btn-size*3;
     height: $btn-size;
     margin: $gutter-width;
