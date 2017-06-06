@@ -2,7 +2,8 @@
   <div class="instrument-calibration" >
     <button @click="calibrateInstrument(instrument.axis, position)" class='btn-calibrate save'>SAVE {{position | prettify}}</button>
     <button @click="moveToPlungerPosition(instrument.axis, position)" :class="[{'disabled': !instrument.calibrated}, 'btn-calibrate', 'move-to']">MOVE TO {{position | prettify}}</button>
-    <router-link :to="'/volume/' + instrument.axis">Calibrate Volume</router-link>
+    <p>Current Max Volume: {{instrument.max_volume}} <router-link :to="'/volume/' + instrument.axis">Calibrate Volume</router-link></p>
+    
   </div>
 </template>
 

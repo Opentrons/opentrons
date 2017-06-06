@@ -5,14 +5,39 @@
         <h2>Push on a tip</h2>
         <button class="btn-vol" @click="currentStep = 'source'">OK</button>
       </div>
+
+  
+    <!-- TODO: get current location if checked, pass to set source method -->
       <div class="source" v-if="currentStep == 'source'">
-        <h2>Select source Container/Well or current location</h2>
+        <h2>Select source Container/Well</h2>
+        <br>
+        <input type="checkbox" v-model="useCurrentSource"><label>Use Current Location</label>
+        <h3>or</h3>
+        <select v-model='sourceContainer'>
+          <option value='Select Source Container'>Select Source Container</option>
+          <option v-for='container in deck'> {{ container.label }}</option>
+        </select>
+        <label>Enter Well Location</label>
+        <input type="text" v-model="sourceWell" value="">
         <button class="btn-vol" @click="currentStep = 'destination'">Aspirate</button>
       </div>
+
+      <!-- TODO: get current location if checked, pass to set destination method -->
       <div class="destination" v-if="currentStep == 'destination'">
-        <h2>Select destination Container/Well or current location</h2>
+        <h2>Select destination Container/Well</h2>
+        <br>
+        <input type="checkbox" v-model="useCurrentDestination"><label>Use Current Location</label>
+        <h3>or</h3>
+        <select v-model='destinationContainer'>
+          <option value='Select Destination Container'>Select Destination Container</option>
+          <option v-for='container in deck'> {{ container.label }}</option>
+        </select>
+        <label>Enter Well Location</label>
+        <input type="text" v-model="destinationWell" value="">
         <button class="btn-vol" @click="currentStep = 'enter-volume'">Dispense</button>
       </div>
+
+
       <div class="enter-volume" v-if="currentStep == 'enter-volume'">
         <h2>Enter volume (or redo)</h2>
         <button class="btn-vol" @click="currentStep = 'source'">Redo</button>
@@ -31,7 +56,13 @@
     data () {
       return {
         currentStep: 'add-tip',
-        volume: 0
+        volume: 0,
+        sourceContainer: 'Select Source Container',
+        sourceWell: '',
+        destinationContainer: 'Select Destination Container',
+        destinationWell: '',
+        useCurrentSource: 'false',
+        useCurrentDestination: 'false'
       }
     },
     computed: {
@@ -39,6 +70,9 @@
         return this.$store.state.tasks.instruments.filter((instrument) => {
           return instrument.axis === this.$route.params.instrument
         })[0]
+      },
+      deck () {
+        return this.$store.state.tasks.deck
       }
     },
     methods: {

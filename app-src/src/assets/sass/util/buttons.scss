@@ -15,6 +15,23 @@ input {
     color: $primary-text;
 }
 
+select {
+    flex: 0 0;
+    background: white;
+    border-radius: 6px;
+    border: 2px solid lighten($btn-jog, 15%);
+    -webkit-appearance: none;
+    outline: none;
+    color: white;
+    height: $btn-size;
+    min-width: 6*$btn-size;
+    padding-left: 10px;
+    background-image: url("../assets/img/caret.png");
+    background-repeat: no-repeat;
+    background-position: 95% 50%;
+    color: $btn-jog;
+}
+
 button {
     background-color: $well-bg;
     &:focus {
@@ -153,3 +170,13 @@ input[type="radio"]:checked + label span {
     -moz-transition: background-color 0.4s linear;
     transition: background-color 0.4s linear;
 }
+
+input[type="checkbox"]{
+    height:12px;  margin-right:10px;
+    padding:10px;
+}
+
+input[type="checkbox"] + label{
+    line-height: 20px;
+}
+
