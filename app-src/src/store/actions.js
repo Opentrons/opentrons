@@ -127,10 +127,6 @@ const actions = {
       commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     })
   },
-  runDetached ({ commit }) {
-    commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-    Opentrons.runDetached()
-  },
   runProtocol ({ commit }) {
     commit(types.UPDATE_RUNNING, {'running': true})
     commit(types.UPDATE_PROTOCOL_FINISHED, {'running': true})
