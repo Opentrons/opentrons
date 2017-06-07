@@ -16,7 +16,7 @@
         <li @click="modePlunger(instrument.axis, 'top')" class="top" :class="{calibrated: isCalibrated('top')}">Top </li>
         <li @click="modePlunger(instrument.axis, 'bottom')" class="bottom" :class="{calibrated: isCalibrated('bottom')}">Bottom</li>
         <li @click="modePlunger(instrument.axis, 'blow_out')" class="blow_out" :class="{calibrated: isCalibrated('blow_out')}">Blowout</li>
-        <li @click="modePlunger(instrument.axis, 'drop_tip')" class="drop_tip" :class="{calibrated: isCalibrated('dorp_tip')}">Drop Tip</li>
+        <li @click="modePlunger(instrument.axis, 'drop_tip')" class="drop_tip" :class="{calibrated: isCalibrated('drop_tip')}">Drop Tip</li>
       </ul>
     </div>
     <div class="plunger-img">

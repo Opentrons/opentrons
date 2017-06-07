@@ -2,7 +2,11 @@
   <div class="instrument-calibration" >
     <button @click="calibrateInstrument(instrument.axis, position)" class='btn-calibrate save'>SAVE {{position | prettify}}</button>
     <button @click="moveToPlungerPosition(instrument.axis, position)" :class="[{'disabled': !instrument.calibrated}, 'btn-calibrate', 'move-to']">MOVE TO {{position | prettify}}</button>
-    <p>Current Max Volume: {{instrument.max_volume}} <router-link :to="'/volume/' + instrument.axis">Calibrate Volume</router-link></p>
+    <span v-if="instrument.calibrated">
+    <label>Current Max Volume: {{instrument.max_volume}} </label>
+    <router-link :to="'/volume/' + instrument.axis" class="btn">Calibrate Volume</router-link>
+    </span>
+    
     
   </div>
 </template>
@@ -15,7 +19,6 @@
     props: ['instrument', 'position'],
     data () {
       return {
-
       }
     },
     filters: {

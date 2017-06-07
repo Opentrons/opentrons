@@ -171,12 +171,62 @@ input[type="radio"]:checked + label span {
     transition: background-color 0.4s linear;
 }
 
-input[type="checkbox"]{
-    height:12px;  margin-right:10px;
-    padding:10px;
-}
+  $radius: 20px;
 
-input[type="checkbox"] + label{
-    line-height: 20px;
+/*** Radio/Checkbox Override ***/
+
+label {
+    display: inline-block;
+    cursor: pointer;
+    /* Accessible Hidden Radio/Checkbox */
+    input[type="radio"],
+    input[type="checkbox"] {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+    input[type="radio"] + span,
+    input[type="checkbox"] + span {
+        text-align: center;
+        margin-right: 10px;
+        &:before {
+            content: '';
+            display: inline-block;
+            width: $radius;
+            height: $radius;
+            vertical-align: -$radius/4;
+            border-radius: $radius/2;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #000;
+            margin-right: 10px;
+            transition: 0.5s ease all;
+        }
+    }
+    input[type="checkbox"] + span:before {
+        border-radius: 6px;
+    }
+    input:checked + span:before {
+        background: $primary-brand;
+        box-shadow: 0 0 0 4px #000;
+        font-size: 18px;
+    }
+    input[type="checkbox"]:checked + span:before {
+        content: '\2713';
+        color: white;
+    }
+    input[type="checkbox"]:focus + span:before {
+        outline: none;
+        margin-top: 0px;
+    }
+    input[type="checkbox"] + span{
+        font-size: 14px;
+
+
+    }
 }
 

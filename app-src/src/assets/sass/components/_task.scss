@@ -8,8 +8,26 @@ section#welcome-view, section#volume-view {
 }
 
 section#volume-view{
+    position: relative;
     button{
-        min-width: $btn-size*2;
+        width: $btn-size*3;
+        text-transform: uppercase;
+    }
+    button.next{
+        position: absolute;
+        bottom:50px;
+        right: 50px;
+    }
+    button.close{
+        font-size: 24px;
+        line-height: 26px;
+        height: 32px;
+        max-width: 32px;
+        border-radius: 16px;
+        float: right;
+        color: $btn-jog;
+        border:2px solid $btn-jog;
+
     }
 }
 
@@ -47,6 +65,35 @@ section#task-view {
         #a{
             float: right;
         }
+        a.btn, label{
+            display: inline-block;
+            vertical-align: top;
+            
+          
+          height: 30px;
+          line-height: 30px;
+          
+          margin: 4px;
+          
+
+          
+          text-transform: uppercase;
+          
+        }
+        label{
+            width:160px;
+            padding-left: 2px;
+        }
+        a.btn{
+            width:130px;
+            padding: 0px 15px;
+                      border-radius: 6px;
+          text-align: center;
+          text-decoration: none;
+            color: white;
+            background-color: $secondary-brand;
+        }
+
     }
     section#placeable-pane {
         h1 {
@@ -158,7 +205,8 @@ div.pipette-modal {
 }
 
 .instrument-calibration{ 
-    padding:45px 5px 5px;
+    padding:25px 5px 5px;
+
 }
 
 .placeable-calibration{
