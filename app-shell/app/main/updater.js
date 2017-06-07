@@ -7,7 +7,7 @@ var UPDATE_SERVER_URL = 'http://ot-app-releases-2.herokuapp.com'
 
 function initAutoUpdater () {
   const mainLogger = getLogger('electron-main')
-  mainLogger.info('starting ')
+  mainLogger.info('Initializing Audo Updater')
 
   autoUpdater.on(
     'error',
