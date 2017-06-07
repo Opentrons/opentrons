@@ -70,7 +70,7 @@ deploy:
   # Publish API to PyPI and Anaconda
   - provider: script
     skip_cleanup: true
-    script: api/scripts/publish.sh
+    script: cd api && api/scripts/publish.sh && cd ..
     on:
       tags: true
 
