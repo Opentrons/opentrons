@@ -1,4 +1,5 @@
-section#welcome-view, section#volume-view {
+section#welcome-view,
+section#volume-view {
     width: 700px;
     height: 376px;
     padding: 10px;
@@ -7,18 +8,18 @@ section#welcome-view, section#volume-view {
     border-radius: 6px;
 }
 
-section#volume-view{
+section#volume-view {
     position: relative;
-    button{
+    button {
         width: $btn-size*3;
         text-transform: uppercase;
     }
-    button.next{
+    button.next {
         position: absolute;
-        bottom:50px;
+        bottom: 50px;
         right: 50px;
     }
-    button.close{
+    button.close {
         font-size: 24px;
         line-height: 26px;
         height: 32px;
@@ -26,12 +27,9 @@ section#volume-view{
         border-radius: 16px;
         float: right;
         color: $btn-jog;
-        border:2px solid $btn-jog;
-
+        border: 2px solid $btn-jog;
     }
 }
-
-
 
 section#task-view {
     width: 725px;
@@ -51,49 +49,41 @@ section#task-view {
         }
     }
     section#instrument-pane {
-            margin: 0;
-        .pipette-btns{
+        margin: 0;
+        .pipette-btns {
             display: block;
-            width:100%;
+            width: 100%;
             clear: both;
         }
-        .pipette-btns:after{
+        .pipette-btns:after {
             content: '';
             clear: both;
-
         }
-        #a{
+        #a {
             float: right;
         }
-        a.btn, label{
+        a.btn,
+        label {
             display: inline-block;
             vertical-align: top;
-            
-          
-          height: 30px;
-          line-height: 30px;
-          
-          margin: 4px;
-          
-
-          
-          text-transform: uppercase;
-          
+            height: 30px;
+            line-height: 30px;
+            margin: 4px;
+            text-transform: uppercase;
         }
-        label{
-            width:160px;
+        label {
+            width: 160px;
             padding-left: 2px;
         }
-        a.btn{
-            width:130px;
+        a.btn {
+            width: 130px;
             padding: 0px 15px;
-                      border-radius: 6px;
-          text-align: center;
-          text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            text-decoration: none;
             color: white;
             background-color: $secondary-brand;
         }
-
     }
     section#placeable-pane {
         h1 {
@@ -125,7 +115,7 @@ button.tab {
 }
 
 div.pipette-modal {
-    width:100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -135,21 +125,21 @@ div.pipette-modal {
         height: 190px;
         ul {
             list-style-type: none;
-            padding-left:5px;
-            margin:0;
+            padding-left: 5px;
+            margin: 0;
             li {
                 line-height: 47px;
                 font-size: 14px;
                 color: $secondary-brand;
                 text-decoration: underline;
-                padding-left:20px;
+                padding-left: 20px;
                 cursor: pointer;
-                &.calibrated:after{
+                &.calibrated:after {
                     content: "\2713";
                     font-size: 16px;
                     color: $secondary-brand;
-                    float:right;
-                    padding-right:20px;
+                    float: right;
+                    padding-right: 20px;
                     text-decoration: none;
                 }
             }
@@ -204,11 +194,10 @@ div.pipette-modal {
     }
 }
 
-.instrument-calibration{ 
-    padding:25px 5px 5px;
-
+.instrument-calibration {
+    padding: 25px 5px 5px;
 }
 
-.placeable-calibration{
-     padding:0 5px;
+.placeable-calibration {
+    padding: 0 5px;
 }
