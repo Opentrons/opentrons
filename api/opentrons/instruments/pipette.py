@@ -83,8 +83,16 @@ class Pipette(Instrument):
         self.axis = axis
         self.channels = channels
 
+        self.min_volume = min_volume
+        self.max_volume = max_volume or (min_volume + 1)
+
         if not name:
-            name = self.__class__.__name__
+            name = '{0}-{1}_{2}-channel_{3}-{4}uL'.format(
+                self.__class__.__name__,
+                self.axis.upper(),
+                self.channels,
+                self.min_volume,
+                self.max_volume)
         self.name = name
 
         if isinstance(trash_container, Container) and len(trash_container) > 0:
@@ -109,9 +117,6 @@ class Pipette(Instrument):
             'aspirate': aspirate_speed,
             'dispense': dispense_speed
         }
-
-        self.min_volume = min_volume
-        self.max_volume = max_volume or (min_volume + 1)
 
         self.positions = {
             'top': None,
@@ -895,7 +900,7 @@ class Pipette(Instrument):
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
-        >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
+        >>> p200 = instruments.Pipette(axis='a', max_volume=200, tip_racks=[tiprack])  # noqa
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
