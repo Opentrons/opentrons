@@ -603,13 +603,14 @@ class Robot(object, metaclass=Singleton):
 
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(tallest_z, robot_max_z)
+        arrival_z = min(destination[2], robot_max_z)
 
         self._previous_container = this_container
 
         return [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
-            {'z': destination[2]}
+            {'z': arrival_z}
         ]
 
     @property
