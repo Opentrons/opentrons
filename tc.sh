@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+echo "foo fooo fooo"
+
 # Enable nvm
 mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh && nvm alias default 6.0.0
 npm config set python /usr/bin/python
