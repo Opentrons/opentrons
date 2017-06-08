@@ -68,11 +68,11 @@ deploy:
       all_branches: true
 
   # Publish API to PyPI and Anaconda
-  - provider: script
-    skip_cleanup: true
-    script: cd api && scripts/publish.sh && cd ..
-    on:
-      tags: true
+  # - provider: script
+  #   skip_cleanup: true
+  #   script: cd api && scripts/publish.sh && cd ..
+  #   on:
+  #     tags: true
 
 env:
   global:
