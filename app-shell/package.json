@@ -1,18 +1,12 @@
 {
   "scripts": {
     "postinstall": "install-app-deps",
+    "build": "python3 scripts/build_electron_app_with_builder.py",
     "clean": "rm -rf ./out && rm -rf ./releases/*",
-    "build:frontend": "python3 scripts/build_electron_app_with_builder.py",
-    "release": "npm run build:backend && npm run build:frontend",
-    "build:frontend:posix": "python3 scripts/build_electron_app_with_builder.py",
-    "build:frontend:win": "C:\\Python35\\python scripts\\build_electron_app_with_builder.py",
-    "publish:posix": "python3 scripts/release_stable.py",
-    "publish:win": "C:\\Python35\\python scripts\\release_stable.py",
-    "release:posix": "npm run build:env:posix && npm run build:backend:posix && npm run build:frontend:posix",
-    "release:win": "npm run build:env:win && npm run build:backend:win && npm run build:frontend:win",
+    "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js",
+    "publish": "python3 scripts/release_stable.py",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
-    "unit-main": "mocha test/main/",
-    "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js"
+    "unit-main": "mocha test/main/"
   },
   "devDependencies": {
     "chai": "^3.5.0",
