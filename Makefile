@@ -32,6 +32,7 @@ app-shell-setup:
 app-shell-build:
 	cd app-shell &&\
 		npm run build &&\
+		npm run release &&\
 		ls dist/* &&\
 		ls releases
 
