@@ -2,10 +2,12 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "clean": "rm -rf ./out && rm -rf ./releases/*",
-    "build:frontend": "python scripts/build_electron_app_with_builder.py",
+    "build:frontend": "python3 scripts/build_electron_app_with_builder.py",
     "release": "npm run build:backend && npm run build:frontend",
-    "build:frontend:posix": "./scripts/build_electron_app_with_builder.py",
+    "build:frontend:posix": "python3 scripts/build_electron_app_with_builder.py",
     "build:frontend:win": "C:\\Python35\\python scripts\\build_electron_app_with_builder.py",
+    "publish:posix": "python3 scripts/release_stable.py",
+    "publish:win": "C:\\Python35\\python scripts\\release_stable.py",
     "release:posix": "npm run build:env:posix && npm run build:backend:posix && npm run build:frontend:posix",
     "release:win": "npm run build:env:win && npm run build:backend:win && npm run build:frontend:win",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
@@ -13,57 +15,21 @@
     "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js"
   },
   "devDependencies": {
-    "babel-core": "^6.0.0",
-    "babel-eslint": "^7.1.1",
-    "babel-loader": "^6.0.0",
-    "babel-preset-es2015": "^6.16.0",
-    "babel-preset-stage-2": "^6.17.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
     "cross-env": "^3.1.3",
-    "css-loader": "^0.25.0",
-    "electron": "1.4.7",
-    "electron-builder": "10.9.2",
-    "electron-chromedriver": "1.4.1",
-    "eslint": "^3.10.2",
-    "eslint-config-standard": "^5.1.0",
-    "eslint-friendly-formatter": "^1.2.2",
-    "eslint-loader": "^1.3.0",
-    "eslint-plugin-html": "^1.3.0",
-    "eslint-plugin-promise": "^1.0.8",
-    "eslint-plugin-standard": "^1.3.2",
-    "file-loader": "^0.9.0",
-    "glob": "^7.1.1",
-    "inject-loader": "^2.0.1",
-    "isparta-loader": "^2.0.0",
-    "jasmine-core": "^2.5.2",
-    "karma": "^1.3.0",
-    "karma-coverage": "^1.1.1",
-    "karma-electron": "^5.1.1",
-    "karma-jasmine": "^1.0.2",
-    "karma-mocha": "^1.2.0",
+    "electron": "1.7.1",
+    "electron-builder": "18.4.0",
+    "electron-publisher-s3": "18.4.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.26",
-    "karma-webpack": "^1.8.0",
-    "live-reload": "^1.1.0",
     "mocha": "^3.1.2",
-    "node-sass": "^3.10.1",
-    "sass-loader": "^4.0.2",
-    "spectron": "3.4.1",
-    "url-loader": "^0.5.7",
-    "vue-devtools": "^2.0.4",
-    "webpack": "1.13.2",
-    "webpack-dev-server": "1.14.0",
-    "webpack-merge": "^0.15.0"
+    "spectron": "3.7.1"
   },
   "build": {
     "asar": true,
     "appId": "ot.one.opentrons",
-    "electronVersion": "1.4.7",
     "productName": "Opentrons 2.0",
-    "extraResources": [
-      "env-dist/venv.zip"
-    ],
     "dmg": {
       "backgroundColor": "white",
       "contents": [
@@ -82,28 +48,29 @@
     },
     "mac": {
       "target": [
-        "dmg",
         "zip"
       ],
       "category": "productivity"
     },
     "win": {
-      "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico",
-      "target": [
-        "squirrel"
-      ]
+      "icon": "build/icon.ico",
+      "forceCodeSigning": false,
+      "target": "nsis"
     },
     "linux": {
       "category": "Science",
       "target": "deb"
+    },
+    "publish": {
+      "provider": "s3",
+      "bucket": "ot-app-builds",
+      "path": "channels/${env.CHANNEL}",
+      "channel": "${env.CHANNEL}"
     }
   },
   "dependencies": {
     "asar": "^0.13.0",
     "autotrack": "1.1.0",
-    "babel-preset-es2016": "^6.16.0",
-    "electron-debug": "^1.0.1",
-    "sinon": "^1.17.6",
-    "underscore.string": "^3.3.4"
+    "electron-debug": "^1.0.1"
   }
 }
