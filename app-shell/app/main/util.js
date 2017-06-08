@@ -17,4 +17,23 @@ function waitUntilServerResponds (createWindow, windowUrl) {
     })
 }
 
-module.exports = {waitUntilServerResponds}
+const cantorReverse = (z) => {
+  const w = Math.floor((Math.sqrt((8*z) + 1) - 1)/2)
+  const t = (Math.pow(w, 2) + w)/2
+  const y = z - t
+  const x = w - y
+  return [x, y]
+}
+
+const getAppVersion = (version, channel) => {
+  const [major, minor, patch] = version.split('.')
+  const p = parseInt(patch)
+  if (p - 1000 >= 0) {
+    const [patch, buildNumber] = cantorReverse(p - 1000)
+    return `${major}.${minor}.${patch}+${buildNumber}`
+  } else {
+    return `${major}.${minor}.${p}`
+  }
+}
+
+module.exports = {getAppVersion, waitUntilServerResponds}
