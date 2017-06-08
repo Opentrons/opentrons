@@ -624,11 +624,12 @@ def _get_unique_containers(instrument):
     """
     unique_containers = set()
     for location in instrument.placeables:
-        if isinstance(location, containers.placeable.WellSeries):
+        while isinstance(location, containers.placeable.WellSeries):
             location = location[0]
         for c in location.get_trace():
             if isinstance(c, containers.placeable.Container):
                 unique_containers.add(c)
+                break
 
     return _sort_containers(list(unique_containers))
 

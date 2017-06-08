@@ -32,7 +32,6 @@ function createWindow (windowUrl) {
     width: 1060,
     height: 750
   })
-  mainWindow.loadURL(windowUrl, {"extraHeaders" : "pragma: no-cache\n"})
   mainWindow.on('closed', function () {
     mainLogger.info('Electron App window closed, quitting App')
     rp(windowUrl + 'exit')
@@ -41,10 +40,15 @@ function createWindow (windowUrl) {
         app.quit()
       })
       .catch((err) => {
+        mainLogger.info('Received an expected error while calling exit route')
         mainLogger.info(err)
         mainWindow = null
         app.quit()
       })
+  })
+  mainWindow.on('unresponsive', function () {
+    mainLogger.info('window is unresponsive, reloading')
+    setTimeout(mainWindow.reload, 500)
   })
   // Note: Auth0 pop window does not close itself, this will this window when it pops up
   setInterval(() => {
@@ -52,6 +56,10 @@ function createWindow (windowUrl) {
       .filter(win => win.frameName === 'auth0_signup_popup')
       .map(win => win.close())
   }, 3000)
+  // load the UI (no caching)
+  setTimeout(() => {
+    mainWindow.loadURL(windowUrl, {"extraHeaders" : "pragma: no-cache\n"})
+  }, 200)
   return mainWindow
 }
 
@@ -81,6 +89,7 @@ function startUp () {
   process.on('uncaughtException', (error) => {
     if (process.listeners('uncaughtException').length > 1) {
       console.log(error)
+      mainLogger.info('Uncaught Exception:')
       mainLogger.info(error)
     }
   })

@@ -9,6 +9,7 @@ function waitUntilServerResponds (createWindow, windowUrl) {
       return createWindow()
     })
     .catch((err) => {
+      mainLogger.info('Error while pinging ' + windowUrl)
       mainLogger.info(err)
       setTimeout(() => {
         waitUntilServerResponds(createWindow, windowUrl)
