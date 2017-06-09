@@ -32,7 +32,7 @@ function initAutoUpdater () {
   autoUpdater.logger = log
 
   const mainLogger = getLogger('electron-main')
-  mainLogger.info('Initializing Audo Updater')
+  mainLogger.info('Initializing Auto Updater')
 
   autoUpdater.on(
     'error',
