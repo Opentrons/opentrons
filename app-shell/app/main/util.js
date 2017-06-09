@@ -25,7 +25,7 @@ const cantorReverse = (z) => {
   return [x, y]
 }
 
-const getAppVersion = (version, channel) => {
+const getAppVersion = (version) => {
   const [major, minor, patch] = version.split('.')
   const p = parseInt(patch)
   if (p - 1000 >= 0) {
