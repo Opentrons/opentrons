@@ -9,6 +9,17 @@ div#nav-spacer {
 
 div#nav-spacer.nav-open {
     height: 150px;
+    text-decoration: none;
+}
+
+header nav ul li ul li a:hover, header nav ul li ul li a.active:hover{
+  text-decoration: none;
+  color: black;
+}
+
+header nav ul li a:hover, header nav ul li a.active:hover{
+  text-decoration: none;
+  color: black;
 }
 
 @media screen and (max-width: 875px),

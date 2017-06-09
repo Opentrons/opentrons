@@ -43,6 +43,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     ABSOLUTE_POSITIONING = 'G90'
     RELATIVE_POSITIONING = 'G91'
 
+    COMMANDS_TO_RECORD = [
+        ABSOLUTE_POSITIONING, RELATIVE_POSITIONING, MOVE, DWELL, HOME,
+        SET_ZERO, SET_SPEED, SET_ACCELERATION, PUSH_SPEED, POP_SPEED,
+        MOTORS_ON, MOTORS_OFF, AXIS_AMPERAGE
+    ]
+
     CONFIG_GET = 'config-get sd'
     CONFIG_SET = 'config-set sd'
     OT_VERSION = 'ot_version'
@@ -69,7 +75,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     connection = None
 
     firmware_version = None
-    config_version = None
+    config_file_version = None
     ot_version = None
 
     def __init__(self, defaults):
@@ -91,10 +97,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.ot_one_dimensions = {}
         self.speeds = {}
 
-        self._apply_defaults(defaults)
+        self.smoothie_player = None
 
-        self.save_gcode_commands = False
-        self.gcode_commands_sent = []
+        self._apply_defaults(defaults)
 
     def get_connected_port(self):
         """
@@ -113,14 +118,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def connect(self, smoothie_connection):
         self.connection = smoothie_connection
         self.toggle_port()
-        log.debug("Connected to {}".format(smoothie_connection.name()))
-
         self.versions_compatible()
-
+        self.prevent_squeal_on_boot()
         self.calm_down()
-        self.prevent_squeal()
+        log.debug("Connected to {}".format(self.connection.name()))
 
-    def prevent_squeal(self):
+    def prevent_squeal_on_boot(self):
         # TODO: (andy) Smoothieware EDGE has this weird bug,
         # seems to require the following commands to run after Smoothieboard
         # boots, or else all motors freeze up and make high-pitch sounds.
@@ -129,6 +132,18 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.wait_for_ok()
         self.send_halt_command()
         self.calm_down()
+
+    def prevent_squeal_after_home(self, axis):
+        # TODO: (andy) Smoothieware EDGE has this weird bug,
+        # after homing an AB axis, trying to do an absolute (G90) move
+        # on that axis will create a high-pitched squeel. Then
+        # any following command will work fine.
+        # The below move commands are meant to force Smoothieware
+        # through this bug without affecting the robot's physical position
+        axis = [ax for ax in axis if ax.upper() in 'AB']
+        for ax in axis:
+            self.move(**{ax.lower(): 1 / 1600})
+            self.move(**{ax.lower(): 0.0})
 
     def is_connected(self):
         if self.connection:
@@ -199,6 +214,31 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return bool(isinstance(
             self.connection.device(), VirtualSmoothie))
 
+    def is_recording(self):
+        if not self.smoothie_player:
+            return False
+        return bool(self.smoothie_player.is_recording)
+
+    def is_playing(self):
+        if not self.smoothie_player:
+            return False
+        return bool(self.smoothie_player.is_playing())
+
+    def record_start(self, player):
+        self.smoothie_player = player
+        self.smoothie_player.record_start(self.COMMANDS_TO_RECORD)
+
+    def record_stop(self):
+        self.smoothie_player.record_stop()
+
+    def record(self, command, data):
+        if self.is_simulating() and self.is_recording():
+            self.smoothie_player.record(command, data)
+
+    def play(self, player):
+        self.smoothie_player = player
+        self.smoothie_player.play(self.connection)
+
     # SMOOTHIE METHODS
     def send_command(self, command, read_after=True, timeout=3, **kwargs):
         """
@@ -221,6 +261,8 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         self.connection.flush_input()
         self.connection.write_string(gcode_line)
+
+        self.record(command, gcode_line)
 
         if read_after:
             return self.readline_from_serial(timeout=timeout)
@@ -292,27 +334,43 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             coordinates += offset
         return coordinates
 
-    def wait_for_arrival(self, tolerance=0.5):
+    def wait_for_arrival(self, tolerance=1):
         target = self.get_target_position()
+
+        prev_diff = 0
+        did_move_timestamp = time.time()
 
         while True:
             self.check_paused_stopped()
+            try:
+                current = self.get_current_position()
+                diff = self._get_difference(current, target)
+                if diff < tolerance:
+                    return
+                if diff != prev_diff:
+                    did_move_timestamp = time.time()
+                prev_diff = diff
+                if diff > tolerance * 5:
+                    self.connection.serial_pause()
+            except Exception:
+                self.connection.serial_pause()
+                self.connection.flush_input()
 
-            current = self.get_current_position()
-            diff = {}
-            for axis in list(target.keys()):
-                diff[axis] = current[axis] - target[axis]
-            dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
-            diff_head = math.sqrt(dist)
-            diff_a = abs(diff.get('a', 0))
-            diff_b = abs(diff.get('b', 0))
+            if time.time() - did_move_timestamp > 1.0:
+                raise RuntimeError('Expected robot to move, please reconnect')
 
-            if max(diff_head, diff_a, diff_b) < tolerance:
-                return
+    def _get_difference(self, c, t):
+        diff = {}
+        for axis in list(t.keys()):
+            diff[axis] = c.get(axis, t[axis]) - t[axis]
+        dist = pow(diff['x'], 2) + pow(diff['y'], 2) + pow(diff['z'], 2)
+        diff_head = math.sqrt(dist)
+        diff_a = abs(diff.get('a', 0))
+        diff_b = abs(diff.get('b', 0))
+        return max(diff_head, diff_a, diff_b)
 
     def home(self, *axis):
 
-        self.send_halt_command()
         self.calm_down()
 
         axis_to_home = ''
@@ -334,19 +392,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             raise RuntimeWarning(
                 'HOMING ERROR: Check switches are being pressed and connected')
 
-        # TODO: (andy) Smoothieware EDGE has this weird bug,
-        # after homing an AB axis, trying to do an absolute (G90) move
-        # on that axis will create a high-pitched squeel. Then
-        # any following command will work fine.
-        # The below move commands are meant to force Smoothieware
-        # through this bug without affecting the robot's physical position
-        for ax in axis_to_home:
-            if ax in 'AB':
-                kwargs = {}
-                kwargs[ax.lower()] = 1 / 1600
-                self.move(**kwargs)
-                kwargs[ax.lower()] = 0.0
-                self.move(**kwargs)
+        self.prevent_squeal_after_home(axis_to_home)
 
         arguments = {
             'name': 'home',
@@ -603,33 +649,35 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return res
 
     def get_ot_version(self):
-        res = self.get_config_value(self.OT_VERSION)
-        self.ot_version = None
-        if res not in self.ot_one_dimensions:
-            log.debug('{} is not an ot_version'.format(res))
-            return None
-        self.ot_version = res
-        self.speeds = self.default_speeds[self.ot_version]
+        if not self.ot_version:
+            res = self.get_config_value(self.OT_VERSION)
+            if res not in self.ot_one_dimensions:
+                log.debug('{} is not an ot_version'.format(res))
+                return None
+            self.ot_version = res
+            if not self.speeds:
+                self.speeds = self.default_speeds[self.ot_version]
         return self.ot_version
 
     def get_firmware_version(self):
-        # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa
-        #   CNC Build 6 axis
-        #   6 axis
-        # ok
-        line_1 = self.send_command(self.GET_FIRMWARE_VERSION)
-        self.ignore_next_line()
-        self.ignore_next_line()
-        self.wait_for_ok()
+        if not self.firmware_version:
+            # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa
+            #   CNC Build 6 axis
+            #   6 axis
+            # ok
+            line_1 = self.send_command(self.GET_FIRMWARE_VERSION)
+            self.connection.readline_string()
+            self.connection.readline_string()
+            self.wait_for_ok()
 
-        # uses the "branch-hash" portion as the version response
-        self.firmware_version = line_1.split(',')[0].split(' ')[-1]
-
+            # uses the "branch-hash" portion as the version response
+            self.firmware_version = line_1.split(',')[0].split(' ')[-1]
         return self.firmware_version
 
     def get_config_version(self):
-        res = self.get_config_value(self.CONFIG_VERSION)
-        self.config_file_version = res
+        if not self.config_file_version:
+            res = self.get_config_value(self.CONFIG_VERSION)
+            self.config_file_version = res
         return self.config_file_version
 
     def get_dimensions(self):
