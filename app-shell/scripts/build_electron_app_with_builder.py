@@ -163,7 +163,7 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
                            "{} {}".format(
             ci_name, branch, commit
         ))
-        return "{}_{}".format(branch, commit[:10])
+        return "{}_{}".format(branch, commit[:7])
 
     print(script_tab + "The environmental variables for {} were deemed "
                        "invalid".format(ci_name))
