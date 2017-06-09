@@ -25,7 +25,7 @@ const cantorReverse = (z) => {
   return [x, y]
 }
 
-const getAppVersion = (version) => {
+const decodeAppVersion = (version) => {
   const [major, minor, patch] = version.split('.')
   const p = parseInt(patch)
   if (p - 1000 >= 0) {
@@ -36,4 +36,4 @@ const getAppVersion = (version) => {
   }
 }
 
-module.exports = {getAppVersion, waitUntilServerResponds}
+module.exports = {decodeAppVersion, waitUntilServerResponds}
