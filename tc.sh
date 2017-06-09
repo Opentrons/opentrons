@@ -16,3 +16,6 @@ make api-valid-exe
 
 # Build app shell
 make app-shell
+
+# Contents of releases dir
+ls -la app-shell/releases/
