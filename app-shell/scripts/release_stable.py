@@ -3,13 +3,16 @@ import os
 import util
 import build_electron_app_with_builder as builder
 
+script_tag = '[OT App Release] '
+script_tab = '                 '
 
-def build_app(channel):
+
+def build_app(channel, app_version):
     """
-    Builds electron app using electron-builder; 
+    Builds electron app using electron-builder;
     """
     os.environ['CHANNEL'] = channel
-    builder.update_pkg_json_app_version(builder.get_app_version())
+    builder.update_pkg_json_app_version(app_version)
     builder.build_electron_app(publish=True)
 
 
@@ -35,7 +38,13 @@ def is_tag():
 
 
 def is_release_branch():
-    pass
+    """
+    Returns True if a branch starts with "release/"
+    """
+    branch_name = util.get_branch()
+    if branch_name.startswith('release/'):
+        return True
+    return False
 
 
 def release():
@@ -43,14 +52,18 @@ def release():
     Builds and releases application when running on a valid release branch
     """
     if not is_release_branch():
-        print('[OT App Release] Valid release branch not detected; Not releasing app')
+        print(script_tag + 'Valid release branch not detected; Not releasing app')
         exit()
 
+    print(script_tag + 'Valid release detected')
     if is_tag():
-        print('*** Detected CI Tag')
-        build_app(channel='stable')
+        print(script_tag +
+                'CI Tag detected; releasing app to **stable** channel')
+        build_app('stable', builder.get_app_version())
     else:
-        build_app(channel='beta')
+        print(script_tag +
+                'CI Tag **not** detected; releasing app to **beta** channel')
+        build_app('beta', builder.get_app_version_with_build_encoded())
 
 
 if __name__ == '__main__':
