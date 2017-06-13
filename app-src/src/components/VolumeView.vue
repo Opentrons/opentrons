@@ -83,11 +83,11 @@
         return this.$store.state.tasks.deck
       }
     },
-    mounted: {
+    mounted () {
       if (!this.$store.state.busy) {
         this.$store.dispatch('jogToSlot', {slot: 'C2'})
       }
-    }
+    },
     methods: {
       maxVolume () {
         let volume = parseFloat(this.volume)
