@@ -350,19 +350,17 @@ class Robot(object, metaclass=Singleton):
 
         self._driver = device
         self.smoothie_drivers['live'] = device
-        self.set_connection('live')
 
         # overwrite VirtualSmoothie to share same versions as live robot
-        for d in self.smoothie_drivers.values():
-            if d.is_simulating():
-                d.ot_version = self._driver.get_ot_version()
-                d.firmware_version = self._driver.get_firmware_version()
-                d.config_file_version = self._driver.get_config_version()
+        for mode in ['simulate', 'simulate_switches']:
+            self.smoothie_drivers[mode] = drivers.get_virtual_driver(
+                options={
+                    'firmware': device.get_firmware_version(),
+                    'limit_switches': 'switch' in mode
+                })
+            self.smoothie_drivers[mode].ot_version = device.get_ot_version()
 
-        # set virtual smoothie do have same dimensions as real smoothie
-        ot_v = device.ot_version
-        self.smoothie_drivers['simulate'].ot_version = ot_v
-        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
+        self.set_connection('live')
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -760,17 +758,28 @@ class Robot(object, metaclass=Singleton):
 
         d = self.smoothie_drivers[mode]
 
-        # set VirtualSmoothie's coordinates to be the same as physical robot
         if d and d.is_simulating():
-            if self._driver and self._driver.is_connected():
-                d.connection.serial_port.set_position_from_arguments({
-                    ax.upper(): val
-                    for ax, val in self._driver.get_current_position().items()
-                })
+            self._copy_driver_coordinates(d)
 
         self._driver = d
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
+
+    def _copy_driver_coordinates(self, virtual_driver):
+        # set VirtualSmoothie's coordinates to be the same as physical robot
+        if self._driver and self._driver.is_connected():
+            version = virtual_driver.get_firmware_version()
+            virtual_smoothie = virtual_driver.connection.serial_port
+            if version == 'v1.0.5':
+                virtual_smoothie.process_set_position_command({
+                    a.upper(): v
+                    for a, v in self._driver.get_position()['current'].items()
+                })
+            else:
+                virtual_smoothie.set_position_from_arguments({
+                    a.upper(): v
+                    for a, v in self._driver.get_current_position().items()
+                })
 
     def disconnect(self):
         """
