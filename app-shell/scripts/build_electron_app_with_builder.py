@@ -182,7 +182,7 @@ def which(pgm):
             return p
 
 
-def build_electron_app():
+def build_electron_app(publish=False):
     print(script_tag + "Running electron-builder process.")
 
     platform_type = util.get_os()
@@ -194,7 +194,7 @@ def build_electron_app():
     ]
 
     # If on master branch, publish artifact
-    if util.get_branch().strip() == 'master' or os.environ.get('PUBLISH'):
+    if publish:
         process_args.extend(["-p", "always"])
 
     print(process_args)
@@ -306,17 +306,10 @@ def clean_build_dist(build_tag):
 
 if __name__ == '__main__':
     print('Detected branch is', util.get_branch(), util.get_branch() == 'master')
-    if (
-            'CHANNEL' not in os.environ and
-            util.is_ci() and
-            util.is_master_branch()
-    ):
-        os.environ['CHANNEL'] = 'beta'
-    elif 'CHANNEL' not in os.environ:
-        # os.environ['CHANNEL'] = 'dev'
-        os.environ['CHANNEL'] = 'beta'
+    if 'CHANNEL' not in os.environ:
+        os.environ['CHANNEL'] = 'foo'
 
     update_pkg_json_app_version(get_app_version_with_build_encoded())
-    build_electron_app()
+    build_electron_app(publish=False)
     build_tag = get_build_tag(util.get_os(), get_app_version_with_build())
     clean_build_dist(build_tag)
