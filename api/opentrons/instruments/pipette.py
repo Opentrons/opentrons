@@ -539,7 +539,7 @@ class Pipette(Instrument):
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(1)
+                location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct', enqueue=False)
 
     # QUEUEABLE
