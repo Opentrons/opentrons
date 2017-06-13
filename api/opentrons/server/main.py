@@ -923,17 +923,22 @@ def move_to_plunger_position():
 
 
 @app.route('/aspirate', methods=["POST"])
-def aspirate_from_current_position():
+def aspirate_for_calibration():
     axis = request.json.get("axis")
+    slot = request.json.get("slot")
+    label = request.json.get("label")
+    well = request.json.get("well")
     try:
-        # this action mimics 1.2 app experience
-        # but should be re-thought to take advantage of API features
-        instrument = robot._instruments[axis.upper()]
-        robot.move_head(z=20, mode='relative')
-        instrument.motor.move(instrument.positions['blow_out'])
-        instrument.motor.move(instrument.positions['bottom'])
-        robot.move_head(z=-20, mode='relative')
-        instrument.motor.move(instrument.positions['top'])
+        pipette = robot._instruments[axis.upper()]
+        _, _, robot_max_z = robot._driver.get_dimensions()
+        well_placeable = None
+        if slot and label and well:
+            well_placeable = robot._deck[slot].get_child_by_name(label)[well]
+            if not well_placeable:
+                raise RuntimeError('Unknown well {} in container {}'.format(
+                    well, label))
+        pipette.aspirate(well_placeable, enqueue=False)
+        robot.move_head(z=robot_max_z)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -948,13 +953,22 @@ def aspirate_from_current_position():
 
 
 @app.route('/dispense', methods=["POST"])
-def dispense_from_current_position():
+def dispense_for_calibration():
     axis = request.json.get("axis")
+    slot = request.json.get("slot")
+    label = request.json.get("label")
+    well = request.json.get("well")
     try:
-        # this action mimics 1.2 app experience
-        # but should be re-thought to take advantage of API features
-        instrument = robot._instruments[axis.upper()]
-        instrument.motor.move(instrument.positions['blow_out'])
+        pipette = robot._instruments[axis.upper()]
+        _, _, robot_max_z = robot._driver.get_dimensions()
+        well_placeable = None
+        if slot and label and well:
+            well_placeable = robot._deck[slot].get_child_by_name(label)[well]
+            if not well_placeable:
+                raise RuntimeError('Unknown well {} in container {}'.format(
+                    well, label))
+        pipette.dispense(well_placeable, enqueue=False)
+        robot.move_head(z=robot_max_z)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
