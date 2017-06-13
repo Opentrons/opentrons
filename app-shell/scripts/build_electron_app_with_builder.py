@@ -309,7 +309,7 @@ if __name__ == '__main__':
     if 'CHANNEL' not in os.environ:
         os.environ['CHANNEL'] = 'foo'
 
-    update_pkg_json_app_version(builder.get_app_version())
+    update_pkg_json_app_version(get_app_version())
     build_electron_app(publish=False)
     build_tag = get_build_tag(util.get_os(), get_app_version_with_build())
     clean_build_dist(build_tag)
