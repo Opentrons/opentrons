@@ -25,14 +25,14 @@ class StateTestCase(unittest.TestCase):
             tip_racks=[self.tiprack1, self.tiprack2],
             max_volume=200,
             min_volume=10,  # These are variable
-            axis="b",
+            axis="a",
             channels=1
         )
         self.p200.aspirate(100, self.plate[0]).dispense()
 
     def test_initial_state(self):
         s = state.get_state(self.robot)
-        expected = [{'axis': 'b',
+        expected = [{'axis': 'a',
                      'blow_out': 12,
                      'bottom': 10,
                      'calibrated': True,

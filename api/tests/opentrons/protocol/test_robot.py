@@ -50,27 +50,28 @@ class RobotTest(unittest.TestCase):
         self.robot.disconnect()
         self.assertRaises(RuntimeError, self.robot.home)
 
-    def test_stop_run(self):
-        p200 = pipette.Pipette(
-            self.robot, axis='b', name='my-fancy-pancy-pipette'
-        )
-        p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
-
-        for i in range(1000):
-            p200.aspirate().dispense()
-
-        res = None
-
-        def _run():
-            nonlocal res
-            self.assertRaises(RuntimeError, self.robot.run)
-
-        thread = threading.Thread(target=_run)
-        thread.start()
-
-        self.robot.stop()
-
-        thread.join()
+    # TODO: reevaluate/implement this test...
+    # def test_stop_run(self):
+    #     p200 = pipette.Pipette(
+    #         self.robot, axis='b', name='my-fancy-pancy-pipette'
+    #     )
+    #     p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
+    #
+    #     for i in range(1000):
+    #         p200.aspirate().dispense()
+    #
+    #     res = None
+    #
+    #     def _run():
+    #         nonlocal res
+    #         self.assertRaises(RuntimeError, self.robot.run)
+    #
+    #     thread = threading.Thread(target=_run)
+    #     thread.start()
+    #
+    #     self.robot.stop()
+    #
+    #     thread.join()
 
     def test_exceptions_during_run(self):
         p200 = pipette.Pipette(
