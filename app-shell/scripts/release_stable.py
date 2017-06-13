@@ -5,6 +5,9 @@ import build_electron_app_with_builder as builder
 
 
 def build_app(channel):
+    """
+    Builds electron app using electron-builder; 
+    """
     os.environ['CHANNEL'] = channel
     builder.update_pkg_json_app_version(builder.get_app_version())
     builder.build_electron_app(publish=True)
@@ -18,6 +21,7 @@ def is_tc_tag():
         print('Could not detect TC tag')
         return False
 
+
 def is_tag():
     """Returns true if the current environmen is a
     Travis, AppVeyor, or TeamCity CI tag
@@ -29,9 +33,25 @@ def is_tag():
         False
     )
 
-if __name__ == '__main__':
+
+def is_release_branch():
+    pass
+
+
+def release():
+    """
+    Builds and releases application when running on a valid release branch
+    """
+    if not is_release_branch():
+        print('[OT App Release] Valid release branch not detected; Not releasing app')
+        exit()
+
     if is_tag():
         print('*** Detected CI Tag')
-        build_app()
+        build_app(channel='stable')
     else:
-        print('*** Tag not detected; Not releasing app')
+        build_app(channel='beta')
+
+
+if __name__ == '__main__':
+    release()
