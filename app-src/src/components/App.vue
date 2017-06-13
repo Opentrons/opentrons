@@ -1,6 +1,5 @@
 <template>
   <div>
-    <toast position='n'></toast>
     <header id='home-connect'>
       <Home :busy='robotBusy'></Home>
       <div class='brand'>
@@ -25,8 +24,10 @@
     </section>
     <main id='container'>
       <Jog :busy='robotBusy'></Jog>
-      <TaskPane :busy='robotBusy'>
+      <!-- <TaskView :busy='robotBusy'> -->
+      <router-view></router-view>
     </main>
+    <console></console>
   <div>
 </template>
 
@@ -36,23 +37,23 @@
   import Home from './Home.vue'
   import Jog from './Jog.vue'
   import Upload from './Upload.vue'
-  import TaskPane from './TaskPane.vue'
+  // import TaskView from './TaskView.vue'
   import Run from './Run.vue'
   import Protocol from './Protocol.vue'
   import ProgressBar from './ProgressBar.vue'
-  import { Toast } from 'vuex-toast'
+  import Console from './Console'
 
   export default {
     components: {
-      Toast,
       Connect,
       Home,
       Jog,
       Upload,
-      TaskPane,
+      // TaskView,
       Run,
       Protocol,
-      ProgressBar
+      ProgressBar,
+      Console
     },
     data: function () {
       return {
@@ -66,6 +67,7 @@
       }
     },
     mounted: function () {
+      this.$store.dispatch('updateContainers')
       this.$http
         .get('http://localhost:31950/app_version').then((response) => {
           let version = response.body.version
@@ -88,6 +90,5 @@
 </script>
 
 <style lang='sass'>
-  @import "../assets/sass/new.scss";
-  @import "../../node_modules/vuex-toast/dist/vuex-toast.css";
+  @import "../assets/sass/main.scss";
 </style>

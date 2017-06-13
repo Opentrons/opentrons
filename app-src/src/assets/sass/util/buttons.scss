@@ -2,17 +2,34 @@
             Buttons
 ******************************/
 input {
-    flex: 0 0 $btn-size*3 - 2;
-    min-width: $btn-size*3 - 2;
+    flex: 0 0 $btn-size*2 + 2;
+    min-width: $btn-size*2 + 2;
     height: $btn-size - 2;
     line-height: $btn-size;
-    padding: 0px;
+    padding: 2px;
     border: 1px solid #999;
-    margin: $gutter-width*2 2px $gutter-width*2 1px;
+    margin: $gutter-width*2 2px $gutter-width*2 0;
     text-align: left;
     border-radius: 6px;
     text-align: center;
     color: $primary-text;
+}
+
+select {
+    flex: 0 0;
+    background: white;
+    border-radius: 6px;
+    border: 2px solid lighten($btn-jog, 15%);
+    -webkit-appearance: none;
+    outline: none;
+    color: white;
+    height: $btn-size;
+    min-width: 6*$btn-size;
+    padding-left: 10px;
+    background-image: url("../assets/img/caret.png");
+    background-repeat: no-repeat;
+    background-position: 95% 50%;
+    color: $btn-jog;
 }
 
 button {
@@ -51,7 +68,8 @@ button {
 .btn-run,
 .btn-play,
 .btn-pause,
-.btn-clear {
+.btn-clear,
+.btn-vol {
     min-width: $btn-size*3;
     height: $btn-size;
     margin: $gutter-width;
@@ -83,7 +101,7 @@ button {
 
 .btn-calibrate {
     flex: 0 0;
-    min-width: $btn-size*3;
+    min-width: 47%;
     height: $btn-size;
     line-height: $btn-size;
     padding: 0px 15px;
@@ -92,6 +110,7 @@ button {
     border-radius: 6px;
     text-align: center;
     color: white;
+    text-transform: uppercase;
 }
 
 .save {
@@ -151,3 +170,63 @@ input[type="radio"]:checked + label span {
     -moz-transition: background-color 0.4s linear;
     transition: background-color 0.4s linear;
 }
+
+  $radius: 20px;
+
+/*** Radio/Checkbox Override ***/
+
+label {
+    display: inline-block;
+    cursor: pointer;
+    /* Accessible Hidden Radio/Checkbox */
+    input[type="radio"],
+    input[type="checkbox"] {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+    input[type="radio"] + span,
+    input[type="checkbox"] + span {
+        text-align: center;
+        margin-right: 10px;
+        &:before {
+            content: '';
+            display: inline-block;
+            width: $radius;
+            height: $radius;
+            vertical-align: -$radius/4;
+            border-radius: $radius/2;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #000;
+            margin-right: 10px;
+            transition: 0.5s ease all;
+        }
+    }
+    input[type="checkbox"] + span:before {
+        border-radius: 6px;
+    }
+    input:checked + span:before {
+        background: $primary-brand;
+        box-shadow: 0 0 0 4px #000;
+        font-size: 18px;
+    }
+    input[type="checkbox"]:checked + span:before {
+        content: '\2713';
+        color: white;
+    }
+    input[type="checkbox"]:focus + span:before {
+        outline: none;
+        margin-top: 0px;
+    }
+    input[type="checkbox"] + span{
+        font-size: 14px;
+
+
+    }
+}
+

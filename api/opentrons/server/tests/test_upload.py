@@ -77,93 +77,108 @@ class UploadTestCase(unittest.TestCase):
 
         response = self.app.get('/instruments/placeables')
         response = json.loads(response.data.decode())
-        self.assertEquals(response['status'], 'success')
 
         expected_data = {
-            'data': [
-                {
-                    'axis': 'a',
-                    'blow_out': 2,
-                    'bottom': 1,
-                    'drop_tip': None,
-                    'label': 'p10',
-                    'max_volume': 10,
-                    'placeables': [
-                        {
-                            'calibrated': True,
-                            'label': 'test-tiprack',
-                            'slot': 'A1',
-                            'type': 'tiprack-200ul'
-                        },
-                        {
-                            'calibrated': False,
-                            'label': 'test-trough',
-                            'slot': 'B1',
-                            'type': 'trough-12row'
-                        },
-                        {
-                            'calibrated': False,
-                            'label': 'test-plate',
-                            'slot': 'B2',
-                            'type': '96-flat'
-                        },
-                        {
-                            'calibrated': False,
-                            'label': 'test-trash',
-                            'slot': 'A2',
-                            'type': 'point'
-                        }
-                    ],
-                    'top': 0
-                },
-                {
-                    'axis': 'b',
-                    'blow_out': None,
-                    'bottom': None,
-                    'drop_tip': None,
-                    'label': 'p200',
-                    'max_volume': 200,
-                    'placeables': [
-                        {
-                            'calibrated': False,
-                            'label': 'test-tiprack',
-                            'slot': 'A1',
-                            'type': 'tiprack-200ul'
-                        },
-                        {
-                            'calibrated': False,
-                            'label': 'test-trough',
-                            'slot': 'B1',
-                            'type': 'trough-12row'
-                        },
-                        {
-                            'calibrated': False,
-                            'label': 'test-plate',
-                            'slot': 'B2',
-                            'type': '96-flat'
-                        },
-                        {
-                            'calibrated': False,
-                            'label': 'test-trash',
-                            'slot': 'A2',
-                            'type': 'point'
-                        }
-                    ],
-                    'top': None
-                }
-            ],
-            'status': 200
+            'data': {
+                'deck': [
+                    {
+                        'instruments': [
+                            {
+                                'axis': 'a',
+                                'calibrated': True,
+                                'label': 'p10'
+                            },
+                            {
+                                'axis': 'b',
+                                'calibrated': False,
+                                'label': 'p1000'
+                            }
+                        ],
+                        'label': 'test-tiprack',
+                        'slot': 'A1',
+                        'type': 'tiprack-200ul'
+                    },
+                    {
+                        'instruments': [
+                            {
+                                'axis': 'a',
+                                'calibrated': False,
+                                'label': 'p10'
+                            },
+                            {
+                                'axis': 'b',
+                                'calibrated': False,
+                                'label': 'p1000'
+                            }
+                        ],
+                        'label': 'test-trash',
+                        'slot': 'A2',
+                        'type': 'point'
+                    },
+                    {
+                        'instruments': [
+                            {
+                                'axis': 'a',
+                                'calibrated': False,
+                                'label': 'p10'
+                            },
+                            {
+                                'axis': 'b',
+                                'calibrated': False,
+                                'label': 'p1000'
+                            }
+                        ],
+                        'label': 'test-trough',
+                        'slot': 'B1',
+                        'type': 'trough-12row'
+                    },
+                    {
+                        'instruments': [
+                            {
+                                'axis': 'a',
+                                'calibrated': False,
+                                'label': 'p10'
+                            },
+                            {
+                                'axis': 'b',
+                                'calibrated': False,
+                                'label': 'p1000'
+                            }
+                        ],
+                        'label': 'test-plate',
+                        'slot': 'B2',
+                        'type': '96-flat'
+                    }
+                ],
+                'instruments': [
+                    {
+                        'axis': 'a',
+                        'blow_out': 2,
+                        'bottom': 1,
+                        'calibrated': False,
+                        'channels': 8,
+                        'drop_tip': None,
+                        'label': 'p10',
+                        'max_volume': 10,
+                        'top': 0
+                    },
+                    {
+                        'axis': 'b',
+                        'blow_out': None,
+                        'bottom': None,
+                        'calibrated': False,
+                        'channels': 1,
+                        'drop_tip': None,
+                        'label': 'p1000',
+                        'max_volume': 10,
+                        'top': None
+                    }
+                ]
+            },
+            'status': 'success'
         }
 
-        response_data = response['data'][0]
-        for key, value in expected_data['data'][0].items():
-            if key != 'placeables':
-                self.assertEquals(value, response_data[key])
-                pass
-            else:
-                for placeable in value:
-                    self.assertTrue(placeable in response_data['placeables'])
-                    pass
+        self.assertDictEqual(response, expected_data)
 
     def test_upload_invalid_python(self):
         pass

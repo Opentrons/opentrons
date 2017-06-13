@@ -4,8 +4,9 @@ import VueResource from 'vue-resource'
 import store from './store/store'
 import { getUserId } from './util'
 import {
-  Placeable,
-  CalibrateInstrument,
+  TaskView,
+  WelcomeView,
+  VolumeView,
   App
 } from './components/export'
 import { loginRoute, logoutRoute } from './login-routes'
@@ -15,8 +16,10 @@ Vue.use(VueResource)
 
 const router = new VueRouter({
   routes: [
-    { path: '/calibrate/:instrument', component: CalibrateInstrument },
-    { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable },
+    { name: 'welcome', path: '/', component: WelcomeView },
+    { name: 'instrument', path: '/calibrate/:instrument', component: TaskView },
+    { name: 'placeable', path: '/calibrate/:instrument/:slot/:placeable', component: TaskView },
+    { name: 'volume', path: '/volume/:instrument', component: VolumeView },
     loginRoute,
     logoutRoute
   ],

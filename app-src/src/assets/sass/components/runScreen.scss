@@ -1,22 +1,33 @@
 /******************************
-Run Screen
+Console
 ******************************/
-.runScreen {
+section#console {
+    width: 1024px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    height: 160px;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    background-color: $well-bg;
+    border-radius: 6px;
+    padding: 10px;
+    padding-bottom:30px;
+    border-top:14px solid $well-bg;
     .runCommand {
-        padding-bottom: 0px;
-        margin: 5px;
         &:last-child {
             color: $primary-brand;
+            border-radius: 3px;
+            background: rgba(0,0,0,0.05);
         }
-    }
-    #exit {
-        position: fixed;
-        top: auto;
-        padding-left: 685px;
-        padding-right: 10px;
-        font-size: xx-large;
-        font-weight: bold;
-        cursor: pointer;
-        color: $secondary-brand;
+        &.info{
+            color: $primary-brand;
+        }
+        &.success{
+            color: $primary-brand;
+        }
+        &.danger{
+            color: #f33b59;
+        }
     }
 }

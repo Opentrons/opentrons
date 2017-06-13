@@ -7,6 +7,30 @@ import Opentrons from '../rest_api_wrapper'
 import { processTasks } from '../util'
 
 const actions = {
+  updateContainers ({commit}) {
+    let url = 'http://localhost:31950/api_containers'
+    // let url = 'https://raw.githubusercontent.com/OpenTrons/opentrons-api/march-22-container-file-update/api/opentrons/config/containers/default-containers.json'
+    let containers = {}
+    Vue.http.get(url).then((response) => {
+      containers = response.body.data.containers
+    }).then(() => {
+      for (const c in containers) {
+        let offset = {'x': 0, 'y': 0}
+        let container = containers[c]
+        if (container['origin-offset']) {
+          offset['x'] = container['origin-offset']['x']
+          offset['y'] = container['origin-offset']['y']
+        }
+        let wells = container['locations']
+        for (const w in wells) {
+          let well = wells[w]
+          well['x'] = (well['x'] + offset['x'])
+          well['y'] = (well['y'] + offset['y'])
+        }
+      }
+      commit(types.UPDATE_CONTAINERS, {containers})
+    })
+  },
   connectRobot ({ commit }, port) {
     commit(types.UPDATE_DETACHED, {'detached': false})
     commit(types.UPDATE_ROBOT_STATE, {'busy': false})
@@ -14,12 +38,12 @@ const actions = {
     Opentrons.connect(port).then((wasSuccessful) => {
       if (wasSuccessful) {
         commit(types.UPDATE_ROBOT_CONNECTION, payload)
-        if (window.confirm('Successfully Connected. Do you want to home now?')) {
-          Opentrons.home('all')
-        }
         Opentrons.getVersions().then((result) => {
           let versions = result
           commit(types.UPDATE_ROBOT_VERSIONS, {versions})
+          if (window.confirm('Successfully Connected. Do you want to home now?')) {
+            Opentrons.home('all')
+          }
         })
       }
     })
@@ -99,10 +123,8 @@ const actions = {
     .post('http://localhost:31950/move_to_container', JSON.stringify(data), {emulateJSON: true})
     .then((response) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': false})
-      console.log('success', response)
     }, (response) => {
       commit(types.UPDATE_ROBOT_STATE, {'busy': true})
-      console.log('failed', response)
     })
   },
   runProtocol ({ commit }) {
@@ -130,7 +152,6 @@ const actions = {
   },
   pauseProtocol ({ commit }) {
     Opentrons.pauseProtocol().then((wasSuccessful) => {
-      console.log(wasSuccessful)
       if (wasSuccessful) {
         commit(types.UPDATE_PAUSED, wasSuccessful)
       }
@@ -138,7 +159,6 @@ const actions = {
   },
   resumeProtocol ({ commit }) {
     Opentrons.resumeProtocol().then((wasSuccessful) => {
-      console.log(wasSuccessful)
       if (wasSuccessful) {
         commit(types.UPDATE_PAUSED, !wasSuccessful)
       }

@@ -1,5 +1,3 @@
-import { ADD_TOAST_MESSAGE } from 'vuex-toast'
-
 import * as types from './mutation-types'
 import { processTasks } from '../util'
 import { trackEventFromWebsocket } from '../analytics'
@@ -56,12 +54,10 @@ function WebSocketPlugin (socket) {
         if (data.text.length > 0) {
           let {text, type} = data
           text = `${text}`
-          store.dispatch(ADD_TOAST_MESSAGE, {text, type})
-
           data.timestamp = (new Date()).toLocaleTimeString()
           data.command_description = text
           data.notification = true
-          trackEventFromWebsocket(data)
+          data.type = type
           store.commit(types.UPDATE_RUN_LOG, data)
         }
       }

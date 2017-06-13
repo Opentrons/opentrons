@@ -1,0 +1,203 @@
+section#welcome-view,
+section#volume-view {
+    width: 700px;
+    height: 376px;
+    padding: 10px;
+    margin-left: 5px;
+    border: 2px solid $well-bg;
+    border-radius: 6px;
+}
+
+section#volume-view {
+    position: relative;
+    button {
+        width: $btn-size*3;
+        text-transform: uppercase;
+    }
+    button.next {
+        position: absolute;
+        bottom: 50px;
+        right: 50px;
+    }
+    button.close {
+        font-size: 24px;
+        line-height: 26px;
+        height: 32px;
+        max-width: 32px;
+        border-radius: 16px;
+        float: right;
+        color: $btn-jog;
+        border: 2px solid $btn-jog;
+    }
+}
+
+section#task-view {
+    width: 725px;
+    height: 400px;
+    display: flex;
+    flex-direction: row;
+    section#placeable-pane,
+    section#instrument-pane {
+        flex: 1 1 370px;
+        background-color: $well-bg;
+        border-radius: 6px;
+        border: 2px solid $well-bg;
+        margin: 0 5px;
+        h1 {
+            padding-top: 10px;
+            padding-left: 10px;
+        }
+    }
+    section#instrument-pane {
+        margin: 0;
+        .pipette-btns {
+            display: block;
+            width: 100%;
+            clear: both;
+        }
+        .pipette-btns:after {
+            content: '';
+            clear: both;
+        }
+        #a {
+            float: right;
+        }
+        a.btn,
+        label {
+            display: inline-block;
+            vertical-align: top;
+            height: 30px;
+            line-height: 30px;
+            margin: 4px;
+            text-transform: uppercase;
+        }
+        label {
+            width: 160px;
+            padding-left: 2px;
+        }
+        a.btn {
+            width: 130px;
+            padding: 0px 15px;
+            border-radius: 6px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background-color: $secondary-brand;
+        }
+    }
+    section#placeable-pane {
+        h1 {
+            visibility: hidden;
+            &.active {
+                visibility: visible;
+                position: relative;
+            }
+        }
+    }
+}
+
+button.tab {
+    width: 170px;
+    height: 40px;
+    margin: 20px 0 5px 5px;
+    border-radius: 6px;
+    border: 2px solid $well-bg;
+    background-color: white;
+    &.active {
+        background-color: $well-bg;
+        color: black;
+        border: 2px solid $primary-brand;
+        // &:focus {
+        //     border: 2px solid $secondary-brand;
+        // }
+    }
+    &:first-child {}
+}
+
+div.pipette-modal {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.plunger-nav {
+        flex: 1 1 100px;
+        display: inline-block;
+        height: 190px;
+        ul {
+            list-style-type: none;
+            padding-left: 5px;
+            margin: 0;
+            li {
+                line-height: 47px;
+                font-size: 14px;
+                color: $secondary-brand;
+                text-decoration: underline;
+                padding-left: 20px;
+                cursor: pointer;
+                &.calibrated:after {
+                    content: "\2713";
+                    font-size: 16px;
+                    color: $secondary-brand;
+                    float: right;
+                    padding-right: 20px;
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+    div.plunger-img {
+        flex: 1 1 200px;
+        margin-right: 5px;
+        height: 188px;
+        display: inline-block;
+        background-color: white;
+    }
+}
+
+// modal logic
+div.pipette-modal {
+    img {
+        display: none;
+        height: 100%;
+    }
+    &.mode-top {
+        li.top {
+            background-color: white
+        }
+        img.top {
+            display: block;
+        }
+    }
+    &.mode-bottom {
+        li.bottom {
+            background-color: white
+        }
+        img.bottom {
+            display: block;
+        }
+    }
+    &.mode-blow_out {
+        li.blow_out {
+            background-color: white
+        }
+        img.blow_out {
+            display: block;
+        }
+    }
+    &.mode-drop_tip {
+        li.drop_tip {
+            background-color: white
+        }
+        img.drop_tip {
+            display: block;
+        }
+    }
+}
+
+.instrument-calibration {
+    padding: 25px 5px 5px;
+}
+
+.placeable-calibration {
+    padding: 0 5px;
+}

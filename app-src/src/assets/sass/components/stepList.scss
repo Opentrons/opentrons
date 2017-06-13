@@ -4,10 +4,11 @@ Step List
 aside#step-list {
     width: 140px;
     flex: 0 0 140px;
-    height: 330px;
+    margin-top: 6px;
+    //height: 330px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     div.instrument {
         border-left: 5px solid $secondary-brand;
         width: 135px;
@@ -25,9 +26,10 @@ aside#step-list {
             a {
                 display: block;
                 line-height: $baseline;
-                padding-left: 30px;
+                padding-left: 20px;
                 text-decoration: none;
                 color: $primary-black;
+                border-right:10px solid white;
                 // not in use yet but will need to truncate longer container names
                 span.clip {
                     display: block;
@@ -39,7 +41,9 @@ aside#step-list {
                 }
             }
             a.router-link-active {
-                background-color: $well-bg;
+                background-color: $secondary-brand;
+                color:white;
+                font-style: italic;
             }
             a.completed:before {
                 content: "\2713";

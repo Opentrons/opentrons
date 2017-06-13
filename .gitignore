@@ -84,6 +84,8 @@ sample_protocol.py
 calibrations/
 */calibrations
 
+*.pid
+
 # SDK logs
 *.log
 *.log.*

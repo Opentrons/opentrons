@@ -11,7 +11,9 @@
 
 //task pane
 @import "components/stepList";
-@import "components/task";
+@import "components/_task";
+@import "components/deckMap";
+@import "components/modal";
 
 //run screen
 @import "components/runScreen";

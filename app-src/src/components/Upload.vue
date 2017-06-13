@@ -28,7 +28,7 @@
     },
     computed: {
       taskListLen () {
-        return this.$store.state.tasks.length > 0
+        return this.$store.state.tasks.deck !== undefined
       },
       busy () {
         return this.$store.state.busy
@@ -36,12 +36,8 @@
     },
     watch: {
       taskListLen: function () {
-        var task = this.$store.state.tasks[0]
-        if (task && task.placeables && task.placeables[0]) {
-          this.$router.push(task.placeables[0].href)
-        } else {
-          this.$router.push('/')
-        }
+        var instHref = this.$store.state.tasks.instruments[0].href
+        this.$router.push(instHref)
       }
     }
   }

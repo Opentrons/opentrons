@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import io from 'socket.io-client/socket.io'
 import appMutations from './mutations'
 import appActions from './actions'
-import { createModule } from 'vuex-toast'
 import wsp from './websocket-plugin'
 const { WebSocketPlugin } = wsp
 
@@ -22,12 +21,10 @@ socket.on('disconnect', function () {
 })
 
 const websocketplugin = new WebSocketPlugin(socket)
-const toast = createModule({dismissInterval: 12000})
 
 export default new Vuex.Store({
   state,
   actions,
   mutations,
-  plugins: [websocketplugin],
-  modules: {toast}
+  plugins: [websocketplugin]
 })

@@ -42,7 +42,7 @@ app = Flask(__name__,
 CORS(app)
 app.jinja_env.autoescape = False
 app.config['ALLOWED_EXTENSIONS'] = set(['json', 'py'])
-socketio = SocketIO(app, async_mode='gevent')
+socketio = SocketIO(app, async_mode='threading')
 
 filename = "N/A"
 last_modified = "N/A"
@@ -245,7 +245,7 @@ def emit_notifications(notifications, _type):
         })
 
 
-def _run_commands(should_home_first=True):
+def _run_commands():
     robot = Robot.get_instance()
 
     start_time = time.time()
@@ -485,9 +485,10 @@ def connectRobot():
     robot = Robot.get_instance()
     try:
         robot.connect(port, options=options)
+        emit_notifications(["Successfully connected"], 'info')
     except Exception as e:
         # any robot version incompatibility will be caught here
-        robot.disconnect()
+        disconnectRobot()
         status = 'error'
         data = str(e)
         if "versions are incompatible" in data:
@@ -681,20 +682,43 @@ current_protocol_step_list = None
 
 def create_step_list():
     global current_protocol_step_list
+    current_protocol_step_list = {'instruments': [], 'deck': []}
     try:
-        current_protocol_step_list = [{
-            'axis': instrument.axis,
-            'label': instrument.name,
-            'channels': instrument.channels,
-            'placeables': [
+        current_protocol_step_list['instruments'] = sorted(
+            [
                 {
-                    'type': container.get_type(),
-                    'label': container.get_name(),
-                    'slot': container.get_parent().get_name()
+                    'axis': instrument.axis,
+                    'label': instrument.name,
+                    'channels': instrument.channels
                 }
-                for container in _get_unique_containers(instrument)
-            ]
-        } for instrument in _get_all_pipettes()]
+                for instrument in _get_all_pipettes()
+            ],
+            key=lambda p: '{}-{}'.format(p['axis'], p['label'])
+        )
+
+        current_protocol_step_list['deck'] = sorted(
+            [
+                {
+                    'type': c.get_type(),
+                    'label': c.get_name(),
+                    'slot': c.get_parent().get_name(),
+                    'instruments': sorted(
+                        [
+                            {
+                                'axis': instrument.axis,
+                                'label': instrument.name
+                            }
+                            for instrument in _get_all_pipettes()
+                            for container in _get_unique_containers(instrument)
+                            if container is c
+                        ],
+                        key=lambda p: '{}-{}'.format(p['axis'], p['label'])
+                    )
+                }
+                for c in _get_all_containers()
+            ],
+            key=lambda cont: '{}-{}'.format(cont['slot'], cont['label'])
+        )
     except Exception as e:
         app.logger.exception('Error creating step list')
         emit_notifications([str(e)], 'danger')
@@ -708,10 +732,10 @@ def update_step_list():
     if current_protocol_step_list is None:
         create_step_list()
     try:
-        for step in current_protocol_step_list:
-            t_axis = str(step['axis']).upper()
+        for p in current_protocol_step_list['instruments']:
+            t_axis = str(p['axis']).upper()
             instrument = robot._instruments[t_axis]
-            step.update({
+            p.update({
                 'top': instrument.positions['top'],
                 'bottom': instrument.positions['bottom'],
                 'blow_out': instrument.positions['blow_out'],
@@ -720,12 +744,16 @@ def update_step_list():
                 'calibrated': _check_if_instrument_calibrated(instrument)
             })
 
-            for placeable_step in step['placeables']:
-                c = _get_container_from_step(placeable_step)
-                if c:
-                    placeable_step.update({
-                        'calibrated': _check_if_calibrated(instrument, c)
+        for container_json in current_protocol_step_list['deck']:
+            c = _get_container_from_step(container_json)
+            if c:
+                for p in container_json['instruments']:
+                    t_axis = str(p['axis']).upper()
+                    this_instrument = robot._instruments[t_axis]
+                    p.update({
+                        'calibrated': _check_if_calibrated(this_instrument, c)
                     })
+
     except Exception as e:
         emit_notifications([str(e)], 'danger')
 
@@ -895,19 +923,22 @@ def move_to_plunger_position():
 
 
 @app.route('/aspirate', methods=["POST"])
-def aspirate_from_current_position():
+def aspirate_for_calibration():
     axis = request.json.get("axis")
+    slot = request.json.get("slot")
+    label = request.json.get("label")
+    well = request.json.get("well")
     try:
+        pipette = robot._instruments[axis.upper()]
         _, _, robot_max_z = robot._driver.get_dimensions()
-        current_z = robot._driver.get_position()['current']['z']
-        jog_up_distance = min(robot_max_z - current_z, 20)
-
-        robot.move_head(z=jog_up_distance, mode='relative')
-        instrument = robot._instruments[axis.upper()]
-        instrument.motor.move(instrument.positions['blow_out'])
-        instrument.motor.move(instrument.positions['bottom'])
-        robot.move_head(z=-jog_up_distance, mode='relative')
-        instrument.motor.move(instrument.positions['top'])
+        well_placeable = None
+        if slot and label and well:
+            well_placeable = robot._deck[slot].get_child_by_name(label)[well]
+            if not well_placeable:
+                raise RuntimeError('Unknown well {} in container {}'.format(
+                    well, label))
+        pipette.aspirate(well_placeable, enqueue=False)
+        robot.move_head(z=robot_max_z)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -922,13 +953,22 @@ def aspirate_from_current_position():
 
 
 @app.route('/dispense', methods=["POST"])
-def dispense_from_current_position():
+def dispense_for_calibration():
     axis = request.json.get("axis")
+    slot = request.json.get("slot")
+    label = request.json.get("label")
+    well = request.json.get("well")
     try:
-        # this action mimics 1.2 app experience
-        # but should be re-thought to take advantage of API features
-        instrument = robot._instruments[axis.upper()]
-        instrument.motor.move(instrument.positions['blow_out'])
+        pipette = robot._instruments[axis.upper()]
+        _, _, robot_max_z = robot._driver.get_dimensions()
+        well_placeable = None
+        if slot and label and well:
+            well_placeable = robot._deck[slot].get_child_by_name(label)[well]
+            if not well_placeable:
+                raise RuntimeError('Unknown well {} in container {}'.format(
+                    well, label))
+        pipette.dispense(well_placeable, enqueue=False)
+        robot.move_head(z=robot_max_z)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -1015,6 +1055,29 @@ def calibrate_placeable():
     })
 
 
+@app.route("/api_containers", methods=["GET"])
+def api_containers():
+    global containers
+    try:
+        api_containers = {}
+        for container_name in containers.list():
+            container_json = containers.get_json(container_name)
+            if container_json:
+                api_containers[container_name] = container_json
+        return flask.jsonify({
+            'status': 'success',
+            'data': {
+                'containers': api_containers
+            }
+        })
+    except Exception as e:
+        emit_notifications([str(e)], 'danger')
+        return flask.jsonify({
+            'status': 'error',
+            'data': str(e)
+        })
+
+
 def _calibrate_plunger(position, axis_name):
     axis_name = axis_name.upper()
     if axis_name not in robot._instruments:
@@ -1099,10 +1162,8 @@ def start():
     socketio.run(
         app,
         debug=False,
-        logger=False,
         use_reloader=False,
         log_output=False,
-        engineio_logger=False,
         port=31950
     )
 

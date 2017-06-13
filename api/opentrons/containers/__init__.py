@@ -3,6 +3,7 @@ import json
 import os
 
 from opentrons.containers.persisted_containers import get_persisted_container
+from opentrons.containers.persisted_containers import get_json
 from opentrons.containers import persisted_containers
 from opentrons.containers.placeable import (
     Deck,
@@ -23,7 +24,8 @@ __all__ = [
     Well,
     WellSeries,
     unpack_location,
-    apply_calibration]
+    apply_calibration,
+    get_json]
 
 
 def load(container_name, slot, label=None):

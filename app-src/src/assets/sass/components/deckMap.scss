@@ -1,0 +1,123 @@
+/******************************
+    Deck Map
+******************************/
+
+$deck-width: 428px * 0.7;
+$deck-height: 383px * 0.7;
+$slot-height: $deck-height/3;
+section#deck-map {
+    width: 100%;
+    border-radius: 6px;
+    display: inline-block;
+
+
+    div.deck-wrapper {
+        padding: 20px 10px 10px 10px;
+        background-color: $well-bg;
+        border-radius: 6px;
+        border-top-left-radius: 0px;
+    }
+    div.deck-container {
+        background-color: $well-bg;
+        width: $deck-width;
+        height: $deck-height;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        border: 1px solid #BBB;
+    }
+    .deck-col {
+        display: flex;
+        flex-direction: column-reverse;
+        flex: 1 1 20%;
+        justify-content: stretch;
+    }
+    .deck-slot {
+        display: flex;
+        justify-content: stretch;
+        align-items: center;
+        box-sizing: border-box;
+        height: $slot-height;
+        .empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #DDD;
+            p {
+                font-family: 'trons';
+                color: #BBB;
+                font-weight: 500;
+                font-size: 36px;
+            }
+        }
+        &:not(.active) {
+            border: 1px solid #DDD;
+        }
+        // Grey By Default, Color based on Pipette Association and Active Step
+        .placeable {
+            flex: 1 1 100%;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+            left: 0;
+            border: 2px solid #666;
+            background-color: grey;
+            svg {
+                box-sizing: border-box;
+                overflow: visible;
+                height: 100%;
+                align-self: center;
+                .well,
+                .trough {
+                    stroke: #333;
+                    stroke-width: 1px;
+                    fill: #666;
+                }
+            }
+        }
+        // Blue if associated with selected pipette
+        &.occupied.currentPipette {
+            display: flex;
+            justify-content: stretch;
+            box-sizing: border-box;
+            opacity: 0.7;
+            .placeable {
+                background-color: $primary-brand;
+                border: 2px solid #68affc;
+                svg {
+                    .well,
+                    .trough {
+                        stroke: #004999;
+                        stroke-width: 1px;
+                        fill: #68affc;
+                    }
+                }
+            }
+            &.calibrated {
+                opacity: 1;
+            }
+        }
+        // turn teal if current container/step
+        &.active.occupied.currentPipette {
+            z-index: 1000;
+            .placeable {
+                box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.3);
+                border: 5px solid $secondary-brand;
+                svg {
+                    .well {
+                        &:first-child {
+                            fill: $call-to-action;
+                        }
+                    }
+                    .trough {
+                        &:last-child {
+                            fill: $call-to-action;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

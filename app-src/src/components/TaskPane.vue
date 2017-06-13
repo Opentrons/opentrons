@@ -1,23 +1,19 @@
 <template>
   <span>
     <section id='task-pane' v-show='!running()'>
-      <aside id='step-list'>
-        <StepList></StepList>
-      </aside>
-      <router-view :class="{'disabled': busy}"></router-view>
-    </section>
-    <RunScreen class='run-screen' v-show='running()'></RunScreen>
-  </span>
+    <router-view></router-view>
+        </section>
+        <RunScreen class='run-screen' v-show='running()'></RunScreen>
+      </span>
 </template>
 
 <script>
-  import StepList from './StepList.vue'
   import RunScreen from './RunScreen.vue'
 
   export default {
+    name: 'TaskPane',
     props: ['busy'],
     components: {
-      StepList,
       RunScreen
     },
     methods: {

@@ -23,7 +23,6 @@ class InstrumentMosfet(object):
     """
     Provides access to MagBead's MOSFET.
     """
-
     def __init__(self, this_robot, mosfet_index):
         self.robot = this_robot
         self.mosfet_index = mosfet_index
@@ -101,7 +100,6 @@ class InstrumentMotor(object):
         rate : int
         """
         self.robot._driver.set_plunger_speed(rate, self.axis)
-        return self
 
 
 class Robot(object, metaclass=Singleton):
@@ -353,10 +351,16 @@ class Robot(object, metaclass=Singleton):
         self._driver = device
         self.smoothie_drivers['live'] = device
 
-        # set virtual smoothie do have same dimensions as real smoothie
-        ot_v = device.ot_version
-        self.smoothie_drivers['simulate'].ot_version = ot_v
-        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
+        # overwrite VirtualSmoothie to share same versions as live robot
+        for mode in ['simulate', 'simulate_switches']:
+            self.smoothie_drivers[mode] = drivers.get_virtual_driver(
+                options={
+                    'firmware': device.get_firmware_version(),
+                    'limit_switches': 'switch' in mode
+                })
+            self.smoothie_drivers[mode].ot_version = device.get_ot_version()
+
+        self.set_connection('live')
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -672,12 +676,13 @@ class Robot(object, metaclass=Singleton):
         cmd_run_event['mode'] = mode
         cmd_run_event['name'] = 'command-run'
         for i, command in enumerate(self._commands):
-            cmd_run_event.update({
-                'command_description': command.description,
-                'command_index': i,
-                'commands_total': len(self._commands)
-            })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
+            if not self._driver.is_simulating():
+                cmd_run_event.update({
+                    'command_description': command.description,
+                    'command_index': i,
+                    'commands_total': len(self._commands)
+                })
+                trace.EventBroker.get_instance().notify(cmd_run_event)
             try:
                 self.can_pop_command.wait()
                 if command.description:
@@ -685,7 +690,7 @@ class Robot(object, metaclass=Singleton):
                 command()
             except Exception as e:
                 trace.EventBroker.get_instance().notify({
-                    'mode': mode,
+                    'mode': 'live',
                     'name': 'command-failed',
                     'error': str(e)
                 })
@@ -716,7 +721,7 @@ class Robot(object, metaclass=Singleton):
         if not resp.ok:
             raise Exception('App failed to accept protocol upload')
 
-    def simulate(self, switches=False):
+    def simulate(self, switches=False, record=False):
         """
         Simulate a protocol run on a virtual robot.
 
@@ -754,17 +759,28 @@ class Robot(object, metaclass=Singleton):
 
         d = self.smoothie_drivers[mode]
 
-        # set VirtualSmoothie's coordinates to be the same as physical robot
         if d and d.is_simulating():
-            if self._driver and self._driver.is_connected():
-                d.connection.serial_port.set_position_from_arguments({
-                    ax.upper(): val
-                    for ax, val in self._driver.get_current_position().items()
-                })
+            self._copy_driver_coordinates(d)
 
         self._driver = d
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
+
+    def _copy_driver_coordinates(self, virtual_driver):
+        # set VirtualSmoothie's coordinates to be the same as physical robot
+        if self._driver and self._driver.is_connected():
+            version = virtual_driver.get_firmware_version()
+            virtual_smoothie = virtual_driver.connection.serial_port
+            if version == 'v1.0.5':
+                virtual_smoothie.process_set_position_command({
+                    a.upper(): v
+                    for a, v in self._driver.get_position()['current'].items()
+                })
+            else:
+                virtual_smoothie.set_position_from_arguments({
+                    a.upper(): v
+                    for a, v in self._driver.get_current_position().items()
+                })
 
     def disconnect(self):
         """
@@ -776,7 +792,6 @@ class Robot(object, metaclass=Singleton):
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
-        del self.smoothie_drivers['live']
         self.smoothie_drivers['live'] = None
 
     def containers(self):
@@ -937,20 +952,21 @@ class Robot(object, metaclass=Singleton):
     def versions(self):
         # TODO: Store these versions in config
         compatible = self._driver.versions_compatible()
-        return {
+        res = {
             'firmware': {
                 'version': self._driver.get_firmware_version(),
-                'compatible': compatible['firmware']
+                'compatible': compatible.get('firmware')
             },
             'config': {
                 'version': self._driver.get_config_version(),
-                'compatible': compatible['config']
+                'compatible': compatible.get('config')
             },
             'ot_version': {
                 'version': self._driver.get_ot_version(),
-                'compatible': compatible['ot_version']
+                'compatible': compatible.get('ot_version')
             }
         }
+        return res
 
     def diagnostics(self):
         """
