@@ -4,7 +4,7 @@
     "build": "python3 scripts/build_electron_app_with_builder.py",
     "clean": "rm -rf ./out && rm -rf ./releases/*",
     "e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js",
-    "release": "python3 scripts/release_stable.py",
+    "release": "python3 scripts/release.py",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
     "unit-main": "mocha test/main/"
   },
