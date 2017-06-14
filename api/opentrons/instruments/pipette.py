@@ -996,6 +996,8 @@ class Pipette(Instrument):
         def _do():
             nonlocal location, presses
 
+            self.motor.move(self._get_plunger_position('bottom'))
+
             if location:
                 self.move_to(location, strategy='arc', enqueue=False)
 
