@@ -92,7 +92,9 @@ calibrations/
 
 # JS
 node_modules
-app-src/test/coverage
+.nvm
+
+app/test/coverage
 
 # app api assets
 api/opentrons/server/templates/

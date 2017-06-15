@@ -4,13 +4,10 @@ var webpack = require('webpack')
 
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 
-var outputPathDir = path.resolve(__dirname, '../api/opentrons/server/templates')
-console.log('[OT App Webpack] Output build dir path is:', outputPathDir)
-
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: path.join(outputPathDir),
+    path: 'build',
     publicPath: '/',
     filename: 'build.js'
   },

@@ -1,6 +1,12 @@
-.PHONY: app-pre-install
+SHELL:=/bin/bash
 
-app: app-pre-install
+.PHONY: api app shell
 
-app-pre-install:
-	./scripts/travis.sh pre-install
+api:
+	cd api && make config install exe
+
+app:
+	cd app && make config install build
+
+shell:
+	cd shell && make config install exe
