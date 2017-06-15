@@ -1,35 +1,33 @@
-.PHONY: api api-install api-test api-lint api-docs api-deploy api-clean api-valid-exe
+SHELL:=/bin/bash
 
-api: api-clean api-install api-lint api-test api-docs api-deploy api-exe
+.PHONY: test docs publish clean install exe config
 
-api-valid-exe: api-clean api-install api-test api-exe
+config: venv
 
-api-install:
-	pip3 install -r requirements.txt
-	python3 setup.py install
+venv:
+	virtualenv venv -p python3.5
 
-api-test:
-	nosetests --with-coverage
+install:
+	source venv/bin/activate && python setup.py install && pip install -r requirements.txt
 
-api-lint:
-	pylama
+test:
+	source venv/bin/activate && pylama opentrons tests && py.test --cov
 
-api-docs:
-	cd docs && make clean html && make doctest && cd ..
+docs:
+	source venv/bin/activate && cd docs && make html && make doctest
 
-api-deploy:
-	cd scripts && ./doc-deploy.sh && cd ..
+publish:
+	source venv/bin/activate && cd scripts && publish.sh && doc-deploy.sh
 
-api-wheel:
-	rm ../app/release-assets/*.whl; python3 setup.py bdist_wheel -d ../app/release-assets
-	ls ../app/release-assets/*.whl | xargs -I{} basename {} > ../app/release-assets/whl-name
+exe: dist
 
-api-exe:
-	python3 scripts/build_pyinstaller.py
+dist:
+	source venv/bin/activate && pyinstaller opentrons-api-server.spec
 
-api-clean:
+clean:
 	rm -rf \
 		*.egg-info \
-		build/ \
-		dist/ \
-		calibrations/ \
+		build \
+		dist \
+		calibrations \
+		.coverage

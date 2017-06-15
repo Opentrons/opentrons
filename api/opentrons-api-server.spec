@@ -6,11 +6,11 @@ import opentrons
 
 block_cipher = None
 
-a = Analysis(['../opentrons/server/main.py'],
+a = Analysis(['opentrons/server/main.py'],
              pathex=[],
              binaries=None,
              datas=[
-                 ('../opentrons/server/templates/', 'templates'),
+                 ('opentrons/server/templates/', 'templates'),
                  (os.path.join(opentrons.__path__[0], 'config'), 'opentrons/config')
              ],
              hiddenimports=[
@@ -30,7 +30,7 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
-          name='otone_server',
+          name='opentrons-api-server',
           debug=False,
           strip=False,
           upx=True,
