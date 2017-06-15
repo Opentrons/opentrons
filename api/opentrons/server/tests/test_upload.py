@@ -36,15 +36,6 @@ class UploadTestCase(unittest.TestCase):
         response = json.loads(response.data.decode())
         self.assertEqual(response['status'], 'success')
 
-    def test_upload_valid_python(self):
-        response = self.app.post('/upload', data={
-            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
-        })
-        from pprint import pprint
-        pprint(response.data)
-        status = json.loads(response.data.decode())['status']
-        self.assertEqual(status, 'success')
-
     def test_get_instrument_placeables(self):
         self.robot.connect(options={'limit_switches': False})
         response = self.app.post('/upload', data={

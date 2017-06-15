@@ -374,7 +374,6 @@ class Robot(object):
 
     def add_command(self, command):
         if self.mode == 'live':
-            print('saving cmd', command)
             cmd_run_event = {'caller': 'ui'}
             cmd_run_event['mode'] = 'live'
             cmd_run_event['name'] = 'command-run'
