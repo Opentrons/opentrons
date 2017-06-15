@@ -83,7 +83,7 @@ def get_serial_ports_list():
     return result
 
 
-def get_virtual_driver(options):
+def get_virtual_driver(options={}):
 
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
@@ -122,21 +122,23 @@ def get_serial_driver(port):
 
 def get_driver(c):
     driver_class = drivers_by_version.get(get_version(c))
-    if not driver_class:
+    if driver_class:
+        d = driver_class(SMOOTHIE_DEFAULTS)
+        d.connect(c)
+        return d
+    else:
         raise RuntimeError(
-            'Can not read version from port {}'.format(c.name()))
-    d = driver_class(SMOOTHIE_DEFAULTS)
-    d.connect(c)
-    return d
+            'Can not read version from port "{}"'.format(c.name()))
 
 
 def get_version(c):
     c.open()
+    c.serial_pause()
     c.flush_input()
     c.write_string('version \r\n')
-    c.wait_for_data(timeout=3)
-    response = c.readline_string()
+    response = c.readline_string(timeout=3)
     c.flush_input()
+    c.close()
 
     # {"version":v1.0.5}
     v = response.split(':')[-1][:-1]

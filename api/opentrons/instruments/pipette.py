@@ -483,7 +483,7 @@ class Pipette(Instrument):
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(1)
+                location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 
     # QUEUEABLE
@@ -819,12 +819,12 @@ class Pipette(Instrument):
 
         presses = (1 if not is_number(presses) else presses)
 
+        self.motor.move(self._get_plunger_position('bottom'))
+
         if location:
             self.move_to(location, strategy='arc')
 
         tip_plunge = 6
-
-
         for i in range(int(presses) - 1):
             self.robot.move_head(z=tip_plunge, mode='relative')
             self.robot.move_head(z=-tip_plunge, mode='relative')

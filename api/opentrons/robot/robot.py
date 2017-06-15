@@ -176,6 +176,7 @@ class Robot(object):
             )
         }
         self._driver = None
+        self.arc_height = 5
         self.set_connection('simulate')
         self.reset()
 
@@ -321,6 +322,11 @@ class Robot(object):
 
         self._driver = device
         self.smoothie_drivers['live'] = device
+
+        # set virtual smoothie do have same dimensions as real smoothie
+        ot_v = device.ot_version
+        self.smoothie_drivers['simulate'].ot_version = ot_v
+        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -547,17 +553,18 @@ class Robot(object):
 
         _, _, tallest_z = self._calibrated_max_dimension(
             ref_container, instrument)
-        tallest_z += 5
+        tallest_z += self.arc_height
 
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(tallest_z, robot_max_z)
+        arrival_z = min(destination[2], robot_max_z)
 
         self._previous_container = this_container
 
         return [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
-            {'z': destination[2]}
+            {'z': arrival_z}
         ]
 
     @property
@@ -612,7 +619,7 @@ class Robot(object):
         cmd_run_event.update(kwargs)
 
         mode = 'live'
-        if self._driver.is_simulating():
+        if self.is_simulating():
             mode = 'simulate'
 
         cmd_run_event['mode'] = mode
@@ -697,7 +704,20 @@ class Robot(object):
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
-        self._driver = self.smoothie_drivers[mode]
+
+        d = self.smoothie_drivers[mode]
+
+        # set VirtualSmoothie's coordinates to be the same as physical robot
+        if d and d.is_simulating():
+            if self._driver and self._driver.is_connected():
+                d.connection.serial_port.set_position_from_arguments({
+                    ax.upper(): val
+                    for ax, val in self._driver.get_current_position().items()
+                })
+
+        self._driver = d
+        if self._driver and not self._driver.is_connected():
+            self._driver.toggle_port()
 
     def disconnect(self):
         """
@@ -858,6 +878,11 @@ class Robot(object):
 
     def is_connected(self):
         return self._driver.is_connected()
+
+    def is_simulating(self):
+        if not self._driver:
+            return False
+        return self._driver.is_simulating()
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
