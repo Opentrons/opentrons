@@ -1,11 +1,9 @@
 import unittest
-import time
 
 from opentrons import Robot
 from opentrons.containers import load as containers_load
 from opentrons.helpers.helpers import import_calibration_json
 from opentrons.instruments import pipette
-from opentrons.util.trace import EventBroker
 
 
 class PerformanceTest(unittest.TestCase):
@@ -133,6 +131,9 @@ class PerformanceTest(unittest.TestCase):
 
     def test_performance(self):
         """
+        # import time
+        # from opentrons.util.trace import EventBroker
+
         EventBroker.get_instance().add(self.log)
         start = time.process_time()
         self.protocol()

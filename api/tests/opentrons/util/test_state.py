@@ -5,8 +5,6 @@ from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 from opentrons.util import state
 
-from pprint import pprint as pp
-
 
 class StateTestCase(unittest.TestCase):
     def setUp(self):

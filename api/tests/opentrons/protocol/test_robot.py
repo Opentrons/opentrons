@@ -1,4 +1,3 @@
-import threading
 import unittest
 from unittest import mock
 
@@ -188,7 +187,8 @@ class RobotTest(unittest.TestCase):
 
         #
         # FIXME: pause and resume can't be measured based on whether commands
-        # in the command queue are executed since all robot actions will be called immediately
+        # in the command queue are executed since all robot actions will be
+        # called immediately
         #
 
         # self.robot.pause()

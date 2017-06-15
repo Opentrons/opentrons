@@ -62,7 +62,7 @@ class RobotSerializationTestCase(unittest.TestCase):
         )
         self.make_commands(p200, plate, p100, plate)
 
-        original_robot_cmds_txt = self.robot.commands()
+        # original_robot_cmds_txt = self.robot.commands()
         original_robot_cmd_cnts = len(self.robot._commands)
 
         robot_as_bytes = dill.dumps(self.robot)

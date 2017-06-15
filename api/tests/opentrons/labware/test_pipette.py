@@ -8,13 +8,10 @@ from opentrons.util.vector import Vector
 
 from opentrons.containers.placeable import unpack_location, Container, Well
 
-from pprint import pprint as pp
-
 
 class PipetteTest(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
-        # self.robot.connect()
         self.robot.home()
 
         self.trash = containers_load(self.robot, 'point', 'A1')
@@ -419,7 +416,6 @@ class PipetteTest(unittest.TestCase):
             self.plate[1:9],
             new_tip='always'
         )
-        # from pprint import pprint
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
