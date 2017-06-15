@@ -47,7 +47,7 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(self.robot._commands[0], 'hello')
 
     def test_home_after_disconnect(self):
-        self.robot.disconnect()
+        self.robot._driver.connection = None
         self.assertRaises(RuntimeError, self.robot.home)
 
     # TODO: reevaluate/implement this test...

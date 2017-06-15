@@ -48,7 +48,6 @@ socketio = SocketIO(app, async_mode='gevent')
 
 
 def notify(info):
-    print('[notify]', info)
     s = json.dumps(info, cls=VectorEncoder)
     name = json.loads(s).get('name')
     if name != 'move-finished' and name != 'move-to':
@@ -717,7 +716,7 @@ def calibrate_placeable():
     slot = request.json.get("slot")
     try:
         _calibrate_placeable(name, slot, axis)
-        calibrations = robot_state.get_state()
+        calibrations = robot_state.get_state(app.robot)
         emit_notifications([
             'Saved {0} for the {1} axis'.format(name, axis)], 'success')
     except Exception as e:

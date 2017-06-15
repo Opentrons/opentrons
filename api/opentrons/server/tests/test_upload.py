@@ -15,6 +15,7 @@ class UploadTestCase(unittest.TestCase):
             os.path.dirname(__file__) + '/data/'
         )
         self.robot = app.robot
+        self.robot.reset()
 
     def tearDown(self):
         del self.robot
@@ -39,13 +40,13 @@ class UploadTestCase(unittest.TestCase):
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
         })
-
-        print('%%%%%', response.data.decode())
+        from pprint import pprint
+        pprint(response.data)
         status = json.loads(response.data.decode())['status']
         self.assertEqual(status, 'success')
 
     def test_get_instrument_placeables(self):
-        self.robot.connect(None, options={'limit_switches': False})
+        self.robot.connect(options={'limit_switches': False})
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
         })
