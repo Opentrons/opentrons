@@ -1,5 +1,6 @@
 module.exports = {
   addHrefs,
+  getFakeUserId,
   getUserEmail,
   getUserId,
   getUserProfile,
@@ -8,6 +9,8 @@ module.exports = {
   processTasks
 }
 
+import uuidV4 from 'uuid/v4'
+
 function addHrefs (tasks) {
   tasks.map((instrument) => {
     instrument.href = '/calibrate/' + instrument.axis
@@ -15,6 +18,13 @@ function addHrefs (tasks) {
       placeable.href = '/calibrate/' + instrument.axis + '/' + placeable.slot + '/' + placeable.label
     })
   })
+}
+
+function getFakeUserId () {
+  if (!localStorage.getItem('fakeUserID')) {
+    localStorage.setItem('fakeUserID', 'fake-' + uuidV4())
+  }
+  return localStorage.getItem('fakeUserID')
 }
 
 function getUserId () {

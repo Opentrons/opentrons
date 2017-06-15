@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import store from './store/store'
-import { getUserId } from './util'
+import { getFakeUserId, getUserId } from './util'
 import {
   Placeable,
   CalibrateInstrument,
@@ -25,7 +25,7 @@ const router = new VueRouter({
 
 /* eslint-disable */
 window.onload = function () {
-  if (getUserId()) window.ot_dataLayer.push({userId: getUserId()})
+  window.ot_dataLayer.push({userId: getUserId() || getFakeUserId()})
   const app = new Vue({
     router,
     store,
