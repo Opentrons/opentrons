@@ -26,7 +26,8 @@ def get_state(robot):
                 for container in get_unique_containers(inst)
             ]
         }
-    for inst in get_all_pipettes(robot)]
+        for inst in get_all_pipettes(robot)
+    ]
 
 
 def get_unique_containers(instrument):
@@ -99,7 +100,8 @@ def sort_containers(container_list):
     Returns the passed container list, sorted with tipracks first
     then alphabetically by name
     """
-    is_tiprack = lambda c: 'tip' in c.get_type().lower()
+    def is_tiprack(c):
+        return 'tip' in c.get_type().lower()
 
     tiprack_containers = filter(is_tiprack, container_list)
     other_containers = filter(lambda c: not is_tiprack(c), container_list)
