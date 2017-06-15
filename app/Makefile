@@ -6,7 +6,7 @@ NVM_DIR:=$(shell pwd)/.nvm
 config: .nvm
 
 .nvm:
-	wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+	NVM_DIR=$(NVM_DIR) bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 	source '$(NVM_DIR)/nvm.sh' && nvm install --lts
 
 install: 
