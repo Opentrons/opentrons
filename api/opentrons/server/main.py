@@ -13,10 +13,9 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from opentrons import robot, Robot, containers, instruments
+from opentrons import robot, Robot, instruments, containers  # NOQA
 from opentrons.util import trace, environment, state as robot_state
 from opentrons.util.vector import VectorEncoder
-from opentrons.util.singleton import Singleton
 from opentrons.drivers.smoothie_drivers.v2_0_0 import player
 
 
@@ -86,7 +85,7 @@ def get_protocol_locals():
     return locals()
 
 
-def load_python(code : str):
+def load_python(code: str):
     robot = app.robot
     api_response = {'errors': [], 'warnings': []}
 
@@ -129,7 +128,6 @@ def load_python(code : str):
             "This protocol does not contain any commands for the robot."
         )
         api_response['errors'] = [error]
-
 
     return api_response
 
@@ -928,7 +926,6 @@ def start():
         engineio_logger=False,
         port=31950
     )
-
 
 
 if __name__ == "__main__":

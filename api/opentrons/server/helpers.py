@@ -49,14 +49,14 @@ def get_upload_proof_robot(robot):
     return (patched_robot, restore)
 
 
-def load_python(robot, code : str):
+def load_python(robot, code: str):
     robot.set_connection('simulate')
     robot.reset()
     exec(code, globals())
     robot.set_connection('live')
 
 
-def simulate_protocol(robot, code : str):
+def simulate_protocol(robot, code: str):
     """
     :param robot: robot instance for protocol
     :param code: str of protocol
@@ -67,7 +67,7 @@ def simulate_protocol(robot, code : str):
     return robot._commands
 
 
-def timestamp(seconds : int):
+def timestamp(seconds: int):
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     return "%d:%02d:%02d" % (hours, minutes, seconds)

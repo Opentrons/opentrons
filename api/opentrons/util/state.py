@@ -4,25 +4,28 @@ from opentrons.containers import placeable
 
 def get_state(robot):
     return [
-        {'axis': inst.axis,
-         'label': inst.name,
-         'channels': inst.channels,
-         'top': inst.positions['top'],
-         'bottom': inst.positions['bottom'],
-         'blow_out': inst.positions['blow_out'],
-         'drop_tip': inst.positions['drop_tip'],
-         'max_volume': inst.max_volume,
-         'calibrated': are_instrument_positions_calibrated(inst),
-         'placeables': [
-             {'type': container.get_type(),
-              'label': container.get_name(),
-              'slot': container.get_parent().get_name(),
-              'calibrated': is_inst_calibrated_to_container(
-                  inst, container
-              )
-            }
-         for container in get_unique_containers(inst)]
-         }
+        {
+            'axis': inst.axis,
+            'label': inst.name,
+            'channels': inst.channels,
+            'top': inst.positions['top'],
+            'bottom': inst.positions['bottom'],
+            'blow_out': inst.positions['blow_out'],
+            'drop_tip': inst.positions['drop_tip'],
+            'max_volume': inst.max_volume,
+            'calibrated': are_instrument_positions_calibrated(inst),
+            'placeables': [
+                {
+                    'type': container.get_type(),
+                    'label': container.get_name(),
+                    'slot': container.get_parent().get_name(),
+                    'calibrated': is_inst_calibrated_to_container(
+                        inst, container
+                    )
+                }
+                for container in get_unique_containers(inst)
+            ]
+        }
     for inst in get_all_pipettes(robot)]
 
 

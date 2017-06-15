@@ -19,7 +19,8 @@ def list_routes():
 
         methods = ','.join(rule.methods)
         url = flask.url_for(rule.endpoint, **options)
-        line = urllib.parse.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        line = urllib.parse.unquote("{:50s} {:20s} {}".format(
+            rule.endpoint, methods, url))
         output.append(line)
 
     for line in sorted(output):
