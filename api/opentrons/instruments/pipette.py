@@ -121,7 +121,7 @@ class Pipette(Instrument):
         self.min_volume = min_volume
         self.max_volume = max_volume or (min_volume + 1)
 
-        # NOTE: positions set to none in order to determine calibration state..?
+        # NOTE: positions set to none in order to determine calibration state?
         # self.positions = {
         #     'top': None,
         #     'bottom': None,
@@ -130,7 +130,7 @@ class Pipette(Instrument):
         # }
 
         # FIXME
-        default_positions =  {
+        default_positions = {
             'top': 0,
             'bottom': 10,
             'blow_out': 12,
@@ -331,7 +331,6 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
         if not is_number(volume):
@@ -359,7 +358,6 @@ class Pipette(Instrument):
         bottom = self._get_plunger_position('bottom')
         destination = bottom - distance
         speed = self.speeds['aspirate'] * rate
-
 
         """
         TODO: emit the description asynchronously
@@ -654,10 +652,10 @@ class Pipette(Instrument):
         v_offset = (0, 0, height_offset)
 
         well_edges = [
-            location.from_center(x=radius, y=0, z=1),  # right edge
-            location.from_center(x=radius * -1, y=0, z=1), # left edge
-            location.from_center(x=0, y=radius, z=1),  # back edge
-            location.from_center(x=0, y=radius * -1, z=1) # front edge
+            location.from_center(x=radius, y=0, z=1),       # right edge
+            location.from_center(x=radius * -1, y=0, z=1),  # left edge
+            location.from_center(x=0, y=radius, z=1),       # back edge
+            location.from_center(x=0, y=radius * -1, z=1)   # front edge
         ]
 
         # Apply vertical offset to well edges
