@@ -622,6 +622,8 @@ class Container(Placeable):
             new_wells = WellSeries(self.get_children_list())
         elif len(args) > 1:
             new_wells = WellSeries([self.well(n) for n in args])
+        elif 'x' in kwargs or 'y' in kwargs:
+            new_wells = self._parse_wells_x_y(*args, **kwargs)
         else:
             new_wells = self._parse_wells_to_and_length(*args, **kwargs)
 
@@ -673,6 +675,11 @@ class Container(Placeable):
                 step = step * -1 if step > 0 else step
             return WellSeries(
                 wrapped_wells[start + total_kids::step][:length])
+
+    def _parse_wells_x_y(self, *args, **kwargs):
+        x = kwargs.get('x', None)
+        y = kwargs.get('y', None)
+
 
 
 class WellSeries(Container):
