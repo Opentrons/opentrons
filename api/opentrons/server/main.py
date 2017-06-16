@@ -170,7 +170,8 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
-        commands, error_msg = helpers.run_protocol(app.robot, app.code)
+        commands, error_msg = helpers.run_protocol(
+            app.robot, app.code, mode='null')
         app.robot.mode = 'live'
         app.robot.cmds_total = len(commands)
         app.robot._commands = []
