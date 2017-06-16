@@ -85,53 +85,6 @@ def get_protocol_locals():
     return locals()
 
 
-def load_python(code: str):
-    robot = app.robot
-    api_response = {'errors': [], 'warnings': []}
-
-    robot.reset()
-
-    """
-    TODO: a perhaps cleaner work around to jailing certain robot
-    methods during runtime is to use a flag and make decision as to whether
-    or not they should run. Optionally we can decorate these methods. e.g.:
-
-    @not_run_safe
-    def foo(self, args):
-       pass
-
-    patched_robot, restore_patched_robot = (
-        helpers.get_upload_proof_robot(robot)
-    )
-    """
-    try:
-        app.robot.set_connection('simulate')
-        app.robot.reset()
-        exec(code, globals())
-    except Exception as e:
-        app.logger.exception('Protocol exec failed')
-        tb = e.__traceback__
-        stack_list = traceback.extract_tb(tb)
-        _, line, name, text = stack_list[-1]
-        if 'exec' in text:
-            text = None
-        raise Exception(
-            'Error in protocol file line {} : {}\n{}'.format(
-                line,
-                str(e),
-                text or ''
-            )
-        )
-
-    if len(robot._commands) == 0:
-        error = (
-            "This protocol does not contain any commands for the robot."
-        )
-        api_response['errors'] = [error]
-
-    return api_response
-
-
 @app.route("/upload", methods=["POST"])
 def upload():
     # TODO: refactor and persist upload history?
@@ -149,9 +102,10 @@ def upload():
 
     extension = file.filename.split('.')[-1].lower()
 
-    api_response = None
+    api_response = {'errors': [], 'warnings': []}
     if extension == 'py':
-        api_response = load_python(app.code)
+        commands, stack_trace = helpers.load_python(app.robot, app.code)
+        api_response['errors'] = stack_trace
     else:
         return flask.jsonify({
             'status': 'error',
@@ -251,14 +205,14 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
-        commands = helpers.simulate_protocol(app.robot, app.code)
+        commands, stack_trace = helpers.simulate_protocol(app.robot, app.code)
         robot.mode = 'live'
         robot.cmds_total = len(commands)
         robot._commands = []
         robot.resume()
 
         start_time = time.time()
-        load_python(app.code)
+        helpers.load_python(app.robot, app.code)   
         end_time = time.time()
 
         run_time = helpers.timestamp(end_time - start_time)

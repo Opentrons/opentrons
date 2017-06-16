@@ -49,22 +49,31 @@ def get_upload_proof_robot(robot):
     return (patched_robot, restore)
 
 
-def load_python(robot, code: str):
-    robot.set_connection('simulate')
-    robot.reset()
-    exec(code, globals())
-    robot.set_connection('live')
+def load_python(robot, code: str) -> tuple:
+    stack_trace = []
+    commands = []
+    try:
+        robot.reset()
+        exec(code, globals())
+        commands = robot._commands
+    except Exception as e:
+        tb = e.__traceback__
+        stack_trace = traceback.format_list(traceback.extract_tb(tb))
+        app.logger.exception('Protocol exec failed')
+        app.logger.exception(stack_trace)
+    return (commands, stack_trace)
 
 
-def simulate_protocol(robot, code: str):
+def simulate_protocol(robot, code: str) -> tuple:
     """
     :param robot: robot instance for protocol
     :param code: str of protocol
     :return:
     """
-
-    load_python(robot, code)
-    return robot._commands
+    robot.set_connection('simulate')
+    res = load_python(robot, code)
+    robot.set_connection('live')
+    return res
 
 
 def timestamp(seconds: int):
