@@ -175,7 +175,8 @@ class Robot(object):
                 options={'limit_switches': True}
             )
         }
-        self._driver = None
+        self._driver = drivers.get_virtual_driver()
+        self.disconnect()
         self.arc_height = 5
         self.set_connection('simulate')
         self.reset()
@@ -727,9 +728,6 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-
-        del self.smoothie_drivers['live']
-        self.smoothie_drivers['live'] = None
 
     def containers(self):
         """

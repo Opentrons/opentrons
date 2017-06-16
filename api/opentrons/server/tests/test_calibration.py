@@ -13,6 +13,8 @@ class CalibrationTestCase(unittest.TestCase):
             os.path.dirname(__file__) + '/data/'
         )
         self.robot = app.robot
+        self.robot.reset()
+        self.robot.connect()
 
     def test_move_to_slot(self):
         arguments = {
