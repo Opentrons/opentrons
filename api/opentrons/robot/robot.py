@@ -171,8 +171,10 @@ class Robot(object):
         }
 
         null_driver = drivers.get_virtual_driver()
+
         def _null(*args, **kwargs):
             return
+
         null_driver.move = _null
         null_driver.home = _null
         self.smoothie_drivers['null'] = null_driver
