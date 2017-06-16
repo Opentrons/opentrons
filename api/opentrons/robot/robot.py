@@ -169,10 +169,18 @@ class Robot(object):
                 options={'limit_switches': True}
             )
         }
+
+        null_driver = drivers.get_virtual_driver()
+        def _null(*args, **kwargs):
+            return
+        null_driver.move = _null
+        null_driver.home = _null
+        self.smoothie_drivers['null'] = null_driver
+
         self._driver = drivers.get_virtual_driver()
         self.disconnect()
         self.arc_height = 5
-        self.set_connection('simulate')
+        self.set_connection('null')
         self.reset()
 
     def reset(self):
@@ -322,6 +330,7 @@ class Robot(object):
         ot_v = device.ot_version
         self.smoothie_drivers['simulate'].ot_version = ot_v
         self.smoothie_drivers['simulate_switches'].ot_version = ot_v
+        self.smoothie_drivers['null'].ot_version = ot_v
 
     def _update_axis_homed(self, *args):
         for a in args:

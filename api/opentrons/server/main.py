@@ -69,7 +69,7 @@ def welcome():
 def exit():
     # stop any active threads
     exit_threads.set()  # stop detached run thread
-    Robot.get_instance().stop()  # stops attached run thread
+    app.robot.stop()  # stops attached run thread
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         sys.exit()
@@ -101,7 +101,8 @@ def upload():
 
     api_response = {'errors': [], 'warnings': []}
     if extension == 'py':
-        commands, error_msg = helpers.simulate_protocol(app.robot, app.code)
+        commands, error_msg = helpers.run_protocol(
+            app.robot, app.code, mode='null')
         if error_msg:
             app.logger.exception('Protocol exec failed')
             app.logger.exception(error_msg)
@@ -169,14 +170,14 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
-        commands, stack_trace = helpers.simulate_protocol(app.robot, app.code)
-        robot.mode = 'live'
-        robot.cmds_total = len(commands)
-        robot._commands = []
-        robot.resume()
+        commands, error_msg = helpers.run_protocol(app.robot, app.code)
+        app.robot.mode = 'live'
+        app.robot.cmds_total = len(commands)
+        app.robot._commands = []
+        app.robot.resume()
 
         start_time = time.time()
-        helpers.load_python(app.robot, app.code)
+        helpers.run_protocol(app.robot, app.code, mode='live')
         end_time = time.time()
 
         run_time = helpers.timestamp(end_time - start_time)
@@ -189,15 +190,13 @@ def run():
 
 @app.route("/run_home", methods=["GET"])
 def run_home():
-    robot = app.robot
-    robot.home()
+    app.robot.home()
     return run()
 
 
 def _detached_progress():
-    robot = Robot.get_instance()
     while not exit_threads.is_set():
-        res = robot._driver.smoothie_player.progress(timeout=20)
+        res = app.robot._driver.smoothie_player.progress(timeout=20)
         if not res.get('file'):
             return
         percentage = '{}%'.format(round(res.get('percentage', 0) * 100, 2))
@@ -230,7 +229,6 @@ def _detached_progress():
 
 def _run_detached():
     try:
-        robot = Robot.get_instance()
         p = player.SmoothiePlayer_2_0_0()
 
         d = {'caller': 'ui', 'mode': 'live', 'name': 'command-run'}
@@ -239,16 +237,19 @@ def _run_detached():
         })
         notify(d)
 
-        robot.smoothie_drivers['simulate'].record_start(p)
-        robot.simulate()
-        robot.smoothie_drivers['simulate'].record_stop()
+        app.robot.smoothie_drivers['simulate_switches'].record_start(p)
+        commands, error_msg = helpers.run_protocol(
+            app.robot, app.code, mode='simulate_switches')
+        app.robot.smoothie_drivers['simulate_switches'].record_stop()
+        if error_msg:
+            raise RuntimeError(error_msg)
 
         d.update({
             'command_description': 'Saving file to robot, please wait...'
         })
         notify(d)
 
-        robot._driver.play(p)
+        app.robot._driver.play(p)
 
         d.update({
             'command_description': 'Protocol running, unplug USB at any time.'
@@ -274,21 +275,20 @@ def run_detached():
 
 @app.route("/run_home_detached", methods=["GET"])
 def run_home_detached():
-    robot = Robot.get_instance()
-    robot.home()
+    app.robot.home()
     return run_detached()
 
 
 @app.route("/pause", methods=["GET"])
 def pause():
-    result = robot.pause()
+    result = app.robot.pause()
     emit_notifications(['Protocol paused'], 'info')
     return flask.jsonify({'status': 'success', 'data': result})
 
 
 @app.route("/resume", methods=["GET"])
 def resume():
-    result = robot.resume()
+    result = app.robot.resume()
     emit_notifications(['Protocol resumed'], 'info')
 
     return flask.jsonify({
@@ -299,7 +299,7 @@ def resume():
 
 @app.route("/cancel", methods=["GET"])
 def stop():
-    result = robot.stop()
+    result = app.robot.stop()
     emit_notifications(['Protocol stopped'], 'info')
 
     return flask.jsonify({
@@ -310,7 +310,7 @@ def stop():
 
 @app.route("/halt", methods=["GET"])
 def halt():
-    result = robot.halt()
+    result = app.robot.halt()
     emit_notifications(
         ['Robot halted suddenly, please HOME ALL before running again'],
         'info'
@@ -334,46 +334,41 @@ def script_loader(filename):
 # TODO: move to robot.get_state()
 @app.route("/robot/serial/list")
 def get_serial_ports_list():
-    robot = app.robot
     return flask.jsonify({
-        'ports': robot.get_serial_ports_list()
+        'ports': app.robot.get_serial_ports_list()
     })
 
 
 # TODO: move to robot.get_state()
 @app.route("/robot/serial/is_connected")
 def is_connected():
-    robot = app.robot
     return flask.jsonify({
-        'is_connected': robot.is_connected(),
-        'port': robot.get_connected_port()
+        'is_connected': app.robot.is_connected(),
+        'port': app.robot.get_connected_port()
     })
 
 
 # TODO: move to robot.get_state()
 @app.route("/robot/get_coordinates")
 def get_coordinates():
-    robot = app.robot
     return flask.jsonify({
-        'coords': robot._driver.get_position().get("target")
+        'coords': app.robot._driver.get_position().get("target")
     })
 
 
 # TODO: move to robot.get_state()
 @app.route("/robot/diagnostics")
 def diagnostics():
-    robot = app.robot
     return flask.jsonify({
-        'diagnostics': robot.diagnostics()
+        'diagnostics': app.robot.diagnostics()
     })
 
 
 # TODO: move to robot.get_state()
 @app.route("/robot/versions")
 def get_versions():
-    robot = app.robot
     return flask.jsonify({
-        'versions': robot.versions()
+        'versions': app.robot.versions()
     })
 
 
@@ -396,7 +391,7 @@ def connectRobot():
         app.robot.connect(port, options=options)
     except Exception as e:
         # any robot version incompatibility will be caught here
-        robot.disconnect()
+        app.robot.disconnect()
         status = 'error'
         data = str(e)
         if "versions are incompatible" in data:
@@ -499,7 +494,6 @@ def home(axis):
 
 @app.route('/jog', methods=["POST"])
 def jog():
-    global robot
     coords = request.json
 
     status = 'success'
@@ -529,8 +523,8 @@ def move_to_slot():
         slot = app.robot._deck[slot]
 
         slot_x, slot_y, _ = slot.from_center(
-            x=-1, y=0, z=0, reference=robot._deck)
-        _, _, robot_max_z = robot._driver.get_dimensions()
+            x=-1, y=0, z=0, reference=app.robot._deck)
+        _, _, robot_max_z = app.robot._driver.get_dimensions()
 
         app.robot.move_head(z=robot_max_z)
         app.robot.move_head(x=slot_x, y=slot_y)
@@ -556,12 +550,12 @@ def move_to_container():
         well_x, well_y, well_z = tuple(instrument.calibrator.convert(
             container[0],
             container[0].bottom()[1]))
-        _, _, robot_max_z = robot._driver.get_dimensions()
+        _, _, robot_max_z = app.robot._driver.get_dimensions()
 
         # move to max Z to avoid collisions while calibrating
-        robot.move_head(z=robot_max_z)
-        robot.move_head(x=well_x, y=well_y)
-        robot.move_head(z=well_z)
+        app.robot.move_head(z=robot_max_z)
+        app.robot.move_head(x=well_x, y=well_y)
+        app.robot.move_head(z=well_z)
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -713,7 +707,7 @@ def _calibrate_placeable(container_name, parent_slot, axis_name):
         raise ValueError('Container {0} not found in slot {1}'.format(
             container_name, parent_slot))
 
-    if axis_name not in robot._instruments:
+    if axis_name not in app.robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
     instrument = app.robot._instruments[axis_name]
@@ -756,10 +750,10 @@ def calibrate_placeable():
 
 def _calibrate_plunger(position, axis_name):
     axis_name = axis_name.upper()
-    if axis_name not in robot._instruments:
+    if axis_name not in app.robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
-    instrument = robot._instruments[axis_name]
+    instrument = app.robot._instruments[axis_name]
     if position not in instrument.positions:
         raise ValueError('Position {} is not on the plunger'.format(position))
 

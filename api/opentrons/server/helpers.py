@@ -27,8 +27,7 @@ def get_upload_proof_robot(robot):
         'disconnect',
         'move_head',
         'move_plunger',
-        'reset',
-        'send_to_app'
+        'reset'
     ]
 
     def mock(*args, **kwargs):
@@ -48,8 +47,14 @@ def get_upload_proof_robot(robot):
     return (patched_robot, restore)
 
 
-def load_python(robot, code: str) -> tuple:
-    exception_msg = []
+def run_protocol(robot, code: str, mode='simulate') -> tuple:
+    """
+    :param robot: robot instance for protocol
+    :param code: str of protocol
+    :return:
+    """
+    robot.set_connection(mode)
+    exception_msg = ''
     commands = []
     try:
         robot.reset()
@@ -57,19 +62,8 @@ def load_python(robot, code: str) -> tuple:
         commands = robot._commands
     except Exception:
         exception_msg = traceback.format_exc()
-    return (commands, exception_msg)
-
-
-def simulate_protocol(robot, code: str) -> tuple:
-    """
-    :param robot: robot instance for protocol
-    :param code: str of protocol
-    :return:
-    """
-    robot.set_connection('simulate')
-    res = load_python(robot, code)
     robot.set_connection('live')
-    return res
+    return (commands, exception_msg)
 
 
 def timestamp(seconds: int):
