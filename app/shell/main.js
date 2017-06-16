@@ -1,28 +1,25 @@
-if (require('electron-squirrel-startup')) return
-const child_process = require('child_process')
+const {app, BrowserWindow} = require('electron')
+
+if (require('electron-squirrel-startup')) app.quit()
+
 const fs = require('fs')
-const http = require('http')
 const path = require('path')
-const urlJoin = require('url-join')
 
-const electron = require('electron')
 const rp = require('request-promise')
-const {app, BrowserWindow, ipcMain} = electron
 
-const {addMenu} = require('./menu.js')
-const {getLogger} = require('./logging.js')
-const {initAutoUpdater} = require('./updater.js')
-const {ServerManager} = require('./servermanager.js')
-const {PythonEnvManager} = require('./envmanager.js')
-const {waitUntilServerResponds} = require('./util.js')
+const {addMenu} = require('./menu')
+const {getLogger} = require('./logging')
+const {initAutoUpdater} = require('./updater')
+const {ServerManager} = require('./servermanager')
+const {waitUntilServerResponds} = require('./util')
 
 let appWindowUrl = 'http://127.0.0.1:31950/'
 let mainWindow
 let mainLogger
 let serverManager = new ServerManager()
 
-if (process.env.NODE_ENV === 'development'){
-  require('electron-debug')({showDevTools: 'undocked'});
+if (process.env.NODE_ENV === 'development') {
+  require('electron-debug')({showDevTools: 'undocked'})
   appWindowUrl = 'http://127.0.0.1:8090/'
 }
 
@@ -58,7 +55,7 @@ function createWindow (windowUrl) {
   }, 3000)
   // load the UI (no caching)
   setTimeout(() => {
-    mainWindow.loadURL(windowUrl, {"extraHeaders" : "pragma: no-cache\n"})
+    mainWindow.loadURL(windowUrl, {'extraHeaders': 'pragma: no-cache\n'})
   }, 200)
   return mainWindow
 }
@@ -82,7 +79,7 @@ function startUp () {
   mainLogger.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event
-  if (process.env.NODE_ENV === 'development'){
+  if (process.env.NODE_ENV === 'development') {
     require('vue-devtools').install()
   }
 
