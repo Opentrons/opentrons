@@ -69,6 +69,7 @@ class Pipette(Instrument):
     >>> p1000 = instruments.Pipette(axis='a', max_volume=1000)
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'A1')
     >>> p200 = instruments.Pipette(
+    ...     name='p200',
     ...     axis='b',
     ...     max_volume=200,
     ...     tip_racks=[tip_rack_200ul])
@@ -310,15 +311,15 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(
+        ...     name='p200', axis='a', max_volume=200, overwrite_volume=True)
 
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate 50uL from the center of a well
-        >>> relative_vector = plate[1].center()
-        >>> p200.aspirate(50, (plate[1], relative_vector)) # doctest: +ELLIPSIS
+        >>> p200.aspirate(50, plate[1].bottom()) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate 20uL in place, twice as fast
@@ -408,7 +409,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -524,7 +525,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
 
         >>> # mix 50uL in a Well, three times
         >>> p200.mix(3, 50, plate[0]) # doctest: +ELLIPSIS
@@ -580,7 +581,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -629,7 +630,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
@@ -695,7 +696,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
@@ -950,7 +951,7 @@ class Pipette(Instrument):
         --------
         ..
         >>> plate = containers.load('96-flat', 'B1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -976,7 +977,7 @@ class Pipette(Instrument):
         --------
         ..
         >>> plate = containers.load('96-flat', 'B1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1074,7 +1075,7 @@ class Pipette(Instrument):
         --------
         ..
         >>> plate = containers.load('96-flat', 'B1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
