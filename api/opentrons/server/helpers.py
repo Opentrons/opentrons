@@ -28,7 +28,6 @@ def get_upload_proof_robot(robot):
         'move_head',
         'move_plunger',
         'reset',
-        'send_to_app'
     ]
 
     def mock(*args, **kwargs):
