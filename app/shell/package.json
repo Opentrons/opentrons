@@ -1,11 +1,6 @@
 {
   "scripts": {
-    "postinstall": "install-app-deps",
-    "clean": "rm -rf ./out && rm -rf ./releases/*",
-    "build:frontend": "python scripts/build_electron_app_with_builder.py",
     "release": "npm run build:backend && npm run build:frontend",
-    "build:frontend:posix": "./scripts/build_electron_app_with_builder.py",
-    "build:frontend:win": "C:\\Python35\\python scripts\\build_electron_app_with_builder.py",
     "release:posix": "npm run build:env:posix && npm run build:backend:posix && npm run build:frontend:posix",
     "release:win": "npm run build:env:win && npm run build:backend:win && npm run build:frontend:win",
     "start": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true NODE_ENV=development electron app/ --disable-http-cache",
@@ -25,6 +20,7 @@
     "electron": "1.4.7",
     "electron-builder": "10.9.2",
     "electron-chromedriver": "1.4.1",
+    "electron-debug": "^1.0.1",
     "eslint": "^3.10.2",
     "eslint-config-standard": "^5.1.0",
     "eslint-friendly-formatter": "^1.2.2",
@@ -58,12 +54,9 @@
   },
   "build": {
     "asar": true,
-    "appId": "ot.one.opentrons",
+    "appId": "com.opentrons.ot-app",
     "electronVersion": "1.4.7",
     "productName": "Opentrons 2.0",
-    "extraResources": [
-      "env-dist/venv.zip"
-    ],
     "dmg": {
       "backgroundColor": "white",
       "contents": [
@@ -101,8 +94,6 @@
   "dependencies": {
     "asar": "^0.13.0",
     "autotrack": "1.1.0",
-    "babel-preset-es2016": "^6.16.0",
-    "electron-debug": "^1.0.1",
     "sinon": "^1.17.6",
     "underscore.string": "^3.3.4"
   }

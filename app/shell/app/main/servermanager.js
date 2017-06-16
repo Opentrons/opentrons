@@ -13,20 +13,7 @@ class ServerManager {
   start () {
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
-    let backendPath
-
-    let backends = {
-      'darwin': '/backend-dist/mac/otone_server',
-      'linux': '/backend-dist/linux/otone_server',
-      'win32': '\\backend-dist\\win\\otone_server.exe'
-    }
-
-    if (!(process.platform in backends)) {
-      console.log('\n\n\n\nunknown OS: ' + process.platform + '\n\n\n\n')
-      return
-    }
-
-    backendPath = app.getAppPath() + backends[process.platform]
+    let backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')
     process.env['appVersion'] = app.getVersion()
     this.execFile(backendPath, [userDataPath])
   }

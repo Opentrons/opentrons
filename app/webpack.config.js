@@ -1,4 +1,3 @@
-var argv = require('yargs').argv;
 var path = require('path')
 var webpack = require('webpack')
 
@@ -7,7 +6,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: 'build',
+    path: 'dist/ui',
     publicPath: '/',
     filename: 'build.js'
   },
@@ -93,7 +92,7 @@ module.exports = {
   target: 'web',  // process.env['APP_TARGET'] (TODO: bring back),
   plugins: [
       new CopyWebpackPlugin([
-          {from: 'src/index.html', to: 'index.html'}
+          {from: 'ui/index.html', to: 'index.html'}
       ])
   ]
 }

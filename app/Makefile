@@ -10,12 +10,17 @@ config: .nvm
 	source '$(NVM_DIR)/nvm.sh' && nvm install --lts
 
 install: 
-	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm i --production
+	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm i
 
-test:
+unit:
 	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run unit
 
-build:
+integration:
+	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run integration
+
+build: dist
+
+dist:
 	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run build
 
 clean:
