@@ -25,9 +25,7 @@ class MiscHelpersTestCase(unittest.TestCase):
             'disconnect',
             'move_head',
             'move_plunger',
-            'reset',
-            'run',
-            'simulate'
+            'reset'
         ]
 
         real_list = [getattr(self.robot, i) for i in methods]

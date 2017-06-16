@@ -28,8 +28,6 @@ def get_upload_proof_robot(robot):
         'move_head',
         'move_plunger',
         'reset',
-        'run',
-        'simulate',
         'send_to_app'
     ]
 
