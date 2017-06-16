@@ -14,7 +14,7 @@ module.exports = {
     extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, 'node_modules')],
     alias: {
-      src: path.resolve(__dirname, 'src'), // this alias is used by karma tests to import modules from the ./src dir
+      // src: path.resolve(__dirname, 'src'), // this alias is used by karma tests to import modules from the ./src dir
       vue: 'vue/dist/vue.js',
       sinon: 'sinon/pkg/sinon'
     }
@@ -89,7 +89,6 @@ module.exports = {
     'Access-Control-Allow-Credentials': 'true'
   },
   devtool: '#eval-source-map',
-  target: 'web',  // process.env['APP_TARGET'] (TODO: bring back),
   plugins: [
       new CopyWebpackPlugin([
           {from: 'ui/index.html', to: 'index.html'}
