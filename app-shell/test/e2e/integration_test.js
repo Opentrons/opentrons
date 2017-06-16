@@ -46,12 +46,8 @@ describe('application launch', function () {
     }
   })
 
-  function assertText(result, expected) {
-    expect(result).to.equal(expected)
-  }
-
   it('opens a window', function () {
-    return this.app.client.waitUntilWindowLoaded(600000000)
+    return this.app.client.waitUntilWindowLoaded(10000)
       .getWindowCount().should.eventually.equal(1)
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false
@@ -61,7 +57,7 @@ describe('application launch', function () {
       .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
   })
 
-  function connectAndRunLoadedProtocol() {
+  function connectAndRunLoadedProtocol () {
     let pauseTime = process.env.PAUSE_TIME || 0
     let connectDropDown = '//*[@id="connections"]'
     let virtualSmoothie = connectDropDown + '/option[3]'
@@ -105,7 +101,7 @@ describe('application launch', function () {
       .waitForText('.toast-message-text', 'Run complete')
   }
 
-  function uploadProtocol(file) {
+  function uploadProtocol (file) {
     let uploadXpath = '/html/body/div/section/span/form/div/input'
     return this.app.client
       .chooseFile(uploadXpath, file)
@@ -122,26 +118,6 @@ describe('application launch', function () {
       .then(uploadProtocol.bind(this, file))
       .then(connectAndRunLoadedProtocol.bind(this))
       .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
-  })
-
-  it('runs jupyter protocol', function () {
-    let uploadScript = path.join(__dirname, 'jupyter_upload.py')
-    child_process.spawnSync('python3', [uploadScript])
-
-    this.app.client.execute(() => {
-      window.confirm = function () { return true }
-    })
-    return this.app.client.waitUntilWindowLoaded(31950)
-      .then(connectAndRunLoadedProtocol.bind(this))
-  })
-
-  it('handles upload of empty protocol gracefully', function () {
-    let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/empty.py')
-    let expectedText = 'This protocol does not contain any commands for the robot.'
-    return this.app.client.waitUntilWindowLoaded(31950)
-      .then(uploadProtocol.bind(this, file))
-      .getText('.toast-message-text')
-      .then(assertText.bind(null, expectedText))
   })
 
   it('opens login dialog when login is clicked', function () {
