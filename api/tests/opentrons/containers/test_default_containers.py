@@ -19,7 +19,8 @@ class DefaultContainersTestCase(unittest.TestCase):
         self.T25_flask = containers_load(self.robot, 'T25-flask', 'B2')
 
     def test_new_containers(self):
-        p200 = pipette.Pipette(self.robot, axis='a', max_volume=1000)
+        p200 = pipette.Pipette(
+            self.robot, axis='a', max_volume=1000, name='stupid-pipette')
         p200.aspirate(100, self.wheaton_vial_rack[0])
         p200.aspirate(100, self.tube_rack_80well[0])
         p200.aspirate(100, self.T75_flask[0])

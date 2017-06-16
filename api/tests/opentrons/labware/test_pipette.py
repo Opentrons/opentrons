@@ -27,8 +27,11 @@ class PipetteTest(unittest.TestCase):
             max_volume=200,
             min_volume=10,  # These are variable
             axis="b",
-            channels=1
+            channels=1,
+            name='other-pipette-for-transfer-tests'
         )
+        self.p200.max_volume = 200
+        self.p200.update_calibrations()
 
         self.p200.reset()
 
@@ -915,7 +918,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '199', 'Well B1'],
             ['drop']
         ]
-        print(self.robot.commands())
+        from pprint import pprint
+        pprint(self.robot.commands())
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
@@ -1512,10 +1516,14 @@ class PipetteTest(unittest.TestCase):
 
         self.p200 = pipette.Pipette(
             self.robot,
+            max_volume=200,
             axis='b',
             tip_racks=[self.tiprack1, self.tiprack2],
-            trash_container=self.tiprack1
+            trash_container=self.tiprack1,
+            name='pipette-for-transfer-tests'
         )
+        self.p200.max_volume = 200
+        self.p200.update_calibrations()
 
         self.p200.move_to = mock.Mock()
 
