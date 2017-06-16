@@ -50,20 +50,10 @@ class Magbead(Instrument):
             :any:`run` or :any:`simulate`. If set to `False`, the
             method will skip the command queue and execute immediately
         """
-        def _setup():
-            self.engaged = True
-
-        def _do():
-            self.motor.engage()
-
-        _description = "Engaging Magbead at mosfet #{}".format(
-            self.motor)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
-
+        self.engaged = True
+        self.motor.engage()
+        _description = "Engaging Magbead at mosfet #{}".format(self.motor)
+        self.robot.add_command(_description)
         return self
 
     def disengage(self, enqueue=True):
@@ -80,20 +70,10 @@ class Magbead(Instrument):
             :any:`run` or :any:`simulate`. If set to `False`, the
             method will skip the command queue and execute immediately
         """
-        def _setup():
-            self.engaged = False
-
-        def _do():
-            self.motor.disengage()
-
-        _description = "Engaging Magbead at mosfet #{}".format(
-            self.motor)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
-
+        self.engaged = False
+        self.motor.disengage()
+        _description = "Engaging Magbead at mosfet #{}".format(self.motor)
+        self.robot.add_command(_description)
         return self
 
     def delay(self, seconds=0, minutes=0, enqueue=True):
@@ -111,23 +91,13 @@ class Magbead(Instrument):
             :any:`run` or :any:`simulate`. If set to `False`, the
             method will skip the command queue and execute immediately
         """
-        def _setup():
-            pass
-
-        def _do():
-            self.motor.wait(seconds)
-
         minutes += int(seconds / 60)
         seconds = int(seconds % 60)
         _description = "Delaying {} minutes and {} seconds".format(
             minutes, seconds)
+        self.robot.add_command(_description)
         seconds += (minutes * 60)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
-
+        self.motor.wait(seconds)
         return self
 
     @property
