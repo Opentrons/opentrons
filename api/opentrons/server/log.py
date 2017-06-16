@@ -2,8 +2,10 @@ import logging
 from logging.config import dictConfig
 import os
 
+from opentrons.util import environment
 
-data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
+
+data_dir = environment.get_path('APP_DATA_DIR')
 LOG_FILE_DIR = os.path.join(data_dir, 'logs')
 
 

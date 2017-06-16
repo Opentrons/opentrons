@@ -20,6 +20,7 @@ const state = {
   versions: [],
   uploading: false,
   running: false,
+  detached: false,
   protocolFinished: false,
   paused: false
 }
@@ -74,6 +75,9 @@ const mutations = {
   },
   [types.UPDATE_RUNNING] (state, payload) {
     state.running = payload.running
+  },
+  [types.UPDATE_DETACHED] (state, payload) {
+    state.detached = payload.detached
   },
   [types.UPDATE_PROTOCOL_FINISHED] (state, payload) {
     state.protocolFinished = payload.running
