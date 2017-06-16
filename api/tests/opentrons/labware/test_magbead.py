@@ -30,8 +30,6 @@ class MagbeadTest(unittest.TestCase):
     def test_magbead_engage(self):
         self.magbead.engage()
 
-        self.robot.run()
-
         calls = self.robot._driver.set_mosfet.mock_calls
         expected = [mock.call(0, True)]
         self.assertEquals(calls, expected)
@@ -39,7 +37,6 @@ class MagbeadTest(unittest.TestCase):
     def test_magbead_disengage(self):
         self.magbead.engage()
         self.magbead.disengage()
-        self.robot.run()
 
         calls = self.robot._driver.set_mosfet.mock_calls
         expected = [mock.call(0, True), mock.call(0, False)]
@@ -50,7 +47,6 @@ class MagbeadTest(unittest.TestCase):
         self.magbead.delay(2)
         self.magbead.disengage()
         self.magbead.delay(minutes=2)
-        self.robot.run()
 
         calls = self.robot._driver.set_mosfet.mock_calls
         expected = [mock.call(0, True), mock.call(0, False)]

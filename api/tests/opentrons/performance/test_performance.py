@@ -123,8 +123,6 @@ class PerformanceTest(unittest.TestCase):
             p200.aspirate(2, plate[95 - i])
         p200.dispense(trough[0])
         p200.drop_tip(tiprack[1])
-        # TODO: optimize robot.run()
-        # robot.run()
 
     def log(self, info):
         self.events.append(info)

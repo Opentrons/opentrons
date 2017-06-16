@@ -72,20 +72,6 @@ class RobotTest(unittest.TestCase):
     #
     #     thread.join()
 
-    def test_exceptions_during_run(self):
-        p200 = pipette.Pipette(
-            self.robot, axis='b', name='my-fancy-pancy-pipette'
-        )
-
-        def _do():
-            return 'hello' / 3
-
-        p200.create_command(
-            do=_do,
-            enqueue=True)
-
-        self.assertRaises(RuntimeError, self.robot.run)
-
     def test_calibrated_max_dimension(self):
 
         expected = self.robot._deck.max_dimensions(self.robot._deck)

@@ -134,25 +134,6 @@ will print out...
     Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
     Goodbye, just dropped tip A1
 
-Simulate
-========
-
-Once commands have been enqueued to the ``robot``, we can simulate their execution by calling ``robot.simulate()``. This helps us debug our protocol, and to see if the robots gives us any warnings.
-
-.. testcode:: robot
-    
-    pipette.pick_up_tip()
-
-    for warning in robot.simulate():
-        print(warning)
-
-will print out...
-
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    pick_up_tip called with no reference to a tip
-
 Get Containers
 ==============
 

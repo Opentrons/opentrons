@@ -144,8 +144,6 @@ class Robot(object):
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
     ['Aspirating 200 at <Deck><Slot A1><Container plate><Well A1>']
-    >>> robot.simulate()
-    []
     """
 
     def __init__(self):
@@ -591,31 +589,6 @@ class Robot(object):
         for instrument in self._instruments.values():
             instrument.reset()
 
-    def run(self, **kwargs):
-        """
-        [DEPRECATED]
-        Run the command queue on a device provided in :func:`connect`.
-
-        Notes
-        -----
-        If :func:`connect` was called with ``port='Virtual Smoothie'``
-        it will execute similar to :func:`simulate`.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import Robot
-        >>> robot = Robot()
-        >>> from opentrons.instruments.pipette import Pipette
-        >>> robot.connect('Virtual Smoothie')
-        >>> robot.home()
-        >>> plate = robot.add_container('96-flat', 'A1', 'plate')
-        >>> p200 = Pipette(robot, axis='a')
-        >>> robot.move_to(plate[0])
-        >>> robot.move_to(plate[0].top())
-        """
-        return self._runtime_warnings
-
     def send_to_app(self):
         robot_as_bytes = dill.dumps(self)
         try:
@@ -636,22 +609,6 @@ class Robot(object):
         )
         if not resp.ok:
             raise Exception('App failed to accept protocol upload')
-
-    def simulate(self, switches=False):
-        """
-        [DEPRECATED]
-        Simulate a protocol run on a virtual robot.
-
-        It is recommended to call this method before running the
-        protocol on a real robot.
-
-        Parameters
-        ----------
-        switches : bool
-            If ``True`` tells the robot to stop
-            execution and throw an error if limit switch was hit.
-        """
-        return self._runtime_warnings
 
     def set_connection(self, mode):
         if mode not in self.smoothie_drivers:
