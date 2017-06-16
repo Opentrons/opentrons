@@ -2,16 +2,12 @@ import copy
 import os
 from threading import Event
 
-import dill
-import requests
-
 from opentrons import containers, drivers
 from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
-from opentrons.util.environment import settings
 
 
 log = get_logger(__name__)
@@ -588,27 +584,6 @@ class Robot(object):
 
         for instrument in self._instruments.values():
             instrument.reset()
-
-    def send_to_app(self):
-        robot_as_bytes = dill.dumps(self)
-        try:
-            resp = requests.get(settings.get('APP_IS_ALIVE_URL'))
-            if not resp.ok:
-                raise Exception
-        except (Exception, requests.exceptions.ConnectionError):
-            print(
-                'Cannot determine if the Opentrons App is up and running.'
-                ' Please make sure it is installed and running'
-            )
-            return
-
-        resp = requests.post(
-            settings.get('APP_JUPYTER_UPLOAD_URL'),
-            data=robot_as_bytes,
-            headers={'Content-Type': 'application/octet-stream'}
-        )
-        if not resp.ok:
-            raise Exception('App failed to accept protocol upload')
 
     def set_connection(self, mode):
         if mode not in self.smoothie_drivers:

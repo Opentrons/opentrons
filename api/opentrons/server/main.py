@@ -6,7 +6,6 @@ import sys
 import threading
 import time
 
-import dill
 import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
@@ -137,42 +136,6 @@ def upload():
             'lastModified': app.last_modified
         }
     })
-
-
-@app.route("/upload-jupyter", methods=["POST"])
-def upload_jupyter():
-    robot = app.robot
-
-    try:
-        jupyter_robot = dill.loads(request.data)
-        # These attributes need to be persisted from existing robot
-        jupyter_robot._driver = robot._driver
-        jupyter_robot.smoothie_drivers = robot.smoothie_drivers
-        jupyter_robot.can_pop_command = robot.can_pop_command
-        app.robot = jupyter_robot
-
-        # Reload instrument calibrations
-        [instr.load_persisted_data()
-            for _, instr in jupyter_robot.get_instruments()]
-        [instr.update_calibrator()
-            for _, instr in jupyter_robot.get_instruments()]
-
-        app.current_protocol_step_list = None  # NOQA
-        calibrations = robot_state.get_state(app.robot)
-        app.filename = 'JUPYTER UPLOAD'
-        app.last_modified = dt.datetime.now().strftime('%a %b %d %Y')
-        upload_data = {
-            'calibrations': calibrations,
-            'fileName': app.filename.title(),
-            'lastModified': app.last_modified
-        }
-        app.logger.info('Successfully deserialized robot for jupyter upload')
-        socketio.emit('event', {'data': upload_data, 'name': 'jupyter-upload'})
-    except Exception as e:
-        app.logger.exception('Failed to properly deserialize jupyter upload')
-        print(e)
-
-    return flask.jsonify({'status': 'success', 'data': None})
 
 
 @app.route("/load")
