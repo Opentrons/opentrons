@@ -5,7 +5,6 @@ import os
 import sys
 import threading
 import time
-import traceback
 
 import dill
 import flask
@@ -215,7 +214,7 @@ def run():
         robot.resume()
 
         start_time = time.time()
-        helpers.load_python(app.robot, app.code)   
+        helpers.load_python(app.robot, app.code)
         end_time = time.time()
 
         run_time = helpers.timestamp(end_time - start_time)
