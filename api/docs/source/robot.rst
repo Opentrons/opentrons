@@ -81,8 +81,6 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Homing Robot
-    Homing Robot
     Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
     Drop_tip at <Deck><Slot A1><Container my-rack><Well A1>
 

@@ -85,7 +85,8 @@ class Pipette(Instrument):
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
-            dispense_speed=500):
+            dispense_speed=500,
+            overwrite_volume=False):
 
         self.robot = robot
         self.axis = axis
@@ -159,6 +160,10 @@ class Pipette(Instrument):
                 self.positions[key] = default_positions[key]
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+
+        if overwrite_volume and is_number(max_volume) and max_volume > 0:
+            self.max_volume = max_volume
+            self.update_calibrations()
 
     def update_calibrator(self):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)

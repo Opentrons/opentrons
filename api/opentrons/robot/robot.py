@@ -593,6 +593,7 @@ class Robot(object):
 
     def run(self, **kwargs):
         """
+        [DEPRECATED]
         Run the command queue on a device provided in :func:`connect`.
 
         Notes
@@ -613,39 +614,6 @@ class Robot(object):
         >>> robot.move_to(plate[0])
         >>> robot.move_to(plate[0].top())
         """
-        self.prepare_for_run()
-
-        cmd_run_event = {}
-        cmd_run_event.update(kwargs)
-
-        mode = 'live'
-        if self.is_simulating():
-            mode = 'simulate'
-
-        cmd_run_event['mode'] = mode
-        cmd_run_event['name'] = 'command-run'
-        for i, command in enumerate(self._commands):
-            cmd_run_event.update({
-                'command_description': command.description,
-                'command_index': i,
-                'commands_total': len(self._commands)
-            })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
-            try:
-                self.can_pop_command.wait()
-                if command.description:
-                    log.info("Executing: {}".format(command.description))
-                command()
-            except Exception as e:
-                trace.EventBroker.get_instance().notify({
-                    'mode': mode,
-                    'name': 'command-failed',
-                    'error': str(e)
-                })
-                raise RuntimeError(
-                    'Command #{0} failed (\"{1}\"").\nError: \"{2}\"'.format(
-                        i, command.description, str(e))) from e
-
         return self._runtime_warnings
 
     def send_to_app(self):
@@ -671,6 +639,7 @@ class Robot(object):
 
     def simulate(self, switches=False):
         """
+        [DEPRECATED]
         Simulate a protocol run on a virtual robot.
 
         It is recommended to call this method before running the
@@ -682,20 +651,6 @@ class Robot(object):
             If ``True`` tells the robot to stop
             execution and throw an error if limit switch was hit.
         """
-        if switches:
-            self.set_connection('simulate_switches')
-        else:
-            self.set_connection('simulate')
-        for instrument in self._instruments.values():
-            instrument.setup_simulate()
-
-        self.run()
-
-        self.set_connection('live')
-
-        for instrument in self._instruments.values():
-            instrument.teardown_simulate()
-
         return self._runtime_warnings
 
     def set_connection(self, mode):
