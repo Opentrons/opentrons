@@ -45,7 +45,7 @@ window.intercomSettings = {
 </script>
 <script>
     function toggleNav () {
-        document.getElementById('main-menu').toggleClass('open');
+        document.getElementById('main-menu').classList.toggle('open');
     }
 </script>
 {% endblock %} {# Disable base theme's top+bottom related navs; we have our own in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock %} {# Nav should appear before content, not after #} {%- block content %}
