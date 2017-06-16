@@ -51,6 +51,7 @@ nav.main-menu a.brand {
 
 nav.main-menu a.brand img {
     margin-top: 4px;
+    margin-bottom: 6px;
     transition: all 0.5s linear;
     width: 100%;
 }
@@ -369,6 +370,7 @@ div#mc_embed_signup_scroll {
 
 div#mc_embed_signup_scroll input {
     max-width: 100%;
+    width: 98%;
     height: 34px;
     margin-top: 5px;
     padding-left: 10px;

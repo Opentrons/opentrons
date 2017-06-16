@@ -126,90 +126,78 @@ window.intercomSettings = {
 </div>
 {%- else %} {{ super() }} {%- endif %} {%- endblock %} {%- block footer %}
 <footer>
-    <div class="get-in-touch">
-        <h1 class="title">Get In Touch</h1>
-        <p class="caption">
-            We'd love to hear from you!
-            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
-        </p>
-        <form class="footerForm">
-            <div class="input-wrapper">
-                <input type="text" name="name" value="" id="name" placeholder="Name">
-                <input type="email" name="email" value="" id="email" placeholder="Email">
-            </div>
-            <textarea name="message" id="message" placeholder="Message"></textarea>
-            <input type="hidden" name="type" value="message"></input>
-            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+  <div class="wrapper">
+    
+    <section class="social-signup">
+      <div class="social-links">
+        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"  
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Facebook"
+        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
+        <a href="https://twitter.com/OpenTrons_" target="_blank" 
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+        <a href="https://www.instagram.com/opentronslab/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> 
+        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"  
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div id="mc_embed_signup">
+        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          <div id="mc_embed_signup_scroll">
+            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
+            ga-on="input"
+            ga-event-category="Mailchimp"
+            ga-event-action="Enter Email"
+            >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"  
+            ga-on="click"
+            ga-event-category="Mailchimp"
+            ga-event-action="Newsletter Signup">
+          </div>
         </form>
-    </div>
-    <div class="nav-link-group">
-        <div class="nav-link products">
-            <span class="link-title">PRODUCTS</span>
-            <ul class="products-list">
-                <li><a href="https://opentrons.com/#/robots">Robots</a></li>
-                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
-                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
-                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
-            </ul>
-        </div>
-        <div class="nav-link-divider"></div>
-        <div class="nav-link company">
-            <span class="link-title">COMPANY</span>
-            <ul class="company-list">
-                <li><a href="https://opentrons.com/about">About</a></li>
-                <li><a href="https://opentrons.com/team">Team</a></li>
-                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
-                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
-                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
-                <!-- <li>Privacy Policy</li> -->
-            </ul>
-        </div>
-        <div class="nav-link-divider"></div>
-        <div class="nav-link resources">
-            <span class="link-title">RESOURCES</span>
-            <ul class="resources-list">
+      </div>
+      <p class="copyrite">&#169;&nbsp;OPENTRONS 2017</p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots" >Robots</a></li>
+        <li><a href="https://opentrons.com/modules" >Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about" >About</a></li>
+        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        <li><a href="https://opentrons.recruitee.com/" target="_blank" class="hiring">WE'RE HIRING</a></li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+        <li><a href="https://support.opentrons.com/getting-started" target="_blank">Getting Started</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://support.opentrons.com/frequently-asked-questions" target="_blank">FAQ</a></li>
+          <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
 
+    </section>
 
-            <li><a href="https://support.opentrons.com/">Support</a></li>
-
-
-                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
-                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
-                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
-            </ul>
-        </div>
-        <div class="nav-link-divider"></div>
-        <div class="nav-link buy-button">
-            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
-        </div>
-        <div class="social-group">
-            <p class="social-links">
-                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
-                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
-                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
-                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
-                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
-            </p>
-            <p class="ot-newsletter">
-                Subscribe to our newsletter
-                <br>
-                <!-- <input type="email" name="email" placeholder="Email"></input>
-      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
-                <div id="mc_embed_signup">
-                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-                        <div id="mc_embed_signup_scroll">
-                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
-                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
-                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
-                            </div>
-                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
-                        </div>
-                    </form>
-                </div>
-            </p>
-        </div>
-        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
-    </div>
+  </div>
 </footer>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
