@@ -101,7 +101,7 @@ def sort_containers(container_list):
     then alphabetically by name
     """
     def is_tiprack(container):
-        return 'tip' in c.get_type().lower()
+        return 'tip' in container.get_type().lower()
 
     tiprack_containers = filter(is_tiprack, container_list)
     other_containers = filter(lambda c: not is_tiprack(c), container_list)

@@ -162,9 +162,9 @@ class Pipette(Instrument):
 
         # if the user passed an initialization value,
         # overwrite the loaded persisted data with it
-        if isinstance(max_volume, (int, float, complex)) and max_volume > 0:
-            self.max_volume = max_volume
-            self.update_calibrations()
+        # if isinstance(max_volume, (int, float, complex)) and max_volume > 0:
+        #     self.max_volume = max_volume
+        #     self.update_calibrations()
 
     def update_calibrator(self):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)

@@ -583,7 +583,7 @@ will print out...
 .. testoutput:: distributeconsolidate_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip 
+    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
     Aspirating 165.0 at <Deck><Slot B1><Container 96-flat><Well A1>
     Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well A2>
     Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well B2>
@@ -595,7 +595,7 @@ will print out...
     Aspirating 110.0 at <Deck><Slot B1><Container 96-flat><Well A1>
     Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well G2>
     Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Drop_tip
+    Drop_tip at <Deck><Slot D2><Container point><Well A1>
 
 If there are multiple source wells, the pipette will never combine their volumes into the same tip.
 
@@ -977,12 +977,12 @@ will print out...
 .. testoutput:: options_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip 
+    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
     Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
     Touching tip
     Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
     Touching tip
-    Drop_tip 
+    Drop_tip at <Deck><Slot D2><Container point><Well A1> 
 
 Blow Out
 --------
