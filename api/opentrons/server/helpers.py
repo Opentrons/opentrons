@@ -1,5 +1,6 @@
 import json
 import sys
+import traceback
 
 
 JSON_ERROR = None
@@ -50,18 +51,15 @@ def get_upload_proof_robot(robot):
 
 
 def load_python(robot, code: str) -> tuple:
-    stack_trace = []
+    exception_msg = []
     commands = []
     try:
         robot.reset()
         exec(code, globals())
         commands = robot._commands
-    except Exception as e:
-        tb = e.__traceback__
-        stack_trace = traceback.format_list(traceback.extract_tb(tb))
-        app.logger.exception('Protocol exec failed')
-        app.logger.exception(stack_trace)
-    return (commands, stack_trace)
+    except Exception:
+        exception_msg = traceback.format_exc()
+    return (commands, exception_msg)
 
 
 def simulate_protocol(robot, code: str) -> tuple:

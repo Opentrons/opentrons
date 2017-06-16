@@ -876,6 +876,8 @@ class Robot(object):
         return ports
 
     def is_connected(self):
+        if not self._driver:
+            return False
         return self._driver.is_connected()
 
     def is_simulating(self):

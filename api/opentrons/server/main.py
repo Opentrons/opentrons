@@ -104,8 +104,11 @@ def upload():
 
     api_response = {'errors': [], 'warnings': []}
     if extension == 'py':
-        commands, stack_trace = helpers.load_python(app.robot, app.code)
-        api_response['errors'] = stack_trace
+        commands, error_msg = helpers.simulate_protocol(app.robot, app.code)
+        if error_msg:
+            app.logger.exception('Protocol exec failed')
+            app.logger.exception(error_msg)
+            api_response['errors'] = [error_msg]
     else:
         return flask.jsonify({
             'status': 'error',
