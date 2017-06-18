@@ -679,7 +679,15 @@ class Container(Placeable):
     def _parse_wells_x_y(self, *args, **kwargs):
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
-
+        if x is None and isinstance(y, int):
+            return self.rows(y)
+        elif y is None and isinstance(x, int):
+            return self.cols(x)
+        elif isinstance(x, int) and isinstance(y, int):
+            i = (y * len(self.cols)) + x
+            return self.wells(i)
+        else:
+            raise ValueError('Placeable.wells(x=, y=) expects ints')
 
 
 class WellSeries(Container):
