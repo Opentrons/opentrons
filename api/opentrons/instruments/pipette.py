@@ -86,8 +86,7 @@ class Pipette(Instrument):
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
-            dispense_speed=500,
-            overwrite_volume=False):
+            dispense_speed=500):
 
         self.robot = robot
         self.axis = axis
@@ -162,7 +161,7 @@ class Pipette(Instrument):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
-        if overwrite_volume and is_number(max_volume) and max_volume > 0:
+        if is_number(max_volume) and max_volume > 0:
             self.max_volume = max_volume
             self.update_calibrations()
 
@@ -310,7 +309,7 @@ class Pipette(Instrument):
         --------
         ..
         >>> p200 = instruments.Pipette(
-        ...     name='p200', axis='a', max_volume=200, overwrite_volume=True)
+        ...     name='p200', axis='a', max_volume=200)
 
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -732,7 +731,7 @@ class Pipette(Instrument):
         ..
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a',
-        ...     tip_racks=[tiprack], max_volume=200, overwrite_volume=True)
+        ...     tip_racks=[tiprack], max_volume=200)
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
