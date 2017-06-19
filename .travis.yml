@@ -9,8 +9,7 @@ matrix:
   include:
     - os: linux
       sudo: false
-      python: "3.5"  # TODO: revisit...
-      env: OPENTRONS_APP_UPLOAD_DIR=linux
+      python: "3.5"
       addons:
         apt:
           sources: &common_sources
@@ -21,13 +20,11 @@ matrix:
             - graphicsmagick # electron-builder dependency
             - xvfb
     - os: osx
-      language: generic
-      env: OPENTRONS_APP_UPLOAD_DIR=mac
+      python: "3.5"
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
   pip: true
-  apt: true
   directories:
     - app/node_modules
 

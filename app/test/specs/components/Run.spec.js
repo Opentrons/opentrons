@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 import Vue from 'vue'
-import Run from 'renderer/components/Run.vue'
+import Run from 'components/Run.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {

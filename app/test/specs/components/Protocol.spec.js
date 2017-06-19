@@ -1,6 +1,6 @@
 /* global describe, it */
 import { expect } from 'chai'
-import Protocol from 'src/components/Protocol.vue'
+import Protocol from 'components/Protocol.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {

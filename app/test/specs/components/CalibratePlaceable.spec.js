@@ -1,10 +1,10 @@
 /* global describe, it */
 import { expect } from 'chai'
 import sinon from 'sinon'
-import CalibratePlaceable from 'src/components/CalibratePlaceable.vue'
+import CalibratePlaceable from 'components/CalibratePlaceable.vue'
 import { getRenderedVm } from '../../util.js'
 
-function getMockStore () {
+function getMockStore() {
   return {
     actions: {
       pickUpTip: sinon.spy(),

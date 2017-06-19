@@ -1,7 +1,7 @@
 /* global describe, it */
 import { expect } from 'chai'
 import sinon from 'sinon'
-import RunScreen from 'renderer/components/RunScreen.vue'
+import RunScreen from 'components/RunScreen.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {

@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 
-import wsp from 'renderer/store/websocket-plugin'
+import wsp from 'store/websocket-plugin'
 const { handleJupyterUpload } = wsp
 
 describe('websocket-plugin', () => {

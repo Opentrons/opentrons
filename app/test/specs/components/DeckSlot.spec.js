@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import Vue from 'vue'
 import sinon from 'sinon'
-import DeckSlot from 'src/components/DeckSlot.vue'
+import DeckSlot from 'components/DeckSlot.vue'
 import { getRenderedVm } from '../../util.js'
 
 function getMockStore () {

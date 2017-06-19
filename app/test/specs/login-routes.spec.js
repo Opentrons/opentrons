@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import sinon from 'sinon'
-import { loginUser, logoutUser } from 'src/login-routes'
+import { loginUser, logoutUser } from 'login-routes'
 
 describe('Login Routes', () => {
   it('sets user info on login', () => {
