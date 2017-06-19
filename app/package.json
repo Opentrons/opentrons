@@ -55,7 +55,7 @@
   "build": {
     "asar": true,
     "appId": "com.opentrons.ot-app",
-    "electronVersion": "1.4.7",
+    "electronVersion": "1.6.11",
     "productName": "Opentrons 2.0",
     "dmg": {
       "backgroundColor": "white",
