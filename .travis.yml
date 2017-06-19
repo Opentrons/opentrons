@@ -40,10 +40,12 @@ before_install:
 install:
   - curl -o- https://bootstrap.pypa.io/get-pip.py | python
   - pip install coveralls
-  - cd api && make config
+  - make -C api config install
+  - make -C app config install
 
 script:
-  - cd api && make install test
+  - make -C api test exe
+  - make -C app package
 
 # Deploy the build version in an S3 bucket
 deploy:
