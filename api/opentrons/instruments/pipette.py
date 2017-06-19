@@ -243,7 +243,6 @@ class Pipette(Instrument):
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    # QUEUEABLE
     def move_to(self, location, strategy='arc'):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
@@ -278,7 +277,6 @@ class Pipette(Instrument):
 
         return self
 
-    # QUEUEABLE
     def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -374,7 +372,6 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def dispense(self,
                  volume=None,
                  location=None,
@@ -484,7 +481,6 @@ class Pipette(Instrument):
                 location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 
-    # QUEUEABLE
     def mix(self,
             repetitions=1,
             volume=None,
@@ -555,7 +551,6 @@ class Pipette(Instrument):
 
         return self
 
-    # QUEUEABLE
     def blow_out(self, location=None):
         """
         Force any remaining liquid to dispense, by moving
@@ -597,7 +592,6 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def touch_tip(self, location=None, radius=1.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
@@ -667,7 +661,6 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def air_gap(self, volume=None, height=None):
         """
         Pull air into the :any:`Pipette` current tip
@@ -720,7 +713,6 @@ class Pipette(Instrument):
         self.aspirate(volume)
         return self
 
-    # QUEUEABLE
     def return_tip(self, home_after=True):
         """
         Drop the pipette's current tip to it's originating tip rack
@@ -760,7 +752,6 @@ class Pipette(Instrument):
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    # QUEUEABLE
     def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
@@ -832,7 +823,6 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def drop_tip(self, location=None, home_after=True):
         """
         Drop the pipette's current tip
@@ -900,7 +890,6 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def home(self):
 
         """
@@ -933,7 +922,6 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def distribute(self, *args, **kwargs):
         """
         Distribute will move a volume of liquid from a single of source
@@ -959,7 +947,6 @@ class Pipette(Instrument):
             kwargs['disposal_vol'] = self.min_volume
         return self.transfer(*args, **kwargs)
 
-    # QUEUEABLE
     def consolidate(self, *args, **kwargs):
         """
         Consolidate will move a volume of liquid from a list of sources
@@ -986,7 +973,6 @@ class Pipette(Instrument):
 
         return self.transfer(*args, **kwargs)
 
-    # QUEUEABLE
     def transfer(self, volume, source, dest, **kwargs):
 
         """
@@ -1100,7 +1086,6 @@ class Pipette(Instrument):
 
         return self
 
-    # QUEUEABLE
     def delay(self, seconds=0, minutes=0):
         """
         Parameters
