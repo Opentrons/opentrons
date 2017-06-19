@@ -26,8 +26,8 @@
     "package-linux": "npm run build && build --linux",
     "package-all": "npm run build && build -mwl"
   },
-  "name": "ot-one-desktop-app",
-  "productName": "OT One App 2",
+  "name": "ot-app",
+  "productName": "OT-App",
   "version": "2.4.2",
   "description": "OT One Robot Companion Desktop App",
   "main": "shell/dist/bundle.js",
@@ -39,7 +39,7 @@
     "name": "engineering@opentrons.com",
     "email": "engineering@opentrons.com"
   },
-  "license": "APACHE 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },

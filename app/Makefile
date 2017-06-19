@@ -8,7 +8,7 @@ config:
 	source '$(NVM_DIR)/nvm.sh' && nvm install --lts
 
 install:
-	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm i
+	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm up
 
 package:
 	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && mkdir -p bin && cp ../api/dist/opentrons-api-server bin/ && npm run package
