@@ -2,9 +2,7 @@ SHELL:=/bin/bash
 
 .PHONY: test docs publish clean install exe config dev
 
-config: venv
-
-venv:
+config:
 	virtualenv venv -p python3.5
 
 install:

@@ -3,13 +3,11 @@ NVM_DIR:=$(shell pwd)/.nvm
 
 .PHONY: test clean install config package
 
-config: .nvm
-
-.nvm:
+config:
 	NVM_DIR=$(NVM_DIR) bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 	source '$(NVM_DIR)/nvm.sh' && nvm install --lts
 
-install: 
+install:
 	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm i
 
 package:

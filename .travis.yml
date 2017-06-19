@@ -40,7 +40,7 @@ before_install:
 install:
   - curl -o- https://bootstrap.pypa.io/get-pip.py | python
   - pip install coveralls
-  - cd api && make install && cd ..
+  - cd api && make config install && cd ..
   - cd app && make config install && cd ..
 
 script:
