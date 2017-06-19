@@ -10,7 +10,6 @@ a = Analysis(['opentrons/server/main.py'],
              pathex=[],
              binaries=None,
              datas=[
-                 ('opentrons/server/templates/', 'templates'),
                  (os.path.join(opentrons.__path__[0], 'config'), 'opentrons/config')
              ],
              hiddenimports=[

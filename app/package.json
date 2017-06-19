@@ -46,7 +46,6 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "files": [
     "bin/opentrons-api-server",
-    "node_modules",
     "ui/dist",
     "ui/index.html",
     "shell/dist",
