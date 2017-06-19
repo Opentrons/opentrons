@@ -4,6 +4,9 @@ const path = require('path')
 
 const {app} = electron
 
+const {getAppVersion} = require('./util')
+const {getChannel} = require('./preferences')
+
 class ServerManager {
   constructor () {
     this.serverProcess = null
@@ -27,7 +30,7 @@ class ServerManager {
     }
 
     backendPath = app.getAppPath() + backends[process.platform]
-    process.env['appVersion'] = app.getVersion()
+    process.env['appVersion'] = getAppVersion(app.getVersion(), getChannel())
     this.execFile(backendPath, [userDataPath])
   }
 
