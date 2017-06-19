@@ -10,6 +10,8 @@ const rp = require('request-promise')
 const {app, BrowserWindow, ipcMain} = electron
 
 const {addMenu} = require('./menu.js')
+const {getAppVersion} = require('./util')
+const {getChannel} = require('./preferences')
 const {getLogger} = require('./logging.js')
 const {initAutoUpdater} = require('./updater.js')
 const {ServerManager} = require('./servermanager.js')
@@ -21,7 +23,7 @@ let mainWindow
 let mainLogger
 let serverManager = new ServerManager()
 
-if (process.env.NODE_ENV === 'development'){
+if (process.env.NODE_ENV === 'development') {
   require('electron-debug')({showDevTools: 'undocked'});
   appWindowUrl = 'http://127.0.0.1:8090/'
 }
@@ -58,7 +60,12 @@ function createWindow (windowUrl) {
   }, 3000)
   // load the UI (no caching)
   setTimeout(() => {
-    mainWindow.loadURL(windowUrl, {"extraHeaders" : "pragma: no-cache\n"})
+    const version = getAppVersion(app.getVersion(), getChannel())
+    const agent = mainWindow.webContents.getUserAgent().replace(/Chrome\/58\.0\.3029\.110/, `Chrome/${version}`)
+    mainWindow.loadURL(windowUrl, {
+        "extraHeaders" : "pragma: no-cache\n",
+        userAgent: agent
+    })
   }, 200)
   return mainWindow
 }
