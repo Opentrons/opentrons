@@ -1,6 +1,7 @@
 .DS_Store
 .env
 .python-version
+.eslintcache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -99,3 +100,7 @@ app/test/coverage
 # app api assets
 api/opentrons/server/templates/
 *.pid
+
+# build process assets
+app/bin/
+app/dll/

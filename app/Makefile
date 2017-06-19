@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 NVM_DIR:=$(shell pwd)/.nvm
 
-.PHONY: test clean install config 
+.PHONY: test clean install config package
 
 config: .nvm
 
@@ -12,20 +12,18 @@ config: .nvm
 install: 
 	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm i
 
-unit:
-	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run unit
+package:
+	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && mkdir -p bin && cp ../api/dist/opentrons-api-server bin/ && npm run package
 
-integration:
-	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run integration
-
-build: dist
-
-dist:
-	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run build
+test:
+	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run test
 
 clean:
 	rm -rf \
 		.nvm \
-		build \
+		ui/dist \
+		shell/dist \
+		dll \
 		node_modules \
+		bin \
 		.coverage

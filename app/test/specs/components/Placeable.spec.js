@@ -63,7 +63,7 @@ describe('Placeable.vue', () => {
     expect(emptyStore.actions.loadProtocol.calledOnce).to.be.true
   })
 
-  it('correctly determins its calibration point', () => {
+  it('correctly determines its calibration point', () => {
     expect(placeable.calibrationPoint).to.equal('of the A1 well')
 
     let troughStore = getMockStore()

@@ -1,6 +1,6 @@
 SHELL:=/bin/bash
 
-.PHONY: test docs publish clean install exe config
+.PHONY: test docs publish clean install exe config dev
 
 config: venv
 
@@ -18,6 +18,9 @@ docs:
 
 publish:
 	source venv/bin/activate && cd scripts && publish.sh && doc-deploy.sh
+
+dev:
+	source venv/bin/activate && python opentrons/server/main.py
 
 exe: dist
 

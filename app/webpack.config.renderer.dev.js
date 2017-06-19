@@ -16,8 +16,8 @@ import { spawn, execSync } from 'child_process';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import baseConfig from './webpack.config.base';
 
-const port = process.env.PORT || 1212;
-const publicPath = `http://localhost:${port}/dist`;
+const port = process.env.PORT || 8090;
+const publicPath = `http://localhost:${port}/`;
 const dll = path.resolve(process.cwd(), 'dll');
 const manifest = path.resolve(dll, 'vendor.json');
 
@@ -37,10 +37,8 @@ export default merge.smart(baseConfig, {
   target: 'electron-renderer',
 
   entry: [
-    'react-hot-loader/patch',
-    `webpack-dev-server/client?http://localhost:${port}/`,
-    'webpack/hot/only-dev-server',
-    path.join(__dirname, 'app/index.js'),
+    path.join(__dirname, './ui/main.js'),
+    `webpack-dev-server/client?http://localhost:${port}/`
   ],
 
   output: {
@@ -232,7 +230,7 @@ export default merge.smart(baseConfig, {
     lazy: false,
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    contentBase: path.join(__dirname, 'dist'),
+    contentBase: path.join(__dirname, 'ui'),
     watchOptions: {
       aggregateTimeout: 300,
       poll: 100

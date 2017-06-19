@@ -13,11 +13,12 @@
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --progress --profile --colors",
     "build-main": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.main.prod.js --progress --profile --colors",
     "build-renderer": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.prod.js --progress --profile --colors",
+    "build-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.js --progress --profile --colors",
     "start": "cross-env NODE_ENV=production electron ./app/",
     "prestart": "npm run build",
     "flow": "flow check",
     "flow-typed": "rimraf flow-typed/npm && flow-typed install --overwrite || true",
-    "start-hot-renderer": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./app/main.dev",
+    "start-hot-renderer": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./shell/main",
     "postinstall": "concurrently \"npm run flow-typed\" \"npm run build\" \"npm run build-dll\" \"install-app-deps\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\"",
     "dev": "cross-env START_HOT=1 npm run hot-updates-server",
     "package": "npm run build && build --publish never",
@@ -29,7 +30,7 @@
   "productName": "OT One App 2",
   "version": "2.4.2",
   "description": "OT One Robot Companion Desktop App",
-  "main": "shell/main.prod.js",
+  "main": "shell/dist/bundle.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"
@@ -44,11 +45,12 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "files": [
-    "bin",
+    "bin/opentrons-api-server",
     "node_modules",
     "ui/dist",
     "ui/index.html",
-    "shell/main.prod.js"
+    "shell/dist",
+    "ui/assets"
   ],
   "build": {
     "asar": true,
@@ -79,10 +81,12 @@
       "category": "productivity"
     },
     "win": {
-      "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico",
       "target": [
         "squirrel"
       ]
+    },
+    "squirrelWindows": {
+      "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
     },
     "linux": {
       "category": "Science",
@@ -90,7 +94,9 @@
     }
   },
   "devDependencies": {
+    "ajv": "^5.2.0",
     "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
     "babel-preset-env": "^1.5.2",
     "babel-preset-es2015": "^6.24.1",
@@ -100,7 +106,16 @@
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
     "electron": "^1.6.11",
-    "electron-builder": "^19.4.2",
+    "electron-builder": "^19.5.1",
+    "electron-builder-squirrel-windows": "^19.5.1",
+    "eslint": "^4.0.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-formatter-pretty": "^1.1.0",
+    "eslint-plugin-html": "^3.0.0",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.11.2",
     "node-sass": "^4.5.3",
@@ -121,19 +136,19 @@
   "dependencies": {
     "asar": "^0.13.0",
     "autotrack": "1.1.0",
-    "underscore.string": "^3.3.4",
-    "socket.io-client": "~1.3.7",
-    "websocket": "^1.0.23",
     "electron-json-storage": "^2.0.0",
-    "electron-settings": "^2.1.1",
+    "electron-settings": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
     "fs": "0.0.2",
-    "moment-timezone": "^0.5.9",
-    "request": "^2.78.0",
-    "request-promise": "^4.1.1",
+    "moment-timezone": "^0.5.13",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
+    "socket.io-client": "^1.7.4",
     "tar": "^2.2.1",
+    "underscore.string": "^3.3.4",
     "unzip": "0.1.11",
     "url-join": "1.1.0",
+    "websocket": "^1.0.23",
     "winston": "^2.2.0",
     "zip-folder": "^1.0.0"
   }

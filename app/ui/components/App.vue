@@ -25,9 +25,9 @@
     </section>
     <main id='container'>
       <Jog :busy='robotBusy'></Jog>
-      <TaskPane :busy='robotBusy'>
+      <TaskPane :busy='robotBusy' />
     </main>
-  <div>
+  </div>
 </template>
 
 

@@ -2,9 +2,9 @@
  * Webpack config for production electron main process
  */
 
+import path from 'path';
 import webpack from 'webpack';
 import merge from 'webpack-merge';
-import BabiliPlugin from 'babili-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
 
@@ -17,16 +17,11 @@ export default merge.smart(baseConfig, {
 
   // 'main.js' in root
   output: {
-    path: __dirname,
-    filename: './shell/main.prod.js'
+    path: path.join(__dirname, 'shell/dist'),
+    filename: './bundle.js'
   },
 
   plugins: [
-    /**
-     * Babli is an ES6+ aware minifier based on the Babel toolchain (beta)
-     */
-    new BabiliPlugin(),
-
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
       openAnalyzer: process.env.OPEN_ANALYZER === 'true'

@@ -1,4 +1,4 @@
-node_modules/
-app/node_modules/
-server/
+node_modules
 test/unit/coverage/
+ui/dist
+shell/dist

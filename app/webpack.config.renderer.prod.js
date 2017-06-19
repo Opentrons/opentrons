@@ -7,7 +7,6 @@ import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
-import BabiliPlugin from 'babili-webpack-plugin';
 import baseConfig from './webpack.config.base';
 
 export default merge.smart(baseConfig, {
@@ -19,17 +18,17 @@ export default merge.smart(baseConfig, {
 
   output: {
     path: path.join(__dirname, 'ui/dist'),
-    publicPath: '/'
+    publicPath: '/dist'
   },
 
   module: {
     rules: [
       {
         test: /\.vue$/,
-        use: ExtractTextPlugin.extract({
-          use: 'vue-loader',
-          fallback: 'style-loader'
-        })
+        loader: 'vue-loader',
+        options: {
+          extractCSS: true
+        }
       },
       // Extract all .global.css to style.css as is
       {
@@ -155,11 +154,6 @@ export default merge.smart(baseConfig, {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
     }),
-
-    /**
-     * Babli is an ES6+ aware minifier based on the Babel toolchain (beta)
-     */
-    new BabiliPlugin(),
 
     new ExtractTextPlugin('style.css'),
 

@@ -11,6 +11,10 @@ class ServerManager {
   }
 
   start () {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Not starting embedded API server since we are in development mode')
+      return
+    }
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
     let backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')

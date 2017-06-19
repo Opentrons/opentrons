@@ -23,7 +23,7 @@ export default {
   },
 
   output: {
-    path: path.join(__dirname, 'app'),
+    path: path.join(__dirname, 'ui/dist'),
     filename: 'bundle.js',
     // https://github.com/webpack/webpack/issues/1114
     libraryTarget: 'commonjs2'
@@ -35,12 +35,13 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
     modules: [
-      path.join(__dirname, 'app'),
+      path.join(__dirname, 'ui'),
+      path.join(__dirname, 'shell'),
       'node_modules',
     ],
   },
 
   plugins: [
-    new webpack.NamedModulesPlugin(),
+    new webpack.NamedModulesPlugin()
   ],
 };
