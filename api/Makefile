@@ -1,29 +1,26 @@
 SHELL:=/bin/bash
 
-.PHONY: test docs publish clean install exe config dev
-
-config:
-	virtualenv venv -p python3.5
+.PHONY: test docs publish clean install exe dev
 
 install:
-	source venv/bin/activate && python setup.py install && pip install -r requirements.txt
+	python setup.py install && pip install -r requirements.txt
 
 test:
-	source venv/bin/activate && pylama opentrons tests && py.test --cov
+	pylama opentrons tests && py.test --cov
 
 docs:
-	source venv/bin/activate && cd docs && make html && make doctest
+	cd docs && make html && make doctest
 
 publish:
-	source venv/bin/activate && cd scripts && publish.sh && doc-deploy.sh
+	cd scripts && publish.sh && doc-deploy.sh
 
 dev:
-	source venv/bin/activate && python opentrons/server/main.py
+	python opentrons/server/main.py
 
 exe: dist/opentrons-api-server
 
 dist/opentrons-api-server:
-	source venv/bin/activate && pyinstaller opentrons-api-server.spec
+	pyinstaller opentrons-api-server.spec
 
 clean:
 	rm -rf \
