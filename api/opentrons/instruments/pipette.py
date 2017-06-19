@@ -344,7 +344,7 @@ class Pipette(Instrument):
 
         if self.current_volume + volume > self.max_volume:
             raise RuntimeWarning(
-                'Pipette ({0}) cannot hold volume {1}'
+                    'Pipette with max volume of {0} cannot hold volume {1}'
                 .format(
                     self.max_volume,
                     self.current_volume + volume)
@@ -738,10 +738,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
-        >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
+        >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack], max_volume=200, overwrite_volume=True)
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
