@@ -22,9 +22,9 @@ publish:
 dev:
 	source venv/bin/activate && python opentrons/server/main.py
 
-exe: dist
+exe: dist/opentrons-api-server
 
-dist:
+dist/opentrons-api-server:
 	source venv/bin/activate && pyinstaller opentrons-api-server.spec
 
 clean:
