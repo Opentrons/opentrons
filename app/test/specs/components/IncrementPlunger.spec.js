@@ -4,7 +4,7 @@ import sinon from 'sinon'
 import IncrementPlunger from 'components/IncrementPlunger.vue'
 import { getRenderedVm } from '../../util.js'
 
-function getMockStore () {
+function getMockStore() {
   return {
     state: { currentIncrementPlunger: 2 },
     actions: { selectIncrementPlunger: sinon.spy() }
@@ -39,6 +39,8 @@ describe('IncrementPlunger.vue', () => {
     propsData.increments.map((inc, i) => {
       let incrementSelector = protocol.$el.querySelector(`[for='${inc}']`)
       incrementSelector.click()
+      console.log(`getCall(${i}): ` + selectIncrementAction.getCall(i))
+      console.log('args: ' + selectIncrementAction.getCall(i).args)
       let selectArgs = selectIncrementAction.getCall(i).args.slice(-2)[0]
       expect(selectArgs.inc).to.equal(inc)
     })

@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 Vue.use(Vuex)
 Vue.use(VueRouter)
 
-function getRenderedVm (Component, propsData, storeData, store, router) {
+function getRenderedVm(Component, propsData, storeData, store, router) {
   const Ctor = Vue.extend(Component)
   return new Ctor({
     propsData,

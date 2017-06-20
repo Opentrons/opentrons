@@ -10,12 +10,13 @@
 <script>
   export default {
     computed: {
-      runLog () {
+      runLog() {
+        console.log('HI')
         return this.$store.state.runLog
       }
     },
     methods: {
-      clearRunScreen () {
+      clearRunScreen() {
         this.$store.dispatch('finishRun')
         if (this.$store.state.detached) {
           this.$store.dispatch('disconnectRobot')

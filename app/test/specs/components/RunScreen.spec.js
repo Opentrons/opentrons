@@ -30,10 +30,6 @@ describe('RunScreen.vue', () => {
     expect(runCommandSelector[1].textContent.trim()).to.equal(secondCommand)
   })
 
-  it('has the runLog', () => {
-    expect(runScreen.runLog()).to.equal(mockStore.state.runLog)
-  })
-
   it('dispatches finishRun when the X is clicked', () => {
     const exitSelector = runScreen.$el.querySelector('#exit')
     exitSelector.click()

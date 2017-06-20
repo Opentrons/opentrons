@@ -39,7 +39,7 @@ install:
 
 script:
   - cd api && make test exe && cd ..
-  - cd app && make package && cd .. # TODO: add test
+  - cd app && make test package && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:

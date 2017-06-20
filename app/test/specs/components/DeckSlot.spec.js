@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import DeckSlot from 'components/DeckSlot.vue'
 import { getRenderedVm } from '../../util.js'
 
-function getMockStore () {
+function getMockStore() {
   return {
     state: {
       versions: {

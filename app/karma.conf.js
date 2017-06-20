@@ -1,3 +1,4 @@
+import webpack from 'webpack'
 import merge from 'webpack-merge'
 import baseConfig from './webpack.config.renderer.dev'
 
@@ -7,7 +8,7 @@ module.exports = function (config) {
     // 1. install corresponding karma launcher
     //    http://karma-runner.github.io/0.13/config/browsers.html
     // 2. add it to the `browsers` array below.
-    browsers: ['PhantomJS'],
+    browsers: ['Electron'],
     frameworks: ['mocha'], // TODO: move to Jasmine as it has built-in mocks and spies
     reporters: ['spec', 'coverage'],
     files: [
@@ -20,10 +21,15 @@ module.exports = function (config) {
     webpack: merge.smart(baseConfig, {
       devtool: 'inline-source-map',
       output: {
-        // Our original setting is commonjs2, Karma's PhantomJS / Electron
+        // Our base setting is commonjs2, Karma's PhantomJS / Electron
         // browsers don't support that, falling back to var
         libraryTarget: 'var'
-      }
+      },
+      plugins: [
+        new webpack.DefinePlugin({
+          'global': {} // webpack workaround for lolex library required by sinon
+        })
+      ]
     }),
     webpackMiddleware: {
       stats: 'errors-only'
