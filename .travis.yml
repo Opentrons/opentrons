@@ -64,7 +64,7 @@ deploy:
     upload-dir: $OPENTRONS_APP_UPLOAD_DIR
     acl: public_read
     on:
-      repo: OpenTrons/opentrons-api
+      repo: OpenTrons/opentrons
       all_branches: true
 
   # Publish API to PyPI and Anaconda

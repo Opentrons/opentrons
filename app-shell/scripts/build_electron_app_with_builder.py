@@ -12,7 +12,6 @@ import time
 
 
 import util
-import cantor
 
 
 script_tag = "[OT-App frontend build] "
@@ -34,31 +33,6 @@ def get_app_version():
     return opentrons.__version__.split('+')[0]
 
 
-def get_app_version_with_build():
-    """
-    Returns OT App version from versioneer with build
-    E.g: "2.4.0+5"
-    """
-    import opentrons
-    return '{}.{}.{}+{}'.format(*get_version_parts(opentrons.__version__))
-
-
-def get_app_version_with_build_encoded():
-    """
-    Returns OT App version with patch and build numbers encoded into the
-    patch number
-    """
-    import opentrons
-    major, minor, patch, build = get_version_parts(opentrons.__version__)
-    print('version parts are', major, minor, patch, build)
-
-    # Encode patch into build if build and patch exist
-    if build:
-        patch = cantor.cantor_calculate(int(patch), int(build)) + 1000
-
-    return '{}.{}.{}'.format(major, minor, patch)
-
-
 def update_pkg_json_app_version(version):
     """
     Overwrites app/package.json "version" attribute for electron-builder
@@ -71,22 +45,6 @@ def update_pkg_json_app_version(version):
     app_json['version'] = version
     with open(app_json_path, 'w') as json_file:
         json.dump(app_json, json_file, indent=2)
-
-
-def get_version_parts(version):
-    # matches: "2.4.0" or "2.4.0+55"
-
-    rest = version
-    major, rest = rest.split('.', 1)
-    minor, rest = rest.split('.', 1)
-    patch = rest.split('+')[0]
-
-    if '+' in version:
-        rest = version.split('+')[1]
-        build = version.split('.', 1)[0]
-    else:
-        build = None
-    return (major, minor, patch, build)
 
 
 def remove_directory(dir_to_remove):
@@ -257,9 +215,9 @@ def clean_build_dist(build_tag):
 
     build_artifacts_globs = []
     if platform_type == "win":
-        build_artifacts_globs = ["RELEASES", "*.nupkg", "*.exe"]
+        build_artifacts_globs = ["*.exe", "*.yml"]
     elif platform_type == "mac":
-        build_artifacts_globs = ["*.dmg", "*.zip"]
+        build_artifacts_globs = ["*.dmg", "*.zip", "*.json"]
     elif platform_type == "linux":
         build_artifacts_globs = ["../*.deb"]
 
@@ -311,5 +269,5 @@ if __name__ == '__main__':
 
     update_pkg_json_app_version(get_app_version())
     build_electron_app(publish=False)
-    build_tag = get_build_tag(util.get_os(), get_app_version_with_build())
+    build_tag = get_build_tag(util.get_os(), get_app_version())
     clean_build_dist(build_tag)
