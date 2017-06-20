@@ -25,6 +25,11 @@ from opentrons.server import helpers
 
 TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
+STATIC_DIR = './build/static'
+INTERFACE = 'wlan0'  # 'wlp7s0'
+WPA_CONF = '/etc/wpa_supplicant/wpa_supplicant.conf'
+DEFAULT_HEADER = "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\nupdate_config=1\n\n"
+
 
 BACKGROUND_TASKS = {}
 CACHED_ROBOT_VERSIONS = ''
@@ -1100,6 +1105,58 @@ def start(host='127.0.0.1', port=31950):
         host=host,
         port=port
     )
+
+
+# Wireless configuration routes and functions below
+def activate(interface):
+    down_proc = sp.call('/sbin/ifdown wlan0', shell=True)
+    up_proc = sp.call('/sbin/ifup wlan0', shell=True)
+
+def save_network(ssid, passkey, network_type):
+    """
+    TODO: Handle other network types (open, WPA2)
+    Writes a new /etc/wpa_supplicant/wpa_supplicant.conf file with a network config
+        
+        network={
+                ssid="NETWORK_SSID"
+                psk="PASWORD_UNENCRYPTED"
+        }
+    """
+    if network_type is 'wpa':
+        config = '\nnetwork={{\n\tssid="{}"\n\tpsk="{}"\n}}'.format(ssid,
+                passkey)
+    with open(WPA_CONF, 'w') as wpa_file:
+        file_contents = DEFAULT_HEADER + config
+        wpa_file.write(file_contents)
+
+@app.route('/networks')
+def get_networks():
+    response = jsonify({'networks': {
+        (c.ssid or 'no name'): {'quality': c.quality, 'encrypted': c.encrypted}
+        for c in Cell.all(INTERFACE)
+    }})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/is_connected')
+def check_connection():
+    if not sp.call('ip -4 addr show wlan0 | grep -oP "(?<=inet ).*(?=/)"', shell=True):
+        response = jsonify({'connected': True})         
+    else:
+        response = jsonify({'connected': False})         
+    return response
+
+@app.route('/connect', methods=['POST'])
+def connect():
+    req = request.get_json()
+
+    ssid = req.get('ssid')
+    passkey = req.get('passkey') or None  # cast falsey to None
+    save_network(ssid, passkey, 'wpa')
+    activate(INTERFACE)
+    response = jsonify({"network_config_received": True})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 if __name__ == "__main__":
