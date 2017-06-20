@@ -13,7 +13,7 @@
 
 
 <script>
-  import Opentrons from '../rest_api_wrapper'
+  import Opentrons from 'rest_api_wrapper'
 
   export default {
     name: 'Connect',

@@ -1,3 +1,5 @@
+/* istanbul ignore next */
+
 import Vue from 'vue'
 import {addHrefs, processProtocol} from './util'
 

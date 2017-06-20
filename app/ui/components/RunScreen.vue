@@ -11,7 +11,6 @@
   export default {
     computed: {
       runLog() {
-        console.log('HI')
         return this.$store.state.runLog
       }
     },

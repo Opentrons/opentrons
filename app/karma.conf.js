@@ -1,5 +1,6 @@
 import webpack from 'webpack'
 import merge from 'webpack-merge'
+import path from 'path'
 import baseConfig from './webpack.config.renderer.dev'
 
 module.exports = function (config) {
@@ -25,6 +26,12 @@ module.exports = function (config) {
         // browsers don't support that, falling back to var
         libraryTarget: 'var'
       },
+      resolve: {
+        alias: {
+          // Override rest_api_wrapper with test mock
+          rest_api_wrapper: path.resolve(__dirname, 'test/rest_api_wrapper_mock.js')
+        }
+      },
       plugins: [
         new webpack.DefinePlugin({
           'global': {} // webpack workaround for lolex library required by sinon
@@ -37,7 +44,10 @@ module.exports = function (config) {
     coverageReporter: {
       dir: 'coverage',
       reporters: [
-        { type: 'lcov', subdir: '.' },
+        // TODO: integrate with coveralls
+        // maybe run lcov from command line for development purposes?
+        // Look into https://github.com/istanbuljs/nyc
+        // { type: 'lcov', subdir: '.' },
         { type: 'text-summary' }
       ]
     }
