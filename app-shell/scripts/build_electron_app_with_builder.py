@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from collections import OrderedDict
 import glob
 import json
 import os
@@ -25,13 +26,25 @@ project_root_dir = \
 
 def get_app_version():
     """
-    Get the OT App version as specified in the electron package.json file
-    :return: string of app version
+    Returns OT App version from versioneer
+    E.g: "2.4.0"
     """
+    import opentrons
+    return opentrons.__version__.split('+')[0]
 
+
+def update_pkg_json_app_version(version):
+    """
+    Overwrites app/package.json "version" attribute for electron-builder
+    """
     app_json_path = os.path.join(project_root_dir, "app", "package.json")
     with open(app_json_path, 'r') as json_file:
-        return json.load(json_file).get('version')
+        app_json = json.load(json_file, object_pairs_hook=OrderedDict)
+
+    print(script_tab, 'Writing app version to file:', version)
+    app_json['version'] = version
+    with open(app_json_path, 'w') as json_file:
+        json.dump(app_json, json_file, indent=2)
 
 
 def remove_directory(dir_to_remove):
@@ -43,7 +56,7 @@ def remove_directory(dir_to_remove):
         print(script_tab + "Directory %s was not found." % dir_to_remove)
 
 
-def get_build_tag(os_type):
+def get_build_tag(os_type, app_version):
     """
     Gets the OS, CPU architecture (32 vs 64 bit), and current time stamp and
     appends CI branch, commit, or pull request info
@@ -74,8 +87,6 @@ def get_build_tag(os_type):
             branch_var='APPVEYOR_REPO_BRANCH',
             commit_var='APPVEYOR_REPO_COMMIT'
         )
-
-    app_version = get_app_version()
 
     build_tag = "v{app_version}-{arch_time_stamp}".format(
         app_version=app_version,
@@ -110,7 +121,7 @@ def tag_from_ci_env_vars(ci_name, pull_request_var, branch_var, commit_var):
                            "{} {}".format(
             ci_name, branch, commit
         ))
-        return "{}_{}".format(branch, commit[:10])
+        return "{}_{}".format(branch, commit[:7])
 
     print(script_tab + "The environmental variables for {} were deemed "
                        "invalid".format(ci_name))
@@ -129,30 +140,50 @@ def which(pgm):
             return p
 
 
-def build_electron_app():
+def build_electron_app(publish=False):
     print(script_tag + "Running electron-builder process.")
 
     platform_type = util.get_os()
     process_args = [
-        which("build"),
-        os.path.join(project_root_dir, "app"),
+        os.path.join(project_root_dir, 'node_modules', '.bin', 'build'),
+        os.path.join(project_root_dir, 'app'),
         "--{}".format(platform_type),
-        "--{}".format(util.get_arch()),
+        "--{}".format(util.get_arch())
     ]
+
+    # If on master branch, publish artifact
+    if publish:
+        process_args.extend(["-p", "always"])
 
     print(process_args)
 
     if platform_type in {'mac'}:
-        electron_builder_process = subprocess.Popen(process_args)
+        electron_builder_process = subprocess.Popen(
+            process_args, env=os.environ.copy()
+        )
     elif platform_type in {'win', 'linux'}:
-        electron_builder_process = subprocess.Popen(process_args, shell=True)
+        electron_builder_process = subprocess.Popen(
+            process_args, shell=True, env=os.environ.copy()
+        )
 
     electron_builder_process.communicate()
 
     if electron_builder_process.returncode != 0:
         raise SystemExit(script_tag + 'Failed to properly build electron app')
 
+    # Run windows repulish
+    # if platform_type == 'win' and 'always' in process_args:
+    #     print(os.listdir(os.path.join(project_root_dir, 'dist')))
+    #     yml_file = os.path.join(
+    #         project_root_dir, 'dist', '{}.yml'.format(os.environ['CHANNEL'])
+    #     )
+    #     exe_file = glob.glob(
+    #         os.path.join(project_root_dir, 'dist', '*.exe')
+    #     )[0]
+    #     util.republish_win_s3(yml_file, exe_file)
+
     print(script_tab + 'electron-builder process completed successfully')
+
 
 def clean_build_dist(build_tag):
     """
@@ -167,11 +198,11 @@ def clean_build_dist(build_tag):
 
     platform_type = util.get_os()
     if platform_type == "win":
-        platform_dist_dir = "win"
+        platform_dist_dir = ""
     elif platform_type == "linux":
         platform_dist_dir = "linux-unpacked"
     elif platform_type == "mac":
-        platform_dist_dir = "mac"
+        platform_dist_dir = ""
 
     electron_builder_dist = os.path.join(project_root_dir, "dist", platform_dist_dir)
     print(script_tab + 'Contents electron-builder dist dir: {}'.format(
@@ -184,9 +215,9 @@ def clean_build_dist(build_tag):
 
     build_artifacts_globs = []
     if platform_type == "win":
-        build_artifacts_globs = ["RELEASES", "*.nupkg", "*.exe"]
+        build_artifacts_globs = ["*.exe", "*.yml"]
     elif platform_type == "mac":
-        build_artifacts_globs = ["*.dmg", "*.zip"]
+        build_artifacts_globs = ["*.dmg", "*.zip", "*.json"]
     elif platform_type == "linux":
         build_artifacts_globs = ["../*.deb"]
 
@@ -232,6 +263,11 @@ def clean_build_dist(build_tag):
 
 
 if __name__ == '__main__':
-    build_electron_app()
-    build_tag = get_build_tag(util.get_os())
+    # NOTE: CHANNEL env var needs to be set or electron-builder will error out
+    if 'CHANNEL' not in os.environ:
+        os.environ['CHANNEL'] = 'foo'
+
+    update_pkg_json_app_version(get_app_version())
+    build_electron_app(publish=False)
+    build_tag = get_build_tag(util.get_os(), get_app_version())
     clean_build_dist(build_tag)

@@ -31,7 +31,7 @@ app-shell-setup:
 
 app-shell-build:
 	cd app-shell &&\
-		npm run build:frontend &&\
+		npm run build &&\
 		ls dist/* &&\
 		ls releases
 
