@@ -84,7 +84,7 @@ will print out...
 Clear Commands
 ==============
 
-Once commands are enqueued to the ``robot``, we can erase those commands by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but all commands are erased.
+We can erase the robot command history by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but the commands history is erased.
 
 .. testcode:: robot
     
