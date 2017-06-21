@@ -356,10 +356,6 @@ class Pipette(Instrument):
         destination = bottom - distance
         speed = self.speeds['aspirate'] * rate
 
-        """
-        TODO: emit the description asynchronously
-        e.g. loop.call_soon(...)
-        """
         _description = "Aspirating {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
