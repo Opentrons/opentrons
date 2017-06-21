@@ -1,18 +1,13 @@
 import copy
 import itertools
-import numbers
 
 from opentrons.containers import unpack_location
 from opentrons.containers.calibrator import Calibrator
-from opentrons.containers.placeable import Placeable, WellSeries, Container
-from opentrons.containers.placeable import humanize_location
-from opentrons.instruments.instrument import Instrument
+from opentrons.containers.placeable import (
+    Container, humanize_location, Placeable, WellSeries
+)
 from opentrons.helpers import helpers
-
-
-# TODO: move to helpers
-def is_number(obj):
-    return isinstance(obj, numbers.Number)
+from opentrons.instruments.instrument import Instrument
 
 
 class Pipette(Instrument):
@@ -161,7 +156,7 @@ class Pipette(Instrument):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
-        if is_number(max_volume) and max_volume > 0:
+        if helpers.is_number(max_volume) and max_volume > 0:
             self.max_volume = max_volume
             self.update_calibrations()
 
@@ -330,7 +325,7 @@ class Pipette(Instrument):
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
-        if not is_number(volume):
+        if not helpers.is_number(volume):
             if volume and not location:
                 location = volume
             volume = self.max_volume - self.current_volume
@@ -423,7 +418,7 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        if not is_number(volume):
+        if not helpers.is_number(volume):
             if volume and not location:
                 location = volume
             volume = self.current_volume
@@ -627,7 +622,7 @@ class Pipette(Instrument):
         """
         height_offset = 0
 
-        if is_number(location):
+        if helpers.is_number(location):
             height_offset = location
             location = None
 
@@ -800,7 +795,7 @@ class Pipette(Instrument):
 
         self.current_volume = 0
 
-        presses = (1 if not is_number(presses) else presses)
+        presses = (1 if not helpers.is_number(presses) else presses)
 
         self.motor.move(self._get_plunger_position('bottom'))
 
@@ -1262,7 +1257,7 @@ class Pipette(Instrument):
         """
         try:
             value = self.positions[position]
-            if is_number(value):
+            if helpers.is_number(value):
                 return value
             else:
                 raise RuntimeError(

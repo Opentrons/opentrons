@@ -1,4 +1,5 @@
 import json
+import numbers
 
 from opentrons.util.vector import Vector
 
@@ -286,3 +287,7 @@ def _compress_for_consolidate(max_vol, plan, **kwargs):
         temp_aspirates.append(p['aspirate'])
     _append_aspirates()
     return new_transfer_plan
+
+
+def is_number(obj):
+    return isinstance(obj, numbers.Number)
