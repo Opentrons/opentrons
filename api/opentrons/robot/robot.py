@@ -456,12 +456,6 @@ class Robot(object):
         >>> robot.move_to(plate[0].top())
         """
 
-        # enqueue = kwargs.get('enqueue', False)
-        # Adding this for backwards compatibility with old move_to(now=False)
-        # convention.
-        # if 'now' in kwargs:
-        #     enqueue = not kwargs.get('now')
-
         placeable, coordinates = containers.unpack_location(location)
 
         if instrument:
@@ -485,13 +479,6 @@ class Robot(object):
         else:
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
-
-        # _description = 'Moving to {}'.format(placeable)
-        # self.add_command(_description)
-        # if enqueue:
-        #     self.add_command(Command(do=_do, description=_description))
-        # else:
-        #     _do()
 
     def _calibrated_max_dimension(self, container=None, instrument=None):
         """
