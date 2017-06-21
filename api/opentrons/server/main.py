@@ -89,7 +89,7 @@ def upload():
     app.file = file
     app.filename = file.filename
     app.last_modified = request.form.get('lastModified')
-    app.code = helpers.convert_byte_stream_to_str(file.stream)
+    app.code = file.stream.read().decode()
 
     if not file:
         return flask.jsonify({
