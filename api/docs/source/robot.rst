@@ -51,17 +51,17 @@ The maximum speed of the robot's head can be set using ``robot.head_speed()``. T
 Homing
 ======
 
-You can enqueue a ``home()`` command to your protocol, by giving it the ``enqueue=True`` option. Without passing the enqueue option, the home command will run immediately.
+You can `home` the robot by calling ``home()``. You can also specify axes. The robot will home immdediately when this call is made.
 
 .. testcode:: robot
 
-    robot.home(enqueue=True)           # home the robot on all axis
-    robot.home('z', enqueue=True)      # home the Z axis only
+    robot.home()           # home the robot on all axis
+    robot.home('z')        # home the Z axis only
 
 Commands
 ========
 
-When commands are called on a pipette, they are automatically enqueued to the ``robot`` in the order they are called. You can see all currently held commands by calling ``robot.commands()``, which returns a `Python list`__.
+When commands are called on a pipette, they are recorded on the ``robot`` in the order they are called. You can see all past executed commands by calling ``robot.commands()``, which returns a `Python list`__.
 
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
