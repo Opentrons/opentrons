@@ -2,16 +2,13 @@
 
 .. testsetup:: robot
 
-    from opentrons import robot, Robot, containers, instruments
+    from opentrons import containers, instruments, robot
     from opentrons.instruments import pipette as _pipette
 
     robot.reset()
-    robot = Robot()
 
-    # plate = containers.load('96-flat', 'B1', 'my-plate')
     plate = robot.add_container('96-flat', 'B1', 'my-plate')
 
-    # tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
     tiprack = robot.add_container('tiprack-200ul', 'A1', 'my-rack')
 
     pipette = _pipette.Pipette(robot, axis='b', max_volume=200, name='my-pipette')

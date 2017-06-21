@@ -4,6 +4,10 @@ import numbers
 from opentrons.util.vector import Vector
 
 
+def is_number(obj):
+    return isinstance(obj, numbers.Number)
+
+
 def unpack_coordinates(coordinates):
     if not isinstance(coordinates, tuple):
         coordinates = tuple([coordinates[axis] for axis in 'xyz'])
@@ -287,7 +291,3 @@ def _compress_for_consolidate(max_vol, plan, **kwargs):
         temp_aspirates.append(p['aspirate'])
     _append_aspirates()
     return new_transfer_plan
-
-
-def is_number(obj):
-    return isinstance(obj, numbers.Number)
