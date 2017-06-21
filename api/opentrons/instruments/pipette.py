@@ -1349,7 +1349,7 @@ class Pipette(Instrument):
 
     def _run_transfer_plan(self, tips, plan, **kwargs):
         air_gap = kwargs.get('air_gap', 0)
-        touch_tip = kwargs.get('touch_tip', -1)
+        touch_tip = kwargs.get('touch_tip', False)
 
         total_transfers = len(plan)
         for i, step in enumerate(plan):
