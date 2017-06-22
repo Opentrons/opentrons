@@ -36,19 +36,11 @@ class Magbead(Instrument):
         self.init_calibrations(key=persisted_key)
         self.load_persisted_data()
 
-    def engage(self, enqueue=True):
+    def engage(self):
         """
         Move the Magbead platform upwards,
         bringing the magnetic field close to the wells
 
-        Parameters
-        ----------
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
         """
         self.engaged = True
         self.motor.engage()
@@ -56,19 +48,11 @@ class Magbead(Instrument):
         self.robot.add_command(_description)
         return self
 
-    def disengage(self, enqueue=True):
+    def disengage(self):
         """
         Move the Magbead platform downwards,
         lowering the magnetic field away to the wells
 
-        Parameters
-        ----------
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
         """
         self.engaged = False
         self.motor.disengage()
@@ -76,7 +60,7 @@ class Magbead(Instrument):
         self.robot.add_command(_description)
         return self
 
-    def delay(self, seconds=0, minutes=0, enqueue=True):
+    def delay(self, seconds=0, minutes=0):
         """
         Pause the robot for a given number of seconds
 
@@ -85,11 +69,6 @@ class Magbead(Instrument):
         seconds : int or float
             The number of seconds to delay
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
         """
         minutes += int(seconds / 60)
         seconds = int(seconds % 60)
