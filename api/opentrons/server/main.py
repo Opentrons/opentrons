@@ -6,6 +6,7 @@ import sys
 import threading
 import time
 import traceback
+import argparse
 
 import dill
 import flask
@@ -24,8 +25,14 @@ from opentrons.server import helpers
 from opentrons.server.process_manager import run_once
 
 
-TEMPLATES_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', nargs='?', default=STATIC_FOLDER, help='UI Assets folder')
+    args = parser.parse_args()
+    STATIC_FOLDER = os.path.abspath(args.path)
+
 
 BACKGROUND_TASKS = {}
 
@@ -34,7 +41,6 @@ exit_threads.clear()
 
 app = Flask(__name__,
             static_folder=STATIC_FOLDER,
-            template_folder=TEMPLATES_FOLDER,
             static_url_path=''
             )
 
@@ -1108,4 +1114,5 @@ def start():
 
 
 if __name__ == "__main__":
+    print('Opentrons API server is serving UI from: ' + STATIC_FOLDER)
     start()

@@ -10,16 +10,22 @@ class ServerManager {
     this.processName = null
   }
 
-  start () {
+  start() {
+    process.env['appVersion'] = app.getVersion()
+
     if (process.env.NODE_ENV === 'development') {
       console.log('Not starting embedded API server since we are in development mode')
       return
     }
+
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
-    let backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')
-    process.env['appVersion'] = app.getVersion()
-    this.execFile(backendPath, [userDataPath])
+
+    const backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')
+    const uiPath = path.join(app.getAppPath(), 'ui')
+    console.log('Serving UI from: ', path.join(app.getAppPath(), 'ui'))
+
+    this.execFile(backendPath, [uiPath])
   }
 
   /**
@@ -31,7 +37,6 @@ class ServerManager {
     this.serverProcess = childProcess.execFile(
       filePath,
       extraArgs,
-      { stdio: 'ignore' },
       function (error, stdout, stderr) {
         console.log(stdout)
         console.log(stderr)
