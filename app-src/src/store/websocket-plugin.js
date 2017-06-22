@@ -27,8 +27,10 @@ function WebSocketPlugin (socket) {
         if (data.isConnected === false) {
           store.commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
         }
-        if (data.isConnected === true) {
-          store.commit(types.UPDATE_SOCKET_CONNECTION, 'connected')
+        if (data.is_wireless === true) {
+          store.commit(types.UPDATE_ROBOT_CONNECTION, 'connected_wireless')
+        } else if (data.is_wireless === false) {
+          store.commit(types.UPDATE_ROBOT_CONNECTION, 'connected')
         }
       }
       if (data.name === 'move-finished') {
@@ -78,15 +80,13 @@ function WebSocketPlugin (socket) {
         console.log('JUPYTER UPLOAD HANDLER DISPATCHED W/', data)
         handleJupyterUpload(store, data)
       }
-    },
-    socket.on('connect', function () {
-      console.log('WebSocket has connected.')
-      socket.emit('connected')
-      debugger
-      store.commit(types.UPDATE_ROBOT_CONNECTION, 'connected')
+    })
+    socket.on('disconnect', function () {
+      console.log('WebSocket has disconnected.')
+      socket.emit('disconnected')
+      store.commit(types.UPDATE_ROBOT_CONNECTION, '')
       debugger
     })
-    )
   }
 }
 
