@@ -342,11 +342,7 @@ class Pipette(Instrument):
                     self.current_volume + volume)
             )
 
-        # set True if volume before this aspirate was 0uL
-        is_plunger_empty = (self.current_volume == 0)
-        self.current_volume += volume
-
-        distance = self._plunge_distance(self.current_volume)
+        distance = self._plunge_distance(self.current_volume + volume)
         bottom = self._get_plunger_position('bottom')
         destination = bottom - distance
         speed = self.speeds['aspirate'] * rate
@@ -356,10 +352,11 @@ class Pipette(Instrument):
             ('at ' + humanize_location(location) if location else '')
         )  # NOQA
 
-        self._position_for_aspirate(location, is_plunger_empty)
+        self._position_for_aspirate(location)
         self.motor.speed(speed)
         self.motor.move(destination)
         self.robot.add_command(_description)
+        self.current_volume += volume  # update after actual aspirate
         return self
 
     def dispense(self,
@@ -430,18 +427,17 @@ class Pipette(Instrument):
         if volume == 0:
             return self
 
-        self.current_volume -= volume
-
         self.move_to(location, strategy='arc')  # position robot above location
 
         # TODO(ahmed): revisit this
-        distance = self._plunge_distance(self.current_volume)
+        distance = self._plunge_distance(self.current_volume - volume)
         bottom = self._get_plunger_position('bottom')
         destination = bottom - distance
         speed = self.speeds['dispense'] * rate
 
         self.motor.speed(speed)
         self.motor.move(destination)
+        self.current_volume -= volume  # update after actual dispense
 
         _description = "Dispensing {0} {1}".format(
             volume,
@@ -450,7 +446,7 @@ class Pipette(Instrument):
         self.robot.add_command(_description)
         return self
 
-    def _position_for_aspirate(self, location=None, plunger_empty=False):
+    def _position_for_aspirate(self, location=None):
         """
         Position this :any:`Pipette` for an aspiration,
         given it's current state
@@ -462,7 +458,7 @@ class Pipette(Instrument):
             self.move_to(placeable.top(), strategy='arc')
 
         # setup the plunger above the liquid
-        if plunger_empty:
+        if self.current_volume == 0:
             self.motor.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
@@ -571,10 +567,9 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        self.current_volume = 0
-
         self.move_to(location, strategy='arc')
         self.motor.move(self._get_plunger_position('blow_out'))
+        self.current_volume = 0
 
         _description = "Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
@@ -793,11 +788,10 @@ class Pipette(Instrument):
         if isinstance(location, Placeable):
             location = location.bottom()
 
-        self.current_volume = 0
-
         presses = (1 if not helpers.is_number(presses) else presses)
 
         self.motor.move(self._get_plunger_position('bottom'))
+        self.current_volume = 0
 
         if location:
             self.move_to(location, strategy='arc')
@@ -862,10 +856,6 @@ class Pipette(Instrument):
             # give space for the drop-tip mechanism
             location = location.bottom(self._drop_tip_offset)
 
-        self.current_tip(None)
-
-        self.current_volume = 0
-
         if location:
             self.move_to(location, strategy='arc')
 
@@ -874,6 +864,9 @@ class Pipette(Instrument):
             self.motor.home()
 
         self.motor.move(self._get_plunger_position('bottom'))
+
+        self.current_volume = 0
+        self.current_tip(None)
 
         _description = "Drop_tip {}".format(
             ('at ' + humanize_location(location) if location else '')
