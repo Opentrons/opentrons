@@ -2,6 +2,7 @@ import datetime as dt
 import json
 import logging
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -12,6 +13,7 @@ import flask
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
+import wifi
 
 from opentrons import robot, Robot, containers, instruments
 from opentrons.util import trace
@@ -527,7 +529,8 @@ def _start_connection_watcher():
                 'event',
                 {
                     'type': 'connection_status',
-                    'is_connected': robot.is_connected()
+                    'is_connected': robot.is_connected(),
+                    'is_wireless': is_wireless_connection()
                 }
             )
             socketio.sleep(1.5)
@@ -1109,8 +1112,8 @@ def start(host='127.0.0.1', port=31950):
 
 # Wireless configuration routes and functions below
 def activate(interface):
-    down_proc = sp.call('/sbin/ifdown wlan0', shell=True)
-    up_proc = sp.call('/sbin/ifup wlan0', shell=True)
+    down_proc = subprocess.call('/sbin/ifdown wlan0', shell=True)
+    up_proc = subprocess.call('/sbin/ifup wlan0', shell=True)
 
 def save_network(ssid, passkey, network_type):
     """
@@ -1131,30 +1134,26 @@ def save_network(ssid, passkey, network_type):
 
 @app.route('/networks')
 def get_networks():
-    response = jsonify({'networks': {
+    response = flask.jsonify({'networks': {
         (c.ssid or 'no name'): {'quality': c.quality, 'encrypted': c.encrypted}
-        for c in Cell.all(INTERFACE)
+        for c in wifi.Cell.all(INTERFACE)
     }})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@app.route('/is_connected')
-def check_connection():
-    if not sp.call('ip -4 addr show wlan0 | grep -oP "(?<=inet ).*(?=/)"', shell=True):
-        response = jsonify({'connected': True})         
-    else:
-        response = jsonify({'connected': False})         
-    return response
+def is_wireless_connection():
+    if not subprocess.call('ip -4 addr show wlan0 | grep -oP "(?<=inet ).*(?=/)"', shell=True):
+        return True
+    return False
 
 @app.route('/connect', methods=['POST'])
 def connect():
     req = request.get_json()
-
     ssid = req.get('ssid')
     passkey = req.get('passkey') or None  # cast falsey to None
     save_network(ssid, passkey, 'wpa')
     activate(INTERFACE)
-    response = jsonify({"network_config_received": True})
+    response = flask.jsonify({"network_config_received": True})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
