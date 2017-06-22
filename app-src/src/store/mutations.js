@@ -22,8 +22,9 @@ const state = {
   detached: false,
   protocolFinished: false,
   paused: false,
+  isSocketConnected: false,
   selectedRobot: 'ot-two.local:31950',
-  connectedRobot: 'ot-two.local:31950', // TODO: default to blank
+  connectedRobot: '', // TODO: default to blank
   robots: []
 }
 
@@ -36,6 +37,9 @@ const mutations = {
   },
   [types.UPDATE_ROBOT_CONNECTION] (state, address) {
     state.connectedRobot = address
+  },
+  [types.UPDATE_SOCKET_CONNECTION] (state, isConnected) {
+    state.isSocketConnected = isConnected
   },
   [types.AUTHENTICATE] (state, payload) {
     state.isAuthenticated = payload.isAuthenticated

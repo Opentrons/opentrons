@@ -21,10 +21,14 @@ function WebSocketPlugin (socket) {
        * Toast notifications and RunLog events
        */
       trackEventFromWebsocket(data)
+      console.log('check')
 
       if (data.type === 'connection_status') {
         if (data.isConnected === false) {
           store.commit(types.UPDATE_ROBOT_CONNECTION, {'isConnected': false, 'port': null})
+        }
+        if (data.isConnected === true) {
+          store.commit(types.UPDATE_SOCKET_CONNECTION, 'connected')
         }
       }
       if (data.name === 'move-finished') {
@@ -74,7 +78,15 @@ function WebSocketPlugin (socket) {
         console.log('JUPYTER UPLOAD HANDLER DISPATCHED W/', data)
         handleJupyterUpload(store, data)
       }
+    },
+    socket.on('connect', function () {
+      console.log('WebSocket has connected.')
+      socket.emit('connected')
+      debugger
+      store.commit(types.UPDATE_ROBOT_CONNECTION, 'connected')
+      debugger
     })
+    )
   }
 }
 

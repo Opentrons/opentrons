@@ -34,5 +34,9 @@ nav.connect {
             &.connected {
                 background-color: #3bf389;
             }
+
+            &.connected_wireless{
+                background-color: #3bc9f7;
+            }
         }
     }
