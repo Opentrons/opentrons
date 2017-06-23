@@ -1,17 +1,16 @@
 <template>
 	<nav>
-		<button id='configure_network' @click='config_network()' class='btn-run'>Configure Network</button>
-
-		<div id="myModal" class="modal" v-show="showNetworkPanel">
-			<div class="modal-content">
-				<span @click='config_network()' class="close">&times;</span>
-				<div v-for="network in availableNetworks">
-				{{ network.name }}
-				<input type="text" name="password" v-model="password" v-show="network.is_encrypted"><br>
-				<button @click="sendWifiCredentials(network.name, password)">Connect</button>
+		<button id='network-config-open-btn' @click='toggleNetworkPanel()' class='btn-run'>Configure Network</button>
+		<div class="network-config-content" v-show="showNetworkPanel">
+			<div class="available-network-container" v-for="network in availableNetworks">
+				<div class="available-network" @click="networkFocus(network.name)">
+					<h3 class="network-config-network-label">{{ network.name }}</h3>
+					<div class="network-config-credentials" v-show="networkInFocus == network.name">
+						<span class="password-label" v-show="network.is_encrypted">Password: </span><input type="text" name="password" v-model="passkey" v-show="network.is_encrypted"><br>
+						<button class='btn-run' @click="sendWifiCredentials(network.name, passkey)">Connect</button>
+					</div>
 				</div>
 			</div>
-
 		</div>
 <nav>
 </template>
@@ -24,8 +23,8 @@
     name: 'Connect',
     data: function () {
       return {
-        password: null,
-        selectedNetwork: null,
+        passkey: null,
+        networkInFocus: '',
         showNetworkPanel: false,
         availableNetworks: {}
       }
@@ -39,25 +38,30 @@
       }
     },
     methods: {
-      config_network: function () {
+      toggleNetworkPanel: function () {
         this.showNetworkPanel = !this.showNetworkPanel
-        this.$http
-          .get(`http://${this.$store.state.selectedRobot}/networks`)
-          .then(function (response) {
-            this.availableNetworks = response.body.networks
-          }, (response) => {
-            this.$store.commit(types.UPDATE_ROBOT_CONNECTION, '')
-            console.log(`Failed to connect to ot-two: ${response}`)
-          })
+        if (this.showNetworkPanel) {
+          this.$http
+            .get(`http://${this.$store.state.selectedRobot}/wifi/get_networks`)
+            .then(function (response) {
+              this.availableNetworks = response.body.networks
+            }, (response) => {
+              this.$store.commit(types.UPDATE_ROBOT_CONNECTION, '')
+              console.log(`Failed to connect to ot-two: ${response}`)
+            })
+        }
       },
       sendWifiCredentials: function (ssid, passkey) {
-        this.$store.dispatch('connectWifi', ssid, passkey)
+        this.$store.dispatch('sendWifiCredentials', [ssid, passkey])
       },
       logout: function () {
         this.$router.push('/logout')
       },
-      networkCheck: function () {
-        console.log(this.value)
+      networkFocus: function (networkName) {
+        if (this.networkInFocus !== networkName) {
+          this.passkey = ''
+          this.networkInFocus = networkName
+        }
       }
     }
 }

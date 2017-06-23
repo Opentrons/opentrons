@@ -85,7 +85,6 @@ function WebSocketPlugin (socket) {
       console.log('WebSocket has disconnected.')
       socket.emit('disconnected')
       store.commit(types.UPDATE_ROBOT_CONNECTION, '')
-      debugger
     })
   }
 }
