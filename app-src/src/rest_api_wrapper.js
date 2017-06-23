@@ -26,6 +26,7 @@ class Opentrons {
     this.versionUrl = this.baseUrl + '/robot/versions'
     this.uploadUrl = this.baseUrl + '/upload'
     this.loadUrl = this.baseUrl + '/load'
+    this.sendWifiCredentialsUrl = this.baseUrl + '/wifi/send_credentials'
   }
 
   getPortsList () {
@@ -37,6 +38,21 @@ class Opentrons {
         console.log('failed to get serial ports list', response)
       })
   }
+
+  sendWifiCredentials (ssid, passkey) {
+    let options = {'ssid': ssid, 'passkey': passkey}
+    return Vue.http
+        .post(this.sendWifiCredentialsUrl, options)
+        .then((response) => {
+        if (response.data.received_network_credentials) {
+      console.log('network credentials received...')
+      return true
+    }
+  }, (response) => {
+      console.log('failed to connect', response)
+    })
+  }
+
 
   connect (port) {
     let options = {'port': port}

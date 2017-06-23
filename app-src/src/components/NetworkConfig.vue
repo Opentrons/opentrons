@@ -1,23 +1,18 @@
 <template>
-<nav>
-    <button id='configure_network' @click='config_network()' class='btn-run'>Configure Network</button>
-	
-	<div id="myModal" class="modal" v-show="showNetworkPanel">
-		<div class="modal-content">
-			<span @click='config_network()' class="close">&times;</span>
-			<form action=''>
-				<select v-model="selected">			  
-			      <option v-for="network in Object.keys(availableNetworks)">
-				    {{ network }}
-				  </option>
-				</select>
-				<input type="text" name="password" v-if="selected">
-				<span> Selected: {{ selected }}
-				<input type="submit" value="Submit">
-			</form>
-		</div>
+	<nav>
+		<button id='configure_network' @click='config_network()' class='btn-run'>Configure Network</button>
 
-	</div>
+		<div id="myModal" class="modal" v-show="showNetworkPanel">
+			<div class="modal-content">
+				<span @click='config_network()' class="close">&times;</span>
+				<div v-for="network in availableNetworks">
+				{{ network.name }}
+				<input type="text" name="password" v-model="password" v-show="network.is_encrypted"><br>
+				<button @click="sendWifiCredentials(network.name, password)">Connect</button>
+				</div>
+			</div>
+
+		</div>
 <nav>
 </template>
 
@@ -29,6 +24,8 @@
     name: 'Connect',
     data: function () {
       return {
+        password: null,
+        selectedNetwork: null,
         showNetworkPanel: false,
         availableNetworks: {}
       }
@@ -52,6 +49,9 @@
             this.$store.commit(types.UPDATE_ROBOT_CONNECTION, '')
             console.log(`Failed to connect to ot-two: ${response}`)
           })
+      },
+      sendWifiCredentials: function (ssid, passkey) {
+        this.$store.dispatch('connectWifi', ssid, passkey)
       },
       logout: function () {
         this.$router.push('/logout')
