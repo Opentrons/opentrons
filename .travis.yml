@@ -20,7 +20,7 @@ matrix:
             - graphicsmagick # electron-builder dependency
             - xvfb
     - os: osx
-      python: "3.5"
+      language: generic
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
