@@ -47,6 +47,8 @@ script:
   - cd api && make test exe && cd ..
   - cd app && make -j 2 build && make test package && cd ..
   - ls -la app/dist
+  # Clean up. This will leave only single-file build artifacts
+  - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
 # Deploy the build version in an S3 bucket
 deploy:
@@ -55,7 +57,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: app/dist
+    local-dir: $(cwd)/app/dist
     upload-dir: $TRAVIS_OS_NAME
     acl: public_read
     on:

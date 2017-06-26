@@ -24,6 +24,7 @@ dist/opentrons-api-server:
 
 clean:
 	rm -rf \
+		__pycache__ \
 		*.egg-info \
 		build \
 		dist \

@@ -2,6 +2,8 @@
 
 trap 'exit' ERR
 
+OT_PYTHON_VERSION=3.5.3
+
 export HOMEBREW_CACHE="$HOME/.cache/brew"
 export NVM_DIR="$(pwd)/.nvm"
 bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
@@ -11,6 +13,9 @@ nvm install --lts && nvm use --lts
 # Brew contains Python 3.6. We need 3.5, so we are going to use pyenv
 brew upgrade pyenv
 eval "$(pyenv init -)"
-# PyInstaller needs that
-env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.3
-cd api && pyenv local 3.5.3 && cd ..
+# PyInstaller needs development dependencies of python such as pyconfig and Makefile
+# --enable-framework allows us to do that
+# Also we override default exec-prefix pointing it to the framework path, so we can get
+# sane relative paths between sys.prefix and sysconfig.get_config_h_filename()
+env PYTHON_CONFIGURE_OPTS="--enable-framework --exec-prefix=$HOME/.pyenv/versions/$OT_PYTHON_VERSION/Python.framework/Versions/${OT_PYTHON_VERSION:0:3}" pyenv install $OT_PYTHON_VERSION
+cd api && pyenv local $OT_PYTHON_VERSION && cd ..
