@@ -34,12 +34,13 @@ before_install:
 install:
   - pip install coveralls
   - scripts/install-${TRAVIS_OS_NAME}
-  - source $NVM_DIR/nvm.sh
+  - source ${NVM_DIR}/nvm.sh
   - nvm install 6.11.0 && nvm use 6.11.0
   - cd api && make install && cd ..
   - cd app && make install && cd ..
 
 script:
+  - echo $DISPLAY
   - cd api && make test exe && cd ..
   - cd app && make build test package && cd ..
 
