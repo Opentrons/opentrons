@@ -57,7 +57,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: $(cwd)/app/dist
+    local-dir: $(pwd)/app/dist
     upload-dir: $TRAVIS_OS_NAME
     acl: public_read
     on:
