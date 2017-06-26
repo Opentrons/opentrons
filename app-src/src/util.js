@@ -1,6 +1,6 @@
 module.exports = {
   addHrefs,
-  getFakeUserId,
+  getCustomUserId,
   getUserEmail,
   getUserId,
   getUserProfile,
@@ -20,19 +20,19 @@ function addHrefs (tasks) {
   })
 }
 
-function getFakeUserId () {
-  if (!localStorage.getItem('fakeUserID')) {
-    localStorage.setItem('fakeUserID', 'fake-' + uuidV4())
+function getCustomUserId () {
+  if (!localStorage.getItem('CustomUserID')) {
+    localStorage.setItem('CustomUserID', 'opentrons|' + uuidV4())
   }
-  return localStorage.getItem('fakeUserID')
+  return localStorage.getItem('CustomUserID')
 }
 
 function getUserId () {
-  return getUserProfile().user_id || null
+  return getUserProfile().user_id || getCustomUserId()
 }
 
 function getUserEmail () {
-  return getUserProfile().email || null
+  return getUserProfile().email || getCustomUserId() + '@opentrons.com'
 }
 
 function getUserProfile () {
