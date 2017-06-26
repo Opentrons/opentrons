@@ -11,10 +11,13 @@ ui/dist:
 shell/dist:
 	npm run build-main
 
-build: shell/dist ui/dist
+bin/opentrons-api-server:
+	mkdir -p bin && cp ../api/dist/opentrons-api-server bin/
+
+build: shell/dist ui/dist bin/opentrons-api-server
 
 package: build
-	mkdir -p bin && cp ../api/dist/opentrons-api-server bin/ && npm run package
+	npm run package
 
 test: build
 	npm run test && npm run test-e2e
