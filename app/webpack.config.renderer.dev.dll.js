@@ -154,7 +154,7 @@ export default merge.smart(baseConfig, {
 
   resolve: {
     modules: [
-      'app',
+      'ui',
     ],
   },
 
@@ -195,7 +195,7 @@ export default merge.smart(baseConfig, {
     new webpack.LoaderOptionsPlugin({
       debug: true,
       options: {
-        context: path.resolve(process.cwd(), 'app'),
+        context: path.resolve(process.cwd(), 'ui'),
         output: {
           path: path.resolve(process.cwd(), 'dll'),
         },

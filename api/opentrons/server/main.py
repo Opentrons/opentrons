@@ -10,7 +10,7 @@ import argparse
 
 import dill
 import flask
-from flask import Flask, render_template, request
+from flask import Flask, send_from_directory, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
@@ -29,7 +29,11 @@ STATIC_FOLDER = os.path.join(helpers.get_frozen_root() or '', 'templates')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', nargs='?', default=STATIC_FOLDER, help='UI Assets folder')
+    parser.add_argument(
+        'path', nargs='?',
+        default=STATIC_FOLDER,
+        help='UI Assets folder'
+    )
     args = parser.parse_args()
     STATIC_FOLDER = os.path.abspath(args.path)
 
@@ -39,10 +43,10 @@ BACKGROUND_TASKS = {}
 exit_threads = threading.Event()
 exit_threads.clear()
 
-app = Flask(__name__,
-            static_folder=STATIC_FOLDER,
-            static_url_path=''
-            )
+app = Flask(
+    __name__,
+    static_url_path='',
+)
 
 
 CORS(app)
@@ -65,8 +69,25 @@ trace.EventBroker.get_instance().add(notify)
 
 
 @app.route("/")
-def welcome():
-    return render_template("index.html")
+def serve_index():
+    return send_from_directory(STATIC_FOLDER, 'index.html')
+
+
+@app.route("/index.html")
+def serve_index2():
+    return send_from_directory(STATIC_FOLDER, 'index.html')
+
+
+@app.route("/dist/<path:path>")
+def serve_dist(path):
+    print('Path: ' + path)
+    return send_from_directory(os.path.join(STATIC_FOLDER, 'dist'), path)
+
+
+@app.route("/assets/<path:path>")
+def serve_assets(path):
+    print('Assets: ' + path)
+    return send_from_directory(os.path.join(STATIC_FOLDER, 'assets'), path)
 
 
 @app.route("/exit")
@@ -1104,7 +1125,7 @@ def start():
 
     socketio.run(
         app,
-        debug=False,
+        debug=True,
         logger=False,
         use_reloader=False,
         log_output=False,

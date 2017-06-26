@@ -13,14 +13,15 @@ const {initAutoUpdater} = require('./updater')
 const {ServerManager} = require('./servermanager')
 const {waitUntilServerResponds} = require('./util')
 
-let appWindowUrl = 'http://127.0.0.1:31950/'
+const port = process.env.PORT || 8090
+let appWindowUrl = `http://127.0.0.1:31950/`
 let mainWindow
 let mainLogger
 let serverManager = new ServerManager()
 
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')({showDevTools: 'undocked'})
-  appWindowUrl = 'http://127.0.0.1:8090/'
+  appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
 function createWindow (windowUrl) {
@@ -53,9 +54,8 @@ function createWindow (windowUrl) {
       .filter(win => win.frameName === 'auth0_signup_popup')
       .map(win => win.close())
   }, 3000)
-  // load the UI (no caching)
   setTimeout(() => {
-    mainWindow.loadURL(windowUrl, {'extraHeaders': 'pragma: no-cache\n'})
+    mainWindow.webContents.loadURL(windowUrl, {'extraHeaders': 'pragma: no-cache\n'})
   }, 200)
   return mainWindow
 }
@@ -94,7 +94,7 @@ function startUp () {
   serverManager.start()
   waitUntilServerResponds(
     () => createWindow(appWindowUrl),
-    'http://127.0.0.1:31950/'
+    appWindowUrl
   )
   addMenu()
   initAutoUpdater()

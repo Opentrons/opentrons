@@ -17,7 +17,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import baseConfig from './webpack.config.base';
 
 const port = process.env.PORT || 8090;
-const publicPath = `http://localhost:${port}/`;
+const publicPath = `http://localhost:${port}/dist`;
 const dll = path.resolve(process.cwd(), 'dll');
 const manifest = path.resolve(dll, 'vendor.json');
 
@@ -49,7 +49,16 @@ export default merge.smart(baseConfig, {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
+            // the "scss" and "sass" values for the lang attribute to the right configs here.
+            // other preprocessors should work out of the box, no loader config like this necessary.
+            'scss': 'vue-style-loader!css-loader!sass-loader',
+            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+          }
+        }
       },
       {
         test: /\.global\.css$/,
@@ -230,7 +239,7 @@ export default merge.smart(baseConfig, {
     lazy: false,
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    contentBase: path.join(__dirname, 'ui'),
+    contentBase: [path.join(__dirname, 'ui'), __dirname],
     watchOptions: {
       aggregateTimeout: 300,
       poll: 100

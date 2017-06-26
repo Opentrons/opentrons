@@ -18,7 +18,7 @@ export default merge.smart(baseConfig, {
 
   output: {
     path: path.join(__dirname, 'ui/dist'),
-    publicPath: '/dist'
+    publicPath: '../dist/'
   },
 
   module: {
@@ -27,7 +27,37 @@ export default merge.smart(baseConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          extractCSS: true
+          loaders: {
+            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
+            // the "scss" and "sass" values for the lang attribute to the right configs here.
+            // other preprocessors should work out of the box, no loader config like this necessary.
+            scss: ExtractTextPlugin.extract({
+              use: [
+                {
+                  loader: 'css-loader'
+                },
+                {
+                  loader: 'sass-loader'
+                }
+              ],
+              fallback: 'vue-style-loader'
+            }),
+            sass: ExtractTextPlugin.extract({
+              use: [
+                {
+                  loader: 'css-loader'
+                },
+                {
+                  loader: 'sass-loader?indentedSyntax'
+                }
+              ],
+              fallback: 'vue-style-loader'
+            }),
+            css: ExtractTextPlugin.extract({
+              use: 'css-loader',
+              fallback: 'vue-style-loader' // <- this is a dep of vue-loader, so no need to explicitly install if using npm3
+            })
+          }
         }
       },
       // Extract all .global.css to style.css as is
@@ -145,7 +175,7 @@ export default merge.smart(baseConfig, {
     /**
      * Create global constants which can be configured at compile time.
      *
-     * Useful for allowing different behaviour between development builds and
+     * Useful for allowing different behavior between development builds and
      * release builds
      *
      * NODE_ENV should be production so that modules do not perform certain

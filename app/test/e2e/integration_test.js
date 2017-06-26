@@ -6,32 +6,14 @@ let chaiAsPromised = require('chai-as-promised')
 let path = require('path')
 let child_process = require('child_process')
 
-let appPath
-if (process.platform === 'win32') {
-  appPath = path.resolve(
-    __dirname,
-    '../../node_modules/electron/dist/Electron.exe'
-  )
-} else if (process.platform === 'darwin') {
-  appPath = path.resolve(
-    __dirname,
-    '../../node_modules/electron/dist/Electron.app/Contents/MacOS/Electron'
-  )
-} else {
-  appPath = path.resolve(
-    __dirname,
-    '../../node_modules/electron/dist/electron'
-  )
-}
-
 chai.should()
 chai.use(chaiAsPromised)
 
 describe('application launch', function () {
   beforeEach(function () {
     this.app = new Application({
-      path: appPath,
-      args: ['./app']
+      path: require('electron'),
+      args: ['.']
     })
     return this.app.start()
   })

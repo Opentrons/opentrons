@@ -3,13 +3,22 @@
   <head>
     <meta charset="UTF-8">
     <title>OT App</title>
-    <!-- NOTE: The location of the build.js file is determined by the webpack.config.js-->
+    <script>
+      (function() {
+        if (!process.env.HOT) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = './dist/style.css';
+          // HACK: Writing the script path should be done with webpack
+          document.getElementsByTagName('head')[0].appendChild(link);
+        }
+      }());
+    </script>
     <script>
       dataLayer = []
       window.ot_dataLayer = dataLayer // Create global reference to dataLayer to make accessible in Vue
     </script>
     <script src="http://cdn.auth0.com/js/lock/10.14.0/lock.min.js"></script>
-    <script src="dist/bundle.js"></script>
 
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -26,5 +35,27 @@
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <div id="app"></div>
+    <script>
+      {
+        const scripts = [];
+        // Dynamically insert the DLL script in development env in the
+        // renderer process
+        if (process.env.NODE_ENV === 'development') {
+          scripts.push('../dll/vendor.dll.js');
+        }
+        // Dynamically insert the bundled app script in the renderer process
+        const port = process.env.PORT || 8090;
+        scripts.push(
+          (process.env.HOT)
+            ? 'http://localhost:' + port + '/dist/bundle.js'
+            : './dist/bundle.js'
+        );
+        document.write(
+          scripts
+            .map(script => '<script defer src="' + script + '"><\/script>')
+            .join('')
+        );
+      }
+    </script>
   </body>
 </html>

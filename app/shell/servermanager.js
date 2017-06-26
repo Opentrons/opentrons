@@ -22,8 +22,9 @@ class ServerManager {
     console.log('User Data Path', userDataPath)
 
     const backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')
-    const uiPath = path.join(app.getAppPath(), 'ui')
-    console.log('Serving UI from: ', path.join(app.getAppPath(), 'ui'))
+    // App UI assets are marked to be unpacked in electron-builder config
+    const uiPath = path.join(app.getAppPath(), 'ui').replace('app.asar', 'app.asar.unpacked')
+    console.log('Serving UI from: ', uiPath)
 
     this.execFile(backendPath, [uiPath])
   }
