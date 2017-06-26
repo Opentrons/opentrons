@@ -4,3 +4,4 @@ set -e
 
 brew update
 brew install python3
+nvm use --lts

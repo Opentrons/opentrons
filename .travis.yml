@@ -36,11 +36,11 @@ install:
   - pip install coveralls
   - source scripts/install-${TRAVIS_OS_NAME}
   - cd api && make install && cd ..
-  - cd app && make config install && cd ..
+  - cd app && make install && cd ..
 
 script:
   - cd api && make test exe && cd ..
-  - cd app && make test package && cd ..
+  - cd app && make build test package && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:
