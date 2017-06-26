@@ -4,5 +4,5 @@ set -e
 
 brew update
 brew install nvm 
-brew install python3
+brew install python3.5
 export NVM_DIR="$(pwd)/.nvm"

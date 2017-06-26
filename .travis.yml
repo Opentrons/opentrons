@@ -35,7 +35,7 @@ install:
   - pip install coveralls
   - scripts/install-${TRAVIS_OS_NAME}
   - source $NVM_DIR/nvm.sh
-  - nvm install --lts && nvm use --lts
+  - nvm install 6.11.0 && nvm use 6.11.0
   - cd api && make install && cd ..
   - cd app && make install && cd ..
 
