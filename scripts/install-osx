@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-set -e
+trap 'exit' ERR
+
+export HOMEBREW_CACHE="$HOME/.cache/brew"
+export NVM_DIR="$(pwd)/.nvm"
 
 bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 brew upgrade pyenv
+eval "$(pyenv init -)"
 pyenv install 3.5.3
 cd api && pyenv local 3.5.3 && cd ..
+source "$NVM_DIR/nvm.sh"
+nvm install --lts && nvm use --lts

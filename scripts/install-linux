@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-set -e
+trap 'exit' ERR
 
+export NVM_DIR="$(pwd)/.nvm"
+export DISPLAY=':99.0'
 bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+source "$NVM_DIR/nvm.sh"
+nvm install --lts && nvm use --lts
