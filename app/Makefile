@@ -14,7 +14,7 @@ package:
 	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && mkdir -p bin && cp ../api/dist/opentrons-api-server bin/ && npm run package
 
 test:
-	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run test test-e2e
+	source '$(NVM_DIR)/nvm.sh' && nvm use --lts && npm run test && npm run test-e2e
 
 clean:
 	rm -rf \
