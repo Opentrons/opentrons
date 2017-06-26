@@ -34,7 +34,7 @@ before_install:
 install:
   - pip install coveralls
   - scripts/install-${TRAVIS_OS_NAME}
-  - source "$NVM_DIR/nvm.sh"
+  - source $NVM_DIR/nvm.sh
   - nvm install --lts && nvm use --lts
   - cd api && make install && cd ..
   - cd app && make install && cd ..
