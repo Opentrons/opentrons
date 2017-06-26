@@ -17,9 +17,9 @@ bin/opentrons-api-server:
 build: shell/dist ui/dist bin/opentrons-api-server
 
 package: build
-	export OT_TIME_SUFFIX=${OT_TIME_SUFFIX:-''} && \
-	export OT_BRANCH_SUFFIX=${OT_BRANCH_SUFFIX:-''} && \
-	export OT_COMMIT_SUFFIX=${OT_COMMIT_SUFFIX:-''} && \
+	export OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) && \
+	export OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) && \
+	export OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX) && \
 	npm run package
 
 test: build
