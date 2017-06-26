@@ -5,10 +5,18 @@ SHELL:=/bin/bash
 install:
 	npm up
 
-package:
+ui/dist:
+	npm run build-renderer
+
+shell/dist:
+	npm run build-main
+
+build: shell/dist ui/dist
+
+package: build
 	mkdir -p bin && cp ../api/dist/opentrons-api-server bin/ && npm run package
 
-test:
+test: build
 	npm run test && npm run test-e2e
 
 clean:

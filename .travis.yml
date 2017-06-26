@@ -33,18 +33,17 @@ before_install:
 
 install:
   - pip install coveralls
-  - export NVM_DIR="$(pwd)/.nvm"
-  - export DISPLAY=':99.0'
-  - scripts/install-${TRAVIS_OS_NAME}
+  - export NVM_DIR="$(pwd)/.nvm" 
+  - export DISPLAY=':99.0' # Needed for headless test using chromedriver
+  - scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
   - source ${NVM_DIR}/nvm.sh
   - nvm install 6.11.0 && nvm use 6.11.0
   - cd api && make install && cd ..
   - cd app && make install && cd ..
 
 script:
-  - echo $DISPLAY
   - cd api && make test exe && cd ..
-  - cd app && make build test package && cd ..
+  - cd app && make -j 2 build && make test package && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:

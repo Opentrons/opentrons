@@ -2,7 +2,7 @@
 
 set -e
 
-brew install nvm
+bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 brew upgrade pyenv
 pyenv install 3.5.3
 cd api && pyenv local 3.5.3 && cd ..
