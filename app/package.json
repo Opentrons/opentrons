@@ -21,7 +21,7 @@
     "start-hot-renderer": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./shell/main",
     "postinstall": "concurrently \"npm run flow-typed\" \"npm run build\" \"npm run build-dll\" \"install-app-deps\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\"",
     "dev": "cross-env START_HOT=1 npm run hot-updates-server",
-    "package": "npm run build && build --publish never",
+    "package": "build --publish never",
     "package-win": "npm run build && build --win --x64",
     "package-linux": "npm run build && build --linux",
     "package-all": "npm run build && build -mwl"
@@ -36,7 +36,7 @@
     "url": "https://github.com/Opentrons/opentrons.git"
   },
   "author": {
-    "name": "engineering@opentrons.com",
+    "name": "Opentrons Labworks",
     "email": "engineering@opentrons.com"
   },
   "license": "Apache-2.0",
@@ -44,14 +44,17 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons",
-  "files": [
-    "bin/opentrons-api-server",
-    "ui/dist",
-    "ui/index.html",
-    "shell/dist",
-    "ui/assets"
-  ],
   "build": {
+    "files": [
+      "!**/*",
+      "node_modules/**",
+      "bin/opentrons-api-server",
+      "ui/dist",
+      "ui/index.html",
+      "shell/dist",
+      "ui/assets"
+    ],
+    "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
     "asar": true,
     "asarUnpack": "ui/**",
     "appId": "com.opentrons.ot-app",
