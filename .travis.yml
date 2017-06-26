@@ -32,9 +32,8 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
 
 install:
-  - curl -o- https://bootstrap.pypa.io/get-pip.py | python
   - pip install coveralls
-  - source scripts/install-${TRAVIS_OS_NAME}
+  - scripts/install-${TRAVIS_OS_NAME}
   - cd api && make install && cd ..
   - cd app && make install && cd ..
 
