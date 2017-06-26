@@ -3,7 +3,7 @@
 set -e
 
 brew install nvm
-brew install pyenv
+brew upgrade pyenv
 pyenv install 3.5.3
 cd api && pyenv local 3.5.3 && cd ..
 export NVM_DIR="$(pwd)/.nvm"
