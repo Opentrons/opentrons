@@ -33,6 +33,8 @@ before_install:
 
 install:
   - pip install coveralls
+  - export NVM_DIR="$(pwd)/.nvm"
+  - export DISPLAY=':99.0'
   - scripts/install-${TRAVIS_OS_NAME}
   - source ${NVM_DIR}/nvm.sh
   - nvm install 6.11.0 && nvm use 6.11.0

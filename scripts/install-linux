@@ -2,7 +2,5 @@
 
 set -e
 
-export NVM_DIR="$(pwd)/.nvm"
 bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
-export DISPLAY=':99.0'
 Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
