@@ -36,7 +36,7 @@ before_install:
 
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
-  - pip install coveralls
+  - pip install pyyaml coveralls
   - cd api && make install && cd ..
   - cd app && make install && cd ..
 
@@ -49,6 +49,9 @@ script:
   - ls -la app/dist
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
+  - ls -la app/dist
+
+after_success: cd api && coveralls && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:
@@ -81,5 +84,3 @@ notifications:
   email:
     on_success: change
     on_failure: change
-
-after_success: cd api && coveralls && cd ..
