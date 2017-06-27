@@ -1,50 +1,45 @@
 /* global describe, it, beforeEach, afterEach */
 import 'babel-polyfill'
 import { Application } from 'spectron'
-import chai, { expect } from 'chai'
+import electronPath from 'electron'
+import { expect } from 'chai'
 import path from 'path'
 import childProcess from 'child_process'
+
+const delay = time => new Promise(resolve => setTimeout(resolve, time))
 
 describe('OT-app', function spec() {
   beforeEach(async () => {
     this.app = new Application({
-      path: require('electron'),
-      args: ['.']
+      path: electronPath,
+      args: [path.join(__dirname, '..', '..')]
     })
-    var res = this.app.start()
-    console.log(res)
-    return res
+    return this.app.start()
   })
 
-  beforeEach(function () {
-  	console.log('before transferPromiseness')
-    chaiAsPromised.transferPromiseness = this.app.transferPromiseness
-    console.log('after transferPromiseness')
-  })
-
-  afterEach(function () {
+  afterEach(() => {
     if (this.app && this.app.isRunning()) {
       return this.app.stop()
     }
   })
 
-  function assertText(result, expected) {
-    expect(result).to.equal(expected)
-  }
+  it('opens a window', async () => {
+    const { client, browserWindow } = this.app
+    await client.waitUntilWindowLoaded()
+    await delay(1000)
+    browserWindow.show()
 
-  it('opens a window', function () {
-    return this.app.client.waitUntilWindowLoaded(600000000).pause(2000).then(this.app.browserWindow.show())
-      .getWindowCount().should.eventually.equal(1)
-      .browserWindow.isMinimized().should.eventually.be.false
-      .browserWindow.isDevToolsOpened().should.eventually.be.false
-      .browserWindow.isVisible().should.eventually.be.true
-      .browserWindow.isFocused().should.eventually.be.true
-      .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
-      .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
+    expect(await client.getWindowCount()).to.equal(1)
+    expect(await browserWindow.isMinimized()).to.be.false
+    expect(await browserWindow.isDevToolsOpened()).to.be.false
+    expect(await browserWindow.isVisible()).be.true
+    expect(await browserWindow.isFocused()).be.true
+    expect(await browserWindow.getBounds()).have.property('width').and.be.above(0)
+    expect(await browserWindow.getBounds()).have.property('height').and.be.above(0)
   })
 
-  function connectAndRunLoadedProtocol() {
-    let pauseTime = process.env.PAUSE_TIME || 0
+  var connectAndRunLoadedProtocol = (client) => {
+    let pauseTime = process.env.PAUSE_TIME || 100
     let connectDropDown = '//*[@id="connections"]'
     let virtualSmoothie = connectDropDown + '/option[3]'
     let saveButton = '//*[@id="task"]/span/button[1]'
@@ -57,7 +52,7 @@ describe('OT-app', function spec() {
     let plungerDown = '//*[@id="jog-controls-plunger"]/span[1]/button[2]'
     let run = '//*[@id="run"]/button'
 
-    return this.app.client
+    return client
       .click(connectDropDown)
       .pause(pauseTime)
       .click(virtualSmoothie)
@@ -87,48 +82,55 @@ describe('OT-app', function spec() {
       .waitForText('.toast-message-text', 'Run complete')
   }
 
-  function uploadProtocol(file) {
+  const uploadProtocol = (client, file) => {
     let uploadXpath = '/html/body/div/section/span/form/div/input'
-    return this.app.client
-      .chooseFile(uploadXpath, file)
-      .pause(1000)
+    client.chooseFile(uploadXpath, file)
   }
 
-  it('runs a user uploaded protocol', function () {
+  it('runs a user uploaded protocol', async () => {
     let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/simple_protocol.py')
     console.log('uploading file: ' + file)
-    this.app.client.execute(() => {
+
+    const { client } = this.app
+    client.execute(() => {
       window.confirm = function () { return true }
     })
-    return this.app.client.waitUntilWindowLoaded(31950).pause(2000)
-      .then(uploadProtocol.bind(this, file))
-      .then(connectAndRunLoadedProtocol.bind(this))
-      .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
+
+    await client.waitUntilWindowLoaded()
+    await delay(1000)
+    await uploadProtocol(client, file)
+    await connectAndRunLoadedProtocol(client)
+    await client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
   })
 
-  it('runs jupyter protocol', function () {
+  it('runs jupyter protocol', async () => {
     let uploadScript = path.join(__dirname, 'jupyter_upload.py')
-    this.app.client.waitUntilWindowLoaded(31950).then(childProcess.spawnSync('python3', [uploadScript]))
+    const { client } = this.app
 
-    this.app.client.execute(() => {
+    await client.waitUntilWindowLoaded()
+    await childProcess.spawnSync('python3', [uploadScript])
+    client.execute(() => {
       window.confirm = function () { return true }
     })
-    return connectAndRunLoadedProtocol.bind(this)
+
+    await connectAndRunLoadedProtocol(client)
   })
 
-  it('handles upload of empty protocol gracefully', function () {
+  it('handles upload of empty protocol gracefully', async () => {
     let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/empty.py')
-    let expectedText = 'This protocol does not contain any commands for the robot.'
     console.log('uploading file: ' + file)
-    return this.app.client.waitUntilWindowLoaded(31950).pause(1000)
-      .then(uploadProtocol.bind(this, file))
-      .getText('.toast-message-text')
-      .then(assertText.bind(null, expectedText))
+    let expectedText = 'This protocol does not contain any commands for the robot.'
+    const { client } = this.app
+    await client.waitUntilWindowLoaded()
+    await uploadProtocol(client, file)
+    await client.waitForText('.toast-message-text', expectedText)
   })
 
-  it('opens login dialog when login is clicked', function () {
-    return this.app.client.waitUntilWindowLoaded(31950).pause(1000)
-      .click('//*[@id="login"]')
-      .waitForExist('//*[@id="auth0-lock-container-1"]/div/div[2]/form')
+  it('opens login dialog when login is clicked', async () => {
+    const { client } = this.app
+    await client.waitUntilWindowLoaded()
+    await delay(100)
+    await client.click('//*[@id="login"]')
+    await client.waitForExist('//*[@id="auth0-lock-container-1"]/div/div[2]/form')
   })
 })
