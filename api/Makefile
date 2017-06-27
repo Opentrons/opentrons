@@ -1,6 +1,6 @@
 .PHONY: api api-install api-test api-lint api-docs api-deploy api-clean api-valid-exe
 
-api: api-clean api-install api-lint api-test api-docs api-deploy api-exe
+api: api-clean api-install api-lint api-test api-deploy api-exe
 
 api-valid-exe: api-clean api-install api-test api-exe
 
