@@ -1,25 +1,25 @@
 /* global describe, it, beforeEach, afterEach */
-let Application = require('spectron').Application
-let chai = require('chai')
-const { expect } = chai
-let chaiAsPromised = require('chai-as-promised')
-let path = require('path')
-let child_process = require('child_process')
+import 'babel-polyfill'
+import { Application } from 'spectron'
+import chai, { expect } from 'chai'
+import path from 'path'
+import childProcess from 'child_process'
 
-chai.should()
-chai.use(chaiAsPromised)
-
-describe('application launch', function () {
-  beforeEach(function () {
+describe('OT-app', function spec() {
+  beforeEach(async () => {
     this.app = new Application({
       path: require('electron'),
       args: ['.']
     })
-    return this.app.start()
+    var res = this.app.start()
+    console.log(res)
+    return res
   })
 
   beforeEach(function () {
+  	console.log('before transferPromiseness')
     chaiAsPromised.transferPromiseness = this.app.transferPromiseness
+    console.log('after transferPromiseness')
   })
 
   afterEach(function () {
@@ -33,7 +33,7 @@ describe('application launch', function () {
   }
 
   it('opens a window', function () {
-    return this.app.client.waitUntilWindowLoaded(600000000)
+    return this.app.client.waitUntilWindowLoaded(600000000).pause(2000).then(this.app.browserWindow.show())
       .getWindowCount().should.eventually.equal(1)
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false
@@ -100,7 +100,7 @@ describe('application launch', function () {
     this.app.client.execute(() => {
       window.confirm = function () { return true }
     })
-    return this.app.client.waitUntilWindowLoaded(31950)
+    return this.app.client.waitUntilWindowLoaded(31950).pause(2000)
       .then(uploadProtocol.bind(this, file))
       .then(connectAndRunLoadedProtocol.bind(this))
       .waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
@@ -108,27 +108,26 @@ describe('application launch', function () {
 
   it('runs jupyter protocol', function () {
     let uploadScript = path.join(__dirname, 'jupyter_upload.py')
-    child_process.spawnSync('python3', [uploadScript])
+    this.app.client.waitUntilWindowLoaded(31950).then(childProcess.spawnSync('python3', [uploadScript]))
 
     this.app.client.execute(() => {
       window.confirm = function () { return true }
     })
-    return this.app.client.waitUntilWindowLoaded(31950)
-      .then(connectAndRunLoadedProtocol.bind(this))
+    return connectAndRunLoadedProtocol.bind(this)
   })
 
   it('handles upload of empty protocol gracefully', function () {
     let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/empty.py')
     let expectedText = 'This protocol does not contain any commands for the robot.'
     console.log('uploading file: ' + file)
-    return this.app.client.waitUntilWindowLoaded(31950)
+    return this.app.client.waitUntilWindowLoaded(31950).pause(1000)
       .then(uploadProtocol.bind(this, file))
       .getText('.toast-message-text')
       .then(assertText.bind(null, expectedText))
   })
 
   it('opens login dialog when login is clicked', function () {
-    return this.app.client.waitUntilWindowLoaded(31950)
+    return this.app.client.waitUntilWindowLoaded(31950).pause(1000)
       .click('//*[@id="login"]')
       .waitForExist('//*[@id="auth0-lock-container-1"]/div/div[2]/form')
   })

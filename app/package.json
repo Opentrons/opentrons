@@ -3,7 +3,7 @@
     "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./node_modules/karma/bin/karma start karma.conf.js --single-run",
     "test-all": "npm run lint && npm run test && npm run build && npm run test-e2e",
     "test-watch": "npm test -- --watch",
-    "test-e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --timeout 60000 test/e2e/integration_test.js",
+    "test-e2e": "cross-env ENABLE_VIRTUAL_SMOOTHIE=true mocha --compilers js:babel-core/register --timeout 60000 test/e2e/integration_test.js",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",
     "lint-fix": "npm run lint -- --fix",
     "lint-styles": "stylelint app/*.css app/components/*.css --syntax scss",
