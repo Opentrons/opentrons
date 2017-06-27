@@ -9,9 +9,12 @@ import {
   App
 } from './components/export'
 import { loginRoute, logoutRoute } from './login-routes'
+import { listen } from './deviceDiscovery'
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
+
+listen()
 
 const router = new VueRouter({
   routes: [

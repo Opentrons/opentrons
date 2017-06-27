@@ -2,29 +2,23 @@
 /* Modal Content/Box */
 .network-config-content {
     display: inherit;
+    z-index: 2;
     background-color: #fefefe;
     border: 1px solid #888;
     width: 200px;
     max-height: 300px;
-    overflow: scroll/* Could be more or less, depending on screen size */
+    overflow: auto
 }
 
-.available-network-container:hover,
-.available-network-container:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
 
-.available-network-container:focus > .available-network,
-.available-network-container:hover > .available-network
+.available-network-container:focus > .collapsed-network,
+.available-network-container:hover > .collapsed-network
 {
-    background:   #cccccc;
-    font-size: 90%;
+    background: #0070ff;
+    color: white;
 }
 
 .password-label{
-    font-size: 100%;
 }
 
 .available-network {
@@ -32,12 +26,10 @@
     outline-width: 1px;
     outline-color: slategrey;
     cursor: pointer;
+    font-size: 110%;
     position: relative;
     padding: 4px 4px 4px 4px;
     background: #eee;
-    font-size: 60%;
-    //font-family: "Times New Roman";
-    transition: 0.3s;
 
     /* make the list items unselectable */
     -webkit-user-select: none;
