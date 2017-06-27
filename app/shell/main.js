@@ -7,9 +7,9 @@ import {addMenu} from './menu'
 import {getLogger} from './logging'
 import {initAutoUpdater} from './updater'
 import {ServerManager} from './servermanager'
+import url from 'url'
 
 if (require('electron-squirrel-startup')) app.quit()
-const mainLogger = getLogger('electron-main')
 
 const port = process.env.PORT || 8090
 const dataDirName = 'otone_data'
@@ -27,24 +27,26 @@ process.env.APP_DATA_DIR = (() => {
   return dir
 })()
 
-let createWindow = async (windowUrl) => {
+const log = getLogger('electron-main')
+
+let createWindow = async windowUrl => {
   const mainWindow = new BrowserWindow({width: 1060, height: 750})
-  mainLogger.info('Creating Electron App window at ' + windowUrl)
+  log.info('Creating Electron App window at ' + windowUrl)
 
   mainWindow.on('closed', function () {
-    mainLogger.info('Electron App window closed, quitting App')
-    request(windowUrl + 'exit')
+    log.info('Electron App window closed, quitting App')
+    request(url.resolve(windowUrl, 'exit'))
       .then(() => {
         app.quit()
       })
       .catch((err) => {
-        mainLogger.error('Received an expected error while calling exit route', err)
+        log.error('Received an expected error while calling exit route', err)
         app.quit()
       })
   })
 
   mainWindow.on('unresponsive', async () => {
-    mainLogger.info('window is unresponsive, reloading')
+    log.info('window is unresponsive, reloading')
     await delay(500)
     mainWindow.reload()
   })
@@ -72,7 +74,7 @@ let createWindow = async (windowUrl) => {
 
 let startUp = async () => {
   // Prepare app data dir (necessary for logging errors that occur during setup)
-  mainLogger.info('Starting App')
+  log.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event
   if (process.env.NODE_ENV === 'development') {
@@ -81,7 +83,7 @@ let startUp = async () => {
 
   process.on('uncaughtException', error => {
     if (process.listeners('uncaughtException')) {
-      mainLogger.info('Uncaught Exception: ', error)
+      log.info('Uncaught Exception: ', error)
     }
   })
 
@@ -91,9 +93,16 @@ let startUp = async () => {
     serverManager.shutdown()
   })
 
-  while (!await request(appWindowUrl, {timeout: 1000})) {
+  let response
+  do {
+    response = await request(
+      appWindowUrl,
+      {timeout: 1000}
+    ).catch(error => {
+      log.debug(`While pinging back-end process: ${error}`)
+    })
     await delay(1000)
-  }
+  } while (!response)
 
   createWindow(appWindowUrl)
 }

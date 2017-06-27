@@ -27,7 +27,6 @@ test: build
 
 clean:
 	rm -rf \
-		.nvm \
 		ui/dist \
 		shell/dist \
 		dll \
