@@ -14,12 +14,16 @@ describe('OT-app', function spec() {
       path: electronPath,
       args: [path.join(__dirname, '..', '..')]
     })
-    return this.app.start()
+    var res = await this.app.start()
+    await delay(5000)
+    return res
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     if (this.app && this.app.isRunning()) {
-      return this.app.stop()
+      var res = await this.app.stop()
+      await delay(5000)
+      return res
     }
   })
 
@@ -27,7 +31,7 @@ describe('OT-app', function spec() {
     const { client, browserWindow } = this.app
     await client.waitUntilWindowLoaded()
     await delay(1000)
-    browserWindow.show()
+    await browserWindow.show()
 
     expect(await client.getWindowCount()).to.equal(1)
     expect(await browserWindow.isMinimized()).to.be.false
@@ -39,7 +43,7 @@ describe('OT-app', function spec() {
   })
 
   var connectAndRunLoadedProtocol = (client) => {
-    let pauseTime = process.env.PAUSE_TIME || 100
+    let pauseTime = process.env.PAUSE_TIME || 500
     let connectDropDown = '//*[@id="connections"]'
     let virtualSmoothie = connectDropDown + '/option[3]'
     let saveButton = '//*[@id="task"]/span/button[1]'
@@ -109,6 +113,8 @@ describe('OT-app', function spec() {
 
     await client.waitUntilWindowLoaded()
     await childProcess.spawnSync('python3', [uploadScript])
+    await delay(1000)
+
     client.execute(() => {
       window.confirm = function () { return true }
     })
