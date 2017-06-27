@@ -47,7 +47,7 @@ install:
   - python --version
   - python3 --version
   -  ./scripts/with-nodenv "make app"
-  - make api-exe
+  - make api-exe > /dev/null
   -  ./scripts/with-nodenv "make app-shell"
 
 script:
