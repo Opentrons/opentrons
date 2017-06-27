@@ -17,5 +17,5 @@ eval "$(pyenv init -)"
 # --enable-framework allows us to do that
 # Also we override default exec-prefix pointing it to the framework path, so we can get
 # sane relative paths between sys.prefix and sysconfig.get_config_h_filename()
-env PYTHON_CONFIGURE_OPTS="--enable-framework --exec-prefix=$HOME/.pyenv/versions/$OT_PYTHON_VERSION/Python.framework/Versions/${OT_PYTHON_VERSION:0:3}" pyenv install $OT_PYTHON_VERSION
+env PYTHON_CONFIGURE_OPTS="--enable-framework --exec-prefix=$HOME/.pyenv/versions/$OT_PYTHON_VERSION/Python.framework/Versions/${OT_PYTHON_VERSION:0:3}" pyenv install -s $OT_PYTHON_VERSION
 cd api && pyenv local $OT_PYTHON_VERSION && cd ..
