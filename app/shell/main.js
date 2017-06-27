@@ -1,81 +1,77 @@
-const {app, BrowserWindow} = require('electron')
+import 'babel-polyfill'
+import {app, BrowserWindow} from 'electron'
+import fs from 'fs'
+import path from 'path'
+import request from 'request-promise'
+import {addMenu} from './menu'
+import {getLogger} from './logging'
+import {initAutoUpdater} from './updater'
+import {ServerManager} from './servermanager'
 
 if (require('electron-squirrel-startup')) app.quit()
-
-const fs = require('fs')
-const path = require('path')
-
-const rp = require('request-promise')
-
-const {addMenu} = require('./menu')
-const {getLogger} = require('./logging')
-const {initAutoUpdater} = require('./updater')
-const {ServerManager} = require('./servermanager')
-const {waitUntilServerResponds} = require('./util')
+const mainLogger = getLogger('electron-main')
 
 const port = process.env.PORT || 8090
+const dataDirName = 'otone_data'
 let appWindowUrl = `http://127.0.0.1:31950/`
-let mainWindow
-let mainLogger
-let serverManager = new ServerManager()
-
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')({showDevTools: 'undocked'})
   appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
-function createWindow (windowUrl) {
+const delay = time => new Promise(resolve => setTimeout(resolve, time))
+
+process.env.APP_DATA_DIR = (() => {
+  const dir = path.join(app.getPath('userData'), dataDirName)
+  !fs.existsSync(dir) && fs.mkdirSync(dir)
+  return dir
+})()
+
+let createWindow = async (windowUrl) => {
+  const mainWindow = new BrowserWindow({width: 1060, height: 750})
   mainLogger.info('Creating Electron App window at ' + windowUrl)
-  mainWindow = new BrowserWindow({
-    width: 1060,
-    height: 750
-  })
+
   mainWindow.on('closed', function () {
     mainLogger.info('Electron App window closed, quitting App')
-    rp(windowUrl + 'exit')
-      .then((html) => {
-        mainWindow = null
+    request(windowUrl + 'exit')
+      .then(() => {
         app.quit()
       })
       .catch((err) => {
-        mainLogger.info('Received an expected error while calling exit route')
-        mainLogger.info(err)
-        mainWindow = null
+        mainLogger.error('Received an expected error while calling exit route', err)
         app.quit()
       })
   })
-  mainWindow.on('unresponsive', function () {
+
+  mainWindow.on('unresponsive', async () => {
     mainLogger.info('window is unresponsive, reloading')
-    setTimeout(mainWindow.reload, 500)
+    await delay(500)
+    mainWindow.reload()
   })
-  // Note: Auth0 pop window does not close itself, this will this window when it pops up
+
+  // Note: Auth0 pop window does not close itself, 
+  // this will close this window when it pops up
   setInterval(() => {
     BrowserWindow.getAllWindows()
       .filter(win => win.frameName === 'auth0_signup_popup')
       .map(win => win.close())
   }, 3000)
-  setTimeout(() => {
-    mainWindow.webContents.loadURL(windowUrl, {'extraHeaders': 'pragma: no-cache\n'})
-  }, 200)
+
+  await delay(200)
+
+  addMenu()
+  initAutoUpdater()
+
+  mainWindow.webContents.loadURL(
+    windowUrl,
+    {'extraHeaders': 'pragma: no-cache\n'}
+  )
+
   return mainWindow
 }
 
-function createAndSetAppDataDir () {
-  if (!app.isReady()) {
-    throw Error('Attempting to create otone_data dir when app is not ready')
-  }
-  const appDataDir = path.join(app.getPath('userData'), 'otone_data')
-
-  if (!fs.existsSync(appDataDir)) {
-    fs.mkdirSync(appDataDir)
-  }
-  process.env['APP_DATA_DIR'] = appDataDir
-}
-
-function startUp () {
+let startUp = async () => {
   // Prepare app data dir (necessary for logging errors that occur during setup)
-  createAndSetAppDataDir()
-  mainLogger = getLogger('electron-main')
   mainLogger.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event
@@ -83,24 +79,23 @@ function startUp () {
     require('vue-devtools').install()
   }
 
-  process.on('uncaughtException', (error) => {
-    if (process.listeners('uncaughtException').length > 1) {
-      console.log(error)
-      mainLogger.info('Uncaught Exception:')
-      mainLogger.info(error)
+  process.on('uncaughtException', error => {
+    if (process.listeners('uncaughtException')) {
+      mainLogger.info('Uncaught Exception: ', error)
     }
   })
 
+  const serverManager = new ServerManager()
   serverManager.start()
-  waitUntilServerResponds(
-    () => createWindow(appWindowUrl),
-    appWindowUrl
-  )
-  addMenu()
-  initAutoUpdater()
+  app.on('quit', () => {
+    serverManager.shutdown()
+  })
+
+  while (!await request(appWindowUrl, {timeout: 1000})) {
+    await delay(1000)
+  }
+
+  createWindow(appWindowUrl)
 }
 
 app.on('ready', startUp)
-app.on('quit', function () {
-  serverManager.shutdown()
-})
