@@ -65,7 +65,7 @@ describe('OT-app', function spec() {
       .pause(pauseTime)
       .click(virtualSmoothie)
       .pause(pauseTime)
-      .click(saveButton)
+      .waitForExist(saveButton).click(saveButton)
       .pause(pauseTime)
       .click(platePath)
       .pause(pauseTime)
@@ -116,7 +116,7 @@ describe('OT-app', function spec() {
     const { client } = this.app
 
     await client.waitUntilWindowLoaded()
-    await childProcess.spawnSync('python3', [uploadScript])
+    await childProcess.spawnSync('python', [uploadScript])
     await delay(1000)
 
     client.execute(() => {
