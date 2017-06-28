@@ -4,6 +4,10 @@ environment:
   BASH: C:\cygwin64\bin\bash
 
 platform: x64
+
+cache:
+  - app\node_modules        # local npm modules
+  - '%APPDATA%\npm-cache'   # npm cache
     
 init:
   - set PATH=c:\Python35;c:\Python35\Scripts;%PATH% # Activate Python 3.5
@@ -11,21 +15,17 @@ init:
   - git config --global core.autocrlf true
 
 install:
-  - ps: Install-Product node 6.11.0 x64 
-  - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && make install"
-  - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make install"
+  - ps: Install-Product node 6.11.0 x64
+  - pip install setuptools
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && make install"'
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make install"'
 
 build: false # No need to run MSBuild
 
 build_script:
-  - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make test exe"
-  - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && source scripts/env-vars-appveyor && make -j 2 build && make test package"
-  - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make test exe"'
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && source scripts/env-vars-appveyor && make -j 2 build && make test package"'
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."'
 
 before_deploy:
   - ps: Get-ChildItem .\app\dist\*
