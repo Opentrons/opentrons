@@ -2,6 +2,8 @@ image: Visual Studio 2015
 
 environment:
   BASH: C:\cygwin64\bin\bash
+  PYTHON: c:\Python35 # No trailing backslash
+  CYG_PYTHON_PATH: /cygdrive/c/Python35:/cygdrive/c/Python35/Scripts # Need to override /usr/bin
 
 platform: x64
 
@@ -10,21 +12,19 @@ cache:
   - '%APPDATA%\npm-cache'   # npm cache
     
 init:
-  - set PATH=c:\Python35;c:\Python35\Scripts;%PATH% # Activate Python 3.5
-  - set PATH=c:\Cygwin64;%PATH% # We are relying in make
+  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH% # Activate Python 3.5
   - git config --global core.autocrlf true
 
 install:
   - ps: Install-Product node 6.11.0 x64
-  - pip install setuptools
-  - '%BASH% -lc "echo $PATH && which python && which pip"'
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make install"'
+  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && echo $PATH && which python && which pip"'
+  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make install"'
   - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && make install"'
 
 build: false # No need to run MSBuild
 
 build_script:
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make test exe"'
+  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test exe"'
   - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && cd app && make -j 2 build && make test package"'
   - >
     %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
