@@ -47,9 +47,11 @@ const log = getLogger('electron-main')
 let loadUI = windowUrl => {
   log.info('Loading App UI at ' + windowUrl)
   BrowserWindow.getAllWindows()[0].webContents.loadURL(
-    windowUrl,
+    // windowUrl,
+    'about:blank',
     {'extraHeaders': 'pragma: no-cache\n'}
   )
+  log.info('Dispatched .loadURL call')
 }
 
 let createWindow = async () => {
