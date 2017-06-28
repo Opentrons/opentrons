@@ -13,6 +13,10 @@ if (require('electron-squirrel-startup')) app.quit()
 const port = process.env.PORT || 8090
 const dataDirName = 'otone_data'
 let appWindowUrl = `http://127.0.0.1:31950/`
+// const indexPath = path.join(__dirname, '../../ui/index.html')
+// console.log(`Index path: ${indexPath}`)
+// let appWindowUrl = `file://${indexPath}`
+
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')({showDevTools: 'undocked'})
   appWindowUrl = `http://127.0.0.1:${port}/`
@@ -28,7 +32,15 @@ process.env.APP_DATA_DIR = (() => {
 
 const log = getLogger('electron-main')
 
-let createWindow = async windowUrl => {
+let loadUI = windowUrl => {
+  log.info('Loading App UI at ' + windowUrl)
+  BrowserWindow.getAllWindows()[0].webContents.loadURL(
+    windowUrl,
+    {'extraHeaders': 'pragma: no-cache\n'}
+  )
+}
+
+let createWindow = async () => {
   // Avoid window flashing and possibly fix integration tests
   // that are waiting for the window that appears before page is loaded
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#showing-window-gracefully
@@ -37,11 +49,9 @@ let createWindow = async windowUrl => {
     mainWindow.show()
   })
 
-  log.info('Creating Electron App window at ' + windowUrl)
-
   mainWindow.on('closed', function () {
     log.info('Electron App window closed, quitting App')
-    request(url.resolve(windowUrl, 'exit'))
+    request(url.resolve(appWindowUrl, 'exit'))
       .then(() => {
         app.quit()
       })
@@ -70,16 +80,10 @@ let createWindow = async windowUrl => {
   addMenu()
   initAutoUpdater()
 
-  mainWindow.webContents.loadURL(
-    windowUrl,
-    {'extraHeaders': 'pragma: no-cache\n'}
-  )
-
   return mainWindow
 }
 
 let startUp = async () => {
-  // Prepare app data dir (necessary for logging errors that occur during setup)
   log.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event
@@ -99,6 +103,8 @@ let startUp = async () => {
     serverManager.shutdown()
   })
 
+  createWindow()
+
   let response
   do {
     response = await request(
@@ -110,7 +116,7 @@ let startUp = async () => {
     await delay(1000)
   } while (!response)
 
-  createWindow(appWindowUrl)
+  loadUI(appWindowUrl)
 }
 
 app.on('ready', startUp)
