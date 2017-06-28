@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import {app, BrowserWindow} from 'electron'
 import fs from 'fs'
 import path from 'path'
@@ -14,8 +13,8 @@ if (require('electron-squirrel-startup')) app.quit()
 const port = process.env.PORT || 8090
 const dataDirName = 'otone_data'
 let appWindowUrl = `http://127.0.0.1:31950/`
+require('electron-debug')({showDevTools: 'undocked'})
 if (process.env.NODE_ENV === 'development') {
-  require('electron-debug')({showDevTools: 'undocked'})
   appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
