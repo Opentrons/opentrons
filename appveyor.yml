@@ -1,78 +1,35 @@
-os: unstable
+image: Visual Studio 2015
 
 environment:
-  matrix:
-    - language: cpp
-      PYTHON3: "C:\\Python35"
-      PYTHON3_VERSION: "3.5.0"
-      PYTHON3_ARCH: "64"
+  BASH: C:\cygwin64\bin\bash
 
-      # PYTHON2.7 REQUIRED FOR NODE-GYP & ELECTRON
-      PYTHON2: "C:\\Python27"
-      PYTHON2_VERSION: "2.7.9"
-      PYTHON2_ARCH: "64"
-
-  PIP3: C:\\Python35\Scripts\pip
-  PIP2: C:\\Python27\Scripts\pip
-
-  npm_config_arch: x64
-
-platform: x64
-
-configuration: Release
-
+matrix:
+  - platform: x64
+    
 init:
-  - cmd: node --version
-  - cmd: npm --version
-
-  - "ECHO Installed SDKs:"
-  - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
-
-  - cmd: ECHO Processor architecture - %PROCESSOR_ARCHITECTURE%
-  - cmd: wmic OS get OSArchitecture
-  - cmd: npm config set msvs_version 2015 --global
-
-  - cmd: ECHO %PYTHON3% %PYTHON3_VERSION% %PYTHON3_ARCH%
-  - cmd: "%PYTHON3%\\python --version"
-  - cmd: "%PYTHON3%\\python -c \"import struct; print(struct.calcsize('P') * 8)\""
-  - cmd: "%PYTHON3%\\python -m pip install --upgrade pip"
-
-  - cmd: ECHO %PYTHON2% %PYTHON2_VERSION% %PYTHON2_ARCH%
-  - cmd: "%PYTHON2%\\python --version"
-  - cmd: "%PYTHON2%\\python -c \"import struct; print(struct.calcsize('P') * 8)\""
-  - cmd: "%PYTHON2%\\python -m pip install --upgrade pip"
-
-  - ps: Install-Product node 6.0.0 x64
-  - cmd: node --version
-  - cmd: npm --version
-
-  # CRITICAL FOR NODE-GYP TO WORK
-  - cmd: npm -g install npm@latest
-  - cmd: npm --version
-
-  # SET THE RELEVANT PYTHON AND PIP LOCATIONS IN THE PATH
-  - cmd: set PATH=%PYTHON3%;%PYTHON3%\scripts;%PYTHON2%;%PYTHON2%\scripts;%PATH%
-  - cmd: set PATH=c:\MinGW\bin;%PATH%
-  - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
-  - cmd: ECHO Path - %PATH%
-  - ps: cp C:\Python35\python.exe C:\Python35\python3
+  - set PATH=c:\Python35;c:\Python35\Scripts;%PATH% # Activate Python 3.5
+  - set PATH=c:\Cygwin64;%PATH% # We are relying in make
+  - git config --global core.autocrlf true
 
 install:
-  - cmd: "%PIP2% freeze"
-  - cmd: "%PIP3% freeze"
+  - ps: Install-Product node 6.11.0 x64 
+  - >
+    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && make install"
+  - >
+    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make install"
 
-  - cmd: npm config list
-  - cmd: npm config set python %PYTHON2%\python.exe --global
+build: false # No need to run MSBuild
 
-  - make app
-  - make api-valid-exe
-  - make app-shell-win
-
-build: off
+build_script:
+  - >
+    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make test exe"
+  - >
+    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && source scripts/env-vars-appveyor && make -j 2 build && make test package"
+  - >
+    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
 
 before_deploy:
-  - ps: Get-ChildItem .\app-shell\releases\*
-  - ps: ls .\app-shell\releases\*
+  - ps: Get-ChildItem .\app\dist\*
   - ps: Get-ChildItem .\app-shell\releases\* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
 
 deploy:
