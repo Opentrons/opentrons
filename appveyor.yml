@@ -23,6 +23,7 @@ install:
 build: false # No need to run MSBuild
 
 build_script:
+  - '%BASH% -lc "echo $PATH && which python && which pip"'
   - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/api && make test exe"'
   - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && cd app && make -j 2 build && make test package"'
   - >
