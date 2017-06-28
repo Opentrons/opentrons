@@ -13,8 +13,8 @@ if (require('electron-squirrel-startup')) app.quit()
 const port = process.env.PORT || 8090
 const dataDirName = 'otone_data'
 let appWindowUrl = `http://127.0.0.1:31950/`
-require('electron-debug')({showDevTools: 'undocked'})
 if (process.env.NODE_ENV === 'development') {
+  require('electron-debug')({showDevTools: 'undocked'})
   appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
@@ -29,7 +29,14 @@ process.env.APP_DATA_DIR = (() => {
 const log = getLogger('electron-main')
 
 let createWindow = async windowUrl => {
-  const mainWindow = new BrowserWindow({width: 1060, height: 750})
+  // Avoid window flashing and possibly fix integration tests
+  // that are waiting for the window that appears before page is loaded
+  // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#showing-window-gracefully
+  const mainWindow = new BrowserWindow({show: false, width: 1060, height: 750})
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+  })
+
   log.info('Creating Electron App window at ' + windowUrl)
 
   mainWindow.on('closed', function () {
