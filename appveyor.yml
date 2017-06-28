@@ -3,8 +3,7 @@ image: Visual Studio 2015
 environment:
   BASH: C:\cygwin64\bin\bash
 
-matrix:
-  - platform: x64
+platform: x64
     
 init:
   - set PATH=c:\Python35;c:\Python35\Scripts;%PATH% # Activate Python 3.5
