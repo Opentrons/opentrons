@@ -132,6 +132,7 @@
     "mocha": "^3.4.2",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
+    "shelljs": "^0.7.8",
     "sinon": "^2.3.4",
     "spectron": "^3.6.4",
     "style-loader": "^0.18.2",

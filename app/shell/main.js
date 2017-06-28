@@ -7,12 +7,15 @@ import {getLogger} from './logging'
 import {initAutoUpdater} from './updater'
 import {ServerManager} from './servermanager'
 import url from 'url'
+import shell from 'shelljs'
+
 
 if (require('electron-squirrel-startup')) app.quit()
 
 const port = process.env.PORT || 8090
 const dataDirName = 'otone_data'
 let appWindowUrl = `http://127.0.0.1:31950/`
+// TODO: Test app behavior with UI loaded from file://
 // const indexPath = path.join(__dirname, '../../ui/index.html')
 // console.log(`Index path: ${indexPath}`)
 // let appWindowUrl = `file://${indexPath}`
@@ -22,11 +25,20 @@ if (process.env.NODE_ENV === 'development') {
   appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
+// Clean up User Data for tests
+if (process.env.INTEGRATION_TEST === 'true') {
+  const userData = app.getPath('userData')
+  console.log(`We are in Integration Test mode. Deleting userData: ${userData}`)
+  shell.rm('-rf', app.getPath('userData'))
+}
+
 const delay = time => new Promise(resolve => setTimeout(resolve, time))
 
 process.env.APP_DATA_DIR = (() => {
   const dir = path.join(app.getPath('userData'), dataDirName)
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+  // 'userData' is created on app.on('ready'), since we need it earlier
+  // for logging, we want to make sure it exis
+  if (!fs.existsSync(dir)) shell.mkdir('-p', dir)
   return dir
 })()
 
