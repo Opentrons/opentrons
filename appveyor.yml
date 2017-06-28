@@ -14,6 +14,13 @@ cache:
 init:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH% # Activate Python 3.5
   - git config --global core.autocrlf true
+  # Start RDP server to watch the build
+  # https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+# Keep RDP server to see at what happened if the build got stuck
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   - ps: Install-Product node 6.11.0 x64
