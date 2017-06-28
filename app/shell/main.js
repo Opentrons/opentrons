@@ -22,7 +22,7 @@ const delay = time => new Promise(resolve => setTimeout(resolve, time))
 
 process.env.APP_DATA_DIR = (() => {
   const dir = path.join(app.getPath('userData'), dataDirName)
-  !fs.existsSync(dir) && fs.mkdirSync(dir)
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir)
   return dir
 })()
 

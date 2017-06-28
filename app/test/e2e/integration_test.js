@@ -5,24 +5,28 @@ import electronPath from 'electron'
 import { expect } from 'chai'
 import path from 'path'
 import childProcess from 'child_process'
+import fs from 'fs'
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time))
+
+let logDir = path.join(__dirname, 'log')
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
 describe('OT-app', function spec() {
   beforeEach(async () => {
     this.app = new Application({
       path: electronPath,
-      args: [path.join(__dirname, '..', '..')]
+      args: [path.join(__dirname, '..', '..')],
+      chromeDriverLogPath: path.join(logDir, 'chrome-driver.log'),
+      webdriverLogPath: path.join(logDir, 'web-driver.log')
     })
     var res = await this.app.start()
-    await delay(5000)
     return res
   })
 
   afterEach(async () => {
     if (this.app && this.app.isRunning()) {
       var res = await this.app.stop()
-      await delay(5000)
       return res
     }
   })
