@@ -58,7 +58,12 @@ function createWindow (windowUrl) {
   }, 3000)
   // load the UI (no caching)
   setTimeout(() => {
-    mainWindow.loadURL(windowUrl, {"extraHeaders" : "pragma: no-cache\n"})
+    const version = app.getVersion()
+    const agent = mainWindow.webContents.getUserAgent().replace(/Chrome\/[\d+\.]+/, `Chrome/${version}`)
+    mainWindow.loadURL(windowUrl, {
+      "extraHeaders" : "pragma: no-cache\n",
+       userAgent: agent
+    })
   }, 200)
   return mainWindow
 }

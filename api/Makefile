@@ -15,7 +15,7 @@ api-lint:
 	pylama
 
 api-docs:
-	cd docs && make clean html && make doctest && cd ..
+	cd docs && make clean html && make doctest 2>&1 >/dev/null && cd ..
 
 api-deploy:
 	cd scripts && ./doc-deploy.sh && cd ..
