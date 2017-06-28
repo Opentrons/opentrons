@@ -1132,21 +1132,28 @@ def save_network(ssid, passkey, network_type):
         file_contents = DEFAULT_HEADER + config
         wpa_file.write(file_contents)
 
-@app.route('/networks')
+
+@app.route('/wifi/get_networks')
 def get_networks():
-    response = flask.jsonify({'networks': {
-        (c.ssid or 'no name'): {'quality': c.quality, 'encrypted': c.encrypted}
-        for c in wifi.Cell.all(INTERFACE)
-    }})
+    networks = [
+       {'name': c.ssid,
+        'is_encrypted': c.encrypted,
+        'quality': c.quality}
+       for c in wifi.Cell.all(INTERFACE)
+       if c.ssid
+    ]
+    response = flask.jsonify({'networks': networks})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
 
 def is_wireless_connection():
     if not subprocess.call('ip -4 addr show wlan0 | grep -oP "(?<=inet ).*(?=/)"', shell=True):
         return True
     return False
 
-@app.route('/connect', methods=['POST'])
+
+@app.route('/wifi/send_credentials', methods=['POST'])
 def connect():
     req = request.get_json()
     ssid = req.get('ssid')
