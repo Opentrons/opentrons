@@ -23,7 +23,10 @@ package: build
 	npm run package
 
 test: build
-	npm run test && npm run test-e2e
+	npm run test
+
+test-e2e: build
+	npm run test-e2e
 
 clean:
 	rm -rf \

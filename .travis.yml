@@ -47,7 +47,7 @@ script:
   - cd api && make test exe && cd ..
   - > # Make docs on linux only
     [ "$TRAVIS_OS_NAME" == "linux" ] && (cd api && make docs && cd ..)
-  - cd app && make -j 2 build && make test package && cd ..
+  - cd app && make -j 2 build test test-e2e package && cd ..
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
@@ -64,7 +64,7 @@ deploy:
     upload-dir: $TRAVIS_OS_NAME
     acl: public_read
     on:
-      repo: OpenTrons/opentrons
+      repo: Opentrons/opentrons
       all_branches: true
 
   # Publish API to PyPI and Anaconda

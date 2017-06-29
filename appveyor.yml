@@ -16,7 +16,7 @@ init:
   - git config --global core.autocrlf true
   # Start RDP server to watch the build
   # https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # Keep RDP server to see at what happened if the build got stuck
 on_finish:
@@ -24,7 +24,6 @@ on_finish:
 
 install:
   - ps: Install-Product node 6.11.0 x64
-  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && echo $PATH && which python && which pip"'
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make install"'
   - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && make install"'
 
@@ -32,12 +31,15 @@ build: false # No need to run MSBuild
 
 build_script:
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test exe"'
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && cd app && make -j 2 build && make test package"'
+  # Note: we are not running test-e2e on Windows due to problems with ChromeDriver
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && cd app && make -j 2 build test package"'
   - >
     %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist/win && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
 
-before_deploy:
-  - ps: Get-ChildItem .\app\dist\win | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
+# Uncomment this to debug a stuck build through RDP:
+# https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+# before_deploy:
+#   - ps: Get-ChildItem .\app\dist\win | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
 
 deploy:
   - provider: S3
