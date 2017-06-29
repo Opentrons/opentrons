@@ -65,8 +65,7 @@ deploy:
     upload-dir: $TRAVIS_OS_NAME
     acl: public_read
     on:
-      condition: >
-        [ "$TRAVIS_TEST_RESULT" == "0" ] || (echo "Build failed, skipping deploy") || [ 1 ]
+      condition: "$TRAVIS_TEST_RESULT" == "0"
       repo: Opentrons/opentrons
       all_branches: true
 
