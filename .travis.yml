@@ -47,7 +47,7 @@ script:
   - cd api && make test exe && cd ..
   - > # Make docs on linux only
     [ "$TRAVIS_OS_NAME" == "linux" ] && (cd api && make docs && cd ..)
-  - cd app && make -j 2 build test test-e2e package && cd ..
+  - cd app && make -j 2 build test test-e2e && make package && cd ..
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
