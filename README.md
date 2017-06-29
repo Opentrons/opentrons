@@ -1,9 +1,9 @@
 # Opentrons Platform
 
-[Overview](#overview)
-[Opentrons API](#api)
-[OT-App](#app)
-[Contributing/Building](#contributing)
+* [Overview](#overview)
+* [Opentrons API](#api)
+* [OT-App](#app)
+* [Contributing/Building](#contributing)
 
 <a name="overview"></a>
 ## Overview
@@ -29,8 +29,8 @@ pipette.aspirate(tube_1).dispense(tube_2)
 
 That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one.
 
-[Documentation](http://docs.opentrons.com)
-[Source code](https://github.com/OpenTrons/opentrons/tree/develop/api)
+* [Documentation](http://docs.opentrons.com)
+* [Source code](https://github.com/OpenTrons/opentrons/tree/develop/api)
 
 <a name="app"></a>
 ## OT-App
@@ -39,8 +39,8 @@ Easily upload a protocol, calibrate positions, and run your experiment right fro
 
 ![ot-app](https://lh3.googleusercontent.com/hz80NB3yiMB6r50aKg9DgSuqmwNAEKFz7aC3qQS56YregCGygg1oc3ldn9FAanqTt7REUXikkSuHDX69JODaLWgegDwO_JnDf30j3NuZ05mWOq16nMTxQBAFW6cZqqEsLaDU-uRW)
 
-[Documentation](https://support.opentrons.com/)
-[Source code](https://github.com/OpenTrons/opentrons/tree/develop/app)
+* [Documentation](https://support.opentrons.com/)
+* [Source code](https://github.com/OpenTrons/opentrons/tree/develop/app)
 
 <a name="contributing"></a>
 ## Contributing
@@ -54,20 +54,18 @@ If you want to build the platform and play with the latest development version, 
 * Python 3.5.3 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended)
 * Node 6.11.0 ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
 * OS X 10.11+, Linux, Windows 10 with Cygwin
-* GNU Make
-
-Both API and OT-App are using [Makefiles](https://en.wikipedia.org/wiki/Makefile)
+* GNU Make: both API and OT-App are using [Makefiles](https://en.wikipedia.org/wiki/Makefile)
 
 ### API
 
-Clone the repository to get started
-```(shell)
+Clone the repository to get started.
+```shell
 git clone https://github.com/OpenTrons/opentrons.git
 ```
 
 Install the dependencies and API itself.
 
-```(shell)
+```shell
 cd api
 make install
 # Verify
@@ -76,7 +74,7 @@ python -c 'import opentrons; print(opentrons.__version__)'
 ```
 
 (Optional) test, lint and build API server executable (needed for the app)
-```(shell)
+```shell
 make test
 make exe
 ```
@@ -87,16 +85,16 @@ Our app is build with [Electron](https://github.com/electron/electron) using mod
 
 You can read great coverage of some tools that are used in our stack [here](https://github.com/grab/front-end-guide). Note, our front-end framework of choice is [Vue.js](https://vuejs.org/) which dictates our choice of test tools: [Karma](https://github.com/karma-runner/karma), [Mocha](https://github.com/mochajs/mocha), [Chai](https://github.com/chaijs/chai) and [Istanbul](https://github.com/gotwarlost/istanbul)
 
-Install OT-App dependencies
+Install OT-App dependencies.
 
-```(shell)
+```shell
 cd app
 make install
 ```
 
 Build and package the app
 
-```(shell)
+```shell
 make build package
 # Optionally test
 make test
