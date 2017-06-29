@@ -9,7 +9,6 @@ import {ServerManager} from './servermanager'
 import url from 'url'
 import shell from 'shelljs'
 
-
 if (require('electron-squirrel-startup')) app.quit()
 
 const port = process.env.PORT || 8090
@@ -25,6 +24,10 @@ if (process.env.NODE_ENV === 'development') {
   appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
+// TODO(artyom): it should be long to integration test and/or CI scripts
+// but for that we need to determine userData value before running the test
+// and for that we need to create an instance of the app. 
+// 
 // Clean up User Data for tests
 if (process.env.INTEGRATION_TEST === 'true') {
   const userData = app.getPath('userData')
@@ -46,9 +49,8 @@ const log = getLogger('electron-main')
 
 let loadUI = windowUrl => {
   log.info('Loading App UI at ' + windowUrl)
-  BrowserWindow.getAllWindows()[0].webContents.loadURL(
-    // windowUrl,
-    'about:blank',
+  BrowserWindow.getAllWindows()[0].loadURL(
+    windowUrl,
     {'extraHeaders': 'pragma: no-cache\n'}
   )
   log.info('Dispatched .loadURL call')
@@ -81,6 +83,14 @@ let createWindow = async () => {
     mainWindow.reload()
   })
 
+  // TODO: the sequence of instantiating the BrowserWindow
+  // and then calling loadURL with our UI causes integration 
+  // tests to fail randomly on windows, likely due to a race
+  // condition while WebDriver is connecting to Chrome DevTools
+  // causing Chrome to crash. We are experimenting with pre-loading
+  // 'about:blank' first
+  // mainWindow.loadURL('about:blank')
+
   // Note: Auth0 pop window does not close itself, 
   // this will close this window when it pops up
   setInterval(() => {
@@ -88,8 +98,6 @@ let createWindow = async () => {
       .filter(win => win.frameName === 'auth0_signup_popup')
       .map(win => win.close())
   }, 3000)
-
-  await delay(200)
 
   addMenu()
   initAutoUpdater()

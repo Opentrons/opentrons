@@ -9,20 +9,21 @@ import fs from 'fs'
 import shell from 'shelljs'
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time))
+const connectDropDown = '//*[@id="connections"]'
 
 let logDir = path.join(__dirname, 'log')
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
-// const pythonVersion = shell.cat('.python-version').trim()
-// const python = shell.exec('python --version', {silent: true})
-// const version = python.stdout || python.stderr || ''
+const pythonVersion = shell.cat('.python-version').trim()
+const python = shell.exec('python --version', {silent: true})
+const version = python.stdout || python.stderr || ''
 
-// // Needed for Jupyter testing and potentially for future tests 
-// // involving python interpreter
-// if (version.indexOf(pythonVersion) === -1) {
-//   console.log(`e2e tests require Python ${pythonVersion}. Output: ${version || 'none'}`)
-//   process.exit(1)
-// }
+// Needed for Jupyter testing and potentially for future tests 
+// involving python interpreter
+if (version.indexOf(pythonVersion) === -1) {
+  console.log(`e2e tests require Python ${pythonVersion}. Output: ${version || 'none'}`)
+  process.exit(1)
+}
 
 describe('OT-app', function spec() {
   beforeEach(async () => {
@@ -32,23 +33,18 @@ describe('OT-app', function spec() {
       chromeDriverLogPath: path.join(logDir, 'chrome-driver.log'),
       webdriverLogPath: path.join(logDir, 'web-driver.log')
     })
-    var res = await this.app.start()
-    return res
+    return this.app.start()
   })
 
-  afterEach(async () => {
+  afterEach(() => {
     if (this.app && this.app.isRunning()) {
-      var res = await this.app.stop()
-      return res
+      return this.app.stop()
     }
   })
 
   it('opens a window', async () => {
     const { client, browserWindow } = this.app
     await client.waitUntilWindowLoaded()
-    await delay(1000)
-    await browserWindow.show()
-
     expect(await client.getWindowCount()).to.equal(1)
     expect(await browserWindow.isMinimized()).to.be.false
     expect(await browserWindow.isDevToolsOpened()).to.be.false
@@ -60,7 +56,6 @@ describe('OT-app', function spec() {
 
   var connectAndRunLoadedProtocol = (client) => {
     let pauseTime = process.env.PAUSE_TIME || 500
-    let connectDropDown = '//*[@id="connections"]'
     let virtualSmoothie = connectDropDown + '/option[3]'
     let saveButton = '//*[@id="task"]/span/button[1]'
     let platePath = '//*[@id="step-list"]/div/span/div/ul/li[2]/a'
@@ -117,7 +112,6 @@ describe('OT-app', function spec() {
     })
 
     await client.waitUntilWindowLoaded()
-    await delay(1000)
     await uploadProtocol(client, file)
     await connectAndRunLoadedProtocol(client)
     await client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
