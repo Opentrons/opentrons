@@ -35,10 +35,10 @@ That is how you tell the Opentrons robot to pipette its max volume from one tube
 
 Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
-![ot-app](https://lh3.googleusercontent.com/hz80NB3yiMB6r50aKg9DgSuqmwNAEKFz7aC3qQS56YregCGygg1oc3ldn9FAanqTt7REUXikkSuHDX69JODaLWgegDwO_JnDf30j3NuZ05mWOq16nMTxQBAFW6cZqqEsLaDU-uRW)
-
 * [Documentation](https://support.opentrons.com/)
 * [Source code](https://github.com/OpenTrons/opentrons/tree/develop/app)
+
+![ot-app](https://lh3.googleusercontent.com/hz80NB3yiMB6r50aKg9DgSuqmwNAEKFz7aC3qQS56YregCGygg1oc3ldn9FAanqTt7REUXikkSuHDX69JODaLWgegDwO_JnDf30j3NuZ05mWOq16nMTxQBAFW6cZqqEsLaDU-uRW)
 
 <a name="contributing"></a>
 ## Contributing
