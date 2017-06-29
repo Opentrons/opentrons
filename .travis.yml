@@ -51,7 +51,8 @@ script:
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
-after_success: cd api && coveralls && cd ..
+after_success:
+  - cd api && coveralls && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:
