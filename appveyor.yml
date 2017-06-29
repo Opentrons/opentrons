@@ -19,8 +19,10 @@ init:
   # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # Keep RDP server to see at what happened if the build got stuck
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# Uncomment this to debug a stuck build through RDP:
+# https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   - ps: Install-Product node 6.11.0 x64
@@ -36,10 +38,8 @@ build_script:
   - >
     %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist/win && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
 
-# Uncomment this to debug a stuck build through RDP:
-# https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
-# before_deploy:
-#   - ps: Get-ChildItem .\app\dist\win | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
+before_deploy:
+  - ps: Get-ChildItem .\app\dist\win | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
 
 deploy:
   - provider: S3

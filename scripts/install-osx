@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-trap 'exit' ERR
+# trap 'exit' ERR
 
 OT_PYTHON_VERSION=3.5.3
 

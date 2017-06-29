@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'development') {
   appWindowUrl = `http://127.0.0.1:${port}/`
 }
 
-// TODO(artyom): it should be long to integration test and/or CI scripts
+// TODO(artyom): it should belong to integration test and/or CI scripts
 // but for that we need to determine userData value before running the test
 // and for that we need to create an instance of the app. 
 // 
