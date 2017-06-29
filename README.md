@@ -8,13 +8,11 @@
 <a name="overview"></a>
 ## Overview
 
-Today, biologists spend too much time pipetting by hand. We think biologists should have robots to do pipetting for them. People doing science should be free of tedious benchwork and repetitive stress injuries. They should be able to spend their time designing experiments and analyzing data.
+Opentrons makes robots for biologists. 
 
-That's why we started Opentrons.
+Our mission is to provide the scientific community with a common platform to easily share protocols and reproduce each other's work. Our robots automate experiments that would otherwise be done by hand, allowing our users to spend more time pursuing answers to the 21st century’s most important questions, and less time pipetting.
 
-We make robots for biologists. Our mission is to provide the scientific community with a common platform to easily share protocols and reproduce each other's results. Our robots automate experiments that would otherwise be done by hand, allowing our community to spend more time pursuing answers to some of the 21st century’s most important questions.
-
-This repository contains our API and OT-App products so you could explore, hack and even contribute!
+This repository contains the source code for the Opentrons API and OT App. We'd love for you to to explore, hack, and build upon them! 
 
 <a name="api"></a>
 ## Opentrons API
@@ -27,15 +25,15 @@ We've designed it in a way we hope is accessible to anyone with basic computer a
 pipette.aspirate(tube_1).dispense(tube_2)
 ```
 
-That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one.
+That is how you tell the Opentrons robot to pipette its max volume from one tube to another. Learn more here:
 
 * [Documentation](http://docs.opentrons.com)
 * [Source code](https://github.com/OpenTrons/opentrons/tree/develop/api)
 
 <a name="app"></a>
-## OT-App
+## OT App
 
-Easily upload a protocol, calibrate positions, and run your experiment right from your computer.
+Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
 ![ot-app](https://lh3.googleusercontent.com/hz80NB3yiMB6r50aKg9DgSuqmwNAEKFz7aC3qQS56YregCGygg1oc3ldn9FAanqTt7REUXikkSuHDX69JODaLWgegDwO_JnDf30j3NuZ05mWOq16nMTxQBAFW6cZqqEsLaDU-uRW)
 
@@ -45,24 +43,29 @@ Easily upload a protocol, calibrate positions, and run your experiment right fro
 <a name="contributing"></a>
 ## Contributing
 
-You are welcome to participate in the project by filing an [bug report](https://github.com/OpenTrons/opentrons/issues) or by submitting a pull request.
+We love contributors! Here is the best way to work with us:
 
-If you want to build the platform and play with the latest development version, here are the steps.
+1. Filing a [bug report](https://github.com/OpenTrons/opentrons/issues). We will fix these as quickly as we can, and appreciate your help uncovering bugs in our code. 
 
-### Development environment
+2. Submit a pull request with any new features you've added to a branch of the API or App. We will reach out to talk with you about integration testing and launcing it into our product!
+
+### Using BETA versions
+
+If you want to build the platform and play with the latest development version we are working on before it is launched, here are the steps:
+
+### Set up your development environment
 
 * Python 3.5.3 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended)
 * Node 6.11.0 ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
 * OS X 10.11+, Linux, Windows 10 with Cygwin
 * GNU Make: both API and OT-App are using [Makefiles](https://en.wikipedia.org/wiki/Makefile)
 
-### API
+### Start the Opentrons API
 
 Clone the repository to get started.
 ```shell
 git clone https://github.com/OpenTrons/opentrons.git
 ```
-
 Install the dependencies and API itself.
 
 ```shell
@@ -81,7 +84,7 @@ make exe
 
 ### OT-App
 
-Our app is build with [Electron](https://github.com/electron/electron) using modern front-end stack. The structure and configuration of bundling, testing and packaging are based on [this great repo](https://github.com/chentsulin/electron-react-boilerplate).
+Our app is built with [Electron](https://github.com/electron/electron). The structure and configuration of bundling, testing and packaging are based on [this great repo](https://github.com/chentsulin/electron-react-boilerplate).
 
 You can read great coverage of some tools that are used in our stack [here](https://github.com/grab/front-end-guide). Note, our front-end framework of choice is [Vue.js](https://vuejs.org/) which dictates our choice of test tools: [Karma](https://github.com/karma-runner/karma), [Mocha](https://github.com/mochajs/mocha), [Chai](https://github.com/chaijs/chai) and [Istanbul](https://github.com/gotwarlost/istanbul)
 
