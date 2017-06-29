@@ -46,7 +46,7 @@ script:
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT: -7}" # Escape -
   - cd api && make test exe && cd ..
   - > # Make docs on linux only
-    [ "$TRAVIS_OS_NAME" == "linux" ] && (cd api && make docs && cd ..)
+    [ "$TRAVIS_OS_NAME" == "linux" ] && (cd api && make docs > /dev/null && cd ..)
   - cd app && make -j 2 build test test-e2e && make package && cd ..
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
