@@ -12,7 +12,8 @@ nvm install --lts && nvm use --lts
 
 # Brew contains Python 3.6. We need 3.5, so we are going to use pyenv
 # Brew's update process takes a while, so we check that pyenv is installed first
-[ -e $HOME/.pyenv ] || brew upgrade pyenv
+brew upgrade pyenv
+pyenv install --list
 eval "$(pyenv init -)"
 # PyInstaller needs development dependencies of python such as pyconfig and Makefile
 # --enable-framework allows us to do that
