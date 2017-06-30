@@ -41,7 +41,6 @@ class Opentrons {
 
   sendWifiCredentials (ssid, passkey) {
     let options = {'ssid': ssid, 'passkey': passkey}
-    debugger
     return Vue.http
         .post(this.sendWifiCredentialsUrl, options)
         .then((response) => {
