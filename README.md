@@ -88,6 +88,8 @@ Our app is built with [Electron](https://github.com/electron/electron). The stru
 
 You can read great coverage of some tools that are used in our stack [here](https://github.com/grab/front-end-guide). Note, our front-end framework of choice is [Vue.js](https://vuejs.org/) which dictates our choice of test tools: [Karma](https://github.com/karma-runner/karma), [Mocha](https://github.com/mochajs/mocha), [Chai](https://github.com/chaijs/chai) and [Istanbul](https://github.com/gotwarlost/istanbul)
 
+#### Build
+
 Install OT-App dependencies.
 
 ```shell
@@ -103,6 +105,16 @@ make build package
 make test
 # For end-to-end click-through test
 make test-e2e
+```
+
+#### Develop
+
+If you want to play with the code base and make some changes, feel free to do so.
+
+Start Python API Server (in a separate terminal)
+```
+cd api
+python -c 'from opentrons import server; server.start()'
 ```
 
 Enjoy!

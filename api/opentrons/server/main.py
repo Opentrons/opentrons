@@ -1123,6 +1123,7 @@ def start():
     lg.info('Starting Flask Server')
     [app.logger.addHandler(handler) for handler in lg.handlers]
 
+    print('Opentrons API server is serving UI from: ' + STATIC_FOLDER)
     socketio.run(
         app,
         debug=False,
@@ -1135,5 +1136,4 @@ def start():
 
 
 if __name__ == "__main__":
-    print('Opentrons API server is serving UI from: ' + STATIC_FOLDER)
     start()
