@@ -114,7 +114,7 @@ describe('OT-app', function spec() {
     await client.waitUntilWindowLoaded()
     await uploadProtocol(client, file)
     await connectAndRunLoadedProtocol(client)
-    await client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
+    return client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
   })
 
   // it('runs jupyter protocol', async () => {
@@ -139,7 +139,7 @@ describe('OT-app', function spec() {
     const { client } = this.app
     await client.waitUntilWindowLoaded()
     await uploadProtocol(client, file)
-    await client.waitForText('.toast-message-text', expectedText)
+    return client.waitForText('.toast-message-text', expectedText)
   })
 
   it('opens login dialog when login is clicked', async () => {
@@ -147,6 +147,6 @@ describe('OT-app', function spec() {
     await client.waitUntilWindowLoaded()
     await delay(100)
     await client.click('//*[@id="login"]')
-    await client.waitForExist('//*[@id="auth0-lock-container-1"]/div/div[2]/form')
+    return client.waitForExist('//*[@id="auth0-lock-container-1"]/div/div[2]/form')
   })
 })

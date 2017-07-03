@@ -160,7 +160,6 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "socket.io-client": "^1.7.4",
-    "tar": "^2.2.1",
     "underscore.string": "^3.3.4",
     "unzip": "0.1.11",
     "url-join": "1.1.0",
