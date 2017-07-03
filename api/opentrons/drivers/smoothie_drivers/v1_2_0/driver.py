@@ -9,13 +9,13 @@ from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 
-from opentrons.util import trace
+from opentrons.util import trace, environment
 
 
 DEFAULTS_DIR_PATH = pkg_resources.resource_filename(
     'opentrons.config', 'smoothie')
 DEFAULTS_FILE_PATH = os.path.join(DEFAULTS_DIR_PATH, 'smoothie-defaults.ini')
-CONFIG_DIR_PATH = os.environ.get('APP_DATA_DIR', os.getcwd())
+CONFIG_DIR_PATH = environment.get_path('APP_DATA_DIR')
 CONFIG_DIR_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie')
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 

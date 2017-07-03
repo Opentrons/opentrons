@@ -15,7 +15,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 from opentrons import robot, Robot, containers, instruments
-from opentrons.util import trace
+from opentrons.util import trace, environment
 from opentrons.util.vector import VectorEncoder
 from opentrons.util.singleton import Singleton
 from opentrons.drivers.smoothie_drivers.v2_0_0 import player
@@ -1112,7 +1112,7 @@ def log_after_request(response):
 
 
 def start():
-    data_dir = os.environ.get('APP_DATA_DIR', os.getcwd())
+    data_dir = environment.get_path('APP_DATA_DIR')
     IS_DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
     if not IS_DEBUG:
         run_once(data_dir)
@@ -1125,7 +1125,7 @@ def start():
 
     socketio.run(
         app,
-        debug=True,
+        debug=False,
         logger=False,
         use_reloader=False,
         log_output=False,
