@@ -7,6 +7,10 @@ import Opentrons from '../rest_api_wrapper'
 import { processTasks } from '../util'
 
 const actions = {
+  sendWifiCredentials ({commit}, wifiInfo) {
+    commit(types.SENDING_WIFI_CREDENTIALS)
+    Opentrons.sendWifiCredentials(wifiInfo[0], wifiInfo[1])
+  },
   uploadProtocol ({commit}, formData) {
     commit(types.UPDATE_ROBOT_STATE, {'busy': true})
     commit(types.UPLOADING, {'uploading': true})

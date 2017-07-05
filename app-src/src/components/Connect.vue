@@ -1,7 +1,7 @@
 <template>
   <nav class='connect'>
-    <NetworkConfig/>
-    <div id='indicator' :class="[{'connected' : connected == 'connected'}, {'connected_wireless' : connected == 'connected_wireless'}]"></div>
+    <div id='indicator' :class="[{'connected': connected == 'connected'}, {'connected_wireless' : connected == 'connected_wireless'}]"></div>
+    <NetworkConfig v-show="connected"/>
     <button v-if="!isAuthenticated" id="login" @click='login()' class='btn-run' :class="btn-run">Login</button>
     <button v-else id="logout" @click='logout()' class='btn-run' :class="btn-run">Logout</button>
   </nav>
