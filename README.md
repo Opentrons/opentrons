@@ -107,15 +107,30 @@ make test
 make test-e2e
 ```
 
-#### Develop
+## Develop
 
 If you want to play with the code base and make some changes, feel free to do so.
 
-Start Python API Server (in a separate terminal)
-```
+Start Python API Server (in a separate terminal):
+
+```shell
 cd api
-python -c 'from opentrons import server; server.start()'
+export ENABLE_VIRTUAL_SMOOTHIE=true; python opentrons/server/main.py
+```
+
+Install dev tools:
+
+```shell
+cd app
+# Install development tools that are not part of package.json
+npm i electron-debug
+npm i vue-devtools
+```
+
+Run OT-App in development mode. This will open development tools and connect to the API Server already running (instead of starting it from `app/bin/opentrons-api-server`):
+
+```shell
+make dev
 ```
 
 Enjoy!
-
