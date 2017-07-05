@@ -11,7 +11,7 @@ DISTNAME = 'opentrons'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
-URL = "https://github.com/OpenTrons/opentrons-api"
+URL = "https://github.com/OpenTrons/opentrons"
 DOWNLOAD_URL = ''
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
@@ -33,7 +33,6 @@ INSTALL_REQUIRES = [
     'dill==0.2.5',
     'requests==2.14.2',
     'pyserial==3.2.1']
-TEST_SUITE = 'nose.collector'
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -64,7 +63,8 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
+        setup_requires=['pytest-runner'],
+        tests_require=['pytest'],
         cmdclass=versioneer.get_cmdclass(),
-        include_package_data=True,
-        test_suite=TEST_SUITE
+        include_package_data=True
     )
