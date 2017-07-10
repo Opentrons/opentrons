@@ -353,16 +353,12 @@ class Robot(object):
 
             If no arguments provided home Z-axis then X, Y, B, A
 
-        enqueue : {True, False} Default: ``False``
-            If ``True`` put into command queue,
-            if ``False`` execute immediately.
-
         Notes
         -----
         Sometimes while executing a long protocol,
         a robot might accumulate precision
         error and it is recommended to home it. In this scenario, add
-        ``robot.home('xyzab', enqueue=True)`` into your script.
+        ``robot.home('xyzab')`` into your script.
 
         Examples
         --------
