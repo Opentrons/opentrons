@@ -8,12 +8,8 @@ matrix:
   fast_finish: true
   include:
     - os: linux
-      # Trying container environment
       sudo: false
-      # sudo: required
-      # dist: trusty
-      python: "3.5"  # TODO: revisit...
-      env: OPENTRONS_APP_UPLOAD_DIR=linux
+      python: "3.5"
       addons:
         apt:
           sources: &common_sources
@@ -23,35 +19,40 @@ matrix:
             - icnsutils # electron-builder dependency
             - graphicsmagick # electron-builder dependency
             - xvfb
-
     - os: osx
       language: generic
-      env: OPENTRONS_APP_UPLOAD_DIR=mac
 
+# More: https://docs.travis-ci.com/user/caching/
 cache:
-  apt: true
+  pip: true
   directories:
-    - app-src/node_modules
-    - app-shell/node_modules
-    - app-shell/app/node_modules
-    # - $HOME/.electron
-    # - pip
-    # - $HOME/.cache/pip3
-    - $HOME/.cache/our-brew
+    - app/node_modules
+    - $HOME/.pyenv
+    - $HOME/.cache/brew
+    - .nvm
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
-  - ./app-shell/scripts/travis.sh pre-install
 
 install:
-  - python --version
-  - python3 --version
-  -  ./scripts/with-nodenv "make app"
-  - make api-exe
-  -  ./scripts/with-nodenv "make app-shell"
+  - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
+  - pip install pyyaml coveralls
+  - cd api && make install && cd ..
+  - cd app && make install && cd ..
 
 script:
-  - echo "Skipping Travis scripts"
+  - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
+  - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
+  - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT: -7}" # Escape -
+  - cd api && make test exe && cd ..
+  - > # Make docs on linux only
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd api && make docs > /dev/null && cd ..) fi;
+  - cd app && make -j 2 build test test-e2e && make package && cd ..
+  # Clean up. This will leave only single-file build artifacts
+  - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
+
+after_success:
+  - cd api && coveralls && cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:
@@ -60,17 +61,18 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: app-shell/releases
-    upload-dir: $OPENTRONS_APP_UPLOAD_DIR
+    local-dir: $(pwd)/app/dist
+    upload-dir: $TRAVIS_OS_NAME
     acl: public_read
     on:
-      repo: OpenTrons/opentrons-api
+      condition: $TRAVIS_TEST_RESULT = 0
+      repo: OpenTrons/opentrons
       all_branches: true
 
   # Publish API to PyPI and Anaconda
   - provider: script
     skip_cleanup: true
-    script: cd api && scripts/publish.sh && cd ..
+    script: cd api && make publish && cd ..
     on:
       tags: true
 
@@ -84,5 +86,3 @@ notifications:
   email:
     on_success: change
     on_failure: change
-
-after_success: cd api && coveralls && cd ..

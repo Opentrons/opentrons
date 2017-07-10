@@ -45,4 +45,3 @@ class HelpersTest(unittest.TestCase):
         ]
         robot.app_run_mode = False
         assert all([(i == 'method skipped') for i in skipped_calls])
-

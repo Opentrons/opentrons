@@ -8,6 +8,7 @@ from opentrons.util.vector import Vector
 def is_number(obj):
     return isinstance(obj, numbers.Number)
 
+
 def not_app_run_safe(func):
     """
     Decorator that will not call func when app_run_mode is set

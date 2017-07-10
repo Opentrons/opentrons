@@ -1,0 +1,4 @@
+node_modules
+test/unit/coverage/
+ui/dist
+shell/dist

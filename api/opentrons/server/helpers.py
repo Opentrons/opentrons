@@ -20,6 +20,7 @@ def get_frozen_root():
 def convert_byte_stream_to_str(stream):
     return ''.join([line.decode() for line in stream])
 
+
 def run_protocol(robot, code: str, mode='simulate') -> tuple:
     """
     :param robot: robot instance for protocol
