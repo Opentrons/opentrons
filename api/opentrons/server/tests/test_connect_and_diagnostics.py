@@ -55,11 +55,7 @@ class ConnectDiagnosticsTestCase(unittest.TestCase):
         self.assertTrue(response['is_connected'])
         self.assertEquals(response['port'], 'Virtual Smoothie')
 
-    # FIXME
     def test_diagnostics(self):
-        # self.robot.disconnect()
-        # self.robot.connect()
-
         response = self.app.get(
             '/robot/diagnostics',
             content_type='application/json')
