@@ -55,5 +55,6 @@ npm i vue-devtools
 Run OT-App in development mode. This will open development tools and connect to the API Server already running (instead of starting it from `app/bin/opentrons-api-server`):
 
 ```shell
+#	Run in the `app` directory
 make dev
 ```

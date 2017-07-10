@@ -28,6 +28,10 @@ test: build
 test-e2e: build
 	npm run test-e2e
 
+dev:
+	npm run build-dev
+	npm run dev
+
 clean:
 	rm -rf \
 		ui/dist \
