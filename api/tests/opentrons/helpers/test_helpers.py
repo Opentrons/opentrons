@@ -35,7 +35,7 @@ class HelpersTest(unittest.TestCase):
 
     def test_not_app_run_safe(self):
         robot = Robot()
-        robot.is_app_run = True
+        robot.app_run_mode = True
 
         skipped_calls = [
             robot.connect(),
@@ -43,5 +43,7 @@ class HelpersTest(unittest.TestCase):
             robot.move_head(),
             robot.move_plunger()
         ]
+        robot.app_run_mode = False
+        print([(i == 'method skipped') for i in skipped_calls])
         assert all([(i == 'method skipped') for i in skipped_calls])
 
