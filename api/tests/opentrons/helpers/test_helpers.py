@@ -32,3 +32,16 @@ class HelpersTest(unittest.TestCase):
             0.6515237505617075)
         self.assertEquals(res[-1], expected)
         self.assertEquals(len(res), 5)
+
+    def test_not_app_run_safe(self):
+        robot = Robot()
+        robot.is_app_run = True
+
+        skipped_calls = [
+            robot.connect(),
+            robot.disconnect(),
+            robot.move_head(),
+            robot.move_plunger()
+        ]
+        assert all([(i == 'method skipped') for i in skipped_calls])
+

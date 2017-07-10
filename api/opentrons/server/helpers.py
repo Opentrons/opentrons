@@ -20,33 +20,6 @@ def get_frozen_root():
 def convert_byte_stream_to_str(stream):
     return ''.join([line.decode() for line in stream])
 
-
-def get_upload_proof_robot(robot):
-    methods_to_stash = [
-        'connect',
-        'disconnect',
-        'move_head',
-        'move_plunger',
-        'reset'
-    ]
-
-    def mock(*args, **kwargs):
-        pass
-
-    stashed_methods = {}
-    for method in methods_to_stash:
-        stashed_methods[method] = getattr(robot, method)
-        setattr(robot, method, mock)
-
-    def restore():
-        for method_name, method_obj in stashed_methods.items():
-            setattr(robot, method_name, method_obj)
-        return robot
-
-    patched_robot = robot
-    return (patched_robot, restore)
-
-
 def run_protocol(robot, code: str, mode='simulate') -> tuple:
     """
     :param robot: robot instance for protocol
@@ -58,10 +31,13 @@ def run_protocol(robot, code: str, mode='simulate') -> tuple:
     commands = []
     try:
         robot.reset()
+        robot.app_run_mode = True
         exec(code, globals())
         commands = robot._commands
     except Exception:
         exception_msg = traceback.format_exc()
+    finally:
+        robot.app_run_mode = False
     robot.set_connection('live')
     return (commands, exception_msg)
 

@@ -185,6 +185,7 @@ class Robot(object):
         self.set_connection('simulate')
         self.reset()
 
+    @helpers.not_app_run_safe
     def reset(self):
         """
         Resets the state of the robot and clears:
@@ -303,6 +304,7 @@ class Robot(object):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
+    @helpers.not_app_run_safe
     def connect(self, port=None, options=None):
         """
         Connects the robot to a serial port.
@@ -391,9 +393,11 @@ class Robot(object):
             trace.EventBroker.get_instance().notify(cmd_run_event)
         self._commands.append(command)
 
+    @helpers.not_app_run_safe
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
+    @helpers.not_app_run_safe
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -604,6 +608,7 @@ class Robot(object):
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
+    @helpers.not_app_run_safe
     def disconnect(self):
         """
         Disconnects from the robot.
