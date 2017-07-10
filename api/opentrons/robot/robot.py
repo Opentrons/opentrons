@@ -370,7 +370,6 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        # def _do():
         self._driver.calm_down()
         if args:
             self._update_axis_homed(*args)
@@ -469,7 +468,6 @@ class Robot(object):
         else:
             coordinates += placeable.coordinates(placeable.get_deck())
 
-        # def _do():
         if strategy == 'arc':
             arc_coords = self._create_arc(coordinates, placeable, instrument)
             for coord in arc_coords:
