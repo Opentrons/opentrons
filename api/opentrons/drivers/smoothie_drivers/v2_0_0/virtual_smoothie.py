@@ -349,7 +349,11 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
             with open(gfile, 'a') as gf:
                 log_data = data.decode().split(' ')
                 log_data = [i.rstrip() for i in log_data]
-                log_data = (' '.join([log_data[0]] + sorted(log_data[1:]))).rstrip() + '\n'
+                log_data = (
+                    (' '.join([log_data[0]] +  # GCODE cmd
+                              sorted(log_data[1:]))).rstrip() +  # GCODE args
+                    '\n'
+                )
                 gf.write(log_data)
 
         if not self.isOpen():
