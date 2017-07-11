@@ -23,7 +23,11 @@ def test_gcode():
     rexpected_hash = hashlib.md5(open(expected_gcode, 'rb').read()).hexdigest()
 
     assert result_hash == rexpected_hash,\
-        'G-CODE test failed. Compare: {} and {}'.format(
-            res_gcode, expected_gcode
-        )
+        """G-CODE test failed. Compare: {0} and {1}'
+
+        Use diff.py for a visual HTML comparison
+
+        e.g.: python {2} {0} {1} -m > gcode-diff.html
+
+        """.format(res_gcode, expected_gcode, os.path.join(this_dir, 'diff.py'))
 
