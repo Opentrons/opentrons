@@ -347,7 +347,10 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
         gfile = os.environ.get('GCODE_FILE')
         if gfile:
             with open(gfile, 'a') as gf:
-                gf.write(data.decode())
+                log_data = data.decode().split(' ')
+                log_data = [i.rstrip() for i in log_data]
+                log_data = (' '.join([log_data[0]] + sorted(log_data[1:]))).rstrip() + '\n'
+                gf.write(log_data)
 
         if not self.isOpen():
             raise RuntimeError('Virtual Smoothie not currently connected')
