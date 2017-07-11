@@ -2,14 +2,16 @@
 
 .. testsetup:: robot
 
-    from opentrons import robot, containers, instruments
+    from opentrons import containers, instruments, robot
+    from opentrons.instruments import pipette as _pipette
 
     robot.reset()
 
-    plate = containers.load('96-flat', 'B1', 'my-plate')
-    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
+    plate = robot.add_container('96-flat', 'B1', 'my-plate')
 
-    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
+    tiprack = robot.add_container('tiprack-200ul', 'A1', 'my-rack')
+
+    pipette = _pipette.Pipette(robot, axis='b', max_volume=200, name='my-pipette')
 
 ###################
 Advanced Control
@@ -49,17 +51,17 @@ The maximum speed of the robot's head can be set using ``robot.head_speed()``. T
 Homing
 ======
 
-You can enqueue a ``home()`` command to your protocol, by giving it the ``enqueue=True`` option. Without passing the enqueue option, the home command will run immediately.
+You can `home` the robot by calling ``home()``. You can also specify axes. The robot will home immdediately when this call is made.
 
 .. testcode:: robot
 
-    robot.home(enqueue=True)           # home the robot on all axis
-    robot.home('z', enqueue=True)      # home the Z axis only
+    robot.home()           # home the robot on all axis
+    robot.home('z')        # home the Z axis only
 
 Commands
 ========
 
-When commands are called on a pipette, they are automatically enqueued to the ``robot`` in the order they are called. You can see all currently held commands by calling ``robot.commands()``, which returns a `Python list`__.
+When commands are called on a pipette, they are recorded on the ``robot`` in the order they are called. You can see all past executed commands by calling ``robot.commands()``, which returns a `Python list`__.
 
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
@@ -76,15 +78,13 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Homing Robot
-    Homing Robot
     Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
     Drop_tip at <Deck><Slot A1><Container my-rack><Well A1>
 
 Clear Commands
 ==============
 
-Once commands are enqueued to the ``robot``, we can erase those commands by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but all commands are erased.
+We can erase the robot command history by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but the commands history is erased.
 
 .. testcode:: robot
     
@@ -130,25 +130,6 @@ will print out...
     Hello, just picked up tip A1
     Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
     Goodbye, just dropped tip A1
-
-Simulate
-========
-
-Once commands have been enqueued to the ``robot``, we can simulate their execution by calling ``robot.simulate()``. This helps us debug our protocol, and to see if the robots gives us any warnings.
-
-.. testcode:: robot
-    
-    pipette.pick_up_tip()
-
-    for warning in robot.simulate():
-        print(warning)
-
-will print out...
-
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    pick_up_tip called with no reference to a tip
 
 Get Containers
 ==============

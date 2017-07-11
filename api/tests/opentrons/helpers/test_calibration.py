@@ -2,27 +2,30 @@ import json
 import os
 import unittest
 
-from opentrons import instruments
-from opentrons import containers
 from opentrons import Robot
-
+from opentrons.containers import load as containers_load
 from opentrons.helpers.helpers import import_calibration_file
+from opentrons.instruments import pipette
 
 
 class CalibrationTest(unittest.TestCase):
 
     def setUp(self):
-        Robot.reset_for_tests()
-        self.robot = Robot.get_instance()
+        self.robot = Robot()
         self.robot.connect()
 
-        self.trash = containers.load('point', 'A1', 'trash')
-        self.tiprack = containers.load('tiprack-200ul', 'B2', 'p200-rack')
-        self.trough = containers.load('trough-12row', 'B2', 'trough')
+        self.trash = containers_load(self.robot, 'point', 'A1', 'trash')
+        self.tiprack = containers_load(
+            self.robot, 'tiprack-200ul', 'B2', 'p200-rack'
+        )
+        self.trough = containers_load(
+            self.robot, 'trough-12row', 'B2', 'trough'
+        )
 
-        self.plate = containers.load('96-flat', 'A2', 'magbead')
+        self.plate = containers_load(self.robot, '96-flat', 'A2', 'magbead')
 
-        self.p200 = instruments.Pipette(
+        self.p200 = pipette.Pipette(
+            self.robot,
             name="p200",
             trash_container=self.trash,
             tip_racks=[self.tiprack],
@@ -31,7 +34,8 @@ class CalibrationTest(unittest.TestCase):
             channels=1
         )
 
-        self.p1000 = instruments.Pipette(
+        self.p1000 = pipette.Pipette(
+            self.robot,
             name="p1000",
             trash_container=self.trash,
             tip_racks=[self.tiprack],

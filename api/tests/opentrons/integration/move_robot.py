@@ -81,8 +81,6 @@ def run_test():
     p200.pick_up_tip(tiprack[4])
     p200.drop_tip(tiprack[95])
 
-    robot.run()
-
 
 calibrate_plunger()
 setup_tiprack()

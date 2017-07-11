@@ -1,4 +1,5 @@
 import io
+import os
 import re
 
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie
@@ -343,6 +344,14 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
                 #     'Command {} is not supported'.format(command))
 
     def write(self, data):
+        gfile = os.environ.get('GCODE_FILE')
+        if gfile:
+            with open(gfile, 'a') as gf:
+                log_data = data.decode().split(' ')
+                log_data = [i.rstrip() for i in log_data]
+                log_data = (' '.join([log_data[0]] + sorted(log_data[1:]))).rstrip() + '\n'
+                gf.write(log_data)
+
         if not self.isOpen():
             raise RuntimeError('Virtual Smoothie not currently connected')
         if not isinstance(data, str):

@@ -1,8 +1,6 @@
 import json
 import sys
-
-from opentrons.json_importer import JSONProtocolProcessor
-from opentrons.robot import Robot
+import traceback
 
 
 JSON_ERROR = None
@@ -23,61 +21,29 @@ def convert_byte_stream_to_str(stream):
     return ''.join([line.decode() for line in stream])
 
 
-def load_json(json_byte_stream):
-    json_str = convert_byte_stream_to_str(json_byte_stream)
-
-    api_response = {'errors': None, 'warnings': []}
-
-    robot = Robot.get_instance()
-    robot.reset()
-
-    jpp = None
-    errors, warnings = [], []
+def run_protocol(robot, code: str, mode='simulate') -> tuple:
+    """
+    :param robot: robot instance for protocol
+    :param code: str of protocol
+    :return:
+    """
+    robot.set_connection(mode)
+    exception_msg = ''
+    commands = []
     try:
-        jpp = JSONProtocolProcessor(json_str)
-        jpp.process()
-        robot.simulate()
-    except JSON_ERROR:
-        errors.append('Cannot parse invalid JSON')
-    except Exception as e:
-        errors.append(str(e))
-
-    if jpp:
-        errors.extend(jpp.errors)
-        warnings.extend(jpp.warnings)
-
-    if robot.get_warnings():
-        warnings.extend(robot.get_warnings())
-
-    api_response['errors'] = errors
-    api_response['warnings'] = warnings
-    return api_response
+        robot.reset()
+        robot.app_run_mode = True
+        exec(code, globals())
+        commands = robot._commands
+    except Exception:
+        exception_msg = traceback.format_exc()
+    finally:
+        robot.app_run_mode = False
+    robot.set_connection('live')
+    return (commands, exception_msg)
 
 
-def get_upload_proof_robot(robot):
-    methods_to_stash = [
-        'connect',
-        'disconnect',
-        'move_head',
-        'move_plunger',
-        'reset',
-        'run',
-        'simulate',
-        'send_to_app'
-    ]
-
-    def mock(*args, **kwargs):
-        pass
-
-    stashed_methods = {}
-    for method in methods_to_stash:
-        stashed_methods[method] = getattr(robot, method)
-        setattr(robot, method, mock)
-
-    def restore():
-        for method_name, method_obj in stashed_methods.items():
-            setattr(robot, method_name, method_obj)
-        return robot
-
-    patched_robot = robot
-    return (patched_robot, restore)
+def timestamp(seconds: int):
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return "%d:%02d:%02d" % (hours, minutes, seconds)

@@ -22,11 +22,11 @@ __all__ = [
 ]
 
 
-drivers_by_version = {
+DRIVER_VERSIONS = {
     'v1.0.5': SmoothieDriver_1_2_0,
     'edge-1c222d9NOMSD': SmoothieDriver_2_0_0
 }
-virtual_smoothies_by_version = {
+VIRTUAL_SMOOTHIE_VERSIONS = {
     'v1.0.5': VirtualSmoothie_1_2_0,
     'edge-1c222d9NOMSD': VirtualSmoothie_2_0_0
 }
@@ -83,8 +83,10 @@ def get_serial_ports_list():
     return result
 
 
-def get_virtual_driver(options={}):
-
+def create_virtual_driver(options=None):
+    """
+    Creates a driver powered by virtual smoothie
+    """
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
         'limit_switches': True,
@@ -104,31 +106,24 @@ def get_virtual_driver(options={}):
         default_options.update(options)
 
     version_name = default_options.get('firmware')
-    vs_class = virtual_smoothies_by_version.get(version_name)
-    if not vs_class:
-        raise RuntimeError(
-            'No virtual smoothie version {}'.format(version_name))
+    vs_class = VIRTUAL_SMOOTHIE_VERSIONS[version_name]
 
     vs = vs_class(default_options)
     c = connection.Connection(vs, port=VIRTUAL_SMOOTHIE_PORT, timeout=0)
-    return get_driver(c)
+    return create_driver(c)
 
 
 def get_serial_driver(port):
     s = serial.Serial()
     c = connection.Connection(s, port=port, baudrate=115200, timeout=0.01)
-    return get_driver(c)
+    return create_driver(c)
 
 
-def get_driver(c):
-    driver_class = drivers_by_version.get(get_version(c))
-    if driver_class:
-        d = driver_class(SMOOTHIE_DEFAULTS)
-        d.connect(c)
-        return d
-    else:
-        raise RuntimeError(
-            'Can not read version from port "{}"'.format(c.name()))
+def create_driver(c):
+    driver_class = DRIVER_VERSIONS[get_version(c)]
+    d = driver_class(SMOOTHIE_DEFAULTS)
+    d.connect(c)
+    return d
 
 
 def get_version(c):
@@ -142,7 +137,7 @@ def get_version(c):
 
     # {"version":v1.0.5}
     v = response.split(':')[-1][:-1]
-    if v in drivers_by_version:
+    if v in DRIVER_VERSIONS:
         return v
 
     # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa
@@ -150,5 +145,5 @@ def get_version(c):
     #   6 axis
     # ok
     v = response.split(',')[0].split(' ')[-1]  # BRANCH-HASH
-    if v in drivers_by_version:
+    if v in DRIVER_VERSIONS:
         return v

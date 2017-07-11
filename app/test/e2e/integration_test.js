@@ -117,31 +117,6 @@ describe('OT-app', function spec() {
     return client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
   })
 
-  // it('runs jupyter protocol', async () => {
-  //   let uploadScript = path.join(__dirname, 'jupyter_upload.py')
-  //   const { client } = this.app
-
-  //   await client.waitUntilWindowLoaded()
-  //   await childProcess.spawnSync('python3', [uploadScript])
-  //   await delay(1000)
-
-  //   client.execute(() => {
-  //     window.confirm = function () { return true }
-  //   })
-
-  //   await connectAndRunLoadedProtocol(client)
-  // })
-
-  it('handles upload of empty protocol gracefully', async () => {
-    let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/empty.py')
-    console.log('uploading file: ' + file)
-    let expectedText = 'This protocol does not contain any commands for the robot.'
-    const { client } = this.app
-    await client.waitUntilWindowLoaded()
-    await uploadProtocol(client, file)
-    return client.waitForText('.toast-message-text', expectedText)
-  })
-
   it('opens login dialog when login is clicked', async () => {
     const { client } = this.app
     await client.waitUntilWindowLoaded()
