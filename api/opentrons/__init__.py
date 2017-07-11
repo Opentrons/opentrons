@@ -15,6 +15,7 @@ if version < (3, 5):
 
 robot = Robot()
 
+
 def reset():
     global robot
     robot = Robot()
