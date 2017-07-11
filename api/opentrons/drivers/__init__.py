@@ -84,27 +84,26 @@ def get_serial_ports_list():
 
 
 def create_virtual_driver(options=None):
+    """
+    Creates a driver powered by virtual smoothie
+    """
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
         'limit_switches': True,
         'firmware': 'edge-1c222d9NOMSD',
-        'config': {}
-    }
-    default_config = {
-        'ot_version': 'one_pro_plus',
-        'version': 'v2.0.0',    # config version
-        'alpha_steps_per_mm': 80.0,
-        'beta_steps_per_mm': 80.0,
-        'gamma_steps_per_mm': 400
+        'config': {
+            'ot_version': 'one_pro_plus',
+            'version': 'v2.0.0',    # config version
+            'alpha_steps_per_mm': 80.0,
+            'beta_steps_per_mm': 80.0,
+            'gamma_steps_per_mm': 400
+        }
     }
 
-    # update default options
-    options = options or {}
-    default_options.update(options)
-
-    # If passed in configs are empty use default_config
-    config = options.get('config', {}) or default_config
-    default_options['config'].update(config)
+    if options:
+        default_options['config'].update(options.get('config', {}))
+        options['config'] = default_options['config']
+        default_options.update(options)
 
     version_name = default_options.get('firmware')
     vs_class = VIRTUAL_SMOOTHIE_VERSIONS[version_name]

@@ -1,6 +1,6 @@
 import unittest
 
-from opentrons.drivers import virtual_smoothies_by_version
+from opentrons.drivers import VIRTUAL_SMOOTHIE_VERSIONS
 
 
 class VirtualSmoothieTestCase(unittest.TestCase):
@@ -17,7 +17,7 @@ class VirtualSmoothieTestCase(unittest.TestCase):
                 'gamma_steps_per_mm': 400
             }
         }
-        self.s = virtual_smoothies_by_version.get('edge-1c222d9NOMSD')(options)
+        self.s = VIRTUAL_SMOOTHIE_VERSIONS.get('edge-1c222d9NOMSD')(options)
         self.s.open()
 
     def test_version(self):

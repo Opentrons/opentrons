@@ -67,7 +67,7 @@ class OpenTronsTest(unittest.TestCase):
                 }
             }
         }
-        self.assertRaises(RuntimeError, self.robot.connect, **kwargs)
+        self.assertRaises(KeyError, self.robot.connect, **kwargs)
 
     def test_invalid_coordinate_system(self):
         self.assertRaises(ValueError, self.motor.set_coordinate_system, 'andy')
