@@ -162,15 +162,15 @@ class Robot(object):
         self.mode = None
         self.smoothie_drivers = {
             'live': None,
-            'simulate': drivers.get_virtual_driver(
+            'simulate': drivers.create_virtual_driver(
                 options={'limit_switches': False}
             ),
-            'simulate_switches': drivers.get_virtual_driver(
+            'simulate_switches': drivers.create_virtual_driver(
                 options={'limit_switches': True}
             )
         }
 
-        null_driver = drivers.get_virtual_driver()
+        null_driver = drivers.create_virtual_driver()
 
         def _null(*args, **kwargs):
             return
@@ -179,7 +179,7 @@ class Robot(object):
         null_driver.home = _null
         self.smoothie_drivers['null'] = null_driver
 
-        self._driver = drivers.get_virtual_driver()
+        self._driver = drivers.create_virtual_driver()
         self.disconnect()
         self.arc_height = 5
         self.set_connection('simulate')
@@ -315,7 +315,7 @@ class Robot(object):
             OS-specific port name or ``'Virtual Smoothie'``
         options : dict
             if :attr:`port` is set to ``'Virtual Smoothie'``, provide
-            the list of options to be passed to :func:`get_virtual_device`
+            the list of options to be passed to :func:`create_virtual_device`
 
         Returns
         -------
@@ -323,7 +323,7 @@ class Robot(object):
         """
         device = None
         if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
-            device = drivers.get_virtual_driver(options)
+            device = drivers.create_virtual_driver(options)
         else:
             device = drivers.get_serial_driver(port)
 

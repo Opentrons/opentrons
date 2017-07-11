@@ -26,7 +26,7 @@ drivers_by_version = {
     'v1.0.5': SmoothieDriver_1_2_0,
     'edge-1c222d9NOMSD': SmoothieDriver_2_0_0
 }
-virtual_smoothies_by_version = {
+VIRTUAL_SMOOTHIE_VERSIONS = {
     'v1.0.5': VirtualSmoothie_1_2_0,
     'edge-1c222d9NOMSD': VirtualSmoothie_2_0_0
 }
@@ -83,31 +83,31 @@ def get_serial_ports_list():
     return result
 
 
-def get_virtual_driver(options={}):
-
+def create_virtual_driver(options=None):
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
         'limit_switches': True,
         'firmware': 'edge-1c222d9NOMSD',
-        'config': {
-            'ot_version': 'one_pro_plus',
-            'version': 'v2.0.0',    # config version
-            'alpha_steps_per_mm': 80.0,
-            'beta_steps_per_mm': 80.0,
-            'gamma_steps_per_mm': 400
-        }
+        'config': {}
+    }
+    default_config = {
+        'ot_version': 'one_pro_plus',
+        'version': 'v2.0.0',    # config version
+        'alpha_steps_per_mm': 80.0,
+        'beta_steps_per_mm': 80.0,
+        'gamma_steps_per_mm': 400
     }
 
-    if options:
-        default_options['config'].update(options.get('config', {}))
-        options['config'] = default_options['config']
-        default_options.update(options)
+    # update default options
+    options = options or {}
+    default_options.update(options)
+
+    # If passed in configs are empty use default_config
+    config = options.get('config', {}) or default_config
+    default_options['config'].update(config)
 
     version_name = default_options.get('firmware')
-    vs_class = virtual_smoothies_by_version.get(version_name)
-    if not vs_class:
-        raise RuntimeError(
-            'No virtual smoothie version {}'.format(version_name))
+    vs_class = VIRTUAL_SMOOTHIE_VERSIONS[version_name]
 
     vs = vs_class(default_options)
     c = connection.Connection(vs, port=VIRTUAL_SMOOTHIE_PORT, timeout=0)
