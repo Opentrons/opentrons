@@ -6,7 +6,8 @@ install:
 	python setup.py install && pip install -r requirements.txt
 
 test:
-	pylama opentrons tests && py.test --cov
+	export APP_DATA_DIR="${TMPDIR:=${TMP:-$(CDPATH=/var:/; cd -P tmp)}}" &&\
+		pylama opentrons tests && py.test --cov
 
 docs:
 	cd docs && make html && make doctest
