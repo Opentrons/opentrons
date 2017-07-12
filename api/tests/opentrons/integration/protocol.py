@@ -1,8 +1,14 @@
 from opentrons import containers, instruments, robot
 
+<<<<<<< HEAD
 p300_tips = containers.load('tiprack-200ul', 'E3', 'p10tiprack')
 pcr_plate = containers.load('96-PCR-tall', 'C3', 'pcr')
 template_plate = containers.load('96-PCR-flat', 'D3', 'template')
+=======
+p300_tips = containers.load('tiprack-200ul','E3','p10tiprack')
+pcr_plate = containers.load('96-PCR-tall','C3','pcr')
+template_plate = containers.load('96-PCR-flat','D3','template')
+>>>>>>> add gcode test
 
 p200_tips = containers.load('tiprack-200ul', 'A1')
 
@@ -23,10 +29,18 @@ p200 = instruments.Pipette(
     trash_container=trash)
 
 # add 5 uL template to PCR plate 2 times.
+<<<<<<< HEAD
 for x in range(2):
     for i in range(2):
         p300multi.pick_up_tip(p300_tips.rows[i][0])
         p300multi.aspirate(5, template_plate.rows[i][0])
+=======
+
+for x in range(2):
+    for i in range(2):
+        p300multi.pick_up_tip(p300_tips.rows[i][0])
+        p300multi.aspirate(5,template_plate.rows[i][0])
+>>>>>>> add gcode test
         p300multi.dispense(pcr_plate.rows[i][0]).touch_tip()
         p300multi.drop_tip(p300_tips.rows[i][0])
     robot.home()
@@ -39,4 +53,8 @@ p200.transfer(100, pcr_plate.wells('A1'), pcr_plate.rows('2'))
 
 p200.consolidate(30, pcr_plate.rows('2'), pcr_plate.wells('A1'))
 
+<<<<<<< HEAD
 p200.distribute(55, pcr_plate.wells('A1'), pcr_plate.rows('2'))
+=======
+p200.distribute(55, pcr_plate.wells('A1'), pcr_plate.rows('2'))
+>>>>>>> add gcode test

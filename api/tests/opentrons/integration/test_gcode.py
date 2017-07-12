@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 import difflib
 import hashlib
 from pprint import pformat
 import os
+=======
+import os
+import hashlib
+>>>>>>> add gcode test
 
 
 def test_gcode():
@@ -22,12 +27,18 @@ def test_gcode():
     os.environ['GCODE_FILE'] = ''
 
     result_hash = hashlib.md5(open(res_gcode, 'rb').read()).hexdigest()
+<<<<<<< HEAD
     expected_hash = hashlib.md5(open(expected_gcode, 'rb').read()).hexdigest()
 
     res = open(res_gcode, 'r').readlines()
     exp = open(expected_gcode, 'r').readlines()
 
     assert result_hash == expected_hash,\
+=======
+    rexpected_hash = hashlib.md5(open(expected_gcode, 'rb').read()).hexdigest()
+
+    assert result_hash == rexpected_hash,\
+>>>>>>> add gcode test
         """G-CODE test failed. Compare: {0} and {1}'
 
         Use diff.py for a visual HTML comparison
@@ -36,6 +47,7 @@ def test_gcode():
 
         """.format(
             res_gcode, expected_gcode, os.path.join(this_dir, 'diff.py')
+<<<<<<< HEAD
         ) + ("""
         {}
         """.format(
@@ -45,3 +57,6 @@ def test_gcode():
                 )
             )))
         )
+=======
+        )
+>>>>>>> add gcode test
