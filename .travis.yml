@@ -12,6 +12,7 @@ matrix:
       python: "3.5"
       env:
         - DEPLOY_DIR="linux"
+        - TMPDIR=/tmp
       addons:
         apt:
           sources: &common_sources
