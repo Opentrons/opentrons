@@ -13,7 +13,7 @@ cache:
     
 init:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH% # Activate Python 3.5
-  - git config --global core.autocrlf false
+  - git config --global core.autocrlf false # don't convert LFs to CRLFs since we are running Cygwin
   # Start RDP server to watch the build
   # https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
   # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
