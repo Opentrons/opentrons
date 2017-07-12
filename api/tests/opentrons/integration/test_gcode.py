@@ -1,5 +1,7 @@
-import os
+import difflib
 import hashlib
+from pprint import pformat
+import os
 
 
 def test_gcode():
