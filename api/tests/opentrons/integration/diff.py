@@ -8,16 +8,20 @@
 
 """
 
-import sys, os, time, difflib, argparse
+import argparse
 from datetime import datetime, timezone
+import difflib
+import os
+import sys
+
 
 def file_mtime(path):
     t = datetime.fromtimestamp(os.stat(path).st_mtime,
                                timezone.utc)
     return t.astimezone().isoformat()
 
-def main():
 
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', action='store_true', default=False,
                         help='Produce a context format diff (default)')
@@ -46,15 +50,22 @@ def main():
         tolines = tf.readlines()
 
     if options.u:
-        diff = difflib.unified_diff(fromlines, tolines, fromfile, tofile, fromdate, todate, n=n)
+        diff = difflib.unified_diff(
+            fromlines, tolines, fromfile, tofile, fromdate, todate, n=n
+        )
     elif options.n:
         diff = difflib.ndiff(fromlines, tolines)
     elif options.m:
-        diff = difflib.HtmlDiff().make_file(fromlines,tolines,fromfile,tofile,context=options.c,numlines=n)
+        diff = difflib.HtmlDiff().make_file(
+            fromlines, tolines, fromfile, tofile, context=options.c, numlines=n
+        )
     else:
-        diff = difflib.context_diff(fromlines, tolines, fromfile, tofile, fromdate, todate, n=n)
+        diff = difflib.context_diff(
+            fromlines, tolines, fromfile, tofile, fromdate, todate, n=n
+        )
 
     sys.stdout.writelines(diff)
+
 
 if __name__ == '__main__':
     main()

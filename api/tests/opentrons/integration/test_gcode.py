@@ -29,5 +29,6 @@ def test_gcode():
 
         e.g.: python {2} {0} {1} -m > gcode-diff.html
 
-        """.format(res_gcode, expected_gcode, os.path.join(this_dir, 'diff.py'))
-
+        """.format(
+            res_gcode, expected_gcode, os.path.join(this_dir, 'diff.py')
+        )
