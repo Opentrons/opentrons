@@ -10,6 +10,8 @@ matrix:
     - os: linux
       sudo: false
       python: "3.5"
+      env:
+        - DEPLOY_DIR="linux"
       addons:
         apt:
           sources: &common_sources
@@ -21,6 +23,8 @@ matrix:
             - xvfb
     - os: osx
       language: generic
+      env:
+        - DEPLOY_DIR="mac"
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
@@ -43,7 +47,7 @@ install:
 script:
   - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
-  - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT: -7}" # Escape -
+  - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   - cd api && make test exe && cd ..
   - > # Make docs on linux only
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd api && make docs > /dev/null && cd ..) fi;
@@ -62,7 +66,7 @@ deploy:
     bucket: ot-app-builds
     skip_cleanup: true
     local-dir: $(pwd)/app/dist
-    upload-dir: $TRAVIS_OS_NAME
+    upload-dir: $DEPLOY_DIR
     acl: public_read
     on:
       condition: $TRAVIS_TEST_RESULT = 0

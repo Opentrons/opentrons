@@ -1,8 +1,16 @@
-import unittest
 import math
+import json
+import os
+import unittest
 
-from opentrons import containers
+from opentrons.containers import (
+    create as containers_create,
+    load as containers_load,
+    list as containers_list
+)
 from opentrons.util import environment
+from opentrons import Robot
+from opentrons.containers import placeable
 from opentrons.containers.placeable import (
     Container,
     Well,
@@ -11,6 +19,12 @@ from opentrons.containers.placeable import (
 
 
 class ContainerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.robot = Robot()
+
+    def tearDown(self):
+        del self.robot
+
     def generate_plate(self, wells, cols, spacing, offset, radius):
         c = Container()
 
@@ -25,11 +39,8 @@ class ContainerTestCase(unittest.TestCase):
         return c
 
     def test_containers_create(self):
-        import os
-        import json
-        from opentrons import Robot
         container_name = 'plate_for_testing_containers_create'
-        containers.create(
+        containers_create(
             name=container_name,
             grid=(8, 12),
             spacing=(9, 9),
@@ -37,12 +48,12 @@ class ContainerTestCase(unittest.TestCase):
             depth=8,
             volume=1000)
 
-        p = containers.load(container_name, 'A1')
+        p = containers_load(self.robot, container_name, 'A1')
         self.assertEquals(len(p), 96)
         self.assertEquals(len(p.rows), 12)
         self.assertEquals(len(p.cols), 8)
         self.assertEquals(
-            p.get_parent(), Robot.get_instance().deck['A1'])
+            p.get_parent(), self.robot.deck['A1'])
         self.assertEquals(p['C3'], p[18])
         self.assertEquals(p['C3'].max_volume(), 1000)
         for i, w in enumerate(p):
@@ -59,12 +70,12 @@ class ContainerTestCase(unittest.TestCase):
             os.remove(environment.get_path('CONTAINERS_FILE'))
 
     def test_containers_list(self):
-        res = containers.list()
+        res = containers_list()
         self.assertTrue(len(res))
 
     def test_bad_unpack_containers(self):
         self.assertRaises(
-            ValueError, containers.placeable.unpack_location, 1)
+            ValueError, placeable.unpack_location, 1)
 
     def test_iterate_without_parent(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)

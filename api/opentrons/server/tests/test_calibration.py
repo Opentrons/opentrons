@@ -1,21 +1,19 @@
-import unittest
 import json
-from unittest import mock
 import os
-
-from opentrons.robot import Robot
+import unittest
+from unittest import mock
 
 
 class CalibrationTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.get_instance().reset_for_tests()
         from main import app
         self.app = app.test_client()
 
         self.data_path = os.path.join(
             os.path.dirname(__file__) + '/data/'
         )
-        self.robot = Robot.get_instance()
+        self.robot = app.robot
+        self.robot.reset()
         self.robot.connect()
 
     def test_move_to_slot(self):

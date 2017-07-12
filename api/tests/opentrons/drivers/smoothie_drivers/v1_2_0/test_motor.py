@@ -10,7 +10,7 @@ class OpenTronsTest(unittest.TestCase):
 
     def setUp(self):
         global reset_time
-        self.robot = Robot.get_instance()
+        self.robot = Robot()
 
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
