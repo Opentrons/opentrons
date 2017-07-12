@@ -41,7 +41,7 @@ def test_gcode():
         """.format(
             pformat(list(
                 difflib.context_diff(
-                    res[:30], exp[:30], fromfile='res', tofile='exp'
+                    res[:100], exp[:100], fromfile='res', tofile='exp'
                 )
-            )[:30]))
+            )))
         )
