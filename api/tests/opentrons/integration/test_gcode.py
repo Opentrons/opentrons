@@ -1,5 +1,7 @@
-import os
+import difflib
 import hashlib
+from pprint import pformat
+import os
 
 
 def test_gcode():
@@ -22,8 +24,6 @@ def test_gcode():
     result_hash = hashlib.md5(open(res_gcode, 'rb').read()).hexdigest()
     expected_hash = hashlib.md5(open(expected_gcode, 'rb').read()).hexdigest()
 
-    import difflib
-    from pprint import pformat
     res = open(res_gcode, 'r').readlines()
     exp = open(expected_gcode, 'r').readlines()
 
