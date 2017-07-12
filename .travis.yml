@@ -43,7 +43,7 @@ install:
 script:
   - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
-  - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT: 7}"
+  - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   - cd api && make test exe && cd ..
   - > # Make docs on linux only
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd api && make docs > /dev/null && cd ..) fi;
