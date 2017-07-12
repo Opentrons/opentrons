@@ -354,7 +354,7 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
                               sorted(log_data[1:]))).rstrip() +  # GCODE args
                     '\n'
                 )
-                gf.write(log_data.encode())
+                gf.write(log_data)
 
         if not self.isOpen():
             raise RuntimeError('Virtual Smoothie not currently connected')
