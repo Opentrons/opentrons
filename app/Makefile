@@ -23,8 +23,7 @@ package: build
 	npm run package
 
 test: build
-	# npm run test
-	echo '!!Skipping unit tests until uuid package loading is resolved...'
+	npm run test
 
 test-e2e: build
 	npm run test-e2e
