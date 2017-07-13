@@ -35,7 +35,6 @@ package: build
 	npm run package
 
 dev:
-	npm i vue-devtools electron-debug
 	npm run build-dev
 	npm run dev
 
