@@ -1,5 +1,6 @@
 module.exports = {
   addHrefs,
+  getCustomUserId,
   getUserEmail,
   getUserId,
   getUserProfile,
@@ -7,6 +8,8 @@ module.exports = {
   processProtocol,
   processTasks
 }
+
+import uuidV4 from 'uuid/v4'
 
 function addHrefs (tasks) {
   tasks.map((instrument) => {
@@ -17,12 +20,19 @@ function addHrefs (tasks) {
   })
 }
 
+function getCustomUserId () {
+  if (!localStorage.getItem('CustomUserID')) {
+    localStorage.setItem('CustomUserID', 'opentrons|' + uuidV4())
+  }
+  return localStorage.getItem('CustomUserID')
+}
+
 function getUserId () {
-  return getUserProfile().user_id || null
+  return getUserProfile().user_id || getCustomUserId()
 }
 
 function getUserEmail () {
-  return getUserProfile().email || null
+  return getUserProfile().email || getCustomUserId() + '@opentrons.com'
 }
 
 function getUserProfile () {
