@@ -15,7 +15,7 @@ class ProtocolTestCase(unittest.TestCase):
         plate = containers_load(self.robot, '96-flat', 'A1', 'myPlate')
         tiprack = containers_load(self.robot, 'tiprack-10ul', 'B2')
 
-        containers_list = self.robot.containers().values()
+        containers_list = self.robot.get_containers()
         self.assertEqual(len(containers_list), 2)
 
         self.assertEqual(self.robot._deck['A1']['myPlate'], plate)

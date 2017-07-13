@@ -37,14 +37,14 @@ class GridTestCase(unittest.TestCase):
         slot = 'B1'
 
         plate = load(self.robot, '96-flat', slot, 'plate')
-        self.assertEquals(len(robot.containers()), 1)
+        self.assertEquals(len(robot.get_containers()), 1)
         plate.get_parent().remove_child(plate.get_name())
-        self.assertEquals(len(robot.containers()), 0)
+        self.assertEquals(len(robot.get_containers()), 0)
 
         plate = load(self.robot, '96-flat', slot, 'plate')
-        self.assertEquals(len(robot.containers()), 1)
+        self.assertEquals(len(robot.get_containers()), 1)
         robot.deck[slot].remove_child(plate.get_name())
-        self.assertEquals(len(robot.containers()), 0)
+        self.assertEquals(len(robot.get_containers()), 0)
 
     def test_placeable(self):
         plate = self.plate

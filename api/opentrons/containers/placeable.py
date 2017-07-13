@@ -459,21 +459,20 @@ class Deck(Placeable):
     """
     This class implements behaviour specific to the Deck
     """
-    def containers(self) -> dict:
+    def containers(self) -> list:
         """
-        Returns all containers on a deck as a name:placeable dict
+        Returns all containers on a deck as a list
         """
-        containers = OrderedDict()
+        all_containers = list()
         for slot in self:
-            for container in slot:
-                containers[container.get_name()] = container
-        return containers
+            all_containers += slot.get_children_list()
+        return all_containers
 
     def has_container(self, container_instance):
         """
         Returns *True* if :Deck: has a container :container_instance:
         """
-        return container_instance in self.containers().values()
+        return container_instance in self.containers()
 
 
 class Well(Placeable):
