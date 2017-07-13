@@ -1,4 +1,3 @@
-import webpack from 'webpack'
 import merge from 'webpack-merge'
 import path from 'path'
 import baseConfig from './webpack.config.renderer.dev'
@@ -20,7 +19,7 @@ module.exports = function (config) {
       'test/index.js': ['webpack', 'sourcemap']
     },
     // `useIframe: false` is for launching a new window instead of using an iframe
-    // In Electron, iframes don't get `nodeIntegration` priveleges yet windows do
+    // In Electron, iframes don't get `nodeIntegration` privileges yet windows do
     client: {
       useIframe: false
     },
