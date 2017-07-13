@@ -1,35 +1,27 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import VueResource from 'vue-resource'
-import store from './store/store'
-import { getUserId } from './util'
-import {
-  Placeable,
-  CalibrateInstrument,
-  App
-} from './components/export'
-import { loginRoute, logoutRoute } from './login-routes'
+import React from 'react';
+import { render } from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
+import Root from './containers/Root';
+import { configureStore, history } from './store/configureStore';
+import './app.global.css';
 
-Vue.use(VueRouter)
-Vue.use(VueResource)
+const store = configureStore();
 
-const router = new VueRouter({
-  routes: [
-    { path: '/calibrate/:instrument', component: CalibrateInstrument },
-    { path: '/calibrate/:instrument/:slot/:placeable', component: Placeable },
-    loginRoute,
-    logoutRoute
-  ],
-  mode: 'hash'
-})
+render(
+  <AppContainer>
+    <Root store={store} history={history} />
+  </AppContainer>,
+  document.getElementById('root')
+);
 
-/* eslint-disable */
-window.onload = function () {
-  if (getUserId()) window.ot_dataLayer.push({userId: getUserId()})
-  const app = new Vue({
-    router,
-    store,
-    ...App
-  }).$mount('#app')
+if (module.hot) {
+  module.hot.accept('./containers/Root', () => {
+    const NextRoot = require('./containers/Root'); // eslint-disable-line global-require
+    render(
+      <AppContainer>
+        <NextRoot store={store} history={history} />
+      </AppContainer>,
+      document.getElementById('root')
+    );
+  });
 }
-/* eslint-enable */
