@@ -29,6 +29,7 @@ test-e2e: build
 	npm run test-e2e
 
 dev:
+	npm i vue-devtools electron-debug
 	npm run build-dev
 	npm run dev
 
