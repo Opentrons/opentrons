@@ -41,11 +41,6 @@ class GridTestCase(unittest.TestCase):
         plate.get_parent().remove_child(plate.get_name())
         self.assertEquals(len(robot.get_containers()), 0)
 
-        plate = load(self.robot, '96-flat', slot, 'plate')
-        self.assertEquals(len(robot.get_containers()), 1)
-        robot.deck[slot].remove_child(plate.get_name())
-        self.assertEquals(len(robot.get_containers()), 0)
-
     def test_placeable(self):
         plate = self.plate
         self.assertEqual(plate.rows[0].center(plate), (11.24, 14.34, 5.25))
@@ -72,13 +67,14 @@ class GridTestCase(unittest.TestCase):
             self.robot,
             'trough-12row',
             'B1',
-            'trough'
+            'trough',
+            share=True
         )
 
         trash = load(
             self.robot,
             'point',
-            'A2',
+            'A3',
             'trash'
         )
 

@@ -223,7 +223,9 @@ class Placeable(object):
             name = str(child)
 
         if name in self.children_by_name:
-            del self.children_by_name[name]
+            raise RuntimeWarning(
+                'Child with name {} already in slot, use custom name'.format(
+                    name))
 
         child._coordinates = Vector(coordinates)
         child.parent = self

@@ -693,12 +693,17 @@ class Robot(object):
         """
         return self._deck.containers()
 
-    def add_container(self, container_name, slot, label=None):
+    def add_container(self, container_name, slot, label=None, share=False):
         if not label:
             label = container_name
         container = containers.get_persisted_container(container_name)
         container.properties['type'] = container_name
-        self._deck[slot].add(container, label)
+        if self._deck[slot].has_children() and not share:
+            raise RuntimeWarning(
+                'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
+                    slot, container_name, slot))
+        else:
+            self._deck[slot].add(container, label)
 
         # if a container is added to Deck AFTER a Pipette, the Pipette's
         # Calibrator must update to include all children of Deck
