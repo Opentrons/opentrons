@@ -18,8 +18,8 @@ module.exports = function (config) {
     preprocessors: {
       'test/index.js': ['webpack', 'sourcemap']
     },
-    // In Electron, iframes don't get `nodeIntegration` priveleges yet windows do
     // `useIframe: false` is for launching a new window instead of using an iframe
+    // In Electron, iframes don't get `nodeIntegration` privileges yet windows do
     client: {
       useIframe: false
     },
