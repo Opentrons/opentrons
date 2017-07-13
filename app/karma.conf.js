@@ -19,24 +19,19 @@ module.exports = function (config) {
     preprocessors: {
       'test/index.js': ['webpack', 'sourcemap']
     },
+    // `useIframe: false` is for launching a new window instead of using an iframe
+    // In Electron, iframes don't get `nodeIntegration` priveleges yet windows do
+    client: {
+      useIframe: false
+    },
     webpack: merge.smart(baseConfig, {
       devtool: 'inline-source-map',
-      output: {
-        // Our base setting is commonjs2, Karma's PhantomJS / Electron
-        // browsers don't support that, falling back to var
-        libraryTarget: 'var'
-      },
       resolve: {
         alias: {
           // Override rest_api_wrapper with test mock
           rest_api_wrapper: path.resolve(__dirname, 'test/rest_api_wrapper_mock.js')
         }
-      },
-      plugins: [
-        new webpack.DefinePlugin({
-          'global': {} // webpack workaround for lolex library required by sinon
-        })
-      ]
+      }
     }),
     webpackMiddleware: {
       stats: 'errors-only'
