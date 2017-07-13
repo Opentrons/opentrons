@@ -695,10 +695,13 @@ class Robot(object):
 
     def get_containers(self):
         """
-        Returns the list of the containers on the deck.
+        Returns all containers currently on the deck
         """
-        return sorted(
-            self._deck.containers().items(), key=lambda s: s[0].lower())
+        all_containers = list()
+        for slot in robot._deck:
+            if slot.has_children():
+                all_containers += slot.get_children_list()
+        return all_containers
 
     def add_container(self, container_name, slot, label=None):
         if not label:
