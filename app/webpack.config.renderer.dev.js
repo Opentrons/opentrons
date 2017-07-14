@@ -32,7 +32,7 @@ if (!(fs.existsSync(dll) && fs.existsSync(manifest))) {
 }
 
 export default merge.smart(baseConfig, {
-  devtool: 'inline-source-map',
+  devtool: 'eval-source-map',
 
   target: 'electron-renderer',
 
@@ -228,7 +228,7 @@ export default merge.smart(baseConfig, {
     lazy: false,
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    contentBase: [path.join(__dirname, 'ui'), __dirname],
+    contentBase: [path.join(__dirname, 'ui')],
     watchOptions: {
       aggregateTimeout: 300,
       poll: 100

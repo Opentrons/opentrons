@@ -7,10 +7,10 @@ export default class Home extends Component {
     const { home } = this.props
     return (
       <div>
-        <button onClick={home('x')} />
-        <button onClick={home('y')} />
-        <button onClick={home('z')} />
-        <button onClick={home('xyz')} />
+        <button onClick={() => home('x')} />
+        <button onClick={() => home('y')} />
+        <button onClick={() => home('z')} />
+        <button onClick={() => home('xyz')} />
       </div>
     )
   }

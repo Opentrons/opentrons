@@ -5,6 +5,7 @@ import * as RobotActions from '../actions/robot';
 
 function mapStateToProps(state) {
   return {
+    // User selectors
     robotState: state.robot
   };
 }

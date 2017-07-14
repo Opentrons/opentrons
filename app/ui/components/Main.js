@@ -11,19 +11,18 @@ import Status from './Status'
 export default class Main extends Component {
   render() {
     const { move, home, load, run, robotState } = this.props;
-
     return (
       <div>
         <div>
-          <Home />
+          <Home {...{ home }} />
         </div>
         <div>
           <Switch>
-            <Route path="/" render={ () => (<Welcome />) } />
-            <Route path="/load" render={ () => (<Load load />) } />
-            <Route path="/calibrate" render={ () => (<Calibrate robotState move />)} />
-            <Route path="/run" render={ () => (<Run robotState run/>) } />
-            <Route path="/welcome" render={ () => (<Welcome />) } />
+            <Route path="/" render={() => (<Welcome />)} />
+            <Route path="/load" render={() => (<Load {...{ load }} />)} />
+            <Route path="/calibrate" render={() => (<Calibrate {...{ robotState, move }} />)} />
+            <Route path="/run" render={() => (<Run {...{ robotState, run }} />)} />
+            <Route path="/welcome" render={() => (<Welcome />)} />
           </Switch>
         </div>
         <div>

@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron'
+import {app, Menu, BrowserWindow} from 'electron'
 import fs from 'fs'
 import path from 'path'
 import {addMenu} from './menu'
@@ -10,23 +10,38 @@ import shell from 'shelljs'
 
 if (require('electron-squirrel-startup')) app.quit()
 
-const port = process.env.PORT || 8090
 const dataDirName = 'otone_data'
-let appWindowUrl = `http://127.0.0.1:31950/`
-// TODO: Test app behavior with UI loaded from file://
-// const indexPath = path.join(__dirname, '../../ui/index.html')
-// console.log(`Index path: ${indexPath}`)
-// let appWindowUrl = `file://${indexPath}`
+const indexPath = path.join(__dirname, '..', 'ui', 'index.html')
+const appWindowUrl = url.resolve('file://', indexPath)
+console.log(appWindowUrl)
 
-if (process.env.NODE_ENV === 'development') {
-  require('electron-debug')({showDevTools: 'undocked'})
-  appWindowUrl = `http://127.0.0.1:${port}/`
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support');
+  sourceMapSupport.install();
 }
+
+if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+  require('electron-debug')();
+  const p = path.join(__dirname, '..', 'node_modules');
+  require('module').globalPaths.push(p);
+}
+
+const installExtensions = async () => {
+  const installer = require('electron-devtools-installer');
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  const extensions = [
+    'REACT_DEVELOPER_TOOLS',
+    'REDUX_DEVTOOLS'
+  ];
+
+  return Promise
+    .all(extensions.map(name => installer.default(installer[name], forceDownload)))
+    .catch(console.log);
+};
 
 // TODO(artyom): it should belong to integration test and/or CI scripts
 // but for that we need to determine userData value before running the test
-// and for that we need to create an instance of the app. 
-// 
+// and for that we need to create an instance of the app.
 // Clean up User Data for tests
 if (process.env.INTEGRATION_TEST === 'true') {
   const userData = app.getPath('userData')
@@ -46,10 +61,10 @@ process.env.APP_DATA_DIR = (() => {
 
 const log = getLogger('electron-main')
 
-let loadUI = windowUrl => {
-  log.info('Loading App UI at ' + windowUrl)
-  BrowserWindow.getAllWindows()[0].loadURL(
-    windowUrl,
+let loadUI = (win, url) => {
+  log.info('Loading App UI at ' + url)
+  win.loadURL(
+    url,
     {'extraHeaders': 'pragma: no-cache\n'}
   )
   log.info('Dispatched .loadURL call')
@@ -64,31 +79,11 @@ let createWindow = async () => {
     mainWindow.show()
   })
 
-  mainWindow.on('closed', function () {
-    log.info('Electron App window closed, quitting App')
-    fetch(url.resolve(appWindowUrl, 'exit'))
-      .then(() => {
-        app.quit()
-      })
-      .catch((err) => {
-        log.error('Received an expected error while calling exit route', err)
-        app.quit()
-      })
-  })
-
   mainWindow.on('unresponsive', async () => {
     log.info('window is unresponsive, reloading')
     await delay(500)
     mainWindow.reload()
   })
-
-  // TODO: the sequence of instantiating the BrowserWindow
-  // and then calling loadURL with our UI causes integration 
-  // tests to fail randomly on windows, likely due to a race
-  // condition while WebDriver is connecting to Chrome DevTools
-  // causing Chrome to crash. We are experimenting with pre-loading
-  // 'about:blank' first
-  // mainWindow.loadURL('about:blank')
 
   // Note: Auth0 pop window does not close itself, 
   // this will close this window when it pops up
@@ -107,9 +102,8 @@ let createWindow = async () => {
 let startUp = async () => {
   log.info('Starting App')
 
-  // NOTE: vue-devtools can only be installed after app the 'ready' event
-  if (process.env.NODE_ENV === 'development') {
-    require('vue-devtools').install()
+  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    await installExtensions();
   }
 
   process.on('uncaughtException', error => {
@@ -124,20 +118,25 @@ let startUp = async () => {
     serverManager.shutdown()
   })
 
-  createWindow()
+  const mainWindow = await createWindow()
+  loadUI(mainWindow, appWindowUrl)
 
-  let response
-  do {
-    response = await fetch(
-      appWindowUrl,
-      {timeout: 1000}
-    ).catch(error => {
-      log.debug(`While pinging back-end process: ${error}`)
-    })
-    await delay(1000)
-  } while (!response)
+  // Setup Development Environment
+  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    mainWindow.openDevTools();
+    mainWindow.webContents.on('context-menu', (e, props) => {
+      const { x, y } = props;
 
-  loadUI(appWindowUrl)
+      Menu
+        .buildFromTemplate([{
+          label: 'Inspect element',
+          click: () => {
+            mainWindow.inspectElement(x, y);
+          }
+        }])
+        .popup(mainWindow);
+    });
+  }
 }
 
 app.on('ready', startUp)
