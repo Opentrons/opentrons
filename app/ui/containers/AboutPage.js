@@ -5,7 +5,9 @@ import Home from '../components/Home';
 export default class HomePage extends Component {
   render() {
     return (
-      <Home />
+      <div>
+        <h1>Hello, World!</h1>
+      </div>
     );
   }
 }

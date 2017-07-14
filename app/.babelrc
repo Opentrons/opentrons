@@ -1,12 +1,32 @@
 {
- "env": {
+  "env": {
     "test": {
       "plugins":
         ["istanbul"]
+    },
+    "production": {
+      "presets": ["react-optimize"],
+      "plugins": ["babel-plugin-dev-expression"]
+    },
+    "development": {
+      "plugins": [
+        "transform-class-properties",
+        "transform-es2015-classes",
+        "react-hot-loader/babel",
+        ["flow-runtime", {
+          "assert": true,
+          "annotate": true
+        }]
+      ]
     }
   },
+  "plugins": ["add-module-exports", "dynamic-import-webpack"],
   "presets": [
-    "es2015",
-    "stage-2"
+    ["env", {
+      "targets": { "node": 6 },
+      "useBuiltIns": true
+    }],
+    "stage-0",
+    "react"
   ]
 }

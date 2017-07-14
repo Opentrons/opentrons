@@ -37,8 +37,10 @@ export default merge.smart(baseConfig, {
   target: 'electron-renderer',
 
   entry: [
+    'react-hot-loader/patch',
+    `webpack-dev-server/client?http://localhost:${port}/`,
+    'webpack/hot/only-dev-server',
     path.join(__dirname, './ui/main.js'),
-    `webpack-dev-server/client?http://localhost:${port}/`
   ],
 
   output: {
@@ -47,19 +49,6 @@ export default merge.smart(baseConfig, {
 
   module: {
     rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-            // the "scss" and "sass" values for the lang attribute to the right configs here.
-            // other preprocessors should work out of the box, no loader config like this necessary.
-            'scss': 'vue-style-loader!css-loader!sass-loader',
-            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
-          }
-        }
-      },
       {
         test: /\.global\.css$/,
         use: [

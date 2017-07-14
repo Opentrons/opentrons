@@ -1,17 +1,17 @@
-// @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
 
 export default class Home extends Component {
   render() {
+    const { home } = this.props
     return (
       <div>
-        <div className={styles.container} data-tid="container">
-          <h2>Home</h2>
-          <Link to="/counter">to Counter</Link>
-        </div>
+        <button onClick={home('x')} />
+        <button onClick={home('y')} />
+        <button onClick={home('z')} />
+        <button onClick={home('xyz')} />
       </div>
-    );
+    )
   }
 }

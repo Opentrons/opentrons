@@ -1,7 +1,6 @@
 import {app, BrowserWindow} from 'electron'
 import fs from 'fs'
 import path from 'path'
-import request from 'request-promise'
 import {addMenu} from './menu'
 import {getLogger} from './logging'
 import {initAutoUpdater} from './updater'
@@ -67,7 +66,7 @@ let createWindow = async () => {
 
   mainWindow.on('closed', function () {
     log.info('Electron App window closed, quitting App')
-    request(url.resolve(appWindowUrl, 'exit'))
+    fetch(url.resolve(appWindowUrl, 'exit'))
       .then(() => {
         app.quit()
       })
@@ -129,7 +128,7 @@ let startUp = async () => {
 
   let response
   do {
-    response = await request(
+    response = await fetch(
       appWindowUrl,
       {timeout: 1000}
     ).catch(error => {

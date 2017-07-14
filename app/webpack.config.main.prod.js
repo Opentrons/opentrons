@@ -30,7 +30,7 @@ export default merge.smart(baseConfig, {
     /**
      * Create global constants which can be configured at compile time.
      *
-     * Useful for allowing different behaviour between development builds and
+     * Useful for allowing different behavior between development builds and
      * release builds
      *
      * NODE_ENV should be production so that modules do not perform certain
