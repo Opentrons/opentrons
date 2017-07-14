@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Switch, Route } from 'react-router';
 
 import Home from './Home';
+import Brand from './Brand';
 import Calibrate from './Calibrate';
 import Run from './Run';
 import Load from './Load';
@@ -12,11 +13,14 @@ import styles from './Main.css';
 
 export default class Main extends Component {
   render() {
-    const { move, home, load, run, robotState } = this.props;
+    const { version, move, home, load, run, robotState } = this.props;
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <Home {...{ home }} />
+          <section className={styles.menu}>
+            <Home {...{ home }} className={styles.home}/>
+            <Brand {...{ version }} className={styles.brand}/>
+          </section>
         </div>
         <div className={styles.task}>
           <Switch>

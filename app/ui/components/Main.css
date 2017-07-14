@@ -15,5 +15,29 @@
 }
 
 .header, .task, .footer{
-  background-color: #ecebeb;
+  composes: well from './Util.css';
 } 
+
+.menu{
+  display: grid;
+  padding: 10px 0;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: "home brand connect";
+}
+
+.home{
+  grid-area: home;
+  padding-left: 20px;
+  vertical-align: middle;
+}
+
+.brand{
+   grid-area: brand;
+   text-align: center;
+   vertical-align: middle;
+}
+
+.connect{
+  vertical-align: middle;
+  grid-area: connect;
+}
