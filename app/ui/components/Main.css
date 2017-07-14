@@ -41,3 +41,19 @@
   vertical-align: middle;
   grid-area: connect;
 }
+
+.protocol{
+  height: 90px;
+  background-color: rgba(155, 155, 155, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: "upload . run ";
+}
+
+.upload{
+  grid-area: upload;
+}
+
+.run{
+  grid-area: run;
+}

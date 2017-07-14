@@ -18,9 +18,10 @@ export default class Main extends Component {
       <div className={styles.container}>
         <div className={styles.header}>
           <section className={styles.menu}>
-            <Home {...{ home }} className={styles.home}/>
-            <Brand {...{ version }} className={styles.brand}/>
+            <Home {...{ home }} className={styles.home} />
+            <Brand {...{ version }} className={styles.brand} />
           </section>
+          <section className={styles.protocol} />
         </div>
         <div className={styles.task}>
           <Switch>
