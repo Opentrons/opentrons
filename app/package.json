@@ -27,7 +27,7 @@
     "package-all": "npm run build && build -mwl"
   },
   "name": "ot-app",
-  "productName": "OT-App",
+  "productName": "OT One App 2",
   "version": "2.4.2",
   "description": "OT One Robot Companion Desktop App",
   "main": "shell/dist/bundle.js",
