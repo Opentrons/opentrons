@@ -5,21 +5,11 @@ body{
   height: 768px;
 }
 
-@font-face {
-    font-family: 'trons';
-    src: url('./fonts/Geogtq-Rg-webfont.woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'sans';
-    src: url('./fonts/OpenSans-Regular-webfont.woff');
-    font-weight: 300;
-    font-style: normal;
-}
-
 *{
   margin: 0;
   padding: 0;
+}
+
+button{
+  border: none;
 }
