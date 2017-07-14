@@ -6,7 +6,6 @@ export function getUserId () {
 
 export function getUserEmail () {
   return getUserProfile().email || null
-
 }
 
 export function getUserProfile () {
