@@ -198,14 +198,15 @@ def emit_notifications(notifications, _type):
 def run():
     def _run():
         commands, error_msg = helpers.run_protocol(
-            app.robot, app.code, mode='null')
-        app.robot.mode = 'live'
+            app.robot, app.code, mode='simulate')
+        time.sleep(2)
         app.robot.cmds_total = len(commands)
         app.robot._commands = []
         app.robot.resume()
 
         start_time = time.time()
-        helpers.run_protocol(app.robot, app.code, mode='live')
+        # TODO: bubble up exception from live protocol run
+        cmds, exp = helpers.run_protocol(app.robot, app.code, mode='live')
         end_time = time.time()
 
         run_time = helpers.timestamp(end_time - start_time)

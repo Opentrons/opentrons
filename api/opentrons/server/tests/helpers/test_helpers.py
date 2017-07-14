@@ -1,8 +1,6 @@
-import io
 import unittest
 
 from opentrons.robot import Robot
-from opentrons.server import helpers
 
 
 class MiscHelpersTestCase(unittest.TestCase):
