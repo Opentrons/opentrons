@@ -17,10 +17,6 @@ def get_frozen_root():
     return sys._MEIPASS if getattr(sys, 'frozen', False) else None
 
 
-def convert_byte_stream_to_str(stream):
-    return ''.join([line.decode() for line in stream])
-
-
 def run_protocol(robot, code: str, mode='simulate') -> tuple:
     """
     :param robot: robot instance for protocol
@@ -43,7 +39,7 @@ def run_protocol(robot, code: str, mode='simulate') -> tuple:
     return (commands, exception_msg)
 
 
-def timestamp(seconds: int):
+def timestamp(seconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     return "%d:%02d:%02d" % (hours, minutes, seconds)
