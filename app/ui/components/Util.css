@@ -1,0 +1,56 @@
+@value blue: #006FFF;
+@value teal: #05C1B3;
+@value mustard: #FFD252;
+
+@value small: (max-width: 599px);
+@value medium: (min-width: 600px) and (max-width: 959px);
+@value large: (min-width: 960px);
+
+@font-face {
+    font-family: 'trons';
+    src: url('../fonts/Geogtq-Rg-webfont.woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'sans';
+    src: url('../fonts/OpenSans-Regular-webfont.woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/*************************
+          Globals
+*************************/
+.well{
+  background-color: #ecebeb;
+  border-radius: 3px;
+}
+
+.btn{
+  padding: 5px;
+  border-radius: 6px;
+  line-height: 21px;
+  background-color: #9b9b9b;
+  color: white;
+  font-family: 'trons';
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn:hover{
+  background-color: #898989;
+}
+
+.title{
+  font-family: 'sans';
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  margin: 20px;
+  /* margin: 38px 20px 20px; */
+  color: #9b9b9b;
+}
