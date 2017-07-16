@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 class Calibrate extends Component {
   render() {
@@ -6,8 +6,8 @@ class Calibrate extends Component {
       <div>
         <h1>Calibrate. Deckmap.</h1>
       </div>
-    );
+    )
   }
 }
 
-export default Calibrate;
+export default Calibrate
