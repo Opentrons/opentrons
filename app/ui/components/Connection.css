@@ -1,0 +1,17 @@
+.status{
+  width: 15px;
+  height: 15px;
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 50%;
+  background-color: #d8d8d8;
+
+}
+
+.connected{
+  width: 15px;
+  height: 15px;
+  background-color: #7ed321;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+}

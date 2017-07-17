@@ -4,6 +4,7 @@ import { Switch, Route } from 'react-router'
 import Home from './Home'
 import Brand from './Brand'
 import Connect from './Connect'
+import Connection from './Connection'
 import Calibrate from './Calibrate'
 import Run from './Run'
 import Load from './Load'
@@ -14,7 +15,7 @@ import styles from './Main.css'
 
 export default class Main extends Component {
   render() {
-    const { version, move, home, load, run, connect, robotState } = this.props
+    const { version, move, home, load, run, connect, connectionStatus, robotState } = this.props
     return (
       <div className={styles.container}>
         <div className={styles.header}>
@@ -23,6 +24,7 @@ export default class Main extends Component {
             <Brand {...{ version }} className={styles.brand} />
             <div className={styles.connect}>
               <Connect {...{ connect }} />
+              <Connection {...{ connectionStatus }} />
             </div>
           </section>
           <section className={styles.protocol} />
