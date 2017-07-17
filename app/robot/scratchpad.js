@@ -1,5 +1,12 @@
 import connect from './proxy'
 
+//
+// Questions:
+// 1. How to un-box payload when we need a value of a target
+// 2. Do we want calls to return promise?
+// 3. What to do if function and class field have the same name?
+//
+
 const main = async () => {
   const proxy = await connect(
     'ws://127.0.0.1:31950/',
@@ -7,7 +14,7 @@ const main = async () => {
 
   console.log(proxy)
   let foo = await proxy.get_foo()
-  console.log(proxy.value)
+  console.log(foo.value)
   console.log(await foo.get_value())
   foo = await foo.get_next()
   console.log(await foo.get_value())

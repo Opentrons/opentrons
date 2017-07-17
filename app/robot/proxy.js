@@ -9,27 +9,50 @@ const CALL_ACK_MESSAGE = 1
 const NOTIFICATION_MESSAGE = 2
 const CONTROL_MESSAGE = 3
 
-const HANDSHAKE_TIMEOUT = 1000
-const CONNECTION_TIMEOUT = 1000
-const CALL_RESULT_TIMEOUT = 10000
+const MSEC = 1
+const SEC = 1000 * MSEC
+
+const HANDSHAKE_TIMEOUT = 5 * SEC
+const CONNECTION_TIMEOUT = 10 * SEC
+const CALL_RESULT_TIMEOUT = 10 * SEC
+const CALL_ACK_TIMEOUT = 5 * SEC
 
 // To prevent from dispatching these calls to the remote
 // TODO: need to be mindful of not naming your remote methods the same
 const SPECIAL_FUNCTION_NAMES = ['then', 'inspect']
+const ES_BUILTIN_TYPES = ['string', 'number', 'boolean', 'undefined']
 
-const BuildProxy = (obj, connection) =>
-  new Proxy(
-    obj,
+// As there is no way to tell if an object is a proxy need this
+class Remote {}
+
+const BuildProxy = (obj, connection) => {
+  // if it's a built in, no need to proxy it
+  if (ES_BUILTIN_TYPES.indexOf(typeof obj) > -1) return obj
+
+  // if it's an array, build an array of proxies and return
+  if (Array.isArray(obj)) return obj.map(item => BuildProxy(item, connection))
+
+  return new Proxy(obj, // <- object we are proxying
     {
+      // Use this to help client code determine if it's a proxy
+      getPrototypeOf: () => Remote.prototype,
+
       // Trap attempts to access object's properties
       get: (target, name) => {
-        // Then check if object we are proxying has a field
-        const val = target[name] || target.payload[name]
-        if (val) return val
+        // check if object we are proxying has a property
+        const val = target[name]
+
+        // If this property is a proxy itself, return it
+        if (val instanceof Remote) return val
+
+        if (val) {
+          // Fix by disabling no-param-reassign linting check?
+          target[name] = BuildProxy(val, connection)
+          return target[name]
+        }
 
         // Don't try to dispatch symbols since the don't belong to Python
-        const nameType = typeof name
-        if (nameType === 'symbol') return undefined
+        if (typeof name === 'symbol') return undefined
 
         if (SPECIAL_FUNCTION_NAMES.indexOf(name) > -1) {
           log.warn(`${name}() is a special function. Not dispatching.`)
@@ -37,111 +60,120 @@ const BuildProxy = (obj, connection) =>
         }
 
         // name can be Symbol which can't be used in concatenation hence .toString()
-        log.info(`Will dispatch a remote call: Target = ${target}, name = ${name.toString()}, typeof name = ${nameType}`)
+        log.info(`Will dispatch a remote call: ${target}.${name.toString()}`)
 
         // If not, assume it's a function call
-        return ((...args) => callRemoteMethod(connection, target.that, name, args))
+        return ((...args) => callRemoteMethod(connection, target.$meta.that, name, args))
       }
     }
   )
+}
+
+// Initialize
+const init = (connection, notify) => {
+  const rootObj = {
+    $meta: { that: null, connection, disconnect: () => connection.close() }
+  }
+  const proxy = BuildProxy(rootObj, connection)
+
+  return new Promise((resolve, reject) => {
+    setTimeout(
+      () => reject(`Handshake timed out after ${HANDSHAKE_TIMEOUT} msec`),
+      HANDSHAKE_TIMEOUT)
+
+    connection.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data)
+      log.warn(`Received message: ${JSON.stringify(message)}`)
+
+      const $meta = message.$meta
+      const pending = rootObj.$meta.pending
+      const id = $meta.id
+
+      // The response has id but we don't have a call pending
+      if (id && !(id in pending)) {
+        log.error(`Received a response with id ${id} whilch we never dispatched`)
+        return
+      }
+
+      switch ($meta.type) {
+        // Init root object with initial state of remote server
+        case CONTROL_MESSAGE:
+          rootObj.$meta = message.$meta
+          resolve(proxy)
+          break
+        // Pass notifications to notify() handler
+        case NOTIFICATION_MESSAGE:
+          log.info(`Received notification: ${message}`)
+          notify(message)
+          break
+        case CALL_RESULT_MESSAGE:
+          // Clear wait for result timeout
+          clearTimeout(pending[id].timer)
+          if ($meta.status === 'success') {
+            pending[id].resove(message)
+          } else {
+            pending[id].reject(message)
+          }
+          break
+        case CALL_ACK_MESSAGE:
+          log.info(`Received message ACK for id ${id}`)
+          // Clear call ACK timeout
+          clearTimeout(pending[id].timer)
+          // Start waiting for the result
+          pending[id].timer = setTimeout(
+            () =>
+              pending[id].reject(`Waiting for result ${id}: timed out after ${CALL_RESULT_TIMEOUT} msec`),
+            CALL_RESULT_TIMEOUT
+          )
+          break
+        default:
+          log.error(`Invalid message type ${$meta.type}`)
+      }
+    })
+  })
+}
 
 // Accept url and notification handler
 const connect = (url, notify) => {
   const connection = new WebSocket(url)
 
-  const rootObj = {
-    that: null,
-    payload: {},
-    disconnect: () => connection.close()
-  }
-
-  const connectionPromise = new Promise((resolve, reject) => {
+  const tryConnect = new Promise((resolve, reject) => {
     setTimeout(
       () => reject(
         `Timed out after ${CONNECTION_TIMEOUT} msec while connecting to ${url}`
       ),
       CONNECTION_TIMEOUT)
-    connection.on('open', () => {
-      resolve()
-    })
-    connection.on('error', (error) => {
-      reject(error)
-    })
+    connection.on('open', () => resolve())
+    connection.on('error', (error) => reject(error))
   })
 
-  return connectionPromise.then(() =>
-    new Promise((resolve, reject) => {
-      const proxy = BuildProxy(rootObj, connection)
-
-      setTimeout(
-        () => reject(`Handshake timed out after ${HANDSHAKE_TIMEOUT} msec`),
-        HANDSHAKE_TIMEOUT)
-
-      connection.addEventListener('message', (event) => {
-        const message = JSON.parse(event.data)
-        switch (message.type) {
-          // Upon connect server will send us it's own id
-          case CONTROL_MESSAGE:
-            rootObj.that = message.that
-            resolve(proxy)
-            break
-          case NOTIFICATION_MESSAGE:
-            log.info(`Received notification: ${message.payload}`)
-            notify(message)
-            break
-          case CALL_RESULT_MESSAGE || CALL_ACK_MESSAGE:
-            log.info(`Received message of type ${message.type} in root listener, skipping`)
-            break
-          default:
-            log.error(`Invalid message type ${message.type}`)
-        }
-      })
-    })
-  )
+  return tryConnect.then(() => init(connection, notify))
 }
 
-const callRemoteMethod = (connection, that, name, payload) => {
-  log.info(`Calling ${name}(${payload}) from ${connection}`)
-
-  return new Promise((resolve, reject) => {
-    const id = uuidV4()
-    const unsubscribe = () => connection.removeEventListener('message', callHandler)
-    const callHandler = (event) => {
-      const message = JSON.parse(event.data)
-
-      log.debug(`Received: ${message}`)
-
-      if (message.id !== id) return
-
-      switch (message.type) {
-        case CALL_ACK_MESSAGE:
-          log.info(`Call acknowledged ${id}`)
-          break
-        case CALL_RESULT_MESSAGE:
-          log.info(`Call result received ${id} : ${message.payload}`)
-          unsubscribe()
-          if (message.status === 'success') {
-            resolve(BuildProxy({ payload: message.payload, that: message.that }, connection))
-          } else {
-            reject(message.payload)
-          }
-          break
-        default:
-          log.error(`Ignoring message type ${message.type} here`)
-      }
-    }
-
-    connection.addEventListener('message', callHandler)
-    connection.send(JSON.stringify({ id, name, that, payload }))
-
-    setTimeout(
-      () => {
-        unsubscribe()
-        reject(`Timed out after ${CALL_RESULT_TIMEOUT} msec while waiting for remote call to return`)
-      },
-      CALL_RESULT_TIMEOUT
-    )
+const callRemoteMethod = (rootProxy, that, name, args) => {
+  const $meta = rootProxy.$meta
+  const id = uuidV4()
+  let handlers = null
+  const promise = new Promise((resolve, reject) => {
+    handlers = { resolve, reject }
+    $meta.pending[id] = handlers
   })
+
+  handlers.timer = setTimeout(
+    () =>
+      handlers.reject(`Waiting for call to be acknoleged: timed out after ${CALL_ACK_TIMEOUT} msec`),
+    CALL_ACK_TIMEOUT
+  )
+
+  log.info(`Calling ${name}(${args}) from ${$meta.connection}`)
+
+  try {
+    $meta.connection.send(JSON.stringify({ id, name, that, args }))
+  } catch (e) {
+    handlers.reject(e)
+  }
+
+  return promise
 }
 
 export default connect

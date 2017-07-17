@@ -71,9 +71,7 @@ class Server:
             raise ValueError('Object with id {0} not found'.format(_id))
 
         obj = self.objects[_id]
-        function = getattr(obj, name)
-
-        log.debug('Foo : {0}'.format(function()))
+        function = getattr(type(obj), name)
 
         if not function:
             raise ValueError(
@@ -83,7 +81,7 @@ class Server:
             raise ValueError(
                 'Property {0} of {1} is not a function'.format(name, type(obj)))
 
-        res = function(*args)
+        res = function(obj, *args)
         self.objects[id(res)] = res
 
         return res
@@ -94,10 +92,11 @@ class Server:
 server = Server()
 
 def serialize(value):
-    if '__dict__' in dir(value):
-        return value.__dict__
-
-    return value
+    res = dir(value).get('__dict__', None) or value
+    return {
+        'value': res,
+        'type': type(value)
+    }
 
 async def handler(request):
     ws = web.WebSocketResponse()
@@ -106,8 +105,10 @@ async def handler(request):
 
     # Our first message is address of Server instance
     ws.send_str(json.dumps({
-            'that': id(server),
-            'type': CONTROL_MESSAGE
+            '$meta': {
+                'that': id(server),
+                'type': CONTROL_MESSAGE
+            }
         })
     )
 
@@ -127,8 +128,8 @@ async def handler(request):
                 res = await server.dispatch(
                     _id=data['that'],
                     name=data['name'],
-                    args=data['payload'])
-                log.debug('res = {0}'.format(res))
+                    args=data['args'])
+
                 # Send call result
                 await ws.send_str(json.dumps({
                     'id': data['id'],
