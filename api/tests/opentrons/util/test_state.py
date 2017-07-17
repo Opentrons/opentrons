@@ -33,7 +33,7 @@ class StateTestCase(unittest.TestCase):
         expected = [{'axis': 'a',
                      'blow_out': 12.0101,
                      'bottom': 10.0101,
-                     'calibrated': True,
+                     'calibrated': False,
                      'channels': 1,
                      'drop_tip': 14.0101,
                      'label': 'Pipette',
