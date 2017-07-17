@@ -72,7 +72,6 @@ def are_instrument_positions_calibrated(instrument):
     ])
 
 
-
 def get_all_pipettes(robot):
     """
     Returns all pipettes attached to robot
