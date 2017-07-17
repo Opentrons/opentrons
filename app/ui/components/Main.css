@@ -38,8 +38,11 @@
 }
 
 .connect{
-  vertical-align: middle;
   grid-area: connect;
+  display: grid;
+  grid-template-columns: 207px 25px 73px;
+  grid-gap: 10px;
+  vertical-align: middle;
 }
 
 .protocol{
