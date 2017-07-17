@@ -15,7 +15,7 @@ import styles from './Main.css'
 
 export default class Main extends Component {
   render() {
-    const { version, move, home, load, run, connect, connectionStatus, robotState } = this.props
+    const { version, move, home, load, run, connections, connectionStatus, robotState } = this.props
     return (
       <div className={styles.container}>
         <div className={styles.header}>
@@ -23,7 +23,7 @@ export default class Main extends Component {
             <Home {...{ home }} className={styles.home} />
             <Brand {...{ version }} className={styles.brand} />
             <div className={styles.connect}>
-              <Connect {...{ connect }} />
+              <Connect {...{ connections }} />
               <Connection {...{ connectionStatus }} />
             </div>
           </section>
