@@ -1,0 +1,14 @@
+.ports{
+    background-image: url("../img/caret.png");
+    background-repeat: no-repeat;
+    background-position: 95% 50%;
+    background-size: 10px 7px;
+    -webkit-appearance: none;
+    outline: none;   
+    width: 207px;
+    height: 42px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    border: solid 1px #e0e7ee;
+    padding-left: 15px;
+}
