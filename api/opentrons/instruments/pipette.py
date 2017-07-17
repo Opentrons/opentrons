@@ -127,10 +127,10 @@ class Pipette(Instrument):
 
         # FIXME
         default_positions = {
-            'top': 0,
-            'bottom': 10,
-            'blow_out': 12,
-            'drop_tip': 14
+            'top': 0.0101,
+            'bottom': 10.0101,
+            'blow_out': 12.0101,
+            'drop_tip': 14.0101
         }
         self.positions = {}
         self.positions.update(default_positions)
