@@ -1474,10 +1474,10 @@ class Pipette(Instrument):
         return self
 
     def set_flowrate(self, **kwargs):
+        ul_per_mm = self.max_volume / self._plunge_distance(self.max_volume)
         keys = {'aspirate', 'dispense'} & kwargs.keys()
         for key in keys:
             # convert from uL/sec to mm/min
-            ul_mm = self.max_volume / self._plunge_distance(self.max_volume)
             self.speeds[key] = (kwargs.get(key) / ul_per_mm) * 60
         return self
 
