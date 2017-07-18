@@ -26,7 +26,7 @@ __all__ = [
     apply_calibration]
 
 
-def load(robot, *args, **kwargs):
+def load(robot, container_name, slot, label=None, share=False):
     """
     Examples
     --------
@@ -38,7 +38,7 @@ def load(robot, *args, **kwargs):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
-    return robot.add_container(*args, **kwargs)
+    return robot.add_container(container_name, slot, label=label, share=share)
 
 
 def list():
