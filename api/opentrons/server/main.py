@@ -197,11 +197,19 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
-        emit_notifications(['Protocol run initiated. Simulating...'], 'run')
+        # Generate a run log message for app simulation, this will interfere
+        # with app progress since it relies on number of 'command-run' events
+        # to determine progress
+        socketio.emit('event', {
+            'caller': 'ui',
+            'mode': 'live',
+            'name': 'command-run',
+            'command_description': 'Protocol run initiated. Simulating...'
+        })
         commands, error_msg = helpers.run_protocol(
             app.robot, app.code, mode='simulate')
         time.sleep(2)
-        app.robot.cmds_total = len(commands)
+        app.robot.cmds_total = len(commands) + 1 # add one for simulation event
         app.robot._commands = []
         app.robot.resume()
 
