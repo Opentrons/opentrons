@@ -81,7 +81,9 @@ class Pipette(Instrument):
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
-            dispense_speed=500):
+            dispense_speed=500,
+            aspirate_flowrate=None,
+            dispense_flowrate=None):
 
         self.robot = robot
         self.axis = axis
@@ -153,6 +155,12 @@ class Pipette(Instrument):
         for key, val in self.positions.items():
             if val is None:
                 self.positions[key] = default_positions[key]
+
+        # converting flowrate to speed relies on calibrated plunger positions
+        if helpers.is_number(aspirate_flowrate):
+            self.set_flowrate(aspirate=aspirate_flowrate)
+        if helpers.is_number(dispense_flowrate):
+            self.set_flowrate(dispense=dispense_flowrate)
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
@@ -1461,7 +1469,16 @@ class Pipette(Instrument):
         """
         keys = {'aspirate', 'dispense'} & kwargs.keys()
         for key in keys:
-            self.speeds[key] = kwargs.get(key)
+            if helpers.is_number(kwargs.get(key)):
+                self.speeds[key] = kwargs.get(key)
+        return self
+
+    def set_flowrate(self, **kwargs):
+        keys = {'aspirate', 'dispense'} & kwargs.keys()
+        for key in keys:
+            # convert from uL/sec to mm/min
+            ul_mm = self.max_volume / self._plunge_distance(self.max_volume)
+            self.speeds[key] = (kwargs.get(key) / ul_per_mm) * 60
         return self
 
     @property
