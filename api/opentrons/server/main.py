@@ -197,6 +197,7 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
+        emit_notifications(['Protocol run initiated. Simulating...'], 'run')
         commands, error_msg = helpers.run_protocol(
             app.robot, app.code, mode='simulate')
         time.sleep(2)
@@ -206,13 +207,16 @@ def run():
 
         start_time = time.time()
         # TODO: bubble up exception from live protocol run
-        cmds, exp = helpers.run_protocol(app.robot, app.code, mode='live')
+        cmds, error = helpers.run_protocol(app.robot, app.code, mode='live')
         end_time = time.time()
 
-        run_time = helpers.timestamp(end_time - start_time)
-        result = "Run complete in {}".format(run_time)
-        emit_notifications([result], 'success')
-        socketio.emit('event', {'name': 'run-finished'})
+        if error:
+            emit_notifications([error], 'danger')
+        else:
+            run_time = helpers.timestamp(end_time - start_time)
+            result = "Run complete in {}".format(run_time)
+            emit_notifications([result], 'success')
+            socketio.emit('event', {'name': 'run-finished'})
     threading.Thread(target=_run, args=()).start()
     return flask.jsonify({'status': 'success', 'data': {}})
 
