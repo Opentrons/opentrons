@@ -1,3 +1,6 @@
+@value colors: './Util.css';
+@value green from colors;
+
 .status{
   width: 15px;
   height: 15px;
@@ -11,7 +14,15 @@
 .connected{
   width: 15px;
   height: 15px;
-  background-color: #7ed321;
+  background-color: green;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+.disconnected{
+  width: 15px;
+  height: 15px;
+  background-color: red;
   border-radius: 50%;
   box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
 }
