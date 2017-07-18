@@ -510,9 +510,9 @@ def home(axis):
     result = ''
     try:
         if axis == 'undefined' or axis == '' or axis.lower() == 'all':
-            result = app.robot.home(enqueue=False)
+            result = app.robot.home()
         else:
-            result = app.robot.home(axis, enqueue=False)
+            result = app.robot.home(axis)
         emit_notifications(["Successfully homed"], 'info')
     except Exception as e:
         result = str(e)
@@ -608,7 +608,7 @@ def pick_up_tip():
         axis = request.json.get("axis")
         instrument = app.robot._instruments[axis.upper()]
         instrument.reset_tip_tracking()
-        instrument.pick_up_tip(enqueue=False)
+        instrument.pick_up_tip()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -627,7 +627,7 @@ def drop_tip():
     try:
         axis = request.json.get("axis")
         instrument = app.robot._instruments[axis.upper()]
-        instrument.return_tip(enqueue=False)
+        instrument.return_tip()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
