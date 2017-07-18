@@ -14,9 +14,13 @@
   font-weight: 300;
 }
 
-.header, .task, .footer{
+.header, .footer{
   composes: well from './Util.css';
-} 
+}
+
+.task{
+  display: grid;
+}
 
 .menu{
   display: grid;
