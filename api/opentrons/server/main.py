@@ -209,7 +209,7 @@ def run():
         commands, error_msg = helpers.run_protocol(
             app.robot, app.code, mode='simulate')
         time.sleep(2)
-        app.robot.cmds_total = len(commands) + 1 # add one for simulation event
+        app.robot.cmds_total = len(commands) + 1  # acct for simulation event
         app.robot._commands = []
         app.robot.resume()
 
