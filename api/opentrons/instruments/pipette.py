@@ -158,10 +158,6 @@ class Pipette(Instrument):
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
-        if helpers.is_number(max_volume) and max_volume > 0:
-            self.max_volume = max_volume
-            self.update_calibrations()
-
     def update_calibrator(self):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
