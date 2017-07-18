@@ -213,6 +213,22 @@ class PipetteTest(unittest.TestCase):
             {'a': 0, 'b': 10.0}
         )
 
+    def test_dispense_aspirate_default_positions(self):
+        self.p200.move_to = mock.Mock()
+        self.p200.aspirate(100, self.plate[0]).dispense(self.plate[0])
+        expected = [
+            mock.call(
+                self.plate[0].top(), strategy='arc'
+            ),
+            mock.call(
+                self.plate[0].bottom(1), strategy='direct'
+            ),
+            mock.call(
+                self.plate[0].bottom(1), strategy='arc'
+            )
+        ]
+        self.assertEqual(expected, self.p200.move_to.mock_calls)
+
     def test_blow_out_move_to(self):
         x, y, z = (161.0, 116.7, 3.0)
         well = self.plate[0]

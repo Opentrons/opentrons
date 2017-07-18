@@ -427,23 +427,26 @@ class Pipette(Instrument):
         if volume == 0:
             return self
 
-        self.move_to(location, strategy='arc')  # position robot above location
-
         # TODO(ahmed): revisit this
         distance = self._plunge_distance(self.current_volume - volume)
         bottom = self._get_plunger_position('bottom')
         destination = bottom - distance
         speed = self.speeds['dispense'] * rate
 
-        self.motor.speed(speed)
-        self.motor.move(destination)
-        self.current_volume -= volume  # update after actual dispense
+        # set default dispense location to bottom of well
+        if isinstance(location, Placeable):
+            location = location.bottom(min(location.z_size(), 1))
 
         _description = "Dispensing {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
         )  # NOQA
+
+        self.move_to(location, strategy='arc')
+        self.motor.speed(speed)
+        self.motor.move(destination)
         self.robot.add_command(_description)
+        self.current_volume -= volume  # update after actual dispense
         return self
 
     def _position_for_aspirate(self, location=None):
