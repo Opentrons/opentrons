@@ -57,7 +57,7 @@ class Foo(object):
 # Cons: we actually might want to access instances between sessions.
 # In which case they will be garbage collected if they are weak references.
 #
-class Server:
+class Server(object):
     def __init__(self):
         self.objects = { id(self): self }
 
@@ -66,11 +66,11 @@ class Server:
         return Foo(0)
 
 
-    async def dispatch(self, _id, name, args):
-        if not _id in self.objects:
-            raise ValueError('Object with id {0} not found'.format(_id))
+    async def dispatch(self, that, name, args):
+        if not that in self.objects:
+            raise ValueError('Object with id {0} not found'.format(that))
 
-        obj = self.objects[_id]
+        obj = self.objects[that]
         function = getattr(type(obj), name)
 
         if not function:
@@ -86,13 +86,25 @@ class Server:
 
         return res
 
+class ObjectEncoder(json.JSONEncoder):
+    def default(self, o):
+        log.debug('Serializing {0}'.format(o))
+        try:
+            res = o.__dict__
+        except AttributeError:
+            pass
+        else:
+            return res
+
+        return json.JSONEncoder.default(self, o)
+
 # Let's try using one server for all clients for now and see what happens
 # Pros: it can give us an opportunity to display state from multiple clients
 # Cons: multiple clients can dispatch calls, memory leaks, how to invalidate state?
 server = Server()
 
 def serialize(value):
-    res = dir(value).get('__dict__', None) or value
+    res = value.__dict__ if hasattr(value, '__dict__') else value
     return {
         'value': res,
         'type': type(value)
@@ -104,13 +116,21 @@ async def handler(request):
     await ws.prepare(request)
 
     # Our first message is address of Server instance
-    ws.send_str(json.dumps({
-            '$meta': {
-                'that': id(server),
-                'type': CONTROL_MESSAGE
-            }
-        })
-    )
+    try:
+        s = json.dumps({
+                '$meta': {
+                    'that': id(server),
+                    'type': CONTROL_MESSAGE
+                },
+                'payload': {
+                    'value': server,
+                    'type': type(server)
+                }
+            }, cls=ObjectEncoder)
+    except e as Exception:
+        log.error('While handling call: {0}'.format(e))
+    else:
+        ws.send_str(s)
 
     async for msg in ws:
         log.debug('Received: {0}'.format(msg))
@@ -120,30 +140,34 @@ async def handler(request):
 
             # Acknowledge the call
             await ws.send_str(json.dumps({
-                'id': data['id'],
-                'type': CALL_ACK_MESSAGE
+                '$meta': {
+                    'id': data['id'],
+                    'type': CALL_ACK_MESSAGE
+                }
             }))
 
             try:
-                res = await server.dispatch(
-                    _id=data['that'],
-                    name=data['name'],
-                    args=data['args'])
+                _id = data.pop('id')
+                res = await server.dispatch(**data)
 
                 # Send call result
                 await ws.send_str(json.dumps({
-                    'id': data['id'],
-                    'type': CALL_RESULT_MESSAGE,
-                    'status': 'success',
-                    'that': id(res),
+                    '$meta': {
+                        'id': _id,
+                        'type': CALL_RESULT_MESSAGE,
+                        'that': id(res),
+                        'status': 'success',
+                    },
                     'payload': serialize(res)
-                }))
+                }, cls=ObjectEncoder))
             except Exception as e:
                 log.error('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
                 payload = json.dumps({
-                    'id': data['id'],
-                    'type': CALL_RESULT_MESSAGE,
-                    'status': 'error',
+                    '$meta': {
+                        'id': _id,
+                        'type': CALL_RESULT_MESSAGE,
+                        'status': 'error',
+                    },
                     'payload': str(e)
                 })
                 ws.send_str(payload)

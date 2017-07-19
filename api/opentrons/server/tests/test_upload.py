@@ -4,6 +4,9 @@ import os
 
 from opentrons.robot import Robot
 
+# Disable test
+pass
+
 
 class UploadTestCase(unittest.TestCase):
     def setUp(self):

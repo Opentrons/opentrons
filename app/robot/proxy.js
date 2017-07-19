@@ -25,12 +25,13 @@ const ES_BUILTIN_TYPES = ['string', 'number', 'boolean', 'undefined']
 // As there is no way to tell if an object is a proxy need this
 class Remote {}
 
-const BuildProxy = (obj, connection) => {
+// TODO: pass root proxy around
+const BuildProxy = (obj, context) => {
   // if it's a built in, no need to proxy it
-  if (ES_BUILTIN_TYPES.indexOf(typeof obj) > -1) return obj
+  if (ES_BUILTIN_TYPES.indexOf(typeof obj.payload.value) > -1) return obj.payload.value
 
   // if it's an array, build an array of proxies and return
-  if (Array.isArray(obj)) return obj.map(item => BuildProxy(item, connection))
+  if (Array.isArray(obj)) return obj.map(item => BuildProxy(item, context))
 
   return new Proxy(obj, // <- object we are proxying
     {
@@ -40,15 +41,15 @@ const BuildProxy = (obj, connection) => {
       // Trap attempts to access object's properties
       get: (target, name) => {
         // check if object we are proxying has a property
-        const val = target[name]
+        const val = target.payload.value[name]
 
-        // If this property is a proxy itself, return it
+        // If this property is already a proxy itself, return it
         if (val instanceof Remote) return val
 
         if (val) {
           // Fix by disabling no-param-reassign linting check?
-          target[name] = BuildProxy(val, connection)
-          return target[name]
+          target.payload.value[name] = BuildProxy(val, context)
+          return target.payload.value[name]
         }
 
         // Don't try to dispatch symbols since the don't belong to Python
@@ -60,10 +61,10 @@ const BuildProxy = (obj, connection) => {
         }
 
         // name can be Symbol which can't be used in concatenation hence .toString()
-        log.info(`Will dispatch a remote call: ${target}.${name.toString()}`)
+        log.info(`Will dispatch a remote call: ${target.$meta.type}.${name.toString()}`)
 
         // If not, assume it's a function call
-        return ((...args) => callRemoteMethod(connection, target.$meta.that, name, args))
+        return ((...args) => callRemoteMethod(context, target.$meta.that, name, args))
       }
     }
   )
@@ -71,10 +72,16 @@ const BuildProxy = (obj, connection) => {
 
 // Initialize
 const init = (connection, notify) => {
-  const rootObj = {
-    $meta: { that: null, connection, disconnect: () => connection.close() }
+  const context = {
+    connection,
+    pending: {}
   }
-  const proxy = BuildProxy(rootObj, connection)
+
+  const rootObj = {
+    $meta: { that: null },
+    payload: { value: {} },
+    disconnect: () => connection.close(),
+  }
 
   return new Promise((resolve, reject) => {
     setTimeout(
@@ -83,10 +90,10 @@ const init = (connection, notify) => {
 
     connection.addEventListener('message', (event) => {
       const message = JSON.parse(event.data)
-      log.warn(`Received message: ${JSON.stringify(message)}`)
+      log.debug(`Received message: ${JSON.stringify(message)}`)
 
       const $meta = message.$meta
-      const pending = rootObj.$meta.pending
+      const pending = context.pending
       const id = $meta.id
 
       // The response has id but we don't have a call pending
@@ -98,8 +105,11 @@ const init = (connection, notify) => {
       switch ($meta.type) {
         // Init root object with initial state of remote server
         case CONTROL_MESSAGE:
-          rootObj.$meta = message.$meta
-          resolve(proxy)
+          resolve(
+            BuildProxy({
+              ...message,
+              disconnect: () => connection.close()
+            }, context))
           break
         // Pass notifications to notify() handler
         case NOTIFICATION_MESSAGE:
@@ -110,7 +120,7 @@ const init = (connection, notify) => {
           // Clear wait for result timeout
           clearTimeout(pending[id].timer)
           if ($meta.status === 'success') {
-            pending[id].resove(message)
+            pending[id].resove(BuildProxy(message, context))
           } else {
             pending[id].reject(message)
           }
@@ -150,13 +160,12 @@ const connect = (url, notify) => {
   return tryConnect.then(() => init(connection, notify))
 }
 
-const callRemoteMethod = (rootProxy, that, name, args) => {
-  const $meta = rootProxy.$meta
+const callRemoteMethod = (context, that, name, args) => {
   const id = uuidV4()
   let handlers = null
   const promise = new Promise((resolve, reject) => {
     handlers = { resolve, reject }
-    $meta.pending[id] = handlers
+    context.pending[id] = handlers
   })
 
   handlers.timer = setTimeout(
@@ -165,10 +174,10 @@ const callRemoteMethod = (rootProxy, that, name, args) => {
     CALL_ACK_TIMEOUT
   )
 
-  log.info(`Calling ${name}(${args}) from ${$meta.connection}`)
+  log.info(`Calling ${name}(${args}) from ${context.connection}`)
 
   try {
-    $meta.connection.send(JSON.stringify({ id, name, that, args }))
+    context.connection.send(JSON.stringify({ id, name, that, args }))
   } catch (e) {
     handlers.reject(e)
   }
