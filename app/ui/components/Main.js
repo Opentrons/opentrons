@@ -20,7 +20,7 @@ export default class Main extends Component {
       <div className={styles.container}>
         <div className={styles.header}>
           <section className={styles.menu}>
-            <Home {...{ home }} className={styles.home} />
+            <Home {...[home]} className={styles.home} />
             <Brand {...{ version }} className={styles.brand} />
             <div className={styles.connect}>
               <Connect {...{ connections }} />
