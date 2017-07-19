@@ -224,7 +224,8 @@ def run():
             run_time = helpers.timestamp(end_time - start_time)
             result = "Run complete in {}".format(run_time)
             emit_notifications([result], 'success')
-            socketio.emit('event', {'name': 'run-finished'})
+        socketio.emit('event', {'name': 'run-finished'})
+
     threading.Thread(target=_run, args=()).start()
     return flask.jsonify({'status': 'success', 'data': {}})
 
