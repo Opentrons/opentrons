@@ -874,7 +874,7 @@ def start():
     print('Opentrons API server is serving UI from: ' + STATIC_FOLDER)
     socketio.run(
         app,
-        debug=True,
+        debug=False,
         logger=False,
         use_reloader=False,
         log_output=False,

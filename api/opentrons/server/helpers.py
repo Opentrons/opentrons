@@ -31,8 +31,12 @@ def run_protocol(robot, code: str, mode='simulate') -> tuple:
         robot.app_run_mode = True
         exec(code, globals())
         commands = robot._commands
-    except Exception:
-        exception_msg = traceback.format_exc()
+    except Exception as bb:
+        # If exception is not caused by protocol run being cancelled
+        # set exception message to traceback
+        if not (bb.args and
+            bb.args[0] == 'Received a STOP signal and exited from movements'):
+            exception_msg = traceback.format_exc()
     finally:
         robot.app_run_mode = False
     robot.set_connection('live')
