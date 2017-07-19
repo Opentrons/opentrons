@@ -74,7 +74,7 @@ let createWindow = async () => {
   // Avoid window flashing and possibly fix integration tests
   // that are waiting for the window that appears before page is loaded
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#showing-window-gracefully
-  const mainWindow = new BrowserWindow({show: false, width: 1024, height: 768, webPreferences: {
+  const mainWindow = new BrowserWindow({show: false, width: 1024, height: 790, webPreferences: {
     experimentalFeatures: true,
   }})
   mainWindow.once('ready-to-show', () => {
