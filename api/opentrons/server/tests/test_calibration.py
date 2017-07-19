@@ -3,6 +3,8 @@ import os
 import unittest
 from unittest import mock
 
+# Disable test
+pass
 
 class CalibrationTestCase(unittest.TestCase):
     def setUp(self):

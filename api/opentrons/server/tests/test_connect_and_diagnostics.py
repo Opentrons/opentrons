@@ -2,6 +2,8 @@ import unittest
 import json
 import os
 
+# Disable test
+pass
 
 class ConnectDiagnosticsTestCase(unittest.TestCase):
     def setUp(self):
