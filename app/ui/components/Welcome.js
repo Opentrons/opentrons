@@ -1,12 +1,16 @@
 import React, { Component } from 'react'
-import Jog from './Jog'
+import JogPipette from './JogPipette'
+import JogPlunger from './JogPlunger'
 import styles from './Welcome.css'
 
 class Welcome extends Component {
   render() {
     return (
       <div className={styles.welcome}>
-        <Jog className={styles.jog} />
+        <div className={styles.jog}>
+          <JogPipette />
+          <JogPlunger />
+        </div>
       </div>
     )
   }
