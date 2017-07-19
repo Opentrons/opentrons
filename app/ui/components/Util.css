@@ -1,6 +1,7 @@
 @value blue: #006FFF;
 @value teal: #05C1B3;
 @value mustard: #FFD252;
+@value green: #7ed321;
 
 @value small: (max-width: 599px);
 @value medium: (min-width: 600px) and (max-width: 959px);

@@ -2,7 +2,7 @@
     display: grid;
     width: 1024px;
     height:  768px;
-    grid-template-rows:[row]152px [row]460px [row]154px;
+    grid-template-rows:[row]152px [row]460px [row]150px;
     grid-row-gap: 1px;
     background-color: white;
   }
@@ -14,9 +14,13 @@
   font-weight: 300;
 }
 
-.header, .task, .footer{
+.header, .footer{
   composes: well from './Util.css';
-} 
+}
+
+.task{
+  display: grid;
+}
 
 .menu{
   display: grid;
@@ -59,4 +63,5 @@
 
 .run{
   grid-area: run;
+  overflow: scroll;
 }
