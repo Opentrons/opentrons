@@ -715,7 +715,7 @@ class Pipette(Instrument):
         ..
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a',
-        ...     tip_racks=[tiprack], max_volume=200)
+        ...     tip_racks=[tiprack], max_volume=200, name='p200')
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
