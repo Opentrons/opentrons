@@ -45,6 +45,13 @@
   background-color: #898989;
 }
 
+.btn:active {
+  outline: none;
+  border: none;
+}
+
+button:focus {outline:0;}
+
 .title{
   font-family: 'sans';
   text-transform: uppercase;
