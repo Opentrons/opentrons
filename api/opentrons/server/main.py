@@ -207,18 +207,19 @@ def run():
             'command_description': 'Protocol run initiated. Simulating...'
         })
         commands, error_msg = helpers.run_protocol(
-            app.robot, app.code, mode='simulate')
-        time.sleep(2)
+            app.robot, app.code, mode='null')
         app.robot.cmds_total = len(commands) + 1  # acct for simulation event
         app.robot._commands = []
         app.robot.resume()
 
         start_time = time.time()
-        # TODO: bubble up exception from live protocol run
         cmds, error = helpers.run_protocol(app.robot, app.code, mode='live')
         end_time = time.time()
 
         if error:
+            # run protocol to list of interacted placeables
+            helpers.run_protocol(
+                app.robot, app.code, mode='null')
             emit_notifications([error], 'danger')
         else:
             run_time = helpers.timestamp(end_time - start_time)

@@ -34,8 +34,8 @@ def run_protocol(robot, code: str, mode='simulate') -> tuple:
     except Exception as bb:
         # If exception is not caused by protocol run being cancelled
         # set exception message to traceback
-        if not (bb.args and
-            bb.args[0] == 'Received a STOP signal and exited from movements'):
+        stop_exc_msg = 'Received a STOP signal and exited from movements'
+        if not (bb.args and bb.args[0] == stop_exc_msg):
             exception_msg = traceback.format_exc()
     finally:
         robot.app_run_mode = False
