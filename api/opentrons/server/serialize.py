@@ -1,44 +1,42 @@
-def _get_object_tree(obj, path):
+import functools
+import types
+
+def _get_object_tree(shallow, path, refs, depth, obj):
+    # If shallow serialization, go only one level deep
+    if depth > 0 and shallow: return None
+
     is_class_type = hasattr(obj, '__dict__')
 
     # If we have ourself in path, it's a circular reference
     # we are terminating it with Nothing
-    if is_class_type and obj in path: return None
+    if is_class_type and id(obj) in path: return None
     
-    path += [obj]
+    path += [id(obj)]
 
     payload = None
+    meta = {}
+    object_tree = functools.partial(_get_object_tree, shallow, path, refs, depth+1)
 
     if isinstance(obj, (list, tuple)):
-        payload = [_get_object_tree(o, path) for o in obj]
+        payload = [object_tree(o) for o in obj]
     elif isinstance(obj, dict):
-        payload = { k: _get_object_tree(v, path) for k, v in obj.items() }
-    elif not is_class_type:
+        payload = { str(k): object_tree(v) for k, v in obj.items() }
+    elif isinstance(obj, (str, int, bool, float, complex)) or obj is None:
         payload = obj
+    elif hasattr(obj, '__dict__'):
+        payload = { k: object_tree(v) for k, v in obj.__dict__.items() }
+        refs[id(obj)] = obj
+        meta = { '$meta': { 'that': id(obj) } }
     else:
-        payload = { k: _get_object_tree(v, path) for k, v in obj.__dict__.items()  }
+        return None
     
-    meta = { '$meta': { 'that': (id(obj), obj) } } if is_class_type else {}
+    # If shallow, don't output the attributes of the object
+    if depth == 0 and shallow: payload = {}
 
-    return { **meta, obj.__class__.__name__ : payload }
-
-
-def extract_references(tree):
-    results = []
-    if isinstance(tree, dict):
-        results = sum([extract_references(v) for v in tree.values()], [])
-
-    if isinstance(tree, (list, tuple)):
-        results = sum([extract_references(i) for i in tree], [])
-
-    if isinstance(tree, dict) and '$meta' in tree:
-        _id, obj = tree['$meta']['that']
-        tree['$meta']['that'] = _id
-        results += [(_id, obj)]
-
-    return results
+    return { **meta, obj.__class__.__name__: payload }
 
 
-def get_object_tree(obj):
-    tree = _get_object_tree(obj, [])
-    return (tree, dict(extract_references(tree)))
+def get_object_tree(obj, shallow=False):
+    refs = {}
+    tree = _get_object_tree(shallow, [], refs, 0, obj)
+    return (tree, refs)

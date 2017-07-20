@@ -1,22 +1,19 @@
 import json
+import pytest
 
 from opentrons.server import serialize
 from opentrons import robot, instruments, containers
 
-class A:
-    def __init__(self, args):
-        self.update(args)
+@pytest.fixture
+def instance():
+    class A:
+        def __init__(self, args):
+            self.update(args)
 
-    def update(self, args):
-        for k, v in args.items():
-            setattr(self, k, v)
+        def update(self, args):
+            for k, v in args.items():
+                setattr(self, k, v)
 
-
-def test_robot():
-    pass
-
-
-def test_extract_references():
     a1 = A(
                 {
                     'b': 1,
@@ -35,6 +32,33 @@ def test_extract_references():
         }
     )
     root.update({'circular': root})
+
+    return (root, a1, a2, a3)
+
+def test_robot():
+    trough = containers.load('trough-12row', 'C1', 'trough')
+    plate = containers.load('96-PCR-flat', 'D1', 'plate')
+
+    # a tip rack for our pipette
+    p200rack = containers.load('tiprack-200ul', 'B1', 'tiprack')
+
+    # create a p200 pipette on robot axis B
+    p200 = instruments.Pipette(
+        name="p200",
+        axis="b",
+        min_volume=20,
+        max_volume=200,
+        tip_racks=[p200rack]
+    )
+
+    # Robot tree is pretty big and hard to verify
+    # Making sure we can serialize it into json
+    tree, refs = serialize.get_object_tree(robot)
+    json.dumps(tree)    
+
+
+def test_get_object_tree(instance):
+    root, a1, a2, a3 = instance
 
     tree, refs = serialize.get_object_tree(root)
 
@@ -70,4 +94,13 @@ def test_extract_references():
                             {'$meta': {'that': id(a3)},
                             'A': {}}]}}},
             'circular': None}}
+
     assert json.dumps(tree)
+
+
+def test_get_object_tree_shallow(instance):
+    root, *_ = instance
+    tree, refs = serialize.get_object_tree(root, shallow=True)
+
+    assert tree == {'$meta': {'that': id(root)}, 'A': {}}
+    assert refs == {id(root): root}

@@ -3,10 +3,12 @@
 import aiohttp
 import json
 import logging
+import sys
 import traceback
 
-from logging.config import dictConfig
 from aiohttp import web
+from logging.config import dictConfig
+from opentrons.server import serialize
 
 
 # TODO(artyom): might as well use this: https://pypi.python.org/pypi/logging-color-formatter
@@ -41,17 +43,6 @@ NOTIFICATION_MESSAGE = 2
 CONTROL_MESSAGE = 3
 
 
-class Foo(object):
-    def __init__(self, value):
-        self.value = value
-
-    def get_next(self):
-        return Foo(self.value + 1)
-
-    def get_value(self):
-        return self.value
-
-
 # TODO(artyom): consider using weak references to avoid memory leaks
 # Pros: no memory leaks
 # Cons: we actually might want to access instances between sessions.
@@ -64,6 +55,17 @@ class Server(object):
 
     def get_foo(self):
         return Foo(0)
+
+    def update_refs(self, refs):
+        self.objects.update(refs)
+
+    def resolve_args(self, args):
+        def resove(a):
+            if a['$meta'] and a['$meta']['that']:
+                return self.objects[a['$meta']['that']]
+            return a
+
+        return [resolve(a) for a in args]
 
 
     async def dispatch(self, that, name, args):
@@ -81,56 +83,35 @@ class Server(object):
             raise ValueError(
                 'Property {0} of {1} is not a function'.format(name, type(obj)))
 
-        res = function(obj, *args)
+        res = function(obj, *resolve_args(args))
         self.objects[id(res)] = res
 
         return res
 
-class ObjectEncoder(json.JSONEncoder):
-    def default(self, o):
-        log.debug('Serializing {0}'.format(o))
-        try:
-            res = o.__dict__
-        except AttributeError:
-            pass
-        else:
-            return res
 
-        return json.JSONEncoder.default(self, o)
+def update_meta(obj, meta):
+    if '$meta' not in obj:
+        obj['$meta'] = {}
 
-# Let's try using one server for all clients for now and see what happens
+    return obj['$meta'].update(meta)
+
+# We are using one Server instance for all clients for now and see what happens
 # Pros: it can give us an opportunity to display state from multiple clients
 # Cons: multiple clients can dispatch calls, memory leaks, how to invalidate state?
 server = Server()
 
-def serialize(value):
-    res = value.__dict__ if hasattr(value, '__dict__') else value
-    return {
-        'value': res,
-        'type': type(value)
-    }
 
+# TODO: it looks like the exceptions being thrown in this method
+# are not escalated / reported
 async def handler(request):
     ws = web.WebSocketResponse()
 
     await ws.prepare(request)
 
     # Our first message is address of Server instance
-    try:
-        s = json.dumps({
-                '$meta': {
-                    'that': id(server),
-                    'type': CONTROL_MESSAGE
-                },
-                'payload': {
-                    'value': server,
-                    'type': type(server)
-                }
-            }, cls=ObjectEncoder)
-    except e as Exception:
-        log.error('While handling call: {0}'.format(e))
-    else:
-        ws.send_str(s)
+    root, _ = serialize.get_object_tree(server, shallow=True)
+    root = update_meta(root, {'type': CONTROL_MESSAGE})
+    await ws.send_str(json.dumps(root))
 
     async for msg in ws:
         log.debug('Received: {0}'.format(msg))
@@ -139,38 +120,26 @@ async def handler(request):
             data = json.loads(msg.data)
 
             # Acknowledge the call
-            await ws.send_str(json.dumps({
-                '$meta': {
+            await ws.send_str(
+                json.dumps(update_meta({}, {
                     'id': data['id'],
-                    'type': CALL_ACK_MESSAGE
-                }
-            }))
+                    'type': CALL_ACK_MESSAGE 
+                    })))
 
             try:
-                _id = data.pop('id')
+                meta = { 'id': data.pop('id'), 'type': CALL_RESULT_MESSAGE }
                 res = await server.dispatch(**data)
-
+                meta.update({'status': 'success'})
+                root, refs = serialize.get_object_tree(res)
+                server.update_refs(refs)
                 # Send call result
-                await ws.send_str(json.dumps({
-                    '$meta': {
-                        'id': _id,
-                        'type': CALL_RESULT_MESSAGE,
-                        'that': id(res),
-                        'status': 'success',
-                    },
-                    'payload': serialize(res)
-                }, cls=ObjectEncoder))
+                await ws.send_str(json.dumps(update_meta(root, meta)))
             except Exception as e:
                 log.error('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
-                payload = json.dumps({
-                    '$meta': {
-                        'id': _id,
-                        'type': CALL_RESULT_MESSAGE,
-                        'status': 'error',
-                    },
-                    'payload': str(e)
-                })
-                ws.send_str(payload)
+                root, refs = serialize.get_object_tree(e)
+                server.update_refs(refs)
+                meta.update({ 'type': CALL_RESULT_MESSAGE, 'status': 'error' })
+                await ws.send_str(update_meta(root, meta))
 
         elif msg.type == aiohttp.WSMsgType.ERROR:
             log.error(
@@ -179,11 +148,25 @@ async def handler(request):
     return ws
 
 
-def start():
+def start(host='127.0.0.1', port=31950):
     app = web.Application()
     app.router.add_get('/', handler)
-    web.run_app(app, host='127.0.0.1', port=31950)
+    web.run_app(app, host, port)
 
 
 if __name__ == "__main__":
-    start()
+    kwargs = {}
+    if (len(sys.args) == 2):
+        try:
+            address = sys.args[1].split(':')
+            host, port, *_ = tuple(address + [])
+            # Check that our IP address is 4 octets in 0..255 range each
+            octets = filter([int(octet) for octet in host.split('.')], lambda v: 0 <= v <= 255)
+            if len(octets) != 4:
+                raise ValueError('Invalid address: {0}'.format())
+            kwargs = {'host': host, 'port': int(port)}
+        except e as Exception:
+            log.debug('While parsing IP address: {0}'.format(e))
+            print('Invalid address {0}. Correct format is IP:PORT'.format(address))
+
+    start(**kwargs)
