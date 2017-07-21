@@ -39,7 +39,7 @@
     "files": [
       "!**/*",
       "node_modules/**",
-      "bin/opentrons-api-server",
+      "bin/opentrons-api-server*",
       "ui/dist",
       "ui/index.html",
       "shell/dist",
