@@ -1,36 +1,10 @@
-#!/usr/bin/env python
-
 import aiohttp
-import functools
 import json
 import logging
-import sys
 import traceback
 
 from aiohttp import web
 from opentrons.server import serialize
-
-# TODO(artyom): might as well use this: https://pypi.python.org/pypi/logging-color-formatter
-from logging.config import dictConfig
-logging_config = dict(
-    version=1,
-    formatters={
-        'basic': {
-            'format': '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s]     %(message)s'  #NOQA
-        }
-    },
-    handlers={
-        'debug': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
-        }
-    },
-    root={
-        'handlers': ['debug'],
-        'level': logging.DEBUG,
-    }
-)
-dictConfig(logging_config)
 
 log = logging.getLogger(__name__)
 
@@ -41,9 +15,16 @@ NOTIFICATION_MESSAGE = 2
 CONTROL_MESSAGE = 3
 
 class Server(object):
-    def __init__(self, root=None):
+    def __init__(self, root=None, host='127.0.0.1', port=31950):
         self.objects = { id(self): self }
         self.root = root
+        self.host = host
+        self.port = port
+
+    def start(self):
+        app = web.Application()
+        app.router.add_get('/', self.handler)
+        web.run_app(app, host=self.host, port=self.port)
 
     def update_refs(self, refs):
         self.objects.update(refs)
@@ -88,6 +69,7 @@ class Server(object):
     # TODO: it looks like the exceptions being thrown in this method
     # are not escalated / reported
     async def handler(self, request):
+        log.debug('Starting handler for request: {0}'.format(request))
         ws = web.WebSocketResponse()
 
         await ws.prepare(request)
@@ -116,7 +98,7 @@ class Server(object):
                     meta.update({'status': 'success'})
                     root, refs = serialize.get_object_tree(res)
                 except Exception as e:
-                    log.error('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
+                    log.warning('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
                     res = str(e)
                     meta.update({ 'status': 'error' })
                 finally:
@@ -129,31 +111,3 @@ class Server(object):
                     'WebSocket connection closed with exception %s' % ws.exception())
 
         return ws
-
-
-    def start(self, host='127.0.0.1', port=31950):
-        app = web.Application()
-        app.router.add_get('/', self.handler)
-        web.run_app(app, host, port)
-
-
-if __name__ == "__main__":
-    kwargs = {}
-    if (len(sys.args) == 2):
-        try:
-            address = sys.args[1].split(':')
-            host, port, *_ = tuple(address + [])
-            # Check that our IP address is 4 octets in 0..255 range each
-            octets = filter([int(octet) for octet in host.split('.')], lambda v: 0 <= v <= 255)
-            if len(octets) != 4:
-                raise ValueError('Invalid address: {0}'.format())
-            kwargs = {'host': host, 'port': int(port)}
-        except e as Exception:
-            log.debug('While parsing IP address: {0}'.format(e))
-            print('Invalid address {0}. Correct format is IP:PORT'.format(address))
-            exit(1)
-    elif (len(sys.args) > 2):
-        print('Too many arguments. Valid argument is IP:PORT')
-        exit(1)
-
-    start(**kwargs)

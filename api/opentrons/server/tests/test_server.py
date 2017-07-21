@@ -8,7 +8,7 @@ from asyncio import Queue
 from aiohttp import web
 from uuid import uuid4 as uuid
 
-from opentrons.server import server
+from opentrons.server import rpc
 
 class WebSocket(object):
     def __init__(self):
@@ -90,11 +90,11 @@ class ServerWrapper(object):
 @pytest.fixture
 def session(monkeypatch, request, event_loop):
     socket = WebSocket()
-    s = server.Server(Foo(0))
+    server = rpc.Server(Foo(0))
     monkeypatch.setattr(web, 'WebSocketResponse', lambda: socket)
 
-    future = asyncio.ensure_future(s.handler(None))
-    wrapper = ServerWrapper(socket, s)
+    future = asyncio.ensure_future(server.handler(None))
+    wrapper = ServerWrapper(socket, server)
 
     async def finalize():
         await wrapper.close()
@@ -110,7 +110,7 @@ def session(monkeypatch, request, event_loop):
 async def test_init(session):
     expected = {
         "$meta": 
-            {"type": server.CONTROL_MESSAGE, "that": id(session.server)}, 
+            {"type": rpc.CONTROL_MESSAGE, "that": id(session.server)}, 
             "Server": {}}
 
     init = json.loads(await session.read())
@@ -122,14 +122,14 @@ async def test_invalid_call(session):
     init = json.loads(await session.read()) # Skip init
     await session.put({})
     ack = json.loads(await session.read())  # Receive ACK
-    expected = {"$meta": {"type": server.CALL_ACK_MESSAGE, "id": session.id}}
+    expected = {"$meta": {"type": rpc.CALL_ACK_MESSAGE, "id": session.id}}
     assert ack == expected
 
     res = json.loads(await session.read())  # Receive call result
     expected = {'$meta': {
                     'id': session.id,
                     'status': 'error',
-                    'type': server.CALL_RESULT_MESSAGE},
+                    'type': rpc.CALL_RESULT_MESSAGE},
                     'str': "dispatch() missing 3 required positional arguments: 'that', 'name', "
                     "and 'args'"}
 
@@ -148,7 +148,7 @@ async def test_get_root(session):
                     'id': session.id,
                     'status': 'success',
                     'that': id(session.server.root),
-                    'type': server.CALL_RESULT_MESSAGE},
+                    'type': rpc.CALL_RESULT_MESSAGE},
           'Foo': {'value': {'int': 0}}}
     assert res == expected
 
@@ -168,7 +168,7 @@ async def test_call_on_result(session):
     expected = {'$meta': {
                     'id': session.id,
                     'status': 'success',
-                    'type': server.CALL_RESULT_MESSAGE},
+                    'type': rpc.CALL_RESULT_MESSAGE},
                 'int': 0}
 
     assert res == expected
@@ -179,7 +179,7 @@ async def test_call_on_result(session):
     expected = {'$meta': {
                     'id': session.id,
                     'status': 'success',
-                    'type': server.CALL_RESULT_MESSAGE},
+                    'type': rpc.CALL_RESULT_MESSAGE},
                 'int': 1}
 
     assert res == expected
@@ -199,7 +199,7 @@ async def test_exception_on_call(session):
     expected = {'$meta': {
                     'id': session.id,
                     'status': 'error',
-                    'type': server.CALL_RESULT_MESSAGE},
+                    'type': rpc.CALL_RESULT_MESSAGE},
                 'str': 'Kaboom!'}
 
     assert res == expected
@@ -230,7 +230,7 @@ async def test_call_on_reference(session):
     expected = {'$meta': {
                     'id': session.id,
                     'status': 'success',
-                    'type': server.CALL_RESULT_MESSAGE},
+                    'type': rpc.CALL_RESULT_MESSAGE},
                 'Foo': {'value': {'int': 1}}}
 
     assert res == expected

@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import sys
+import logging
+from opentrons.server.rpc import Server
+from opentrons.robot import Robot
+from logging.config import dictConfig
+
+# TODO(artyom): might as well use this: https://pypi.python.org/pypi/logging-color-formatter
+logging_config = dict(
+    version=1,
+    formatters={
+        'basic': {
+            'format': '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  #NOQA
+        }
+    },
+    handlers={
+        'debug': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'basic',
+        }
+    },
+    loggers={
+        '__main__': {
+            'handlers': ['debug'],
+        },
+        'opentrons.server': {
+            'handlers': ['debug'],
+        },
+    }
+)
+dictConfig(logging_config)
+
+log = logging.getLogger(__name__)
+
+class RobotManager(object):
+    def get_new(self):
+        return Robot()
+
+    def say_hi(self):
+        return "hi!"
+
+def main():
+    kwargs = {}
+    if (len(sys.argv) == 2):
+        try:
+            address = sys.argv[1].split(':')
+            host, port, *_ = tuple(address + [])
+            # Check that our IP address is 4 octets in 0..255 range each
+            octets = list(filter(
+                lambda v: 0 <= v <= 255,
+                [int(octet) for octet in host.split('.')]))
+            if len(octets) != 4:
+                raise ValueError('Invalid octets: {0}'.format(octets))
+            kwargs = {'host': host, 'port': int(port)}
+        except Exception as e:
+            log.debug('While parsing IP address: {0}'.format(e))
+            print('Invalid address {0}.'.format(sys.argv[1]))
+            exit(1)
+    elif (len(sys.argv) > 2):
+        print('Too many arguments. Valid argument is IP:PORT')
+        exit(1)
+
+    server = Server(RobotManager(), **kwargs)
+    print(
+        'Started Opentrons API RPC Server listening at ws://{0}:{1}/'.format(server.host, server.port))
+    server.start()
+
+
+if __name__ == "__main__":
+    main()
