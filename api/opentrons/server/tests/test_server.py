@@ -4,10 +4,10 @@ import logging
 import pytest
 
 from aiohttp import WSMsgType
-from asyncio import Queue
 from aiohttp import web
-from uuid import uuid4 as uuid
+from asyncio import Queue
 
+from uuid import uuid4 as uuid
 from opentrons.server import rpc
 
 class WebSocket(object):
@@ -46,7 +46,6 @@ class Message(object):
     def __init__(self, **kwargs):
         [setattr(self, k, v) for k, v in kwargs.items()]
 
-
 class Foo(object):
     def __init__(self, value):
         self.value = value
@@ -71,7 +70,6 @@ class ServerWrapper(object):
         self.socket = socket
         self.server = server
         self.id = str(uuid())
-
 
     async def put(self, value):
         value['id'] = self.id
@@ -232,6 +230,5 @@ async def test_call_on_reference(session):
                     'status': 'success',
                     'type': rpc.CALL_RESULT_MESSAGE},
                 'Foo': {'value': {'int': 1}}}
-
     assert res == expected
 

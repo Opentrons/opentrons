@@ -42,10 +42,13 @@ class Server(object):
 
     async def dispatch(self, that, name, args):
         if not that in self.objects:
-            raise ValueError('Object with id {0} not found'.format(that))
+            raise ValueError('dispatch: object with id {0} not found'.format(that))
 
         obj = self.objects[that]
         function = getattr(type(obj), name)
+
+        log.debug('dispatch: will call {0}.{1}({2})'
+            .format(obj, name, ', '.join([str(a) for a in args])))
 
         if not function:
             raise ValueError(
@@ -53,7 +56,7 @@ class Server(object):
 
         if not callable(function):
             raise ValueError(
-                'Property {0} of {1} is not a function'.format(name, type(obj)))
+                'Attribute {0} of {1} is not a function'.format(name, type(obj)))
 
         res = function(obj, *self.resolve_args(args))
         self.objects[id(res)] = res
@@ -63,51 +66,57 @@ class Server(object):
     def update_meta(self, obj, meta):
         if '$meta' not in obj:
             obj['$meta'] = {}
-        obj['$meta'].update(meta)
+        obj.update(meta)
         return obj
 
-    # TODO: it looks like the exceptions being thrown in this method
-    # are not escalated / reported
+    async def process(self, message, send):
+        if message.type == aiohttp.WSMsgType.TEXT:
+            data = json.loads(message.data)
+
+            # Acknowledge the call
+            await send(self.update_meta({}, {
+                    'id': data['id'],
+                    'type': CALL_ACK_MESSAGE 
+                }))
+
+            meta = { 'id': data.pop('id'), 'type': CALL_RESULT_MESSAGE }
+            try:
+                res = await self.dispatch(**data)
+                meta.update({'status': 'success'})
+            except Exception as e:
+                log.warning('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
+                res = str(e)
+                meta.update({'status': 'error'})
+            finally:
+                root, refs = serialize.get_object_tree(res)
+                self.update_refs(refs)
+                await send(self.update_meta(root, meta))
+
+        elif message.type == aiohttp.WSMsgType.ERROR:
+            log.error(
+                'WebSocket connection closed with exception %s' % ws.exception())
+
     async def handler(self, request):
         log.debug('Starting handler for request: {0}'.format(request))
         ws = web.WebSocketResponse()
 
         await ws.prepare(request)
 
+        def send(payload):
+            log.debug('Sending {0} to {1}: '.format(payload, ws))
+            return ws.send_str(json.dumps(payload))
+
         # Our first message is address of Server instance
         root, _ = serialize.get_object_tree(self, shallow=True)
         root = self.update_meta(root, {'type': CONTROL_MESSAGE})
-        await ws.send_str(json.dumps(root))
+        await send(root)
 
         async for msg in ws:
             log.debug('Received: {0}'.format(msg))
-
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                data = json.loads(msg.data)
-
-                # Acknowledge the call
-                await ws.send_str(
-                    json.dumps(self.update_meta({}, {
-                        'id': data['id'],
-                        'type': CALL_ACK_MESSAGE 
-                    })))
-
-                meta = { 'id': data.pop('id'), 'type': CALL_RESULT_MESSAGE }
-                try:
-                    res = await self.dispatch(**data)
-                    meta.update({'status': 'success'})
-                    root, refs = serialize.get_object_tree(res)
-                except Exception as e:
-                    log.warning('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
-                    res = str(e)
-                    meta.update({ 'status': 'error' })
-                finally:
-                    root, refs = serialize.get_object_tree(res)
-                    self.update_refs(refs)
-                    await ws.send_str(json.dumps(self.update_meta(root, meta)))
-
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                log.error(
-                    'WebSocket connection closed with exception %s' % ws.exception())
+            try:
+                await self.process(msg, send)
+            except Exception as e:
+                ws.close()
+                log.error('Exception while processing message: {0}'.format(traceback.format_exc()))
 
         return ws

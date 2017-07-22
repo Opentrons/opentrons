@@ -1,15 +1,12 @@
 import functools
-import types
 
 def _get_object_tree(shallow, path, refs, depth, obj):
     # If shallow serialization, go only one level deep
     if depth > 0 and shallow: return None
 
-    is_class_type = hasattr(obj, '__dict__')
-
     # If we have ourself in path, it's a circular reference
     # we are terminating it with Nothing
-    if is_class_type and id(obj) in path: return None
+    if  hasattr(obj, '__dict__') and id(obj) in path: return None
     
     path += [id(obj)]
 
