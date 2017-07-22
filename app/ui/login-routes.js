@@ -33,7 +33,7 @@ function getLock () {
         loginAfterSignUp: true,
         auth: { redirect: false, sso: false },
         theme: {
-          logo: '/auth0_opentrons_logo_drop_small.png',
+          logo: 'assets/img/auth0_opentrons_logo_drop_small.png',
           primaryColor: '#006FFF'
         }
       }
