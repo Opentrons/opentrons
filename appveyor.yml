@@ -21,8 +21,8 @@ init:
 # Keep RDP server to see at what happened if the build got stuck
 # Uncomment this to debug a stuck build through RDP:
 # https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   - ps: Install-Product node 6.11.0 x64
@@ -35,6 +35,7 @@ build_script:
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test exe"'
   # Note: we are not running test-e2e on Windows due to problems with ChromeDriver
   - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && cd app && make -j 2 build test package"'
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && scripts/prep-build-artifacts-appveyor app/dist/win"'
   - >
     %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist/win && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
 
