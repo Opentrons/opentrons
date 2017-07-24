@@ -26,7 +26,9 @@
       "targets": { "node": 6 },
       "useBuiltIns": true
     }],
-    "stage-0",
-    "react"
+    "stage-2",
+    "react",
+    "es2015",
+    "es2017"
   ]
 }

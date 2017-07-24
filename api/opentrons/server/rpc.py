@@ -66,7 +66,7 @@ class Server(object):
     def update_meta(self, obj, meta):
         if '$meta' not in obj:
             obj['$meta'] = {}
-        obj.update(meta)
+        obj['$meta'].update(meta)
         return obj
 
     async def process(self, message, send):
