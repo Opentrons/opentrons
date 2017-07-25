@@ -7,7 +7,7 @@ install:
 
 test:
 	export APP_DATA_DIR="${TMPDIR:=${TMP:-$(CDPATH=/var:/; cd -P tmp)}}" &&\
-		pylama opentrons tests && py.test --cov
+		tests/gcode/gcode.test.sh
 
 docs:
 	cd docs && make html && make doctest
