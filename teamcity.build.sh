@@ -1,6 +1,8 @@
 # TeamCity Build Script
 # source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
 # pip install pyyaml coveralls
+
+eval "$(pyenv init -)"
 cd api && make install && cd ..
 cd app && make install && cd ..
 
