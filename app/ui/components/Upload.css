@@ -8,9 +8,8 @@
   composes: btn from './Util.css';
   background-color: #d8d8d8;
   border: solid 1px rgba(151, 151, 151, 0.1);
-  height: 45px;
-  width: 45px;
-  padding:5px;
+  height: 34px;
+  width: 34px;
   transition: all 100 linear;
 }
 
