@@ -32,4 +32,4 @@ clean:
 		dist \
 		calibrations \
 		.coverage
-	find . -name __pycache__ -type d -print | xargs rm -rf
+	find . -name "*.pyc" -delete && find . -type d -name __pycache__ -delete
