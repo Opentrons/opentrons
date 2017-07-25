@@ -6,8 +6,8 @@ eval "$(pyenv init -)"
 mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh
 nvm install --lts && nvm use --lts
 
-cd api && make install && cd ..
-cd app && make install && cd ..
+cd api && make clean install && cd ..
+cd app && make clean install && cd ..
 
 export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')
 export OT_BRANCH_SUFFIX=-$(git branch | grep \* | cut -d ' ' -f2)
