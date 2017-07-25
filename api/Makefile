@@ -31,5 +31,6 @@ clean:
 		build \
 		dist \
 		calibrations \
-		.coverage
+		.coverage \
+		tests/gcode/results
 	find . -name "*.pyc" -delete && find . -type d -name __pycache__ -delete
