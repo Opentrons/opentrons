@@ -3,6 +3,9 @@
 # pip install pyyaml coveralls
 
 eval "$(pyenv init -)"
+mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh
+nvm install --lts && nvm use --lts
+
 cd api && make install && cd ..
 cd app && make install && cd ..
 
