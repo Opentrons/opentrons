@@ -5,6 +5,7 @@ import Home from './Home'
 import Brand from './Brand'
 import Connect from './Connect'
 import Connection from './Connection'
+import Upload from './Upload'
 import Calibrate from './Calibrate'
 import Run from './Run'
 import Load from './Load'
@@ -27,7 +28,9 @@ export default class Main extends Component {
               <Connection {...{ connectionStatus }} />
             </div>
           </section>
-          <section className={styles.protocol} />
+          <section className={styles.protocol} >
+            <Upload />
+          </section>
         </div>
         <div className={styles.task}>
           <Switch>
