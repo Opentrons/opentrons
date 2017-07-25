@@ -3,7 +3,7 @@
 set -eu
 
 SOURCE="${BASH_SOURCE[0]}"
-TEST_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"  # "$(pwd)"
+TEST_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd $TEST_DIR
 echo "Current test dir $(pwd)"
 
