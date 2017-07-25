@@ -2,7 +2,8 @@
 
 set -eu
 
-TEST_DIR="tests/gcode"
+SOURCE="${BASH_SOURCE[0]}"
+TEST_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"  # "$(pwd)"
 cd $TEST_DIR
 echo "Current test dir $(pwd)"
 
@@ -12,11 +13,12 @@ rm -rf $TEST_DIR/results/*
 echo "Cloning current protocols"
 # rm -rf Protocols && git clone https://github.com/OpenTrons/Protocols.git
 
-for protocol in Protocols/**/*.py; do
+for protocol in $TEST_DIR/Protocols/**/*.py; do
     echo 'Testing: ' $protocol
     GCODE_RES_FILE_NAME=$(echo $protocol | sed 's/\.py$/.gcode/')
-    GCODE_RES_FILE_PATH=results/$GCODE_RES_FILE_NAME
-    GCODE_EXPECTED_FILE_PATH=expected/$GCODE_RES_FILE_NAME
+    GCODE_RES_FILE_NAME=${GCODE_RES_FILE_NAME#$TEST_DIR}
+    GCODE_RES_FILE_PATH=$TEST_DIR/results/$GCODE_RES_FILE_NAME
+    GCODE_EXPECTED_FILE_PATH=$TEST_DIR/expected/$GCODE_RES_FILE_NAME
 
     mkdir -p $(dirname $GCODE_RES_FILE_PATH)
 
