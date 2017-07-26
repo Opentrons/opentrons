@@ -1,4 +1,4 @@
 [submodule "api/tests/gcode/Protocols"]
 	path = api/tests/gcode/Protocols
-	url = git@github.com:OpenTrons/Protocols.git
+	url = git://github.com/OpenTrons/Protocols.git
 	branch = 20170725-144000-add-imports-plate-image-protocol
