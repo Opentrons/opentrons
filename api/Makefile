@@ -30,3 +30,4 @@ clean:
 		dist \
 		calibrations \
 		.coverage
+	find . -name "*.pyc" -delete && find . -type d -name __pycache__ -delete

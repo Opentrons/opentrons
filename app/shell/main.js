@@ -45,7 +45,7 @@ process.env.APP_DATA_DIR = (() => {
   return dir
 })()
 
-const log = getLogger('electron-main')
+let log = null
 
 let loadUI = windowUrl => {
   const version = app.getVersion()
@@ -108,6 +108,7 @@ let createWindow = async () => {
 }
 
 let startUp = async () => {
+  log = getLogger('electron-main')
   log.info('Starting App')
 
   // NOTE: vue-devtools can only be installed after app the 'ready' event

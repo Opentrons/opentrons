@@ -197,21 +197,36 @@ def emit_notifications(notifications, _type):
 @app.route("/run", methods=["GET"])
 def run():
     def _run():
+        # Generate a run log message for app simulation, this will interfere
+        # with app progress since it relies on number of 'command-run' events
+        # to determine progress
+        socketio.emit('event', {
+            'caller': 'ui',
+            'mode': 'live',
+            'name': 'command-run',
+            'command_description': 'Protocol run initiated. Simulating...'
+        })
         commands, error_msg = helpers.run_protocol(
             app.robot, app.code, mode='null')
-        app.robot.mode = 'live'
-        app.robot.cmds_total = len(commands)
+        app.robot.cmds_total = len(commands) + 1  # acct for simulation event
         app.robot._commands = []
         app.robot.resume()
 
         start_time = time.time()
-        helpers.run_protocol(app.robot, app.code, mode='live')
+        cmds, error = helpers.run_protocol(app.robot, app.code, mode='live')
         end_time = time.time()
 
-        run_time = helpers.timestamp(end_time - start_time)
-        result = "Run complete in {}".format(run_time)
-        emit_notifications([result], 'success')
+        if error:
+            # run protocol to list of interacted placeables
+            helpers.run_protocol(
+                app.robot, app.code, mode='null')
+            emit_notifications([error], 'danger')
+        else:
+            run_time = helpers.timestamp(end_time - start_time)
+            result = "Run complete in {}".format(run_time)
+            emit_notifications([result], 'success')
         socketio.emit('event', {'name': 'run-finished'})
+
     threading.Thread(target=_run, args=()).start()
     return flask.jsonify({'status': 'success', 'data': {}})
 
@@ -505,9 +520,9 @@ def home(axis):
     result = ''
     try:
         if axis == 'undefined' or axis == '' or axis.lower() == 'all':
-            result = app.robot.home(enqueue=False)
+            result = app.robot.home()
         else:
-            result = app.robot.home(axis, enqueue=False)
+            result = app.robot.home(axis)
         emit_notifications(["Successfully homed"], 'info')
     except Exception as e:
         result = str(e)
@@ -603,7 +618,7 @@ def pick_up_tip():
         axis = request.json.get("axis")
         instrument = app.robot._instruments[axis.upper()]
         instrument.reset_tip_tracking()
-        instrument.pick_up_tip(enqueue=False)
+        instrument.pick_up_tip()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -622,7 +637,7 @@ def drop_tip():
     try:
         axis = request.json.get("axis")
         instrument = app.robot._instruments[axis.upper()]
-        instrument.return_tip(enqueue=False)
+        instrument.return_tip()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -860,7 +875,7 @@ def start():
     print('Opentrons API server is serving UI from: ' + STATIC_FOLDER)
     socketio.run(
         app,
-        debug=True,
+        debug=False,
         logger=False,
         use_reloader=False,
         log_output=False,

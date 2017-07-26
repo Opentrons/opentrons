@@ -31,16 +31,16 @@ class StateTestCase(unittest.TestCase):
     def test_initial_state(self):
         s = state.get_state(self.robot)
         expected = [{'axis': 'a',
-                     'blow_out': 12,
-                     'bottom': 10,
-                     'calibrated': True,
+                     'blow_out': 12.0101,
+                     'bottom': 10.0101,
+                     'calibrated': False,
                      'channels': 1,
-                     'drop_tip': 14,
+                     'drop_tip': 14.0101,
                      'label': 'Pipette',
                      'max_volume': 200,
                      'placeables': [{'calibrated': False,
                                      'label': '96-flat',
                                      'slot': 'A2',
                                      'type': '96-flat'}],
-                     'top': 0}]
+                     'top': 0.0101}]
         self.assertEqual(s, expected)

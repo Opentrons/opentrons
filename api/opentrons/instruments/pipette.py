@@ -129,10 +129,10 @@ class Pipette(Instrument):
 
         # FIXME
         default_positions = {
-            'top': 0,
-            'bottom': 10,
-            'blow_out': 12,
-            'drop_tip': 14
+            'top': 0.0101,
+            'bottom': 10.0101,
+            'blow_out': 12.0101,
+            'drop_tip': 14.0101
         }
         self.positions = {}
         self.positions.update(default_positions)
@@ -163,10 +163,6 @@ class Pipette(Instrument):
             self.set_flowrate(dispense=dispense_flowrate)
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
-
-        if helpers.is_number(max_volume) and max_volume > 0:
-            self.max_volume = max_volume
-            self.update_calibrations()
 
     def update_calibrator(self):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
@@ -359,11 +355,11 @@ class Pipette(Instrument):
             volume,
             ('at ' + humanize_location(location) if location else '')
         )  # NOQA
+        self.robot.add_command(_description)
 
         self._position_for_aspirate(location)
         self.motor.speed(speed)
         self.motor.move(destination)
-        self.robot.add_command(_description)
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -435,6 +431,12 @@ class Pipette(Instrument):
         if volume == 0:
             return self
 
+        _description = "Dispensing {0} {1}".format(
+            volume,
+            ('at ' + humanize_location(location) if location else '')
+        )  # NOQA
+        self.robot.add_command(_description)
+
         self.move_to(location, strategy='arc')  # position robot above location
 
         # TODO(ahmed): revisit this
@@ -446,12 +448,6 @@ class Pipette(Instrument):
         self.motor.speed(speed)
         self.motor.move(destination)
         self.current_volume -= volume  # update after actual dispense
-
-        _description = "Dispensing {0} {1}".format(
-            volume,
-            ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
-        self.robot.add_command(_description)
         return self
 
     def _position_for_aspirate(self, location=None):
@@ -575,14 +571,14 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        self.move_to(location, strategy='arc')
-        self.motor.move(self._get_plunger_position('blow_out'))
-        self.current_volume = 0
-
         _description = "Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
         )
         self.robot.add_command(_description)
+
+        self.move_to(location, strategy='arc')
+        self.motor.move(self._get_plunger_position('blow_out'))
+        self.current_volume = 0
         return self
 
     def touch_tip(self, location=None, radius=1.0):
@@ -623,6 +619,10 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+
+        _description = 'Touching tip'
+        self.robot.add_command(_description)
+
         height_offset = 0
 
         if helpers.is_number(location):
@@ -650,8 +650,6 @@ class Pipette(Instrument):
 
         [self.move_to((location, e), strategy='direct') for e in well_edges]
 
-        _description = 'Touching tip'
-        self.robot.add_command(_description)
         return self
 
     def air_gap(self, volume=None, height=None):
@@ -694,6 +692,7 @@ class Pipette(Instrument):
             return self
 
         _description = 'Air gap'
+        self.robot.add_command(_description)
 
         if height is None:
             height = 5
@@ -702,7 +701,6 @@ class Pipette(Instrument):
         # "move_to" separate from aspirate command
         # so "_position_for_aspirate" isn't executed
         self.move_to(location)
-        self.robot.add_command(_description)
         self.aspirate(volume)
         return self
 
@@ -725,7 +723,7 @@ class Pipette(Instrument):
         ..
         >>> tiprack = containers.load('tiprack-200ul', 'A1')
         >>> p200 = instruments.Pipette(axis='a',
-        ...     tip_racks=[tiprack], max_volume=200)
+        ...     tip_racks=[tiprack], max_volume=200, name='p200')
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -796,6 +794,11 @@ class Pipette(Instrument):
         if isinstance(location, Placeable):
             location = location.bottom()
 
+        _description = "Picking up tip {0}".format(
+            ('from ' + humanize_location(location) if location else '')
+        )  # NOQA
+        self.robot.add_command(_description)
+
         presses = (1 if not helpers.is_number(presses) else presses)
 
         self.motor.move(self._get_plunger_position('bottom'))
@@ -808,12 +811,6 @@ class Pipette(Instrument):
         for i in range(int(presses) - 1):
             self.robot.move_head(z=tip_plunge, mode='relative')
             self.robot.move_head(z=-tip_plunge, mode='relative')
-
-        _description = "Picking up tip {0}".format(
-            ('from ' + humanize_location(location) if location else '')
-        )  # NOQA
-
-        self.robot.add_command(_description)
         return self
 
     def drop_tip(self, location=None, home_after=True):
@@ -864,6 +861,11 @@ class Pipette(Instrument):
             # give space for the drop-tip mechanism
             location = location.bottom(self._drop_tip_offset)
 
+        _description = "Drop_tip {}".format(
+            ('at ' + humanize_location(location) if location else '')
+        )
+        self.robot.add_command(_description)
+
         if location:
             self.move_to(location, strategy='arc')
 
@@ -875,11 +877,6 @@ class Pipette(Instrument):
 
         self.current_volume = 0
         self.current_tip(None)
-
-        _description = "Drop_tip {}".format(
-            ('at ' + humanize_location(location) if location else '')
-        )
-        self.robot.add_command(_description)
         return self
 
     def home(self):
@@ -905,13 +902,13 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        self.current_volume = 0
-        self.motor.home()
         _description = "Homing pipette plunger on axis {}".format(
             self.axis
         )  # NOQA
-
         self.robot.add_command(_description)
+
+        self.current_volume = 0
+        self.motor.home()
         return self
 
     def distribute(self, *args, **kwargs):
@@ -1088,14 +1085,14 @@ class Pipette(Instrument):
         """
 
         minutes += int(seconds / 60)
-        seconds = seconds % 60
+        seconds %= 60
+
         _description = "Delaying {} minutes and {} seconds".format(
             minutes, seconds)  # NOQA
-        seconds += float(minutes * 60)
-
-        self.motor.wait(seconds)
-
         self.robot.add_command(_description)
+
+        seconds += float(minutes * 60)
+        self.motor.wait(seconds)
         return self
 
     def calibrate(self, position):

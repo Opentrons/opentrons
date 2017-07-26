@@ -182,6 +182,7 @@ class Robot(object):
         self._driver = drivers.get_virtual_driver()
         self.disconnect()
         self.arc_height = 5
+        self.cmds_total = None
         self.set_connection('simulate')
         self.reset()
 
@@ -582,10 +583,11 @@ class Robot(object):
             instrument.reset()
 
     def set_connection(self, mode):
+        self.mode = mode
         if mode not in self.smoothie_drivers:
             raise ValueError(
                 'mode expected to be "live", "simulate_switches", '
-                'or "simulate", {} provided'.format(mode)
+                '"null" or "simulate", {} provided'.format(mode)
             )
 
         d = self.smoothie_drivers[mode]
