@@ -1453,7 +1453,7 @@ class Pipette(Instrument):
             tips -= 1
         return tips
 
-    def set_speed(self, **kwargs):
+    def set_speed(self, aspirate=None, dispense=None):
         """
         Set the speed (mm/minute) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
@@ -1464,18 +1464,19 @@ class Pipette(Instrument):
             A dictionary who's keys are either "aspirate" or "dispense",
             and who's values are int or float (Example: `{"aspirate": 300}`)
         """
-        keys = {'aspirate', 'dispense'} & kwargs.keys()
-        for key in keys:
-            if helpers.is_number(kwargs.get(key)):
-                self.speeds[key] = kwargs.get(key)
+        if helpers.is_number(aspirate):
+            self.speeds['aspirate'] = aspirate
+        if helpers.is_number(dispense):
+            self.speeds['dispense'] = dispense
         return self
 
-    def set_flowrate(self, **kwargs):
+    def set_flowrate(self, aspirate=None, dispense=None):
         ul_per_mm = self.max_volume / self._plunge_distance(self.max_volume)
-        keys = {'aspirate', 'dispense'} & kwargs.keys()
-        for key in keys:
-            # convert from uL/sec to mm/min
-            self.speeds[key] = (kwargs.get(key) / ul_per_mm) * 60
+        if helpers.is_number(aspirate):
+            aspirate = (aspirate / ul_per_mm) * 60
+        if helpers.is_number(dispense):
+            dispense = (dispense / ul_per_mm) * 60
+        self.set_speed(aspirate=aspirate, dispense=dispense)
         return self
 
     @property
