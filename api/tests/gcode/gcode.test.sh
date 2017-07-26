@@ -26,7 +26,17 @@ for protocol in $TEST_DIR/Protocols/**/*.py; do
     # echo 'Storing gcode results in: ' $GCODE_RES_FILE_PATH
     APP_DATA_DIR=${TMPDIR:=${TMP:-$(CDPATH=/var:/; cd -P tmp)}}
     rm -rf $APP_DATA_DIR/calibrations/*
-    APP_DATA_DIR=APP_DATA_DIR LOG_GCODE=true python $protocol > $GCODE_RES_FILE_PATH
+
+    export APP_DATA_DIR=APP_DATA_DIR
+    export LOG_GCODE=true
+    # Using Windows Python on Cygwin requires paths be converted
+    # check if cygpath exists which means we're runnin on cygwin
+    if hash cygpath 2>/dev/null; then
+        python $(cygpath -w $protocol > $GCODE_RES_FILE_PATH)
+    else
+        python $protocol > $GCODE_RES_FILE_PATH
+    fi
+
 
     cmp --silent $GCODE_EXPECTED_FILE_PATH $GCODE_RES_FILE_PATH || echo '[FAIL] G-Code match false: ' $protocol
 done
