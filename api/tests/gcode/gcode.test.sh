@@ -27,7 +27,7 @@ for protocol in $TEST_DIR/Protocols/**/*.py; do
     APP_DATA_DIR=${TMPDIR:=${TMP:-$(CDPATH=/var:/; cd -P tmp)}}
     rm -rf $APP_DATA_DIR/calibrations/*
 
-    export APP_DATA_DIR=APP_DATA_DIR
+    export APP_DATA_DIR=$APP_DATA_DIR
     export LOG_GCODE=true
     # Using Windows Python on Cygwin requires paths be converted
     # check if cygpath exists which means we're runnin on cygwin
