@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Rename build articats and re-generate RELEASES file
+
+set -e
+
+cd $1
+
+OT_APP_EXE=$(ls opentrons-v*.exe)
+OT_APP_NAME=${OT_APP_EXE:0:-4}
+OT_APP_NUPKG="$OT_APP_NAME.nupkg"
+
+cp *.exe $OT_APP_NUPKG
+
+OT_SHA=$(sha1sum $OT_APP_NUPKG | tr [a-z] [A-Z])
+echo "${OT_SHA:0:40} $OT_APP_NUPKG $(stat -c%s $OT_APP_NUPKG)" > "$OT_APP_NAME.RELEASES"

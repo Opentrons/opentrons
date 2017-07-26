@@ -17,10 +17,6 @@ def get_frozen_root():
     return sys._MEIPASS if getattr(sys, 'frozen', False) else None
 
 
-def convert_byte_stream_to_str(stream):
-    return ''.join([line.decode() for line in stream])
-
-
 def run_protocol(robot, code: str, mode='simulate') -> tuple:
     """
     :param robot: robot instance for protocol
@@ -35,15 +31,19 @@ def run_protocol(robot, code: str, mode='simulate') -> tuple:
         robot.app_run_mode = True
         exec(code, globals())
         commands = robot._commands
-    except Exception:
-        exception_msg = traceback.format_exc()
+    except Exception as e:
+        # If exception is not caused by protocol run being cancelled
+        # set exception message to traceback
+        stop_exc_msg = 'Received a STOP signal and exited from movements'
+        if not (e.args and e.args[0] == stop_exc_msg):
+            exception_msg = traceback.format_exc()
     finally:
         robot.app_run_mode = False
     robot.set_connection('live')
     return (commands, exception_msg)
 
 
-def timestamp(seconds: int):
+def timestamp(seconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     return "%d:%02d:%02d" % (hours, minutes, seconds)

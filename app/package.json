@@ -27,8 +27,8 @@
     "package-all": "npm run build && build -mwl"
   },
   "name": "ot-app",
-  "productName": "OT-App",
-  "version": "2.4.2",
+  "productName": "OT One App 2",
+  "version": "2.5.0",
   "description": "OT One Robot Companion Desktop App",
   "main": "shell/dist/bundle.js",
   "repository": {
@@ -48,7 +48,7 @@
     "files": [
       "!**/*",
       "node_modules/**",
-      "bin/opentrons-api-server",
+      "bin/opentrons-api-server*",
       "ui/dist",
       "ui/index.html",
       "shell/dist",
@@ -112,6 +112,7 @@
     "electron": "1.6.11",
     "electron-builder": "^19.5.1",
     "electron-builder-squirrel-windows": "^19.5.1",
+    "electron-debug": "^1.2.0",
     "eslint": "^4.0.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-formatter-pretty": "^1.1.0",
@@ -129,6 +130,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.3",
+    "loglevel": "^1.4.1",
     "mocha": "^3.4.2",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
