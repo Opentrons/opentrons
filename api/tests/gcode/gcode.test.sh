@@ -10,9 +10,9 @@ echo "Current test dir $(pwd)"
 echo "Cleaning out old test results.."
 rm -rf $TEST_DIR/results/*
 
-echo "Cloning current protocols"
-rm -rf Protocols && git clone https://github.com/OpenTrons/Protocols.git
-git checkout 20170725-144000-add-imports-plate-image-protocol
+# echo "Cloning current protocols"
+# rm -rf Protocols && git clone https://github.com/OpenTrons/Protocols.git
+# git checkout 20170725-144000-add-imports-plate-image-protocol
 
 for protocol in $TEST_DIR/Protocols/**/*.py; do
     echo 'Testing: ' $protocol
