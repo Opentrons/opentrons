@@ -1,6 +1,10 @@
+#!/usr/bin/env bash
+
+#
 # TeamCity Build Script
-# source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
-# pip install pyyaml coveralls
+#
+
+git submodule update --init --recursive
 
 eval "$(pyenv init -)"
 mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh
