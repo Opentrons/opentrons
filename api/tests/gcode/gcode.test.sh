@@ -32,7 +32,7 @@ for protocol in $TEST_DIR/Protocols/**/*.py; do
     # Using Windows Python on Cygwin requires paths be converted
     # check if cygpath exists which means we're runnin on cygwin
     if hash cygpath 2>/dev/null; then
-        python "`cygpath -w $protocol > $GCODE_RES_FILE_PATH`"
+        python $(cygpath -w $protocol) > $GCODE_RES_FILE_PATH
     else
         python $protocol > $GCODE_RES_FILE_PATH
     fi
