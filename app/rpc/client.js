@@ -21,6 +21,8 @@ const CONNECTION_TIMEOUT = 10 * SEC
 const CALL_RESULT_TIMEOUT = 10 * SEC
 const CALL_ACK_TIMEOUT = 5 * SEC
 
+// winston.level = 'warning'
+
 // To prevent from dispatching these calls to the remote
 const SPECIAL_FUNCTION_NAMES =
   new Set([
@@ -34,24 +36,34 @@ const SPECIAL_FUNCTION_NAMES =
     '@@__IMMUTABLE_SET__@@',
     '@@__IMMUTABLE_MAP__@@',
     '@@__IMMUTABLE_STACK__@@',
-    'toJSON'
+    'toJSON',
+    'valueOf'
   ])
 
-const ES_BUILTIN_TYPES = new Set(['string', 'number', 'boolean', 'undefined'])
+const RemoteObject = (context, obj, isValueNode = false) => {
+  // A shorthand to alternate between Reference Node and Value Node
+  // in JSON object graph. See below for details
+  const nextRemoteObject = (nextObject) =>
+    RemoteObject(context, nextObject, !isValueNode)
 
-const RemoteObject = (context, obj, isValueNode = true) => {
-  const nextRemoteObject = (...args) =>
-    RemoteObject(...args, !isValueNode)
-
-  const getProxy = (that) =>
-    new Proxy({}, // <- object we are proxying
+  // Returns a proxy object that points to the record in the
+  // instances map that corresponds to the id of a remote object
+  const getProxy = (id, instance) => {
+    // If no id, the object is not remote, return it
+    if (!id) return instance
+    // Store locally only if there is value
+    // If there is an id but no value, it's a circular reference
+    if (instance) context.put(id, instance)
+    return new Proxy({}, // <- object we are proxying
       {
+        // Needed for reflection
         getOwnPropertyDescriptor: (target, prop) => {
-          const remote = context.get(that)
+          const remote = context.get(id)
           return Object.getOwnPropertyDescriptor(remote, prop)
         },
+        // Probably too ...
         ownKeys: () => {
-          const remote = context.get(that)
+          const remote = context.get(id)
           const keys = Object.getOwnPropertyNames(remote)
           return keys
         },
@@ -59,84 +71,77 @@ const RemoteObject = (context, obj, isValueNode = true) => {
         get: (target, name) => {
           if (SPECIAL_FUNCTION_NAMES.has(name)) return target[name]
           if (typeof name === 'symbol') return target[name]
-          const remote = context.get(that)
-          if (!remote) return remote
+          const remote = context.get(id)
           if (Object.prototype.hasOwnProperty.call(remote, name)) {
             return remote[name]
           }
-
+          // If there is no value to be found between target and instances map
+          // return a promise that will dispatch a remote function call
           return async (...args) => {
-            const res = await context.callRemoteMethod(that, name, args)
-            if (res.$meta.status === 'error') throw new Error(res.str)
-            // If no remote object returned, delete meta altogether
-            if (!(res.$meta.that)) delete res.$meta
-            return RemoteObject(context, res)
+            const res = await context.callRemoteMethod(id, name, args)
+            if (res.$.status === 'error') throw new Error(res.data)
+            return RemoteObject(context, res.data)
           }
         }
       })
-
-  const { $meta, ...values } = obj
+  }
 
   if (isValueNode) {
-    const type = Object.keys(values).pop()
-    const value = values[type]
-    if (ES_BUILTIN_TYPES.has(typeof value)) return value
-    const remote = nextRemoteObject(context, value)
-    if ($meta) {
-      context.put($meta.that, remote)
-      return getProxy($meta.that)
-    }
-    return remote
+    if (!obj) return obj
+
+    const res = {}
+    // If object iterate through keys / values
+    // TODO: explore why Object.entries from ES2017 is not working
+    // What's the idiomatic way of mapping through key / values?
+    Object.keys(obj)
+      .forEach((key) => { res[key] = nextRemoteObject(obj[key]) })
+
+    return res
   }
 
   if (Array.isArray(obj)) {
     return obj.map(
-      (item) => nextRemoteObject(context, item))
+      item => RemoteObject(context, item, isValueNode))
   }
 
-  const res = {}
-  Object.keys(values)
-    .forEach((key) => { res[key] = nextRemoteObject(context, values[key]) })
+  // Check if primitive
+  if (obj !== Object(obj)) return obj
 
-  if (res === {}) return { ...values }
-  return res
+  return getProxy(obj.i, nextRemoteObject(obj.v))
 }
 
 const Context = (connection) => ({
   connection,
-  // Maps ID of a pending call to Call instance
+  // Remote calls in progress
   pendingCalls: new Map(),
-  // Maps ID of a remote object to local instance
+  // Local copies of remote objects
   instances: new Map(),
-  // that : id of remote object
-  // name : method name
-  // args : array of arguments to be passed
-  put(that, value) {
-    if (this.instances.has(that)) log.info(`Updating instance with id=${that}`)
-    this.instances.set(that, value)
+  put(id, value) {
+    if (this.instances.has(id)) log.info(`Updating instance with ${{ id }}`)
+    this.instances.set(id, value)
   },
   // TODO: if not found, try to retrieve from remote?
-  get(that) {
-    if (!this.instances.has(that)) {
-      log.info(`Local instance with id=${that} is missing`)
+  get(id) {
+    if (!this.instances.has(id)) {
+      log.info(`Local instance with id=${{ id }} is missing`)
       return undefined
     }
-    return this.instances.get(that)
+    return this.instances.get(id)
   },
 
-  callRemoteMethod(that, name, args) {
-    const id = uuidV4()
-    const removePending = (v) => this.pendingCalls.delete(id) && v
+  callRemoteMethod(id, name, args) {
+    const token = uuidV4()
+    const removePending = v => this.pendingCalls.delete(token) && v
     const promise = new Promise((resolve, reject) => {
       if (typeof name === 'symbol') return resolve(undefined)
       if (SPECIAL_FUNCTION_NAMES.has(name)) {
         log.warn(`Not dispatching ES special function ${name}()`)
         return resolve(undefined)
       }
-      this.pendingCalls.set(id, this.Call(id, resolve, reject))
+      this.pendingCalls.set(token, this.Call(id, resolve, reject))
       log.info(`Calling ${name}(${args})`)
       try {
-        this.connection.send(JSON.stringify({ id, name, that, args }))
+        this.connection.send(JSON.stringify({ $: { token }, name, id, args }))
       } catch (e) {
         return reject(e)
       }
@@ -154,36 +159,36 @@ const Context = (connection) => ({
     // Create ACK timer first
     timer: setTimeout(() => reject('Call ACK timed out'), CALL_ACK_TIMEOUT),
     handle(message) {
-      const $meta = message.$meta
-      switch ($meta.type) {
+      switch (message.$.type) {
+        // Server will acknowledge call first
         case CALL_ACK_MESSAGE:
           clearTimeout(this.timer)
-          if (this.state !== DISPATCHED) {
-            reject('Received unexpected ACK')
-          }
+          if (this.state !== DISPATCHED) return reject('Received unexpected ACK')
           this.state = ACKNOWLEDGED
           this.timer = setTimeout(
             () => reject('Timed out waiting for result'), CALL_RESULT_TIMEOUT)
           break
+        // Then dispatch the result once ready
         case CALL_RESULT_MESSAGE:
           clearTimeout(this.timer)
           if (this.state !== ACKNOWLEDGED) {
-            reject('Received result without call being ACKed first')
+            return reject('Received result without call being ACKed first')
           }
           this.state = RETURNED
           resolve(message)
           break
         default:
-          reject(`Unknown message type: ${$meta.type}`)
+          return reject(`Unknown message type: ${message.$.type}`)
       }
     }
   }),
+
   // Dispatch message to one of the Calls pending
   dispatch(message) {
-    const id = message.$meta.id
-    const call = this.pendingCalls.get(id)
+    const token = message.$.token
+    const call = this.pendingCalls.get(token)
     if (!call) {
-      log.error(`Call with id=${id} was never issued`)
+      log.error(`Call with token=${token} was never issued`)
       return
     }
     return call.handle(message)
@@ -204,7 +209,10 @@ const Connection = (url) => {
       () => reject(`Connection timeout: ${url}`),
       CONNECTION_TIMEOUT)
   })
+  // Dispatching outside of promise to avoid race condition
   register()
+  // In addition to promise, return socket for test purposes
+  // TODO: find a way to mock socket that works in async
   return { promise, socket }
 }
 
@@ -215,15 +223,15 @@ const Client = (connection, notify) => {
     setTimeout(
       () => reject('Handshake timeout'),
       HANDSHAKE_TIMEOUT)
+    // Run on nextTick to avoid race condition
     process.nextTick(() => connection.addEventListener(
       'message', (event) => {
         try {
           const message = JSON.parse(event.data)
           log.info(`Received message: ${JSON.stringify(message)}`)
-          const $meta = message.$meta
-          switch ($meta.type) {
+          switch (message.$.type) {
             case CONTROL_MESSAGE:
-              return resolve(RemoteObject(context, message))
+              return resolve(RemoteObject(context, message.data))
             case NOTIFICATION_MESSAGE:
               log.info(`Notification: ${message}`)
               notify(message)
@@ -232,6 +240,7 @@ const Client = (connection, notify) => {
               context.dispatch(message)
           }
         } catch (e) {
+          log.warning(`Websocket loop: ${e}`)
           return reject(e)
         }
       }

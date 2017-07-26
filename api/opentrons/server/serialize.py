@@ -1,36 +1,52 @@
 import functools
+import logging
+
+log = logging.getLogger(__name__)
+
 
 def _get_object_tree(shallow, path, refs, depth, obj):
-    # If shallow serialization, go only one level deep
-    if depth > 0 and shallow: return None
+
+    def object_container(value): return {'i': id(obj), 'v': value}
+
+    # TODO: what's the better way to detect primitive types?
+    if isinstance(obj, (str, int, bool, float, complex)) or obj is None:
+        return obj
 
     # If we have ourself in path, it's a circular reference
-    # we are terminating it with Nothing
-    if  hasattr(obj, '__dict__') and id(obj) in path: return None
-    
+    # we are terminating it with a valid id but a a value of None
+    if hasattr(obj, '__dict__') and id(obj) in path:
+        return object_container(None)
+
+    # Shorthand for calling ourselves recursively
+    object_tree = functools.partial(
+        _get_object_tree, shallow, path, refs, depth+1)
+
     path += [id(obj)]
 
-    payload = None
-    meta = {}
-    object_tree = functools.partial(_get_object_tree, shallow, path, refs, depth+1)
+    # If shallow, go only one level deep
+    if depth > 0 and shallow:
+        return {}
 
     if isinstance(obj, (list, tuple)):
-        payload = [object_tree(o) for o in obj]
-    elif isinstance(obj, dict):
-        payload = { str(k): object_tree(v) for k, v in obj.items() }
-    elif isinstance(obj, (str, int, bool, float, complex)) or obj is None:
-        payload = obj
-    elif hasattr(obj, '__dict__'):
-        payload = { k: object_tree(v) for k, v in obj.__dict__.items() }
-        refs[id(obj)] = obj
-        meta = { '$meta': { 'that': id(obj) } }
-    else:
-        return None
-    
-    # If shallow, don't output the attributes of the object
-    if depth == 0 and shallow: payload = {}
+        return [object_tree(o) for o in obj]
 
-    return { **meta, obj.__class__.__name__: payload }
+    def iterate(kv): return {str(k): object_tree(v) for k, v in kv.items()}
+
+    if isinstance(obj, dict):
+        return object_container(iterate(obj))
+    elif hasattr(obj, '__dict__'):
+        refs[id(obj)] = obj
+        items = []
+        # If Type is iterable we will iterate generating numeric keys and
+        # and merge with the output
+        try:
+            items = [object_tree(o) for o in obj]
+        except TypeError:
+            pass
+        tail = {str(i): v for i, v in enumerate(items)}
+        return object_container({**iterate(obj.__dict__), **tail})
+    else:
+        return object_container({})
 
 
 def get_object_tree(obj, shallow=False):

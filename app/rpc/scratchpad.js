@@ -1,4 +1,4 @@
-import connect from './proxy'
+import { Connection, Client } from './client'
 
 //
 // Questions:
@@ -8,17 +8,15 @@ import connect from './proxy'
 //
 
 const main = async () => {
-  const proxy = await connect(
-    'ws://127.0.0.1:31950/',
-    (message) => console.log(message))
-
-  console.log(proxy)
-  let foo = await proxy.get_foo()
-  console.log(foo.value)
-  console.log(await foo.add(5))
-  foo = await foo.get_next()
-  console.log(await foo.get_value())
-  proxy.disconnect()
+  const { promise } = Connection(
+    'ws://127.0.0.1:31950/'
+  )
+  const connection = await promise
+  const client = await Client(connection)
+  const robotContainer = await client.get_root()
+  const robot = await robotContainer.load_protocol_file(
+    '/Users/astaff/Development/opentrons/opentrons-api/api/opentrons/server/tests/data/dinosaur.py')
+  console.log(await robot.commmands())
 }
 
 main()

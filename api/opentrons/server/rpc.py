@@ -14,9 +14,10 @@ CALL_ACK_MESSAGE = 1
 NOTIFICATION_MESSAGE = 2
 CONTROL_MESSAGE = 3
 
+
 class Server(object):
     def __init__(self, root=None, host='127.0.0.1', port=31950):
-        self.objects = { id(self): self }
+        self.objects = {id(self): self}
         self.root = root
         self.host = host
         self.port = port
@@ -26,28 +27,39 @@ class Server(object):
         app.router.add_get('/', self.handler)
         web.run_app(app, host=self.host, port=self.port)
 
-    def update_refs(self, refs):
-        self.objects.update(refs)
-
+    # If arguments have references to local objects
+    # resolve them into these instances
     def resolve_args(self, args):
         def resolve(a):
-            if isinstance(a, dict) and a['$meta'] and a['$meta']['that']:
-                return self.objects[a['$meta']['that']]
+            if isinstance(a, dict):
+                _id = a.get('i', None)
+                # If it's a compound type (including dict)
+                # Check if it has id (i) to determine that it has
+                # a reference in object storage. If it's None, then it's
+                # a dict or array originated on the remote
+                return self.objects[_id] if _id else a['v']
+            # if array, resolve it's elements
+            if isinstance(a, (list, tuple)):
+                return [resolve(i) for i in a]
             return a
 
         return [resolve(a) for a in args]
 
     def get_root(self):
+        log.debug('Root = {0}'.format(self.root))
         return self.root
 
-    async def dispatch(self, that, name, args):
-        if not that in self.objects:
-            raise ValueError('dispatch: object with id {0} not found'.format(that))
+    async def dispatch(self, _id, name, args):
+        if _id not in self.objects:
+            raise ValueError(
+                'dispatch: object with id {0} not found'.format(_id))
 
-        obj = self.objects[that]
+        obj = self.objects[_id]
         function = getattr(type(obj), name)
+        args = self.resolve_args(args)
 
-        log.debug('dispatch: will call {0}.{1}({2})'
+        log.debug(
+            'dispatch: will call {0}.{1}({2})'
             .format(obj, name, ', '.join([str(a) for a in args])))
 
         if not function:
@@ -56,67 +68,79 @@ class Server(object):
 
         if not callable(function):
             raise ValueError(
-                'Attribute {0} of {1} is not a function'.format(name, type(obj)))
+                'Attribute {0} of {1} is not a function'
+                .format(name, type(obj)))
 
-        res = function(obj, *self.resolve_args(args))
+        res = function(obj, *args)
         self.objects[id(res)] = res
-
         return res
-
-    def update_meta(self, obj, meta):
-        if '$meta' not in obj:
-            obj['$meta'] = {}
-        obj['$meta'].update(meta)
-        return obj
 
     async def process(self, message, send):
         if message.type == aiohttp.WSMsgType.TEXT:
             data = json.loads(message.data)
-
+            token = data.pop('$')['token']
             # Acknowledge the call
-            await send(self.update_meta({}, {
-                    'id': data['id'],
-                    'type': CALL_ACK_MESSAGE 
-                }))
-
-            meta = { 'id': data.pop('id'), 'type': CALL_RESULT_MESSAGE }
+            await send({
+                '$': {
+                    'token': token,
+                    'type': CALL_ACK_MESSAGE
+                }
+            })
             try:
-                res = await self.dispatch(**data)
-                meta.update({'status': 'success'})
+                msg = {
+                    '$': {
+                        'token': token,
+                        'type': CALL_RESULT_MESSAGE
+                    }
+                }
+                # Replace id with _id to be compatible with
+                # dispatch's args
+                _id = data.pop('id', None)
+                res = await self.dispatch(_id, **data)
+                msg['$']['status'] = 'success'
             except Exception as e:
-                log.warning('Exception while dispatching a method call: {0}'.format(traceback.format_exc()))
+                log.warning(
+                    'Exception while dispatching a method call: {0}'
+                    .format(traceback.format_exc()))
                 res = str(e)
-                meta.update({'status': 'error'})
+                msg['$']['status'] = 'error'
             finally:
                 root, refs = serialize.get_object_tree(res)
-                self.update_refs(refs)
-                await send(self.update_meta(root, meta))
+                msg['data'] = root
+                await send(msg)
 
         elif message.type == aiohttp.WSMsgType.ERROR:
             log.error(
-                'WebSocket connection closed with exception %s' % ws.exception())
+                'WebSocket connection closed with exception %s'
+                % ws.exception())
 
+    # Handler receives HTTP request and negotiates up to
+    # a websocket session
     async def handler(self, request):
         log.debug('Starting handler for request: {0}'.format(request))
         ws = web.WebSocketResponse()
 
+        # upgrade to websockets
         await ws.prepare(request)
 
         def send(payload):
-            log.debug('Sending {0} to {1}: '.format(payload, ws))
+            log.debug('Sending {0} to {1}'.format(payload, ws))
             return ws.send_str(json.dumps(payload))
 
         # Our first message is address of Server instance
         root, _ = serialize.get_object_tree(self, shallow=True)
-        root = self.update_meta(root, {'type': CONTROL_MESSAGE})
-        await send(root)
+        await send({'$': {'type': CONTROL_MESSAGE}, 'data': root})
 
+        # Not the async iterator. It will keep looping
+        # until the websocket is closed
         async for msg in ws:
             log.debug('Received: {0}'.format(msg))
             try:
                 await self.process(msg, send)
             except Exception as e:
-                ws.close()
-                log.error('Exception while processing message: {0}'.format(traceback.format_exc()))
+                await ws.close()
+                log.error(
+                    'Exception while processing message: {0}'
+                    .format(traceback.format_exc()))
 
         return ws

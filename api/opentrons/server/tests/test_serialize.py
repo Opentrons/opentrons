@@ -1,8 +1,10 @@
 import json
 import pytest
 
+from collections import OrderedDict
 from opentrons.server import serialize
 from opentrons import robot, instruments, containers
+
 
 @pytest.fixture
 def instance():
@@ -14,26 +16,22 @@ def instance():
             for k, v in args.items():
                 setattr(self, k, v)
 
-    a1 = A(
-                {
-                    'b': 1,
-                    'c': 'c',
-                    'd': True,
-                    'e': None
-                })
+        def __iter__(self):
+            return iter([0])
+
+    a1 = A({'b': 1, 'c': 'c', 'd': True, 'e': None})
     a2 = A({'a': 1})
     a3 = A({})
 
-    root = A(
-        {
-            'a': a1,
-            'b': [a2, 'b', 1],
-            'c': {'a': 1, 'b': [1, 2, a3]},
-        }
-    )
+    root = A({
+                'a': a1,
+                'b': [a2, 'b', 1],
+                'c': {'a': 1, 'b': [1, 2, a3]},
+            })
     root.update({'circular': root})
 
     return (root, a1, a2, a3)
+
 
 def test_robot():
     trough = containers.load('trough-12row', 'C1', 'trough')
@@ -54,46 +52,32 @@ def test_robot():
     # Robot tree is pretty big and hard to verify
     # Making sure we can serialize it into json
     tree, refs = serialize.get_object_tree(robot)
-    json.dumps(tree)    
 
 
 def test_get_object_tree(instance):
     root, a1, a2, a3 = instance
-
     tree, refs = serialize.get_object_tree(root)
 
-    assert refs == { id(o) : o for o in [root, a1, a2, a3] }
+    assert refs == {id(o): o for o in [root, a1, a2, a3]}
     assert tree == {
-        '$meta': {'that': id(root)},
-        'A': {
+        'i': id(root),
+        'v': {
+            '0': 0,
             'a': {
-                '$meta': {'that': id(a1)},
-                'A': {
-                    'b': {'int': 1},
-                    'c': {'str': 'c'},
-                    'd': {'bool': True},
-                    'e': {'NoneType': None}}},
-            'b': {
-                'list': [
-                    {
-                        '$meta': {'that': id(a2)},
-                        'A': {
-                            'a': {'int': 1}
-                        }
-                    },
-                    {'str': 'b'},
-                    {'int': 1}
-                ]},
+                'i': id(a1),
+                'v': {
+                    '0': 0,
+                    'b': 1,
+                    'c': 'c',
+                    'd': True,
+                    'e': None}},
+            'b': [{'i': id(a2), 'v': {'0': 0, 'a': 1}}, 'b', 1],
             'c': {
-                'dict': {
-                    'a': {'int': 1},
-                    'b': {
-                        'list': [
-                            {'int': 1},
-                            {'int': 2},
-                            {'$meta': {'that': id(a3)},
-                            'A': {}}]}}},
-            'circular': None}}
+                'i': tree['v']['c']['i'],
+                'v': {
+                    'a': 1,
+                    'b': [1, 2, {'i': id(a3), 'v': {'0': 0}}]}},
+            'circular': {'i': id(root), 'v': None}}}
 
     assert json.dumps(tree)
 
@@ -101,6 +85,21 @@ def test_get_object_tree(instance):
 def test_get_object_tree_shallow(instance):
     root, *_ = instance
     tree, refs = serialize.get_object_tree(root, shallow=True)
-
-    assert tree == {'$meta': {'that': id(root)}, 'A': {}}
+    assert tree == {
+        'i': id(root),
+        'v': {
+            '0': 0, 'a': {}, 'b': {}, 'c': {},
+            'circular': {'i': id(root), 'v': None}}}
     assert refs == {id(root): root}
+
+
+def test_ordered_dict():
+    b = OrderedDict()
+    b['b'] = 1
+    a = {'a': b}
+    tree, refs = serialize.get_object_tree(a)
+    assert tree == {
+        'i': id(a),
+        'v': {'a': {
+                'i': id(b),
+                'v': {'b': 1}}}}

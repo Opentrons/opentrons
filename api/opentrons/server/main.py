@@ -3,15 +3,18 @@
 import sys
 import logging
 from opentrons.server.rpc import Server
+from opentrons.server.robot_container import RobotContainer
 from opentrons.robot import Robot
 from logging.config import dictConfig
 
-# TODO(artyom): might as well use this: https://pypi.python.org/pypi/logging-color-formatter
+# TODO(artyom): might as well use this:
+# https://pypi.python.org/pypi/logging-color-formatter
 logging_config = dict(
     version=1,
     formatters={
         'basic': {
-            'format': '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  #NOQA
+            'format':
+            '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # NOQA
         }
     },
     handlers={
@@ -23,9 +26,11 @@ logging_config = dict(
     loggers={
         '__main__': {
             'handlers': ['debug'],
+            'level': logging.DEBUG
         },
         'opentrons.server': {
             'handlers': ['debug'],
+            'level': logging.DEBUG
         },
     }
 )
@@ -33,12 +38,6 @@ dictConfig(logging_config)
 
 log = logging.getLogger(__name__)
 
-class RobotManager(object):
-    def get_new(self):
-        return Robot()
-
-    def say_hi(self):
-        return "hi!"
 
 def main():
     kwargs = {}
@@ -61,9 +60,10 @@ def main():
         print('Too many arguments. Valid argument is IP:PORT')
         exit(1)
 
-    server = Server(RobotManager(), **kwargs)
+    server = Server(RobotContainer(), **kwargs)
     print(
-        'Started Opentrons API RPC Server listening at ws://{0}:{1}/'.format(server.host, server.port))
+        'Started Opentrons API RPC Server listening at ws://{0}:{1}/'
+        .format(server.host, server.port))
     server.start()
 
 

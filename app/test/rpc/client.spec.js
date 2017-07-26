@@ -2,11 +2,8 @@ jest.mock('uuid/v4')
 
 const WebSocket = require('ws')
 const uuidV4 = require('uuid/v4')
-const winston = require('winston')
 
 const { Connection, Client, Context, RemoteObject } = require('../../rpc/client')
-
-const log = winston
 
 // TODO: How to import properly?
 const DISPATCHED = 0
@@ -44,9 +41,8 @@ describe('Call Remote Method', () => {
 
   it('arguments passed and set', () => {
     const args = JSON.parse(sendMock.calls[0])
-    expect(args.id).toEqual('uuid')
     expect(args.name).toEqual('func')
-    expect(args.that).toEqual(42)
+    expect(args.id).toEqual(42)
     expect(args.args).toEqual([1, 2])
   })
 
@@ -57,12 +53,14 @@ describe('Call Remote Method', () => {
   })
 
   it('completes successful call sequence', async () => {
-    context.dispatch({ $meta: { id: 'uuid', type: CALL_ACK_MESSAGE } })
+    context.dispatch({ $: { token: 'uuid', type: CALL_ACK_MESSAGE } })
+    const call = context.pendingCalls.get('uuid')
     expect(context.pendingCalls.get('uuid').state).toEqual(ACKNOWLEDGED)
-    context.dispatch({ $meta: { id: 'uuid', type: CALL_RESULT_MESSAGE }, str: 'hi!' })
+    context.dispatch({ $: { token: 'uuid', type: CALL_RESULT_MESSAGE }, data: 'hi!' })
     const res = await promise
     expect(context.pendingCalls.size).toEqual(0)
-    expect(res).toEqual({ $meta: { id: 'uuid', type: CALL_RESULT_MESSAGE }, str: 'hi!' })
+    expect(res).toEqual({ $: { token: 'uuid', type: CALL_RESULT_MESSAGE }, data: 'hi!' })
+    expect(call.state).toEqual(RETURNED)
   })
 })
 
@@ -81,8 +79,8 @@ describe('Connect and receive root object proxy', () => {
     process.nextTick(() => socket.trigger(
       'message',
       { data: JSON.stringify({
-        Foo: { a: { int: 1 }, b: { int: 2 } },
-        $meta: { type: CONTROL_MESSAGE, that: 42 }
+        data: { i: 42, v: { a: 1, b: 2 } },
+        $: { type: CONTROL_MESSAGE }
       }) }
     ))
     const res = await client
@@ -90,14 +88,15 @@ describe('Connect and receive root object proxy', () => {
   })
 })
 
-describe('Create remote object proxy', () => {
+describe('Remote object proxy', () => {
   const { socket } = Connection('ws://127.0.0.1')
   process.nextTick(() => socket.trigger('open'))
   const context = Context(socket)
   const obj = {
-    $meta: { that: 42 },
-    Foo: { a: { int: 3 }, b: { int: 4 } }
+    i: 42,
+    v: { a: 3, b: 4 }
   }
+
   const res = RemoteObject(context, obj)
 
   it('accepts remote object', () => {
@@ -108,11 +107,16 @@ describe('Create remote object proxy', () => {
 
   it('accepts nested objects', () => {
     const newObj = {
-      $meta: { that: 42 },
-      Foo: {
-        a: { int: 3 },
-        b: { $meta: { that: 33 }, Bar: { s: { str: 'hi' } } } }
+      i: 42,
+      v: {
+        a: 3,
+        b: {
+          i: 33,
+          v: { s: 'hi' }
+        }
+      }
     }
+
     const newRes = RemoteObject(context, newObj)
     expect(newRes).toEqual({ a: 3, b: { s: 'hi' } })
   })
@@ -124,21 +128,22 @@ describe('Create remote object proxy', () => {
   it('dispatches a call to nested object', () => {
     res.b.test(1, 2, 3)
     expect(JSON.parse(socket.send.mock.calls.pop())).toEqual(
-      { args: [1, 2, 3], id: 'uuid', name: 'test', that: 33 }
+      { $: { token: 'uuid' }, id: 33, name: 'test', args: [1, 2, 3] }
     )
   })
 
   it('handles arrays and dictionaries', () => {
     const newObj = {
-      $meta: { that: 42 },
-      Foo: {
-        a: { dict:
-        {
-          a: { int: 1 },
-          b: { int: 2 },
-          c: { array:
-            [{ int: 1 }, { $meta: { that: 100 }, Bar: { a: { int: 5 } } }] }
-        } }
+      i: 42,
+      v: {
+        a: {
+          i: 234,
+          v: {
+            a: 1,
+            b: 2,
+            c: [1, { i: 100, v: { a: 5 } }]
+          }
+        }
       }
     }
     const newRes = RemoteObject(context, newObj)
@@ -148,7 +153,7 @@ describe('Create remote object proxy', () => {
   it('dispatches call to remote object in nested array', () => {
     res.a.c[1].foo('hi!')
     expect(JSON.parse(socket.send.mock.calls.pop())).toEqual(
-      { args: ['hi!'], id: 'uuid', name: 'foo', that: 100 }
+      { $: { token: 'uuid' }, id: 100, name: 'foo', args: ['hi!'] }
     )
   })
 })
