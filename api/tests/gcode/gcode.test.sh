@@ -10,10 +10,6 @@ echo "Current test dir $(pwd)"
 echo "Cleaning out old test results.."
 rm -rf $TEST_DIR/results/*
 
-# echo "Cloning current protocols"
-# rm -rf Protocols && git clone https://github.com/OpenTrons/Protocols.git
-# git checkout 20170725-144000-add-imports-plate-image-protocol
-
 for protocol in $TEST_DIR/Protocols/**/*.py; do
     echo 'Testing: ' $protocol
     GCODE_RES_FILE_NAME=$(echo $protocol | sed 's/\.py$/.gcode/')
@@ -33,6 +29,7 @@ for protocol in $TEST_DIR/Protocols/**/*.py; do
     # check if cygpath exists which means we're runnin on cygwin
     if hash cygpath 2>/dev/null; then
         python $(cygpath -w $protocol) > $GCODE_RES_FILE_PATH
+        dos2unix $(cygpath $GCODE_RES_FILE_PATH)  # Adjust line endings
     else
         python $protocol > $GCODE_RES_FILE_PATH
     fi
