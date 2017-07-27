@@ -2,6 +2,7 @@ import Vue from 'vue'
 
 import config from './config'
 import store from './store/store'
+import { getUserId } from './util'
 
 // Note: This is not in GTM because sending email data to GTM violoates
 // the GTM User Policy
@@ -85,6 +86,7 @@ function logoutUser () {
   localStorage.removeItem('profile')
   store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
   emitAppUserInfo()
+  window.ot_dataLayer.push({userId: getUserId()})
   restartIntercom()
 }
 
