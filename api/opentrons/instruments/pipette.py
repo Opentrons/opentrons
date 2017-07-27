@@ -119,14 +119,6 @@ class Pipette(Instrument):
         self.min_volume = min_volume
         self.max_volume = max_volume or (min_volume + 1)
 
-        # NOTE: positions set to none in order to determine calibration state?
-        # self.positions = {
-        #     'top': None,
-        #     'bottom': None,
-        #     'blow_out': None,
-        #     'drop_tip': None
-        # }
-
         # FIXME
         default_positions = {
             'top': 0.0101,
