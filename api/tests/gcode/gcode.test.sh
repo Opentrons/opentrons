@@ -29,7 +29,7 @@ for protocol in $TEST_DIR/Protocols/**/*.py; do
     # check if cygpath exists which means we're runnin on cygwin
     if hash cygpath 2>/dev/null; then
         python $(cygpath -w $protocol) > $GCODE_RES_FILE_PATH
-        dos2unix $(cygpath $GCODE_RES_FILE_PATH)  # Adjust line endings
+        dos2unix $GCODE_RES_FILE_PATH  # Adjust line endings
     else
         python $protocol > $GCODE_RES_FILE_PATH
     fi
