@@ -35,5 +35,5 @@ for protocol in $TEST_DIR/Protocols/**/*.py; do
     fi
 
 
-    cmp --silent $GCODE_EXPECTED_FILE_PATH $GCODE_RES_FILE_PATH || echo '[FAIL] G-Code match false: ' $protocol
+    cmp --silent $GCODE_EXPECTED_FILE_PATH $GCODE_RES_FILE_PATH || { echo '[FAIL] G-Code match false: ' $protocol;  exit 1; }
 done
