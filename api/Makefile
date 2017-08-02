@@ -3,10 +3,14 @@ SHELL:=/bin/bash
 .PHONY: test docs publish clean install exe dev
 
 install:
+	git submodule update --init --recursive &&\
+	git submodule update --remote &&\
 	python setup.py install && pip install -r requirements.txt
 
 test:
-	pylama opentrons tests && py.test --cov
+	export APP_DATA_DIR="${TMPDIR:=${TMP:-$(CDPATH=/var:/; cd -P tmp)}}" &&\
+		pylama opentrons tests/opentrons && py.test --cov &&\
+		tests/gcode/gcode.test.sh
 
 docs:
 	cd docs && make html && make doctest
@@ -29,5 +33,6 @@ clean:
 		build \
 		dist \
 		calibrations \
-		.coverage
+		.coverage \
+		tests/gcode/results
 	find . -name "*.pyc" -delete && find . -type d -name __pycache__ -delete
