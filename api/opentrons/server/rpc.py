@@ -36,7 +36,7 @@ class Server(object):
                 # If it's a compound type (including dict)
                 # Check if it has id (i) to determine that it has
                 # a reference in object storage. If it's None, then it's
-                # a dict or array originated on the remote
+                # a dict originated at the remote
                 return self.objects[_id] if _id else a['v']
             # if array, resolve it's elements
             if isinstance(a, (list, tuple)):
@@ -131,7 +131,7 @@ class Server(object):
         root, _ = serialize.get_object_tree(self, shallow=True)
         await send({'$': {'type': CONTROL_MESSAGE}, 'data': root})
 
-        # Not the async iterator. It will keep looping
+        # Note the async iterator. It will keep looping
         # until the websocket is closed
         async for msg in ws:
             log.debug('Received: {0}'.format(msg))
