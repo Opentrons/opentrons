@@ -344,10 +344,15 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
                 #     'Command {} is not supported'.format(command))
 
     def write(self, data):
-        gfile = os.environ.get('GCODE_FILE')
-        if gfile:
-            with open(gfile, 'a') as gf:
-                gf.write(data.decode())
+        log_gcode = os.environ.get('LOG_GCODE')
+        if log_gcode:
+            log_data = data.decode().split(' ')
+            log_data = [i.rstrip() for i in log_data]
+            log_data = (
+                (' '.join([log_data[0]] +  # GCODE cmd
+                          sorted(log_data[1:]))).rstrip()  # GCODE args
+            )
+            print(log_data)
 
         if not self.isOpen():
             raise RuntimeError('Virtual Smoothie not currently connected')

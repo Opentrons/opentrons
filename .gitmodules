@@ -1,0 +1,4 @@
+[submodule "api/tests/gcode/Protocols"]
+	path = api/tests/gcode/Protocols
+	url = git://github.com/OpenTrons/Protocols.git
+	branch = master
