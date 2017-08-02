@@ -3,7 +3,9 @@ SHELL:=/bin/bash
 .PHONY: test docs publish clean install exe dev
 
 install:
-	git submodule update --init --recursive && python setup.py install && pip install -r requirements.txt
+	git submodule update --init --recursive &&\
+	git submodule update --remote &&\
+	python setup.py install && pip install -r requirements.txt
 
 test:
 	export APP_DATA_DIR="${TMPDIR:=${TMP:-$(CDPATH=/var:/; cd -P tmp)}}" &&\
