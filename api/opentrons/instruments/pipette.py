@@ -1,4 +1,5 @@
 import copy
+import inspect
 import itertools
 
 from opentrons.containers import unpack_location
@@ -147,6 +148,14 @@ class Pipette(Instrument):
                 self.positions[key] = default_positions[key]
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+
+    def _log(self, msg):
+        """
+        Logs pipette command calls, prepend '*' for nested public
+        pipette commands
+        """
+        msg = (helpers.call_depth(self, inspect.stack()) * '*') + msg
+        self.robot.add_command(msg)
 
     def update_calibrator(self):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
@@ -335,11 +344,10 @@ class Pipette(Instrument):
         destination = bottom - distance
         speed = self.speeds['aspirate'] * rate
 
-        _description = "Aspirating {0} {1}".format(
+        self._log("Aspirating {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
-        self.robot.add_command(_description)
+        ))
 
         self._position_for_aspirate(location)
         self.motor.speed(speed)
@@ -415,11 +423,10 @@ class Pipette(Instrument):
         if volume == 0:
             return self
 
-        _description = "Dispensing {0} {1}".format(
+        self._log("Dispensing {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
-        self.robot.add_command(_description)
+        ))
 
         self.move_to(location, strategy='arc')  # position robot above location
 
@@ -509,10 +516,12 @@ class Pipette(Instrument):
         if volume is None:
             volume = self.max_volume
 
-        _description = "Mixing {0} times with a volume of {1}ul".format(
-            repetitions, self.max_volume if volume is None else volume
+        self._log(
+            "Mixing {0} times with a volume of {1}ul".format(
+                repetitions,
+                self.max_volume if volume is None else volume
+            )
         )
-        self.robot.add_command(_description)
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
@@ -555,10 +564,9 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        _description = "Blowing out {}".format(
+        self._log("Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
-        )
-        self.robot.add_command(_description)
+        ))
 
         self.move_to(location, strategy='arc')
         self.motor.move(self._get_plunger_position('blow_out'))
@@ -604,8 +612,7 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        _description = 'Touching tip'
-        self.robot.add_command(_description)
+        self._log('Touching tip')
 
         height_offset = 0
 
@@ -675,8 +682,7 @@ class Pipette(Instrument):
         if volume is 0:
             return self
 
-        _description = 'Air gap'
-        self.robot.add_command(_description)
+        self._log('Air gap')
 
         if height is None:
             height = 5
@@ -718,13 +724,12 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        _description = "Returning tip"
+        self._log('Returning tip')
 
         if not self.current_tip():
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.robot.add_command(_description)
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
@@ -778,10 +783,9 @@ class Pipette(Instrument):
         if isinstance(location, Placeable):
             location = location.bottom()
 
-        _description = "Picking up tip {0}".format(
+        self._log("Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')
-        )  # NOQA
-        self.robot.add_command(_description)
+        ))  # NOQA
 
         presses = (1 if not helpers.is_number(presses) else presses)
 
@@ -845,10 +849,9 @@ class Pipette(Instrument):
             # give space for the drop-tip mechanism
             location = location.bottom(self._drop_tip_offset)
 
-        _description = "Drop_tip {}".format(
+        self._log("Drop_tip {}".format(
             ('at ' + humanize_location(location) if location else '')
-        )
-        self.robot.add_command(_description)
+        ))
 
         if location:
             self.move_to(location, strategy='arc')
@@ -886,10 +889,7 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        _description = "Homing pipette plunger on axis {}".format(
-            self.axis
-        )  # NOQA
-        self.robot.add_command(_description)
+        self._log("Homing pipette plunger on axis {}".format(self.axis))
 
         self.current_volume = 0
         self.motor.home()
@@ -918,6 +918,13 @@ class Pipette(Instrument):
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
+
+        self._log(
+            'Distributing {}ul from {} to {}'.format(
+                args[0], args[1], args[2]
+            )
+        )
+
         return self.transfer(*args, **kwargs)
 
     def consolidate(self, *args, **kwargs):
@@ -943,6 +950,12 @@ class Pipette(Instrument):
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
+
+        self._log(
+            'Consolidating {}ul from {} to {}'.format(
+                args[0], args[1], args[2]
+            )
+        )
 
         return self.transfer(*args, **kwargs)
 
@@ -1054,6 +1067,10 @@ class Pipette(Instrument):
         if tips is None:
             raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
 
+        self._log(
+            'Transferring {}ul from {} to {}'.format(volume, source, dest)
+        )
+
         plan = self._create_transfer_plan(volume, source, dest, **kwargs)
         self._run_transfer_plan(tips, plan, **kwargs)
 
@@ -1071,9 +1088,9 @@ class Pipette(Instrument):
         minutes += int(seconds / 60)
         seconds %= 60
 
-        _description = "Delaying {} minutes and {} seconds".format(
-            minutes, seconds)  # NOQA
-        self.robot.add_command(_description)
+        self._log(
+            "Delaying {} minutes and {} seconds".format(minutes, seconds)
+        )
 
         seconds += float(minutes * 60)
         self.motor.wait(seconds)
