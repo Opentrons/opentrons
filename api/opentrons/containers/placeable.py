@@ -724,9 +724,13 @@ class WellSeries(Container):
         return str(self)
 
     def __str__(self):
+        s = ''.join([str(well) for well in self.values[:1]])
+        e = ''.join([str(well) for well in self.values[-1:]])
         return '<{0}: {1}>'.format(
             self.__class__.__name__,
-            ''.join([str(well) for well in self.values]))
+            '{}..{}'.format(s, e)
+        )
+
 
     def __getattr__(self, name):
         # getstate/setstate are used by pickle and are not implemented by

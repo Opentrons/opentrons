@@ -944,7 +944,9 @@ class Pipette(Instrument):
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
 
-        self._log('Distributing')
+        self._log(
+            'Consolidating {}ul from {} to {}'.format(args[0], args[1], args[2])
+        )
 
         return self.transfer(*args, **kwargs)
 
@@ -972,7 +974,9 @@ class Pipette(Instrument):
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
 
-        self._log('Consolidating')
+        self._log(
+            'Consolidating {}ul from {} to {}'.format(args[0], args[1], args[2])
+        )
 
         return self.transfer(*args, **kwargs)
 
@@ -1084,7 +1088,7 @@ class Pipette(Instrument):
         if tips is None:
             raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
 
-        self._log('Transferring')
+        self._log('Transferring {}ul from {} to {}'.format(volume, source, dest))
 
         plan = self._create_transfer_plan(volume, source, dest, **kwargs)
         self._run_transfer_plan(tips, plan, **kwargs)
