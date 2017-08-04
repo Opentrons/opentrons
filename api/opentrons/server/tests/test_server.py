@@ -87,6 +87,10 @@ class ServerWrapper(object):
         await self.socket.close()
 
 
+def type_id(instance):
+    return id(type(instance))
+
+
 # TODO: add assert for nothing_to_read into finalizer
 # Right now have to add it at the end of every test
 # Tried doing and getting an assertion exception all the time
@@ -114,14 +118,25 @@ def session(monkeypatch, request, event_loop):
 @pytest.mark.asyncio
 async def test_init(session):
     expected = {
-        'data': {
-            'i': id(session.server),
-            'v': {
-                'objects': {},
-                'port': 31950,
-                'root': {},
-                'host': '127.0.0.1'}
+        'control': {
+            'instance': {
+                'i': id(session.server.control),
+                't': type_id(session.server.control),
+                'v': {'server': {}}
             },
+            'type': {
+                'i': type_id(session.server.control),
+                't': type_id(type),
+                'v': {
+                    '__dict__': {},
+                    '__doc__': None,
+                    '__init__': {},
+                    '__module__': 'opentrons.server.rpc',
+                    '__weakref__': {},
+                    'get_object_by_id': {},
+                    'get_root': {}}
+            }
+        },
         '$': {'type': rpc.CONTROL_MESSAGE}}
 
     res = json.loads(await session.read())
@@ -142,7 +157,7 @@ async def test_invalid_call(session):
                     'status': 'error',
                     'type': rpc.CALL_RESULT_MESSAGE
                 },
-                'data': "dispatch() missing 2 required positional arguments: 'name' "  # NOQA
+                'data': "TypeError: dispatch() missing 2 required positional arguments: 'name' "  # NOQA
                 "and 'args'"}
 
     assert res == expected
@@ -152,8 +167,7 @@ async def test_invalid_call(session):
 async def test_get_root(session):
     init = json.loads(await session.read())  # Skip init
     await session.put(
-        {'id': id(session.server), 'name': 'get_root', 'args': []})
-
+        {'id': id(session.server.control), 'name': 'get_root', 'args': []})
     json.loads(await session.read())  # Skip ACK
     res = json.loads(await session.read())  # Get call result
 
@@ -163,19 +177,61 @@ async def test_get_root(session):
                     'type': rpc.CALL_RESULT_MESSAGE},
                 'data': {
                     'i': id(session.server.root),
+                    't': type_id(session.server.root),
                     'v': {'value': 0}}}
     assert res == expected
 
 
 @pytest.mark.asyncio
-async def test_call_on_result(session):
+async def test_get_object_by_id(session):
     init = json.loads(await session.read())  # Skip init
-
-    # Call get root first, so root id is saved in references dict
     await session.put(
-        {'id': id(session.server), 'name': 'get_root', 'args': []})
+        {'id': id(session.server.control), 'name': 'get_root', 'args': []})
     json.loads(await session.read())  # Skip ACK
-    assert json.loads(await session.read())['$']['status'] == 'success'
+    res = json.loads(await session.read())  # Get call result
+
+    await session.put(
+        {
+            'id': id(session.server.control),
+            'name': 'get_object_by_id',
+            'args': [type_id(session.server.root)]})
+    json.loads(await session.read())  # Skip ACK
+    res = json.loads(await session.read())  # Get call result
+    expected = {'$': {
+                    'token': session.id,
+                    'status': 'success',
+                    'type': rpc.CALL_RESULT_MESSAGE},
+                'data': {
+                    'i': type_id(session.server.root),
+                    't': id(type),
+                    'v': set([
+                        '__dict__',
+                        '__module__',
+                        'value',
+                        '__init__',
+                        '__doc__',
+                        'throw',
+                        'next',
+                        'combine',
+                        'add',
+                        '__weakref__'])
+                    }
+                }
+    # We care only about dictionary keys, since we don't want
+    # to track ids of function objects
+    res['data']['v'] = set(res['data']['v'])
+
+    assert res == expected
+
+
+@pytest.mark.asyncio
+async def test_call_on_result(session):
+    json.loads(await session.read())  # Skip init
+
+    await session.put(
+        {'id': id(session.server.control), 'name': 'get_root', 'args': []})
+    json.loads(await session.read())  # Skip ACK
+    res = json.loads(await session.read())  # Get call result
 
     await session.put(
         {'id': id(session.server.root), 'name': 'value', 'args': []})
@@ -205,11 +261,11 @@ async def test_call_on_result(session):
 @pytest.mark.asyncio
 async def test_exception_on_call(session):
     json.loads(await session.read())  # Skip init
-    # Call get root first, so root id is saved in references dict
+
     await session.put(
-        {'id': id(session.server), 'name': 'get_root', 'args': []})
+        {'id': id(session.server.control), 'name': 'get_root', 'args': []})
     json.loads(await session.read())  # Skip ACK
-    json.loads(await session.read())  # Skip call results
+    res = json.loads(await session.read())  # Get call result
 
     await session.put(
         {'id': id(session.server.root), 'name': 'throw', 'args': []})
@@ -219,7 +275,7 @@ async def test_exception_on_call(session):
                     'token': session.id,
                     'status': 'error',
                     'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 'Kaboom!'}
+                'data': 'Exception: Kaboom!'}
 
     assert res == expected
 
@@ -227,11 +283,11 @@ async def test_exception_on_call(session):
 @pytest.mark.asyncio
 async def test_call_on_reference(session):
     json.loads(await session.read())    # Skip init
-    # Call get root first, so root id is saved in references dict
+
     await session.put(
-        {'id': id(session.server), 'name': 'get_root', 'args': []})
-    json.loads(await session.read())    # Skip ACK
-    json.loads(await session.read())    # Skip call results
+        {'id': id(session.server.control), 'name': 'get_root', 'args': []})
+    json.loads(await session.read())  # Skip ACK
+    res = json.loads(await session.read())  # Get call result
 
     await session.put(
         {'id': id(session.server.root), 'name': 'next', 'args': []})
@@ -254,5 +310,6 @@ async def test_call_on_reference(session):
                     'type': rpc.CALL_RESULT_MESSAGE},
                 'data': {
                     # i was popped out above
+                    't': type_id(session.server.root),
                     'v': {'value': 1}}}
     assert res == expected

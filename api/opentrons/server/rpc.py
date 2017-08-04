@@ -15,12 +15,26 @@ NOTIFICATION_MESSAGE = 2
 CONTROL_MESSAGE = 3
 
 
+# Wrapper class to dispatch select calls to server
+# without exposing the entire server class
+class ControlBox(object):
+    def __init__(self, server):
+        self.server = server
+
+    def get_root(self):
+        return self.server.root
+
+    def get_object_by_id(self, _id):
+        return self.server.objects[_id]
+
+
 class Server(object):
     def __init__(self, root=None, host='127.0.0.1', port=31950):
         self.objects = {id(self): self}
         self.root = root
         self.host = host
         self.port = port
+        self.control = ControlBox(self)
 
     def start(self):
         app = web.Application()
@@ -45,10 +59,6 @@ class Server(object):
 
         return [resolve(a) for a in args]
 
-    def get_root(self):
-        log.debug('Root = {0}'.format(self.root))
-        return self.root
-
     async def dispatch(self, _id, name, args):
         if _id not in self.objects:
             raise ValueError(
@@ -72,7 +82,6 @@ class Server(object):
                 .format(name, type(obj)))
 
         res = function(obj, *args)
-        self.objects[id(res)] = res
         return res
 
     async def process(self, message, send):
@@ -102,10 +111,11 @@ class Server(object):
                 log.warning(
                     'Exception while dispatching a method call: {0}'
                     .format(traceback.format_exc()))
-                res = str(e)
+                res = '{0}: {1}'.format(type(e).__name__, str(e))
                 msg['$']['status'] = 'error'
             finally:
                 root, refs = serialize.get_object_tree(res)
+                self.objects = {**self.objects, **refs}
                 msg['data'] = root
                 await send(msg)
 
@@ -127,9 +137,24 @@ class Server(object):
             log.debug('Sending {0} to {1}'.format(payload, ws))
             return ws.send_str(json.dumps(payload))
 
-        # Our first message is address of Server instance
-        root, _ = serialize.get_object_tree(self, shallow=True)
-        await send({'$': {'type': CONTROL_MESSAGE}, 'data': root})
+        # Return instance of root object and instance of control box
+        control_type, control_type_refs = serialize.get_object_tree(
+            type(self.control), shallow=True)
+        control_instance, control_instance_refs = serialize.get_object_tree(
+            self.control, shallow=True)
+        self.objects = {
+            **self.objects,
+            **control_type_refs,
+            **control_instance_refs}
+
+        await send(
+            {
+                '$': {'type': CONTROL_MESSAGE},
+                'control': {
+                    'instance': control_instance,
+                    'type': control_type
+                }
+            })
 
         # Note the async iterator. It will keep looping
         # until the websocket is closed
