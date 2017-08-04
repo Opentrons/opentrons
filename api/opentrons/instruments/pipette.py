@@ -11,30 +11,6 @@ from opentrons.helpers import helpers
 from opentrons.instruments.instrument import Instrument
 
 
-def call_depth(instance, call_stack):
-    """
-    Returns depth of the penultimate call relative to calls in
-    the stack by methods of this class
-
-    :param instance: object instance of a class
-    :return: int
-    """
-    class_methods = [
-        func_name
-        for func_name, _ in inspect.getmembers(
-            instance, predicate=inspect.ismethod)
-    ]
-    stack_fns = [i.function for i in call_stack]
-
-    # Remove stack methods not in the class
-    calls = filter(lambda m: m in class_methods, stack_fns)
-
-    # Remove private methods
-    calls = filter(lambda x: not x.startswith('_'), calls)
-
-    return len(list(calls)) - 1
-
-
 class Pipette(Instrument):
 
     """
@@ -178,7 +154,7 @@ class Pipette(Instrument):
         Logs pipette command calls, prepend '*' for nested public
         pipette commands
         """
-        msg = (call_depth(self, inspect.stack()) * '*') + msg
+        msg = (helpers.call_depth(self, inspect.stack()) * '*') + msg
         self.robot.add_command(msg)
 
     def update_calibrator(self):
