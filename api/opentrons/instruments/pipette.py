@@ -175,11 +175,10 @@ class Pipette(Instrument):
 
     def _log(self, msg):
         """
-        Logs pipette command calls
-        :param msg: msg to log
-        :return: None
+        Logs pipette command calls, prepend '*' for nested public
+        pipette commands
         """
-        msg = (call_depth(self, inspect.stack()) * '*' ) + msg
+        msg = (call_depth(self, inspect.stack()) * '*') + msg
         self.robot.add_command(msg)
 
     def update_calibrator(self):
@@ -945,7 +944,9 @@ class Pipette(Instrument):
             kwargs['disposal_vol'] = self.min_volume
 
         self._log(
-            'Consolidating {}ul from {} to {}'.format(args[0], args[1], args[2])
+            'Distributing {}ul from {} to {}'.format(
+                args[0], args[1], args[2]
+            )
         )
 
         return self.transfer(*args, **kwargs)
@@ -975,7 +976,9 @@ class Pipette(Instrument):
         kwargs['disposal_vol'] = 0
 
         self._log(
-            'Consolidating {}ul from {} to {}'.format(args[0], args[1], args[2])
+            'Consolidating {}ul from {} to {}'.format(
+                args[0], args[1], args[2]
+            )
         )
 
         return self.transfer(*args, **kwargs)
@@ -1088,7 +1091,9 @@ class Pipette(Instrument):
         if tips is None:
             raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
 
-        self._log('Transferring {}ul from {} to {}'.format(volume, source, dest))
+        self._log(
+            'Transferring {}ul from {} to {}'.format(volume, source, dest)
+        )
 
         plan = self._create_transfer_plan(volume, source, dest, **kwargs)
         self._run_transfer_plan(tips, plan, **kwargs)
@@ -1107,7 +1112,9 @@ class Pipette(Instrument):
         minutes += int(seconds / 60)
         seconds %= 60
 
-        self._log("Delaying {} minutes and {} seconds".format(minutes, seconds))
+        self._log(
+            "Delaying {} minutes and {} seconds".format(minutes, seconds)
+        )
 
         seconds += float(minutes * 60)
         self.motor.wait(seconds)

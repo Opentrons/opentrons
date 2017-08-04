@@ -422,6 +422,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '190', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
@@ -456,6 +458,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(len(self.robot.commands()))
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['aspirating', '190', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
             ['dispensing', '30', 'Well C1'],
@@ -502,6 +506,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '30', 'Well A1'],
             ['dispensing', '30', 'Well B1'],
@@ -541,6 +546,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Consolidating'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '30', 'Well A1'],
             ['aspirating', '30', 'Well B1'],
@@ -573,7 +580,9 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
-            ['aspirating', '30', 'Well A1'],
+            ['Consolidating'],
+            ['*Transferring'],
+            ['**aspirating', '30', 'Well A1'],
             ['aspirating', '30', 'Well B1'],
             ['aspirating', '30', 'Well C1'],
             ['aspirating', '30', 'Well D1'],
@@ -659,6 +668,7 @@ class PipetteTest(unittest.TestCase):
         print('\n\n***\n')
         pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '30', 'Well A1'],
             ['air'],
@@ -802,6 +812,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '100', 'Well A1'],
             ['dispensing', '100', 'Well A1'],
@@ -829,6 +840,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Consolidating'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '100', 'Well A1'],
             ['aspirating', '100', 'Well B1'],
@@ -855,6 +868,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '100', 'Well A1'],
@@ -867,6 +882,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
+                print(s, c)
                 self.assertTrue(s.lower() in c.lower())
         self.robot.clear_commands()
 
@@ -884,6 +900,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '150', 'Well A1'],
             ['dispensing', '150', 'Well B1'],
@@ -909,6 +926,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well B1'],
@@ -949,6 +967,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '160', 'Well A1'],
             ['dispensing', '10', 'Well A2'],
@@ -986,6 +1006,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '160', 'Well A1'],
             ['air'],
@@ -1058,6 +1080,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['mix', '10'],
             ['aspirating', 'Well A1'],
@@ -1087,6 +1110,7 @@ class PipetteTest(unittest.TestCase):
         print('\n\n***\n')
         pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '120', 'Well A1'],
             ['air gap'],
@@ -1114,11 +1138,13 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
-            ['pick'],
-            ['aspirating', '60', 'Well A1'],
-            ['aspirating', '60', 'Well B1'],
-            ['dispensing', '120', 'Well C1'],
-            ['drop']
+            ['Consolidating'],
+            ['*Tranferring'],
+            ['**pick'],
+            ['**aspirating', '60', 'Well A1'],
+            ['**aspirating', '60', 'Well B1'],
+            ['**dispensing', '120', 'Well C1'],
+            ['**drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
@@ -1138,18 +1164,20 @@ class PipetteTest(unittest.TestCase):
         print('\n\n***\n')
         pprint(self.robot.commands())
         expected = [
-            ['pick'],
-            ['aspirating', '130', 'Well C1'],
-            ['air gap'],
-            ['aspirating', '20'],
-            ['dispensing', '20'],
-            ['dispensing', '60', 'Well A1'],
-            ['air gap'],
-            ['aspirating', '20'],
-            ['dispensing', '20'],
-            ['dispensing', '60', 'Well B1'],
-            ['blow', 'point'],
-            ['drop']
+            ['Distributing'],
+            ['*Transferring'],
+            ['**pick'],
+            ['**aspirating', '130', 'Well C1'],
+            ['**air gap'],
+            ['***aspirating', '20'],
+            ['**dispensing', '20'],
+            ['**dispensing', '60', 'Well A1'],
+            ['**air gap'],
+            ['**aspirating', '20'],
+            ['**dispensing', '20'],
+            ['**dispensing', '60', 'Well B1'],
+            ['**blow', 'point'],
+            ['**drop']
         ]
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
@@ -1170,6 +1198,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '140', 'Well C1'],
             ['air gap'],
@@ -1202,6 +1232,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Consolidating'],
+            ['Transferring'],
             ['pick'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well C1'],
@@ -1234,6 +1266,8 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Distributing'],
+            ['Transferring'],
             ['pick'],
             ['mix', '10'],
             ['aspirating', 'Well A1'],
@@ -1268,6 +1302,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well A2'],
@@ -1295,6 +1330,7 @@ class PipetteTest(unittest.TestCase):
         print('\n\n***\n')
         pprint(self.robot.commands())
         expected = [
+            ['Transferring'],
             ['pick'],
             ['aspirating', '200', 'Well A1'],
             ['dispensing', '200', 'Well A3'],
