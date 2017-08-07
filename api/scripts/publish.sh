@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo "--------- GIT STATUS ---------"
 git status
@@ -8,7 +9,7 @@ git checkout .
 git clean -fd
 
 # Publish to PyPI
-python setup.py sdist bdist_wheel && twine upload dist/*
+python ../setup.py sdist bdist_wheel && twine upload dist/*
 
 # Publish to https://anaconda.org/opentrons/opentrons
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
