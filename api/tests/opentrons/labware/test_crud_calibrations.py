@@ -1,10 +1,11 @@
-import shutil
 import os
 import json
+import shutil
 import unittest
 
 from opentrons import Robot
-from opentrons import containers, instruments
+from opentrons.containers import load as containers_load
+from opentrons.instruments import instrument, pipette
 from opentrons.util.vector import Vector
 from opentrons.util import environment
 
@@ -12,11 +13,10 @@ from opentrons.util import environment
 class CrudCalibrationsTestCase(unittest.TestCase):
 
     def setUp(self):
-        Robot.reset_for_tests()
-        self.robot = Robot.get_instance()
+        self.robot = Robot()
         self.robot.connect()
-        self.plate = containers.load('96-flat', 'A1', 'plate')
-        self.p200 = instruments.Pipette(name="p200", axis="b")
+        self.plate = containers_load(self.robot, '96-flat', 'A1', 'plate')
+        self.p200 = pipette.Pipette(self.robot, name="p200", axis="b")
 
         self.p200.delete_calibration_data()
 
@@ -32,14 +32,14 @@ class CrudCalibrationsTestCase(unittest.TestCase):
 
     def test_save_load_calibration_data(self):
 
-        self.p200 = instruments.Pipette(name="p200-diff", axis="b")
+        self.p200 = pipette.Pipette(self.robot, name="p200-diff", axis="b")
         self.assertDictEqual(self.p200.calibration_data, {})
 
-        self.p200 = instruments.Pipette(name="p200", axis="a")
+        self.p200 = pipette.Pipette(self.robot, name="p200", axis="a")
         self.p200.delete_calibration_data()
         self.assertDictEqual(self.p200.calibration_data, {})
 
-        self.p200 = instruments.Pipette(name="p200", axis="b")
+        self.p200 = pipette.Pipette(self.robot, name="p200", axis="b")
 
         expected_delta = {
             'delta': (1.0, 2.0, 3.0),
@@ -54,7 +54,7 @@ class CrudCalibrationsTestCase(unittest.TestCase):
 
     def test_delete_calibrations_data(self):
 
-        self.p200 = instruments.Pipette(name="p200", axis="b")
+        self.p200 = pipette.Pipette(self.robot, name="p200", axis="b")
 
         expected_delta = {
             'delta': (1.0, 2.0, 3.0),
@@ -70,10 +70,13 @@ class CrudCalibrationsTestCase(unittest.TestCase):
         self.p200.delete_calibration_data()
         self.assertDictEqual(self.p200.calibration_data, {})
 
-        self.p200 = instruments.Pipette(name="p200", axis="b")
+        self.p200 = pipette.Pipette(self.robot, name="p200", axis="b")
         self.assertDictEqual(self.p200.calibration_data, {})
         self.assertDictEqual(self.p200.positions, {
-            'top': None, 'bottom': None, 'blow_out': None, 'drop_tip': None
+            'top': 0.0101,
+            'bottom': 10.0101,
+            'blow_out': 12.0101,
+            'drop_tip': 14.0101
         })
 
     def test_delete_old_calibration_file(self):
@@ -85,7 +88,7 @@ class CrudCalibrationsTestCase(unittest.TestCase):
                 os.path.join(calib_dir, 'calibrations.json')
             )
 
-            instruments.instrument.Instrument()._read_calibrations()
+            instrument.Instrument()._read_calibrations()
 
             file = os.path.join(calib_dir, 'calibrations.json')
             with open(file) as f:

@@ -1,19 +1,19 @@
 import unittest
-from opentrons import containers
 
 from opentrons import Robot
+from opentrons.containers import load as containers_load
 from opentrons.containers.placeable import Container, Deck
-from opentrons import instruments
+from opentrons.instruments import pipette
 
 
+# TODO: Refactor this into a standalone protocol script thats invoked by test
 class ProtocolTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.reset_for_tests()
-        self.robot = Robot.get_instance()
+        self.robot = Robot()
 
     def test_protocol_container_setup(self):
-        plate = containers.load('96-flat', 'A1', 'myPlate')
-        tiprack = containers.load('tiprack-10ul', 'B2')
+        plate = containers_load(self.robot, '96-flat', 'A1', 'myPlate')
+        tiprack = containers_load(self.robot, 'tiprack-10ul', 'B2')
 
         containers_list = self.robot.containers().values()
         self.assertEqual(len(containers_list), 2)
@@ -25,10 +25,11 @@ class ProtocolTestCase(unittest.TestCase):
         self.assertTrue(tiprack in containers_list)
 
     def test_protocol_head(self):
-        trash = containers.load('point', 'A1', 'myTrash')
-        tiprack = containers.load('tiprack-10ul', 'B2')
+        trash = containers_load(self.robot, 'point', 'A1', 'myTrash')
+        tiprack = containers_load(self.robot, 'tiprack-10ul', 'B2')
 
-        p200 = instruments.Pipette(
+        p200 = pipette.Pipette(
+            self.robot,
             name='myPipette',
             trash_container=trash,
             tip_racks=[tiprack],
@@ -46,8 +47,8 @@ class ProtocolTestCase(unittest.TestCase):
     def test_deck_setup(self):
         deck = self.robot.deck
 
-        trash = containers.load('point', 'A1', 'myTrash')
-        tiprack = containers.load('tiprack-10ul', 'B2')
+        trash = containers_load(self.robot, 'point', 'A1', 'myTrash')
+        tiprack = containers_load(self.robot, 'tiprack-10ul', 'B2')
 
         self.assertTrue(isinstance(tiprack, Container))
         self.assertTrue(isinstance(deck, Deck))

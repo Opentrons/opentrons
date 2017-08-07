@@ -359,6 +359,9 @@ texinfo_documents = [
 
 numpydoc_show_class_members = False
 
+# TODO: fix invalid :any: references
+suppress_warnings = ['ref']
+
 # Documents to append as an appendix to all manuals.
 #
 # texinfo_appendices = []

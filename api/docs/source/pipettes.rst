@@ -433,9 +433,9 @@ Demonstrates the different ways to control the movement of the Opentrons liquid 
 Move To
 =======
 
-Pipette's are able to ``move_to()`` any location on the deck. Any call to ``move_to()`` will be enqueued, meaning that it will not execute until calling ``robot.run()``.
+Pipette's are able to ``move_to()`` any location on the deck.
 
-For example, we can enqueue a movement to the first tip in our tip rack:
+For example, we can move to the first tip in our tip rack:
 
 .. testcode:: moving
 

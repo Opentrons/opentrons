@@ -7,14 +7,19 @@ from opentrons.robot import Robot
 
 class UploadTestCase(unittest.TestCase):
     def setUp(self):
-        Robot.get_instance().reset_for_tests()
+        self.robot = Robot()
         from main import app
         self.app = app.test_client()
 
         self.data_path = os.path.join(
             os.path.dirname(__file__) + '/data/'
         )
-        self.robot = Robot.get_instance()
+        self.robot = app.robot
+        self.robot.reset()
+
+    def tearDown(self):
+        del self.robot
+        del self.app
 
     def test_upload_and_run(self):
         response = self.app.post('/upload', data={
@@ -31,48 +36,38 @@ class UploadTestCase(unittest.TestCase):
         response = json.loads(response.data.decode())
         self.assertEqual(response['status'], 'success')
 
-    def test_upload_valid_python(self):
-        response = self.app.post('/upload', data={
-            'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
-        })
-
-        status = json.loads(response.data.decode())['status']
-        self.assertEqual(status, 'success')
-
     def test_get_instrument_placeables(self):
-        self.robot.connect(None, options={'limit_switches': False})
+        self.robot.connect(options={'limit_switches': False})
         response = self.app.post('/upload', data={
             'file': (open(self.data_path + 'protocol.py', 'rb'), 'protocol.py')
         })
         response = json.loads(response.data.decode())
         self.assertEquals(response['status'], 'success')
 
-        robot = Robot.get_instance()
-
-        robot._instruments['A'].positions = {
+        self.robot._instruments['A'].positions = {
             'top': 0,
             'bottom': 1,
             'blow_out': 2,
             'drop_tip': None
         }
-        robot._instruments['B'].positions = {
+        self.robot._instruments['B'].positions = {
             'top': None,
             'bottom': None,
             'blow_out': None,
             'drop_tip': None
         }
 
-        for instrument in robot._instruments.values():
+        for instrument in self.robot._instruments.values():
             instrument.calibration_data = {}
             instrument.update_calibrations()
 
-        location = robot._deck['A1'].get_child_by_name(
+        location = self.robot._deck['A1'].get_child_by_name(
             'test-tiprack')
         rel_vector = location[0].from_center(
             x=0, y=0, z=-1, reference=location)
         location = (location, rel_vector)
 
-        pipette = robot._instruments['A']
+        pipette = self.robot._instruments['A']
         pipette.calibrate_position(location)
 
         response = self.app.get('/instruments/placeables')
@@ -164,26 +159,3 @@ class UploadTestCase(unittest.TestCase):
                 for placeable in value:
                     self.assertTrue(placeable in response_data['placeables'])
                     pass
-
-    def test_upload_invalid_python(self):
-        pass
-
-    def test_upload_valid_json(self):
-        response = self.app.post('/upload', data={
-            'file': (
-                open(self.data_path + 'good_json_protocol.json', 'rb'),
-                'good_json_protocol.json'
-            )
-        })
-        status = json.loads(response.data.decode())['status']
-        self.assertEqual(status, 'success')
-
-    def test_upload_invalid_json(self):
-        response = self.app.post('/upload', data={
-            'file': (
-                open(self.data_path + 'invalid_json_protocol.json', 'rb'),
-                'good_json_protocol.json'
-            )
-        })
-        status = json.loads(response.data.decode())['status']
-        self.assertEqual(status, 'error')

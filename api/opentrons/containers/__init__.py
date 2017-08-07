@@ -26,7 +26,7 @@ __all__ = [
     apply_calibration]
 
 
-def load(container_name, slot, label=None):
+def load(robot, container_name, slot, label=None):
     """
     Examples
     --------
@@ -38,11 +38,9 @@ def load(container_name, slot, label=None):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
-    from opentrons import Robot
     if not label:
         label = container_name
-    protocol = Robot.get_instance()
-    return protocol.add_container(container_name, slot, label)
+    return robot.add_container(container_name, slot, label)
 
 
 def list():

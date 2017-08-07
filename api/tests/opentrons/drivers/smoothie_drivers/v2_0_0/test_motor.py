@@ -9,7 +9,7 @@ from opentrons.util.vector import Vector
 class OpenTronsTest(unittest.TestCase):
 
     def setUp(self):
-        self.robot = Robot.get_instance()
+        self.robot = Robot()
 
         # set this to True if testing with a robot connected
         # testing while connected allows the response handlers
@@ -37,7 +37,8 @@ class OpenTronsTest(unittest.TestCase):
         self.assertFalse(self.motor.is_connected())
 
     def test_write_with_lost_connection(self):
-        self.motor.connection.serial_port.is_open = False
+        sp = self.motor.connection
+        self.motor.connection = None
         old_method = getattr(self.motor, 'is_connected')
 
         def _temp():
@@ -46,11 +47,12 @@ class OpenTronsTest(unittest.TestCase):
         setattr(self.motor, 'is_connected', _temp)
 
         self.assertTrue(self.motor.is_connected())
-        self.assertRaises(RuntimeError, self.motor.calm_down)
+        self.assertRaises(Exception, self.motor.calm_down)
         setattr(self.motor, 'is_connected', old_method)
+        self.motor.connection = sp
 
     def test_write_after_disconnect(self):
-        self.motor.disconnect()
+        self.motor.connection = None
         self.assertRaises(RuntimeError, self.motor.calm_down)
 
     def test_version_compatible(self):
@@ -95,7 +97,6 @@ class OpenTronsTest(unittest.TestCase):
         self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
         self.motor.disconnect()
         res = self.motor.get_connected_port()
-        self.assertEquals(res, None)
         self.assertFalse(self.motor.is_connected())
 
     def test_get_dimensions(self):

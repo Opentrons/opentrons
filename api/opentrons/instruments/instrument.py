@@ -3,13 +3,9 @@ import json
 import os
 import sys
 
-from opentrons.containers.calibrator import Calibrator
-from opentrons.util.vector import (Vector, VectorEncoder)
 from opentrons.util import environment
-from opentrons.robot.command import Command
-from opentrons import Robot
-
 from opentrons.util.log import get_logger
+from opentrons.util.vector import Vector, VectorEncoder
 
 
 JSON_ERROR = None
@@ -37,8 +33,6 @@ class Instrument(object):
     persisted_attributes = []
     persisted_defaults = {}
 
-    calibrator = Calibrator(Robot()._deck, {})
-
     def reset(self):
         """
         Placeholder for instruments to reset their state between runs
@@ -56,54 +50,6 @@ class Instrument(object):
         Placeholder for instruments to reverse :meth:`setup_simulate`
         """
         pass
-
-    def create_command(self, do, setup=None, description=None, enqueue=True):
-        """
-        Creates an instance of Command to be appended to the
-        :any:`Robot` run queue.
-
-        Parameters
-        ----------
-        do : callable
-            The method to execute on the robot. This usually includes
-            moving an instrument's motors, or the robot head
-
-        setup : callable
-            The method to execute just before `do()`, which includes
-            updating the instrument's state
-
-        description : str
-            Human-readable description of the action taking place
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
-        Examples
-        --------
-        ..
-        >>> instrument = Instrument()
-        >>> def setup():
-        >>>     print('hello')
-        >>> def do():
-        >>>     print(' world')
-        >>> description = 'printing "hello world"'
-        >>> instrument.create_command(do, setup, description)
-        hello
-        >>> robot.simulate()
-        hello world
-        >>> instrument.create_command(do, setup, description, enqueue=False)
-        hello world
-        """
-
-        command = Command(do=do, setup=setup, description=description)
-
-        if enqueue:
-            Robot().add_command(command)
-        else:
-            command()
 
     def init_calibrations(self, key, attributes=None):
         """
@@ -267,7 +213,3 @@ class Instrument(object):
                 except JSON_ERROR:
                     pass
         return obj
-
-    @property
-    def robot(self):
-        return Robot.get_instance()
