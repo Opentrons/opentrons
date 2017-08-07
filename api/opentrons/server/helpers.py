@@ -36,7 +36,7 @@ def run_protocol(robot, code: str, mode='simulate') -> tuple:
         # set exception message to traceback
         stop_exc_msg = 'Received a STOP signal and exited from movements'
         if not (e.args and e.args[0] == stop_exc_msg):
-            exception_msg = traceback.format_exc()
+            exception_msg = 'Error in: ' + traceback.format_exc()
     finally:
         robot.app_run_mode = False
     robot.set_connection('live')
