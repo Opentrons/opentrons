@@ -14,7 +14,7 @@ docs:
 	cd docs && make html && make doctest
 
 publish:
-	cd scripts && publish.sh && doc-deploy.sh
+	cd scripts && ./publish.sh && ./doc-deploy.sh
 
 dev:
 	python opentrons/server/main.py
