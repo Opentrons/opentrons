@@ -57,7 +57,7 @@
     "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
     "asar": true,
     "asarUnpack": "ui/**",
-    "appId": "com.opentrons.ot-app",
+    "appId": "ot.one.opentrons",
     "electronVersion": "1.6.11",
     "productName": "Opentrons 2.0",
     "dmg": {

@@ -582,13 +582,19 @@ def move_to_slot():
     })
 
 
+def _get_pipette_from_axis(axis):
+    inst = app.robot._instruments[axis.upper()]
+    inst.load_persisted_data()
+    return inst
+
+
 @app.route('/move_to_container', methods=["POST"])
 def move_to_container():
     slot = request.json.get("slot")
     name = request.json.get("label")
     axis = request.json.get("axis")
     try:
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         container = app.robot._deck[slot].get_child_by_name(name)
         well_x, well_y, well_z = tuple(instrument.calibrator.convert(
             container[0],
@@ -616,7 +622,7 @@ def move_to_container():
 def pick_up_tip():
     try:
         axis = request.json.get("axis")
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         instrument.reset_tip_tracking()
         instrument.pick_up_tip()
     except Exception as e:
@@ -636,7 +642,7 @@ def pick_up_tip():
 def drop_tip():
     try:
         axis = request.json.get("axis")
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         instrument.return_tip()
     except Exception as e:
         emit_notifications([str(e)], 'danger')
@@ -656,7 +662,7 @@ def move_to_plunger_position():
     position = request.json.get("position")
     axis = request.json.get("axis")
     try:
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         instrument.motor.move(instrument.positions[position])
     except Exception as e:
         emit_notifications([str(e)], 'danger')
@@ -680,7 +686,7 @@ def aspirate_from_current_position():
         jog_up_distance = min(robot_max_z - current_z, 20)
 
         app.robot.move_head(z=jog_up_distance, mode='relative')
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         instrument.motor.move(instrument.positions['blow_out'])
         instrument.motor.move(instrument.positions['bottom'])
         app.robot.move_head(z=-jog_up_distance, mode='relative')
@@ -704,7 +710,7 @@ def dispense_from_current_position():
     try:
         # this action mimics 1.2 app experience
         # but should be re-thought to take advantage of API features
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         instrument.motor.move(instrument.positions['blow_out'])
     except Exception as e:
         emit_notifications([str(e)], 'danger')
@@ -724,7 +730,7 @@ def set_max_volume():
     volume = request.json.get("volume")
     axis = request.json.get("axis")
     try:
-        instrument = app.robot._instruments[axis.upper()]
+        instrument = _get_pipette_from_axis(axis)
         instrument.set_max_volume(int(volume))
         msg = "Max volume set to {0}ul on the {1} axis".format(volume, axis)
         emit_notifications([msg], 'success')
@@ -753,7 +759,7 @@ def _calibrate_placeable(container_name, parent_slot, axis_name):
     if axis_name not in app.robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
-    instrument = app.robot._instruments[axis_name]
+    instrument = _get_pipette_from_axis(axis_name)
 
     well = this_container[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=this_container)
@@ -796,7 +802,7 @@ def _calibrate_plunger(position, axis_name):
     if axis_name not in app.robot._instruments:
         raise ValueError('Axis {} is not initialized'.format(axis_name))
 
-    instrument = app.robot._instruments[axis_name]
+    instrument = _get_pipette_from_axis(axis_name)
     if position not in instrument.positions:
         raise ValueError('Position {} is not on the plunger'.format(position))
 
