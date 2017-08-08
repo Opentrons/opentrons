@@ -27,6 +27,23 @@ class ControlBox(object):
     def get_object_by_id(self, _id):
         return self.server.objects[_id]
 
+    # This is a stub in case the root object doesn't
+    # have async iterator
+    async def __anext__(self):
+        raise StopAsyncIteration
+
+    def __aiter__(self):
+        # Return self in case root doesn't provide __aiter__
+        res = self
+        try:
+            res = self.server.root.__aiter__()
+        except AttributeError as e:
+            log.info(
+                '__aiter__ attribute is not defined for {0}'.format(
+                    self.server.root))
+        finally:
+            return res
+
 
 class Server(object):
     def __init__(self, root=None, host='127.0.0.1', port=31950):
@@ -118,7 +135,6 @@ class Server(object):
                 self.objects = {**self.objects, **refs}
                 msg['data'] = root
                 await send(msg)
-
         elif message.type == aiohttp.WSMsgType.ERROR:
             log.error(
                 'WebSocket connection closed with exception %s'
@@ -156,8 +172,27 @@ class Server(object):
                 }
             })
 
-        # Note the async iterator. It will keep looping
-        # until the websocket is closed
+        # Start a loop listening for root object events
+        try:
+            async for event in self.control:
+                try:
+                    root, refs = serialize.get_object_tree(event)
+                    await send(
+                        {
+                            '$': {'type': NOTIFICATION_MESSAGE},
+                            'data': root
+                        })
+                    self.objects = {**self.objects, **refs}
+                except Exception as e:
+                    log.warning(
+                        'While processing event {0}: {1}',
+                        event, e)
+        except Exception as e:
+            log.warning(
+                'While binding to event stream: {1}',
+                event, e)
+
+        # Async receive ws data until websocket is closed
         async for msg in ws:
             log.debug('Received: {0}'.format(msg))
             try:

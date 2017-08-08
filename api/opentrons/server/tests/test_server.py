@@ -69,6 +69,22 @@ class Foo(object):
         raise Exception('Kaboom!')
 
 
+class TickTock(object):
+    def __init__(self):
+        self.value = 0
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        if (self.value > 5):
+            raise StopAsyncIteration
+
+        await asyncio.sleep(0.1)
+        self.value += 1
+        return 'Tick ' + str(self.value)
+
+
 class ServerWrapper(object):
     def __init__(self, socket, server):
         self.socket = socket
@@ -91,15 +107,11 @@ def type_id(instance):
     return id(type(instance))
 
 
-# TODO: add assert for nothing_to_read into finalizer
-# Right now have to add it at the end of every test
-# Tried doing and getting an assertion exception all the time
-@pytest.fixture
-def session(monkeypatch, request, event_loop):
+def make_session(monkeypatch, request, event_loop, instance):
     event_loop.set_debug(enabled=True)
 
     socket = WebSocket()
-    server = rpc.Server(Foo(0))
+    server = rpc.Server(instance)
     monkeypatch.setattr(web, 'WebSocketResponse', lambda: socket)
 
     future = asyncio.ensure_future(server.handler(None))
@@ -115,6 +127,19 @@ def session(monkeypatch, request, event_loop):
     return wrapper
 
 
+# TODO: add assert for nothing_to_read into finalizer
+# Right now have to add it at the end of every test
+# Tried doing and getting an assertion exception all the time
+@pytest.fixture
+def session(monkeypatch, request, event_loop):
+    return make_session(monkeypatch, request, event_loop, Foo(0))
+
+
+@pytest.fixture
+def notify_session(monkeypatch, request, event_loop):
+    return make_session(monkeypatch, request, event_loop, TickTock())
+
+
 @pytest.mark.asyncio
 async def test_init(session):
     expected = {
@@ -128,6 +153,8 @@ async def test_init(session):
                 'i': type_id(session.server.control),
                 't': type_id(type),
                 'v': {
+                    '__aiter__': {},
+                    '__anext__': {},
                     '__dict__': {},
                     '__doc__': None,
                     '__init__': {},
@@ -313,3 +340,22 @@ async def test_call_on_reference(session):
                     't': type_id(session.server.root),
                     'v': {'value': 1}}}
     assert res == expected
+
+
+@pytest.mark.asyncio
+async def test_notifications(notify_session):
+    await notify_session.read()
+    res = []
+    for i in range(5):
+        message = await notify_session.read()
+        message = json.loads(message)
+        assert message['$']['type'] == rpc.NOTIFICATION_MESSAGE
+        res.append(message['data'])
+
+    assert res == [
+        'Tick 1',
+        'Tick 2',
+        'Tick 3',
+        'Tick 4',
+        'Tick 5',
+    ]

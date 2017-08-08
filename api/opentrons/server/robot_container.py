@@ -1,5 +1,10 @@
+import asyncio
 import logging
+
 from opentrons import robot
+from opentrons.util.trace import EventBroker
+from asyncio import Queue
+
 
 log = logging.getLogger(__name__)
 
@@ -8,6 +13,13 @@ class RobotContainer(object):
     def __init__(self):
         self._globals = {'robot': robot}
         self._locals = {}
+        self.notifications = Queue()
+        EventBroker.get_instance().add(self.notify)
+
+    def notify(self, info):
+        # Use this to transition from non-async to async context
+        # This puts the task into event queue
+        asyncio.ensure_future(self.notifications.put(info))
 
     def load_protocol(self, text):
         robot.reset()
@@ -19,3 +31,12 @@ class RobotContainer(object):
         with open(file) as file:
             text = ''.join(list(file))
         return self.load_protocol(text)
+
+    def get_robot(self):
+        return self._globals['robot']
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        return await self.notifications.get()
