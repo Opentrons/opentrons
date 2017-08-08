@@ -78,7 +78,8 @@ deploy:
     skip_cleanup: true
     script: cd api && make publish && cd ..
     on:
-      tags: true
+      # tags: true
+      branch: master
 
 env:
   global:
