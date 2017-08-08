@@ -1,3 +1,4 @@
+import asyncio
 import aiohttp
 import json
 import logging
@@ -140,6 +141,26 @@ class Server(object):
                 'WebSocket connection closed with exception %s'
                 % ws.exception())
 
+    async def monitor_events(self, send):
+        try:
+            async for event in self.control:
+                try:
+                    data, refs = serialize.get_object_tree(event)
+                    await send(
+                        {
+                            '$': {'type': NOTIFICATION_MESSAGE},
+                            'data': data
+                        })
+                    self.objects = {**self.objects, **refs}
+                except Exception as e:
+                    print(
+                        'While processing event {0}: {1}'.format(
+                            event, e))
+        except Exception as e:
+            print(
+                'While binding to event stream: {0}'.format(
+                    e))
+
     # Handler receives HTTP request and negotiates up to
     # a websocket session
     async def handler(self, request):
@@ -172,25 +193,12 @@ class Server(object):
                 }
             })
 
+        events = None
         # Start a loop listening for root object events
         try:
-            async for event in self.control:
-                try:
-                    root, refs = serialize.get_object_tree(event)
-                    await send(
-                        {
-                            '$': {'type': NOTIFICATION_MESSAGE},
-                            'data': root
-                        })
-                    self.objects = {**self.objects, **refs}
-                except Exception as e:
-                    log.warning(
-                        'While processing event {0}: {1}',
-                        event, e)
+            asyncio.ensure_future(self.monitor_events(send))
         except Exception as e:
-            log.warning(
-                'While binding to event stream: {1}',
-                event, e)
+            print(e)
 
         # Async receive ws data until websocket is closed
         async for msg in ws:
