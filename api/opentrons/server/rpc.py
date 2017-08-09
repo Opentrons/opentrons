@@ -153,11 +153,11 @@ class Server(object):
                         })
                     self.objects = {**self.objects, **refs}
                 except Exception as e:
-                    print(
+                    log.warning(
                         'While processing event {0}: {1}'.format(
                             event, e))
         except Exception as e:
-            print(
+            log.warning(
                 'While binding to event stream: {0}'.format(
                     e))
 
@@ -198,7 +198,7 @@ class Server(object):
         try:
             asyncio.ensure_future(self.monitor_events(send))
         except Exception as e:
-            print(e)
+            log.warning(e)
 
         # Async receive ws data until websocket is closed
         async for msg in ws:
@@ -208,7 +208,7 @@ class Server(object):
             except Exception as e:
                 await ws.close()
                 log.error(
-                    'Exception while processing message: {0}'
+                    'While processing message: {0}'
                     .format(traceback.format_exc()))
 
         return ws
