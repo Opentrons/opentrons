@@ -25,7 +25,7 @@ cd ..
 
 # Clean out existing contents
 rm -rf out/* || exit 0
-cp -r ../docs/build/html/* out/
+cp -r docs/build/html/* out/
 touch out/.nojekyll
 echo "$CNAME" > out/CNAME
 
@@ -53,7 +53,7 @@ ENCRYPTED_KEY_VAR="encrypted_${ENCRYPTION_LABEL}_key"
 ENCRYPTED_IV_VAR="encrypted_${ENCRYPTION_LABEL}_iv"
 ENCRYPTED_KEY=${!ENCRYPTED_KEY_VAR}
 ENCRYPTED_IV=${!ENCRYPTED_IV_VAR}
-openssl aes-256-cbc -K $ENCRYPTED_KEY -iv $ENCRYPTED_IV -in ../doc-deploy.key.enc -out ../doc-deploy.key -d
+openssl aes-256-cbc -K $ENCRYPTED_KEY -iv $ENCRYPTED_IV -in ../scripts/doc-deploy.key.enc -out ../doc-deploy.key -d
 chmod 600 ../doc-deploy.key
 eval `ssh-agent -s`
 ssh-add ../doc-deploy.key

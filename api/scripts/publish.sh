@@ -1,4 +1,5 @@
 #!/bin/bash
+set -v
 
 echo "--------- GIT STATUS ---------"
 git status
