@@ -394,14 +394,14 @@ class PipetteTest(unittest.TestCase):
         self.p200.delay(1)
 
         self.assertEqual(
-            self.robot._commands[-1],
+            self.robot.commands()[-1],
             "Delaying 0 minutes and 1 seconds")
 
         self.robot.clear_commands()
         self.p200.delay(seconds=12, minutes=10)
 
         self.assertEqual(
-            self.robot._commands[-1],
+            self.robot.commands()[-1],
             "Delaying 10 minutes and 12 seconds")
 
     def test_set_speed(self):
@@ -1147,6 +1147,7 @@ class PipetteTest(unittest.TestCase):
             ['**dispensing', '120', 'Well C1'],
             ['**drop']
         ]
+        print(self.robot.commands())
         self.assertEqual(len(self.robot.commands()), len(expected))
         for i, c in enumerate(self.robot.commands()):
             for s in expected[i]:
@@ -1161,29 +1162,23 @@ class PipetteTest(unittest.TestCase):
             self.plate[0:2],
             air_gap=20
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
-        expected = [
-            ['Distributing'],
-            ['*Transferring'],
-            ['**pick'],
-            ['**aspirating', '130', 'Well C1'],
-            ['**air gap'],
-            ['***aspirating', '20'],
-            ['**dispensing', '20'],
-            ['**dispensing', '60', 'Well A1'],
-            ['**air gap'],
-            ['**aspirating', '20'],
-            ['**dispensing', '20'],
-            ['**dispensing', '60', 'Well B1'],
-            ['**blow', 'point'],
-            ['**drop']
-        ]
-        self.assertEqual(len(self.robot.commands()), len(expected))
-        for i, c in enumerate(self.robot.commands()):
-            for s in expected[i]:
-                self.assertTrue(s.lower() in c.lower())
+
+        expected = ['Distributing 60ul from <Well C1> to <WellSeries: <Well A1>..<Well B1>>',       # NOQA
+                    '*Transferring 60ul from <Well C1> to <WellSeries: <Well A1>..<Well B1>>',      # NOQA
+                    '**Picking up tip from <Deck><Slot B2><Container tiprack-10ul><Well A1>',       # NOQA
+                    '**Aspirating 130.0 at <Deck><Slot A2><Container 96-flat><Well C1>',            # NOQA
+                    '**Air gap',                                                                    # NOQA
+                    '***Aspirating 20 ',                                                            # NOQA
+                    '**Dispensing 20 at <Deck><Slot A2><Container 96-flat><Well A1>',               # NOQA
+                    '**Dispensing 60.0 at <Deck><Slot A2><Container 96-flat><Well A1>',             # NOQA
+                    '**Air gap',                                                                    # NOQA
+                    '***Aspirating 20 ',                                                            # NOQA
+                    '**Dispensing 20 at <Deck><Slot A2><Container 96-flat><Well B1>',               # NOQA
+                    '**Dispensing 60.0 at <Deck><Slot A2><Container 96-flat><Well B1>',             # NOQA
+                    '**Blowing out at <Deck><Slot A1><Container point><Well A1>',                   # NOQA
+                    '**Drop_tip at <Deck><Slot A1><Container point><Well A1>']                      # NOQA
+
+        assert self.robot.commands() == expected
         self.robot.clear_commands()
 
     def test_distribute_air_gap_and_disposal_vol(self):

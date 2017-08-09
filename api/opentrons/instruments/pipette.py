@@ -1,6 +1,9 @@
 import copy
 import inspect
 import itertools
+import sys
+
+from collections import namedtuple
 
 from opentrons.containers import unpack_location
 from opentrons.containers.calibrator import Calibrator
@@ -150,12 +153,40 @@ class Pipette(Instrument):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
     def _log(self, msg):
-        """
-        Logs pipette command calls, prepend '*' for nested public
-        pipette commands
-        """
-        msg = (helpers.call_depth(self, inspect.stack()) * '*') + msg
-        self.robot.add_command(msg)
+        Command = namedtuple('Command', ['msg', 'depth', 'stack'])
+
+        stack = []
+
+        frame = sys._getframe()
+        while frame:
+            stack.insert(0, frame.f_code.co_name)
+            frame = frame.f_back
+
+        # Make sure we have at least one command in list
+        empty_command = Command(msg='', depth=0, stack=[])
+        last_command = \
+            (self.robot.commands(string=False) or [empty_command])[-1]
+        _, depth, previous_stack = last_command
+
+        # Filter internal functions which we identify as something
+        # that starts with '_'
+        #
+        # TODO(artyom): how do we keep ourselves from having to do this,
+        # since there is no standard naming convention for private
+        # functions in Python
+        current_stack = [f for f in stack if not str(f).startswith('_')]
+
+        # Remove immediate caller from the stack
+        # since we don't want to compare stack trace
+        # with our siblings in call tree
+        current_stack.pop()
+
+        if current_stack > previous_stack:
+            depth += 1
+        elif current_stack < previous_stack:
+            depth -= 1
+
+        self.robot.add_command(Command(msg, depth, current_stack))
 
     def update_calibrator(self):
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)

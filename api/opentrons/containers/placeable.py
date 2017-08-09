@@ -13,7 +13,7 @@ def unpack_location(location):
     Returns (:Placeable:, :Vector:) tuple
 
     If :location: is :Placeable: it will get converted to
-    (:Placeable:, :Vector: corresponting to the top)
+    (:Placeable:, :Vector: corresponding to the top)
     """
     coordinates = None
     placeable = None
