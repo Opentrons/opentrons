@@ -316,9 +316,19 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         args.update({"F": max(list(self.speeds.values()))})
 
         self.check_paused_stopped()
-        self.send_command(self.MOVE, **args)
-        self.wait_for_ok()
-        # self.wait_for_arrival()
+
+        attempts = 0
+        max_attempts = 3
+        while attempts <= max_attempts:
+            attempts += 1
+            try:
+                self.send_command(self.MOVE, **args)
+                self.wait_for_ok()
+                break
+            except Exception as e:
+                log.exception('MOVE command send failed. Trying again')
+                time.sleep(0.5)
+                self.connection.reconnect()
 
         arguments = {
             'name': 'move-finished',
