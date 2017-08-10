@@ -15,7 +15,7 @@ export default merge.smart(baseConfig, {
 
   entry: ['babel-polyfill', './shell/main'],
 
-  // 'main.js' in root
+  // 'index.js' in root
   output: {
     path: path.join(__dirname, 'shell/dist'),
     filename: './bundle.js'

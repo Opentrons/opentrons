@@ -91,7 +91,6 @@ calibrations/
 
 
 # JS
-node_modules
 .nvm
 
 app/test/coverage

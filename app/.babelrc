@@ -1,32 +1,34 @@
 {
   "env": {
     "test": {
-      "plugins":
-        ["istanbul"]
+      "plugins": [
+        "istanbul"
+      ]
     },
     "production": {
-      "presets": ["react-optimize"],
-      "plugins": ["babel-plugin-dev-expression"]
+      "presets": [
+        "react-optimize"
+      ]
     },
     "development": {
       "plugins": [
-        "transform-class-properties",
-        "transform-es2015-classes",
         "react-hot-loader/babel"
       ]
     }
   },
-  "plugins": ["add-module-exports", "dynamic-import-webpack"],
+  "plugins": [
+    "babel-plugin-transform-object-rest-spread"
+  ],
   "presets": [
+    "react",
     [
       "env", {
-        "targets": {"node": 6},
+        "targets": {
+          "node": "6.11",
+          "electron": "1.6"
+        },
         "useBuiltIns": true
       }
-    ],
-    "stage-2",
-    "react",
-    "es2015",
-    "es2017"
+    ]
   ]
 }
