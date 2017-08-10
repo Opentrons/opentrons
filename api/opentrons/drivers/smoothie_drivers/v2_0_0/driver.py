@@ -332,6 +332,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             except RuntimeWarning as e:
                 raise e
             except Exception as e:
+                time.sleep(0.5)
                 log.exception(
                     'Failed to send MOVE command. Will reconnect and '
                     'trying again'
