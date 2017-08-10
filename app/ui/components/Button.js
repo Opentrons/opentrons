@@ -16,7 +16,7 @@ const Button = props => (
 
 Button.propTypes = {
   disabled: PropTypes.bool,
-  onClick: PropTypes.func
+  onClick: PropTypes.func.isRequired
 }
 
 export default Button

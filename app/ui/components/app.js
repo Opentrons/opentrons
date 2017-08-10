@@ -4,9 +4,10 @@ import styles from './app.css'
 import Connection from './Connection'
 import Button from './Button'
 
-const running = false;
+
 
 export default function App () {
+  const running = false
   return (
     <div className={styles.run_wrapper}>
       <header className={styles.menu}>
