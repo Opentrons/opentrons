@@ -129,6 +129,7 @@
     "babel-preset-react-optimize": "^1.0.1",
     "babel-register": "^6.24.1",
     "babili-webpack-plugin": "^0.1.1",
+    "classnames": "^2.2.5",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
