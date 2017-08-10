@@ -26,6 +26,9 @@ body{
 .menu {
   grid-area: head;
   background-color: #666;
+  display:grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
+  grid-template-areas:  ". . . run"
 }
 
 .sidebar {
@@ -35,6 +38,11 @@ body{
 .connect {
   grid-area: connect;
   background-color: #DDD;
+}
+
+.run{
+  grid-area: run;
+  margin:1rem;
 }
 
 .run_progress{

@@ -21,6 +21,12 @@
     font-style: normal;
 }
 
+button{
+  border:none;
+}
+
+button:focus {outline:0;}
+
 /*************************
           Globals
 *************************/
@@ -31,10 +37,10 @@
 
 .btn{
   padding: 5px;
-  border-radius: 6px;
+  border-radius: 2px;
   line-height: 21px;
-  background-color: #9b9b9b;
-  color: white;
+  background-color: #EEE;
+  color: #666;
   font-family: 'trons';
   font-size: 14px;
   text-transform: uppercase;
@@ -50,7 +56,14 @@
   border: none;
 }
 
-button:focus {outline:0;}
+.disabled{
+  color:#888;
+  background-color: #AAA;
+  pointer-events: none;
+}
+
+
+
 
 .title{
   font-family: 'sans';
