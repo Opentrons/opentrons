@@ -255,7 +255,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.toggle_port()
 
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
-        gcode_line = '{} {}\r\n'.format(command, args)
+        gcode_line = '{} {} M400\r\n'.format(command, args)
         log.debug("Write: {}".format(gcode_line))
 
         self.connection.flush_input()
@@ -281,6 +281,17 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             raise RuntimeWarning(error_msg)
 
     def move(self, mode='absolute', **kwargs):
+
+        # Convert relative coordinates to absolute coordinates
+        if mode == 'relative':
+            mode = 'absolute'
+            for axis in 'xyz':
+                current = self.get_head_position()['target']
+                kwargs[axis] = kwargs.get(axis, 0) + current[axis]
+            for axis in 'ab':
+                current = self.get_plunger_positions()['target']
+                kwargs[axis] = kwargs.get(axis, 0) + current[axis]
+
         self.set_coordinate_system(mode)
         self.set_speed()
 
@@ -292,6 +303,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             )
             for axis in 'xyz'
         }
+        print(target_point)
 
         flipped_vector = self.flip_coordinates(
             Vector(target_point), mode)
@@ -306,7 +318,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.check_paused_stopped()
         self.send_command(self.MOVE, **args)
         self.wait_for_ok()
-        self.wait_for_arrival()
+        # self.wait_for_arrival()
 
         arguments = {
             'name': 'move-finished',
