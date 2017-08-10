@@ -326,7 +326,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 self.wait_for_ok()
                 break
             except Exception as e:
-                log.exception('MOVE command send failed. Trying again')
+                log.exception(
+                    'Failed to send MOVE command. Will reconnect and '
+                    'trying again'
+                )
                 time.sleep(0.5)
                 self.connection.reconnect()
 
