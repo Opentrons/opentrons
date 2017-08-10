@@ -33,6 +33,10 @@ def instance():
     return (root, a1, a2, a3)
 
 
+def type_id(instance):
+    return id(type(instance))
+
+
 def test_robot():
     trough = containers.load('trough-12row', 'C1', 'trough')
     plate = containers.load('96-PCR-flat', 'D1', 'plate')
@@ -58,26 +62,31 @@ def test_get_object_tree(instance):
     root, a1, a2, a3 = instance
     tree, refs = serialize.get_object_tree(root)
 
-    assert refs == {id(o): o for o in [root, a1, a2, a3]}
+    r = [root, a1, a2, a3]
+    r += [type(o) for o in r] + [dict]
+    assert refs == {id(o): o for o in r}
     assert tree == {
         'i': id(root),
+        't': type_id(root),
         'v': {
             '0': 0,
             'a': {
                 'i': id(a1),
+                't': type_id(a1),
                 'v': {
                     '0': 0,
                     'b': 1,
                     'c': 'c',
                     'd': True,
                     'e': None}},
-            'b': [{'i': id(a2), 'v': {'0': 0, 'a': 1}}, 'b', 1],
+            'b': [{'i': id(a2), 't': type_id(a2), 'v': {'0': 0, 'a': 1}}, 'b', 1],  # NOQA
             'c': {
                 'i': tree['v']['c']['i'],
+                't': id(dict),
                 'v': {
                     'a': 1,
-                    'b': [1, 2, {'i': id(a3), 'v': {'0': 0}}]}},
-            'circular': {'i': id(root), 'v': None}}}
+                    'b': [1, 2, {'i': id(a3), 't': type_id(a3), 'v': {'0': 0}}]}},  # NOQA
+            'circular': {'i': id(root), 't': type_id(root), 'v': None}}}
 
     assert json.dumps(tree)
 
@@ -87,10 +96,11 @@ def test_get_object_tree_shallow(instance):
     tree, refs = serialize.get_object_tree(root, shallow=True)
     assert tree == {
         'i': id(root),
+        't': type_id(root),
         'v': {
             '0': 0, 'a': {}, 'b': {}, 'c': {},
-            'circular': {'i': id(root), 'v': None}}}
-    assert refs == {id(root): root}
+            'circular': {'i': id(root), 't': type_id(root), 'v': None}}}
+    assert refs == {id(root): root, type_id(root): type(root)}
 
 
 def test_ordered_dict():
@@ -100,6 +110,8 @@ def test_ordered_dict():
     tree, refs = serialize.get_object_tree(a)
     assert tree == {
         'i': id(a),
+        't': type_id(a),
         'v': {'a': {
                 'i': id(b),
+                't': type_id(b),
                 'v': {'b': 1}}}}
