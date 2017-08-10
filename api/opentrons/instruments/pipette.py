@@ -26,7 +26,6 @@ class Pipette(Instrument):
         * Instantiate a pipette with a maximum volume (uL)
         and an axis (`a` or `b`)
         * Design your protocol through the pipette's liquid-handling commands
-        * Run on the :any:`Robot` using :any:`run` or :any:`simulate`
 
     Parameters
     ----------
@@ -871,7 +870,6 @@ class Pipette(Instrument):
         Notes
         -----
         `Pipette.home()` homes the `Robot`
-        (see :any:`run` and :any:`simulate`)
 
         Returns
         -------
