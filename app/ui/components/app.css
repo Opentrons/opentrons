@@ -11,15 +11,16 @@ body{
   overflow:hidden;
 }
 
-.wrapper {
+.run_wrapper {
   display: grid;
   width:1024px;
   height:768px;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 68px 550px 150px;
+  grid-template-rows: 68px 200px 350px 150px;
   grid-template-areas:  "head head head" 
-                        "sidebar task task" 
-                        "connect task task";
+                        "sidebar controls controls" 
+                        "sidebar log log" 
+                        "connect log log";
 }
 
 .menu {
@@ -33,6 +34,11 @@ body{
 
 .connect {
   grid-area: connect;
+  background-color: #DDD;
+}
+
+.run_progress{
+  grid-area: controls;
   background-color: #DDD;
 }
 
