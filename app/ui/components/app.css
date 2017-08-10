@@ -1,0 +1,42 @@
+/*TODO: Move Resets and Typography to global css file*/
+
+*{
+  box-sizing:border-box;
+
+}
+
+body{
+  padding:0;
+  margin:0;
+  overflow:hidden;
+}
+
+.wrapper {
+  display: grid;
+  width:1024px;
+  height:768px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 68px 550px 150px;
+  grid-template-areas:  "head head head" 
+                        "sidebar task task" 
+                        "connect task task";
+}
+
+.menu {
+  grid-area: head;
+  background-color: #666;
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.connect {
+  grid-area: connect;
+  background-color: #DDD;
+}
+
+.task {
+  grid-area: task;
+  background-color: #EEE;
+}
