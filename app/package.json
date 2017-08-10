@@ -162,6 +162,7 @@
     "minimist": "^1.2.0",
     "node-sass": "^4.5.3",
     "prop-types": "^15.5.10",
+    "portfinder": "^1.0.13",
     "react-addons-test-utils": "^15.5.1",
     "react-test-renderer": "^15.5.4",
     "redux-logger": "^3.0.6",
@@ -198,10 +199,10 @@
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "source-map-support": "^0.4.15",
-    "underscore.string": "^3.3.4",
     "unzip": "0.1.11",
     "url-join": "1.1.0",
     "winston": "^2.2.0",
+    "ws": "^3.1.0",
     "zip-folder": "^1.0.0"
   }
 }

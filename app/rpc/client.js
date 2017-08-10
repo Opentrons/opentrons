@@ -1,251 +1,250 @@
-import winston from 'winston'
-import uuidV4 from 'uuid/v4'
+import EventEmitter from 'events'
+import log from 'winston'
+import uuid from 'uuid/v4'
 import WebSocket from 'ws'
 
-const log = winston
+import RemoteObject from './remote-object'
+import { statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE } from './message-types'
 
-const DISPATCHED = 0
-const ACKNOWLEDGED = 1
-const RETURNED = 2
+// timeouts
+const HANDSHAKE_TIMEOUT = 5000
+const RECEIVE_CONTROL_TIMEOUT = 500
+const CALL_ACK_TIMEOUT = 500
+const CALL_RESULT_TIMEOUT = 10000
 
-const CALL_RESULT_MESSAGE = 0
-const CALL_ACK_MESSAGE = 1
-const NOTIFICATION_MESSAGE = 2
-const CONTROL_MESSAGE = 3
+// metadata constants
+const REMOTE_TARGET_OBJECT = 0
+const REMOTE_TYPE_OBJECT = 1
 
-const MSEC = 1
-const SEC = 1000 * MSEC
+// event name utilities
+const makeAckEventName = (token) => `ack:${token}`
+const makeSuccessEventName = (token) => `success:${token}`
+const makeFailureEventName = (token) => `failure:${token}`
 
-const HANDSHAKE_TIMEOUT = 5 * SEC
-const CONNECTION_TIMEOUT = 10 * SEC
-const CALL_RESULT_TIMEOUT = 10 * SEC
-const CALL_ACK_TIMEOUT = 5 * SEC
+// TODO(mc): find out if buffering incomplete messages if needed
+// ws frame size is pretty big, though, so it's probably unnecesary
+function parseMessageString(messageString) {
+  let message
 
-// winston.level = 'warning'
-
-// To prevent from dispatching these calls to the remote
-const SPECIAL_FUNCTION_NAMES =
-  new Set([
-    'then',
-    'inspect',
-    'asymmetricMatch',
-    'constructor',
-    '$$typeof',
-    'nodeType',
-    '@@__IMMUTABLE_LIST__@@',
-    '@@__IMMUTABLE_SET__@@',
-    '@@__IMMUTABLE_MAP__@@',
-    '@@__IMMUTABLE_STACK__@@',
-    'toJSON',
-    'valueOf'
-  ])
-
-const RemoteObject = (context, obj, isValueNode = false) => {
-  // A shorthand to alternate between Reference Node and Value Node
-  // in JSON object graph. See below for details
-  const nextRemoteObject = (nextObject) =>
-    RemoteObject(context, nextObject, !isValueNode)
-
-  // Returns a proxy object that points to the record in the
-  // instances map that corresponds to the id of a remote object
-  const getProxy = (id, instance) => {
-    // If no id, the object is not remote, return it
-    if (!id) return instance
-    // Store locally only if there is value
-    // If there is an id but no value, it's a circular reference
-    if (instance) context.put(id, instance)
-    return new Proxy({}, // <- object we are proxying
-      {
-        // Needed for reflection
-        getOwnPropertyDescriptor: (target, prop) => {
-          const remote = context.get(id)
-          return Object.getOwnPropertyDescriptor(remote, prop)
-        },
-        // Probably too ...
-        ownKeys: () => {
-          const remote = context.get(id)
-          const keys = Object.getOwnPropertyNames(remote)
-          return keys
-        },
-        // Trap attempts to access object's properties
-        get: (target, name) => {
-          if (SPECIAL_FUNCTION_NAMES.has(name)) return target[name]
-          if (typeof name === 'symbol') return target[name]
-          const remote = context.get(id)
-          if (Object.prototype.hasOwnProperty.call(remote, name)) {
-            return remote[name]
-          }
-          // If there is no value to be found between target and instances map
-          // return a promise that will dispatch a remote function call
-          return async (...args) => {
-            const res = await context.callRemoteMethod(id, name, args)
-            if (res.$.status === 'error') throw new Error(res.data)
-            return RemoteObject(context, res.data)
-          }
-        }
-      })
+  try {
+    message = JSON.parse(messageString)
+  } catch (e) {
+    log.warning('JSON parse error', e)
   }
 
-  if (isValueNode) {
-    if (!obj) return obj
-
-    const res = {}
-    // If object iterate through keys / values
-    // TODO: explore why Object.entries from ES2017 is not working
-    // What's the idiomatic way of mapping through key / values?
-    Object.keys(obj)
-      .forEach((key) => { res[key] = nextRemoteObject(obj[key]) })
-
-    return res
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map(
-      item => RemoteObject(context, item, isValueNode))
-  }
-
-  // Check if primitive
-  if (obj !== Object(obj)) return obj
-
-  return getProxy(obj.i, nextRemoteObject(obj.v))
+  return message
 }
 
-const Context = (connection) => ({
-  connection,
-  // Remote calls in progress
-  pendingCalls: new Map(),
-  // Local copies of remote objects
-  instances: new Map(),
-  put(id, value) {
-    if (this.instances.has(id)) log.info(`Updating instance with ${{ id }}`)
-    this.instances.set(id, value)
-  },
-  // TODO: if not found, try to retrieve from remote?
-  get(id) {
-    if (!this.instances.has(id)) {
-      log.info(`Local instance with id=${{ id }} is missing`)
-      return undefined
-    }
-    return this.instances.get(id)
-  },
+// internal RPC over websocket client
+// handles the socket itself and object context
+class RpcContext extends EventEmitter {
+  constructor(ws) {
+    super()
+    this._ws = ws
+    this._resultTypes = new Map()
+    this._typeObjectCache = new Map()
+    this.control = null
+    ws.on('error', this._handleError.bind(this))
+    ws.on('message', this._handleMessage.bind(this))
+  }
 
-  callRemoteMethod(id, name, args) {
-    const token = uuidV4()
-    const removePending = v => this.pendingCalls.delete(token) && v
-    const promise = new Promise((resolve, reject) => {
-      if (typeof name === 'symbol') return resolve(undefined)
-      if (SPECIAL_FUNCTION_NAMES.has(name)) {
-        log.warn(`Not dispatching ES special function ${name}()`)
-        return resolve(undefined)
+  call(id, name, args) {
+    const self = this
+    const token = uuid()
+    const ackEvent = makeAckEventName(token)
+    const resultEvent = makeSuccessEventName(token)
+    const failureEvent = makeFailureEventName(token)
+
+    this._send({ $: { token }, id, name, args })
+
+    return new Promise((resolve, reject) => {
+      let timeout
+
+      const handleError = (error) => {
+        cleanup()
+        reject(error)
       }
-      this.pendingCalls.set(token, this.Call(id, resolve, reject))
-      log.info(`Calling ${name}(${args})`)
-      try {
-        this.connection.send(JSON.stringify({ $: { token }, name, id, args }))
-      } catch (e) {
-        return reject(e)
+
+      const handleFailure = (result) => {
+        handleError(new Error(result))
       }
+
+      const handleSuccess = (result) => {
+        cleanup()
+
+        RemoteObject(this, result)
+          .then(resolve)
+          .catch(reject)
+      }
+
+      const handleAck = () => {
+        clearTimeout(timeout)
+        timeout = setTimeout(
+          () => handleError(new Error(`Result timeout for call ${token}`)),
+          CALL_RESULT_TIMEOUT
+        )
+
+        this.once(resultEvent, handleSuccess)
+        this.once(failureEvent, handleFailure)
+      }
+
+      function cleanup() {
+        clearTimeout(timeout)
+        self.removeAllListeners(ackEvent)
+        self.removeAllListeners(resultEvent)
+        self.removeAllListeners(failureEvent)
+        self.removeListener('error', handleError)
+      }
+
+      this.once('error', handleError)
+      this.once(ackEvent, handleAck)
+      timeout = setTimeout(
+        () => handleError(new Error(`Ack timeout for call ${token}`)),
+        CALL_ACK_TIMEOUT
+      )
     })
-    // Remove call from pending in either case
-    return promise.then(removePending, removePending)
-  },
+  }
 
-  // id : unique id of the call being dispatched
-  // resolve/reject : handlers from a Promise generated upstream
-  Call: (id, resolve, reject) => ({
-    // Valid state sequence:
-    // DISPATCHED -> ACKNOWLEDGED -> RETURNED
-    state: DISPATCHED,
-    // Create ACK timer first
-    timer: setTimeout(() => reject('Call ACK timed out'), CALL_ACK_TIMEOUT),
-    handle(message) {
-      switch (message.$.type) {
-        // Server will acknowledge call first
-        case CALL_ACK_MESSAGE:
-          clearTimeout(this.timer)
-          if (this.state !== DISPATCHED) return reject('Received unexpected ACK')
-          this.state = ACKNOWLEDGED
-          this.timer = setTimeout(
-            () => reject('Timed out waiting for result'), CALL_RESULT_TIMEOUT)
-          break
-        // Then dispatch the result once ready
-        case CALL_RESULT_MESSAGE:
-          clearTimeout(this.timer)
-          if (this.state !== ACKNOWLEDGED) {
-            return reject('Received result without call being ACKed first')
-          }
-          this.state = RETURNED
-          resolve(message)
-          break
-        default:
-          return reject(`Unknown message type: ${message.$.type}`)
-      }
+  resolveTypeValues(source) {
+    const typeId = source.t
+
+    if (this._resultTypes.get(source.i) === REMOTE_TYPE_OBJECT) {
+      return Promise.resolve({})
     }
-  }),
 
-  // Dispatch message to one of the Calls pending
-  dispatch(message) {
-    const token = message.$.token
-    const call = this.pendingCalls.get(token)
-    if (!call) {
-      log.error(`Call with token=${token} was never issued`)
-      return
+    if (this._typeObjectCache.has(typeId)) {
+      return Promise.resolve(this._typeObjectCache.get(typeId).v)
     }
-    return call.handle(message)
-  },
-})
 
-const Connection = (url) => {
-  log.debug(`Connecting to ${url}`)
+    return this.control.get_object_by_id(typeId)
+  }
 
-  let register = null
-  const socket = new WebSocket(url)
-  const promise = new Promise((resolve, reject) => {
-    register = () => {
-      socket.addEventListener('open', () => resolve(socket))
-      socket.addEventListener('error', (error) => reject(error))
+  // close the websocket
+  close() {
+    this._ws.close()
+  }
+
+  // cache required metadata from call results
+  // filter type field from type object to avoid getting unecessary types
+  _cacheCallResultMetadata(resultData) {
+    const id = resultData.i
+    const typeId = resultData.t
+    const value = resultData.v || {}
+
+    // grab any type ids (including children) and set the flags
+    this._resultTypes.set(typeId, REMOTE_TYPE_OBJECT)
+    Object.keys(value)
+      .map((key) => value[key])
+      .filter((v) => v && v.t && v.v)
+      .forEach((v) => this._cacheCallResultMetadata(v))
+
+    if (!this._resultTypes.has(id)) {
+      this._resultTypes.set(id, REMOTE_TARGET_OBJECT)
+    } else if (this._resultTypes.get(id) === REMOTE_TYPE_OBJECT) {
+      this._typeObjectCache.set(id, resultData)
     }
-    setTimeout(
-      () => reject(`Connection timeout: ${url}`),
-      CONNECTION_TIMEOUT)
-  })
-  // Dispatching outside of promise to avoid race condition
-  register()
-  // In addition to promise, return socket for test purposes
-  // TODO: find a way to mock socket that works in async
-  return { promise, socket }
+  }
+
+  _send(message) {
+    log.debug('Sending: %j', message)
+    this._ws.send(JSON.stringify(message))
+  }
+
+  _handleError(error) {
+    this.emit('error', error)
+  }
+
+  // TODO(mc): split this method up
+  _handleMessage(messageString) {
+    log.debug(`Received message ${messageString}`)
+
+    const message = parseMessageString(messageString)
+    const meta = message.$
+    const type = meta.type
+    let control
+
+    switch (type) {
+      case CONTROL_MESSAGE:
+        control = message.control
+        // cache this instance to mark its type as a type object
+        // then cache its type object
+        this._cacheCallResultMetadata(control.instance)
+        this._cacheCallResultMetadata(control.type)
+
+        RemoteObject(this, control.instance)
+          .then((controlRemote) => {
+            this.control = controlRemote
+            this.emit('ready')
+          })
+          .catch((e) => log.error('Error creating control remote', e))
+
+        break
+
+      case RESULT:
+        if (meta.status === statuses.SUCCESS) {
+          this._cacheCallResultMetadata(message.data)
+          this.emit(makeSuccessEventName(meta.token), message.data)
+        } else {
+          this.emit(makeFailureEventName(meta.token), message.data)
+        }
+
+        break
+
+      case ACK:
+        this.emit(makeAckEventName(meta.token))
+        break
+
+      case NOTIFICATION:
+        this.emit('notification', message)
+        break
+
+      default:
+        break
+    }
+  }
 }
 
-const Client = (connection, notify) => {
-  const context = Context(connection)
+export default function Client(url) {
+  const ws = new WebSocket(url, { handshakeTimeout: HANDSHAKE_TIMEOUT })
 
   return new Promise((resolve, reject) => {
-    setTimeout(
-      () => reject('Handshake timeout'),
-      HANDSHAKE_TIMEOUT)
-    // Run on nextTick to avoid race condition
-    process.nextTick(() => connection.addEventListener(
-      'message', (event) => {
-        try {
-          const message = JSON.parse(event.data)
-          log.info(`Received message: ${JSON.stringify(message)}`)
-          switch (message.$.type) {
-            case CONTROL_MESSAGE:
-              return resolve(RemoteObject(context, message.data))
-            case NOTIFICATION_MESSAGE:
-              log.info(`Notification: ${message}`)
-              notify(message)
-              break
-            default:
-              context.dispatch(message)
-          }
-        } catch (e) {
-          log.warning(`Websocket loop: ${e}`)
-          return reject(e)
-        }
+    let context
+    let controlTimeout
+
+    const handleReady = () => {
+      cleanup()
+      resolve(context)
+    }
+
+    const handleError = (error) => {
+      cleanup()
+      reject(error)
+    }
+
+    const handleOpen = () => {
+      ws.removeListener('error', handleError)
+      controlTimeout = setTimeout(
+        () => handleError(new Error('Timeout getting control message')),
+        RECEIVE_CONTROL_TIMEOUT
+      )
+
+      context = new RpcContext(ws)
+        .once('ready', handleReady)
+        .once('error', handleError)
+    }
+
+    function cleanup() {
+      ws.removeListener('open', handleOpen)
+      ws.removeListener('error', handleError)
+
+      if (context) {
+        clearTimeout(controlTimeout)
+        context.removeListener('ready', handleReady)
+        context.removeListener('error', handleError)
       }
-    ))
+    }
+
+    ws.once('open', handleOpen)
+    ws.once('error', handleError)
   })
 }
-
-export default { Connection, Client, Context, RemoteObject }
