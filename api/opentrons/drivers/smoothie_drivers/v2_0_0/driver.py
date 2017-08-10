@@ -280,17 +280,21 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             log.debug(error_msg)
             raise RuntimeWarning(error_msg)
 
+    def convert_relative_coords_to_absolute(self, **kwargs):
+        for axis in 'xyz':
+                current = self.get_head_position()['target']
+                kwargs[axis] = kwargs.get(axis, 0) + current[axis]
+        for axis in 'ab':
+            current = self.get_plunger_positions()['target']
+            kwargs[axis] = kwargs.get(axis, 0) + current[axis]
+        return kwargs
+
     def move(self, mode='absolute', **kwargs):
 
         # Convert relative coordinates to absolute coordinates
         if mode == 'relative':
             mode = 'absolute'
-            for axis in 'xyz':
-                current = self.get_head_position()['target']
-                kwargs[axis] = kwargs.get(axis, 0) + current[axis]
-            for axis in 'ab':
-                current = self.get_plunger_positions()['target']
-                kwargs[axis] = kwargs.get(axis, 0) + current[axis]
+            kwargs = self.convert_relative_coords_to_absolute(**kwargs)
 
         self.set_coordinate_system(mode)
         self.set_speed()
@@ -303,8 +307,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             )
             for axis in 'xyz'
         }
-        print(target_point)
-
         flipped_vector = self.flip_coordinates(
             Vector(target_point), mode)
         for axis in 'xyz':
@@ -319,19 +321,28 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         attempts = 0
         max_attempts = 3
-        while attempts <= max_attempts:
+        move_sent = False
+        while attempts <= max_attempts and (not move_sent):
             attempts += 1
             try:
                 self.send_command(self.MOVE, **args)
                 self.wait_for_ok()
+                move_sent = True
                 break
+            except RuntimeWarning as e:
+                raise e
             except Exception as e:
                 log.exception(
                     'Failed to send MOVE command. Will reconnect and '
                     'trying again'
                 )
-                time.sleep(0.5)
                 self.connection.reconnect()
+
+        if not move_sent:
+            raise RuntimeWarning(
+                'Failed to complete move command after {} tries'
+                .format(attempts)
+            )
 
         arguments = {
             'name': 'move-finished',

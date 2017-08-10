@@ -22,6 +22,8 @@ class Connection(object):
         self.serial_port = sp
 
     def reconnect(self):
+        if not isinstance(self.serial_port, serial.Serial):
+            return
         self.serial_port = serial.Serial(
             port=self.port,
             baudrate=self.baudrate,
