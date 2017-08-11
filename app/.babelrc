@@ -1,10 +1,5 @@
 {
   "env": {
-    "test": {
-      "plugins": [
-        "istanbul"
-      ]
-    },
     "production": {
       "presets": [
         "react-optimize"
@@ -17,7 +12,8 @@
     }
   },
   "plugins": [
-    "babel-plugin-transform-object-rest-spread"
+    "transform-object-rest-spread",
+    "transform-class-properties"
   ],
   "presets": [
     "react",

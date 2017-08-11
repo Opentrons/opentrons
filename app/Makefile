@@ -40,14 +40,23 @@ package: build
 # watch argument for tests
 watch ?= false
 
-test: build
-	npm run test
+test: test-ui
+	make lint
 
 test-e2e: build
 	npm run test-e2e
 
 test-ui:
 	$(ENV)=test $(BIN)/jest './ui/.*\.test\.js' --watch=$(watch)
+
+lint:
+	$(BIN)/standard --verbose | $(BIN)/snazzy
+
+lint-fix:
+	$(BIN)/standard --fix
+
+# development tasks
+#####################################################################
 
 dev:
 	npm run build-dev
@@ -59,4 +68,4 @@ clean:
 		shell/dist \
 		dll \
 		bin \
-		.coverage
+		coverage
