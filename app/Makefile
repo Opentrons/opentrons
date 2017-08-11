@@ -1,6 +1,7 @@
 # app makefile
 
 # use bash
+# TODO(mc): is this really necessary? Could it cause problems in windows?
 SHELL := /bin/bash
 
 # use devDependency CLIs with $(BIN)/command

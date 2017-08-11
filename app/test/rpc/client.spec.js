@@ -16,7 +16,7 @@ import {
 log.level = 'debug'
 jest.mock('uuid/v4')
 
-const { SUCCESS, FAILURE } = statuses
+const {SUCCESS, FAILURE} = statuses
 let mockUuid
 let url
 let wss
@@ -25,59 +25,64 @@ let listeners
 uuid.mockImplementation(() => `uuid-${mockUuid++}`)
 
 const EX_CONTROL_DATA = {
-  instance: { i: 1, t: 2, v: { server: {} } },
-  type: { i: 2, t: 3, v: { get_root: {}, get_object_by_id: {} } }
+  instance: {i: 1, t: 2, v: {server: {}}},
+  type: {i: 2, t: 3, v: {get_root: {}, get_object_by_id: {}}}
 }
 
 const EX_CONTROL_MESSAGE = {
-  $: { type: CONTROL_MESSAGE },
+  $: {type: CONTROL_MESSAGE},
   control: EX_CONTROL_DATA
 }
 
-const EX_ROOT_INSTANCE = { i: 4, t: 5, v: { foo: 'bar' } }
-const EX_ROOT_TYPE = { i: 5, t: 3, v: { be_a_robot: {}, be_a_person: {} } }
+const EX_ROOT_INSTANCE = {i: 4, t: 5, v: {foo: 'bar'}}
+const EX_ROOT_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
 
-function makeAckResponse(token) {
-  return { $: { type: ACK, token } }
+function makeAckResponse (token) {
+  return {$: {type: ACK, token}}
 }
 
-function makeCallResponse(token, status, data) {
-  return { $: { type: RESULT, token, status }, data }
+function makeCallResponse (token, status, data) {
+  return {$: {type: RESULT, token, status}, data}
 }
 
-function addListener(target, event, handler) {
-  listeners.push({ target, event, handler })
+function addListener (target, event, handler) {
+  listeners.push({target, event, handler})
   target.on(event, handler)
 }
 
-function removeListener(listener) {
-  const { target, event, handler } = listener
+function removeListener (listener) {
+  const {target, event, handler} = listener
 
   target.removeListener(event, handler)
 }
 
 class JsonWs extends EventEmitter {
-  constructor(ws) {
+  constructor (ws) {
     super()
     this._ws = ws
 
     addListener(ws, 'message', (message) => this.emit('message', JSON.parse(message)))
-  }
+ }
 
-  send(message) {
+  send (message) {
     this._ws.send(JSON.stringify(message))
-  }
+ }
 }
 
 beforeAll((done) => portfinder.getPort((error, port) => {
   if (error) return done(error)
+  if (!global.WebSocket) global.WebSocket = WebSocket
 
   url = `ws://127.0.0.1:${port}`
-  wss = new WebSocket.Server({ port })
+  wss = new WebSocket.Server({port})
   wss.once('listening', done)
 }))
 
-afterAll((done) => wss.close(done))
+afterAll((done) => {
+  if (global.WebSocket === WebSocket) delete global.WebSocket
+  wss.close(done)
+})
+
 beforeEach(() => {
   mockUuid = 0
   listeners = []
@@ -242,24 +247,24 @@ it('should get the type of an object to create the remote object', () => {
 })
 
 it('should create remote objects for all non-primitive children', () => {
-  const EX_DEEP_TYPE_3 = { i: 11, t: 3, v: { thing_3: {} } }
-  const EX_DEEP_INSTANCE_3 = { i: 10, t: 11, v: { quux: 'quux' } }
+  const EX_DEEP_TYPE_3 = {i: 11, t: 3, v: {thing_3: {}}}
+  const EX_DEEP_INSTANCE_3 = {i: 10, t: 11, v: {quux: 'quux'}}
 
-  const EX_DEEP_TYPE_2 = { i: 13, t: 3, v: { thing_2: {} } }
+  const EX_DEEP_TYPE_2 = {i: 13, t: 3, v: {thing_2: {}}}
   const EX_DEEP_INSTANCE_2 = {
     i: 12,
     t: 13,
-    v: { baz: 'baz', instance_3: EX_DEEP_INSTANCE_3 }
+    v: {baz: 'baz', instance_3: EX_DEEP_INSTANCE_3}
   }
 
-  const EX_DEEP_TYPE_1 = { i: 15, t: 3, v: { thing_1: {} } }
-  const EX_DEEP_INSTANCE_1 = { i: 14, t: 15, v: { bar: 'bar' } }
+  const EX_DEEP_TYPE_1 = {i: 15, t: 3, v: {thing_1: {}}}
+  const EX_DEEP_INSTANCE_1 = {i: 14, t: 15, v: {bar: 'bar'}}
 
-  const EX_DEEP_TYPE_0 = { i: 17, t: 3, v: { thing_0: {} } }
+  const EX_DEEP_TYPE_0 = {i: 17, t: 3, v: {thing_0: {}}}
   const EX_DEEP_INSTANCE_0 = {
     i: 16,
     t: 17,
-    v: { foo: 'foo', instance_1: EX_DEEP_INSTANCE_1, instance_2: EX_DEEP_INSTANCE_2 }
+    v: {foo: 'foo', instance_1: EX_DEEP_INSTANCE_1, instance_2: EX_DEEP_INSTANCE_2}
   }
 
   addListener(wss, 'connection', (websocket) => {
@@ -318,11 +323,11 @@ it('should create remote objects for all non-primitive children', () => {
 })
 
 it('should deserialize remote object with nested circular references', () => {
-  const CIRCULAR_TYPE = { i: 21, t: 3, v: { circle: {} } }
+  const CIRCULAR_TYPE = {i: 21, t: 3, v: {circle: {}}}
   const CIRCULAR_INSTANCE = {
     i: 20,
     t: 21,
-    v: { foo: 'foo', self: { i: 20, t: 21, v: null } }
+    v: {foo: 'foo', self: {i: 20, t: 21, v: null}}
   }
 
   addListener(wss, 'connection', (websocket) => {
@@ -334,8 +339,6 @@ it('should deserialize remote object with nested circular references', () => {
       const requestedId = message.args[0]
       let response
 
-      // will be a bunch of control.get_object_by_id calls
-      // don't care about recursion order as long as result is correct
       if (requestedId === CIRCULAR_TYPE.i) {
         response = CIRCULAR_TYPE
       } else if (requestedId === CIRCULAR_INSTANCE.i) {
@@ -353,13 +356,13 @@ it('should deserialize remote object with nested circular references', () => {
 })
 
 it('should deserialize remote object with sibling circular refs', () => {
-  const TYPE = { i: 30, t: 3, v: {} }
-  const CHILD_INSTANCE = { i: 31, t: 30, v: { foo: 'foo' } }
-  const CIRCULAR_CHILD_INSTANCE = { i: 31, t: 30, v: null }
+  const TYPE = {i: 30, t: 3, v: {}}
+  const CHILD_INSTANCE = {i: 31, t: 30, v: {foo: 'foo'}}
+  const CIRCULAR_CHILD_INSTANCE = {i: 31, t: 30, v: null}
   const PARENT_INSTANCE = {
     i: 32,
     t: 30,
-    v: { circular: CIRCULAR_CHILD_INSTANCE, child: CHILD_INSTANCE }
+    v: {circular: CIRCULAR_CHILD_INSTANCE, child: CHILD_INSTANCE}
   }
 
   addListener(wss, 'connection', (websocket) => {
@@ -371,12 +374,8 @@ it('should deserialize remote object with sibling circular refs', () => {
       const requestedId = message.args[0]
       let response
 
-      // will be a bunch of control.get_object_by_id calls
-      // don't care about recursion order as long as result is correct
       if (requestedId === TYPE.i) {
         response = TYPE
-      } else if (requestedId === CHILD_INSTANCE.i) {
-        response = CHILD_INSTANCE
       } else if (requestedId === PARENT_INSTANCE.i) {
         response = PARENT_INSTANCE
       }
@@ -390,8 +389,76 @@ it('should deserialize remote object with sibling circular refs', () => {
     .then((c) => c.control.get_object_by_id(PARENT_INSTANCE.i))
     .then((remote) => {
       expect(remote.circular).toBe(remote.child)
-      expect(remote.child).toEqual({ foo: 'foo' })
+      expect(remote.child).toEqual({foo: 'foo'})
     })
+})
+
+it('should deserialize remote object with deep matching refs', () => {
+  const TYPE = {i: 30, t: 3, v: {}}
+  const CHILD = {i: 31, t: 30, v: {foo: 'foo'}}
+  const ALSO_CHILD = {i: 31, t: 30, v: null}
+  const PARENT_1 = {i: 32, t: 30, v: {c: ALSO_CHILD}}
+  const PARENT_2 = {i: 33, t: 30, v: {c: CHILD}}
+  const SUPERPARENT = {i: 34, t: 30, v: {a: PARENT_1, b: PARENT_2}}
+
+  addListener(wss, 'connection', (websocket) => {
+    const ws = new JsonWs(websocket)
+
+    ws.send(EX_CONTROL_MESSAGE)
+    addListener(ws, 'message', (message) => {
+      const token = message.$.token
+      const requestedId = message.args[0]
+      let response
+
+      if (requestedId === TYPE.i) {
+        response = TYPE
+      } else if (requestedId === SUPERPARENT.i) {
+        response = SUPERPARENT
+      }
+
+      setTimeout(() => ws.send(makeAckResponse(token)), 1)
+      setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
+    })
+  })
+
+  return Client(url)
+    .then((c) => c.control.get_object_by_id(SUPERPARENT.i))
+    .then((remote) => {
+      expect(remote.a.c).toBe(remote.b.c)
+      expect(remote.a.c).toEqual({foo: 'foo'})
+    })
+})
+
+it('should deserialize remote object with null children', () => {
+  const TYPE = {i: 30, t: 3, v: {}}
+  const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: null}}
+
+  addListener(wss, 'connection', (websocket) => {
+    const ws = new JsonWs(websocket)
+
+    ws.send(EX_CONTROL_MESSAGE)
+    addListener(ws, 'message', (message) => {
+      const token = message.$.token
+      const requestedId = message.args[0]
+      let response
+
+      if (requestedId === TYPE.i) {
+        response = TYPE
+      } else if (requestedId === INSTANCE.i) {
+        response = INSTANCE
+      }
+
+      setTimeout(() => ws.send(makeAckResponse(token)), 1)
+      setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
+    })
+  })
+
+  return Client(url)
+    .then((c) => c.control.get_object_by_id(INSTANCE.i))
+    .then((remote) => expect(remote).toEqual({
+      foo: 'bar',
+      baz: null
+    }))
 })
 
 it('should handle array values', () => {
@@ -412,8 +479,26 @@ it('should handle array values', () => {
     .then((result) => expect(result).toEqual([1, 2, 3]))
 })
 
+it('should handle null values', () => {
+  addListener(wss, 'connection', (websocket) => {
+    const ws = new JsonWs(websocket)
+
+    ws.send(EX_CONTROL_MESSAGE)
+    addListener(ws, 'message', (message) => {
+      const token = message.$.token
+
+      setTimeout(() => ws.send(makeAckResponse(token)), 1)
+      setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, null)), 5)
+    })
+  })
+
+  return Client(url)
+    .then((c) => c.control.get_object_by_id(1234))
+    .then((result) => expect(result).toEqual(null))
+})
+
 it('should emit notification events', (done) => {
-  const notification = { $: { type: NOTIFICATION }, foo: 'bar', baz: 'quux' }
+  const notification = {$: {type: NOTIFICATION}, foo: 'bar', baz: 'quux'}
   const handler = (message) => {
     expect(message).toEqual(notification)
     done()

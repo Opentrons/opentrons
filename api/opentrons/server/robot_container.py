@@ -22,7 +22,7 @@ class RobotContainer(object):
         asyncio.ensure_future(self.notifications.put(info))
 
     def load_protocol(self, text):
-        robot.reset()
+        # robot.reset()
         exec(text, self._globals, self._locals)
         return self._globals['robot']
 

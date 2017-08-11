@@ -7,45 +7,82 @@ describe('robot reducer', () => {
     const state = reducer(undefined, {})
 
     expect(state).toEqual({
-      home: {requestInProgress: false, error: null},
-      run: {requestInProgress: false, error: null}
+      isConnected: {value: false, requestInProgress: true, error: null},
+      isHomed: {value: false, requestInProgress: false, error: null},
+      isRunning: {value: false, requestInProgress: false, error: null}
+    })
+  })
+
+  test('handles connect response success', () => {
+    const state = {isConnected: {value: false, requestInProgress: true, error: null}}
+    const action = {type: actionTypes.CONNECT_RESPONSE, error: null}
+
+    expect(reducer(state, action)).toEqual({
+      isConnected: {value: true, requestInProgress: false, error: null}
+    })
+  })
+
+  test('handles connect response error', () => {
+    const state = {isConnected: {value: false, requestInProgress: true, error: null}}
+    const action = {type: actionTypes.CONNECT_RESPONSE, error: new Error('AH')}
+
+    expect(reducer(state, action)).toEqual({
+      isConnected: {value: false, requestInProgress: false, error: new Error('AH')}
     })
   })
 
   // TODO(mc): we may need to track which specific axes are homing
   test('handles home action', () => {
+    const state = {isHomed: {value: false, requestInProgress: false, error: 'AHH'}}
     const action = {type: actionTypes.HOME}
-    const state = {home: {requestInProgress: false, error: null}}
 
     expect(reducer(state, action)).toEqual({
-      home: {requestInProgress: true, error: null}
+      isHomed: {value: false, requestInProgress: true, error: null}
     })
   })
 
-  test('handles homeResponse action', () => {
-    const action = {type: actionTypes.HOME_RESPONSE, error: new Error('AH')}
-    const state = {home: {requestInProgress: true, error: null}}
+  test('handles homeResponse success', () => {
+    const state = {isHomed: {value: false, requestInProgress: true, error: null}}
+    const action = {type: actionTypes.HOME_RESPONSE, error: null}
 
     expect(reducer(state, action)).toEqual({
-      home: {requestInProgress: false, error: new Error('AH')}
+      isHomed: {value: true, requestInProgress: false, error: null}
+    })
+  })
+
+  test('handles homeResponse failure', () => {
+    const state = {isHomed: {value: false, requestInProgress: true, error: null}}
+    const action = {type: actionTypes.HOME_RESPONSE, error: new Error('AH')}
+
+    expect(reducer(state, action)).toEqual({
+      isHomed: {value: false, requestInProgress: false, error: new Error('AH')}
     })
   })
 
   test('handles run action', () => {
+    const state = {isRunning: {value: false, requestInProgress: false, error: 'AHH'}}
     const action = {type: actionTypes.RUN}
-    const state = {run: {requestInProgress: false, error: null}}
 
     expect(reducer(state, action)).toEqual({
-      run: {requestInProgress: true, error: null}
+      isRunning: {value: false, requestInProgress: true, error: null}
     })
   })
 
-  test('handles runResponse action', () => {
-    const action = {type: actionTypes.RUN_RESPONSE, error: new Error('AH')}
-    const state = {run: {requestInProgress: true, error: null}}
+  test('handles runResponse success', () => {
+    const state = {isRunning: {value: false, requestInProgress: true, error: null}}
+    const action = {type: actionTypes.RUN_RESPONSE, error: null}
 
     expect(reducer(state, action)).toEqual({
-      run: {requestInProgress: false, error: new Error('AH')}
+      isRunning: {value: true, requestInProgress: false, error: null}
+    })
+  })
+
+  test('handles runResponse failure', () => {
+    const state = {isRunning: {value: false, requestInProgress: true, error: null}}
+    const action = {type: actionTypes.RUN_RESPONSE, error: new Error('AH')}
+
+    expect(reducer(state, action)).toEqual({
+      isRunning: {value: false, requestInProgress: false, error: new Error('AH')}
     })
   })
 })

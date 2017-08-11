@@ -1,18 +1,30 @@
 // robot UI entry point
 // split up into reducer.js, action.js, etc if / when necessary
+import api from './api-middleware'
 
 export const NAME = 'robot'
 
 // reducer / action helpers
-const makeRequestInitialState = () => ({requestInProgress: false, error: null})
 const makeActionName = (action) => `${NAME}:${action}`
+const makeRequestInitialState = (value, inProgress = false) => ({
+  value,
+  requestInProgress: inProgress,
+  error: null
+})
 
 const INITIAL_STATE = {
-  home: makeRequestInitialState(),
-  run: makeRequestInitialState()
+  // TODO(mc): maybe don't connect automatically?
+  isConnected: makeRequestInitialState(false, true),
+  // TODO(mc): keep track of axes and get homed state from robot
+  isHomed: makeRequestInitialState(false),
+  // TODO(mc): this won't work but whatever
+  isRunning: makeRequestInitialState(false)
 }
 
+export const apiMiddleware = api
+
 export const actionTypes = {
+  CONNECT_RESPONSE: makeActionName('CONNECT_RESPONSE'),
   HOME: makeActionName('HOME'),
   HOME_RESPONSE: makeActionName('HOME_RESPONSE'),
   RUN: makeActionName('RUN'),
@@ -20,6 +32,13 @@ export const actionTypes = {
 }
 
 export const actions = {
+  connectResponse (error = null) {
+    return {
+      type: actionTypes.CONNECT_RESPONSE,
+      error
+    }
+  },
+
   home (axes) {
     return {
       type: actionTypes.HOME,
@@ -54,17 +73,29 @@ export function reducer (state = INITIAL_STATE, action) {
   const {type, error} = action
 
   switch (type) {
+    case actionTypes.CONNECT_RESPONSE:
+      return {
+        ...state,
+        isConnected: {
+          ...state.isConnected,
+          value: !error,
+          requestInProgress: false,
+          error
+        }
+      }
+
     case actionTypes.HOME:
       return {
         ...state,
-        home: {...state.home, requestInProgress: true}
+        isHomed: {...state.isHomed, requestInProgress: true, error: null}
       }
 
     case actionTypes.HOME_RESPONSE:
       return {
         ...state,
-        home: {
-          ...state.home,
+        isHomed: {
+          ...state.isHomed,
+          value: !error,
           requestInProgress: false,
           error
         }
@@ -73,14 +104,15 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.RUN:
       return {
         ...state,
-        run: {...state.run, requestInProgress: true}
+        isRunning: {...state.isRunning, requestInProgress: true, error: null}
       }
 
     case actionTypes.RUN_RESPONSE:
       return {
         ...state,
-        run: {
-          ...state.run,
+        isRunning: {
+          ...state.isRunning,
+          value: !error,
           requestInProgress: false,
           error
         }

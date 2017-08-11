@@ -3,6 +3,15 @@
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
+  test('connection response', () => {
+    const expected = {
+      type: actionTypes.CONNECT_RESPONSE,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.connectResponse(new Error('AHHH'))).toEqual(expected)
+  })
+
   test('home action', () => {
     const expected = {
       type: actionTypes.HOME,

@@ -85,6 +85,9 @@ class Server(object):
         obj = self.objects[_id]
         function = getattr(type(obj), name)
         args = self.resolve_args(args)
+        kwargs = {}
+        if (len(args) > 0) and (isinstance(args[-1], dict)):
+            kwargs = args.pop()
 
         log.debug(
             'dispatch: will call {0}.{1}({2})'
@@ -99,7 +102,7 @@ class Server(object):
                 'Attribute {0} of {1} is not a function'
                 .format(name, type(obj)))
 
-        res = function(obj, *args)
+        res = function(obj, *args, **kwargs)
         return res
 
     async def process(self, message, send):
