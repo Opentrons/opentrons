@@ -2,7 +2,7 @@ import time
 from threading import Thread
 import unittest
 
-from opentrons import Robot, drivers
+from opentrons import Robot
 from opentrons.util.vector import Vector
 
 
@@ -26,7 +26,7 @@ class OpenTronsTest(unittest.TestCase):
         }
 
         self.robot.disconnect()
-        self.robot.connect(options=options)
+        self.robot.connect(options=options, port='v1.0.5')
 
         self.motor = self.robot._driver
 
@@ -90,10 +90,10 @@ class OpenTronsTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.motor.get_connected_port()
-        self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, 'v1.0.5')
         self.motor.disconnect()
         res = self.motor.get_connected_port()
-        self.assertEquals(res, 'Virtual Smoothie')
+        self.assertEquals(res, 'v1.0.5')
         self.assertFalse(self.motor.is_connected())
 
     def test_get_dimensions(self):
