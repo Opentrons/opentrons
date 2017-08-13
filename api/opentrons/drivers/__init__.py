@@ -88,7 +88,7 @@ def get_virtual_driver(options={}):
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
         'limit_switches': True,
-        'firmware': 'edge-1c222d9NOMSD',
+        'firmware': 'v1.0.5',  #''edge-1c222d9NOMSD',
         'config': {
             'ot_version': 'one_pro_plus',
             'version': 'v2.0.0',    # config version

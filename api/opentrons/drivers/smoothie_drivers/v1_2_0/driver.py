@@ -475,6 +475,9 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         res = self.send_command(self.SET_POSITION, **uppercase_args)
         return res == 'ok'
 
+    def get_current_position(self):
+        return self.get_position().get('current', {})
+
     def get_head_position(self):
         coords = self.get_position()
         coords['current'] = self.flip_coordinates(Vector(coords['current']))

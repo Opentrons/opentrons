@@ -92,6 +92,9 @@ class VirtualSmoothie_1_2_0(VirtualSmoothie):
         res = {"M119": self.endstop}
         return json.dumps(res) + '\nok'
 
+    def set_position_from_arguments(self, arguments):
+        self.process_set_position_command(arguments)
+
     def process_set_position_command(self, arguments):
         for axis in 'XYZAB':
             if axis in arguments:
