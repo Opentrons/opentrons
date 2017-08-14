@@ -369,6 +369,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         try:
             self.connection.reconnect()
         except OSError:
+            log.info('Driver failed to reconnect')
             pass
 
     def move_plunger(self, mode='absolute', **kwargs):
