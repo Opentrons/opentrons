@@ -78,6 +78,7 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
             self.coordinates['target'][axis] = 0.0
 
     def parse_command(self, gcode):
+        gcode = gcode.replace('M400', '')
         parse_arguments = re.compile(r"(([XYZABCSPabF])(\-?[0-9\.]*))")
         parse_command = re.compile(r"([GM][0-9\.]*)")
 

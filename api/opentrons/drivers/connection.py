@@ -1,5 +1,6 @@
 import time
 
+import serial
 from serial import SerialException
 
 from opentrons.util.log import get_logger
@@ -11,10 +12,23 @@ log = get_logger(__name__)
 class Connection(object):
 
     def __init__(self, sp, port='', baudrate=115200, timeout=0.02):
+        self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+
         sp.port = port
         sp.baudrate = baudrate
         sp.timeout = timeout
         self.serial_port = sp
+
+    def reconnect(self):
+        if not isinstance(self.serial_port, serial.Serial):
+            return
+        self.serial_port = serial.Serial(
+            port=self.port,
+            baudrate=self.baudrate,
+            timeout=self.timeout
+        )
 
     def device(self):
         return self.serial_port
