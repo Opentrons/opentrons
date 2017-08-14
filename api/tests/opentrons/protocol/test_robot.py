@@ -1,6 +1,5 @@
 import unittest
 
-from opentrons import drivers
 from opentrons.containers import load as containers_load
 from opentrons.containers.placeable import Deck
 from opentrons.instruments import pipette
@@ -124,7 +123,7 @@ class RobotTest(unittest.TestCase):
 
     def test_get_connected_port(self):
         res = self.robot.get_connected_port()
-        self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
+        self.assertEquals(res, 'edge-1c222d9NOMSD')
 
     def test_robot_move_to(self):
         self.robot.move_to((Deck(), (100, 0, 0)))

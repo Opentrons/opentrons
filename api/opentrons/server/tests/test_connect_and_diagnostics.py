@@ -53,7 +53,7 @@ class ConnectDiagnosticsTestCase(unittest.TestCase):
             content_type='application/json')
         response = json.loads(response.data.decode())
         self.assertTrue(response['is_connected'])
-        self.assertEquals(response['port'], 'Virtual Smoothie')
+        self.assertEquals(response['port'], 'edge-1c222d9NOMSD')
 
     def test_diagnostics(self):
         response = self.app.get(

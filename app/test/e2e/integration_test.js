@@ -54,9 +54,9 @@ describe('OT-app', function spec() {
     expect(await browserWindow.getBounds()).have.property('height').and.be.above(0)
   })
 
-  var connectAndRunLoadedProtocol = (client) => {
+  var connectAndRunLoadedProtocol = (client, dropdownOptionIndex) => {
     let pauseTime = process.env.PAUSE_TIME || 500
-    let virtualSmoothie = connectDropDown + '/option[3]'
+    let virtualSmoothie = connectDropDown + `/option[${dropdownOptionIndex}]`
     let saveButton = '//*[@id="task"]/span/button[1]'
     let platePath = '//*[@id="step-list"]/div/span/div/ul/li[2]/a'
     let plungerPath = '//*[@id="step-list"]/div/span/div/ul/li[3]/a'
@@ -102,7 +102,7 @@ describe('OT-app', function spec() {
     client.chooseFile(uploadXpath, file)
   }
 
-  it('runs a user uploaded protocol', async () => {
+  it('runs a user uploaded protocol with firmware "v1.0.5"', async () => {
     let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/simple_protocol.py')
     console.log('uploading file: ' + file)
 
@@ -113,7 +113,22 @@ describe('OT-app', function spec() {
 
     await client.waitUntilWindowLoaded()
     await uploadProtocol(client, file)
-    await connectAndRunLoadedProtocol(client)
+    await connectAndRunLoadedProtocol(client, 3)
+    return client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
+  })
+
+  it('runs a user uploaded protocol with firmware "edge-1c222d9NOMSD"', async () => {
+    let file = path.join(__dirname, '..', '..', '..', 'api', 'opentrons', 'server', 'tests', 'data', '/simple_protocol.py')
+    console.log('uploading file: ' + file)
+
+    const { client } = this.app
+    client.execute(() => {
+      window.confirm = function () { return true }
+    })
+
+    await client.waitUntilWindowLoaded()
+    await uploadProtocol(client, file)
+    await connectAndRunLoadedProtocol(client, 4)
     return client.waitForText('.toast-message-text', 'Successfully uploaded simple_protocol.py')
   })
 

@@ -320,8 +320,12 @@ class Robot(object):
         ``True`` for success, ``False`` for failure.
         """
         device = None
-        if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
-            device = drivers.get_virtual_driver(options)
+
+        # Default port virtual smoothie 2.0.0 port
+        port = port or 'edge-1c222d9NOMSD'
+
+        if port in drivers.VIRTUAL_SMOOTHIE_PORTS:
+            device = drivers.get_virtual_driver(options=options, port=port)
         else:
             device = drivers.get_serial_driver(port)
 
@@ -361,7 +365,7 @@ class Robot(object):
         Examples
         --------
         >>> from opentrons import Robot
-        >>> robot.connect('Virtual Smoothie')
+        >>> robot.connect()
         >>> robot.home()
         """
         self._driver.calm_down()
@@ -408,7 +412,7 @@ class Robot(object):
         Examples
         --------
         >>> from opentrons import robot
-        >>> robot.connect('Virtual Smoothie')
+        >>> robot.connect()
         >>> robot.home()
         >>> robot.head_speed(4500)
         >>> robot.move_head(x=200, y=200)
@@ -446,7 +450,7 @@ class Robot(object):
         >>> from opentrons import Robot
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> robot.connect('Virtual Smoothie')
+        >>> robot.connect()
         >>> robot.home()
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> robot.move_to(plate[0])
@@ -752,7 +756,7 @@ class Robot(object):
         ports = []
         # TODO: Store these settings in config
         if os.environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            ports = [drivers.VIRTUAL_SMOOTHIE_PORT]
+            ports.extend(drivers.VIRTUAL_SMOOTHIE_PORTS)
         ports.extend(drivers.get_serial_ports_list())
         return ports
 

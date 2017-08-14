@@ -32,7 +32,7 @@ virtual_smoothies_by_version = {
 }
 
 
-VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
+VIRTUAL_SMOOTHIE_PORTS = list(virtual_smoothies_by_version.keys())
 
 SMOOTHIE_DEFAULTS_DIR = pkg_resources.resource_filename(
     'opentrons.config', 'smoothie')
@@ -83,12 +83,14 @@ def get_serial_ports_list():
     return result
 
 
-def get_virtual_driver(options={}):
+def get_virtual_driver(port='edge-1c222d9NOMSD', options={}):
+
+    FIRMWARE_VERSION = port
 
     default_options = {
         'config_file_path': SMOOTHIE_VIRTUAL_CONFIG_FILE,
         'limit_switches': True,
-        'firmware': 'edge-1c222d9NOMSD',
+        'firmware': FIRMWARE_VERSION,
         'config': {
             'ot_version': 'one_pro_plus',
             'version': 'v2.0.0',    # config version
@@ -110,7 +112,7 @@ def get_virtual_driver(options={}):
             'No virtual smoothie version {}'.format(version_name))
 
     vs = vs_class(default_options)
-    c = connection.Connection(vs, port=VIRTUAL_SMOOTHIE_PORT, timeout=0)
+    c = connection.Connection(vs, port=port, timeout=0)
     return get_driver(c)
 
 
