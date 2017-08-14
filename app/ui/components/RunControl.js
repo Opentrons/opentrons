@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './RunControl.css'
 import RunNotifications from './RunNotifications'
+import RunProgress from './RunProgress'
 
 class RunControl extends Component {
 	
@@ -12,6 +13,7 @@ class RunControl extends Component {
 		const errors = this.props.errors
 		const hasError = errors.length > 0 
 		const paused = this.props.paused
+		const progress = (1 / 3) * 100 
 		return(
 			<section className={style}>
 				<div className={styles.btn_wrapper}>
@@ -19,15 +21,14 @@ class RunControl extends Component {
 					<button onClick= {() => { console.log('pause')}} className={styles.btn_pause}>Pause</button>
 					<button onClick= {() => { console.log('cancel')}} className={styles.btn_cancel}>Cancel Job</button>
 				</div>
-				
-	
-					<RunNotifications {...{running, paused,errors, hasError} }/>	
-							
-
 					
+				<RunNotifications {...{running, paused,errors, hasError} }/>	
 				
-				
-				<div className={styles.progress_bar}>
+				<div>
+				<div className={styles.progress} >
+					<span>Time Remaining: 00:03:00</span>
+					<RunProgress {...{progress, paused, errors}} />
+				</div>
 				</div>
 			</section>
 		)
@@ -39,7 +40,8 @@ class RunControl extends Component {
 
 RunControl.propTypes = {
   running: PropTypes.bool,
-  error: PropTypes.array,
+  paused: PropTypes.bool,
+  errors: PropTypes.array,
   style:PropTypes.string
 }
 

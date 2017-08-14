@@ -48,6 +48,7 @@ body{
 .run_progress{
   grid-area: controls;
   background-color: #DDD;
+  position:relative;
 }
 
 .task {
