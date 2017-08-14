@@ -320,7 +320,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.check_paused_stopped()
 
         attempts = 0
-        max_attempts = 3
+        max_attempts = 7
         move_sent = False
         while attempts <= max_attempts and (not move_sent):
             attempts += 1
@@ -332,11 +332,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             except RuntimeWarning as e:
                 raise e
             except Exception as e:
-                time.sleep(0.5)
+                reconnect_delay = attempts ** 2
                 log.exception(
                     'Failed to send MOVE command. Will reconnect and '
-                    'trying again'
+                    'trying again in {} seconds'.format(reconnect_delay)
                 )
+                time.sleep(reconnect_delay)
                 self.connection.reconnect()
 
         if not move_sent:
