@@ -6,9 +6,9 @@ const ErrorNotification = props => {
   return (
     <div>
      {props.errors.map((e) => 
-        <div key={e} className={styles.error_wrapper}>
-          <div className={styles.error_icon}>X</div>
-          <div className={styles.error_message}>
+        <div key={e} className={styles.notification_wrapper}>
+          <div className={styles.notification_icon}>X</div>
+          <div className={styles.notification}>
             <span className={styles.type}>Error: </span>
             {e}
           </div>
@@ -29,8 +29,11 @@ const DefaultNotification = props => {
 
 const PausedNotification = props => {
   return (
-    <div>
-      {props.paused}      
+    <div className={styles.notification_wrapper}>
+      <div className={styles.notification_icon}>II</div>
+      <div className={styles.notification_message}>
+        <span className={styles.type}>PAUSED</span>
+      </div>
     </div>
   )
 }
