@@ -1,6 +1,5 @@
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
-import log from 'winston'
 import WebSocket from 'ws'
 import uuid from 'uuid/v4'
 
@@ -13,7 +12,6 @@ import {
   CONTROL_MESSAGE
 } from '../../rpc/message-types'
 
-log.level = 'debug'
 jest.mock('uuid/v4')
 
 const {SUCCESS, FAILURE} = statuses

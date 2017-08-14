@@ -10,7 +10,7 @@ import {createLogger} from 'redux-logger'
 import {
   NAME as ROBOT_NAME,
   reducer as robotReducer,
-  apiMiddleware as robotApiMiddleware
+  apiClientMiddleware as robotApiMiddleware
 } from './robot'
 
 // components
@@ -44,6 +44,10 @@ if (module.hot) {
     const nextApp = require('./components/app').default
     render(nextApp)
   })
+}
+
+if (process.env.NODE_ENV === 'development') {
+  global.store = store
 }
 
 render(App)

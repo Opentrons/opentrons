@@ -2,17 +2,26 @@
 
 import {actions, actionTypes} from '../'
 
-describe('robot actions', () => {
-  test('connection response', () => {
+describe('robot requests and responses', () => {
+  test('connect action', () => {
     const expected = {
-      type: actionTypes.CONNECT_RESPONSE,
-      error: new Error('AHHH')
+      type: actionTypes.CONNECT,
+      meta: {robotCommand: true}
     }
 
-    expect(actions.connectResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.connect()).toEqual(expected)
   })
 
-  test('home action', () => {
+  test('home action without axes', () => {
+    const expected = {
+      type: actionTypes.HOME,
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.home()).toEqual(expected)
+  })
+
+  test('home action with axes', () => {
     const expected = {
       type: actionTypes.HOME,
       payload: {axes: 'xy'},
@@ -47,5 +56,16 @@ describe('robot actions', () => {
     }
 
     expect(actions.runResponse(new Error('AHHH'))).toEqual(expected)
+  })
+})
+
+describe('robot state', () => {
+  test('set isConnected', () => {
+    const expected = {
+      type: actionTypes.SET_IS_CONNECTED,
+      payload: {isConnected: false}
+    }
+
+    expect(actions.setIsConnected(false)).toEqual(expected)
   })
 })

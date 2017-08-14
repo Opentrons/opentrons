@@ -98,14 +98,21 @@
     "moduleFileExtensions": [
       "js"
     ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
     "transform": {
       "^.+\\.js$": "babel-jest"
     },
     "setupFiles": [
       "./internals/scripts/CheckBuiltsExist.js"
+    ],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!node_modules/**",
+      "!dll/**",
+      "!internals/**",
+      "!**/dist/**",
+      "!webpack**",
+      "!coverage/**",
+      "!**/test/**"
     ]
   },
   "standard": {
@@ -163,7 +170,6 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
     "jsdom": "^11.0.0",
-    "loglevel": "^1.4.1",
     "minimist": "^1.2.0",
     "node-sass": "^4.5.3",
     "portfinder": "^1.0.13",

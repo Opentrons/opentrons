@@ -1,37 +1,47 @@
 // robot UI entry point
 // split up into reducer.js, action.js, etc if / when necessary
-import api from './api-middleware'
+import api from './api-client'
 
 export const NAME = 'robot'
 
 // reducer / action helpers
 const makeActionName = (action) => `${NAME}:${action}`
-const makeRequestInitialState = (value, inProgress = false) => ({
-  value,
-  requestInProgress: inProgress,
-  error: null
-})
+const makeRequestInitialState = () => ({inProgress: false, error: null})
 
 const INITIAL_STATE = {
-  // TODO(mc): maybe don't connect automatically?
-  isConnected: makeRequestInitialState(false, true),
-  // TODO(mc): keep track of axes and get homed state from robot
-  isHomed: makeRequestInitialState(false),
-  // TODO(mc): this won't work but whatever
-  isRunning: makeRequestInitialState(false)
+  // request states
+  connectRequest: makeRequestInitialState(),
+  homeRequest: makeRequestInitialState(),
+  runRequest: makeRequestInitialState(),
+
+  // instantaneous robot state
+  isConnected: false
 }
 
-export const apiMiddleware = api
+export const apiClientMiddleware = api
 
 export const actionTypes = {
+  // requests and responses
+  CONNECT: makeActionName('CONNECT'),
   CONNECT_RESPONSE: makeActionName('CONNECT_RESPONSE'),
   HOME: makeActionName('HOME'),
   HOME_RESPONSE: makeActionName('HOME_RESPONSE'),
   RUN: makeActionName('RUN'),
-  RUN_RESPONSE: makeActionName('RUN_RESPONSE')
+  RUN_RESPONSE: makeActionName('RUN_RESPONSE'),
+
+  // instantaneous state
+  SET_IS_CONNECTED: makeActionName('SET_IS_CONNECTED')
 }
 
 export const actions = {
+  // TODO(mc): connect should take a URL or robot identifier
+  connect () {
+    return {
+      type: actionTypes.CONNECT,
+      meta: {robotCommand: true}
+    }
+  },
+
   connectResponse (error = null) {
     return {
       type: actionTypes.CONNECT_RESPONSE,
@@ -40,11 +50,14 @@ export const actions = {
   },
 
   home (axes) {
-    return {
+    const action = {
       type: actionTypes.HOME,
-      meta: {robotCommand: true},
-      payload: {axes}
+      meta: {robotCommand: true}
     }
+
+    if (axes != null) action.payload = {axes}
+
+    return action
   },
 
   homeResponse (error = null) {
@@ -66,57 +79,58 @@ export const actions = {
       type: actionTypes.RUN_RESPONSE,
       error
     }
+  },
+
+  setIsConnected (isConnected) {
+    return {
+      type: actionTypes.SET_IS_CONNECTED,
+      payload: {isConnected}
+    }
   }
 }
 
 export function reducer (state = INITIAL_STATE, action) {
-  const {type, error} = action
+  const {type, payload, error} = action
 
   switch (type) {
+    case actionTypes.CONNECT:
+      return {
+        ...state,
+        connectRequest: {...state.connectRequest, inProgress: true, error: null}
+      }
+
     case actionTypes.CONNECT_RESPONSE:
       return {
         ...state,
-        isConnected: {
-          ...state.isConnected,
-          value: !error,
-          requestInProgress: false,
-          error
-        }
+        connectRequest: {...state.connectRequest, inProgress: false, error}
       }
 
     case actionTypes.HOME:
       return {
         ...state,
-        isHomed: {...state.isHomed, requestInProgress: true, error: null}
+        homeRequest: {...state.homeRequest, inProgress: true, error: null}
       }
 
     case actionTypes.HOME_RESPONSE:
       return {
         ...state,
-        isHomed: {
-          ...state.isHomed,
-          value: !error,
-          requestInProgress: false,
-          error
-        }
+        homeRequest: {...state.homeRequest, inProgress: false, error}
       }
 
     case actionTypes.RUN:
       return {
         ...state,
-        isRunning: {...state.isRunning, requestInProgress: true, error: null}
+        runRequest: {...state.runRequest, inProgress: true, error: null}
       }
 
     case actionTypes.RUN_RESPONSE:
       return {
         ...state,
-        isRunning: {
-          ...state.isRunning,
-          value: !error,
-          requestInProgress: false,
-          error
-        }
+        runRequest: {...state.runRequest, inProgress: false, error}
       }
+
+    case actionTypes.SET_IS_CONNECTED:
+      return {...state, ...payload}
   }
 
   return state
