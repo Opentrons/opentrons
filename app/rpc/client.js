@@ -149,6 +149,7 @@ class RpcContext extends EventEmitter {
     log.debug('Received message %j', message)
 
     const meta = message.$
+    const data = message.data
     const type = meta.type
     let control
 
@@ -171,10 +172,10 @@ class RpcContext extends EventEmitter {
 
       case RESULT:
         if (meta.status === statuses.SUCCESS) {
-          this._cacheCallResultMetadata(message.data)
-          this.emit(makeSuccessEventName(meta.token), message.data)
+          this._cacheCallResultMetadata(data)
+          this.emit(makeSuccessEventName(meta.token), data)
         } else {
-          this.emit(makeFailureEventName(meta.token), message.data)
+          this.emit(makeFailureEventName(meta.token), data)
         }
 
         break
@@ -184,7 +185,12 @@ class RpcContext extends EventEmitter {
         break
 
       case NOTIFICATION:
-        this.emit('notification', message)
+        this._cacheCallResultMetadata(data)
+
+        RemoteObject(this, data)
+          .then((remote) => this.emit('notification', remote))
+          .catch((e) => log.error('Error creating notification remote', e))
+
         break
 
       default:
