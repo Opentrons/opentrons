@@ -365,7 +365,7 @@ class Robot(object):
         Examples
         --------
         >>> from opentrons import Robot
-        >>> robot.connect('Virtual Smoothie')
+        >>> robot.connect()
         >>> robot.home()
         """
         self._driver.calm_down()
@@ -412,7 +412,7 @@ class Robot(object):
         Examples
         --------
         >>> from opentrons import robot
-        >>> robot.connect('Virtual Smoothie')
+        >>> robot.connect()
         >>> robot.home()
         >>> robot.head_speed(4500)
         >>> robot.move_head(x=200, y=200)
@@ -450,7 +450,7 @@ class Robot(object):
         >>> from opentrons import Robot
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> robot.connect('Virtual Smoothie')
+        >>> robot.connect()
         >>> robot.home()
         >>> plate = robot.add_container('96-flat', 'A1', 'plate')
         >>> robot.move_to(plate[0])
