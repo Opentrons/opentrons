@@ -1,4 +1,6 @@
-import csv  # Import inorder to verify api/app package this module
+# Import csv inorder to verify api/app package this module
+import csv  # NOQA
+
 from opentrons import containers
 from opentrons import instruments
 
