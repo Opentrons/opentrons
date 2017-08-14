@@ -1,3 +1,4 @@
+import csv  # Needed for customers
 import sys
 
 from opentrons.robot.robot import Robot
@@ -50,7 +51,7 @@ class InstrumentsWrapper(object):
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 
-__all__ = [containers, instruments, robot, reset]
+__all__ = [containers, csv, instruments, robot, reset]
 
 
 __version__ = get_versions()['version']
