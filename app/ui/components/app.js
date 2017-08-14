@@ -9,9 +9,9 @@ export default class App extends Component {
   constructor(props){
     super(props)
     this.state = {
-      running: true,
-      paused: false,
-      errors: ['Lost connection with serial port'],
+      running: false,
+      paused: true,
+      errors: [],
       run_commands:[
         {
           timestamp: '2:01:43 PM',

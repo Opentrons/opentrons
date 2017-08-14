@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import styles from './RunControl.css'
 import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
 
 class RunControl extends Component {
-	
 	render(){
 		const style = this.props.style
 		const running = this.props.running
@@ -27,7 +25,7 @@ class RunControl extends Component {
 				<div>
 				<div className={styles.progress} >
 					<span>Time Remaining: 00:03:00</span>
-					<RunProgress {...{progress, paused, errors}} />
+					<RunProgress {...{progress, paused, hasError}} />
 				</div>
 				</div>
 			</section>

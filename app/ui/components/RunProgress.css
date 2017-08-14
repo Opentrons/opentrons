@@ -6,6 +6,14 @@
 }
 
 .bar{
-	background-color: green;
+	background-color: lime;
 	height:2rem;
+}
+
+.error_bar{
+	background-color: red;
+}
+
+.paused_bar{
+	background-color: grey;
 }
