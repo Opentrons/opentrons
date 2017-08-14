@@ -624,7 +624,27 @@ def pick_up_tip():
         axis = request.json.get("axis")
         instrument = _get_pipette_from_axis(axis)
         instrument.reset_tip_tracking()
-        instrument.pick_up_tip()
+
+        # Note (Ahmed, Andy): Instead of picking up the tip with drop tip
+        # we will go to the robots max Z height and then call pick up tip
+        # this is becauase pipette.pick_up_tip() uses robot.move_to which uses
+        # the last placeable the robot interacted with to get the max Z height
+        # it should move to.
+
+        # instrument.pick_up_tip()  # Do not use this until explicitly setting
+        # X, Y, Z
+
+        tip_placeable = instrument.tip_racks[0][0]
+        tip_x, tip_y, tip_z = tuple(instrument.calibrator.convert(
+            tip_placeable,
+            tip_placeable.bottom()[1])
+        )
+
+        _, _, robot_max_z = app.robot._driver.get_dimensions()
+        app.robot.move_head(z=robot_max_z)
+        app.robot.move_head(x=tip_x, y=tip_y)
+        instrument.pick_up_tip(tip_placeable)
+
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
@@ -643,7 +663,28 @@ def drop_tip():
     try:
         axis = request.json.get("axis")
         instrument = _get_pipette_from_axis(axis)
-        instrument.return_tip()
+        instrument.reset_tip_tracking()
+
+        # Note (Ahmed, Andy): Instead of dropping the tip with drop tip
+        # we will go to the robots max Z height and then call pick up tip
+        # this is because pipette.pick_up_tip() uses robot.move_to which uses
+        # the last placeable the robot interacted with to get the max Z height
+        # it should move to.
+
+        # instrument.return_tip()  # Do not use this until explicitly setting
+        # X, Y, Z
+
+        tip_placeable = instrument.tip_racks[0][0]
+        tip_x, tip_y, tip_z = tuple(instrument.calibrator.convert(
+            tip_placeable,
+            tip_placeable.bottom()[1])
+        )
+
+        _, _, robot_max_z = app.robot._driver.get_dimensions()
+        app.robot.move_head(z=robot_max_z)
+        app.robot.move_head(x=tip_x, y=tip_y)
+        instrument.drop_tip(tip_placeable)
+
     except Exception as e:
         emit_notifications([str(e)], 'danger')
         return flask.jsonify({
