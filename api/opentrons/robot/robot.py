@@ -809,7 +809,7 @@ class Robot(object):
             }
         }
 
-    def commands(self):
+    def commands(self, string=True):
         """
         Access the human-readable list of commands in the robot's queue.
 
@@ -819,7 +819,12 @@ class Robot(object):
 
         ``'Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>'``
         """
-        return self._commands
+        res = self._commands
+        if string:
+            res = [
+                '{}{}'.format('*' * (c.depth-1), c.msg)
+                for c in self._commands]
+        return res
 
     def comment(self, msg):
         self.add_command(msg)

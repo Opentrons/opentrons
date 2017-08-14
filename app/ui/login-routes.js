@@ -4,7 +4,7 @@ import config from './config'
 import store from './store/store'
 import { getUserId } from './util'
 
-// Note: This is not in GTM because sending email data to GTM violoates
+// Note: This is not in GTM because sending email data to GTM violates
 // the GTM User Policy
 function emitAppUserInfo (userId, userEmail) {
   window.ot_dataLayer.push({userId: userId})

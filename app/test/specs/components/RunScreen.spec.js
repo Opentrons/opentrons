@@ -8,8 +8,8 @@ function getMockStore () {
   return {
     state: {
       runLog: [
-        { timestamp: 'today', command_description: 'some command' },
-        { timestamp: 'tomorrow', command_description: 'other command' }
+        { timestamp: 'today', command_description: '**some command' },
+        { timestamp: 'tomorrow', command_description: '*other command' }
       ]
     },
     actions: { finishRun: sinon.spy() }
@@ -24,8 +24,8 @@ describe('RunScreen.vue', () => {
     const runCommandSelector = runScreen.$el.querySelectorAll('.runCommand')
     const runLog = mockStore.state.runLog
     expect(runCommandSelector.length).to.equal(runLog.length)
-    const firstCommand = 'today - some command'
-    const secondCommand = 'tomorrow - other command'
+    const firstCommand = 'today: \u3000\u3000\u21B3some command'
+    const secondCommand = 'tomorrow: \u3000\u21B3other command'
     expect(runCommandSelector[0].textContent.trim()).to.equal(firstCommand)
     expect(runCommandSelector[1].textContent.trim()).to.equal(secondCommand)
   })
