@@ -411,6 +411,24 @@ class PipetteTest(unittest.TestCase):
         self.p200.set_speed(dispense=100)
         self.assertEqual(self.p200.speeds['dispense'], 100)
 
+    def test_set_flowrate(self):
+
+        p = pipette.Pipette(
+            self.robot,
+            axis="b",
+            name='other-other-pipette-for-flowrate-tests',
+            max_volume=200,
+            aspirate_flowrate=50,
+            dispense_flowrate=75
+        )
+        p.set_max_volume(200)
+        # speed = (flowrate / (max_volume / plunger_distance)) * 60
+        self.assertEquals(p.speeds['aspirate'], 150)
+        self.assertEquals(p.speeds['dispense'], 225)
+        p.set_flowrate(aspirate=75, dispense=50)
+        self.assertEquals(p.speeds['aspirate'], 225)
+        self.assertEquals(p.speeds['dispense'], 150)
+
     def test_distribute(self):
         self.p200.reset()
         self.p200.distribute(
