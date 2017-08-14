@@ -239,7 +239,13 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.smoothie_player.play(self.connection)
 
     # SMOOTHIE METHODS
-    def send_command(self, command, read_after=True, timeout=3, **kwargs):
+    def send_command(
+            self,
+            command,
+            read_after=True,
+            timeout=3,
+            m400=False,
+            **kwargs):
         """
         Sends a GCode command.  Keyword arguments will be automatically
         converted to GCode syntax.
@@ -249,13 +255,17 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         send_command(self.MOVE, x=100 y=100)
         G0 X100 Y100
-        """
 
+        appends M400 if m400=True. This will cause smoothie to send 'ok'
+        only after it empties the queue (finishes making a move).
+        """
         if not self.is_connected():
             self.toggle_port()
 
+        m400_cmd = 'M400' if m400 else ''
+
         args = ' '.join(['{}{}'.format(k, v) for k, v in kwargs.items()])
-        gcode_line = '{} {} M400\r\n'.format(command, args)
+        gcode_line = '{} {} {}\r\n'.format(command, args, m400_cmd)
         log.debug("Write: {}".format(gcode_line))
 
         self.connection.flush_input()
@@ -290,7 +300,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         return kwargs
 
     def move(self, mode='absolute', **kwargs):
-
         # Convert relative coordinates to absolute coordinates
         if mode == 'relative':
             mode = 'absolute'
@@ -325,7 +334,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         while attempts <= max_attempts and (not move_sent):
             attempts += 1
             try:
-                self.send_command(self.MOVE, **args)
+                self.send_command(self.MOVE, **args, m400=True)
                 self.wait_for_ok()
                 move_sent = True
                 break
@@ -335,10 +344,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 reconnect_delay = attempts ** 2
                 log.exception(
                     'Failed to send MOVE command. Will reconnect and '
-                    'trying again in {} seconds'.format(reconnect_delay)
+                    'try again in {} seconds'.format(reconnect_delay)
                 )
                 time.sleep(reconnect_delay)
-                self.connection.reconnect()
+                self.reconnect_driver()
 
         if not move_sent:
             raise RuntimeWarning(
@@ -355,6 +364,12 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             'class': type(self.connection).__name__
         }
         trace.EventBroker.get_instance().notify(arguments)
+
+    def reconnect_driver(self):
+        try:
+            self.connection.reconnect()
+        except OSError:
+            pass
 
     def move_plunger(self, mode='absolute', **kwargs):
         self.move(mode, **kwargs)
