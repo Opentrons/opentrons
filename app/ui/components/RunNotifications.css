@@ -20,3 +20,31 @@
 	font-family:'sans';
 	font-size: 0.75rem;
 }
+
+.error_wrapper{
+	display: grid;
+	height:2rem;
+	padding: 0 1rem;
+	line-height: 2rem;
+	grid-template-columns: 2.1rem auto;
+	font-family: 'sans';
+	font-size: 0.75rem;
+
+}
+
+.error_icon{
+	border:1px solid grey;
+	text-align: center;
+}
+
+.error_message{
+	padding-left: 0.5rem;
+	border:1px solid grey;
+	border-left:none;
+}
+
+.type{
+	font-family:'trons';
+	text-transform: uppercase;
+}
+

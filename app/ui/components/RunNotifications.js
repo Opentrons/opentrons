@@ -3,7 +3,19 @@ import styles from './RunNotifications.css'
 import PropTypes from 'prop-types' 
 
 const ErrorNotification = props => {
-  return <div>{props.errors}</div>
+  return (
+    <div>
+     {props.errors.map((e) => 
+        <div key={e} className={styles.error_wrapper}>
+          <div className={styles.error_icon}>X</div>
+          <div className={styles.error_message}>
+            <span className={styles.type}>Error: </span>
+            {e}
+          </div>
+        </div>
+      )} 
+    </div>
+  )    
 }
 
 const DefaultNotification = props => {
