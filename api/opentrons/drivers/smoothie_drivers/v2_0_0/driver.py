@@ -331,7 +331,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         attempts = 0
         max_attempts = 7
         move_sent = False
-        last_seen_exception = None
         while attempts <= max_attempts and (not move_sent):
             attempts += 1
             try:
@@ -339,8 +338,9 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 self.wait_for_ok()
                 move_sent = True
                 break
+            except RuntimeWarning as e:
+                raise e
             except Exception as e:
-                last_seen_exception = e
                 reconnect_delay = attempts ** 2
                 log.exception(
                     'Failed to send MOVE command. Will reconnect and '
@@ -350,8 +350,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 self.reconnect_driver()
 
         if not move_sent:
-            log.error('Failed to complete move command after multiple attempts')
-            raise last_seen_exception
+            raise RuntimeWarning(
+                'Failed to complete move command after {} tries'
+                .format(attempts)
+            )
 
         arguments = {
             'name': 'move-finished',
