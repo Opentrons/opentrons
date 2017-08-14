@@ -28,7 +28,7 @@
   },
   "name": "ot-app",
   "productName": "OT One App 2",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "OT One Robot Companion Desktop App",
   "main": "shell/dist/bundle.js",
   "repository": {
