@@ -1,3 +1,4 @@
+import csv  # Import inorder to verify api/app package this module
 from opentrons import containers
 from opentrons import instruments
 
