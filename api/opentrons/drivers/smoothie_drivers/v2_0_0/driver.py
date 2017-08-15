@@ -172,6 +172,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
 
         Raises RuntimeWarning if read fails on serial port
         """
+        log.debug('Reading line from serial with timeout={}'.format(timeout))
         self.connection.wait_for_data(timeout=timeout)
         msg = self.connection.readline_string()
         if msg:
@@ -259,6 +260,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         appends M400 if m400=True. This will cause smoothie to send 'ok'
         only after it empties the queue (finishes making a move).
         """
+        log.debug('sending {} command w/timeout = {}'.format(command, timeout))
         if not self.is_connected():
             self.toggle_port()
 
