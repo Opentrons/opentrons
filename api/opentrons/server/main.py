@@ -4,7 +4,6 @@ import sys
 import logging
 from opentrons.server.rpc import Server
 from opentrons.server.robot_container import RobotContainer
-from opentrons.robot import Robot
 from logging.config import dictConfig
 
 # TODO(artyom): might as well use this:
@@ -14,7 +13,7 @@ logging_config = dict(
     formatters={
         'basic': {
             'format':
-            '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # NOQA
+            '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # noqa: E501
         }
     },
     handlers={

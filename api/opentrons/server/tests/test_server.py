@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import pytest
 
 from aiohttp import WSMsgType
@@ -172,7 +171,7 @@ async def test_init(session):
 
 @pytest.mark.asyncio
 async def test_invalid_call(session):
-    init = json.loads(await session.read())  # Skip init
+    json.loads(await session.read())  # Skip init
     await session.put({})
     ack = json.loads(await session.read())   # Receive ACK
     expected = {'$': {'type': rpc.CALL_ACK_MESSAGE, 'token': session.id}}
@@ -184,7 +183,7 @@ async def test_invalid_call(session):
                     'status': 'error',
                     'type': rpc.CALL_RESULT_MESSAGE
                 },
-                'data': "TypeError: dispatch() missing 2 required positional arguments: 'name' "  # NOQA
+                'data': "TypeError: dispatch() missing 2 required positional arguments: 'name' "  # noqa: E501
                 "and 'args'"}
 
     assert res == expected
@@ -192,7 +191,7 @@ async def test_invalid_call(session):
 
 @pytest.mark.asyncio
 async def test_get_root(session):
-    init = json.loads(await session.read())  # Skip init
+    json.loads(await session.read())  # Skip init
     await session.put(
         {'id': id(session.server.control), 'name': 'get_root', 'args': []})
     json.loads(await session.read())  # Skip ACK
@@ -211,7 +210,7 @@ async def test_get_root(session):
 
 @pytest.mark.asyncio
 async def test_get_object_by_id(session):
-    init = json.loads(await session.read())  # Skip init
+    json.loads(await session.read())  # Skip init
     await session.put(
         {'id': id(session.server.control), 'name': 'get_root', 'args': []})
     json.loads(await session.read())  # Skip ACK

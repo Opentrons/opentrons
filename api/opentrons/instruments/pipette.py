@@ -350,7 +350,7 @@ class Pipette(Instrument):
         _description = "Aspirating {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
+        )
 
         self._position_for_aspirate(location)
         self.motor.speed(speed)
@@ -442,7 +442,7 @@ class Pipette(Instrument):
         _description = "Dispensing {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
+        )
         self.robot.add_command(_description)
         return self
 
@@ -803,7 +803,7 @@ class Pipette(Instrument):
 
         _description = "Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')
-        )  # NOQA
+        )
 
         self.robot.add_command(_description)
         return self
@@ -901,7 +901,7 @@ class Pipette(Instrument):
         self.motor.home()
         _description = "Homing pipette plunger on axis {}".format(
             self.axis
-        )  # NOQA
+        )
 
         self.robot.add_command(_description)
         return self
@@ -1082,7 +1082,7 @@ class Pipette(Instrument):
         minutes += int(seconds / 60)
         seconds = seconds % 60
         _description = "Delaying {} minutes and {} seconds".format(
-            minutes, seconds)  # NOQA
+            minutes, seconds)
         seconds += float(minutes * 60)
 
         self.motor.wait(seconds)

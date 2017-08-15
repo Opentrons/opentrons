@@ -109,14 +109,14 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
 
     def process_get_endstops(self, arguments):
         # X_min:0 Y_min:0 Z_min:0 A_min:0 B_min:0 \
-        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0  # noqa
+        # pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0
         # ok
         # ok
         res = ''
         for name in ['X', 'Y', 'Z', 'A', 'B']:
             name += '_min'
             res += '{}:{} '.format(name, self.endstop[name])
-        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0'  # noqa
+        res += 'pins- (XL)P1.24:0 (YL)P1.26:0 (ZL)P1.28:0 (AL)P1.25:0 (BL)P1.27:0'  # noqa: E501
         return res + '\nok\nok'
 
     def set_position_from_arguments(self, arguments):
@@ -205,7 +205,7 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
         return 'ok\nok'
 
     def process_halt(self, arguments):
-        e = 'ok Emergency Stop Requested - reset or M999 required to exit HALT state'  # noqa
+        e = 'ok Emergency Stop Requested - reset or M999 required to exit HALT state'  # noqa: E501
         e += '\nok'
         return e
 
@@ -218,12 +218,12 @@ class VirtualSmoothie_2_0_0(VirtualSmoothie):
         return 'ok\nok'
 
     def process_version(self, arguments):
-        # Build version: BRANCH-HASH, Build date: MONTH DAY YEAR HOUR:MIN:SEC, MCU: LPC1769, System Clock: 120MHz   # noqa
+        # Build version: BRANCH-HASH, Build date: MONTH DAY YEAR HOUR:MIN:SEC, MCU: LPC1769, System Clock: 120MHz   # noqa: E501
         #   CNC Build 6 axis
         #   6 axis
         # ok
         res = 'Build version: {}, '.format(self.version)
-        res += 'Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz'  # noqa
+        res += 'Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz'  # noqa: E501
         res += '\n  CNC Build 6 axis'
         res += '\n  6 axis'
         return res + '\nok'

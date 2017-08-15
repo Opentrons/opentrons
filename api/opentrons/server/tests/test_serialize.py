@@ -38,14 +38,14 @@ def type_id(instance):
 
 
 def test_robot():
-    trough = containers.load('trough-12row', 'C1', 'trough')
-    plate = containers.load('96-PCR-flat', 'D1', 'plate')
+    containers.load('trough-12row', 'C1', 'trough')
+    containers.load('96-PCR-flat', 'D1', 'plate')
 
     # a tip rack for our pipette
     p200rack = containers.load('tiprack-200ul', 'B1', 'tiprack')
 
     # create a p200 pipette on robot axis B
-    p200 = instruments.Pipette(
+    instruments.Pipette(
         name="p200",
         axis="b",
         min_volume=20,
@@ -79,13 +79,13 @@ def test_get_object_tree(instance):
                     'c': 'c',
                     'd': True,
                     'e': None}},
-            'b': [{'i': id(a2), 't': type_id(a2), 'v': {'0': 0, 'a': 1}}, 'b', 1],  # NOQA
+            'b': [{'i': id(a2), 't': type_id(a2), 'v': {'0': 0, 'a': 1}}, 'b', 1],  # noqa: E501
             'c': {
                 'i': tree['v']['c']['i'],
                 't': id(dict),
                 'v': {
                     'a': 1,
-                    'b': [1, 2, {'i': id(a3), 't': type_id(a3), 'v': {'0': 0}}]}},  # NOQA
+                    'b': [1, 2, {'i': id(a3), 't': type_id(a3), 'v': {'0': 0}}]}},  # noqa: E501
             'circular': {'i': id(root), 't': type_id(root), 'v': None}}}
 
     assert json.dumps(tree)
