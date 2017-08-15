@@ -334,7 +334,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         while attempts <= max_attempts and (not move_sent):
             attempts += 1
             try:
-                self.send_command(self.MOVE, **args, m400=True, timeout=60)
+                self.send_command(self.MOVE, **args, m400=True, timeout=300)
                 self.wait_for_ok()
                 move_sent = True
                 break
