@@ -103,6 +103,7 @@ class Server(object):
         return res
 
     async def process(self, message, send):
+        ws = web.WebSocketResponse()
         if message.type == aiohttp.WSMsgType.TEXT:
             data = json.loads(message.data)
             token = data.pop('$')['token']
@@ -193,7 +194,6 @@ class Server(object):
                 }
             })
 
-        events = None
         # Start a loop listening for root object events
         try:
             asyncio.ensure_future(self.monitor_events(send))

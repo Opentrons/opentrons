@@ -1,5 +1,5 @@
 @value colors: './Util.css';
-@value green from colors;
+@value green, red, blue from colors;
 
 .status{
   width: 15px;
@@ -14,7 +14,7 @@
 .connected{
   width: 15px;
   height: 15px;
-  background-color: green;
+  background-color: blue;
   border-radius: 50%;
   box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
 }
@@ -25,4 +25,9 @@
   background-color: red;
   border-radius: 50%;
   box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+.msg{
+  font-family:'trons';
+  text-transform: uppercase;
 }

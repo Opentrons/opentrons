@@ -145,7 +145,7 @@ def get_version(c):
     if v in drivers_by_version:
         return v
 
-    # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa
+    # Build version: BRANCH-HASH, Build date: Mar 18 2017 21:15:21, MCU: LPC1769, System Clock: 120MHz  # noqa: E501
     #   CNC Build 6 axis
     #   6 axis
     # ok

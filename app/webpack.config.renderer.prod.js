@@ -15,7 +15,7 @@ export default merge.smart(baseConfig, {
 
   target: 'electron-renderer',
 
-  entry: ['babel-polyfill', './ui/main'],
+  entry: ['babel-polyfill', './ui/index'],
 
   output: {
     path: path.join(__dirname, 'ui/dist'),

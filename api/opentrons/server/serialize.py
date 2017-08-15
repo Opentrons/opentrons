@@ -4,7 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _get_object_tree(shallow, path, refs, depth, obj):
+def _get_object_tree(shallow, path, refs, depth, obj):  # noqa (TODO. Complexity is 11)
 
     def object_container(value):
         # Save id of instance of object's type as a reference too

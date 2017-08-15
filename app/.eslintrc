@@ -7,28 +7,32 @@
   "extends": "airbnb",
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "rules": {
     "arrow-parens": ["off"],
     "compat/compat": "error",
     "consistent-return": "off",
     "comma-dangle": "off",
+    "default-case": "off",
     "flowtype-errors/show-errors": "error",
     "generator-star-spacing": "off",
+    "global-require": "off",
     "import/no-unresolved": "error",
     "import/no-extraneous-dependencies": "off",
     "no-console": "off",
-    "no-multi-assign": "off",
     "no-param-reassign": "off",
     "no-plusplus": "off",
     "no-return-assign": ["error", "except-parens"],
     "no-underscore-dangle": "off",
     "no-use-before-define": ["error", "nofunc"],
+    "object-curly-spacing": ["error", "never"],
     "promise/param-names": "error",
     "promise/always-return": "off",
     "promise/catch-or-return": "off",
     "promise/no-native": "off",
+    "space-before-function-paren": ["error", "always"],
     "react/sort-comp": ["error", {
       "order": ["type-annotations", "static-methods", "lifecycle", "everything-else", "render"]
     }],
