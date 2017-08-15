@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import styles from './Jog.css'
 
 export default class JogPipette extends Component {
-  render() {
+  render () {
     const axis = [
       {
         name: 'x_neg',

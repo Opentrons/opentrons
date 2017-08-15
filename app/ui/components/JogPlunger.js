@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import styles from './Jog.css'
 
 export default class JogPlunger extends Component {
-  render() {
+  render () {
     const axis = [
       {
         name: 'b_neg',
@@ -23,7 +23,7 @@ export default class JogPlunger extends Component {
         name: 'a_pos',
         content: '\u2193',
         direction: 1
-      },
+      }
     ]
     return (
       <section className={styles.plunger}>
