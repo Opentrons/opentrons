@@ -24,11 +24,13 @@ __all__ = [
 
 drivers_by_version = {
     'v1.0.5': SmoothieDriver_1_2_0,
-    'edge-1c222d9NOMSD': SmoothieDriver_2_0_0
+    'edge-1c222d9NOMSD': SmoothieDriver_2_0_0,
+    'edge-049af91NOMSD': SmoothieDriver_2_0_0
 }
 virtual_smoothies_by_version = {
     'v1.0.5': VirtualSmoothie_1_2_0,
-    'edge-1c222d9NOMSD': VirtualSmoothie_2_0_0
+    'edge-1c222d9NOMSD': VirtualSmoothie_2_0_0,
+    'edge-049af91NOMSD': VirtualSmoothie_2_0_0
 }
 
 
