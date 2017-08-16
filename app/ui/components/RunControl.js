@@ -34,8 +34,8 @@ export default function RunControl (props) {
 }
 
 RunControl.propTypes = {
-  running: PropTypes.bool,
-  paused: PropTypes.bool,
+  isRunning: PropTypes.bool,
+  isPaused: PropTypes.bool,
   errors: PropTypes.array,
   style: PropTypes.string
 }
