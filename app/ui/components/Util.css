@@ -8,17 +8,17 @@
 @value large: (min-width: 960px);
 
 @font-face {
-    font-family: 'trons';
-    src: url('../fonts/Geogtq-Rg-webfont.woff2');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'trons';
+  src: url('../fonts/Geogtq-Rg-webfont.woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'sans';
-    src: url('../fonts/OpenSans-Regular-webfont.woff');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'sans';
+  src: url('../fonts/OpenSans-Regular-webfont.woff');
+  font-weight: 300;
+  font-style: normal;
 }
 
 button{

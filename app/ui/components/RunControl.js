@@ -16,7 +16,6 @@ export default function RunControl (props) {
           ? <button onClick={() => { console.log('resume') }} className={styles.btn_pause}>Resume</button>
           : <button onClick={() => { console.log('pause') }} className={styles.btn_pause}>Pause</button>
         }
-
         <button onClick={() => { console.log('cancel') }} className={styles.btn_cancel}>Cancel Job</button>
       </div>
 
@@ -26,7 +25,6 @@ export default function RunControl (props) {
         <div className={styles.progress} >
           <span>Time Remaining: 00:03:00</span>
           <RunProgress {...{progress, isPaused, hasError}} />
-
         </div>
       </div>
     </section>

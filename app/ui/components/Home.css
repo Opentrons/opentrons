@@ -2,12 +2,12 @@
 @value blue, teal, mustard from colors;
 
 .home{
-    display: grid;
-    width: inherit;
-    grid-gap: 5px;
-    height: 42px;
-    padding-left: 20px;
-    grid-template-columns: 60px repeat(5, [col] 42px );
+	display: grid;
+	width: inherit;
+	grid-gap: 5px;
+	height: 42px;
+	padding-left: 20px;
+	grid-template-columns: 60px repeat(5, [col] 42px );
 }
 
 .btn{
