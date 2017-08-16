@@ -10,7 +10,7 @@ import {statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE} from './message-ty
 const HANDSHAKE_TIMEOUT = 5000
 const RECEIVE_CONTROL_TIMEOUT = 500
 const CALL_ACK_TIMEOUT = 5000
-const CALL_RESULT_TIMEOUT = 10000
+const CALL_RESULT_TIMEOUT = 60000
 
 // metadata constants
 const REMOTE_TARGET_OBJECT = 0
@@ -30,6 +30,10 @@ class RpcContext extends EventEmitter {
     this._resultTypes = new Map()
     this._typeObjectCache = new Map()
     this.control = null
+    // default max listeners is 10, we need more than that
+    // keeping this at a finite number just in case we get a leak later
+    this.setMaxListeners(100)
+
     ws.on('error', this._handleError.bind(this))
     ws.on('message', this._handleMessage.bind(this))
   }

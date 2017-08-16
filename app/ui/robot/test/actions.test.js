@@ -2,7 +2,7 @@
 
 import {actions, actionTypes} from '../'
 
-describe('robot requests and responses', () => {
+describe('robot effects', () => {
   test('connect action', () => {
     const expected = {
       type: actionTypes.CONNECT,
@@ -59,7 +59,7 @@ describe('robot requests and responses', () => {
   })
 })
 
-describe('robot state', () => {
+describe('robot actions', () => {
   test('set isConnected', () => {
     const expected = {
       type: actionTypes.SET_IS_CONNECTED,

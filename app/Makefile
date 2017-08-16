@@ -51,8 +51,13 @@ clean:
 
 .PHONY: test test-e2e test-unit lint lint-js lint-js-fix lint-css lint-css-fix
 
-# watch argument for tests
+# watch and coverage arguments for tests
 watch ?= false
+cover ?= true
+
+ifeq ($(watch), true)
+	cover = false
+endif
 
 test: test-ui
 	$(MAKE) lint
@@ -61,7 +66,7 @@ test-e2e: build
 	npm run test-e2e
 
 test-unit:
-	$(ENV)=test $(BIN)/jest '.*\.test\.js' --coverage --watch=$(watch)
+	$(ENV)=test $(BIN)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
 lint:
 	$(BIN)/concurrently "$(MAKE) lint-js" "$(MAKE) lint-css"

@@ -1,13 +1,31 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+
+import {actions} from '../robot'
+
 import styles from './app.css'
 
 import Connection from './Connection'
 import Button from './Button'
 import RunControl from './RunControl'
 
-export default class App extends Component {
+const mapStateToProps = (state) => {
+  return {
+    isRunning: state.robot.runRequest.inProgress,
+    isConnected: state.isConnected
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onRunButtonClick: () => dispatch(actions.run())
+  }
+}
+
+class App extends Component {
   constructor (props) {
     super(props)
+
     this.state = {
       isRunning: true,
       isPaused: false,
@@ -29,15 +47,19 @@ export default class App extends Component {
     }
   }
   render () {
-    const isRunning = this.state.isRunning
-    const isPaused = this.state.isPaused
-    const errors = this.state.errors
+    const {isRunning, onRunButtonClick} = this.props
+    const {isPaused, errors} = this.state
+
     return (
       <div className={styles.run_wrapper}>
         <header className={styles.menu}>
-          { !isRunning &&
-            <Button onClick={() => { console.log('run') }} disabled={isRunning} style={styles.run}>Run Job</Button>
-          }
+          {!isRunning && <Button
+            onClick={onRunButtonClick}
+            disabled={isRunning}
+            style={styles.run}
+          >
+            Run Job
+          </Button>}
         </header>
         <aside className={styles.sidebar} />
         <div className={styles.connect}>
@@ -58,3 +80,5 @@ export default class App extends Component {
     )
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

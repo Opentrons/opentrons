@@ -6,16 +6,20 @@ export const NAME = 'robot'
 
 // reducer / action helpers
 const makeActionName = (action) => `${NAME}:${action}`
-const makeRequestInitialState = () => ({inProgress: false, error: null})
+const makeRequestState = () => ({inProgress: false, error: null})
 
 const INITIAL_STATE = {
-  // request states
-  connectRequest: makeRequestInitialState(),
-  homeRequest: makeRequestInitialState(),
-  runRequest: makeRequestInitialState(),
+  // robot connection
+  // TODO(mc): explore combining request state with result state
+  connectRequest: makeRequestState(),
+  homeRequest: makeRequestState(),
+  runRequest: makeRequestState(),
 
-  // instantaneous robot state
-  isConnected: false
+  // instantaneous robot state below
+  // is connected to compute
+  isConnected: false,
+  // is running a protocol
+  isRunning: false
 }
 
 export const apiClientMiddleware = api
@@ -102,6 +106,7 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.CONNECT_RESPONSE:
       return {
         ...state,
+        isConnected: !error,
         connectRequest: {...state.connectRequest, inProgress: false, error}
       }
 
@@ -120,7 +125,10 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.RUN:
       return {
         ...state,
-        runRequest: {...state.runRequest, inProgress: true, error: null}
+        runRequest: {...state.runRequest, inProgress: true, error: null},
+        // TODO(mc): for now, naively assume that if a run request is dispatched
+        // the robot is running
+        isRunning: true
       }
 
     case actionTypes.RUN_RESPONSE:

@@ -10,7 +10,8 @@ describe('robot reducer', () => {
       connectRequest: {inProgress: false, error: null},
       homeRequest: {inProgress: false, error: null},
       runRequest: {inProgress: false, error: null},
-      isConnected: false
+      isConnected: false,
+      isRunning: false
     })
   })
 
@@ -24,20 +25,28 @@ describe('robot reducer', () => {
   })
 
   test('handles connect response success', () => {
-    const state = {connectRequest: {inProgress: true, error: null}}
+    const state = {
+      connectRequest: {inProgress: true, error: null},
+      isConnected: false
+    }
     const action = {type: actionTypes.CONNECT_RESPONSE, error: null}
 
     expect(reducer(state, action)).toEqual({
-      connectRequest: {inProgress: false, error: null}
+      connectRequest: {inProgress: false, error: null},
+      isConnected: true
     })
   })
 
   test('handles connectResponse failure', () => {
-    const state = {connectRequest: {inProgress: true, error: null}}
+    const state = {
+      connectRequest: {inProgress: true, error: null},
+      isConnected: true
+    }
     const action = {type: actionTypes.CONNECT_RESPONSE, error: new Error('AH')}
 
     expect(reducer(state, action)).toEqual({
-      connectRequest: {inProgress: false, error: new Error('AH')}
+      connectRequest: {inProgress: false, error: new Error('AH')},
+      isConnected: false
     })
   })
 
@@ -74,7 +83,10 @@ describe('robot reducer', () => {
     const action = {type: actionTypes.RUN}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: true, error: null}
+      runRequest: {inProgress: true, error: null},
+      // TODO(mc): for now, naively assume that if a run request is dispatched
+      // the robot is running
+      isRunning: true
     })
   })
 
@@ -105,4 +117,12 @@ describe('robot reducer', () => {
 
     expect(reducer(state, action)).toEqual({isConnected: true})
   })
+
+  // test('handles getDetectedSmoothies', () => {
+  //
+  // })
+  //
+  // test('handles setDetectedSmoothies', () => {
+  //   const state = {}
+  // })
 })
