@@ -38,20 +38,12 @@ const PausedNotification = props => {
 }
 
 export default function RunNotifications (props) {
-  const { isRunning, isPaused, errors, hasError } = props
-  let notification
-  // changed this to assume running means you have hit run button, and have not canceled
-  if (isRunning && !isPaused && !hasError) {
-    notification = <DefaultNotification />
-  } else if (hasError) {
+  const { isPaused, errors, hasError } = props
+  let notification = <DefaultNotification />
+  if (hasError) {
     notification = <ErrorNotification {...{errors}} />
   } else if (isPaused) {
     notification = <PausedNotification />
-  } else {
-    return null
   }
-
-  return (
-    notification
-  )
+  return notification
 }

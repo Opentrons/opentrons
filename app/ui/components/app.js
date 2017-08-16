@@ -10,7 +10,7 @@ export default class App extends Component {
     super(props)
     this.state = {
       isRunning: true,
-      isPaused: false,
+      isPaused: true,
       errors: [],
       run_commands: [
         {
@@ -43,8 +43,8 @@ export default class App extends Component {
         { this.state.isRunning
           ? <RunControl
             style={styles.run_progress}
-            running={this.state.isRunning}
-            paused={this.state.isPaused}
+            isRunning={this.state.isRunning}
+            isPaused={this.state.isPaused}
             errors={this.state.errors}
             commands={this.state.run_commands}
           />
