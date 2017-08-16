@@ -1,0 +1,20 @@
+.bar_wrapper{
+	border:1px solid grey;
+	height:2rem;
+	width:100%;
+	overflow:hidden;
+}
+
+.bar{
+	background-color: lime;
+	height:2rem;
+}
+
+.paused_bar{
+	background-color: grey;
+}
+
+.error_bar{
+	background-color: red;
+}
+

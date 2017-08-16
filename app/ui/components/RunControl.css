@@ -1,0 +1,37 @@
+
+
+.btn_wrapper{
+	display:grid;
+	grid-template-columns: repeat(4, [col] 1fr );
+	grid-template-areas: "error . pause cancel";
+}
+
+
+.btn_error{
+	composes: btn from './Util.css';
+	grid-area:error;
+	margin:1rem;
+}
+
+.btn_pause{
+	composes: btn from './Util.css';
+	grid-area:pause;
+	margin:1rem;
+}
+
+.btn_cancel{
+	composes: btn from './Util.css';
+	grid-area:cancel;
+	margin:1rem;
+}
+
+.progress{
+	height:3.1rem;
+	display:block;
+	bottom:0;
+	left:0;
+	right:0;
+	position:absolute;
+}
+
+

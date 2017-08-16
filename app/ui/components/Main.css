@@ -1,11 +1,11 @@
 .container{
-    display: grid;
-    width: 1024px;
-    height:  768px;
-    grid-template-rows:[row]152px [row]460px [row]150px;
-    grid-row-gap: 1px;
-    background-color: white;
-  }
+  display: grid;
+  width: 1024px;
+  height:  768px;
+  grid-template-rows:[row]152px [row]460px [row]150px;
+  grid-row-gap: 1px;
+  background-color: white;
+}
 
 .container :global{
   color: grey;

@@ -1,0 +1,50 @@
+.tip{
+	display: inline-block;
+	margin-left:1rem;
+	width:50px;
+	height:50px;
+	border-radius: 50%;
+	border:2px solid grey;
+	line-height: 48px;
+	text-align: center;
+	text-transform: uppercase;
+	font-family:'trons';
+	vertical-align: middle;
+}
+
+.tip_text{
+	display: inline-block;
+	width:80%;
+	vertical-align: middle;
+	padding-left: 1rem;
+	font-family:'sans';
+	font-size: 0.75rem;
+}
+
+.notification_wrapper{
+	display: grid;
+	height:2rem;
+	padding: 0 1rem;
+	line-height: 2rem;
+	grid-template-columns: 2.1rem auto;
+	font-family: 'sans';
+	font-size: 0.75rem;
+
+}
+
+.notification_icon{
+	border:1px solid grey;
+	text-align: center;
+}
+
+.notification_message{
+	padding-left: 0.5rem;
+	border:1px solid grey;
+	border-left:none;
+}
+
+.type{
+	font-family:'trons';
+	text-transform: uppercase;
+}
+

@@ -4,7 +4,7 @@ import JogPlunger from './JogPlunger'
 import styles from './Welcome.css'
 
 class Welcome extends Component {
-  render() {
+  render () {
     return (
       <div className={styles.welcome}>
         <div className={styles.jog}>
