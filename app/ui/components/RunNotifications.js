@@ -46,6 +46,8 @@ function RunNotifications ({ running, paused, errors, hasError }) {
     notification = <PausedNotification />
   } else if (hasError) {
     notification = <ErrorNotification {...{errors}} />
+  }else{
+    return null
   }
 
   return (
