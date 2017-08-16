@@ -12,7 +12,7 @@ ENV := $(BIN)/cross-env NODE_ENV
 # tasks
 #####################################################################
 
-.PHONY: test test-ui clean install package
+.PHONY: install build package dev clean
 
 install:
 	npm install
@@ -34,30 +34,6 @@ package: build
 	export OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX) && \
 	npm run package
 
-# test tasks
-#####################################################################
-
-# watch argument for tests
-watch ?= false
-
-test: test-ui
-	make lint
-
-test-e2e: build
-	npm run test-e2e
-
-test-ui:
-	$(ENV)=test $(BIN)/jest './ui/.*\.test\.js' --watch=$(watch)
-
-lint:
-	$(BIN)/standard --verbose | $(BIN)/snazzy
-
-lint-fix:
-	$(BIN)/standard --fix
-
-# development tasks
-#####################################################################
-
 dev:
 	npm run build-dev
 	npm run dev
@@ -69,3 +45,35 @@ clean:
 		dll \
 		bin \
 		coverage
+
+# test tasks
+#####################################################################
+
+.PHONY: test test-e2e test-ui lint lint-js lint-js-fix lint-css lint-css-fix
+
+# watch argument for tests
+watch ?= false
+
+test: test-ui
+	$(MAKE) lint
+
+test-e2e: build
+	npm run test-e2e
+
+test-ui:
+	$(ENV)=test $(BIN)/jest './ui/.*\.test\.js' --watch=$(watch)
+
+lint:
+	$(BIN)/concurrently "$(MAKE) lint-js" "$(MAKE) lint-css"
+
+lint-js:
+	$(BIN)/standard --verbose | $(BIN)/snazzy
+
+lint-js-fix:
+	$(BIN)/standard --fix
+
+lint-css:
+	$(BIN)/stylelint '**/*.css' --verbose
+
+lint-css-fix:
+	$(BIN)/stylelint '**/*.css' --fix
