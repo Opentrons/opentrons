@@ -175,12 +175,7 @@ class Server(object):
 
         return [resolve(a) for a in args]
 
-<<<<<<< HEAD
-    async def process(self, message, send):
-        ws = web.WebSocketResponse()
-=======
     async def process(self, message):
->>>>>>> refactoring, added support for broadcasting responses and notifications to all clients
         if message.type == aiohttp.WSMsgType.TEXT:
             data = json.loads(message.data)
             token = data.pop('$')['token']
@@ -220,78 +215,6 @@ class Server(object):
                 'WebSocket connection closed with exception %s'
                 % ws.exception())
 
-<<<<<<< HEAD
-    async def monitor_events(self, send):
-        try:
-            async for event in self.control:
-                try:
-                    data, refs = serialize.get_object_tree(event)
-                    await send(
-                        {
-                            '$': {'type': NOTIFICATION_MESSAGE},
-                            'data': data
-                        })
-                    self.objects = {**self.objects, **refs}
-                except Exception as e:
-                    log.warning(
-                        'While processing event {0}: {1}'.format(
-                            event, e))
-        except Exception as e:
-            log.warning(
-                'While binding to event stream: {0}'.format(
-                    e))
-
-    # Handler receives HTTP request and negotiates up to
-    # a websocket session
-    async def handler(self, request):
-        log.debug('Starting handler for request: {0}'.format(request))
-        ws = web.WebSocketResponse()
-
-        # upgrade to websockets
-        await ws.prepare(request)
-
-        def send(payload):
-            log.debug('Sending {0} to {1}'.format(payload, ws))
-            return ws.send_str(json.dumps(payload))
-
-        # Return instance of root object and instance of control box
-        control_type, control_type_refs = serialize.get_object_tree(
-            type(self.control), shallow=True)
-        control_instance, control_instance_refs = serialize.get_object_tree(
-            self.control, shallow=True)
-        self.objects = {
-            **self.objects,
-            **control_type_refs,
-            **control_instance_refs}
-
-        await send(
-            {
-                '$': {'type': CONTROL_MESSAGE},
-                'control': {
-                    'instance': control_instance,
-                    'type': control_type
-                }
-            })
-
-        # Start a loop listening for root object events
-        try:
-            asyncio.ensure_future(self.monitor_events(send))
-        except Exception as e:
-            log.warning(e)
-
-        # Async receive ws data until websocket is closed
-        async for msg in ws:
-            log.debug('Received: {0}'.format(msg))
-            try:
-                await self.process(msg, send)
-            except Exception as e:
-                await ws.close()
-                log.error(
-                    'While processing message: {0}'
-                    .format(traceback.format_exc()))
-
-        return ws
-=======
     def send(self, payload):
         for client in self.clients:
             if client.closed:
@@ -301,4 +224,3 @@ class Server(object):
                 continue
             log.warning('Sending {0} to {1}'.format(payload, client))
             client.send_str(json.dumps(payload))
->>>>>>> refactoring, added support for broadcasting responses and notifications to all clients
