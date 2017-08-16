@@ -120,11 +120,11 @@
     "ignore": [
       "dll/"
     ],
-    "env": {
-      "node": true,
-      "browser": true,
-      "jest": true
-    }
+    "env": [
+      "node",
+      "browser",
+      "jest"
+    ]
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
