@@ -15,11 +15,11 @@ body{
   display: grid;
   width:1024px;
   height:768px;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 100px 1fr 1fr;
   grid-template-rows: 68px 200px 350px 150px;
-  grid-template-areas:  "head head head" 
-                        "sidebar controls controls" 
-                        "sidebar log log" 
+  grid-template-areas:  "head head head"
+                        "sidebar controls controls"
+                        "sidebar log log"
                         "connect log log";
 }
 
