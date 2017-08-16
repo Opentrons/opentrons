@@ -4,7 +4,8 @@ import styles from './RunControl.css'
 import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
 
-const RunControl = ({isRunning, isPaused, errors, style}) => {
+export default function RunControl (props) {
+  const {isRunning, isPaused, errors, style} = props
   const hasError = errors.length > 0
   const progress = (1 / 3) * 100 // dummy current index divded by commands.length for progress bar
   return (
@@ -39,4 +40,3 @@ RunControl.propTypes = {
   style: PropTypes.string
 }
 
-export default RunControl

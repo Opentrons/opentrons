@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import styles from './Connection.css'
 
 export default class Connection extends Component {
-  render() {
+  render () {
     const connectionStatusStyles = {
       connected: styles.connected,
       disconnected: styles.disconnected
