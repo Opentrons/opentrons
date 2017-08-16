@@ -38,7 +38,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onRunButtonClick: () => dispatch(robotActions.run())
+    onRunButtonClick: () => dispatch(robotActions.run()),
+    // TODO(mc): revisit when robot discovery / multiple robots is addressed
+    onConnectButtonClick: () => dispatch(robotActions.connect())
   }
 }
 
