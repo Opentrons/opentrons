@@ -59,7 +59,7 @@ ifeq ($(watch), true)
 	cover = false
 endif
 
-test: test-ui
+test: test-unit
 	$(MAKE) lint
 
 test-e2e: build
