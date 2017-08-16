@@ -29,23 +29,26 @@ export default class App extends Component {
     }
   }
   render () {
+    const isRunning = this.state.isRunning
+    const isPaused = this.state.isPaused
+    const errors = this.state.errors
     return (
       <div className={styles.run_wrapper}>
         <header className={styles.menu}>
-          { !this.state.isRunning &&
-            <Button onClick={() => { console.log('run') }} disabled={this.state.isRunning} style={styles.run}>Run Job</Button>
+          { !isRunning &&
+            <Button onClick={() => { console.log('run') }} disabled={isRunning} style={styles.run}>Run Job</Button>
           }
         </header>
         <aside className={styles.sidebar} />
         <div className={styles.connect}>
           <Connection />
         </div>
-        { this.state.isRunning
+        { isRunning
           ? <RunControl
             style={styles.run_progress}
-            isRunning={this.state.isRunning}
-            isPaused={this.state.isPaused}
-            errors={this.state.errors}
+            isRunning={isRunning}
+            isPaused={isPaused}
+            errors={errors}
             commands={this.state.run_commands}
           />
           : <section className={styles.run_progress} />
