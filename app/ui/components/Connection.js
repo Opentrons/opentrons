@@ -1,18 +1,28 @@
-import React, { Component } from 'react'
+// TODO(mc): maybe put this robot specific component in ui/robot/components
+import React from 'react'
+import PropTypes from 'prop-types'
+
 import styles from './Connection.css'
 
-export default class Connection extends Component {
-  render () {
-    const connectionStatusStyles = {
-      connected: styles.connected,
-      disconnected: styles.disconnected
-    }
-    const status = this.props.connectionStatus || 'connected'
-    return (
-      <div className={styles.status}>
-        <div className={connectionStatusStyles[status]} />
-        <div className={styles.msg}> Device {status}</div>
+export default function Connection (props) {
+  const {isConnected, connectionStatus} = props
+
+  // TODO(mc): handle connection in progress (state is in place for this)
+  const style = isConnected
+    ? styles.connected
+    : styles.disconnected
+
+  return (
+    <div className={styles.status}>
+      <div className={style} />
+      <div className={styles.msg}>
+        Device {connectionStatus}
       </div>
-    )
-  }
+    </div>
+  )
+}
+
+Connection.propTypes = {
+  isConnected: PropTypes.bool.isRequired,
+  connectionStatus: PropTypes.string.isRequired
 }

@@ -14,7 +14,7 @@ import {
 } from './robot'
 
 // components
-import App from './components/app'
+import Root from './containers/Root'
 
 const reducer = combineReducers({
   [ROBOT_NAME]: robotReducer
@@ -23,7 +23,7 @@ const reducer = combineReducers({
 const middleware = applyMiddleware(
   robotApiMiddleware,
   // TODO(mc): log to file instead of console in prod
-  createLogger(),
+  createLogger()
 )
 
 const store = createStore(reducer, middleware)
@@ -40,9 +40,8 @@ const render = (Component) => ReactDom.render(
 )
 
 if (module.hot) {
-  module.hot.accept('./components/app', () => {
-    const nextApp = require('./components/app').default
-    render(nextApp)
+  module.hot.accept('./containers/Root', () => {
+    render(require('./containers/Root').default)
   })
 }
 
@@ -50,4 +49,4 @@ if (process.env.NODE_ENV === 'development') {
   global.store = store
 }
 
-render(App)
+render(Root)

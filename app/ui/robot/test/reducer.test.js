@@ -91,20 +91,22 @@ describe('robot reducer', () => {
   })
 
   test('handles runResponse success', () => {
-    const state = {runRequest: {inProgress: true, error: null}}
+    const state = {isRunning: true, runRequest: {inProgress: true, error: null}}
     const action = {type: actionTypes.RUN_RESPONSE, error: null}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: false, error: null}
+      runRequest: {inProgress: false, error: null},
+      isRunning: false
     })
   })
 
   test('handles runResponse failure', () => {
-    const state = {runRequest: {inProgress: true, error: null}}
+    const state = {isRunning: true, runRequest: {inProgress: true, error: null}}
     const action = {type: actionTypes.RUN_RESPONSE, error: new Error('AH')}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: false, error: new Error('AH')}
+      runRequest: {inProgress: false, error: new Error('AH')},
+      isRunning: false
     })
   })
 
@@ -117,12 +119,4 @@ describe('robot reducer', () => {
 
     expect(reducer(state, action)).toEqual({isConnected: true})
   })
-
-  // test('handles getDetectedSmoothies', () => {
-  //
-  // })
-  //
-  // test('handles setDetectedSmoothies', () => {
-  //   const state = {}
-  // })
 })

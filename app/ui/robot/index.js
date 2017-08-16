@@ -22,6 +22,21 @@ const INITIAL_STATE = {
   isRunning: false
 }
 
+// miscellaneous constants
+export const constants = {
+  DISCONNECTED: 'disconnected',
+  CONNECTING: 'connecting',
+  CONNECTED: 'connected'
+}
+
+export const selectors = {
+  getConnectionStatus: (state) => {
+    if (state.isConnected) return constants.CONNECTED
+    if (state.connectRequest.inProgress) return constants.CONNECTING
+    return constants.DISCONNECTED
+  }
+}
+
 export const apiClientMiddleware = api
 
 export const actionTypes = {
@@ -134,7 +149,8 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.RUN_RESPONSE:
       return {
         ...state,
-        runRequest: {...state.runRequest, inProgress: false, error}
+        runRequest: {...state.runRequest, inProgress: false, error},
+        isRunning: false
       }
 
     case actionTypes.SET_IS_CONNECTED:
