@@ -39,4 +39,3 @@ RunControl.propTypes = {
   errors: PropTypes.array,
   style: PropTypes.string
 }
-
