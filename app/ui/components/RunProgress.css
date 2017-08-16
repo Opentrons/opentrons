@@ -10,10 +10,11 @@
 	height:2rem;
 }
 
+.paused_bar{
+	background-color: grey;
+}
+
 .error_bar{
 	background-color: red;
 }
 
-.paused_bar{
-	background-color: grey;
-}

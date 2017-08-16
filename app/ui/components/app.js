@@ -10,8 +10,8 @@ export default class App extends Component {
     super(props)
     this.state = {
       running: true,
-      paused: false,
-      errors: [],
+      paused: true,
+      errors: ['serial port connection lost'],
       run_commands: [
         {
           timestamp: '2:01:43 PM',
@@ -40,14 +40,16 @@ export default class App extends Component {
         <div className={styles.connect}>
           <Connection />
         </div>
-        <RunControl
-          style={styles.run_progress}
-          running={this.state.running}
-          paused={this.state.paused}
-          errors={this.state.errors}
-          commands={this.state.run_commands}
-        />
-
+        { this.state.running
+          ? <RunControl
+            style={styles.run_progress}
+            running={this.state.running}
+            paused={this.state.paused}
+            errors={this.state.errors}
+            commands={this.state.run_commands}
+          />
+          : <section className={styles.run_progress} />
+        }
         <main className={styles.task} />
       </div>
     )

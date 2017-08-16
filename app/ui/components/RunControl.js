@@ -24,7 +24,7 @@ const RunControl = ({running, paused, errors, style}) => {
       <div>
         <div className={styles.progress} >
           <span>Time Remaining: 00:03:00</span>
-          <RunProgress {...{progress, paused, hasError}} />
+          {running && <RunProgress {...{progress, paused, hasError}} />}
         </div>
       </div>
     </section>

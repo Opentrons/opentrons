@@ -42,11 +42,11 @@ function RunNotifications ({ running, paused, errors, hasError }) {
   // changed this to assume running means you have hit run button, and have not canceled
   if (running && !paused && !hasError) {
     notification = <DefaultNotification />
-  } else if (paused) {
-    notification = <PausedNotification />
   } else if (hasError) {
     notification = <ErrorNotification {...{errors}} />
-  }else{
+  } else if (paused) {
+    notification = <PausedNotification />
+  } else {
     return null
   }
 
