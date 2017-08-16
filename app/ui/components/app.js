@@ -9,9 +9,9 @@ export default class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      running: true,
-      paused: true,
-      errors: ['serial port connection lost'],
+      isRunning: true,
+      isPaused: false,
+      errors: [],
       run_commands: [
         {
           timestamp: '2:01:43 PM',
@@ -32,19 +32,19 @@ export default class App extends Component {
     return (
       <div className={styles.run_wrapper}>
         <header className={styles.menu}>
-          { !this.state.running &&
-            <Button onClick={() => { console.log('run') }} disabled={this.state.running} style={styles.run}>Run Job</Button>
+          { !this.state.isRunning &&
+            <Button onClick={() => { console.log('run') }} disabled={this.state.isRunning} style={styles.run}>Run Job</Button>
           }
         </header>
         <aside className={styles.sidebar} />
         <div className={styles.connect}>
           <Connection />
         </div>
-        { this.state.running
+        { this.state.isRunning
           ? <RunControl
             style={styles.run_progress}
-            running={this.state.running}
-            paused={this.state.paused}
+            running={this.state.isRunning}
+            paused={this.state.isPaused}
             errors={this.state.errors}
             commands={this.state.run_commands}
           />
