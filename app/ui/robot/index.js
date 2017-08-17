@@ -1,12 +1,14 @@
-// robot UI entry point
+// robot state module
 // split up into reducer.js, action.js, etc if / when necessary
+import {makeActionName} from '../util'
 import api from './api-client'
 
 export const NAME = 'robot'
 
 // reducer / action helpers
-const makeActionName = (action) => `${NAME}:${action}`
+const makeRobotActionName = (action) => makeActionName(NAME, action)
 const makeRequestState = () => ({inProgress: false, error: null})
+const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
   // robot connection
@@ -30,7 +32,9 @@ export const constants = {
 }
 
 export const selectors = {
-  getConnectionStatus: (state) => {
+  getConnectionStatus (allState) {
+    const state = getModuleState(allState)
+
     if (state.isConnected) return constants.CONNECTED
     if (state.connectRequest.inProgress) return constants.CONNECTING
     return constants.DISCONNECTED
@@ -41,15 +45,15 @@ export const apiClientMiddleware = api
 
 export const actionTypes = {
   // requests and responses
-  CONNECT: makeActionName('CONNECT'),
-  CONNECT_RESPONSE: makeActionName('CONNECT_RESPONSE'),
-  HOME: makeActionName('HOME'),
-  HOME_RESPONSE: makeActionName('HOME_RESPONSE'),
-  RUN: makeActionName('RUN'),
-  RUN_RESPONSE: makeActionName('RUN_RESPONSE'),
+  CONNECT: makeRobotActionName('CONNECT'),
+  CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
+  HOME: makeRobotActionName('HOME'),
+  HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  RUN: makeRobotActionName('RUN'),
+  RUN_RESPONSE: makeRobotActionName('RUN_RESPONSE'),
 
   // instantaneous state
-  SET_IS_CONNECTED: makeActionName('SET_IS_CONNECTED')
+  SET_IS_CONNECTED: makeRobotActionName('SET_IS_CONNECTED')
 }
 
 export const actions = {

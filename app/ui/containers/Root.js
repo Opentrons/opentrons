@@ -3,7 +3,11 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 import {
-  NAME as ROBOT_NAME,
+  actions as interfaceActions,
+  selectors as interfaceSelectors
+} from '../interface'
+
+import {
   actions as robotActions,
   selectors as robotSelectors
 } from '../robot'
@@ -12,9 +16,13 @@ import App from '../components/app'
 
 const mapStateToProps = (state) => {
   return {
+    // interface
+    isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
+
+    // robot
     isRunning: state.robot.isRunning,
     isConnected: state.robot.isConnected,
-    connectionStatus: robotSelectors.getConnectionStatus(state[ROBOT_NAME]),
+    connectionStatus: robotSelectors.getConnectionStatus(state),
 
     // TODO(mc): remove development hardcoded values
     isPaused: false,
@@ -38,6 +46,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    // interface
+    onNavButtonClick: () => dispatch(interfaceActions.toggleNavPanel()),
+
+    // robot
     onRunButtonClick: () => dispatch(robotActions.run()),
     // TODO(mc): revisit when robot discovery / multiple robots is addressed
     onConnectButtonClick: () => dispatch(robotActions.connect())
