@@ -321,6 +321,10 @@ class Robot(object):
         """
         device = None
 
+        # Maintain backwards compatibility
+        if port == 'Virtual Smoothie':
+            port = 'edge-1c222d9NOMSD'
+
         # Default port virtual smoothie 2.0.0 port
         port = port or 'edge-1c222d9NOMSD'
 
