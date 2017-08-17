@@ -6,7 +6,13 @@ import {createStore, combineReducers, applyMiddleware} from 'redux'
 import {AppContainer} from 'react-hot-loader'
 import {createLogger} from 'redux-logger'
 
-// robot logic
+// interface state
+import {
+  NAME as INTERFACE_NAME,
+  reducer as interfaceReducer
+} from './interface'
+
+// robot state
 import {
   NAME as ROBOT_NAME,
   reducer as robotReducer,
@@ -17,6 +23,7 @@ import {
 import Root from './containers/Root'
 
 const reducer = combineReducers({
+  [INTERFACE_NAME]: interfaceReducer,
   [ROBOT_NAME]: robotReducer
 })
 
