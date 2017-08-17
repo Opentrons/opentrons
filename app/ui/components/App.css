@@ -23,7 +23,7 @@ body{
 
 }
 
-.run_wrapper.open{
+.open{
   grid-template-columns: 1fr 1fr 1fr;
 }
 

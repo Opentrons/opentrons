@@ -9,15 +9,16 @@ import RunControl from './RunControl'
 export default function App (props) {
   const {
     // state
+    isNavPanelOpen,
     isConnected,
     isRunning,
     isPaused,
     errors,
     runCommands,
     // handlers
-    onRunButtonClick
+    onRunButtonClick,
+    onNavButtonClick
   } = props
-  let isPanelOpen = false
   let runButton
   let runControl
   if (!isRunning) {
@@ -46,16 +47,12 @@ export default function App (props) {
     )
   }
 
-  function toggleNav () {
-    isPanelOpen = !isPanelOpen
-  }
-
   return (
-    <div className={classnames(styles.run_wrapper, { [styles.open]: isPanelOpen })}>
+    <div className={classnames(styles.run_wrapper, { [styles.open]: isNavPanelOpen })}>
       <header className={styles.menu}>
         <button
           className={styles.toggle_nav}
-          onClick={toggleNav}
+          onClick={onNavButtonClick}
         >
           &#9776;
         </button>
