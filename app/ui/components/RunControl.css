@@ -2,7 +2,7 @@
 
 .btn_wrapper{
 	display:grid;
-	grid-template-columns: repeat(4, [col] 1fr );
+	grid-template-columns: 10rem auto 10rem 10rem;
 	grid-template-areas: "error . pause cancel";
 }
 

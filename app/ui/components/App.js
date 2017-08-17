@@ -1,5 +1,5 @@
 import React from 'react'
-
+import classnames from 'classnames'
 import styles from './App.css'
 import ConnectionIndicator from './ConnectionIndicator'
 import ConnectionInfo from './ConnectionInfo'
@@ -17,7 +17,7 @@ export default function App (props) {
     // handlers
     onRunButtonClick
   } = props
-
+  let isPanelOpen = false
   let runButton
   let runControl
   if (!isRunning) {
@@ -46,9 +46,19 @@ export default function App (props) {
     )
   }
 
+  function toggleNav () {
+    isPanelOpen = !isPanelOpen
+  }
+
   return (
-    <div className={styles.run_wrapper}>
+    <div className={classnames(styles.run_wrapper, { [styles.open]: isPanelOpen })}>
       <header className={styles.menu}>
+        <button
+          className={styles.toggle_nav}
+          onClick={toggleNav}
+        >
+          &#9776;
+        </button>
         {runButton}
       </header>
       <aside className={styles.sidebar} >

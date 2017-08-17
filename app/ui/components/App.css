@@ -15,7 +15,7 @@ body{
   display: grid;
   width:1024px;
   height:768px;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 40px 1fr 1fr;
   grid-template-rows: 68px 200px 500px;
   grid-template-areas:  "head head head"
                         "sidebar controls controls"
@@ -23,12 +23,25 @@ body{
 
 }
 
+.run_wrapper.open{
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .menu {
   grid-area: head;
   background-color: #666;
   display:grid;
-  grid-template-columns: 2fr 2fr 1fr 1fr;
-  grid-template-areas:  ". . . run"
+  grid-template-columns: 40px auto auto 10rem;
+  grid-template-areas:  "nav . . run"
+}
+
+.toggle_nav{
+  grid-area: nav;
+  margin:1rem 0.25rem;
+  font-size:1.5rem;
+  color:white;
+  background-color: transparent;
+  cursor:pointer;
 }
 
 .sidebar {
