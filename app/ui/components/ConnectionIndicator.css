@@ -1,11 +1,13 @@
 @value colors: './Util.css';
 @value green, red, blue from colors;
-
+.connection_status{
+  border-right: 1px solid silver;
+}
 .status{
-  width: 15px;
-  height: 15px;
-  padding: 5px;
-  margin-top: 10px;
+  width: 25px;
+  height: 25px;
+  padding:5px;
+  margin:0.75rem auto;
   border-radius: 50%;
   background-color: #d8d8d8;
 
@@ -22,12 +24,7 @@
 .disconnected{
   width: 15px;
   height: 15px;
-  background-color: red;
+  background-color: silver;
   border-radius: 50%;
   box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
-}
-
-.msg{
-  font-family:'trons';
-  text-transform: uppercase;
 }

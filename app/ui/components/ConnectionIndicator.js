@@ -2,10 +2,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import styles from './Connection.css'
+import styles from './ConnectionIndicator.css'
 
 export default function Connection (props) {
-  const {isConnected, connectionStatus} = props
+  const {isConnected} = props
 
   // TODO(mc): handle connection in progress (state is in place for this)
   const style = isConnected
@@ -13,16 +13,14 @@ export default function Connection (props) {
     : styles.disconnected
 
   return (
-    <div className={styles.status}>
-      <div className={style} />
-      <div className={styles.msg}>
-        Device {connectionStatus}
+    <div className={styles.connection_status}>
+      <div className={styles.status}>
+        <div className={style} />
       </div>
     </div>
   )
 }
 
 Connection.propTypes = {
-  isConnected: PropTypes.bool.isRequired,
-  connectionStatus: PropTypes.string.isRequired
+  isConnected: PropTypes.bool.isRequired
 }

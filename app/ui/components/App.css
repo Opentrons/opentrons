@@ -15,12 +15,12 @@ body{
   display: grid;
   width:1024px;
   height:768px;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-rows: 68px 200px 350px 150px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 68px 200px 500px;
   grid-template-areas:  "head head head"
                         "sidebar controls controls"
-                        "sidebar log log"
-                        "connect log log";
+                        "sidebar log log";
+
 }
 
 .menu {
@@ -33,11 +33,19 @@ body{
 
 .sidebar {
   grid-area: sidebar;
+  display: grid;
+  overflow:hidden;
+  grid-template-rows: auto 150px;
+  border-right: 1px solid silver;
+  grid-template-areas: "."
+                       "connect";
 }
 
-.connect {
+.connection_panel{
   grid-area: connect;
-  background-color: #DDD;
+  display: grid;
+  grid-template-columns: 40px auto;
+  border-top: 1px solid silver;
 }
 
 .run{

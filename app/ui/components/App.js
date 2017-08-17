@@ -1,7 +1,8 @@
 import React from 'react'
 
 import styles from './App.css'
-import Connection from './Connection'
+import ConnectionIndicator from './ConnectionIndicator'
+import ConnectionInfo from './ConnectionInfo'
 import Button from './Button'
 import RunControl from './RunControl'
 
@@ -50,10 +51,12 @@ export default function App (props) {
       <header className={styles.menu}>
         {runButton}
       </header>
-      <aside className={styles.sidebar} />
-      <div className={styles.connect}>
-        <Connection {...props} />
-      </div>
+      <aside className={styles.sidebar} >
+        <div className={styles.connection_panel}>
+          <ConnectionIndicator {...props} />
+          <ConnectionInfo {...props} />
+        </div>
+      </aside>
       {runControl}
       <main className={styles.task} />
     </div>
