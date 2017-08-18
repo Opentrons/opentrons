@@ -21,8 +21,13 @@ class RobotContainer(object):
         # This puts the task into event queue
         asyncio.ensure_future(self.notifications.put(info))
 
-    def load_protocol(self, text):
+    def reset(self):
+        # TODO(artyom, 08/11/2017)
+        # Replace reset with a switchover of robot connection
+        # before new protocol is loaded
         robot.reset()
+
+    def load_protocol(self, text):
         exec(text, self._globals, self._locals)
         return self._globals['robot']
 

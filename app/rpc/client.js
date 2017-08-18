@@ -1,16 +1,16 @@
 import EventEmitter from 'events'
 import log from 'winston'
 import uuid from 'uuid/v4'
-import WebSocket from 'ws'
 
+import WebSocketClient from './websocket-client'
 import RemoteObject from './remote-object'
-import { statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE } from './message-types'
+import {statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE} from './message-types'
 
 // timeouts
 const HANDSHAKE_TIMEOUT = 5000
 const RECEIVE_CONTROL_TIMEOUT = 500
-const CALL_ACK_TIMEOUT = 500
-const CALL_RESULT_TIMEOUT = 10000
+const CALL_ACK_TIMEOUT = 5000
+const CALL_RESULT_TIMEOUT = 60000
 
 // metadata constants
 const REMOTE_TARGET_OBJECT = 0
@@ -21,41 +21,31 @@ const makeAckEventName = (token) => `ack:${token}`
 const makeSuccessEventName = (token) => `success:${token}`
 const makeFailureEventName = (token) => `failure:${token}`
 
-// TODO(mc): find out if buffering incomplete messages if needed
-// ws frame size is pretty big, though, so it's probably unnecesary
-function parseMessageString(messageString) {
-  let message
-
-  try {
-    message = JSON.parse(messageString)
-  } catch (e) {
-    log.warning('JSON parse error', e)
-  }
-
-  return message
-}
-
 // internal RPC over websocket client
 // handles the socket itself and object context
 class RpcContext extends EventEmitter {
-  constructor(ws) {
+  constructor (ws) {
     super()
     this._ws = ws
     this._resultTypes = new Map()
     this._typeObjectCache = new Map()
     this.control = null
+    // default max listeners is 10, we need more than that
+    // keeping this at a finite number just in case we get a leak later
+    this.setMaxListeners(100)
+
     ws.on('error', this._handleError.bind(this))
     ws.on('message', this._handleMessage.bind(this))
   }
 
-  call(id, name, args) {
+  call (id, name, args) {
     const self = this
     const token = uuid()
     const ackEvent = makeAckEventName(token)
     const resultEvent = makeSuccessEventName(token)
     const failureEvent = makeFailureEventName(token)
 
-    this._send({ $: { token }, id, name, args })
+    this._send({$: {token}, id, name, args})
 
     return new Promise((resolve, reject) => {
       let timeout
@@ -88,7 +78,7 @@ class RpcContext extends EventEmitter {
         this.once(failureEvent, handleFailure)
       }
 
-      function cleanup() {
+      function cleanup () {
         clearTimeout(timeout)
         self.removeAllListeners(ackEvent)
         self.removeAllListeners(resultEvent)
@@ -105,7 +95,7 @@ class RpcContext extends EventEmitter {
     })
   }
 
-  resolveTypeValues(source) {
+  resolveTypeValues (source) {
     const typeId = source.t
 
     if (this._resultTypes.get(source.i) === REMOTE_TYPE_OBJECT) {
@@ -120,13 +110,17 @@ class RpcContext extends EventEmitter {
   }
 
   // close the websocket
-  close() {
+  close () {
     this._ws.close()
   }
 
   // cache required metadata from call results
   // filter type field from type object to avoid getting unecessary types
-  _cacheCallResultMetadata(resultData) {
+  _cacheCallResultMetadata (resultData) {
+    if (!resultData || !resultData.i) {
+      return
+    }
+
     const id = resultData.i
     const typeId = resultData.t
     const value = resultData.v || {}
@@ -145,21 +139,21 @@ class RpcContext extends EventEmitter {
     }
   }
 
-  _send(message) {
+  _send (message) {
     log.debug('Sending: %j', message)
-    this._ws.send(JSON.stringify(message))
+    this._ws.send(message)
   }
 
-  _handleError(error) {
+  _handleError (error) {
     this.emit('error', error)
   }
 
   // TODO(mc): split this method up
-  _handleMessage(messageString) {
-    log.debug(`Received message ${messageString}`)
+  _handleMessage (message) {
+    log.debug('Received message %j', message)
 
-    const message = parseMessageString(messageString)
     const meta = message.$
+    const data = message.data
     const type = meta.type
     let control
 
@@ -182,10 +176,10 @@ class RpcContext extends EventEmitter {
 
       case RESULT:
         if (meta.status === statuses.SUCCESS) {
-          this._cacheCallResultMetadata(message.data)
-          this.emit(makeSuccessEventName(meta.token), message.data)
+          this._cacheCallResultMetadata(data)
+          this.emit(makeSuccessEventName(meta.token), data)
         } else {
-          this.emit(makeFailureEventName(meta.token), message.data)
+          this.emit(makeFailureEventName(meta.token), data)
         }
 
         break
@@ -195,7 +189,12 @@ class RpcContext extends EventEmitter {
         break
 
       case NOTIFICATION:
-        this.emit('notification', message)
+        this._cacheCallResultMetadata(data)
+
+        RemoteObject(this, data)
+          .then((remote) => this.emit('notification', remote))
+          .catch((e) => log.error('Error creating notification remote', e))
+
         break
 
       default:
@@ -204,8 +203,8 @@ class RpcContext extends EventEmitter {
   }
 }
 
-export default function Client(url) {
-  const ws = new WebSocket(url, { handshakeTimeout: HANDSHAKE_TIMEOUT })
+export default function Client (url) {
+  const ws = new WebSocketClient(url)
 
   return new Promise((resolve, reject) => {
     let context
@@ -221,7 +220,13 @@ export default function Client(url) {
       reject(error)
     }
 
+    const handshakeTimeout = setTimeout(
+      () => handleError(new Error('Handshake timeout')),
+      HANDSHAKE_TIMEOUT
+    )
+
     const handleOpen = () => {
+      clearTimeout(handshakeTimeout)
       ws.removeListener('error', handleError)
       controlTimeout = setTimeout(
         () => handleError(new Error('Timeout getting control message')),
@@ -233,7 +238,8 @@ export default function Client(url) {
         .once('error', handleError)
     }
 
-    function cleanup() {
+    function cleanup () {
+      clearTimeout(handshakeTimeout)
       ws.removeListener('open', handleOpen)
       ws.removeListener('error', handleError)
 

@@ -15,12 +15,14 @@ with open(protocol_file) as file:
 
 def test_load_from_text():
     rc = robot_container.RobotContainer()
+    rc.reset()
     robot = rc.load_protocol(protocol_text)
     assert len(robot.commands()) == 101
 
 
 def test_load_from_file():
     rc = robot_container.RobotContainer()
+    rc.reset()
     robot = rc.load_protocol_file(protocol_file)
     assert len(robot.commands()) == 101
 
