@@ -722,15 +722,13 @@ def move_to_plunger_position():
 def aspirate_from_current_position():
     axis = request.json.get("axis")
     try:
-        _, _, robot_max_z = app.robot._driver.get_dimensions()
-        current_z = app.robot._driver.get_position()['current']['z']
-        jog_up_distance = min(robot_max_z - current_z, 20)
-
-        app.robot.move_head(z=jog_up_distance, mode='relative')
-        instrument = _get_pipette_from_axis(axis)
+        # this action mimics 1.2 app experience
+        # but should be re-thought to take advantage of API features
+        instrument = robot._instruments[axis.upper()]
+        robot.move_head(z=20, mode='relative')
         instrument.motor.move(instrument.positions['blow_out'])
         instrument.motor.move(instrument.positions['bottom'])
-        app.robot.move_head(z=-jog_up_distance, mode='relative')
+        robot.move_head(z=-20, mode='relative')
         instrument.motor.move(instrument.positions['top'])
     except Exception as e:
         emit_notifications([str(e)], 'danger')
