@@ -47,6 +47,7 @@ export default function App (props) {
     )
   }
 
+  // TODO (ka) convert aside to sidebar component
   return (
     <div className={classnames(styles.run_wrapper, { [styles.open]: isNavPanelOpen })}>
       <header className={styles.menu}>
