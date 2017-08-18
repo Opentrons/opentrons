@@ -19,6 +19,9 @@ class Pose(object):
     def __repr__(self):
         return repr(self._pose)
 
+    def __eq__(self, other):
+        return (self._pose == other._pose).all()
+
     # Is there another intuitive matrix mult that
     # I just don't know about which would make this confusing?
     def __mul__(self, other):
