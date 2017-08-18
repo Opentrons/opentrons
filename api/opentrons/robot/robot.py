@@ -8,6 +8,8 @@ from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
 
+from opentrons.trackers import position_tracker
+
 
 log = get_logger(__name__)
 
