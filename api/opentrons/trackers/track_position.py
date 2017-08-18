@@ -5,12 +5,17 @@ import numpy
 # Double check the real meaning of pose
 # Also not dealing with roation at all
 
+
+# Don't have internet access while writing,
+# but I bet there is a library that already handles the logic
+# of using numpy for relative coordinate systems
 class Pose(object):
     def __init__(self, x, y, z):
         self._pose = numpy.identity(3)
         self.x = x
         self.y = y
         #self.z = z
+
     def __repr__(self):
         return repr(self._pose)
 
@@ -80,3 +85,8 @@ class PositionTracker(object):
 
     def get_object_position(self, obj):
         return self[obj]
+
+    def adjust_object(self, obj, x, y, z):
+        new_coords = self[obj] * [x, y, 1]
+        new_pose   = Pose(*new_coords)
+        self[obj] = new_pose
