@@ -54,13 +54,6 @@ body{
                        "connect";
 }
 
-.connection_panel{
-  grid-area: connect;
-  display: grid;
-  grid-template-columns: 40px auto;
-  border-top: 1px solid silver;
-}
-
 .run{
   grid-area: run;
   margin:1rem;

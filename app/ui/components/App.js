@@ -1,8 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import styles from './App.css'
-import ConnectionIndicator from './ConnectionIndicator'
-import ConnectionInfo from './ConnectionInfo'
+import ConnectionPanel from './ConnectionPanel'
+
 import Button from './Button'
 import RunControl from './RunControl'
 
@@ -59,10 +59,7 @@ export default function App (props) {
         {runButton}
       </header>
       <aside className={styles.sidebar} >
-        <div className={styles.connection_panel}>
-          <ConnectionIndicator {...props} />
-          <ConnectionInfo {...props} />
-        </div>
+        <ConnectionPanel {...props} />
       </aside>
       {runControl}
       <main className={styles.task} />
