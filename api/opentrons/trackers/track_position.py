@@ -27,6 +27,7 @@ class Pose(object):
     @property
     def x(self):
         return self._pose[0][2]
+
     @x.setter
     def x(self, val):
         self._pose[0][2] = val
