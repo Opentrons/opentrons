@@ -59,10 +59,12 @@ body{
   margin:1rem;
 }
 
-.run_progress{
+.run_controls{
   grid-area: controls;
   background-color: #DDD;
-  position:relative;
+  display: grid;
+  grid-template-rows: 4rem 4rem auto;
+
 }
 
 .task {

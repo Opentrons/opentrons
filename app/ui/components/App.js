@@ -21,6 +21,11 @@ export default function App (props) {
   } = props
   let runButton
   let runControl
+  // mock prop for styling
+  const fileName = 'dinsoaur.py'
+  const startTime = Date.now()
+  const timeRemaining = '00:03:25' // swap out for timer
+
   if (!isRunning) {
     runButton = (
       <Button
@@ -38,11 +43,9 @@ export default function App (props) {
   } else {
     runControl = (
       <RunControl
-        style={styles.run_progress}
-        isRunning={isRunning}
-        isPaused={isPaused}
-        errors={errors}
-        commands={runCommands}
+        style={styles.run_controls}
+        {...{fileName, startTime, timeRemaining}}
+        {...props}
       />
     )
   }
