@@ -1,0 +1,18 @@
+>>> from opentrons.trackers import position_tracker
+>>> from opentrons import containers
+>>> plate = containers.load('96-flat', 'A1')
+>>> well1 = plate[0]
+>>> well2 = plate[1]
+>>> position_tracker[well1]
+array([[  1.  ,   0.  ,   8.04],
+       [  0.  ,   1.  ,  11.14],
+       [  0.  ,   0.  ,   1.  ]])
+>>> position_tracker.track_relative_object(well1, well2, 2, 2.5, 2)
+>>> position_tracker[well1]
+array([[  1.  ,   0.  ,  19.04],
+       [  0.  ,   1.  ,  13.64],
+       [  0.  ,   0.  ,   1.  ]])
+>>> position_tracker[well2]
+array([[  1.  ,   0.  ,  17.04],
+       [  0.  ,   1.  ,  11.14],
+       [  0.  ,   0.  ,   1.  ]])sl
