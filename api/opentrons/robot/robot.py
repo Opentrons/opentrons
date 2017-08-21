@@ -380,6 +380,7 @@ class Robot(object):
 
     @helpers.not_app_run_safe
     def move_head(self, *args, **kwargs):
+
         self._driver.move_head(*args, **kwargs)
 
     @helpers.not_app_run_safe
