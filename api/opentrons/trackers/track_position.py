@@ -102,5 +102,5 @@ class PositionTracker(object):
 
     def adjust_object(self, obj, x, y, z):
         new_coords = self[obj] * [x, y, z, 1]
-        new_pose   = Pose(*new_coords)
-        self[obj]  = new_pose
+        new_pose   = Pose(*new_coords[:3])
+        self[obj] = new_pose
