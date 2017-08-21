@@ -202,8 +202,9 @@ class Robot(object):
         self._deck = containers.Deck()
         self.setup_deck()
 
-        self._ingredients = {}  # TODO needs to be discusses/researched
         self._instruments = {}
+
+        self.position_tracker = position_tracker.PositionTracker()
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
@@ -697,12 +698,22 @@ class Robot(object):
         else:
             self._deck[slot].add(container, label)
 
+        self.add_to_position_tracker(container)
+
         # if a container is added to Deck AFTER a Pipette, the Pipette's
         # Calibrator must update to include all children of Deck
         for _, instr in self.get_instruments():
             if hasattr(instr, 'update_calibrator'):
                 instr.update_calibrator()
         return container
+
+    def add_to_position_tracker(self, object : Placeable):
+        """
+        Tracks object in position tracker
+        :param object:
+        :return:
+        """
+        pass
 
     def clear_commands(self):
         """
