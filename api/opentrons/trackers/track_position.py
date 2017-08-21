@@ -50,6 +50,7 @@ class Pose(object):
     def z(self, val):
         self._pose[2][3] = val
 
+
 class PositionTracker(object):
     def __init__(self):
         self._position_dict = {}
@@ -90,7 +91,7 @@ class PositionTracker(object):
         :return: None
         '''
 
-        glb_x, glb_y, glb_z = self[tracked_obj] * [x, y, z, 1]
+        glb_x, glb_y, glb_z = self[tracked_obj] * [x, y, z, DUMMY]
         self.track_object(new_obj, glb_x, glb_y, glb_z)
 
     def remove_object(self, obj):

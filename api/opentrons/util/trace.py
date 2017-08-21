@@ -53,8 +53,8 @@ class MessageBroker(object):
         else:
             self.topics[topic] = [func]
 
-    def remove(self, topic, f):
-        self.listeners[topic].remove(f)
+    def remove(self, topic, func):
+        self.listeners[topic].remove(func)
 
     def publish(self, topic, message):
         if topic not in self.topics:
@@ -62,6 +62,7 @@ class MessageBroker(object):
         for subscriber in self.topics[topic]:
             subscriber(message)
         message = "Topic: {} \n Message: {}".format(topic, message)
+        print(message)
 
 
 
