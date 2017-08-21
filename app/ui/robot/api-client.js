@@ -8,7 +8,7 @@ import {actions, actionTypes} from './'
 
 // TODO(mc): don't hardcode this URL or protocol
 const URL = 'ws://127.0.0.1:31950'
-const PROTOCOL = '/Users/mc/opentrons/opentrons/api/opentrons/server/tests/data/dinosaur.py'
+const PROTOCOL = '/Users/Katie/Documents/OPENTRONS/opentrons/api/opentrons/server/tests/data/dinosaur.py'
 
 export default function apiMiddleware (store) {
   const {dispatch} = store
