@@ -1,20 +1,21 @@
 import numpy
 
+# not sure if this swinging too far against 'custom vector'
+from pyrr import matrix44, vector4
 
-# Starting with 2D just because I know it...
+
+
 # Double check the real meaning of pose
 # Also not dealing with roation at all
 
+DUMMY = 1 # Sometimes added to vectors to maintain matrix values
 
-# Don't have internet access while writing,
-# but I bet there is a library that already handles the logic
-# of using numpy for relative coordinate systems
 class Pose(object):
     def __init__(self, x, y, z):
-        self._pose = numpy.identity(3)
+        self._pose = matrix44.create_identity()
         self.x = x
         self.y = y
-        #self.z = z
+        self.z = z
 
     def __repr__(self):
         return repr(self._pose)
@@ -22,25 +23,29 @@ class Pose(object):
     def __eq__(self, other):
         return (self._pose == other._pose).all()
 
-    # Is there another intuitive matrix mult that
-    # I just don't know about which would make this confusing?
     def __mul__(self, other):
         return self._pose.dot(other)
 
     @property
     def x(self):
-        return self._pose[0][2]
-
+        return self._pose[0][3]
     @x.setter
     def x(self, val):
-        self._pose[0][2] = val
+        self._pose[0][3] = val
 
     @property
     def y(self):
-        return self._pose[1][2]
+        return self._pose[1][3]
     @y.setter
     def y(self, val):
-        self._pose[1][2] = val
+        self._pose[1][3] = val
+
+    @property
+    def z(self):
+        return self._pose[2][3]
+    @z.setter
+    def z(self, val):
+        self._pose[2][3] = val
 
 class PositionTracker(object):
     def __init__(self):
@@ -81,8 +86,8 @@ class PositionTracker(object):
         :param x, y, z: relative translation between the two objects
         :return: None
         '''
-        glb_x, glb_y, dummy = self[tracked_obj] * [x, y, 1]
-        self.track_object(new_obj, glb_x, glb_y, dummy)
+        glb_x, glb_y, glb_z, dummy = self[tracked_obj] * [x, y, z, DUMMY]
+        self.track_object(new_obj, glb_x, glb_y, glb_z)
 
     def remove_object(self, obj):
         del self[obj]
@@ -91,6 +96,6 @@ class PositionTracker(object):
         return self[obj]
 
     def adjust_object(self, obj, x, y, z):
-        new_coords = self[obj] * [x, y, 1]
+        new_coords = self[obj] * vector4.create(x, y, z, DUMMY)
         new_pose   = Pose(*new_coords)
-        self[obj] = new_pose
+        self[obj]  = new_pose
