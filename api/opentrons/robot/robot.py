@@ -206,6 +206,7 @@ class Robot(object):
 
         self.position_tracker = position_tracker.PositionTracker()
 
+        # TODO: Shouldn't we make driver now about these things not robot ?
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
