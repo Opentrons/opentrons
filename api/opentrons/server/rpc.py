@@ -128,15 +128,19 @@ class Server(object):
 
         return ws
 
-    async def dispatch(self, id, name, args):
-        if id not in self.objects:
+    async def dispatch(self, _id, name, args):
+        if _id not in self.objects:
             raise ValueError(
-                'dispatch: object with id {0} not found'.format(id))
+                'dispatch: object with id {0} not found'.format(_id))
 
-        obj = self.objects[id]
+        obj = self.objects[_id]
         function = getattr(type(obj), name)
         args = self.resolve_args(args)
         kwargs = {}
+        # NOTE: since ECMAScript doesn't have a notion of named arguments
+        # we are using a convention that the last dictionary parameter will
+        # be expanded into kwargs. This introduces a risk of mistreating a
+        # legitimate dictionary as kwargs, but we consider it very low.
         if (len(args) > 0) and (isinstance(args[-1], dict)):
             kwargs = args.pop()
 
@@ -195,8 +199,8 @@ class Server(object):
                 }
                 # Replace id with id to be compatible with
                 # dispatch's args
-                id = data.pop('id', None)
-                call_result = await self.dispatch(id, **data)
+                _id = data.pop('id', None)
+                call_result = await self.dispatch(_id, **data)
                 msg['$']['status'] = 'success'
             except Exception as e:
                 log.warning(
@@ -212,8 +216,8 @@ class Server(object):
                 self.send(msg)
         elif message.type == aiohttp.WSMsgType.ERROR:
             log.error(
-                'WebSocket connection closed with exception %s'
-                % ws.exception())
+                'WebSocket connection closed unexpectedly: {0}'.format(
+                    message))
 
     def send(self, payload):
         for client in self.clients:
