@@ -256,6 +256,7 @@ class Robot(object):
         """
         return list(self._runtime_warnings)
 
+    # TODO: remove because Magbead will be controlled by RPI
     def get_mosfet(self, mosfet_index):
         """
         Get MOSFET for a MagBead (URL).
