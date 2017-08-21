@@ -19,7 +19,7 @@ body{
   grid-template-rows: 68px 200px 500px;
   grid-template-areas:  "head head head"
                         "sidebar controls controls"
-                        "sidebar log log";
+                        "sidebar task task";
 
 }
 
@@ -67,7 +67,7 @@ body{
 
 }
 
-.task {
+.task{
   grid-area: task;
-  background-color: #EEE;
+  background-color: #EFEFEF;
 }
