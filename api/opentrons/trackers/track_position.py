@@ -12,7 +12,7 @@ DUMMY = 1 # Sometimes added to vectors to maintain matrix values
 
 class Pose(object):
     def __init__(self, x, y, z):
-        self._pose = matrix44.create_identity()
+        self._pose = numpy.identity(4)
         self.x = x
         self.y = y
         self.z = z
@@ -29,6 +29,7 @@ class Pose(object):
     @property
     def x(self):
         return self._pose[0][3]
+
     @x.setter
     def x(self, val):
         self._pose[0][3] = val
@@ -36,6 +37,7 @@ class Pose(object):
     @property
     def y(self):
         return self._pose[1][3]
+
     @y.setter
     def y(self, val):
         self._pose[1][3] = val
@@ -43,6 +45,7 @@ class Pose(object):
     @property
     def z(self):
         return self._pose[2][3]
+
     @z.setter
     def z(self, val):
         self._pose[2][3] = val
@@ -86,7 +89,8 @@ class PositionTracker(object):
         :param x, y, z: relative translation between the two objects
         :return: None
         '''
-        glb_x, glb_y, glb_z, dummy = self[tracked_obj] * [x, y, z, DUMMY]
+
+        glb_x, glb_y, glb_z = self[tracked_obj] * [x, y, z, 1]
         self.track_object(new_obj, glb_x, glb_y, glb_z)
 
     def remove_object(self, obj):
@@ -96,6 +100,6 @@ class PositionTracker(object):
         return self[obj]
 
     def adjust_object(self, obj, x, y, z):
-        new_coords = self[obj] * vector4.create(x, y, z, DUMMY)
+        new_coords = self[obj] * [x, y, z, 1]
         new_pose   = Pose(*new_coords)
         self[obj]  = new_pose
