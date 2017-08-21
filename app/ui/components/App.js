@@ -2,9 +2,9 @@ import React from 'react'
 import classnames from 'classnames'
 import styles from './App.css'
 import ConnectionPanel from './ConnectionPanel'
-
 import Button from './Button'
 import RunControl from './RunControl'
+import RunLog from './RunLog'
 
 export default function App (props) {
   const {
@@ -66,7 +66,7 @@ export default function App (props) {
         <ConnectionPanel {...props} />
       </aside>
       {runControl}
-      <main className={styles.task} />
+      <RunLog style={styles.task} {...props} />
     </div>
   )
 }
