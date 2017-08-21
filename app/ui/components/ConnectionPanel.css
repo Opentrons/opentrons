@@ -1,0 +1,64 @@
+@value colors: './Util.css';
+@value green, red, blue from colors;
+
+.connection_panel{
+  grid-area: connect;
+  display: grid;
+  grid-template-columns: 40px auto;
+  border-top: 1px solid silver;
+}
+
+
+.connection_status{
+  border-right: 1px solid silver;
+}
+.status{
+  width: 25px;
+  height: 25px;
+  padding:5px;
+  margin:0.75rem auto;
+  border-radius: 50%;
+  background-color: #d8d8d8;
+
+}
+
+.connected{
+  width: 15px;
+  height: 15px;
+  background-color: blue;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+.disconnected{
+  width: 15px;
+  height: 15px;
+  background-color: silver;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+.connect{
+  padding:0.5rem 0.5rem;
+}
+
+.msg{
+  font-family:'sans';
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding-bottom: 1rem
+}
+
+.connection_type{
+  text-transform: uppercase;
+}
+
+.location{
+  font-family: 'sans';
+  line-height: 1rem;
+}
+
+.connect_btn{
+  width:100%;
+}
+

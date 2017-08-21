@@ -9,7 +9,7 @@ BIN := node_modules/.bin
 # set NODE_ENV for a command with $(ENV)=environment
 ENV := $(BIN)/cross-env NODE_ENV
 
-# tasks
+# setup and development
 #####################################################################
 
 .PHONY: install build package dev clean
@@ -49,19 +49,24 @@ clean:
 # test tasks
 #####################################################################
 
-.PHONY: test test-e2e test-ui lint lint-js lint-js-fix lint-css lint-css-fix
+.PHONY: test test-e2e test-unit lint lint-js lint-js-fix lint-css lint-css-fix
 
-# watch argument for tests
+# watch and coverage arguments for tests
 watch ?= false
+cover ?= true
 
-test: test-ui
+ifeq ($(watch), true)
+	cover = false
+endif
+
+test: test-unit
 	$(MAKE) lint
 
 test-e2e: build
 	npm run test-e2e
 
-test-ui:
-	$(ENV)=test $(BIN)/jest './ui/.*\.test\.js' --watch=$(watch)
+test-unit:
+	$(ENV)=test $(BIN)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
 lint:
 	$(BIN)/concurrently "$(MAKE) lint-js" "$(MAKE) lint-css"

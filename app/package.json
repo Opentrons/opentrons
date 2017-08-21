@@ -98,14 +98,21 @@
     "moduleFileExtensions": [
       "js"
     ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
     "transform": {
       "^.+\\.js$": "babel-jest"
     },
     "setupFiles": [
       "./internals/scripts/CheckBuiltsExist.js"
+    ],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!node_modules/**",
+      "!dll/**",
+      "!internals/**",
+      "!**/dist/**",
+      "!webpack**",
+      "!coverage/**",
+      "!**/test/**"
     ]
   },
   "standard": {
@@ -113,11 +120,11 @@
     "ignore": [
       "dll/"
     ],
-    "env": {
-      "node": true,
-      "browser": true,
-      "jest": true
-    }
+    "env": [
+      "node",
+      "browser",
+      "jest"
+    ]
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
@@ -163,7 +170,6 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
     "jsdom": "^11.0.0",
-    "loglevel": "^1.4.1",
     "minimist": "^1.2.0",
     "node-sass": "^4.5.3",
     "portfinder": "^1.0.13",
@@ -185,7 +191,8 @@
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.8.2",
     "webpack-dev-server": "^2.4.5",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "ws": "^3.1.0"
   },
   "dependencies": {
     "electron-debug": "^1.1.0",
@@ -208,7 +215,6 @@
     "unzip": "0.1.11",
     "url-join": "1.1.0",
     "winston": "^2.2.0",
-    "ws": "^3.1.0",
     "zip-folder": "^1.0.0"
   }
 }

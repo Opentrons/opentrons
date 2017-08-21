@@ -2,6 +2,7 @@
 @value teal: #05C1B3;
 @value mustard: #FFD252;
 @value green: #7ed321;
+@value red: #F00000;
 
 @value small: (max-width: 599px);
 @value medium: (min-width: 600px) and (max-width: 959px);
@@ -61,9 +62,6 @@ button:focus {outline:0;}
   background-color: #AAA;
   pointer-events: none;
 }
-
-
-
 
 .title{
   font-family: 'sans';

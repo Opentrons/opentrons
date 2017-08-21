@@ -30,3 +30,4 @@ clean:
 		dist \
 		calibrations \
 		.coverage
+	find . -name __pycache__ -type d -print | xargs rm -rf

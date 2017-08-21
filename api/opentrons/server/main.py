@@ -40,6 +40,9 @@ log = logging.getLogger(__name__)
 
 def main():
     kwargs = {}
+    # TODO(artyom, 08/11/2017)
+    # Refactor this into regex and proper use of
+    # command line argument parsing
     if (len(sys.argv) == 2):
         try:
             address = sys.argv[1].split(':')

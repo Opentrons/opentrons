@@ -14,6 +14,7 @@ class WebSocket(object):
     def __init__(self):
         self.inbound = Queue()
         self.outbound = Queue()
+        self.closed = False
 
     def nothing_to_read(self):
         return self.outbound.empty()
@@ -22,6 +23,7 @@ class WebSocket(object):
         await self.inbound.put(value)
 
     async def close(self):
+        self.closed = True
         await self.inbound.put(None)
 
     async def read(self):
@@ -30,8 +32,8 @@ class WebSocket(object):
     async def prepare(self, request):
         self.request = request
 
-    async def send_str(self, s):
-        await self.outbound.put(s)
+    def send_str(self, s):
+        asyncio.ensure_future(self.outbound.put(s))
 
     def __aiter__(self):
         return self
@@ -346,8 +348,7 @@ async def test_notifications(notify_session):
     await notify_session.read()
     res = []
     for i in range(5):
-        message = await notify_session.read()
-        message = json.loads(message)
+        message = json.loads(await notify_session.read())
         assert message['$']['type'] == rpc.NOTIFICATION_MESSAGE
         res.append(message['data'])
 

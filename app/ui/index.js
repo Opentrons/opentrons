@@ -2,20 +2,38 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import {Provider} from 'react-redux'
-import {createStore, combineReducers} from 'redux'
+import {createStore, combineReducers, applyMiddleware} from 'redux'
 import {AppContainer} from 'react-hot-loader'
+import {createLogger} from 'redux-logger'
 
-// reducers
-import {NAME as ROBOT_NAME, reducer as robotReducer} from './robot'
+// interface state
+import {
+  NAME as INTERFACE_NAME,
+  reducer as interfaceReducer
+} from './interface'
+
+// robot state
+import {
+  NAME as ROBOT_NAME,
+  reducer as robotReducer,
+  apiClientMiddleware as robotApiMiddleware
+} from './robot'
 
 // components
-import App from './components/app'
+import Root from './containers/Root'
 
-const rootReducer = combineReducers({
+const reducer = combineReducers({
+  [INTERFACE_NAME]: interfaceReducer,
   [ROBOT_NAME]: robotReducer
 })
 
-const store = createStore(rootReducer)
+const middleware = applyMiddleware(
+  robotApiMiddleware,
+  // TODO(mc): log to file instead of console in prod
+  createLogger()
+)
+
+const store = createStore(reducer, middleware)
 
 const render = (Component) => ReactDom.render(
   (
@@ -29,10 +47,13 @@ const render = (Component) => ReactDom.render(
 )
 
 if (module.hot) {
-  module.hot.accept('./components/app', () => {
-    const nextApp = require('./components/app').default
-    render(nextApp)
+  module.hot.accept('./containers/Root', () => {
+    render(require('./containers/Root').default)
   })
 }
 
-render(App)
+if (process.env.NODE_ENV === 'development') {
+  global.store = store
+}
+
+render(Root)
