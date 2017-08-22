@@ -21,6 +21,7 @@ export default function App (props) {
   } = props
   let runButton
   let runControl
+  let runLog
   // mock prop for styling
   const fileName = 'dinsoaur.py'
   const startTime = Date.now()
@@ -40,6 +41,10 @@ export default function App (props) {
     runControl = (
       <section className={styles.run_progress} />
     )
+
+    runLog = (
+      <main className={styles.task} />
+    )
   } else {
     runControl = (
       <RunControl
@@ -48,6 +53,7 @@ export default function App (props) {
         {...props}
       />
     )
+    runLog = <RunLog style={styles.task} {...props} />
   }
 
   // TODO (ka) convert aside to sidebar component
@@ -66,7 +72,7 @@ export default function App (props) {
         <ConnectionPanel {...props} />
       </aside>
       {runControl}
-      <RunLog style={styles.task} {...props} />
+      {runLog}
     </div>
   )
 }
