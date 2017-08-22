@@ -60,9 +60,14 @@ class PositionTracker(object):
 
     def __getitem__(self, obj):
         try:
-            return self._position_dict[obj][0]
+            print("obj: ", obj)
+            res = self._position_dict[obj]
+            return res[0]
         except KeyError:
             raise KeyError("Position not tracked: {}".format(obj))
+
+    def __contains__(self, item):
+        return item in self._position_dict
 
     def __setitem__(self, obj, pose):
         if not isinstance(pose, Pose):
@@ -80,6 +85,7 @@ class PositionTracker(object):
         :param x, y, z: global object position
         :return: None
         '''
+        print("tracking: ", obj)
         pose = Pose(x, y, z)
         node = self._position_dict[parent][1].add_child(obj)
         self._position_dict[obj] = (pose, node)
