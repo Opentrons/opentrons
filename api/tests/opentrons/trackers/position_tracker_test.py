@@ -1,10 +1,15 @@
 
-# Note: already state is annoying due to the use of singleton
 
-from opentrons.trackers import track_position as pt
+from opentrons.trackers import position_tracker as pt
 from opentrons.trackers import calibration_functions
 from opentrons.trackers import position_tracker
 from opentrons import containers
+
+
+def add_container_to_deck():
+    plate = containers.load('96-flat'), 'A1')
+    assert plate in position_tracker
+
 
 def calibrate_plate():
     plate = containers.load('96-flat', 'A1')
@@ -18,3 +23,7 @@ def calibrate_plate():
     assert position_tracker[plate[5]] == pt.Pose(54.04, 14.14, 4)
 
 calibrate_plate()
+
+
+
+
