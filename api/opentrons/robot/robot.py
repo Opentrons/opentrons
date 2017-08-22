@@ -201,8 +201,10 @@ class Robot(object):
 
         self._previous_container = None
 
-        self._deck = containers.Deck()
         self.position_tracker = position_tracker.PositionTracker()
+        self.position_tracker.create_root_object('head', 0, 0, 0)
+
+        self._deck = containers.Deck()
         self.setup_deck()
 
         self._instruments = {}
@@ -239,6 +241,8 @@ class Robot(object):
         """
         axis = axis.upper()
         self._instruments[axis] = instrument
+
+        self.position_tracker.track_object('head', instrument, 0, 0, 0)
 
     def add_warning(self, warning_msg):
         """
