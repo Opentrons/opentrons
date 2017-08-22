@@ -3,6 +3,8 @@ import os
 from threading import Event
 
 from opentrons import containers, drivers
+from opentrons.containers import Container
+from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
@@ -200,11 +202,11 @@ class Robot(object):
         self._previous_container = None
 
         self._deck = containers.Deck()
+        self.position_tracker = position_tracker.PositionTracker()
         self.setup_deck()
 
         self._instruments = {}
 
-        self.position_tracker = position_tracker.PositionTracker()
 
         # TODO: Shouldn't we make driver now about these things not robot ?
         self.axis_homed = {
@@ -641,24 +643,31 @@ class Robot(object):
         return 3
 
     def setup_deck(self):
-        robot_rows = self.get_max_robot_rows()
-        row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
+        def setup_deck_slots():
+            robot_rows = self.get_max_robot_rows()
+            row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
 
-        for col_index, col in enumerate('ABCDE'):
-            for row_index, row in enumerate(range(1, robot_rows + 1)):
-                properties = {
-                    'width': col_offset,
-                    'length': row_offset,
-                    'height': 0
-                }
-                slot = containers.Slot(properties=properties)
-                slot_coordinates = (
-                    (col_offset * col_index) + x_offset,
-                    (row_offset * row_index) + y_offset,
-                    0  # TODO: should z always be zero?
-                )
-                slot_name = "{}{}".format(col, row)
-                self._deck.add(slot, slot_name, slot_coordinates)
+            for col_index, col in enumerate('ABCDE'):
+                for row_index, row in enumerate(range(1, robot_rows + 1)):
+                    properties = {
+                        'width': col_offset,
+                        'length': row_offset,
+                        'height': 0
+                    }
+                    slot = containers.Slot(properties=properties)
+                    slot_coordinates = (
+                        (col_offset * col_index) + x_offset,
+                        (row_offset * row_index) + y_offset,
+                        0  # TODO: should z always be zero?
+                    )
+                    slot_name = "{}{}".format(col, row)
+                    self._deck.add(slot, slot_name, slot_coordinates)
+        setup_deck_slots()
+
+        # Setup Deck as root object for position tracker
+        self.position_tracker.create_root_object(
+            self._deck, *self._deck.coordinates()
+        )
 
     @property
     def deck(self):
@@ -700,7 +709,7 @@ class Robot(object):
         else:
             self._deck[slot].add(container, label)
 
-        self.add_to_position_tracker(container)
+        self.add_container_to_position_tracker(container)
 
         # if a container is added to Deck AFTER a Pipette, the Pipette's
         # Calibrator must update to include all children of Deck
@@ -709,12 +718,13 @@ class Robot(object):
                 instr.update_calibrator()
         return container
 
-    def add_to_position_tracker(self, object : Placeable):
+    def add_container_to_position_tracker(self, container_obj : Container):
         """
         Tracks object in position tracker
         :param object:
         :return:
         """
+        # self.position_tracker.track_object(container)
         pass
 
     def clear_commands(self):

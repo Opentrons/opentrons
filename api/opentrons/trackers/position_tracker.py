@@ -5,8 +5,11 @@ from pyrr import matrix44, vector4
 
 
 
-# Double check the real meaning of pose
-# Also not dealing with roation at all
+class Node(object):
+    def __init__(self, object):
+        self.children = []
+        self.parent = None
+        self.value = object
 
 DUMMY = 1 # Sometimes added to vectors to maintain matrix values
 
@@ -57,14 +60,14 @@ class PositionTracker(object):
 
     def __getitem__(self, obj):
         try:
-            return self._position_dict[id(obj)]
+            return self._position_dict[obj][0]
         except KeyError:
             raise KeyError("Position not tracked: {}".format(obj))
 
-    def __setitem__(self, obj, value):
-        if not isinstance(value, Pose):
-            raise TypeError("{} is not an instance of Pose".format(value))
-        self._position_dict[id(obj)] = value
+    def __setitem__(self, obj, pose):
+        if not isinstance(pose, Pose):
+            raise TypeError("{} is not an instance of Pose".format(pose))
+        self._position_dict[obj][0] = pose
 
     def __repr__(self):
         return repr(self._position_dict)
@@ -78,7 +81,14 @@ class PositionTracker(object):
         :return: None
         '''
         pose = Pose(x, y, z)
-        self[obj] = pose
+        node = self._position_dict[parent][1].add_child(obj)
+        self._position_dict[obj] = (pose, node)
+
+    def create_root_object(self, obj, x, y, z):
+        pose = Pose(x, y, z)
+        node = Node(obj)
+        self._position_dict[obj] = (pose, node)
+
 
     def track_relative_object(self, new_obj, tracked_obj, x, y, z):
         '''
@@ -90,12 +100,8 @@ class PositionTracker(object):
         :param x, y, z: relative translation between the two objects
         :return: None
         '''
-
-        glb_x, glb_y, glb_z = self[tracked_obj] * [x, y, z, DUMMY]
+        glb_x, glb_y, glb_z = self[tracked_obj] * [x, y, z, 1]
         self.track_object(new_obj, glb_x, glb_y, glb_z)
-
-    def remove_object(self, obj):
-        del self[obj]
 
     def get_object_position(self, obj):
         return self[obj]

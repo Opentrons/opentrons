@@ -255,7 +255,7 @@ class Placeable(object):
         child = self.children_by_name[name]
         del self.children_by_name[name]
         del self.children_by_reference[child]
-        del position_tracker[child]
+        # del position_tracker[child]
 
     def get_parent(self):
         """
