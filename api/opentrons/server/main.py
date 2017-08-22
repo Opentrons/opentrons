@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 
 
 def main():
-    kwargs = {}
+    kwargs = {'host': '127.0.0.1', 'port': 31950}
     # TODO(artyom, 08/11/2017)
     # Refactor this into regex and proper use of
     # command line argument parsing
@@ -62,11 +62,11 @@ def main():
         print('Too many arguments. Valid argument is IP:PORT')
         exit(1)
 
-    server = Server(RobotContainer(), **kwargs)
+    server = Server(RobotContainer())
     print(
-        'Started Opentrons API RPC Server listening at ws://{0}:{1}/'
-        .format(server.host, server.port))
-    server.start()
+        'Started Opentrons API RPC Server listening at ws://{host}:{port}/'
+        .format(**kwargs))
+    server.start(**kwargs)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 pylama
 pytest
 pytest-cov
-pytest-asyncio
+pytest-aiohttp
 
 numpydoc==0.6.0
 # June 15 2017 (artyom) : https://github.com/pyinstaller/pyinstaller/issues/2434
