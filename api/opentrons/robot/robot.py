@@ -725,14 +725,20 @@ class Robot(object):
                 instr.update_calibrator()
         return container
 
-    def add_container_to_position_tracker(self, container_obj : Container):
+    def add_container_to_position_tracker(self, container : Container):
         """
-        Tracks object in position tracker
-        :param object:
-        :return:
+        Add container and child wells to position tracker. Sets container.parent
+        (slot) as position tracker parent
         """
-        # self.position_tracker.track_object(container)
-        pass
+        self.position_tracker.track_object(
+            container.parent, container, container.coordinates()
+        )
+        for well in container:
+            self.position_tracker.track_object(
+                container,
+                well,
+                well.coordinates()
+            )
 
     def clear_commands(self):
         """
