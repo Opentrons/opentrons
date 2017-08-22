@@ -669,6 +669,13 @@ class Robot(object):
             self._deck, *self._deck.coordinates()
         )
 
+        for slot in self._deck:
+            self.position_tracker.track_object(
+                self._deck,
+                slot,
+                *slot.coordinates()
+            )
+
     @property
     def deck(self):
         return self._deck
