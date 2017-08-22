@@ -241,7 +241,6 @@ class Robot(object):
         """
         axis = axis.upper()
         self._instruments[axis] = instrument
-
         self.position_tracker.track_object('head', instrument, 0, 0, 0)
 
     def add_warning(self, warning_msg):
@@ -735,13 +734,13 @@ class Robot(object):
         (slot) as position tracker parent
         """
         self.position_tracker.track_object(
-            container.parent, container, container.coordinates()
+            container.parent, container, *container.coordinates()
         )
         for well in container:
             self.position_tracker.track_object(
                 container,
                 well,
-                well.coordinates()
+                *well.coordinates()
             )
 
     def clear_commands(self):
