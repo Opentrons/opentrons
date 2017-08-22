@@ -4,6 +4,7 @@ from opentrons.trackers import position_tracker as pt
 from opentrons.trackers import calibration_functions
 from opentrons.trackers import position_tracker
 from opentrons import containers
+from opentrons.instruments import Pipette
 
 
 
@@ -30,7 +31,9 @@ def test_calibrate_plate(robot):
     assert position_tracker[plate[2]] == pt.Pose(27.04, 14.14, 4)
     assert position_tracker[plate[5]] == pt.Pose(54.04, 14.14, 4)
 
-
+def test_add_pipette(robot):
+    p200 = Pipette(robot, 'a')
+    assert p200 in robot.position_tracker
 
 
 
