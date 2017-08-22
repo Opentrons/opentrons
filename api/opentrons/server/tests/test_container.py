@@ -1,23 +1,14 @@
-import os
 from opentrons.util.trace import EventBroker
 
-protocol_text = None
-protocol_file = os.path.join(
-        os.path.dirname(__file__), 'data', 'dinosaur.py')
-
-with open(protocol_file) as file:
-    protocol_text = ''.join(list(file))
-
-
-async def test_load_from_text(robot_container):
+async def test_load_from_text(robot_container, protocol):
     robot_container.reset()
-    robot = robot_container.load_protocol(protocol_text)
+    robot = robot_container.load_protocol(protocol.text)
     assert len(robot.commands()) == 101
 
 
-async def test_load_from_file(robot_container):
+async def test_load_from_file(robot_container, protocol):
     robot_container.reset()
-    robot = robot_container.load_protocol_file(protocol_file)
+    robot = robot_container.load_protocol_file(protocol.filename)
     assert len(robot.commands()) == 101
 
 

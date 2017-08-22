@@ -32,10 +32,6 @@ class RobotContainer(object):
         self.loop = loop
 
     def notify(self, info):
-        try:
-            info['arguments'] = None
-        except KeyError:
-            pass
         asyncio.run_coroutine_threadsafe(
                 self.notifications.put(info), self.loop)
 

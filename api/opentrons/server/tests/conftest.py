@@ -1,5 +1,6 @@
 import logging
 import pytest
+import os
 
 from collections import namedtuple
 from logging.config import dictConfig
@@ -36,6 +37,21 @@ from uuid import uuid4 as uuid
 Session = namedtuple(
     'Session',
     ['server', 'socket', 'token', 'call'])
+
+Protocol = namedtuple(
+    'Protocol',
+    ['text', 'filename'])
+
+
+@pytest.fixture(params=["dinosaur.py"])
+def protocol(request):
+    text = None
+    filename = os.path.join(os.path.dirname(__file__), 'data', request.param)
+
+    with open(filename) as file:
+        text = ''.join(list(file))
+
+    return Protocol(text=text, filename=filename)
 
 
 @pytest.fixture

@@ -93,7 +93,7 @@ def test_get_object_tree(instance):
 
 def test_get_object_tree_shallow(instance):
     root, *_ = instance
-    tree, refs = serialize.get_object_tree(root, shallow=True)
+    tree, refs = serialize.get_object_tree(root, max_depth=1)
     assert tree == {
         'i': id(root),
         't': type_id(root),

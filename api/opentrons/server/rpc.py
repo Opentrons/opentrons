@@ -50,7 +50,7 @@ class ControlBox(object):
 
 
 class Server(object):
-    def __init__(self, root=None, loop=None):
+    def __init__(self, root=None, loop=None, notification_max_depth=4):
         # All function calls requested will be executed
         # in a separate thread
         # TODO (artyom, 08/22/2017): look into asyncio executors
@@ -65,6 +65,7 @@ class Server(object):
 
         self.objects = {id(self): self}
         self.control = ControlBox(self)
+        self.notification_max_depth = notification_max_depth
 
         self.loop = loop or asyncio.get_event_loop()
         self.exec_loop = asyncio.new_event_loop()
@@ -114,7 +115,11 @@ class Server(object):
     async def monitor_events(self):
         async for event in self.control:
             try:
-                data, refs = serialize.get_object_tree(event)
+                # Render only two levels deep for notifications
+                # to avoid flooding
+                data, refs = serialize.get_object_tree(
+                    event,
+                    self.notification_max_depth)
                 self.send(
                     {
                         '$': {'type': NOTIFICATION_MESSAGE},
@@ -137,18 +142,13 @@ class Server(object):
         # upgrade to Websockets
         await ws.prepare(request)
 
-        try:
-            ws.set_tcp_cork(True)
-        except Exception as e:
-            print(e)
-
         self.clients.append(ws)
 
         # Return instance of root object and instance of control box
         control_type, control_type_refs = \
-            serialize.get_object_tree(type(self.control), shallow=True)
+            serialize.get_object_tree(type(self.control), max_depth=1)
         control_instance, control_instance_refs = \
-            serialize.get_object_tree(self.control, shallow=True)
+            serialize.get_object_tree(self.control, max_depth=1)
         self.objects.update({**control_type_refs, **control_instance_refs})
 
         self.send(
