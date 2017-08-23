@@ -97,12 +97,17 @@ class Server(object):
         self.monitor_events_task = \
             self.loop.create_task(self.monitor_events())
 
+        # We are relying on set_loop being present in root object
+        # so we can inject the event loop it will be running in
         if hasattr(self._root, 'set_loop'):
             log.info('Root has set_loop() method. Calling.')
             self._root.set_loop(self.loop)
 
     def start(self, host, port):
-        return web.run_app(self.app, host=host, port=port)
+        # This call will block while server is running
+        # run_app is capable of catching SIGINT and shutting down
+        web.run_app(self.app, host=host, port=port)
+        stop()
 
     def stop(self):
         self.monitor_events_task.cancel()

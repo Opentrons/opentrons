@@ -1,13 +1,11 @@
 from opentrons.util.trace import EventBroker
 
 async def test_load_from_text(robot_container, protocol):
-    robot_container.reset()
-    robot = robot_container.load_protocol(protocol.text)
+    robot = robot_container.load_protocol(protocol.text, '<blank>')
     assert len(robot.commands()) == 101
 
 
 async def test_load_from_file(robot_container, protocol):
-    robot_container.reset()
     robot = robot_container.load_protocol_file(protocol.filename)
     assert len(robot.commands()) == 101
 

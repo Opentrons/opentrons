@@ -12,7 +12,12 @@ async def test_notifications(session, robot_container, protocol):
     await session.socket.receive_json()  # Skip ack
     await session.socket.receive_json()  # Get call result
 
-    await session.call(session.server.root, 'load_protocol', [protocol.text])
+    await session.call(
+        session.server.root,
+        'load_protocol',
+        [protocol.text, protocol.filename]
+    )
+
     await session.socket.receive_json()  # Skip ack
 
     responses = []
