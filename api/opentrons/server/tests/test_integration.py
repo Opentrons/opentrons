@@ -19,6 +19,14 @@ async def test_notifications(session, robot_container, protocol):
     )
 
     await session.socket.receive_json()  # Skip ack
+    await session.socket.receive_json()  # Skip result
+
+    await session.call(
+        session.server.root,
+        'run',
+        []
+    )
+    await session.socket.receive_json()  # Skip ack
 
     responses = []
 
@@ -28,7 +36,7 @@ async def test_notifications(session, robot_container, protocol):
     # 50 responses we've got, and confirm that all are notifications
     # which means that async calls are working and the actual
     # call hasn't returned yet, but notifications are coming in
-    for i in range(100):
+    for i in range(10):
         responses.append(await session.socket.receive_json())
 
     assert all([
