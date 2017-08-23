@@ -5,7 +5,7 @@
 import assert from 'assert'
 import log from 'winston'
 import Client from '../../rpc/client'
-import {actions, actionTypes, selectors} from './'
+import {NAME, actions, actionTypes, selectors} from './'
 
 // TODO(mc): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
@@ -109,7 +109,8 @@ export default function apiMiddleware (store) {
 
   // load protocol
   function loadProtocol () {
-    const file = selectors.getProtocolFile(getState())
+    const robotState = getState()[NAME]
+    const file = selectors.getProtocolFile(robotState)
 
     robotContainer.load_protocol_file(file)
       .then((virtualRobot) => virtualRobot.commands())

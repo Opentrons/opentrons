@@ -19,6 +19,10 @@ class RobotContainer(object):
         EventBroker.get_instance().add(self.notify)
 
     def notify(self, info):
+        # TODO(artyom, 2017-08-23): allow filtering to be configured
+        if info.get('name', None) != 'add-command':
+            return
+
         # Use this to turn self into it's id so we don't
         # end up serializing every object who's method triggered the event
         arguments = info.get('arguments', {})

@@ -19,10 +19,7 @@ const INITIAL_STATE = {
   // instantaneous robot state below
   // protocol
   // TODO(mc, 2017-08-23): do not hardcode this protocol!
-  protocol: path.join(
-    __dirname,
-    '../../../api/opentrons/server/tests/data/dinosaur.py'
-  ),
+  protocol: '/Users/mc/opentrons/opentrons/api/opentrons/server/tests/data/dinosaur.py',
   protocolError: null,
   // is connected to compute
   isConnected: false,
