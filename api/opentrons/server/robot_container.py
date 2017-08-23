@@ -14,13 +14,18 @@ class RobotContainer(object):
     def __init__(self, loop=None):
         self.loop = loop or asyncio.get_event_loop()
         self.protocol_text = None
+        self.filters = set()
 
         self.notifications = Queue(loop=self.loop)
         EventBroker.get_instance().add(self.notify)
 
+    def update_filters(self, filters):
+        def update():
+            self.filters = set(filters)
+        self.loop.call_soon_threadsafe(update)
+
     def notify(self, info):
-        # TODO(artyom, 2017-08-23): allow filtering to be configured
-        if info.get('name', None) != 'add-command':
+        if info.get('name', None) not in self.filters:
             return
 
         # Use this to turn self into it's id so we don't
@@ -41,9 +46,9 @@ class RobotContainer(object):
         _robot = self.new_robot()
         robot.__dict__ = {**_robot.__dict__}
 
-    def run(self, devicename=None):
+    def run(self, devicename=None, filters=['add-command']):
         from opentrons import robot
-
+        self.update_filters(filters)
         self.reset_robot(robot)
 
         if devicename is not None:
@@ -63,7 +68,7 @@ class RobotContainer(object):
         tree = ast.parse(text)
         compile(tree, filename=filename, mode='exec')
         self.protocol_text = text
-        return self.run()
+        return self.run(filters=[])
 
     def load_protocol_file(self, filename):
         with open(filename) as file:
