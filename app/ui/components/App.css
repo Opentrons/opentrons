@@ -15,29 +15,43 @@ body{
   display: grid;
   width:1024px;
   height:768px;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-rows: 68px 200px 350px 150px;
+  grid-template-columns: 40px 1fr 1fr;
+  grid-template-rows: 68px 200px 500px;
   grid-template-areas:  "head head head"
                         "sidebar controls controls"
-                        "sidebar log log"
-                        "connect log log";
+                        "sidebar task task";
+
+}
+
+.open{
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .menu {
   grid-area: head;
   background-color: #666;
   display:grid;
-  grid-template-columns: 2fr 2fr 1fr 1fr;
-  grid-template-areas:  ". . . run"
+  grid-template-columns: 40px auto auto 10rem;
+  grid-template-areas:  "nav . . run"
+}
+
+.toggle_nav{
+  grid-area: nav;
+  margin:1rem 0.25rem;
+  font-size:1.5rem;
+  color:white;
+  background-color: transparent;
+  cursor:pointer;
 }
 
 .sidebar {
   grid-area: sidebar;
-}
-
-.connect {
-  grid-area: connect;
-  background-color: #DDD;
+  display: grid;
+  overflow:hidden;
+  grid-template-rows: auto 150px;
+  border-right: 1px solid silver;
+  grid-template-areas: "."
+                       "connect";
 }
 
 .run{
@@ -45,13 +59,15 @@ body{
   margin:1rem;
 }
 
-.run_progress{
+.run_controls{
   grid-area: controls;
   background-color: #DDD;
-  position:relative;
+  display: grid;
+  grid-template-rows: 4rem 4rem auto;
+
 }
 
-.task {
+.task{
   grid-area: task;
-  background-color: #EEE;
+  background-color: #EFEFEF;
 }

@@ -1,13 +1,15 @@
-// robot UI entry point
+// robot state module
 // split up into reducer.js, action.js, etc if / when necessary
 import path from 'path'
+import {makeActionName} from '../util'
 import api from './api-client'
 
 export const NAME = 'robot'
 
 // reducer / action helpers
-const makeActionName = (action) => `${NAME}:${action}`
+const makeRobotActionName = (action) => makeActionName(NAME, action)
 const makeRequestState = () => ({inProgress: false, error: null})
+const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
   // robot connection
@@ -38,15 +40,16 @@ export const constants = {
 }
 
 export const selectors = {
-  getProtocolFile (state) {
-    return state.protocol
+  getProtocolFile (allState) {
+    return getModuleState(allState).protocol
   },
 
-  getProtocolName (state) {
-    return path.basename(selectors.getProtocolFile(state))
+  getProtocolName (allState) {
+    return path.basename(selectors.getProtocolFile(allState))
   },
 
-  getConnectionStatus (state) {
+  getConnectionStatus (allState) {
+    const state = getModuleState(allState)
     if (state.isConnected) return constants.CONNECTED
     if (state.connectRequest.inProgress) return constants.CONNECTING
     return constants.DISCONNECTED
@@ -57,21 +60,21 @@ export const apiClientMiddleware = api
 
 export const actionTypes = {
   // requests and responses
-  CONNECT: makeActionName('CONNECT'),
-  CONNECT_RESPONSE: makeActionName('CONNECT_RESPONSE'),
-  LOAD_PROTOCOL: makeActionName('LOAD_PROTOCOL'),
-  HOME: makeActionName('HOME'),
-  HOME_RESPONSE: makeActionName('HOME_RESPONSE'),
-  RUN: makeActionName('RUN'),
-  RUN_RESPONSE: makeActionName('RUN_RESPONSE'),
+  CONNECT: makeRobotActionName('CONNECT'),
+  CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
+  LOAD_PROTOCOL: makeRobotActionName('LOAD_PROTOCOL'),
+  HOME: makeRobotActionName('HOME'),
+  HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  RUN: makeRobotActionName('RUN'),
+  RUN_RESPONSE: makeRobotActionName('RUN_RESPONSE'),
 
   // instantaneous state
-  SET_IS_CONNECTED: makeActionName('SET_IS_CONNECTED'),
+  SET_IS_CONNECTED: makeRobotActionName('SET_IS_CONNECTED'),
   // TODO(mc, 2017-08-23): consider combining set commands and set protocol
   // error into a single loadProtocolResponse action
-  SET_COMMANDS: makeActionName('SET_COMMANDS'),
-  SET_PROTOCOL_ERROR: makeActionName('SET_PROTOCOL_ERROR'),
-  TICK_CURRENT_COMMAND: makeActionName('TICK_CURRENT_COMMAND')
+  SET_COMMANDS: makeRobotActionName('SET_COMMANDS'),
+  SET_PROTOCOL_ERROR: makeRobotActionName('SET_PROTOCOL_ERROR'),
+  TICK_CURRENT_COMMAND: makeRobotActionName('TICK_CURRENT_COMMAND')
 }
 
 export const actions = {

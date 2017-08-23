@@ -1,13 +1,12 @@
 .bar_wrapper{
 	border:1px solid grey;
-	height:2rem;
 	width:100%;
 	overflow:hidden;
 }
 
 .bar{
-	background-color: lime;
-	height:2rem;
+	background-color: blue;
+	height:100%;
 }
 
 .paused_bar{
