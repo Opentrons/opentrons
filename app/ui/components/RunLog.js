@@ -41,7 +41,7 @@ export default function RunLog (props) {
   return (
     <main className={classnames(style, styles.wrapper)}>
       {protocolCommands.map((command, index) =>
-        <p key={command.timestamp} className={classnames({ [styles.current]: currentCommandIndex === index })}>{command.timestamp} : {command.command_description}</p>
+        <p key={command.uid} className={classnames({ [styles.current]: currentCommandIndex === index })}>{command.timestamp} : {command.command_description}</p>
       )}
     </main>
   )
