@@ -12,8 +12,7 @@ class RobotContainer(object):
         from opentrons import robot
 
         self.loop = loop or asyncio.get_event_loop()
-        self._globals = {'robot': robot}
-        self._locals = {}
+        self._globals = {}
         self.notifications = Queue(loop=self.loop)
         EventBroker.get_instance().add(self.notify)
 
@@ -32,24 +31,26 @@ class RobotContainer(object):
         self.loop = loop
 
     def notify(self, info):
+        # Use this to turn self into it's id so we don't
+        # end up serializing every object that received the call
+        arguments = info.get('arguments', {})
+        if 'self' in arguments:
+            arguments['self'] = id(arguments['self'])
+
         asyncio.run_coroutine_threadsafe(
                 self.notifications.put(info), self.loop)
 
     def reset(self):
-        # TODO(artyom, 08/11/2017)
-        # Replace reset with a switchover of robot connection
-        # before new protocol is loaded
-        self.robot.reset()
+        pass
 
     def load_protocol(self, text):
-        exec(text, self._globals, self._locals)
+        exec(text, self._globals)
         return self.robot
 
     def load_protocol_file(self, file):
-        text = ''
         with open(file) as file:
             text = ''.join(list(file))
-        return self.load_protocol(text)
+            return self.load_protocol(text)
 
     def get_robot(self):
         return self.robot
