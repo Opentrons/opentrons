@@ -1,10 +1,20 @@
 // robot selectors test
 import {selectors, constants} from '../'
 
-describe('robot selectors', () => {
-  it('should be able to get connection status', () => {
-    const {getConnectionStatus} = selectors
+const {
+  getProtocolFile,
+  getProtocolName,
+  getConnectionStatus
+} = selectors
 
+describe('robot selectors', () => {
+  test('getProtocolFile and getProtocolName', () => {
+    const state = {protocol: '/path/to/some/protocol/foobar.py'}
+    expect(getProtocolFile(state)).toBe('/path/to/some/protocol/foobar.py')
+    expect(getProtocolName(state)).toBe('foobar.py')
+  })
+
+  it('should be able to get connection status', () => {
     let state = {isConnected: false, connectRequest: {inProgress: false}}
     expect(getConnectionStatus(state)).toBe(constants.DISCONNECTED)
 

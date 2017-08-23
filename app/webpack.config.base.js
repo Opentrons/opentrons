@@ -36,13 +36,17 @@ export default {
     modules: [
       path.join(__dirname, 'ui'),
       path.join(__dirname, 'shell'),
-      'node_modules',
-    ],
+      'node_modules'
+    ]
   },
 
   plugins: [
     new webpack.NamedModulesPlugin(),
     // set default NODE_ENV to "development"
     new webpack.EnvironmentPlugin({NODE_ENV: 'development'})
-  ]
+  ],
+
+  node: {
+    __dirname: true
+  }
 }

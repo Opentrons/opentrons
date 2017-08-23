@@ -1,5 +1,6 @@
 // robot UI entry point
 // split up into reducer.js, action.js, etc if / when necessary
+import path from 'path'
 import api from './api-client'
 
 export const NAME = 'robot'
@@ -16,10 +17,20 @@ const INITIAL_STATE = {
   runRequest: makeRequestState(),
 
   // instantaneous robot state below
+  // protocol
+  // TODO(mc, 2017-08-23): do not hardcode this protocol!
+  protocol: path.join(
+    __dirname,
+    '../../../api/opentrons/server/tests/data/dinosaur.py'
+  ),
+  protocolError: null,
   // is connected to compute
   isConnected: false,
   // is running a protocol
-  isRunning: false
+  isRunning: false,
+  // protocol commands list
+  commands: [],
+  currentCommand: -1
 }
 
 // miscellaneous constants
@@ -30,7 +41,15 @@ export const constants = {
 }
 
 export const selectors = {
-  getConnectionStatus: (state) => {
+  getProtocolFile (state) {
+    return state.protocol
+  },
+
+  getProtocolName (state) {
+    return path.basename(selectors.getProtocolFile(state))
+  },
+
+  getConnectionStatus (state) {
     if (state.isConnected) return constants.CONNECTED
     if (state.connectRequest.inProgress) return constants.CONNECTING
     return constants.DISCONNECTED
@@ -43,13 +62,19 @@ export const actionTypes = {
   // requests and responses
   CONNECT: makeActionName('CONNECT'),
   CONNECT_RESPONSE: makeActionName('CONNECT_RESPONSE'),
+  LOAD_PROTOCOL: makeActionName('LOAD_PROTOCOL'),
   HOME: makeActionName('HOME'),
   HOME_RESPONSE: makeActionName('HOME_RESPONSE'),
   RUN: makeActionName('RUN'),
   RUN_RESPONSE: makeActionName('RUN_RESPONSE'),
 
   // instantaneous state
-  SET_IS_CONNECTED: makeActionName('SET_IS_CONNECTED')
+  SET_IS_CONNECTED: makeActionName('SET_IS_CONNECTED'),
+  // TODO(mc, 2017-08-23): consider combining set commands and set protocol
+  // error into a single loadProtocolResponse action
+  SET_COMMANDS: makeActionName('SET_COMMANDS'),
+  SET_PROTOCOL_ERROR: makeActionName('SET_PROTOCOL_ERROR'),
+  TICK_CURRENT_COMMAND: makeActionName('TICK_CURRENT_COMMAND')
 }
 
 export const actions = {
@@ -65,6 +90,12 @@ export const actions = {
     return {
       type: actionTypes.CONNECT_RESPONSE,
       error
+    }
+  },
+
+  loadProtocol () {
+    return {
+      type: actionTypes.LOAD_PROTOCOL
     }
   },
 
@@ -104,6 +135,26 @@ export const actions = {
     return {
       type: actionTypes.SET_IS_CONNECTED,
       payload: {isConnected}
+    }
+  },
+
+  setCommands (commands) {
+    return {
+      type: actionTypes.SET_COMMANDS,
+      payload: {commands}
+    }
+  },
+
+  setProtocolError (error) {
+    return {
+      type: actionTypes.SET_PROTOCOL_ERROR,
+      error
+    }
+  },
+
+  tickCurrentCommand () {
+    return {
+      type: actionTypes.TICK_CURRENT_COMMAND
     }
   }
 }
@@ -155,6 +206,15 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.SET_IS_CONNECTED:
       return {...state, ...payload}
+
+    case actionTypes.SET_COMMANDS:
+      return {...state, commands: payload.commands}
+
+    case actionTypes.SET_PROTOCOL_ERROR:
+      return {...state, protocolError: error}
+
+    case actionTypes.TICK_CURRENT_COMMAND:
+      return {...state, currentCommand: state.currentCommand + 1}
   }
 
   return state

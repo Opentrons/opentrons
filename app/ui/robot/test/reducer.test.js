@@ -1,5 +1,6 @@
 // robot reducer test
 
+import path from 'path'
 import {reducer, actionTypes} from '../'
 
 describe('robot reducer', () => {
@@ -10,8 +11,15 @@ describe('robot reducer', () => {
       connectRequest: {inProgress: false, error: null},
       homeRequest: {inProgress: false, error: null},
       runRequest: {inProgress: false, error: null},
+      protocol: path.join(
+        __dirname,
+        '../../../../api/opentrons/server/tests/data/dinosaur.py'
+      ),
+      protocolError: null,
       isConnected: false,
-      isRunning: false
+      isRunning: false,
+      currentCommand: -1,
+      commands: []
     })
   })
 
@@ -118,5 +126,32 @@ describe('robot reducer', () => {
     }
 
     expect(reducer(state, action)).toEqual({isConnected: true})
+  })
+
+  test('handles setCommands', () => {
+    const state = {commands: []}
+    const action = {
+      type: actionTypes.SET_COMMANDS,
+      payload: {commands: ['foo', 'bar', 'baz']}
+    }
+
+    expect(reducer(state, action)).toEqual({commands: ['foo', 'bar', 'baz']})
+  })
+
+  test('handles setProtocolError', () => {
+    const state = {protocolError: null}
+    const action = {
+      type: actionTypes.SET_PROTOCOL_ERROR,
+      error: new Error('AHHH')
+    }
+
+    expect(reducer(state, action)).toEqual({protocolError: new Error('AHHH')})
+  })
+
+  test('handles tickCurrentCommand', () => {
+    const state = {currentCommand: 3}
+    const action = {type: actionTypes.TICK_CURRENT_COMMAND}
+
+    expect(reducer(state, action)).toEqual({currentCommand: 4})
   })
 })

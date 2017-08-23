@@ -12,6 +12,23 @@ describe('robot effects', () => {
     expect(actions.connect()).toEqual(expected)
   })
 
+  test('connect response action', () => {
+    const expected = {
+      type: actionTypes.CONNECT_RESPONSE,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.connectResponse(new Error('AHHH'))).toEqual(expected)
+  })
+
+  test('load protocol action', () => {
+    const expected = {
+      type: actionTypes.LOAD_PROTOCOL
+    }
+
+    expect(actions.loadProtocol()).toEqual(expected)
+  })
+
   test('home action without axes', () => {
     const expected = {
       type: actionTypes.HOME,
@@ -67,5 +84,29 @@ describe('robot actions', () => {
     }
 
     expect(actions.setIsConnected(false)).toEqual(expected)
+  })
+
+  test('set commands', () => {
+    const expected = {
+      type: actionTypes.SET_COMMANDS,
+      payload: {commands: ['foo', 'bar', 'baz']}
+    }
+
+    expect(actions.setCommands(['foo', 'bar', 'baz'])).toEqual(expected)
+  })
+
+  test('set protocol error', () => {
+    const expected = {
+      type: actionTypes.SET_PROTOCOL_ERROR,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.setProtocolError(new Error('AHHH'))).toEqual(expected)
+  })
+
+  test('tick current command counter', () => {
+    const expected = {type: actionTypes.TICK_CURRENT_COMMAND}
+
+    expect(actions.tickCurrentCommand()).toEqual(expected)
   })
 })
