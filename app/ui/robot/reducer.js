@@ -34,7 +34,10 @@ const INITIAL_STATE = {
   // protocol
   // TODO(mc, 2017-08-24): move protocol to its own state module
   // TODO(mc, 2017-08-23): DO NOT hardcode this protocol!
-  protocol: '/Users/mc/opentrons/opentrons/api/opentrons/server/tests/data/dinosaur.py',
+  protocol: path.join(
+    __dirname,
+    '../../../api/opentrons/server/tests/data/dinosaur.py'
+  ),
   protocolError: null,
   // is connected to compute
   isConnected: false,
