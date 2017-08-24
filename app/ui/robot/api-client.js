@@ -128,6 +128,14 @@ export default function apiMiddleware (store) {
   function handleRobotNotification (message) {
     // TODO(mc, 2017-08-23): change this log to debug
     log.info('Recieved robot notification: %j', message)
+
+    if (!selectors.getIsReadyToRun(getState())) return
+
+    switch (message.name) {
+      case 'add-command':
+        dispatch(actions.tickCurrentCommand())
+        break
+    }
   }
 
   function handleClientError (error) {

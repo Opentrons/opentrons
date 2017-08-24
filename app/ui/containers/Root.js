@@ -20,27 +20,18 @@ const mapStateToProps = (state) => {
     isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
 
     // robot
+    isReadyToRun: robotSelectors.getIsReadyToRun(state),
     isRunning: state.robot.isRunning,
     isConnected: state.robot.isConnected,
     connectionStatus: robotSelectors.getConnectionStatus(state),
 
+    // protocol
+    protocolName: robotSelectors.getProtocolName(state),
+    commands: robotSelectors.getCommands(state),
+
     // TODO(mc): remove development hardcoded values
     isPaused: false,
-    errors: [],
-    runCommands: [
-      {
-        timestamp: '2:01:43 PM',
-        command_description: 'Picking up tip from <Deck><Slot E3><Container p10tiprack><Well A1>'
-      },
-      {
-        timestamp: '2:01:56 PM',
-        command_description: 'Aspirating 5 at <Deck><Slot D3><Container template><Well A1>'
-      },
-      {
-        timestamp: '2:02:43 PM',
-        command_description: 'Picking up tip from <Deck><Slot E3><Container p10tiprack><Well A1>'
-      }
-    ]
+    errors: []
   }
 }
 

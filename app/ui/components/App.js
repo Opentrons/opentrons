@@ -11,10 +11,12 @@ export default function App (props) {
     // state
     isNavPanelOpen,
     isConnected,
+    isReadyToRun,
     isRunning,
     isPaused,
     errors,
-    runCommands,
+    protocolName,
+    commands,
     // handlers
     onRunButtonClick,
     onNavButtonClick
@@ -22,8 +24,8 @@ export default function App (props) {
   let runButton
   let runControl
   let runLog
+
   // mock prop for styling
-  const fileName = 'dinsoaur.py'
   const startTime = Date.now()
   const timeRemaining = '00:03:25' // swap out for timer
 
@@ -31,28 +33,23 @@ export default function App (props) {
     runButton = (
       <Button
         onClick={onRunButtonClick}
-        disabled={!isConnected}
+        disabled={!isReadyToRun}
         style={styles.run}
       >
         Run Job
       </Button>
     )
+  }
 
-    runControl = (
-      <section className={styles.run_progress} />
-    )
-
-    runLog = (
-      <main className={styles.task} />
-    )
-  } else {
+  if (isReadyToRun) {
     runControl = (
       <RunControl
         style={styles.run_controls}
-        {...{fileName, startTime, timeRemaining}}
+        {...{startTime, timeRemaining}}
         {...props}
       />
     )
+
     runLog = <RunLog style={styles.task} {...props} />
   }
 

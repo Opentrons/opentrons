@@ -5,7 +5,7 @@ import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
 
 export default function RunControl (props) {
-  const {isRunning, isPaused, errors, style, fileName, startTime} = props
+  const {isRunning, isPaused, errors, style, protocolName, startTime} = props
   const hasError = errors.length > 0
   const progress = (1 / 3) * 100 // dummy current index divded by commands.length for progress bar
 
@@ -13,7 +13,7 @@ export default function RunControl (props) {
     <section className={style}>
       <div className={styles.btn_wrapper}>
         <div className={styles.file_info}>
-          FILE NAME: {fileName}
+          FILE NAME: {protocolName}
           <br />
           START TIME: {startTime}
         </div>
@@ -38,6 +38,7 @@ export default function RunControl (props) {
 }
 
 RunControl.propTypes = {
+  protocolName: PropTypes.string.isRequired,
   isRunning: PropTypes.bool,
   isPaused: PropTypes.bool,
   errors: PropTypes.array,

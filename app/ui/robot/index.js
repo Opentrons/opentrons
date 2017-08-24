@@ -53,6 +53,23 @@ export const selectors = {
     if (state.isConnected) return constants.CONNECTED
     if (state.connectRequest.inProgress) return constants.CONNECTING
     return constants.DISCONNECTED
+  },
+
+  getIsReadyToRun (allState) {
+    const state = getModuleState(allState)
+    return state.isConnected && (state.commands.length > 0)
+  },
+
+  getCommands (allState) {
+    const state = getModuleState(allState)
+    const currentCommand = state.currentCommand
+
+    return state.commands.map((command, index) => ({
+      // TODO(mc, 2017-08-23): generate command IDs on python side instead
+      id: index,
+      description: command,
+      isCurrent: index === currentCommand
+    }))
   }
 }
 
@@ -208,7 +225,7 @@ export function reducer (state = INITIAL_STATE, action) {
       return {...state, ...payload}
 
     case actionTypes.SET_COMMANDS:
-      return {...state, commands: payload.commands}
+      return {...state, commands: payload.commands, currentCommand: -1}
 
     case actionTypes.SET_PROTOCOL_ERROR:
       return {...state, protocolError: error}

@@ -129,13 +129,16 @@ describe('robot reducer', () => {
   })
 
   test('handles setCommands', () => {
-    const state = {commands: []}
+    const state = {commands: [], currentCommand: 42}
     const action = {
       type: actionTypes.SET_COMMANDS,
       payload: {commands: ['foo', 'bar', 'baz']}
     }
 
-    expect(reducer(state, action)).toEqual({commands: ['foo', 'bar', 'baz']})
+    expect(reducer(state, action)).toEqual({
+      commands: ['foo', 'bar', 'baz'],
+      currentCommand: -1
+    })
   })
 
   test('handles setProtocolError', () => {
