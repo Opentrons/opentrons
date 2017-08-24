@@ -59,7 +59,7 @@ export default function apiMiddleware (store) {
         break
 
       case actionTypes.LOAD_PROTOCOL:
-        loadProtocol()
+        loadProtocol(payload)
         break
 
       case actionTypes.HOME:
@@ -68,6 +68,18 @@ export default function apiMiddleware (store) {
 
       case actionTypes.RUN:
         run(payload)
+        break
+
+      case actionTypes.PAUSE:
+        pause(payload)
+        break
+
+      case actionTypes.RESUME:
+        resume(payload)
+        break
+
+      case actionTypes.CANCEL:
+        cancel(payload)
         break
     }
 
@@ -123,6 +135,27 @@ export default function apiMiddleware (store) {
       .run(serialPort)
       .then(() => dispatch(actions.runResponse()))
       .catch((error) => dispatch(actions.runResponse(error)))
+  }
+
+  function pause () {
+    robot
+      .pause()
+      .then(() => dispatch(actions.pauseResponse()))
+      .catch((error) => dispatch(actions.pauseResponse(error)))
+  }
+
+  function resume () {
+    robot
+      .resume()
+      .then(() => dispatch(actions.resumeResponse()))
+      .catch((error) => dispatch(actions.resumeResponse(error)))
+  }
+
+  function cancel () {
+    robot
+      .stop()
+      .then(() => dispatch(actions.cancelResponse()))
+      .catch((error) => dispatch(actions.cancelResponse(error)))
   }
 
   function handleRobotNotification (message) {

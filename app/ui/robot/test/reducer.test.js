@@ -21,6 +21,7 @@ describe('robot reducer', () => {
       cancelRequest: {inProgress: false, error: null},
       isConnected: false,
       isRunning: false,
+      isPaused: false,
       currentCommand: -1,
       commands: []
     })
@@ -97,7 +98,8 @@ describe('robot reducer', () => {
       runRequest: {inProgress: true, error: null},
       // TODO(mc): for now, naively assume that if a run request is dispatched
       // the robot is running
-      isRunning: true
+      isRunning: true,
+      currentCommand: -1
     })
   })
 

@@ -20,17 +20,18 @@ const mapStateToProps = (state) => {
     isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
 
     // robot
+    isConnected: state.robot.isConnected,
     isReadyToRun: robotSelectors.getIsReadyToRun(state),
     isRunning: state.robot.isRunning,
-    isConnected: state.robot.isConnected,
+    isPaused: state.robot.isPaused,
     connectionStatus: robotSelectors.getConnectionStatus(state),
 
     // protocol
     protocolName: robotSelectors.getProtocolName(state),
     commands: robotSelectors.getCommands(state),
+    runProgress: robotSelectors.getRunProgress(state),
 
     // TODO(mc): remove development hardcoded values
-    isPaused: false,
     errors: []
   }
 }
@@ -38,12 +39,15 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     // interface
-    onNavButtonClick: () => dispatch(interfaceActions.toggleNavPanel()),
+    onNavClick: () => dispatch(interfaceActions.toggleNavPanel()),
 
     // robot
-    onRunButtonClick: () => dispatch(robotActions.run()),
     // TODO(mc): revisit when robot discovery / multiple robots is addressed
-    onConnectButtonClick: () => dispatch(robotActions.connect())
+    onConnectClick: () => dispatch(robotActions.connect()),
+    onRunClick: () => dispatch(robotActions.run()),
+    onPauseClick: () => dispatch(robotActions.pause()),
+    onResumeClick: () => dispatch(robotActions.resume()),
+    onCancelClick: () => dispatch(robotActions.cancel())
   }
 }
 

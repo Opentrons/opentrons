@@ -6,7 +6,9 @@ const makeState = (state) => ({[NAME]: state})
 const {
   getProtocolFile,
   getProtocolName,
-  getConnectionStatus
+  getConnectionStatus,
+  getCommands,
+  getRunProgress
 } = selectors
 
 describe('robot selectors', () => {
@@ -16,7 +18,7 @@ describe('robot selectors', () => {
     expect(getProtocolName(state)).toBe('foobar.py')
   })
 
-  it('should be able to get connection status', () => {
+  test('getConnectionStatus', () => {
     let state = {isConnected: false, connectRequest: {inProgress: false}}
     expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTED)
 
@@ -25,5 +27,32 @@ describe('robot selectors', () => {
 
     state = {isConnected: true, connectRequest: {inProgress: false}}
     expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
+  })
+
+  test('getCommands', () => {
+    const state = makeState({
+      commands: ['foo', 'bar', 'baz', 'qux'],
+      currentCommand: 2
+    })
+
+    expect(getCommands(state)).toEqual([
+      {id: 0, description: 'foo', isCurrent: false},
+      {id: 1, description: 'bar', isCurrent: false},
+      {id: 2, description: 'baz', isCurrent: true},
+      {id: 3, description: 'qux', isCurrent: false}
+    ])
+  })
+
+  test('getRunProgress', () => {
+    const commands = ['foo', 'bar', 'baz', 'qux']
+
+    let state = makeState({commands, currentCommand: -1})
+    expect(getRunProgress(state)).toBe(0)
+
+    state = makeState({commands, currentCommand: 2})
+    expect(getRunProgress(state)).toBe(75)
+
+    state = makeState({commands, currentCommand: 3})
+    expect(getRunProgress(state)).toBe(100)
   })
 })

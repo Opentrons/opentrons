@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './App.css'
 import ConnectionPanel from './ConnectionPanel'
@@ -13,13 +14,12 @@ export default function App (props) {
     isConnected,
     isReadyToRun,
     isRunning,
-    isPaused,
     errors,
     protocolName,
     commands,
     // handlers
-    onRunButtonClick,
-    onNavButtonClick
+    onRunClick,
+    onNavClick
   } = props
   let runButton
   let runControl
@@ -32,7 +32,7 @@ export default function App (props) {
   if (!isRunning) {
     runButton = (
       <Button
-        onClick={onRunButtonClick}
+        onClick={onRunClick}
         disabled={!isReadyToRun}
         style={styles.run}
       >
@@ -59,7 +59,7 @@ export default function App (props) {
       <header className={styles.menu}>
         <button
           className={styles.toggle_nav}
-          onClick={onNavButtonClick}
+          onClick={onNavClick}
         >
           &#9776;
         </button>
@@ -72,4 +72,8 @@ export default function App (props) {
       {runLog}
     </div>
   )
+}
+
+App.propTypes = {
+  onNavClick: PropTypes.func.isRequired
 }

@@ -26,7 +26,7 @@ ConnectionIndicator.propTypes = {
 }
 
 const ConnectionInfo = props => {
-  const {isConnected, connectionStatus, onConnectButtonClick} = props
+  const {isConnected, connectionStatus, onConnectClick} = props
   let statusMessage = {
     connected: 'available',
     disconnected: 'unavailable',
@@ -36,7 +36,7 @@ const ConnectionInfo = props => {
     return (
       <div className={styles.connect}>
         <Button
-          onClick={onConnectButtonClick}
+          onClick={onConnectClick}
           disabled={isConnected}
           style={styles.connect_btn}
         >
@@ -64,7 +64,7 @@ const ConnectionInfo = props => {
 ConnectionInfo.propTypes = {
   isConnected: PropTypes.bool.isRequired,
   connectionStatus: PropTypes.string.isRequired,
-  onConnectButtonClick: PropTypes.func.isRequired
+  onConnectClick: PropTypes.func.isRequired
 }
 
 export default function ConnectionPanel (props) {

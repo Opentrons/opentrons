@@ -40,6 +40,7 @@ const INITIAL_STATE = {
   isConnected: false,
   // is running a protocol
   isRunning: false,
+  isPaused: false,
   // protocol commands list
   commands: [],
   currentCommand: -1
@@ -76,6 +77,12 @@ export const selectors = {
       description: command,
       isCurrent: index === currentCommand
     }))
+  },
+
+  getRunProgress (allState) {
+    const state = getModuleState(allState)
+
+    return 100 * (state.currentCommand + 1) / state.commands.length
   }
 }
 
@@ -101,7 +108,8 @@ export function reducer (state = INITIAL_STATE, action) {
     // the robot is running
     case actionTypes.RUN:
       return handleRequest(state, 'runRequest', payload, error, {
-        isRunning: true
+        isRunning: true,
+        currentCommand: -1
       })
 
     case actionTypes.RUN_RESPONSE:
