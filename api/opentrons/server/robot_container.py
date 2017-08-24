@@ -22,7 +22,11 @@ class RobotContainer(object):
     def update_filters(self, filters):
         def update():
             self.filters = set(filters)
-        self.loop.call_soon_threadsafe(update)
+
+        if asyncio.get_event_loop() != self.loop:
+            self.loop.call_soon_threadsafe(update)
+        else:
+            update()
 
     def notify(self, info):
         if info.get('name', None) not in self.filters:
@@ -38,7 +42,7 @@ class RobotContainer(object):
                 self.notifications.put(info), self.loop)
 
     def reset_robot(self, robot):
-        # robot is essentially a signleton
+        # robot is essentially a singleton
         # throughout the api however we want to reset it
         # in order to do this we call a constructor
         # and then copy over the __dict__ of a newly
