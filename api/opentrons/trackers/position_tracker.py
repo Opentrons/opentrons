@@ -1,7 +1,7 @@
 import numpy
-
-# not sure if this swinging too far against 'custom vector'
-from pyrr import matrix44, vector4
+from opentrons.util.trace import MessageBroker
+from opentrons.pubsub_util.topics import MOVEMENT
+from opentrons.pubsub_util.messages.movement import moved_msg
 
 
 
@@ -53,16 +53,18 @@ class Pose(object):
     def z(self, val):
         self._pose[2][3] = val
 
+    @property
+    def position(self):
+        return (self.x, self.y, self.z)
 
 class PositionTracker(object):
-    def __init__(self):
+    def __init__(self, broker: MessageBroker):
         self._position_dict = {}
+        broker.subscribe(MOVEMENT, self._object_moved)
 
     def __getitem__(self, obj):
         try:
-            print("obj: ", obj)
-            res = self._position_dict[obj]
-            return res[0]
+            return self._position_dict[obj][0]
         except KeyError:
             raise KeyError("Position not tracked: {}".format(obj))
 
@@ -72,7 +74,8 @@ class PositionTracker(object):
     def __setitem__(self, obj, pose):
         if not isinstance(pose, Pose):
             raise TypeError("{} is not an instance of Pose".format(pose))
-        self._position_dict[obj][0] = pose
+        print(self._position_dict[obj][0])
+        self._position_dict[obj] = (pose, self._position_dict[obj][1])
 
     def __repr__(self):
         return repr(self._position_dict)
@@ -85,16 +88,17 @@ class PositionTracker(object):
         :param x, y, z: global object position
         :return: None
         '''
-        print("tracking: ", obj)
         pose = Pose(x, y, z)
         node = self._position_dict[parent][1].add_child(obj)
         self._position_dict[obj] = (pose, node)
 
     def create_root_object(self, obj, x, y, z):
+        '''Create a root node in the position tree. This is a node without a parent.
+        There is no difference between a root and a child aside from the fact that a root has no parent.
+        However, if you are constructing a new mapping context you better know what you're doing!'''
         pose = Pose(x, y, z)
         node = Node(obj)
         self._position_dict[obj] = (pose, node)
-
 
     def track_relative_object(self, new_obj, tracked_obj, x, y, z):
         '''
@@ -109,10 +113,31 @@ class PositionTracker(object):
         glb_x, glb_y, glb_z = self[tracked_obj] * [x, y, z, 1]
         self.track_object(new_obj, glb_x, glb_y, glb_z)
 
-    def get_object_position(self, obj):
+    def get_object_pose(self, obj):
+        '''Returns object pose as an instance of the Pose class'''
         return self[obj]
 
-    def adjust_object(self, obj, x, y, z):
-        new_coords = self[obj] * [x, y, z, 1]
-        new_pose   = Pose(*new_coords[:3])
-        self[obj] = new_pose
+    def get_object_children(self, obj):
+        '''Returns a list of child objects'''
+        node = self._position_dict[obj][1]
+        return [node.value for node in node.children]
+
+    def _translate_object(self, obj_to_trans, x, y, z):
+        '''Translates a single object'''
+        new_x, new_y, new_z, _ = self[obj_to_trans] * [x, y, z, 1]
+        new_pose   = Pose(new_x, new_y, new_z)
+        self[obj_to_trans] = new_pose
+
+    def translate_object(self, obj_to_trans, x, y, z):
+        '''Translates an object and descendants'''
+        self._translate_object(obj_to_trans, x, y, z)
+        for child in self.get_object_children(obj_to_trans):
+            self.translate_object(child, x, y, z) #recursively translate children
+
+    def _object_moved(self, new_position: moved_msg):
+        '''Calculates translation as diff between current position and previous - applies this translation to subtree'''
+        moved_object = new_position.moved_object
+        old_x, old_y, old_z = self[moved_object].position
+        delta_x, delta_y, delta_z = new_position.x - old_x, new_position.y - old_y, new_position.z - old_z
+        self.translate_object(moved_object, delta_x, delta_y, delta_z)
+

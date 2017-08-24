@@ -8,8 +8,7 @@ from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
-from opentrons.util.trace import traceable
-
+from opentrons.util.trace import MessageBroker
 from opentrons.trackers import position_tracker
 
 
@@ -200,8 +199,8 @@ class Robot(object):
         self._runtime_warnings = []
 
         self._previous_container = None
-
-        self.position_tracker = position_tracker.PositionTracker()
+        message_broker = MessageBroker.get_instance()
+        self.position_tracker = position_tracker.PositionTracker(message_broker)
         self.position_tracker.create_root_object('head', 0, 0, 0)
 
         self._deck = containers.Deck()
@@ -416,7 +415,7 @@ class Robot(object):
         """
         self._driver.set_speed(*args, **kwargs)
 
-    @traceable('move-to')
+    @MessageBroker.traceable('instrument_action', 'move-to') # just giving a random topic name since IDK what this is doing
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
