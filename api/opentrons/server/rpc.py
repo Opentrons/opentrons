@@ -6,6 +6,7 @@ import logging
 import traceback
 
 from aiohttp import web
+from asyncio import Queue
 from opentrons.server import serialize
 from threading import Thread
 
@@ -16,7 +17,7 @@ CALL_RESULT_MESSAGE = 0
 CALL_ACK_MESSAGE = 1
 NOTIFICATION_MESSAGE = 2
 CONTROL_MESSAGE = 3
-ERROR_MESSAGE = 4
+CALL_NACK_MESSAGE = 4
 
 
 # Wrapper class to dispatch select calls to server
@@ -68,6 +69,7 @@ class Server(object):
         self.notification_max_depth = notification_max_depth
 
         self.loop = loop or asyncio.get_event_loop()
+        self.send_queue = Queue(loop=self.loop)
         self.exec_loop = asyncio.new_event_loop()
         self.monitor_events_task = None
 
@@ -80,6 +82,8 @@ class Server(object):
             target=start_background_loop,
             args=(self.exec_loop,))
         self.exec_thread.start()
+
+        self.send_loop_task = self.loop.create_task(self.send_loop())
 
         self.app = web.Application()
         self.app.router.add_get('/', self.handler)
@@ -97,35 +101,42 @@ class Server(object):
         self.monitor_events_task = \
             self.loop.create_task(self.monitor_events())
 
-        # We are relying on set_loop being present in root object
-        # so we can inject the event loop it will be running in
-        if hasattr(self._root, 'set_loop'):
-            log.info('Root has set_loop() method. Calling.')
-            self._root.set_loop(self.loop)
+        if hasattr(self._root, 'loop'):
+            self._root.loop = self.loop
 
     def start(self, host, port):
         # This call will block while server is running
         # run_app is capable of catching SIGINT and shutting down
         web.run_app(self.app, host=host, port=port)
-        stop()
+        self.stop()
 
     def stop(self):
         self.monitor_events_task.cancel()
+        self.send_loop_task.cancel()
 
-        if hasattr(self.root, 'finalize'):
+        if callable(getattr(self._root, 'finalize', None)):
             self.root.finalize()
 
         self.exec_loop.call_soon_threadsafe(self.exec_loop.stop)
 
+    async def send_loop(self):
+        log.info('Starting send loop')
+        while True:
+            client, payload = await self.send_queue.get()
+            # TODO: if we are experiencing issues of partial packets being sent
+            # over websocket, consider adding async client.drain()
+            # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
+            await client.send_str(json.dumps(payload))
+
     async def monitor_events(self):
         async for event in self.control:
             try:
-                # Render only two levels deep for notifications
-                # to avoid flooding
+                # Apply notification_max_depth to control object tree depth
+                # during serialization to avoid flooding comms
                 data, refs = serialize.get_object_tree(
                     event,
                     self.notification_max_depth)
-                self.send(
+                await self.send(
                     {
                         '$': {'type': NOTIFICATION_MESSAGE},
                         'data': data
@@ -156,7 +167,7 @@ class Server(object):
             serialize.get_object_tree(self.control, max_depth=1)
         self.objects.update({**control_type_refs, **control_instance_refs})
 
-        self.send(
+        await self.send(
             {
                 '$': {'type': CONTROL_MESSAGE},
                 'control': {
@@ -236,8 +247,10 @@ class Server(object):
             if message.type == aiohttp.WSMsgType.TEXT:
                 try:
                     func, token = self.prepare_call(message)
+                    # Acknowledge the call
+                    await self.send_ack(token)
                 except Exception as e:
-                    self.send_error(str(e))
+                    await self.send_error('Bad request: ' + str(e))
                 else:
                     await self.make_call(func, token)
             elif message.type == aiohttp.WSMsgType.ERROR:
@@ -253,17 +266,13 @@ class Server(object):
             token = data.pop('$')['token']
             _id = data.pop('id', None)
             func = self.build_call(_id, **data)
-
-            # Acknowledge the call
-            self.send_ack(token)
         except Exception as e:
             log.warning('While preparing call: {0}'.format(
                 traceback.format_exc()))
             details = '{0}: {1}'.format(e.__class__.__name__, str(e))
-            error = (
-                "Error handling request: {details}\n"
-                "Expected message format:\n"
-                "{{'$': {{'token': string}}, 'data': {{'id': int}}") \
+            error = ("{details}\n"
+                     "Expected message format:\n"
+                     "{{'$': {{'token': string}}, 'data': {{'id': int}}") \
                 .format(details=details)
             raise RuntimeError(error)
 
@@ -290,35 +299,35 @@ class Server(object):
                 root, refs = serialize.get_object_tree(call_result)
                 self.objects.update(refs)
                 response['data'] = root
-                self.send(response)
+                self.loop.create_task(self.send(response))
 
         future = asyncio.run_coroutine_threadsafe(
             coro(func),
             self.exec_loop)
         future.add_done_callback(resolved)
 
-    def send_error(self, text):
-        self.send({
+    async def send_error(self, text):
+        await self.send({
             '$': {
-                'type': ERROR_MESSAGE
+                'type': CALL_NACK_MESSAGE
             },
-            'data': text
+            'reason': text
         })
 
-    def send_ack(self, token):
-        self.send({
+    async def send_ack(self, token):
+        await self.send({
             '$': {
                 'token': token,
                 'type': CALL_ACK_MESSAGE
             }
         })
 
-    def send(self, payload):
+    async def send(self, payload):
         for client in self.clients:
             if client.closed:
                 log.warning(
                     'Attempted to send into a closed socket {0}'
                     .format(client))
                 continue
-            log.warning('Sending {0} to {1}'.format(payload, client))
-            client.send_str(json.dumps(payload))
+            log.info('Enqueuing {0} for {1}'.format(payload, client))
+            await self.send_queue.put((client, payload))

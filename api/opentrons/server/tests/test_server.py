@@ -94,11 +94,11 @@ async def test_invalid_call(session):
     await session.socket.send_json({})
     ack = await session.socket.receive_json()     # Receive ACK
     expected = {
-        'data': (
-            "Error handling request: KeyError: '$'\n"
+        'reason': (
+            "Bad request: KeyError: '$'\n"
             "Expected message format:\n"
             "{'$': {'token': string}, 'data': {'id': int}"),
-        '$': {'type': rpc.ERROR_MESSAGE}}
+        '$': {'type': rpc.CALL_NACK_MESSAGE}}
     assert ack == expected
 
 
@@ -106,8 +106,8 @@ async def test_exception_during_call(session):
     await session.socket.receive_json()
     await session.call()
     res = await session.socket.receive_json()
-    assert res.pop('$') == {'type': rpc.ERROR_MESSAGE}
-    assert res.pop('data').startswith('Error handling request')
+    assert res.pop('$') == {'type': rpc.CALL_NACK_MESSAGE}
+    assert res.pop('reason').startswith('Bad request')
     assert res == {}
 
 

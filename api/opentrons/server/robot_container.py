@@ -11,10 +11,10 @@ log = logging.getLogger(__name__)
 
 
 class RobotContainer(object):
-    def __init__(self, loop=None):
+    def __init__(self, loop=None, filters=['add-command']):
         self.loop = loop or asyncio.get_event_loop()
-        self.protocol_text = None
-        self.filters = set()
+        self.protocol = None
+        self.update_filters(filters)
 
         self.notifications = Queue(loop=self.loop)
         EventBroker.get_instance().add(self.notify)
@@ -23,9 +23,14 @@ class RobotContainer(object):
         def update():
             self.filters = set(filters)
 
-        if asyncio.get_event_loop() != self.loop:
-            self.loop.call_soon_threadsafe(update)
-        else:
+        try:
+            if asyncio.get_event_loop() != self.loop:
+                self.loop.call_soon_threadsafe(update)
+            else:
+                update()
+        except RuntimeError:
+            # If running tests and event loop is not set
+            # get_event_loop will throw a RuntimeError
             update()
 
     def notify(self, info):
@@ -33,7 +38,8 @@ class RobotContainer(object):
             return
 
         # Use this to turn self into it's id so we don't
-        # end up serializing every object who's method triggered the event
+        # end up serializing every object who's method
+        # triggered the event
         arguments = info.get('arguments', {})
         if 'self' in arguments:
             arguments['self_id'] = arguments.pop('self')
@@ -50,16 +56,15 @@ class RobotContainer(object):
         _robot = self.new_robot()
         robot.__dict__ = {**_robot.__dict__}
 
-    def run(self, devicename=None, filters=['add-command']):
+    def run(self, devicename=None):
         from opentrons import robot
-        self.update_filters(filters)
         self.reset_robot(robot)
 
         if devicename is not None:
             robot.connect(devicename)
 
         try:
-            exec(self.protocol_text, {})
+            exec(self.protocol, {})
         finally:
             robot.disconnect()
 
@@ -70,9 +75,15 @@ class RobotContainer(object):
 
     def load_protocol(self, text, filename):
         tree = ast.parse(text)
-        compile(tree, filename=filename, mode='exec')
-        self.protocol_text = text
-        return self.run(filters=[])
+        self.protocol = compile(tree, filename=filename, mode='exec')
+        # Suppress all notifications during protocol simulation
+        try:
+            _filters = self.filters
+            self.update_filters([])
+            res = self.run()
+        finally:
+            self.update_filters(_filters)
+            return res
 
     def load_protocol_file(self, filename):
         with open(filename) as file:
@@ -84,9 +95,6 @@ class RobotContainer(object):
 
     async def __anext__(self):
         return await self.notifications.get()
-
-    def set_loop(self, loop):
-        self.loop = loop
 
     def finalize(self):
         log.info('Finalizing RobotContainer')

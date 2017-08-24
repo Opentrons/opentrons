@@ -36,8 +36,13 @@ async def test_notifications(session, robot_container, protocol):
     # 50 responses we've got, and confirm that all are notifications
     # which means that async calls are working and the actual
     # call hasn't returned yet, but notifications are coming in
-    for i in range(10):
-        responses.append(await session.socket.receive_json())
+    while True:
+        res = await session.socket.receive_json()
+        if (res['$']['type'] == rpc.CALL_RESULT_MESSAGE):
+            break
 
+        responses.append(res)
+
+    print(len(responses))
     assert all([
         res['$']['type'] == rpc.NOTIFICATION_MESSAGE for res in responses])
