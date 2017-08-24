@@ -16,6 +16,9 @@ describe('robot reducer', () => {
         '../../../../api/opentrons/server/tests/data/dinosaur.py'
       ),
       protocolError: null,
+      pauseRequest: {inProgress: false, error: null},
+      resumeRequest: {inProgress: false, error: null},
+      cancelRequest: {inProgress: false, error: null},
       isConnected: false,
       isRunning: false,
       currentCommand: -1,
@@ -115,6 +118,115 @@ describe('robot reducer', () => {
     expect(reducer(state, action)).toEqual({
       runRequest: {inProgress: false, error: new Error('AH')},
       isRunning: false
+    })
+  })
+
+  test('handles pause action', () => {
+    const state = {pauseRequest: {inProgress: false, error: new Error('AHHH')}}
+    const action = {type: actionTypes.PAUSE}
+
+    expect(reducer(state, action)).toEqual({
+      pauseRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles pauseResponse success', () => {
+    const state = {
+      pauseRequest: {inProgress: true, error: null},
+      isPaused: false
+    }
+    const action = {type: actionTypes.PAUSE_RESPONSE, error: null}
+
+    expect(reducer(state, action)).toEqual({
+      pauseRequest: {inProgress: false, error: null},
+      isPaused: true
+    })
+  })
+
+  test('handles pauseResponse failure', () => {
+    const state = {
+      pauseRequest: {inProgress: true, error: null},
+      isPaused: false
+    }
+    const action = {type: actionTypes.PAUSE_RESPONSE, error: new Error('AH')}
+
+    expect(reducer(state, action)).toEqual({
+      pauseRequest: {inProgress: false, error: new Error('AH')},
+      isPaused: false
+    })
+  })
+
+  test('handles resume action', () => {
+    const state = {resumeRequest: {inProgress: false, error: new Error('AHHH')}}
+    const action = {type: actionTypes.RESUME}
+
+    expect(reducer(state, action)).toEqual({
+      resumeRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles resumeResponse success', () => {
+    const state = {
+      resumeRequest: {inProgress: true, error: null},
+      isPaused: true
+    }
+    const action = {type: actionTypes.RESUME_RESPONSE, error: null}
+
+    expect(reducer(state, action)).toEqual({
+      resumeRequest: {inProgress: false, error: null},
+      isPaused: false
+    })
+  })
+
+  test('handles resumeResponse failure', () => {
+    const state = {
+      resumeRequest: {inProgress: true, error: null},
+      isPaused: true
+    }
+    const action = {type: actionTypes.RESUME_RESPONSE, error: new Error('AH')}
+
+    expect(reducer(state, action)).toEqual({
+      resumeRequest: {inProgress: false, error: new Error('AH')},
+      isPaused: true
+    })
+  })
+
+  test('handles cancel action', () => {
+    const state = {cancelRequest: {inProgress: false, error: new Error('AHHH')}}
+    const action = {type: actionTypes.CANCEL}
+
+    expect(reducer(state, action)).toEqual({
+      cancelRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles cancelResponse success', () => {
+    const state = {
+      cancelRequest: {inProgress: true, error: null},
+      isRunning: true,
+      isPaused: true
+    }
+    const action = {type: actionTypes.CANCEL_RESPONSE, error: null}
+
+    expect(reducer(state, action)).toEqual({
+      cancelRequest: {inProgress: false, error: null},
+      isRunning: false,
+      isPaused: false
+    })
+  })
+
+  test('handles cancelResponse failure', () => {
+    const state = {
+      cancelRequest: {inProgress: true, error: null},
+      isRunning: true,
+      isPaused: true
+    }
+    const action = {type: actionTypes.CANCEL_RESPONSE, error: new Error('AH')}
+
+    expect(reducer(state, action)).toEqual({
+      cancelRequest: {inProgress: false, error: new Error('AH')},
+      isRunning: true,
+      isPaused: true
     })
   })
 

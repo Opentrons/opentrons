@@ -74,6 +74,57 @@ describe('robot effects', () => {
 
     expect(actions.runResponse(new Error('AHHH'))).toEqual(expected)
   })
+
+  test('pause action', () => {
+    const expected = {
+      type: actionTypes.PAUSE,
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.pause()).toEqual(expected)
+  })
+
+  test('pause response action', () => {
+    const expected = {
+      type: actionTypes.PAUSE_RESPONSE,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.pauseResponse(new Error('AHHH'))).toEqual(expected)
+  })
+
+  test('resume action', () => {
+    const expected = {
+      type: actionTypes.RESUME,
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.resume()).toEqual(expected)
+  })
+
+  test('resume response action', () => {
+    const expected = {
+      type: actionTypes.RESUME_RESPONSE,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.resumeResponse(new Error('AHHH'))).toEqual(expected)
+  })
+
+  test('cancel action', () => {
+    const expected = {type: actionTypes.CANCEL}
+
+    expect(actions.cancel()).toEqual(expected)
+  })
+
+  test('cancel response action', () => {
+    const expected = {
+      type: actionTypes.CANCEL_RESPONSE,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.cancelResponse(new Error('AHHH'))).toEqual(expected)
+  })
 })
 
 describe('robot actions', () => {

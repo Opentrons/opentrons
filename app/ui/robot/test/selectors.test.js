@@ -11,7 +11,7 @@ const {
 
 describe('robot selectors', () => {
   test('getProtocolFile and getProtocolName', () => {
-    const state = {protocol: '/path/to/some/protocol/foobar.py'}
+    const state = makeState({protocol: '/path/to/some/protocol/foobar.py'})
     expect(getProtocolFile(state)).toBe('/path/to/some/protocol/foobar.py')
     expect(getProtocolName(state)).toBe('foobar.py')
   })
