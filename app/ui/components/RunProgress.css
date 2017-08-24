@@ -1,19 +1,19 @@
-.bar_wrapper{
-	border:1px solid grey;
-	width:100%;
-	overflow:hidden;
+.bar_wrapper {
+  border: 1px solid grey;
+  width: 100%;
+  overflow: hidden;
 }
 
-.bar{
-	background-color: blue;
-	height:100%;
+.bar {
+  background-color: blue;
+  height: 100%;
 }
 
-.paused_bar{
-	background-color: grey;
+.paused_bar {
+  background-color: grey;
 }
 
-.error_bar{
-	background-color: red;
+.error_bar {
+  background-color: red;
 }
 
