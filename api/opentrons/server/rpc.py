@@ -246,12 +246,14 @@ class Server(object):
     async def process(self, message):
         try:
             if message.type == aiohttp.WSMsgType.TEXT:
+                data = json.loads(message.data)
+                token = data.pop('$')['token']
                 try:
-                    func, token = self.prepare_call(message)
+                    func = self.prepare_call(data)
                     # Acknowledge the call
                     self.send_ack(token)
                 except Exception as e:
-                    self.send_error('Bad request: ' + str(e))
+                    self.send_error(str(e), token)
                 else:
                     self.make_call(func, token)
             elif message.type == aiohttp.WSMsgType.ERROR:
@@ -261,23 +263,17 @@ class Server(object):
         except Exception as e:
             log.error('While processing request: {0}'.format(str(e)))
 
-    def prepare_call(self, message):
+    def prepare_call(self, data):
         try:
-            data = json.loads(message.data)
-            token = data.pop('$')['token']
             _id = data.pop('id', None)
             func = self.build_call(_id, **data)
         except Exception as e:
             log.warning('While preparing call: {0}'.format(
                 traceback.format_exc()))
             details = '{0}: {1}'.format(e.__class__.__name__, str(e))
-            error = ("{details}\n"
-                     "Expected message format:\n"
-                     "{{'$': {{'token': string}}, 'data': {{'id': int}}") \
-                .format(details=details)
-            raise RuntimeError(error)
+            raise RuntimeError(details)
 
-        return (func, token)
+        return func
 
     def make_call(self, func, token):
         response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
@@ -307,9 +303,10 @@ class Server(object):
             self.exec_loop)
         future.add_done_callback(resolved)
 
-    def send_error(self, text):
+    def send_error(self, text, token):
         self.send({
             '$': {
+                'token': token,
                 'type': CALL_NACK_MESSAGE
             },
             'reason': text

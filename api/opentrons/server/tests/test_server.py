@@ -89,25 +89,15 @@ async def test_init(session):
     assert res == expected
 
 
-async def test_invalid_call(session):
-    await session.socket.receive_json()
-    await session.socket.send_json({})
-    ack = await session.socket.receive_json()     # Receive ACK
-    expected = {
-        'reason': (
-            "Bad request: KeyError: '$'\n"
-            "Expected message format:\n"
-            "{'$': {'token': string}, 'data': {'id': int}"),
-        '$': {'type': rpc.CALL_NACK_MESSAGE}}
-    assert ack == expected
-
-
 async def test_exception_during_call(session):
     await session.socket.receive_json()
     await session.call()
     res = await session.socket.receive_json()
-    assert res.pop('$') == {'type': rpc.CALL_NACK_MESSAGE}
-    assert res.pop('reason').startswith('Bad request')
+    assert res.pop('$') == {
+        'type': rpc.CALL_NACK_MESSAGE,
+        'token': session.token
+    }
+    assert res.pop('reason').startswith('TypeError: build_call()')
     assert res == {}
 
 
