@@ -19,6 +19,7 @@ body {
     "sidebar controls controls" 200px
     "sidebar task task" 500px;
   grid-template-columns: 40px 1fr 1fr;
+  position:fixed;
 }
 
 .open {
