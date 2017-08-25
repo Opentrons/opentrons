@@ -82,12 +82,6 @@ export const selectors = {
     }))
   },
 
-  getCurrentCommand (allState) {
-    const state = getModuleState(allState)
-    const currentCommand = state.currentCommand
-    return currentCommand
-  },
-
   getRunProgress (allState) {
     const state = getModuleState(allState)
 

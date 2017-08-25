@@ -5,20 +5,25 @@ import styles from './RunLog.css'
 
 export default class RunLog extends Component {
   componentDidUpdate () {
-    const currentCommand = this.props.currentCommand
-    if (this.refs[currentCommand]) {
-      this.refs[currentCommand].scrollIntoView(true)
-    }
+    this.refs['ensureVisible'].scrollIntoView(true)
   }
 
   render () {
     const { style, commands } = this.props
+    const commandItems = commands.map((command) => {
+      const {id, isCurrent, description} = command
+      const props = {
+        key: id,
+        className: classnames({[styles.current]: isCurrent})
+      }
+      // TODO: add ability to turn autoscroll on and off
+      if (isCurrent) props.ref = 'ensureVisible'
+
+      return (<p {...props}>[{id}] : {description}</p>)
+    })
     return (
       <main className={classnames(style, styles.wrapper)}>
-        {commands.map((command, index) =>
-          <p key={command.id} ref={index} className={classnames({[styles.current]: command.isCurrent})}>[{command.id}] : {command.description}
-          </p>
-        )}
+        {commandItems}
       </main>
     )
   }

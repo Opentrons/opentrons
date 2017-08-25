@@ -17,7 +17,6 @@ export default function App (props) {
     errors,
     protocolName,
     commands,
-    currentCommand,
     // handlers
     onRunClick,
     onNavClick

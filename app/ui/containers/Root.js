@@ -29,7 +29,6 @@ const mapStateToProps = (state) => {
     // protocol
     protocolName: robotSelectors.getProtocolName(state),
     commands: robotSelectors.getCommands(state),
-    currentCommand: robotSelectors.getCurrentCommand(state),
     runProgress: robotSelectors.getRunProgress(state),
 
     // TODO(mc): remove development hardcoded values
