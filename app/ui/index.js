@@ -37,11 +37,11 @@ const store = createStore(reducer, middleware)
 
 const render = (Component) => ReactDom.render(
   (
-    <Provider store={store}>
-      <AppContainer>
-        <Component store={store} />
-      </AppContainer>
-    </Provider>
+    <AppContainer>
+      <Provider store={store}>
+        <Component />
+      </Provider>
+    </AppContainer>
   ),
   document.getElementById('root')
 )

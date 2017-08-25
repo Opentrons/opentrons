@@ -124,7 +124,10 @@
     ]
   },
   "stylelint": {
-    "extends": "stylelint-config-standard",
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-config-css-modules"
+    ],
     "ignoreFiles": [
       "**/dist/**",
       "**/coverage/**"
@@ -183,6 +186,7 @@
     "standard": "^10.0.3",
     "style-loader": "^0.18.1",
     "stylelint": "~8.0.0",
+    "stylelint-config-css-modules": "^1.1.0",
     "stylelint-config-standard": "^17.0.0",
     "url-loader": "^0.5.8",
     "webpack": "^2.6.1",
@@ -201,8 +205,8 @@
     "moment-timezone": "^0.5.13",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-hot-loader": "3.0.0-beta.6",
-    "react-redux": "^5.0.5",
+    "react-hot-loader": "3.0.0-beta.5",
+    "react-redux": "^5.0.6",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
     "react-router-redux": "^5.0.0-alpha.6",
