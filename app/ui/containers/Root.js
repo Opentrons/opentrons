@@ -12,7 +12,7 @@ import {
   selectors as robotSelectors
 } from '../robot'
 
-import App from '../components/app'
+import App from '../components/App'
 
 const mapStateToProps = (state) => {
   return {
