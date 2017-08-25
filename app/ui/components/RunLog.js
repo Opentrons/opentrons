@@ -22,9 +22,9 @@ export default class RunLog extends Component {
       return (<p {...props}>[{id}] : {description}</p>)
     })
     return (
-      <main className={classnames(style, styles.wrapper)}>
+      <section className={classnames(style, styles.wrapper)}>
         {commandItems}
-      </main>
+      </section>
     )
   }
 }
@@ -37,6 +37,5 @@ RunLog.propTypes = {
   isConnected: PropTypes.bool.isRequired,
   // TODO(mc, 2017-08-23): use PropTypes.shape (or whatever that method is)
   // instead of object
-  commands: PropTypes.arrayOf(PropTypes.object).isRequired,
-  currentCommand: PropTypes.number.isRequired
+  commands: PropTypes.arrayOf(PropTypes.object).isRequired
 }
