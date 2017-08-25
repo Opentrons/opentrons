@@ -644,28 +644,28 @@ class Robot(object):
         # TODO: dynamically figure out robot rows
         return 3
 
+    def add_slots_to_deck(self):
+        robot_rows = self.get_max_robot_rows()
+        row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
+
+        for col_index, col in enumerate('ABCDE'):
+            for row_index, row in enumerate(range(1, robot_rows + 1)):
+                properties = {
+                    'width': col_offset,
+                    'length': row_offset,
+                    'height': 0
+                }
+                slot = containers.Slot(properties=properties)
+                slot_coordinates = (
+                    (col_offset * col_index) + x_offset,
+                    (row_offset * row_index) + y_offset,
+                    0  # TODO: should z always be zero?
+                )
+                slot_name = "{}{}".format(col, row)
+                self._deck.add(slot, slot_name, slot_coordinates)
+
     def setup_deck(self):
-        def setup_deck_slots():
-            robot_rows = self.get_max_robot_rows()
-            row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
-
-            for col_index, col in enumerate('ABCDE'):
-                for row_index, row in enumerate(range(1, robot_rows + 1)):
-                    properties = {
-                        'width': col_offset,
-                        'length': row_offset,
-                        'height': 0
-                    }
-                    slot = containers.Slot(properties=properties)
-                    slot_coordinates = (
-                        (col_offset * col_index) + x_offset,
-                        (row_offset * row_index) + y_offset,
-                        0  # TODO: should z always be zero?
-                    )
-                    slot_name = "{}{}".format(col, row)
-                    self._deck.add(slot, slot_name, slot_coordinates)
-        setup_deck_slots()
-
+        self.add_slots_to_deck()
         # Setup Deck as root object for position tracker
         self.position_tracker.create_root_object(
             self._deck, *self._deck.coordinates()
