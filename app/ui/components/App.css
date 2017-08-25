@@ -1,0 +1,70 @@
+/* TODO: Move Resets and Typography to global css file */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.run_wrapper {
+  display: grid;
+  width: 1024px;
+  height: 768px;
+  grid-template:
+    "head head head" 68px
+    "sidebar controls controls" 200px
+    "sidebar task task" 500px;
+  grid-template-columns: 40px 1fr 1fr;
+}
+
+.open {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.menu {
+  grid-area: head;
+  background-color: #666;
+  display: grid;
+  grid-template-columns: 40px auto auto 10rem;
+  grid-template-areas: "nav . . run";
+}
+
+.toggle_nav {
+  grid-area: nav;
+  margin: 1rem 0.25rem;
+  font-size: 1.5rem;
+  color: white;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  display: grid;
+  overflow: hidden;
+  border-right: 1px solid silver;
+  grid-template:
+    "." auto
+    "connect" 150px;
+}
+
+.run {
+  grid-area: run;
+  margin: 1rem;
+}
+
+.run_controls {
+  grid-area: controls;
+  background-color: #ddd;
+  display: grid;
+  grid-template-rows: 4rem 4rem auto;
+}
+
+.task {
+  grid-area: task;
+  background-color: #efefef;
+}

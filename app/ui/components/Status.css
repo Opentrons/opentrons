@@ -1,9 +1,0 @@
-.title{
-  composes: title from './Util.css';
-}
-
-.log{
-  height: 78px;
-  padding-left: 20px;
-  overflow-y: scroll;
-}

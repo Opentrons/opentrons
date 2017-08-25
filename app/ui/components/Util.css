@@ -2,7 +2,7 @@
 @value teal: #05C1B3;
 @value mustard: #FFD252;
 @value green: #7ed321;
-
+@value red: #F00000;
 @value small: (max-width: 599px);
 @value medium: (min-width: 600px) and (max-width: 959px);
 @value large: (min-width: 960px);
@@ -21,25 +21,25 @@
   font-style: normal;
 }
 
-button{
-  border:none;
+button {
+  border: none;
 }
 
-button:focus {outline:0;}
+button:focus { outline: 0; }
 
 /*************************
           Globals
 *************************/
-.well{
+.well {
   background-color: #ecebeb;
   border-radius: 3px;
 }
 
-.btn{
+.btn {
   padding: 5px;
   border-radius: 2px;
   line-height: 21px;
-  background-color: #EEE;
+  background-color: #eee;
   color: #666;
   font-family: 'trons';
   font-size: 14px;
@@ -47,7 +47,7 @@ button:focus {outline:0;}
   cursor: pointer;
 }
 
-.btn:hover{
+.btn:hover {
   background-color: #898989;
 }
 
@@ -56,22 +56,20 @@ button:focus {outline:0;}
   border: none;
 }
 
-.disabled{
-  color:#888;
-  background-color: #AAA;
+.disabled {
+  color: #888;
+  background-color: #aaa;
   pointer-events: none;
 }
 
-
-
-
-.title{
+.title {
   font-family: 'sans';
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2px;
   margin: 20px;
+
   /* margin: 38px 20px 20px; */
   color: #9b9b9b;
 }

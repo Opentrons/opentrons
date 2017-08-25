@@ -1,0 +1,14 @@
+.wrapper {
+  font-family: 'sans';
+  overflow-y: scroll;
+  height: 100%;
+  padding: 1rem;
+}
+
+.wrapper p {
+  margin: 0.5rem 0;
+}
+
+.current {
+  color: #006fff;
+}

@@ -1,15 +1,15 @@
-body{
+body {
   margin: 0 auto;
   padding: 0;
   width: 1024px;
   height: 768px;
 }
 
-*{
+* {
   margin: 0;
   padding: 0;
 }
 
-button{
+button {
   border: none;
 }

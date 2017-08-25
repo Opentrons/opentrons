@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import styles from './RunNotifications.css'
 
 const ErrorNotification = props => {
@@ -46,4 +47,10 @@ export default function RunNotifications (props) {
     notification = <PausedNotification />
   }
   return notification
+}
+
+RunNotifications.propTypes = {
+  isPaused: PropTypes.bool.isRequired,
+  hasError: PropTypes.bool.isRequired,
+  errors: PropTypes.array
 }

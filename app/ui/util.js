@@ -1,26 +1,25 @@
-module.exports = {
-  getUserEmail,
-  getUserId,
-  getUserProfile,
-  isAuthenticated,
-}
+// utility functions
 
-function getUserId () {
+export function getUserId () {
   return getUserProfile().user_id || null
 }
 
-function getUserEmail () {
+export function getUserEmail () {
   return getUserProfile().email || null
 }
 
-function getUserProfile () {
+export function getUserProfile () {
   return JSON.parse(localStorage.getItem('profile') || '{}')
 }
 
-function isAuthenticated () {
+export function isAuthenticated () {
   const profile = localStorage.getItem('profile')
   const idToken = localStorage.getItem('id_token')
   if (profile == null) return false
   if (idToken == null) return false
   return true
+}
+
+export function makeActionName (moduleName, actionName) {
+  return `${moduleName}:${actionName}`
 }

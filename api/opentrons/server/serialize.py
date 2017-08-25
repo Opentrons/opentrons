@@ -4,7 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _get_object_tree(shallow, path, refs, depth, obj):  # noqa (TODO. Complexity is 11)
+def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa (TODO. Complexity is 11)
 
     def object_container(value):
         # Save id of instance of object's type as a reference too
@@ -25,12 +25,13 @@ def _get_object_tree(shallow, path, refs, depth, obj):  # noqa (TODO. Complexity
 
     # Shorthand for calling ourselves recursively
     object_tree = functools.partial(
-        _get_object_tree, shallow, path, refs, depth+1)
+        _get_object_tree, max_depth, path, refs, depth+1)
 
     path += [id(obj)]
 
-    # If shallow, go only one level deep
-    if depth > 0 and shallow:
+    # Cut-off at max_depth
+    # If max_depth == 0 (evaluates to False) — keep going
+    if max_depth and (depth >= max_depth):
         return {}
 
     if isinstance(obj, (list, tuple)):
@@ -55,7 +56,7 @@ def _get_object_tree(shallow, path, refs, depth, obj):  # noqa (TODO. Complexity
         return object_container({})
 
 
-def get_object_tree(obj, shallow=False):
+def get_object_tree(obj, max_depth=0):
     refs = {}
-    tree = _get_object_tree(shallow, [], refs, 0, obj)
+    tree = _get_object_tree(max_depth, [], refs, 0, obj)
     return (tree, refs)

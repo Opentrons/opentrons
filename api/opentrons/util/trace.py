@@ -43,7 +43,7 @@ def traceable(*args):
         name = f.__qualname__
         return _traceable(f)
     else:
-        # Event name is overriden:
+        # Event name is overridden:
         # @traceable('event-foo')
         # def foo()
         name, = args
