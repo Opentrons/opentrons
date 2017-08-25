@@ -62,9 +62,6 @@ endif
 test: test-unit
 	$(MAKE) lint
 
-test-e2e: build
-	npm run test-e2e
-
 test-unit:
 	$(ENV)=test $(BIN)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
