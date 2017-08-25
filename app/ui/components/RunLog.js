@@ -5,7 +5,7 @@ import styles from './RunLog.css'
 
 export default class RunLog extends Component {
   componentDidUpdate () {
-    this.refs['ensureVisible'].scrollIntoViewIfNeeded()
+    this.refs['ensureVisible'].scrollIntoView(true)
   }
 
   render () {
