@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import styles from './Upload.css'
 
 export default class Upload extends Component {

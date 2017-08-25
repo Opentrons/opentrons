@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './RunLog.css'
 
 export default class RunLog extends Component {
-  componentWillUpdate () {
+  componentDidUpdate () {
     const currentCommand = this.props.currentCommand
     if (this.refs[currentCommand]) {
       this.refs[currentCommand].scrollIntoView(true)
