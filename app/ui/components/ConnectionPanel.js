@@ -5,7 +5,7 @@ import Button from './Button'
 import styles from './ConnectionPanel.css'
 
 const ConnectionIndicator = props => {
-  const {isConnected} = props
+  const {isConnected, onNavClick} = props
 
   // TODO(mc): handle connection in progress (state is in place for this)
   const style = isConnected
@@ -13,7 +13,7 @@ const ConnectionIndicator = props => {
     : styles.disconnected
 
   return (
-    <div className={styles.connection_status}>
+    <div className={styles.connection_status} onClick={onNavClick}>
       <div className={styles.status}>
         <div className={style} />
       </div>

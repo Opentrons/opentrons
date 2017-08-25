@@ -10,6 +10,7 @@
 
 .connection_status {
   border-right: 1px solid silver;
+  cursor: pointer;
 }
 
 .status {
