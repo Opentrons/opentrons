@@ -1,5 +1,4 @@
 import asyncio
-import pytest
 import time
 
 from opentrons.server import rpc

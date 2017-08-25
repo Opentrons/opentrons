@@ -1,8 +1,5 @@
-import asyncio
-import os
-import pytest
-
 from opentrons.server import rpc
+
 
 async def test_notifications(session, robot_container, protocol):
     session.server.root = robot_container

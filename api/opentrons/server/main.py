@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import argparse
 import re
 import sys
 import logging
@@ -41,7 +40,6 @@ log = logging.getLogger(__name__)
 
 
 def parse_address(address):
-    error_message = 'Invalid address: {0}'.format(address)
     match = re.fullmatch(
         '^(\d+)\.(\d+)\.(\d+)\.(\d+)(:(?P<port>\d+))?$', address)
     if not match:
@@ -60,8 +58,8 @@ def parse_address(address):
 def parse_command_line(argv):
     try:
         address = '127.0.0.1:31950' if len(argv) != 2 else argv[1]
-    except:
-        raise Exception('Invalid address: {0}'.format(address))
+    except Exception as e:
+        raise Exception('Invalid address: {0} ({1})'.format(address, str(e)))
 
     return parse_address(address)
 
@@ -71,11 +69,10 @@ if __name__ == "__main__":
         host, port = parse_command_line(sys.argv)
     except Exception as e:
         print(str(e))
-        exit(code)
+        exit(1)
 
     server = Server(RobotContainer())
     print(
         'Started Opentrons API Server listening at ws://{host}:{port}/'
         .format(host=host, port=port))
     server.start(host, port)
-

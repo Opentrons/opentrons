@@ -7,7 +7,6 @@ from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import traceable
-from opentrons.util.trace import EventBroker
 
 
 log = get_logger(__name__)
