@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import argparse
+import re
 import sys
 import logging
 from opentrons.server.rpc import Server
@@ -38,36 +40,42 @@ dictConfig(logging_config)
 log = logging.getLogger(__name__)
 
 
-def main():
-    kwargs = {'host': '127.0.0.1', 'port': 31950}
-    # TODO(artyom, 08/11/2017)
-    # Refactor this into regex and proper use of
-    # command line argument parsing
-    if (len(sys.argv) == 2):
-        try:
-            address = sys.argv[1].split(':')
-            host, port, *_ = tuple(address + [])
-            # Check that our IP address is 4 octets in 0..255 range each
-            octets = list(filter(
-                lambda v: 0 <= v <= 255,
-                [int(octet) for octet in host.split('.')]))
-            if len(octets) != 4:
-                raise ValueError('Invalid octets: {0}'.format(octets))
-            kwargs = {'host': host, 'port': int(port)}
-        except Exception as e:
-            log.debug('While parsing IP address: {0}'.format(e))
-            print('Invalid address {0}.'.format(sys.argv[1]))
-            exit(1)
-    elif (len(sys.argv) > 2):
-        print('Too many arguments. Valid argument is IP:PORT')
-        exit(1)
+def parse_address(address):
+    error_message = 'Invalid address: {0}'.format(address)
+    match = re.fullmatch(
+        '^(\d+)\.(\d+)\.(\d+)\.(\d+)(:(?P<port>\d+))?$', address)
+    if not match:
+        raise ValueError('address')
 
-    server = Server(RobotContainer())
-    print(
-        'Started Opentrons API RPC Server listening at ws://{host}:{port}/'
-        .format(**kwargs))
-    server.start(**kwargs)
+    octets = [o for o in match.groups()[0:4] if 0 <= int(o) <= 255]
+    if len(octets) != 4:
+        raise ValueError('address')
+
+    port = match.groupdict().get('port', None)
+    if port:
+        port = int(port)
+    return ('.'.join(octets), port)
+
+
+def parse_command_line(argv):
+    try:
+        address = '127.0.0.1:31950' if len(argv) != 2 else argv[1]
+    except:
+        raise Exception('Invalid address: {0}'.format(address))
+
+    return parse_address(address)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        host, port = parse_command_line(sys.argv)
+    except Exception as e:
+        print(str(e))
+        exit(code)
+
+    server = Server(RobotContainer())
+    print(
+        'Started Opentrons API Server listening at ws://{host}:{port}/'
+        .format(host=host, port=port))
+    server.start(host, port)
+
