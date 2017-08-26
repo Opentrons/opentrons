@@ -1,29 +1,53 @@
 from functools import wraps
 import inspect
+import tempfile as tmpfs
+import os
+
+
+# TODO: Create a nice logging mechanism looking at messages.
+# This mechanism could be a constant write to a file (named using the topic)
+#  in the temp_fs that would just write every message. Maybe it would also enumerate them
+#  so they could be logically linked together during debugging.
+
+TEMP_FILES_PATH = '/Users/jaredgreene/OpenTrons/opentrons-api/api/opentrons'
+
+
+
 
 class MessageBroker(object):
     _instance = None
 
     def __init__(self):
-        self.topics = {}
+        self.topics_and_funcs = {}
+        self.topic_temp_files = {}
+        self.topic_temp_files['topics']      = tmpfs.NamedTemporaryFile(prefix='Topics_', dir='.')
+        self.topic_temp_files['subscribers'] = tmpfs.NamedTemporaryFile(prefix='Subscribers_', dir='.')
+
+    def write_to_temp_file(self, topic, msg):
+        file = self.topic_temp_files[topic].file
+        file.write((str(msg) + '\n').encode())
+        file.flush()
 
     def subscribe(self, topic, func):
-        if topic in self.topics:
-            self.topics.get(topic).append(func)
+        subscription_info = topic + ': ' + repr(func)
+        self.write_to_temp_file('subscribers', subscription_info)
+        if topic in self.topics_and_funcs:
+            self.topics_and_funcs.get(topic).append(func)
         else:
-            self.topics[topic] = [func]
+            self.topics_and_funcs[topic] = [func]
+            self.write_to_temp_file('topics', topic)
+            self.topic_temp_files[topic] = tmpfs.NamedTemporaryFile(prefix= topic +'_', dir='.')
+
 
     def remove(self, topic, func):
         self.listeners[topic].remove(func)
 
     def publish(self, topic, message):
-        print("Topic: {}\nMessage: {}".format(topic, message))
-        if topic not in self.topics:
-            print("NO topic ", topic)
+        if topic not in self.topics_and_funcs:
             return
-        for subscriber in self.topics[topic]:
+        self.write_to_temp_file(topic, message)
+        for subscriber in self.topics_and_funcs[topic]:
             subscriber(message)
-        print(message)
 
 
     @classmethod
