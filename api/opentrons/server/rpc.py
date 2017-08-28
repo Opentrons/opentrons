@@ -8,7 +8,6 @@ import traceback
 from aiohttp import web
 from aiohttp import WSCloseCode
 from asyncio import Queue
-from concurrent import futures
 from opentrons.server import serialize
 from threading import Thread
 from threading import current_thread

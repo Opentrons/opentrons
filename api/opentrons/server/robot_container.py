@@ -32,6 +32,7 @@ class RobotContainer(object):
 
         # If same thread, just call the function,
         # without wrapping it into threadsafe call
+        # to prevent freezing during test run
         if self.same_thread():
             update()
         else:
