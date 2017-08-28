@@ -17,34 +17,34 @@ function addMenu () {
       { type: 'separator' },
       { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() } }
     ]},
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Download Logs',
-          click () { downloadLogs() }
-        },
-        {
-          label: 'Open Containers Folder',
-          click () { openContainersFolder() }
-        },
-        {
-          label: 'Enable Auto Updating this App',
-          type: 'checkbox',
-          checked: getSetting('autoUpdate'),
-          click () { toggleSetting('autoUpdate') }
-        },
-        {
-          label: 'Enable Anonymous Crash Reporting',
-          type: 'checkbox',
-          checked: getSetting('crashReport'),
-          click () { toggleSetting('crashReport') }
-        }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Download Logs',
+        click () { downloadLogs() }
+      },
+      {
+        label: 'Open Containers Folder',
+        click () { openContainersFolder() }
+      },
+      {
+        label: 'Enable Auto Updating this App',
+        type: 'checkbox',
+        checked: getSetting('autoUpdate'),
+        click () { toggleSetting('autoUpdate') }
+      },
+      {
+        label: 'Enable Anonymous Crash Reporting',
+        type: 'checkbox',
+        checked: getSetting('crashReport'),
+        click () { toggleSetting('crashReport') }
+      }
+    ]
+  },
+  {
+    label: 'Edit',
+    submenu: [
         { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
         { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' },
         { type: 'separator' },
@@ -52,25 +52,25 @@ function addMenu () {
         { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
         { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
         { label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
-      ]
-    },
-    {
-      label: 'Help',
-      submenu: [
-        {
-          label: 'Open API Documentation',
-          click () { electron.shell.openExternal('http://docs.opentrons.com') }
-        },
-        {
-          label: 'Open Getting Started',
-          click () { electron.shell.openExternal('https://opentrons.com/getting-started') }
-        },
-        {
-          label: 'Log an Issue',
-          click () { electron.shell.openExternal('https://github.com/OpenTrons/opentrons-app/issues/new') }
-        }
-      ]
-    }
+    ]
+  },
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'Open API Documentation',
+        click () { electron.shell.openExternal('http://docs.opentrons.com') }
+      },
+      {
+        label: 'Open Getting Started',
+        click () { electron.shell.openExternal('https://opentrons.com/getting-started') }
+      },
+      {
+        label: 'Log an Issue',
+        click () { electron.shell.openExternal('https://github.com/OpenTrons/opentrons-app/issues/new') }
+      }
+    ]
+  }
   ]
 
   const menu = Menu.buildFromTemplate(template)

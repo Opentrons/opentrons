@@ -10,7 +10,7 @@ class ServerManager {
     this.processName = null
   }
 
-  start() {
+  start () {
     process.env['appVersion'] = app.getVersion()
 
     if (process.env.NODE_ENV === 'development') {

@@ -21,10 +21,12 @@ matrix:
             - icnsutils # electron-builder dependency
             - graphicsmagick # electron-builder dependency
             - xvfb
-    - os: osx
-      language: generic
-      env:
-        - DEPLOY_DIR="mac"
+    # TODO(mc, 2017-08-25): Disabled osx build in travis for now. Be sure to
+    # revisit OSX CI in the near future
+    # - os: osx
+    #   language: generic
+    #   env:
+    #     - DEPLOY_DIR="mac"
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
@@ -41,17 +43,17 @@ before_install:
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
   - pip install pyyaml coveralls
-  - cd api && make install && cd ..
-  - cd app && make install && cd ..
+  - make -C api install
+  - make -C app install
 
 script:
   - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
-  - cd api && make test exe && cd ..
+  - make -C api test exe
   - > # Make docs on linux only
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd api && make docs > /dev/null && cd ..) fi;
-  - cd app && make -j 2 build test && make package && cd ..
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
+  - make -C app -j 2 build test && make -C app package
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
