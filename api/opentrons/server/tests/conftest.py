@@ -1,38 +1,41 @@
-import logging
+# Uncomment to enable logging during tests
+# import logging
+# from logging.config import dictConfig
+
 import pytest
 import os
 
 from collections import namedtuple
-from logging.config import dictConfig
 from opentrons.server import rpc
 from uuid import uuid4 as uuid
 
-logging_config = dict(
-    version=1,
-    formatters={
-        'basic': {
-            'format':
-            '[Line %(lineno)s] %(message)s'
-        }
-    },
-    handlers={
-        'debug': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
-        }
-    },
-    loggers={
-        '__main__': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-        'opentrons.server': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-    }
-)
-dictConfig(logging_config)
+# Uncomment to enable logging during tests
+# logging_config = dict(
+#     version=1,
+#     formatters={
+#         'basic': {
+#             'format':
+#             '[Line %(lineno)s] %(message)s'
+#         }
+#     },
+#     handlers={
+#         'debug': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'basic',
+#         }
+#     },
+#     loggers={
+#         '__main__': {
+#             'handlers': ['debug'],
+#             'level': logging.DEBUG
+#         },
+#         'opentrons.server': {
+#             'handlers': ['debug'],
+#             'level': logging.DEBUG
+#         },
+#     }
+# )
+# dictConfig(logging_config)
 
 Session = namedtuple(
     'Session',
@@ -57,7 +60,9 @@ def protocol(request):
 @pytest.fixture
 def robot_container(loop, request):
     from opentrons.server import robot_container
-    container = robot_container.RobotContainer(loop=loop)
+    container = robot_container.RobotContainer(
+        loop=loop,
+        filters=['add-command', 'move-to'])
     yield container
     container.finalize()
 

@@ -7,7 +7,6 @@ import traceback
 
 from aiohttp import web
 from asyncio import Queue
-from concurrent import futures
 from opentrons.server import serialize
 from threading import Thread
 from threading import current_thread
@@ -297,6 +296,8 @@ class Server(object):
                     id(current_thread())))
                 self.send(response)
 
+        log.info('Scheduling a call from thread id {0}'
+                 .format(id(current_thread())))
         asyncio.run_coroutine_threadsafe(
             call(func),
             self.exec_loop)
