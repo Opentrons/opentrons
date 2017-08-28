@@ -89,7 +89,7 @@ def session(loop, test_client, request):
         return await socket.send_json(request)
 
     def finalizer():
-        server.stop()
+        server.shutdown()
 
     request.addfinalizer(finalizer)
     return Session(server, socket, token, call)

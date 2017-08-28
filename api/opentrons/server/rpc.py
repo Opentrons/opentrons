@@ -106,19 +106,25 @@ class Server(object):
             self._root.loop = self.loop
 
     def start(self, host, port):
+        self.app.on_shutdown.append(self.on_shutdown)
         # This call will block while server is running
         # run_app is capable of catching SIGINT and shutting down
         web.run_app(self.app, host=host, port=port)
-        self.stop()
 
-    def stop(self):
-        self.monitor_events_task.cancel()
+    def shutdown(self):
         self.send_loop_task.cancel()
+        self.monitor_events_task.cancel()
 
         if callable(getattr(self._root, 'finalize', None)):
             self.root.finalize()
 
         self.exec_loop.call_soon_threadsafe(self.exec_loop.stop)
+
+    async def on_shutdown(self, app):
+        for ws in self.clients:
+            await ws.close(code=WSCloseCode.GOING_AWAY,
+                           message='Server shutdown')
+        self.shutdown()
 
     async def send_loop(self):
         log.info('Starting send loop')
@@ -149,15 +155,13 @@ class Server(object):
 
     async def handler(self, request):
         """
-        Receives HTTP request and negotiates up to
-        a Websocket session
+        Receives HTTP request and negotiates up to a Websocket session
         """
         log.debug('Starting handler for request: {0}'.format(request))
         ws = web.WebSocketResponse()
 
         # upgrade to Websockets
         await ws.prepare(request)
-
         self.clients.append(ws)
 
         # Return instance of root object and instance of control box
@@ -176,18 +180,23 @@ class Server(object):
                 }
             })
 
-        # Async receive ws data until websocket is closed
-        async for msg in ws:
-            log.debug('Received: {0}'.format(msg))
-            try:
-                await self.process(msg)
-            except Exception as e:
-                await ws.close()
-                log.warning(
-                    'While processing message: {0}'
-                    .format(traceback.format_exc()))
-
-        self.clients.remove(ws)
+        try:
+            # Async receive ws data until websocket is closed
+            async for msg in ws:
+                log.debug('Received: {0}'.format(msg))
+                try:
+                    await self.process(msg)
+                except Exception as e:
+                    await ws.close()
+                    log.warning(
+                        'While processing message: {0}'
+                        .format(traceback.format_exc()))
+        except Exception as e:
+            log.error(
+                'While reading from socket: {0}'
+                .format(traceback.format_exc()))
+        finally:
+            self.clients.remove(ws)
 
         return ws
 
@@ -249,7 +258,6 @@ class Server(object):
                 token = data.pop('$')['token']
                 try:
                     func = self.prepare_call(data)
-                    # Acknowledge the call
                     self.send_ack(token)
                 except Exception as e:
                     self.send_error(str(e), token)
