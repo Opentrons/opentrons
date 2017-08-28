@@ -86,7 +86,6 @@ class Server(object):
             args=(self.exec_loop,))
         self.exec_thread.start()
 
-        # To be brought back once send queue is back
         self.send_loop_task = self.loop.create_task(self.send_loop())
 
         self.app = web.Application()
@@ -145,7 +144,7 @@ class Server(object):
                 data, refs = serialize.get_object_tree(
                     event,
                     self.notification_max_depth)
-                await self.send(
+                self.send(
                     {
                         '$': {'type': NOTIFICATION_MESSAGE},
                         'data': data
@@ -174,7 +173,7 @@ class Server(object):
             serialize.get_object_tree(self.control, max_depth=1)
         self.objects.update({**control_type_refs, **control_instance_refs})
 
-        await self.send(
+        self.send(
             {
                 '$': {'type': CONTROL_MESSAGE},
                 'control': {
@@ -263,9 +262,9 @@ class Server(object):
                     func = self.prepare_call(data)
                     self.send_ack(token)
                 except Exception as e:
-                    await self.send_error(str(e), token)
+                    self.send_error(str(e), token)
                 else:
-                    await self.make_call(func, token)
+                    self.make_call(func, token)
             elif message.type == aiohttp.WSMsgType.ERROR:
                 log.error(
                     'WebSocket connection closed unexpectedly: {0}'.format(
@@ -285,7 +284,7 @@ class Server(object):
 
         return func
 
-    async def make_call(self, func, token):
+    def make_call(self, func, token):
         response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
 
         async def call(func):
@@ -313,8 +312,8 @@ class Server(object):
             call(func),
             self.exec_loop)
 
-    async def send_error(self, text, token):
-        await self.send({
+    def send_error(self, text, token):
+        self.send({
             '$': {
                 'token': token,
                 'type': CALL_NACK_MESSAGE
@@ -322,15 +321,15 @@ class Server(object):
             'reason': text
         })
 
-    async def send_ack(self, token):
-        await self.send({
+    def send_ack(self, token):
+        self.send({
             '$': {
                 'token': token,
                 'type': CALL_ACK_MESSAGE
             }
         })
 
-    async def send(self, payload):
+    def send(self, payload):
         for client in self.clients:
             if client.closed:
                 log.warning(
