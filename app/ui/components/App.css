@@ -49,7 +49,7 @@ body {
   overflow: hidden;
   border-right: 1px solid silver;
   grid-template:
-    "." auto
+    "upload" auto
     "connect" 150px;
 }
 

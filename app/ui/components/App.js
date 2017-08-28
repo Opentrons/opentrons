@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './App.css'
+import UploadPanel from './UploadPanel'
 import ConnectionPanel from './ConnectionPanel'
 import Button from './Button'
 import RunControl from './RunControl'
@@ -11,12 +12,12 @@ export default function App (props) {
   const {
     // state
     isNavPanelOpen,
-    isConnected,
+    // isConnected,
     isReadyToRun,
     isRunning,
-    errors,
-    protocolName,
-    commands,
+    // errors,
+    // protocolName,
+    // commands,
     // handlers
     onRunClick,
     onNavClick
@@ -66,6 +67,7 @@ export default function App (props) {
         {runButton}
       </header>
       <aside className={styles.sidebar} >
+        <UploadPanel {...props} protocolName={'dino.py'} />
         <ConnectionPanel {...props} />
       </aside>
       {runControl}

@@ -9,7 +9,6 @@
 }
 
 .connection_status {
-  border-right: 1px solid silver;
   cursor: pointer;
 }
 
@@ -40,6 +39,7 @@
 
 .connect {
   padding: 0.5rem;
+  border-left: 1px solid silver;
 }
 
 .msg {
