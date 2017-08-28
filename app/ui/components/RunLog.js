@@ -1,18 +1,32 @@
-import React from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './RunLog.css'
 
-export default function RunLog (props) {
-  const {isConnected, style, commands} = props
+export default class RunLog extends Component {
+  componentDidUpdate () {
+    this.refs.ensureVisible.scrollIntoView(true)
+  }
 
-  return (
-    <main className={classnames(style, styles.wrapper)}>
-      {commands.map((command) =>
-        <p key={command.id} className={classnames({[styles.current]: command.isCurrent})}>[{command.id}] : {command.description}</p>
-      )}
-    </main>
-  )
+  render () {
+    const { style, commands } = this.props
+    const commandItems = commands.map((command) => {
+      const {id, isCurrent, description} = command
+      const props = {
+        key: id,
+        className: classnames({[styles.current]: isCurrent})
+      }
+      // TODO: add ability to turn autoscroll on and off
+      if (isCurrent) props.ref = 'ensureVisible'
+
+      return (<p {...props}>[{id}] : {description}</p>)
+    })
+    return (
+      <section className={classnames(style, styles.wrapper)}>
+        {commandItems}
+      </section>
+    )
+  }
 }
 
 /*
