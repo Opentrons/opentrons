@@ -26,6 +26,8 @@ class Pose(object):
     def __eq__(self, other):
         return (self._pose == other._pose).all()
 
+
+    #TODO: We might want to think about whether this will be communcative and if the behavior is obvious
     def __mul__(self, other):
         return self._pose.dot(other)
 
