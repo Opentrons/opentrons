@@ -143,3 +143,7 @@ class PositionTracker(object):
         delta_x, delta_y, delta_z = new_position.x - old_x, new_position.y - old_y, new_position.z - old_z
         self.translate_object(moved_object, delta_x, delta_y, delta_z)
 
+    def relative_object_position(self, target_object, reference_object):
+        tx, ty, tz = self[target_object].position
+        rx, ry, rz = self[reference_object].position
+        return (tx - rx, ty - ry, tz - rz)
