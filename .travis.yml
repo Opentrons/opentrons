@@ -42,9 +42,6 @@ before_install:
 
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
-  # TODO(mc, 2017-08-28): these should be in requirements.txt, but also are
-  # either pyyaml or coveralls needed anymore?
-  - pip install pyyaml coveralls
   - make install
 
 script:
