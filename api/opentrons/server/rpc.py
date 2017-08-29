@@ -22,9 +22,11 @@ CONTROL_MESSAGE = 3
 CALL_NACK_MESSAGE = 4
 
 
-# Wrapper class to dispatch select calls to server
-# without exposing the entire server class
 class ControlBox(object):
+    """
+    Wrapper class to dispatch select calls to server
+    without exposing the entire server class
+    """
     def __init__(self, server):
         self.server = server
 
