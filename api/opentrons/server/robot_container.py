@@ -7,7 +7,6 @@ from concurrent import futures
 from opentrons.robot.robot import Robot
 from opentrons.util.trace import EventBroker
 
-
 log = logging.getLogger(__name__)
 
 
@@ -15,16 +14,13 @@ class RobotContainer(object):
     def __init__(self, loop=None, filters=['add-command']):
         self.loop = loop or asyncio.get_event_loop()
         self.protocol = None
+        self.session = None
         self.update_filters(filters)
 
         self.notifications = Queue(loop=self.loop)
-        EventBroker.get_instance().add(self.notify)
 
-    def same_thread(self):
-        try:
-            return asyncio.get_event_loop() == self.loop
-        except RuntimeError:
-            return True
+        EventBroker.get_instance().add(self.notify)
+        EventBroker.get_instance().add(self.add_command)
 
     def update_filters(self, filters):
         def update():
@@ -38,6 +34,15 @@ class RobotContainer(object):
         else:
             self.loop.call_soon_threadsafe(update)
 
+    def add_command(self, info):
+        if self.session and info.get('name', '') == 'add-command':
+            # TODO(artyom, 2017-08-29): pass command object directly to
+            # add_to_log, once robot is capable of tracking
+            # command's nesting level in call tree and thus contains
+            # level as the first item of a tuple
+            item = (0, info['arguments']['command'])
+            self.session.add_to_log(item)
+
     def notify(self, info):
         if info.get('name', None) not in self.filters:
             return
@@ -49,8 +54,9 @@ class RobotContainer(object):
         if 'self' in arguments:
             arguments['self_id'] = arguments.pop('self')
 
+        payload = (info, self.session)
         future = asyncio.run_coroutine_threadsafe(
-                self.notifications.put(info), self.loop)
+                self.notifications.put(payload), self.loop)
 
         # If same thread, don't wait, will freeze otherwise
         if not self.same_thread():
@@ -73,11 +79,32 @@ class RobotContainer(object):
             robot.connect(devicename)
 
         try:
+            self.session.set_state('running')
             exec(self.protocol, {})
+            self.session.set_state('finished')
+        except Exception as e:
+            self.session.add_error(e)
+            self.session.set_state('error')
+            raise
         finally:
             robot.disconnect()
 
-        return robot
+        return robot.commands()
+
+    def stop(self):
+        from opentrons import robot
+        robot.stop()
+        self.session.set_state('stopped')
+
+    def pause(self):
+        from opentrons import robot
+        robot.pause()
+        self.session.set_state('paused')
+
+    def resume(self):
+        from opentrons import robot
+        robot.resume()
+        self.session.set_state('running')
 
     def new_robot(self):
         return Robot()
@@ -87,17 +114,26 @@ class RobotContainer(object):
         self.protocol = compile(tree, filename=filename, mode='exec')
         # Suppress all notifications during protocol simulation
         try:
+            self.session = Session(name=filename)
             _filters = self.filters
             self.update_filters([])
-            res = self.run()
+            commands = self.run()
+            self.session.set_commands(commands)
+        except Exception as e:
+            self.session.add_error(e)
+            self.set_state('error')
+            raise
         finally:
             self.update_filters(_filters)
-            return res
+            return self.session
 
     def load_protocol_file(self, filename):
         with open(filename) as file:
             text = ''.join(list(file))
             return self.load_protocol(text, filename)
+
+    def get_session(self):
+        return self.session
 
     def __aiter__(self):
         return self
@@ -107,8 +143,15 @@ class RobotContainer(object):
 
     def finalize(self):
         log.info('Finalizing RobotContainer')
+        for command in [self.add_command, self.notify]:
+            try:
+                EventBroker.get_instance().remove(command)
+            except ValueError:
+                log.debug(
+                    "Tried removing notification handler that wasn't registered")  # NOQA
+
+    def same_thread(self):
         try:
-            EventBroker.get_instance().remove(self.notify)
-        except ValueError:
-            log.debug(
-                "Tried removing notification handler that wasn't registered")
+            return asyncio.get_event_loop() == self.loop
+        except RuntimeError:
+            return True
