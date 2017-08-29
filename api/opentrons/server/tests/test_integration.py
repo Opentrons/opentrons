@@ -31,8 +31,19 @@ async def test_notifications(session, robot_container, protocol):
         res = await session.socket.receive_json()
         if (res['$']['type'] == rpc.CALL_RESULT_MESSAGE):
             break
-
         responses.append(res)
 
     assert all([
         res['$']['type'] == rpc.NOTIFICATION_MESSAGE for res in responses])
+
+    await session.call(
+        session.server.root,
+        'get_session',
+        []
+    )
+
+    await session.socket.receive_json()  # Skip ack
+    res = await session.socket.receive_json()
+
+    # There are 101 commands in the protocol
+    assert len(res['data']['v']['run_log']) == 101

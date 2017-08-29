@@ -1,10 +1,12 @@
 import ast
 import asyncio
 import logging
+import sys
 
 from asyncio import Queue
 from concurrent import futures
 from opentrons.robot.robot import Robot
+from opentrons.server.session import Session
 from opentrons.util.trace import EventBroker
 
 log = logging.getLogger(__name__)
@@ -20,7 +22,6 @@ class RobotContainer(object):
         self.notifications = Queue(loop=self.loop)
 
         EventBroker.get_instance().add(self.notify)
-        EventBroker.get_instance().add(self.add_command)
 
     def update_filters(self, filters):
         def update():
@@ -34,18 +35,12 @@ class RobotContainer(object):
         else:
             self.loop.call_soon_threadsafe(update)
 
-    def add_command(self, info):
-        if self.session and info.get('name', '') == 'add-command':
-            # TODO(artyom, 2017-08-29): pass command object directly to
-            # add_to_log, once robot is capable of tracking
-            # command's nesting level in call tree and thus contains
-            # level as the first item of a tuple
-            item = (0, info['arguments']['command'])
-            self.session.add_to_log(item)
-
     def notify(self, info):
         if info.get('name', None) not in self.filters:
             return
+
+        if self.session and info.get('name', '') == 'add-command':
+            self.session.add_to_log(info['arguments']['command'])
 
         # Use this to turn self into it's id so we don't
         # end up serializing every object who's method
@@ -83,9 +78,9 @@ class RobotContainer(object):
             exec(self.protocol, {})
             self.session.set_state('finished')
         except Exception as e:
-            self.session.add_error(e)
+            type, value, traceback = sys.exc_info()
+            self.session.add_error((e, traceback))
             self.session.set_state('error')
-            raise
         finally:
             robot.disconnect()
 
@@ -110,19 +105,25 @@ class RobotContainer(object):
         return Robot()
 
     def load_protocol(self, text, filename):
-        tree = ast.parse(text)
-        self.protocol = compile(tree, filename=filename, mode='exec')
-        # Suppress all notifications during protocol simulation
         try:
+            tree = ast.parse(text)
+            self.protocol = compile(tree, filename=filename, mode='exec')
             self.session = Session(name=filename)
+
+            # Suppress all notifications during protocol simulation
             _filters = self.filters
             self.update_filters([])
             commands = self.run()
+
+            # TODO(artyom, 20170829): remove wrapping command into tuple
+            # once commands contain call depth information
+            commands = [(0, command) for command in commands]
             self.session.set_commands(commands)
         except Exception as e:
-            self.session.add_error(e)
+            # Should we create session when protocol has failed to load?!
+            type, value, traceback = sys.exc_info()
+            self.session.add_error((e, traceback))
             self.set_state('error')
-            raise
         finally:
             self.update_filters(_filters)
             return self.session
@@ -143,7 +144,9 @@ class RobotContainer(object):
 
     def finalize(self):
         log.info('Finalizing RobotContainer')
-        for command in [self.add_command, self.notify]:
+
+        # Keep it as a loop in case there is more than one handler to remove
+        for command in [self.notify]:
             try:
                 EventBroker.get_instance().remove(command)
             except ValueError:
