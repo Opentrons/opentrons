@@ -4,18 +4,7 @@ from opentrons.server.session import Session
 
 
 @pytest.fixture
-def run_session(monkeypatch):
-    import time
-
-    def patched_time():
-        t = 42
-        while True:
-            yield t
-            t += 1
-
-    it = patched_time()
-    monkeypatch.setattr(time, 'time', it.__next__)
-
+def run_session(time):
     return Session('dino')
 
 
