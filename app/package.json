@@ -118,6 +118,7 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
+      "dist/",
       "dll/"
     ],
     "env": [

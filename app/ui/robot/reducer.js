@@ -1,10 +1,17 @@
 // robot reducer
 import path from 'path'
-import {NAME, actionTypes, constants} from './'
+import {actionTypes} from './actions'
+import NAME from './name'
 
-// selector and reducer helpers
+// miscellaneous constants
+export const constants = {
+  DISCONNECTED: 'disconnected',
+  CONNECTING: 'connecting',
+  CONNECTED: 'connected'
+}
+
+// state helpers
 const getModuleState = (state) => state[NAME]
-
 const makeRequestState = () => ({inProgress: false, error: null})
 
 const handleRequest = (state, request, payload, error, props = {}) => ({

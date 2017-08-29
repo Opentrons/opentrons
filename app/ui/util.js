@@ -23,3 +23,7 @@ export function isAuthenticated () {
 export function makeActionName (moduleName, actionName) {
   return `${moduleName}:${actionName}`
 }
+
+export function delay (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

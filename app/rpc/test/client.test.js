@@ -1,7 +1,6 @@
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WebSocket from 'ws'
-import uuid from 'uuid/v4'
 // import log from 'winston'
 
 import Client from '../../rpc/client'
@@ -14,7 +13,6 @@ import {
 } from '../../rpc/message-types'
 
 // log.level = 'debug'
-jest.mock('uuid/v4')
 
 const {SUCCESS, FAILURE} = statuses
 
@@ -40,12 +38,9 @@ function makeCallResponse (token, status, data) {
 }
 
 describe('rpc client', () => {
-  let mockUuid
   let url
   let wss
   let listeners
-
-  uuid.mockImplementation(() => `uuid-${mockUuid++}`)
 
   function addListener (target, event, handler) {
     listeners.push({target, event, handler})
@@ -87,7 +82,6 @@ describe('rpc client', () => {
   })
 
   beforeEach(() => {
-    mockUuid = 0
     listeners = []
   })
 
@@ -139,7 +133,7 @@ describe('rpc client', () => {
       addListener(ws, 'message', (message) => {
         expect(message).toEqual({
           $: {
-            token: 'uuid-0'
+            token: expect.anything()
           },
           id: EX_CONTROL_DATA.instance.i,
           name: 'get_object_by_id',
@@ -153,15 +147,16 @@ describe('rpc client', () => {
     })
 
     test('resolves the result of the method call', () => {
-      const exResponse = makeCallResponse(
-        'uuid-0',
+      const exResponse = (token) => makeCallResponse(
+        token,
         SUCCESS,
         EX_CONTROL_DATA.instance
       )
 
-      addListener(ws, 'message', () => {
-        ws.send(makeAckResponse('uuid-0'))
-        setTimeout(() => ws.send(exResponse), 100)
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        ws.send(makeAckResponse(token))
+        setTimeout(() => ws.send(exResponse(token)), 5)
       })
 
       const result = client.control.get_object_by_id(EX_CONTROL_DATA.instance.i)
@@ -173,42 +168,44 @@ describe('rpc client', () => {
     })
 
     test('rejects the result of a failed method call', () => {
-      const exResponse = makeCallResponse('uuid-0', FAILURE, 'Oh no: ahhh')
+      const exResponse = (token) => makeCallResponse(token, FAILURE, 'ahhh')
 
-      addListener(ws, 'message', () => {
-        ws.send(makeAckResponse('uuid-0'))
-        setTimeout(() => ws.send(exResponse), 5)
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        ws.send(makeAckResponse(token))
+        setTimeout(() => ws.send(exResponse(token)), 5)
       })
 
       const result = client.control.get_object_by_id(EX_CONTROL_DATA.instance.i)
 
       return expect(result).rejects.toMatchObject({
-        message: 'Oh no: ahhh'
+        message: 'ahhh'
       })
     })
 
     test('getss the type of an object to create a remote object', () => {
-      const exInstanceResponse = makeCallResponse(
-        'uuid-0',
+      const exInstanceResponse = (token) => makeCallResponse(
+        token,
         SUCCESS,
         EX_ROOT_INSTANCE
       )
 
-      const exTypeResponse = makeCallResponse(
-        'uuid-1',
+      const exTypeResponse = (token) => makeCallResponse(
+        token,
         SUCCESS,
         EX_ROOT_TYPE
       )
 
+      let messageCount = 0
       addListener(ws, 'message', (message) => {
         const token = message.$.token
 
-        if (token === 'uuid-0') {
+        if (messageCount === 0) {
           // first message: should call get_object_by_id on EX_ROOT_INSTANCE
           // checked in previous test so no assertions here
-          setTimeout(() => ws.send(makeAckResponse('uuid-0')), 1)
-          setTimeout(() => ws.send(exInstanceResponse), 5)
-        } else if (token === 'uuid-1') {
+          setTimeout(() => ws.send(makeAckResponse(token)), 1)
+          setTimeout(() => ws.send(exInstanceResponse(token)), 5)
+        } else if (messageCount === 1) {
           // second message should be a get_object_by_id for the type of EX_ROOT_INSTANCE
           // check that we called control.get_object_by_id properly
           expect(message).toMatchObject({
@@ -217,9 +214,11 @@ describe('rpc client', () => {
             args: [EX_ROOT_TYPE.i]
           })
           // return an ack, then return the type object
-          setTimeout(() => ws.send(makeAckResponse('uuid-1')), 1)
-          setTimeout(() => ws.send(exTypeResponse), 5)
+          setTimeout(() => ws.send(makeAckResponse(token)), 1)
+          setTimeout(() => ws.send(exTypeResponse(token)), 5)
         }
+
+        messageCount++
       })
 
       const result = client.control.get_object_by_id(EX_ROOT_INSTANCE.i)

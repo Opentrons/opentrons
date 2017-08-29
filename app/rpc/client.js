@@ -1,10 +1,16 @@
 import EventEmitter from 'events'
-import log from 'winston'
-import uuid from 'uuid/v4'
+// TODO(mc, 2017-08-29): Disable winston and uuid because of worker-loader bug
+// preventing webpackification of built-in node modules
+// import log from 'winston'
+// import uuid from 'uuid/v4'
 
 import WebSocketClient from './websocket-client'
 import RemoteObject from './remote-object'
 import {statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE} from './message-types'
+
+// TODO(mc, 2017-08-29): see note about uuid above
+let _uniqueId = 0
+const uuid = () => `id-${_uniqueId++}`
 
 // timeouts
 const HANDSHAKE_TIMEOUT = 5000
@@ -140,7 +146,7 @@ class RpcContext extends EventEmitter {
   }
 
   _send (message) {
-    log.debug('Sending: %j', message)
+    // log.debug('Sending: %j', message)
     this._ws.send(message)
   }
 
@@ -150,7 +156,7 @@ class RpcContext extends EventEmitter {
 
   // TODO(mc): split this method up
   _handleMessage (message) {
-    log.debug('Received message %j', message)
+    // log.debug('Received message %j', message)
 
     const meta = message.$
     const data = message.data
@@ -170,7 +176,7 @@ class RpcContext extends EventEmitter {
             this.control = controlRemote
             this.emit('ready')
           })
-          .catch((e) => log.error('Error creating control remote', e))
+          // .catch((e) => log.error('Error creating control remote', e))
 
         break
 
@@ -193,7 +199,7 @@ class RpcContext extends EventEmitter {
 
         RemoteObject(this, data)
           .then((remote) => this.emit('notification', remote))
-          .catch((e) => log.error('Error creating notification remote', e))
+          // .catch((e) => log.error('Error creating notification remote', e))
 
         break
 
