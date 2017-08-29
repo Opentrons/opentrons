@@ -1,4 +1,4 @@
-# app makefile
+# opentrons app makefile
 
 # use bash
 SHELL := /bin/bash
