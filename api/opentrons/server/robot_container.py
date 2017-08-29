@@ -24,16 +24,7 @@ class RobotContainer(object):
         EventBroker.get_instance().add(self.notify)
 
     def update_filters(self, filters):
-        def update():
-            self.filters = set(filters)
-
-        # If same thread, just call the function,
-        # without wrapping it into threadsafe call
-        # to prevent freezing during test run
-        if self.same_thread():
-            update()
-        else:
-            self.loop.call_soon_threadsafe(update)
+        self.filters = set(filters)
 
     def notify(self, info):
         if info.get('name', None) not in self.filters:
@@ -53,8 +44,10 @@ class RobotContainer(object):
         future = asyncio.run_coroutine_threadsafe(
                 self.notifications.put(payload), self.loop)
 
-        # If same thread, don't wait, will freeze otherwise
-        if not self.same_thread():
+        # TODO (artyom, 20170829): this block ensures proper sequencing
+        # of notification, also covering the scenario of being called from
+        # unit test where MainThread has no event loop associated with it
+        if not self.thread_has_event_loop():
             futures.wait([future])
 
     def reset_robot(self, robot):
@@ -153,8 +146,10 @@ class RobotContainer(object):
                 log.debug(
                     "Tried removing notification handler that wasn't registered")  # NOQA
 
-    def same_thread(self):
+    def thread_has_event_loop(self):
         try:
-            return asyncio.get_event_loop() == self.loop
-        except RuntimeError:
+            asyncio.get_event_loop()
+        except RuntimeError as e:
+            return False
+        else:
             return True

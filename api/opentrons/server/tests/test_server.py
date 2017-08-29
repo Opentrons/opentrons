@@ -74,7 +74,11 @@ async def test_init(session):
                     '__aiter__': {},
                     '__anext__': {},
                     '__dict__': {},
-                    '__doc__': None,
+                    '__doc__':
+                        ("\n"
+                         "    Wrapper class to dispatch select calls to server\n"  # NOQA
+                         "    without exposing the entire server class\n"
+                         "    "),
                     '__init__': {},
                     '__module__': 'opentrons.server.rpc',
                     '__weakref__': {},

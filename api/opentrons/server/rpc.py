@@ -9,8 +9,7 @@ from aiohttp import web
 from aiohttp import WSCloseCode
 from asyncio import Queue
 from opentrons.server import serialize
-from threading import Thread
-from threading import current_thread
+from concurrent.futures import ThreadPoolExecutor
 
 log = logging.getLogger(__name__)
 
@@ -56,36 +55,21 @@ class ControlBox(object):
 
 class Server(object):
     def __init__(self, root=None, loop=None, notification_max_depth=4):
-        # All function calls requested will be executed
-        # in a separate thread
-        # TODO (artyom, 08/22/2017): look into asyncio executors
-        # and possibly have multiple executor threads or processes
-        def start_background_loop(loop):
-            try:
-                asyncio.set_event_loop(loop)
-                loop.run_forever()
-            finally:
-                log.info('Exiting from exec thread')
-                loop.close()
-
         self.objects = {id(self): self}
         self.control = ControlBox(self)
         self.notification_max_depth = notification_max_depth
 
+        # Allow for two concurrent calls max
+        self.executor = ThreadPoolExecutor(max_workers=2)
+
         self.loop = loop or asyncio.get_event_loop()
         self.send_queue = Queue(loop=self.loop)
-        self.exec_loop = asyncio.new_event_loop()
         self.monitor_events_task = None
 
         self._root = None
         self.root = root
 
         self.clients = []
-
-        self.exec_thread = Thread(
-            target=start_background_loop,
-            args=(self.exec_loop,))
-        self.exec_thread.start()
 
         self.send_loop_task = self.loop.create_task(self.send_loop())
 
@@ -120,8 +104,6 @@ class Server(object):
 
         if callable(getattr(self._root, 'finalize', None)):
             self.root.finalize()
-
-        self.exec_loop.call_soon_threadsafe(self.exec_loop.stop)
 
     async def on_shutdown(self, app):
         for ws in self.clients:
@@ -265,7 +247,8 @@ class Server(object):
                 except Exception as e:
                     self.send_error(str(e), token)
                 else:
-                    self.make_call(func, token)
+                    response = await self.make_call(func, token)
+                    self.send(response)
             elif message.type == aiohttp.WSMsgType.ERROR:
                 log.error(
                     'WebSocket connection closed unexpectedly: {0}'.format(
@@ -285,33 +268,26 @@ class Server(object):
 
         return func
 
-    def make_call(self, func, token):
-        response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
-
-        async def call(func):
+    async def make_call(self, func, token):
+        def call(func):
+            response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
             try:
                 call_result = func()
-                log.info('Call result: {0}'.format(call_result))
                 response['$']['status'] = 'success'
             except Exception as e:
                 log.warning(
                     'Exception while dispatching a method call: {0}'
                     .format(traceback.format_exc()))
-                response['$']['status'] = "error"
+                response['$']['status'] = 'error'
                 call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
             finally:
+                log.info('Call result: {0}'.format(call_result))
                 root, refs = serialize.get_object_tree(call_result)
                 self.objects.update(refs)
                 response['data'] = root
-                log.debug('Sending call result from from thread id {0}'.format(
-                    id(current_thread())))
-                self.send(response)
+                return response
 
-        log.info('Scheduling a call from thread id {0}'
-                 .format(id(current_thread())))
-        asyncio.run_coroutine_threadsafe(
-            call(func),
-            self.exec_loop)
+        return await self.loop.run_in_executor(self.executor, call, func)
 
     def send_error(self, text, token):
         self.send({
