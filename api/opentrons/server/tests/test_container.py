@@ -2,6 +2,7 @@ from opentrons.util.trace import EventBroker
 from datetime import datetime
 import pytest
 
+
 async def test_load_from_text(robot_container, protocol):
     session = robot_container.load_protocol(protocol.text, '<blank>')
     assert session.name == '<blank>'
