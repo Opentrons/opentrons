@@ -2,7 +2,6 @@
 // TODO(mc): as written, this is pretty hard to test. Spend some time thinking
 // about how to refactor so that this is not the case
 
-import assert from 'assert'
 import log from 'winston'
 import Client from '../../rpc/client'
 import {actions, actionTypes, selectors} from './'
@@ -25,28 +24,6 @@ export default function apiMiddleware (store) {
 
     return client.control.get_root()
   }
-
-  const handleContainerAndGetRobot = (rpcRobotContainer) => {
-    robotContainer = rpcRobotContainer
-
-    return robotContainer.new_robot()
-  }
-
-  const handleRobot = (rpcRobot) => {
-    robot = rpcRobot
-
-    return robot.get_serial_ports_list()
-  }
-
-  // TODO(mc): serial port connection should not be the responsibility
-  // of the client. Remove BEFORE RELEASE when backend handles it
-  const handleConnect = (ports) => {
-    assert(ports.length, `No serial ports found; cannot connect to Smoothie`)
-    serialPort = ports[0]
-    dispatch(actions.connectResponse())
-  }
-
-  const handleConnectError = (e) => dispatch(actions.connectResponse(e))
 
   return (next) => (action) => {
     const {type, meta, payload} = action
@@ -86,25 +63,6 @@ export default function apiMiddleware (store) {
     next(action)
   }
 
-  function connect () {
-    // initialize websocket connection
-    // TODO(mc): Hardcoded URL is bad and also: retries?
-    return Client(URL)
-      .then(subscibeAndGetRobotContainer)
-      .then(handleContainerAndGetRobot)
-      .then(handleRobot)
-      .then(handleConnect)
-      // TODO(mc): maybe remove this debug stuff?
-      .then(() => {
-        if (process.env.NODE_ENV === 'development') {
-          global.client = client
-          global.robotContainer = robotContainer
-          global.robot = robot
-        }
-      })
-      .catch(handleConnectError)
-  }
-
   function home (payload) {
     robot.connect(serialPort)
       .then(() => {
@@ -117,17 +75,6 @@ export default function apiMiddleware (store) {
       .then(() => robot.disconnect())
       .then(() => dispatch(actions.homeResponse()))
       .catch((error) => dispatch(actions.homeResponse(error)))
-  }
-
-  // load protocol
-  function loadProtocol () {
-    const file = selectors.getProtocolFile(getState())
-
-    robotContainer.load_protocol_file(file)
-      .then((virtualRobot) => virtualRobot.commands())
-      .then((commands) => dispatch(actions.setCommands(commands)))
-      // TODO(mc, 2017-08-23): filter error types, possibly using Bluebird
-      .catch((error) => dispatch(actions.setProtocolError(error)))
   }
 
   function run () {
