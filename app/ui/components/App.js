@@ -50,7 +50,9 @@ export default function App (props) {
     runLog = <RunLog style={styles.task} {...props} />
   }
 
-  // TODO (ka) convert aside to sidebar component
+  // TODO (ka) convert aside to sidebar class based component,
+  // toggle side panel content based on selected icon rather than isNavPanelOpen bool and onNavClick handler, remove hamburger
+  // refactor top level component jsx and css layout accordingly
   return (
     <div className={classnames(styles.run_wrapper, { [styles.open]: isNavPanelOpen })}>
       <header className={styles.menu}>
