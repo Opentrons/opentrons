@@ -16,28 +16,28 @@ const appWindowUrl = url.resolve('file://', indexPath)
 console.log(appWindowUrl)
 
 if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support');
-  sourceMapSupport.install();
+  const sourceMapSupport = require('source-map-support')
+  sourceMapSupport.install()
 }
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-  require('electron-debug')();
-  const p = path.join(__dirname, '..', 'node_modules');
-  require('module').globalPaths.push(p);
+  require('electron-debug')()
+  const p = path.join(__dirname, '..', 'node_modules')
+  require('module').globalPaths.push(p)
 }
 
 const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  const installer = require('electron-devtools-installer')
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS
   const extensions = [
     'REACT_DEVELOPER_TOOLS',
     'REDUX_DEVTOOLS'
-  ];
+  ]
 
   return Promise
     .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-    .catch(console.log);
-};
+    .catch(console.log)
+}
 
 // TODO(artyom): it should belong to integration test and/or CI scripts
 // but for that we need to determine userData value before running the test
@@ -74,9 +74,12 @@ let createWindow = async () => {
   // Avoid window flashing and possibly fix integration tests
   // that are waiting for the window that appears before page is loaded
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#showing-window-gracefully
-  const mainWindow = new BrowserWindow({show: false, width: 1024, height: 768, webPreferences: {
-    experimentalFeatures: true,
-  }})
+  const mainWindow = new BrowserWindow({show: false,
+    width: 1024,
+    height: 768,
+    webPreferences: {
+      experimentalFeatures: true
+    }})
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
@@ -87,7 +90,7 @@ let createWindow = async () => {
     mainWindow.reload()
   })
 
-  // Note: Auth0 pop window does not close itself, 
+  // Note: Auth0 pop window does not close itself,
   // this will close this window when it pops up
   setInterval(() => {
     BrowserWindow.getAllWindows()
@@ -105,7 +108,7 @@ let startUp = async () => {
   log.info('Starting App')
 
   if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-    await installExtensions();
+    await installExtensions()
   }
 
   process.on('uncaughtException', error => {
@@ -125,19 +128,19 @@ let startUp = async () => {
 
   // Setup Development Environment
   if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-    mainWindow.openDevTools();
+    mainWindow.openDevTools()
     mainWindow.webContents.on('context-menu', (e, props) => {
-      const { x, y } = props;
+      const { x, y } = props
 
       Menu
         .buildFromTemplate([{
           label: 'Inspect element',
           click: () => {
-            mainWindow.inspectElement(x, y);
+            mainWindow.inspectElement(x, y)
           }
         }])
-        .popup(mainWindow);
-    });
+        .popup(mainWindow)
+    })
   }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 // import PropTypes from 'prop-types'
-import styles from './Upload.css'
+import styles from './UploadPanel.css'
 
 export default function UploadPanel (props) {
   // Props needed: recent protocols, protocol file name (if uploaded), onUploadProtocol handler

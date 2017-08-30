@@ -3,7 +3,7 @@ const {dialog} = electron
 const settings = require('electron-settings')
 
 settings.on('create', pathToSettings => {
-  // A dialog popping up is preventing 
+  // A dialog popping up is preventing
   // integration tests from running
   if (process.env.INTEGRATION_TEST === 'true') {
     settings.setSync('autoUpdate', false)

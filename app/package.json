@@ -110,6 +110,9 @@
       "!webpack**",
       "!coverage/**",
       "!**/test/**"
+    ],
+    "coverageReporters": [
+      "lcov", "text"
     ]
   },
   "standard": {

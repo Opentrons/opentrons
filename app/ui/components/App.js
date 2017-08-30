@@ -12,12 +12,8 @@ export default function App (props) {
   const {
     // state
     isNavPanelOpen,
-    // isConnected,
     isReadyToRun,
     isRunning,
-    // errors,
-    // protocolName,
-    // commands,
     // handlers
     onRunClick,
     onNavClick

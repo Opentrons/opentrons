@@ -1,4 +1,4 @@
-# app makefile
+# opentrons app makefile
 
 # use bash
 SHELL := /bin/bash
@@ -39,11 +39,11 @@ dev:
 	npm run dev
 
 clean:
-	rm -rf \
-		ui/dist \
+	rm -rf       \
+		ui/dist    \
 		shell/dist \
-		dll \
-		bin \
+		dll        \
+		bin        \
 		coverage
 
 # test tasks
