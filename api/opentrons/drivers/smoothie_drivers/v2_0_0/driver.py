@@ -283,7 +283,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
     def move(self, mode='absolute', **kwargs):
         self.set_coordinate_system(mode)
         self.set_speed()
-
         current = self.get_head_position()['target']
         target_point = {
             axis: kwargs.get(

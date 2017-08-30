@@ -814,7 +814,7 @@ class Robot(object):
 
     def calibrate_container_with_instrument(self, container, instrument):
         tracked_position = self.position_tracker[container[0]].position
-        true_position    = self.position_tracker[instrument[0]].position
+        true_position    = self.position_tracker[instrument].position
         calib.calibrate_container_with_delta(container,
                                              self.position_tracker,
-                                             **(tracked_position-true_position))
+                                             *(true_position - tracked_position))
