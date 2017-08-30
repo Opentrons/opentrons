@@ -10,7 +10,8 @@ export const actionTypes = {
   // requests and responses
   CONNECT: makeRobotActionName('CONNECT'),
   CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
-  LOAD_PROTOCOL: makeRobotActionName('LOAD_PROTOCOL'),
+  SESSION: makeRobotActionName('SESSION'),
+  SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
   HOME: makeRobotActionName('HOME'),
   HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
   RUN: makeRobotActionName('RUN'),
@@ -23,9 +24,8 @@ export const actionTypes = {
   CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE'),
 
   // instantaneous state
-  SET_IS_CONNECTED: makeRobotActionName('SET_IS_CONNECTED'),
   // TODO(mc, 2017-08-23): consider combining set commands and set protocol
-  // error into a single loadProtocolResponse action
+  // error into a single newSessionResponse action
   SET_COMMANDS: makeRobotActionName('SET_COMMANDS'),
   SET_PROTOCOL_ERROR: makeRobotActionName('SET_PROTOCOL_ERROR'),
   TICK_CURRENT_COMMAND: makeRobotActionName('TICK_CURRENT_COMMAND')
@@ -41,8 +41,13 @@ export const actions = {
     return {type: actionTypes.CONNECT_RESPONSE, error}
   },
 
-  loadProtocol () {
-    return {type: actionTypes.LOAD_PROTOCOL}
+  // get session or make new session with protocol file
+  session (file = null) {
+    return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
+  },
+
+  sessionResponse (error = null, session = null) {
+    return {type: actionTypes.SESSION_RESPONSE, payload: {session}, error}
   },
 
   home (axes) {
@@ -86,10 +91,6 @@ export const actions = {
 
   cancelResponse (error) {
     return {type: actionTypes.CANCEL_RESPONSE, error}
-  },
-
-  setIsConnected (isConnected) {
-    return {type: actionTypes.SET_IS_CONNECTED, payload: {isConnected}}
   },
 
   setCommands (commands) {

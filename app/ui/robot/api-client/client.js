@@ -2,7 +2,6 @@
 // takes a dispatch (send) function and returns a receive handler
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
-import {selectors} from '../reducer'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
@@ -22,8 +21,8 @@ export default function client (dispatch) {
         connect(state, action)
         break
 
-      case actionTypes.LOAD_PROTOCOL:
-        loadProtocol(state, action)
+      case actionTypes.NEW_SESSION:
+        newSession(state, action)
         break
     }
   }
@@ -57,13 +56,22 @@ export default function client (dispatch) {
       .catch((e) => dispatch(actions.connectResponse(e)))
   }
 
-  function loadProtocol (state, action) {
-    const file = selectors.getProtocolFile(state)
+  function session (state, action) {
+    const file = action.payload && action.payload.file
 
-    robotContainer.load_protocol_file(file)
-      .then((virtualRobot) => virtualRobot.commands())
-      .then((commands) => dispatch(actions.setCommands(commands)))
-      .catch((error) => dispatch(actions.setProtocolError(error)))
+    if (file) {
+      const name = file.name
+      const reader = new FileReader()
+
+      reader.onload = function handleProtocolRead (event) {
+        console.log('NEW SESSION')
+        console.log(event.target.result)
+      }
+
+      return reader.readFileAsText(file)
+    }
+
+    console.log('GET SESSION')
   }
 
   function handleRobotNotification (message) {

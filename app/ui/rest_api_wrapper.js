@@ -110,7 +110,7 @@ class Opentrons {
       })
   }
 
-  uploadProtocol (formData) {
+  upnewSession (formData) {
     return Vue.http
       .post('http://localhost:31950/upload', formData)
       .then((response) => {
@@ -121,7 +121,7 @@ class Opentrons {
       })
   }
 
-  loadProtocol () {
+  newSession () {
     return Vue.http
       .get('http://localhost:31950/load')
       .then((response) => {

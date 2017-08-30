@@ -8,7 +8,7 @@ export default function apiClientMiddleware (store) {
   const worker = new Worker()
 
   worker.onmessage = function handleWorkerMessage (event) {
-    dispatch(JSON.parse(event.data))
+    dispatch(event.data)
   }
 
   return (next) => (action) => {
@@ -17,7 +17,7 @@ export default function apiClientMiddleware (store) {
     if (meta && meta.robotCommand) {
       const state = getState()
 
-      worker.postMessage(JSON.stringify({state, action}))
+      worker.postMessage({state, action})
     }
 
     next(action)

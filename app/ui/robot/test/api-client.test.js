@@ -13,6 +13,23 @@ describe('api client', () => {
   let robotContainer
   let robot
 
+  let _oldFileReader
+  beforeAll(() => {
+    if (global.FileReader) {
+      _oldFileReader = global.FileReader
+    }
+
+    global.FileReader = jest.fn()
+  })
+
+  afterAll(() => {
+    if (_oldFileReader) {
+      global.FileReader = _oldFileReader
+    } else {
+      delete global.FileReader
+    }
+  })
+
   beforeEach(() => {
     // TODO(mc, 2017-08-29): this is a pretty nasty mock. Probably a sign we
     // need to simplify the RPC client
@@ -103,7 +120,7 @@ describe('api client', () => {
     })
   })
 
-  describe('load protocol', () => {
+  describe('new session', () => {
     beforeEach(() => {
       receive({}, actions.connect())
       return delay(1)
@@ -113,7 +130,7 @@ describe('api client', () => {
       const commands = ['foo', 'bar', 'baz']
 
       robot.commands.mockReturnValueOnce(Promise.resolve(commands))
-      receive({robot: {protocol: 'foo.py'}}, actions.loadProtocol())
+      receive({}, actions.session({}))
 
       return delay(1)
         .then(() => {

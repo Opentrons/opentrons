@@ -28,9 +28,8 @@ const mapStateToProps = (state) => {
     connectionStatus: robotSelectors.getConnectionStatus(state),
 
     // protocol
-    protocolName: robotSelectors.getProtocolName(state),
+    protocolName: robotSelectors.getSessionName(state),
     commands: robotSelectors.getCommands(state),
-    runProgress: robotSelectors.getRunProgress(state),
 
     // TODO(mc): remove development hardcoded values
     errors: []
