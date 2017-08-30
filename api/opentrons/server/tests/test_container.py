@@ -1,5 +1,6 @@
 from opentrons.util.trace import EventBroker
-
+from datetime import datetime
+import pytest
 
 async def test_load_from_text(robot_container, protocol):
     session = robot_container.load_protocol(protocol.text, '<blank>')
@@ -26,14 +27,16 @@ async def test_async_notifications(robot_container):
 
 
 async def test_load_protocol_with_error(robot_container):
-    session = robot_container.load_protocol('blah', '<blank>')
+    with pytest.raises(Exception) as e:
+        session = robot_container.load_protocol('blah', '<blank>')
+        assert session is None
 
-    timestamp, error = session.errors.pop()
-    exception, traceback = error
-    assert type(timestamp) == float
+    timestamp, error = e.value.args
+    exception, trace = error
+
+    assert datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
     assert type(exception) == NameError
     assert str(exception) == "name 'blah' is not defined"
-    assert session.state == 'error'
 
 
 async def test_load_and_run(robot_container, protocol):

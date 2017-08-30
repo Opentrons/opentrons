@@ -1,11 +1,12 @@
 import pytest
+from datetime import datetime
 
 from opentrons.server.session import Session
 
 
 @pytest.fixture
-def run_session(time):
-    return Session('dino')
+def run_session():
+    return Session('dino', 'from opentrons import robot')
 
 
 def test_init(run_session):
@@ -24,7 +25,7 @@ def test_set_state(run_session):
 
 
 def test_set_commands(run_session):
-    run_session.set_commands([
+    run_session.init_commands([
         (0, 'A'),
         (0, 'B'),
         (0, 'C')
@@ -32,23 +33,23 @@ def test_set_commands(run_session):
 
     assert run_session.commands == [
         {
-            'text': 'A',
-            'index': 0,
+            'description': 'A',
+            'id': 0,
             'children': []
         },
         {
-            'text': 'B',
-            'index': 1,
+            'description': 'B',
+            'id': 1,
             'children': []
         },
         {
-            'text': 'C',
-            'index': 2,
+            'description': 'C',
+            'id': 2,
             'children': []
         },
     ]
 
-    run_session.set_commands([
+    run_session.init_commands([
         (0, 'A'),
         (1, 'B'),
         (2, 'C'),
@@ -57,45 +58,55 @@ def test_set_commands(run_session):
 
     assert run_session.commands == [
         {
-            'text': 'A',
-            'index': 0,
+            'description': 'A',
+            'id': 0,
             'children': [{
-                    'text': 'B',
-                    'index': 1,
+                    'description': 'B',
+                    'id': 1,
                     'children': [{
-                                'text': 'C',
-                                'index': 2,
+                                'description': 'C',
+                                'id': 2,
                                 'children': []
                             }]
                     }]
         },
         {
-            'text': 'D',
-            'index': 3,
+            'description': 'D',
+            'id': 3,
             'children': []
         }
     ]
 
 
-def test_add_to_log(run_session):
-    run_session.add_to_log('A')
-    run_session.add_to_log('B')
-    run_session.add_to_log('C')
+def test_log_append(run_session):
+    run_session.log_append('A')
+    run_session.log_append('B')
+    run_session.log_append('C')
 
-    assert run_session.run_log == [
-        (0, 42, 'A'),
-        (1, 43, 'B'),
-        (2, 44, 'C'),
+    run_log = [
+        (_id, description)
+        for _id, timestamp, description in run_session.run_log
+        if datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')]
+
+    assert run_log == [
+        (0, 'A'),
+        (1, 'B'),
+        (2, 'C'),
     ]
 
 
-def test_add_error(run_session):
+def test_error_append(run_session):
     foo = Exception('Foo')
     bar = Exception('Bar')
-    run_session.add_error(foo)
-    run_session.add_error(bar)
+    run_session.error_append(foo)
+    run_session.error_append(bar)
 
-    assert run_session.errors == [
-        (42, foo),
-        (43, bar)
+    errors = [
+        (error, )
+        for timestamp, error in run_session.errors
+        if datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')]
+
+    assert errors == [
+        (foo,),
+        (bar,)
     ]

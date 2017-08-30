@@ -46,21 +46,6 @@ Protocol = namedtuple(
     ['text', 'filename'])
 
 
-@pytest.fixture(scope='function')
-def time(monkeypatch):
-    import time
-
-    def patched_time():
-        t = 42
-        while True:
-            yield t
-            t += 1
-
-    it = patched_time()
-    monkeypatch.setattr(time, 'time', it.__next__)
-    return time
-
-
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
     text = None
