@@ -14,10 +14,11 @@ export default function UploadPanel (props) {
         </div>
       </section>
       <section className={styles.open_file}>
-        <label className={styles.upload_btn}>
+        <label className={styles.upload_btn} htmlFor='uploaded-file'>
           Open File
+           <input className={styles.file} type='file' name='uploaded-file' id='uploaded-file' />
         </label>
-        <input className={styles.file} type='file' />
+
       </section>
 
       <section className={styles.recent_files} />

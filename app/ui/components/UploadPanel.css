@@ -34,16 +34,10 @@
 }
 
 .file {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  cursor: pointer;
-  /*width: 300px;*/
-  opacity: 0;
-  filter: alpha(opacity=0);
+  position: fixed;
+  clip: rect( 1px 1px 1px 1px );
 }
+
 
 .recent_files {
   grid-row: 2;
