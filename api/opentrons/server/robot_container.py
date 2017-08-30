@@ -3,6 +3,7 @@ import asyncio
 import logging
 
 from asyncio import Queue
+from concurrent import futures
 from opentrons.robot.robot import Robot
 from opentrons.util.trace import EventBroker
 
@@ -19,19 +20,22 @@ class RobotContainer(object):
         self.notifications = Queue(loop=self.loop)
         EventBroker.get_instance().add(self.notify)
 
+    def same_thread(self):
+        try:
+            return asyncio.get_event_loop() == self.loop
+        except RuntimeError:
+            return True
+
     def update_filters(self, filters):
         def update():
             self.filters = set(filters)
 
-        try:
-            if asyncio.get_event_loop() != self.loop:
-                self.loop.call_soon_threadsafe(update)
-            else:
-                update()
-        except RuntimeError:
-            # If running tests and event loop is not set
-            # get_event_loop will throw a RuntimeError
+        # If same thread, just call the function,
+        # without wrapping it into threadsafe call
+        if self.same_thread():
             update()
+        else:
+            self.loop.call_soon_threadsafe(update)
 
     def notify(self, info):
         if info.get('name', None) not in self.filters:
@@ -44,8 +48,12 @@ class RobotContainer(object):
         if 'self' in arguments:
             arguments['self_id'] = arguments.pop('self')
 
-        asyncio.run_coroutine_threadsafe(
+        future = asyncio.run_coroutine_threadsafe(
                 self.notifications.put(info), self.loop)
+
+        # If same thread, don't wait, will freeze otherwise
+        if not self.same_thread():
+            futures.wait([future])
 
     def reset_robot(self, robot):
         # robot is essentially a singleton

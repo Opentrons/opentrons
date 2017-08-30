@@ -27,12 +27,6 @@ async def test_notifications(session, robot_container, protocol):
 
     responses = []
 
-    # NOTE: Streaming absolutely every response in the loop
-    # causes aiohttp flow control to fail and start
-    # composing partial frames. For now, we'll just sample
-    # 50 responses we've got, and confirm that all are notifications
-    # which means that async calls are working and the actual
-    # call hasn't returned yet, but notifications are coming in
     while True:
         res = await session.socket.receive_json()
         if (res['$']['type'] == rpc.CALL_RESULT_MESSAGE):
