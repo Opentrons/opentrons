@@ -22,12 +22,10 @@ class Session(object):
 
     def init_commands(self, commands):
         """
-        Expects a list of tuples of form (depth, command_text)
-        where depth is depth of the element in command tree.
-
-        The list's item order corresponds to DFS traversal of a command tree.
-
-        Returns a dictionary that reconstructs a command tree.
+        Given a list of tuples of form (depth, command_text)
+        that represents a DFS traversal of a command tree,
+        updates self.commands with a dictionary that holds
+        a command tree.
         """
         def children(commands, level=0, base_index=0):
             return [
