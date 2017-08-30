@@ -14,9 +14,9 @@ export default function UploadPanel (props) {
         </div>
       </section>
       <section className={styles.open_file}>
-        <div className={styles.upload_btn}>
+        <label className={styles.upload_btn}>
           Open File
-        </div>
+        </label>
         <input className={styles.file} type='file' />
       </section>
 

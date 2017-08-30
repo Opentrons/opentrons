@@ -29,6 +29,7 @@
 
 .upload_btn {
   composes: btn from './Util.css';
+  display:block;
   text-align: center;
 }
 
@@ -39,7 +40,7 @@
   left: 0;
   right: 0;
   cursor: pointer;
-  width: 300px;
+  /*width: 300px;*/
   opacity: 0;
   filter: alpha(opacity=0);
 }
