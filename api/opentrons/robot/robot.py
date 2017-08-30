@@ -10,9 +10,11 @@ from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import MessageBroker
 from opentrons.trackers import position_tracker
-
+import opentrons.util.calibration_functions as calib
+import opentrons.util.position_functions as pf
 
 log = get_logger(__name__)
+HEAD = 'head'
 
 
 class InstrumentMosfet(object):
@@ -201,7 +203,7 @@ class Robot(object):
         self._previous_container = None
         message_broker = MessageBroker.get_instance()
         self.position_tracker = position_tracker.PositionTracker(message_broker)
-        self.position_tracker.create_root_object('head', 0, 0, 0)
+        self.position_tracker.create_root_object(HEAD, 0, 0, 0)
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -240,7 +242,7 @@ class Robot(object):
         """
         axis = axis.upper()
         self._instruments[axis] = instrument
-        self.position_tracker.track_object('head', instrument, 0, 0, 0)
+        self.position_tracker.track_object(HEAD, instrument, 1, 3, 2) #TODO: Create real pipette offsets
 
     def add_warning(self, warning_msg):
         """
@@ -415,8 +417,8 @@ class Robot(object):
         """
         self._driver.set_speed(*args, **kwargs)
 
-    @MessageBroker.traceable('instrument_action', 'move-to') # just giving a random topic name since IDK what this is doing
-    def move_to(self, location, instrument=None, strategy='arc', **kwargs):
+    @MessageBroker.traceable('instrument_action', 'move-to')
+    def move_to(self, location, instrument=HEAD, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
         a container.
@@ -453,17 +455,26 @@ class Robot(object):
         >>> robot.move_to(plate[0].top())
         """
 
+
         placeable, coordinates = containers.unpack_location(location)
 
-        if instrument:
-            coordinates = instrument.calibrator.convert(
-                placeable,
-                coordinates)
-        else:
-            coordinates += placeable.coordinates(placeable.get_deck())
+        # because the top position is what is tracked, this checks if there's an offset
+        offset = coordinates - placeable.top()[1]
+        target = self.position_tracker[placeable].position + offset.coordinates
+
+        coordinates = pf.target_pos_for_instrument_positioning(self.position_tracker, HEAD, instrument, *target)
+
+        # if instrument:
+        #     coordinates = instrument.calibrator.convert(
+        #         placeable,
+        #         coordinates)
+        # # else:
+        #     coordinates += placeable.coordinates(placeable.get_deck())
+
+
 
         if strategy == 'arc':
-            arc_coords = self._create_arc(coordinates, placeable, instrument)
+            arc_coords = self._create_arc(coordinates, placeable)
             for coord in arc_coords:
                 self._driver.move_head(**coord)
         elif strategy == 'direct':
@@ -476,54 +487,7 @@ class Robot(object):
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
-    def _calibrated_max_dimension(self, container=None, instrument=None):
-        """
-        Returns a Vector, each axis being the calibrated maximum
-        for all instruments
-        """
-        if not self._instruments or not self.get_containers():
-            if container:
-                return container.max_dimensions(self._deck)
-            return self._deck.max_dimensions(self._deck)
-
-        def _max_per_instrument(placeable, inst):
-            """
-            Returns list of Vectors, one for each Instrument's farthest
-            calibrated coordinate for the supplied placeable
-            """
-            if inst:
-                return [
-                    instrument.calibrator.convert(
-                        placeable,
-                        placeable.max_dimensions(placeable)
-                    )
-                ]
-            return [
-                instrument.calibrator.convert(
-                    placeable,
-                    placeable.max_dimensions(placeable)
-                )
-                for instrument in self._instruments.values()
-            ]
-
-        container_max_coords = []
-        if container:
-            container_max_coords = _max_per_instrument(container, instrument)
-        else:
-            for c in self.get_containers():
-                container_max_coords += _max_per_instrument(c, instrument)
-
-        max_coords = [
-            max(
-                container_max_coords,
-                key=lambda coordinates: coordinates[axis]
-            )[axis]
-            for axis in range(3)
-        ]
-
-        return Vector(max_coords)
-
-    def _create_arc(self, destination, placeable=None, instrument=None):
+    def _create_arc(self, destination, placeable=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -535,16 +499,11 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        ref_container = None
-        if this_container and (self._previous_container == this_container):
-            ref_container = this_container
-
-        _, _, tallest_z = self._calibrated_max_dimension(
-            ref_container, instrument)
-        tallest_z += self.arc_height
+        tallest_z = self.position_tracker.max_z_in_subtree(self._deck)
+        travel_height = tallest_z + self.arc_height
 
         _, _, robot_max_z = self._driver.get_dimensions()
-        arc_top = min(tallest_z, robot_max_z)
+        arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
 
         self._previous_container = this_container
@@ -852,3 +811,10 @@ class Robot(object):
 
     def comment(self, msg):
         self.add_command(msg)
+
+    def calibrate_container_with_instrument(self, container, instrument):
+        tracked_position = self.position_tracker[container[0]].position
+        true_position    = self.position_tracker[instrument[0]].position
+        calib.calibrate_container_with_delta(container,
+                                             self.position_tracker,
+                                             **(tracked_position-true_position))

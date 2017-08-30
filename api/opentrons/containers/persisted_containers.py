@@ -7,6 +7,7 @@ import pkg_resources
 
 from opentrons.containers.placeable import Container, Well
 from opentrons.util import environment
+from opentrons.util.vector import Vector
 
 
 persisted_containers_dict = {}
@@ -164,20 +165,20 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
     container_data = copy.deepcopy(container_data)
     origin_offset_x = container_data.get('origin-offset', {}).get('x') or 0
     origin_offset_y = container_data.get('origin-offset', {}).get('y') or 0
+    origin_offset_z = container_data.get('origin-offset', {}).get('z') or 0
 
     container = Container()
     locations = container_data.get('locations')
+    container._coordinates = Vector(origin_offset_x, origin_offset_y, origin_offset_z)
+
 
     for well_name, well_properties in locations.items():
         x = well_properties.pop('x')
         y = well_properties.pop('y')
-        z = well_properties.pop('z')
+        z = well_properties.pop('z') + well_properties['depth']
 
-        # assert 'depth' in well_properties
-        # assert 'diameter' in well_properties
-        # assert 'length' in well_properties
-        # assert 'width' in well_properties
-        # assert 'total-liquid-volume' in well_properties
+
+
         assert isinstance(x, numbers.Number)
         assert isinstance(y, numbers.Number)
         assert isinstance(z, numbers.Number)
@@ -190,11 +191,7 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         x -= (well.x_size() / 2)
         y -= (well.y_size() / 2)
 
-        well_coordinates = (
-            x + origin_offset_x,
-            y + origin_offset_y,
-            z
-        )
+        well_coordinates = (x, y, z)
 
         container.add(well, well_name, well_coordinates)
 
