@@ -1,16 +1,17 @@
-import time
+from datetime import datetime
 
 VALID_STATES = set(
     ['loaded', 'running', 'error', 'finished', 'stopped', 'paused'])
 
 
 class Session(object):
-    def __init__(self, name):
+    def __init__(self, name, protocol_text):
         self.name = name
         self.commands = None
         self.run_log = []
         self.errors = []
-        self.state = 'loaded'
+        self.set_state('loaded')
+        self.protocol_text = protocol_text
 
     def set_state(self, state):
         if state not in VALID_STATES:
@@ -19,7 +20,7 @@ class Session(object):
 
         self.state = state
 
-    def set_commands(self, commands):
+    def init_commands(self, commands):
         """
         Expects a list of tuples of form (depth, command_text)
         where depth is depth of the element in command tree.
@@ -28,21 +29,22 @@ class Session(object):
 
         Returns a dictionary that reconstructs a command tree.
         """
-        def get_children(commands, level=0, base_index=0):
+        def children(commands, level=0, base_index=0):
             return [
                 {
-                    'text': command[1],
-                    'children': get_children(commands[index:], level+1, index),
-                    'index': base_index+index
+                    'description': command[1],
+                    'children': children(commands[index:], level+1, index),
+                    'id': base_index+index
                 }
                 for index, command in enumerate(commands)
                 if command[0] == level
             ]
 
-        self.commands = get_children(commands)
+        self.commands = children(commands)
 
-    def add_to_log(self, command):
-        self.run_log.append((len(self.run_log), time.time(), command))
+    def log_append(self, command):
+        self.run_log.append(
+            (len(self.run_log), datetime.utcnow().isoformat(), command))
 
-    def add_error(self, error):
-        self.errors.append((time.time(), error))
+    def error_append(self, error):
+        self.errors.append((datetime.utcnow().isoformat(), error))
