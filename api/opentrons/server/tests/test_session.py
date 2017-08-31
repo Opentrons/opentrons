@@ -42,6 +42,7 @@ async def test_load_protocol_with_error(session_manager):
 
 async def test_load_and_run(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
+    assert session_manager.notifications.queue.qsize() == 0
     assert session.command_log == {}
     assert session.state == 'loaded'
     session.run(devicename='Virtual Smoothie')

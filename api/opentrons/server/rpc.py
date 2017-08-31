@@ -25,7 +25,7 @@ CALL_NACK_MESSAGE = 4
 
 
 class Server(object):
-    def __init__(self, root=None, loop=None, notification_max_depth=0):
+    def __init__(self, root=None, loop=None, notification_max_depth=5):
         self.monitor_events_task = None
         self.loop = loop or asyncio.get_event_loop()
 

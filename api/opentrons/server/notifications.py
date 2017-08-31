@@ -10,7 +10,7 @@ class Notifications(object):
     def __init__(self, loop=None, filters=['add-command']):
         self.loop = loop or asyncio.get_event_loop()
         self.update_filters(filters)
-        self.notifications = Queue(loop=self.loop)
+        self.queue = Queue(loop=self.loop)
         self.session = None
 
         EventBroker.get_instance().add(self.on_notify)
@@ -55,7 +55,7 @@ class Notifications(object):
 
         payload = (event, self.session)
         future = asyncio.run_coroutine_threadsafe(
-                self.notifications.put(payload), self.loop)
+                self.queue.put(payload), self.loop)
 
         # TODO (artyom, 20170829): this block ensures proper sequencing
         # of notification, also covering the scenario of being called from
@@ -67,7 +67,7 @@ class Notifications(object):
         EventBroker.get_instance().remove(self.on_notify)
 
     async def __anext__(self):
-        return await self.notifications.get()
+        return await self.queue.get()
 
     def __aiter__(self):
         return self
