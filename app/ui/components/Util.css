@@ -36,7 +36,7 @@ button:focus { outline: 0; }
 }
 
 .btn {
-  padding: 5px;
+  /*padding: 5px;*/
   border-radius: 2px;
   line-height: 21px;
   background-color: #eee;

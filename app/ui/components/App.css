@@ -55,7 +55,7 @@ body {
 
 .run {
   grid-area: run;
-  margin: 1rem;
+  margin: 0.5rem;
 }
 
 .run_controls {
