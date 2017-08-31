@@ -32,6 +32,9 @@ class SessionManager(object):
             self.notifications.bind(self.session)
         return self.session
 
+    def get_session(self):
+        return self.session
+
 
 class Session(object):
     def __init__(self, name, text):
