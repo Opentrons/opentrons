@@ -683,7 +683,7 @@ class Robot(object):
             self.position_tracker.track_object(
                 container,
                 well,
-                *well.top()[1]
+                *(well._coordinates + well.top()[1])
             )
 
     def clear_commands(self):

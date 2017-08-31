@@ -22,5 +22,4 @@ def calibrate_container_with_delta(container, position_tracker, delta_x, delta_y
     if save:
         container_json = container_to_json(container, container.get_type())
         save_calibrated_container_file(container_json)
-        print(container_json)
 

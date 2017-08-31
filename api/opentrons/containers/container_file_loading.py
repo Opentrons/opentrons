@@ -180,7 +180,7 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
     for well_name, well_properties in locations.items():
         x = well_properties.pop('x')
         y = well_properties.pop('y')
-        z = well_properties.pop('z') + well_properties['depth']
+        z = well_properties.pop('z')
         assert isinstance(x, numbers.Number)
         assert isinstance(y, numbers.Number)
         assert isinstance(z, numbers.Number)
@@ -194,10 +194,7 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         y -= (well.y_size() / 2)
 
         well_coordinates = (x, y, z)
-        print("WELL COORDS: ", well_coordinates)
-
         container.add(well, well_name, well_coordinates)
-    print('{}: {}'.format(container.get_type(), container._coordinates))
     return container
 
 def save_calibrated_container_file(calibrated_container_json):

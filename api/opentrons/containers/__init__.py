@@ -66,13 +66,14 @@ def create(name, grid, spacing, diameter, depth, volume=0):
     save_custom_container(json_container)
     container_file_loading.load_all_containers_from_disk()
 
-
+#FIXME: [Jared - 8/31/17] This is not clean
+#FIXME: fix it by using the same reference points in saved containers and Container/Well objects
 def container_to_json(c, name):
     locations = []
     c_x, c_y, c_z = c._coordinates
     container_offset = {'x': c_x,'y': c_y, 'z': c_z}
     for w in c:
-        x, y, z = w.bottom()[1]
+        x, y, z = w._coordinates + w.bottom()[1]
         properties_dict = {
             'x': x, 'y': y, 'z': z,
             'depth': w.z_size(),
