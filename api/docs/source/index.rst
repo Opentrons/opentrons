@@ -37,12 +37,12 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
     Use the Opentrons API's containers and instruments
 
-    Add a 96 well plate, and place it in slot 'B1'
-    Add a 200uL tip rack, and place it in slot 'A1'
+    Add a 96 well plate, and place it in slot 'B1' of the robot deck
+    Add a 200uL tip rack, and place it in slot 'A1' of the robot deck
 
     Add a 200uL pipette to axis 'b', and tell it to use that tip rack
 
-    Transfer 100uL from the plate's 'A1' well to it's 'A2' well
+    Transfer 100uL from the plate's 'A1' well to it's 'B2' well
 
 If we were to rewrite this with the Opentrons API, it would look like the following:
 
@@ -59,7 +59,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
     # commands
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+    pipette.transfer(100, plate.wells('A1'), plate.wells('B2'))
 
 **********************
 
