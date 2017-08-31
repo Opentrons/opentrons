@@ -69,23 +69,23 @@ def test_get_object_tree(instance):
         'i': id(root),
         't': type_id(root),
         'v': {
-            '0': 0,
+            0: 0,
             'a': {
                 'i': id(a1),
                 't': type_id(a1),
                 'v': {
-                    '0': 0,
+                    0: 0,
                     'b': 1,
                     'c': 'c',
                     'd': True,
                     'e': None}},
-            'b': [{'i': id(a2), 't': type_id(a2), 'v': {'0': 0, 'a': 1}}, 'b', 1],  # noqa: E501
+            'b': [{'i': id(a2), 't': type_id(a2), 'v': {0: 0, 'a': 1}}, 'b', 1],  # noqa: E501
             'c': {
                 'i': tree['v']['c']['i'],
                 't': id(dict),
                 'v': {
                     'a': 1,
-                    'b': [1, 2, {'i': id(a3), 't': type_id(a3), 'v': {'0': 0}}]}},  # noqa: E501
+                    'b': [1, 2, {'i': id(a3), 't': type_id(a3), 'v': {0: 0}}]}},  # noqa: E501
             'circular': {'i': id(root), 't': type_id(root), 'v': None}}}
 
     assert json.dumps(tree)
@@ -98,7 +98,7 @@ def test_get_object_tree_shallow(instance):
         'i': id(root),
         't': type_id(root),
         'v': {
-            '0': 0, 'a': {}, 'b': {}, 'c': {},
+            0: 0, 'a': {}, 'b': {}, 'c': {},
             'circular': {'i': id(root), 't': type_id(root), 'v': None}}}
     assert refs == {id(root): root, type_id(root): type(root)}
 
