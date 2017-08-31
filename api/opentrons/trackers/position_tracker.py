@@ -96,10 +96,11 @@ class PositionTracker(object):
         Adds an object to the dict of object positions
 
         :param obj: Object to add to the position dict
-        :param x, y, z: global object position
+        :param x, y, z: object position relative to parent
         :return: None
         '''
-        pose = Pose(x, y, z)
+        relative_pose = Pose(x, y, z)
+        pose = Pose(*(self[parent].position + relative_pose.position))
         node = self._position_dict[parent][1].add_child(obj)
         self._position_dict[obj] = (pose, node)
 

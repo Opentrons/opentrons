@@ -11,43 +11,50 @@ from opentrons.util.vector import Vector
 
 
 persisted_containers_dict = {}
-persisted_containers_file_list = []
-
-
-def load_persisted_containers_from_file_list(file_list):
-    for file_name in file_list:
-        load_persisted_containers_from_file_path(file_name)
-
-
-def load_all_persisted_containers_from_disk():
-    persisted_containers_file_list.clear()
-    persisted_containers_file_list.extend(
-        [persisted_containers_json_path] + get_custom_container_files()
-    )
-
-    load_persisted_containers_from_file_list(
-        persisted_containers_file_list
-    )
-
-
-def load_persisted_containers_from_file_path(file_path):
-    with open(file_path) as f:
-        persisted_containers_dict.update(json.load(
-            f,
-            object_pairs_hook=OrderedDict
-        )['containers'])
-
+containers_file_list = []
 
 containers_dir_path = pkg_resources.resource_filename(
     'opentrons.config',
     'containers'
 )
 
-persisted_containers_json_path = os.path.join(
+default_containers_path = os.path.join(
     containers_dir_path,
     'default-containers.json'
 )
 
+calibrated_containers_path = os.path.join(
+    containers_dir_path,
+    'calibrated-containers.json'
+)
+
+def load_containers_from_file_list(file_list):
+    for file_name in file_list:
+        load_containers_from_file_path(file_name)
+
+def get_calibrated_container_file():
+    if not os.path.isfile(calibrated_containers_path):
+        with open(calibrated_containers_path, 'w') as f:
+            f.write(json.dumps({'containers': {}}))
+    return calibrated_containers_path
+
+def load_all_containers_from_disk():
+    containers_file_list.clear()
+    containers_file_list.extend(
+        get_custom_container_files() + [default_containers_path, get_calibrated_container_file()]
+    )
+
+    load_containers_from_file_list(
+        containers_file_list
+    )
+
+#TODO: How should we handle faulty container paths?
+def load_containers_from_file_path(file_path):
+    with open(file_path) as f:
+        persisted_containers_dict.update(json.load(
+            f,
+            object_pairs_hook=OrderedDict
+        ).get('containers', [(None,None)]))
 
 def get_custom_container_files():
     """
@@ -78,7 +85,7 @@ def get_persisted_container(container_name: str) -> Container:
     if not container_data:
         raise ValueError(
             ('Container type "{}" not found in files: {}')
-            .format(container_name, persisted_containers_file_list)
+            .format(container_name, containers_file_list)
         )
     return create_container_obj_from_dict(container_data)
 
@@ -88,7 +95,7 @@ def list_container_names():
     return sorted(c_list, key=lambda s: s.lower())
 
 
-def load_all_persisted_containers():
+def load_all_containers():
     containers = []
     for container_name, container_data in persisted_containers_dict.items():
         try:
@@ -170,15 +177,10 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
     container = Container()
     locations = container_data.get('locations')
     container._coordinates = Vector(origin_offset_x, origin_offset_y, origin_offset_z)
-
-
     for well_name, well_properties in locations.items():
         x = well_properties.pop('x')
         y = well_properties.pop('y')
         z = well_properties.pop('z') + well_properties['depth']
-
-
-
         assert isinstance(x, numbers.Number)
         assert isinstance(y, numbers.Number)
         assert isinstance(z, numbers.Number)
@@ -192,12 +194,23 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         y -= (well.y_size() / 2)
 
         well_coordinates = (x, y, z)
+        print("WELL COORDS: ", well_coordinates)
 
         container.add(well, well_name, well_coordinates)
-
+    print('{}: {}'.format(container.get_type(), container._coordinates))
     return container
+
+def save_calibrated_container_file(calibrated_container_json):
+    with open(calibrated_containers_path, 'r+') as f:
+        container_data = json.load(f)
+        container_data['containers'].update(calibrated_container_json)
+        f.seek(0)
+        f.write(json.dumps(container_data, indent=4))
+        f.truncate()
+
+
 
 
 # Load default persisted containers from API distribution
 # and whatever containers we find in environment.get_path('CONTAINERS_DIR')
-load_all_persisted_containers_from_disk()
+load_all_containers_from_disk()

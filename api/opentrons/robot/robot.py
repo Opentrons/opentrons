@@ -618,14 +618,14 @@ class Robot(object):
         self.add_slots_to_deck()
         # Setup Deck as root object for position tracker
         self.position_tracker.create_root_object(
-            self._deck, *self._deck.coordinates()
+            self._deck, *self._deck._coordinates
         )
 
         for slot in self._deck:
             self.position_tracker.track_object(
                 self._deck,
                 slot,
-                *slot.coordinates()
+                *slot._coordinates
             )
 
     @property
@@ -660,6 +660,7 @@ class Robot(object):
         if not label:
             label = container_name
         container = containers.get_persisted_container(container_name)
+        print("COORD: ", container._coordinates)
         container.properties['type'] = container_name
         if self._deck[slot].has_children() and not share:
             raise RuntimeWarning(
@@ -667,7 +668,6 @@ class Robot(object):
                     slot, container_name, slot))
         else:
             self._deck[slot].add(container, label)
-
         self.add_container_to_position_tracker(container)
         return container
 
@@ -677,13 +677,13 @@ class Robot(object):
         (slot) as position tracker parent
         """
         self.position_tracker.track_object(
-            container.parent, container, *container.coordinates()
+            container.parent, container, *container._coordinates
         )
         for well in container:
             self.position_tracker.track_object(
                 container,
                 well,
-                *well.coordinates()
+                *well.top()[1]
             )
 
     def clear_commands(self):
@@ -797,9 +797,9 @@ class Robot(object):
     def comment(self, msg):
         self.add_command(msg)
 
-    def calibrate_container_with_instrument(self, container, instrument):
+    def calibrate_container_with_instrument(self, container, instrument, save=False):
         tracked_position = self.position_tracker[container[0]].position
         true_position    = self.position_tracker[instrument].position
         calib.calibrate_container_with_delta(container,
                                              self.position_tracker,
-                                             *(true_position - tracked_position))
+                                             *(true_position - tracked_position), save)

@@ -2,8 +2,8 @@ from collections import OrderedDict
 import json
 import os
 
-from opentrons.containers.persisted_containers import get_persisted_container
-from opentrons.containers import persisted_containers
+from opentrons.containers.container_file_loading import get_persisted_container
+from opentrons.containers import container_file_loading
 from opentrons.containers.placeable import (
     Deck,
     Slot,
@@ -38,11 +38,11 @@ def load(robot, container_name, slot, label=None, share=False):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
-    return robot.add_container(container_name, slot, label=label, share=share)
+    return robot.add_container(container_name, slot, label)
 
 
 def list():
-    return persisted_containers.list_container_names()
+    return container_file_loading.list_container_names()
 
 
 def create(name, grid, spacing, diameter, depth, volume=0):
@@ -64,23 +64,30 @@ def create(name, grid, spacing, diameter, depth, volume=0):
             custom_container.add(well, well_name, coordinates)
     json_container = container_to_json(custom_container, name)
     save_custom_container(json_container)
-    persisted_containers.load_all_persisted_containers_from_disk()
+    container_file_loading.load_all_containers_from_disk()
 
 
 def container_to_json(c, name):
     locations = []
+    c_x, c_y, c_z = c._coordinates
+    container_offset = {'x': c_x,'y': c_y, 'z': c_z}
     for w in c:
-        x, y, z = w.coordinates()
+        x, y, z = w.bottom()[1]
+        properties_dict = {
+            'x': x, 'y': y, 'z': z,
+            'depth': w.z_size(),
+            'total-liquid-volume': w.max_volume()
+        }
+        if w.properties.get('diameter'):
+            properties_dict.update({'diameter': w.properties['diameter']})
+        else:
+            properties_dict.update({'width': w.properties['width'], 'length': w.properties['length']})
         locations.append((
             w.get_name(),
-            {
-                'x': x, 'y': y, 'z': z,
-                'depth': w.z_size(),
-                'diameter': w.x_size(),
-                'total-liquid-volume': w.max_volume()
-            }
+            properties_dict
+
         ))
-    return {name: {'locations': OrderedDict(locations)}}
+    return {name: {'origin-offset': container_offset,'locations': OrderedDict(locations)}}
 
 
 def save_custom_container(data):
