@@ -84,7 +84,7 @@ class Pipette(Instrument):
             dispense_speed=500):
 
         self.robot = robot
-        self.axis = axis
+        self.axis = axis.lower()
         self.channels = channels
 
         if not name:
