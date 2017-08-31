@@ -10,32 +10,32 @@ from opentrons.server import rpc
 from uuid import uuid4 as uuid
 
 # Uncomment to enable logging during tests
-logging_config = dict(
-    version=1,
-    formatters={
-        'basic': {
-            'format':
-            '[Line %(lineno)s] %(message)s'
-        }
-    },
-    handlers={
-        'debug': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
-        }
-    },
-    loggers={
-        '__main__': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-        'opentrons.server': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-    }
-)
-dictConfig(logging_config)
+# logging_config = dict(
+#     version=1,
+#     formatters={
+#         'basic': {
+#             'format':
+#             '[Line %(lineno)s] %(message)s'
+#         }
+#     },
+#     handlers={
+#         'debug': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'basic',
+#         }
+#     },
+#     loggers={
+#         '__main__': {
+#             'handlers': ['debug'],
+#             'level': logging.DEBUG
+#         },
+#         'opentrons.server': {
+#             'handlers': ['debug'],
+#             'level': logging.DEBUG
+#         },
+#     }
+# )
+# dictConfig(logging_config)
 
 Session = namedtuple(
     'Session',
@@ -66,7 +66,7 @@ def session_manager(loop):
 
 
 @pytest.fixture
-def session(loop, test_client, request):
+def session(loop, test_client, request, session_manager):
     """
     Create testing session. Tests using this fixture are expected
     to have @pytest.mark.parametrize('root', [value]) decorator set.
@@ -75,6 +75,8 @@ def session(loop, test_client, request):
     root = None
     try:
         root = request.getfuncargvalue('root')
+        if not root:
+            root = session_manager
         root.init(loop)
     except:
         pass

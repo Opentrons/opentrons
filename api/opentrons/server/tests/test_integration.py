@@ -1,27 +1,26 @@
+import pytest
 from opentrons.server import rpc
 
 
-async def test_notifications(session, robot_container, protocol):
-    session.server.root = robot_container
+# Setting root to None tells session to use session_manager as root
+@pytest.mark.parametrize('root', [None])
+async def test_notifications(session, session_manager, protocol, root):
+    root = session_manager
+
     await session.socket.receive_json()  # Skip init
-
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Get call result
-
     await session.call(
-        session.server.root,
-        'load_protocol',
-        [protocol.text, protocol.filename]
+        id=id(root),
+        name='create',
+        args=[protocol.filename, protocol.text]
     )
 
     await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Skip result
+    res = await session.socket.receive_json()
 
     await session.call(
-        session.server.root,
-        'run',
-        []
+        id=res['data']['i'],
+        name='run',
+        args=[]
     )
     await session.socket.receive_json()  # Skip ack
 
@@ -35,16 +34,15 @@ async def test_notifications(session, robot_container, protocol):
 
     assert all([
         res['$']['type'] == rpc.NOTIFICATION_MESSAGE for res in responses])
-    print(responses[0])
 
     await session.call(
-        session.server.root,
-        'get_session',
-        []
+        id=id(root),
+        name='get_session',
+        args=[]
     )
 
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()
 
     # There are 101 commands in the protocol
-    assert len(res['data']['v']['run_log']) == 101
+    assert len(res['data']['v']['command_log']['v']) == 101
