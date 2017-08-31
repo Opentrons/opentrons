@@ -47,7 +47,7 @@ def _get_object_tree(max_depth, path, refs, depth, obj):
             items = [object_tree(o) for o in obj]
         except TypeError:
             pass
-        tail = {str(i): v for i, v in enumerate(items)}
+        tail = {i: v for i, v in enumerate(items)}
         return object_container({**iterate(obj.__dict__), **tail})
     else:
         return object_container({})
