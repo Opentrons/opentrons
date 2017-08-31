@@ -35,6 +35,7 @@ async def test_notifications(session, robot_container, protocol):
 
     assert all([
         res['$']['type'] == rpc.NOTIFICATION_MESSAGE for res in responses])
+    print(responses[0])
 
     await session.call(
         session.server.root,

@@ -1,6 +1,6 @@
 # Uncomment to enable logging during tests
-# import logging
-# from logging.config import dictConfig
+import logging
+from logging.config import dictConfig
 
 import pytest
 import os
@@ -10,32 +10,32 @@ from opentrons.server import rpc
 from uuid import uuid4 as uuid
 
 # Uncomment to enable logging during tests
-# logging_config = dict(
-#     version=1,
-#     formatters={
-#         'basic': {
-#             'format':
-#             '[Line %(lineno)s] %(message)s'
-#         }
-#     },
-#     handlers={
-#         'debug': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'basic',
-#         }
-#     },
-#     loggers={
-#         '__main__': {
-#             'handlers': ['debug'],
-#             'level': logging.DEBUG
-#         },
-#         'opentrons.server': {
-#             'handlers': ['debug'],
-#             'level': logging.DEBUG
-#         },
-#     }
-# )
-# dictConfig(logging_config)
+logging_config = dict(
+    version=1,
+    formatters={
+        'basic': {
+            'format':
+            '[Line %(lineno)s] %(message)s'
+        }
+    },
+    handlers={
+        'debug': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'basic',
+        }
+    },
+    loggers={
+        '__main__': {
+            'handlers': ['debug'],
+            'level': logging.DEBUG
+        },
+        'opentrons.server': {
+            'handlers': ['debug'],
+            'level': logging.DEBUG
+        },
+    }
+)
+dictConfig(logging_config)
 
 Session = namedtuple(
     'Session',
@@ -58,34 +58,39 @@ def protocol(request):
 
 
 @pytest.fixture
-def robot_container(loop, request):
-    from opentrons.server import robot_container
-    container = robot_container.RobotContainer(
-        loop=loop,
-        filters=['add-command', 'move-to'])
-    yield container
-    container.finalize()
+def session_manager(loop):
+    from opentrons.server.session import SessionManager
+    with SessionManager(loop=loop, filters=['add-command', 'move-to']) as s:
+        yield s
+    return
 
 
 @pytest.fixture
 def session(loop, test_client, request):
-    server = rpc.Server(loop=loop)
+    """
+    Create testing session. Tests using this fixture are expected
+    to have @pytest.mark.parametrize('root', [value]) decorator set.
+    If not set root will be defaulted to None
+    """
+    root = None
+    try:
+        root = request.getfuncargvalue('root')
+        root.init(loop)
+    except:
+        pass
+
+    server = rpc.Server(loop=loop, root=root)
     client = loop.run_until_complete(test_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
     token = str(uuid())
 
-    async def call(obj=None, name=None, args=None):
+    async def call(**kwargs):
         request = {
             '$': {
                 'token': token
             },
-            'id': id(obj)
         }
-        if name is not None:
-            request['name'] = name
-        if args is not None:
-            request['args'] = args
-
+        request.update(kwargs)
         return await socket.send_json(request)
 
     def finalizer():

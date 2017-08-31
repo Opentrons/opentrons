@@ -13,6 +13,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 log = logging.getLogger(__name__)
 
+# Number of executor threads
+MAX_WORKERS = 2
+
 # Keep these in sync with ES code
 CALL_RESULT_MESSAGE = 0
 CALL_ACK_MESSAGE = 1
@@ -21,56 +24,23 @@ CONTROL_MESSAGE = 3
 CALL_NACK_MESSAGE = 4
 
 
-class ControlBox(object):
-    """
-    Wrapper class to dispatch select calls to server
-    without exposing the entire server class
-    """
-    def __init__(self, server):
-        self.server = server
-
-    def get_root(self):
-        return self.server.root
-
-    def get_object_by_id(self, id):
-        return self.server.objects[id]
-
-    # This is a stub in case the root object doesn't
-    # have async iterator
-    async def __anext__(self):
-        raise StopAsyncIteration
-
-    def __aiter__(self):
-        # Return self in case root doesn't provide __aiter__
-        res = self
-        try:
-            res = self.server.root.__aiter__()
-        except AttributeError as e:
-            log.info(
-                '__aiter__ attribute is not defined for {0}'.format(
-                    self.server.root))
-        finally:
-            return res
-
-
 class Server(object):
-    def __init__(self, root=None, loop=None, notification_max_depth=4):
+    def __init__(self, root=None, loop=None, notification_max_depth=0):
+        self.monitor_events_task = None
+        self.loop = loop or asyncio.get_event_loop()
+
         self.objects = {id(self): self}
-        self.control = ControlBox(self)
+        self.control_box = ControlBox(self.objects)
+
+        self.root = root
         self.notification_max_depth = notification_max_depth
 
         # Allow for two concurrent calls max
-        self.executor = ThreadPoolExecutor(max_workers=2)
-
-        self.loop = loop or asyncio.get_event_loop()
-        self.send_queue = Queue(loop=self.loop)
-        self.monitor_events_task = None
-
-        self._root = None
-        self.root = root
+        self.executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
         self.clients = []
 
+        self.send_queue = Queue(loop=self.loop)
         self.send_loop_task = self.loop.create_task(self.send_loop())
 
         self.app = web.Application()
@@ -84,13 +54,9 @@ class Server(object):
     def root(self, value):
         if self.monitor_events_task:
             self.monitor_events_task.cancel()
-
-        self._root = value
         self.monitor_events_task = \
-            self.loop.create_task(self.monitor_events())
-
-        if hasattr(self._root, 'loop'):
-            self._root.loop = self.loop
+            self.loop.create_task(self.monitor_events(value))
+        self._root = value
 
     def start(self, host, port):
         self.app.on_shutdown.append(self.on_shutdown)
@@ -102,9 +68,6 @@ class Server(object):
         self.send_loop_task.cancel()
         self.monitor_events_task.cancel()
 
-        if callable(getattr(self._root, 'finalize', None)):
-            self.root.finalize()
-
     async def on_shutdown(self, app):
         for ws in self.clients:
             await ws.close(code=WSCloseCode.GOING_AWAY,
@@ -112,27 +75,25 @@ class Server(object):
         self.shutdown()
 
     async def send_loop(self):
-        log.info('Starting send loop')
         while True:
             client, payload = await self.send_queue.get()
             # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
             await client.drain()
             client.send_str(json.dumps(payload))
 
-    async def monitor_events(self):
-        async for event in self.control:
+    async def monitor_events(self, instance):
+        async for event in instance.notifications:
             try:
                 # Apply notification_max_depth to control object tree depth
                 # during serialization to avoid flooding comms
-                data, refs = serialize.get_object_tree(
-                    event,
-                    self.notification_max_depth)
+                data = self.call(
+                    lambda: event,
+                    max_depth=self.notification_max_depth)
                 self.send(
                     {
                         '$': {'type': NOTIFICATION_MESSAGE},
                         'data': data
                     })
-                self.objects.update(refs)
             except Exception as e:
                 log.warning(
                     'While processing event {0}: {1}'.format(
@@ -149,21 +110,11 @@ class Server(object):
         await ws.prepare(request)
         self.clients.append(ws)
 
-        # Return instance of root object and instance of control box
-        control_type, control_type_refs = \
-            serialize.get_object_tree(type(self.control), max_depth=1)
-        control_instance, control_instance_refs = \
-            serialize.get_object_tree(self.control, max_depth=1)
-        self.objects.update({**control_type_refs, **control_instance_refs})
-
-        self.send(
-            {
-                '$': {'type': CONTROL_MESSAGE},
-                'control': {
-                    'instance': control_instance,
-                    'type': control_type
-                }
-            })
+        self.send({
+            '$': {'type': CONTROL_MESSAGE},
+            'root': self.call(lambda: self.root),
+            'type': self.call(lambda: type(self.root))
+        })
 
         try:
             # Async receive ws data until websocket is closed
@@ -240,7 +191,14 @@ class Server(object):
         try:
             if message.type == aiohttp.WSMsgType.TEXT:
                 data = json.loads(message.data)
-                token = data.pop('$')['token']
+                meta = data.pop('$')
+                token = meta['token']
+
+                # If no id, or id is null/none/undefined assume
+                # a system call to control_box instance
+                if 'id' not in data or data['id'] is None:
+                    data['id'] = id(self.control_box)
+
                 try:
                     func = self.prepare_call(data)
                     self.send_ack(token)
@@ -265,14 +223,20 @@ class Server(object):
                 traceback.format_exc()))
             details = '{0}: {1}'.format(e.__class__.__name__, str(e))
             raise RuntimeError(details)
-
         return func
+
+    def call(self, func, max_depth=0):
+        call_result = func()
+        serialized, refs = serialize.get_object_tree(
+            call_result, max_depth=max_depth)
+        self.objects.update(refs)
+        return serialized
 
     async def make_call(self, func, token):
         def call(func):
             response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
             try:
-                call_result = func()
+                call_result = self.call(func)
                 response['$']['status'] = 'success'
             except Exception as e:
                 log.warning(
@@ -282,10 +246,8 @@ class Server(object):
                 call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
             finally:
                 log.info('Call result: {0}'.format(call_result))
-                root, refs = serialize.get_object_tree(call_result)
-                self.objects.update(refs)
-                response['data'] = root
-                return response
+                response['data'] = call_result
+            return response
 
         return await self.loop.run_in_executor(self.executor, call, func)
 
@@ -316,3 +278,12 @@ class Server(object):
             log.info('Enqueuing {0} for {1}'.format(payload, client))
             asyncio.run_coroutine_threadsafe(
                 self.send_queue.put((client, payload)), self.loop)
+
+
+class ControlBox(object):
+    def __init__(self, objects):
+        self.objects = objects
+        objects[id(self)] = self
+
+    def get_object_by_id(self, id):
+        return self.objects[id]

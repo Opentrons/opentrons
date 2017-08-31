@@ -1,4 +1,5 @@
 import asyncio
+import pytest
 import time
 
 from opentrons.server import rpc
@@ -24,27 +25,17 @@ class Foo(object):
         raise Exception('Kaboom!')
 
 
-class TickTock(object):
-    def __init__(self):
-        self.value = 0
-        self.loop = None
-
-    def set_loop(self, loop):
+class Notifications(object):
+    def __init__(self, loop):
         self.loop = loop
+        self.queue = asyncio.Queue(loop=loop)
+
+    def put(self, value):
+        asyncio.run_coroutine_threadsafe(
+            self.queue.put(value), self.loop)
 
     def __aiter__(self):
-        if self.loop is None:
-            raise ValueError('Expected loop to be set')
-        self.queue = asyncio.Queue(loop=self.loop)
         return self
-
-    def start(self):
-        for i in range(5):
-            asyncio.run_coroutine_threadsafe(
-                self.queue.put(i), self.loop)
-            time.sleep(0.1)
-
-        return "Done!"
 
     async def __anext__(self):
         res = await self.queue.get()
@@ -55,37 +46,42 @@ class TickTock(object):
         return res
 
 
+class TickTock(object):
+    def __init__(self):
+        self.value = 0
+
+    # Called by test fixture to set loop
+    def init(self, loop):
+        print('aaa')
+        self.notifications = Notifications(loop)
+        print('aaa')
+
+    def start(self):
+        for i in range(5):
+            self.notifications.put(i)
+            time.sleep(0.1)
+        return "Done!"
+
+
 def type_id(instance):
     return id(type(instance))
 
 
-async def test_init(session):
+@pytest.mark.parametrize('root', [Foo(0)])
+async def test_call(session, root):
+    res = session.server.call(lambda: root)
+    assert res == {'v': {'value': 0}, 't': type_id(root), 'i': id(root)}
+
+
+@pytest.mark.parametrize('root', [Foo(0)])
+async def test_init(session, root):
     expected = {
-        'control': {
-            'instance': {
-                'i': id(session.server.control),
-                't': type_id(session.server.control),
-                'v': {'server': {}}
-            },
-            'type': {
-                'i': type_id(session.server.control),
-                't': type_id(type),
-                'v': {
-                    '__aiter__': {},
-                    '__anext__': {},
-                    '__dict__': {},
-                    '__doc__':
-                        ("\n"
-                         "    Wrapper class to dispatch select calls to server\n"  # NOQA
-                         "    without exposing the entire server class\n"
-                         "    "),
-                    '__init__': {},
-                    '__module__': 'opentrons.server.rpc',
-                    '__weakref__': {},
-                    'get_object_by_id': {},
-                    'get_root': {}}
-            }
+        'root': {
+            'i': id(root),
+            't': type_id(root),
+            'v': {'value': 0}
         },
+        'type': session.server.call(lambda: type(root)),
         '$': {'type': rpc.CONTROL_MESSAGE}}
 
     res = await session.socket.receive_json()
@@ -104,40 +100,13 @@ async def test_exception_during_call(session):
     assert res == {}
 
 
-async def test_get_root(session):
-    session.server.root = Foo(0)
-
+@pytest.mark.parametrize('root', [Foo(0)])
+async def test_get_object_by_id(session, root):
     await session.socket.receive_json()  # Skip init
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    res = await session.socket.receive_json()  # Get call result
-
-    expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': {
-                    'i': id(session.server.root),
-                    't': type_id(session.server.root),
-                    'v': {'value': 0}}}
-    assert res == expected
-
-
-async def test_get_object_by_id(session):
-    session.server.root = Foo(0)
-    await session.socket.receive_json()  # Skip init
-
-    # Since we are going to retrieve root's type
-    # we need to call it first, so it's instance and type ids
-    # get cached on a server side
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Get call result
 
     await session.call(
-        session.server.control,
-        'get_object_by_id',
-        [type_id(session.server.root)])
+        name='get_object_by_id',
+        args=[type_id(root)])
 
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
@@ -168,15 +137,16 @@ async def test_get_object_by_id(session):
     assert res == expected
 
 
-async def test_call_on_result(session):
-    session.server.root = Foo(0)
+@pytest.mark.parametrize('root', [Foo(0)])
+async def test_call_on_result(session, root):
     await session.socket.receive_json()  # Skip init
 
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Get call result
+    await session.call(
+        id=id(root),
+        name='value',
+        args=[]
+    )
 
-    await session.call(session.server.root, 'value', [])
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
@@ -186,7 +156,12 @@ async def test_call_on_result(session):
                 'data': 0}
     assert res == expected
 
-    await session.call(session.server.root, 'add', [1])
+    await session.call(
+        id=id(root),
+        name='add',
+        args=[1]
+    )
+
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
@@ -198,15 +173,16 @@ async def test_call_on_result(session):
     assert res == expected
 
 
-async def test_exception_on_call(session):
-    session.server.root = Foo(0)
+@pytest.mark.parametrize('root', [Foo(0)])
+async def test_exception_on_call(session, root):
     await session.socket.receive_json()  # Skip init
 
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Get call result
+    await session.call(
+        id=id(root),
+        name='throw',
+        args=[]
+    )
 
-    await session.call(session.server.root, 'throw', [])
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
@@ -218,19 +194,24 @@ async def test_exception_on_call(session):
     assert res == expected
 
 
-async def test_call_on_reference(session):
-    session.server.root = Foo(0)
+@pytest.mark.parametrize('root', [Foo(0)])
+async def test_call_on_reference(session, root):
     await session.socket.receive_json()  # Skip init
 
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Get call result
+    await session.call(
+        id=id(root),
+        name='next',
+        args=[]
+    )
 
-    await session.call(session.server.root, 'next', [])
     await session.socket.receive_json()  # Skip ack
     foo_id = (await session.socket.receive_json())['data']['i']
 
-    await session.call(session.server.root, 'combine', [{'i': foo_id}])
+    await session.call(
+        id=id(root),
+        name='combine',
+        args=[{'i': foo_id}]
+    )
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()
 
@@ -243,20 +224,20 @@ async def test_call_on_reference(session):
                     'type': rpc.CALL_RESULT_MESSAGE},
                 'data': {
                     # i was popped out above
-                    't': type_id(session.server.root),
+                    't': type_id(root),
                     'v': {'value': 1}}}
     assert res == expected
 
 
-async def test_notifications(session):
-    session.server.root = TickTock()
+@pytest.mark.parametrize('root', [TickTock()])
+async def test_notifications(session, root):
     await session.socket.receive_json()  # Skip init
 
-    await session.call(session.server.control, 'get_root', [])
-    await session.socket.receive_json()  # Skip ack
-    await session.socket.receive_json()  # Get call result
-
-    await session.call(session.server.root, 'start', [])
+    await session.call(
+        id=id(root),
+        name='start',
+        args=[]
+    )
     await session.socket.receive_json()  # Skip ack
 
     res = []

@@ -1,26 +1,116 @@
+import ast
+import sys
+
+from opentrons import robot
+from opentrons.robot.robot import Robot
 from datetime import datetime
 
+from opentrons.server.notifications import Notifications
+from opentrons.util.trace import EventBroker
+
+# TODO: add session variables as per:
+# https://docs.google.com/document/d/1fXJBd1SFIqudxdWzyFSHoq5mkER45tr_A5Yx1s-nFQs/edit
 VALID_STATES = set(
     ['loaded', 'running', 'error', 'finished', 'stopped', 'paused'])
 
 
+class SessionManager(object):
+    def __init__(self, loop, filters):
+        self.notifications = Notifications(loop=loop, filters=filters)
+        self.robot = Robot()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.notifications.finalize()
+        pass
+
+    def create(self, name, text):
+        with self.notifications.snooze():
+            self.session = Session(name=name, text=text)
+            self.notifications.bind(self.session)
+        return self.session
+
+
 class Session(object):
-    def __init__(self, name, protocol_text):
+    def __init__(self, name, text):
         self.name = name
-        self.commands = None
-        self.run_log = []
-        self.errors = []
-        self.set_state('loaded')
-        self.protocol_text = protocol_text
+        self.protocol_text = text
+        self.state = None
+        self.refresh()
+
+        def on_notify(event):
+            if event.get('name', None) == 'add-command':
+                self.log_append(event['arguments']['command'])
+
+        # TODO(artyom, 20170830): consider using weak references
+        # so we are not leaking memory when session is no longer active
+        EventBroker.get_instance().add(on_notify)
+
+    def refresh(self):
+        self.command_log = {}
+        self.errors = {}
+
+        try:
+            tree = ast.parse(self.protocol_text)
+            self.protocol = compile(tree, filename=self.name, mode='exec')
+            _, commands = self.run()
+            # TODO(artyom, 20170830): this will go away once commands are
+            # passed along with their nesting level in command tree
+            self.load_commands([
+                {'level': 0, 'description': command}
+                for command in commands])
+            self.command_log.clear()
+        finally:
+            if self.state == 'error':
+                raise Exception(*self.errors.values())
+            self.set_state('loaded')
+        return self
+
+    def stop(self):
+        robot.stop()
+        self.set_state('stopped')
+        return self
+
+    def pause(self):
+        robot.pause()
+        self.set_state('paused')
+        return self
+
+    def resume(self):
+        robot.resume()
+        self.set_state('running')
+        return self
+
+    def run(self, devicename=None):
+        # HACK: hard reset singleton by replacing all of it's attributes
+        # with the one from a newly constructed robot
+        robot.__dict__ = {**Robot().__dict__}
+
+        if devicename is not None:
+            robot.connect(devicename)
+
+        try:
+            self.set_state('running')
+            exec(self.protocol, {})
+            self.set_state('finished')
+        except Exception as e:
+            self.set_state('error')
+            _, _, traceback = sys.exc_info()
+            self.error_append((e, traceback))
+        finally:
+            robot.disconnect()
+
+        return (self, robot.commands())
 
     def set_state(self, state):
         if state not in VALID_STATES:
             raise ValueError('Invalid state: {0}. Valid states are: {1}'
                              .format(state, VALID_STATES))
-
         self.state = state
 
-    def init_commands(self, commands):
+    def load_commands(self, commands):
         """
         Given a list of tuples of form (depth, command_text)
         that represents a DFS traversal of a command tree,
@@ -30,19 +120,27 @@ class Session(object):
         def children(commands, level=0, base_index=0):
             return [
                 {
-                    'description': command[1],
+                    'description': command['description'],
                     'children': children(commands[index:], level+1, index),
                     'id': base_index+index
                 }
                 for index, command in enumerate(commands)
-                if command[0] == level
+                if command['level'] == level
             ]
 
         self.commands = children(commands)
 
     def log_append(self, command):
-        self.run_log.append(
-            (len(self.run_log), datetime.utcnow().isoformat(), command))
+        self.command_log.update({
+            len(self.command_log): {
+                'timestamp': datetime.utcnow().isoformat()
+            }
+        })
 
     def error_append(self, error):
-        self.errors.append((datetime.utcnow().isoformat(), error))
+        self.errors.update({
+            len(self.errors): {
+                'timestamp': datetime.utcnow().isoformat(),
+                'error': error
+            }
+        })
