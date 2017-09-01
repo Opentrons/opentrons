@@ -46,6 +46,8 @@ def refresh():
         'CALIBRATIONS_DIR': os.path.join(APP_DATA_DIR, 'calibrations'),
         'CALIBRATIONS_FILE':
             os.path.join(APP_DATA_DIR, 'calibrations', 'calibrations.json'),
+        'DATABASE_FILE':
+            os.path.join(APP_DATA_DIR, 'opentrons.db'),
         'APP_IS_ALIVE_URL': 'http://localhost:31950',
     })
 

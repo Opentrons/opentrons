@@ -1,11 +1,17 @@
 import sqlite3
-import database_crud_funcs
+
+from opentrons.data_storage import database_crud_funcs
+from opentrons.util import environment
 from opentrons.util.vector import Vector
 from opentrons.containers.placeable import Container, Well
 
 
+
 #FIXME: This should be centralized or an env variable
-database_file = './opentrons_database.db'
+database_file = environment.get_path('DATABASE_FILE')
+db = sqlite3.connect(database_file)
+
+
 
 #------------- Private Functions -------------#
 def _parse_container_obj(container):
@@ -18,31 +24,16 @@ def _parse_well_obj(well):
     volume = well.properties.get('total-liquid-volume', None)
     width, length = well.properties['width'], well.properties['length']
     return (location, *relative_coords, depth, volume, diameter, length, width)
-
-def _create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
-    return None
 #------------ END Private Functions -----------#
 
 
-
 #--------------- Public Functions -------------#
-def create_container_obj_in_db(db, container, container_name):
+def create_container_obj_in_db(container, container_name):
     database_crud_funcs.create_container(db, container_name, *_parse_container_obj(container))
     for well in container.wells():
         create_well_obj_in_db(db, container_name, well)
 
 def load_container_object_from_db(container_name):
-    db = _create_connection(database_file)
     container_type, *rel_coords = database_crud_funcs.get_container_by_name(db, container_name)
     wells = database_crud_funcs.get_wells_by_container_name(db, container_name)
     container = Container()
@@ -52,11 +43,10 @@ def load_container_object_from_db(container_name):
         container.add(*load_well_object_from_db(well))
     return container
 
-def update_container_object_in_db(db, container, container_name):
-    db = _create_connection(database_file)
-    database_crud_funcs.update_container(db, container_name, *_parse_container_obj(container))
+def update_container_object_in_db(container):
+    database_crud_funcs.update_container(db, container.get_type(), *_parse_container_obj(container))
 
-def create_well_obj_in_db(db, container_name, well):
+def create_well_obj_in_db(container_name, well):
     well_data = _parse_well_obj()
     database_crud_funcs.insert_well_into_db(db, container_name, *well_data)
 

@@ -2,7 +2,7 @@ from collections import OrderedDict
 import json
 
 from opentrons.containers import container_to_json
-from opentrons.containers.container_file_loading import save_calibrated_container_file
+from opentrons.data_storage import database
 
 
 STORAGE_LOCATION = ''
@@ -15,11 +15,13 @@ STORAGE_LOCATION = ''
        then be able to avoid calibrating all the other plates with with the second pipette.
 '''
 
-def calibrate_container_with_delta(container, position_tracker, delta_x, delta_y, delta_z, save=False):
+def calibrate_container_with_delta(container, position_tracker, delta_x,
+                                   delta_y, delta_z, save=False, new_container_name=None):
     delta = (delta_x, delta_y, delta_z)
     position_tracker.translate_object(container, *delta)
     container._coordinates += delta
-    if save:
-        container_json = container_to_json(container, container.get_type())
-        save_calibrated_container_file(container_json)
+    if save and new_container_name:
+        create_container_obj_in_db(container, new_container_name)
+    elif save:
+        update_container_obj_in_db(container)
 

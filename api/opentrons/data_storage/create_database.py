@@ -2,9 +2,9 @@ import sqlite3
 from opentrons.containers import get_persisted_container
 from opentrons import containers
 import database_crud_funcs
+from opentrons.util import environment
 
-
-db_path = './opentrons_database.db'
+db_path = environment.get_path('DATABASE_FILE')
 containers_table = """ CREATE TABLE IF NOT EXISTS Containers (
                                     name TEXT PRIMARY KEY,
                                     relative_x INTEGER DEFAULT 0,
