@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './App.css'
 import grid from './Grid.css'
-import UploadPanel from './UploadPanel'
-import ConnectionPanel from './ConnectionPanel'
+import SideBar from './SideBar'
+// import UploadPanel from './UploadPanel'
+// import ConnectionPanel from './ConnectionPanel'
 import Button from './Button'
 import RunControl from './RunControl'
 import RunLog from './RunLog'
@@ -70,12 +71,7 @@ export default function App (props) {
 
   return (
     <div className={grid.wrapper}>
-      <aside className={classnames(grid.nav_panel, { [grid.open]: isNavPanelOpen })}>
-        <nav className={grid.nav_icons} onClick={onNavClick}>
-         *
-        </nav>
-        <section className={grid.nav_info}>dynamic nav content</section>
-      </aside>
+      <SideBar {...props} />
       <main className={grid.task}>
         <header className={grid.header}>
            {runButton}

@@ -36,19 +36,18 @@ button:focus { outline: 0; }
 }
 
 .btn {
-  /*padding: 5px;*/
   border-radius: 2px;
-  line-height: 21px;
-  background-color: #eee;
+  border: 1px solid silver;
+  background-color: #fff;
   color: #666;
-  font-family: 'trons';
+  font-family: 'sans';
   font-size: 14px;
   text-transform: uppercase;
   cursor: pointer;
 }
 
 .btn:hover {
-  background-color: #898989;
+  background-color: #eee;
 }
 
 .btn:active {

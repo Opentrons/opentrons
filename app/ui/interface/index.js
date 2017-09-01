@@ -8,12 +8,16 @@ const makeInterfaceActionName = (action) => makeActionName(NAME, action)
 const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
-  isNavPanelOpen: false
+  isNavPanelOpen: false,
+  currentNavPanelTask: 'connect'
 }
 
 export const selectors = {
   getIsNavPanelOpen (allState) {
     return getModuleState(allState).isNavPanelOpen
+  },
+  getCurrentNavPanelTask (allState) {
+    return getModuleState(allState).currentNavPanelTask
   }
 }
 

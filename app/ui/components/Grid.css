@@ -1,70 +1,54 @@
-*{
-	margin:0;
-	padding:0;
+* {
+  margin: 0;
+  padding: 0;
 }
 
-.wrapper{
-	width: 1024px;
-	height: 768px;
-	display: flex;
-	flex-direction: row;
-	font-family: 'sans';
+.wrapper {
+  width: 1024px;
+  height: 768px;
+  display: flex;
+  flex-direction: row;
+  font-family: 'sans';
 }
 
-.nav_panel{
-	border: 1px solid silver;
-	width: 50px;
-	overflow: hidden;
-	transition: all 1s;
-	display: grid;
-	grid-auto-rows: auto;
-	grid-area: sidebar;
-	display:grid;
-	grid-template-columns: 50px 300px;
-	grid-template-areas: 'menu info';
+.nav_panel {
+  border: 1px solid silver;
+  width: 75px;
+  overflow: hidden;
+  transition: all 1s;
+  display: grid;
+  grid-auto-rows: auto;
+  grid-area: sidebar;
+  grid-template-columns: 75px 300px;
+  grid-template-areas: 'menu info';
 }
 
-.nav_panel.open{
-	width:350px;
-}
-
-.nav_icons {
-	grid-area: menu;
-	border-right: 1px solid silver;
-}
-
-.nav_info {
-	grid-area: info;
-	position: relative;
+.nav_panel.open {
+  width: 375px;
 }
 
 .task {
-	grid-area: main;
-	display: grid;
-	flex: 1 1;
-	grid-template:
-		'header' 50px
-		'controls' 200px
-		'main-task' auto;
+  grid-area: main;
+  display: grid;
+  flex: 1 1;
+  grid-template:
+    'header' 75px
+    'controls' 225px
+    'main-task' auto;
 }
 
-.header{
-	background-color: grey;
-	display: grid;
-  grid-template-columns: 40px auto auto 10rem;
+.header {
+  background-color: grey;
+  display: grid;
+  grid-template-columns: auto auto auto 10rem;
   grid-template-areas: ". . . run";
 }
 
 .controls {
-	background-color: silver;
+  background-color: silver;
 }
 
 .maintask {
-	background-color: #EEE;
+  background-color: #eee;
 }
 
-.close {
-	position: absolute;
-	right:10px;
-	top:10px;
-}

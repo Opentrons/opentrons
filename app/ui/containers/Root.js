@@ -18,6 +18,7 @@ const mapStateToProps = (state) => {
   return {
     // interface
     isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
+    currentNavPanelTask: interfaceSelectors.getCurrentNavPanelTask(state),
 
     // robot
     isConnected: state.robot.isConnected,

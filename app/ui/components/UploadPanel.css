@@ -20,28 +20,3 @@
   width: 100%;
   height: auto;
 }
-
-.open_file {
-  position: relative;
-  padding: 0.5rem;
-  border-left: 1px solid silver;
-}
-
-.upload_btn {
-  composes: btn from './Util.css';
-  display:block;
-  text-align: center;
-}
-
-.file {
-  position: fixed;
-  clip: rect( 1px 1px 1px 1px );
-}
-
-
-.recent_files {
-  grid-row: 2;
-  grid-column: 2;
-  border-top: 1px solid silver;
-  border-left: 1px solid silver;
-}
