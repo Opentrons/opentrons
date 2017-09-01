@@ -46,6 +46,12 @@
   grid-template-areas: ". . . run";
 }
 
+/* This will be removed once we refine placement of run button in nav panel, keeping for now */
+.run {
+  grid-area: run;
+  margin: 1rem;
+}
+
 .controls {
   background-color: #eee;
 }

@@ -1,6 +1,7 @@
 .nav_panel {
   display: grid;
   height: 100%;
+  padding: 0 1rem;
   grid-template:
     'details' 675px
     'connect_toggle' auto;

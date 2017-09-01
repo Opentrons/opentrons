@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styles from './App.css'
 import grid from './Grid.css'
 import SideBar from './SideBar'
 import Button from './Button'
@@ -28,7 +27,7 @@ export default function App (props) {
       <Button
         onClick={onRunClick}
         disabled={!isReadyToRun}
-        style={styles.run}
+        style={grid.run}
       >
         Run Job
       </Button>

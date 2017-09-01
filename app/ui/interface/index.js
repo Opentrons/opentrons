@@ -10,6 +10,9 @@ const getModuleState = (state) => state[NAME]
 const INITIAL_STATE = {
   isNavPanelOpen: false,
   currentNavPanelTask: 'connect'
+  // ^ currently changing NavPanel content by changing this manually
+  // need reducer/handler to set currentNavPanelTask item onNavIconClick
+  // change to 'upload' to see upload buttons
 }
 
 export const selectors = {
