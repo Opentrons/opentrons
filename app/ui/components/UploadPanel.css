@@ -29,15 +29,14 @@
 
 .upload_btn {
   composes: btn from './Util.css';
-  display:block;
+  display: block;
   text-align: center;
 }
 
 .file {
   position: fixed;
-  clip: rect( 1px 1px 1px 1px );
+  clip: rect(1px 1px 1px 1px);
 }
-
 
 .recent_files {
   grid-row: 2;
