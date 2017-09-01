@@ -9,7 +9,7 @@ const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
   isNavPanelOpen: false,
-  currentNavPanelTask: 'upload'
+  currentNavPanelTask: 'connect'
 }
 
 export const selectors = {

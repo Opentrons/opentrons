@@ -1,13 +1,13 @@
-.wrapper {
+.run_log_wrapper {
   font-family: 'sans';
   overflow-y: scroll;
-  height: 100%;
-  padding: 1rem;
-  padding-bottom: 3rem;
+  padding: 1rem 1rem 3rem;
+  border-top: 1rem solid white;
+  border-bottom: 3rem solid white;
 }
 
-.wrapper p {
-  margin: 0.5rem 0;
+.run_log_wrapper p {
+  margin: 1rem 0;
 }
 
 .current {
