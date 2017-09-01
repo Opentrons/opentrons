@@ -7,7 +7,8 @@ describe('interface reducer', () => {
     const state = reducer(undefined, {})
 
     expect(state).toEqual({
-      isNavPanelOpen: false
+      isNavPanelOpen: false,
+      currentNavPanelTask: 'connect'
     })
   })
 
