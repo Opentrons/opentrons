@@ -26,6 +26,7 @@
   padding: 1rem;
   cursor: pointer;
   color: grey;
+  z-index: 100;
 }
 
 .upload_icon {

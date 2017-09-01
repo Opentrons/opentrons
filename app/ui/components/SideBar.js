@@ -37,16 +37,16 @@ ConnectionIndicator.propTypes = {
 }
 
 export default function SideBar (props) {
-  const {isNavPanelOpen, onNavClick, currentNavPanelTask} = props
+  const {isNavPanelOpen, onNavClick} = props
   return (
     <aside className={classnames(grid.nav_panel, { [grid.open]: isNavPanelOpen })}>
-      <nav className={styles.nav_icons}>
-        <UploadMenu {...props}/>
+      <nav className={styles.nav_icons} >
+        <UploadMenu {...props} />
         <ConnectionIndicator {...props} />
       </nav>
       <section className={styles.nav_info}>
         <span className={styles.close} onClick={onNavClick}>X</span>
-        <NavPanel {...props}/>
+        <NavPanel {...props} />
       </section>
     </aside>
   )

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
+// import classnames from 'classnames'
 import styles from './App.css'
 import grid from './Grid.css'
 import SideBar from './SideBar'
@@ -13,12 +13,12 @@ import RunLog from './RunLog'
 export default function App (props) {
   const {
     // state
-    isNavPanelOpen,
+    // isNavPanelOpen,
     isReadyToRun,
     isRunning,
     // handlers
-    onRunClick,
-    onNavClick
+    onRunClick
+    // onNavClick
   } = props
   let runButton
   let runControl
@@ -74,7 +74,7 @@ export default function App (props) {
       <SideBar {...props} />
       <main className={grid.task}>
         <header className={grid.header}>
-           {runButton}
+          {runButton}
         </header>
         {runControl}
         {runLog}

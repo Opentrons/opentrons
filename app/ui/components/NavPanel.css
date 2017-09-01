@@ -4,13 +4,17 @@
   grid-template:
     'details' 675px
     'connect_toggle' auto;
+  font-family: 'sans';
+  font-size: 14px;
+  line-height: 2rem;
+  color: grey;
 }
 
 /* Upload */
 .choose_file {
   grid-area: details;
   position: relative;
-  padding: 1rem 0.5rem 0.5rem;
+  padding: 2rem 0.5rem 0.5rem;
 }
 
 .btn {
@@ -28,6 +32,7 @@
 }
 
 .btn_upload {
+  composes: btn;
   background-image: url(../../ui/img/icon_fileupload.svg);
 }
 
@@ -41,11 +46,10 @@
   clip: rect(1px 1px 1px 1px);
 }
 
-.recent_files {
-  grid-row: 2;
-  grid-column: 2;
-  border-top: 1px solid silver;
-  border-left: 1px solid silver;
+.title {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 /* Connect */
