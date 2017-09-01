@@ -2,7 +2,7 @@ import pytest
 
 from datetime import datetime
 
-from opentrons.server.session import Session
+from opentrons.session import Session
 from opentrons.util.trace import EventBroker
 
 

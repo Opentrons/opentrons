@@ -59,7 +59,7 @@ def protocol(request):
 
 @pytest.fixture
 def session_manager(loop):
-    from opentrons.server.session import SessionManager
+    from opentrons.session import SessionManager
     with SessionManager(loop=loop, filters=['add-command', 'move-to']) as s:
         yield s
     return

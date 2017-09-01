@@ -4,7 +4,7 @@ import re
 import sys
 import logging
 from opentrons.server.rpc import Server
-from opentrons.server.session import SessionManager
+from opentrons.session import SessionManager
 from logging.config import dictConfig
 
 # TODO(artyom): might as well use this:
