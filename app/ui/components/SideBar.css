@@ -29,17 +29,25 @@
   z-index: 100;
 }
 
-.upload_icon {
-  border-radius: 2px;
-  border: solid 2px rgba(151, 151, 151, 0.1);
-  padding: 0.5rem 1rem;
+.upload_icon,
+.design_icon,
+.setup_icon {
+  border-bottom: solid 2px rgba(151, 151, 151, 0.1);
+  text-align: center;
+  height: 75px;
   transition: all 100 linear;
   cursor: pointer;
 }
 
 .upload_icon img {
-  width: 100%;
-  height: auto;
+  margin: 0.75rem auto;
+  width: 2.25rem;
+}
+
+.design_icon img,
+.setup_icon img {
+  margin: 1.25rem auto;
+  width: 2rem;
 }
 
 .connection_status {
