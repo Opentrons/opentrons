@@ -1,4 +1,7 @@
-# OT-App
+# OT App
+
+[![JavaScript Style Guide][style-guide-badge]][style-guide]
+
 
 ## Overview
 
@@ -58,3 +61,6 @@ Run OT-App in development mode. This will open development tools and connect to 
 #	Run in the `app` directory
 make dev
 ```
+
+[style-guide]: https://standardjs.com
+[style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600

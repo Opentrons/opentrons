@@ -350,7 +350,7 @@ class Pipette(Instrument):
         _description = "Aspirating {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
+        )
 
         self._position_for_aspirate(location)
         self.motor.speed(speed)
@@ -427,26 +427,23 @@ class Pipette(Instrument):
         if volume == 0:
             return self
 
+        self.move_to(location, strategy='arc')  # position robot above location
+
         # TODO(ahmed): revisit this
         distance = self._plunge_distance(self.current_volume - volume)
         bottom = self._get_plunger_position('bottom')
         destination = bottom - distance
         speed = self.speeds['dispense'] * rate
 
-        # set default dispense location to bottom of well
-        if isinstance(location, Placeable):
-            location = location.bottom(min(location.z_size(), 1))
+        self.motor.speed(speed)
+        self.motor.move(destination)
+        self.current_volume -= volume  # update after actual dispense
 
         _description = "Dispensing {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
-        )  # NOQA
-
-        self.move_to(location, strategy='arc')
-        self.motor.speed(speed)
-        self.motor.move(destination)
+        )
         self.robot.add_command(_description)
-        self.current_volume -= volume  # update after actual dispense
         return self
 
     def _position_for_aspirate(self, location=None):
@@ -806,7 +803,7 @@ class Pipette(Instrument):
 
         _description = "Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')
-        )  # NOQA
+        )
 
         self.robot.add_command(_description)
         return self
@@ -904,7 +901,7 @@ class Pipette(Instrument):
         self.motor.home()
         _description = "Homing pipette plunger on axis {}".format(
             self.axis
-        )  # NOQA
+        )
 
         self.robot.add_command(_description)
         return self
@@ -1085,7 +1082,7 @@ class Pipette(Instrument):
         minutes += int(seconds / 60)
         seconds = seconds % 60
         _description = "Delaying {} minutes and {} seconds".format(
-            minutes, seconds)  # NOQA
+            minutes, seconds)
         seconds += float(minutes * 60)
 
         self.motor.wait(seconds)

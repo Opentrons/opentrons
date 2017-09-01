@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const winston = require('winston')
 
-function createLogger(path, name) {
+function createLogger (path, name) {
   fs.appendFileSync(path, '')
 
   return new (winston.Logger)({
@@ -24,7 +24,7 @@ function createLogger(path, name) {
   })
 }
 
-function getLogger(name) {
+function getLogger (name) {
   const loggerPath = path.join(
     process.env.APP_DATA_DIR,
     name.concat('.log'))

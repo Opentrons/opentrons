@@ -1,4 +1,6 @@
-SHELL:=/bin/bash
+# opentrons api makefile
+
+SHELL := /bin/bash
 
 .PHONY: test docs publish clean install exe dev
 
@@ -6,7 +8,7 @@ install:
 	python setup.py install && pip install -r requirements.txt
 
 test:
-	pylama opentrons tests && py.test --cov
+	pylama opentrons tests && py.test --cov && coverage xml
 
 docs:
 	cd docs && make html && make doctest
@@ -30,3 +32,4 @@ clean:
 		dist \
 		calibrations \
 		.coverage
+	find . -name __pycache__ -type d -print | xargs rm -rf

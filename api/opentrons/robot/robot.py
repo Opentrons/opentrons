@@ -3,7 +3,6 @@ import os
 from threading import Event
 
 from opentrons import containers, drivers
-from opentrons.util import trace
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
@@ -375,17 +374,8 @@ class Robot(object):
             self._driver.home('z')
             self._driver.home('x', 'y', 'b', 'a')
 
+    @traceable('add-command')
     def add_command(self, command):
-        if self.mode == 'live':
-            cmd_run_event = {'caller': 'ui'}
-            cmd_run_event['mode'] = 'live'
-            cmd_run_event['name'] = 'command-run'
-            cmd_run_event.update({
-                'command_description': command,
-                'command_index': len(self._commands),
-                'commands_total': self.cmds_total
-            })
-            trace.EventBroker.get_instance().notify(cmd_run_event)
         self._commands.append(command)
 
     @helpers.not_app_run_safe

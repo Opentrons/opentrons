@@ -7,7 +7,5 @@ export DISPLAY=':99.0'
 Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 # We are managing Node versions through nvm, installing latest LTS version
-export NVM_DIR="$(pwd)/.nvm"
-bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
-source "$NVM_DIR/nvm.sh"
+# nvm is pre-installed in Travis
 nvm install --lts && nvm use --lts

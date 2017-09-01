@@ -1,12 +1,30 @@
 {
- "env": {
-    "test": {
-      "plugins":
-        ["istanbul"]
+  "env": {
+    "production": {
+      "presets": [
+        "react-optimize"
+      ]
+    },
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
     }
   },
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-class-properties"
+  ],
   "presets": [
-    "es2015",
-    "stage-2"
+    "react",
+    [
+      "env", {
+        "targets": {
+          "node": "6.11",
+          "electron": "1.6"
+        },
+        "useBuiltIns": true
+      }
+    ]
   ]
 }

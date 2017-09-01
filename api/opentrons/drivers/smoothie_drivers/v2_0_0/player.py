@@ -178,7 +178,7 @@ class SmoothiePlayer_2_0_0(object):
 
         self.progress_info['paused'] = False
         try:
-            # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa
+            # file: /sd/protocol.gcode, 7 % complete, elapsed time: 00:00:08, est time: 00:02:06  # noqa: E501
             split_data = progress_a.split(',')
 
             file = split_data[0].strip().split(' ')[-1]

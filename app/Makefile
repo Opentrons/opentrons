@@ -1,9 +1,21 @@
-SHELL:=/bin/bash
+# opentrons app makefile
 
-.PHONY: test clean install package
+# use bash
+SHELL := /bin/bash
+
+# use devDependency CLIs with $(BIN)/command
+BIN := node_modules/.bin
+
+# set NODE_ENV for a command with $(ENV)=environment
+ENV := $(BIN)/cross-env NODE_ENV
+
+# setup and development
+#####################################################################
+
+.PHONY: install build package dev clean
 
 install:
-	npm up
+	npm install
 
 ui/dist:
 	npm run build-renderer
@@ -22,20 +34,48 @@ package: build
 	export OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX) && \
 	npm run package
 
-test: build
-	npm run test
-
-test-e2e: build
-	npm run test-e2e
-
 dev:
 	npm run build-dev
 	npm run dev
 
 clean:
-	rm -rf \
-		ui/dist \
+	rm -rf       \
+		ui/dist    \
 		shell/dist \
-		dll \
-		bin \
-		.coverage
+		dll        \
+		bin        \
+		coverage
+
+# test tasks
+#####################################################################
+
+.PHONY: test test-e2e test-unit lint lint-js lint-js-fix lint-css lint-css-fix
+
+# watch and coverage arguments for tests
+watch ?= false
+cover ?= true
+
+ifeq ($(watch), true)
+	cover = false
+endif
+
+test: test-unit
+	$(MAKE) lint
+
+test-unit:
+	$(ENV)=test $(BIN)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
+
+lint:
+	$(BIN)/concurrently "$(MAKE) lint-js" "$(MAKE) lint-css"
+
+lint-js:
+	$(BIN)/standard --verbose | $(BIN)/snazzy
+
+lint-js-fix:
+	$(BIN)/standard --fix
+
+lint-css:
+	$(BIN)/stylelint '**/*.css' --verbose
+
+lint-css-fix:
+	$(BIN)/stylelint '**/*.css' --fix

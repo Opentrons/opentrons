@@ -1,5 +1,8 @@
 # Opentrons Platform
 
+[![Travis CI][travis-badge]][travis]
+[![Codecov][codecov-badge]][codecov]
+
 * [Overview](#overview)
 * [Opentrons API](#api)
 * [OT-App](#app)
@@ -134,3 +137,8 @@ make dev
 ```
 
 Enjoy!
+
+[travis]: https://travis-ci.org/OpenTrons/opentrons/branches
+[travis-badge]: https://img.shields.io/travis/OpenTrons/opentrons/app-3-0.svg?style=flat-square&maxAge=3600
+[codecov]: https://codecov.io/gh/OpenTrons/opentrons/branches
+[codecov-badge]: https://img.shields.io/codecov/c/github/OpenTrons/opentrons/app-3-0.svg?style=flat-square&maxAge=3600

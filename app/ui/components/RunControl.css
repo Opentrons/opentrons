@@ -1,0 +1,53 @@
+.btn_wrapper {
+  display: grid;
+  grid-template-areas: "file  pause cancel";
+  grid-template-columns: auto 10rem 10rem;
+}
+
+.file_info {
+  margin: 1rem;
+  grid-area: file;
+  font-family: 'trons';
+  color: grey;
+}
+
+.btn_pause {
+  composes: btn from './Util.css';
+  grid-area: pause;
+  margin: 1rem;
+}
+
+.btn_cancel {
+  composes: btn from './Util.css';
+  grid-area: cancel;
+  margin: 1rem;
+}
+
+.progress {
+  display: grid;
+  grid-template:
+    "report . timer" 70%
+    "progress_bar progress_bar progress_bar" 30%;
+  grid-template-columns: repeat(3 [cols] 1fr);
+}
+
+.btn_error {
+  composes: btn from './Util.css';
+  grid-area: report;
+  margin: 0 0 1rem 1rem;
+}
+
+.timer {
+  grid-area: timer;
+  font-size: 3rem;
+  padding-right: 1rem;
+  text-align: right;
+  line-height: 3rem;
+  color: grey;
+  font-family: 'sans';
+}
+
+.progress_bar {
+  grid-area: progress_bar;
+}
+
