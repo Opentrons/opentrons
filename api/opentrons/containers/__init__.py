@@ -2,7 +2,8 @@ from collections import OrderedDict
 import json
 import os
 
-from opentrons.containers.container_file_loading import get_persisted_container
+from opentrons.data_storage.database import load_container_object_from_db as get_persisted_container
+from opentrons.data_storage import database
 from opentrons.containers import container_file_loading
 from opentrons.containers.placeable import (
     Deck,
@@ -45,7 +46,7 @@ def load(robot, container_name, slot, label=None):
     return robot.add_container(container_name, slot, label)
 
 def list():
-    return container_file_loading.list_container_names()
+    return database.list_all_container_names()
 
 def create(name, grid, spacing, diameter, depth, volume=0):
     columns, rows = grid
