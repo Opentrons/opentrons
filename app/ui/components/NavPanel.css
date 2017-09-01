@@ -56,9 +56,16 @@
 
 .connection_info {
   grid-area: details;
+  padding: 3rem 1rem;
 }
 
 .connection_toggle {
   grid-area: connect_toggle;
   padding: 1rem;
+}
+
+.btn_connect {
+  composes: btn;
+  padding-left: 0;
+  text-align: center;
 }

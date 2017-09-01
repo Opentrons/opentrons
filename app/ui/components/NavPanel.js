@@ -27,19 +27,36 @@ const UploadPanel = props => {
 
 const ConnectPanel = props => {
   const {isConnected, onConnectClick} = props
+  let connectButton
+  let connectionStatus
+  if (!isConnected) {
+    connectButton =
+      <Button
+        onClick={onConnectClick}
+        disabled={isConnected}
+        style={styles.btn_connect}
+      >
+        Connect To Robot
+      </Button>
+    connectionStatus = <h2 className={styles.title}> Robot Detected</h2> // what if no robot detected?
+  } else {
+    connectButton =
+      <Button
+        onClick={() => console.log('disconnect')}
+        disabled={!isConnected}
+        style={styles.btn_connect}
+      >
+        Disconnect Robot
+      </Button>
+    connectionStatus = <h2 className={styles.title}> Robot Connected</h2>
+  }
   return (
     <div className={styles.nav_panel}>
       <section className={styles.connection_info}>
-        <p>connect</p>
+        {connectionStatus}
       </section>
       <section className={styles.connection_toggle}>
-        <Button
-          onClick={onConnectClick}
-          disabled={isConnected}
-          style={styles.btn}
-        >
-          Connect To Robot
-        </Button>
+        {connectButton}
       </section>
     </div>
   )
