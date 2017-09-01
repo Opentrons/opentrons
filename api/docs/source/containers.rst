@@ -1,5 +1,10 @@
 .. _containers:
 
+.. testsetup:: *
+
+    from opentrons import containers, robot
+    robot.reset()
+
 ######################
 Containers
 ######################
@@ -25,6 +30,29 @@ If you are interested in using your own container that is not included in the AP
 .. note::
 
     All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
+
+**********************
+
+Placing containers on the robot deck
+=====
+
+The robot deck is made up of slots labeled A1, A2, A3, B1, and so on.
+
+.. image:: img/DeckMapEmpty.png
+
+To tell the robot what containers will be on the deck for your protocol, use `containers.load`
+
+.. code-block:: python
+  samples_rack = containers.load('tube-rack-2ml', slot='B1')
+
+Putting multiple containers in the same slot
+-----
+
+Some containers might only take up half a slot. You must explicitly say `share=True`, indicating that it is okay to share the slot.
+
+.. code-block:: python
+  tubes = containers.load('T25-flask', slot='C1')
+  more_tubes = containers.load('T25-flask', slot='C1', share=True)
 
 **********************
 
@@ -244,11 +272,6 @@ See dimensions in diagram below.
 
 **********************
 
-.. testsetup:: containers
-
-    from opentrons import containers, robot
-    robot.reset()
-
 **************
 Containers
 **************
@@ -284,7 +307,7 @@ Labware is loaded with two arguments: 1) the container type, and 2) the deck slo
 
 A third optional argument can be used to give a container a unique name.
 
-.. testcode:: containers
+.. testcode:: containers_2
 
     p = containers.load('96-flat', 'B1', 'any-name-you-want')
 
@@ -296,13 +319,13 @@ Unique names are useful in a few scenarios. First, they allow the container to h
 
 __ https://opentrons.com/getting-started/calibrate-deck
 
-Names can also be used to place multiple containers in the same slot all at once. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
+Names can also be used to place multiple containers in the same slot all at once, using the `share=True` argument. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
 
 .. testcode:: containers
 
     fa = containers.load('T25-flask', 'D1', 'flask_a')
-    fb = containers.load('T25-flask', 'D1', 'flask_b')
-    fc = containers.load('T25-flask', 'D1', 'flask_c')
+    fb = containers.load('T25-flask', 'D1', 'flask_b', share=True)
+    fc = containers.load('T25-flask', 'D1', 'flask_c', share=True)
 
 Create
 ======
@@ -311,7 +334,7 @@ In addition to the default containers that come with the Opentrons API, you can 
 
 Through the API's call containers.create(), you can create simple grid containers, which consist of circular wells arranged in columns and rows.
 
-.. testcode:: containers
+.. testcode:: containers_custom
 
     containers.create(
         '3x6_plate',                    # name of you container
@@ -323,7 +346,7 @@ Through the API's call containers.create(), you can create simple grid container
 
 When you create your custom container, then it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
 
-.. testcode:: containers
+.. testcode:: containers_custom
 
     custom_plate = containers.load('3x6_plate', 'D1')
 
@@ -332,7 +355,7 @@ When you create your custom container, then it will be saved for later use under
 
 will print out...
 
-.. testoutput:: containers
+.. testoutput:: containers_custom
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     <Well A1>

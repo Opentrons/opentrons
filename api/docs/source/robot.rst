@@ -2,16 +2,8 @@
 
 .. testsetup:: robot
 
-    from opentrons import containers, instruments, robot
-    from opentrons.instruments import pipette as _pipette
-
+    from opentrons import robot
     robot.reset()
-
-    plate = robot.add_container('96-flat', 'B1', 'my-plate')
-
-    tiprack = robot.add_container('tiprack-200ul', 'A1', 'my-rack')
-
-    pipette = _pipette.Pipette(robot, axis='b', max_volume=200, name='my-pipette')
 
 ###################
 Advanced Control
@@ -66,7 +58,7 @@ When commands are called on a pipette, they are recorded on the ``robot`` in the
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. testcode:: robot
-    
+
     pipette.pick_up_tip(tiprack.wells('A1'))
     pipette.drop_tip(tiprack.wells('A1'))
 
@@ -87,7 +79,7 @@ Clear Commands
 We can erase the robot command history by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but the commands history is erased.
 
 .. testcode:: robot
-    
+
     robot.clear_commands()
     pipette.pick_up_tip(tiprack['A1'])
     print('There is', len(robot.commands()), 'command')
@@ -109,7 +101,7 @@ Comment
 You can add a custom message to the list of command descriptions you see when running ``robot.commands()``. This command is ``robot.comment()``, and it allows you to print out any information you want at the point in your protocol
 
 .. testcode:: robot
-    
+
     robot.clear_commands()
 
     pipette.pick_up_tip(tiprack['A1'])
@@ -139,17 +131,17 @@ When containers are loaded, they are automatically added to the ``robot``. You c
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. testcode:: robot
-    
-    for name, container in robot.get_containers():
-        print(name, container.get_type())
+
+    for container in robot.get_containers():
+        print(container.get_name(), container.get_type())
 
 will print out...
 
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    my-plate 96-flat
     my-rack tiprack-200ul
+    my-plate 96-flat
 
 Get Instruments
 ===============
@@ -159,7 +151,7 @@ When instruments are created, they are automatically added to the ``robot``. You
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. testcode:: robot
-    
+
     for axis, pipette in robot.get_instruments():
         print(pipette.name, axis)
 
@@ -176,7 +168,7 @@ Reset
 Calling ``robot.reset()`` will remove everything from the robot. Any previously added containers, pipettes, or commands will be erased.
 
 .. testcode:: robot
-    
+
     robot.reset()
     print(robot.get_containers())
     print(robot.get_instruments())
@@ -190,4 +182,3 @@ will print out...
     []
     []
     []
-
