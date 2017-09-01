@@ -5,7 +5,7 @@ from opentrons import robot
 from opentrons.robot.robot import Robot
 from datetime import datetime
 
-from opentrons.server.notifications import Notifications
+from .notifications import Notifications
 from opentrons.util.trace import EventBroker
 
 # TODO: add session variables as per:
