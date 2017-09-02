@@ -1,10 +1,9 @@
 import sqlite3
-from opentrons.containers import get_persisted_container
+from opentrons.containers.container_file_loading import load_all_containers_from_disk, list_container_names, get_persisted_container
 from opentrons import containers
-import database_crud_funcs
+from opentrons.data_storage import database
 from opentrons.util import environment
 
-db_path = environment.get_path('DATABASE_FILE')
 containers_table = """ CREATE TABLE IF NOT EXISTS Containers (
                                     name TEXT PRIMARY KEY,
                                     relative_x INTEGER DEFAULT 0,
@@ -27,11 +26,17 @@ container_wells = """CREATE TABLE IF NOT EXISTS ContainerWells (
                             );"""
 
 
-def migrate_containers_and_wells(db_file):
-    db_conn = create_connection(db_file)
-    for container_name in containers.list():
+def migrate_containers_and_wells(db_conn):
+    print("Loading json containers...")
+    load_all_containers_from_disk()
+    print("Json container file load complete.")
+    print("Starting migration...")
+    for container_name in list_container_names():
+        print('migrating {} from json to database'.format(container_name))
         container = get_persisted_container(container_name)
-        insert_container_obj_in_db(db_conn, container, container_name)
+        database.create_container_obj_in_db(container, container_name)
+    print("Database migration complete!")
+
 
 def create_table(conn, create_table_sql):
     """ create a table from the create_table_sql statement
@@ -47,11 +52,15 @@ def create_table(conn, create_table_sql):
 
 def main():
     # create a database connection
-    conn = create_connection(db_path)
+    # db_path = environment.get_path('DATABASE_FILE')
+
+    db_path = '/Users/jaredgreene/OpenTrons/opentrons-api/api/opentrons/data_storage/opentrons.db'
+    print("PATH: ",db_path)
+    conn = sqlite3.connect(db_path)
     if conn is not None:
         create_table(conn, containers_table)
         create_table(conn, container_wells)
-        migrate_containers_and_wells(db_path)
+        migrate_containers_and_wells(conn)
 
     else:
         print("Error! cannot create the database connection.")

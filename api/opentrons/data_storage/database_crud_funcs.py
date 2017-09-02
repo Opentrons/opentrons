@@ -1,7 +1,7 @@
 import sqlite3
 
 #------------- Container Functions -------------#
-def get_all_container_names(db_conn, container_name):
+def get_all_container_names(db_conn):
     with db_conn:
         cursor = db_conn.cursor()
         cursor.execute('SELECT name from Containers')

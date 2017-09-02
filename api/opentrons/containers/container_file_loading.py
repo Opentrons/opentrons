@@ -205,9 +205,3 @@ def save_calibrated_container_file(calibrated_container_json):
         f.write(json.dumps(container_data, indent=4))
         f.truncate()
 
-
-
-
-# Load default persisted containers from API distribution
-# and whatever containers we find in environment.get_path('CONTAINERS_DIR')
-load_all_containers_from_disk()

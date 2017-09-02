@@ -24,14 +24,14 @@ def test_add_container_to_deck(robot):
 
 def test_calibrate_plate(robot):
     plate = containers_load(robot, '96-flat', 'A1')
-    assert robot.position_tracker[plate]    == pt.Pose(10,10, 0)
-    assert robot.position_tracker[plate[2]] == pt.Pose(24.8, 6.8, 10.5)
-    assert robot.position_tracker[plate[5]] == pt.Pose(51.8, 6.8, 10.5)
+    assert robot.position_tracker[plate]    == pt.Pose(21.24,24.34, 0)
+    assert robot.position_tracker[plate[2]] == pt.Pose(39.24, 24.34, 10.5)
+    assert robot.position_tracker[plate[5]] == pt.Pose(66.24, 24.34, 10.5)
 
     cf.calibrate_container_with_delta(plate, robot.position_tracker, 1, 3, 4)
-    assert robot.position_tracker[plate] == pt.Pose(11, 13, 4)
-    assert robot.position_tracker[plate[2]] == pt.Pose(25.8, 9.8, 14.5)
-    assert robot.position_tracker[plate[5]] == pt.Pose(52.8, 9.8, 14.5)
+    assert robot.position_tracker[plate] == pt.Pose(22.24, 27.34, 4)
+    assert robot.position_tracker[plate[2]] == pt.Pose(40.24, 27.34, 14.5)
+    assert robot.position_tracker[plate[5]] == pt.Pose(67.24, 27.34, 14.5)
 
 def test_add_pipette(robot):
     p200 = Pipette(robot, 'a')
@@ -41,7 +41,7 @@ def test_pipette_movement(robot):
     p200  = Pipette(robot, 'a')
     plate = containers_load(robot, '96-flat', 'A1')
     p200.move_to(plate[2])
-    assert robot.position_tracker[p200] == pt.Pose(24.8, 6.8, 10.5)
+    assert robot.position_tracker[p200] == pt.Pose(39.24, 24.34, 10.5)
 
 
 def test_max_z(robot):

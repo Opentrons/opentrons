@@ -1,6 +1,6 @@
 import sqlite3
 
-from opentrons.data_storage import database_crud_funcs
+from opentrons.data_storage import database_crud_funcs as db_crud
 from opentrons.util import environment
 from opentrons.util.vector import Vector
 from opentrons.containers.placeable import Container, Well
@@ -8,7 +8,8 @@ from opentrons.containers.placeable import Container, Well
 
 
 #FIXME: This should be centralized or an env variable
-database_file = environment.get_path('DATABASE_FILE')
+# database_file = environment.get_path('DATABASE_FILE')
+database_file = '/Users/jaredgreene/OpenTrons/opentrons-api/api/opentrons/data_storage/opentrons.db'
 db = sqlite3.connect(database_file)
 
 
@@ -29,13 +30,13 @@ def _parse_well_obj(well):
 
 #--------------- Public Functions -------------#
 def create_container_obj_in_db(container, container_name):
-    database_crud_funcs.create_container(db, container_name, *_parse_container_obj(container))
+    db_crud.create_container(db, container_name, *_parse_container_obj(container))
     for well in container.wells():
-        create_well_obj_in_db(db, container_name, well)
+        create_well_obj_in_db(container_name, well)
 
 def load_container_object_from_db(container_name):
-    container_type, *rel_coords = database_crud_funcs.get_container_by_name(db, container_name)
-    wells = database_crud_funcs.get_wells_by_container_name(db, container_name)
+    container_type, *rel_coords = db_crud.get_container_by_name(db, container_name)
+    wells = db_crud.get_wells_by_container_name(db, container_name)
     container = Container()
     container.properties['type'] = container_type
     container._coordinates = Vector(rel_coords)
@@ -44,11 +45,11 @@ def load_container_object_from_db(container_name):
     return container
 
 def update_container_object_in_db(container):
-    database_crud_funcs.update_container(db, container.get_type(), *_parse_container_obj(container))
+    db_crud.update_container(db, container.get_type(), *_parse_container_obj(container))
 
 def create_well_obj_in_db(container_name, well):
-    well_data = _parse_well_obj()
-    database_crud_funcs.insert_well_into_db(db, container_name, *well_data)
+    well_data = _parse_well_obj(well)
+    db_crud.insert_well_into_db(db, container_name, *well_data)
 
 #FIXME: This has ugly output because of the way that wells are added to containers. fix this by fixing placeables....
 def load_well_object_from_db(well_data):
@@ -65,5 +66,5 @@ def load_well_object_from_db(well_data):
     return (well, location, well_coordinates)
 
 def list_all_container_names():
-    return get_all_container_names()
+    return db_crud.get_all_container_names(db)
 #-------------- END Public Functions -----------#
