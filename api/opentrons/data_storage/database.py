@@ -60,7 +60,8 @@ def _load_well_object_from_db(db, well_data):
     return (well, location, well_coordinates)
 
 def _list_all_containers_by_name(db):
-    return db_crud.get_all_container_names(db)
+    clean_list = [container for container, in db_crud.get_all_container_names(db)]
+    return clean_list
 #------------ END Private Functions -----------#
 
 
