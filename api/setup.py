@@ -11,7 +11,7 @@ DISTNAME = 'opentrons'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
-URL = "https://github.com/OpenTrons/opentrons-api"
+URL = "https://github.com/OpenTrons/opentrons"
 DOWNLOAD_URL = ''
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
@@ -31,20 +31,10 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'dill==0.2.5',
-    'requests>=2.12.4',
-    'pyserial==3.2.1',
-    'Flask==0.10.1',
-    'Flask-SocketIO==2.5',
-    'Flask-Cors==3.0.2',
-    'psutil==4.3.1',
-    'gevent==1.1.2']
-TEST_SUITE = 'nose.collector'
+    'requests==2.14.2',
+    'pyserial==3.2.1']
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-
-# Note(Ahmed): This is only needed when the api includes the app
-# with open('requirements-app.txt') as f:
-#     INSTALL_REQUIRES.extend([i.strip() for i in list(f.readlines())])
 
 
 def read(*parts):
@@ -73,7 +63,8 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
+        setup_requires=['pytest-runner'],
+        tests_require=['pytest'],
         cmdclass=versioneer.get_cmdclass(),
-        include_package_data=True,
-        test_suite=TEST_SUITE
+        include_package_data=True
     )

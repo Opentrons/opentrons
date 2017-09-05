@@ -1,35 +1,35 @@
-.PHONY: api api-install api-test api-lint api-docs api-deploy api-clean api-valid-exe
+# opentrons api makefile
 
-api: api-clean api-install api-lint api-test api-docs api-deploy api-exe
+SHELL := /bin/bash
 
-api-valid-exe: api-clean api-install api-test api-exe
+.PHONY: test docs publish clean install exe dev
 
-api-install:
-	pip3 install -r requirements.txt
-	python3 setup.py install
+install:
+	python setup.py install && pip install -r requirements.txt
 
-api-test:
-	nosetests --with-coverage
+test:
+	pylama opentrons tests && py.test --cov && coverage xml
 
-api-lint:
-	pylama
+docs:
+	cd docs && make html && make doctest
 
-api-docs:
-	cd docs && make clean html && make doctest && cd ..
+publish:
+	cd scripts && publish.sh && doc-deploy.sh
 
-api-deploy:
-	cd scripts && ./doc-deploy.sh && cd ..
+dev:
+	python opentrons/server/main.py
 
-api-wheel:
-	rm ../app/release-assets/*.whl; python3 setup.py bdist_wheel -d ../app/release-assets
-	ls ../app/release-assets/*.whl | xargs -I{} basename {} > ../app/release-assets/whl-name
+exe: dist/opentrons-api-server
 
-api-exe:
-	python3 scripts/build_pyinstaller.py
+dist/opentrons-api-server:
+	pyinstaller opentrons-api-server.spec
 
-api-clean:
+clean:
 	rm -rf \
+		__pycache__ \
 		*.egg-info \
-		build/ \
-		dist/ \
-		calibrations/ \
+		build \
+		dist \
+		calibrations \
+		.coverage
+	find . -name __pycache__ -type d -print | xargs rm -rf

@@ -3,13 +3,13 @@ import os
 from opentrons import containers
 from opentrons.labware import instruments
 from opentrons import Robot
-from opentrons.drivers.motor import CNCDriver
+from opentrons.drivers.motor import SmoothieDriver1
 
 from helpers.calibration import import_json_calibration
 
 robot = Robot.get_instance()
 
-robot._driver = CNCDriver()
+robot._driver = SmoothieDriver1()
 
 plate = containers.load('96-flat', 'A2', 'magbead')
 trash = containers.load('point', 'A1', 'trash')
@@ -80,8 +80,6 @@ def run_test():
 
     p200.pick_up_tip(tiprack[4])
     p200.drop_tip(tiprack[95])
-
-    robot.run()
 
 
 calibrate_plunger()

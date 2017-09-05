@@ -1,11 +1,16 @@
 .. _api:
 
+.. testcleanup:: *
+
+  from opentrons import robot
+  robot.reset()
+
 API Reference
 ===============
 
 .. module:: opentrons
 
-If you are reading this, you are probably looking for an in-depth explanation of API classes and methods to fully master your protocol development skills. 
+If you are reading this, you are probably looking for an in-depth explanation of API classes and methods to fully master your protocol development skills.
 
 Robot
 -----

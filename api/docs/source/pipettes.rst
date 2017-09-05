@@ -1,5 +1,10 @@
 .. _pipettes:
 
+.. testsetup:: *
+
+  from opentrons import robot
+  robot.reset()
+
 ########################
 Liquid Handling
 ########################
@@ -65,7 +70,7 @@ The speeds at which the pipette will aspirate and dispense can be set through ``
 
 .. testcode:: pipettes
 
-    pipeipette = instruments.Pipette(
+    pipette = instruments.Pipette(
         axis='b',
         name='my-p200-multichannel',
         max_volume=200,
@@ -73,17 +78,6 @@ The speeds at which the pipette will aspirate and dispense can be set through ``
         channels=8,
         aspirate_speed=200,
         dispense_speed=600)
-
-.. testsetup:: robot
-
-    from opentrons import robot, containers, instruments
-
-    robot.reset()
-
-    plate = containers.load('96-flat', 'B1', 'my-plate')
-    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
-
-    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
 
 **********************
@@ -96,21 +90,10 @@ When we handle liquids with a pipette, we are constantly exchanging old, used ti
 
 **********************
 
-.. testsetup:: tips
-
-    from opentrons import containers, instruments, robot
-
-    robot.reset()
-
-    trash = containers.load('point', 'D2')
-    tiprack = containers.load('tiprack-200ul', 'B1')
-
-    pipette = instruments.Pipette(axis='a')
-
 This section demonstrates the options available for controlling tips
 
 .. testcode:: tips
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -158,29 +141,13 @@ When we need to return the tip to its originating location on the tip rack, we c
 
 **********************
 
-.. testsetup:: tipsiterating
-
-    from opentrons import containers, instruments, robot
-
-    robot.reset()
-
-    trash = containers.load('point', 'D2')
-    tip_rack_1 = containers.load('tiprack-200ul', 'B1')
-    tip_rack_2 = containers.load('tiprack-200ul', 'B2')
-
-    pipette = instruments.Pipette(
-        axis='b',
-        tip_racks=[tip_rack_1, tip_rack_2],
-        trash_container=trash
-    )
-
 Tips Iterating
 ==============
 
 Automatically iterate through tips and drop tip in trash by attaching containers to a pipette
 
 .. testcode:: tipsiterating
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -299,7 +266,7 @@ This is the fun section, where we get to move things around and pipette! This se
     pipette = instruments.Pipette(axis='b', max_volume=200)
 
 .. testcode:: liquid
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -419,7 +386,7 @@ Moving
 Demonstrates the different ways to control the movement of the Opentrons liquid handler during a protocol run.
 
 .. testcode:: moving
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -433,9 +400,9 @@ Demonstrates the different ways to control the movement of the Opentrons liquid 
 Move To
 =======
 
-Pipette's are able to ``move_to()`` any location on the deck. Any call to ``move_to()`` will be enqueued, meaning that it will not execute until calling ``robot.run()``.
+Pipette's are able to ``move_to()`` any location on the deck.
 
-For example, we can enqueue a movement to the first tip in our tip rack:
+For example, we can move to the first tip in our tip rack:
 
 .. testcode:: moving
 
@@ -457,7 +424,7 @@ The above commands will cause the robot's head to first move upwards, then over 
     pipette.move_to(plate.wells('A1'), strategy='direct')
 
 .. note::
-    
+
     Moving with ``strategy='direct'`` will run the risk of colliding with things on your deck. Be very careful when using the option.
 
 Usually the ``strategy='direct'`` option is useful when moving inside of a well. Take a look at the below sequence of movements, which first move the head to a well, and use 'direct' movements inside that well, then finally move on to a different well.
@@ -479,5 +446,3 @@ To have your protocol pause for any given number of minutes or seconds, simply c
     pipette.delay(seconds=2)             # pause for 2 seconds
     pipette.delay(minutes=5)             # pause for 5 minutes
     pipette.delay(minutes=5, seconds=2)  # pause for 5 minutes and 2 seconds
-
-

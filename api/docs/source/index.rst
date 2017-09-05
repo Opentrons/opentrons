@@ -3,6 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. testsetup:: *
+
+  from opentrons import robot, containers, instruments
+  robot.reset()
+
+.. testcleanup:: *
+
+  from opentrons import robot, containers, instruments
+  robot.reset()
+
 ===============
 Opentrons API
 ===============
@@ -17,17 +27,6 @@ __ https://github.com/opentrons/opentrons-api
 
 **********************
 
-.. testsetup::  helloworld
-
-    from opentrons import containers, instruments, robot
-
-    robot.reset()
-
-    tiprack = containers.load('tiprack-200ul', 'A1')
-    plate = containers.load('96-flat', 'B1')
-
-    pipette = instruments.Pipette(axis='b', max_volume=200)
-
 How it Looks
 ---------------
 
@@ -37,16 +36,16 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
     Use the Opentrons API's containers and instruments
 
-    Add a 96 well plate, and place it in slot 'B1'
-    Add a 200uL tip rack, and place it in slot 'A1'
+    Add a 96 well plate, and place it in slot 'B1' of the robot deck
+    Add a 200uL tip rack, and place it in slot 'A1' of the robot deck
 
     Add a 200uL pipette to axis 'b', and tell it to use that tip rack
 
-    Transfer 100uL from the plate's 'A1' well to it's 'A2' well
+    Transfer 100uL from the plate's 'A1' well to it's 'B2' well
 
 If we were to rewrite this with the Opentrons API, it would look like the following:
 
-.. testcode::  helloworld
+.. testcode:: helloworld
 
     # imports
     from opentrons import containers, instruments
@@ -59,7 +58,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
     # commands
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+    pipette.transfer(100, plate.wells('A1'), plate.wells('B2'))
 
 **********************
 
@@ -80,7 +79,7 @@ When writing in Python, you must always include the Opentrons API within your fi
 
 From the example above, the "imports" section looked like:
 
-.. code-block::  python
+.. testcode:: imports
 
     from opentrons import containers, instruments
 
@@ -94,7 +93,7 @@ Each container is given a type (ex: ``'96-flat'``), and the slot on the robot it
 
 From the example above, the "containers" section looked like:
 
-.. code-block::  python
+.. testcode:: imports
 
     plate = containers.load('96-flat', 'B1')
     tiprack = containers.load('tiprack-200ul', 'A1')
@@ -108,7 +107,7 @@ There are other parameters for pipettes, but the most important are the ``max_vo
 
 From the example above, the "pipettes" section looked like:
 
-.. code-block::  python
+.. testcode:: imports
 
     pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
@@ -121,7 +120,7 @@ This section can tend to get long, relative to the complexity of your protocol. 
 
 From the example above, the "commands" section looked like:
 
-.. code-block:: python
+.. testcode:: imports
 
     pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
 

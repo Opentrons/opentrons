@@ -223,7 +223,9 @@ class Placeable(object):
             name = str(child)
 
         if name in self.children_by_name:
-            del self.children_by_name[name]
+            raise RuntimeWarning(
+                'Child with name {} already in slot, use custom name'.format(
+                    name))
 
         child._coordinates = Vector(coordinates)
         child.parent = self
@@ -459,21 +461,20 @@ class Deck(Placeable):
     """
     This class implements behaviour specific to the Deck
     """
-    def containers(self) -> dict:
+    def containers(self) -> list:
         """
-        Returns all containers on a deck as a name:placeable dict
+        Returns all containers on a deck as a list
         """
-        containers = OrderedDict()
+        all_containers = list()
         for slot in self:
-            for container in slot:
-                containers[container.get_name()] = container
-        return containers
+            all_containers += slot.get_children_list()
+        return all_containers
 
     def has_container(self, container_instance):
         """
         Returns *True* if :Deck: has a container :container_instance:
         """
-        return container_instance in self.containers().values()
+        return container_instance in self.containers()
 
 
 class Well(Placeable):
@@ -622,6 +623,8 @@ class Container(Placeable):
             new_wells = WellSeries(self.get_children_list())
         elif len(args) > 1:
             new_wells = WellSeries([self.well(n) for n in args])
+        elif 'x' in kwargs or 'y' in kwargs:
+            new_wells = self._parse_wells_x_y(*args, **kwargs)
         else:
             new_wells = self._parse_wells_to_and_length(*args, **kwargs)
 
@@ -673,6 +676,19 @@ class Container(Placeable):
                 step = step * -1 if step > 0 else step
             return WellSeries(
                 wrapped_wells[start + total_kids::step][:length])
+
+    def _parse_wells_x_y(self, *args, **kwargs):
+        x = kwargs.get('x', None)
+        y = kwargs.get('y', None)
+        if x is None and isinstance(y, int):
+            return self.rows(y)
+        elif y is None and isinstance(x, int):
+            return self.cols(x)
+        elif isinstance(x, int) and isinstance(y, int):
+            i = (y * len(self.cols)) + x
+            return self.wells(i)
+        else:
+            raise ValueError('Placeable.wells(x=, y=) expects ints')
 
 
 class WellSeries(Container):

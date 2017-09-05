@@ -1,12 +1,13 @@
 import copy
 import itertools
 
-from opentrons import containers
+from opentrons.containers import unpack_location
 from opentrons.containers.calibrator import Calibrator
-from opentrons.containers.placeable import Placeable, WellSeries, Container
-from opentrons.containers.placeable import humanize_location
-from opentrons.instruments.instrument import Instrument
+from opentrons.containers.placeable import (
+    Container, humanize_location, Placeable, WellSeries
+)
 from opentrons.helpers import helpers
+from opentrons.instruments.instrument import Instrument
 
 
 class Pipette(Instrument):
@@ -59,10 +60,13 @@ class Pipette(Instrument):
 
     Examples
     --------
-    >>> from opentrons import instruments, containers
+    >>> from opentrons import instruments, containers, robot
+    >>> robot.reset() # doctest: +ELLIPSIS
+    <opentrons.robot.robot.Robot object at ...>
     >>> p1000 = instruments.Pipette(axis='a', max_volume=1000)
-    >>> tip_rack_200ul = containers.load('tiprack-200ul', 'A1')
+    >>> tip_rack_200ul = containers.load('tiprack-200ul', 'B1')
     >>> p200 = instruments.Pipette(
+    ...     name='p200',
     ...     axis='b',
     ...     max_volume=200,
     ...     tip_racks=[tip_rack_200ul])
@@ -70,6 +74,7 @@ class Pipette(Instrument):
 
     def __init__(
             self,
+            robot,
             axis,
             name=None,
             channels=1,
@@ -80,7 +85,8 @@ class Pipette(Instrument):
             aspirate_speed=300,
             dispense_speed=500):
 
-        self.axis = axis
+        self.robot = robot
+        self.axis = axis.lower()
         self.channels = channels
 
         if not name:
@@ -113,13 +119,25 @@ class Pipette(Instrument):
         self.min_volume = min_volume
         self.max_volume = max_volume or (min_volume + 1)
 
-        self.positions = {
-            'top': None,
-            'bottom': None,
-            'blow_out': None,
-            'drop_tip': None
+        # NOTE: positions set to none in order to determine calibration state?
+        # self.positions = {
+        #     'top': None,
+        #     'bottom': None,
+        #     'blow_out': None,
+        #     'drop_tip': None
+        # }
+
+        # FIXME
+        default_positions = {
+            'top': 0,
+            'bottom': 10,
+            'blow_out': 12,
+            'drop_tip': 14
         }
-        self.calibrated_positions = copy.deepcopy(self.positions)
+        self.positions = {}
+        self.positions.update(default_positions)
+
+        self.calibrated_positions = copy.deepcopy(default_positions)
 
         self.calibration_data = {}
 
@@ -134,11 +152,13 @@ class Pipette(Instrument):
             attributes=persisted_attributes)
         self.load_persisted_data()
 
+        for key, val in self.positions.items():
+            if val is None:
+                self.positions[key] = default_positions[key]
+
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
-        # if the user passed an initialization value,
-        # overwrite the loaded persisted data with it
-        if isinstance(max_volume, (int, float, complex)) and max_volume > 0:
+        if helpers.is_number(max_volume) and max_volume > 0:
             self.max_volume = max_volume
             self.update_calibrations()
 
@@ -154,23 +174,6 @@ class Pipette(Instrument):
         self.previous_placeable = None
         self.current_volume = 0
         self.reset_tip_tracking()
-
-    def setup_simulate(self, **kwargs):
-        """
-        Overwrites :any:`Instrument` method, setting the plunger positions
-        to simulation defaults
-        """
-        self.calibrated_positions = copy.deepcopy(self.positions)
-        self.positions['top'] = 0
-        self.positions['bottom'] = 10
-        self.positions['blow_out'] = 12
-        self.positions['drop_tip'] = 14
-
-    def teardown_simulate(self):
-        """
-        Re-assigns any previously-calibrated plunger positions
-        """
-        self.positions = self.calibrated_positions
 
     def has_tip_rack(self):
         """
@@ -201,6 +204,7 @@ class Pipette(Instrument):
             self.tip_rack_iter = itertools.chain(iterables)
 
     def current_tip(self, *args):
+        # TODO(ahmed): revisit
         if len(args) and (isinstance(args[0], Placeable) or args[0] is None):
             self.current_tip_home_well = args[0]
         return self.current_tip_home_well
@@ -230,16 +234,12 @@ class Pipette(Instrument):
         if not location:
             return
 
-        placeable, _ = containers.unpack_location(location)
+        placeable, _ = unpack_location(location)
         self.previous_placeable = placeable
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    # QUEUEABLE
-    def move_to(self,
-                location,
-                strategy='arc',
-                enqueue=True):
+    def move_to(self, location, strategy='arc'):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -260,12 +260,6 @@ class Pipette(Instrument):
             "direct" strategies will simply move in a straight line from
             the current position
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -274,20 +268,12 @@ class Pipette(Instrument):
         if not location:
             return self
 
-        self.robot.move_to(
-            location,
-            instrument=self,
-            strategy=strategy,
-            enqueue=enqueue)
+        self._associate_placeable(location)
+        self.robot.move_to(location, instrument=self, strategy=strategy)
 
         return self
 
-    # QUEUEABLE
-    def aspirate(self,
-                 volume=None,
-                 location=None,
-                 rate=1.0,
-                 enqueue=True):
+    def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
 
@@ -311,12 +297,6 @@ class Pipette(Instrument):
             Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed (see :meth:`set_speed`)
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -325,15 +305,15 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(
+        ...     name='p200', axis='a', max_volume=200)
 
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate 50uL from the center of a well
-        >>> relative_vector = plate[1].center()
-        >>> p200.aspirate(50, (plate[1], relative_vector)) # doctest: +ELLIPSIS
+        >>> p200.aspirate(50, plate[1].bottom()) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
 
         >>> # aspirate 20uL in place, twice as fast
@@ -345,71 +325,46 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        # set True if volume before this aspirate was 0uL
-        plunger_empty = False
-
-        def _setup():
-            nonlocal volume
-            nonlocal location
-            nonlocal rate
-            nonlocal plunger_empty
-            if not isinstance(volume, (int, float, complex)):
-                if volume and not location:
-                    location = volume
-                volume = self.max_volume - self.current_volume
-
-            if self.current_volume + volume > self.max_volume:
-                raise RuntimeWarning(
-                    'Pipette ({0}) cannot hold volume {1}'
-                    .format(
-                        self.max_volume,
-                        self.current_volume + volume)
-                )
-
-            if self.current_volume == 0:
-                plunger_empty = True
-            self.current_volume += volume
-
-            self._associate_placeable(location)
-
-        def _do():
-            nonlocal volume
-            nonlocal location
-            nonlocal rate
-            nonlocal plunger_empty
-            distance = self._plunge_distance(self.current_volume)
-            bottom = self._get_plunger_position('bottom')
-            destination = bottom - distance
-
-            speed = self.speeds['aspirate'] * rate
-
-            self._position_for_aspirate(location, plunger_empty)
-
-            self.motor.speed(speed)
-            self.motor.move(destination)
+        # Note: volume positional argument may not be passed. if it isn't then
+        # assume the first positional argument is the location
+        if not helpers.is_number(volume):
+            if volume and not location:
+                location = volume
+            volume = self.max_volume - self.current_volume
 
         # if volume is specified as 0uL, then do nothing
-        if volume is 0:
+        if volume == 0:
             return self
+
+        if self.current_volume + volume > self.max_volume:
+            raise RuntimeWarning(
+                'Pipette with max volume of {0} cannot hold volume {1}'
+                .format(
+                    self.max_volume,
+                    self.current_volume + volume)
+            )
+
+        distance = self._plunge_distance(self.current_volume + volume)
+        bottom = self._get_plunger_position('bottom')
+        destination = bottom - distance
+        speed = self.speeds['aspirate'] * rate
 
         _description = "Aspirating {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
 
+        self._position_for_aspirate(location)
+        self.motor.speed(speed)
+        self.motor.move(destination)
+        self.robot.add_command(_description)
+        self.current_volume += volume  # update after actual aspirate
         return self
 
-    # QUEUEABLE
     def dispense(self,
                  volume=None,
                  location=None,
-                 rate=1.0,
-                 enqueue=True):
+                 rate=1.0):
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
 
@@ -432,12 +387,6 @@ class Pipette(Instrument):
             Set plunger speed for this dispense, where
             speed = rate * dispense_speed (see :meth:`set_speed`)
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -446,7 +395,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -468,58 +417,38 @@ class Pipette(Instrument):
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            nonlocal volume
-            nonlocal rate
+        if not helpers.is_number(volume):
+            if volume and not location:
+                location = volume
+            volume = self.current_volume
 
-            if not isinstance(volume, (int, float, complex)):
-                if volume and not location:
-                    location = volume
-                volume = self.current_volume
-
-            if volume is None or (self.current_volume - volume < 0):
-                volume = self.current_volume
-
-            if isinstance(location, Placeable):
-                location = location.bottom(1)
-
-            self.current_volume -= volume
-
-            self._associate_placeable(location)
-
-        def _do():
-            nonlocal location
-            nonlocal volume
-            nonlocal rate
-
-            self.move_to(location, strategy='arc', enqueue=False)
-
-            distance = self._plunge_distance(self.current_volume)
-            bottom = self._get_plunger_position('bottom')
-            destination = bottom - distance
-
-            speed = self.speeds['dispense'] * rate
-
-            self.motor.speed(speed)
-            self.motor.move(destination)
+        # Ensure we don't dispense more than the current volume
+        volume = min(self.current_volume, volume)
 
         # if volume is specified as 0uL, then do nothing
-        if volume is 0:
+        if volume == 0:
             return self
+
+        self.move_to(location, strategy='arc')  # position robot above location
+
+        # TODO(ahmed): revisit this
+        distance = self._plunge_distance(self.current_volume - volume)
+        bottom = self._get_plunger_position('bottom')
+        destination = bottom - distance
+        speed = self.speeds['dispense'] * rate
+
+        self.motor.speed(speed)
+        self.motor.move(destination)
+        self.current_volume -= volume  # update after actual dispense
 
         _description = "Dispensing {0} {1}".format(
             volume,
             ('at ' + humanize_location(location) if location else '')
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        self.robot.add_command(_description)
         return self
 
-    def _position_for_aspirate(self, location=None, plunger_empty=False):
+    def _position_for_aspirate(self, location=None):
         """
         Position this :any:`Pipette` for an aspiration,
         given it's current state
@@ -527,26 +456,24 @@ class Pipette(Instrument):
 
         # first go to the destination
         if location:
-            placeable, _ = containers.unpack_location(location)
-            self.move_to(placeable.top(), strategy='arc', enqueue=False)
+            placeable, _ = unpack_location(location)
+            self.move_to(placeable.top(), strategy='arc')
 
         # setup the plunger above the liquid
-        if plunger_empty:
+        if self.current_volume == 0:
             self.motor.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(1)
-            self.move_to(location, strategy='direct', enqueue=False)
+                location = location.bottom(min(location.z_size(), 1))
+            self.move_to(location, strategy='direct')
 
-    # QUEUEABLE
     def mix(self,
             repetitions=1,
             volume=None,
             location=None,
-            rate=1.0,
-            enqueue=True):
+            rate=1.0):
         """
         Mix a volume of liquid (in microliters/uL) using this pipette
 
@@ -574,12 +501,6 @@ class Pipette(Instrument):
             speed = rate * (aspirate_speed or dispense_speed)
             (see :meth:`set_speed`)
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -588,7 +509,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
 
         >>> # mix 50uL in a Well, three times
         >>> p200.mix(3, 50, plate[0]) # doctest: +ELLIPSIS
@@ -599,45 +520,26 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            nonlocal volume
-            nonlocal location
-            nonlocal repetitions
-
-            if volume is None:
-                volume = self.max_volume
-
-            self._associate_placeable(location)
-
-        def _do():
-            # plunger movements are handled w/ aspirate/dispense
-            # using Command for printing description
-            pass
+        if volume is None:
+            volume = self.max_volume
 
         _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, self.max_volume if volume is None else volume
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        self.robot.add_command(_description)
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
-        self.aspirate(location=location,
-                      volume=volume,
-                      rate=rate,
-                      enqueue=enqueue)
+
+        self.aspirate(location=location, volume=volume, rate=rate)
         for i in range(repetitions - 1):
-            self.dispense(volume, rate=rate, enqueue=enqueue)
-            self.aspirate(volume, rate=rate, enqueue=enqueue)
-        self.dispense(volume, rate=rate, enqueue=enqueue)
+            self.dispense(volume, rate=rate)
+            self.aspirate(volume, rate=rate)
+        self.dispense(volume, rate=rate)
 
         return self
 
-    # QUEUEABLE
-    def blow_out(self, location=None, enqueue=True):
+    def blow_out(self, location=None):
         """
         Force any remaining liquid to dispense, by moving
         this pipette's plunger to the calibrated `blow_out` position
@@ -654,12 +556,6 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -668,32 +564,22 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            self.current_volume = 0
-            self._associate_placeable(location)
 
-        def _do():
-            nonlocal location
-            self.move_to(location, strategy='arc', enqueue=False)
-            self.motor.move(self._get_plunger_position('blow_out'))
+        self.move_to(location, strategy='arc')
+        self.motor.move(self._get_plunger_position('blow_out'))
+        self.current_volume = 0
 
         _description = "Blowing out {}".format(
             'at ' + humanize_location(location) if location else ''
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
-    def touch_tip(self, location=None, radius=1.0, enqueue=True):
+    def touch_tip(self, location=None, radius=1.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -717,12 +603,6 @@ class Pipette(Instrument):
             radius=0.5, :any:`touch_tip()` will move to 50% of the wells
             radius.
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -731,7 +611,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
@@ -739,65 +619,36 @@ class Pipette(Instrument):
         """
         height_offset = 0
 
-        def _setup():
-            nonlocal location, height_offset
-            if isinstance(location, (int, float, complex)):
-                height_offset = location
-                location = self.previous_placeable
-            self._associate_placeable(location)
+        if helpers.is_number(location):
+            height_offset = location
+            location = None
 
-        def _do():
-            nonlocal location, radius
+        # if no location specified, use the previously
+        # associated placeable to get Well dimensions
+        if location:
+            self.move_to(location, strategy='arc')
+        else:
+            location = self.previous_placeable
 
-            # if no location specified, use the previously
-            # associated placeable to get Well dimensions
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
-            else:
-                location = self.previous_placeable
+        v_offset = (0, 0, height_offset)
 
-            v_offset = (0, 0, height_offset)
+        well_edges = [
+            location.from_center(x=radius, y=0, z=1),       # right edge
+            location.from_center(x=radius * -1, y=0, z=1),  # left edge
+            location.from_center(x=0, y=radius, z=1),       # back edge
+            location.from_center(x=0, y=radius * -1, z=1)   # front edge
+        ]
 
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=radius, y=0, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=radius * -1, y=0, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=0, y=radius, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
-            self.move_to(
-                (
-                    location,
-                    location.from_center(x=0, y=radius * -1, z=1) + v_offset
-                ),
-                strategy='direct',
-                enqueue=False)
+        # Apply vertical offset to well edges
+        well_edges = map(lambda x: x + v_offset, well_edges)
+
+        [self.move_to((location, e), strategy='direct') for e in well_edges]
 
         _description = 'Touching tip'
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
-
+        self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
-    def air_gap(self, volume=None, height=None, enqueue=True):
+    def air_gap(self, volume=None, height=None):
         """
         Pull air into the :any:`Pipette` current tip
 
@@ -825,43 +676,31 @@ class Pipette(Instrument):
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            pass
-
-        def _do():
-            pass
-
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
             return self
 
         _description = 'Air gap'
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
 
         if height is None:
-            height = 20
+            height = 5
 
         location = self.previous_placeable.top(height)
         # "move_to" separate from aspirate command
         # so "_position_for_aspirate" isn't executed
-        self.move_to(location, enqueue=enqueue)
-        self.aspirate(volume, enqueue=enqueue)
-
+        self.move_to(location)
+        self.robot.add_command(_description)
+        self.aspirate(volume)
         return self
 
-    # QUEUEABLE
-    def return_tip(self, enqueue=True):
+    def return_tip(self, home_after=True):
         """
         Drop the pipette's current tip to it's originating tip rack
 
@@ -869,14 +708,6 @@ class Pipette(Instrument):
         -----
         This method requires one or more tip-rack :any:`Container`
         to be in this Pipette's `tip_racks` list (see :any:`Pipette`)
-
-        Parameters
-        ----------
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -888,8 +719,9 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'A1')
-        >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
+        >>> tiprack = containers.load('tiprack-200ul', 'E1', share=True)
+        >>> p200 = instruments.Pipette(axis='a',
+        ...     tip_racks=[tiprack], max_volume=200)
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -900,29 +732,17 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            pass
-
-        def _do():
-            pass
-
         _description = "Returning tip"
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
 
         if not self.current_tip():
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.drop_tip(self.current_tip(), enqueue=enqueue)
-
+        self.robot.add_command(_description)
+        self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    # QUEUEABLE
-    def pick_up_tip(self, location=None, enqueue=True):
+    def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -938,12 +758,6 @@ class Pipette(Instrument):
             The :any:`Placeable` (:any:`Well`) to perform the pick_up_tip.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -967,47 +781,38 @@ class Pipette(Instrument):
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            if not location:
-                location = self.get_next_tip()
-            self.current_tip(None)
-            if location:
-                placeable, _ = containers.unpack_location(location)
-                self.current_tip(placeable)
 
-            if isinstance(location, Placeable):
-                location = location.bottom()
+        if not location:
+            location = self.get_next_tip()
+        self.current_tip(None)
+        if location:
+            placeable, _ = unpack_location(location)
+            self.current_tip(placeable)
 
-            self._associate_placeable(location)
+        if isinstance(location, Placeable):
+            location = location.bottom()
 
-            self.current_volume = 0
+        presses = (1 if not helpers.is_number(presses) else presses)
 
-        def _do():
-            nonlocal location
+        self.motor.move(self._get_plunger_position('bottom'))
+        self.current_volume = 0
 
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
+        if location:
+            self.move_to(location, strategy='arc')
 
-            tip_plunge = 6
-
+        tip_plunge = 6
+        for i in range(int(presses) - 1):
             self.robot.move_head(z=tip_plunge, mode='relative')
-            self.robot.move_head(z=-tip_plunge - 1, mode='relative')
-            self.robot.move_head(z=tip_plunge + 1, mode='relative')
             self.robot.move_head(z=-tip_plunge, mode='relative')
 
         _description = "Picking up tip {0}".format(
             ('from ' + humanize_location(location) if location else '')
         )
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+
+        self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
-    def drop_tip(self, location=None, enqueue=True):
+    def drop_tip(self, location=None, home_after=True):
         """
         Drop the pipette's current tip
 
@@ -1023,12 +828,6 @@ class Pipette(Instrument):
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
 
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
-
         Returns
         -------
 
@@ -1039,8 +838,8 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'A1')
-        >>> trash = containers.load('point', 'A1')
+        >>> tiprack = containers.load('tiprack-200ul', 'A2')
+        >>> trash = containers.load('point', 'A3')
         >>> p200 = instruments.Pipette(axis='a', trash_container=trash)
         >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -1053,60 +852,41 @@ class Pipette(Instrument):
         >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        def _setup():
-            nonlocal location
-            if not location and self.trash_container:
-                location = self.trash_container
 
-            if isinstance(location, Placeable):
-                # give space for the drop-tip mechanism
-                location = location.bottom(self._drop_tip_offset)
+        if not location and self.trash_container:
+            location = self.trash_container
 
-            self._associate_placeable(location)
-            self.current_tip(None)
+        if isinstance(location, Placeable):
+            # give space for the drop-tip mechanism
+            location = location.bottom(self._drop_tip_offset)
 
-            self.current_volume = 0
+        if location:
+            self.move_to(location, strategy='arc')
 
-        def _do():
-            nonlocal location
-
-            if location:
-                self.move_to(location, strategy='arc', enqueue=False)
-
-            self.motor.move(self._get_plunger_position('drop_tip'))
+        self.motor.move(self._get_plunger_position('drop_tip'))
+        if home_after:
             self.motor.home()
 
-            self.motor.move(self._get_plunger_position('bottom'))
+        self.motor.move(self._get_plunger_position('bottom'))
+
+        self.current_volume = 0
+        self.current_tip(None)
 
         _description = "Drop_tip {}".format(
             ('at ' + humanize_location(location) if location else '')
         )
-
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
-    def home(self, enqueue=True):
+    def home(self):
 
         """
         Home the pipette's plunger axis during a protocol run
 
         Notes
         -----
-        `Pipette.home()` enqueues to `Robot` commands
+        `Pipette.home()` homes the `Robot`
         (see :any:`run` and :any:`simulate`)
-
-        Parameters
-        ----------
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
 
         Returns
         -------
@@ -1121,21 +901,15 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        def _setup():
-            self.current_volume = 0
+        self.current_volume = 0
+        self.motor.home()
+        _description = "Homing pipette plunger on axis {}".format(
+            self.axis
+        )
 
-        def _do():
-            self.motor.home()
-
-        _description = "Homing pipette plunger on axis {}".format(self.axis)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+        self.robot.add_command(_description)
         return self
 
-    # QUEUEABLE
     def distribute(self, *args, **kwargs):
         """
         Distribute will move a volume of liquid from a single of source
@@ -1150,8 +924,10 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'B1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1161,7 +937,6 @@ class Pipette(Instrument):
             kwargs['disposal_vol'] = self.min_volume
         return self.transfer(*args, **kwargs)
 
-    # QUEUEABLE
     def consolidate(self, *args, **kwargs):
         """
         Consolidate will move a volume of liquid from a list of sources
@@ -1176,8 +951,10 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'B1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1185,9 +962,9 @@ class Pipette(Instrument):
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
+
         return self.transfer(*args, **kwargs)
 
-    # QUEUEABLE
     def transfer(self, volume, source, dest, **kwargs):
 
         """
@@ -1273,8 +1050,10 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'B1')
-        >>> p200 = instruments.Pipette(axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1301,39 +1080,24 @@ class Pipette(Instrument):
 
         return self
 
-    # QUEUEABLE
-    def delay(self, seconds=0, minutes=0, enqueue=True):
+    def delay(self, seconds=0, minutes=0):
         """
         Parameters
         ----------
 
         seconds: float
             The number of seconds to freeeze in place.
-
-        enqueue : bool
-            If set to `True` (default), the method will be appended
-            to the robots list of commands for executing during
-            :any:`run` or :any:`simulate`. If set to `False`, the
-            method will skip the command queue and execute immediately
         """
-
-        def _setup():
-            pass
-
-        def _do():
-            nonlocal seconds
-            self.motor.wait(seconds)
 
         minutes += int(seconds / 60)
         seconds = seconds % 60
         _description = "Delaying {} minutes and {} seconds".format(
             minutes, seconds)
         seconds += float(minutes * 60)
-        self.create_command(
-            do=_do,
-            setup=_setup,
-            description=_description,
-            enqueue=enqueue)
+
+        self.motor.wait(seconds)
+
+        self.robot.add_command(_description)
         return self
 
     def calibrate(self, position):
@@ -1445,7 +1209,7 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'A1')
+        >>> tiprack = containers.load('tiprack-200ul', 'E2')
         >>> p200 = instruments.Pipette(axis='a')
         >>> robot.move_head(x=100, y=100, z=100)
         >>> rel_pos = tiprack[0].from_center(x=0, y=0, z=-1, reference=tiprack)
@@ -1496,7 +1260,7 @@ class Pipette(Instrument):
         """
         try:
             value = self.positions[position]
-            if isinstance(value, (int, float, complex)):
+            if helpers.is_number(value):
                 return value
             else:
                 raise RuntimeError(
@@ -1587,9 +1351,8 @@ class Pipette(Instrument):
         return transfer_plan
 
     def _run_transfer_plan(self, tips, plan, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
         air_gap = kwargs.get('air_gap', 0)
-        touch_tip = kwargs.get('touch_tip', -1)
+        touch_tip = kwargs.get('touch_tip', False)
 
         total_transfers = len(plan)
         for i, step in enumerate(plan):
@@ -1605,44 +1368,46 @@ class Pipette(Instrument):
             if dispense:
                 self._dispense_during_transfer(
                     dispense['volume'], dispense['location'], **kwargs)
-                if touch_tip or touch_tip is 0:
-                    self.touch_tip(touch_tip, enqueue=enqueue)
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
+                    if touch_tip or touch_tip is 0:
+                        self.touch_tip(touch_tip)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
-                        self.air_gap(air_gap, enqueue=enqueue)
+                        self.air_gap(air_gap)
+                    if touch_tip or touch_tip is 0:
+                        self.touch_tip(touch_tip)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """
         Performs a :any:`pick_up_tip` when running a :any:`transfer`,
         :any:`distribute`, or :any:`consolidate`.
         """
-        enqueue = kwargs.get('enqueue', True)
         if self.has_tip_rack() and tips > 0 and not self.current_tip():
-            self.pick_up_tip(enqueue=enqueue)
+            self.pick_up_tip()
 
     def _aspirate_during_transfer(self, vol, loc, **kwargs):
         """
         Performs an :any:`aspirate` when running a :any:`transfer`, and
         optionally a :any:`touch_tip` afterwards.
         """
-        enqueue = kwargs.get('enqueue', True)
         rate = kwargs.get('rate', 1)
         mix_before = kwargs.get('mix', kwargs.get('mix_before', (0, 0)))
         air_gap = kwargs.get('air_gap', 0)
         touch_tip = kwargs.get('touch_tip', False)
 
+        well, _ = unpack_location(loc)
+
         if self.current_volume == 0:
-            self._mix_during_transfer(mix_before, loc, **kwargs)
-        self.aspirate(vol, loc, rate=rate, enqueue=enqueue)
-        if touch_tip or touch_tip is 0:
-            self.touch_tip(touch_tip, enqueue=enqueue)
+            self._mix_during_transfer(mix_before, well, **kwargs)
+        self.aspirate(vol, loc, rate=rate)
         if air_gap:
-            self.air_gap(air_gap, enqueue=enqueue)
+            self.air_gap(air_gap)
+        if touch_tip or touch_tip is 0:
+            self.touch_tip(touch_tip)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
         """
@@ -1650,31 +1415,30 @@ class Pipette(Instrument):
         optionally a :any:`mix`, :any:`touch_tip`, and/or
         :any:`blow_out` afterwards.
         """
-        enqueue = kwargs.get('enqueue', True)
         mix_after = kwargs.get('mix_after', (0, 0))
         rate = kwargs.get('rate', 1)
         air_gap = kwargs.get('air_gap', 0)
 
+        well, _ = unpack_location(loc)
+
         if air_gap:
-            self.dispense(air_gap, loc, rate=rate, enqueue=enqueue)
-        self.dispense(vol, loc, rate=rate, enqueue=enqueue)
-        self._mix_during_transfer(mix_after, loc, **kwargs)
+            self.dispense(air_gap, well.top(5), rate=rate)
+        self.dispense(vol, loc, rate=rate)
+        self._mix_during_transfer(mix_after, well, **kwargs)
 
     def _mix_during_transfer(self, mix, loc, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
         if self.current_volume == 0 and isinstance(mix, (tuple, list)):
             if len(mix) == 2 and 0 not in mix:
-                self.mix(mix[0], mix[1], loc, enqueue=enqueue)
+                self.mix(mix[0], mix[1], loc)
 
     def _blowout_during_transfer(self, loc, **kwargs):
-        enqueue = kwargs.get('enqueue', True)
         blow_out = kwargs.get('blow_out', False)
         if self.current_volume > 0 or blow_out:
             if not isinstance(blow_out, Placeable):
                 blow_out = self.trash_container
                 if self.current_volume == 0:
                     blow_out = None
-            self.blow_out(blow_out, enqueue=enqueue)
+            self.blow_out(blow_out)
             self._mix_during_transfer(
                 kwargs.get('mix_after', (0, 0)),
                 loc,
@@ -1685,13 +1449,12 @@ class Pipette(Instrument):
         Performs a :any:`drop_tip` or :any:`return_tip` when
         running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
         """
-        enqueue = kwargs.get('enqueue', True)
         trash = kwargs.get('trash', True)
         if tips > 1 or (i + 1 == total and tips > 0):
             if trash and self.trash_container:
-                self.drop_tip(enqueue=enqueue)
+                self.drop_tip()
             else:
-                self.return_tip(enqueue=enqueue)
+                self.return_tip()
             tips -= 1
         return tips
 

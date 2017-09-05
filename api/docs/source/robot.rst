@@ -2,14 +2,8 @@
 
 .. testsetup:: robot
 
-    from opentrons import robot, containers, instruments
-
+    from opentrons import robot
     robot.reset()
-
-    plate = containers.load('96-flat', 'B1', 'my-plate')
-    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
-
-    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
 ###################
 Advanced Control
@@ -49,22 +43,22 @@ The maximum speed of the robot's head can be set using ``robot.head_speed()``. T
 Homing
 ======
 
-You can enqueue a ``home()`` command to your protocol, by giving it the ``enqueue=True`` option. Without passing the enqueue option, the home command will run immediately.
+You can `home` the robot by calling ``home()``. You can also specify axes. The robot will home immdediately when this call is made.
 
 .. testcode:: robot
 
-    robot.home(enqueue=True)           # home the robot on all axis
-    robot.home('z', enqueue=True)      # home the Z axis only
+    robot.home()           # home the robot on all axis
+    robot.home('z')        # home the Z axis only
 
 Commands
 ========
 
-When commands are called on a pipette, they are automatically enqueued to the ``robot`` in the order they are called. You can see all currently held commands by calling ``robot.commands()``, which returns a `Python list`__.
+When commands are called on a pipette, they are recorded on the ``robot`` in the order they are called. You can see all past executed commands by calling ``robot.commands()``, which returns a `Python list`__.
 
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. testcode:: robot
-    
+
     pipette.pick_up_tip(tiprack.wells('A1'))
     pipette.drop_tip(tiprack.wells('A1'))
 
@@ -76,18 +70,16 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Homing Robot
-    Homing Robot
     Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
     Drop_tip at <Deck><Slot A1><Container my-rack><Well A1>
 
 Clear Commands
 ==============
 
-Once commands are enqueued to the ``robot``, we can erase those commands by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but all commands are erased.
+We can erase the robot command history by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but the commands history is erased.
 
 .. testcode:: robot
-    
+
     robot.clear_commands()
     pipette.pick_up_tip(tiprack['A1'])
     print('There is', len(robot.commands()), 'command')
@@ -109,7 +101,7 @@ Comment
 You can add a custom message to the list of command descriptions you see when running ``robot.commands()``. This command is ``robot.comment()``, and it allows you to print out any information you want at the point in your protocol
 
 .. testcode:: robot
-    
+
     robot.clear_commands()
 
     pipette.pick_up_tip(tiprack['A1'])
@@ -131,25 +123,6 @@ will print out...
     Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
     Goodbye, just dropped tip A1
 
-Simulate
-========
-
-Once commands have been enqueued to the ``robot``, we can simulate their execution by calling ``robot.simulate()``. This helps us debug our protocol, and to see if the robots gives us any warnings.
-
-.. testcode:: robot
-    
-    pipette.pick_up_tip()
-
-    for warning in robot.simulate():
-        print(warning)
-
-will print out...
-
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    pick_up_tip called with no reference to a tip
-
 Get Containers
 ==============
 
@@ -158,17 +131,17 @@ When containers are loaded, they are automatically added to the ``robot``. You c
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. testcode:: robot
-    
-    for name, container in robot.get_containers():
-        print(name, container.get_type())
+
+    for container in robot.get_containers():
+        print(container.get_name(), container.get_type())
 
 will print out...
 
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    my-plate 96-flat
     my-rack tiprack-200ul
+    my-plate 96-flat
 
 Get Instruments
 ===============
@@ -178,7 +151,7 @@ When instruments are created, they are automatically added to the ``robot``. You
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. testcode:: robot
-    
+
     for axis, pipette in robot.get_instruments():
         print(pipette.name, axis)
 
@@ -195,7 +168,7 @@ Reset
 Calling ``robot.reset()`` will remove everything from the robot. Any previously added containers, pipettes, or commands will be erased.
 
 .. testcode:: robot
-    
+
     robot.reset()
     print(robot.get_containers())
     print(robot.get_instruments())
@@ -209,4 +182,3 @@ will print out...
     []
     []
     []
-

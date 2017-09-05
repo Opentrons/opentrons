@@ -10,7 +10,7 @@ logging_config = dict(
     version=1,
     formatters={
         'basic': {
-            'format': '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s]     %(message)s'  #NOQA
+            'format': '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s]     %(message)s'  # noqa: E501
         }
     },
     handlers={

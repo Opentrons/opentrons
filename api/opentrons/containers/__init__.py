@@ -26,7 +26,7 @@ __all__ = [
     apply_calibration]
 
 
-def load(container_name, slot, label=None):
+def load(robot, container_name, slot, label=None, share=False):
     """
     Examples
     --------
@@ -38,11 +38,7 @@ def load(container_name, slot, label=None):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
-    from opentrons import Robot
-    if not label:
-        label = container_name
-    protocol = Robot.get_instance()
-    return protocol.add_container(container_name, slot, label)
+    return robot.add_container(container_name, slot, label=label, share=share)
 
 
 def list():
@@ -72,16 +68,19 @@ def create(name, grid, spacing, diameter, depth, volume=0):
 
 
 def container_to_json(c, name):
-    locations = OrderedDict()
+    locations = []
     for w in c:
         x, y, z = w.coordinates()
-        locations[w.get_name()] = {
-            'x': x, 'y': y, 'z': z,
-            'depth': w.z_size(),
-            'diameter': w.x_size(),
-            'total-liquid-volume': w.max_volume()
-        }
-    return {name: {'locations': locations}}
+        locations.append((
+            w.get_name(),
+            {
+                'x': x, 'y': y, 'z': z,
+                'depth': w.z_size(),
+                'diameter': w.x_size(),
+                'total-liquid-volume': w.max_volume()
+            }
+        ))
+    return {name: {'locations': OrderedDict(locations)}}
 
 
 def save_custom_container(data):

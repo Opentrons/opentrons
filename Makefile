@@ -1,33 +1,26 @@
-.PHONY: app api-exe app-shell api-valid-exe
+# opentrons platform makefile
+# https://github.com/OpenTrons/opentrons
 
-app:
-	cd app-src &&\
-		npm --version &&\
-		node --version &&\
-		npm config get python &&\
-		npm i &&\
-		npm run unit &&\
-		./node_modules/.bin/webpack --out ../api/opentrons/server/templates
+SHELL := /bin/bash
 
-api-exe:
-	cd api &&\
-		make api
+API_DIR := api
+APP_DIR := app
 
-api-valid-exe:
-	cd api &&\
-		make api-valid-exe
+.PHONY: install test coverage
 
-api-exe-win:
-	cd api &&\
-		make api-win
+# install project dependencies for both api and app
+install:
+	$(MAKE) -C $(API_DIR) install
+	$(MAKE) -C $(APP_DIR) install
 
-app-shell:
-	cd app-shell &&\
-		npm --version &&\
-		node --version &&\
-		npm config get python &&\
-		npm i &&\
-		npm run unit-main &&\
-		npm run build:frontend &&\
-		ls dist/* &&\
-		ls releases
+# run api and app tests
+test:
+	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(APP_DIR) test
+
+# upload coverage reports
+# uses codecov's bash upload script
+# TODO(mc, 2018-08-28): add test as a task dependency once travis is setup to
+# use this Makefile for tests
+coverage:
+	$(SHELL) <(curl -s https://codecov.io/bash) -X coveragepy
