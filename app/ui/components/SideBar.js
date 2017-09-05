@@ -77,3 +77,8 @@ export default function SideBar (props) {
     </aside>
   )
 }
+
+SideBar.propTypes = {
+  isNavPanelOpen: PropTypes.bool.isRequired,
+  onNavClick: PropTypes.func.isRequired
+}
