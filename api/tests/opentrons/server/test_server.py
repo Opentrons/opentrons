@@ -52,9 +52,7 @@ class TickTock(object):
 
     # Called by test fixture to set loop
     def init(self, loop):
-        print('aaa')
         self.notifications = Notifications(loop)
-        print('aaa')
 
     def start(self):
         for i in range(5):
@@ -69,7 +67,7 @@ def type_id(instance):
 
 @pytest.mark.parametrize('root', [Foo(0)])
 async def test_call(session, root):
-    res = session.server.call(lambda: root)
+    res = session.server.call_and_serialize(lambda: root)
     assert res == {'v': {'value': 0}, 't': type_id(root), 'i': id(root)}
 
 
@@ -81,7 +79,7 @@ async def test_init(session, root):
             't': type_id(root),
             'v': {'value': 0}
         },
-        'type': session.server.call(lambda: type(root)),
+        'type': session.server.call_and_serialize(lambda: type(root)),
         '$': {'type': rpc.CONTROL_MESSAGE}}
 
     res = await session.socket.receive_json()

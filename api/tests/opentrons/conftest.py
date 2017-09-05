@@ -1,6 +1,6 @@
 # Uncomment to enable logging during tests
-import logging
-from logging.config import dictConfig
+# import logging
+# from logging.config import dictConfig
 
 import pytest
 import os
@@ -78,7 +78,7 @@ def session(loop, test_client, request, session_manager):
         if not root:
             root = session_manager
         root.init(loop)
-    except:
+    except Exception as e:
         pass
 
     server = rpc.Server(loop=loop, root=root)
