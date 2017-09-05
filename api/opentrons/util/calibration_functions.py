@@ -21,7 +21,7 @@ def calibrate_container_with_delta(container, position_tracker, delta_x,
     position_tracker.translate_object(container, *delta)
     container._coordinates += delta
     if save and new_container_name:
-        create_container_obj_in_db(container, new_container_name)
+        database.save_new_container(container, new_container_name)
     elif save:
-        update_container_obj_in_db(container)
+        database.overwrite_container(container)
 

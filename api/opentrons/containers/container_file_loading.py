@@ -23,25 +23,14 @@ default_containers_path = os.path.join(
     'default-containers.json'
 )
 
-calibrated_containers_path = os.path.join(
-    containers_dir_path,
-    'calibrated-containers.json'
-)
-
 def load_containers_from_file_list(file_list):
     for file_name in file_list:
         load_containers_from_file_path(file_name)
 
-def get_calibrated_container_file():
-    if not os.path.isfile(calibrated_containers_path):
-        with open(calibrated_containers_path, 'w') as f:
-            f.write(json.dumps({'containers': {}}))
-    return calibrated_containers_path
-
 def load_all_containers_from_disk():
     containers_file_list.clear()
     containers_file_list.extend(
-        get_custom_container_files() + [default_containers_path, get_calibrated_container_file()]
+        get_custom_container_files() + [default_containers_path]
     )
 
     load_containers_from_file_list(
@@ -197,11 +186,4 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         container.add(well, well_name, well_coordinates)
     return container
 
-def save_calibrated_container_file(calibrated_container_json):
-    with open(calibrated_containers_path, 'r+') as f:
-        container_data = json.load(f)
-        container_data['containers'].update(calibrated_container_json)
-        f.seek(0)
-        f.write(json.dumps(container_data, indent=4))
-        f.truncate()
 
