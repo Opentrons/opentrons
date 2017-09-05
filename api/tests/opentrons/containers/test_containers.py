@@ -69,6 +69,36 @@ class ContainerTestCase(unittest.TestCase):
         if should_delete:
             os.remove(environment.get_path('CONTAINERS_FILE'))
 
+    def test_load_same_slot_force(self):
+        container_name = '96-flat'
+        slot = 'A1'
+        containers_load(self.robot, container_name, slot)
+        self.assertEquals(len(self.robot.get_containers()), 1)
+
+        self.assertRaises(
+            RuntimeWarning, containers_load,
+            self.robot, container_name, slot)
+        self.assertRaises(
+            RuntimeWarning, containers_load,
+            self.robot, container_name, slot, share=True)
+        self.assertRaises(
+            RuntimeWarning, containers_load,
+            self.robot, container_name, slot, 'custom-name')
+        self.assertRaises(
+            RuntimeWarning, containers_load,
+            self.robot, 'trough-12row', slot)
+        self.assertRaises(
+            RuntimeWarning, containers_load,
+            self.robot, 'trough-12row', slot, 'custom-name')
+
+        containers_load(
+            self.robot, container_name, slot, 'custom-name', share=True)
+        self.assertEquals(len(self.robot.get_containers()), 2)
+
+        containers_load(
+            self.robot, 'trough-12row', slot, share=True)
+        self.assertEquals(len(self.robot.get_containers()), 3)
+
     def test_containers_list(self):
         res = containers_list()
         self.assertTrue(len(res))

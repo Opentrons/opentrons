@@ -38,6 +38,7 @@ def type_id(instance):
 
 
 def test_robot():
+    robot.reset()
     containers.load('trough-12row', 'C1', 'trough')
     containers.load('96-PCR-flat', 'D1', 'plate')
 

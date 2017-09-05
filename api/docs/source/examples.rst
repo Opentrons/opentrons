@@ -4,20 +4,10 @@
 Examples
 ########
 
-.. testsetup:: examples
+.. testsetup:: *
 
-  from opentrons import robot, containers, instruments
-
-  plate = containers.load('96-flat', 'B1')
-  trough = containers.load('trough-12row', 'C1')
-
-  tiprack_1 = containers.load('tiprack-200ul', 'A1')
-  tiprack_2 = containers.load('tiprack-200ul', 'A2')
-      
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume=200,
-      tip_racks=[tiprack_2]) 
+  from opentrons import robot
+  robot.reset()
 
 All examples on this page assume the following containers and pipette:
 
@@ -29,8 +19,8 @@ All examples on this page assume the following containers and pipette:
   trough = containers.load('trough-12row', 'C1')
 
   tiprack_1 = containers.load('tiprack-200ul', 'A1')
-  tiprack_2 = containers.load('tiprack-200ul', 'A2') 
-      
+  tiprack_2 = containers.load('tiprack-200ul', 'A2')
+
   p200 = instruments.Pipette(
       axis="b",
       max_volume=200,
@@ -45,7 +35,7 @@ Basic Transfer
 Moving 100uL from one well to another:
 
 .. testcode:: examples
-  
+
   p200.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
 If you prefer to not use the ``.transfer()`` command, the following pipette commands will create the some results:
@@ -84,7 +74,7 @@ Multiple Air Gaps
 The Opentrons liquid handler can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the trough, while creating a air gap between each sample.
 
 .. testcode:: examples
-  
+
   p200.pick_up_tip()
 
   for well in trough.wells():
@@ -209,12 +199,12 @@ This example shows how to deposit liquid around the edge of a well.
   while p200.current_volume > 0:
       # we can move around a circle with radius (r) and theta (degrees)
       well_edge = plate.wells('B1').from_center(r=1.0, theta=theta, h=0.9)
-      
+
       # combine a Well with a Vector in a tuple
       destination = (plate.wells('B1'), well_edge)
       p200.move_to(destination, strategy='direct')  # move straight there
       p200.dispense(10)
-      
+
       theta += 0.314
 
   p200.drop_tip()
