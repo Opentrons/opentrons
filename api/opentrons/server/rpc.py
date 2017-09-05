@@ -86,7 +86,7 @@ class Server(object):
             try:
                 # Apply notification_max_depth to control object tree depth
                 # during serialization to avoid flooding comms
-                data = self.call(
+                data = self.call_and_serialize(
                     lambda: event,
                     max_depth=self.notification_max_depth)
                 self.send(
@@ -112,8 +112,8 @@ class Server(object):
 
         self.send({
             '$': {'type': CONTROL_MESSAGE},
-            'root': self.call(lambda: self.root),
-            'type': self.call(lambda: type(self.root))
+            'root': self.call_and_serialize(lambda: self.root),
+            'type': self.call_and_serialize(lambda: type(self.root))
         })
 
         try:
@@ -200,10 +200,12 @@ class Server(object):
                     data['id'] = id(self.control_box)
 
                 try:
-                    func = self.prepare_call(data)
+                    _id = data.pop('id', None)
+                    func = self.build_call(_id, **data)
                     self.send_ack(token)
                 except Exception as e:
-                    self.send_error(str(e), token)
+                    error = '{0}: {1}'.format(e.__class__.__name__, e)
+                    self.send_error(error, token)
                 else:
                     response = await self.make_call(func, token)
                     self.send(response)
@@ -214,18 +216,7 @@ class Server(object):
         except Exception as e:
             log.error('While processing request: {0}'.format(str(e)))
 
-    def prepare_call(self, data):
-        try:
-            _id = data.pop('id', None)
-            func = self.build_call(_id, **data)
-        except Exception as e:
-            log.warning('While preparing call: {0}'.format(
-                traceback.format_exc()))
-            details = '{0}: {1}'.format(e.__class__.__name__, str(e))
-            raise RuntimeError(details)
-        return func
-
-    def call(self, func, max_depth=0):
+    def call_and_serialize(self, func, max_depth=0):
         call_result = func()
         serialized, refs = serialize.get_object_tree(
             call_result, max_depth=max_depth)
@@ -233,23 +224,21 @@ class Server(object):
         return serialized
 
     async def make_call(self, func, token):
-        def call(func):
-            response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
-            try:
-                call_result = self.call(func)
-                response['$']['status'] = 'success'
-            except Exception as e:
-                log.warning(
-                    'Exception while dispatching a method call: {0}'
-                    .format(traceback.format_exc()))
-                response['$']['status'] = 'error'
-                call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
-            finally:
-                log.info('Call result: {0}'.format(call_result))
-                response['data'] = call_result
-            return response
-
-        return await self.loop.run_in_executor(self.executor, call, func)
+        response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
+        try:
+            call_result = await self.loop.run_in_executor(
+                self.executor, self.call_and_serialize, func)
+            response['$']['status'] = 'success'
+        except Exception as e:
+            log.warning(
+                'Exception while dispatching a method call: {0}'
+                .format(traceback.format_exc()))
+            response['$']['status'] = 'error'
+            call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
+        finally:
+            log.info('Call result: {0}'.format(call_result))
+            response['data'] = call_result
+        return response
 
     def send_error(self, text, token):
         self.send({

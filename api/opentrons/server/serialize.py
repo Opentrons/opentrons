@@ -1,7 +1,7 @@
 import functools
 
 
-def _get_object_tree(max_depth, path, refs, depth, obj):
+def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
 
     def object_container(value):
         # Save id of instance of object's type as a reference too
