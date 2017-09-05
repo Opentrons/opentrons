@@ -1,22 +1,22 @@
 import functools
-from opentrons import containers
+from opentrons.containers import Slot, Container
 
 
-def get_container(slot):
-    res = [None] + [
+def get_containers(slot):
+    res = [
         c for c in slot.get_all_children()
-        if isinstance(c, containers.Container)]
-    return res.pop()
+        if isinstance(c, Container)] or [None]
+    return res
 
 
-def container_name(slot):
-    c = get_container(slot)
-    return c.get_name() if c else ''
+def container_names(slot):
+    children = get_containers(slot)
+    return ', '.join(c.get_name() if c else '' for c in children)
 
 
-def container_type(slot):
-    c = get_container(slot)
-    return c.get_type() if c else ''
+def container_types(slot):
+    children = get_containers(slot)
+    return [c.get_type() if c else '' for c in children]
 
 
 def format_slot(slot, height, width, top_margin):
@@ -29,11 +29,8 @@ def format_slot(slot, height, width, top_margin):
     for _ in range(top_margin-1):
         res += [content_string.format('')]
 
-    res += [
-        content_string.format(slot.get_name()),
-        content_string.format(container_name(slot)),
-        content_string.format(container_type(slot))
-    ]
+    res += [content_string.format(slot.get_name()), content_string.format('')]
+    res += [content_string.format(container_names(slot))]
 
     res += divider
 
@@ -65,7 +62,7 @@ def stringify_deck(formatted_slots, n, m):
     return functools.reduce(join_rows, output_rows)
 
 
-def pprint(deck):
+def deck_to_ascii(deck):
     # Determine dimensions given the number of slots
     size_map = {
         10: (5, 2),
@@ -75,7 +72,7 @@ def pprint(deck):
     # Get all slots on a deck
     deck = [
         c for c in deck.get_all_children()
-        if isinstance(c, containers.Slot)
+        if isinstance(c, Slot)
     ]
 
     if not len(deck) in size_map:
@@ -86,7 +83,9 @@ def pprint(deck):
     # Get all string labels of everything we'll be printing
     # to calculate cell width
     labels = sum([
-        [slot.get_name(), container_name(slot), container_type(slot)]
+        [slot.get_name(),
+            container_names(slot),
+            container_types(slot)]
         for slot in deck], [])
 
     slot_width = max([len(s) for s in labels]) + 10
@@ -106,4 +105,9 @@ def pprint(deck):
         format_slot(slot, slot_height, slot_width, 2)
         for slot in deck]
 
-    print('\n'.join(stringify_deck(pretty_slots, N, M)))
+    output = '\n'.join(stringify_deck(pretty_slots, N, M))
+    return output
+
+
+def pprint(deck):
+    print(deck_to_ascii(deck))

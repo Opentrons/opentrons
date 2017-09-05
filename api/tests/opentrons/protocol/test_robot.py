@@ -18,6 +18,14 @@ class RobotTest(unittest.TestCase):
         self.robot.connect(options={'firmware': self.smoothie_version})
         self.robot.home(enqueue=False)
 
+    def test_slot_order(self):
+        assert list(Robot().reset()._deck.children_by_name.keys()) == [
+            'A1', 'A2', 'A3',
+            'B1', 'B2', 'B3',
+            'C1', 'C2', 'C3',
+            'D1', 'D2', 'D3',
+            'E1', 'E2', 'E3']
+
     def test_firmware_verson(self):
         self.assertEquals(
             self.smoothie_version, self.robot._driver.firmware_version)

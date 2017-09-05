@@ -476,6 +476,71 @@ class Deck(Placeable):
         """
         return container_instance in self.containers()
 
+    def _repr_html_(self):
+        # TODO (Ian 2017-09-05) write test for order of children_by_name
+        slots = self.children_by_name
+
+        col_letters = sorted(list({k[0] for k in slots.keys()}))
+        row_numbers = sorted(list({k[1] for k in slots.keys()}))
+
+        deck_by_col = [
+            [
+                slots[col_letter + row_number]
+                for col_letter in col_letters
+            ]
+            for row_number in reversed(row_numbers)
+        ]
+
+        def html_column(slots):
+            return '<div class="deckmap-row">' + \
+                ''.join([
+                    '<div class="deckmap-slot" data-slotname="{}">'
+                    .format(slot.get_name()) +
+                    ''.join([
+                        '<label>' + c.get_name() + '</label>'
+                        for c in slot.get_children_list()]) +
+                    '</div>'
+                    for slot in slots]) + \
+                '</div>'
+
+        # TODO (Ian 2017-09-05) find better solutions for css in jupyter
+        style = """
+        <style>
+        .deckmap {
+          background-color: rgb(200, 200, 200);
+        }
+
+        .deckmap-row {
+            display: flex;
+        }
+
+        .deckmap-slot {
+          border: 1px solid skyblue;
+          min-height: 4em;
+          height: auto;
+          flex: 1;
+        }
+
+        .deckmap-slot:before {
+          content: attr(data-slotname);
+          color: green;
+          display: block;
+        }
+
+        .deckmap-slot label {
+          display: block;
+          color: #3f3f3f;
+        }
+        </style>
+        """
+
+        return (
+            style +
+            '<div class="deckmap">' +
+            ''.join([html_column(col) for col in deck_by_col]) +
+            '</div>'
+        )
+
 
 class Well(Placeable):
     """
