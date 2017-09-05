@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
-import WebSocket from 'ws'
+import WS from 'ws'
 // import log from 'winston'
 
 import Client from '../../rpc/client'
@@ -8,6 +8,7 @@ import {
   statuses,
   RESULT,
   ACK,
+  NACK,
   NOTIFICATION,
   CONTROL_MESSAGE
 } from '../../rpc/message-types'
@@ -29,13 +30,12 @@ const EX_CONTROL_MESSAGE = {
 const EX_ROOT_INSTANCE = {i: 4, t: 5, v: {foo: 'bar'}}
 const EX_ROOT_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
 
-function makeAckResponse (token) {
-  return {$: {type: ACK, token}}
-}
-
-function makeCallResponse (token, status, data) {
-  return {$: {type: RESULT, token, status}, data}
-}
+const makeAckResponse = (token) => ({$: {type: ACK, token}})
+const makeNackResponse = (token, reason) => ({$: {type: NACK, token}, reason})
+const makeCallResponse = (token, status, data) => ({
+  $: {type: RESULT, token, status},
+  data
+})
 
 describe('rpc client', () => {
   let url
@@ -48,9 +48,7 @@ describe('rpc client', () => {
   }
 
   function removeListener (listener) {
-    const {target, event, handler} = listener
-
-    target.removeListener(event, handler)
+    listener.target.removeListener(listener.event, listener.handler)
   }
 
   class JsonWs extends EventEmitter {
@@ -58,7 +56,7 @@ describe('rpc client', () => {
       super()
       this._ws = ws
 
-      addListener(ws, 'message', (message) => this.emit('message', JSON.parse(message)))
+      addListener(ws, 'message', (m) => this.emit('message', JSON.parse(m)))
       addListener(ws, 'close', () => this.emit('close'))
     }
 
@@ -69,15 +67,15 @@ describe('rpc client', () => {
 
   beforeAll((done) => portfinder.getPort((error, port) => {
     if (error) return done(error)
-    if (!global.WebSocket) global.WebSocket = WebSocket
+    if (!global.WebSocket) global.WebSocket = WS
 
     url = `ws://127.0.0.1:${port}`
-    wss = new WebSocket.Server({port})
+    wss = new WS.Server({port})
     wss.once('listening', done)
   }))
 
   afterAll((done) => {
-    if (global.WebSocket === WebSocket) delete global.WebSocket
+    if (global.WebSocket === WS) delete global.WebSocket
     wss.close(done)
   })
 
@@ -183,7 +181,20 @@ describe('rpc client', () => {
       })
     })
 
-    test('getss the type of an object to create a remote object', () => {
+    test("rejects the result of a nack'd method call", () => {
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        ws.send(makeNackResponse(token, 'You done messed up'))
+      })
+
+      const result = client.control.get_object_by_id(EX_CONTROL_DATA.instance.i)
+
+      return expect(result).rejects.toMatchObject({
+        message: 'NACK ERROR in get_object_by_id: You done messed up'
+      })
+    })
+
+    test('gets the type of an object to create a remote object', () => {
       const exInstanceResponse = (token) => makeCallResponse(
         token,
         SUCCESS,

@@ -1,12 +1,19 @@
 import EventEmitter from 'events'
 // TODO(mc, 2017-08-29): Disable winston and uuid because of worker-loader bug
-// preventing webpackification of built-in node modules
+// preventing webpackification of built-in node modules (os and crypto)
 // import log from 'winston'
 // import uuid from 'uuid/v4'
 
 import WebSocketClient from './websocket-client'
 import RemoteObject from './remote-object'
-import {statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE} from './message-types'
+import {
+  statuses,
+  RESULT,
+  ACK,
+  NACK,
+  NOTIFICATION,
+  CONTROL_MESSAGE
+} from './message-types'
 
 // TODO(mc, 2017-08-29): see note about uuid above
 let _uniqueId = 0
@@ -15,7 +22,7 @@ const uuid = () => `id-${_uniqueId++}`
 // timeouts
 const HANDSHAKE_TIMEOUT = 5000
 const RECEIVE_CONTROL_TIMEOUT = 500
-const CALL_ACK_TIMEOUT = 5000
+const CALL_ACK_TIMEOUT = 1000
 const CALL_RESULT_TIMEOUT = 240000
 
 // metadata constants
@@ -24,6 +31,7 @@ const REMOTE_TYPE_OBJECT = 1
 
 // event name utilities
 const makeAckEventName = (token) => `ack:${token}`
+const makeNackEventName = (token) => `nack:${token}`
 const makeSuccessEventName = (token) => `success:${token}`
 const makeFailureEventName = (token) => `failure:${token}`
 
@@ -48,6 +56,7 @@ class RpcContext extends EventEmitter {
     const self = this
     const token = uuid()
     const ackEvent = makeAckEventName(token)
+    const nackEvent = makeNackEventName(token)
     const resultEvent = makeSuccessEventName(token)
     const failureEvent = makeFailureEventName(token)
 
@@ -84,9 +93,14 @@ class RpcContext extends EventEmitter {
         this.once(failureEvent, handleFailure)
       }
 
+      const handleNack = (reason) => {
+        handleError(new Error(`NACK ERROR in ${name}: ${reason}`))
+      }
+
       function cleanup () {
         clearTimeout(timeout)
         self.removeAllListeners(ackEvent)
+        self.removeAllListeners(nackEvent)
         self.removeAllListeners(resultEvent)
         self.removeAllListeners(failureEvent)
         self.removeListener('error', handleError)
@@ -94,6 +108,7 @@ class RpcContext extends EventEmitter {
 
       this.once('error', handleError)
       this.once(ackEvent, handleAck)
+      this.once(nackEvent, handleNack)
       timeout = setTimeout(
         () => handleError(new Error(`Ack timeout for call ${token}`)),
         CALL_ACK_TIMEOUT
@@ -192,6 +207,10 @@ class RpcContext extends EventEmitter {
 
       case ACK:
         this.emit(makeAckEventName(meta.token))
+        break
+
+      case NACK:
+        this.emit(makeNackEventName(meta.token), message.reason)
         break
 
       case NOTIFICATION:
