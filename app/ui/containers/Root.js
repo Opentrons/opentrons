@@ -41,6 +41,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     // interface
     onNavClick: () => dispatch(interfaceActions.toggleNavPanel()),
+    onNavIconClick: (panel) => () => dispatch(interfaceActions.setCurrentNavPanel(panel)),
 
     // robot
     // TODO(mc): revisit when robot discovery / multiple robots is addressed

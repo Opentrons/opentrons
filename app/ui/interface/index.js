@@ -10,9 +10,6 @@ const getModuleState = (state) => state[NAME]
 const INITIAL_STATE = {
   isNavPanelOpen: false,
   currentNavPanelTask: 'connect'
-  // ^ currently changing NavPanel content by changing this manually
-  // need reducer/handler to set currentNavPanelTask item onNavIconClick
-  // change to 'upload' to see upload buttons
 }
 
 export const selectors = {
@@ -25,7 +22,8 @@ export const selectors = {
 }
 
 export const actionTypes = {
-  TOGGLE_NAV_PANEL: makeInterfaceActionName('TOGGLE_NAV_PANEL')
+  TOGGLE_NAV_PANEL: makeInterfaceActionName('TOGGLE_NAV_PANEL'),
+  SET_CURRENT_NAV_PANEL: makeInterfaceActionName('SET_CURRENT_NAV_PANEL')
 }
 
 export const actions = {
@@ -33,16 +31,21 @@ export const actions = {
     return {
       type: actionTypes.TOGGLE_NAV_PANEL
     }
+  },
+  setCurrentNavPanel (panel) {
+    return {type: actionTypes.SET_CURRENT_NAV_PANEL, payload: {panel}}
   }
 }
 
 export function reducer (state = INITIAL_STATE, action) {
-  const {type} = action
+  const {type, payload} = action
 
   switch (type) {
     case actionTypes.TOGGLE_NAV_PANEL:
       return {...state, isNavPanelOpen: !state.isNavPanelOpen}
-  }
 
+    case actionTypes.SET_CURRENT_NAV_PANEL:
+      return {...state, currentNavPanelTask: payload.panel, isNavPanelOpen: true}
+  }
   return state
 }

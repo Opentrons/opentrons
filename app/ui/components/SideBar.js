@@ -6,9 +6,9 @@ import grid from './Grid.css'
 import styles from './SideBar.css'
 
 const UploadMenu = props => {
-  const {onNavClick} = props
+  const {onNavIconClick} = props
   return (
-    <section className={styles.upload_menu} onClick={onNavClick}>
+    <section className={styles.upload_menu} onClick={onNavIconClick('upload')}>
       <div className={styles.upload_icon}>
         <img src='../ui/img/icon_file.svg' alt='upload' />
       </div>
@@ -19,9 +19,9 @@ const UploadMenu = props => {
 // TODO: (ka) these are just placeholder icons, refactor to reuse same component for upload, design, setup
 // with icon, style, and handler as props
 const DesignMenu = props => {
-  const {onNavClick} = props
+  const {onNavIconClick} = props
   return (
-    <section className={styles.design_menu} onClick={onNavClick}>
+    <section className={styles.design_menu} onClick={onNavIconClick('design')}>
       <div className={styles.design_icon}>
         <img src='../ui/img/icon_design.svg' alt='design' />
       </div>
@@ -30,9 +30,9 @@ const DesignMenu = props => {
 }
 
 const SetupMenu = props => {
-  const {onNavClick} = props
+  const {onNavIconClick} = props
   return (
-    <section className={styles.setup_menu} onClick={onNavClick}>
+    <section className={styles.setup_menu} onClick={onNavIconClick('setup')}>
       <div className={styles.setup_icon}>
         <img src='../ui/img/icon_setup.svg' alt='design' />
       </div>
@@ -41,14 +41,14 @@ const SetupMenu = props => {
 }
 
 const ConnectionIndicator = props => {
-  const {isConnected, onNavClick} = props
+  const {isConnected, onNavIconClick} = props
   // TODO(mc): handle connection in progress (state is in place for this)
   const style = isConnected
     ? styles.connected
     : styles.disconnected
 
   return (
-    <div className={styles.connection_status} onClick={onNavClick}>
+    <div className={styles.connection_status} onClick={onNavIconClick('connect')}>
       <div className={styles.status}>
         <div className={style} />
       </div>
