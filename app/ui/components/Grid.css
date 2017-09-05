@@ -43,7 +43,12 @@
   background-color: grey;
   display: grid;
   grid-template-columns: auto auto auto 10rem;
-  grid-template-areas: ". . . .";
+  grid-template-areas: ". . . run";
+}
+
+.run {
+  margin: 1rem;
+  grid-area: run;
 }
 
 .controls {
