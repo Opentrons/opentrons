@@ -6,7 +6,7 @@ from threading import Event
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
-from opentrons.pubsub_util.topics import MOVEMENT
+from opentrons.pubsub_util import topics
 from opentrons.pubsub_util.messages.movement import moved_msg
 from opentrons.util.trace import MessageBroker
 
@@ -317,10 +317,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             },
             'class': type(self.connection).__name__
         }
-        message_broker.publish('instrument-action', arguments)
+        message_broker.publish(topics.MISC, arguments)
 
         new_position = moved_msg('head',*current_pos)
-        message_broker.publish(MOVEMENT, new_position)
+        message_broker.publish(topics.MOVEMENT, new_position)
 
     def move_plunger(self, mode='absolute', **kwargs):
         self.move(mode, **kwargs)
@@ -405,7 +405,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 'plunger': self.get_plunger_positions()["current"]
             }
         }
-        message_broker.publish('instrument-action', arguments)
+        message_broker.publish(topics.MISC, arguments)
 
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
@@ -435,7 +435,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 time.sleep(delay_time)
 
         end_time = _current_time() + delay_time
-        message_broker.publish('time-action', {
+        message_broker.publish(topics.MISC, {
             'name': 'delay-start',
             'time': delay_time
         })
@@ -443,11 +443,11 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.check_paused_stopped()
             _sleep(min(1, end_time - _current_time()))
 
-            message_broker.publish('time-action', {
+            message_broker.publish(topics.MISC, {
                 'name': 'countdown',
                 'countdown': int(end_time - time.time())
             })
-            message_broker.publish('time-action', {
+            message_broker.publish(topics.MISC, {
             'name': 'delay-finish'
         })
 
