@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from './Button'
 import styles from './NavPanel.css'
 
@@ -50,6 +51,12 @@ const SetupPanel = props => {
   )
 }
 
+SetupPanel.propTypes = {
+  isRunning: PropTypes.bool.isRequired,
+  isReadyToRun: PropTypes.bool.isRequired,
+  onRunClick: PropTypes.func.isRequired
+}
+
 const ConnectPanel = props => {
   const {isConnected, onConnectClick} = props
   let connectButton
@@ -87,6 +94,11 @@ const ConnectPanel = props => {
   )
 }
 
+ConnectPanel.propTypes = {
+  isConnected: PropTypes.bool.isRequired,
+  onConnectClick: PropTypes.func.isRequired
+}
+
 const panel = (props) => ({
   upload: <UploadPanel {...props} />,
   connect: <ConnectPanel {...props} />,
@@ -97,4 +109,8 @@ const panel = (props) => ({
 export default function NavPanel (props) {
   const {currentNavPanelTask} = props
   return <div >{panel(props)[currentNavPanelTask]}</div>
+}
+
+NavPanel.propTypes = {
+  currentNavPanelTask: PropTypes.string.isRequired
 }
