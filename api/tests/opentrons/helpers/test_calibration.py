@@ -16,7 +16,7 @@ class CalibrationTest(unittest.TestCase):
 
         self.trash = containers_load(self.robot, 'point', 'A1', 'trash')
         self.tiprack = containers_load(
-            self.robot, 'tiprack-200ul', 'B2', 'p200-rack'
+            self.robot, 'tiprack-200ul', 'B1', 'p200-rack'
         )
         self.trough = containers_load(
             self.robot, 'trough-12row', 'B2', 'trough'

@@ -1,10 +1,7 @@
 # Hello, Opentrons API
 
 ```python
-from opentrons import Robot
-from opentrons import containers, instruments
-
-robot = Robot.get_instance()
+from opentrons import robot, containers, instruments
 
 tiprack = containers.load(
     'tiprack-200ul',  # container type
@@ -12,7 +9,7 @@ tiprack = containers.load(
     'tiprack'         # user-defined name
 )
 plate = containers.load('96-flat', 'B1', 'plate')
-    
+
 p200 = instruments.Pipette(
     axis="b",
     max_volume=200,

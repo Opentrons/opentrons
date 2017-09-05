@@ -1,5 +1,10 @@
 .. _containers:
 
+.. testsetup:: *
+
+    from opentrons import containers, robot
+    robot.reset()
+
 ######################
 Containers
 ######################
@@ -28,16 +33,39 @@ If you are interested in using your own container that is not included in the AP
 
 **********************
 
+Placing containers on the robot deck
+=====
+
+The robot deck is made up of slots labeled A1, A2, A3, B1, and so on.
+
+.. image:: img/DeckMapEmpty.png
+
+To tell the robot what containers will be on the deck for your protocol, use `containers.load`
+
+.. code-block:: python
+  samples_rack = containers.load('tube-rack-2ml', slot='B1')
+
+Putting multiple containers in the same slot
+-----
+
+Some containers might only take up half a slot. You must explicitly say `share=True`, indicating that it is okay to share the slot.
+
+.. code-block:: python
+  tubes = containers.load('T25-flask', slot='C1')
+  more_tubes = containers.load('T25-flask', slot='C1', share=True)
+
+**********************
+
 Point
 =====
 
-Use ``point`` when there is only one position per container, such as the trash or a scale. 
+Use ``point`` when there is only one position per container, such as a scale.
 
 .. code-block:: python
 
-    container.load('point', slot)
+    my_container = containers.load('point', slot)
 
-You can access the point position as ``container.wells('A1')`` or ``container.wells(0)``.
+You can access the point position as ``my_container.wells('A1')`` or ``my_container.container.wells(0)``.
 
 **********************
 
@@ -51,7 +79,7 @@ Tip rack for a 10 uL pipette (single or 8-channel)
 
 .. code-block:: python
 
-    container.load('tiprack-10ul', slot)
+    containers.load('tiprack-10ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -64,7 +92,7 @@ Tip rack for a single channel 10 uL pipette when the pipette is in the center po
 
 .. code-block:: python
 
-    container.load('tiprack-10ul-H', slot)
+    containers.load('tiprack-10ul-H', slot)
 
 **Accessing Tips:** *single channel* ``['E-H, 1-12']``
 
@@ -77,7 +105,7 @@ Tip rack for a 200 or 300 uL pipette (single or 8-channel)
 
 .. code-block:: python
 
-    container.load('tiprack-200ul', slot)
+    containers.load('tiprack-200ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -90,7 +118,7 @@ Tip rack for a 1000 uL pipette (single or 8-channel)
 
 .. code-block:: python
 
-    container.load('tiprack-1000ul', slot)
+    containers.load('tiprack-1000ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -103,7 +131,7 @@ Tip rack for 1000ul chem (10x10)
 
 .. code-block:: python
 
-    container.load('tiprack-1000ul-chem', slot)
+    containers.load('tiprack-1000ul-chem', slot)
 
 **Accessing Tips:** *single channel* ``[0]-[99]``
 
@@ -121,7 +149,7 @@ trough-12row
 
 .. code-block:: python
 
-    container.load('trough-12row', slot)
+    containers.load('trough-12row', slot)
 
 **Accessing Rows:** *single channel* ``['A1']-['A12']``, *8-channel* ``['A1']-['A12']``
 
@@ -140,7 +168,7 @@ tube-rack-.75ml
 
 .. code-block:: python
 
-    container.load('tube-rack-.75ml', slot)
+    containers.load('tube-rack-.75ml', slot)
 
 **Accessing Tubes:** *single channel* ``['A1']-['D6']``
 
@@ -153,7 +181,7 @@ tube-rack-2ml
 
 .. code-block:: python
 
-    container.load('tube-rack-2ml', slot)
+    containers.load('tube-rack-2ml', slot)
 
 **Accessing Tubes:** *single channel* ``['A1']-['D6']``
 
@@ -166,7 +194,7 @@ rack that holds 6 15 mL tubes and 4 50 mL tubes
 
 .. code-block:: python
 
-    container.load('tube-rack-15_50ml', slot)
+    containers.load('tube-rack-15_50ml', slot)
 
 **Accessing Tubes:** *single channel* ``['A1']-['A3'], ['B1']-['B3'], ['C1']-['C2'], ['D1']-['D2']``
 
@@ -183,7 +211,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('96-deep-well', slot)
+    containers.load('96-deep-well', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -196,7 +224,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('96-PCR-tall', slot)
+    containers.load('96-PCR-tall', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -209,7 +237,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('96-PCR-flat', slot)
+    containers.load('96-PCR-flat', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -222,7 +250,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('PCR-strip-tall', slot)
+    containers.load('PCR-strip-tall', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['A8']``, *8-channel* ``['A1']``
 
@@ -235,7 +263,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('384-plate', slot)
+    containers.load('384-plate', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['P24']``, *multi-channel* ``['A1']-['A24]``
 
@@ -243,11 +271,6 @@ See dimensions in diagram below.
 
 
 **********************
-
-.. testsetup:: containers
-
-    from opentrons import containers, robot
-    robot.reset()
 
 **************
 Containers
@@ -284,7 +307,7 @@ Labware is loaded with two arguments: 1) the container type, and 2) the deck slo
 
 A third optional argument can be used to give a container a unique name.
 
-.. testcode:: containers
+.. testcode:: containers_2
 
     p = containers.load('96-flat', 'B1', 'any-name-you-want')
 
@@ -296,13 +319,13 @@ Unique names are useful in a few scenarios. First, they allow the container to h
 
 __ https://opentrons.com/getting-started/calibrate-deck
 
-Names can also be used to place multiple containers in the same slot all at once. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
+Names can also be used to place multiple containers in the same slot all at once, using the `share=True` argument. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
 
 .. testcode:: containers
 
     fa = containers.load('T25-flask', 'D1', 'flask_a')
-    fb = containers.load('T25-flask', 'D1', 'flask_b')
-    fc = containers.load('T25-flask', 'D1', 'flask_c')
+    fb = containers.load('T25-flask', 'D1', 'flask_b', share=True)
+    fc = containers.load('T25-flask', 'D1', 'flask_c', share=True)
 
 Create
 ======
@@ -311,18 +334,19 @@ In addition to the default containers that come with the Opentrons API, you can 
 
 Through the API's call containers.create(), you can create simple grid containers, which consist of circular wells arranged in columns and rows.
 
-.. testcode:: containers
+.. testcode:: containers_custom
 
     containers.create(
         '3x6_plate',                    # name of you container
         grid=(3, 6),                    # specify amount of (columns, rows)
         spacing=(12, 12),               # distances (mm) between each (column, row)
         diameter=5,                     # diameter (mm) of each well on the plate
-        depth=10)                       # depth (mm) of each well on the plate
+        depth=10,                       # depth (mm) of each well on the plate
+        volume=200)                     # optional: volume capacity of each well (uL)
 
 When you create your custom container, then it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
 
-.. testcode:: containers
+.. testcode:: containers_custom
 
     custom_plate = containers.load('3x6_plate', 'D1')
 
@@ -331,7 +355,7 @@ When you create your custom container, then it will be saved for later use under
 
 will print out...
 
-.. testoutput:: containers
+.. testoutput:: containers_custom
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
     <Well A1>
@@ -383,7 +407,7 @@ The OT-One deck and containers are all set up with the same coordinate system - 
 .. image:: img/well_iteration/Well_Iteration.png
 
 .. testcode:: individualwells
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -459,7 +483,7 @@ If we had to reference each well one at a time, our protocols could get very ver
 When describing a liquid transfer, we can point to groups of wells for the liquid's source and/or destination. Or, we can get a group of wells that we want to loop through.
 
 .. testcode:: multiwells
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -510,7 +534,7 @@ Wells To
 Instead of having to list the name of every well, we can also create a range of wells with a start and end point. The first argument is the starting well, and the ``to=`` argument is the last well.
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', to='H1'):
         print(w)
 
@@ -531,7 +555,7 @@ will print out...
 Not only can we get every well between the start and end positions, but we can also set the ``step=`` size. The example below will access every 2nd well between ``'A1'`` and ``'H'``:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', to='H1', step=2):
         print(w)
 
@@ -548,7 +572,7 @@ will print out...
 These lists of wells can also move in the reverse direction along your container. For example, setting the ``to=`` argument to a well that comes before the starting position is allowed:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('H1', to='A1', step=2):
         print(w)
 
@@ -568,7 +592,7 @@ Wells Length
 Another way you can create a list of wells is by specifying the length= of the well list you need, in addition to the starting point. The example below will return eight wells, starting at well ``'A1'``:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', length=8):
         print(w)
 
@@ -589,7 +613,7 @@ will print out...
 And just like before, we can also set the ``step=`` argument. Except this time the example will be accessing every 3rd well, until a total of eight wells have been found:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', length=8, step=3):
         print(w)
 
@@ -610,7 +634,7 @@ will print out...
 You can set the step= value to a negative number to move in the reverse direction along the container:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('H11', length=8, step=-1):
         print(w)
 
