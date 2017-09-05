@@ -26,12 +26,8 @@ __all__ = [
     unpack_location,
     apply_calibration]
 
-<<<<<<< HEAD
 
 def load(robot, container_name, slot, label=None, share=False):
-=======
-def load(robot, container_name, slot, label=None):
->>>>>>> changed a newline
     """
     Examples
     --------
