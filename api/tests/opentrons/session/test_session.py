@@ -29,8 +29,6 @@ async def test_load_protocol_with_error(session_manager):
         session = session_manager.create(name='<blank>', text='blah')
         assert session is None
 
-    print(e.value.args)
-
     args, = e.value.args
     timestamp = args['timestamp']
     exception, trace = args['error']
@@ -47,6 +45,20 @@ async def test_load_and_run(session_manager, protocol):
     assert session.state == 'loaded'
     session.run(devicename='Virtual Smoothie')
     assert len(session.command_log) == 101
+
+    res = []
+    async for notification in session_manager.notifications:
+        assert isinstance(notification, tuple), "notification is a tuple"
+        event, s = notification
+        assert isinstance(s, Session), "second element is Session"
+        if event['name'] == 'session.state.change':
+            state = event['arguments']['state']
+            res.append(state)
+            if state == 'finished':
+                break
+
+    assert res == ['running', 'finished'], 'Run should emit state change to "running" and then to "finished"'  # noqa
+    assert session_manager.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
 
 @pytest.fixture

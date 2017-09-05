@@ -7,7 +7,7 @@ from opentrons.util.trace import EventBroker
 
 
 class Notifications(object):
-    def __init__(self, loop=None, filters=['add-command']):
+    def __init__(self, loop=None, filters=None):
         self.loop = loop or asyncio.get_event_loop()
         self.update_filters(filters)
         self.queue = Queue(loop=self.loop)
@@ -32,7 +32,11 @@ class Notifications(object):
         self.session = session
 
     def update_filters(self, filters):
-        self.filters = set(filters)
+        self.filters = None if filters is None else set(filters)
+
+    def append_filters(self, filters):
+        _filters = [] if self.filters is None else set(self.filters)
+        self.filters = set(_filters) | set(filters)
 
     def on_notify(self, event):
         def thread_has_event_loop():
@@ -43,7 +47,9 @@ class Notifications(object):
             else:
                 return True
 
-        if event.get('name', None) not in self.filters:
+        if self.filters is None:
+            pass    # if filters not set keep going, accept everything
+        elif event.get('name', None) not in self.filters:
             return
 
         # Use this to turn self into it's id so we don't

@@ -28,9 +28,8 @@ class Server(object):
     def __init__(self, root=None, loop=None, notification_max_depth=5):
         self.monitor_events_task = None
         self.loop = loop or asyncio.get_event_loop()
-
-        self.objects = {id(self): self}
-        self.control_box = ControlBox(self.objects)
+        self.objects = {}
+        self.system = SystemCalls(self.objects)
 
         self.root = root
         self.notification_max_depth = notification_max_depth
@@ -195,9 +194,9 @@ class Server(object):
                 token = meta['token']
 
                 # If no id, or id is null/none/undefined assume
-                # a system call to control_box instance
+                # a system call to system instance
                 if 'id' not in data or data['id'] is None:
-                    data['id'] = id(self.control_box)
+                    data['id'] = id(self.system)
 
                 try:
                     _id = data.pop('id', None)
@@ -269,7 +268,7 @@ class Server(object):
                 self.send_queue.put((client, payload)), self.loop)
 
 
-class ControlBox(object):
+class SystemCalls(object):
     def __init__(self, objects):
         self.objects = objects
         objects[id(self)] = self
