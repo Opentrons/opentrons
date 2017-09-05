@@ -6,12 +6,15 @@ from opentrons.pubsub_util.messages.movement import moved_msg
 
 
 class Node(object):
-    def __init__(self, object):
-        self.children = []
-        self.parent   = None
+    def __init__(self, object, parent=None):
         self.value    = object
+        self.parent   = parent
+        self.children = []
 
-DUMMY = 1 # Sometimes added to vectors to maintain matrix values
+    def add_child(self, child_node):
+        child_node.parent = self
+        self.children.append(child_node)
+
 
 class Pose(object):
     def __init__(self, x, y, z):
@@ -101,7 +104,8 @@ class PositionTracker(object):
         '''
         relative_pose = Pose(x, y, z)
         pose = Pose(*(self[parent].position + relative_pose.position))
-        node = self._position_dict[parent][1].add_child(obj)
+        node = Node(obj)
+        self._position_dict[parent][1].add_child(node)
         self._position_dict[obj] = (pose, node)
 
     def create_root_object(self, obj, x, y, z):

@@ -5,8 +5,8 @@ import logging
 from asyncio import Queue
 from concurrent import futures
 from opentrons.robot.robot import Robot
-from opentrons.util.trace import EventBroker
-
+from opentrons.util.trace import MessageBroker
+from opentrons.pubsub_utils import topics
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class RobotContainer(object):
         self.update_filters(filters)
 
         self.notifications = Queue(loop=self.loop)
-        EventBroker.get_instance().add(self.notify)
+        MessageBroker.get_instance().subscribe(topics.MISC, self.notify)
 
     def same_thread(self):
         try:

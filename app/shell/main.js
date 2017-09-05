@@ -59,8 +59,7 @@ process.env.APP_DATA_DIR = (() => {
   return dir
 })()
 
-let log = null
-
+const log = getLogger('electron-main')
 let loadUI = (win, url) => {
   log.info('Loading App UI at ' + url)
   win.loadURL(
@@ -105,7 +104,6 @@ let createWindow = async () => {
 }
 
 let startUp = async () => {
-  log = getLogger('electron-main')
   log.info('Starting App')
 
   if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
