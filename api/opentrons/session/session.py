@@ -7,6 +7,8 @@ from datetime import datetime
 
 from .notifications import Notifications
 from opentrons.util.trace import EventBroker
+from opentrons.util.trace import traceable
+
 
 # TODO: add session variables as per:
 # https://docs.google.com/document/d/1fXJBd1SFIqudxdWzyFSHoq5mkER45tr_A5Yx1s-nFQs/edit
@@ -15,7 +17,9 @@ VALID_STATES = set(
 
 
 class SessionManager(object):
-    def __init__(self, loop, filters):
+    def __init__(self, loop, filters=[
+            'add-command',
+            'session.state.change']):
         self.notifications = Notifications(loop=loop, filters=filters)
         self.robot = Robot()
 
@@ -24,7 +28,6 @@ class SessionManager(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.notifications.finalize()
-        pass
 
     def create(self, name, text):
         with self.notifications.snooze():
@@ -107,6 +110,7 @@ class Session(object):
 
         return (self, robot.commands())
 
+    @traceable('session.state.change')
     def set_state(self, state):
         if state not in VALID_STATES:
             raise ValueError('Invalid state: {0}. Valid states are: {1}'

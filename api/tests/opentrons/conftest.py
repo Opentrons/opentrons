@@ -60,7 +60,10 @@ def protocol(request):
 @pytest.fixture
 def session_manager(loop):
     from opentrons.session import SessionManager
-    with SessionManager(loop=loop, filters=['add-command', 'move-to']) as s:
+    with SessionManager(loop=loop) as s:
+        # We are adding this so more notifications are generated
+        # during the run, in addition to default ones
+        s.notifications.append_filters(['move-to'])
         yield s
     return
 
