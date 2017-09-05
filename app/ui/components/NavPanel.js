@@ -24,6 +24,32 @@ const UploadPanel = props => {
   )
 }
 
+const SetupPanel = props => {
+  const {isRunning, isReadyToRun, onRunClick} = props
+  let runButton
+  if (!isRunning) {
+    runButton = (
+      <Button
+        onClick={onRunClick}
+        disabled={!isReadyToRun}
+        style={styles.btn_run}
+      >
+        Run Job
+      </Button>
+    )
+  }
+  return (
+    <div className={styles.nav_panel}>
+      <section className={styles.links}>
+        <a href='#'>Set Up Pipettes</a>
+        <a href='#'>Set Up Deck</a>
+        <a href='#'>Set Up Reagents</a>
+        {runButton}
+      </section>
+    </div>
+  )
+}
+
 const ConnectPanel = props => {
   const {isConnected, onConnectClick} = props
   let connectButton
@@ -64,7 +90,8 @@ const ConnectPanel = props => {
 const panel = (props) => ({
   upload: <UploadPanel {...props} />,
   connect: <ConnectPanel {...props} />,
-  setup: <div>setup</div>
+  setup: <SetupPanel {...props} />,
+  design: <div>design...</div>
 })
 
 export default function NavPanel (props) {

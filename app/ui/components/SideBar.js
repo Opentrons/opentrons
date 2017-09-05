@@ -34,7 +34,7 @@ const SetupMenu = props => {
   return (
     <section className={styles.setup_menu} onClick={onNavIconClick('setup')}>
       <div className={styles.setup_icon}>
-        <img src='../ui/img/icon_setup.svg' alt='design' />
+        <img src='../ui/img/icon_setup.svg' alt='setup' />
       </div>
     </section>
   )

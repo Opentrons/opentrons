@@ -43,13 +43,7 @@
   background-color: grey;
   display: grid;
   grid-template-columns: auto auto auto 10rem;
-  grid-template-areas: ". . . run";
-}
-
-/* This will be removed once we refine placement of run button in nav panel, keeping for now */
-.run {
-  grid-area: run;
-  margin: 1rem;
+  grid-template-areas: ". . . .";
 }
 
 .controls {
