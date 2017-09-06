@@ -5,8 +5,8 @@ from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
 from opentrons.util.vector import Vector
 
-def approx(pose):
-    return int(sum(pose))
+def approx(pos):
+    return int(sum(pos))
 
 @pytest.fixture
 def robot():
