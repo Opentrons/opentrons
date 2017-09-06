@@ -61,7 +61,7 @@ class Notifications(object):
         # triggered the event
         arguments = event.get('arguments', {})
         if 'self' in arguments:
-            arguments['self_id'] = arguments.pop('self')
+            arguments['self_id'] = id(arguments.pop('self'))
 
         payload = (event, copy.deepcopy(self.session))
         future = asyncio.run_coroutine_threadsafe(

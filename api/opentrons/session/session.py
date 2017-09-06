@@ -6,7 +6,6 @@ from opentrons.robot.robot import Robot
 from datetime import datetime
 
 from .notifications import Notifications
-from opentrons.util.trace import EventBroker
 from opentrons.util.trace import traceable
 
 

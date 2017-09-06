@@ -52,7 +52,7 @@ async def test_load_and_run(session_manager, protocol):
         assert isinstance(notification, tuple), "notification is a tuple"
         event, s = notification
         if (event['name'] == 'add-command'):
-            index += 1  # Command log in sync with add-command events emmitted
+            index += 1  # Command log in sync with add-command events emitted
         assert len(s.command_log) == index
         assert isinstance(s, Session), "second element is Session"
         if event['name'] == 'session.state.change':
