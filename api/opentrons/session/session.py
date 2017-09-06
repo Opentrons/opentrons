@@ -46,17 +46,12 @@ class Session(object):
         self.state = None
         self.refresh()
 
-        def on_notify(event):
-            if event.get('name', None) == 'add-command':
-                self.log_append(event['arguments']['command'])
-
-        # TODO(artyom, 20170830): consider using weak references
-        # so we are not leaking memory when session is no longer active
-        EventBroker.get_instance().add(on_notify)
-
-    def refresh(self):
+    def reset(self):
         self.command_log = {}
         self.errors = {}
+
+    def refresh(self):
+        self.reset()
 
         try:
             tree = ast.parse(self.protocol_text)
@@ -93,6 +88,7 @@ class Session(object):
         # HACK: hard reset singleton by replacing all of it's attributes
         # with the one from a newly constructed robot
         robot.__dict__ = {**Robot().__dict__}
+        self.reset()
 
         if devicename is not None:
             robot.connect(devicename)
@@ -144,6 +140,7 @@ class Session(object):
             }
         })
 
+    # TODO: make it an array
     def error_append(self, error):
         self.errors.update({
             len(self.errors): {

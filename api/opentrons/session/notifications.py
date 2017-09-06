@@ -1,4 +1,5 @@
 import asyncio
+import copy
 
 from asyncio import Queue
 from concurrent import futures
@@ -52,6 +53,9 @@ class Notifications(object):
         elif event.get('name', None) not in self.filters:
             return
 
+        if event.get('name', None) == 'add-command':
+            self.session.log_append(event['arguments']['command'])
+
         # Use this to turn self into it's id so we don't
         # end up serializing every object who's method
         # triggered the event
@@ -59,7 +63,7 @@ class Notifications(object):
         if 'self' in arguments:
             arguments['self_id'] = arguments.pop('self')
 
-        payload = (event, self.session)
+        payload = (event, copy.deepcopy(self.session))
         future = asyncio.run_coroutine_threadsafe(
                 self.queue.put(payload), self.loop)
 
