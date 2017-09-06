@@ -21,6 +21,10 @@ def update_container(db_conn, container_name, x, y, z):
     with db_conn:
        db_conn.execute('UPDATE Containers SET relative_x=?, relative_y=?, relative_z=? WHERE name=?',
                        (x,y,z,container_name,))
+
+def delete_container(db_conn, container_name):
+    with db_conn:
+        db_conn.execute('DELETE FROM Containers WHERE name=?', (container_name,))
 #------------ END Container Functions -----------#
 
 
@@ -36,6 +40,11 @@ def get_wells_by_container_name(db_conn, container_name):
         cursor = db_conn.cursor()
         cursor.execute('SELECT * from ContainerWells WHERE container_name=?', (container_name,))
         return cursor.fetchall()
+
+def delete_wells_by_container_name(db_conn, container_name):
+    with db_conn:
+        db_conn.execute('DELETE FROM ContainerWells WHERE container_name=?', (container_name,))
+
 #------------ END Well Functions -----------#
 
 

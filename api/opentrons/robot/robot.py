@@ -10,12 +10,15 @@ from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import MessageBroker, traceable
 from opentrons.trackers import position_tracker
+from opentrons.data_storage import database
 import opentrons.util.calibration_functions as calib
 import opentrons.util.position_functions as pf
 
 log = get_logger(__name__)
-HEAD = 'head'
 
+
+#FIXME: This should be a head object - but using a string now to avoid scope creep
+HEAD = 'head'
 
 class InstrumentMosfet(object):
     """
@@ -659,7 +662,7 @@ class Robot(object):
     def add_container(self, container_name, slot, label=None, share=False):
         if not label:
             label = container_name
-        container = containers.get_persisted_container(container_name)
+        container = database.load_container(container_name)
         container.properties['type'] = container_name
         if self._deck[slot].has_children() and not share:
             raise RuntimeWarning(

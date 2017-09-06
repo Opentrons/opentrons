@@ -3,6 +3,7 @@ import json
 import os
 import unittest
 
+from opentrons.data_storage import database
 from opentrons.containers import (
     create as containers_create,
     load as containers_load,
@@ -59,15 +60,10 @@ class ContainerTestCase(unittest.TestCase):
         for i, w in enumerate(p):
             self.assertEquals(w, p[i])
 
-        # remove the file if we only created it for this test
-        should_delete = False
-        with open(environment.get_path('CONTAINERS_FILE')) as f:
-            created_containers = json.load(f)
-            del created_containers['containers'][p.get_name()]
-            if not len(created_containers['containers'].keys()):
-                should_delete = True
-        if should_delete:
-            os.remove(environment.get_path('CONTAINERS_FILE'))
+        assert container_name in containers_list()
+        database.delete_container(container_name)
+        assert not container_name in containers_list()
+
 
     def test_load_same_slot_force(self):
         container_name = '96-flat'

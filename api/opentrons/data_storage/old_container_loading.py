@@ -1,3 +1,14 @@
+'''
+    ATTENTION: This file was is for loading of json container files.
+    It is only being kept so that old json files can be migrated!
+    If you are looking to work with container file saving, or loading, or
+    really anything aside from using an old json container file you should probably
+    check out the new database we use for this storage! It can be found in
+    api/opentrons/data_storage/database.py.
+'''
+
+#TODO: Delete this file.
+
 from collections import OrderedDict
 import copy
 import json

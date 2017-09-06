@@ -1,5 +1,5 @@
 import sqlite3
-from opentrons.containers.container_file_loading import load_all_containers_from_disk, list_container_names, get_persisted_container
+from opentrons.data_storage.old_container_loading import load_all_containers_from_disk, list_container_names, get_persisted_container
 from opentrons.data_storage import database
 from opentrons.util import environment
 

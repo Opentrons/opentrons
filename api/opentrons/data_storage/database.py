@@ -41,6 +41,10 @@ def _load_container_object_from_db(db, container_name: str):
 def _update_container_object_in_db(db, container: Container):
     db_crud.update_container(db, container.get_type(), *_parse_container_obj(container))
 
+def _delete_container_object_in_db(db, container_name: str):
+    db_crud.delete_wells_by_container_name(db_conn, container_name)
+    db_crud.delete_container(db, container_name)
+
 def _create_well_obj_in_db(db, container_name: str, well: Well):
     well_data = _parse_well_obj(well)
     db_crud.insert_well_into_db(db, container_name, *well_data)
@@ -65,6 +69,7 @@ def _list_all_containers_by_name(db):
 #------------ END Private Functions -----------#
 
 
+
 #--------------- Public Functions -------------#
 def save_new_container(container: Container, container_name: str):
     return _create_container_obj_in_db(db_conn, container, container_name)
@@ -74,6 +79,9 @@ def load_container(container_name: str):
 
 def overwrite_container(container: Container):
     return _update_container_object_in_db(db_conn, container)
+
+def delete_container(container_name):
+    return _delete_container_object_in_db(db_conn, container_name)
 
 def list_all_containers():
     return _list_all_containers_by_name(db_conn)
