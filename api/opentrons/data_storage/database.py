@@ -12,10 +12,10 @@ db_conn = sqlite3.connect(default_database)
 
 
 #------------- Private Functions -------------#
-def _parse_container_obj(container):
+def _parse_container_obj(container: Container):
     return container._coordinates
 
-def _parse_well_obj(well):
+def _parse_well_obj(well: Well):
     relative_coords = well._coordinates + well.bottom()[1]
     location, depth = well.get_name(), well.z_size()
     diameter = well.properties.get('diameter', None)
@@ -23,12 +23,12 @@ def _parse_well_obj(well):
     width, length = well.properties['width'], well.properties['length']
     return (location, *relative_coords, depth, volume, diameter, length, width)
 
-def _create_container_obj_in_db(db, container, container_name):
+def _create_container_obj_in_db(db, container: Container, container_name: str):
     db_crud.create_container(db, container_name, *_parse_container_obj(container))
     for well in container.wells():
         _create_well_obj_in_db(db, container_name, well)
 
-def _load_container_object_from_db(db, container_name):
+def _load_container_object_from_db(db, container_name: str):
     container_type, *rel_coords = db_crud.get_container_by_name(db, container_name)
     wells = db_crud.get_wells_by_container_name(db, container_name)
     container = Container()
@@ -38,10 +38,10 @@ def _load_container_object_from_db(db, container_name):
         container.add(*_load_well_object_from_db(db, well))
     return container
 
-def _update_container_object_in_db(db, container):
+def _update_container_object_in_db(db, container: Container):
     db_crud.update_container(db, container.get_type(), *_parse_container_obj(container))
 
-def _create_well_obj_in_db(db, container_name, well):
+def _create_well_obj_in_db(db, container_name: str, well: Well):
     well_data = _parse_well_obj(well)
     db_crud.insert_well_into_db(db, container_name, *well_data)
 
@@ -66,13 +66,13 @@ def _list_all_containers_by_name(db):
 
 
 #--------------- Public Functions -------------#
-def save_new_container(container, container_name):
+def save_new_container(container: Container, container_name: str):
     return _create_container_obj_in_db(db_conn, container, container_name)
 
-def load_container(container_name):
+def load_container(container_name: str):
     return _load_container_object_from_db(db_conn, container_name)
 
-def overwrite_container(container):
+def overwrite_container(container: Container):
     return _update_container_object_in_db(db_conn, container)
 
 def list_all_containers():

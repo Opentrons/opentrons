@@ -80,8 +80,7 @@ deploy:
     skip_cleanup: true
     script: make -C api publish
     on:
-      # tags: true
-      branch: master
+       tags: true
 
 env:
   global:
