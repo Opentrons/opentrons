@@ -8,7 +8,8 @@ const URL = 'ws://127.0.0.1:31950'
 
 export default function client (dispatch) {
   let rpcClient
-  let robotContainer
+  let sessionManager
+  let session
   let robot
   // TODO(mc, 2017-08-29): remove when server handles serial port
   let serialPort
@@ -21,8 +22,12 @@ export default function client (dispatch) {
         connect(state, action)
         break
 
-      case actionTypes.NEW_SESSION:
-        newSession(state, action)
+      case actionTypes.SESSION:
+        createSession(state, action)
+        break
+
+      case actionTypes.RUN:
+        run(state, action)
         break
     }
   }
@@ -35,14 +40,12 @@ export default function client (dispatch) {
           .on('notification', handleRobotNotification)
           .on('error', handleClientError)
 
-        return rpcClient.control.get_root()
-      })
-      .then((rc) => {
-        robotContainer = rc
-        return robotContainer.new_robot()
-      })
-      .then((r) => {
-        robot = r
+        sessionManager = rpcClient.remote
+        session = sessionManager.session
+        robot = sessionManager.robot
+
+        if (session) handleApiSession(session)
+
         return robot.get_serial_ports_list()
       })
       // TODO(mc, 2017-08-29): serial port connection should not be the
@@ -56,28 +59,78 @@ export default function client (dispatch) {
       .catch((e) => dispatch(actions.connectResponse(e)))
   }
 
-  function session (state, action) {
-    const file = action.payload && action.payload.file
+  function createSession (state, action) {
+    const file = action.payload.file
+    const name = file.name
+    const reader = new FileReader()
 
-    if (file) {
-      const name = file.name
-      const reader = new FileReader()
-
-      reader.onload = function handleProtocolRead (event) {
-        console.log('NEW SESSION')
-        console.log(event.target.result)
-      }
-
-      return reader.readFileAsText(file)
+    reader.onload = function handleProtocolRead (event) {
+      sessionManager.create(name, event.target.result)
+        .then(handleApiSession)
+        .catch((error) => dispatch(actions.sessionResponse(error)))
     }
 
-    console.log('GET SESSION')
+    return reader.readAsText(file)
+  }
+
+  function handleApiSession (apiSession) {
+    session = apiSession
+
+    const {name, protocol_text, commands, command_log, state} = session
+    const protocolCommands = []
+    const protocolCommandsById = {}
+
+    // TODO(mc, 2017-08-30): Use a reduce
+    commands.forEach(makeHandleCommand())
+
+    dispatch(actions.sessionResponse(null, {
+      sessionName: name,
+      protocolText: protocol_text,
+      protocolCommands,
+      protocolCommandsById,
+      // TODO(mc, 2017-09-06): handle session errors
+      sessionErrors: [],
+      sessionState: state
+    }))
+
+    function makeHandleCommand (depth = 0) {
+      return function handleCommand (command) {
+        const {id, description} = command
+        const logEntry = command_log[id]
+        const children = Array.from(command.children)
+        let handledAt = ''
+
+        if (logEntry) handledAt = logEntry.timestamp
+        if (depth === 0) protocolCommands.push(id)
+
+        children.forEach(makeHandleCommand(depth + 1))
+        protocolCommandsById[id] = {
+          id,
+          description,
+          handledAt,
+          children: children.map((c) => c.id)
+        }
+      }
+    }
+  }
+
+  function run (state, action) {
+    session
+      .run(serialPort)
+      .then(() => dispatch(actions.runResponse()))
+      .catch((error) => dispatch(actions.runResponse(error)))
   }
 
   function handleRobotNotification (message) {
-    switch (message.name) {
+    const [command, payload] = message
+
+    if (command.name === 'session.state.change') {
+      console.log(message)
+    }
+
+    switch (command.name) {
       case 'add-command':
-        dispatch(actions.tickCurrentCommand())
+        handleApiSession(payload)
         break
     }
   }

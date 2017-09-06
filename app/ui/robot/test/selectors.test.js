@@ -27,7 +27,7 @@ describe('robot selectors', () => {
     expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
   })
 
-  test('getCommands', () => {
+  test('getCommands and getRunProgress', () => {
     const state = makeState({
       protocolCommands: [0, 4],
       protocolCommandsById: {
@@ -64,6 +64,7 @@ describe('robot selectors', () => {
       }
     })
 
+    expect(getRunProgress(state)).toEqual(50)
     expect(getCommands(state)).toEqual([
       {
         id: 0,

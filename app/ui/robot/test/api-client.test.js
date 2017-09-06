@@ -10,8 +10,9 @@ describe('api client', () => {
   let dispatch
   let receive
   let rpcClient
-  let robotContainer
   let robot
+  // let session
+  let sessionManager
 
   let _oldFileReader
   beforeAll(() => {
@@ -33,24 +34,15 @@ describe('api client', () => {
   beforeEach(() => {
     // TODO(mc, 2017-08-29): this is a pretty nasty mock. Probably a sign we
     // need to simplify the RPC client
-    // mock robot
-    robot = {
-      get_serial_ports_list: jest.fn(),
-      commands: jest.fn()
-    }
-
-    // mock robot container
-    robotContainer = {
-      new_robot: jest.fn(() => Promise.resolve(robot)),
-      load_protocol_file: jest.fn(() => Promise.resolve(robot))
-    }
+    // mock robot, session, and session manager
+    robot = {}
+    // session = {}
+    sessionManager = {robot}
 
     // mock rpc client
     rpcClient = {
       on: jest.fn(() => rpcClient),
-      control: {
-        get_root: jest.fn(() => Promise.resolve(robotContainer))
-      }
+      remote: sessionManager
     }
 
     dispatch = jest.fn()
@@ -71,10 +63,11 @@ describe('api client', () => {
         .then(() => expect(RpcClient).toHaveBeenCalledTimes(1))
     })
 
+    // TODO(mc, 2017-09-06): remove when server handles serial port
     test('dispatch CONNECT_RESPONSE once client has serial list', () => {
       const expectedResponse = actions.connectResponse()
 
-      robot.get_serial_ports_list
+      robot.get_serial_ports_list = jest.fn()
         .mockReturnValueOnce(Promise.resolve(['/dev/tty.usbserial']))
 
       receive({}, actions.connect())
@@ -86,63 +79,29 @@ describe('api client', () => {
         })
     })
 
-    test('dispatch CONNECT_RESPONSE error if get_root fails', () => {
+    test('dispatch CONNECT_RESPONSE error if connection fails', () => {
       const error = new Error('AHH get_root')
       const expectedResponse = actions.connectResponse(error)
 
-      rpcClient.control.get_root.mockReturnValueOnce(Promise.reject(error))
+      RpcClient.mockReturnValueOnce(Promise.reject(error))
       receive({}, actions.connect())
 
       return delay(1)
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('dispatch CONNECT_RESPONSE error if new_robot fails', () => {
-      const error = new Error('AHH new_robot')
-      const expectedResponse = actions.connectResponse(error)
-
-      robotContainer.new_robot.mockReturnValueOnce(Promise.reject(error))
-      receive({}, actions.connect())
-
-      return delay(1)
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
-    })
-
+    // TODO(mc, 2017-09-06): remove when server handles serial port
     test('dispatch CONNECT_RESPONSE error if get_serial... fails', () => {
       const error = new Error('AHH get_serial_ports_list')
       const expectedResponse = actions.connectResponse(error)
 
-      robot.get_serial_ports_list.mockReturnValueOnce(Promise.reject(error))
+      robot.get_serial_ports_list = jest.fn()
+        .mockReturnValueOnce(Promise.reject(error))
+
       receive({}, actions.connect())
 
       return delay(1)
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
-  })
-
-  describe('new session', () => {
-    beforeEach(() => {
-      receive({}, actions.connect())
-      return delay(1)
-    })
-
-    test('load protocol success', () => {
-      const commands = ['foo', 'bar', 'baz']
-
-      robot.commands.mockReturnValueOnce(Promise.resolve(commands))
-      receive({}, actions.session({}))
-
-      return delay(1)
-        .then(() => {
-          expect(robotContainer.load_protocol_file)
-            .toHaveBeenCalledWith('foo.py')
-          expect(dispatch)
-            .toHaveBeenCalledWith(actions.setCommands(commands))
-        })
-    })
-  })
-
-  describe('run protocol', () => {
-
   })
 })

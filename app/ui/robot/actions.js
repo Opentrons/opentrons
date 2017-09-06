@@ -42,7 +42,7 @@ export const actions = {
   },
 
   // get session or make new session with protocol file
-  session (file = null) {
+  session (file) {
     return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
   },
 

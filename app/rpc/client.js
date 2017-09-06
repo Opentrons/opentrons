@@ -21,8 +21,8 @@ const uuid = () => `id-${_uniqueId++}`
 
 // timeouts
 const HANDSHAKE_TIMEOUT = 5000
-const RECEIVE_CONTROL_TIMEOUT = 500
-const CALL_ACK_TIMEOUT = 1000
+const RECEIVE_CONTROL_TIMEOUT = 3000
+const CALL_ACK_TIMEOUT = 3000
 const CALL_RESULT_TIMEOUT = 240000
 
 // metadata constants
@@ -52,7 +52,7 @@ class RpcContext extends EventEmitter {
     ws.on('message', this._handleMessage.bind(this))
   }
 
-  callRemote (id, name, args) {
+  callRemote (id, name, args = []) {
     const self = this
     const token = uuid()
     const ackEvent = makeAckEventName(token)
@@ -65,9 +65,9 @@ class RpcContext extends EventEmitter {
     return new Promise((resolve, reject) => {
       let timeout
 
-      const handleError = (error) => {
+      const handleError = (reason) => {
         cleanup()
-        reject(error)
+        reject(new Error(`Error in ${name}(${args.join(', ')}): ${reason}`))
       }
 
       const handleFailure = (result) => {
@@ -85,7 +85,7 @@ class RpcContext extends EventEmitter {
       const handleAck = () => {
         clearTimeout(timeout)
         timeout = setTimeout(
-          () => handleError(new Error(`Result timeout for call ${token}`)),
+          () => handleError('Result timeout'),
           CALL_RESULT_TIMEOUT
         )
 
@@ -93,9 +93,7 @@ class RpcContext extends EventEmitter {
         this.once(failureEvent, handleFailure)
       }
 
-      const handleNack = (reason) => {
-        handleError(new Error(`NACK ERROR in ${name}: ${reason}`))
-      }
+      const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
 
       function cleanup () {
         clearTimeout(timeout)
@@ -110,7 +108,7 @@ class RpcContext extends EventEmitter {
       this.once(ackEvent, handleAck)
       this.once(nackEvent, handleNack)
       timeout = setTimeout(
-        () => handleError(new Error(`Ack timeout for call ${token}`)),
+        () => handleError('ACK timeout'),
         CALL_ACK_TIMEOUT
       )
     })

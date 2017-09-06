@@ -67,7 +67,7 @@ export const selectors = {
 
   getIsReadyToRun (allState) {
     const state = getModuleState(allState)
-    return state.isConnected && (state.commands.length > 0)
+    return state.isConnected && (state.protocolCommands.length > 0)
   },
 
   getCommands (allState) {
@@ -89,6 +89,14 @@ export const selectors = {
         return {...command, children, isCurrent}
       }
     }
+  },
+
+  getRunProgress (allState) {
+    // TODO(mc, 2017-08-30): Memoize
+    const commands = selectors.getCommands(allState)
+    const currentCommand = commands.find((c) => c.isCurrent)
+
+    return 100 * (commands.indexOf(currentCommand) + 1) / commands.length
   }
 }
 

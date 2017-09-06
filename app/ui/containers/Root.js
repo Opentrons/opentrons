@@ -30,6 +30,7 @@ const mapStateToProps = (state) => {
     // protocol
     protocolName: robotSelectors.getSessionName(state),
     commands: robotSelectors.getCommands(state),
+    runProgress: robotSelectors.getRunProgress(state),
 
     // TODO(mc): remove development hardcoded values
     errors: []

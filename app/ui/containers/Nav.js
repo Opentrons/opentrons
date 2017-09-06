@@ -37,7 +37,10 @@ const mapDispatchToProps = (dispatch) => {
     // robot
     // TODO(mc): revisit when robot discovery / multiple robots is addressed
     onConnectClick: () => dispatch(robotActions.connect()),
-    onRunClick: () => dispatch(robotActions.run())
+    onRunClick: () => dispatch(robotActions.run()),
+
+    // session
+    onUpload: (event) => dispatch(robotActions.session(event.target.files[0]))
   }
 }
 

@@ -87,8 +87,6 @@ describe('rpc client', () => {
   test('rejects if control message never comes', () => {
     const result = Client(url)
 
-    // TODO(mc): can't call .toMatch on an error
-    // figure out if this is best practice for jest error checking
     return expect(result).rejects.toMatchObject({
       message: expect.stringMatching(/timeout/i)
     })
@@ -154,7 +152,7 @@ describe('rpc client', () => {
       const result = client.remote.be_a_robot(1, 2)
 
       return expect(result).rejects.toMatchObject({
-        message: 'ahhh'
+        message: expect.stringMatching(/ahhh/)
       })
     })
 
@@ -167,7 +165,7 @@ describe('rpc client', () => {
       const result = client.remote.be_a_person('Tim')
 
       return expect(result).rejects.toMatchObject({
-        message: 'NACK ERROR in be_a_person: You done messed up'
+        message: expect.stringMatching(/NACK.+You done messed up/)
       })
     })
 
