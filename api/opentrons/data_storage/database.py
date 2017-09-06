@@ -25,12 +25,21 @@ def _parse_well_obj(well: Well):
 
 def _create_container_obj_in_db(db, container: Container, container_name: str):
     db_crud.create_container(db, container_name, *_parse_container_obj(container))
-    for well in container.wells():
+    for well in iter(container):
         _create_well_obj_in_db(db, container_name, well)
 
 def _load_container_object_from_db(db, container_name: str):
-    container_type, *rel_coords = db_crud.get_container_by_name(db, container_name)
+    db_data = db_crud.get_container_by_name(db, container_name)
+    if not db_data:
+        raise ResourceWarning(
+            "No container with name {} found in Containers database".format(container_name))
+
+    container_type, *rel_coords = db_data
     wells = db_crud.get_wells_by_container_name(db, container_name)
+    if not wells:
+        raise ResourceWarning(
+            "No wells for container {} found in ContainerWells database".format(container_name))
+
     container = Container()
     container.properties['type'] = container_type
     container._coordinates = Vector(rel_coords)

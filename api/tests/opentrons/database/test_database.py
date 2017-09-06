@@ -26,11 +26,10 @@ def robot():
     from opentrons import Robot
     return Robot()
 
-#TODO: Use some non-persistent db instance in testing
 @pytest.fixture
 def database():
     temp_db_fd = tempfile.NamedTemporaryFile(dir='./')
-    testing_database_path = shutil.copy2('./testing_database.db', temp_db_fd.name)
+    testing_database_path = shutil.copy2('../testing_database.db', temp_db_fd.name)
     ot_db.change_database(testing_database_path)
     return ot_db
 
