@@ -206,7 +206,7 @@ class Robot(object):
         self._previous_container = None
         message_broker = MessageBroker.get_instance()
         self.position_tracker = position_tracker.PositionTracker(message_broker)
-        self.position_tracker.create_root_object(HEAD, 0, 0, 0)
+        self.position_tracker.create_root_object(HEAD, 0, 0, 0) # 0,0,0, is rel pos of smoothie w.r.t the deck
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -214,7 +214,7 @@ class Robot(object):
         self._instruments = {}
 
 
-        # TODO: Shouldn't we make driver now about these things not robot ?
+        #TODO: Moving homing info to driver
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
@@ -533,11 +533,10 @@ class Robot(object):
             instrument.reset()
 
     def set_connection(self, mode):
-        self.mode = mode
         if mode not in self.smoothie_drivers:
             raise ValueError(
                 'mode expected to be "live", "simulate_switches", '
-                '"null" or "simulate", {} provided'.format(mode)
+                'or "simulate", {} provided'.format(mode)
             )
 
         d = self.smoothie_drivers[mode]

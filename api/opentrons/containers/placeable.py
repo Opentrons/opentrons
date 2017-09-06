@@ -3,7 +3,6 @@ import math
 import numbers
 from collections import OrderedDict
 from opentrons.util.vector import Vector
-# from opentrons.trackers import position_tracker
 
 import re
 import functools

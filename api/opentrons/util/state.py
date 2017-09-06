@@ -64,12 +64,11 @@ def are_instrument_positions_calibrated(instrument):
         return True
 
     positions = instrument.positions
-    if len(positions.values()) != 4:
-        return False
+    for p in positions:
+        if positions.get(p) is None:
+            return False
 
-    return not any([
-        str(val).endswith('.0101') for val in positions.values()
-    ])
+    return True
 
 
 def get_all_pipettes(robot):

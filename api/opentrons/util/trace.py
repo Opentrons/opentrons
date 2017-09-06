@@ -2,15 +2,11 @@ from functools import wraps
 import inspect
 import tempfile as tmpfs
 import os
+
 from opentrons.pubsub_util import topics
+from opentrons.util import environment
 
-
-# TODO: Create a nice logging mechanism looking at messages.
-# This mechanism could be a constant write to a file (named using the topic)
-#  in the temp_fs that would just write every message. Maybe it would also enumerate them
-#  so they could be logically linked together during debugging.
-
-TEMP_FILES_PATH = './'
+TOPIC_FILES_PATH = environment.get_path('LOG_DIR')
 
 def traceable(self, name=None):
     def _traceable(f):
@@ -54,8 +50,8 @@ class MessageBroker(object):
     def __init__(self):
         self.topics_and_funcs = {}
         self.topic_temp_files = {}
-        self.topic_temp_files['topics']      = tmpfs.NamedTemporaryFile(prefix='Topics_', dir='.')
-        self.topic_temp_files['subscribers'] = tmpfs.NamedTemporaryFile(prefix='Subscribers_', dir='.')
+        self.topic_temp_files['topics']      = tmpfs.NamedTemporaryFile(prefix='Topics_', dir=TOPIC_FILES_PATH)
+        self.topic_temp_files['subscribers'] = tmpfs.NamedTemporaryFile(prefix='Subscribers_', dir=TOPIC_FILES_PATH)
 
     def write_to_temp_file(self, topic, msg):
         file = self.topic_temp_files[topic].file
@@ -70,7 +66,7 @@ class MessageBroker(object):
         else:
             self.topics_and_funcs[topic] = [func]
             self.write_to_temp_file('topics', topic)
-            self.topic_temp_files[topic] = tmpfs.NamedTemporaryFile(prefix= topic +'_', dir='.')
+            self.topic_temp_files[topic] = tmpfs.NamedTemporaryFile(prefix= topic +'_', dir=TOPIC_FILES_PATH)
 
 
     def remove(self, topic, func):
