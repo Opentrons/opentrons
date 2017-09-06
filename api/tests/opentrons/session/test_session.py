@@ -47,9 +47,13 @@ async def test_load_and_run(session_manager, protocol):
     assert len(session.command_log) == 101
 
     res = []
+    index = 0
     async for notification in session_manager.notifications:
         assert isinstance(notification, tuple), "notification is a tuple"
         event, s = notification
+        if (event['name'] == 'add-command'):
+            index += 1  # Command log in sync with add-command events emmitted
+        assert len(s.command_log) == index
         assert isinstance(s, Session), "second element is Session"
         if event['name'] == 'session.state.change':
             state = event['arguments']['state']
@@ -59,6 +63,10 @@ async def test_load_and_run(session_manager, protocol):
 
     assert res == ['running', 'finished'], 'Run should emit state change to "running" and then to "finished"'  # noqa
     assert session_manager.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
+
+    session.run(devicename='Virtual Smoothie')
+    assert len(session.command_log) == 101, \
+        "Clears command log on the next run"
 
 
 @pytest.fixture
