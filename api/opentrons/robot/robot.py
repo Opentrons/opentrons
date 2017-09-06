@@ -186,7 +186,6 @@ class Robot(object):
         self._driver = drivers.get_virtual_driver()
         self.disconnect()
         self.arc_height = 5
-        self.cmds_total = None
         self.set_connection('simulate')
         self.reset()
 
@@ -214,7 +213,7 @@ class Robot(object):
         self._instruments = {}
 
 
-        #TODO: Moving homing info to driver
+        #TODO: Move homing info to driver
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 

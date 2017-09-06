@@ -1,11 +1,4 @@
-from collections import OrderedDict
-import json
-
-from opentrons.containers import container_to_json
 from opentrons.data_storage import database
-
-
-STORAGE_LOCATION = ''
 
 '''
  IDEA: For OT1, we calibrate everything with respect to one of the pipettes, including the OTHER pipette.
@@ -16,7 +9,7 @@ STORAGE_LOCATION = ''
 '''
 
 def calibrate_container_with_delta(container, position_tracker, delta_x,
-                                   delta_y, delta_z, save=False, new_container_name=None):
+                                   delta_y, delta_z, save, new_container_name=None):
     delta = (delta_x, delta_y, delta_z)
     position_tracker.translate_object(container, *delta)
     container._coordinates += delta

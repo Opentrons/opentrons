@@ -49,9 +49,10 @@ class MessageBroker(object):
 
     def __init__(self):
         self.topics_and_funcs = {}
-        self.topic_temp_files = {}
-        self.topic_temp_files['topics']      = tmpfs.NamedTemporaryFile(prefix='Topics_', dir=TOPIC_FILES_PATH)
-        self.topic_temp_files['subscribers'] = tmpfs.NamedTemporaryFile(prefix='Subscribers_', dir=TOPIC_FILES_PATH)
+        self.topic_temp_files = {
+            'topics': tmpfs.NamedTemporaryFile(prefix='Topics_', dir=TOPIC_FILES_PATH),
+            'subscribers': tmpfs.NamedTemporaryFile(prefix='Subscribers_', dir=TOPIC_FILES_PATH)
+        }
 
     def write_to_temp_file(self, topic, msg):
         file = self.topic_temp_files[topic].file
@@ -68,7 +69,6 @@ class MessageBroker(object):
             self.write_to_temp_file('topics', topic)
             self.topic_temp_files[topic] = tmpfs.NamedTemporaryFile(prefix= topic +'_', dir=TOPIC_FILES_PATH)
 
-
     def remove(self, topic, func):
         self.listeners[topic].remove(func)
 
@@ -78,7 +78,6 @@ class MessageBroker(object):
         self.write_to_temp_file(topic, message)
         for subscriber in self.topics_and_funcs[topic]:
             subscriber(message)
-
 
     @classmethod
     def get_instance(cls):
