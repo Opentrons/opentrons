@@ -3,6 +3,7 @@ from opentrons.util.trace import (
     MessageBroker,
     traceable
 )
+from opentrons.pubsub_util import topics
 
 
 class TraceTestCase(unittest.TestCase):
@@ -23,7 +24,7 @@ class TraceTestCase(unittest.TestCase):
         self.events.append(info)
 
     def test_add_listener(self):
-        MessageBroker.get_instance().add(self.log)
+        MessageBroker.get_instance().subscribe(topics.MISC, self.log)
         expected_results = []
 
         # Test positional args

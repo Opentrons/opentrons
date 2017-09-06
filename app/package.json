@@ -18,8 +18,8 @@
     "package-all": "npm run build && build -mwl"
   },
   "name": "ot-app",
-  "productName": "OT One App 2",
-  "version": "2.5.0",
+  "productName": "OT-App",
+  "version": "2.4.2",
   "description": "OT One Robot Companion Desktop App",
   "main": "shell/dist/bundle.js",
   "repository": {
@@ -39,7 +39,7 @@
     "files": [
       "!**/*",
       "node_modules/**",
-      "bin/opentrons-api-server*",
+      "bin/opentrons-api-server",
       "ui/dist",
       "ui/index.html",
       "shell/dist",
@@ -48,7 +48,7 @@
     "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
     "asar": true,
     "asarUnpack": "ui/**",
-    "appId": "ot.one.opentrons",
+    "appId": "com.opentrons.ot-app",
     "electronVersion": "1.6.11",
     "productName": "Opentrons 2.0",
     "dmg": {

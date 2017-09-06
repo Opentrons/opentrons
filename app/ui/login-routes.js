@@ -2,7 +2,6 @@ import Vue from 'vue'
 
 import config from './config'
 import store from './store/store'
-import { getUserId } from './util'
 
 // Note: This is not in GTM because sending email data to GTM violoates
 // the GTM User Policy
@@ -34,7 +33,7 @@ function getLock () {
         loginAfterSignUp: true,
         auth: { redirect: false, sso: false },
         theme: {
-          logo: 'assets/img/auth0_opentrons_logo_drop_small.png',
+          logo: '/auth0_opentrons_logo_drop_small.png',
           primaryColor: '#006FFF'
         }
       }
@@ -86,7 +85,6 @@ function logoutUser () {
   localStorage.removeItem('profile')
   store.commit('AUTHENTICATE', {isAuthenticated: false, userProfile: null})
   emitAppUserInfo()
-  window.ot_dataLayer.push({userId: getUserId()})
   restartIntercom()
 }
 

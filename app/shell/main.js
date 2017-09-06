@@ -60,6 +60,7 @@ process.env.APP_DATA_DIR = (() => {
 })()
 
 const log = getLogger('electron-main')
+
 let loadUI = (win, url) => {
   log.info('Loading App UI at ' + url)
   win.loadURL(

@@ -21,7 +21,7 @@ class ServerManager {
     const userDataPath = app.getPath('userData')
     console.log('User Data Path', userDataPath)
 
-		const backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')
+	const backendPath = path.join(app.getAppPath(), 'bin', 'opentrons-api-server')
 
     // App UI assets are marked to be unpacked in electron-builder config
     const uiPath = path.join(app.getAppPath(), 'ui').replace('app.asar', 'app.asar.unpacked')
