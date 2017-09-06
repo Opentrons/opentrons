@@ -59,7 +59,7 @@ export default function RemoteObject (context, source, seen) {
   const methods = context.resolveTypeValues(source)
     .then((typeObject) => Object.keys(typeObject).reduce((result, key) => {
       result[key] = function remoteCall (...args) {
-        return context.call(id, key, args)
+        return context.callRemote(id, key, args)
       }
 
       return result

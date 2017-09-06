@@ -43,7 +43,7 @@ class RpcContext extends EventEmitter {
     this._ws = ws
     this._resultTypes = new Map()
     this._typeObjectCache = new Map()
-    this.control = null
+    this.remote = null
     // default max listeners is 10, we need more than that
     // keeping this at a finite number just in case we get a leak later
     this.setMaxListeners(100)
@@ -52,7 +52,7 @@ class RpcContext extends EventEmitter {
     ws.on('message', this._handleMessage.bind(this))
   }
 
-  call (id, name, args) {
+  callRemote (id, name, args) {
     const self = this
     const token = uuid()
     const ackEvent = makeAckEventName(token)
@@ -127,7 +127,7 @@ class RpcContext extends EventEmitter {
       return Promise.resolve(this._typeObjectCache.get(typeId).v)
     }
 
-    return this.control.get_object_by_id(typeId)
+    return this.callRemote(null, 'get_object_by_id', [typeId])
   }
 
   // close the websocket
@@ -176,19 +176,19 @@ class RpcContext extends EventEmitter {
     const meta = message.$
     const data = message.data
     const type = meta.type
-    let control
 
     switch (type) {
       case CONTROL_MESSAGE:
-        control = message.control
+        const root = message.root
+        const rootType = message.type
         // cache this instance to mark its type as a type object
         // then cache its type object
-        this._cacheCallResultMetadata(control.instance)
-        this._cacheCallResultMetadata(control.type)
+        this._cacheCallResultMetadata(root)
+        this._cacheCallResultMetadata(rootType)
 
-        RemoteObject(this, control.instance)
-          .then((controlRemote) => {
-            this.control = controlRemote
+        RemoteObject(this, root)
+          .then((remote) => {
+            this.remote = remote
             this.emit('ready')
           })
           // .catch((e) => log.error('Error creating control remote', e))
