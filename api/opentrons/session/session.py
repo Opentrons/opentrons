@@ -17,7 +17,7 @@ VALID_STATES = set(
 
 
 class SessionManager(object):
-    def __init__(self, loop, filters=[
+    def __init__(self, loop=None, filters=[
             'add-command',
             'session.state.change']):
         self.notifications = Notifications(loop=loop, filters=filters)
