@@ -103,12 +103,14 @@ describe('robot reducer', () => {
       type: actionTypes.SESSION_RESPONSE,
       error: null,
       payload: {
-        sessionName: 'foo.py',
-        protocolText: 'protocol woo',
-        protocolCommands: [],
-        protocolCommandsById: {},
-        sessionErrors: [],
-        sessionState: 'running'
+        session: {
+          sessionName: 'foo.py',
+          protocolText: 'protocol woo',
+          protocolCommands: [],
+          protocolCommandsById: {},
+          sessionErrors: [],
+          sessionState: 'running'
+        }
       }
     }
 

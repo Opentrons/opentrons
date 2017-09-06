@@ -114,13 +114,11 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.SESSION:
       return handleRequest(state, 'sessionRequest', payload, error, {
-        sessionName: payload && payload.file && payload.file.name
-          ? path.basename(payload.file.name)
-          : state.sessionName
+        sessionName: path.basename(payload.file.name)
       })
 
     case actionTypes.SESSION_RESPONSE:
-      return handleResponse(state, 'sessionRequest', payload, error, payload)
+      return handleResponse(state, 'sessionRequest', payload, error, payload.session)
 
     case actionTypes.HOME:
       return handleRequest(state, 'homeRequest', payload, error)

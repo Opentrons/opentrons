@@ -26,8 +26,24 @@ export default function client (dispatch) {
         createSession(state, action)
         break
 
+      case actionTypes.HOME:
+        home(state, action)
+        break
+
       case actionTypes.RUN:
         run(state, action)
+        break
+
+      case actionTypes.PAUSE:
+        pause(state, action)
+        break
+
+      case actionTypes.RESUME:
+        resume(state, action)
+        break
+
+      case actionTypes.CANCEL:
+        cancel(state, action)
         break
     }
   }
@@ -73,6 +89,38 @@ export default function client (dispatch) {
     return reader.readAsText(file)
   }
 
+  function home (state, action) {
+    robot.connect(serialPort)
+      .then(() => robot.home())
+      .then(() => robot.disconnect())
+      .then(() => dispatch(actions.homeResponse()))
+      .catch((error) => dispatch(actions.homeResponse(error)))
+  }
+
+  function run (state, action) {
+    session.run(serialPort)
+      .then(() => dispatch(actions.runResponse()))
+      .catch((error) => dispatch(actions.runResponse(error)))
+  }
+
+  function pause (state, action) {
+    session.pause()
+      .then(() => dispatch(actions.pauseResponse()))
+      .catch((error) => dispatch(actions.pauseResponse(error)))
+  }
+
+  function resume (state, action) {
+    session.resume()
+      .then(() => dispatch(actions.resumeResponse()))
+      .catch((error) => dispatch(actions.resumeResponse(error)))
+  }
+
+  function cancel (state, action) {
+    session.stop()
+      .then(() => dispatch(actions.cancelResponse()))
+      .catch((error) => dispatch(actions.cancelResponse(error)))
+  }
+
   function handleApiSession (apiSession) {
     session = apiSession
 
@@ -112,13 +160,6 @@ export default function client (dispatch) {
         }
       }
     }
-  }
-
-  function run (state, action) {
-    session
-      .run(serialPort)
-      .then(() => dispatch(actions.runResponse()))
-      .catch((error) => dispatch(actions.runResponse(error)))
   }
 
   function handleRobotNotification (message) {
