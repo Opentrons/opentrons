@@ -126,12 +126,9 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.HOME_RESPONSE:
       return handleResponse(state, 'homeRequest', payload, error)
 
-    // TODO(mc): for now, naively assume that if a run request is dispatched
-    // the robot is running
     case actionTypes.RUN:
       return handleRequest(state, 'runRequest', payload, error, {
-        isRunning: true,
-        currentCommand: -1
+        isRunning: true
       })
 
     case actionTypes.RUN_RESPONSE:

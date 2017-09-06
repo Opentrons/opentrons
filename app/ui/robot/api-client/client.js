@@ -82,7 +82,10 @@ export default function client (dispatch) {
 
     reader.onload = function handleProtocolRead (event) {
       sessionManager.create(name, event.target.result)
-        .then(handleApiSession)
+        .then((apiSession) => {
+          session = apiSession
+          handleApiSession(apiSession, true)
+        })
         .catch((error) => dispatch(actions.sessionResponse(error)))
     }
 
@@ -122,9 +125,7 @@ export default function client (dispatch) {
   }
 
   function handleApiSession (apiSession) {
-    session = apiSession
-
-    const {name, protocol_text, commands, command_log, state} = session
+    const {name, protocol_text, commands, command_log, state} = apiSession
     const protocolCommands = []
     const protocolCommandsById = {}
 
@@ -152,6 +153,7 @@ export default function client (dispatch) {
         if (depth === 0) protocolCommands.push(id)
 
         children.forEach(makeHandleCommand(depth + 1))
+
         protocolCommandsById[id] = {
           id,
           description,
@@ -165,11 +167,8 @@ export default function client (dispatch) {
   function handleRobotNotification (message) {
     const [command, payload] = message
 
-    if (command.name === 'session.state.change') {
-      console.log(message)
-    }
-
     switch (command.name) {
+      case 'session.state.change':
       case 'add-command':
         handleApiSession(payload)
         break
