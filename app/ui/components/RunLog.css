@@ -2,22 +2,43 @@
   font-family: 'sans';
   overflow-y: scroll;
   padding: 1rem 1rem 3rem;
-  border-top: 1rem solid white;
-  border-bottom: 3rem solid white;
+  background: linear-gradient(to right, #fff, #fff 0%, #fff 80%, #eee 20%);
 }
 
-p {
+ol {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
   margin: 0.5rem 0;
 }
 
-.current {
+p::after {
+  font-size: 0.75rem;
+  content: '';
+  display: inline-block;
+  width: 125px;
+  float: right;
+}
+
+p::after {
+  padding-right: 1rem;
+  content: attr(data-timestamp);
+}
+
+li.current {
   color: #006fff;
 }
 
-.secondary {
+li.current > ol {
+  color: black;
+}
+
+.indent-1 p {
   padding-left: 2rem;
 }
 
-.tertiary {
-  padding-left: 4rem;
+.indent-2 p {
+  padding-left: 3rem;
 }
