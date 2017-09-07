@@ -328,6 +328,7 @@ footer .wrapper section.footer-menu ul li:first-child a {
 footer .wrapper section.footer-menu ul li a {
     color: #777;
     font-weight: 400;
+    text-decoration: none;
 }
 
 @media only screen and (min-device-width: 769px) and (min-width: 769px) {
