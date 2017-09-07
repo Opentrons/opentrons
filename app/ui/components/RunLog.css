@@ -14,6 +14,11 @@ li {
   margin: 0.5rem 0;
 }
 
+.indent-1 p::before,
+.indent-2 p::before {
+  content: '\21b3';
+}
+
 p::after {
   font-size: 0.75rem;
   content: '';
