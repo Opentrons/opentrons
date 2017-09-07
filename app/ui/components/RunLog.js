@@ -9,48 +9,7 @@ export default class RunLog extends Component {
   }
 
   render () {
-    const {style} = this.props
-    // hardcoded nested commands for style updates need to add {commands back to props when coming from API}
-    const nestedCommands =
-      [
-        {
-          id: 0,
-          description: 'foo',
-          handledAt: '2017-08-30T12:00:00Z',
-          isCurrent: true,
-          children: [
-            {
-              id: 1,
-              description: 'bar',
-              handledAt: '2017-08-30T12:00:01Z',
-              isCurrent: true,
-              children: [
-                {
-                  id: 2,
-                  description: 'baz',
-                  handledAt: '2017-08-30T12:00:02Z',
-                  isCurrent: true,
-                  children: []
-                },
-                {
-                  id: 3,
-                  description: 'qux',
-                  handledAt: '',
-                  isCurrent: false,
-                  children: []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 4,
-          description: 'fizzbuzz',
-          handledAt: '',
-          isCurrent: false,
-          children: []
-        }
-      ]
+    const { style, commands } = this.props
 
     const makeCommandToTemplateMapper = (depth) => (command) => {
       const {id, isCurrent, description, children, handledAt} = command
@@ -77,7 +36,7 @@ export default class RunLog extends Component {
       )
     }
 
-    const commandItems = nestedCommands.map(makeCommandToTemplateMapper(0))
+    const commandItems = commands.map(makeCommandToTemplateMapper(0))
 
     return (
       <section className={classnames(style, styles.run_log_wrapper)}>
