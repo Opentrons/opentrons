@@ -1,3 +1,4 @@
+// RPC client tests
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WS from 'ws'

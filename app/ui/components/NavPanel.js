@@ -62,7 +62,7 @@ SetupPanel.propTypes = {
 }
 
 const ConnectPanel = props => {
-  const {isConnected, onConnectClick} = props
+  const {isConnected, onConnectClick, onDisconnectClick} = props
   let connectButton
   let connectionStatus
   if (!isConnected) {
@@ -78,7 +78,7 @@ const ConnectPanel = props => {
   } else {
     connectButton =
       <Button
-        onClick={() => console.log('disconnect')}
+        onClick={onDisconnectClick}
         disabled={!isConnected}
         style={styles.btn_connect}
       >
@@ -100,7 +100,8 @@ const ConnectPanel = props => {
 
 ConnectPanel.propTypes = {
   isConnected: PropTypes.bool.isRequired,
-  onConnectClick: PropTypes.func.isRequired
+  onConnectClick: PropTypes.func.isRequired,
+  onDisconnectClick: PropTypes.func.isRequired
 }
 
 const panel = (props) => ({

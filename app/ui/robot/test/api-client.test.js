@@ -42,6 +42,7 @@ describe('api client', () => {
     // mock rpc client
     rpcClient = {
       on: jest.fn(() => rpcClient),
+      close: jest.fn(),
       remote: sessionManager
     }
 
@@ -54,7 +55,7 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
-  describe('connect', () => {
+  describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
       expect(RpcClient).toHaveBeenCalledTimes(0)
       receive({}, actions.connect())
@@ -102,6 +103,30 @@ describe('api client', () => {
 
       return delay(1)
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('disconnect RPC on DISCONNECT message', () => {
+      receive({}, actions.connect())
+
+      return delay(1)
+        .then(() => receive({}, actions.disconnect()))
+        .then(() => expect(rpcClient.close).toHaveBeenCalled())
+    })
+
+    test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
+      const expected = actions.disconnectResponse()
+      receive({}, actions.disconnect())
+      expect(dispatch).toHaveBeenCalledWith(expected)
+    })
+
+    test('dispatch DISCONNECT_RESPONSE if close is called', () => {
+      const expected = actions.disconnectResponse()
+
+      receive({}, actions.connect())
+
+      return delay(1)
+        .then(() => receive({}, actions.disconnect()))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
 })

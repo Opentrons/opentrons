@@ -23,6 +23,10 @@ export default function client (dispatch) {
         connect(state, action)
         break
 
+      case actionTypes.DISCONNECT:
+        disconnect(state, action)
+        break
+
       case actionTypes.SESSION:
         createSession(state, action)
         break
@@ -74,6 +78,20 @@ export default function client (dispatch) {
         dispatch(actions.connectResponse())
       })
       .catch((e) => dispatch(actions.connectResponse(e)))
+  }
+
+  function disconnect () {
+    if (rpcClient) rpcClient.close()
+
+    // null out saved client and session
+    rpcClient = null
+    sessionManager = null
+    session = null
+    robot = null
+    // TODO(mc, 2017-09-07): remove when server handles serial port
+    serialPort = null
+
+    dispatch(actions.disconnectResponse())
   }
 
   function createSession (state, action) {
