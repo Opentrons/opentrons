@@ -140,28 +140,4 @@ describe('robot actions', () => {
 
     expect(actions.cancelResponse(new Error('AHHH'))).toEqual(expected)
   })
-
-  test('set commands', () => {
-    const expected = {
-      type: actionTypes.SET_COMMANDS,
-      payload: {commands: ['foo', 'bar', 'baz']}
-    }
-
-    expect(actions.setCommands(['foo', 'bar', 'baz'])).toEqual(expected)
-  })
-
-  test('set protocol error', () => {
-    const expected = {
-      type: actionTypes.SET_PROTOCOL_ERROR,
-      error: new Error('AHHH')
-    }
-
-    expect(actions.setProtocolError(new Error('AHHH'))).toEqual(expected)
-  })
-
-  test('tick current command counter', () => {
-    const expected = {type: actionTypes.TICK_CURRENT_COMMAND}
-
-    expect(actions.tickCurrentCommand()).toEqual(expected)
-  })
 })

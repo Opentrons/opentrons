@@ -19,10 +19,23 @@ export default function RunControl (props) {
   } = props
 
   const hasError = errors.length > 0
+  const onPauseResumeClick = isPaused
+    ? onResumeClick
+    : onPauseClick
 
-  const pauseResumeButton = isPaused
-    ? (<button onClick={onResumeClick} className={styles.btn_pause}>Resume</button>)
-    : (<button onClick={onPauseClick} className={styles.btn_pause}>Pause</button>)
+  const pauseResumeText = isPaused
+    ? 'Resume'
+    : 'Pause'
+
+  const pauseResumeButton = (
+    <button
+      onClick={onPauseResumeClick}
+      className={styles.btn_pause}
+      disabled={!isRunning}
+    >
+      {pauseResumeText}
+    </button>
+  )
 
   return (
     <section className={style}>
@@ -33,7 +46,11 @@ export default function RunControl (props) {
           START TIME: {startTime}
         </div>
         {pauseResumeButton}
-        <button onClick={onCancelClick} className={styles.btn_cancel}>
+        <button
+          onClick={onCancelClick}
+          className={styles.btn_cancel}
+          disabled={!isRunning}
+        >
           Cancel Job
         </button>
       </div>

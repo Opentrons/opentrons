@@ -7,7 +7,15 @@ import NAME from './name'
 export const constants = {
   DISCONNECTED: 'disconnected',
   CONNECTING: 'connecting',
-  CONNECTED: 'connected'
+  CONNECTED: 'connected',
+
+  // session states
+  LOADED: 'loaded',
+  RUNNING: 'running',
+  PAUSED: 'paused',
+  ERROR: 'error',
+  FINISHED: 'finished',
+  STOPPED: 'stopped'
 }
 
 // state helpers
@@ -66,8 +74,28 @@ export const selectors = {
   },
 
   getIsReadyToRun (allState) {
-    const state = getModuleState(allState)
-    return state.isConnected && (state.protocolCommands.length > 0)
+    return getModuleState(allState).sessionState === constants.LOADED
+  },
+
+  getIsRunning (allState) {
+    const sessionState = getModuleState(allState).sessionState
+    return (
+      sessionState === constants.RUNNING ||
+      sessionState === constants.PAUSED
+    )
+  },
+
+  getIsPaused (allState) {
+    return getModuleState(allState).sessionState === constants.PAUSED
+  },
+
+  getIsDone (allState) {
+    const sessionState = getModuleState(allState).sessionState
+    return (
+      sessionState === constants.ERROR ||
+      sessionState === constants.FINISHED ||
+      sessionState === constants.STOPPED
+    )
   },
 
   getCommands (allState) {
@@ -160,12 +188,6 @@ export function reducer (state = INITIAL_STATE, action) {
         isRunning: error != null,
         isPaused: error != null
       })
-
-    case actionTypes.SET_COMMANDS:
-      return {...state, commands: payload.commands, currentCommand: -1}
-
-    case actionTypes.TICK_CURRENT_COMMAND:
-      return {...state, currentCommand: state.currentCommand + 1}
   }
 
   return state

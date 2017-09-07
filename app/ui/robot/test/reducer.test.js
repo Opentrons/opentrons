@@ -64,15 +64,6 @@ describe('robot reducer', () => {
     })
   })
 
-  test('handles session without file', () => {
-    const state = {sessionRequest: {inProgress: false, error: new Error('AH')}}
-    const action = {type: actionTypes.SESSION}
-
-    expect(reducer(state, action)).toEqual({
-      sessionRequest: {inProgress: true, error: null}
-    })
-  })
-
   test('handles session with file', () => {
     const state = {
       sessionRequest: {inProgress: false, error: new Error('AH')},
@@ -161,8 +152,7 @@ describe('robot reducer', () => {
       runRequest: {inProgress: true, error: null},
       // TODO(mc): for now, naively assume that if a run request is dispatched
       // the robot is running
-      isRunning: true,
-      currentCommand: -1
+      isRunning: true
     })
   })
 
@@ -293,25 +283,5 @@ describe('robot reducer', () => {
       isRunning: true,
       isPaused: true
     })
-  })
-
-  test('handles setCommands', () => {
-    const state = {commands: [], currentCommand: 42}
-    const action = {
-      type: actionTypes.SET_COMMANDS,
-      payload: {commands: ['foo', 'bar', 'baz']}
-    }
-
-    expect(reducer(state, action)).toEqual({
-      commands: ['foo', 'bar', 'baz'],
-      currentCommand: -1
-    })
-  })
-
-  test('handles tickCurrentCommand', () => {
-    const state = {currentCommand: 3}
-    const action = {type: actionTypes.TICK_CURRENT_COMMAND}
-
-    expect(reducer(state, action)).toEqual({currentCommand: 4})
   })
 })

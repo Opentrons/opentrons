@@ -10,9 +10,9 @@ import grid from './Grid.css'
 
 export default function App (props) {
   const {
-    // state
-    isRunning,
     isReadyToRun,
+    isRunning,
+    isDone,
     onRunClick
   } = props
   let runControl
@@ -33,7 +33,7 @@ export default function App (props) {
       </Button>
     )
   }
-  if (isReadyToRun) {
+  if (isReadyToRun || isRunning || isDone) {
     runControl = (
       <RunControl
         style={grid.controls}
@@ -59,5 +59,9 @@ export default function App (props) {
 }
 
 App.propTypes = {
+  isReadyToRun: PropTypes.bool.isRequired,
+  isRunning: PropTypes.bool.isRequired,
+  isPaused: PropTypes.bool.isRequired,
+  isDone: PropTypes.bool.isRequired,
   onRunClick: PropTypes.func.isRequired
 }

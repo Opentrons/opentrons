@@ -7,7 +7,11 @@ const {
   getSessionName,
   getConnectionStatus,
   getCommands,
-  getRunProgress
+  getRunProgress,
+  getIsReadyToRun,
+  getIsRunning,
+  getIsPaused,
+  getIsDone
 } = selectors
 
 describe('robot selectors', () => {
@@ -104,5 +108,73 @@ describe('robot selectors', () => {
         children: []
       }
     ])
+  })
+
+  test('getIsReadyToRun', () => {
+    const expectedStates = {
+      loaded: true,
+      running: false,
+      error: false,
+      finished: false,
+      stopped: false,
+      paused: false
+    }
+
+    Object.keys(expectedStates).forEach((sessionState) => {
+      const state = makeState({sessionState})
+      const expected = expectedStates[sessionState]
+      expect(getIsReadyToRun(state)).toBe(expected)
+    })
+  })
+
+  test('getIsRunning', () => {
+    const expectedStates = {
+      loaded: false,
+      running: true,
+      error: false,
+      finished: false,
+      stopped: false,
+      paused: true
+    }
+
+    Object.keys(expectedStates).forEach((sessionState) => {
+      const state = makeState({sessionState})
+      const expected = expectedStates[sessionState]
+      expect(getIsRunning(state)).toBe(expected)
+    })
+  })
+
+  test('getIsPaused', () => {
+    const expectedStates = {
+      loaded: false,
+      running: false,
+      error: false,
+      finished: false,
+      stopped: false,
+      paused: true
+    }
+
+    Object.keys(expectedStates).forEach((sessionState) => {
+      const state = makeState({sessionState})
+      const expected = expectedStates[sessionState]
+      expect(getIsPaused(state)).toBe(expected)
+    })
+  })
+
+  test('getIsDone', () => {
+    const expectedStates = {
+      loaded: false,
+      running: false,
+      error: true,
+      finished: true,
+      stopped: true,
+      paused: false
+    }
+
+    Object.keys(expectedStates).forEach((sessionState) => {
+      const state = makeState({sessionState})
+      const expected = expectedStates[sessionState]
+      expect(getIsDone(state)).toBe(expected)
+    })
   })
 })

@@ -23,8 +23,9 @@ const mapStateToProps = (state) => {
     // robot
     isConnected: state.robot.isConnected,
     isReadyToRun: robotSelectors.getIsReadyToRun(state),
-    isRunning: state.robot.isRunning,
-    isPaused: state.robot.isPaused,
+    isRunning: robotSelectors.getIsRunning(state),
+    isPaused: robotSelectors.getIsPaused(state),
+    isDone: robotSelectors.getIsDone(state),
     connectionStatus: robotSelectors.getConnectionStatus(state),
 
     // protocol

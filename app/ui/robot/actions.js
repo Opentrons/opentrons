@@ -21,14 +21,7 @@ export const actionTypes = {
   RESUME: makeRobotActionName('RESUME'),
   RESUME_RESPONSE: makeRobotActionName('RESUME_RESPONSE'),
   CANCEL: makeRobotActionName('CANCEL'),
-  CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE'),
-
-  // instantaneous state
-  // TODO(mc, 2017-08-23): consider combining set commands and set protocol
-  // error into a single newSessionResponse action
-  SET_COMMANDS: makeRobotActionName('SET_COMMANDS'),
-  SET_PROTOCOL_ERROR: makeRobotActionName('SET_PROTOCOL_ERROR'),
-  TICK_CURRENT_COMMAND: makeRobotActionName('TICK_CURRENT_COMMAND')
+  CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE')
 }
 
 export const actions = {
@@ -91,17 +84,5 @@ export const actions = {
 
   cancelResponse (error) {
     return {type: actionTypes.CANCEL_RESPONSE, error}
-  },
-
-  setCommands (commands) {
-    return {type: actionTypes.SET_COMMANDS, payload: {commands}}
-  },
-
-  setProtocolError (error) {
-    return {type: actionTypes.SET_PROTOCOL_ERROR, error}
-  },
-
-  tickCurrentCommand () {
-    return {type: actionTypes.TICK_CURRENT_COMMAND}
   }
 }
