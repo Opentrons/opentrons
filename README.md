@@ -56,8 +56,10 @@ If you want to build the platform and play with the latest development version w
 ### Set up your development environment
 
 * Python 3.5.3 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended)
+  - On Linux, when using pyenv, run `export PYTHON_CONFIGURE_OPTS="--enable-shared"` before `pyenv install ...`
 * Node 6.11.0 ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
 * OS X 10.11+, Linux, Windows 10 with Cygwin
+  - On Ubuntu Linux, install `libgconf-2-4, graphicsmagick, icnsutils` packages via `apt-get`
 * GNU Make: both API and OT-App are using [Makefiles](https://en.wikipedia.org/wiki/Makefile)
 
 ### Start the Opentrons API
