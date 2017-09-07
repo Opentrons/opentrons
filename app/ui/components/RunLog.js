@@ -61,8 +61,8 @@ export default class RunLog extends Component {
           className: classnames({[styles.current]: isCurrent}, styles[level])
         }
         return (
-          <span key={groupKey}>
-            <p {...props}>[{id}] : {description}</p>
+          <span key={groupKey}><p {...props}>[{id}] : {description}</p>
+            {getChildCommands(child, 'tertiary')}
           </span>
         )
       })
@@ -75,16 +75,17 @@ export default class RunLog extends Component {
         key: id,
         className: classnames({[styles.current]: isCurrent})
       }
-      let primaryCommand = <p {...props}>[{id}] : {description}</p>
-      let secondaryCommands = getChildCommands(command, 'secondary')
-      let tertiaryCommands = command.children.map((child) => {
-        return getChildCommands(child, 'tertiary')
-      })
-      return (<span key={groupKey}>{primaryCommand} {secondaryCommands} {tertiaryCommands}</span>)
+      return (
+        <span key={groupKey}>
+          <p {...props}>[{id}] : {description}</p>
+          {getChildCommands(command, 'secondary')}
+        </span>
+      )
     })
 
     return (
       <section className={classnames(style, styles.run_log_wrapper)}>
+        {getChildCommands({nestedCommands}, 'primary')}
         {commandItems}
       </section>
     )
