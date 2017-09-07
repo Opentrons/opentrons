@@ -21,7 +21,8 @@ export const actionTypes = {
   RESUME: makeRobotActionName('RESUME'),
   RESUME_RESPONSE: makeRobotActionName('RESUME_RESPONSE'),
   CANCEL: makeRobotActionName('CANCEL'),
-  CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE')
+  CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE'),
+  TICK_RUN_TIME: makeRobotActionName('TICK_RUN_TIME')
 }
 
 export const actions = {
@@ -39,7 +40,7 @@ export const actions = {
     return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
   },
 
-  sessionResponse (error = null, session = null) {
+  sessionResponse (error = null, session) {
     return {type: actionTypes.SESSION_RESPONSE, payload: {session}, error}
   },
 
@@ -84,5 +85,9 @@ export const actions = {
 
   cancelResponse (error) {
     return {type: actionTypes.CANCEL_RESPONSE, error}
+  },
+
+  tickRunTime () {
+    return {type: actionTypes.TICK_RUN_TIME}
   }
 }

@@ -2,7 +2,15 @@
 
 import {reducer, actionTypes} from '../'
 
+jest.useFakeTimers()
+
 describe('robot reducer', () => {
+  const now = Date.now()
+  const _nowFn = Date.now
+
+  beforeAll(() => (Date.now = () => now))
+  afterAll(() => (Date.now = _nowFn))
+
   test('initial state', () => {
     const state = reducer(undefined, {})
 
@@ -24,8 +32,7 @@ describe('robot reducer', () => {
       pauseRequest: {inProgress: false, error: null},
       resumeRequest: {inProgress: false, error: null},
       cancelRequest: {inProgress: false, error: null},
-      isRunning: false,
-      isPaused: false
+      runTime: 0
     })
   })
 
@@ -145,35 +152,41 @@ describe('robot reducer', () => {
   })
 
   test('handles run action', () => {
-    const state = {runRequest: {inProgress: false, error: new Error('AH')}}
+    const state = {
+      runTime: now,
+      runRequest: {inProgress: false, error: new Error('AH')}
+    }
     const action = {type: actionTypes.RUN}
 
     expect(reducer(state, action)).toEqual({
       runRequest: {inProgress: true, error: null},
-      // TODO(mc): for now, naively assume that if a run request is dispatched
-      // the robot is running
-      isRunning: true
+      runTime: 0
     })
   })
 
   test('handles runResponse success', () => {
-    const state = {isRunning: true, runRequest: {inProgress: true, error: null}}
+    const state = {runRequest: {inProgress: true, error: null}}
     const action = {type: actionTypes.RUN_RESPONSE, error: null}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: false, error: null},
-      isRunning: false
+      runRequest: {inProgress: false, error: null}
     })
   })
 
   test('handles runResponse failure', () => {
-    const state = {isRunning: true, runRequest: {inProgress: true, error: null}}
+    const state = {runRequest: {inProgress: true, error: null}}
     const action = {type: actionTypes.RUN_RESPONSE, error: new Error('AH')}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: false, error: new Error('AH')},
-      isRunning: false
+      runRequest: {inProgress: false, error: new Error('AH')}
     })
+  })
+
+  test('handled tickRunTime', () => {
+    const state = {runTime: 0}
+    const action = {type: actionTypes.TICK_RUN_TIME}
+
+    expect(reducer(state, action)).toEqual({runTime: now})
   })
 
   test('handles pause action', () => {

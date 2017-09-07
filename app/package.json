@@ -112,7 +112,8 @@
       "!**/test/**"
     ],
     "coverageReporters": [
-      "lcov", "text"
+      "lcov",
+      "text"
     ]
   },
   "standard": {
@@ -207,6 +208,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "fs": "0.0.2",
     "history": "^4.6.1",
+    "lodash": "^4.17.4",
     "moment-timezone": "^0.5.13",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",

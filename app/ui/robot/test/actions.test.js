@@ -140,4 +140,10 @@ describe('robot actions', () => {
 
     expect(actions.cancelResponse(new Error('AHHH'))).toEqual(expected)
   })
+
+  test('tick run time action', () => {
+    const expected = {type: actionTypes.TICK_RUN_TIME}
+
+    expect(actions.tickRunTime()).toEqual(expected)
+  })
 })

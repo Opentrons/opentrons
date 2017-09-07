@@ -5,6 +5,7 @@ import {actions, actionTypes} from '../actions'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
+const RUN_TIME_TICK_INTERVAL_MS = 200
 
 export default function client (dispatch) {
   let rpcClient
@@ -101,9 +102,16 @@ export default function client (dispatch) {
   }
 
   function run (state, action) {
+    const interval = setInterval(
+      () => dispatch(actions.tickRunTime()),
+      RUN_TIME_TICK_INTERVAL_MS
+    )
+
+    // TODO(mc, 2017-09-07): consider using Bluebird disposers for the interval
     session.run(serialPort)
       .then(() => dispatch(actions.runResponse()))
       .catch((error) => dispatch(actions.runResponse(error)))
+      .then(() => clearInterval(interval))
   }
 
   function pause (state, action) {

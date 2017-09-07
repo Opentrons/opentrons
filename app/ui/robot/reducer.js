@@ -1,5 +1,6 @@
 // robot reducer
 import path from 'path'
+import padStart from 'lodash/padStart'
 import {actionTypes} from './actions'
 import NAME from './name'
 
@@ -57,8 +58,7 @@ const INITIAL_STATE = {
   pauseRequest: makeRequestState(),
   resumeRequest: makeRequestState(),
   cancelRequest: makeRequestState(),
-  isRunning: false,
-  isPaused: false
+  runTime: 0
 }
 
 export const selectors = {
@@ -78,7 +78,7 @@ export const selectors = {
   },
 
   getIsRunning (allState) {
-    const sessionState = getModuleState(allState).sessionState
+    const {sessionState} = getModuleState(allState)
     return (
       sessionState === constants.RUNNING ||
       sessionState === constants.PAUSED
@@ -90,7 +90,7 @@ export const selectors = {
   },
 
   getIsDone (allState) {
-    const sessionState = getModuleState(allState).sessionState
+    const {sessionState} = getModuleState(allState)
     return (
       sessionState === constants.ERROR ||
       sessionState === constants.FINISHED ||
@@ -125,6 +125,29 @@ export const selectors = {
     const currentCommand = commands.find((c) => c.isCurrent)
 
     return 100 * (commands.indexOf(currentCommand) + 1) / commands.length
+  },
+
+  getStartTime (allState) {
+    // TODO(mc, 2017-08-30): Memoize
+    const commands = selectors.getCommands(allState)
+
+    if (!commands.length) return ''
+
+    return commands[0].handledAt
+  },
+
+  getRunTime (allState) {
+    const {runTime} = getModuleState(allState)
+    const startTime = selectors.getStartTime(allState)
+    const runTimeSeconds = (runTime && startTime)
+      ? Math.floor((runTime - Date.parse(startTime)) / 1000)
+      : 0
+
+    const hours = padStart(Math.floor(runTimeSeconds / 3600), 2, '0')
+    const minutes = padStart(Math.floor(runTimeSeconds / 60) % 60, 2, '0')
+    const seconds = padStart(runTimeSeconds % 60, 2, '0')
+
+    return `${hours}:${minutes}:${seconds}`
   }
 }
 
@@ -156,13 +179,11 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.RUN:
       return handleRequest(state, 'runRequest', payload, error, {
-        isRunning: true
+        runTime: 0
       })
 
     case actionTypes.RUN_RESPONSE:
-      return handleResponse(state, 'runRequest', payload, error, {
-        isRunning: false
-      })
+      return handleResponse(state, 'runRequest', payload, error)
 
     case actionTypes.PAUSE:
       return handleRequest(state, 'pauseRequest', payload, error)
@@ -188,6 +209,9 @@ export function reducer (state = INITIAL_STATE, action) {
         isRunning: error != null,
         isPaused: error != null
       })
+
+    case actionTypes.TICK_RUN_TIME:
+      return {...state, runTime: Date.now()}
   }
 
   return state

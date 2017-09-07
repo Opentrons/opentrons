@@ -12,6 +12,7 @@ export default function RunControl (props) {
     style,
     protocolName,
     startTime,
+    runTime,
     runProgress,
     onPauseClick,
     onResumeClick,
@@ -60,7 +61,9 @@ export default function RunControl (props) {
 
       <div className={styles.progress} >
         { hasError && <button className={styles.btn_error}>Report Error</button> }
-        <div className={styles.timer}>00:03:00</div>
+        <div className={styles.timer}>
+          {runTime}
+        </div>
         <RunProgress style={styles.progress_bar} {...{runProgress, isPaused, hasError}} />
       </div>
 
@@ -70,6 +73,8 @@ export default function RunControl (props) {
 
 RunControl.propTypes = {
   protocolName: PropTypes.string.isRequired,
+  startTime: PropTypes.string.isRequired,
+  runTime: PropTypes.string.isRequired,
   isRunning: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,
   onPauseClick: PropTypes.func.isRequired,
