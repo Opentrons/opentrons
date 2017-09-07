@@ -10,7 +10,48 @@ export default class RunLog extends Component {
 
   render () {
     const { style, commands } = this.props
-    const commandItems = commands.map((command) => {
+    // hardcoded nested commands for style updates
+    const nestedCommands =
+      [
+        {
+          id: 0,
+          description: 'foo',
+          handledAt: '2017-08-30T12:00:00Z',
+          isCurrent: true,
+          children: [
+            {
+              id: 1,
+              description: 'bar',
+              handledAt: '2017-08-30T12:00:01Z',
+              isCurrent: true,
+              children: [
+                {
+                  id: 2,
+                  description: 'baz',
+                  handledAt: '2017-08-30T12:00:02Z',
+                  isCurrent: true,
+                  children: []
+                },
+                {
+                  id: 3,
+                  description: 'qux',
+                  handledAt: '',
+                  isCurrent: false,
+                  children: []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 4,
+          description: 'fizzbuzz',
+          handledAt: '',
+          isCurrent: false,
+          children: []
+        }
+      ]
+    const commandItems = nestedCommands.map((command) => {
       const {id, isCurrent, description} = command
       const props = {
         key: id,

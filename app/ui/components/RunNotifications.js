@@ -48,6 +48,8 @@ export default function RunNotifications (props) {
     notification = <PausedNotification />
   } else if (isRunning) {
     notification = <RunningNotification />
+  } else {
+    notification = <div className={styles.no_notification} />
   }
 
   return notification
