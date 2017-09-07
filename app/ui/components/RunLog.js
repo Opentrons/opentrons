@@ -9,8 +9,8 @@ export default class RunLog extends Component {
   }
 
   render () {
-    const { style, commands } = this.props
-    // hardcoded nested commands for style updates
+    const {style} = this.props
+    // hardcoded nested commands for style updates need to add {commands back to props when coming from API}
     const nestedCommands =
       [
         {
@@ -29,7 +29,7 @@ export default class RunLog extends Component {
                   id: 2,
                   description: 'baz',
                   handledAt: '2017-08-30T12:00:02Z',
-                  isCurrent: true,
+                  isCurrent: false,
                   children: []
                 },
                 {
@@ -51,17 +51,38 @@ export default class RunLog extends Component {
           children: []
         }
       ]
-    const commandItems = nestedCommands.map((command) => {
-      const {id, isCurrent, description} = command
-      const props = {
+
+    const getChildCommands = (parent, level) => {
+      return parent.children.map((child, index) => {
+        let {id, isCurrent, description} = child
+        let groupKey = `${level}-${index}-${id}`
+        let props = {
+          key: id,
+          className: classnames({[styles.current]: isCurrent}, styles[level])
+        }
+        return (
+          <span key={groupKey}>
+            <p {...props}>[{id}] : {description}</p>
+          </span>
+        )
+      })
+    }
+
+    const commandItems = nestedCommands.map((command, index) => {
+      let {id, isCurrent, description} = command
+      let groupKey = `primary-${index}-${id}`
+      let props = {
         key: id,
         className: classnames({[styles.current]: isCurrent})
       }
-      // TODO: add ability to turn autoscroll on and off
-      if (isCurrent) props.ref = 'ensureVisible'
-
-      return (<p {...props}>[{id}] : {description}</p>)
+      let primaryCommand = <p {...props}>[{id}] : {description}</p>
+      let secondaryCommands = getChildCommands(command, 'secondary')
+      let tertiaryCommands = command.children.map((child) => {
+        return getChildCommands(child, 'tertiary')
+      })
+      return (<span key={groupKey}>{primaryCommand} {secondaryCommands} {tertiaryCommands}</span>)
     })
+
     return (
       <section className={classnames(style, styles.run_log_wrapper)}>
         {commandItems}

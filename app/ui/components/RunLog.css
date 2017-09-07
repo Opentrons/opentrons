@@ -6,10 +6,18 @@
   border-bottom: 3rem solid white;
 }
 
-.run_log_wrapper p {
-  margin: 1rem 0;
+p {
+  margin: 0.5rem 0;
 }
 
 .current {
   color: #006fff;
+}
+
+.secondary {
+  padding-left: 2rem;
+}
+
+.tertiary {
+  padding-left: 4rem;
 }
