@@ -30,9 +30,8 @@ DESCRIPTION = (
     "writing automated biology lab protocols easy.")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'dill==0.2.5',
-    'requests==2.14.2',
-    'pyserial==3.2.1']
+    'pyserial==3.2.1',
+    'aiohttp==2.2.3']
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
