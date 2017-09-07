@@ -2,6 +2,10 @@
   height: 50px;
 }
 
+.tip_wrapper {
+  height: 50px;
+}
+
 .tip {
   display: inline-block;
   margin-left: 1rem;
