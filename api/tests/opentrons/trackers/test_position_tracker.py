@@ -34,8 +34,6 @@ def test_add_pipette(robot):
     p200 = Pipette(robot, 'a')
     assert p200 in robot.position_tracker
 
-
-
 def test_pipette_movement(robot):
     p200  = Pipette(robot, 'a')
     plate = containers_load(robot, '96-flat', 'A1')

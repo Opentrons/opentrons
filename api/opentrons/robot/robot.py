@@ -244,7 +244,7 @@ class Robot(object):
         """
         axis = axis.upper()
         self._instruments[axis] = instrument
-        self.position_tracker.track_object(HEAD, instrument, 1, 3, 2) #TODO: Create real pipette offsets
+        self.position_tracker.track_object(HEAD, instrument, 0, 0, 0) #TODO: Create real pipette offsets
 
     def add_warning(self, warning_msg):
         """

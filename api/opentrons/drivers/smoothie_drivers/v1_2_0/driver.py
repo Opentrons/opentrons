@@ -8,8 +8,10 @@ from threading import Event
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
-
-from opentrons.util import trace, environment
+from opentrons.pubsub_util import topics
+from opentrons.pubsub_util.messages.movement import moved_msg
+from opentrons.util.trace import MessageBroker
+from opentrons.util import environment
 
 
 DEFAULTS_DIR_PATH = pkg_resources.resource_filename(
@@ -21,6 +23,7 @@ CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'smoothie-config.ini')
 
 log = get_logger(__name__)
 
+message_broker = MessageBroker.get_instance()
 
 class SmoothieDriver_1_2_0(SmoothieDriver):
 
@@ -353,16 +356,20 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
             return (False, self.SMOOTHIE_ERROR)
 
         self.wait_for_arrival()
+        current_pos = self.get_head_position()["current"]
 
         arguments = {
             'name': 'move-finished',
             'position': {
-                'head': self.get_head_position()["current"],
+                'head': current_pos,
                 'plunger': self.get_plunger_positions()["current"]
             },
             'class': type(self.connection).__name__
         }
-        trace.MessageBroker.get_instance().notify(arguments)
+        message_broker.publish(topics.MISC, arguments)
+        new_position = moved_msg('head', *current_pos)
+        message_broker.publish(topics.MOVEMENT, new_position)
+
         return (True, self.SMOOTHIE_SUCCESS)
 
     def flip_coordinates(self, coordinates, mode='absolute'):
@@ -429,7 +436,7 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                     'plunger': self.get_plunger_positions()["current"]
                 }
             }
-            trace.MessageBroker.get_instance().notify(arguments)
+            message_broker.publish(topics.MISC, arguments)
             # the axis aren't necessarily set to 0.0
             # values after homing, so force it
             pos_args = {}
@@ -443,7 +450,7 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
         start_time = time.time()
         end_time = start_time + delay_time
         arguments = {'name': 'delay-start', 'time': delay_time}
-        trace.MessageBroker.get_instance().notify(arguments)
+        message_broker.publish(topics.MISC, arguments)
         if not isinstance(self.connection, VirtualSmoothie):
             while time.time() + 1.0 < end_time:
                 self.check_paused_stopped()
@@ -452,11 +459,11 @@ class SmoothieDriver_1_2_0(SmoothieDriver):
                     'name': 'countdown',
                     'countdown': int(end_time - time.time())
                 }
-                trace.MessageBroker.get_instance().notify(arguments)
+                message_broker.publish(topics.MISC, arguments)
             remaining_time = end_time - time.time()
             time.sleep(max(0, remaining_time))
         arguments = {'name': 'delay-finish'}
-        trace.MessageBroker.get_instance().notify(arguments)
+        message_broker.publish(topics.MISC, arguments)
         return True
 
     def calm_down(self):

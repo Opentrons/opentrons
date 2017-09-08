@@ -8,6 +8,9 @@ from opentrons.instruments import pipette
 from opentrons.data_storage import database as ot_db
 
 
+def file_dir_path():
+    filename = globals()["__file__"]
+    return os.path.dirname(filename)
 
 @pytest.fixture
 def robot():
@@ -16,8 +19,9 @@ def robot():
 
 @pytest.fixture
 def database():
-    temp_db_fd = tempfile.NamedTemporaryFile(dir='./')
-    testing_database_path = shutil.copy2('../testing_database.db', temp_db_fd.name)
+    db = os.path.join(file_dir_path(), '../testing_database.db')
+    temp_db_fd = tempfile.NamedTemporaryFile(dir=file_dir_path())
+    testing_database_path = shutil.copy2(db, temp_db_fd.name)
     ot_db.change_database(testing_database_path)
     return ot_db
 

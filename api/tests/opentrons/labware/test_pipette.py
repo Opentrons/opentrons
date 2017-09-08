@@ -5,15 +5,30 @@ from opentrons import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 from opentrons.util.vector import Vector
-
+from opentrons.data_storage import database as ot_db
+import tempfile
+import shutil
+import os
 from opentrons.containers.placeable import unpack_location, Container, Well
+
+def database():
+    db = os.path.join(file_dir_path(), '../testing_database.db')
+    temp_db_fd = tempfile.NamedTemporaryFile(dir=file_dir_path())
+    testing_database_path = shutil.copy2(db, temp_db_fd.name)
+    ot_db.change_database(testing_database_path)
+    return ot_db
+
+def file_dir_path():
+    filename = globals()["__file__"]
+    return os.path.dirname(filename)
+
 
 
 class PipetteTest(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
         self.robot.home()
-
+        database()
         self.trash = containers_load(self.robot, 'point', 'A1')
         self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', 'B2')
         self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', 'B3')
@@ -160,21 +175,21 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.p200.motor.speed.mock_calls, expected)
 
     def test_aspirate_move_to(self):
-        x, y, z = (161.0, 116.7, 3.0)
+        x, y, z = (161.0, 116.7, 1.5)
         well = self.plate[0]
         pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
         location = (self.plate, pos)
 
         self.robot._driver.move_head(x=x, y=y, z=z)
 
-        self.p200.calibrate_position(location)
+        self.robot.calibrate_container_with_instrument(self.plate, self.p200, False)
 
         self.p200.aspirate(100, location)
 
         current_pos = self.robot._driver.get_head_position()['current']
         self.assertEqual(
             current_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
+            Vector({'x': 172.24, 'y': 131.04, 'z': 9.5})
         )
 
         current_pos = self.robot._driver.get_plunger_positions()['current']
