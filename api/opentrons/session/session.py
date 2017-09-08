@@ -1,7 +1,5 @@
 import ast
 import copy
-import itertools
-import sys
 
 from opentrons import robot
 from opentrons.robot.robot import Robot

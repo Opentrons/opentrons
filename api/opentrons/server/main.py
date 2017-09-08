@@ -65,6 +65,7 @@ def log_init():
     )
     dictConfig(logging_config)
 
+
 if __name__ == "__main__":
     log_init()
     try:

@@ -4,7 +4,7 @@ import itertools
 from opentrons.containers import unpack_location
 from opentrons.containers.calibrator import Calibrator
 from opentrons.containers.placeable import (
-    Container, humanize_location, Placeable, WellSeries
+    Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers
 from opentrons.instruments.instrument import Instrument
@@ -523,10 +523,6 @@ class Pipette(Instrument):
         if volume is None:
             volume = self.max_volume
 
-        _description = "Mixing {0} times with a volume of {1}ul".format(
-            repetitions, self.max_volume if volume is None else volume
-        )
-
         if not location and self.previous_placeable:
             location = self.previous_placeable
 
@@ -683,8 +679,6 @@ class Pipette(Instrument):
         if volume is 0:
             return self
 
-        _description = 'Air gap'
-
         if height is None:
             height = 5
 
@@ -799,10 +793,6 @@ class Pipette(Instrument):
             self.robot.move_head(z=tip_plunge, mode='relative')
             self.robot.move_head(z=-tip_plunge, mode='relative')
 
-        _description = "Picking up tip {0}".format(
-            ('from ' + humanize_location(location) if location else '')
-        )
-
         return self
 
     @both(name='robot.command', text='Dropping tip {location}')
@@ -868,7 +858,6 @@ class Pipette(Instrument):
 
         return self
 
-    @both(name='robot.command', text='Homing')
     def home(self):
 
         """
@@ -891,13 +880,14 @@ class Pipette(Instrument):
         >>> p200.home() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        @both(
+            name='robot.command',
+            text='Homing pipette plunger on axis {axis}')
+        def _home(axis):
+            self.current_volume = 0
+            self.motor.home()
 
-        self.current_volume = 0
-        self.motor.home()
-        _description = "Homing pipette plunger on axis {}".format(
-            self.axis
-        )
-
+        _home(self.axis)
         return self
 
     @both(
@@ -1094,8 +1084,6 @@ class Pipette(Instrument):
 
         minutes += int(seconds / 60)
         seconds = seconds % 60
-        _description = "Delaying {} minutes and {} seconds".format(
-            minutes, seconds)
         seconds += float(minutes * 60)
 
         self.motor.wait(seconds)

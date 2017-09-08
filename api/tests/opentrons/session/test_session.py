@@ -6,6 +6,7 @@ from opentrons.broker import notify
 
 from opentrons.session import Session
 
+
 async def test_load_from_text(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert session.name == '<blank>'

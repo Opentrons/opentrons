@@ -54,7 +54,7 @@ def protocol(request):
     except Exception as e:
         root = request.param
 
-    filename = os.path.join(os.path.dirname(__file__), 'data', request.param)
+    filename = os.path.join(os.path.dirname(__file__), 'data', root)
 
     with open(filename) as file:
         text = ''.join(list(file))

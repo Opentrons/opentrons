@@ -22,6 +22,7 @@ class RobotTest(unittest.TestCase):
         self.robot.home(enqueue=False)
 
         commands = []
+
         def on_command(name, payload):
             if payload['$'] == 'before':
                 commands.append(payload['text'].format(**payload))

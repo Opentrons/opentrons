@@ -1,4 +1,3 @@
-import copy
 import os
 from threading import Event
 
@@ -6,8 +5,7 @@ from opentrons import containers, drivers
 from opentrons import helpers
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.broker import before, both
-from opentrons.util import calltree
+from opentrons.broker import before
 
 log = get_logger(__name__)
 

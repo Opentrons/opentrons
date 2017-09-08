@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import functools
 import inspect
 
@@ -110,6 +109,7 @@ def notify(name, payload):
     for topics, listener in listeners:
         if name in topics:
             listener(name, payload)
+
 
 before = functools.partial(publish, before=True, after=False)
 after = functools.partial(publish, before=False, after=True)
