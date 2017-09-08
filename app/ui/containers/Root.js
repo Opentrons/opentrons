@@ -23,13 +23,16 @@ const mapStateToProps = (state) => {
     // robot
     isConnected: state.robot.isConnected,
     isReadyToRun: robotSelectors.getIsReadyToRun(state),
-    isRunning: state.robot.isRunning,
-    isPaused: state.robot.isPaused,
+    isRunning: robotSelectors.getIsRunning(state),
+    isPaused: robotSelectors.getIsPaused(state),
+    isDone: robotSelectors.getIsDone(state),
     connectionStatus: robotSelectors.getConnectionStatus(state),
 
     // protocol
-    protocolName: robotSelectors.getProtocolName(state),
+    sessionName: robotSelectors.getSessionName(state),
     commands: robotSelectors.getCommands(state),
+    startTime: robotSelectors.getStartTime(state),
+    runTime: robotSelectors.getRunTime(state),
     runProgress: robotSelectors.getRunProgress(state),
 
     // TODO(mc): remove development hardcoded values

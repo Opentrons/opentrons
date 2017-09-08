@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styles from './RunNotifications.css'
 
-const ErrorNotification = props => {
+function ErrorNotification (props) {
   return (
     <div>
       {props.errors.map((e) =>
@@ -18,7 +18,7 @@ const ErrorNotification = props => {
   )
 }
 
-const DefaultNotification = props => {
+function RunningNotification (props) {
   return (
     <div>
       <div className={styles.tip}>Tip</div>
@@ -27,7 +27,7 @@ const DefaultNotification = props => {
   )
 }
 
-const PausedNotification = props => {
+function PausedNotification (props) {
   return (
     <div className={styles.notification_wrapper}>
       <div className={styles.notification_icon}>II</div>
@@ -39,17 +39,22 @@ const PausedNotification = props => {
 }
 
 export default function RunNotifications (props) {
-  const { isPaused, errors, hasError } = props
-  let notification = <DefaultNotification />
+  const {isRunning, isPaused, errors, hasError} = props
+  let notification = null
+
   if (hasError) {
     notification = <ErrorNotification {...{errors}} />
   } else if (isPaused) {
     notification = <PausedNotification />
+  } else if (isRunning) {
+    notification = <RunningNotification />
   }
+
   return notification
 }
 
 RunNotifications.propTypes = {
+  isRunning: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,
   hasError: PropTypes.bool.isRequired,
   errors: PropTypes.array

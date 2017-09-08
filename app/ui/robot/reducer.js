@@ -1,10 +1,26 @@
 // robot reducer
 import path from 'path'
-import {NAME, actionTypes, constants} from './'
+import padStart from 'lodash/padStart'
+import {actionTypes} from './actions'
+import NAME from './name'
 
-// selector and reducer helpers
+// miscellaneous constants
+export const constants = {
+  DISCONNECTED: 'disconnected',
+  CONNECTING: 'connecting',
+  CONNECTED: 'connected',
+
+  // session states
+  LOADED: 'loaded',
+  RUNNING: 'running',
+  PAUSED: 'paused',
+  ERROR: 'error',
+  FINISHED: 'finished',
+  STOPPED: 'stopped'
+}
+
+// state helpers
 const getModuleState = (state) => state[NAME]
-
 const makeRequestState = () => ({inProgress: false, error: null})
 
 const handleRequest = (state, request, payload, error, props = {}) => ({
@@ -20,42 +36,34 @@ const handleResponse = (state, request, payload, error, props = {}) => ({
 })
 
 const INITIAL_STATE = {
-  // robot connection and prep
+  // robot API connection
   connectRequest: makeRequestState(),
+  isConnected: false,
+
+  // protocol/workflow session
+  // TODO(mc, 2017-08-24): move session to its own state module or sub-reducer
+  sessionRequest: makeRequestState(),
+  sessionName: '',
+  protocolText: '',
+  protocolCommands: [],
+  protocolCommandsById: {},
+  sessionErrors: [],
+  sessionState: '',
+
+  // robot calibration and setup
   homeRequest: makeRequestState(),
 
-  // robot protocol and running
+  // running a protocol
   runRequest: makeRequestState(),
   pauseRequest: makeRequestState(),
   resumeRequest: makeRequestState(),
   cancelRequest: makeRequestState(),
-
-  // instantaneous robot state below
-  // protocol
-  // TODO(mc, 2017-08-24): move protocol to its own state module
-  // TODO(mc, 2017-08-23): DO NOT hardcode this protocol!
-  protocol: path.join(
-    __dirname,
-    '../../../api/opentrons/server/tests/data/dinosaur.py'
-  ),
-  protocolError: null,
-  // is connected to compute
-  isConnected: false,
-  // is running a protocol
-  isRunning: false,
-  isPaused: false,
-  // protocol commands list
-  commands: [],
-  currentCommand: -1
+  runTime: 0
 }
 
 export const selectors = {
-  getProtocolFile (allState) {
-    return getModuleState(allState).protocol
-  },
-
-  getProtocolName (allState) {
-    return path.basename(selectors.getProtocolFile(allState))
+  getSessionName (allState) {
+    return getModuleState(allState).sessionName
   },
 
   getConnectionStatus (allState) {
@@ -66,26 +74,80 @@ export const selectors = {
   },
 
   getIsReadyToRun (allState) {
-    const state = getModuleState(allState)
-    return state.isConnected && (state.commands.length > 0)
+    return getModuleState(allState).sessionState === constants.LOADED
+  },
+
+  getIsRunning (allState) {
+    const {sessionState} = getModuleState(allState)
+    return (
+      sessionState === constants.RUNNING ||
+      sessionState === constants.PAUSED
+    )
+  },
+
+  getIsPaused (allState) {
+    return getModuleState(allState).sessionState === constants.PAUSED
+  },
+
+  getIsDone (allState) {
+    const {sessionState} = getModuleState(allState)
+    return (
+      sessionState === constants.ERROR ||
+      sessionState === constants.FINISHED ||
+      sessionState === constants.STOPPED
+    )
   },
 
   getCommands (allState) {
-    const state = getModuleState(allState)
-    const currentCommand = state.currentCommand
+    const {protocolCommands, protocolCommandsById} = getModuleState(allState)
 
-    return state.commands.map((command, index) => ({
-      // TODO(mc, 2017-08-23): generate command IDs on python side instead
-      id: index,
-      description: command,
-      isCurrent: index === currentCommand
-    }))
+    return protocolCommands.map(idToCommandList(true))
+
+    function idToCommandList (parentIsCurrent) {
+      return function mapIdToCommand (id, index, commands) {
+        const command = protocolCommandsById[id]
+        const next = protocolCommandsById[commands[index + 1]]
+        const isCurrent = (
+          parentIsCurrent &&
+          command.handledAt &&
+          (!next || !next.handledAt)
+        ) || false
+        const children = command.children.map(idToCommandList(isCurrent))
+
+        return {...command, children, isCurrent}
+      }
+    }
   },
 
   getRunProgress (allState) {
-    const state = getModuleState(allState)
+    // TODO(mc, 2017-08-30): Memoize
+    const commands = selectors.getCommands(allState)
+    const currentCommand = commands.find((c) => c.isCurrent)
 
-    return 100 * (state.currentCommand + 1) / state.commands.length
+    return 100 * (commands.indexOf(currentCommand) + 1) / commands.length
+  },
+
+  getStartTime (allState) {
+    // TODO(mc, 2017-08-30): Memoize
+    const commands = selectors.getCommands(allState)
+
+    if (!commands.length) return ''
+
+    return commands[0].handledAt
+  },
+
+  getRunTime (allState) {
+    const {runTime} = getModuleState(allState)
+    const startTime = selectors.getStartTime(allState)
+    const runTimeSeconds = (runTime && startTime)
+      ? Math.floor((runTime - Date.parse(startTime)) / 1000)
+      : 0
+
+    const hours = padStart(Math.floor(runTimeSeconds / 3600), 2, '0')
+    const minutes = padStart(Math.floor(runTimeSeconds / 60) % 60, 2, '0')
+    const seconds = padStart(runTimeSeconds % 60, 2, '0')
+
+    return `${hours}:${minutes}:${seconds}`
   }
 }
 
@@ -101,24 +163,27 @@ export function reducer (state = INITIAL_STATE, action) {
         isConnected: error == null
       })
 
+    case actionTypes.SESSION:
+      return handleRequest(state, 'sessionRequest', payload, error, {
+        sessionName: path.basename(payload.file.name)
+      })
+
+    case actionTypes.SESSION_RESPONSE:
+      return handleResponse(state, 'sessionRequest', payload, error, payload.session)
+
     case actionTypes.HOME:
       return handleRequest(state, 'homeRequest', payload, error)
 
     case actionTypes.HOME_RESPONSE:
       return handleResponse(state, 'homeRequest', payload, error)
 
-    // TODO(mc): for now, naively assume that if a run request is dispatched
-    // the robot is running
     case actionTypes.RUN:
       return handleRequest(state, 'runRequest', payload, error, {
-        isRunning: true,
-        currentCommand: -1
+        runTime: 0
       })
 
     case actionTypes.RUN_RESPONSE:
-      return handleResponse(state, 'runRequest', payload, error, {
-        isRunning: false
-      })
+      return handleResponse(state, 'runRequest', payload, error)
 
     case actionTypes.PAUSE:
       return handleRequest(state, 'pauseRequest', payload, error)
@@ -145,17 +210,8 @@ export function reducer (state = INITIAL_STATE, action) {
         isPaused: error != null
       })
 
-    case actionTypes.SET_IS_CONNECTED:
-      return {...state, ...payload}
-
-    case actionTypes.SET_COMMANDS:
-      return {...state, commands: payload.commands, currentCommand: -1}
-
-    case actionTypes.SET_PROTOCOL_ERROR:
-      return {...state, protocolError: error}
-
-    case actionTypes.TICK_CURRENT_COMMAND:
-      return {...state, currentCommand: state.currentCommand + 1}
+    case actionTypes.TICK_RUN_TIME:
+      return {...state, runTime: Date.now()}
   }
 
   return state

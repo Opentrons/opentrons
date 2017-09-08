@@ -1,29 +1,38 @@
 // robot reducer test
 
-import path from 'path'
 import {reducer, actionTypes} from '../'
 
+jest.useFakeTimers()
+
 describe('robot reducer', () => {
+  const now = Date.now()
+  const _nowFn = Date.now
+
+  beforeAll(() => (Date.now = () => now))
+  afterAll(() => (Date.now = _nowFn))
+
   test('initial state', () => {
     const state = reducer(undefined, {})
 
     expect(state).toEqual({
       connectRequest: {inProgress: false, error: null},
+      isConnected: false,
+
+      sessionRequest: {inProgress: false, error: null},
+      sessionName: '',
+      protocolText: '',
+      protocolCommands: [],
+      protocolCommandsById: {},
+      sessionErrors: [],
+      sessionState: '',
+
       homeRequest: {inProgress: false, error: null},
+
       runRequest: {inProgress: false, error: null},
-      protocol: path.join(
-        __dirname,
-        '../../../../api/opentrons/server/tests/data/dinosaur.py'
-      ),
-      protocolError: null,
       pauseRequest: {inProgress: false, error: null},
       resumeRequest: {inProgress: false, error: null},
       cancelRequest: {inProgress: false, error: null},
-      isConnected: false,
-      isRunning: false,
-      isPaused: false,
-      currentCommand: -1,
-      commands: []
+      runTime: 0
     })
   })
 
@@ -62,6 +71,58 @@ describe('robot reducer', () => {
     })
   })
 
+  test('handles session with file', () => {
+    const state = {
+      sessionRequest: {inProgress: false, error: new Error('AH')},
+      sessionName: ''
+    }
+    const action = {
+      type: actionTypes.SESSION,
+      payload: {file: {name: '/path/to/foo.py'}}
+    }
+
+    expect(reducer(state, action)).toEqual({
+      sessionRequest: {inProgress: true, error: null},
+      sessionName: 'foo.py'
+    })
+  })
+
+  test('handles session response success with session', () => {
+    const state = {
+      sessionRequest: {inProgress: true, error: null},
+      sessionName: 'foo.py',
+      protocolText: '',
+      protocolCommands: [],
+      protocolCommandsById: {},
+      sessionErrors: [],
+      sessionState: ''
+    }
+    const action = {
+      type: actionTypes.SESSION_RESPONSE,
+      error: null,
+      payload: {
+        session: {
+          sessionName: 'foo.py',
+          protocolText: 'protocol woo',
+          protocolCommands: [],
+          protocolCommandsById: {},
+          sessionErrors: [],
+          sessionState: 'running'
+        }
+      }
+    }
+
+    expect(reducer(state, action)).toEqual({
+      sessionRequest: {inProgress: false, error: null},
+      sessionName: 'foo.py',
+      protocolText: 'protocol woo',
+      protocolCommands: [],
+      protocolCommandsById: {},
+      sessionErrors: [],
+      sessionState: 'running'
+    })
+  })
+
   // TODO(mc): we may need to track which specific axes are homing
   test('handles home action', () => {
     const state = {homeRequest: {inProgress: false, error: new Error('AH')}}
@@ -91,36 +152,41 @@ describe('robot reducer', () => {
   })
 
   test('handles run action', () => {
-    const state = {runRequest: {inProgress: false, error: new Error('AH')}}
+    const state = {
+      runTime: now,
+      runRequest: {inProgress: false, error: new Error('AH')}
+    }
     const action = {type: actionTypes.RUN}
 
     expect(reducer(state, action)).toEqual({
       runRequest: {inProgress: true, error: null},
-      // TODO(mc): for now, naively assume that if a run request is dispatched
-      // the robot is running
-      isRunning: true,
-      currentCommand: -1
+      runTime: 0
     })
   })
 
   test('handles runResponse success', () => {
-    const state = {isRunning: true, runRequest: {inProgress: true, error: null}}
+    const state = {runRequest: {inProgress: true, error: null}}
     const action = {type: actionTypes.RUN_RESPONSE, error: null}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: false, error: null},
-      isRunning: false
+      runRequest: {inProgress: false, error: null}
     })
   })
 
   test('handles runResponse failure', () => {
-    const state = {isRunning: true, runRequest: {inProgress: true, error: null}}
+    const state = {runRequest: {inProgress: true, error: null}}
     const action = {type: actionTypes.RUN_RESPONSE, error: new Error('AH')}
 
     expect(reducer(state, action)).toEqual({
-      runRequest: {inProgress: false, error: new Error('AH')},
-      isRunning: false
+      runRequest: {inProgress: false, error: new Error('AH')}
     })
+  })
+
+  test('handled tickRunTime', () => {
+    const state = {runTime: 0}
+    const action = {type: actionTypes.TICK_RUN_TIME}
+
+    expect(reducer(state, action)).toEqual({runTime: now})
   })
 
   test('handles pause action', () => {
@@ -230,45 +296,5 @@ describe('robot reducer', () => {
       isRunning: true,
       isPaused: true
     })
-  })
-
-  test('handles setIsConnected', () => {
-    const state = {isConnected: false}
-    const action = {
-      type: actionTypes.SET_IS_CONNECTED,
-      payload: {isConnected: true}
-    }
-
-    expect(reducer(state, action)).toEqual({isConnected: true})
-  })
-
-  test('handles setCommands', () => {
-    const state = {commands: [], currentCommand: 42}
-    const action = {
-      type: actionTypes.SET_COMMANDS,
-      payload: {commands: ['foo', 'bar', 'baz']}
-    }
-
-    expect(reducer(state, action)).toEqual({
-      commands: ['foo', 'bar', 'baz'],
-      currentCommand: -1
-    })
-  })
-
-  test('handles setProtocolError', () => {
-    const state = {protocolError: null}
-    const action = {
-      type: actionTypes.SET_PROTOCOL_ERROR,
-      error: new Error('AHHH')
-    }
-
-    expect(reducer(state, action)).toEqual({protocolError: new Error('AHHH')})
-  })
-
-  test('handles tickCurrentCommand', () => {
-    const state = {currentCommand: 3}
-    const action = {type: actionTypes.TICK_CURRENT_COMMAND}
-
-    expect(reducer(state, action)).toEqual({currentCommand: 4})
   })
 })

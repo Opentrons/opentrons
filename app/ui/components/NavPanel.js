@@ -5,8 +5,8 @@ import styles from './NavPanel.css'
 
 const UploadPanel = props => {
   const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
-  const files = recentFiles.map((file) => {
-    return <p>{file}</p>
+  const files = recentFiles.map((file, index) => {
+    return <p key={index}>{file}</p>
   })
   return (
     <div className={styles.nav_panel}>
@@ -14,9 +14,13 @@ const UploadPanel = props => {
         <button className={styles.btn_new}>
           New File
         </button>
-        <label className={styles.btn_upload} htmlFor='uploaded-file'>
+        <label className={styles.btn_upload}>
           Upload
-           <input className={styles.file} type='file' name='uploaded-file' id='uploaded-file' />
+          <input
+            className={styles.file}
+            type='file'
+            onChange={props.onUpload}
+          />
         </label>
         <h2 className={styles.title}>Recently Uploaded</h2>
         {files}
@@ -112,5 +116,7 @@ export default function NavPanel (props) {
 }
 
 NavPanel.propTypes = {
-  currentNavPanelTask: PropTypes.string.isRequired
+  isConnected: PropTypes.bool.isRequired,
+  currentNavPanelTask: PropTypes.string.isRequired,
+  onUpload: PropTypes.func.isRequired
 }

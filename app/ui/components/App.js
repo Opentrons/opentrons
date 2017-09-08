@@ -1,16 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+
+import Nav from '../containers/Nav'
+
 import Button from './Button'
-import SideBar from './SideBar'
 import RunControl from './RunControl'
 import RunLog from './RunLog'
 import grid from './Grid.css'
 
 export default function App (props) {
   const {
-    // state
-    isRunning,
     isReadyToRun,
+    isRunning,
+    isDone,
     onRunClick
   } = props
   let runControl
@@ -31,7 +33,7 @@ export default function App (props) {
       </Button>
     )
   }
-  if (isReadyToRun) {
+  if (isReadyToRun || isRunning || isDone) {
     runControl = (
       <RunControl
         style={grid.controls}
@@ -44,7 +46,7 @@ export default function App (props) {
 
   return (
     <div className={grid.wrapper}>
-      <SideBar {...props} />
+      <Nav />
       <main className={grid.task}>
         <header className={grid.header}>
           {runButton}
@@ -57,5 +59,9 @@ export default function App (props) {
 }
 
 App.propTypes = {
+  isReadyToRun: PropTypes.bool.isRequired,
+  isRunning: PropTypes.bool.isRequired,
+  isPaused: PropTypes.bool.isRequired,
+  isDone: PropTypes.bool.isRequired,
   onRunClick: PropTypes.func.isRequired
 }

@@ -112,12 +112,14 @@
       "!**/test/**"
     ],
     "coverageReporters": [
-      "lcov", "text"
+      "lcov",
+      "text"
     ]
   },
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
+      "dist/",
       "dll/"
     ],
     "env": [
@@ -196,6 +198,7 @@
     "webpack-bundle-analyzer": "^2.8.2",
     "webpack-dev-server": "^2.4.5",
     "webpack-merge": "^4.1.0",
+    "worker-loader": "0.8.0",
     "ws": "^3.1.0"
   },
   "dependencies": {
@@ -205,6 +208,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "fs": "0.0.2",
     "history": "^4.6.1",
+    "lodash": "^4.17.4",
     "moment-timezone": "^0.5.13",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
