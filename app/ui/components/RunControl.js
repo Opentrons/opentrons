@@ -10,7 +10,7 @@ export default function RunControl (props) {
     isPaused,
     errors,
     style,
-    protocolName,
+    sessionName,
     startTime,
     runTime,
     runProgress,
@@ -42,7 +42,7 @@ export default function RunControl (props) {
     <section className={style}>
       <div className={styles.btn_wrapper}>
         <div className={styles.file_info}>
-          FILE NAME: {protocolName}
+          FILE NAME: {sessionName}
           <br />
           START TIME: {startTime}
         </div>
@@ -72,7 +72,7 @@ export default function RunControl (props) {
 }
 
 RunControl.propTypes = {
-  protocolName: PropTypes.string.isRequired,
+  sessionName: PropTypes.string.isRequired,
   startTime: PropTypes.string.isRequired,
   runTime: PropTypes.string.isRequired,
   isRunning: PropTypes.bool.isRequired,

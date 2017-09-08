@@ -21,7 +21,7 @@ export default {
         }
       },
       {
-        test: /\worker.js$/,
+        test: /worker.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'worker-loader'

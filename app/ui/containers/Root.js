@@ -29,7 +29,7 @@ const mapStateToProps = (state) => {
     connectionStatus: robotSelectors.getConnectionStatus(state),
 
     // protocol
-    protocolName: robotSelectors.getSessionName(state),
+    sessionName: robotSelectors.getSessionName(state),
     commands: robotSelectors.getCommands(state),
     startTime: robotSelectors.getStartTime(state),
     runTime: robotSelectors.getRunTime(state),
