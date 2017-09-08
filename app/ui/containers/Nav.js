@@ -12,7 +12,7 @@ import {
   selectors as robotSelectors
 } from '../robot'
 
-import App from '../components/App'
+import SideBar from '../components/SideBar'
 
 const mapStateToProps = (state) => {
   return {
@@ -24,16 +24,7 @@ const mapStateToProps = (state) => {
     isConnected: state.robot.isConnected,
     isReadyToRun: robotSelectors.getIsReadyToRun(state),
     isRunning: state.robot.isRunning,
-    isPaused: state.robot.isPaused,
-    connectionStatus: robotSelectors.getConnectionStatus(state),
-
-    // protocol
-    protocolName: robotSelectors.getProtocolName(state),
-    commands: robotSelectors.getCommands(state),
-    runProgress: robotSelectors.getRunProgress(state),
-
-    // TODO(mc): remove development hardcoded values
-    errors: []
+    connectionStatus: robotSelectors.getConnectionStatus(state)
   }
 }
 
@@ -46,17 +37,14 @@ const mapDispatchToProps = (dispatch) => {
     // robot
     // TODO(mc): revisit when robot discovery / multiple robots is addressed
     onConnectClick: () => dispatch(robotActions.connect()),
-    onRunClick: () => dispatch(robotActions.run()),
-    onPauseClick: () => dispatch(robotActions.pause()),
-    onResumeClick: () => dispatch(robotActions.resume()),
-    onCancelClick: () => dispatch(robotActions.cancel())
+    onRunClick: () => dispatch(robotActions.run())
   }
 }
 
-function Root (props) {
+function Nav (props) {
   return (
-    <App {...props} />
+    <SideBar {...props} />
   )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Root)
+export default connect(mapStateToProps, mapDispatchToProps)(Nav)

@@ -24,18 +24,18 @@ class RobotTest(unittest.TestCase):
 
     def test_add_container(self):
         c1 = self.robot.add_container('96-flat', 'A1')
-        res = self.robot.containers()
-        expected = {
-            '96-flat': c1
-        }
+        res = self.robot.get_containers()
+        expected = [
+            c1
+        ]
         self.assertEquals(res, expected)
 
         c2 = self.robot.add_container('96-flat', 'A2', 'my-special-plate')
-        res = self.robot.containers()
-        expected = {
-            '96-flat': c1,
-            'my-special-plate': c2
-        }
+        res = self.robot.get_containers()
+        expected = [
+            c1,
+            c2
+        ]
         self.assertEquals(res, expected)
 
     def test_comment(self):

@@ -1,0 +1,96 @@
+.nav_panel {
+  display: grid;
+  height: 100%;
+  padding: 0 1rem;
+  grid-template:
+    'details' 675px
+    'connect_toggle' auto;
+  font-family: 'sans';
+  font-size: 14px;
+  line-height: 2rem;
+  color: grey;
+}
+
+/* Upload */
+.choose_file {
+  grid-area: details;
+  position: relative;
+  padding: 2rem 0.5rem 0.5rem;
+}
+
+.btn {
+  composes: btn from './Util.css';
+  width: 100%;
+  display: block;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding-left: 2rem;
+  text-align: left;
+  background-size: 1rem;
+  background-repeat: no-repeat;
+  background-position: 0.5rem center;
+  margin-bottom: 0.5rem;
+}
+
+.btn_upload {
+  composes: btn;
+  background-image: url(../../ui/img/icon_fileupload.svg);
+}
+
+.btn_new {
+  composes: btn;
+  background-image: url(../../ui/img/icon_filenew.svg);
+}
+
+.file {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Connect */
+
+.connection_info {
+  grid-area: details;
+  padding: 3rem 1rem;
+}
+
+.connection_toggle {
+  grid-area: connect_toggle;
+  padding: 1rem;
+}
+
+.btn_connect {
+  composes: btn;
+  padding-left: 0;
+  text-align: center;
+}
+
+/* Setup */
+
+.links {
+  grid-area: details;
+  padding-top: 2rem;
+}
+
+.links > a {
+  display: block;
+  color: silver;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1rem;
+  line-height: 3rem;
+}
+
+.btn_run {
+  composes: btn;
+  background-color: transparent;
+
+  /* TODO: extract assets from soon to be updated sketch files */
+  background-image: url(../../ui/img/icon_fileupload.svg);
+}

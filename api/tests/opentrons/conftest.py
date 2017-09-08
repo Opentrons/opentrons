@@ -58,34 +58,44 @@ def protocol(request):
 
 
 @pytest.fixture
-def robot_container(loop, request):
-    from opentrons.server import robot_container
-    container = robot_container.RobotContainer(
-        loop=loop,
-        filters=['add-command', 'move-to'])
-    yield container
-    container.finalize()
+def session_manager(loop):
+    from opentrons.session import SessionManager
+    with SessionManager(loop=loop) as s:
+        # We are adding this so more notifications are generated
+        # during the run, in addition to default ones
+        s.notifications.append_filters(['move-to'])
+        yield s
+    return
 
 
 @pytest.fixture
-def session(loop, test_client, request):
-    server = rpc.Server(loop=loop)
+def session(loop, test_client, request, session_manager):
+    """
+    Create testing session. Tests using this fixture are expected
+    to have @pytest.mark.parametrize('root', [value]) decorator set.
+    If not set root will be defaulted to None
+    """
+    root = None
+    try:
+        root = request.getfuncargvalue('root')
+        if not root:
+            root = session_manager
+        root.init(loop)
+    except Exception as e:
+        pass
+
+    server = rpc.Server(loop=loop, root=root)
     client = loop.run_until_complete(test_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
     token = str(uuid())
 
-    async def call(obj=None, name=None, args=None):
+    async def call(**kwargs):
         request = {
             '$': {
                 'token': token
             },
-            'id': id(obj)
         }
-        if name is not None:
-            request['name'] = name
-        if args is not None:
-            request['args'] = args
-
+        request.update(kwargs)
         return await socket.send_json(request)
 
     def finalizer():
