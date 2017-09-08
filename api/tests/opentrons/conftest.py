@@ -48,22 +48,22 @@ Protocol = namedtuple(
 
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
-    text = None
+    try:
+        root = request.getfuncargvalue('protocol_file')
+    except Exception as e:
+        root = request.param
+
     filename = os.path.join(os.path.dirname(__file__), 'data', request.param)
 
     with open(filename) as file:
         text = ''.join(list(file))
-
-    return Protocol(text=text, filename=filename)
+        return Protocol(text=text, filename=filename)
 
 
 @pytest.fixture
 def session_manager(loop):
     from opentrons.session import SessionManager
     with SessionManager(loop=loop) as s:
-        # We are adding this so more notifications are generated
-        # during the run, in addition to default ones
-        s.notifications.append_filters(['move-to'])
         yield s
     return
 

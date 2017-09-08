@@ -8,6 +8,7 @@ from opentrons.containers.placeable import (
 )
 from opentrons.helpers import helpers
 from opentrons.instruments.instrument import Instrument
+from opentrons.broker import both
 
 
 class Pipette(Instrument):
@@ -273,6 +274,10 @@ class Pipette(Instrument):
 
         return self
 
+    @both(
+        name='robot.command',
+        text='Aspirating {volume} uL from {location} at {rate} speed'
+    )
     def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -349,18 +354,15 @@ class Pipette(Instrument):
         destination = bottom - distance
         speed = self.speeds['aspirate'] * rate
 
-        _description = "Aspirating {0} {1}".format(
-            volume,
-            ('at ' + humanize_location(location) if location else '')
-        )
-
         self._position_for_aspirate(location)
         self.motor.speed(speed)
         self.motor.move(destination)
-        self.robot.add_command(_description)
         self.current_volume += volume  # update after actual aspirate
         return self
 
+    @both(
+        name='robot.command', text='Dispensing {volume} into {location}'
+    )
     def dispense(self,
                  volume=None,
                  location=None,
@@ -441,11 +443,6 @@ class Pipette(Instrument):
         self.motor.move(destination)
         self.current_volume -= volume  # update after actual dispense
 
-        _description = "Dispensing {0} {1}".format(
-            volume,
-            ('at ' + humanize_location(location) if location else '')
-        )
-        self.robot.add_command(_description)
         return self
 
     def _position_for_aspirate(self, location=None):
@@ -469,6 +466,9 @@ class Pipette(Instrument):
                 location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 
+    @both(
+        name='robot.command',
+        text='Mixing {repetitions} times with a volume of {volume}ul')
     def mix(self,
             repetitions=1,
             volume=None,
@@ -526,7 +526,6 @@ class Pipette(Instrument):
         _description = "Mixing {0} times with a volume of {1}ul".format(
             repetitions, self.max_volume if volume is None else volume
         )
-        self.robot.add_command(_description)
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
@@ -539,6 +538,7 @@ class Pipette(Instrument):
 
         return self
 
+    @both(name='robot.command', text='Blowing out at {location}')
     def blow_out(self, location=None):
         """
         Force any remaining liquid to dispense, by moving
@@ -573,12 +573,9 @@ class Pipette(Instrument):
         self.motor.move(self._get_plunger_position('blow_out'))
         self.current_volume = 0
 
-        _description = "Blowing out {}".format(
-            'at ' + humanize_location(location) if location else ''
-        )
-        self.robot.add_command(_description)
         return self
 
+    @both(name='robot.command', description='Touching tip')
     def touch_tip(self, location=None, radius=1.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
@@ -644,10 +641,9 @@ class Pipette(Instrument):
 
         [self.move_to((location, e), strategy='direct') for e in well_edges]
 
-        _description = 'Touching tip'
-        self.robot.add_command(_description)
         return self
 
+    @both(name='robot.command', text='Air gap')
     def air_gap(self, volume=None, height=None):
         """
         Pull air into the :any:`Pipette` current tip
@@ -696,10 +692,10 @@ class Pipette(Instrument):
         # "move_to" separate from aspirate command
         # so "_position_for_aspirate" isn't executed
         self.move_to(location)
-        self.robot.add_command(_description)
         self.aspirate(volume)
         return self
 
+    @both(name='robot.command', text='Returning tip')
     def return_tip(self, home_after=True):
         """
         Drop the pipette's current tip to it's originating tip rack
@@ -732,16 +728,14 @@ class Pipette(Instrument):
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
-        _description = "Returning tip"
-
         if not self.current_tip():
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        self.robot.add_command(_description)
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
+    @both(name='robot.command', text='Picking up tip {location}')
     def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
@@ -809,9 +803,9 @@ class Pipette(Instrument):
             ('from ' + humanize_location(location) if location else '')
         )
 
-        self.robot.add_command(_description)
         return self
 
+    @both(name='robot.command', text='Dropping tip {location}')
     def drop_tip(self, location=None, home_after=True):
         """
         Drop the pipette's current tip
@@ -872,12 +866,9 @@ class Pipette(Instrument):
         self.current_volume = 0
         self.current_tip(None)
 
-        _description = "Drop_tip {}".format(
-            ('at ' + humanize_location(location) if location else '')
-        )
-        self.robot.add_command(_description)
         return self
 
+    @both(name='robot.command', text='Homing')
     def home(self):
 
         """
@@ -907,10 +898,12 @@ class Pipette(Instrument):
             self.axis
         )
 
-        self.robot.add_command(_description)
         return self
 
-    def distribute(self, *args, **kwargs):
+    @both(
+        name='robot.command',
+        text='Distributing {volume} from {source} to {dest}')
+    def distribute(self, volume, source, dest, *args, **kwargs):
         """
         Distribute will move a volume of liquid from a single of source
         to a list of target locations. See :any:`Transfer` for details
@@ -931,13 +924,17 @@ class Pipette(Instrument):
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        args = [volume, source, dest, *args]
         kwargs['mode'] = 'distribute'
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
             kwargs['disposal_vol'] = self.min_volume
         return self.transfer(*args, **kwargs)
 
-    def consolidate(self, *args, **kwargs):
+    @both(
+        name='robot.command',
+        text='Consolidating {volume} from {source} to {dest}')
+    def consolidate(self, volume, source, dest, *args, **kwargs):
         """
         Consolidate will move a volume of liquid from a list of sources
         to a single target location. See :any:`Transfer` for details
@@ -965,6 +962,9 @@ class Pipette(Instrument):
 
         return self.transfer(*args, **kwargs)
 
+    @both(
+        name='robot.command',
+        text='Transferring {volume} from {source} to {dest}')
     def transfer(self, volume, source, dest, **kwargs):
 
         """
@@ -1080,6 +1080,9 @@ class Pipette(Instrument):
 
         return self
 
+    @both(
+        name='robot.command',
+        text='Delaying for {minutes}m {seconds}s')
     def delay(self, seconds=0, minutes=0):
         """
         Parameters
@@ -1097,7 +1100,6 @@ class Pipette(Instrument):
 
         self.motor.wait(seconds)
 
-        self.robot.add_command(_description)
         return self
 
     def calibrate(self, position):

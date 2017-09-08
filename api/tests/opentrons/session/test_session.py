@@ -1,27 +1,26 @@
 import pytest
 
 from datetime import datetime
+from opentrons.broker import notify
 
 from opentrons.session import Session
-from opentrons.util.trace import EventBroker
-
 
 async def test_load_from_text(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert session.name == '<blank>'
+    print(session.commands)
     assert len(session.commands) == 101
 
 
 async def test_async_notifications(session_manager):
-    session_manager.notifications.update_filters(['bar'])
-    EventBroker.get_instance().notify({'name': 'bar'})
+    notify('session.state.change', {})
     # Get async iterator
     aiter = session_manager.notifications.__aiter__()
     # Then read the first item
     res = await aiter.__anext__()
     # Returns tuple containing message and session
     # Since protocol hasn't been loaded, session is None
-    assert res == ({'name': 'bar'}, None)
+    assert res == ('session.state.change', {})
 
 
 async def test_load_protocol_with_error(session_manager):
@@ -80,7 +79,7 @@ def test_init(run_session):
 
 
 def test_set_state(run_session):
-    states = 'loaded', 'running', 'error', 'finished', 'stopped', 'paused'
+    states = 'loaded', 'running', 'finished', 'stopped', 'paused'
     for state in states:
         run_session.set_state(state)
         assert run_session.state == state
@@ -144,9 +143,9 @@ def test_set_commands(run_session):
 
 
 def test_log_append(run_session):
-    run_session.log_append('A')
-    run_session.log_append('B')
-    run_session.log_append('C')
+    run_session.log_append()
+    run_session.log_append()
+    run_session.log_append()
 
     run_log = {
         _id: value
@@ -163,13 +162,13 @@ def test_error_append(run_session):
     run_session.error_append(foo)
     run_session.error_append(bar)
 
-    errors = {
-        _id: value
-        for _id, value in run_session.errors.items()
+    errors = [
+        value
+        for value in run_session.errors
         if datetime.strptime(value.pop('timestamp'), '%Y-%m-%dT%H:%M:%S.%f')
-    }
+    ]
 
-    assert errors == {
-        0: {'error': foo},
-        1: {'error': bar},
-    }
+    assert errors == [
+        {'error': foo},
+        {'error': bar}
+    ]

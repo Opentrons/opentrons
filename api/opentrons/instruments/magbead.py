@@ -1,4 +1,5 @@
 from opentrons.instruments.instrument import Instrument
+from opentrons.broker import before
 
 
 class Magbead(Instrument):
@@ -43,9 +44,14 @@ class Magbead(Instrument):
 
         """
         self.engaged = True
-        self.motor.engage()
-        _description = "Engaging Magbead at mosfet #{}".format(self.motor)
-        self.robot.add_command(_description)
+
+        @before(
+            name='robot.command',
+            text="Engaging Magbead at mosfet #{motor}")
+        def _engage(motor):
+            motor.engage()
+
+        _engage(self.motor)
         return self
 
     def disengage(self):
@@ -55,11 +61,19 @@ class Magbead(Instrument):
 
         """
         self.engaged = False
-        self.motor.disengage()
-        _description = "Engaging Magbead at mosfet #{}".format(self.motor)
-        self.robot.add_command(_description)
+
+        @before(
+            name='robot.command',
+            text="Disengaging Magbead at mosfet #{motor}")
+        def _disengage(motor):
+            motor.disengage()
+
+        _disengage(self.motor)
         return self
 
+    @before(
+        name='robot.command',
+        text="Delaying {minutes} minutes and {seconds} seconds")
     def delay(self, seconds=0, minutes=0):
         """
         Pause the robot for a given number of seconds
@@ -72,9 +86,6 @@ class Magbead(Instrument):
         """
         minutes += int(seconds / 60)
         seconds = int(seconds % 60)
-        _description = "Delaying {} minutes and {} seconds".format(
-            minutes, seconds)
-        self.robot.add_command(_description)
         seconds += (minutes * 60)
         self.motor.wait(seconds)
         return self

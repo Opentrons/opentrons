@@ -3,11 +3,11 @@ import os
 from threading import Event
 
 from opentrons import containers, drivers
+from opentrons import helpers
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.helpers import helpers
-from opentrons.util.trace import traceable
-
+from opentrons.broker import before, both
+from opentrons.util import calltree
 
 log = get_logger(__name__)
 
@@ -184,7 +184,6 @@ class Robot(object):
         self.set_connection('simulate')
         self.reset()
 
-    @helpers.not_app_run_safe
     def reset(self):
         """
         Resets the state of the robot and clears:
@@ -303,7 +302,6 @@ class Robot(object):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
-    @helpers.not_app_run_safe
     def connect(self, port=None, options=None):
         """
         Connects the robot to a serial port.
@@ -374,15 +372,9 @@ class Robot(object):
             self._driver.home('z')
             self._driver.home('x', 'y', 'b', 'a')
 
-    @traceable('add-command')
-    def add_command(self, command):
-        self._commands.append(command)
-
-    @helpers.not_app_run_safe
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
-    @helpers.not_app_run_safe
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -407,7 +399,7 @@ class Robot(object):
         """
         self._driver.set_speed(*args, **kwargs)
 
-    @traceable('move-to')
+    @before(name='robot.move')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -592,7 +584,6 @@ class Robot(object):
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
-    @helpers.not_app_run_safe
     def disconnect(self):
         """
         Disconnects from the robot.
@@ -798,17 +789,6 @@ class Robot(object):
             }
         }
 
-    def commands(self):
-        """
-        Access the human-readable list of commands in the robot's queue.
-
-        Returns
-        -------
-        A list of string values for each command in the queue, for example:
-
-        ``'Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>'``
-        """
-        return self._commands
-
+    @before(name='robot.command')
     def comment(self, msg):
-        self.add_command(msg)
+        pass
