@@ -4,6 +4,7 @@
 
 import pytest
 import os
+import re
 
 from collections import namedtuple
 from opentrons.server import rpc
@@ -103,3 +104,30 @@ def session(loop, test_client, request, session_manager):
 
     request.addfinalizer(finalizer)
     return Session(server, socket, token, call)
+
+
+def fuzzy_assert(result, expected):
+    expected_re = ['.*'.join(['^'] + item + ['$']) for item in expected]
+
+    assert len(result) == len(expected_re), \
+        'result and expected have different length'
+
+    for res, exp in zip(result, expected_re):
+        assert re.compile(
+            exp.lower()).match(res.lower()), "{} didn't match {}" \
+            .format(res, exp)
+
+
+def patch_robot(robot, commands):
+        """
+        Monkeypatching for backwards compatibility when robot used to have
+        commands
+        """
+        def get_commands():
+            return commands
+
+        def clear_commands():
+            commands.clear()
+
+        setattr(robot, 'commands', get_commands)
+        setattr(robot, 'clear_commands', clear_commands)

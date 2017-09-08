@@ -96,11 +96,10 @@ def subscribe(topics, handler=None, loop=None):
         handler = notifications.on_notify
 
     listener = [set(topics), handler]
+    listeners.append(listener)
 
     def unsubscribe():
         listeners.remove(listener)
-
-    listeners.append(listener)
 
     if notifications:
         return (unsubscribe, notifications)

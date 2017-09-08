@@ -575,7 +575,7 @@ class Pipette(Instrument):
 
         return self
 
-    @both(name='robot.command', description='Touching tip')
+    @both(name='robot.command', text='Touching tip')
     def touch_tip(self, location=None, radius=1.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
@@ -959,7 +959,7 @@ class Pipette(Instrument):
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
-
+        args = [volume, source, dest, *args]
         return self.transfer(*args, **kwargs)
 
     @both(

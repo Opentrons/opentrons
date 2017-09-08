@@ -152,7 +152,6 @@ class Robot(object):
         only once instance of a robot.
         """
 
-        self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
@@ -193,7 +192,6 @@ class Robot(object):
             * Runtime warnings
 
         """
-        self._commands = []
         self._runtime_warnings = []
 
         self._previous_container = None
@@ -539,13 +537,6 @@ class Robot(object):
             {'z': arrival_z}
         ]
 
-    @property
-    def actions(self):
-        """
-        Return a copy of a raw list of commands in the Robot's queue.
-        """
-        return copy.deepcopy(self._commands)
-
     def prepare_for_run(self):
         """
         Internal. Prepare for a Robot's run.
@@ -557,8 +548,6 @@ class Robot(object):
 
         if not self._instruments:
             self.add_warning('No instruments added to robot')
-        if not self._commands:
-            self.add_warning('No commands added to robot')
 
         for instrument in self._instruments.values():
             instrument.reset()
@@ -693,13 +682,6 @@ class Robot(object):
                 instr.update_calibrator()
         return container
 
-    def clear_commands(self):
-        """
-        Clear Robot's command queue.
-        """
-        self._previous_container = None
-        self._commands = []
-
     def pause(self):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -789,6 +771,6 @@ class Robot(object):
             }
         }
 
-    @before(name='robot.command')
+    @before(name='robot.command', text='{msg}')
     def comment(self, msg):
         pass

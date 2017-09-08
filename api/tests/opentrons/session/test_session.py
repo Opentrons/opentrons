@@ -1,3 +1,4 @@
+import itertools
 import pytest
 
 from datetime import datetime
@@ -8,8 +9,16 @@ from opentrons.session import Session
 async def test_load_from_text(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert session.name == '<blank>'
-    print(session.commands)
-    assert len(session.commands) == 101
+
+    acc = []
+
+    def traverse(commands):
+        for command in commands:
+            acc.append(command)
+            traverse(command['children'])
+    traverse(session.commands)
+
+    assert len(acc) == 105
 
 
 async def test_async_notifications(session_manager):
@@ -30,7 +39,7 @@ async def test_load_protocol_with_error(session_manager):
 
     args, = e.value.args
     timestamp = args['timestamp']
-    exception, trace = args['error']
+    exception = args['error']
 
     assert datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
     assert type(exception) == NameError
@@ -43,34 +52,35 @@ async def test_load_and_run(session_manager, protocol):
     assert session.command_log == {}
     assert session.state == 'loaded'
     session.run(devicename='Virtual Smoothie')
-    assert len(session.command_log) == 101
+    assert len(session.command_log) == 105
 
     res = []
     index = 0
     async for notification in session_manager.notifications:
         assert isinstance(notification, tuple), "notification is a tuple"
-        event, s = notification
-        if (event['name'] == 'add-command'):
+        name, s = notification
+        if (name == 'session.state.change'):
             index += 1  # Command log in sync with add-command events emitted
-        assert len(s.command_log) == index
         assert isinstance(s, Session), "second element is Session"
-        if event['name'] == 'session.state.change':
-            state = event['arguments']['state']
-            res.append(state)
-            if state == 'finished':
+        if name == 'session.state.change':
+            res.append(s.state)
+            if s.state == 'finished':
                 break
 
-    assert res == ['running', 'finished'], 'Run should emit state change to "running" and then to "finished"'  # noqa
+    assert [key for key, _ in itertools.groupby(res)] == \
+        ['loaded', 'running', 'finished'], \
+        'Run should emit state change to "running" and then to "finished"'
     assert session_manager.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
     session.run(devicename='Virtual Smoothie')
-    assert len(session.command_log) == 101, \
+    assert len(session.command_log) == 105, \
         "Clears command log on the next run"
 
 
 @pytest.fixture
 def run_session():
-    return Session('dino', 'from opentrons import robot')
+    with Session('dino', 'from opentrons import robot') as s:
+        yield s
 
 
 def test_init(run_session):
@@ -90,9 +100,9 @@ def test_set_state(run_session):
 
 def test_set_commands(run_session):
     run_session.load_commands([
-        {'level': 0, 'description': 'A'},
-        {'level': 0, 'description': 'B'},
-        {'level': 0, 'description': 'C'}
+        {'level': 0, 'description': 'A', 'id': 0},
+        {'level': 0, 'description': 'B', 'id': 1},
+        {'level': 0, 'description': 'C', 'id': 2}
     ])
 
     assert run_session.commands == [
@@ -114,10 +124,10 @@ def test_set_commands(run_session):
     ]
 
     run_session.load_commands([
-        {'level': 0, 'description': 'A'},
-        {'level': 1, 'description': 'B'},
-        {'level': 2, 'description': 'C'},
-        {'level': 0, 'description': 'D'},
+        {'level': 0, 'description': 'A', 'id': 0},
+        {'level': 1, 'description': 'B', 'id': 1},
+        {'level': 2, 'description': 'C', 'id': 2},
+        {'level': 0, 'description': 'D', 'id': 3},
     ])
 
     assert run_session.commands == [

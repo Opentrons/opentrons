@@ -1,7 +1,6 @@
-from opentrons.session import Session
+# from opentrons.session import Session
 
 
-def test_command_tree(protocol):
-    session = Session('dino', protocol.text)
-    _, commands = session.run()
-    print(commands)
+# def test_command_tree(protocol):
+#     session = Session('dino', protocol.text)
+#     print(session.commands)

@@ -7,6 +7,9 @@ from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
 from opentrons.util.vector import Vector
 
+from tests.opentrons.conftest import patch_robot
+from opentrons.broker import subscribe
+
 
 class RobotTest(unittest.TestCase):
     def setUp(self):
@@ -17,6 +20,17 @@ class RobotTest(unittest.TestCase):
         self.robot.reset()
         self.robot.connect(options={'firmware': self.smoothie_version})
         self.robot.home(enqueue=False)
+
+        commands = []
+        def on_command(name, payload):
+            if payload['$'] == 'before':
+                commands.append(payload['text'].format(**payload))
+        patch_robot(self.robot, commands)
+        self.unsubscribe, = subscribe(['robot.command'], on_command)
+
+    def tearDown(self):
+        self.unsubscribe()
+        del self.robot
 
     def test_firmware_verson(self):
         self.assertEquals(
@@ -42,7 +56,7 @@ class RobotTest(unittest.TestCase):
         self.robot.clear_commands()
         self.robot.comment('hello')
         self.assertEquals(len(self.robot.commands()), 1)
-        self.assertEquals(self.robot._commands[0], 'hello')
+        self.assertEquals(self.robot.commands()[0], 'hello')
 
     def test_home_after_disconnect(self):
         self.robot._driver.connection = None
@@ -168,7 +182,7 @@ class RobotTest(unittest.TestCase):
     def test_robot_pause_and_resume(self):
         self.robot.move_to((Deck(), (100, 0, 0)))
         self.robot.move_to((Deck(), (101, 0, 0)))
-        self.assertEqual(len(self.robot._commands), 0)
+        self.assertEqual(len(self.robot.commands()), 0)
 
         #
         # FIXME: pause and resume can't be measured based on whether commands

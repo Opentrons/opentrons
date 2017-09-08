@@ -1,5 +1,6 @@
 import ast
 import copy
+import itertools
 import sys
 
 from opentrons import robot
@@ -18,16 +19,28 @@ class SessionManager(object):
         self.unsubscribe, self.notifications = \
             subscribe(['session.state.change'], loop=loop)
         self.robot = Robot()
+        self.sessions = []
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.clear()
         self.unsubscribe()
 
+    def clear(self):
+        for session in self.sessions:
+            session.close()
+        self.sessions.clear()
+
     def create(self, name, text):
+        self.clear()
+
         with self.notifications.snooze():
             self.session = Session(name=name, text=text)
+            self.sessions.append(self.session)
+        # Can't do it from session's __init__ because notifications are snoozed
+        self.session.set_state('loaded')
         return self.session
 
     def get_session(self):
@@ -41,13 +54,25 @@ class Session(object):
         self.state = None
         self.unsubscribe, = subscribe(
             ['robot.command'], self.on_command)
-        self.refresh()
+
+        try:
+            self.refresh()
+        except Exception as e:
+            self.close()
+            raise e
 
     def on_command(self, name, event):
-        self.log_append()
+        if event['$'] == 'before':
+            self.log_append()
 
     def close(self):
         self.unsubscribe()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
     def reset(self):
         self.command_log = {}
@@ -64,7 +89,10 @@ class Session(object):
 
             if payload['$'] == 'before':
                 commands.append(
-                    {'level': len(stack), 'description': description})
+                    {
+                        'level': len(stack),
+                        'description': description,
+                        'id': len(commands)})
                 stack.append(payload)
             else:
                 stack.pop()
@@ -115,10 +143,10 @@ class Session(object):
         self.reset()
 
         if devicename is not None:
+            self.set_state('running')
             robot.connect(devicename)
 
         try:
-            self.set_state('running')
             exec(self.protocol, {})
         except Exception as e:
             self.error_append(e)
@@ -143,21 +171,33 @@ class Session(object):
         updates self.commands with a dictionary that holds
         a command tree.
         """
-        print('\n'.join([" " * i['level'] + i['description'] for i in commands]))
-        # index = range(len(commands))
+        def subtrees(commands, level):
+            if not commands:
+                return
 
-        def children(commands, level=0):
+            acc = []
+            parent, *commands = commands
+
+            for command in commands:
+                if command['level'] > level:
+                    acc.append(command)
+                else:
+                    yield (parent, acc)
+                    parent = command
+                    acc.clear()
+            yield (parent, acc)
+
+        def walk(commands, level=0):
             return [
                 {
-                    'description': command['description'],
-                    'children': children(commands[index:], level+1),
-                    'id': next(index)
+                    'description': key['description'],
+                    'children': walk(subtree, level+1),
+                    'id': key['id']
                 }
-                for command in commands
-                if command['level'] == level
+                for key, subtree in subtrees(commands, level)
             ]
 
-        self.commands = children(commands)
+        self.commands = walk(commands)
 
     def log_append(self):
         self.command_log.update({

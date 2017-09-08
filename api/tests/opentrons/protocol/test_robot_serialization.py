@@ -5,10 +5,24 @@ from opentrons import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 
+from tests.opentrons.conftest import patch_robot
+from opentrons.broker import subscribe
+
 
 class RobotSerializationTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
+        commands = []
+
+        def on_command(name, payload):
+            if payload['$'] == 'before':
+                commands.append(payload['text'].format(**payload))
+        patch_robot(self.robot, commands)
+        self.unsubscribe, = subscribe(['robot.command'], on_command)
+
+    def tearDown(self):
+        self.unsubscribe()
+        del self.robot
 
     def test_serializing_and_deserializing_unconfigured_robot(self):
         robot_as_bytes = dill.dumps(self.robot)
@@ -22,11 +36,11 @@ class RobotSerializationTestCase(unittest.TestCase):
         for well in plate:
             p200.aspirate(well).delay(5).dispense(well)
 
-        original_robot_cmd_cnts = len(self.robot._commands)
+        original_robot_cmd_cnts = len(self.robot.commands())
         robot_as_bytes = dill.dumps(self.robot)
         self.assertIsInstance(robot_as_bytes, bytes)
         deserialized_robot = dill.loads(robot_as_bytes)
-        deserialized_robot_cmd_cnts = len(deserialized_robot._commands)
+        deserialized_robot_cmd_cnts = len(deserialized_robot.commands())
         self.assertEqual(deserialized_robot_cmd_cnts, original_robot_cmd_cnts)
 
         original_robot_instruments = self.robot.get_instruments()
@@ -63,13 +77,13 @@ class RobotSerializationTestCase(unittest.TestCase):
         self.make_commands(p200, plate, p100, plate)
 
         # original_robot_cmds_txt = self.robot.commands()
-        original_robot_cmd_cnts = len(self.robot._commands)
+        original_robot_cmd_cnts = len(self.robot.commands())
 
         robot_as_bytes = dill.dumps(self.robot)
         self.assertIsInstance(robot_as_bytes, bytes)
 
         deserialized_robot = dill.loads(robot_as_bytes)
-        deserialized_robot_cmd_cnts = len(deserialized_robot._commands)
+        deserialized_robot_cmd_cnts = len(deserialized_robot.commands())
 
         # Check commands are unmarshalled
         self.assertEqual(deserialized_robot_cmd_cnts, original_robot_cmd_cnts)
