@@ -5,7 +5,7 @@ from opentrons import containers, drivers
 from opentrons import helpers
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.broker import before
+from opentrons.broker import publish
 
 log = get_logger(__name__)
 
@@ -395,7 +395,7 @@ class Robot(object):
         """
         self._driver.set_speed(*args, **kwargs)
 
-    @before(name='robot.move')
+    @publish.before(name='robot.move')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -769,6 +769,6 @@ class Robot(object):
             }
         }
 
-    @before(name='robot.command', text='{msg}')
+    @publish.before(name='robot.command', text='{msg}')
     def comment(self, msg):
         pass

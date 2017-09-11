@@ -1,5 +1,5 @@
 from opentrons.instruments.instrument import Instrument
-from opentrons.broker import before
+from opentrons.broker import publish
 
 
 class Magbead(Instrument):
@@ -45,7 +45,7 @@ class Magbead(Instrument):
         """
         self.engaged = True
 
-        @before(
+        @publish.before(
             name='robot.command',
             text="Engaging Magbead at mosfet #{motor}")
         def _engage(motor):
@@ -62,7 +62,7 @@ class Magbead(Instrument):
         """
         self.engaged = False
 
-        @before(
+        @publish.before(
             name='robot.command',
             text="Disengaging Magbead at mosfet #{motor}")
         def _disengage(motor):
@@ -71,7 +71,7 @@ class Magbead(Instrument):
         _disengage(self.motor)
         return self
 
-    @before(
+    @publish.before(
         name='robot.command',
         text="Delaying {minutes} minutes and {seconds} seconds")
     def delay(self, seconds=0, minutes=0):

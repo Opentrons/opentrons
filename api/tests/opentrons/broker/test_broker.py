@@ -1,19 +1,19 @@
-from opentrons.broker import both, subscribe
+from opentrons.broker import publish, subscribe
 
 
-@both(name='command', text='{arg1} {arg2} {arg3}')
+@publish.both(name='command', text='{arg1} {arg2} {arg3}')
 def A(arg1, arg2, arg3='foo'):
     B(0)
     return 100
 
 
-@both(name='command', text='{arg1} {arg2} {arg3}')
+@publish.both(name='command', text='{arg1} {arg2} {arg3}')
 def C(arg1, arg2, arg3='bar'):
     B(0)
     return 100
 
 
-@both(name='command', text='{arg1}')
+@publish.both(name='command', text='{arg1}')
 def B(arg1):
     return None
 
