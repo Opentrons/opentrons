@@ -9,8 +9,7 @@ export default class RunLog extends Component {
   }
 
   render () {
-    const { style, commands } = this.props
-
+    const {style, commands} = this.props
     const makeCommandToTemplateMapper = (depth) => (command) => {
       const {id, isCurrent, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
