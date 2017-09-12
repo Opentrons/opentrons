@@ -14,8 +14,6 @@ def test_add_container_to_deck(robot):
 
 def test_calibrate_plate(robot, tmpdir):
     build_temp_db(tmpdir)
-
-
     #Load container | Test positions of container and wells
     plate = containers_load(robot, '96-flat', 'A1')
     assert approx(robot.position_tracker[plate].position)           == 45
@@ -59,4 +57,7 @@ def test_max_z(robot, tmpdir):
     assert robot.position_tracker.max_z_in_subtree(deck)            == 46
 
 
-
+def test_get_object_children(robot):
+    plate = containers_load('96-flat', 'B2')
+    children = robot.position_tracker.get_object_children(plate)
+    children == plate.get_children_list()

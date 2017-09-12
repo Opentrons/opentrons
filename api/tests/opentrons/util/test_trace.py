@@ -1,4 +1,6 @@
 import unittest
+from opentrons.util.testing.fixtures import robot, message_broker
+from opentrons.pubsub_util import topics
 from opentrons.util.trace import (
     MessageBroker,
     traceable
@@ -6,81 +8,37 @@ from opentrons.util.trace import (
 from opentrons.pubsub_util import topics
 
 
-class TraceTestCase(unittest.TestCase):
-    class MyClass(object):
-        @traceable('my-event-A')
-        def event_A(self, arg1, arg2, arg3='foo'):
-            return 100
+def test_subscription(message_broker):
+    def test():
+        pass
+    message_broker.subscribe(topics.MISC, test)
+    assert topics.MISC in message_broker.topics_and_funcs
+    assert test in message_broker.topics_and_funcs[topics.MISC]
 
-        @traceable
-        def event_B(self, arg1):
-            return None
+def test_single_publish(message_broker):
+    message = "tester message!"
+    test_check = False
+    def test(rcv_msg):
+        nonlocal test_check
+        if message == rcv_msg:
+            test_check = True
+    message_broker.subscribe(topics.MISC, test)
+    message_broker.publish(topics.MISC, message)
+    assert test_check
 
-    def setUp(self):
-        self.my_object = TraceTestCase.MyClass()
-        self.events = []
+def test_publish_to_multiple_subscribers(message_broker):
+    message = "tester message!"
+    test_check1, test_check2 = False, False
+    def test1(rcv_msg):
+        nonlocal test_check1
+        if message == rcv_msg:
+            test_check1 = True
 
-    def log(self, info):
-        self.events.append(info)
-
-    def test_add_listener(self):
-        MessageBroker.get_instance().subscribe(topics.MISC, self.log)
-        expected_results = []
-
-        # Test positional args
-        self.my_object.event_A(1, 2)
-        expected_results.append({
-            'arguments': {
-                'arg1': 1,
-                'arg2': 2,
-                'arg3': 'foo',
-                'self': self.my_object
-            },
-            'name': 'my-event-A',
-            'function': 'TraceTestCase.MyClass.event_A',
-            'result': 100
-        })
-        self.assertDictEqual(expected_results[-1], self.events[-1])
-
-        # Test named args
-        self.my_object.event_A(arg1=1, arg2=2)
-        expected_results.append({
-            'arguments': {
-                'arg1': 1,
-                'arg2': 2,
-                'arg3': 'foo',
-                'self': self.my_object
-            },
-            'name': 'my-event-A',
-            'function': 'TraceTestCase.MyClass.event_A',
-            'result': 100
-        })
-        self.assertDictEqual(expected_results[-1], self.events[-1])
-
-        # Override defaults, and use mixed positonal/named args
-        self.my_object.event_A(1, arg2=2, arg3='bar')
-        expected_results.append({
-            'arguments': {
-                'arg1': 1,
-                'arg2': 2,
-                'arg3': 'bar',
-                'self': self.my_object
-            },
-            'name': 'my-event-A',
-            'function': 'TraceTestCase.MyClass.event_A',
-            'result': 100
-        })
-        self.assertDictEqual(expected_results[-1], self.events[-1])
-
-        # Call event with default name
-        self.my_object.event_B(1)
-        expected_results.append({
-            'arguments': {
-                'arg1': 1,
-                'self': self.my_object
-            },
-            'name': 'TraceTestCase.MyClass.event_B',
-            'function': 'TraceTestCase.MyClass.event_B',
-            'result': None
-        })
-        self.assertDictEqual(expected_results[-1], self.events[-1])
+    def test2(rcv_msg):
+        nonlocal test_check2
+        if message == rcv_msg:
+            test_check2 = True
+    message_broker.subscribe(topics.MISC, test1)
+    message_broker.subscribe(topics.MISC, test2)
+    message_broker.publish(topics.MISC, message)
+    assert test_check1 and test_check2

@@ -17,6 +17,12 @@ def print_db_path(db):
     print("Database: ",db_info[2])
 
 def build_temp_db(tmpdir):
-    temp_db_fd=tmpdir.mkdir('testing').join("database.db")
-    shutil.copy2(db_path(), str(temp_db_fd))
-    database.change_database(str(temp_db_fd))
+    pass
+    # temp_db_path=tmpdir.mkdir('testing').join("database.db")
+    # print(str(temp_db_path))
+    # shutil.copy2(db_path(), str(temp_db_path))
+    # database.change_database(str(temp_db_path))
+
+def dummy_db(path):
+    shutil.copy2(db_path(), path)
+    database.change_database(str(temp_db_path))

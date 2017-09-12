@@ -15,7 +15,6 @@ def test_calibrated_max_z(robot, tmpdir):
         robot, axis='b', name='my-fancy-pancy-pipette'
     )
     plate = containers_load(robot, '96-flat', 'A1')
-
     assert robot.max_deck_height() == 10.5
 
     robot.move_head(x=10, y=10, z=10)

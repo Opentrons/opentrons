@@ -1,35 +1,6 @@
 from opentrons.instruments import pipette
 from opentrons.containers import placeable
 
-
-def get_state(robot):
-    return [
-        {
-            'axis': inst.axis,
-            'label': inst.name,
-            'channels': inst.channels,
-            'top': inst.positions['top'],
-            'bottom': inst.positions['bottom'],
-            'blow_out': inst.positions['blow_out'],
-            'drop_tip': inst.positions['drop_tip'],
-            'max_volume': inst.max_volume,
-            'calibrated': are_instrument_positions_calibrated(inst),
-            'placeables': [
-                {
-                    'type': container.get_type(),
-                    'label': container.get_name(),
-                    'slot': container.get_parent().get_name(),
-                    'calibrated': is_inst_calibrated_to_container(
-                        inst, container
-                    )
-                }
-                for container in get_unique_containers(inst)
-            ]
-        }
-        for inst in get_all_pipettes(robot)
-    ]
-
-
 def get_unique_containers(instrument):
     """
     Returns all associated containers for an instrument
@@ -45,19 +16,7 @@ def get_unique_containers(instrument):
     return sort_containers(list(unique_containers))
 
 
-def is_inst_calibrated_to_container(instrument, container):
-    """
-    Returns True if instrument holds calibration data for a Container
-    """
-    slot = container.get_parent().get_name()
-    label = container.get_name()
-    data = instrument.calibration_data
-    if slot in data:
-        if label in data[slot].get('children'):
-            return True
-    return False
-
-
+#TODO: I think this should be removed once calibrating with respect to pipette is fully removed
 def are_instrument_positions_calibrated(instrument):
     # TODO: rethink calibrating instruments other than Pipette
     if not isinstance(instrument, pipette.Pipette):

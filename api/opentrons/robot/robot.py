@@ -206,7 +206,6 @@ class Robot(object):
         message_broker = MessageBroker.get_instance()
         self.position_tracker = position_tracker.PositionTracker(message_broker)
         self.position_tracker.create_root_object(HEAD, 0, 0, 0) # 0,0,0, is rel pos of smoothie w.r.t the deck
-
         self._deck = containers.Deck()
         self.setup_deck()
 
@@ -457,12 +456,13 @@ class Robot(object):
         >>> robot.move_to(plate[0].top())
         """
 
-
         placeable, coordinates = containers.unpack_location(location)
 
-        # because the top position is what is tracked, this checks if there's an offset
+        # because the top position is what is tracked, this checks if coordinates doesn't equal top
         offset = coordinates - placeable.top()[1]
         target = self.position_tracker[placeable].position + offset.coordinates
+
+
 
         coordinates = pf.target_pos_for_instrument_positioning(
             self.position_tracker, HEAD, instrument, *target)
@@ -801,12 +801,12 @@ class Robot(object):
     def calibrate_container_with_instrument(self, container: Container, instrument, save: bool):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
-        expected_pose = self.position_tracker[well]
-        expected_pose.z -= well.properties['depth']
-        true_pose = self.position_tracker[instrument]
+        expected_position = self.position_tracker[well].position
+        expected_position[2] -= well.properties['depth'] #calibrate will well bottom, but track top of well
+        true_position = self.position_tracker[instrument].position
         calib.calibrate_container_with_delta(container,
                                              self.position_tracker,
-                                             *(true_pose.position - expected_pose.position), save)
+                                             *(true_position - expected_position), save)
 
     def max_deck_height(self):
         return self.position_tracker.max_z_in_subtree(self._deck)

@@ -14,11 +14,11 @@ from opentrons.containers.placeable import unpack_location, Container, Well
 from opentrons.util.testing.util import build_temp_db
 from opentrons.util.testing.fixtures import robot
 
-@pytest.mark.skip(reason="no way of currently testing this")
 def test_drop_tip_move_to(robot, tmpdir):
+    plate = containers_load(robot, '96-flat', 'A1')
     build_temp_db(tmpdir)
     p200 = Pipette(robot, 'b')
-    plate = containers_load(robot, '96-flat', 'A1')
+
 
     x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
@@ -26,10 +26,10 @@ def test_drop_tip_move_to(robot, tmpdir):
     location = (plate, pos)
 
     robot._driver.move_head(x=x, y=y, z=z)
-
     robot.calibrate_container_with_instrument(plate, p200, False)
 
     p200.drop_tip(plate[0])
+    print(p200._drop_tip_offset)
 
     current_pos = robot._driver.get_head_position()['current']
 
