@@ -1,42 +1,29 @@
-import {app, Menu, BrowserWindow} from 'electron'
-import fs from 'fs'
-import path from 'path'
-import {addMenu} from './menu'
-import {getLogger} from './logging'
-import {initAutoUpdater} from './updater'
-import {ServerManager} from './servermanager'
-import url from 'url'
-import shell from 'shelljs'
+// electron main entry point
+'use strict'
+
+const fs = require('fs')
+const path = require('path')
+const {app, dialog, Menu, BrowserWindow} = require('electron')
+const log = require('electron-log')
+
+const menu = require('./menu')
+const initAutoUpdater = require('./updater')
+const url = require('url')
+const shell = require('shelljs')
 
 if (require('electron-squirrel-startup')) app.quit()
+
+const DEV_MODE = process.env.NODE_ENV === 'development'
+const DEBUG_MODE = process.env.DEBUG
 
 const dataDirName = 'otone_data'
 const indexPath = path.join(__dirname, '..', 'ui', 'index.html')
 const appWindowUrl = url.resolve('file://', indexPath)
-console.log(appWindowUrl)
 
-if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support')
-  sourceMapSupport.install()
-}
-
-if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-  require('electron-debug')()
+if (DEV_MODE || DEBUG_MODE) {
+  require('electron-debug')({showDevTools: true})
   const p = path.join(__dirname, '..', 'node_modules')
   require('module').globalPaths.push(p)
-}
-
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer')
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS
-  const extensions = [
-    'REACT_DEVELOPER_TOOLS',
-    'REDUX_DEVTOOLS'
-  ]
-
-  return Promise
-    .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-    .catch(console.log)
 }
 
 // TODO(artyom): it should belong to integration test and/or CI scripts
@@ -49,8 +36,6 @@ if (process.env.INTEGRATION_TEST === 'true') {
   shell.rm('-rf', app.getPath('userData'))
 }
 
-const delay = time => new Promise(resolve => setTimeout(resolve, time))
-
 process.env.APP_DATA_DIR = (() => {
   const dir = path.join(app.getPath('userData'), dataDirName)
   // 'userData' is created on app.on('ready'), since we need it earlier
@@ -59,89 +44,85 @@ process.env.APP_DATA_DIR = (() => {
   return dir
 })()
 
-const log = getLogger('electron-main')
+app.on('ready', startUp)
 
-let loadUI = (win, url) => {
-  log.info('Loading App UI at ' + url)
-  win.loadURL(
-    url,
-    {'extraHeaders': 'pragma: no-cache\n'}
-  )
-  log.info('Dispatched .loadURL call')
+function startUp () {
+  log.info('Starting App')
+  process.on('uncaughtException', (error) => log.info('Uncaught: ', error))
+
+  const mainWindow = createWindow()
+  loadUI(mainWindow, appWindowUrl)
+  // const serverManager = new ServerManager()
+
+  // serverManager.start()
+  // app.on('quit', () => serverManager.shutdown())
+
+  if (DEV_MODE || DEBUG_MODE) {
+    installAndOpenExtensions(mainWindow)
+      .catch((error) => dialog.showErrorBox('Error opening dev tools', error))
+  }
 }
 
-let createWindow = async () => {
+function createWindow () {
   // Avoid window flashing and possibly fix integration tests
   // that are waiting for the window that appears before page is loaded
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#showing-window-gracefully
-  const mainWindow = new BrowserWindow({show: false,
+  const mainWindow = new BrowserWindow({
+    show: false,
     width: 1024,
     height: 768,
     webPreferences: {
+      devTools: DEV_MODE || DEBUG_MODE,
       experimentalFeatures: true
-    }})
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    }
   })
 
-  mainWindow.on('unresponsive', async () => {
+  mainWindow.once('ready-to-show', () => mainWindow.show())
+
+  mainWindow.on('unresponsive', () => {
     log.info('window is unresponsive, reloading')
-    await delay(500)
-    mainWindow.reload()
+    setTimeout(() => mainWindow.reload(), 500)
   })
 
   // Note: Auth0 pop window does not close itself,
   // this will close this window when it pops up
-  setInterval(() => {
+  setTimeout(() => {
     BrowserWindow.getAllWindows()
       .filter(win => win.frameName === 'auth0_signup_popup')
       .map(win => win.close())
   }, 3000)
 
-  addMenu()
+  menu()
   initAutoUpdater()
 
   return mainWindow
 }
 
-let startUp = async () => {
-  log.info('Starting App')
+function loadUI (win, url) {
+  log.info('Loading App UI at ' + url)
+  win.loadURL(url, {'extraHeaders': 'pragma: no-cache\n'})
+  log.info('App UI loaded')
+}
 
-  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-    await installExtensions()
-  }
+function installAndOpenExtensions (mainWindow) {
+  const devtools = require('electron-devtools-installer')
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS
+  const install = devtools.default
+  const extensions = [
+    'REACT_DEVELOPER_TOOLS',
+    'REDUX_DEVTOOLS'
+  ]
 
-  process.on('uncaughtException', error => {
-    if (process.listeners('uncaughtException')) {
-      log.info('Uncaught Exception: ', error)
-    }
-  })
-
-  const serverManager = new ServerManager()
-  serverManager.start()
-  app.on('quit', () => {
-    serverManager.shutdown()
-  })
-
-  const mainWindow = await createWindow()
-  loadUI(mainWindow, appWindowUrl)
-
-  // Setup Development Environment
-  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-    mainWindow.openDevTools()
-    mainWindow.webContents.on('context-menu', (e, props) => {
-      const { x, y } = props
+  return Promise
+    .all(extensions.map((name) => install(devtools[name], forceDownload)))
+    .then(() => mainWindow.webContents.on('context-menu', (_, props) => {
+      const {x, y} = props
 
       Menu
         .buildFromTemplate([{
           label: 'Inspect element',
-          click: () => {
-            mainWindow.inspectElement(x, y)
-          }
+          click: () => mainWindow.inspectElement(x, y)
         }])
         .popup(mainWindow)
-    })
-  }
+    }))
 }
-
-app.on('ready', startUp)

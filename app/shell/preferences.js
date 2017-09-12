@@ -1,8 +1,10 @@
-const electron = require('electron')
-const {dialog} = electron
+'use strict'
+
+const {dialog} = require('electron')
 const settings = require('electron-settings')
 
-settings.on('create', pathToSettings => {
+// TODO(mc, 2017-09-12): don't use sync methods
+settings.on('create', (pathToSettings) => {
   // A dialog popping up is preventing
   // integration tests from running
   if (process.env.INTEGRATION_TEST === 'true') {
@@ -23,14 +25,13 @@ settings.on('create', pathToSettings => {
 })
 
 function getSetting (setting) {
+  // TODO(mc, 2017-09-12): don't use sync methods
   return settings.getSync(setting)
 }
 
 function toggleSetting (setting) {
+  // TODO(mc, 2017-09-12): don't use sync methods
   settings.setSync(setting, !getSetting(setting))
 }
 
-module.exports = {
-  getSetting,
-  toggleSetting
-}
+module.exports = {getSetting, toggleSetting}
