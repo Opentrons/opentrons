@@ -193,17 +193,6 @@ class PlaceableTestCase(unittest.TestCase):
         deck.add(c2, "A2", (50, 50, 50))
         self.assertEqual(len(deck.get_all_children()), 10)
 
-    def test_max_dimensions(self):
-        c1 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        c2 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        deck = Deck()
-        deck.add(c1, "A1", (0, 0, 0))
-        deck.add(c2, "A2", (50, 50, 50))
-
-        actual = deck.max_dimensions(deck)
-        expected = (65.0, 65.0, 50.0)
-        self.assertEqual(actual, expected)
-
     def test_top_bottom(self):
         deck = Deck()
         slot = Slot()

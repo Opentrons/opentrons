@@ -464,7 +464,8 @@ class Robot(object):
         offset = coordinates - placeable.top()[1]
         target = self.position_tracker[placeable].position + offset.coordinates
 
-        coordinates = pf.target_pos_for_instrument_positioning(self.position_tracker, HEAD, instrument, *target)
+        coordinates = pf.target_pos_for_instrument_positioning(
+            self.position_tracker, HEAD, instrument, *target)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(coordinates, placeable)
@@ -492,8 +493,8 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        tallest_z = self.position_tracker.max_z_in_subtree(self._deck)
-        travel_height = tallest_z + self.arc_height
+        travel_height = self.max_deck_height() + self.arc_height
+
 
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(travel_height, robot_max_z)
@@ -798,8 +799,14 @@ class Robot(object):
         self.add_command(msg)
 
     def calibrate_container_with_instrument(self, container: Container, instrument, save: bool):
-        tracked_position = self.position_tracker[container[0]].position
-        true_position    = self.position_tracker[instrument].position
+        '''Calibrates a container using the bottom of the first well'''
+        well = container[0]
+        expected_pose = self.position_tracker[well]
+        expected_pose.z -= well.properties['depth']
+        true_pose = self.position_tracker[instrument]
         calib.calibrate_container_with_delta(container,
                                              self.position_tracker,
-                                             *(true_position - tracked_position), save)
+                                             *(true_pose.position - expected_pose.position), save)
+
+    def max_deck_height(self):
+        return self.position_tracker.max_z_in_subtree(self._deck)

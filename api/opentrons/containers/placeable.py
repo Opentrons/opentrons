@@ -58,7 +58,6 @@ class Placeable(object):
         self.children_by_name = OrderedDict()
         self.children_by_reference = OrderedDict()
         self._coordinates = Vector(0, 0, 0)
-        self._max_dimensions = {}
 
         self.parent = parent
 
@@ -335,39 +334,6 @@ class Placeable(object):
         for child in my_children:
             children.extend(child.get_all_children())
         return children
-
-    def max_dimensions(self, reference):
-        """
-        Returns maximum (x,y,z) coordinates for all children in the
-        container in the *reference* coordinate system
-        >>> plate.max_dimensions(reference=deck)
-        """
-
-        # Our placeables are considered immuteable, hence we are caching
-        # max dimensions for a given reference to calculate it only once
-        if reference in self._max_dimensions:
-            return self._max_dimensions[reference]
-
-        if not self.has_children():
-            return (0, 0, 0)
-
-        # Collect all furthermost child coordinates
-        child_coordinates = [
-            child.from_center(x=1, y=1, z=1, reference=reference)
-            for child in self.get_all_children()]
-
-        # find furthermost x, y and z
-        res = tuple([
-            max(
-                child_coordinates,
-                key=lambda coordinates: coordinates[axis]
-            )[axis]
-            for axis in range(3)])
-
-        # Cache it
-        self._max_dimensions[reference] = res
-
-        return res
 
     def from_polar(self, r, theta, h):
         """

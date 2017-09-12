@@ -5,27 +5,13 @@ import os
 
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
-from opentrons.data_storage import database as ot_db
+from opentrons.data_storage import database
+from opentrons.util.testing.fixtures import robot
+from opentrons.util.testing.util import build_temp_db, approx
 
+def test_new_containers(robot, tmpdir):
+    build_temp_db(tmpdir)
 
-def file_dir_path():
-    filename = globals()["__file__"]
-    return os.path.dirname(filename)
-
-@pytest.fixture
-def robot():
-    from opentrons import Robot
-    return Robot()
-
-@pytest.fixture
-def database():
-    db = os.path.join(file_dir_path(), '../testing_database.db')
-    temp_db_fd = tempfile.NamedTemporaryFile(dir=file_dir_path())
-    testing_database_path = shutil.copy2(db, temp_db_fd.name)
-    ot_db.change_database(testing_database_path)
-    return ot_db
-
-def test_new_containers(robot, database):
     trash_box = containers_load(robot, 'trash-box', 'A1')
     wheaton_vial_rack = containers_load(robot, 'wheaton_vial_rack', 'A2')
     tube_rack_80well = containers_load(robot, 'tube-rack-80well', 'A3')
