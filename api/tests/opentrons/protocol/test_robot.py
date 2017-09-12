@@ -6,7 +6,22 @@ from opentrons.containers.placeable import Deck
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
 from opentrons.util.vector import Vector
+from opentrons.util.testing.fixtures import robot
+from opentrons.util.testing.util import build_temp_db, approx
 
+def test_calibrated_max_z(robot, tmpdir):
+    build_temp_db(tmpdir)
+    p200 = pipette.Pipette(
+        robot, axis='b', name='my-fancy-pancy-pipette'
+    )
+    plate = containers_load(robot, '96-flat', 'A1')
+
+    assert robot.max_deck_height() == 10.5
+
+    robot.move_head(x=10, y=10, z=10)
+    robot.calibrate_container_with_instrument(plate, p200, save=False)
+
+    assert robot.max_deck_height() == 20.5
 
 class RobotTest(unittest.TestCase):
     def setUp(self):
@@ -71,23 +86,6 @@ class RobotTest(unittest.TestCase):
     #
     #     thread.join()
 
-    def test_calibrated_max_dimension(self):
-
-        expected = self.robot._deck.max_dimensions(self.robot._deck)
-        res = self.robot._calibrated_max_dimension()
-        self.assertEquals(res, expected)
-
-        p200 = pipette.Pipette(
-            self.robot, axis='b', name='my-fancy-pancy-pipette'
-        )
-        plate = containers_load(self.robot, '96-flat', 'A1')
-        self.robot.move_head(x=10, y=10, z=10)
-        p200.calibrate_position((plate, Vector(0, 0, 0)))
-
-        res = self.robot._calibrated_max_dimension()
-
-        expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
-        self.assertEquals(res, expected)
 
     def test_create_arc(self):
         p200 = pipette.Pipette(
@@ -95,23 +93,22 @@ class RobotTest(unittest.TestCase):
         )
         plate = containers_load(self.robot, '96-flat', 'A1')
         plate2 = containers_load(self.robot, '96-flat', 'B1')
-
         self.robot.move_head(x=10, y=10, z=10)
-        p200.calibrate_position((plate, Vector(0, 0, 0)))
-        self.robot.move_head(x=10, y=10, z=100)
-        p200.calibrate_position((plate2, Vector(0, 0, 0)))
+        self.robot.calibrate_container_with_instrument(plate, p200, save=False)
 
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 100},
+            {'z': 25.5},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]
         self.assertEquals(res, expected)
 
+        self.robot.move_head(x=10, y=10, z=100)
+        self.robot.calibrate_container_with_instrument(plate, p200, save=False)
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 20.5 + 5},
+            {'z': 100},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]
@@ -127,7 +124,7 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
 
     def test_robot_move_to(self):
-        self.robot.move_to((Deck(), (100, 0, 0)))
+        self.robot.move_to((self.robot._deck, (100, 0, 0)))
         position = self.robot._driver.get_head_position()['current']
         self.assertEqual(position, (100, 0, 0))
 
@@ -166,8 +163,8 @@ class RobotTest(unittest.TestCase):
         })
 
     def test_robot_pause_and_resume(self):
-        self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.move_to((Deck(), (101, 0, 0)))
+        self.robot.move_to((self.robot._deck, (100, 0, 0)))
+        self.robot.move_to((self.robot._deck, (101, 0, 0)))
         self.assertEqual(len(self.robot._commands), 0)
 
         #

@@ -2,6 +2,7 @@ import numpy
 from opentrons.util.trace import MessageBroker
 from opentrons.pubsub_util.topics import MOVEMENT
 from opentrons.pubsub_util.messages.movement import moved_msg
+from opentrons.containers.placeable import WellSeries
 
 
 
@@ -71,6 +72,8 @@ class PositionTracker(object):
         try:
             return self._position_dict[obj][0]
         except KeyError:
+            if isinstance(obj, WellSeries): #FIXME: (09/12/17) Just until we get rid of WellSeries
+                return self._position_dict[obj[0]][0]
             raise KeyError("Position not tracked: {}".format(obj))
 
     def __contains__(self, item):
