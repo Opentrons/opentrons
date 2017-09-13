@@ -19,21 +19,12 @@ li {
   content: '\21b3';
 }
 
-p::after {
-  font-size: 0.75rem;
-  content: '';
-  display: inline-block;
-  width: 125px;
-  float: right;
-}
-
-p::after {
-  padding-right: 1rem;
-  content: attr(data-timestamp);
+li.last_current{
+  color: #006fff;
 }
 
 li.current {
-  color: #006fff;
+  background-color: rgba(150,150,150,0.1);
 }
 
 li.current > ol {
