@@ -11,7 +11,9 @@ module.exports = function devServerConfig (port, publicPath, contentBase) {
     inline: true,
     lazy: false,
     hot: true,
-    headers: { 'Access-Control-Allow-Origin': '*' },
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
     contentBase,
     watchOptions: {
       aggregateTimeout: 300,

@@ -1,4 +1,4 @@
-// base webpack config used across other specific configs
+// webpack config to build UI bundles and assets
 'use strict'
 
 const path = require('path')

@@ -3,7 +3,7 @@
 # use bash
 SHELL := bash
 
-# source directories
+# source files
 ui_source := $(shell find ui -type f -name '*' -not -path 'ui/dist/*')
 shell_source := $(shell find shell -type f -name '*.js')
 
@@ -15,15 +15,16 @@ ui_target := ui/dist/bundle.js
 bin := node_modules/.bin
 env := $(bin)/cross-env NODE_ENV
 
-# watch and coverage variables for tests
+# watch, coverage, and fix variables for tests and linting
 watch ?= false
 cover ?= true
+fix ?= false
 
 ifeq ($(watch), true)
 	cover := false
 endif
 
-set_package_env := 	$(bin)/cross-env \
+set_package_env := $(bin)/cross-env \
 	OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) \
 	OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) \
 	OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX)
@@ -32,7 +33,7 @@ set_package_env := 	$(bin)/cross-env \
 #####################################################################
 
 .PHONY: all
-all: package
+all: clean package
 
 .PHONY: install
 install:
@@ -72,8 +73,8 @@ dist-win: $(ui_target) $(shell_source)
 #####################################################################
 
 .PHONY: dev
-dev:
-	$(bin)/concurrently "$(MAKE) dev-server" "$(MAKE) dev-app"
+dev: clean
+	$(bin)/concurrently "$(MAKE) dev-server" "sleep 2 && $(MAKE) dev-app"
 
 .PHONY: dev-server
 dev-server:
@@ -99,16 +100,8 @@ lint: lint-js lint-css
 
 .PHONY: lint-js
 lint-js:
-	$(BIN)/standard --verbose | $(bin)/snazzy
-
-.PHONY: lint-js-fix
-lint-js-fix:
-	$(BIN)/standard --fix
+	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
 
 .PHONY: lint-css
 lint-css:
-	$(BIN)/stylelint '**/*.css' --verbose
-
-.PHONY: lint-css-fix
-lint-css-fix:
-	$(BIN)/stylelint '**/*.css' --fix
+	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose

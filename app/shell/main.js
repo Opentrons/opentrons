@@ -3,13 +3,13 @@
 
 const fs = require('fs')
 const path = require('path')
+const url = require('url')
 const {app, dialog, Menu, BrowserWindow} = require('electron')
 const log = require('electron-log')
+const shell = require('shelljs')
 
 const menu = require('./menu')
 const initAutoUpdater = require('./updater')
-const url = require('url')
-const shell = require('shelljs')
 
 if (require('electron-squirrel-startup')) app.quit()
 
@@ -51,11 +51,8 @@ function startUp () {
   process.on('uncaughtException', (error) => log.info('Uncaught: ', error))
 
   const mainWindow = createWindow()
-  loadUI(mainWindow, appWindowUrl)
-  // const serverManager = new ServerManager()
 
-  // serverManager.start()
-  // app.on('quit', () => serverManager.shutdown())
+  loadUI(mainWindow, appWindowUrl)
 
   if (DEV_MODE || DEBUG_MODE) {
     installAndOpenExtensions(mainWindow)
