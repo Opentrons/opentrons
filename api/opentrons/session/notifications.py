@@ -4,8 +4,9 @@ import copy
 from asyncio import Queue
 from concurrent import futures
 from contextlib import contextmanager
-from opentrons.util.trace import EventBroker
 
+from opentrons.util.trace import MessageBroker
+from opentrons.pubsub_util import topics
 
 class Notifications(object):
     def __init__(self, loop=None, filters=None):
@@ -14,7 +15,7 @@ class Notifications(object):
         self.queue = Queue(loop=self.loop)
         self.session = None
 
-        EventBroker.get_instance().add(self.on_notify)
+        MessageBroker.get_instance().subscribe(topics.MISC, self.on_notify)
 
     @contextmanager
     def snooze(self):
@@ -74,7 +75,7 @@ class Notifications(object):
             futures.wait([future])
 
     def finalize(self):
-        EventBroker.get_instance().remove(self.on_notify)
+        MessageBroker.get_instance().unsubscribe(topics.MISC, self.on_notify)
 
     async def __anext__(self):
         return await self.queue.get()

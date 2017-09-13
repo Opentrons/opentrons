@@ -8,7 +8,7 @@ install:
 	python setup.py install && pip install -r requirements.txt
 
 test:
-	pylama opentrons tests && py.test \
+	python -m pylama opentrons tests || python -m pytest \
 		--cov=opentrons \
 		--cov-report term-missing:skip-covered \
 		--cov-report xml:coverage.xml \
@@ -18,7 +18,7 @@ docs:
 	cd docs && make html && make doctest
 
 publish:
-       cd scripts && publish.sh && doc-deploy.sh
+	cd scripts && publish.sh && doc-deploy.sh
 
 dev:
 	python opentrons/server/main.py

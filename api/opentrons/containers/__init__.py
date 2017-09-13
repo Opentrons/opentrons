@@ -38,8 +38,10 @@ def load(robot, container_name, slot, label=None, share=False):
     """
     return robot.add_container(container_name, slot, label, share)
 
+
 def list():
     return database.list_all_containers()
+
 
 def create(name, grid, spacing, diameter, depth, volume=0):
     columns, rows = grid

@@ -2,8 +2,9 @@ import pytest
 
 from datetime import datetime
 
+from opentrons.pubsub_util import topics
 from opentrons.session import Session
-from opentrons.util.trace import EventBroker
+from opentrons.util.trace import MessageBroker
 
 
 async def test_load_from_text(session_manager, protocol):
@@ -14,7 +15,7 @@ async def test_load_from_text(session_manager, protocol):
 
 async def test_async_notifications(session_manager):
     session_manager.notifications.update_filters(['bar'])
-    EventBroker.get_instance().notify({'name': 'bar'})
+    MessageBroker.get_instance().publish(topics.MISC, {'name': 'bar'})
     # Get async iterator
     aiter = session_manager.notifications.__aiter__()
     # Then read the first item

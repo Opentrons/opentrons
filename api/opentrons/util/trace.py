@@ -69,8 +69,8 @@ class MessageBroker(object):
             self.write_to_temp_file('topics', topic)
             self.topic_temp_files[topic] = tmpfs.NamedTemporaryFile(prefix= topic +'_', dir=TOPIC_FILES_PATH)
 
-    def remove(self, topic, func):
-        self.listeners[topic].remove(func)
+    def unsubscribe(self, topic, func):
+        self.topics_and_funcs[topic].remove(func)
 
     def publish(self, topic, message):
         if topic not in self.topics_and_funcs:
