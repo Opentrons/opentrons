@@ -7,7 +7,8 @@ describe('interface reducer', () => {
     const state = reducer(undefined, {})
 
     expect(state).toEqual({
-      isNavPanelOpen: false
+      isNavPanelOpen: false,
+      currentNavPanelTask: 'connect'
     })
   })
 
@@ -19,5 +20,14 @@ describe('interface reducer', () => {
 
     state = {isNavPanelOpen: true}
     expect(reducer(state, action)).toEqual({isNavPanelOpen: false})
+  })
+
+  test('handles setCurrentNavPanel', () => {
+    let panel = 'connect'
+
+    const action = {type: actionTypes.SET_CURRENT_NAV_PANEL, payload: {panel}}
+
+    let state = {currentNavPanelTask: 'upload'}
+    expect(reducer(state, action)).toEqual({currentNavPanelTask: 'connect', isNavPanelOpen: true})
   })
 })

@@ -1,15 +1,28 @@
 import EventEmitter from 'events'
-import log from 'winston'
-import uuid from 'uuid/v4'
+// TODO(mc, 2017-08-29): Disable winston and uuid because of worker-loader bug
+// preventing webpackification of built-in node modules (os and crypto)
+// import log from 'winston'
+// import uuid from 'uuid/v4'
 
 import WebSocketClient from './websocket-client'
 import RemoteObject from './remote-object'
-import {statuses, RESULT, ACK, NOTIFICATION, CONTROL_MESSAGE} from './message-types'
+import {
+  statuses,
+  RESULT,
+  ACK,
+  NACK,
+  NOTIFICATION,
+  CONTROL_MESSAGE
+} from './message-types'
+
+// TODO(mc, 2017-08-29): see note about uuid above
+let _uniqueId = 0
+const uuid = () => `id-${_uniqueId++}`
 
 // timeouts
 const HANDSHAKE_TIMEOUT = 5000
-const RECEIVE_CONTROL_TIMEOUT = 500
-const CALL_ACK_TIMEOUT = 5000
+const RECEIVE_CONTROL_TIMEOUT = 3000
+const CALL_ACK_TIMEOUT = 3000
 const CALL_RESULT_TIMEOUT = 240000
 
 // metadata constants
@@ -18,6 +31,7 @@ const REMOTE_TYPE_OBJECT = 1
 
 // event name utilities
 const makeAckEventName = (token) => `ack:${token}`
+const makeNackEventName = (token) => `nack:${token}`
 const makeSuccessEventName = (token) => `success:${token}`
 const makeFailureEventName = (token) => `failure:${token}`
 
@@ -29,7 +43,7 @@ class RpcContext extends EventEmitter {
     this._ws = ws
     this._resultTypes = new Map()
     this._typeObjectCache = new Map()
-    this.control = null
+    this.remote = null
     // default max listeners is 10, we need more than that
     // keeping this at a finite number just in case we get a leak later
     this.setMaxListeners(100)
@@ -38,10 +52,11 @@ class RpcContext extends EventEmitter {
     ws.on('message', this._handleMessage.bind(this))
   }
 
-  call (id, name, args) {
+  callRemote (id, name, args = []) {
     const self = this
     const token = uuid()
     const ackEvent = makeAckEventName(token)
+    const nackEvent = makeNackEventName(token)
     const resultEvent = makeSuccessEventName(token)
     const failureEvent = makeFailureEventName(token)
 
@@ -50,9 +65,9 @@ class RpcContext extends EventEmitter {
     return new Promise((resolve, reject) => {
       let timeout
 
-      const handleError = (error) => {
+      const handleError = (reason) => {
         cleanup()
-        reject(error)
+        reject(new Error(`Error in ${name}(${args.join(', ')}): ${reason}`))
       }
 
       const handleFailure = (result) => {
@@ -70,7 +85,7 @@ class RpcContext extends EventEmitter {
       const handleAck = () => {
         clearTimeout(timeout)
         timeout = setTimeout(
-          () => handleError(new Error(`Result timeout for call ${token}`)),
+          () => handleError('Result timeout'),
           CALL_RESULT_TIMEOUT
         )
 
@@ -78,9 +93,12 @@ class RpcContext extends EventEmitter {
         this.once(failureEvent, handleFailure)
       }
 
+      const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
+
       function cleanup () {
         clearTimeout(timeout)
         self.removeAllListeners(ackEvent)
+        self.removeAllListeners(nackEvent)
         self.removeAllListeners(resultEvent)
         self.removeAllListeners(failureEvent)
         self.removeListener('error', handleError)
@@ -88,8 +106,9 @@ class RpcContext extends EventEmitter {
 
       this.once('error', handleError)
       this.once(ackEvent, handleAck)
+      this.once(nackEvent, handleNack)
       timeout = setTimeout(
-        () => handleError(new Error(`Ack timeout for call ${token}`)),
+        () => handleError('ACK timeout'),
         CALL_ACK_TIMEOUT
       )
     })
@@ -106,7 +125,7 @@ class RpcContext extends EventEmitter {
       return Promise.resolve(this._typeObjectCache.get(typeId).v)
     }
 
-    return this.control.get_object_by_id(typeId)
+    return this.callRemote(null, 'get_object_by_id', [typeId])
   }
 
   // close the websocket
@@ -140,7 +159,7 @@ class RpcContext extends EventEmitter {
   }
 
   _send (message) {
-    log.debug('Sending: %j', message)
+    // log.debug('Sending: %j', message)
     this._ws.send(message)
   }
 
@@ -150,27 +169,27 @@ class RpcContext extends EventEmitter {
 
   // TODO(mc): split this method up
   _handleMessage (message) {
-    log.debug('Received message %j', message)
+    // log.debug('Received message %j', message)
 
     const meta = message.$
     const data = message.data
     const type = meta.type
-    let control
 
     switch (type) {
       case CONTROL_MESSAGE:
-        control = message.control
+        const root = message.root
+        const rootType = message.type
         // cache this instance to mark its type as a type object
         // then cache its type object
-        this._cacheCallResultMetadata(control.instance)
-        this._cacheCallResultMetadata(control.type)
+        this._cacheCallResultMetadata(root)
+        this._cacheCallResultMetadata(rootType)
 
-        RemoteObject(this, control.instance)
-          .then((controlRemote) => {
-            this.control = controlRemote
+        RemoteObject(this, root)
+          .then((remote) => {
+            this.remote = remote
             this.emit('ready')
           })
-          .catch((e) => log.error('Error creating control remote', e))
+          // .catch((e) => log.error('Error creating control remote', e))
 
         break
 
@@ -188,12 +207,16 @@ class RpcContext extends EventEmitter {
         this.emit(makeAckEventName(meta.token))
         break
 
+      case NACK:
+        this.emit(makeNackEventName(meta.token), message.reason)
+        break
+
       case NOTIFICATION:
         this._cacheCallResultMetadata(data)
 
         RemoteObject(this, data)
           .then((remote) => this.emit('notification', remote))
-          .catch((e) => log.error('Error creating notification remote', e))
+          // .catch((e) => log.error('Error creating notification remote', e))
 
         break
 

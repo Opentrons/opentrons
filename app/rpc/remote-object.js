@@ -12,6 +12,10 @@ function isRemoteObject (source) {
 }
 
 export default function RemoteObject (context, source, seen) {
+  if (Array.isArray(source)) {
+    return Promise.all(source.map((s) => RemoteObject(context, s, seen)))
+  }
+
   if (!isRemoteObject(source)) {
     return Promise.resolve(source)
   }
@@ -55,7 +59,7 @@ export default function RemoteObject (context, source, seen) {
   const methods = context.resolveTypeValues(source)
     .then((typeObject) => Object.keys(typeObject).reduce((result, key) => {
       result[key] = function remoteCall (...args) {
-        return context.call(id, key, args)
+        return context.callRemote(id, key, args)
       }
 
       return result

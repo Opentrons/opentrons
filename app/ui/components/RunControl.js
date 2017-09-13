@@ -10,8 +10,9 @@ export default function RunControl (props) {
     isPaused,
     errors,
     style,
-    protocolName,
+    sessionName,
     startTime,
+    runTime,
     runProgress,
     onPauseClick,
     onResumeClick,
@@ -19,21 +20,38 @@ export default function RunControl (props) {
   } = props
 
   const hasError = errors.length > 0
+  const onPauseResumeClick = isPaused
+    ? onResumeClick
+    : onPauseClick
 
-  const pauseResumeButton = isPaused
-    ? (<button onClick={onResumeClick} className={styles.btn_pause}>Resume</button>)
-    : (<button onClick={onPauseClick} className={styles.btn_pause}>Pause</button>)
+  const pauseResumeText = isPaused
+    ? 'Resume'
+    : 'Pause'
+
+  const pauseResumeButton = (
+    <button
+      onClick={onPauseResumeClick}
+      className={styles.btn_pause}
+      disabled={!isRunning}
+    >
+      {pauseResumeText}
+    </button>
+  )
 
   return (
     <section className={style}>
       <div className={styles.btn_wrapper}>
         <div className={styles.file_info}>
-          FILE NAME: {protocolName}
+          FILE NAME: {sessionName}
           <br />
           START TIME: {startTime}
         </div>
         {pauseResumeButton}
-        <button onClick={onCancelClick} className={styles.btn_cancel}>
+        <button
+          onClick={onCancelClick}
+          className={styles.btn_cancel}
+          disabled={!isRunning}
+        >
           Cancel Job
         </button>
       </div>
@@ -43,7 +61,9 @@ export default function RunControl (props) {
 
       <div className={styles.progress} >
         { hasError && <button className={styles.btn_error}>Report Error</button> }
-        <div className={styles.timer}>00:03:00</div>
+        <div className={styles.timer}>
+          {runTime}
+        </div>
         <RunProgress style={styles.progress_bar} {...{runProgress, isPaused, hasError}} />
       </div>
 
@@ -52,7 +72,9 @@ export default function RunControl (props) {
 }
 
 RunControl.propTypes = {
-  protocolName: PropTypes.string.isRequired,
+  sessionName: PropTypes.string.isRequired,
+  startTime: PropTypes.string.isRequired,
+  runTime: PropTypes.string.isRequired,
   isRunning: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,
   onPauseClick: PropTypes.func.isRequired,

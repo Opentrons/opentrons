@@ -2,7 +2,7 @@
 
 import {actions, actionTypes} from '../'
 
-describe('robot effects', () => {
+describe('robot actions', () => {
   test('connect action', () => {
     const expected = {
       type: actionTypes.CONNECT,
@@ -21,12 +21,27 @@ describe('robot effects', () => {
     expect(actions.connectResponse(new Error('AHHH'))).toEqual(expected)
   })
 
-  test('load protocol action', () => {
+  test('session action', () => {
+    const file = {name: '/foo/bar/baz.py'}
     const expected = {
-      type: actionTypes.LOAD_PROTOCOL
+      type: actionTypes.SESSION,
+      payload: {file},
+      meta: {robotCommand: true}
     }
 
-    expect(actions.loadProtocol()).toEqual(expected)
+    expect(actions.session(file)).toEqual(expected)
+  })
+
+  test('session response', () => {
+    const error = new Error('AH')
+    const session = {name: 'session-name'}
+    const expected = {
+      type: actionTypes.SESSION_RESPONSE,
+      payload: {session},
+      error
+    }
+
+    expect(actions.sessionResponse(error, session)).toEqual(expected)
   })
 
   test('home action without axes', () => {
@@ -125,39 +140,10 @@ describe('robot effects', () => {
 
     expect(actions.cancelResponse(new Error('AHHH'))).toEqual(expected)
   })
-})
 
-describe('robot actions', () => {
-  test('set isConnected', () => {
-    const expected = {
-      type: actionTypes.SET_IS_CONNECTED,
-      payload: {isConnected: false}
-    }
+  test('tick run time action', () => {
+    const expected = {type: actionTypes.TICK_RUN_TIME}
 
-    expect(actions.setIsConnected(false)).toEqual(expected)
-  })
-
-  test('set commands', () => {
-    const expected = {
-      type: actionTypes.SET_COMMANDS,
-      payload: {commands: ['foo', 'bar', 'baz']}
-    }
-
-    expect(actions.setCommands(['foo', 'bar', 'baz'])).toEqual(expected)
-  })
-
-  test('set protocol error', () => {
-    const expected = {
-      type: actionTypes.SET_PROTOCOL_ERROR,
-      error: new Error('AHHH')
-    }
-
-    expect(actions.setProtocolError(new Error('AHHH'))).toEqual(expected)
-  })
-
-  test('tick current command counter', () => {
-    const expected = {type: actionTypes.TICK_CURRENT_COMMAND}
-
-    expect(actions.tickCurrentCommand()).toEqual(expected)
+    expect(actions.tickRunTime()).toEqual(expected)
   })
 })

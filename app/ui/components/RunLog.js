@@ -5,7 +5,7 @@ import styles from './RunLog.css'
 
 export default class RunLog extends Component {
   componentDidUpdate () {
-    this.refs.ensureVisible.scrollIntoView(true)
+    if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true)
   }
 
   render () {
@@ -22,7 +22,7 @@ export default class RunLog extends Component {
       return (<p {...props}>[{id}] : {description}</p>)
     })
     return (
-      <section className={classnames(style, styles.wrapper)}>
+      <section className={classnames(style, styles.run_log_wrapper)}>
         {commandItems}
       </section>
     )

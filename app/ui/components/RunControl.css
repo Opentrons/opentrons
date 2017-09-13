@@ -26,8 +26,8 @@
 .progress {
   display: grid;
   grid-template:
-    "report . timer" 70%
-    "progress_bar progress_bar progress_bar" 30%;
+    "report . timer" 72px
+    "progress_bar progress_bar progress_bar" 35px;
   grid-template-columns: repeat(3 [cols] 1fr);
 }
 

@@ -6,6 +6,7 @@ export const RESULT = 0
 export const ACK = 1
 export const NOTIFICATION = 2
 export const CONTROL_MESSAGE = 3
+export const NACK = 4
 
 // statuses
 export const statuses = {

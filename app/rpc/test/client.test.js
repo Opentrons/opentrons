@@ -1,7 +1,6 @@
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
-import WebSocket from 'ws'
-import uuid from 'uuid/v4'
+import WS from 'ws'
 // import log from 'winston'
 
 import Client from '../../rpc/client'
@@ -9,43 +8,36 @@ import {
   statuses,
   RESULT,
   ACK,
+  NACK,
   NOTIFICATION,
   CONTROL_MESSAGE
 } from '../../rpc/message-types'
 
 // log.level = 'debug'
-jest.mock('uuid/v4')
 
 const {SUCCESS, FAILURE} = statuses
 
-const EX_CONTROL_DATA = {
-  instance: {i: 1, t: 2, v: {server: {}}},
-  type: {i: 2, t: 3, v: {get_root: {}, get_object_by_id: {}}}
-}
-
+const EX_REMOTE = {i: 4, t: 5, v: {foo: 'bar'}}
+const EX_REMOTE_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
 const EX_CONTROL_MESSAGE = {
   $: {type: CONTROL_MESSAGE},
-  control: EX_CONTROL_DATA
+  root: EX_REMOTE,
+  type: EX_REMOTE_TYPE
 }
 
-const EX_ROOT_INSTANCE = {i: 4, t: 5, v: {foo: 'bar'}}
 const EX_ROOT_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
 
-function makeAckResponse (token) {
-  return {$: {type: ACK, token}}
-}
-
-function makeCallResponse (token, status, data) {
-  return {$: {type: RESULT, token, status}, data}
-}
+const makeAckResponse = (token) => ({$: {type: ACK, token}})
+const makeNackResponse = (token, reason) => ({$: {type: NACK, token}, reason})
+const makeCallResponse = (token, status, data) => ({
+  $: {type: RESULT, token, status},
+  data
+})
 
 describe('rpc client', () => {
-  let mockUuid
   let url
   let wss
   let listeners
-
-  uuid.mockImplementation(() => `uuid-${mockUuid++}`)
 
   function addListener (target, event, handler) {
     listeners.push({target, event, handler})
@@ -53,9 +45,7 @@ describe('rpc client', () => {
   }
 
   function removeListener (listener) {
-    const {target, event, handler} = listener
-
-    target.removeListener(event, handler)
+    listener.target.removeListener(listener.event, listener.handler)
   }
 
   class JsonWs extends EventEmitter {
@@ -63,7 +53,7 @@ describe('rpc client', () => {
       super()
       this._ws = ws
 
-      addListener(ws, 'message', (message) => this.emit('message', JSON.parse(message)))
+      addListener(ws, 'message', (m) => this.emit('message', JSON.parse(m)))
       addListener(ws, 'close', () => this.emit('close'))
     }
 
@@ -74,20 +64,19 @@ describe('rpc client', () => {
 
   beforeAll((done) => portfinder.getPort((error, port) => {
     if (error) return done(error)
-    if (!global.WebSocket) global.WebSocket = WebSocket
+    if (!global.WebSocket) global.WebSocket = WS
 
     url = `ws://127.0.0.1:${port}`
-    wss = new WebSocket.Server({port})
+    wss = new WS.Server({port})
     wss.once('listening', done)
   }))
 
   afterAll((done) => {
-    if (global.WebSocket === WebSocket) delete global.WebSocket
+    if (global.WebSocket === WS) delete global.WebSocket
     wss.close(done)
   })
 
   beforeEach(() => {
-    mockUuid = 0
     listeners = []
   })
 
@@ -98,8 +87,6 @@ describe('rpc client', () => {
   test('rejects if control message never comes', () => {
     const result = Client(url)
 
-    // TODO(mc): can't call .toMatch on an error
-    // figure out if this is best practice for jest error checking
     return expect(result).rejects.toMatchObject({
       message: expect.stringMatching(/timeout/i)
     })
@@ -111,13 +98,14 @@ describe('rpc client', () => {
     return expect(Client(url)).resolves.toBeDefined()
   })
 
-  test('resolves with a proxy for the control object', () => {
+  test('resolves with a proxy for the remote object', () => {
     addListener(wss, 'connection', (ws) => new JsonWs(ws).send(EX_CONTROL_MESSAGE))
 
     return expect(Client(url)).resolves.toMatchObject({
-      control: {
-        get_root: expect.any(Function),
-        get_object_by_id: expect.any(Function)
+      remote: {
+        foo: 'bar',
+        be_a_robot: expect.any(Function),
+        be_a_person: expect.any(Function)
       }
     })
   })
@@ -139,96 +127,158 @@ describe('rpc client', () => {
       addListener(ws, 'message', (message) => {
         expect(message).toEqual({
           $: {
-            token: 'uuid-0'
+            token: expect.anything()
           },
-          id: EX_CONTROL_DATA.instance.i,
-          name: 'get_object_by_id',
-          args: [EX_CONTROL_DATA.instance.i]
+          id: EX_REMOTE.i,
+          name: 'be_a_person',
+          args: ['foo', 'bar']
         })
 
         done()
       })
 
-      client.control.get_object_by_id(EX_CONTROL_DATA.instance.i)
-    })
-
-    test('resolves the result of the method call', () => {
-      const exResponse = makeCallResponse(
-        'uuid-0',
-        SUCCESS,
-        EX_CONTROL_DATA.instance
-      )
-
-      addListener(ws, 'message', () => {
-        ws.send(makeAckResponse('uuid-0'))
-        setTimeout(() => ws.send(exResponse), 100)
-      })
-
-      const result = client.control.get_object_by_id(EX_CONTROL_DATA.instance.i)
-
-      return expect(result).resolves.toMatchObject({
-        get_root: expect.any(Function),
-        get_object_by_id: expect.any(Function)
-      })
+      client.remote.be_a_person('foo', 'bar')
     })
 
     test('rejects the result of a failed method call', () => {
-      const exResponse = makeCallResponse('uuid-0', FAILURE, 'Oh no: ahhh')
+      const exResponse = (token) => makeCallResponse(token, FAILURE, 'ahhh')
 
-      addListener(ws, 'message', () => {
-        ws.send(makeAckResponse('uuid-0'))
-        setTimeout(() => ws.send(exResponse), 5)
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        setTimeout(() => ws.send(makeAckResponse(token)), 1)
+        setTimeout(() => ws.send(exResponse(token)), 5)
       })
 
-      const result = client.control.get_object_by_id(EX_CONTROL_DATA.instance.i)
+      const result = client.remote.be_a_robot(1, 2)
 
       return expect(result).rejects.toMatchObject({
-        message: 'Oh no: ahhh'
+        message: expect.stringMatching(/ahhh/)
       })
     })
 
-    test('getss the type of an object to create a remote object', () => {
-      const exInstanceResponse = makeCallResponse(
-        'uuid-0',
-        SUCCESS,
-        EX_ROOT_INSTANCE
-      )
+    test("rejects the result of a nack'd method call", () => {
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        ws.send(makeNackResponse(token, 'You done messed up'))
+      })
 
-      const exTypeResponse = makeCallResponse(
-        'uuid-1',
-        SUCCESS,
-        EX_ROOT_TYPE
-      )
+      const result = client.remote.be_a_person('Tim')
+
+      return expect(result).rejects.toMatchObject({
+        message: expect.stringMatching(/NACK.+You done messed up/)
+      })
+    })
+
+    test('resolves a null result of method call', () => {
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+
+        setTimeout(() => ws.send(makeAckResponse(token)), 1)
+        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, null)), 5)
+      })
+
+      return client.remote.be_a_person()
+        .then((result) => expect(result).toEqual(null))
+    })
+
+    test('resolves a primitive result of method call', () => {
+      const VALUE = 'foobar'
 
       addListener(ws, 'message', (message) => {
         const token = message.$.token
 
-        if (token === 'uuid-0') {
-          // first message: should call get_object_by_id on EX_ROOT_INSTANCE
-          // checked in previous test so no assertions here
-          setTimeout(() => ws.send(makeAckResponse('uuid-0')), 1)
-          setTimeout(() => ws.send(exInstanceResponse), 5)
-        } else if (token === 'uuid-1') {
-          // second message should be a get_object_by_id for the type of EX_ROOT_INSTANCE
-          // check that we called control.get_object_by_id properly
-          expect(message).toMatchObject({
-            id: EX_CONTROL_DATA.instance.i,
-            name: 'get_object_by_id',
-            args: [EX_ROOT_TYPE.i]
-          })
-          // return an ack, then return the type object
-          setTimeout(() => ws.send(makeAckResponse('uuid-1')), 1)
-          setTimeout(() => ws.send(exTypeResponse), 5)
-        }
+        setTimeout(() => ws.send(makeAckResponse(token)), 1)
+        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, VALUE)), 5)
       })
 
-      const result = client.control.get_object_by_id(EX_ROOT_INSTANCE.i)
+      return client.remote.be_a_robot()
+        .then((result) => expect(result).toEqual(VALUE))
+    })
 
-      return expect(result).resolves.toEqual({
-        foo: 'bar',
+    test('deserializes an array of primitives or null values', () => {
+      const VALUE = [1, null, 'foo']
+
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        setTimeout(() => ws.send(makeAckResponse(token)), 1)
+        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, VALUE)), 5)
+      })
+
+      return client.remote.be_a_person()
+        .then((result) => expect(result).toEqual(VALUE))
+    })
+
+    test('resolves an object result of a known type', () => {
+      const exResponse = (token) => makeCallResponse(
+        token,
+        SUCCESS,
+        {i: 1, t: EX_ROOT_TYPE.i, v: {baz: 'qux'}}
+      )
+
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+        setTimeout(() => ws.send(makeAckResponse(token)), 1)
+        setTimeout(() => ws.send(exResponse(token)), 5)
+      })
+
+      const result = client.remote.be_a_robot()
+
+      return expect(result).resolves.toMatchObject({
+        baz: 'qux',
         be_a_robot: expect.any(Function),
         be_a_person: expect.any(Function)
       })
+    })
+
+    test('resolves an object of unknown type by getting the type', () => {
+      const ID = 256
+      const TYPE_ID = 42
+      const instanceResponse = (token) => makeCallResponse(token, SUCCESS, {
+        i: ID,
+        t: TYPE_ID,
+        v: {a: 'bc'}
+      })
+
+      const typeResponse = (token) => makeCallResponse(token, SUCCESS, {
+        i: TYPE_ID,
+        t: 3,
+        v: {hello_world: {}}
+      })
+
+      let messageCount = 0
+      let getTypeCall
+      addListener(ws, 'message', (message) => {
+        const token = message.$.token
+
+        if (messageCount === 0) {
+          // first message: should call be_a_person on remote root
+          // checked in previous test so no assertions here
+          setTimeout(() => ws.send(makeAckResponse(token)), 1)
+          setTimeout(() => ws.send(instanceResponse(token)), 5)
+        } else if (messageCount === 1) {
+          // second message should be a get_object_by_id for the type
+          getTypeCall = message
+          // return an ack, then return the type object
+          setTimeout(() => ws.send(makeAckResponse(token)), 1)
+          setTimeout(() => ws.send(typeResponse(token)), 5)
+        }
+
+        messageCount++
+      })
+
+      return client.remote.be_a_person()
+        .then((result) => {
+          expect(getTypeCall).toMatchObject({
+            id: null,
+            name: 'get_object_by_id',
+            args: [TYPE_ID]
+          })
+
+          expect(result).toEqual({
+            a: 'bc',
+            hello_world: expect.any(Function)
+          })
+        })
     })
 
     test('creates remote objects for all non-primitive children', () => {
@@ -267,7 +317,8 @@ describe('rpc client', () => {
           response = EX_DEEP_TYPE_1
         } else if (requestedId === EX_DEEP_TYPE_0.i) {
           response = EX_DEEP_TYPE_0
-        } else if (requestedId === EX_DEEP_INSTANCE_0.i) {
+        } else {
+          // else it wasn't a system get_object_by_id call
           response = EX_DEEP_INSTANCE_0
         }
 
@@ -275,7 +326,7 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
       })
 
-      const result = client.control.get_object_by_id(EX_DEEP_INSTANCE_0.i)
+      const result = client.remote.be_a_person()
 
       return expect(result).resolves.toEqual({
         thing_0: expect.any(Function),
@@ -310,7 +361,7 @@ describe('rpc client', () => {
 
         if (requestedId === CIRCULAR_TYPE.i) {
           response = CIRCULAR_TYPE
-        } else if (requestedId === CIRCULAR_INSTANCE.i) {
+        } else {
           response = CIRCULAR_INSTANCE
         }
 
@@ -318,7 +369,7 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
       })
 
-      return client.control.get_object_by_id(CIRCULAR_INSTANCE.i)
+      return client.remote.be_a_robot()
         .then((remote) => expect(remote.self).toBe(remote))
     })
 
@@ -339,7 +390,7 @@ describe('rpc client', () => {
 
         if (requestedId === TYPE.i) {
           response = TYPE
-        } else if (requestedId === PARENT_INSTANCE.i) {
+        } else {
           response = PARENT_INSTANCE
         }
 
@@ -347,7 +398,7 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
       })
 
-      return client.control.get_object_by_id(PARENT_INSTANCE.i)
+      return client.remote.be_a_robot()
         .then((remote) => {
           expect(remote.circular).toBe(remote.child)
           expect(remote.child).toEqual({foo: 'foo'})
@@ -369,7 +420,7 @@ describe('rpc client', () => {
 
         if (requestedId === TYPE.i) {
           response = TYPE
-        } else if (requestedId === SUPERPARENT.i) {
+        } else {
           response = SUPERPARENT
         }
 
@@ -377,16 +428,16 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
       })
 
-      return client.control.get_object_by_id(SUPERPARENT.i)
+      return client.remote.be_a_person()
         .then((remote) => {
           expect(remote.a.c).toBe(remote.b.c)
           expect(remote.a.c).toEqual({foo: 'foo'})
         })
     })
 
-    test('deserializes remote object with null children', () => {
+    test('deserializes object with null, primitive, and array children', () => {
       const TYPE = {i: 30, t: 3, v: {}}
-      const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: null}}
+      const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: null, qux: [1, 2]}}
 
       addListener(ws, 'message', (message) => {
         const token = message.$.token
@@ -395,7 +446,7 @@ describe('rpc client', () => {
 
         if (requestedId === TYPE.i) {
           response = TYPE
-        } else if (requestedId === INSTANCE.i) {
+        } else {
           response = INSTANCE
         }
 
@@ -403,35 +454,12 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
       })
 
-      return client.control.get_object_by_id(INSTANCE.i)
+      return client.remote.be_a_robot()
         .then((remote) => expect(remote).toEqual({
           foo: 'bar',
-          baz: null
+          baz: null,
+          qux: [1, 2]
         }))
-    })
-
-    test('deserializes array values', () => {
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, [1, 2, 3])), 5)
-      })
-
-      return client.control.get_object_by_id(1234)
-        .then((result) => expect(result).toEqual([1, 2, 3]))
-    })
-
-    test('deserializes null values', () => {
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, null)), 5)
-      })
-
-      return client.control.get_object_by_id(1234)
-        .then((result) => expect(result).toEqual(null))
     })
 
     test('emits notification events', (done) => {
@@ -441,15 +469,8 @@ describe('rpc client', () => {
 
       addListener(ws, 'message', (message) => {
         const token = message.$.token
-        const requestedId = message.args[0]
-        let response
-
-        if (requestedId === TYPE.i) {
-          response = TYPE
-        }
-
         setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
+        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, TYPE)), 5)
       })
 
       setTimeout(() => ws.send(notification), 5)

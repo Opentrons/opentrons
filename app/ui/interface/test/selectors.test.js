@@ -8,4 +8,10 @@ describe('user interface selectors', () => {
 
     expect(selectors.getIsNavPanelOpen(state)).toBe(true)
   })
+
+  test('get current nav panel', () => {
+    const state = {[NAME]: {currentNavPanelTask: 'upload'}}
+
+    expect(selectors.getCurrentNavPanelTask(state)).toBe('upload')
+  })
 })
