@@ -58,6 +58,6 @@ def test_max_z(robot, tmpdir):
 
 
 def test_get_object_children(robot):
-    plate = containers_load('96-flat', 'B2')
+    plate = containers_load(robot, '96-flat', 'B2')
     children = robot.position_tracker.get_object_children(plate)
     children == plate.get_children_list()
