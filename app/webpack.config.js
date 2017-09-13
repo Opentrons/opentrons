@@ -4,21 +4,22 @@
 const path = require('path')
 const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
+const {description, author} = require('./package.json')
 const namedRules = require('./webpack/rules')
 const devServerConfig = require('./webpack/dev-server')
 
 const DEV = process.env.NODE_ENV !== 'production'
 const ANALYZER = process.env.ANALYZER === 'true'
-
-const PORT = process.env.PORT || 8090
+const PORT = process.env.PORT
 
 const JS_BUNDLE_ENTRY = path.join(__dirname, './ui/index.js')
 
 // TODO(mc, 2017-09-13): find out why PUBLIC_PATH is relative and not absolute
 const OUTPUT_PATH = path.join(__dirname, 'ui/dist')
-const PUBLIC_PATH = '../dist/'
 const JS_OUTPUT_NAME = 'bundle.js'
 const CSS_OUTPUT_NAME = 'style.css'
 
@@ -28,8 +29,7 @@ const entry = [
 
 const output = {
   path: OUTPUT_PATH,
-  filename: JS_OUTPUT_NAME,
-  publicPath: PUBLIC_PATH
+  filename: JS_OUTPUT_NAME
 }
 
 const rules = [
@@ -37,6 +37,7 @@ const rules = [
   namedRules.worker,
   namedRules.globalCss,
   namedRules.localCss,
+  namedRules.handlebars,
   namedRules.fonts,
   namedRules.images
 ]
@@ -54,6 +55,17 @@ const plugins = [
   new BundleAnalyzerPlugin({
     analyzerMode: (ANALYZER && 'server') || 'disabled',
     openAnalyzer: ANALYZER
+  }),
+
+  new HtmlWebpackPlugin({
+    title: 'OT App',
+    template: './ui/index.hbs',
+    description,
+    author
+  }),
+
+  new ScriptExtHtmlWebpackPlugin({
+    defaultAttribute: 'defer'
   })
 ]
 
@@ -62,7 +74,7 @@ let devtool = 'source-map'
 let devServer = {}
 
 if (DEV) {
-  const publicPath = `http://localhost:${PORT}/dist/`
+  const publicPath = `http://localhost:${PORT}/`
   const contentBase = [path.join(__dirname, './ui')]
 
   entry.unshift('react-hot-loader/patch')

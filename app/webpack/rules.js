@@ -20,7 +20,7 @@ module.exports = {
 
   // worker loader for inline webworkers
   worker: {
-    test: /worker.js$/,
+    test: /worker\.js$/,
     exclude: /node_modules/,
     use: {
       loader: 'worker-loader',
@@ -53,6 +53,12 @@ module.exports = {
         }
       }
     })
+  },
+
+  // handlebars HTML templates
+  handlebars: {
+    test: /\.hbs$/,
+    use: 'handlebars-loader'
   },
 
   // fonts

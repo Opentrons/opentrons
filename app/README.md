@@ -23,13 +23,13 @@ make install
 make dev
 ```
 
-At this point, the Electron app will be running with [HMR] and various Chrome devtools enabled. The app and dev server look for the following environment variables:
+At this point, the Electron app will be running with [HMR] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
 
 variable   | default      | description
 ---------- | ------------ | -------------------------------------------------
 `NODE_ENV` | `production` | Run environment: production, development, or test
 `DEBUG`    | unset        | Runs the app in debug mode
-`PORT`     | `8090`       | Dev server port
+`PORT`     | `8090`       | Development server port
 
 **Note:** you may want to be running the Opentrons API while developing the app. Please see [the api directory](../api) for API specific development instructions.
 

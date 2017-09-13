@@ -11,9 +11,12 @@ shell_source := $(shell find shell -type f -name '*.js')
 ui_target := ui/dist/bundle.js
 
 # use devDependency CLIs with $(bin)/command
-# set NODE_ENV for a command with $(ENV)=environment
+# set NODE_ENV for a command with $(env)=environment
 bin := node_modules/.bin
 env := $(bin)/cross-env NODE_ENV
+
+# dev server port
+port ?= 8090
 
 # watch, coverage, and fix variables for tests and linting
 watch ?= false
@@ -74,15 +77,15 @@ dist-win: $(ui_target) $(shell_source)
 
 .PHONY: dev
 dev: clean
-	$(bin)/concurrently "$(MAKE) dev-server" "sleep 2 && $(MAKE) dev-app"
+	$(bin)/concurrently "$(MAKE) dev-server" "sleep 1 && $(MAKE) dev-app"
 
 .PHONY: dev-server
 dev-server:
-	$(env)=development $(bin)/webpack-dev-server --hot
+	$(env)=development PORT=$(port) $(bin)/webpack-dev-server --hot
 
 .PHONY: dev-app
 dev-app:
-	$(env)=development HOT=true electron shell/main.js
+	$(env)=development PORT=$(port) electron shell/main.js
 
 # checks
 #####################################################################

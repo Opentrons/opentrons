@@ -17,8 +17,10 @@ const DEV_MODE = process.env.NODE_ENV === 'development'
 const DEBUG_MODE = process.env.DEBUG
 
 const dataDirName = 'otone_data'
-const indexPath = path.join(__dirname, '..', 'ui', 'index.html')
-const appWindowUrl = url.resolve('file://', indexPath)
+
+const appWindowUrl = DEV_MODE
+  ? `http://localhost:${process.env.PORT}`
+  : url.resolve('file://', path.join(__dirname, '../ui/dist/index.html'))
 
 if (DEV_MODE || DEBUG_MODE) {
   require('electron-debug')({showDevTools: true})
