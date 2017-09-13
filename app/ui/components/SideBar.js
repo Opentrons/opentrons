@@ -5,12 +5,16 @@ import NavPanel from './NavPanel'
 import grid from './Grid.css'
 import styles from './SideBar.css'
 
+import uploadIconSrc from '../img/icon_file.svg'
+import designIconSrc from '../img/icon_design.svg'
+import setupIconSrc from '../img/icon_setup.svg'
+
 const UploadMenu = props => {
   const {onNavIconClick} = props
   return (
     <section className={styles.upload_menu} onClick={onNavIconClick('upload')}>
       <div className={styles.upload_icon}>
-        <img src='../ui/img/icon_file.svg' alt='upload' />
+        <img src={uploadIconSrc} alt='upload' />
       </div>
     </section>
   )
@@ -23,7 +27,7 @@ const DesignMenu = props => {
   return (
     <section className={styles.design_menu} onClick={onNavIconClick('design')}>
       <div className={styles.design_icon}>
-        <img src='../ui/img/icon_design.svg' alt='design' />
+        <img src={designIconSrc} alt='design' />
       </div>
     </section>
   )
@@ -34,7 +38,7 @@ const SetupMenu = props => {
   return (
     <section className={styles.setup_menu} onClick={onNavIconClick('setup')}>
       <div className={styles.setup_icon}>
-        <img src='../ui/img/icon_setup.svg' alt='setup' />
+        <img src={setupIconSrc} alt='setup' />
       </div>
     </section>
   )

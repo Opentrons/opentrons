@@ -1,81 +1,114 @@
 # opentrons app makefile
 
 # use bash
-SHELL := /bin/bash
+SHELL := bash
 
-# use devDependency CLIs with $(BIN)/command
-BIN := node_modules/.bin
+# source directories
+ui_source := $(shell find ui -type f -name '*' -not -path 'ui/dist/*')
+shell_source := $(shell find shell -type f -name '*.js')
 
+# intermediate target files
+ui_target := ui/dist/bundle.js
+
+# use devDependency CLIs with $(bin)/command
 # set NODE_ENV for a command with $(ENV)=environment
-ENV := $(BIN)/cross-env NODE_ENV
+bin := node_modules/.bin
+env := $(bin)/cross-env NODE_ENV
 
-# setup and development
-#####################################################################
-
-.PHONY: install build package dev clean
-
-install:
-	npm install
-
-ui/dist:
-	npm run build-renderer
-
-shell/dist:
-	npm run build-main
-
-bin/opentrons-api-server:
-	mkdir -p bin && cp ../api/dist/opentrons-api-server bin/
-
-build: shell/dist ui/dist bin/opentrons-api-server
-
-package: build
-	export OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) && \
-	export OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) && \
-	export OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX) && \
-	npm run package
-
-dev:
-	npm run build-dev
-	npm run dev
-
-clean:
-	rm -rf       \
-		ui/dist    \
-		shell/dist \
-		dll        \
-		bin        \
-		coverage
-
-# test tasks
-#####################################################################
-
-.PHONY: test test-e2e test-unit lint lint-js lint-js-fix lint-css lint-css-fix
-
-# watch and coverage arguments for tests
+# watch and coverage variables for tests
 watch ?= false
 cover ?= true
 
 ifeq ($(watch), true)
-	cover = false
+	cover := false
 endif
 
+set_package_env := 	$(bin)/cross-env \
+	OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) \
+	OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) \
+	OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX)
+
+# stardard targets
+#####################################################################
+
+.PHONY: all
+all: package
+
+.PHONY: install
+install:
+	npm install
+
+.PHONY: uninstall
+uninstall:
+	rm -rf node_modules
+
+.PHONY: clean
+clean:
+	rm -rf coverage dist ui/dist
+
+# artifacts
+#####################################################################
+
+$(ui_target): $(ui_source)
+	$(env)=production $(bin)/webpack --profile
+
+.PHONY: package
+package: $(ui_target) $(shell_source)
+	$(set_package_env) $(bin)/electron-builder --dir
+
+.PHONY: dist-mac
+dist-mac: $(ui_target) $(shell_source)
+	$(set_package_env) $(bin)/electron-builder --mac --publish never
+
+.PHONY: dist-linux
+dist-linux: $(ui_target) $(shell_source)
+	$(set_package_env) $(bin)/electron-builder --linux --publish never
+
+.PHONY: dist-win
+dist-win: $(ui_target) $(shell_source)
+	$(set_package_env) $(bin)/electron-builder --win --x64 --publish never
+
+# development
+#####################################################################
+
+.PHONY: dev
+dev:
+	$(bin)/concurrently "$(MAKE) dev-server" "$(MAKE) dev-app"
+
+.PHONY: dev-server
+dev-server:
+	$(env)=development $(bin)/webpack-dev-server --hot
+
+.PHONY: dev-app
+dev-app:
+	$(env)=development HOT=true electron shell/main.js
+
+# checks
+#####################################################################
+
+.PHONY: test
 test: test-unit
 	$(MAKE) lint
 
+.PHONY: test-unit
 test-unit:
-	$(ENV)=test $(BIN)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
+	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
-lint:
-	$(BIN)/concurrently "$(MAKE) lint-js" "$(MAKE) lint-css"
+.PHONY: lint
+lint: lint-js lint-css
 
+.PHONY: lint-js
 lint-js:
-	$(BIN)/standard --verbose | $(BIN)/snazzy
+	$(BIN)/standard --verbose | $(bin)/snazzy
 
+.PHONY: lint-js-fix
 lint-js-fix:
 	$(BIN)/standard --fix
 
+.PHONY: lint-css
 lint-css:
 	$(BIN)/stylelint '**/*.css' --verbose
 
+.PHONY: lint-css-fix
 lint-css-fix:
 	$(BIN)/stylelint '**/*.css' --fix
