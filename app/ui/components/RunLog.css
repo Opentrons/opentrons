@@ -2,7 +2,7 @@
   font-family: 'sans';
   overflow-y: scroll;
   padding: 1rem 1rem 3rem;
-  background: linear-gradient(to left, rgba(245, 245, 245, 1) 185px, #fff 185px, #fff 100%);
+  /* background: linear-gradient(to left, rgba(245, 245, 245, 1) 185px, #fff 185px, #fff 100%); */
 }
 
 ol {
@@ -24,7 +24,7 @@ li.last_current{
 }
 
 li.current {
-  background-color: rgba(150,150,150,0.1);
+  background-color: rgba(150, 150, 150, 0.1);
 }
 
 li.current > ol {
