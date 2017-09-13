@@ -1,9 +1,15 @@
-import numpy
+import numpy as np
 from opentrons.util.trace import MessageBroker
 from opentrons.pubsub_util.topics import MOVEMENT
 from opentrons.pubsub_util.messages.movement import moved_msg
 from opentrons.containers.placeable import WellSeries
 
+def flatten(S):
+    if S == []:
+        return S
+    if isinstance(S[0], list):
+        return flatten(S[0]) + flatten(S[1:])
+    return S[:1] + flatten(S[1:])
 
 
 class Node(object):
@@ -19,7 +25,7 @@ class Node(object):
 
 class Pose(object):
     def __init__(self, x, y, z):
-        self._pose = numpy.identity(4)
+        self._pose = np.identity(4)
         self.x = x
         self.y = y
         self.z = z
@@ -61,7 +67,7 @@ class Pose(object):
 
     @property
     def position(self):
-        return numpy.array([self.x, self.y, self.z])
+        return np.array([self.x, self.y, self.z])
 
 class PositionTracker(object):
     def __init__(self, broker: MessageBroker):
@@ -87,15 +93,14 @@ class PositionTracker(object):
     def __repr__(self):
         return repr(self._position_dict)
 
-    def get_subtree(self, root, subtree_dict={}):
+    def get_objects_in_subtree(self, root):
         '''Returns a position dict of a subtree with a DFS traversal'''
-        subtree_dict[root] = self._position_dict[root]
-        for child in self.get_object_children(root):
-            self.get_subtree(child, subtree_dict)
-        return subtree_dict
+        return flatten([root, [self.get_objects_in_subtree(item)
+                               for item in self.get_object_children(root)]])
 
     def max_z_in_subtree(self, root):
-        return max([pose.z for pose, _ in self.get_subtree(root).values()])
+        return max([self[obj].z for obj in
+                        self.get_objects_in_subtree(root)])
 
     def track_object(self, parent, obj, x, y, z):
         '''
