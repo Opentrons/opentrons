@@ -156,7 +156,7 @@ class Robot(object):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-
+        self.position_tracker = None
         self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
@@ -199,9 +199,9 @@ class Robot(object):
             * Runtime warnings
 
         """
+
         self._commands = []
         self._runtime_warnings = []
-
         self._previous_container = None
         message_broker = MessageBroker.get_instance()
         self.position_tracker = position_tracker.PositionTracker(message_broker)

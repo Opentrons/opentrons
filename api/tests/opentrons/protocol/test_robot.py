@@ -9,6 +9,19 @@ from opentrons.util.vector import Vector
 from opentrons.util.testing.fixtures import robot
 from opentrons.util.testing.util import build_temp_db, approx
 
+def test_pos_tracker_persistance(robot, tmpdir):
+    build_temp_db(tmpdir)
+    p200 = pipette.Pipette(
+        robot, axis='b', name='my-fancy-pancy-pipette'
+    )
+    plate = containers_load(robot, 'trough-12row', 'B2')
+    assert robot.max_deck_height() == 40
+
+    robot.move_head(x=10, y=10, z=10)
+    robot.calibrate_container_with_instrument(plate, p200, save=False)
+
+    assert robot.max_deck_height() == 50
+
 def test_calibrated_max_z(robot, tmpdir):
     build_temp_db(tmpdir)
     p200 = pipette.Pipette(
