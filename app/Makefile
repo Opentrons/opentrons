@@ -57,8 +57,8 @@ $(ui_target): $(ui_source)
 package: $(ui_target) $(shell_source)
 	$(set_package_env) $(bin)/electron-builder --dir
 
-.PHONY: dist-mac
-dist-mac: $(ui_target) $(shell_source)
+.PHONY: dist-osx
+dist-osx: $(ui_target) $(shell_source)
 	$(set_package_env) $(bin)/electron-builder --mac --publish never
 
 .PHONY: dist-linux
