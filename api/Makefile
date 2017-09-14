@@ -8,6 +8,13 @@ install:
 	python setup.py install && pip install -r requirements.txt
 
 test:
+	python -m pylama opentrons tests || python -m pytest \
+		--cov=opentrons \
+		--cov-report term-missing:skip-covered \
+		--cov-report xml:coverage.xml \
+		tests
+
+test_show:
 	python -m pylama opentrons tests || python -m pytest -s -v \
 		--cov=opentrons \
 		--cov-report term-missing:skip-covered \

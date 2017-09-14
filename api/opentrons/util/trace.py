@@ -8,7 +8,7 @@ from opentrons.util import environment
 TOPIC_FILES_PATH = environment.get_path('LOG_DIR')
 
 
-def traceable(self, name=None):
+def traceable(name=None):
     def _traceable(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -30,7 +30,6 @@ def traceable(self, name=None):
             args_dict.update(kwargs)
 
             # args_dict = {k: str(v) for k, v in args_dict.items()}
-
             MessageBroker.get_instance().publish(topics.MISC, {
                 'name': name,
                 'function': f.__qualname__,

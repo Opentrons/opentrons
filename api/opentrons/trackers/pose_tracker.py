@@ -43,8 +43,10 @@ class Pose(object):
     def __eq__(self, other):
         return (self._pose == other._pose).all()
 
+    # TODO: Revisit this once we start dealing with rotation
+    # to make sure we are doing this in the most expected way
     def __mul__(self, other):
-        return self._pose.dot(other)
+        return Pose(*self._pose.dot(other)[:3])
 
     @property
     def x(self):
@@ -145,8 +147,7 @@ class PoseTracker(object):
 
     def _translate_object(self, obj_to_trans, x, y, z):
         '''Translates a single object'''
-        new_x, new_y, new_z, _ = self[obj_to_trans] * [x, y, z, 1]
-        self[obj_to_trans] = Pose(new_x, new_y, new_z)
+        self[obj_to_trans] *= [x, y, z, 1]
 
     def translate_object(self, obj_to_trans, x, y, z):
         '''Translates an object and its descendants'''

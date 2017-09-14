@@ -4,8 +4,8 @@ from opentrons.data_storage import database_crud_funcs as db_crud
 from opentrons.util import environment
 from opentrons.util.vector import Vector
 
-default_database = environment.get_path('DATABASE_FILE')
-db_conn = sqlite3.connect(default_database)
+database_path = environment.get_path('DATABASE_FILE')
+
 
 
 # ======================== Private Functions ======================== #
@@ -72,7 +72,7 @@ def _update_container_object_in_db(db, container: Container):
 
 
 def _delete_container_object_in_db(db, container_name: str):
-    db_crud.delete_wells_by_container_name(db_conn, container_name)
+    db_crud.delete_wells_by_container_name(db, container_name)
     db_crud.delete_container(db, container_name)
 
 
@@ -113,29 +113,33 @@ def _list_all_containers_by_name(db):
 
 # ======================== Public Functions ======================== #
 def save_new_container(container: Container, container_name: str):
+    db_conn = sqlite3.connect(database_path)
     return _create_container_obj_in_db(db_conn, container, container_name)
 
 
 def load_container(container_name: str):
+    db_conn = sqlite3.connect(database_path)
     return _load_container_object_from_db(db_conn, container_name)
 
 
 def overwrite_container(container: Container):
+    db_conn = sqlite3.connect(database_path)
     return _update_container_object_in_db(db_conn, container)
 
 
 def delete_container(container_name):
+    db_conn = sqlite3.connect(database_path)
     return _delete_container_object_in_db(db_conn, container_name)
 
 
 def list_all_containers():
+    db_conn = sqlite3.connect(database_path)
     return _list_all_containers_by_name(db_conn)
 
 
 def change_database(db_path: str):
-    global db_conn
-    new_db = sqlite3.connect(db_path)
-    db_conn.close()
-    db_conn = new_db
+    global database_path
+    print('\n\n NEW DB:', db_path)
+    database_path = db_path
 
 # ======================== END Public Functions ======================== #

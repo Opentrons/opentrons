@@ -2,6 +2,7 @@ import sys
 
 from opentrons.robot.robot import Robot
 from opentrons import instruments as inst, containers as cnt
+from opentrons import data_storage
 
 from ._version import get_versions
 
@@ -50,7 +51,7 @@ class InstrumentsWrapper(object):
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 
-__all__ = [containers, instruments, robot, reset]
+__all__ = [containers, instruments, robot, reset, data_storage]
 
 
 __version__ = get_versions()['version']

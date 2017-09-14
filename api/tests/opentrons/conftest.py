@@ -47,6 +47,12 @@ Protocol = namedtuple(
     'Protocol',
     ['text', 'filename'])
 
+# Note: When dummy_db or robot fixtures are used, this db is copied into a
+# a temp testing_db that is deleted in between tests to allow for db mutation
+MAIN_TESTER_DB = str(os.path.join(
+    os.path.dirname(
+        globals()["__file__"]), 'testing_database.db')
+)
 
 def print_db_path(db):
     cursor = database.db_conn.cursor()
@@ -55,23 +61,19 @@ def print_db_path(db):
     print("Database: ", db_info[2])
 
 
-def db_path():
-    path = globals()["__file__"]
-    return os.path.join(os.path.dirname(path), 'testing_database.db')
-
-
 # Builds a temp db to allow mutations during testing
 @pytest.fixture
-def build_dummy_temp_db(tmpdir):
-    temp_db_fd = tmpdir.mkdir('testing').join("database.db")
-    shutil.copy2(db_path(), str(temp_db_fd))
-    database.change_database(str(temp_db_fd))
+def dummy_db(tmpdir):
+    temp_db_path = str(tmpdir.mkdir('testing').join("database.db"))
+    shutil.copy2(MAIN_TESTER_DB, temp_db_path)
+    database.change_database(temp_db_path)
     yield None
-    os.remove(str(temp_db_fd))
+    database.change_database(MAIN_TESTER_DB)
+    os.remove(temp_db_path)
 
 
 @pytest.fixture
-def robot(build_dummy_temp_db):
+def robot(dummy_db):
     from opentrons import Robot
     return Robot()
 
@@ -137,3 +139,9 @@ def session(loop, test_client, request, session_manager):
         server.shutdown()
     request.addfinalizer(finalizer)
     return Session(server, socket, token, call)
+
+
+def setup_testing_env():
+    database.change_database(MAIN_TESTER_DB)
+
+setup_testing_env()
