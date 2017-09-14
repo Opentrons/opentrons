@@ -81,17 +81,21 @@ export default function client (dispatch) {
   }
 
   function disconnect () {
-    if (rpcClient) rpcClient.close()
+    if (!rpcClient) return dispatch(actions.disconnectResponse())
 
-    // null out saved client and session
-    rpcClient = null
-    sessionManager = null
-    session = null
-    robot = null
-    // TODO(mc, 2017-09-07): remove when server handles serial port
-    serialPort = null
+    rpcClient.close()
+      .then(() => {
+        // null out saved client and session
+        rpcClient = null
+        sessionManager = null
+        session = null
+        robot = null
+        // TODO(mc, 2017-09-07): remove when server handles serial port
+        serialPort = null
 
-    dispatch(actions.disconnectResponse())
+        dispatch(actions.disconnectResponse())
+      })
+      .catch((error) => dispatch(actions.disconnectResponse(error)))
   }
 
   function createSession (state, action) {

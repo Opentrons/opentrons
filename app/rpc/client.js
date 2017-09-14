@@ -22,6 +22,7 @@ const uuid = () => `id-${_uniqueId++}`
 // timeouts
 const HANDSHAKE_TIMEOUT = 5000
 const RECEIVE_CONTROL_TIMEOUT = 3000
+const CLOSE_TIMEOUT = 1000
 const CALL_ACK_TIMEOUT = 3000
 const CALL_RESULT_TIMEOUT = 240000
 
@@ -60,8 +61,6 @@ class RpcContext extends EventEmitter {
     const resultEvent = makeSuccessEventName(token)
     const failureEvent = makeFailureEventName(token)
 
-    this._send({$: {token}, id, name, args})
-
     return new Promise((resolve, reject) => {
       let timeout
 
@@ -70,17 +69,8 @@ class RpcContext extends EventEmitter {
         reject(new Error(`Error in ${name}(${args.join(', ')}): ${reason}`))
       }
 
-      const handleFailure = (result) => {
-        handleError(new Error(result))
-      }
-
-      const handleSuccess = (result) => {
-        cleanup()
-
-        RemoteObject(this, result)
-          .then(resolve)
-          .catch(reject)
-      }
+      const handleFailure = (result) => handleError(new Error(result))
+      const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
 
       const handleAck = () => {
         clearTimeout(timeout)
@@ -93,7 +83,13 @@ class RpcContext extends EventEmitter {
         this.once(failureEvent, handleFailure)
       }
 
-      const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
+      const handleSuccess = (result) => {
+        cleanup()
+
+        RemoteObject(this, result)
+          .then(resolve)
+          .catch(reject)
+      }
 
       function cleanup () {
         clearTimeout(timeout)
@@ -107,6 +103,7 @@ class RpcContext extends EventEmitter {
       this.once('error', handleError)
       this.once(ackEvent, handleAck)
       this.once(nackEvent, handleNack)
+      this._send({$: {token}, id, name, args})
       timeout = setTimeout(
         () => handleError('ACK timeout'),
         CALL_ACK_TIMEOUT
@@ -130,7 +127,40 @@ class RpcContext extends EventEmitter {
 
   // close the websocket
   close () {
-    this._ws.close()
+    const self = this
+
+    return new Promise((resolve, reject) => {
+      if (this._ws.readyState === this._ws.CLOSED) {
+        return resolve()
+      }
+
+      let closeTimeout
+      const finish = (error) => {
+        cleanup()
+
+        if (this._ws.readyState === this._ws.CLOSED) {
+          return resolve()
+        }
+
+        reject(error || new Error('WebSocket is not closed'))
+      }
+
+      const handleClose = () => finish()
+
+      function cleanup () {
+        clearTimeout(closeTimeout)
+        self._ws.removeListener('close', handleClose)
+        self._ws.removeListener('error', finish)
+      }
+
+      this._ws.once('close', handleClose)
+      this._ws.once('error', finish)
+      this._ws.close()
+      closeTimeout = setTimeout(
+        () => finish(new Error('Timed out closing RPC client')),
+        CLOSE_TIMEOUT
+      )
+    })
   }
 
   // cache required metadata from call results
@@ -171,8 +201,7 @@ class RpcContext extends EventEmitter {
   _handleMessage (message) {
     // log.debug('Received message %j', message)
 
-    const meta = message.$
-    const data = message.data
+    const {$: meta, data} = message
     const type = meta.type
 
     switch (type) {

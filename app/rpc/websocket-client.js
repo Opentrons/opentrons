@@ -26,6 +26,12 @@ export default class WebSocketClient extends EventEmitter {
     this._ws.onmessage = (e) => this.emit('message', parseMessage(e.data))
     this._ws.onclose = (e) => this.emit('close', e.code, e.reason, e.wasClean)
     this._ws.onerror = (error) => this.emit('error', error)
+
+    // also export websocket readyState constants
+    this.CONNECTING = WebSocket.CONNECTING
+    this.OPEN = WebSocket.OPEN
+    this.CLOSING = WebSocket.CLOSING
+    this.CLOSED = WebSocket.CLOSED
   }
 
   get readyState () {
