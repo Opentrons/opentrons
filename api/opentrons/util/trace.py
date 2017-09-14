@@ -1,12 +1,12 @@
 from functools import wraps
 import inspect
 import tempfile as tmpfs
-import os
 
 from opentrons.pubsub_util import topics
 from opentrons.util import environment
 
 TOPIC_FILES_PATH = environment.get_path('LOG_DIR')
+
 
 def traceable(self, name=None):
     def _traceable(f):
@@ -41,8 +41,9 @@ def traceable(self, name=None):
 
         return decorated
 
-    name = name 
+    name = name
     return _traceable
+
 
 class MessageBroker(object):
     _instance = None
@@ -50,8 +51,10 @@ class MessageBroker(object):
     def __init__(self):
         self.topics_and_funcs = {}
         self.topic_temp_files = {
-            'topics': tmpfs.NamedTemporaryFile(prefix='Topics_', dir=TOPIC_FILES_PATH),
-            'subscribers': tmpfs.NamedTemporaryFile(prefix='Subscribers_', dir=TOPIC_FILES_PATH)
+            'topics': tmpfs.NamedTemporaryFile(
+                prefix='Topics_', dir=TOPIC_FILES_PATH),
+            'subscribers': tmpfs.NamedTemporaryFile(
+                prefix='Subscribers_', dir=TOPIC_FILES_PATH)
         }
 
     def write_to_temp_file(self, topic, msg):
@@ -67,7 +70,11 @@ class MessageBroker(object):
         else:
             self.topics_and_funcs[topic] = [func]
             self.write_to_temp_file('topics', topic)
-            self.topic_temp_files[topic] = tmpfs.NamedTemporaryFile(prefix= topic +'_', dir=TOPIC_FILES_PATH)
+            self.topic_temp_files[topic] = \
+                tmpfs.NamedTemporaryFile(
+                    prefix=topic + '_',
+                    dir=TOPIC_FILES_PATH
+                )
 
     def unsubscribe(self, topic, func):
         self.topics_and_funcs[topic].remove(func)

@@ -18,8 +18,6 @@ def test_drop_tip_move_to(robot, tmpdir):
     plate = containers_load(robot, '96-flat', 'A1')
     build_temp_db(tmpdir)
     p200 = Pipette(robot, 'b')
-
-
     x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
@@ -61,6 +59,7 @@ def test_aspirate_move_to(robot, tmpdir):
 
     assert current_pos == {'a': 0, 'b': 5.0}
 
+
 def test_blow_out_move_to(robot, tmpdir):
     build_temp_db(tmpdir)
     p200 = Pipette(robot, 'b')
@@ -79,6 +78,7 @@ def test_blow_out_move_to(robot, tmpdir):
     assert current_pos == Vector({'x': 172.24, 'y': 131.04, 'z': 3.0})
     current_pos = robot._driver.get_plunger_positions()['current']
     assert current_pos == {'a': 0, 'b': 12.0}
+
 
 def test_dispense_move_to(robot, tmpdir):
     build_temp_db(tmpdir)
@@ -105,6 +105,7 @@ def test_dispense_move_to(robot, tmpdir):
 
     assert current_head_pos == Vector({'x': 172.24, 'y': 131.04, 'z': 3.0})
     assert current_plunger_pos == {'a': 0, 'b': 10.0}
+
 
 class PipetteTest(unittest.TestCase):
     def setUp(self):

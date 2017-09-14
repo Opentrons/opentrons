@@ -4,12 +4,10 @@ from threading import Event
 
 from opentrons import containers, drivers
 from opentrons.containers import Container
-from opentrons.util import trace
-from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons.helpers import helpers
 from opentrons.util.trace import MessageBroker, traceable
-from opentrons.trackers import position_tracker
+from opentrons.trackers import pose_tracker
 from opentrons.data_storage import database
 import opentrons.util.calibration_functions as calib
 import opentrons.util.position_functions as pf
@@ -17,8 +15,10 @@ import opentrons.util.position_functions as pf
 log = get_logger(__name__)
 
 
-#FIXME: This should be a head object - but using a string now to avoid scope creep
+# FIXME: This should be a head object -
+# but using a string now to avoid scope creep
 HEAD = 'head'
+
 
 class InstrumentMosfet(object):
     """
@@ -156,7 +156,7 @@ class Robot(object):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self.position_tracker = None
+        self.pose_tracker = None
         self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
@@ -204,15 +204,16 @@ class Robot(object):
         self._runtime_warnings = []
         self._previous_container = None
         message_broker = MessageBroker.get_instance()
-        self.position_tracker = position_tracker.PositionTracker(message_broker)
-        self.position_tracker.create_root_object(HEAD, 0, 0, 0) # 0,0,0, is rel pos of smoothie w.r.t the deck
+        self.pose_tracker = pose_tracker.PoseTracker(message_broker)
+
+        # 0,0,0, is smoothie pos w.r.t deck
+        self.pose_tracker.create_root_object(HEAD, 0, 0, 0)
+
         self._deck = containers.Deck()
         self.setup_deck()
-
         self._instruments = {}
 
-
-        #TODO: Move homing info to driver
+        # TODO: Move homing info to driver
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
@@ -243,7 +244,9 @@ class Robot(object):
         """
         axis = axis.upper()
         self._instruments[axis] = instrument
-        self.position_tracker.track_object(HEAD, instrument, 0, 0, 0) #TODO: Create real pipette offsets
+
+        # TODO: Create real pipette offsets
+        self.pose_tracker.track_object(HEAD, instrument, 0, 0, 0)
 
     def add_warning(self, warning_msg):
         """
@@ -458,14 +461,13 @@ class Robot(object):
 
         placeable, coordinates = containers.unpack_location(location)
 
-        # because the top position is what is tracked, this checks if coordinates doesn't equal top
+        # because the top position is what is tracked,
+        # this checks if coordinates doesn't equal top
         offset = coordinates - placeable.top()[1]
-        target = self.position_tracker[placeable].position + offset.coordinates
-
-
+        target = self.pose_tracker[placeable].position + offset.coordinates
 
         coordinates = pf.target_pos_for_instrument_positioning(
-            self.position_tracker, HEAD, instrument, *target)
+            self.pose_tracker, HEAD, instrument, *target)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(coordinates, placeable)
@@ -494,7 +496,6 @@ class Robot(object):
             this_container = placeable
 
         travel_height = self.max_deck_height() + self.arc_height
-
 
         _, _, robot_max_z = self._driver.get_dimensions()
         arc_top = min(travel_height, robot_max_z)
@@ -618,13 +619,13 @@ class Robot(object):
 
     def setup_deck(self):
         self.add_slots_to_deck()
-        # Setup Deck as root object for position tracker
-        self.position_tracker.create_root_object(
+        # Setup Deck as root object for pose tracker
+        self.pose_tracker.create_root_object(
             self._deck, *self._deck._coordinates
         )
 
         for slot in self._deck:
-            self.position_tracker.track_object(
+            self.pose_tracker.track_object(
                 self._deck,
                 slot,
                 *slot._coordinates
@@ -669,19 +670,19 @@ class Robot(object):
                     slot, container_name, slot))
         else:
             self._deck[slot].add(container, label)
-        self.add_container_to_position_tracker(container)
+        self.add_container_to_pose_tracker(container)
         return container
 
-    def add_container_to_position_tracker(self, container : Container):
+    def add_container_to_pose_tracker(self, container: Container):
         """
-        Add container and child wells to position tracker. Sets container.parent
-        (slot) as position tracker parent
+        Add container and child wells to pose tracker. Sets container.parent
+        (slot) as pose tracker parent
         """
-        self.position_tracker.track_object(
+        self.pose_tracker.track_object(
             container.parent, container, *container._coordinates
         )
         for well in container:
-            self.position_tracker.track_object(
+            self.pose_tracker.track_object(
                 container,
                 well,
                 *(well._coordinates + well.top()[1])
@@ -798,15 +799,23 @@ class Robot(object):
     def comment(self, msg):
         self.add_command(msg)
 
-    def calibrate_container_with_instrument(self, container: Container, instrument, save: bool):
+    def calibrate_container_with_instrument(self,
+                                            container: Container,
+                                            instrument,
+                                            save: bool
+                                            ):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
-        expected_position = self.position_tracker[well].position
-        expected_position[2] -= well.properties['depth'] #calibrate will well bottom, but track top of well
-        true_position = self.position_tracker[instrument].position
-        calib.calibrate_container_with_delta(container,
-                                             self.position_tracker,
-                                             *(true_position - expected_position), save)
+        expected_position = self.pose_tracker[well].position
+
+        # calibrate will well bottom, but track top of well
+        expected_position[2] -= well.properties['depth']
+        true_position = self.pose_tracker[instrument].position
+        calib.calibrate_container_with_delta(
+            container,
+            self.pose_tracker,
+            *(true_position - expected_position), save
+        )
 
     def max_deck_height(self):
-        return self.position_tracker.max_z_in_subtree(self._deck)
+        return self.pose_tracker.max_z_in_subtree(self._deck)

@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from opentrons.util.trace import MessageBroker
 from opentrons.pubsub_util import topics
 
+
 class Notifications(object):
     def __init__(self, loop=None, filters=None):
         self.loop = loop or asyncio.get_event_loop()

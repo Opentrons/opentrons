@@ -1,6 +1,7 @@
 from opentrons.instruments import pipette
 from opentrons.containers import placeable
 
+
 def get_unique_containers(instrument):
     """
     Returns all associated containers for an instrument
@@ -16,7 +17,8 @@ def get_unique_containers(instrument):
     return sort_containers(list(unique_containers))
 
 
-#TODO: I think this should be removed once calibrating with respect to pipette is fully removed
+# TODO: I think this should be removed once
+# calibrating with respect to pipette is fully removed
 def are_instrument_positions_calibrated(instrument):
     # TODO: rethink calibrating instruments other than Pipette
     if not isinstance(instrument, pipette.Pipette):

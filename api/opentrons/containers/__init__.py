@@ -62,12 +62,14 @@ def create(name, grid, spacing, diameter, depth, volume=0):
             custom_container.add(well, well_name, coordinates)
     database.save_new_container(custom_container, name)
 
-#FIXME: [Jared - 8/31/17] This is not clean
-#FIXME: fix it by using the same reference points in saved containers and Container/Well objects
+
+# FIXME: [Jared - 8/31/17] This is not clean
+# fix it by using the same reference points
+# in saved containers and Container/Well objects
 def container_to_json(c, name):
     locations = []
     c_x, c_y, c_z = c._coordinates
-    container_offset = {'x': c_x,'y': c_y, 'z': c_z}
+    container_offset = {'x': c_x, 'y': c_y, 'z': c_z}
     for w in c:
         x, y, z = w._coordinates + w.bottom()[1]
         properties_dict = {
@@ -78,13 +80,16 @@ def container_to_json(c, name):
         if w.properties.get('diameter'):
             properties_dict.update({'diameter': w.properties['diameter']})
         else:
-            properties_dict.update({'width': w.properties['width'], 'length': w.properties['length']})
+            properties_dict.update({'width': w.properties['width'],
+                                    'length': w.properties['length']})
         locations.append((
             w.get_name(),
             properties_dict
 
         ))
-    return {name: {'origin-offset': container_offset,'locations': OrderedDict(locations)}}
+    return {name: {'origin-offset': container_offset,
+                   'locations': OrderedDict(locations)}}
+
 
 def save_custom_container(data):
     container_file_path = environment.get_path('CONTAINERS_FILE')

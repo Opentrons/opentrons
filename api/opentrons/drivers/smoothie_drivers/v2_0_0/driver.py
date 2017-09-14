@@ -13,6 +13,7 @@ from opentrons.util.trace import MessageBroker
 log = get_logger(__name__)
 message_broker = MessageBroker.get_instance()
 
+
 class SmoothieDriver_2_0_0(SmoothieDriver):
 
     """
@@ -319,7 +320,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         }
         message_broker.publish(topics.MISC, arguments)
 
-        new_position = moved_msg('head',*current_pos)
+        new_position = moved_msg('head', *current_pos)
         message_broker.publish(topics.MOVEMENT, new_position)
 
     def move_plunger(self, mode='absolute', **kwargs):
@@ -447,9 +448,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 'name': 'countdown',
                 'countdown': int(end_time - time.time())
             })
-            message_broker.publish(topics.MISC, {
-            'name': 'delay-finish'
-        })
+            message_broker.publish(
+                topics.MISC,
+                {'name': 'delay-finish'}
+            )
 
     def calm_down(self):
         self.send_command(self.CALM_DOWN, read_after=False)

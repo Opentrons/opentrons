@@ -1,25 +1,19 @@
 '''
     ATTENTION: This file was is for loading of json container files.
-    It is only being kept so that old json files can be migrated!
-    If you are looking to work with container file saving, or loading, or
-    really anything aside from using an old json container file you should probably
-    check out the new database we use for this storage! It can be found in
-    api/opentrons/data_storage/database.py.
+    It is only being kept so that old json files can be migrated.
 '''
 
-#TODO: Delete this file.
+# TODO: Delete this file.
 
-from collections import OrderedDict
 import copy
 import json
 import numbers
 import os
 import pkg_resources
-
+from collections import OrderedDict
 from opentrons.containers.placeable import Container, Well
 from opentrons.util import environment
 from opentrons.util.vector import Vector
-
 
 persisted_containers_dict = {}
 containers_file_list = []
@@ -34,9 +28,11 @@ default_containers_path = os.path.join(
     'default-containers.json'
 )
 
+
 def load_containers_from_file_list(file_list):
     for file_name in file_list:
         load_containers_from_file_path(file_name)
+
 
 def load_all_containers_from_disk():
     containers_file_list.clear()
@@ -48,19 +44,22 @@ def load_all_containers_from_disk():
         containers_file_list
     )
 
-#TODO: How should we handle faulty container paths?
+
+# TODO: How should we handle faulty container paths?
 def load_containers_from_file_path(file_path):
     with open(file_path) as f:
         persisted_containers_dict.update(json.load(
             f,
             object_pairs_hook=OrderedDict
-        ).get('containers', [(None,None)]))
+        ).get('containers', [(None, None)]))
+
 
 def get_custom_container_files():
     """
     Traverses environment.get_path('CONTAINERS_DIR') to retrieve
     all .json files
     """
+
     def is_special_file(name):
         return name.startswith('.')
 
@@ -176,7 +175,11 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
 
     container = Container()
     locations = container_data.get('locations')
-    container._coordinates = Vector(origin_offset_x, origin_offset_y, origin_offset_z)
+    container._coordinates = Vector(
+        origin_offset_x,
+        origin_offset_y,
+        origin_offset_z
+    )
     for well_name, well_properties in locations.items():
         x = well_properties.pop('x')
         y = well_properties.pop('y')
@@ -196,5 +199,3 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
         well_coordinates = (x, y, z)
         container.add(well, well_name, well_coordinates)
     return container
-
-

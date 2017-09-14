@@ -1,12 +1,11 @@
 import ast
 import asyncio
 import logging
-
 from asyncio import Queue
 from concurrent import futures
+from opentrons.pubsub_utils import topics
 from opentrons.robot.robot import Robot
 from opentrons.util.trace import MessageBroker
-from opentrons.pubsub_utils import topics
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +48,7 @@ class RobotContainer(object):
             arguments['self_id'] = arguments.pop('self')
 
         future = asyncio.run_coroutine_threadsafe(
-                self.notifications.put(info), self.loop)
+            self.notifications.put(info), self.loop)
 
         # If same thread, don't wait, will freeze otherwise
         if not self.same_thread():
@@ -72,7 +71,7 @@ class RobotContainer(object):
             robot.connect(devicename)
 
         try:
-            exec(self.protocol, {})
+            exec (self.protocol, {})
         finally:
             robot.disconnect()
 
@@ -101,8 +100,11 @@ class RobotContainer(object):
     def __aiter__(self):
         return self
 
-    async def __anext__(self):
-        return await self.notifications.get()
+    async
+
+    def __anext__(self):
+        return await
+        self.notifications.get()
 
     def finalize(self):
         log.info('Finalizing RobotContainer')

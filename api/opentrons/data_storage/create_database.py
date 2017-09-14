@@ -1,6 +1,9 @@
 import sqlite3
-from opentrons.data_storage.old_container_loading import load_all_containers_from_disk, list_container_names, get_persisted_container
 from opentrons.data_storage import database
+from opentrons.data_storage.old_container_loading import \
+    load_all_containers_from_disk, \
+    list_container_names, \
+    get_persisted_container
 from opentrons.util import environment
 
 containers_table = """ CREATE TABLE IF NOT EXISTS Containers (
@@ -12,17 +15,18 @@ containers_table = """ CREATE TABLE IF NOT EXISTS Containers (
 
 # Think we might want to use rows and columns instead of A1 or B2
 container_wells = """CREATE TABLE IF NOT EXISTS ContainerWells (
-                                container_name TEXT NOT NULL references Containers(name),
-                                location TEXT NOT NULL, 
-                                relative_x INTEGER DEFAULT 0,
-                                relative_y INTEGER DEFAULT 0,
-                                relative_z INTEGER DEFAULT 0,
-                                depth INTEGER NOT NULL,
-                                volume INTEGER,
-                                diameter INTEGER,
-                                length INTEGER,
-                                width INTEGER
-                            );"""
+                        container_name TEXT NOT NULL
+                            references Containers(name),
+                        location TEXT NOT NULL,
+                        relative_x INTEGER DEFAULT 0,
+                        relative_y INTEGER DEFAULT 0,
+                        relative_z INTEGER DEFAULT 0,
+                        depth INTEGER NOT NULL,
+                        volume INTEGER,
+                        diameter INTEGER,
+                        length INTEGER,
+                        width INTEGER
+                    );"""
 
 
 def migrate_containers_and_wells():
@@ -38,19 +42,11 @@ def migrate_containers_and_wells():
 
 
 def create_table(conn, create_table_sql):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Error as e:
-        print(e)
+    c = conn.cursor()
+    c.execute(create_table_sql)
+
 
 def main():
-    # create a database connection
     db_path = environment.get_path('DATABASE_FILE')
     conn = sqlite3.connect(db_path)
     if conn is not None:
@@ -60,6 +56,7 @@ def main():
 
     else:
         print("Error! cannot create the database connection.")
+
 
 if __name__ == '__main__':
     main()
