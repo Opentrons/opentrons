@@ -4,12 +4,14 @@
 
 import pytest
 import os
-
+import shutil
 from collections import namedtuple
 from opentrons.server import rpc
 from uuid import uuid4 as uuid
+from opentrons.data_storage import database
 
 # Uncomment to enable logging during tests
+
 # logging_config = dict(
 #     version=1,
 #     formatters={
@@ -46,14 +48,46 @@ Protocol = namedtuple(
     ['text', 'filename'])
 
 
+def print_db_path(db):
+    cursor = database.db_conn.cursor()
+    cursor.execute("PRAGMA database_list")
+    db_info = cursor.fetchone()
+    print("Database: ", db_info[2])
+
+
+def db_path():
+    path = globals()["__file__"]
+    return os.path.join(os.path.dirname(path), 'testing_database.db')
+
+
+# Builds a temp db to allow mutations during testing
+@pytest.fixture
+def build_dummy_temp_db(tmpdir):
+    temp_db_fd = tmpdir.mkdir('testing').join("database.db")
+    shutil.copy2(db_path(), str(temp_db_fd))
+    database.change_database(str(temp_db_fd))
+    yield None
+    os.remove(str(temp_db_fd))
+
+
+@pytest.fixture
+def robot(build_dummy_temp_db):
+    from opentrons import Robot
+    return Robot()
+
+
+@pytest.fixture
+def message_broker():
+    from opentrons.util.trace import MessageBroker
+    return MessageBroker()
+
+
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
     text = None
     filename = os.path.join(os.path.dirname(__file__), 'data', request.param)
-
     with open(filename) as file:
         text = ''.join(list(file))
-
     return Protocol(text=text, filename=filename)
 
 
@@ -84,6 +118,7 @@ def session(loop, test_client, request, session_manager):
     except Exception as e:
         pass
 
+
     server = rpc.Server(loop=loop, root=root)
     client = loop.run_until_complete(test_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
@@ -100,6 +135,5 @@ def session(loop, test_client, request, session_manager):
 
     def finalizer():
         server.shutdown()
-
     request.addfinalizer(finalizer)
     return Session(server, socket, token, call)

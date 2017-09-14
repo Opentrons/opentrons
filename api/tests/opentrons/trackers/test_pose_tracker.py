@@ -1,7 +1,7 @@
 from opentrons.util import calibration_functions as cf
 from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
-from opentrons.util.testing.util import build_temp_db, approx
+from opentrons.util.testing.util import approx
 
 
 def test_add_container_to_deck(robot):
@@ -10,7 +10,6 @@ def test_add_container_to_deck(robot):
 
 
 def test_calibrate_plate(robot, tmpdir):
-    build_temp_db(tmpdir)
     # Load container | Test positions of container and wells
     plate = containers_load(robot, '96-flat', 'A1')
     assert approx(robot.pose_tracker[plate].position) == 45
@@ -38,16 +37,12 @@ def test_calibrate_plate(robot, tmpdir):
     )
 
 
-def test_add_pipette(robot, tmpdir):
-    build_temp_db(tmpdir)
-
+def test_add_pipette(robot):
     p200 = Pipette(robot, 'a')
     assert p200 in robot.pose_tracker
 
 
-def test_pipette_movement(robot, tmpdir):
-    build_temp_db(tmpdir)
-
+def test_pipette_movement(robot):
     p200 = Pipette(robot, 'a')
     plate = containers_load(robot, '96-flat', 'A1')
     p200.move_to(plate[2])
@@ -56,9 +51,7 @@ def test_pipette_movement(robot, tmpdir):
     )
 
 
-def test_max_z(robot, tmpdir):
-    build_temp_db(tmpdir)
-
+def test_max_z(robot):
     containers_load(robot, '96-flat', 'A1')
     deck = robot._deck
     assert robot.pose_tracker.max_z_in_subtree(deck) == 10.5

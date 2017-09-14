@@ -1,11 +1,8 @@
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
-from opentrons.util.testing.util import build_temp_db
 
 
-def test_new_containers(robot, tmpdir):
-    build_temp_db(tmpdir)
-
+def test_new_containers(robot):
     trash_box = containers_load(robot, 'trash-box', 'A1')
     wheaton_vial_rack = containers_load(robot, 'wheaton_vial_rack', 'A2')
     tube_rack_80well = containers_load(robot, 'tube-rack-80well', 'A3')

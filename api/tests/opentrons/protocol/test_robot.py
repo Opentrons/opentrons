@@ -4,11 +4,9 @@ from opentrons import drivers
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
-from opentrons.util.testing.util import build_temp_db
 
 
-def test_pos_tracker_persistance(robot, tmpdir):
-    build_temp_db(tmpdir)
+def test_pos_tracker_persistance(robot):
     p200 = pipette.Pipette(
         robot, axis='b', name='my-fancy-pancy-pipette'
     )
@@ -21,8 +19,7 @@ def test_pos_tracker_persistance(robot, tmpdir):
     assert robot.max_deck_height() == 50
 
 
-def test_calibrated_max_z(robot, tmpdir):
-    build_temp_db(tmpdir)
+def test_calibrated_max_z(robot):
     p200 = pipette.Pipette(
         robot, axis='b', name='my-fancy-pancy-pipette'
     )

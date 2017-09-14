@@ -6,12 +6,10 @@ from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
 from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
-from opentrons.util.testing.util import build_temp_db
 
 
-def test_drop_tip_move_to(robot, tmpdir):
+def test_drop_tip_move_to(robot):
     plate = containers_load(robot, '96-flat', 'A1')
-    build_temp_db(tmpdir)
     p200 = Pipette(robot, 'b')
     x, y, z = (161.0, 116.7, 3.0)
 
@@ -31,8 +29,7 @@ def test_drop_tip_move_to(robot, tmpdir):
         })
 
 
-def test_aspirate_move_to(robot, tmpdir):
-    build_temp_db(tmpdir)
+def test_aspirate_move_to(robot):
     p200 = Pipette(robot, 'b')
 
     x, y, z = (161.0, 116.7, 0)
@@ -52,8 +49,7 @@ def test_aspirate_move_to(robot, tmpdir):
     assert current_pos == {'a': 0, 'b': 5.0}
 
 
-def test_blow_out_move_to(robot, tmpdir):
-    build_temp_db(tmpdir)
+def test_blow_out_move_to(robot):
     p200 = Pipette(robot, 'b')
 
     plate = containers_load(robot, '96-flat', 'A1')
@@ -72,8 +68,7 @@ def test_blow_out_move_to(robot, tmpdir):
     assert current_pos == {'a': 0, 'b': 12.0}
 
 
-def test_dispense_move_to(robot, tmpdir):
-    build_temp_db(tmpdir)
+def test_dispense_move_to(robot):
     p200 = Pipette(robot, 'b')
     plate = containers_load(robot, '96-flat', 'A1')
     x, y, z = (161.0, 116.7, 3.0)

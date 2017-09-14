@@ -2,7 +2,7 @@ from opentrons.containers import load as containers_load
 from opentrons.containers.placeable import Well, Container
 from opentrons.data_storage import database
 from opentrons.instruments import Pipette
-from opentrons.util.testing.util import build_temp_db, approx
+from opentrons.util.testing.util import approx
 from opentrons.util.vector import Vector
 
 EXPECTED_CONTAINER_COORDS = {
@@ -53,7 +53,7 @@ EXPECTED_CONTAINER_COORDS = {
 
 
 def test_container_from_container_load(robot, tmpdir):
-    build_temp_db(tmpdir)
+    # build_temp_db(tmpdir)
     plate = containers_load(robot, '96-flat', 'A1')
     assert plate.get_type() == '96-flat'
     assert plate._coordinates == Vector(11.24, 14.34, 0.00)
@@ -86,7 +86,7 @@ def test_well_parse(robot):
 
 
 def test_load_all_containers(tmpdir):
-    build_temp_db(tmpdir)
+    # build_temp_db(tmpdir)
 
     containers = [database.load_container(container_name)
                   for container_name in database.list_all_containers()]
@@ -100,7 +100,7 @@ def test_load_all_containers(tmpdir):
 
 
 def test_calibrate_container(robot, tmpdir):
-    build_temp_db(tmpdir)
+    # build_temp_db(tmpdir)
 
     pt = robot.pose_tracker
     plate1 = containers_load(robot, '96-flat', 'A1')
@@ -120,7 +120,7 @@ def test_calibrate_container(robot, tmpdir):
 
 
 def test_load_persisted_container(tmpdir):
-    build_temp_db(tmpdir)
+    # build_temp_db(tmpdir)
     plate = database.load_container("24-vial-rack")
     assert isinstance(plate, Container)
     assert isinstance(plate, Container)
@@ -131,5 +131,5 @@ def test_load_persisted_container(tmpdir):
 
 
 def test_load_all_persisted_containers(tmpdir):
-    build_temp_db(tmpdir)
+    # build_temp_db(tmpdir)
     assert len(database.list_all_containers()) == 43

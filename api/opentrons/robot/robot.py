@@ -199,12 +199,15 @@ class Robot(object):
             * Runtime warnings
 
         """
-
         self._commands = []
         self._runtime_warnings = []
         self._previous_container = None
         message_broker = MessageBroker.get_instance()
-        self.pose_tracker = pose_tracker.PoseTracker(message_broker)
+
+        if self.pose_tracker:
+            self.pose_tracker.clear()
+        else:
+            self.pose_tracker = pose_tracker.PoseTracker(message_broker)
 
         # 0,0,0, is smoothie pos w.r.t deck
         self.pose_tracker.create_root_object(HEAD, 0, 0, 0)

@@ -19,6 +19,12 @@ class Node(object):
         self.parent = parent
         self.children = []
 
+    def __repr__(self, level=0):
+        ret = "\t"*level+repr(self.value)+"\n"
+        for child in self.children:
+            ret += child.__repr__(level+1)
+        return ret
+
     def add_child(self, child_node):
         child_node.parent = self
         self.children.append(child_node)
@@ -71,8 +77,10 @@ class Pose(object):
 
 class PoseTracker(object):
     def __init__(self, broker: MessageBroker):
+        self._root_nodes = []
         self._pose_dict = {}
-        broker.subscribe(MOVEMENT, self._object_moved)
+        self.broker = broker
+        self.broker.subscribe(MOVEMENT, self._object_moved)
 
     def __getitem__(self, obj):
         try:
@@ -86,15 +94,23 @@ class PoseTracker(object):
         return item in self._pose_dict
 
     def __iter__(self):
-        return iter()
+        return iter(self._pose_dict)
 
     def __setitem__(self, obj, pose):
         if not isinstance(pose, Pose):
             raise TypeError("{} is not an instance of Pose".format(pose))
         self._pose_dict[obj] = (pose, self._pose_dict[obj][1])
 
-    def __repr__(self):
-        return repr(self._pose_dict)
+    def __str__(self):
+        tree_repr = ''
+        for root in self._root_nodes:
+            pos_context = '\n\n' + repr(root)
+            tree_repr += pos_context
+        return tree_repr
+
+    def clear(self):
+        self._root_nodes = []
+        self._pose_dict = {}
 
     def get_objects_in_subtree(self, root):
         '''Returns a list of objects in a subtree using a DFS tree traversal'''
@@ -106,15 +122,8 @@ class PoseTracker(object):
                     self.get_objects_in_subtree(root)])
 
     def track_object(self, parent, obj, x, y, z):
-        '''
-        Adds an object to the dict of object positions
-
-        :param obj: Object to add to the position dict
-        :param x, y, z: object position relative to parent
-        :return: None
-        '''
-        relative_pose = Pose(x, y, z)
-        pose = Pose(*(self[parent].position + relative_pose.position))
+        '''Adds an object to the dict of object positions'''
+        pose = Pose(*(self[parent].position + [x, y, z]))
         node = Node(obj)
         self._pose_dict[parent][1].add_child(node)
         self._pose_dict[obj] = (pose, node)
@@ -127,40 +136,33 @@ class PoseTracker(object):
         pose = Pose(x, y, z)
         node = Node(obj)
         self._pose_dict[obj] = (pose, node)
+        self._root_nodes.append(node)
 
     def get_object_children(self, obj):
         '''Returns a list of child objects'''
         node = self._pose_dict[obj][1]
-        return [node.value for node in node.children]
+        return [child.value for child in node.children]
 
     def _translate_object(self, obj_to_trans, x, y, z):
         '''Translates a single object'''
         new_x, new_y, new_z, _ = self[obj_to_trans] * [x, y, z, 1]
-        new_pose = Pose(new_x, new_y, new_z)
-        self[obj_to_trans] = new_pose
+        self[obj_to_trans] = Pose(new_x, new_y, new_z)
 
     def translate_object(self, obj_to_trans, x, y, z):
-        '''Translates an object and descendants'''
+        '''Translates an object and its descendants'''
         self._translate_object(obj_to_trans, x, y, z)
+        [self.translate_object(child, x, y, z)
+         for child in self.get_object_children(obj_to_trans)] # recursive
 
-        # recursively translate children
-        for child in self.get_object_children(obj_to_trans):
-            self.translate_object(child, x, y, z)
-
-    def _object_moved(self, new_position: moved_msg):
+    def _object_moved(self, moved_msg: moved_msg):
         '''
-        Calculates translation as diff between current position
-        and previous - applies this translation as a movement
+        Calculates an object movement as diff between current position
+        and previous - translates moved object and its descendants
+        by this difference
         '''
-        moved_object = new_position.moved_object
-        old_x, old_y, old_z = self[moved_object].position
-        delta_x, delta_y, delta_z = \
-            new_position.x - old_x, \
-            new_position.y - old_y, \
-            new_position.z - old_z
-        self.translate_object(moved_object, delta_x, delta_y, delta_z)
+        mover, *new_pos = moved_msg
+        self.translate_object(mover, *(new_pos - self[mover].position))
 
     def relative_object_position(self, target_object, reference_object):
-        tx, ty, tz = self[target_object].position
-        rx, ry, rz = self[reference_object].position
-        return (tx - rx, ty - ry, tz - rz)
+        return self[target_object].position - self[reference_object].position
+
