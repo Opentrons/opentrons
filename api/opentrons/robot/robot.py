@@ -10,7 +10,7 @@ from opentrons.util.trace import MessageBroker, traceable
 from opentrons.trackers import pose_tracker
 from opentrons.data_storage import database
 import opentrons.util.calibration_functions as calib
-import opentrons.util.position_functions as pf
+import opentrons.util.pose_functions as pf
 
 log = get_logger(__name__)
 

@@ -1,10 +1,6 @@
-import pytest
-
 from opentrons.util import calibration_functions as cf
 from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
-from opentrons.util.vector import Vector
-from opentrons.util.testing.fixtures import robot
 from opentrons.util.testing.util import build_temp_db, approx
 
 
@@ -15,23 +11,31 @@ def test_add_container_to_deck(robot):
 
 def test_calibrate_plate(robot, tmpdir):
     build_temp_db(tmpdir)
-    #Load container | Test positions of container and wells
+    # Load container | Test positions of container and wells
     plate = containers_load(robot, '96-flat', 'A1')
     assert approx(robot.pose_tracker[plate].position) == 45
-    assert approx(robot.pose_tracker[plate].position) == \
-           approx((21.24,24.34, 0.0))
-    assert approx(robot.pose_tracker[plate[2]].position) == \
-           approx((39.24, 24.34, 10.5))
-    assert approx(robot.pose_tracker[plate[5]].position) == \
-           approx((66.24, 24.34, 10.5))
-    #Calibrate container with delta | Test is position was correctly adjusted
-    cf.calibrate_container_with_delta(plate, robot.pose_tracker, 1, 3, 4, True)
-    assert approx(robot.pose_tracker[plate].position) == \
-           approx((22.24, 27.34, 4.0))
-    assert approx(robot.pose_tracker[plate[2]].position) == \
-           approx((40.24, 27.34, 14.5))
-    assert approx(robot.pose_tracker[plate[5]].position) == \
-           approx((67.24, 27.34, 14.5))
+    assert approx(robot.pose_tracker[plate].position) == approx(
+        (21.24, 24.34, 0.0)
+    )
+    assert approx(robot.pose_tracker[plate[2]].position) == approx(
+        (39.24, 24.34, 10.5)
+    )
+    assert approx(robot.pose_tracker[plate[5]].position) == approx(
+        (66.24, 24.34, 10.5)
+    )
+    # Calibrate container with delta | Test is position was correctly adjusted
+    cf.calibrate_container_with_delta(
+        plate, robot.pose_tracker, 1, 3, 4, True
+    )
+    assert approx(robot.pose_tracker[plate].position) == approx(
+        (22.24, 27.34, 4.0)
+    )
+    assert approx(robot.pose_tracker[plate[2]].position) == approx(
+        (40.24, 27.34, 14.5)
+    )
+    assert approx(robot.pose_tracker[plate[5]].position) == approx(
+        (67.24, 27.34, 14.5)
+    )
 
 
 def test_add_pipette(robot, tmpdir):
@@ -44,10 +48,12 @@ def test_add_pipette(robot, tmpdir):
 def test_pipette_movement(robot, tmpdir):
     build_temp_db(tmpdir)
 
-    p200  = Pipette(robot, 'a')
+    p200 = Pipette(robot, 'a')
     plate = containers_load(robot, '96-flat', 'A1')
     p200.move_to(plate[2])
-    assert approx(robot.pose_tracker[p200].position) == approx((39.24, 24.34,10.5))
+    assert approx(robot.pose_tracker[p200].position) == approx(
+        (39.24, 24.34, 10.5)
+    )
 
 
 def test_max_z(robot, tmpdir):

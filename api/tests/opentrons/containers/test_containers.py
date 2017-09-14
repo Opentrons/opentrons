@@ -1,6 +1,4 @@
 import math
-import json
-import os
 import unittest
 
 from opentrons.data_storage import database
@@ -9,7 +7,6 @@ from opentrons.containers import (
     load as containers_load,
     list as containers_list
 )
-from opentrons.util import environment
 from opentrons import Robot
 from opentrons.containers import placeable
 from opentrons.containers.placeable import (
@@ -62,8 +59,7 @@ class ContainerTestCase(unittest.TestCase):
 
         assert container_name in containers_list()
         database.delete_container(container_name)
-        assert not container_name in containers_list()
-
+        assert container_name not in containers_list()
 
     def test_load_same_slot_force(self):
         container_name = '96-flat'

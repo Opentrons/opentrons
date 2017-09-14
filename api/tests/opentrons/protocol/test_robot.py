@@ -2,12 +2,10 @@ import unittest
 
 from opentrons import drivers
 from opentrons.containers import load as containers_load
-from opentrons.containers.placeable import Deck
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
-from opentrons.util.vector import Vector
-from opentrons.util.testing.fixtures import robot
-from opentrons.util.testing.util import build_temp_db, approx
+from opentrons.util.testing.util import build_temp_db
+
 
 def test_pos_tracker_persistance(robot, tmpdir):
     build_temp_db(tmpdir)
@@ -22,6 +20,7 @@ def test_pos_tracker_persistance(robot, tmpdir):
 
     assert robot.max_deck_height() == 50
 
+
 def test_calibrated_max_z(robot, tmpdir):
     build_temp_db(tmpdir)
     p200 = pipette.Pipette(
@@ -34,6 +33,7 @@ def test_calibrated_max_z(robot, tmpdir):
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     assert robot.max_deck_height() == 20.5
+
 
 class RobotTest(unittest.TestCase):
     def setUp(self):
@@ -98,7 +98,6 @@ class RobotTest(unittest.TestCase):
     #
     #     thread.join()
 
-
     def test_create_arc(self):
         p200 = pipette.Pipette(
             self.robot, axis='b', name='my-fancy-pancy-pipette'
@@ -117,8 +116,10 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(res, expected)
 
         self.robot.move_head(x=10, y=10, z=100)
-        self.robot.calibrate_container_with_instrument(plate, p200, save=False)
-        res = self.robot._create_arc((0, 0, 0), plate[0])
+        self.robot.calibrate_container_with_instrument(
+            plate2, p200, save=False
+        )
+        res = self.robot._create_arc((0, 0, 0), plate2[0])
         expected = [
             {'z': 100},
             {'x': 0, 'y': 0},

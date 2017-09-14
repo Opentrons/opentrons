@@ -1,27 +1,19 @@
 import unittest
-import pytest
 from unittest import mock
-import tempfile
-import shutil
-import os
 
-
-from opentrons import Robot
+from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
 from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
 from opentrons.util.testing.util import build_temp_db
-from opentrons.util.testing.fixtures import robot
+
 
 def test_drop_tip_move_to(robot, tmpdir):
     plate = containers_load(robot, '96-flat', 'A1')
     build_temp_db(tmpdir)
     p200 = Pipette(robot, 'b')
     x, y, z = (161.0, 116.7, 3.0)
-    well = plate[0]
-    pos = well.from_center(x=0, y=0, z=-1, reference=plate)
-    location = (plate, pos)
 
     robot._driver.move_head(x=x, y=y, z=z)
     robot.calibrate_container_with_instrument(plate, p200, False)
@@ -231,12 +223,8 @@ class PipetteTest(unittest.TestCase):
         ]
         self.assertEquals(self.p200.motor.speed.mock_calls, expected)
 
-
-
     def test_empty_aspirate(self):
-
         self.p200.aspirate(100)
-
         current_pos = self.robot._driver.get_plunger_positions()['current']
 
         self.assertDictEqual(

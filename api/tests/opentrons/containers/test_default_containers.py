@@ -1,13 +1,7 @@
-import pytest
-import tempfile
-import shutil
-import os
-
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
-from opentrons.data_storage import database
-from opentrons.util.testing.fixtures import robot
-from opentrons.util.testing.util import build_temp_db, approx
+from opentrons.util.testing.util import build_temp_db
+
 
 def test_new_containers(robot, tmpdir):
     build_temp_db(tmpdir)
@@ -17,7 +11,9 @@ def test_new_containers(robot, tmpdir):
     tube_rack_80well = containers_load(robot, 'tube-rack-80well', 'A3')
     T75_flask = containers_load(robot, 'T75-flask', 'B1')
     T25_flask = containers_load(robot, 'T25-flask', 'B2')
-    p200 = pipette.Pipette( robot, axis='a', max_volume=1000, name='test-pipette')
+    p200 = pipette.Pipette(
+        robot, axis='a', max_volume=1000, name='test-pipette'
+    )
     p200.aspirate(100, wheaton_vial_rack[0])
     p200.aspirate(100, tube_rack_80well[0])
     p200.aspirate(100, T75_flask[0])
