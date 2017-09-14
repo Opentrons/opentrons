@@ -54,38 +54,65 @@ If you want to build the platform and play with the latest development version w
 
 ### Set up your development environment
 
+* macOS 10.11+, Linux, or Windows 10 with Cygwin
 * Python 3.5.3 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended)
-* Node v6 LTS ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
-* OS X 10.11+, Linux, Windows 10 with Cygwin
-* GNU Make: both API and OT-App are using [Makefiles](https://en.wikipedia.org/wiki/Makefile)
+    
+``` shell
+# pyenv on macOS: install with shared framework option
+$ env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.3
+
+# pyenv on Linux: install with shared library option
+$ env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.3
+```
+
+* Node v6 LTS Boron ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
+
+```shell
+# nvm on macOS and Linux
+$ nvm install lts/boron
+```
+
+* GNU Make: both the API and app manage their builds with [Makefiles](https://en.wikipedia.org/wiki/Makefile)
 
 ### Start the Opentrons API
 
 Clone the repository to get started.
 ```shell
-git clone https://github.com/OpenTrons/opentrons.git
+$ git clone https://github.com/OpenTrons/opentrons.git
 ```
 
 Install the dependencies and API itself.
 
 ```shell
-cd api
-make install
-# Verify
-python -c 'import opentrons; print(opentrons.__version__)'
-2.4.2
+# change into the API directory
+$ cd api
+
+# install dependencies
+$ make install
+
+# verify
+$ python -c 'import opentrons; print(opentrons.__version__)' # > prints version
+
+# run with a real robot
+$ make dev
+
+# run with a virtual robot
+$ ENABLE_VIRTUAL_SMOOTHIE=true make dev
 ```
 
-(Optional) test, lint and build API server executable
+You may also test, lint, and build the API exectutable:
 
 ```shell
-make test
-make exe
+# test and lint the code
+$ make test
+
+# build the API executable
+$ make exe
 ```
 
 ### Start the Opentrons App
 
-See the [App README](https://github.com/OpenTrons/opentrons/tree/develop/app/README.md)
+See the [App README][app-readme] for instructions.
 
 Enjoy!
 
@@ -93,3 +120,4 @@ Enjoy!
 [travis-badge]: https://img.shields.io/travis/OpenTrons/opentrons/app-3-0.svg?style=flat-square&maxAge=3600
 [codecov]: https://codecov.io/gh/OpenTrons/opentrons/branches
 [codecov-badge]: https://img.shields.io/codecov/c/github/OpenTrons/opentrons/app-3-0.svg?style=flat-square&maxAge=3600
+[app-readme]: ./app/README.md

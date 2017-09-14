@@ -43,6 +43,7 @@
   },
   "linux": {
     "category": "Science",
-    "target": "deb"
+    "target": "deb",
+    "executableName": "opentrons-app"
   }
 }

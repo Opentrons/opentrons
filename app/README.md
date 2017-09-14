@@ -12,15 +12,15 @@ The Opentrons desktop application is built with [Electron][].
 
 ## developing
 
-To get started once you've cloned the opentrons/opentrons repository:
+To get started once you've cloned the opentrons/opentrons repository and set up your computer for development as specified in the [project readme][project-readme-setup]:
 
 ``` shell
 # change into the app directory
-cd app
+$ cd app
 # install dependencies
-make install
+$ make install
 # launch the dev server / electron app in dev mode
-make dev
+$ make dev
 ```
 
 At this point, the Electron app will be running with [HMR] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
@@ -31,7 +31,7 @@ variable   | default      | description
 `DEBUG`    | unset        | Runs the app in debug mode
 `PORT`     | `8090`       | Development server port
 
-**Note:** you may want to be running the Opentrons API while developing the app. Please see [the api directory](../api) for API specific development instructions.
+**Note:** you may want to be running the Opentrons API in a different shell while developing the app. Please see [project readme][project-readme-server] for API specific instructions.
 
 ## stack and structure
 
@@ -80,7 +80,19 @@ fix   | false   | Automatically fix lint errors | `$ make lint-js fix=true`
 
 ## building
 
-To build the app and distributables:
+### build dependencies
+
+`electron-builder` requires some native dependencies to build and package the app (see [the electron-builder docs][electron-builder-platforms]).
+
+* macOS - None
+* Linux - icnsutils, graphicsmagick, and xz-utils
+
+```shell
+$ sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-utils
+```
+* Windows - None
+
+### build tasks
 
 * `$ make package` - Package the app for inspection (does not create a distributable)
 * `$ make dist-mac` - Create an OSX distributable of the app
@@ -99,7 +111,7 @@ All artifacts will be placed in:
 After running `make package`, you can launch the production app with:
 
 * macOS: `$ ./dist/mac/Opentrons.app/Contents/MacOS/Opentrons`
-* Linux: `TODO`
+* Linux: `$ ./dist/linux-unpacked/opentrons-app`
 * Windows: `TODO`
 
 ### building UI
@@ -121,11 +133,16 @@ For example, if you wanted to analyze the production JS bundle:
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
+
 [download]: http://opentrons.com/ot-app
 [support]: https://support.opentrons.com/getting-started#software-setup
 [robots]: http://opentrons.com/robots
+[project-readme-setup]: ../README.md#set-up-your-development-environment
+[project-readme-server]: ../README.md#start-the-opentrons-api
+
 [electron]: https://electron.atom.io/
 [electron-builder]: https://www.electron.build/
+[electron-builder-platforms]: https://www.electron.build/multi-platform-build
 [hmr]: https://webpack.js.org/concepts/hot-module-replacement/
 [react]: https://facebook.github.io/react/
 [redux]: http://redux.js.org/

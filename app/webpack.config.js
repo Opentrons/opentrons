@@ -52,11 +52,6 @@ const plugins = [
 
   new ExtractTextPlugin(CSS_OUTPUT_NAME),
 
-  new BundleAnalyzerPlugin({
-    analyzerMode: (ANALYZER && 'server') || 'disabled',
-    openAnalyzer: ANALYZER
-  }),
-
   new HtmlWebpackPlugin({
     title: 'OT App',
     template: './ui/index.hbs',
@@ -89,6 +84,12 @@ if (DEV) {
   devtool = 'eval-source-map'
 
   devServer = devServerConfig(PORT, publicPath, contentBase)
+}
+
+if (ANALYZER) {
+  plugins.push(
+    new BundleAnalyzerPlugin({analyzerMode: 'server', openAnalyzer: true})
+  )
 }
 
 module.exports = {
