@@ -15,7 +15,7 @@ VALID_STATES = set(
 class SessionManager(object):
     def __init__(self, loop=None):
         self.unsubscribe, self.notifications = \
-            subscribe(['session.state.change'], loop=loop)
+            subscribe('session.state.change', loop=loop)
         self.robot = Robot()
         self.sessions = []
 
@@ -51,7 +51,7 @@ class Session(object):
         self.protocol_text = text
         self.state = None
         self.unsubscribe, = subscribe(
-            ['robot.command'], self.on_command)
+            'robot.command', self.on_command)
 
         try:
             self.refresh()
@@ -95,7 +95,7 @@ class Session(object):
             else:
                 stack.pop()
 
-        unsubscribe, = subscribe(['robot.command'], on_command)
+        unsubscribe, = subscribe('robot.command', on_command)
 
         try:
             self.run()

@@ -1,19 +1,20 @@
-from opentrons.broker import publish, subscribe
+from opentrons.broker import subscribe
+from opentrons import commands
 
 
-@publish.both(name='command', text='{arg1} {arg2} {arg3}')
+@commands.publish.both(name='command', payload='{arg1} {arg2} {arg3}')
 def A(arg1, arg2, arg3='foo'):
     B(0)
     return 100
 
 
-@publish.both(name='command', text='{arg1} {arg2} {arg3}')
+@commands.publish.both(name='command', payload='{arg1} {arg2} {arg3}')
 def C(arg1, arg2, arg3='bar'):
     B(0)
     return 100
 
 
-@publish.both(name='command', text='{arg1}')
+@commands.publish.both(name='command', payload='{arg1}')
 def B(arg1):
     return None
 
@@ -24,7 +25,8 @@ def test_add_listener():
 
     def on_notify(name, event):
         assert name == 'command'
-        description = event['text'].format(**event)
+        print(event)
+        description = event['payload'].format(**event)
 
         if event['$'] == 'before':
             stack.append(event)
@@ -32,7 +34,7 @@ def test_add_listener():
         else:
             stack.pop()
 
-    unsubscribe, = subscribe(['command'], on_notify)
+    unsubscribe, = subscribe('command', on_notify)
 
     A(0, 1)
     B(2)

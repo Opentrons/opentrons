@@ -46,14 +46,14 @@ class Notifications(object):
         return self
 
 
-def subscribe(topics, handler=None, loop=None):
+def subscribe(prefix, handler=None, loop=None):
     notifications = None
 
     if handler is None:
         notifications = Notifications(loop)
         handler = notifications.on_notify
 
-    listener = [set(topics), handler]
+    listener = (prefix, handler)
     listeners.append(listener)
 
     def unsubscribe():
@@ -65,6 +65,6 @@ def subscribe(topics, handler=None, loop=None):
 
 
 def notify(name, payload):
-    for topics, listener in listeners:
-        if name in topics:
+    for prefix, listener in listeners:
+        if name.startswith(prefix):
             listener(name, payload)

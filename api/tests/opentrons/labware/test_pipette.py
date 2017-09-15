@@ -50,7 +50,7 @@ class PipetteTest(unittest.TestCase):
             if payload['$'] == 'before':
                 commands.append(payload['text'].format(**payload))
         patch_robot(self.robot, commands)
-        self.unsubscribe, = subscribe(['robot.command'], on_command)
+        self.unsubscribe, = subscribe('robot.command', on_command)
 
     def tearDown(self):
         self.unsubscribe()
@@ -872,9 +872,9 @@ class PipetteTest(unittest.TestCase):
             'Transferring 300 from <Well A1> to <Well B1>',
             'Picking up tip None',
             'Aspirating 150.0 uL from <Well A1> at 1 speed',
-            'Dispensing 150.0 into <Well B1>',
+            'Dispensing 150.0 uL into <Well B1>',
             'Aspirating 150.0 uL from <Well A1> at 1 speed',
-            'Dispensing 150.0 into <Well B1>',
+            'Dispensing 150.0 uL into <Well B1>',
             'Dropping tip None']
 
         assert expected == self.robot.commands()
@@ -894,11 +894,11 @@ class PipetteTest(unittest.TestCase):
             'Transferring 598 from <Well A1> to <Well B1>',
             'Picking up tip None',
             'Aspirating 200.0 uL from <Well A1> at 1 speed',
-            'Dispensing 200.0 into <Well B1>',
+            'Dispensing 200.0 uL into <Well B1>',
             'Aspirating 199.0 uL from <Well A1> at 1 speed',
-            'Dispensing 199.0 into <Well B1>',
+            'Dispensing 199.0 uL into <Well B1>',
             'Aspirating 199.0 uL from <Well A1> at 1 speed',
-            'Dispensing 199.0 into <Well B1>',
+            'Dispensing 199.0 uL into <Well B1>',
             'Dropping tip None']
 
         self.robot.clear_commands()
@@ -928,17 +928,17 @@ class PipetteTest(unittest.TestCase):
             'Transferring (10, 80) from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>',  # noqa
             'Picking up tip None',
             'Aspirating 160.0 uL from <Well A1> at 1 speed',
-            'Dispensing 10.0 into <Well A2>',
-            'Dispensing 20.0 into <Well B2>',
-            'Dispensing 30.0 into <Well C2>',
-            'Dispensing 40.0 into <Well D2>',
-            'Dispensing 50.0 into <Well E2>',
+            'Dispensing 10.0 uL into <Well A2>',
+            'Dispensing 20.0 uL into <Well B2>',
+            'Dispensing 30.0 uL into <Well C2>',
+            'Dispensing 40.0 uL into <Well D2>',
+            'Dispensing 50.0 uL into <Well E2>',
             'Blowing out at <Well A1>',
             'Aspirating 140.0 uL from <Well A1> at 1 speed',
-            'Dispensing 60.0 into <Well F2>', 'Dispensing 70.0 into <Well G2>',
+            'Dispensing 60.0 uL into <Well F2>', 'Dispensing 70.0 uL into <Well G2>',
             'Blowing out at <Well A1>',
             'Aspirating 80.0 uL from <Well A1> at 1 speed',
-            'Dispensing 80.0 into <Well H2>',
+            'Dispensing 80.0 uL into <Well H2>',
             'Blowing out at None', 'Dropping tip None']
 
         self.robot.clear_commands()
@@ -964,57 +964,57 @@ class PipetteTest(unittest.TestCase):
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well A2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well A2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 80.0 into <Well A2>',
+             'Dispensing 80.0 uL into <Well A2>',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well B2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well B2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 70.0 into <Well B2>',
+             'Dispensing 70.0 uL into <Well B2>',
              'Blowing out at <Well A1>',
              'Touching tip',
              'Aspirating 160.0 uL from <Well A1> at 1 speed',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well C2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well C2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 60.0 into <Well C2>',
+             'Dispensing 60.0 uL into <Well C2>',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well D2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well D2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 50.0 into <Well D2>',
+             'Dispensing 50.0 uL into <Well D2>',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well E2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well E2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 40.0 into <Well E2>',
+             'Dispensing 40.0 uL into <Well E2>',
              'Blowing out at <Well A1>',
              'Touching tip',
              'Aspirating 70.0 uL from <Well A1> at 1 speed',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well F2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well F2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 30.0 into <Well F2>',
+             'Dispensing 30.0 uL into <Well F2>',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well G2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well G2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 20.000000000000004 into <Well G2>',
+             'Dispensing 20.000000000000004 uL into <Well G2>',
              'Air gap',
              'Aspirating 20 uL from None at 1.0 speed',
              'Touching tip',
-             'Dispensing 20 into (<Deck><Slot A2><Container 96-flat><Well H2>, (x=3.20, '
+             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well H2>, (x=3.20, '
              'y=3.20, z=15.50))',
-             'Dispensing 10.0 into <Well H2>',
+             'Dispensing 10.0 uL into <Well H2>',
              'Blowing out at <Well A1>',
              'Touching tip',
              'Dropping tip None']

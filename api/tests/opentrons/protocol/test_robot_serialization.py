@@ -18,7 +18,7 @@ class RobotSerializationTestCase(unittest.TestCase):
             if payload['$'] == 'before':
                 commands.append(payload['text'].format(**payload))
         patch_robot(self.robot, commands)
-        self.unsubscribe, = subscribe(['robot.command'], on_command)
+        self.unsubscribe, = subscribe('robot.command', on_command)
 
     def tearDown(self):
         self.unsubscribe()

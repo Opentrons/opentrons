@@ -1,6 +1,8 @@
 import copy
 import itertools
 
+from opentrons import commands
+
 from opentrons.containers import unpack_location
 from opentrons.containers.calibrator import Calibrator
 from opentrons.containers.placeable import (
@@ -8,7 +10,6 @@ from opentrons.containers.placeable import (
 )
 from opentrons.helpers import helpers
 from opentrons.instruments.instrument import Instrument
-from opentrons.broker import publish
 
 
 class Pipette(Instrument):
@@ -274,10 +275,7 @@ class Pipette(Instrument):
 
         return self
 
-    @publish.both(
-        name='robot.command',
-        text='Aspirating {volume} uL from {location} at {rate} speed'
-    )
+    @commands.publish.both(command=commands.aspirate)
     def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -360,9 +358,7 @@ class Pipette(Instrument):
         self.current_volume += volume  # update after actual aspirate
         return self
 
-    @publish.both(
-        name='robot.command', text='Dispensing {volume} into {location}'
-    )
+    @commands.publish.both(command=commands.dispense)
     def dispense(self,
                  volume=None,
                  location=None,
@@ -466,9 +462,7 @@ class Pipette(Instrument):
                 location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 
-    @publish.both(
-        name='robot.command',
-        text='Mixing {repetitions} times with a volume of {volume}ul')
+    @commands.publish.both(command=commands.mix)
     def mix(self,
             repetitions=1,
             volume=None,
@@ -534,7 +528,7 @@ class Pipette(Instrument):
 
         return self
 
-    @publish.both(name='robot.command', text='Blowing out at {location}')
+    @commands.publish.both(command=commands.blow_out)
     def blow_out(self, location=None):
         """
         Force any remaining liquid to dispense, by moving
@@ -571,7 +565,7 @@ class Pipette(Instrument):
 
         return self
 
-    @publish.both(name='robot.command', text='Touching tip')
+    @commands.publish.both(command=commands.touch_tip)
     def touch_tip(self, location=None, radius=1.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
@@ -639,7 +633,7 @@ class Pipette(Instrument):
 
         return self
 
-    @publish.both(name='robot.command', text='Air gap')
+    @commands.publish.both(command=commands.air_gap)
     def air_gap(self, volume=None, height=None):
         """
         Pull air into the :any:`Pipette` current tip
@@ -689,7 +683,7 @@ class Pipette(Instrument):
         self.aspirate(volume)
         return self
 
-    @publish.both(name='robot.command', text='Returning tip')
+    @commands.publish.both(command=commands.return_tip)
     def return_tip(self, home_after=True):
         """
         Drop the pipette's current tip to it's originating tip rack
@@ -729,7 +723,7 @@ class Pipette(Instrument):
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    @publish.both(name='robot.command', text='Picking up tip {location}')
+    @commands.publish.both(command=commands.pick_up_tip)
     def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
@@ -795,7 +789,7 @@ class Pipette(Instrument):
 
         return self
 
-    @publish.both(name='robot.command', text='Dropping tip {location}')
+    @commands.publish.both(command=commands.drop_tip)
     def drop_tip(self, location=None, home_after=True):
         """
         Drop the pipette's current tip
@@ -880,9 +874,7 @@ class Pipette(Instrument):
         >>> p200.home() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        @publish.both(
-            name='robot.command',
-            text='Homing pipette plunger on axis {axis}')
+        @commands.publish.both(command=commands.home)
         def _home(axis):
             self.current_volume = 0
             self.motor.home()
@@ -890,9 +882,7 @@ class Pipette(Instrument):
         _home(self.axis)
         return self
 
-    @publish.both(
-        name='robot.command',
-        text='Distributing {volume} from {source} to {dest}')
+    @commands.publish.both(command=commands.distribute)
     def distribute(self, volume, source, dest, *args, **kwargs):
         """
         Distribute will move a volume of liquid from a single of source
@@ -921,9 +911,7 @@ class Pipette(Instrument):
             kwargs['disposal_vol'] = self.min_volume
         return self.transfer(*args, **kwargs)
 
-    @publish.both(
-        name='robot.command',
-        text='Consolidating {volume} from {source} to {dest}')
+    @commands.publish.both(command=commands.consolidate)
     def consolidate(self, volume, source, dest, *args, **kwargs):
         """
         Consolidate will move a volume of liquid from a list of sources
@@ -952,9 +940,7 @@ class Pipette(Instrument):
         args = [volume, source, dest, *args]
         return self.transfer(*args, **kwargs)
 
-    @publish.both(
-        name='robot.command',
-        text='Transferring {volume} from {source} to {dest}')
+    @commands.publish.both(command=commands.transfer)
     def transfer(self, volume, source, dest, **kwargs):
 
         """
@@ -1070,9 +1056,7 @@ class Pipette(Instrument):
 
         return self
 
-    @publish.both(
-        name='robot.command',
-        text='Delaying for {minutes}m {seconds}s')
+    @commands.publish.both(command=commands.delay)
     def delay(self, seconds=0, minutes=0):
         """
         Parameters
