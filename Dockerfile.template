@@ -1,0 +1,35 @@
+# base-image for python on any machine using a template variable,
+# see more about dockerfile templates here:http://docs.resin.io/pages/deployment/docker-templates
+FROM resin/raspberrypi3-python:3.5-slim-20170705 
+
+WORKDIR /usr/src/api
+
+
+COPY ./api/requirements.txt ./requirements.txt 
+RUN apt-get update
+RUN apt-get install gcc make git g++
+
+
+RUN pip install -r requirements.txt
+
+# Install node
+ENV NODE_VERSION 6.9.1
+RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-armv6l.tar.gz" && \
+    echo "0b30184fe98bd22b859db7f4cbaa56ecc04f7f526313c8da42315d89fabe23b2  node-v$NODE_VERSION-linux-armv6l.tar.gz" | sha256sum -c - && \
+    tar -xzf "node-v$NODE_VERSION-linux-armv6l.tar.gz" -C /usr/local --strip-components=1 && \
+    rm "node-v$NODE_VERSION-linux-armv6l.tar.gz" && \
+    npm config set unsafe-perm true -g --unsafe-perm && \
+    rm -rf /tmp/*
+
+#******* Wifi_connect_resi*********n
+
+WORKDIR /usr/src/api
+
+COPY ./api ./
+
+COPY data-user_storage.mount /etc/systemd/system/
+RUN systemctl enable data-user_storage.mount
+
+ENV INITSYSTEM on
+
+CMD ["/usr/src/api/scripts/compute/start.sh"]

@@ -1,0 +1,11 @@
+[Unit]
+Description = USB Stick inserted by user 
+
+[Mount]
+What = /dev/sda1
+Where = /data/user_storage
+Type = vfat
+Options = rw
+
+[Install]
+WantedBy = multi-user.target
