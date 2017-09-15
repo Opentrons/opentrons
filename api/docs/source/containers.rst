@@ -342,7 +342,8 @@ Through the API's call containers.create(), you can create simple grid container
         spacing=(12, 12),               # distances (mm) between each (column, row)
         diameter=5,                     # diameter (mm) of each well on the plate
         depth=10,                       # depth (mm) of each well on the plate
-        volume=200)                     # optional: volume capacity of each well (uL)
+        volume=200,                     # optional: volume capacity of each well (uL)
+        save=False)
 
 When you create your custom container, then it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
 

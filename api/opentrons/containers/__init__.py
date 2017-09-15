@@ -43,7 +43,7 @@ def list():
     return database.list_all_containers()
 
 
-def create(name, grid, spacing, diameter, depth, volume=0):
+def create(name, grid, spacing, diameter, depth, volume, save):
     columns, rows = grid
     col_spacing, row_spacing = spacing
     custom_container = Container()
@@ -60,8 +60,9 @@ def create(name, grid, spacing, diameter, depth, volume=0):
             well_name = chr(c + ord('A')) + str(1 + r)
             coordinates = (c * col_spacing, r * row_spacing, 0)
             custom_container.add(well, well_name, coordinates)
-    database.save_new_container(custom_container, name)
-
+    if save:
+        database.save_new_container(custom_container, name)
+    return custom_container
 
 # FIXME: [Jared - 8/31/17] This is not clean
 # fix it by using the same reference points

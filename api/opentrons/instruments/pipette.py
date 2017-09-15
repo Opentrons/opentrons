@@ -292,6 +292,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'A1')
         >>> p200 = instruments.Pipette(
         ...     name='p200', axis='a', max_volume=200)
 
@@ -382,6 +383,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'B1')
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
@@ -496,6 +498,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'B1')
+
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
 
         >>> # mix 50uL in a Well, three times
@@ -598,6 +602,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'B1')
+
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
