@@ -50,7 +50,7 @@ async def test_notifications(session, session_manager, protocol, root):
     assert len(res['data']['v']['command_log']['v']) == 105
     responses = [
         res for res in responses
-        if res['data'][0] == 'session.state.change']
+        if res['data'][0] == 'session']
     assert len(responses) == 107
 
     states = [response['data'][1]['v']['state'] for response in responses]

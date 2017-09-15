@@ -1,6 +1,7 @@
 import ast
 import copy
 
+from opentrons.commands import tree
 from opentrons import robot
 from opentrons.robot.robot import Robot
 from datetime import datetime
@@ -10,12 +11,14 @@ from opentrons.broker import notify, subscribe
 
 VALID_STATES = set(
     ['loaded', 'running', 'finished', 'stopped', 'paused'])
+SESSION_TOPIC = 'session'
 
 
 class SessionManager(object):
     def __init__(self, loop=None):
         self.unsubscribe, self.notifications = \
-            subscribe('session.state.change', loop=loop)
+            subscribe(SESSION_TOPIC, loop=loop)
+        self.session = None
         self.robot = Robot()
         self.sessions = []
 
@@ -49,9 +52,12 @@ class Session(object):
     def __init__(self, name, text):
         self.name = name
         self.protocol_text = text
+        self.protocol = None
         self.state = None
-        self.unsubscribe, = subscribe(
-            'robot.command', self.on_command)
+        self.unsubscribe, = subscribe('robot.command', self.on_command)
+        self.commands = []
+        self.command_log = {}
+        self.errors = []
 
         try:
             self.refresh()
@@ -72,13 +78,13 @@ class Session(object):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def reset(self):
-        self.command_log = {}
-        self.errors = []
+    def clear_logs(self):
+        self.command_log.clear()
+        self.errors.clear()
 
     def _simulate(self):
         stack = []
-        commands = []
+        res = []
 
         def on_command(name, payload):
             description = payload.get('text', '').format(
@@ -86,11 +92,11 @@ class Session(object):
             )
 
             if payload['$'] == 'before':
-                commands.append(
+                res.append(
                     {
                         'level': len(stack),
                         'description': description,
-                        'id': len(commands)})
+                        'id': len(res)})
                 stack.append(payload)
             else:
                 stack.pop()
@@ -102,16 +108,15 @@ class Session(object):
         finally:
             unsubscribe()
 
-        return commands
+        return res
 
     def refresh(self):
-        self.reset()
+        self.clear_logs()
 
         try:
-            tree = ast.parse(self.protocol_text)
-            self.protocol = compile(tree, filename=self.name, mode='exec')
-            commands = self._simulate()
-            self.load_commands(commands)
+            parsed = ast.parse(self.protocol_text)
+            self.protocol = compile(parsed, filename=self.name, mode='exec')
+            self.commands = tree.from_list(self._simulate())
             self.command_log.clear()
         finally:
             if self.errors:
@@ -138,7 +143,7 @@ class Session(object):
         # HACK: hard reset singleton by replacing all of it's attributes
         # with the one from a newly constructed robot
         robot.__dict__ = {**Robot().__dict__}
-        self.reset()
+        self.clear_logs()
 
         if devicename is not None:
             self.set_state('running')
@@ -162,41 +167,6 @@ class Session(object):
         self.state = state
         self.on_state_changed()
 
-    def load_commands(self, commands):
-        """
-        Given a list of tuples of form (depth, command_text)
-        that represents a DFS traversal of a command tree,
-        updates self.commands with a dictionary that holds
-        a command tree.
-        """
-        def subtrees(commands, level):
-            if not commands:
-                return
-
-            acc = []
-            parent, *commands = commands
-
-            for command in commands:
-                if command['level'] > level:
-                    acc.append(command)
-                else:
-                    yield (parent, acc)
-                    parent = command
-                    acc.clear()
-            yield (parent, acc)
-
-        def walk(commands, level=0):
-            return [
-                {
-                    'description': key['description'],
-                    'children': walk(subtree, level+1),
-                    'id': key['id']
-                }
-                for key, subtree in subtrees(commands, level)
-            ]
-
-        self.commands = walk(commands)
-
     def log_append(self):
         self.command_log.update({
             len(self.command_log): {
@@ -214,5 +184,15 @@ class Session(object):
         )
         self.on_state_changed()
 
+    def _snapshot(self):
+        return {
+            'name': self.name,
+            'state': self.state,
+            'protocol_text': self.protocol_text,
+            'commands': self.commands.copy(),
+            'command_log': self.command_log.copy(),
+            'errors': self.errors.copy()
+        }
+
     def on_state_changed(self):
-        notify('session.state.change', copy.deepcopy(self))
+        notify(SESSION_TOPIC, self._snapshot())

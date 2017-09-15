@@ -22,6 +22,3 @@ AIR_GAP = makeRobotCommandName('AIR_GAP')
 TOUCH_TIP = makeRobotCommandName('TOUCH_TIP')
 RETURN_TIP = makeRobotCommandName('RETURN_TIP')
 HOME = makeRobotCommandName('HOME')
-
-# State #
-STATE_CHANGE = 'session.state.change'

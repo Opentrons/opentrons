@@ -58,14 +58,12 @@ async def test_load_and_run(session_manager, protocol):
     res = []
     index = 0
     async for notification in session_manager.notifications:
-        assert isinstance(notification, tuple), "notification is a tuple"
-        name, s = notification
-        if (name == 'session.state.change'):
+        name, snapshot = notification
+        if (name == 'session'):
             index += 1  # Command log in sync with add-command events emitted
-        assert isinstance(s, Session), "second element is Session"
-        if name == 'session.state.change':
-            res.append(s.state)
-            if s.state == 'finished':
+            state = snapshot['state']
+            res.append(state)
+            if snapshot['state'] == 'finished':
                 break
 
     assert [key for key, _ in itertools.groupby(res)] == \
@@ -97,60 +95,6 @@ def test_set_state(run_session):
 
     with pytest.raises(ValueError):
         run_session.set_state('impossible-state')
-
-
-def test_set_commands(run_session):
-    run_session.load_commands([
-        {'level': 0, 'description': 'A', 'id': 0},
-        {'level': 0, 'description': 'B', 'id': 1},
-        {'level': 0, 'description': 'C', 'id': 2}
-    ])
-
-    assert run_session.commands == [
-        {
-            'description': 'A',
-            'id': 0,
-            'children': []
-        },
-        {
-            'description': 'B',
-            'id': 1,
-            'children': []
-        },
-        {
-            'description': 'C',
-            'id': 2,
-            'children': []
-        },
-    ]
-
-    run_session.load_commands([
-        {'level': 0, 'description': 'A', 'id': 0},
-        {'level': 1, 'description': 'B', 'id': 1},
-        {'level': 2, 'description': 'C', 'id': 2},
-        {'level': 0, 'description': 'D', 'id': 3},
-    ])
-
-    assert run_session.commands == [
-        {
-            'description': 'A',
-            'id': 0,
-            'children': [{
-                    'description': 'B',
-                    'id': 1,
-                    'children': [{
-                                'description': 'C',
-                                'id': 2,
-                                'children': []
-                            }]
-                    }]
-        },
-        {
-            'description': 'D',
-            'id': 3,
-            'children': []
-        }
-    ]
 
 
 def test_log_append(run_session):
