@@ -4,8 +4,12 @@ from opentrons.containers import load as containers_load
 from opentrons.containers.placeable import Well, Container
 from opentrons.data_storage import database
 from opentrons.instruments import Pipette
-from opentrons.util.testing.util import approx
 from opentrons.util.vector import Vector
+
+
+def approx(n):
+    return pytest.approx(int(sum(n)))
+
 
 EXPECTED_CONTAINER_COORDS = {
     'tube-rack-5ml-96': (0.00, 0.00, 0.00),
@@ -128,6 +132,7 @@ def test_load_persisted_container():
 
 def test_load_all_persisted_containers():
     assert len(database.list_all_containers()) == 43
+
 
 def test_invalid_container_name():
     with pytest.raises(ResourceWarning):

@@ -69,7 +69,7 @@ def create(name, grid, spacing, diameter, depth, volume=0):
 def container_to_json(c, name):
     locations = []
     c_x, c_y, c_z = c._coordinates
-    container_offset = {'x': c_x, 'y':c_y, 'z':c_z}
+    container_offset = {'x': c_x, 'y': c_y, 'z': c_z}
     for w in c:
         x, y, z = w._coordinates + w.bottom()[1]
         properties_dict = {

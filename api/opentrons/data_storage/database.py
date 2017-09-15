@@ -6,9 +6,8 @@ from opentrons.util.vector import Vector
 
 database_path = environment.get_path('DATABASE_FILE')
 
-
-
 # ======================== Private Functions ======================== #
+
 
 def _parse_container_obj(container: Container):
     return container._coordinates
@@ -139,7 +138,6 @@ def list_all_containers():
 
 def change_database(db_path: str):
     global database_path
-    print('\n\n NEW DB:', db_path)
     database_path = db_path
 
 # ======================== END Public Functions ======================== #

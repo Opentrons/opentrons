@@ -110,10 +110,6 @@ class PoseTracker(object):
             tree_repr += pos_context
         return tree_repr
 
-    def clear(self):
-        self._root_nodes = []
-        self._pose_dict = {}
-
     def get_objects_in_subtree(self, root):
         '''Returns a list of objects in a subtree using a DFS tree traversal'''
         return flatten([root, [self.get_objects_in_subtree(item)
@@ -153,7 +149,7 @@ class PoseTracker(object):
         '''Translates an object and its descendants'''
         self._translate_object(obj_to_trans, x, y, z)
         [self.translate_object(child, x, y, z)
-         for child in self.get_object_children(obj_to_trans)] # recursive
+         for child in self.get_object_children(obj_to_trans)]  # recursive
 
     def _object_moved(self, moved_msg: moved_msg):
         '''
@@ -166,4 +162,3 @@ class PoseTracker(object):
 
     def relative_object_position(self, target_object, reference_object):
         return self[target_object].position - self[reference_object].position
-

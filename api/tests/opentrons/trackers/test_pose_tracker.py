@@ -1,8 +1,32 @@
+import pytest
+
 from opentrons.util import calibration_functions as cf
 from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
-from opentrons.util.testing.util import approx
 from opentrons.trackers.pose_tracker import Pose
+from opentrons.robot.robot import Robot
+from opentrons.util.trace import MessageBroker
+
+
+def approx(n):
+    return pytest.approx(int(sum(n)))
+
+
+@pytest.fixture
+def pos_tracker(robot):
+    containers_load(robot, '96-flat', 'A1')
+    Pipette(robot, 'a')
+    return robot.pose_tracker
+
+
+@pytest.fixture
+def p200(robot):
+    return Pipette(robot, 'a')
+
+
+@pytest.fixture
+def plate(robot):
+    return containers_load(robot, '96-flat', 'A1')
 
 
 def test_add_container_to_deck(robot):
@@ -14,28 +38,22 @@ def test_calibrate_plate(robot, tmpdir):
     # Load container | Test positions of container and wells
     plate = containers_load(robot, '96-flat', 'A1')
     assert approx(robot.pose_tracker[plate].position) == 45
-    assert approx(robot.pose_tracker[plate].position) == approx(
-        (21.24, 24.34, 0.0)
-    )
-    assert approx(robot.pose_tracker[plate[2]].position) == approx(
-        (39.24, 24.34, 10.5)
-    )
-    assert approx(robot.pose_tracker[plate[5]].position) == approx(
-        (66.24, 24.34, 10.5)
-    )
+    assert approx(robot.pose_tracker[plate].position) ==\
+        approx((21.24, 24.34, 0.0))
+    assert approx(robot.pose_tracker[plate[2]].position) ==\
+        approx((39.24, 24.34, 10.5))
+    assert approx(robot.pose_tracker[plate[5]].position) == \
+        approx((66.24, 24.34, 10.5))
     # Calibrate container with delta | Test is position was correctly adjusted
     cf.calibrate_container_with_delta(
         plate, robot.pose_tracker, 1, 3, 4, True
     )
-    assert approx(robot.pose_tracker[plate].position) == approx(
-        (22.24, 27.34, 4.0)
-    )
-    assert approx(robot.pose_tracker[plate[2]].position) == approx(
-        (40.24, 27.34, 14.5)
-    )
-    assert approx(robot.pose_tracker[plate[5]].position) == approx(
-        (67.24, 27.34, 14.5)
-    )
+    assert approx(robot.pose_tracker[plate].position) ==\
+        approx((22.24, 27.34, 4.0))
+    assert approx(robot.pose_tracker[plate[2]].position) ==\
+        approx((40.24, 27.34, 14.5))
+    assert approx(robot.pose_tracker[plate[5]].position) ==\
+        approx((67.24, 27.34, 14.5))
 
 
 def test_add_pipette(robot):
@@ -73,36 +91,37 @@ def test_get_object_children(robot):
 def test_tree_printing(robot):
     containers_load(robot, 'trough-12row', 'B2')
     print_output = robot.pose_tracker.__str__()
-    EXPECTED_OUTPUT = "\n\n'head'" \
-               "\n\n\n<Deck>" \
-               "\n\t<Deck><Slot A1>" \
-               "\n\t<Deck><Slot A2>" \
-               "\n\t<Deck><Slot A3>" \
-               "\n\t<Deck><Slot B1>" \
-               "\n\t<Deck><Slot B2>" \
-               "\n\t\t<Deck><Slot B2><Container trough-12row>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A1>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A2>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A3>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A4>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A5>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A6>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A7>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A8>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A9>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A10>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A11>" \
-               "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A12>" \
-               "\n\t<Deck><Slot B3>" \
-               "\n\t<Deck><Slot C1>" \
-               "\n\t<Deck><Slot C2>" \
-               "\n\t<Deck><Slot C3>" \
-               "\n\t<Deck><Slot D1>" \
-               "\n\t<Deck><Slot D2>" \
-               "\n\t<Deck><Slot D3>" \
-               "\n\t<Deck><Slot E1>" \
-               "\n\t<Deck><Slot E2>" \
-               "\n\t<Deck><Slot E3>\n"
+    EXPECTED_OUTPUT =\
+        "\n\n'head'" \
+        "\n\n\n<Deck>" \
+        "\n\t<Deck><Slot A1>" \
+        "\n\t<Deck><Slot A2>" \
+        "\n\t<Deck><Slot A3>" \
+        "\n\t<Deck><Slot B1>" \
+        "\n\t<Deck><Slot B2>" \
+        "\n\t\t<Deck><Slot B2><Container trough-12row>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A1>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A2>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A3>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A4>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A5>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A6>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A7>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A8>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A9>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A10>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A11>" \
+        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A12>" \
+        "\n\t<Deck><Slot B3>" \
+        "\n\t<Deck><Slot C1>" \
+        "\n\t<Deck><Slot C2>" \
+        "\n\t<Deck><Slot C3>" \
+        "\n\t<Deck><Slot D1>" \
+        "\n\t<Deck><Slot D2>" \
+        "\n\t<Deck><Slot D3>" \
+        "\n\t<Deck><Slot E1>" \
+        "\n\t<Deck><Slot E2>" \
+        "\n\t<Deck><Slot E3>\n"
 
     assert print_output == EXPECTED_OUTPUT
 
@@ -133,18 +152,20 @@ def test_get_objects_in_subtree(robot):
     assert set(deck_subtree) - set(EXPECTED_SUBTREE) == set()
 
 
-def test_clear_tracker(robot):
-    plate = containers_load(robot, '96-flat', 'A1')
-    assert plate in robot.pose_tracker
+def test_faulty_set(pos_tracker, robot):
+    with pytest.raises(TypeError):
+        pos_tracker[robot._deck] = 10
 
-    p200 = Pipette(robot, 'a')
-    assert p200 in robot.pose_tracker
 
-    p200.move_to(plate[2])
-    assert approx(robot.pose_tracker[p200].position) == approx(
-        (39.24, 24.34, 10.5)
-    )
+def test_faulty_access(pos_tracker):
+    p300 = Pipette(Robot(), 'a')
+    with pytest.raises(KeyError):
+        pos_tracker[p300]
 
-    robot.pose_tracker.clear()
-    assert plate not in robot.pose_tracker
-    assert p200 not in robot.pose_tracker
+
+def test_relative_object_position(plate, p200, robot):
+    print(robot.pose_tracker)
+    print(MessageBroker.get_instance().topics_and_funcs)
+    robot.move_head(x=10, y=30, z=10)
+    rel_pos = robot.pose_tracker.relative_object_position(p200, plate)
+    assert approx(rel_pos) == approx((-11.24, 5.66, 10))

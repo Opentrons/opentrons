@@ -54,6 +54,7 @@ MAIN_TESTER_DB = str(os.path.join(
         globals()["__file__"]), 'testing_database.db')
 )
 
+
 def print_db_path(db):
     cursor = database.db_conn.cursor()
     cursor.execute("PRAGMA database_list")
@@ -120,7 +121,6 @@ def session(loop, test_client, request, session_manager):
     except Exception as e:
         pass
 
-
     server = rpc.Server(loop=loop, root=root)
     client = loop.run_until_complete(test_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
@@ -143,5 +143,10 @@ def session(loop, test_client, request, session_manager):
 
 def setup_testing_env():
     database.change_database(MAIN_TESTER_DB)
+
+
+def approx(pos):
+    return int(sum(pos))
+
 
 setup_testing_env()
