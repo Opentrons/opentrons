@@ -1,9 +1,9 @@
 import unittest
 from opentrons import Robot
-from opentrons.containers import load as containers_load
 from opentrons.helpers import helpers
 from opentrons.instruments import pipette
 from opentrons.util.vector import Vector
+from opentrons.containers import load as containers_load
 
 
 class HelpersTest(unittest.TestCase):

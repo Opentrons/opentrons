@@ -43,7 +43,7 @@ def list():
     return database.list_all_containers()
 
 
-def create(name, grid, spacing, diameter, depth, volume, save):
+def create(name, grid, spacing, diameter, depth, volume, save=False):
     columns, rows = grid
     col_spacing, row_spacing = spacing
     custom_container = Container()
@@ -63,6 +63,7 @@ def create(name, grid, spacing, diameter, depth, volume, save):
     if save:
         database.save_new_container(custom_container, name)
     return custom_container
+
 
 # FIXME: [Jared - 8/31/17] This is not clean
 # fix it by using the same reference points

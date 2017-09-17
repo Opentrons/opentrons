@@ -44,7 +44,8 @@ class ContainerTestCase(unittest.TestCase):
             spacing=(9, 9),
             diameter=4,
             depth=8,
-            volume=1000)
+            volume=1000,
+            save=True)
 
         p = containers_load(self.robot, container_name, 'A1')
         self.assertEquals(len(p), 96)

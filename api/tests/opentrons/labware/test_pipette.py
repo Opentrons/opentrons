@@ -30,7 +30,7 @@ def test_drop_tip_move_to(robot):
 
 
 def test_aspirate_move_to(robot):
-    p200 = Pipette(robot, 'b')
+    p200 = Pipette(robot, 'b', max_volume=200)
 
     x, y, z = (161.0, 116.7, 0)
     plate = containers_load(robot, '96-flat', 'A1')
@@ -69,7 +69,7 @@ def test_blow_out_move_to(robot):
 
 
 def test_dispense_move_to(robot):
-    p200 = Pipette(robot, 'b')
+    p200 = Pipette(robot, 'b', max_volume=200)
     plate = containers_load(robot, '96-flat', 'A1')
     x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
@@ -115,7 +115,6 @@ class PipetteTest(unittest.TestCase):
             name='other-pipette-for-transfer-tests'
         )
         self.p200.max_volume = 200
-        self.p200.update_calibrations()
 
         self.p200.reset()
 
@@ -141,7 +140,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.p200._get_plunger_position('blow_out'), 12)
         self.assertEquals(self.p200._get_plunger_position('drop_tip'), 13)
 
-        self.p200.positions['drop_tip'] = None
+        self.p200.plunger_positions['drop_tip'] = None
         self.assertRaises(
             RuntimeError, self.p200._get_plunger_position, 'drop_tip')
 
@@ -165,7 +164,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.motor.move(9)
         self.p200.calibrate('bottom')
-        self.assertEquals(self.p200.positions['bottom'], 9)
+        self.assertEquals(self.p200.plunger_positions['bottom'], 9)
 
     def test_get_instruments_by_name(self):
         self.p1000 = Pipette(
@@ -1477,7 +1476,6 @@ class PipetteTest(unittest.TestCase):
             name='pipette-for-transfer-tests'
         )
         self.p200.max_volume = 200
-        self.p200.update_calibrations()
 
         self.p200.move_to = mock.Mock()
 
