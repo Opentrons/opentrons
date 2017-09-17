@@ -51,7 +51,7 @@ class InstrumentsWrapper(object):
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 
-__all__ = [containers, instruments, robot, reset, database]
+__all__ = [containers, instruments, robot, reset]
 
 
 __version__ = get_versions()['version']

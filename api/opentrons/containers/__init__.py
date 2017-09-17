@@ -2,7 +2,7 @@ from collections import OrderedDict
 import json
 import os
 
-from opentrons import database
+from opentrons.data_storage import database
 from opentrons.containers.placeable import (
     Deck,
     Slot,
