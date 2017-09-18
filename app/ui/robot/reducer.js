@@ -38,6 +38,7 @@ const handleResponse = (state, request, payload, error, props = {}) => ({
 const INITIAL_STATE = {
   // robot API connection
   connectRequest: makeRequestState(),
+  disconnectRequest: makeRequestState(),
   isConnected: false,
 
   // protocol/workflow session
@@ -161,6 +162,20 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.CONNECT_RESPONSE:
       return handleResponse(state, 'connectRequest', payload, error, {
         isConnected: error == null
+      })
+
+    case actionTypes.DISCONNECT:
+      return handleRequest(state, 'disconnectRequest', payload, error)
+
+    case actionTypes.DISCONNECT_RESPONSE:
+      return handleResponse(state, 'disconnectRequest', payload, error, {
+        isConnected: error != null,
+        sessionName: error ? state.sessionName : '',
+        protocolText: error ? state.protocolText : '',
+        protocolCommands: error ? state.protocolCommands : [],
+        protocolCommandsById: error ? state.protocolCommandsById : {},
+        sessionErrors: error ? state.sessionErrors : [],
+        sessionState: error ? state.sessionState : ''
       })
 
     case actionTypes.SESSION:

@@ -10,6 +10,8 @@ export const actionTypes = {
   // requests and responses
   CONNECT: makeRobotActionName('CONNECT'),
   CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
+  DISCONNECT: makeRobotActionName('DISCONNECT'),
+  DISCONNECT_RESPONSE: makeRobotActionName('DISCONNECT_RESPONSE'),
   SESSION: makeRobotActionName('SESSION'),
   SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
   HOME: makeRobotActionName('HOME'),
@@ -33,6 +35,15 @@ export const actions = {
 
   connectResponse (error = null) {
     return {type: actionTypes.CONNECT_RESPONSE, error}
+  },
+
+  // TODO(mc, 2017-09-07): connect should take a URL or robot identifier
+  disconnect () {
+    return makeRobotAction({type: actionTypes.DISCONNECT})
+  },
+
+  disconnectResponse (error = null) {
+    return {type: actionTypes.DISCONNECT_RESPONSE, error}
   },
 
   // get session or make new session with protocol file
