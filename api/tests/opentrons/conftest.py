@@ -144,9 +144,4 @@ def session(loop, test_client, request, session_manager):
 def setup_testing_env():
     database.change_database(MAIN_TESTER_DB)
 
-
-def approx(pos):
-    return int(sum(pos))
-
-
 setup_testing_env()

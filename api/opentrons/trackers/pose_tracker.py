@@ -78,30 +78,39 @@ class Pose(object):
 
 
 class PoseTracker(object):
+    '''
+    Tracks pose of all objects on deck using a dictionary and a tree.
+    _pose_dict is a dict that maps objects to poses (np arrays)
+    _node_dict is a dict that maps objects to their nodes
+        in the tree. The tree holds relationships between objects.
+        an object is a child of another if, when that objects moves,
+        its child does as well.
+    '''
     def __init__(self, broker: MessageBroker):
         self._root_nodes = []
         self._pose_dict = {}
+        self._node_dict = {}
         self.broker = broker
         self.broker.subscribe(MOVEMENT, self._object_moved)
 
     def __getitem__(self, obj):
         try:
-            return self._pose_dict[obj][0]
+            return self._pose_dict[obj]
         except KeyError:
             if isinstance(obj, WellSeries):  # FIXME:(09/12) remove WellSeries
-                return self._pose_dict[obj[0]][0]
+                return self._pose_dict[obj[0]]
             raise KeyError("Position not tracked: {}".format(obj))
 
     def __contains__(self, item):
         return item in self._pose_dict
 
     def __iter__(self):
-        return iter(self._pose_dict)
+        return iter(self._pose_dict.items())
 
     def __setitem__(self, obj, pose):
         if not isinstance(pose, Pose):
             raise TypeError("{} is not an instance of Pose".format(pose))
-        self._pose_dict[obj] = (pose, self._pose_dict[obj][1])
+        self._pose_dict[obj] = pose
 
     def __str__(self):
         tree_repr = ''
@@ -116,15 +125,17 @@ class PoseTracker(object):
                                for item in self.get_object_children(root)]])
 
     def max_z_in_subtree(self, root):
-        return max([self[obj].z for obj in
+        return max([self[root].z for obj in
                     self.get_objects_in_subtree(root)])
 
     def track_object(self, parent, obj, x, y, z):
         '''Adds an object to the dict of object positions'''
-        pose = Pose(*(self[parent].position + [x, y, z]))
+        parent_position = self[parent].position
+        obj_position = parent_position + [x, y, z]
+        object_pose = Pose(*obj_position)
         node = Node(obj)
-        self._pose_dict[parent][1].add_child(node)
-        self._pose_dict[obj] = (pose, node)
+        self._node_dict[parent].add_child(node)
+        self._pose_dict[obj] = object_pose
 
     def create_root_object(self, obj, x, y, z):
         '''Create a root node in the position tree. Though this could be done
@@ -133,12 +144,13 @@ class PoseTracker(object):
         not be a default behavior'''
         pose = Pose(x, y, z)
         node = Node(obj)
-        self._pose_dict[obj] = (pose, node)
+        self[obj] = pose
+        self._node_dict[obj] = node
         self._root_nodes.append(node)
 
     def get_object_children(self, obj):
         '''Returns a list of child objects'''
-        node = self._pose_dict[obj][1]
+        node = self._node_dict[obj]
         return [child.value for child in node.children]
 
     def _translate_object(self, obj_to_trans, x, y, z):
