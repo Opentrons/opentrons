@@ -9,6 +9,11 @@
       "plugins": [
         "react-hot-loader/babel"
       ]
+    },
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
     }
   },
   "plugins": [
@@ -23,7 +28,7 @@
           "node": "6.11",
           "electron": "1.6"
         },
-        "useBuiltIns": true
+        "modules": false
       }
     ]
   ]

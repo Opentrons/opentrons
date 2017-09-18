@@ -1,66 +1,154 @@
-# OT App
+# Opentrons Desktop App
 
 [![JavaScript Style Guide][style-guide-badge]][style-guide]
 
+[Download][] | [Support][]
 
-## Overview
+## overview
 
-Our app is built with [Electron](https://github.com/electron/electron). The structure and configuration of bundling, testing and packaging are based on [this great repo](https://github.com/chentsulin/electron-react-boilerplate).
+The Opentrons desktop application lets you use and configure your [Opentrons personal pipetting robot][robots]. This directory contains the application's source code. If you're looking to download or for help with the app, please click one of the links above.
 
-You can read great coverage of some tools that are used in our stack [here](https://github.com/grab/front-end-guide). Note, our front-end framework of choice is [Vue.js](https://vuejs.org/) which dictates our choice of test tools: [Karma](https://github.com/karma-runner/karma), [Mocha](https://github.com/mochajs/mocha), [Chai](https://github.com/chaijs/chai) and [Istanbul](https://github.com/gotwarlost/istanbul)
+The Opentrons desktop application is built with [Electron][].
 
-## Structure
+## developing
 
-* *ui* — front-end assets. Corresponds to Electron's renderer process If you change webpack's `libraryTarge` to `var` you can run it in the browser
-* *shell* — Corresponds to Electron's main process. Entry-point of the app, starts opentrons API server locally and loads the UI.
-* Make sure to build API exe first, as we are embedding it into the app
+To get started once you've cloned the opentrons/opentrons repository and set up your computer for development as specified in the [project readme][project-readme-setup]:
 
-
-## Build
-
-Install OT-App dependencies.
-
-```shell
-cd app
-make install
+``` shell
+# change into the app directory
+$ cd app
+# install dependencies
+$ make install
+# launch the dev server / electron app in dev mode
+$ make dev
 ```
 
-Build and package the app
+At this point, the Electron app will be running with [HMR] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
+
+variable   | default      | description
+---------- | ------------ | -------------------------------------------------
+`NODE_ENV` | `production` | Run environment: production, development, or test
+`DEBUG`    | unset        | Runs the app in debug mode
+`PORT`     | `8090`       | Development server port
+
+**Note:** you may want to be running the Opentrons API in a different shell while developing the app. Please see [project readme][project-readme-server] for API specific instructions.
+
+## stack and structure
+
+The stack / build-chain runs on:
+
+* [Electron][]
+* [Electron Builder][electron-builder]
+* [React][]
+* [Redux][]
+* [CSS modules][css-modules]
+* [Babel][]
+* [Webpack][]
+
+Our files are organized into:
+
+* `app/ui` — Front-end webapp run in Electron's renderer process
+* `app/shell` — Electron's main process
+* `app/rpc` - Opentrons API RPC client (see `api/opentrons/server`)
+* `app/webpack` - Webpack configuration helpers
+
+## testing and linting
+
+To run tests:
+
+* `$ make test` - Run all tests and then lints
+* `$ make test-unit` - Run all unit tests
+
+Test tasks can also be run with the following arguments:
+
+arg   | default | description             | example
+----- | ------- | ----------------------- | -----------------------------------
+watch | false   | Run tests in watch mode | `$ make test-unit watch=true`
+cover | !watch  | Calculate code coverage | `$ make test watch=true cover=true`
+
+To lint JS (with [standard][]) and CSS (with [stylelint][]):
+
+* `$ make lint` - Lint both JS and CSS
+* `$ make lint-js` - Lint JS
+* `$ make lint-css` - List CSS
+
+Lint tasks can also be run with the following arguments:
+
+arg   | default | description                   | example
+----- | ------- | ----------------------------- | -------------------------
+fix   | false   | Automatically fix lint errors | `$ make lint-js fix=true`
+
+## building
+
+### build dependencies
+
+`electron-builder` requires some native dependencies to build and package the app (see [the electron-builder docs][electron-builder-platforms]).
+
+* macOS - None
+* Linux - icnsutils, graphicsmagick, and xz-utils
 
 ```shell
-make build package
-# Optionally test
-make test
-# For end-to-end click-through test
-make test-e2e
+$ sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-utils
 ```
+* Windows - None
 
-## Develop
+### build tasks
 
-If you want to play with the code base and make some changes, feel free to do so.
+* `$ make package` - Package the app for inspection (does not create a distributable)
+* `$ make dist-mac` - Create an OSX distributable of the app
+* `$ make dist-linux` - Create a Linux distributable of the app
+* `$ make dist-win` - Create a Windows distributable of the app
 
-Start Python API Server (in a separate terminal):
+All artifacts will be placed in:
 
-```shell
-cd api
-export ENABLE_VIRTUAL_SMOOTHIE=true; python opentrons/server/main.py
-```
+* `app/dist` - Application packages and/or distributables
+* `app/ui/dist` - Intermediate UI artifacts:
+    * `bundle.js` - Javascript bundle
+    * `style.css` - CSS bundle
+    * Fonts that weren't inlined
+    * Images that weren't inlined
 
-Install dev tools:
+After running `make package`, you can launch the production app with:
 
-```shell
-cd app
-# Install development tools that are not part of package.json
-npm i electron-debug
-npm i vue-devtools
-```
+* macOS: `$ ./dist/mac/Opentrons.app/Contents/MacOS/Opentrons`
+* Linux: `$ ./dist/linux-unpacked/opentrons-app`
+* Windows: `TODO`
 
-Run OT-App in development mode. This will open development tools and connect to the API Server already running (instead of starting it from `app/bin/opentrons-api-server`):
+### building UI
 
-```shell
-#	Run in the `app` directory
-make dev
-```
+The UI can be built by itself with:
+
+`$ make ui/dist/bundle.js`
+
+The UI build process looks for the following environment variables:
+
+variable   | default      | description
+---------- | ------------ | ---------------------------------------------------
+`NODE_ENV` | `production` | Build environment: production, development, or test
+`ANALYZER` | unset        | Launches the [bundle analyzer][bundle-analyzer]
+
+For example, if you wanted to analyze the production JS bundle:
+
+`$ ANALYZER=true make clean ui/dist/bundle.js`
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
+
+[download]: http://opentrons.com/ot-app
+[support]: https://support.opentrons.com/getting-started#software-setup
+[robots]: http://opentrons.com/robots
+[project-readme-setup]: ../README.md#set-up-your-development-environment
+[project-readme-server]: ../README.md#start-the-opentrons-api
+
+[electron]: https://electron.atom.io/
+[electron-builder]: https://www.electron.build/
+[electron-builder-platforms]: https://www.electron.build/multi-platform-build
+[hmr]: https://webpack.js.org/concepts/hot-module-replacement/
+[react]: https://facebook.github.io/react/
+[redux]: http://redux.js.org/
+[css-modules]: https://github.com/css-modules/css-modules
+[babel]: https://babeljs.io/
+[webpack]: https://webpack.js.org/
+[standard]: https://standardjs.com/
+[styelint]: https://stylelint.io/
+[bundle-analyzer]: https://github.com/th0r/webpack-bundle-analyzer

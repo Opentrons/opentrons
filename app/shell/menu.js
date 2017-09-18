@@ -1,15 +1,14 @@
-module.exports.addMenu = addMenu
+// application menu
+'use strict'
 
 const path = require('path')
-
-const electron = require('electron')
-const {app, dialog, Menu, shell} = electron
+const {app, dialog, Menu, shell} = require('electron')
 const moment = require('moment-timezone')
 const zipFolder = require('zip-folder')
 
 const {getSetting, toggleSetting} = require('./preferences')
 
-function addMenu () {
+module.exports = function menu () {
   const template = [{
     label: 'Opentrons',
     submenu: [
@@ -59,15 +58,15 @@ function addMenu () {
     submenu: [
       {
         label: 'Open API Documentation',
-        click () { electron.shell.openExternal('http://docs.opentrons.com') }
+        click: () => shell.openExternal('http://docs.opentrons.com')
       },
       {
         label: 'Open Getting Started',
-        click () { electron.shell.openExternal('https://opentrons.com/getting-started') }
+        click: () => shell.openExternal('https://opentrons.com/getting-started')
       },
       {
         label: 'Log an Issue',
-        click () { electron.shell.openExternal('https://github.com/OpenTrons/opentrons-app/issues/new') }
+        click: () => shell.openExternal('https://github.com/OpenTrons/opentrons/issues/new')
       }
     ]
   }
