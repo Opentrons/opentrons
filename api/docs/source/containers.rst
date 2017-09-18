@@ -43,6 +43,7 @@ The robot deck is made up of slots labeled A1, A2, A3, B1, and so on.
 To tell the robot what containers will be on the deck for your protocol, use `containers.load`
 
 .. code-block:: python
+
   samples_rack = containers.load('tube-rack-2ml', slot='B1')
 
 Putting multiple containers in the same slot
@@ -51,6 +52,7 @@ Putting multiple containers in the same slot
 Some containers might only take up half a slot. You must explicitly say `share=True`, indicating that it is okay to share the slot.
 
 .. code-block:: python
+
   tubes = containers.load('T25-flask', slot='C1')
   more_tubes = containers.load('T25-flask', slot='C1', share=True)
 
