@@ -209,4 +209,3 @@ This example shows how to deposit liquid around the edge of a well.
 
   p200.drop_tip()
 
-******************************

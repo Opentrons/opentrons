@@ -4,8 +4,6 @@
 Hardware Modules
 ################
 
-**********************
-
 **********
 Heat Deck
 **********
@@ -21,8 +19,6 @@ Also download and install the `Arduino IDE`__.
 __ https://www.arduino.cc/en/main/software
 
 Open the file, and you will see detailed instruction for how to update the temperature. The overiew is that you simply set the number for what temperature you want, then upload that code to the Heat Deck.
-
-**********************
 
 **********
 Magbead
