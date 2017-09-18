@@ -7,6 +7,7 @@ from opentrons.robot.robot import Robot
 from datetime import datetime
 
 from opentrons.broker import notify, subscribe
+from opentrons.commands import types
 
 
 VALID_STATES = set(
@@ -54,7 +55,7 @@ class Session(object):
         self.protocol_text = text
         self.protocol = None
         self.state = None
-        self.unsubscribe, = subscribe('robot.command', self.on_command)
+        self.unsubscribe, = subscribe(types.COMMAND, self.on_command)
         self.commands = []
         self.command_log = {}
         self.errors = []
@@ -65,8 +66,8 @@ class Session(object):
             self.close()
             raise e
 
-    def on_command(self, name, event):
-        if event['$'] == 'before':
+    def on_command(self, message):
+        if message['$'] == 'before':
             self.log_append()
 
     def close(self):
@@ -86,22 +87,23 @@ class Session(object):
         stack = []
         res = []
 
-        def on_command(name, payload):
+        def on_command(message):
+            payload = message['payload']
             description = payload.get('text', '').format(
                 **payload
             )
 
-            if payload['$'] == 'before':
+            if message['$'] == 'before':
                 res.append(
                     {
                         'level': len(stack),
                         'description': description,
                         'id': len(res)})
-                stack.append(payload)
+                stack.append(message)
             else:
                 stack.pop()
 
-        unsubscribe, = subscribe('robot.command', on_command)
+        unsubscribe, = subscribe(types.COMMAND, on_command)
 
         try:
             self.run()
@@ -186,12 +188,15 @@ class Session(object):
 
     def _snapshot(self):
         return {
-            'name': self.name,
-            'state': self.state,
-            'protocol_text': self.protocol_text,
-            'commands': self.commands.copy(),
-            'command_log': self.command_log.copy(),
-            'errors': self.errors.copy()
+            'name': 'state',
+            'payload': {
+                'name': self.name,
+                'state': self.state,
+                'protocol_text': self.protocol_text,
+                'commands': self.commands.copy(),
+                'command_log': self.command_log.copy(),
+                'errors': self.errors.copy()
+            }
         }
 
     def _on_state_changed(self):

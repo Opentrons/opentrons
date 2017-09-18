@@ -5,7 +5,7 @@ import inspect
 
 
 def make_command(name, payload):
-    return (name, payload)
+    return {'name': name, 'payload': payload}
 
 
 def home(axis):
@@ -230,34 +230,38 @@ magbead.disengage = disengage
 magbead.delay = delay
 
 
-def publish(before, after, command, payload=None):
+def publish(before, after, command, meta=None):
+    notify_command_topic = functools.partial(notify, topic=types.COMMAND)
+
     def decorator(f):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
-            _payload = _get_args(f, args, kwargs)
+            payload = _get_args(f, args, kwargs)
             command_args = dict(
                 zip(
                     reversed(inspect.getargspec(command).args),
                     reversed(inspect.getargspec(command).defaults or [])))
 
             command_args.update({
-                    key: _payload[key]
+                    key: payload[key]
                     for key in
-                    set(inspect.getargspec(command).args) & _payload.keys()
+                    set(inspect.getargspec(command).args) & payload.keys()
                 })
 
-            if payload:
-                command_args['payload'] = payload
+            if meta:
+                command_args['meta'] = meta
 
-            command_name, _payload = command(**command_args)
+            payload = command(**command_args)
 
             if before:
-                notify(command_name, {**_payload, '$': 'before'})
+                notify_command_topic(
+                    message={**payload, '$': 'before'})
 
             res = f(*args, **kwargs)
 
             if after:
-                notify(command_name, {**_payload, '$': 'after', 'return': res})
+                notify_command_topic(
+                    message={**payload, '$': 'after', 'return': res})
 
             return res
         return decorated

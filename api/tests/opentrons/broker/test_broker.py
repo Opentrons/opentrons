@@ -2,28 +2,28 @@ from opentrons.broker import subscribe
 from opentrons import commands
 
 
-def my_command(arg1, payload=None, arg2='', arg3=''):
-    return (
-        'command',
-        {
-            'description': payload.format(arg1=arg1, arg2=arg2, arg3=arg3)
+def my_command(arg1, meta=None, arg2='', arg3=''):
+    return {
+        'name': 'command',
+        'payload': {
+            'description': meta.format(arg1=arg1, arg2=arg2, arg3=arg3)
         }
-    )
+    }
 
 
-@commands.publish.both(command=my_command, payload='{arg1} {arg2} {arg3}')
+@commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
 def A(arg1, arg2, arg3='foo'):
     B(0)
     return 100
 
 
-@commands.publish.both(command=my_command, payload='{arg1} {arg2} {arg3}')
+@commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
 def C(arg1, arg2, arg3='bar'):
     B(0)
     return 100
 
 
-@commands.publish.both(command=my_command, payload='{arg1}')
+@commands.publish.both(command=my_command, meta='{arg1}')
 def B(arg1):
     return None
 
@@ -32,13 +32,13 @@ def test_add_listener():
     stack = []
     calls = []
 
-    def on_notify(name, event):
-        assert name == 'command'
-        print(event)
-        description = event['description']
+    def on_notify(message):
+        assert message['name'] == 'command'
+        payload = message['payload']
+        description = payload['description']
 
-        if event['$'] == 'before':
-            stack.append(event)
+        if message['$'] == 'before':
+            stack.append(message)
             calls.append({'level': len(stack), 'description': description})
         else:
             stack.pop()

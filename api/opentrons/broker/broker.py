@@ -4,7 +4,7 @@ from asyncio import Queue
 from concurrent import futures
 from contextlib import contextmanager
 
-listeners = []
+subscriptions = {}
 
 
 class Notifications(object):
@@ -21,7 +21,7 @@ class Notifications(object):
         finally:
             self.snoozed = False
 
-    def on_notify(self, name, payload):
+    def on_notify(self, message):
         def thread_has_event_loop():
             try:
                 asyncio.get_event_loop()
@@ -34,7 +34,7 @@ class Notifications(object):
             return
 
         future = asyncio.run_coroutine_threadsafe(
-                self.queue.put((name, payload)), self.loop)
+                self.queue.put(message), self.loop)
 
         if not thread_has_event_loop():
             futures.wait([future])
@@ -46,25 +46,24 @@ class Notifications(object):
         return self
 
 
-def subscribe(prefix, handler=None, loop=None):
+def subscribe(topic, handler=None, loop=None):
     notifications = None
 
     if handler is None:
         notifications = Notifications(loop)
         handler = notifications.on_notify
 
-    listener = (prefix, handler)
-    listeners.append(listener)
+    handlers = subscriptions[topic] = subscriptions.get(topic, [])
+    handlers.append(handler)
 
     def unsubscribe():
-        listeners.remove(listener)
+        handlers.remove(handler)
 
     if notifications:
         return (unsubscribe, notifications)
+
     return (unsubscribe,)
 
 
-def notify(name, payload):
-    for prefix, listener in listeners:
-        if name.startswith(prefix):
-            listener(name, payload)
+def notify(topic, message):
+    [handler(message) for handler in subscriptions.get(topic, [])]

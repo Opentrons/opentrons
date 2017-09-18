@@ -23,14 +23,12 @@ async def test_load_from_text(session_manager, protocol):
 
 
 async def test_async_notifications(session_manager):
-    notify('session.state.change', {})
+    notify('session', {'name': 'foo', 'payload': {'bar': 'baz'}})
     # Get async iterator
     aiter = session_manager.notifications.__aiter__()
     # Then read the first item
     res = await aiter.__anext__()
-    # Returns tuple containing message and session
-    # Since protocol hasn't been loaded, session is None
-    assert res == ('session.state.change', {})
+    assert res == {'name': 'foo', 'payload': {'bar': 'baz'}}
 
 
 async def test_load_protocol_with_error(session_manager):
@@ -58,12 +56,12 @@ async def test_load_and_run(session_manager, protocol):
     res = []
     index = 0
     async for notification in session_manager.notifications:
-        name, snapshot = notification
-        if (name == 'session'):
+        name, payload = notification['name'], notification['payload']
+        if (name == 'state'):
             index += 1  # Command log in sync with add-command events emitted
-            state = snapshot['state']
+            state = payload['state']
             res.append(state)
-            if snapshot['state'] == 'finished':
+            if payload['state'] == 'finished':
                 break
 
     assert [key for key, _ in itertools.groupby(res)] == \

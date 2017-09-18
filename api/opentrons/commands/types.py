@@ -1,9 +1,9 @@
-ROBOT_COMMAND = 'robot.command'
+COMMAND = 'command'
 
 
 # Robot #
 def makeRobotCommandName(name):
-    return '{}.{}'.format(ROBOT_COMMAND, name)
+    return '{}.{}'.format(COMMAND, name)
 
 
 ASPIRATE = makeRobotCommandName('ASPIRATE')

@@ -17,7 +17,7 @@ async def test_notifications(session, session_manager, protocol, root):
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()
 
-    assert res['data'][1]['v']['state'] == 'loaded'
+    assert res['data']['v']['payload']['v']['state'] == 'loaded'
 
     res = await session.socket.receive_json()
     await session.call(
@@ -50,10 +50,12 @@ async def test_notifications(session, session_manager, protocol, root):
     assert len(res['data']['v']['command_log']['v']) == 105
     responses = [
         res for res in responses
-        if res['data'][0] == 'session']
+        if res['data']['v']['name'] == 'state']
     assert len(responses) == 107
 
-    states = [response['data'][1]['v']['state'] for response in responses]
+    states = [
+        response['data']['v']['payload']['v']['state']
+        for response in responses]
 
     assert states[0] == 'running', \
         'First state is "running"'
