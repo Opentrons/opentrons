@@ -121,7 +121,9 @@ def fuzzy_assert(result, expected):
 def patch_robot(robot, commands):
         """
         Monkeypatching for backwards compatibility when robot used to have
-        commands
+        commands.
+
+        TODO (artyom, 20170918): refactor tests to use Session properly.
         """
         def get_commands():
             return commands

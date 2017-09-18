@@ -230,30 +230,26 @@ magbead.disengage = disengage
 magbead.delay = delay
 
 
-def publish(before, after, name=None, command=None, payload=None):
-    assert (name is None) != (command is None), "Either 'name' or 'command' args should be specified"  # noqa
-
+def publish(before, after, command, payload=None):
     def decorator(f):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
             _payload = _get_args(f, args, kwargs)
-            command_name = name
+            command_args = dict(
+                zip(
+                    reversed(inspect.getargspec(command).args),
+                    reversed(inspect.getargspec(command).defaults or [])))
 
-            if command:
-                command_args = dict(
-                    zip(
-                        reversed(inspect.getargspec(command).args),
-                        reversed(inspect.getargspec(command).defaults or [])))
-
-                command_args = {
-                        key: _payload[key]
-                        for key in
-                        set(inspect.getargspec(command).args) & _payload.keys()
-                    }
-                command_name, _payload = command(**command_args)
+            command_args.update({
+                    key: _payload[key]
+                    for key in
+                    set(inspect.getargspec(command).args) & _payload.keys()
+                })
 
             if payload:
-                _payload['payload'] = payload
+                command_args['payload'] = payload
+
+            command_name, _payload = command(**command_args)
 
             if before:
                 notify(command_name, {**_payload, '$': 'before'})

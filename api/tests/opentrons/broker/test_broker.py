@@ -2,19 +2,28 @@ from opentrons.broker import subscribe
 from opentrons import commands
 
 
-@commands.publish.both(name='command', payload='{arg1} {arg2} {arg3}')
+def my_command(arg1, payload=None, arg2='', arg3=''):
+    return (
+        'command',
+        {
+            'description': payload.format(arg1=arg1, arg2=arg2, arg3=arg3)
+        }
+    )
+
+
+@commands.publish.both(command=my_command, payload='{arg1} {arg2} {arg3}')
 def A(arg1, arg2, arg3='foo'):
     B(0)
     return 100
 
 
-@commands.publish.both(name='command', payload='{arg1} {arg2} {arg3}')
+@commands.publish.both(command=my_command, payload='{arg1} {arg2} {arg3}')
 def C(arg1, arg2, arg3='bar'):
     B(0)
     return 100
 
 
-@commands.publish.both(name='command', payload='{arg1}')
+@commands.publish.both(command=my_command, payload='{arg1}')
 def B(arg1):
     return None
 
@@ -26,7 +35,7 @@ def test_add_listener():
     def on_notify(name, event):
         assert name == 'command'
         print(event)
-        description = event['payload'].format(**event)
+        description = event['description']
 
         if event['$'] == 'before':
             stack.append(event)

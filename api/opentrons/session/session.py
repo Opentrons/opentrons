@@ -165,7 +165,7 @@ class Session(object):
             raise ValueError('Invalid state: {0}. Valid states are: {1}'
                              .format(state, VALID_STATES))
         self.state = state
-        self.on_state_changed()
+        self._on_state_changed()
 
     def log_append(self):
         self.command_log.update({
@@ -173,7 +173,7 @@ class Session(object):
                 'timestamp': datetime.utcnow().isoformat()
             }
         })
-        self.on_state_changed()
+        self._on_state_changed()
 
     def error_append(self, error):
         self.errors.append(
@@ -182,7 +182,7 @@ class Session(object):
                 'error': error
             }
         )
-        self.on_state_changed()
+        self._on_state_changed()
 
     def _snapshot(self):
         return {
@@ -194,5 +194,5 @@ class Session(object):
             'errors': self.errors.copy()
         }
 
-    def on_state_changed(self):
+    def _on_state_changed(self):
         notify(SESSION_TOPIC, self._snapshot())
