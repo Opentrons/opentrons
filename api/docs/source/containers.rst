@@ -165,8 +165,7 @@ Tube Racks
 tube-rack-.75ml
 -------------
 
-4x6 rack that holds .75 mL microcentrifuge tubes
-(A1, A1-D6)
+4x6 rack that holds .75 mL microcentrifuge tubes (A1, A1-D6)
 
 .. code-block:: python
 
@@ -271,8 +270,6 @@ See dimensions in diagram below.
 
 .. image:: img/labware_lib/384-plate.png
 
-
-**********************
 
 **************
 Containers
@@ -398,7 +395,6 @@ will print out...
 Accessing Wells
 ******************
 
-**********************
 
 Individual Wells
 ================
