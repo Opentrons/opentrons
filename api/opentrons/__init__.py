@@ -2,7 +2,6 @@ import sys
 
 from opentrons.robot.robot import Robot
 from opentrons import instruments as inst, containers as cnt
-from opentrons.data_storage import database
 
 from ._version import get_versions
 
