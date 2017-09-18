@@ -85,7 +85,7 @@ dev-server:
 
 .PHONY: dev-app
 dev-app:
-	$(env)=development PORT=$(port) electron shell/main.js
+	$(env)=development PORT=$(port) $(bin)/electron shell/main.js
 
 # checks
 #####################################################################

@@ -18,7 +18,6 @@ const PORT = process.env.PORT
 
 const JS_BUNDLE_ENTRY = path.join(__dirname, './ui/index.js')
 
-// TODO(mc, 2017-09-13): find out why PUBLIC_PATH is relative and not absolute
 const OUTPUT_PATH = path.join(__dirname, 'ui/dist')
 const JS_OUTPUT_NAME = 'bundle.js'
 const CSS_OUTPUT_NAME = 'style.css'
