@@ -13,7 +13,7 @@ containers_table = """ CREATE TABLE IF NOT EXISTS Containers (
                                     relative_z INTEGER DEFAULT 0
                                 ); """
 
-# Think we might want to use rows and columns instead of A1 or B2
+# TODO: (JG 9/19/17) Instead of using grids, make wells have row and column coords
 container_wells = """CREATE TABLE IF NOT EXISTS ContainerWells (
                         container_name TEXT NOT NULL
                             references Containers(name),
