@@ -3,6 +3,7 @@ import pytest
 import time
 
 from opentrons.server import rpc
+from threading import Event
 
 
 class Foo(object):
@@ -53,12 +54,24 @@ class TickTock(object):
     # Called by session test fixture to set loop
     def init(self, loop):
         self.notifications = Notifications(loop)
+        self.running = Event()
 
     def start(self):
+        self.running.set()
         for i in range(5):
+            self.running.wait()
             self.notifications.put(i)
             time.sleep(0.1)
         return "Done!"
+
+    def pause(self):
+        print('pause() called')
+        self.running.clear()
+        return "Paused"
+
+    def resume(self):
+        self.running.set()
+        return "Resumed"
 
 
 def type_id(instance):
@@ -258,3 +271,66 @@ async def test_notifications(session, root):
             'type': 0, 'token': session.token
         },
         'data': 'Done!'}
+
+
+@pytest.mark.parametrize('root', [TickTock()])
+async def test_concurrent_calls(session, root):
+    await session.socket.receive_json()  # Skip init
+
+    await session.call(
+        id=id(root),
+        name='start',
+        args=[]
+    )
+    await session.socket.receive_json()  # Skip ack
+
+    await session.call(
+        id=id(root),
+        name='pause',
+        args=[]
+    )
+
+    res = []
+    while True:
+        message = await session.socket.receive_json()
+        if 'token' in message['$']:
+            message['$'].pop('token')
+
+        res += [message]
+        if message.get('data') == 'Paused':
+            break
+
+    # Confirm receiving first notification, ACK for pause and pause result
+    assert res == [
+        {'data': 0, '$': {'type': 2}},
+        {'$': {'type': 1}},
+        {'data': 'Paused', '$': {'status': 'success', 'type': 0}}
+    ]
+    res.clear()
+    await asyncio.sleep(1.0)
+
+    await session.call(
+        id=id(root),
+        name='resume',
+        args=[]
+    )
+
+    while True:
+        message = await session.socket.receive_json()
+        if 'token' in message['$']:
+            message['$'].pop('token')
+
+        res += [message]
+        if message.get('data') == 'Done!':
+            break
+
+    assert res == [
+        {'$': {'type': 1}},  # resume() call ACK
+        {'$': {'status': 'success', 'type': 0}, 'data': 'Resumed'},  # resume() call result # noqa
+        # Original start() call proceeds
+        {'$': {'type': 2}, 'data': 1},
+        {'$': {'type': 2}, 'data': 2},
+        {'$': {'type': 2}, 'data': 3},
+        {'$': {'type': 2}, 'data': 4},
+        {'$': {'status': 'success', 'type': 0}, 'data': 'Done!'}
+    ]
