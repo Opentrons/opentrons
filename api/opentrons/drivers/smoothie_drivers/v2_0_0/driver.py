@@ -7,7 +7,7 @@ from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 
-from opentrons.util import trace
+from opentrons.broker import notify
 
 
 log = get_logger(__name__)
@@ -316,7 +316,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             },
             'class': type(self.connection).__name__
         }
-        trace.EventBroker.get_instance().notify(arguments)
+        notify('driver', arguments)
 
     def move_plunger(self, mode='absolute', **kwargs):
         self.move(mode, **kwargs)
@@ -401,7 +401,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 'plunger': self.get_plunger_positions()["current"]
             }
         }
-        trace.EventBroker.get_instance().notify(arguments)
+        notify('driver', arguments)
 
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
@@ -431,7 +431,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 time.sleep(delay_time)
 
         end_time = _current_time() + delay_time
-        trace.EventBroker.get_instance().notify({
+        notify('driver', {
             'name': 'delay-start',
             'time': delay_time
         })
@@ -439,11 +439,11 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.check_paused_stopped()
             _sleep(min(1, end_time - _current_time()))
 
-            trace.EventBroker.get_instance().notify({
+            notify('driver', {
                 'name': 'countdown',
                 'countdown': int(end_time - time.time())
             })
-        trace.EventBroker.get_instance().notify({
+        notify('driver', {
             'name': 'delay-finish'
         })
 

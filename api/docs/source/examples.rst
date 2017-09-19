@@ -208,5 +208,3 @@ This example shows how to deposit liquid around the edge of a well.
       theta += 0.314
 
   p200.drop_tip()
-
-******************************

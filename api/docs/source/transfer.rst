@@ -52,10 +52,11 @@ will print out...
 .. testoutput:: transfer
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring 100 from <Well A1> to <Well B1>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
+    Dropping tip <Well A1>
 
 Large Volumes
 -------------
@@ -74,16 +75,17 @@ will print out...
 .. testoutput:: transfer_1
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 200.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 200.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 200.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 200.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 150.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 150.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 150.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 150.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring 700 from <Well A2> to <Well B2>
+    Picking up tip <Well A1>
+    Aspirating 200.0 uL from <Well A2> at 1 speed
+    Dispensing 200.0 uL into <Well B2>
+    Aspirating 200.0 uL from <Well A2> at 1 speed
+    Dispensing 200.0 uL into <Well B2>
+    Aspirating 150.0 uL from <Well A2> at 1 speed
+    Dispensing 150.0 uL into <Well B2>
+    Aspirating 150.0 uL from <Well A2> at 1 speed
+    Dispensing 150.0 uL into <Well B2>
+    Dropping tip <Well A1>
 
 Multiple Wells
 --------------
@@ -102,32 +104,33 @@ will print out...
 .. testoutput:: transfer_2
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A3>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B3>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A4>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B4>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A5>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B5>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A6>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B6>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A7>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B7>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A8>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B8>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A9>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B9>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A10>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B10>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A11>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B11>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A12>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B12>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3><Well A4><Well A5><Well A6><Well A7><Well A8><Well A9><Well A10><Well A11><Well A12>> to <WellSeries: <Well B1><Well B2><Well B3><Well B4><Well B5><Well B6><Well B7><Well B8><Well B9><Well B10><Well B11><Well B12>>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
+    Aspirating 100.0 uL from <Well A2> at 1 speed
+    Dispensing 100.0 uL into <Well B2>
+    Aspirating 100.0 uL from <Well A3> at 1 speed
+    Dispensing 100.0 uL into <Well B3>
+    Aspirating 100.0 uL from <Well A4> at 1 speed
+    Dispensing 100.0 uL into <Well B4>
+    Aspirating 100.0 uL from <Well A5> at 1 speed
+    Dispensing 100.0 uL into <Well B5>
+    Aspirating 100.0 uL from <Well A6> at 1 speed
+    Dispensing 100.0 uL into <Well B6>
+    Aspirating 100.0 uL from <Well A7> at 1 speed
+    Dispensing 100.0 uL into <Well B7>
+    Aspirating 100.0 uL from <Well A8> at 1 speed
+    Dispensing 100.0 uL into <Well B8>
+    Aspirating 100.0 uL from <Well A9> at 1 speed
+    Dispensing 100.0 uL into <Well B9>
+    Aspirating 100.0 uL from <Well A10> at 1 speed
+    Dispensing 100.0 uL into <Well B10>
+    Aspirating 100.0 uL from <Well A11> at 1 speed
+    Dispensing 100.0 uL into <Well B11>
+    Aspirating 100.0 uL from <Well A12> at 1 speed
+    Dispensing 100.0 uL into <Well B12>
+    Dropping tip <Well A1>
 
 One to Many
 -------------
@@ -146,24 +149,25 @@ will print out...
 .. testoutput:: transfer_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring 100 from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well A2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well C2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well D2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well E2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well F2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well G2>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well H2>
+    Dropping tip <Well A1>
 
 Few to Many
 -------------
@@ -185,16 +189,17 @@ will print out...
 .. testoutput:: transfer_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A3>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A4>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3><Well A4>> to <WellSeries: <Well B1><Well B2>>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
+    Aspirating 100.0 uL from <Well A2> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
+    Aspirating 100.0 uL from <Well A3> at 1 speed
+    Dispensing 100.0 uL into <Well B2>
+    Aspirating 100.0 uL from <Well A4> at 1 speed
+    Dispensing 100.0 uL into <Well B2>
+    Dropping tip <Well A1>
 
 List of Volumes
 ---------------
@@ -216,14 +221,15 @@ will print out...
 .. testoutput:: transfer_5
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 20.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 20.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Aspirating 40.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 40.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 60.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 60.0 at <Deck><Slot B1><Container 96-flat><Well B3>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring [20, 40, 60] from <Well A1> to <WellSeries: <Well B1><Well B2><Well B3>>
+    Picking up tip <Well A1>
+    Aspirating 20.0 uL from <Well A1> at 1 speed
+    Dispensing 20.0 uL into <Well B1>
+    Aspirating 40.0 uL from <Well A1> at 1 speed
+    Dispensing 40.0 uL into <Well B2>
+    Aspirating 60.0 uL from <Well A1> at 1 speed
+    Dispensing 60.0 uL into <Well B3>
+    Dropping tip <Well A1>
 
 Volume Gradient
 ---------------
@@ -245,24 +251,25 @@ will print out...
 .. testoutput:: transfer_6
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Aspirating 90.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 90.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 80.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 80.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Aspirating 70.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 70.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Aspirating 60.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 60.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Aspirating 50.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 50.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Aspirating 40.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 40.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring (100, 30) from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well A2>
+    Aspirating 90.0 uL from <Well A1> at 1 speed
+    Dispensing 90.0 uL into <Well B2>
+    Aspirating 80.0 uL from <Well A1> at 1 speed
+    Dispensing 80.0 uL into <Well C2>
+    Aspirating 70.0 uL from <Well A1> at 1 speed
+    Dispensing 70.0 uL into <Well D2>
+    Aspirating 60.0 uL from <Well A1> at 1 speed
+    Dispensing 60.0 uL into <Well E2>
+    Aspirating 50.0 uL from <Well A1> at 1 speed
+    Dispensing 50.0 uL into <Well F2>
+    Aspirating 40.0 uL from <Well A1> at 1 speed
+    Dispensing 40.0 uL into <Well G2>
+    Aspirating 30.0 uL from <Well A1> at 1 speed
+    Dispensing 30.0 uL into <Well H2>
+    Dropping tip <Well A1>
 
 **********************
 
@@ -288,18 +295,20 @@ will print out...
 .. testoutput:: distributeconsolidate_1
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Dispensing 180.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Dispensing 60.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Consolidating 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <Well A1>
+    Transferring 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <Well A1>
+    Picking up tip <Well A1>
+    Aspirating 30.0 uL from <Well A2> at 1 speed
+    Aspirating 30.0 uL from <Well B2> at 1 speed
+    Aspirating 30.0 uL from <Well C2> at 1 speed
+    Aspirating 30.0 uL from <Well D2> at 1 speed
+    Aspirating 30.0 uL from <Well E2> at 1 speed
+    Aspirating 30.0 uL from <Well F2> at 1 speed
+    Dispensing 180.0 uL into <Well A1>
+    Aspirating 30.0 uL from <Well G2> at 1 speed
+    Aspirating 30.0 uL from <Well H2> at 1 speed
+    Dispensing 60.0 uL into <Well A1>
+    Dropping tip <Well A1>
 
 If there are multiple destination wells, the pipette will never combine their volumes into the same tip.
 
@@ -315,18 +324,20 @@ will print out...
 .. testoutput:: distributeconsolidate_2
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Dispensing 120.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Aspirating 30.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Dispensing 120.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Consolidating 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <WellSeries: <Well A1><Well A2>>
+    Transferring 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <WellSeries: <Well A1><Well A2>>
+    Picking up tip <Well A1>
+    Aspirating 30.0 uL from <Well A2> at 1 speed
+    Aspirating 30.0 uL from <Well B2> at 1 speed
+    Aspirating 30.0 uL from <Well C2> at 1 speed
+    Aspirating 30.0 uL from <Well D2> at 1 speed
+    Dispensing 120.0 uL into <Well A1>
+    Aspirating 30.0 uL from <Well E2> at 1 speed
+    Aspirating 30.0 uL from <Well F2> at 1 speed
+    Aspirating 30.0 uL from <Well G2> at 1 speed
+    Aspirating 30.0 uL from <Well H2> at 1 speed
+    Dispensing 120.0 uL into <Well A2>
+    Dropping tip <Well A1>
 
 Distribute
 -----------
@@ -345,19 +356,22 @@ will print out...
 .. testoutput:: distributeconsolidate_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 165.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Aspirating 165.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Aspirating 110.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Dispensing 55.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Distributing 55 from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Transferring 55 from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Picking up tip <Well A1>
+    Aspirating 165.0 uL from <Well A1> at 1 speed
+    Dispensing 55.0 uL into <Well A2>
+    Dispensing 55.0 uL into <Well B2>
+    Dispensing 55.0 uL into <Well C2>
+    Aspirating 165.0 uL from <Well A1> at 1 speed
+    Dispensing 55.0 uL into <Well D2>
+    Dispensing 55.0 uL into <Well E2>
+    Dispensing 55.0 uL into <Well F2>
+    Aspirating 110.0 uL from <Well A1> at 1 speed
+    Dispensing 55.0 uL into <Well G2>
+    Dispensing 55.0 uL into <Well H2>
+    Dropping tip <Well A1>
+
 
 If there are multiple source wells, the pipette will never combine their volumes into the same tip.
 
@@ -373,18 +387,20 @@ will print out...
 .. testoutput:: distributeconsolidate_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 120.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Aspirating 120.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Distributing 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Transferring 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Picking up tip <Well A1>
+    Aspirating 120.0 uL from <Well A1> at 1 speed
+    Dispensing 30.0 uL into <Well A2>
+    Dispensing 30.0 uL into <Well B2>
+    Dispensing 30.0 uL into <Well C2>
+    Dispensing 30.0 uL into <Well D2>
+    Aspirating 120.0 uL from <Well A2> at 1 speed
+    Dispensing 30.0 uL into <Well E2>
+    Dispensing 30.0 uL into <Well F2>
+    Dispensing 30.0 uL into <Well G2>
+    Dispensing 30.0 uL into <Well H2>
+    Dropping tip <Well A1>
 
 Disposal Volume
 ---------------
@@ -407,20 +423,22 @@ will print out...
 .. testoutput:: distributeconsolidate_5
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 130.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Blowing out at <Deck><Slot D2><Container point><Well A1>
-    Aspirating 130.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Blowing out at <Deck><Slot D2><Container point><Well A1>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Distributing 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Transferring 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Picking up tip <Well A1>
+    Aspirating 130.0 uL from <Well A1> at 1 speed
+    Dispensing 30.0 uL into <Well A2>
+    Dispensing 30.0 uL into <Well B2>
+    Dispensing 30.0 uL into <Well C2>
+    Dispensing 30.0 uL into <Well D2>
+    Blowing out at <Well A1>
+    Aspirating 130.0 uL from <Well A2> at 1 speed
+    Dispensing 30.0 uL into <Well E2>
+    Dispensing 30.0 uL into <Well F2>
+    Dispensing 30.0 uL into <Well G2>
+    Dispensing 30.0 uL into <Well H2>
+    Blowing out at <Well A1>
+    Dropping tip <Well A1>
 
 .. note::
 
@@ -443,20 +461,22 @@ will print out...
 .. testoutput:: distributeconsolidate_6
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 140.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well C2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well D2>
-    Blowing out at <Deck><Slot D2><Container point><Well A1>
-    Aspirating 140.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well E2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well F2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well G2>
-    Dispensing 30.0 at <Deck><Slot B1><Container 96-flat><Well H2>
-    Blowing out at <Deck><Slot D2><Container point><Well A1>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Distributing 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Transferring 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
+    Picking up tip <Well A1>
+    Aspirating 140.0 uL from <Well A1> at 1 speed
+    Dispensing 30.0 uL into <Well A2>
+    Dispensing 30.0 uL into <Well B2>
+    Dispensing 30.0 uL into <Well C2>
+    Dispensing 30.0 uL into <Well D2>
+    Blowing out at <Well A1>
+    Aspirating 140.0 uL from <Well A2> at 1 speed
+    Dispensing 30.0 uL into <Well E2>
+    Dispensing 30.0 uL into <Well F2>
+    Dispensing 30.0 uL into <Well G2>
+    Dispensing 30.0 uL into <Well H2>
+    Blowing out at <Well A1>
+    Dropping tip <Well A1>
 
 **********************
 
@@ -488,18 +508,19 @@ will print out...
 .. testoutput:: options_1
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well B1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well C1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A3>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B3>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3>> to <WellSeries: <Well B1><Well B2><Well B3>>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
+    Dropping tip <Well A1>
+    Picking up tip <Well B1>
+    Aspirating 100.0 uL from <Well A2> at 1 speed
+    Dispensing 100.0 uL into <Well B2>
+    Dropping tip <Well A1>
+    Picking up tip <Well C1>
+    Aspirating 100.0 uL from <Well A3> at 1 speed
+    Dispensing 100.0 uL into <Well B3>
+    Dropping tip <Well A1>
 
 Never Get a New Tip
 ------------------------
@@ -522,12 +543,13 @@ will print out...
 .. testoutput:: options_2
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B2>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A3>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B3>
+    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3>> to <WellSeries: <Well B1><Well B2><Well B3>>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
+    Aspirating 100.0 uL from <Well A2> at 1 speed
+    Dispensing 100.0 uL into <Well B2>
+    Aspirating 100.0 uL from <Well A3> at 1 speed
+    Dispensing 100.0 uL into <Well B3>
 
 Trash or Return Tip
 ------------------------
@@ -550,11 +572,12 @@ will print out...
 .. testoutput:: options_3
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well B1>
+    Transferring 100 from <Well A1> to <Well B1>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well B1>
     Returning tip
-    Drop_tip at <Deck><Slot A1><Container tiprack-200ul><Well A1>
+    Dropping tip <Well A1>
 
 Touch Tip
 ---------
@@ -577,12 +600,13 @@ will print out...
 .. testoutput:: options_4
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
+    Transferring 100 from <Well A1> to <Well A2>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
     Touching tip
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
+    Dispensing 100.0 uL into <Well A2>
     Touching tip
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Dropping tip <Well A1>
 
 Blow Out
 --------
@@ -605,11 +629,12 @@ will print out...
 .. testoutput:: options_5
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
+    Transferring 100 from <Well A1> to <Well A2>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well A2>
     Blowing out
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Dropping tip <Well A1>
 
 Mix Before/After
 ----------------
@@ -633,22 +658,23 @@ will print out...
 .. testoutput:: options_6
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
+    Transferring 100 from <Well A1> to <Well A2>
+    Picking up tip <Well A1>
     Mixing 2 times with a volume of 50ul
-    Aspirating 50 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 50
-    Aspirating 50
-    Dispensing 50
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
+    Aspirating 50 uL from <Well A1> at 1.0 speed
+    Dispensing 50 uL into None
+    Aspirating 50 uL from None at 1.0 speed
+    Dispensing 50 uL into None
+    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Dispensing 100.0 uL into <Well A2>
     Mixing 3 times with a volume of 75ul
-    Aspirating 75 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 75.0
-    Aspirating 75
-    Dispensing 75.0
-    Aspirating 75
-    Dispensing 75.0
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Aspirating 75 uL from <Well A2> at 1.0 speed
+    Dispensing 75 uL into None
+    Aspirating 75 uL from None at 1.0 speed
+    Dispensing 75 uL into None
+    Aspirating 75 uL from None at 1.0 speed
+    Dispensing 75 uL into None
+    Dropping tip <Well A1>
 
 Air Gap
 -------
@@ -671,10 +697,11 @@ will print out...
 .. testoutput:: options_7
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container tiprack-200ul><Well A1>
-    Aspirating 100.0 at <Deck><Slot B1><Container 96-flat><Well A1>
+    Transferring 100 from <Well A1> to <Well A2>
+    Picking up tip <Well A1>
+    Aspirating 100.0 uL from <Well A1> at 1 speed
     Air gap
-    Aspirating 20
-    Dispensing 20 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Dispensing 100.0 at <Deck><Slot B1><Container 96-flat><Well A2>
-    Drop_tip at <Deck><Slot D2><Container point><Well A1>
+    Aspirating 20 uL from None at 1.0 speed
+    Dispensing 20 uL into <Well A2>
+    Dispensing 100.0 uL into <Well A2>
+    Dropping tip <Well A1>

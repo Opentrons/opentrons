@@ -4,6 +4,7 @@
 
 import pytest
 import os
+import re
 
 from collections import namedtuple
 from opentrons.server import rpc
@@ -48,22 +49,22 @@ Protocol = namedtuple(
 
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
-    text = None
-    filename = os.path.join(os.path.dirname(__file__), 'data', request.param)
+    try:
+        root = request.getfuncargvalue('protocol_file')
+    except Exception as e:
+        root = request.param
+
+    filename = os.path.join(os.path.dirname(__file__), 'data', root)
 
     with open(filename) as file:
         text = ''.join(list(file))
-
-    return Protocol(text=text, filename=filename)
+        return Protocol(text=text, filename=filename)
 
 
 @pytest.fixture
 def session_manager(loop):
     from opentrons.session import SessionManager
     with SessionManager(loop=loop) as s:
-        # We are adding this so more notifications are generated
-        # during the run, in addition to default ones
-        s.notifications.append_filters(['move-to'])
         yield s
     return
 
@@ -103,3 +104,15 @@ def session(loop, test_client, request, session_manager):
 
     request.addfinalizer(finalizer)
     return Session(server, socket, token, call)
+
+
+def fuzzy_assert(result, expected):
+    expected_re = ['.*'.join(['^'] + item + ['$']) for item in expected]
+
+    assert len(result) == len(expected_re), \
+        'result and expected have different length'
+
+    for res, exp in zip(result, expected_re):
+        assert re.compile(
+            exp.lower()).match(res.lower()), "{} didn't match {}" \
+            .format(res, exp)

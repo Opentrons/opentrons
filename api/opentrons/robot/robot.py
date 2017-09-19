@@ -1,13 +1,12 @@
-import copy
 import os
 from threading import Event
 
 from opentrons import containers, drivers
+from opentrons import helpers
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
-from opentrons.helpers import helpers
-from opentrons.util.trace import traceable
-
+from opentrons import commands
+from opentrons.broker import subscribe
 
 log = get_logger(__name__)
 
@@ -138,7 +137,7 @@ class Robot(object):
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
-    ['Aspirating 200 at <Deck><Slot A1><Container plate><Well A1>']
+    ['Aspirating 200 uL from <Well A1> at 1.0 speed']
     """
 
     def __init__(self):
@@ -152,7 +151,6 @@ class Robot(object):
         only once instance of a robot.
         """
 
-        self._commands = None  # []
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
@@ -182,9 +180,14 @@ class Robot(object):
         self.disconnect()
         self.arc_height = 5
         self.set_connection('simulate')
+        # TODO (artyom, 09182017): once protocol development experience
+        # in the light of Session concept is fully fleshed out, we need
+        # to properly communicate deprecation of commands. For now we'll
+        # leave it as is for compatibility with documentation.
+        self._commands = []
+        self._unsubscribe_commands = None
         self.reset()
 
-    @helpers.not_app_run_safe
     def reset(self):
         """
         Resets the state of the robot and clears:
@@ -194,7 +197,6 @@ class Robot(object):
             * Runtime warnings
 
         """
-        self._commands = []
         self._runtime_warnings = []
 
         self._previous_container = None
@@ -207,6 +209,8 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
+        self.clear_commands()
 
         return self
 
@@ -303,7 +307,6 @@ class Robot(object):
         dimensions = self._driver.get_dimensions()
         return helpers.flip_coordinates(coordinates, dimensions)
 
-    @helpers.not_app_run_safe
     def connect(self, port=None, options=None):
         """
         Connects the robot to a serial port.
@@ -374,15 +377,9 @@ class Robot(object):
             self._driver.home('z')
             self._driver.home('x', 'y', 'b', 'a')
 
-    @traceable('add-command')
-    def add_command(self, command):
-        self._commands.append(command)
-
-    @helpers.not_app_run_safe
     def move_head(self, *args, **kwargs):
         self._driver.move_head(*args, **kwargs)
 
-    @helpers.not_app_run_safe
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -407,7 +404,6 @@ class Robot(object):
         """
         self._driver.set_speed(*args, **kwargs)
 
-    @traceable('move-to')
     def move_to(self, location, instrument=None, strategy='arc', **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -547,30 +543,6 @@ class Robot(object):
             {'z': arrival_z}
         ]
 
-    @property
-    def actions(self):
-        """
-        Return a copy of a raw list of commands in the Robot's queue.
-        """
-        return copy.deepcopy(self._commands)
-
-    def prepare_for_run(self):
-        """
-        Internal. Prepare for a Robot's run.
-        """
-        if not self._driver.is_connected():
-            raise RuntimeWarning('Please connect to the robot')
-
-        self._runtime_warnings = []
-
-        if not self._instruments:
-            self.add_warning('No instruments added to robot')
-        if not self._commands:
-            self.add_warning('No commands added to robot')
-
-        for instrument in self._instruments.values():
-            instrument.reset()
-
     def set_connection(self, mode):
         if mode not in self.smoothie_drivers:
             raise ValueError(
@@ -592,7 +564,6 @@ class Robot(object):
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
-    @helpers.not_app_run_safe
     def disconnect(self):
         """
         Disconnects from the robot.
@@ -702,13 +673,6 @@ class Robot(object):
                 instr.update_calibrator()
         return container
 
-    def clear_commands(self):
-        """
-        Clear Robot's command queue.
-        """
-        self._previous_container = None
-        self._commands = []
-
     def pause(self):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -798,17 +762,28 @@ class Robot(object):
             }
         }
 
+    @commands.publish.before(command=commands.comment)
+    def comment(self, msg):
+        pass
+
+    # TODO (artyom, 09182017): implement proper developer experience in light
+    # of Session concept being introduced
     def commands(self):
-        """
-        Access the human-readable list of commands in the robot's queue.
-
-        Returns
-        -------
-        A list of string values for each command in the queue, for example:
-
-        ``'Aspirating 200uL at <Deck>/<Slot A1>/<Container plate>/<Well A1>'``
-        """
         return self._commands
 
-    def comment(self, msg):
-        self.add_command(msg)
+    def clear_commands(self):
+        self._commands.clear()
+        if self._unsubscribe_commands:
+            self._unsubscribe_commands()
+
+        def on_command(message):
+            payload = message.get('payload')
+            text = payload.get('text')
+            if text is None:
+                return
+
+            if message['$'] == 'before':
+                self._commands.append(text.format(**payload))
+
+        self._unsubscribe_commands = subscribe(
+            commands.types.COMMAND, on_command)

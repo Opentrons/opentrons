@@ -25,14 +25,13 @@ CALL_NACK_MESSAGE = 4
 
 
 class Server(object):
-    def __init__(self, root=None, loop=None, notification_max_depth=4):
+    def __init__(self, root=None, loop=None):
         self.monitor_events_task = None
         self.loop = loop or asyncio.get_event_loop()
         self.objects = {}
         self.system = SystemCalls(self.objects)
 
         self.root = root
-        self.notification_max_depth = notification_max_depth
 
         # Allow for two concurrent calls max
         self.executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
@@ -86,8 +85,7 @@ class Server(object):
                 # Apply notification_max_depth to control object tree depth
                 # during serialization to avoid flooding comms
                 data = self.call_and_serialize(
-                    lambda: event,
-                    max_depth=self.notification_max_depth)
+                    lambda: event)
                 self.send(
                     {
                         '$': {'type': NOTIFICATION_MESSAGE},
