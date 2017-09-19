@@ -195,11 +195,10 @@ export default function client (dispatch) {
   }
 
   function handleRobotNotification (message) {
-    const [command, payload] = message
+    const {name, payload} = message
 
-    switch (command.name) {
-      case 'session.state.change':
-      case 'add-command':
+    switch (name) {
+      case 'state':
         handleApiSession(payload)
         break
     }
