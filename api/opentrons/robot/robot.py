@@ -628,7 +628,7 @@ class Robot(object):
             self.pose_tracker.track_object(
                 self._deck,
                 slot,
-                **slot._coordinates
+                *slot._coordinates
             )
 
     @property
@@ -679,13 +679,13 @@ class Robot(object):
         (slot) as pose tracker parent
         """
         self.pose_tracker.track_object(
-            container.parent, container, **container._coordinates
+            container.parent, container, *container._coordinates
         )
         for well in container:
             self.pose_tracker.track_object(
                 container,
                 well,
-                **(well._coordinates + well.top()[1])
+                *(well._coordinates + well.top()[1])
             )
 
     def clear_commands(self):

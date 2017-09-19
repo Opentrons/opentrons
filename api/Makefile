@@ -14,13 +14,6 @@ test:
 		--cov-report xml:coverage.xml \
 		tests
 
-test_show:
-	python -m pylama opentrons tests && python -m pytest -s -v \
-		--cov=opentrons \
-		--cov-report term-missing:skip-covered \
-		--cov-report xml:coverage.xml \
-		tests
-
 docs:
 	cd docs && make html && make doctest
 

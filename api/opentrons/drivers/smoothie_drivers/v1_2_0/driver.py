@@ -9,7 +9,7 @@ from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 from opentrons.pubsub_util import topics
-from opentrons.tracker.move_msgs import new_pos_msg
+from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.util.trace import MessageBroker
 from opentrons.util import environment
 

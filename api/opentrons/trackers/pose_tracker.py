@@ -1,6 +1,6 @@
 import numpy as np
 from opentrons.containers.placeable import WellSeries
-from opentrons.tracker.mmove_msgs import new_pos_msg
+from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.pubsub_util.topics import MOVEMENT
 from opentrons.util.trace import MessageBroker
 
@@ -12,6 +12,11 @@ def flatten(S):
         return flatten(S[0]) + flatten(S[1:])
     return S[:1] + flatten(S[1:])
 
+def pprint_tree(node, level):
+    ret = '\t' * level + repr(node.value) + '\n'
+    for child in self.children:
+        ret += pprint_tree(child, level + 1)
+    return ret
 
 class Node(object):
     def __init__(self, object, parent=None):
@@ -19,10 +24,9 @@ class Node(object):
         self.parent = parent
         self.children = []
 
-    def __repr__(self, level=0):
-        ret = "\t"*level+repr(self.value)+"\n"
-        for child in self.children:
-            ret += child.__repr__(level+1)
+    def __repr__(self):
+        ret = '<Positon Tree>\n'
+        ret += pprint_tree(self, level=0)
         return ret
 
     def add_child(self, child_node):
@@ -97,9 +101,10 @@ class PoseTracker(object):
         try:
             return self._pose_dict[obj]
         except KeyError:
-            if isinstance(obj, WellSeries):  # FIXME:(09/12) remove WellSeries
+            # FIXME:(Jared 09/12) remove WellSeries
+            if isinstance(obj, WellSeries):
                 return self._pose_dict[obj[0]]
-            raise KeyError("Position not tracked: {}".format(obj))
+            raise KeyError("Object pose is not tracked: {}".format(obj))
 
     def __contains__(self, item):
         return item in self._pose_dict
@@ -134,7 +139,9 @@ class PoseTracker(object):
         obj_position = parent_position + [x, y, z]
         object_pose = Pose(*obj_position)
         node = Node(obj)
+
         self._node_dict[parent].add_child(node)
+        self._node_dict[obj] = node
         self._pose_dict[obj] = object_pose
 
     def create_root_object(self, obj, x, y, z):
