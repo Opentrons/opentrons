@@ -14,7 +14,7 @@ def flatten(S):
 
 def pprint_tree(node, level):
     ret = '\t' * level + repr(node.value) + '\n'
-    for child in self.children:
+    for child in node.children:
         ret += pprint_tree(child, level + 1)
     return ret
 
@@ -25,8 +25,7 @@ class Node(object):
         self.children = []
 
     def __repr__(self):
-        ret = '<Positon Tree>\n'
-        ret += pprint_tree(self, level=0)
+        ret = pprint_tree(self, level=0)
         return ret
 
     def add_child(self, child_node):
@@ -47,7 +46,7 @@ class Pose(object):
     def __eq__(self, other):
         return (self._pose == other._pose).all()
 
-    # TODO: Revisit this once we start dealing with rotation
+    # TODO: (JG 9/19/17) Revisit this once we start dealing with rotation
     # to make sure we are doing this in the most expected way
     def __mul__(self, other):
         return Pose(*self._pose.dot(other)[:3])
@@ -130,7 +129,7 @@ class PoseTracker(object):
                                for item in self.get_object_children(root)]])
 
     def max_z_in_subtree(self, root):
-        return max([self[root].z for obj in
+        return max([self[obj].z for obj in
                     self.get_objects_in_subtree(root)])
 
     def track_object(self, parent, obj, x, y, z):
@@ -171,11 +170,9 @@ class PoseTracker(object):
          for child in self.get_object_children(obj_to_trans)]  # recursive
 
     def _object_moved(self, new_pos_msg: new_pos_msg):
-        '''
-        Calculates an object movement as diff between current position
+        '''Calculates an object movement as diff between current position
         and previous - translates moved object and its descendants
-        by this difference
-        '''
+        by this difference'''
         mover, *new_pos = new_pos_msg
         self.translate_object(mover, *(new_pos - self[mover].position))
 

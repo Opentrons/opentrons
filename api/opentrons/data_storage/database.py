@@ -1,6 +1,6 @@
 import sqlite3
 from opentrons.containers.placeable import Container, Well
-from opentrons.data_storage import database_crud_funcs as db_crud
+from opentrons.data_storage import database_queries as db_crud
 from opentrons.util import environment
 from opentrons.util.vector import Vector
 
@@ -8,31 +8,34 @@ database_path = environment.get_path('DATABASE_FILE')
 
 # ======================== Private Functions ======================== #
 
-
+#FIXME: (JG 9/19/17) This zip() return is just code smell due to Vector class
 def _parse_container_obj(container: Container):
-    return container._coordinates
+    return dict(zip('xyz', container._coordinates))
 
 
 def _parse_well_obj(well: Well):
-    relative_coords = well._coordinates + well.bottom()[1]
+    r_x, r_y, r_z = well._coordinates + well.bottom()[1]
     location, depth = well.get_name(), well.z_size()
     diameter = well.properties.get('diameter', None)
     volume = well.properties.get('total-liquid-volume', None)
     width, length = well.properties['width'], well.properties['length']
-    return (
-        location,
-        *relative_coords,
-        depth,
-        volume,
-        diameter,
-        length,
-        width
-    )
+    return {
+        'location': location,
+        'x': r_x,
+        'y': r_y,
+        'z': r_z,
+        'depth': depth,
+        'volume': volume,
+        'diameter': diameter,
+        'length': length,
+        'width': width
+    }
+
 
 
 def _create_container_obj_in_db(db, container: Container, container_name: str):
     db_crud.create_container(
-        db, container_name, *_parse_container_obj(container)
+        db, container_name, **_parse_container_obj(container)
     )
     for well in iter(container):
         _create_well_obj_in_db(db, container_name, well)
@@ -41,7 +44,7 @@ def _create_container_obj_in_db(db, container: Container, container_name: str):
 def _load_container_object_from_db(db, container_name: str):
     db_data = db_crud.get_container_by_name(db, container_name)
     if not db_data:
-        raise ResourceWarning(
+        raise ValueError(
             "No container with name {} found in Containers database"
             .format(container_name)
         )
@@ -66,7 +69,7 @@ def _update_container_object_in_db(db, container: Container):
     db_crud.update_container(
         db,
         container.get_type(),
-        *_parse_container_obj(container)
+        **_parse_container_obj(container)
     )
 
 
@@ -78,7 +81,7 @@ def _delete_container_object_in_db(db, container_name: str):
 def _create_well_obj_in_db(db, container_name: str, well: Well):
     well_data = _parse_well_obj(well)
     db_crud.insert_well_into_db(
-            db, container_name, *well_data
+            db_conn=db, container_name=container_name, **well_data
     )
 
 

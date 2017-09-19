@@ -38,29 +38,31 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_containers_create(self):
         container_name = 'plate_for_testing_containers_create'
-        containers_create(
-            name=container_name,
-            grid=(8, 12),
-            spacing=(9, 9),
-            diameter=4,
-            depth=8,
-            volume=1000,
-            save=True)
+        try: 
+            containers_create(
+                name=container_name,
+                grid=(8, 12),
+                spacing=(9, 9),
+                diameter=4,
+                depth=8,
+                volume=1000,
+                save=True)
 
-        p = containers_load(self.robot, container_name, 'A1')
-        self.assertEquals(len(p), 96)
-        self.assertEquals(len(p.rows), 12)
-        self.assertEquals(len(p.cols), 8)
-        self.assertEquals(
-            p.get_parent(), self.robot.deck['A1'])
-        self.assertEquals(p['C3'], p[18])
-        self.assertEquals(p['C3'].max_volume(), 1000)
-        for i, w in enumerate(p):
-            self.assertEquals(w, p[i])
+            p = containers_load(self.robot, container_name, 'A1')
+            self.assertEquals(len(p), 96)
+            self.assertEquals(len(p.rows), 12)
+            self.assertEquals(len(p.cols), 8)
+            self.assertEquals(
+                p.get_parent(), self.robot.deck['A1'])
+            self.assertEquals(p['C3'], p[18])
+            self.assertEquals(p['C3'].max_volume(), 1000)
+            for i, w in enumerate(p):
+                self.assertEquals(w, p[i])
 
-        assert container_name in containers_list()
-        database.delete_container(container_name)
-        assert container_name not in containers_list()
+            assert container_name in containers_list()
+        finally:
+            database.delete_container(container_name)
+            assert container_name not in containers_list()
 
     def test_load_same_slot_force(self):
         container_name = '96-flat'

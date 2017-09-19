@@ -77,17 +77,34 @@ def test_well_from_container_load(robot):
 
 def test_container_parse(robot):
     plate = containers_load(robot, '96-flat', 'A1')
-    assert database._parse_container_obj(plate) == Vector(11.24, 14.34, 0.00)
+    assert database._parse_container_obj(plate) == {'x': 11.24, 'y': 14.34, 'z': 0.00}
 
 
 def test_well_parse(robot):
     plate = containers_load(robot, '96-flat', 'A1')
-    assert database._parse_well_obj(plate[18]) == (
-        'C3', 18.0, 18.0, 0.0, 10.5, 400, 6.4, 6.4, 6.4
-    )
-    assert database._parse_well_obj(plate[45]) == (
-        'F6', 45.0, 45.0, 0.0, 10.5, 400, 6.4, 6.4, 6.4
-    )
+    assert database._parse_well_obj(plate[18]) == {
+        'diameter': 6.4,
+        'y': 18.0,
+        'width': 6.4,
+        'x': 18.0,
+        'depth': 10.5,
+        'length': 6.4,
+        'z': 0.0,
+        'volume': 400,
+        'location': 'C3'
+    }
+
+    assert database._parse_well_obj(plate[45]) == {
+        'diameter': 6.4,
+        'y': 45.0,
+        'width': 6.4,
+        'x': 45.0,
+        'depth': 10.5,
+        'length': 6.4,
+        'z': 0.0,
+        'volume': 400,
+        'location': 'F6'
+    }
 
 
 def test_load_all_containers():
@@ -135,5 +152,5 @@ def test_load_all_persisted_containers():
 
 
 def test_invalid_container_name():
-    with pytest.raises(ResourceWarning):
+    with pytest.raises(ValueError):
         database.load_container("fake_container")
