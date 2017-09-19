@@ -543,21 +543,6 @@ class Robot(object):
             {'z': arrival_z}
         ]
 
-    def prepare_for_run(self):
-        """
-        Internal. Prepare for a Robot's run.
-        """
-        if not self._driver.is_connected():
-            raise RuntimeWarning('Please connect to the robot')
-
-        self._runtime_warnings = []
-
-        if not self._instruments:
-            self.add_warning('No instruments added to robot')
-
-        for instrument in self._instruments.values():
-            instrument.reset()
-
     def set_connection(self, mode):
         if mode not in self.smoothie_drivers:
             raise ValueError(
@@ -793,9 +778,6 @@ class Robot(object):
 
         def on_command(message):
             payload = message.get('payload')
-            if payload is None:
-                return
-
             text = payload.get('text')
             if text is None:
                 return

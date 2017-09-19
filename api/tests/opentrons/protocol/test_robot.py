@@ -1,4 +1,5 @@
 import unittest
+import pytest
 
 from opentrons import drivers
 from opentrons.containers import load as containers_load
@@ -6,6 +7,19 @@ from opentrons.containers.placeable import Deck
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
 from opentrons.util.vector import Vector
+
+
+@pytest.fixture
+def robot():
+    from opentrons import robot
+    robot.__dict__ = {**Robot().__dict__}
+    return robot
+
+
+def test_get_serial_ports_list(robot, monkeypatch):
+    assert 'Virtual Smoothie' not in robot.get_serial_ports_list()
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    assert 'Virtual Smoothie' in robot.get_serial_ports_list()
 
 
 class RobotTest(unittest.TestCase):
@@ -50,29 +64,6 @@ class RobotTest(unittest.TestCase):
     def test_home_after_disconnect(self):
         self.robot._driver.connection = None
         self.assertRaises(RuntimeError, self.robot.home)
-
-    # TODO: reevaluate/implement this test...
-    # def test_stop_run(self):
-    #     p200 = pipette.Pipette(
-    #         self.robot, axis='b', name='my-fancy-pancy-pipette'
-    #     )
-    #     p200.calibrate_plunger(top=0, bottom=5, blow_out=6, drop_tip=7)
-    #
-    #     for i in range(1000):
-    #         p200.aspirate().dispense()
-    #
-    #     res = None
-    #
-    #     def _run():
-    #         nonlocal res
-    #         self.assertRaises(RuntimeError, self.robot.run)
-    #
-    #     thread = threading.Thread(target=_run)
-    #     thread.start()
-    #
-    #     self.robot.stop()
-    #
-    #     thread.join()
 
     def test_calibrated_max_dimension(self):
 
@@ -167,53 +158,6 @@ class RobotTest(unittest.TestCase):
         self.assertDictEqual(self.robot.axis_homed, {
             'x': True, 'y': True, 'z': True, 'a': True, 'b': True
         })
-
-    def test_robot_pause_and_resume(self):
-        self.robot.move_to((Deck(), (100, 0, 0)))
-        self.robot.move_to((Deck(), (101, 0, 0)))
-        self.assertEqual(len(self.robot.commands()), 0)
-
-        #
-        # FIXME: pause and resume can't be measured based on whether commands
-        # in the command queue are executed since all robot actions will be
-        # called immediately
-        #
-
-        # self.robot.pause()
-        #
-        # def _run():
-        #     self.robot.run()
-        #
-        # thread = threading.Thread(target=_run)
-        # thread.start()
-        # self.robot.resume()
-        # thread.join(0.5)
-        #
-        # self.assertEquals(thread.is_alive(), False)
-        # self.assertEqual(len(self.robot._commands), 2)
-        #
-        # self.robot.clear_commands()
-        # self.assertEqual(len(self.robot._commands), 0)
-        #
-        # self.robot.move_to((Deck(), (100, 0, 0)), enqueue=True)
-        # self.robot.move_to((Deck(), (101, 0, 0)), enqueue=True)
-        #
-        # def _run():
-        #     self.robot.run()
-        #
-        # self.robot.pause()
-        #
-        # thread = threading.Thread(target=_run)
-        # thread.start()
-        # thread.join(0.01)
-        #
-        # self.assertEquals(thread.is_alive(), True)
-        # self.assertEqual(len(self.robot._commands) > 0, True)
-        #
-        # self.robot.resume()
-        #
-        # thread.join(1)
-        # self.assertEqual(len(self.robot._commands), 2)
 
     def test_versions(self):
         res = self.robot.versions()
