@@ -43,7 +43,7 @@ def test_add_listener():
         else:
             stack.pop()
 
-    unsubscribe, = subscribe('command', on_notify)
+    unsubscribe = subscribe('command', on_notify)
 
     A(0, 1)
     B(2)

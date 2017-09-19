@@ -6,7 +6,7 @@ from opentrons import robot
 from opentrons.robot.robot import Robot
 from datetime import datetime
 
-from opentrons.broker import notify, subscribe
+from opentrons.broker import notify, subscribe, Notifications
 from opentrons.commands import types
 
 
@@ -17,10 +17,14 @@ SESSION_TOPIC = 'session'
 
 class SessionManager(object):
     def __init__(self, loop=None):
-        self.unsubscribe, self.notifications = \
-            subscribe(SESSION_TOPIC, loop=loop)
+        self.notifications = Notifications(loop=loop)
+        self.unsubscribe = subscribe(
+            SESSION_TOPIC, self.notifications.on_notify)
         self.session = None
         self.robot = Robot()
+        # TODO (artyom, 09182017): This is to support the future
+        # concept of archived sessions. To be reworked when more details
+        # are available
         self.sessions = []
 
     def __enter__(self):
@@ -55,7 +59,7 @@ class Session(object):
         self.protocol_text = text
         self.protocol = None
         self.state = None
-        self.unsubscribe, = subscribe(types.COMMAND, self.on_command)
+        self.unsubscribe = subscribe(types.COMMAND, self.on_command)
         self.commands = []
         self.command_log = {}
         self.errors = []
@@ -103,7 +107,7 @@ class Session(object):
             else:
                 stack.pop()
 
-        unsubscribe, = subscribe(types.COMMAND, on_command)
+        unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
             self.run()

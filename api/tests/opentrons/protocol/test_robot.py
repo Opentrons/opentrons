@@ -28,7 +28,7 @@ class RobotTest(unittest.TestCase):
             if message['$'] == 'before':
                 commands.append(payload['text'].format(**payload))
         patch_robot(self.robot, commands)
-        self.unsubscribe, = subscribe('command', on_command)
+        self.unsubscribe = subscribe('command', on_command)
 
     def tearDown(self):
         self.unsubscribe()

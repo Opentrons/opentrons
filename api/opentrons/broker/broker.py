@@ -46,23 +46,14 @@ class Notifications(object):
         return self
 
 
-def subscribe(topic, handler=None, loop=None):
-    notifications = None
-
-    if handler is None:
-        notifications = Notifications(loop)
-        handler = notifications.on_notify
-
+def subscribe(topic, handler):
     handlers = subscriptions[topic] = subscriptions.get(topic, [])
     handlers.append(handler)
 
     def unsubscribe():
         handlers.remove(handler)
 
-    if notifications:
-        return (unsubscribe, notifications)
-
-    return (unsubscribe,)
+    return unsubscribe
 
 
 def notify(topic, message):
