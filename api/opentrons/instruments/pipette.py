@@ -1109,7 +1109,7 @@ class Pipette(Instrument):
         current_position = self.robot._driver.get_plunger_positions()
         current_position = current_position['target'][self.axis]
         kwargs = {}
-        kwargs[position] = current_position
+        kwargs[position] = round(current_position, 1)
         self.calibrate_plunger(**kwargs)
 
         return self
