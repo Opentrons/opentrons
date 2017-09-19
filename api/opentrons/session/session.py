@@ -1,5 +1,4 @@
 import ast
-import copy
 
 from opentrons.commands import tree
 from opentrons import robot

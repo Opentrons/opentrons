@@ -10,7 +10,6 @@ from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
 
 from tests.opentrons.conftest import fuzzy_assert
-from opentrons.broker import subscribe
 
 
 class PipetteTest(unittest.TestCase):
@@ -860,12 +859,12 @@ class PipetteTest(unittest.TestCase):
         )
         expected = [
             'Transferring 300 from <Well A1> to <Well B1>',
-            'Picking up tip None',
+            'Picking up tip <Well A1>',
             'Aspirating 150.0 uL from <Well A1> at 1 speed',
             'Dispensing 150.0 uL into <Well B1>',
             'Aspirating 150.0 uL from <Well A1> at 1 speed',
             'Dispensing 150.0 uL into <Well B1>',
-            'Dropping tip None']
+            'Dropping tip <Well A1>']
 
         assert expected == self.robot.commands()
 
