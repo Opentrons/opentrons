@@ -723,7 +723,6 @@ class Pipette(Instrument):
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    @commands.publish.both(command=commands.pick_up_tip)
     def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
@@ -776,20 +775,23 @@ class Pipette(Instrument):
 
         presses = (1 if not helpers.is_number(presses) else presses)
 
-        self.motor.move(self._get_plunger_position('bottom'))
-        self.current_volume = 0
+        @commands.publish.both(command=commands.pick_up_tip)
+        def _pick_up_tip(location):
+            self.motor.move(self._get_plunger_position('bottom'))
+            self.current_volume = 0
 
-        if location:
-            self.move_to(location, strategy='arc')
+            if location:
+                self.move_to(location, strategy='arc')
 
-        tip_plunge = 6
-        for i in range(int(presses) - 1):
-            self.robot.move_head(z=tip_plunge, mode='relative')
-            self.robot.move_head(z=-tip_plunge, mode='relative')
+            tip_plunge = 6
+            for i in range(int(presses) - 1):
+                self.robot.move_head(z=tip_plunge, mode='relative')
+                self.robot.move_head(z=-tip_plunge, mode='relative')
 
-        return self
+            return self
 
-    @commands.publish.both(command=commands.drop_tip)
+        return _pick_up_tip(location)
+
     def drop_tip(self, location=None, home_after=True):
         """
         Drop the pipette's current tip
@@ -838,19 +840,22 @@ class Pipette(Instrument):
             # give space for the drop-tip mechanism
             location = location.bottom(self._drop_tip_offset)
 
-        if location:
-            self.move_to(location, strategy='arc')
+        @commands.publish.both(command=commands.drop_tip)
+        def _drop_tip(location):
+            if location:
+                self.move_to(location, strategy='arc')
 
-        self.motor.move(self._get_plunger_position('drop_tip'))
-        if home_after:
-            self.motor.home()
+            self.motor.move(self._get_plunger_position('drop_tip'))
+            if home_after:
+                self.motor.home()
 
-        self.motor.move(self._get_plunger_position('bottom'))
+            self.motor.move(self._get_plunger_position('bottom'))
 
-        self.current_volume = 0
-        self.current_tip(None)
+            self.current_volume = 0
+            self.current_tip(None)
 
-        return self
+            return self
+        return _drop_tip(location)
 
     def home(self):
 

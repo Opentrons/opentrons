@@ -397,8 +397,6 @@ will print out...
 Accessing Wells
 ******************
 
-**********************
-
 Individual Wells
 ================
 

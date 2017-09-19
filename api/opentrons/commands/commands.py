@@ -4,6 +4,12 @@ import functools
 import inspect
 
 
+def drop_coodrinates(location):
+    if isinstance(location, tuple):
+        return location[0]
+    return location
+
+
 def make_command(name, payload):
     return {'name': name, 'payload': payload}
 
@@ -20,6 +26,7 @@ def home(axis):
 
 
 def aspirate(volume, location, rate):
+    location = drop_coodrinates(location)
     text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
         volume=volume, location=location, rate=rate
     )
@@ -35,6 +42,7 @@ def aspirate(volume, location, rate):
 
 
 def dispense(volume, location, rate):
+    location = drop_coodrinates(location)
     text = 'Dispensing {volume} uL into {location}'.format(
         volume=volume, location=location, rate=rate
     )
@@ -126,7 +134,12 @@ def mix(repetitions, volume):
 
 
 def blow_out(location):
-    text = 'Blowing out at {location}'.format(location=location)
+    location = drop_coodrinates(location)
+    text = 'Blowing out'
+
+    if location is not None:
+        text += ' at {location}'.format(location=location)
+
     return make_command(
         name=types.BLOW_OUT,
         payload={
@@ -167,6 +180,7 @@ def return_tip():
 
 
 def pick_up_tip(location):
+    location = drop_coodrinates(location)
     text = 'Picking up tip {location}'.format(location=location)
     return make_command(
         name=types.PICK_UP_TIP,
@@ -177,6 +191,7 @@ def pick_up_tip(location):
 
 
 def drop_tip(location):
+    location = drop_coodrinates(location)
     text = 'Dropping tip {location}'.format(location=location)
     return make_command(
         name=types.DROP_TIP,

@@ -10,7 +10,6 @@ from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
 
 from tests.opentrons.conftest import fuzzy_assert
-from tests.opentrons.conftest import patch_robot
 from opentrons.broker import subscribe
 
 
@@ -44,17 +43,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.home()
         _, _, starting_z = self.robot._driver.get_head_position()['current']
 
-        commands = []
-
-        def on_command(message):
-            payload = message['payload']
-            if message['$'] == 'before':
-                commands.append(payload['text'].format(**payload))
-        patch_robot(self.robot, commands)
-        self.unsubscribe = subscribe('command', on_command)
-
     def tearDown(self):
-        self.unsubscribe()
         del self.robot
 
     def test_bad_volume_percentage(self):

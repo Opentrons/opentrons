@@ -116,20 +116,3 @@ def fuzzy_assert(result, expected):
         assert re.compile(
             exp.lower()).match(res.lower()), "{} didn't match {}" \
             .format(res, exp)
-
-
-def patch_robot(robot, commands):
-        """
-        Monkeypatching for backwards compatibility when robot used to have
-        commands.
-
-        TODO (artyom, 20170918): refactor tests to use Session properly.
-        """
-        def get_commands():
-            return commands
-
-        def clear_commands():
-            commands.clear()
-
-        setattr(robot, 'commands', get_commands)
-        setattr(robot, 'clear_commands', clear_commands)

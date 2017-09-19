@@ -7,9 +7,6 @@ from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
 from opentrons.util.vector import Vector
 
-from tests.opentrons.conftest import patch_robot
-from opentrons.broker import subscribe
-
 
 class RobotTest(unittest.TestCase):
     def setUp(self):
@@ -21,17 +18,7 @@ class RobotTest(unittest.TestCase):
         self.robot.connect(options={'firmware': self.smoothie_version})
         self.robot.home(enqueue=False)
 
-        commands = []
-
-        def on_command(message):
-            payload = message['payload']
-            if message['$'] == 'before':
-                commands.append(payload['text'].format(**payload))
-        patch_robot(self.robot, commands)
-        self.unsubscribe = subscribe('command', on_command)
-
     def tearDown(self):
-        self.unsubscribe()
         del self.robot
 
     def test_firmware_verson(self):

@@ -48,6 +48,10 @@ class Notifications(object):
 
 def subscribe(topic, handler):
     handlers = subscriptions[topic] = subscriptions.get(topic, [])
+
+    if handler in handlers:
+        return
+
     handlers.append(handler)
 
     def unsubscribe():

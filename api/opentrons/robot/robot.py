@@ -6,6 +6,7 @@ from opentrons import helpers
 from opentrons.util.vector import Vector
 from opentrons.util.log import get_logger
 from opentrons import commands
+from opentrons.broker import subscribe
 
 log = get_logger(__name__)
 
@@ -136,7 +137,7 @@ class Robot(object):
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
-    ['Aspirating 200 at <Deck><Slot A1><Container plate><Well A1>']
+    ['Aspirating 200 uL from <Well A1> at 1.0 speed']
     """
 
     def __init__(self):
@@ -179,6 +180,12 @@ class Robot(object):
         self.disconnect()
         self.arc_height = 5
         self.set_connection('simulate')
+        # TODO (artyom, 09182017): once protocol development experience
+        # in the light of Session concept is fully fleshed out, we need
+        # to properly communicate deprecation of commands. For now we'll
+        # leave it as is for compatibility with documentation.
+        self._commands = []
+        self._unsubscribe_commands = None
         self.reset()
 
     def reset(self):
@@ -202,6 +209,8 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
+        self.clear_commands()
 
         return self
 
@@ -771,3 +780,28 @@ class Robot(object):
     @commands.publish.before(command=commands.comment)
     def comment(self, msg):
         pass
+
+    # TODO (artyom, 09182017): implement proper developer experience in light
+    # of Session concept being introduced
+    def commands(self):
+        return self._commands
+
+    def clear_commands(self):
+        self._commands.clear()
+        if self._unsubscribe_commands:
+            self._unsubscribe_commands()
+
+        def on_command(message):
+            payload = message.get('payload')
+            if payload is None:
+                return
+
+            text = payload.get('text')
+            if text is None:
+                return
+
+            if message['$'] == 'before':
+                self._commands.append(text.format(**payload))
+
+        self._unsubscribe_commands = subscribe(
+            commands.types.COMMAND, on_command)

@@ -70,8 +70,8 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
-    Drop_tip at <Deck><Slot A1><Container my-rack><Well A1>
+    Picking up tip <Well A1>
+    Dropping tip <Well A1>
 
 Clear Commands
 ==============
@@ -118,9 +118,9 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
+    Picking up tip <Well A1>
     Hello, just picked up tip A1
-    Picking up tip from <Deck><Slot A1><Container my-rack><Well A1>
+    Picking up tip <Well A1>
     Goodbye, just dropped tip A1
 
 Get Containers
