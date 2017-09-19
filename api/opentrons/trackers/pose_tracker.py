@@ -1,6 +1,6 @@
 import numpy as np
 from opentrons.containers.placeable import WellSeries
-from opentrons.pubsub_util.messages.movement import moved_msg
+from opentrons.tracker.mmove_msgs import new_pos_msg
 from opentrons.pubsub_util.topics import MOVEMENT
 from opentrons.util.trace import MessageBroker
 
@@ -163,13 +163,13 @@ class PoseTracker(object):
         [self.translate_object(child, x, y, z)
          for child in self.get_object_children(obj_to_trans)]  # recursive
 
-    def _object_moved(self, moved_msg: moved_msg):
+    def _object_moved(self, new_pos_msg: new_pos_msg):
         '''
         Calculates an object movement as diff between current position
         and previous - translates moved object and its descendants
         by this difference
         '''
-        mover, *new_pos = moved_msg
+        mover, *new_pos = new_pos_msg
         self.translate_object(mover, *(new_pos - self[mover].position))
 
     def relative_object_position(self, target_object, reference_object):

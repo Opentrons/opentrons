@@ -68,18 +68,16 @@ def create(name, grid, spacing, diameter, depth, volume, save=False):
 # FIXME: [Jared - 8/31/17] This is not clean
 # fix it by using the same reference points
 # in saved containers and Container/Well objects
-def container_to_json(c, name):
+def container_to_json(container, name):
     locations = []
-    c_x, c_y, c_z = c._coordinates
-    container_offset = {'x': c_x, 'y': c_y, 'z': c_z}
-    for w in c:
+    for w in container:
         x, y, z = w._coordinates + w.bottom()[1]
         properties_dict = {
             'x': x, 'y': y, 'z': z,
             'depth': w.z_size(),
             'total-liquid-volume': w.max_volume()
         }
-        if w.properties.get('diameter'):
+        if w.properties.get('diameter') is not None:
             properties_dict.update({'diameter': w.properties['diameter']})
         else:
             properties_dict.update({'width': w.properties['width'],
@@ -89,7 +87,7 @@ def container_to_json(c, name):
             properties_dict
 
         ))
-    return {name: {'origin-offset': container_offset,
+    return {name: {'origin-offset': dict(zip('xyz', container._coordinates)),
                    'locations': OrderedDict(locations)}}
 
 

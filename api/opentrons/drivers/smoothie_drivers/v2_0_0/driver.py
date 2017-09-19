@@ -7,12 +7,13 @@ from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
 from opentrons.pubsub_util import topics
-from opentrons.pubsub_util.messages.movement import moved_msg
+from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.util.trace import MessageBroker
 
 log = get_logger(__name__)
 message_broker = MessageBroker.get_instance()
 
+HEAD = 'head'
 
 class SmoothieDriver_2_0_0(SmoothieDriver):
 
@@ -320,7 +321,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         }
         message_broker.publish(topics.MISC, arguments)
 
-        new_position = moved_msg('head', *current_pos)
+        new_position = new_pos_msg(HEAD, *current_pos)
         message_broker.publish(topics.MOVEMENT, new_position)
 
     def move_plunger(self, mode='absolute', **kwargs):

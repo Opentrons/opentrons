@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def target_pos_for_instrument_positioning(
+def target_inst_position(
         pose_tracker, mover, instrument, x, y, z):
     '''
     Resolves where a moving component needs to move to in order

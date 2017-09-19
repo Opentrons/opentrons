@@ -10,13 +10,13 @@ from opentrons.util.trace import MessageBroker, traceable
 from opentrons.trackers import pose_tracker
 from opentrons.data_storage import database
 import opentrons.util.calibration_functions as calib
-import opentrons.util.pose_functions as pf
+import opentrons.util.pose_functions as pos_funcs
 
 log = get_logger(__name__)
 
 
-# FIXME: This should be a head object -
-# but using a string now to avoid scope creep
+# FIXME: (Jared 9/18/17)
+# This should be a head object - but using a string now to avoid scope creep
 HEAD = 'head'
 
 
@@ -466,7 +466,7 @@ class Robot(object):
         offset = coordinates - placeable.top()[1]
         target = self.pose_tracker[placeable].position + offset.coordinates
 
-        coordinates = pf.target_pos_for_instrument_positioning(
+        coordinates = pos_funcs.target_inst_position(
             self.pose_tracker, HEAD, instrument, *target)
 
         if strategy == 'arc':
@@ -628,7 +628,7 @@ class Robot(object):
             self.pose_tracker.track_object(
                 self._deck,
                 slot,
-                *slot._coordinates
+                **slot._coordinates
             )
 
     @property
@@ -679,13 +679,13 @@ class Robot(object):
         (slot) as pose tracker parent
         """
         self.pose_tracker.track_object(
-            container.parent, container, *container._coordinates
+            container.parent, container, **container._coordinates
         )
         for well in container:
             self.pose_tracker.track_object(
                 container,
                 well,
-                *(well._coordinates + well.top()[1])
+                **(well._coordinates + well.top()[1])
             )
 
     def clear_commands(self):
