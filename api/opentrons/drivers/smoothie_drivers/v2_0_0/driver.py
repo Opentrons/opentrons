@@ -15,6 +15,7 @@ message_broker = MessageBroker.get_instance()
 
 HEAD = 'head'
 
+
 class SmoothieDriver_2_0_0(SmoothieDriver):
 
     """

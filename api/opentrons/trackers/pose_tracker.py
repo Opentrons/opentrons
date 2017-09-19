@@ -12,11 +12,13 @@ def flatten(S):
         return flatten(S[0]) + flatten(S[1:])
     return S[:1] + flatten(S[1:])
 
+
 def pprint_tree(node, level):
     ret = '\t' * level + repr(node.value) + '\n'
     for child in node.children:
         ret += pprint_tree(child, level + 1)
     return ret
+
 
 class Node(object):
     def __init__(self, object, parent=None):

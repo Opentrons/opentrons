@@ -25,8 +25,8 @@ log = get_logger(__name__)
 
 message_broker = MessageBroker.get_instance()
 
-
 HEAD = 'head'
+
 
 class SmoothieDriver_1_2_0(SmoothieDriver):
 

@@ -38,7 +38,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_containers_create(self):
         container_name = 'plate_for_testing_containers_create'
-        try: 
+        try:
             containers_create(
                 name=container_name,
                 grid=(8, 12),

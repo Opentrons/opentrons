@@ -77,7 +77,11 @@ def test_well_from_container_load(robot):
 
 def test_container_parse(robot):
     plate = containers_load(robot, '96-flat', 'A1')
-    assert database._parse_container_obj(plate) == {'x': 11.24, 'y': 14.34, 'z': 0.00}
+    assert database._parse_container_obj(plate) == {
+        'x': 11.24,
+        'y': 14.34,
+        'z': 0.00
+    }
 
 
 def test_well_parse(robot):
