@@ -1,6 +1,6 @@
 import sqlite3
 from opentrons.containers.placeable import Container, Well
-from opentrons.data_storage import database_queries as db_crud
+from opentrons.data_storage import database_queries as db_queries
 from opentrons.util import environment
 from opentrons.util.vector import Vector
 
@@ -34,7 +34,7 @@ def _parse_well_obj(well: Well):
 
 
 def _create_container_obj_in_db(db, container: Container, container_name: str):
-    db_crud.create_container(
+    db_queries.create_container(
         db, container_name, **_parse_container_obj(container)
     )
     for well in iter(container):
@@ -42,7 +42,7 @@ def _create_container_obj_in_db(db, container: Container, container_name: str):
 
 
 def _load_container_object_from_db(db, container_name: str):
-    db_data = db_crud.get_container_by_name(db, container_name)
+    db_data = db_queries.get_container_by_name(db, container_name)
     if not db_data:
         raise ValueError(
             "No container with name {} found in Containers database"
@@ -50,7 +50,7 @@ def _load_container_object_from_db(db, container_name: str):
         )
 
     container_type, *rel_coords = db_data
-    wells = db_crud.get_wells_by_container_name(db, container_name)
+    wells = db_queries.get_wells_by_container_name(db, container_name)
     if not wells:
         raise ResourceWarning(
             "No wells for container {} found in ContainerWells database"
@@ -66,7 +66,7 @@ def _load_container_object_from_db(db, container_name: str):
 
 
 def _update_container_object_in_db(db, container: Container):
-    db_crud.update_container(
+    db_queries.update_container(
         db,
         container.get_type(),
         **_parse_container_obj(container)
@@ -74,13 +74,13 @@ def _update_container_object_in_db(db, container: Container):
 
 
 def _delete_container_object_in_db(db, container_name: str):
-    db_crud.delete_wells_by_container_name(db, container_name)
-    db_crud.delete_container(db, container_name)
+    db_queries.delete_wells_by_container_name(db, container_name)
+    db_queries.delete_container(db, container_name)
 
 
 def _create_well_obj_in_db(db, container_name: str, well: Well):
     well_data = _parse_well_obj(well)
-    db_crud.insert_well_into_db(
+    db_queries.insert_well_into_db(
             db_conn=db, container_name=container_name, **well_data
     )
 
@@ -107,8 +107,13 @@ def _load_well_object_from_db(db, well_data):
 
 def _list_all_containers_by_name(db):
     clean_list = [container for container,
-                  in db_crud.get_all_container_names(db)]
+                  in db_queries.get_all_container_names(db)]
     return clean_list
+
+
+def _get_db_version(db):
+    version = db_queries.get_user_version(db)[0]
+    return version
 
 # ======================== END Private Functions ======================== #
 
@@ -142,5 +147,16 @@ def list_all_containers():
 def change_database(db_path: str):
     global database_path
     database_path = db_path
+
+
+def get_version():
+    '''Get the Opentrons-defined database version'''
+    db_conn = sqlite3.connect(database_path)
+    return _get_db_version(db_conn)
+
+
+def set_version(version):
+    db_conn = sqlite3.connect(database_path)
+    db_queries.set_user_version(db_conn, version)
 
 # ======================== END Public Functions ======================== #

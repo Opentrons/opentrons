@@ -1,5 +1,22 @@
 
 
+# ------------- Configuration Functions -------------#
+def get_user_version(db_conn):
+    with db_conn:
+        cursor = db_conn.cursor()
+        cursor.execute('PRAGMA user_version')
+        return cursor.fetchone()
+
+
+def set_user_version(db_conn, version):
+    with db_conn:
+        cursor = db_conn.cursor()
+        cursor.execute('PRAGMA user_version={}'.format(version,))
+        return cursor.fetchone()
+
+# ------------ END Configuration Functions -----------#
+
+
 # ------------- Container Functions -------------#
 def get_all_container_names(db_conn):
     with db_conn:
