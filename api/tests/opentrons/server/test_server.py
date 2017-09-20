@@ -299,7 +299,7 @@ async def test_concurrent_calls(session, root):
         res += [message]
         if message.get('data') == 'Paused':
             break
-
+    print(res)
     # Confirm receiving first notification, ACK for pause and pause result
     assert res == [
         {'data': 0, '$': {'type': 2}},
@@ -334,3 +334,8 @@ async def test_concurrent_calls(session, root):
         {'$': {'type': 2}, 'data': 4},
         {'$': {'status': 'success', 'type': 0}, 'data': 'Done!'}
     ]
+
+
+@pytest.mark.parametrize('root', [TickTock()])
+async def test_concurrent_connections(root, session, test_client):
+    pass
