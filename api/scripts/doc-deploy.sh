@@ -25,7 +25,7 @@ cd ..
 
 # Clean out existing contents
 rm -rf out/* || exit 0
--cp -r ../docs/build/html/* out/
+cp -r ../docs/build/html/* out/
 touch out/.nojekyll
 echo "$CNAME" > out/CNAME
 
