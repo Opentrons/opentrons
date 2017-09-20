@@ -158,7 +158,6 @@ class Robot(object):
         only once instance of a robot.
         """
         self.pose_tracker = None
-        self._commands = None  # []
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 

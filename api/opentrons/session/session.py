@@ -16,9 +16,9 @@ SESSION_TOPIC = 'session'
 
 class SessionManager(object):
     def __init__(self, loop=None):
-        self.notifications = Notifications(loop=loop)
-        self.unsubscribe = subscribe(
-            SESSION_TOPIC, self.notifications.on_notify)
+        self._notifications = Notifications(loop=loop)
+        self._unsubscribe = subscribe(
+            SESSION_TOPIC, self._notifications.on_notify)
         self.session = None
         self.robot = Robot()
         # TODO (artyom, 09182017): This is to support the future
@@ -26,12 +26,16 @@ class SessionManager(object):
         # are available
         self.sessions = []
 
+    @property
+    def notifications(self):
+        return self._notifications
+
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.clear()
-        self.unsubscribe()
+        self._unsubscribe()
 
     def clear(self):
         for session in self.sessions:
@@ -41,7 +45,7 @@ class SessionManager(object):
     def create(self, name, text):
         self.clear()
 
-        with self.notifications.snooze():
+        with self._notifications.snooze():
             self.session = Session(name=name, text=text)
             self.sessions.append(self.session)
         # Can't do it from session's __init__ because notifications are snoozed
@@ -58,7 +62,7 @@ class Session(object):
         self.protocol_text = text
         self.protocol = None
         self.state = None
-        self.unsubscribe = subscribe(types.COMMAND, self.on_command)
+        self._unsubscribe = subscribe(types.COMMAND, self.on_command)
         self.commands = []
         self.command_log = {}
         self.errors = []
@@ -74,7 +78,7 @@ class Session(object):
             self.log_append()
 
     def close(self):
-        self.unsubscribe()
+        self._unsubscribe()
 
     def __enter__(self):
         return self

@@ -48,7 +48,11 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
         except TypeError:
             pass
         tail = {i: v for i, v in enumerate(items)}
-        return object_container({**iterate(obj.__dict__), **tail})
+
+        # Filter out private attributes
+        attributes = {
+            k: v for k, v in obj.__dict__.items() if not k.startswith('_')}
+        return object_container({**iterate(attributes), **tail})
     else:
         return object_container({})
 
