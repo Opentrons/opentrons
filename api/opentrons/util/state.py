@@ -84,18 +84,6 @@ def get_all_pipettes(robot):
     return sorted(pipettes, key=lambda p: p.name.lower())
 
 
-def _get_all_containers(robot):
-    """
-    Returns all containers currently on the deck
-    """
-    all_containers = list()
-    for slot in robot._deck:
-        if slot.has_children():
-            all_containers += slot.get_children_list()
-
-    return sort_containers(all_containers)
-
-
 def sort_containers(container_list):
     """
     Returns the passed container list, sorted with tipracks first

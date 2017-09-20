@@ -19,7 +19,7 @@ class CalibrationTest(unittest.TestCase):
             self.robot, 'tiprack-200ul', 'B2', 'p200-rack'
         )
         self.trough = containers_load(
-            self.robot, 'trough-12row', 'B2', 'trough'
+            self.robot, 'trough-12row', 'B3', 'trough'
         )
 
         self.plate = containers_load(self.robot, '96-flat', 'A2', 'magbead')
