@@ -25,7 +25,7 @@ export default class RunLog extends Component {
         )
       }
 
-      const liProps = {key: id, className: classnames({[styles.current]: isCurrent, [styles.last_current]: isLast}, style)}
+      const liProps = {key: id, className: classnames({[styles.executed]: handledAt, [styles.current]: isCurrent, [styles.last_current]: isLast}, style)}
 
       if (isLast) liProps.ref = 'ensureVisible'
 

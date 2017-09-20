@@ -8,6 +8,7 @@
 ol {
   list-style-type: none;
   padding: 0;
+  color: #777;
 }
 
 li {
@@ -19,22 +20,22 @@ li {
   content: '\21b3';
 }
 
-li.last_current {
-  color: #006fff;
-}
-
-li.current {
-  background-color: rgba(150, 150, 150, 0.1);
-}
-
-li.current > ol {
-  color: black;
-}
-
 .indent-1 p {
   padding-left: 2rem;
 }
 
 .indent-2 p {
   padding-left: 3rem;
+}
+
+li.executed {
+  color: black;
+}
+
+li.current {
+  background-color: rgba(150, 150, 150, 0.1);
+}
+
+li.last_current {
+  color: #006fff;
 }
