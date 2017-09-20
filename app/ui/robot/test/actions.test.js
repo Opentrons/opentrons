@@ -21,6 +21,24 @@ describe('robot actions', () => {
     expect(actions.connectResponse(new Error('AHHH'))).toEqual(expected)
   })
 
+  test('disconnect action', () => {
+    const expected = {
+      type: actionTypes.DISCONNECT,
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.disconnect()).toEqual(expected)
+  })
+
+  test('disconnect response action', () => {
+    const expected = {
+      type: actionTypes.DISCONNECT_RESPONSE,
+      error: new Error('AHHH')
+    }
+
+    expect(actions.disconnectResponse(new Error('AHHH'))).toEqual(expected)
+  })
+
   test('session action', () => {
     const file = {name: '/foo/bar/baz.py'}
     const expected = {

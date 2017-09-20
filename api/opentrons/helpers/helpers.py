@@ -8,19 +8,6 @@ def is_number(obj):
     return isinstance(obj, numbers.Number)
 
 
-def not_app_run_safe(func):
-    """
-    Decorator that will not call func when app_run_mode is set
-    """
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        if getattr(self, 'app_run_mode', False):
-            return 'method skipped'
-        else:
-            return func(self, *args, **kwargs)
-    return wrapper
-
-
 def unpack_coordinates(coordinates):
     if not isinstance(coordinates, tuple):
         coordinates = tuple([coordinates[axis] for axis in 'xyz'])

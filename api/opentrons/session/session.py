@@ -1,37 +1,51 @@
 import ast
-import sys
 
+from opentrons.commands import tree
 from opentrons import robot
 from opentrons.robot.robot import Robot
 from datetime import datetime
 
-from .notifications import Notifications
-from opentrons.util.trace import traceable
+from opentrons.broker import publish, subscribe, Notifications
+from opentrons.commands import types
 
 
-# TODO: add session variables as per:
-# https://docs.google.com/document/d/1fXJBd1SFIqudxdWzyFSHoq5mkER45tr_A5Yx1s-nFQs/edit
 VALID_STATES = set(
-    ['loaded', 'running', 'error', 'finished', 'stopped', 'paused'])
+    ['loaded', 'running', 'finished', 'stopped', 'paused'])
+SESSION_TOPIC = 'session'
 
 
 class SessionManager(object):
-    def __init__(self, loop=None, filters=[
-            'add-command',
-            'session.state.change']):
-        self.notifications = Notifications(loop=loop, filters=filters)
+    def __init__(self, loop=None):
+        self.notifications = Notifications(loop=loop)
+        self.unsubscribe = subscribe(
+            SESSION_TOPIC, self.notifications.on_notify)
+        self.session = None
         self.robot = Robot()
+        # TODO (artyom, 09182017): This is to support the future
+        # concept of archived sessions. To be reworked when more details
+        # are available
+        self.sessions = []
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.notifications.finalize()
+        self.clear()
+        self.unsubscribe()
+
+    def clear(self):
+        for session in self.sessions:
+            session.close()
+        self.sessions.clear()
 
     def create(self, name, text):
+        self.clear()
+
         with self.notifications.snooze():
             self.session = Session(name=name, text=text)
-            self.notifications.bind(self.session)
+            self.sessions.append(self.session)
+        # Can't do it from session's __init__ because notifications are snoozed
+        self.session.set_state('loaded')
         return self.session
 
     def get_session(self):
@@ -42,29 +56,76 @@ class Session(object):
     def __init__(self, name, text):
         self.name = name
         self.protocol_text = text
+        self.protocol = None
         self.state = None
-        self.refresh()
-
-    def reset(self):
+        self.unsubscribe = subscribe(types.COMMAND, self.on_command)
+        self.commands = []
         self.command_log = {}
-        self.errors = {}
-
-    def refresh(self):
-        self.reset()
+        self.errors = []
 
         try:
-            tree = ast.parse(self.protocol_text)
-            self.protocol = compile(tree, filename=self.name, mode='exec')
-            _, commands = self.run()
-            # TODO(artyom, 20170830): this will go away once commands are
-            # passed along with their nesting level in command tree
-            self.load_commands([
-                {'level': 0, 'description': command}
-                for command in commands])
+            self.refresh()
+        except Exception as e:
+            self.close()
+            raise e
+
+    def on_command(self, message):
+        if message['$'] == 'before':
+            self.log_append()
+
+    def close(self):
+        self.unsubscribe()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def clear_logs(self):
+        self.command_log.clear()
+        self.errors.clear()
+
+    def _simulate(self):
+        stack = []
+        res = []
+
+        def on_command(message):
+            payload = message['payload']
+            description = payload.get('text', '').format(
+                **payload
+            )
+
+            if message['$'] == 'before':
+                res.append(
+                    {
+                        'level': len(stack),
+                        'description': description,
+                        'id': len(res)})
+                stack.append(message)
+            else:
+                stack.pop()
+
+        unsubscribe = subscribe(types.COMMAND, on_command)
+
+        try:
+            self.run()
+        finally:
+            unsubscribe()
+
+        return res
+
+    def refresh(self):
+        self.clear_logs()
+
+        try:
+            parsed = ast.parse(self.protocol_text)
+            self.protocol = compile(parsed, filename=self.name, mode='exec')
+            self.commands = tree.from_list(self._simulate())
             self.command_log.clear()
         finally:
-            if self.state == 'error':
-                raise Exception(*self.errors.values())
+            if self.errors:
+                raise Exception(*self.errors)
             self.set_state('loaded')
         return self
 
@@ -87,63 +148,59 @@ class Session(object):
         # HACK: hard reset singleton by replacing all of it's attributes
         # with the one from a newly constructed robot
         robot.__dict__ = {**Robot().__dict__}
-        self.reset()
+        self.clear_logs()
 
         if devicename is not None:
+            self.set_state('running')
             robot.connect(devicename)
 
         try:
-            self.set_state('running')
             exec(self.protocol, {})
-            self.set_state('finished')
         except Exception as e:
-            self.set_state('error')
-            _, _, traceback = sys.exc_info()
-            self.error_append((e, traceback))
+            self.error_append(e)
+            raise e
         finally:
+            self.set_state('finished')
             robot.disconnect()
 
-        return (self, robot.commands())
+        return self
 
-    @traceable('session.state.change')
     def set_state(self, state):
         if state not in VALID_STATES:
             raise ValueError('Invalid state: {0}. Valid states are: {1}'
                              .format(state, VALID_STATES))
         self.state = state
+        self._on_state_changed()
 
-    def load_commands(self, commands):
-        """
-        Given a list of tuples of form (depth, command_text)
-        that represents a DFS traversal of a command tree,
-        updates self.commands with a dictionary that holds
-        a command tree.
-        """
-        def children(commands, level=0, base_index=0):
-            return [
-                {
-                    'description': command['description'],
-                    'children': children(commands[index:], level+1, index),
-                    'id': base_index+index
-                }
-                for index, command in enumerate(commands)
-                if command['level'] == level
-            ]
-
-        self.commands = children(commands)
-
-    def log_append(self, command):
+    def log_append(self):
         self.command_log.update({
             len(self.command_log): {
                 'timestamp': datetime.utcnow().isoformat()
             }
         })
+        self._on_state_changed()
 
-    # TODO: make it an array
     def error_append(self, error):
-        self.errors.update({
-            len(self.errors): {
+        self.errors.append(
+            {
                 'timestamp': datetime.utcnow().isoformat(),
                 'error': error
             }
-        })
+        )
+        self._on_state_changed()
+
+    def _snapshot(self):
+        return {
+            'name': 'state',
+            'payload': {
+                'name': self.name,
+                'state': self.state,
+                'protocol_text': self.protocol_text,
+                'commands': self.commands.copy(),
+                'command_log': self.command_log.copy(),
+                'errors': self.errors.copy()
+            }
+        }
+
+    def _on_state_changed(self):
+        publish(SESSION_TOPIC, self._snapshot())

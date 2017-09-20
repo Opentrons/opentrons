@@ -37,6 +37,7 @@ const mapDispatchToProps = (dispatch) => {
     // robot
     // TODO(mc): revisit when robot discovery / multiple robots is addressed
     onConnectClick: () => dispatch(robotActions.connect()),
+    onDisconnectClick: () => dispatch(robotActions.disconnect()),
     onRunClick: () => dispatch(robotActions.run()),
 
     // session

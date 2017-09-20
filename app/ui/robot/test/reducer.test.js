@@ -16,6 +16,7 @@ describe('robot reducer', () => {
 
     expect(state).toEqual({
       connectRequest: {inProgress: false, error: null},
+      disconnectRequest: {inProgress: false, error: null},
       isConnected: false,
 
       sessionRequest: {inProgress: false, error: null},
@@ -68,6 +69,70 @@ describe('robot reducer', () => {
     expect(reducer(state, action)).toEqual({
       connectRequest: {inProgress: false, error: new Error('AH')},
       isConnected: false
+    })
+  })
+
+  test('handles disconnect action', () => {
+    const state = {
+      disconnectRequest: {inProgress: false, error: new Error('AH')}
+    }
+    const action = {type: actionTypes.DISCONNECT}
+
+    expect(reducer(state, action)).toEqual({
+      disconnectRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles disconnect response success', () => {
+    const state = {
+      disconnectRequest: {inProgress: true, error: null},
+      isConnected: true,
+      sessionName: 'session.py',
+      protocolText: 'from opentrons import robot',
+      protocolCommands: [{id: 'foo'}],
+      protocolCommandsById: {foo: {id: 'foo'}},
+      sessionErrors: [{message: 'AHH'}],
+      sessionState: 'running'
+    }
+    const action = {type: actionTypes.DISCONNECT_RESPONSE, error: null}
+
+    expect(reducer(state, action)).toEqual({
+      disconnectRequest: {inProgress: false, error: null},
+      isConnected: false,
+      sessionName: '',
+      protocolText: '',
+      protocolCommands: [],
+      protocolCommandsById: {},
+      sessionErrors: [],
+      sessionState: ''
+    })
+  })
+
+  test('handles disconnectResponse failure', () => {
+    const state = {
+      disconnectRequest: {inProgress: true, error: null},
+      isConnected: true,
+      sessionName: 'session.py',
+      protocolText: 'from opentrons import robot',
+      protocolCommands: [{id: 'foo'}],
+      protocolCommandsById: {foo: {id: 'foo'}},
+      sessionErrors: [{message: 'AHH'}],
+      sessionState: 'running'
+    }
+    const action = {
+      type: actionTypes.DISCONNECT_RESPONSE,
+      error: new Error('AH')
+    }
+
+    expect(reducer(state, action)).toEqual({
+      disconnectRequest: {inProgress: false, error: new Error('AH')},
+      isConnected: true,
+      sessionName: 'session.py',
+      protocolText: 'from opentrons import robot',
+      protocolCommands: [{id: 'foo'}],
+      protocolCommandsById: {foo: {id: 'foo'}},
+      sessionErrors: [{message: 'AHH'}],
+      sessionState: 'running'
     })
   })
 

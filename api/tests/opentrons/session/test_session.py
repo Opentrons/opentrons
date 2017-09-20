@@ -1,28 +1,33 @@
+import itertools
 import pytest
 
 from datetime import datetime
-
-from opentrons.pubsub_util import topics
+from opentrons.broker import publish
 from opentrons.session import Session
-from opentrons.util.trace import MessageBroker
 
 
 async def test_load_from_text(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert session.name == '<blank>'
-    assert len(session.commands) == 101
+
+    acc = []
+
+    def traverse(commands):
+        for command in commands:
+            acc.append(command)
+            traverse(command['children'])
+    traverse(session.commands)
+
+    assert len(acc) == 105
 
 
 async def test_async_notifications(session_manager):
-    session_manager.notifications.update_filters(['bar'])
-    MessageBroker.get_instance().publish(topics.MISC, {'name': 'bar'})
+    publish('session', {'name': 'foo', 'payload': {'bar': 'baz'}})
     # Get async iterator
     aiter = session_manager.notifications.__aiter__()
     # Then read the first item
     res = await aiter.__anext__()
-    # Returns tuple containing message and session
-    # Since protocol hasn't been loaded, session is None
-    assert res == ({'name': 'bar'}, None)
+    assert res == {'name': 'foo', 'payload': {'bar': 'baz'}}
 
 
 async def test_load_protocol_with_error(session_manager):
@@ -32,7 +37,7 @@ async def test_load_protocol_with_error(session_manager):
 
     args, = e.value.args
     timestamp = args['timestamp']
-    exception, trace = args['error']
+    exception = args['error']
 
     assert datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
     assert type(exception) == NameError
@@ -45,34 +50,33 @@ async def test_load_and_run(session_manager, protocol):
     assert session.command_log == {}
     assert session.state == 'loaded'
     session.run(devicename='Virtual Smoothie')
-    assert len(session.command_log) == 101
+    assert len(session.command_log) == 105
 
     res = []
     index = 0
     async for notification in session_manager.notifications:
-        assert isinstance(notification, tuple), "notification is a tuple"
-        event, s = notification
-        if (event['name'] == 'add-command'):
+        name, payload = notification['name'], notification['payload']
+        if (name == 'state'):
             index += 1  # Command log in sync with add-command events emitted
-        assert len(s.command_log) == index
-        assert isinstance(s, Session), "second element is Session"
-        if event['name'] == 'session.state.change':
-            state = event['arguments']['state']
+            state = payload['state']
             res.append(state)
-            if state == 'finished':
+            if payload['state'] == 'finished':
                 break
 
-    assert res == ['running', 'finished'], 'Run should emit state change to "running" and then to "finished"'  # noqa
+    assert [key for key, _ in itertools.groupby(res)] == \
+        ['loaded', 'running', 'finished'], \
+        'Run should emit state change to "running" and then to "finished"'
     assert session_manager.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
     session.run(devicename='Virtual Smoothie')
-    assert len(session.command_log) == 101, \
+    assert len(session.command_log) == 105, \
         "Clears command log on the next run"
 
 
 @pytest.fixture
 def run_session():
-    return Session('dino', 'from opentrons import robot')
+    with Session('dino', 'from opentrons import robot') as s:
+        yield s
 
 
 def test_init(run_session):
@@ -81,7 +85,7 @@ def test_init(run_session):
 
 
 def test_set_state(run_session):
-    states = 'loaded', 'running', 'error', 'finished', 'stopped', 'paused'
+    states = 'loaded', 'running', 'finished', 'stopped', 'paused'
     for state in states:
         run_session.set_state(state)
         assert run_session.state == state
@@ -90,64 +94,10 @@ def test_set_state(run_session):
         run_session.set_state('impossible-state')
 
 
-def test_set_commands(run_session):
-    run_session.load_commands([
-        {'level': 0, 'description': 'A'},
-        {'level': 0, 'description': 'B'},
-        {'level': 0, 'description': 'C'}
-    ])
-
-    assert run_session.commands == [
-        {
-            'description': 'A',
-            'id': 0,
-            'children': []
-        },
-        {
-            'description': 'B',
-            'id': 1,
-            'children': []
-        },
-        {
-            'description': 'C',
-            'id': 2,
-            'children': []
-        },
-    ]
-
-    run_session.load_commands([
-        {'level': 0, 'description': 'A'},
-        {'level': 1, 'description': 'B'},
-        {'level': 2, 'description': 'C'},
-        {'level': 0, 'description': 'D'},
-    ])
-
-    assert run_session.commands == [
-        {
-            'description': 'A',
-            'id': 0,
-            'children': [{
-                    'description': 'B',
-                    'id': 1,
-                    'children': [{
-                                'description': 'C',
-                                'id': 2,
-                                'children': []
-                            }]
-                    }]
-        },
-        {
-            'description': 'D',
-            'id': 3,
-            'children': []
-        }
-    ]
-
-
 def test_log_append(run_session):
-    run_session.log_append('A')
-    run_session.log_append('B')
-    run_session.log_append('C')
+    run_session.log_append()
+    run_session.log_append()
+    run_session.log_append()
 
     run_log = {
         _id: value
@@ -164,13 +114,13 @@ def test_error_append(run_session):
     run_session.error_append(foo)
     run_session.error_append(bar)
 
-    errors = {
-        _id: value
-        for _id, value in run_session.errors.items()
+    errors = [
+        value
+        for value in run_session.errors
         if datetime.strptime(value.pop('timestamp'), '%Y-%m-%dT%H:%M:%S.%f')
-    }
+    ]
 
-    assert errors == {
-        0: {'error': foo},
-        1: {'error': bar},
-    }
+    assert errors == [
+        {'error': foo},
+        {'error': bar}
+    ]

@@ -1,30 +1,16 @@
 {
+  "name": "@opentrons/ot-app",
+  "version": "2.4.2",
+  "description": "Opentrons desktop application",
+  "main": "shell/main.js",
   "scripts": {
     "test": "make test",
-    "hot-updates-server": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack-dev-server/bin/webpack-dev-server --config webpack.config.renderer.dev.js",
-    "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
-    "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --profile --colors",
-    "build-main": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.main.prod.js --profile --colors",
-    "build-renderer": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.prod.js --profile --colors",
-    "build-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.js --profile --colors",
-    "start": "cross-env NODE_ENV=production electron .",
-    "prestart": "npm run build",
-    "start-hot-renderer": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./shell/main",
-    "postinstall": "concurrently \"npm run build\" \"npm run build-dll\" \"electron-builder install-app-deps\"",
-    "dev": "cross-env START_HOT=1 npm run hot-updates-server",
-    "package": "build --publish never",
-    "package-win": "npm run build && build --win --x64",
-    "package-linux": "npm run build && build --linux",
-    "package-all": "npm run build && build -mwl"
+    "start": "make dev",
+    "postinstall": "electron-builder install-app-deps"
   },
-  "name": "ot-app",
-  "productName": "OT-App",
-  "version": "2.4.2",
-  "description": "OT One Robot Companion Desktop App",
-  "main": "shell/dist/bundle.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Opentrons/opentrons.git"
+    "url": "https://github.com/OpenTrons/opentrons.git"
   },
   "author": {
     "name": "Opentrons Labworks",
@@ -32,83 +18,22 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Opentrons/opentrons/issues"
+    "url": "https://github.com/OpenTrons/opentrons/issues"
   },
-  "homepage": "https://github.com/Opentrons/opentrons",
-  "build": {
-    "files": [
-      "!**/*",
-      "node_modules/**",
-      "bin/opentrons-api-server",
-      "ui/dist",
-      "ui/index.html",
-      "shell/dist",
-      "ui/assets"
-    ],
-    "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
-    "asar": true,
-    "asarUnpack": "ui/**",
-    "appId": "com.opentrons.ot-app",
-    "electronVersion": "1.6.11",
-    "productName": "Opentrons 2.0",
-    "dmg": {
-      "backgroundColor": "white",
-      "contents": [
-        {
-          "x": 410,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        },
-        {
-          "x": 130,
-          "y": 150,
-          "type": "file"
-        }
-      ]
-    },
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "category": "productivity"
-    },
-    "win": {
-      "target": [
-        "squirrel"
-      ]
-    },
-    "squirrelWindows": {
-      "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
-    },
-    "linux": {
-      "category": "Science",
-      "target": "deb"
-    }
-  },
+  "homepage": "https://github.com/OpenTrons/opentrons",
   "jest": {
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+      "\\.(jpg|png|gif|svg|woff|woff2)$": "<rootDir>/ui/__mocks__/file.js",
+      "\\.(css)$": "identity-obj-proxy"
     },
-    "moduleFileExtensions": [
-      "js"
-    ],
-    "transform": {
-      "^.+\\.js$": "babel-jest"
-    },
-    "setupFiles": [
-      "./internals/scripts/CheckBuiltsExist.js"
-    ],
     "collectCoverageFrom": [
       "**/*.js",
-      "!node_modules/**",
-      "!dll/**",
-      "!internals/**",
+      "!**/node_modules/**",
+      "!**/__mocks__/**",
       "!**/dist/**",
-      "!webpack**",
-      "!coverage/**",
+      "!**/webpack*",
+      "!**/webpack/**",
+      "!**/coverage/**",
       "!**/test/**"
     ],
     "coverageReporters": [
@@ -119,8 +44,7 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "dist/",
-      "dll/"
+      "dist/"
     ],
     "env": [
       "node",
@@ -143,86 +67,61 @@
     "babel-eslint": "^7.2.3",
     "babel-jest": "^20.0.3",
     "babel-loader": "^7.0.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-dev-expression": "^0.2.1",
-    "babel-plugin-dynamic-import-webpack": "^1.0.1",
-    "babel-plugin-istanbul": "^4.1.4",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "babel-preset-react": "^6.24.1",
-    "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-react-optimize": "^1.0.1",
     "babel-register": "^6.24.1",
-    "babili-webpack-plugin": "^0.1.1",
     "classnames": "^2.2.5",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
     "devtron": "^1.4.0",
     "electron": "1.6.11",
-    "electron-builder": "^19.5.1",
-    "electron-builder-squirrel-windows": "^19.5.1",
-    "electron-devtools-installer": "^2.2.0",
-    "enzyme": "^2.8.2",
-    "enzyme-to-json": "^1.5.1",
-    "express": "^4.15.3",
+    "electron-builder": "~19.27.3",
+    "electron-builder-squirrel-windows": "~19.27.3",
     "extract-text-webpack-plugin": "^2.1.2",
-    "fbjs-scripts": "^0.7.1",
     "file-loader": "^0.11.2",
+    "handlebars-loader": "^1.6.0",
     "html-webpack-plugin": "^2.28.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
-    "jsdom": "^11.0.0",
-    "minimist": "^1.2.0",
-    "node-sass": "^4.5.3",
+    "lodash": "^4.17.4",
     "portfinder": "^1.0.13",
     "prop-types": "^15.5.10",
-    "react-addons-test-utils": "^15.5.1",
-    "react-test-renderer": "^15.5.4",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-hot-loader": "3.0.0-beta.5",
+    "react-redux": "^5.0.6",
+    "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
-    "rimraf": "^2.6.1",
-    "sass-loader": "^6.0.5",
-    "shelljs": "^0.7.8",
-    "sinon": "^2.3.1",
+    "redux-thunk": "^2.2.0",
+    "script-ext-html-webpack-plugin": "^1.8.5",
     "snazzy": "^7.0.0",
-    "spectron": "^3.7.0",
     "standard": "^10.0.3",
     "style-loader": "^0.18.1",
     "stylelint": "~8.0.0",
     "stylelint-config-css-modules": "^1.1.0",
     "stylelint-config-standard": "^17.0.0",
     "url-loader": "^0.5.8",
-    "webpack": "^2.6.1",
+    "webpack": "~2.6.1",
     "webpack-bundle-analyzer": "^2.8.2",
-    "webpack-dev-server": "^2.4.5",
-    "webpack-merge": "^4.1.0",
+    "webpack-dev-server": "~2.4.5",
+    "winston": "^2.2.0",
     "worker-loader": "0.8.0",
     "ws": "^3.1.0"
   },
   "dependencies": {
     "electron-debug": "^1.1.0",
+    "electron-devtools-installer": "^2.2.0",
     "electron-json-storage": "^2.0.0",
+    "electron-log": "^2.2.9",
     "electron-settings": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
-    "fs": "0.0.2",
-    "history": "^4.6.1",
-    "lodash": "^4.17.4",
     "moment-timezone": "^0.5.13",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "react-hot-loader": "3.0.0-beta.5",
-    "react-redux": "^5.0.6",
-    "react-router": "^4.1.1",
-    "react-router-dom": "^4.1.1",
-    "react-router-redux": "^5.0.0-alpha.6",
-    "redux": "^3.6.0",
-    "redux-thunk": "^2.2.0",
-    "source-map-support": "^0.4.15",
-    "unzip": "0.1.11",
-    "url-join": "1.1.0",
-    "winston": "^2.2.0",
+    "shelljs": "^0.7.8",
     "zip-folder": "^1.0.0"
   }
 }

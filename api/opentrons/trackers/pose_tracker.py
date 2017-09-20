@@ -1,8 +1,7 @@
 import numpy as np
 from opentrons.containers.placeable import WellSeries
 from opentrons.trackers.move_msgs import new_pos_msg
-from opentrons.pubsub_util.topics import MOVEMENT
-from opentrons.util.trace import MessageBroker
+from opentrons.broker import topics, subscribe
 
 
 def flatten(S):
@@ -91,12 +90,11 @@ class PoseTracker(object):
         an object is a child of another if, when that objects moves,
         its child does as well.
     '''
-    def __init__(self, broker: MessageBroker):
+    def __init__(self):
         self._root_nodes = []
         self._pose_dict = {}
         self._node_dict = {}
-        self.broker = broker
-        self.broker.subscribe(MOVEMENT, self._object_moved)
+        subscribe(topics.MOVEMENT, self._object_moved)
 
     def __getitem__(self, obj):
         try:

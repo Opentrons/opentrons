@@ -5,7 +5,6 @@ from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
 from opentrons.trackers.pose_tracker import Pose
 from opentrons.robot.robot import Robot
-from opentrons.util.trace import MessageBroker
 
 
 def approx(n):
@@ -164,8 +163,6 @@ def test_faulty_access(pos_tracker):
 
 
 def test_relative_object_position(plate, p200, robot):
-    print(robot.pose_tracker)
-    print(MessageBroker.get_instance().topics_and_funcs)
     robot.move_head(x=10, y=30, z=10)
     rel_pos = robot.pose_tracker.relative_object_position(p200, plate)
     assert approx(rel_pos) == approx((-11.24, 5.66, 10))

@@ -1,3 +1,4 @@
+// RPC client tests
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WS from 'ws'
@@ -59,6 +60,10 @@ describe('rpc client', () => {
 
     send (message) {
       this._ws.send(JSON.stringify(message))
+    }
+
+    get readyState () {
+      return this._ws.readyState
     }
   }
 
@@ -481,9 +486,21 @@ describe('rpc client', () => {
       })
     })
 
-    test('closes the socket', (done) => {
-      addListener(ws, 'close', done)
-      client.close()
+    test('closes the socket', () => {
+      return client.close()
+        .then(() => expect(
+          ws.readyState === global.WebSocket.CLOSING ||
+          ws.readyState === global.WebSocket.CLOSED
+        ).toBe(true))
+    })
+
+    test('client.close resolves if the socket is already closed', () => {
+      return client.close()
+        .then(() => client.close())
+        .then(() => expect(
+          ws.readyState === global.WebSocket.CLOSING ||
+          ws.readyState === global.WebSocket.CLOSED
+        ).toBe(true))
     })
   })
 })

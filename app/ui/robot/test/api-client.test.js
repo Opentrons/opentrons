@@ -14,34 +14,39 @@ describe('api client', () => {
   // let session
   let sessionManager
 
-  let _oldFileReader
-  beforeAll(() => {
-    if (global.FileReader) {
-      _oldFileReader = global.FileReader
-    }
-
-    global.FileReader = jest.fn()
-  })
-
-  afterAll(() => {
-    if (_oldFileReader) {
-      global.FileReader = _oldFileReader
-    } else {
-      delete global.FileReader
-    }
-  })
+  // TODO(mc, 2017-09-14): build or pull in a proper FileReader Jest mock
+  // let _oldFileReader
+  // beforeAll(() => {
+  //   if (global.FileReader) {
+  //     _oldFileReader = global.FileReader
+  //   }
+  //
+  //   global.FileReader = jest.fn()
+  // })
+  //
+  // afterAll(() => {
+  //   if (_oldFileReader) {
+  //     global.FileReader = _oldFileReader
+  //   } else {
+  //     delete global.FileReader
+  //   }
+  // })
 
   beforeEach(() => {
     // TODO(mc, 2017-08-29): this is a pretty nasty mock. Probably a sign we
     // need to simplify the RPC client
     // mock robot, session, and session manager
-    robot = {}
+    robot = {
+      // TODO(mc, 2017-09-07): remove when server handles serial port
+      get_serial_ports_list: jest.fn(() => Promise.resolve(['/dev/tty.USB0']))
+    }
     // session = {}
     sessionManager = {robot}
 
     // mock rpc client
     rpcClient = {
       on: jest.fn(() => rpcClient),
+      close: jest.fn(),
       remote: sessionManager
     }
 
@@ -54,7 +59,7 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
-  describe('connect', () => {
+  describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
       expect(RpcClient).toHaveBeenCalledTimes(0)
       receive({}, actions.connect())
@@ -102,6 +107,39 @@ describe('api client', () => {
 
       return delay(1)
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
+      const expected = actions.disconnectResponse()
+
+      receive({}, actions.disconnect())
+
+      return delay(1)
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('disconnect RPC on DISCONNECT message', () => {
+      const expected = actions.disconnectResponse()
+
+      rpcClient.close.mockReturnValueOnce(Promise.resolve())
+      receive({}, actions.connect())
+
+      return delay(1)
+        .then(() => receive({}, actions.disconnect()))
+        .then(() => delay(1))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('dispatch DISCONNECT_RESPONSE if close errors', () => {
+      const expected = actions.disconnectResponse(new Error('AH'))
+
+      rpcClient.close.mockReturnValueOnce(Promise.reject(new Error('AH')))
+      receive({}, actions.connect())
+
+      return delay(1)
+        .then(() => receive({}, actions.disconnect()))
+        .then(() => delay(1))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
 })

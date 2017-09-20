@@ -6,12 +6,10 @@ from threading import Event
 from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector
 from opentrons.drivers.smoothie_drivers import VirtualSmoothie, SmoothieDriver
-from opentrons.pubsub_util import topics
 from opentrons.trackers.move_msgs import new_pos_msg
-from opentrons.util.trace import MessageBroker
+from opentrons.broker import publish, topics
 
 log = get_logger(__name__)
-message_broker = MessageBroker.get_instance()
 
 HEAD = 'head'
 
@@ -320,10 +318,10 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             },
             'class': type(self.connection).__name__
         }
-        message_broker.publish(topics.MISC, arguments)
 
         new_position = new_pos_msg(HEAD, *current_pos)
-        message_broker.publish(topics.MOVEMENT, new_position)
+        publish(topics.MOVEMENT, new_position)
+        publish('driver', arguments)
 
     def move_plunger(self, mode='absolute', **kwargs):
         self.move(mode, **kwargs)
@@ -408,7 +406,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 'plunger': self.get_plunger_positions()["current"]
             }
         }
-        message_broker.publish(topics.MISC, arguments)
+        publish('driver', arguments)
 
     def set_coordinate_system(self, mode):
         if mode == 'absolute':
@@ -438,7 +436,7 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
                 time.sleep(delay_time)
 
         end_time = _current_time() + delay_time
-        message_broker.publish(topics.MISC, {
+        publish('driver', {
             'name': 'delay-start',
             'time': delay_time
         })
@@ -446,14 +444,13 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
             self.check_paused_stopped()
             _sleep(min(1, end_time - _current_time()))
 
-            message_broker.publish(topics.MISC, {
+            publish('driver', {
                 'name': 'countdown',
                 'countdown': int(end_time - time.time())
             })
-            message_broker.publish(
-                topics.MISC,
-                {'name': 'delay-finish'}
-            )
+        publish('driver', {
+            'name': 'delay-finish'
+        })
 
     def calm_down(self):
         self.send_command(self.CALM_DOWN, read_after=False)

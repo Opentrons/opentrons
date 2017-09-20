@@ -7,35 +7,6 @@ from opentrons.server.rpc import Server
 from opentrons.session import SessionManager
 from logging.config import dictConfig
 
-# TODO(artyom): might as well use this:
-# https://pypi.python.org/pypi/logging-color-formatter
-logging_config = dict(
-    version=1,
-    formatters={
-        'basic': {
-            'format':
-            '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # noqa: E501
-        }
-    },
-    handlers={
-        'debug': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
-        }
-    },
-    loggers={
-        '__main__': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-        'opentrons.server': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-    }
-)
-dictConfig(logging_config)
-
 log = logging.getLogger(__name__)
 
 
@@ -64,7 +35,39 @@ def parse_command_line(argv):
     return parse_address(address)
 
 
+def log_init():
+    # TODO(artyom): might as well use this:
+    # https://pypi.python.org/pypi/logging-color-formatter
+    logging_config = dict(
+        version=1,
+        formatters={
+            'basic': {
+                'format':
+                '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # noqa: E501
+            }
+        },
+        handlers={
+            'debug': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'basic',
+            }
+        },
+        loggers={
+            '__main__': {
+                'handlers': ['debug'],
+                'level': logging.DEBUG
+            },
+            'opentrons.server': {
+                'handlers': ['debug'],
+                'level': logging.DEBUG
+            },
+        }
+    )
+    dictConfig(logging_config)
+
+
 if __name__ == "__main__":
+    log_init()
     try:
         host, port = parse_command_line(sys.argv)
     except Exception as e:
