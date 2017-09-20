@@ -116,16 +116,12 @@ async def test_get_object_by_id(session, root):
                     'i': type_id(session.server.root),
                     't': id(type),
                     'v': set([
-                        '__dict__',
-                        '__module__',
                         'value',
-                        '__init__',
-                        '__doc__',
                         'throw',
                         'next',
                         'combine',
-                        'add',
-                        '__weakref__'])
+                        'add'
+                       ])
                     }
                 }
     # We care only about dictionary keys, since we don't want
