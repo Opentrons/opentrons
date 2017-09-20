@@ -41,6 +41,8 @@ class Server(object):
         self.send_queue = Queue(loop=self.loop)
         self.send_loop_task = self.loop.create_task(self.send_loop())
 
+        self.tasks = []
+
         self.app = web.Application()
         self.app.router.add_get('/', self.handler)
 
@@ -74,10 +76,19 @@ class Server(object):
 
     async def send_loop(self):
         while True:
-            client, payload = await self.send_queue.get()
-            # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
-            await client.drain()
-            client.send_str(json.dumps(payload))
+            try:
+                client, payload = await self.send_queue.get()
+
+                if client not in self.clients:
+                    log.warning('Send loop: websocket {0} is no longer connected'  # noqa
+                        .format(id(client)))
+                    continue
+
+                # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
+                await client.drain()
+                client.send_str(json.dumps(payload))
+            except Exception as e:
+                log.warning('Websocket {0}: {1}'.format(id(client), str(e)))
 
     async def monitor_events(self, instance):
         async for event in instance.notifications:
@@ -100,14 +111,24 @@ class Server(object):
         """
         Receives HTTP request and negotiates up to a Websocket session
         """
-        log.debug('Starting handler for request: {0}'.format(request))
+
+        def task_done(future):
+            exception = future.exception()
+            if exception:
+                log.warning(
+                    'While processing message: {0}\nDetails: {1}'.format(
+                        exception,
+                        traceback.format_exc())
+                )
+
         ws = web.WebSocketResponse()
+        log.debug('Opening WebSocket: {0}'.format(id(ws)))
 
         # upgrade to Websockets
         await ws.prepare(request)
         self.clients.append(ws)
 
-        self.send({
+        ws.send_json({
             '$': {'type': CONTROL_MESSAGE},
             'root': self.call_and_serialize(lambda: self.root),
             'type': self.call_and_serialize(lambda: type(self.root))
@@ -117,18 +138,16 @@ class Server(object):
             # Async receive ws data until websocket is closed
             async for msg in ws:
                 log.debug('Received: {0}'.format(msg))
-                try:
-                    await self.process(msg)
-                except Exception as e:
-                    await ws.close()
-                    log.warning(
-                        'While processing message: {0}'
-                        .format(traceback.format_exc()))
+                task = self.loop.create_task(self.process(msg))
+                task.add_done_callback(task_done)
+                self.tasks += [task]
         except Exception as e:
             log.error(
                 'While reading from socket: {0}'
                 .format(traceback.format_exc()))
         finally:
+            log.info('Closing WebSocket {0}'.format(id(ws)))
+            ws.close()
             self.clients.remove(ws)
 
         return ws

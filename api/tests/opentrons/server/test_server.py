@@ -5,6 +5,8 @@ import time
 from opentrons.server import rpc
 from threading import Event
 
+from uuid import uuid4 as uuid
+
 
 class Foo(object):
     def __init__(self, value):
@@ -336,6 +338,83 @@ async def test_concurrent_calls(session, root):
     ]
 
 
+async def call(socket, **kwargs):
+    token = str(uuid())
+    request = {'$': {'token': token}, **kwargs}
+    await socket.send_json(request)
+    return token
+
+
+async def connect(session, test_client):
+    client = await test_client(session.server.app)
+    return await client.ws_connect('/')
+
+
+# TODO (artyom, 20170920): make it a shared func
+async def read_until(socket, message):
+    res = []
+    while True:
+        data = await socket.receive_json()
+        res += [data]
+        if data == message:
+            break
+    return res
+
+
+def get_token(message):
+    return message['$']['token']
+
+
+def get_result_message(token):
+    return {
+        '$': {'token': token, 'type': 0, 'status': 'success'},
+        'data': 'Done!'}
+
+
+def get_ack_message(token):
+    return {'$': {'token': token, 'type': 1}}
+
+
+def get_notification_message(i):
+    return {'$': {'type': 2}, 'data': i}
+
+
 @pytest.mark.parametrize('root', [TickTock()])
-async def test_concurrent_connections(root, session, test_client):
-    pass
+async def test_concurrent_and_disconnect(loop, root, session, test_client):  # noqa C901
+    futures, _ = await asyncio.wait(
+        [connect(session, test_client) for _ in range(3)])
+    sockets = [future.result() for future in futures]
+
+    # TODO (artyom, 20170920): look for pattern to call several coroutines
+    # and collect results in one line
+    futures, _ = await asyncio.wait([
+        call(socket, id=id(root), name='start', args=[])
+        for socket in sockets])
+    tokens = [future.result() for future in futures]
+
+    await sockets.pop(1).close()
+
+    stop_message = get_result_message(tokens[-1])
+    res = await read_until(sockets[0], stop_message)
+
+    # First message in root info
+    assert res.pop(0)['$'] == {'type': 3}
+    # Next three are acks for each call
+    assert sorted(res[:3], key=get_token) == \
+        sorted(
+            [get_ack_message(token) for token in tokens],
+            key=get_token
+        )
+
+    # expected = [get_result_message(token) for token in tokens] + \
+    #     [get_notification_message(i) for i in range(5)] * 3
+    # # Evaluate...
+    # expected = sorted(expected, key=lambda item: sorted(json.dumps(item)))
+    # _res = sorted(res[3:], key=lambda item: sorted(json.dumps(item)))
+
+    # print('>>', expected)
+    # print('>>', _res)
+
+    # assert _res == expected
+    # # while True:
+    # #     print('>>', await sockets[0].receive_json())
