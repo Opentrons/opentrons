@@ -51,7 +51,7 @@ script:
   # TODO(mc, 2017-08-28): use top level `make test`
   - make -C api test exe
   - > # Make docs on linux only
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs) fi;
   # TODO(mc, 2017-08-28): use top level `make test`
   # TODO(mc, 2017-09-13): handle cross-platform distributables
   - make -C app package test && make -C app dist-${TRAVIS_OS_NAME}
