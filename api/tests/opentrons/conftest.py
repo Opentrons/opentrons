@@ -81,12 +81,6 @@ def robot(dummy_db):
     return Robot()
 
 
-@pytest.fixture
-def message_broker():
-    from opentrons.util.trace import MessageBroker
-    return MessageBroker()
-
-
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
     try:
