@@ -11,7 +11,7 @@ export default class RunLog extends Component {
   render () {
     const {style, commands} = this.props
     const makeCommandToTemplateMapper = (depth) => (command) => {
-      const {id, isCurrent, description, children, handledAt} = command
+      const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
       const contents = [
         <p className={style} data-timestamp={handledAt}>[{id}] : {description}</p>
@@ -25,11 +25,12 @@ export default class RunLog extends Component {
         )
       }
 
+      const liProps = {key: id, className: classnames({[styles.current]: isCurrent, [styles.last_current]: isLast}, style)}
+
+      if (isLast) liProps.ref = 'ensureVisible'
+
       return (
-        <li
-          key={id}
-          className={classnames({[styles.current]: isCurrent}, style)}
-        >
+        <li {...liProps}>
           {contents}
         </li>
       )
