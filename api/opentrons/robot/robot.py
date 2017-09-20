@@ -7,12 +7,9 @@ import opentrons.util.pose_functions as pos_funcs
 from opentrons import containers, drivers
 from opentrons.containers import Container
 from opentrons.util.log import get_logger
-from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
 from opentrons.data_storage import database
 from opentrons import helpers
-from opentrons.util.vector import Vector
-from opentrons.util.log import get_logger
 from opentrons import commands
 from opentrons.broker import subscribe
 
@@ -664,13 +661,6 @@ class Robot(object):
                 well,
                 *(well._coordinates + well.top()[1])
             )
-
-    def clear_commands(self):
-        """
-        Clear Robot's command queue.
-        """
-        self._previous_container = None
-        self._commands = []
 
     def pause(self):
         """

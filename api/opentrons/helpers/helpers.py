@@ -1,4 +1,3 @@
-import functools
 import numbers
 
 from opentrons.util.vector import Vector

@@ -89,7 +89,6 @@ class RobotTest(unittest.TestCase):
         self.robot._driver.connection = None
         self.assertRaises(RuntimeError, self.robot.home)
 
-
     def test_create_arc(self):
         p200 = pipette.Pipette(
             self.robot, axis='b', name='my-fancy-pancy-pipette'
@@ -166,7 +165,6 @@ class RobotTest(unittest.TestCase):
         self.assertDictEqual(self.robot.axis_homed, {
             'x': True, 'y': True, 'z': True, 'a': True, 'b': True
         })
-
 
     def test_versions(self):
         res = self.robot.versions()
