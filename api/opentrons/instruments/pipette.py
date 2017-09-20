@@ -85,7 +85,9 @@ class Pipette(Instrument):
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
-            dispense_speed=500):
+            dispense_speed=500,
+            aspirate_flowrate=None,
+            dispense_flowrate=None):
 
         self.robot = robot
         self.axis = axis.lower()
@@ -157,6 +159,12 @@ class Pipette(Instrument):
         for key, val in self.positions.items():
             if val is None:
                 self.positions[key] = default_positions[key]
+
+        # converting flowrate to speed relies on calibrated plunger positions
+        if helpers.is_number(aspirate_flowrate):
+            self.set_flowrate(aspirate=aspirate_flowrate)
+        if helpers.is_number(dispense_flowrate):
+            self.set_flowrate(dispense=dispense_flowrate)
 
         self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
 
@@ -1437,20 +1445,29 @@ class Pipette(Instrument):
             tips -= 1
         return tips
 
-    def set_speed(self, **kwargs):
+    def set_speed(self, aspirate=None, dispense=None):
         """
         Set the speed (mm/minute) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
-
         Parameters
         ----------
         kwargs: Dict
             A dictionary who's keys are either "aspirate" or "dispense",
             and who's values are int or float (Example: `{"aspirate": 300}`)
         """
-        keys = {'aspirate', 'dispense'} & kwargs.keys()
-        for key in keys:
-            self.speeds[key] = kwargs.get(key)
+        if helpers.is_number(aspirate):
+            self.speeds['aspirate'] = aspirate
+        if helpers.is_number(dispense):
+            self.speeds['dispense'] = dispense
+        return self
+
+    def set_flowrate(self, aspirate=None, dispense=None):
+        ul_per_mm = self.max_volume / self._plunge_distance(self.max_volume)
+        if helpers.is_number(aspirate):
+            aspirate = (aspirate / ul_per_mm) * 60
+        if helpers.is_number(dispense):
+            dispense = (dispense / ul_per_mm) * 60
+        self.set_speed(aspirate=aspirate, dispense=dispense)
         return self
 
     @property
