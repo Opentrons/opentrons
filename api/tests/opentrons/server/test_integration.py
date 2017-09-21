@@ -28,7 +28,7 @@ async def test_notifications(session, session_manager, protocol, root, connect):
     )
     await session.socket.receive_json()  # Skip ack
 
-    # Crate another connection to use throughout the test
+    # Create another connection to use throughout the test
     socket = await connect()
     # Receive control message
     res = await socket.receive_json()

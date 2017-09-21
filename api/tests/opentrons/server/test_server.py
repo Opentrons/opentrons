@@ -67,7 +67,6 @@ class TickTock(object):
         return "Done!"
 
     def pause(self):
-        print('pause() called')
         self.running.clear()
         return "Paused"
 
@@ -301,7 +300,6 @@ async def test_concurrent_calls(session, root):
         res += [message]
         if message.get('data') == 'Paused':
             break
-    print(res)
     # Confirm receiving first notification, ACK for pause and pause result
     assert res == [
         {'data': 0, '$': {'type': 2}},
@@ -347,6 +345,11 @@ async def call(socket, **kwargs):
 
 # TODO (artyom, 20170920): make it a shared func
 async def read_until(socket, messages):
+    """
+    Reads from socket until all messages from the list are received
+    Returns the list of messages read
+    """
+    messages = messages.copy()
     res = []
     while messages:
         data = await socket.receive_json()
@@ -356,44 +359,63 @@ async def read_until(socket, messages):
     return res
 
 
-def get_token(message):
+def token(message):
     return message['$']['token']
 
 
-def get_result_message(token):
+def result_message(token, data):
     return {
         '$': {'token': token, 'type': 0, 'status': 'success'},
-        'data': 'Done!'}
+        'data': data}
 
 
-def get_ack_message(token):
+def ack_message(token):
     return {'$': {'token': token, 'type': 1}}
 
 
-def get_notification_message(i):
-    return {'$': {'type': 2}, 'data': i}
+def notification_message(data):
+    return {'$': {'type': 2}, 'data': data}
+
+
+# Await in list comprehensions is python 3.6
+# https://www.python.org/dev/peps/pep-0530/
+async def async_iterate(iterable):
+    futures, _ = await asyncio.wait(iterable)
+    res = [future.result() for future in futures]
+    return res
+
+
+def message_key(message):
+    meta = message['$']
+    data = message.get('data', '')
+    return str(meta.get('type')) + meta.get('token', '') + str(data)
 
 
 @pytest.mark.parametrize('root', [TickTock()])
 async def test_concurrent_and_disconnect(loop, root, session, connect):  # noqa C901
-    futures, _ = await asyncio.wait(
-        [connect() for _ in range(3)])
-    sockets = [future.result() for future in futures]
+    n_sockets = 20
+    sockets = await async_iterate([connect() for _ in range(n_sockets)])
 
     # TODO (artyom, 20170920): look for pattern to call several coroutines
     # and collect results in one line
-    futures, _ = await asyncio.wait([
+    tokens = await async_iterate([
         call(socket, id=id(root), name='start', args=[])
         for socket in sockets])
-    tokens = [future.result() for future in futures]
 
     await sockets.pop(1).close()
 
-    stop_messages = [get_result_message(token) for token in tokens]
-    res = await read_until(sockets[0], stop_messages)
+    stop_messages = [result_message(token, 'Done!') for token in tokens]
+    results = await async_iterate(
+        [read_until(socket, stop_messages) for socket in sockets])
 
-    # First message is root info
-    assert res.pop(0)['$'] == {'type': 3}
-    expected = [get_ack_message(token) for token in tokens] + \
-        [get_result_message(token) for token in tokens] + \
-        [get_notification_message(i) for i in range(5)] * 3
+    for res in results:
+        # First message is root info
+        assert res.pop(0)['$'] == {'type': 3}
+        expected = []
+        # All acks received
+        expected.extend([ack_message(token) for token in tokens])
+        # All results received
+        expected.extend([result_message(token, 'Done!') for token in tokens])
+        # All notifications received. 5 ticks per notifications
+        expected.extend([notification_message(i) for i in range(5)] * n_sockets)  # noqa
+        assert sorted(res, key=message_key) == sorted(expected, key=message_key)  # noqa
