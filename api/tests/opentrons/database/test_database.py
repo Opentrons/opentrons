@@ -8,7 +8,7 @@ from opentrons.util.vector import Vector
 
 
 
-EXPECTED_CONTAINER_COORDS = {
+EXPECTED_CONTAINER_OFFSETS = {
     'tube-rack-5ml-96': (0.00, 0.00, 0.00),
     'wheaton_vial_rack': (9.00, 9.00, 0.00),
     '6-well-plate': (23.16, 24.76, 0.00),
@@ -115,11 +115,11 @@ def test_load_all_containers():
         {container.get_type(): container._coordinates
          for container in containers}
 
-    for container, coords in containers_and_coords.items():
-        expected = Vector(EXPECTED_CONTAINER_COORDS[container])
-        assert coords[0] == expected[0]
-        assert coords[1] == expected[1]
-        assert coords[2] == expected[2]
+    for container, offset in containers_and_coords.items():
+        expected_offset = Vector(EXPECTED_CONTAINER_OFFSETS[container])
+        assert offset[0] == expected_offset[0]
+        assert offset[1] == expected_offset[1]
+        assert offset[2] == expected_offset[2]
 
 
 def test_calibrate_container(robot):
@@ -133,7 +133,7 @@ def test_calibrate_container(robot):
 
     p200 = Pipette(robot, 'a')
     robot.move_head(x=100, y=150, z=5)
-    robot.calibrate_container_with_instrument(plate1, p200, True)
+    robot.calibrate_container_with_instrument(plate1, p200, save=True)
     assert plate1._coordinates == Vector(90.00, 140.00, 5.00)
     assert plate2._coordinates == Vector(11.24, 14.34, 0.00)
     plate2 = containers_load(robot, '96-flat', 'C1')
