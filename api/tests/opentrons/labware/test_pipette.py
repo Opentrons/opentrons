@@ -3,27 +3,112 @@
 import unittest
 from unittest import mock
 
-from opentrons import Robot
+from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
-from opentrons.instruments import pipette
+from opentrons.instruments import Pipette
 from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
 
 from tests.opentrons.conftest import fuzzy_assert
 
 
+def test_drop_tip_move_to(robot):
+    plate = containers_load(robot, '96-flat', 'A1')
+    p200 = Pipette(robot, 'b')
+    x, y, z = (161.0, 116.7, 3.0)
+
+    robot._driver.move_head(x=x, y=y, z=z)
+    robot.calibrate_container_with_instrument(plate, p200, False)
+
+    p200.drop_tip(plate[0])
+    print(p200._drop_tip_offset)
+
+    current_pos = robot._driver.get_head_position()['current']
+
+    assert current_pos == \
+        Vector({
+            'x': 161.0,
+            'y': 116.7,
+            'z': 3.0 + p200._drop_tip_offset
+        })
+
+
+def test_aspirate_move_to(robot):
+    p200 = Pipette(robot, 'b', max_volume=200)
+
+    x, y, z = (161.0, 116.7, 0)
+    plate = containers_load(robot, '96-flat', 'A1')
+    well = plate[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=plate)
+    location = (plate, pos)
+
+    robot._driver.move_head(x=x, y=y, z=z)
+    robot.calibrate_container_with_instrument(plate, p200, False)
+    p200.aspirate(100, location)
+
+    current_pos = robot._driver.get_head_position()['current']
+    assert current_pos == Vector({'x': 172.24, 'y': 131.04, 'z': 0})
+    current_pos = robot._driver.get_plunger_positions()['current']
+
+    assert current_pos == {'a': 0, 'b': 5.0}
+
+
+def test_blow_out_move_to(robot):
+    p200 = Pipette(robot, 'b')
+
+    plate = containers_load(robot, '96-flat', 'A1')
+    x, y, z = (161.0, 116.7, 3.0)
+    well = plate[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=plate)
+    location = (plate, pos)
+
+    robot._driver.move_head(x=x, y=y, z=z)
+    robot.calibrate_container_with_instrument(plate, p200, False)
+    p200.blow_out(location)
+    current_pos = robot._driver.get_head_position()['current']
+
+    assert current_pos == Vector({'x': 172.24, 'y': 131.04, 'z': 3.0})
+    current_pos = robot._driver.get_plunger_positions()['current']
+    assert current_pos == {'a': 0, 'b': 12.0}
+
+
+def test_dispense_move_to(robot):
+    p200 = Pipette(robot, 'b', max_volume=200)
+    plate = containers_load(robot, '96-flat', 'A1')
+    x, y, z = (161.0, 116.7, 3.0)
+    well = plate[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=plate)
+    location = (plate, pos)
+
+    robot._driver.move_head(x=x, y=y, z=z)
+
+    robot.calibrate_container_with_instrument(plate, p200, False)
+
+    robot.home()
+
+    p200.aspirate(100, location)
+    p200.dispense(100, location)
+
+    driver = robot._driver
+
+    current_plunger_pos = driver.get_plunger_positions()['current']
+    current_head_pos = driver.get_head_position()['current']
+
+    assert current_head_pos == Vector({'x': 172.24, 'y': 131.04, 'z': 3.0})
+    assert current_plunger_pos == {'a': 0, 'b': 10.0}
+
+
 class PipetteTest(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
         self.robot.home()
-
         self.trash = containers_load(self.robot, 'point', 'A1')
         self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', 'B2')
         self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', 'B3')
 
         self.plate = containers_load(self.robot, '96-flat', 'A2')
 
-        self.p200 = pipette.Pipette(
+        self.p200 = Pipette(
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
@@ -34,7 +119,6 @@ class PipetteTest(unittest.TestCase):
             name='other-pipette-for-transfer-tests'
         )
         self.p200.max_volume = 200
-        self.p200.update_calibrations()
 
         self.p200.reset()
 
@@ -60,7 +144,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.p200._get_plunger_position('blow_out'), 12)
         self.assertEquals(self.p200._get_plunger_position('drop_tip'), 13)
 
-        self.p200.positions['drop_tip'] = None
+        self.p200.plunger_positions['drop_tip'] = None
         self.assertRaises(
             RuntimeError, self.p200._get_plunger_position, 'drop_tip')
 
@@ -84,10 +168,10 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.motor.move(9)
         self.p200.calibrate('bottom')
-        self.assertEquals(self.p200.positions['bottom'], 9)
+        self.assertEquals(self.p200.plunger_positions['bottom'], 9)
 
     def test_get_instruments_by_name(self):
-        self.p1000 = pipette.Pipette(
+        self.p1000 = Pipette(
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1],
@@ -126,31 +210,6 @@ class PipetteTest(unittest.TestCase):
             res,
             (self.plate[0], self.plate[0].from_center(x=0, y=0, z=1)))
 
-    def test_calibrate_placeable(self):
-        self.p200.delete_calibration_data()
-        well = self.plate[0]
-        pos = well.from_center(x=0, y=0, z=0, reference=self.plate)
-        location = (self.plate, pos)
-
-        well_deck_coordinates = well.center(well.get_deck())
-        dest = well_deck_coordinates + Vector(1, 2, 3)
-
-        self.robot._driver.move_head(x=dest['x'], y=dest['y'], z=dest['z'])
-
-        self.p200.calibrate_position(location)
-
-        expected_calibration_data = {
-            'A2': {
-                'children': {
-                    '96-flat': {
-                        'delta': (1.0, 2.0, 3.0),
-                        'type': '96-flat'
-                    }}}}
-
-        self.assertDictEqual(
-            self.p200.calibration_data,
-            expected_calibration_data)
-
     def test_aspirate_rate(self):
         self.p200.set_speed(aspirate=300, dispense=500)
         self.robot.clear_commands()
@@ -162,113 +221,8 @@ class PipetteTest(unittest.TestCase):
         ]
         self.assertEquals(self.p200.motor.speed.mock_calls, expected)
 
-    def test_aspirate_move_to(self):
-        x, y, z = (161.0, 116.7, 3.0)
-        well = self.plate[0]
-        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
-        location = (self.plate, pos)
-
-        self.robot._driver.move_head(x=x, y=y, z=z)
-
-        self.p200.calibrate_position(location)
-
-        self.p200.aspirate(100, location)
-
-        current_pos = self.robot._driver.get_head_position()['current']
-        self.assertEqual(
-            current_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
-        )
-
-        current_pos = self.robot._driver.get_plunger_positions()['current']
-
-        self.assertDictEqual(
-            current_pos,
-            {'a': 0, 'b': 5.0}
-        )
-
-    def test_dispense_move_to(self):
-        x, y, z = (161.0, 116.7, 3.0)
-        well = self.plate[0]
-        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
-        location = (self.plate, pos)
-
-        self.robot._driver.move_head(x=x, y=y, z=z)
-
-        self.p200.calibrate_position(location)
-
-        self.robot.home()
-
-        self.p200.aspirate(100, location)
-        self.p200.dispense(100, location)
-
-        driver = self.robot._driver
-
-        current_plunger_pos = driver.get_plunger_positions()['current']
-        current_head_pos = driver.get_head_position()['current']
-
-        self.assertEqual(
-            current_head_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
-        )
-        self.assertDictEqual(
-            current_plunger_pos,
-            {'a': 0, 'b': 10.0}
-        )
-
-    def test_blow_out_move_to(self):
-        x, y, z = (161.0, 116.7, 3.0)
-        well = self.plate[0]
-        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
-        location = (self.plate, pos)
-
-        self.robot._driver.move_head(x=x, y=y, z=z)
-
-        self.p200.calibrate_position(location)
-
-        self.p200.blow_out(location)
-
-        current_pos = self.robot._driver.get_head_position()['current']
-
-        self.assertEqual(
-            current_pos,
-            Vector({'x': 161.0, 'y': 116.7, 'z': 3.0})
-        )
-
-        current_pos = self.robot._driver.get_plunger_positions()['current']
-
-        self.assertDictEqual(
-            current_pos,
-            {'a': 0, 'b': 12.0}
-        )
-
-    def test_drop_tip_move_to(self):
-        x, y, z = (161.0, 116.7, 3.0)
-        well = self.plate[0]
-        pos = well.from_center(x=0, y=0, z=-1, reference=self.plate)
-        location = (self.plate, pos)
-
-        self.robot._driver.move_head(x=x, y=y, z=z)
-
-        self.p200.calibrate_position(location)
-
-        self.p200.drop_tip(self.plate[0])
-
-        current_pos = self.robot._driver.get_head_position()['current']
-
-        self.assertEqual(
-            current_pos,
-            Vector({
-                'x': 161.0,
-                'y': 116.7,
-                'z': 3.0 + self.p200._drop_tip_offset
-            })
-        )
-
     def test_empty_aspirate(self):
-
         self.p200.aspirate(100)
-
         current_pos = self.robot._driver.get_plunger_positions()['current']
 
         self.assertDictEqual(
@@ -1463,7 +1417,7 @@ class PipetteTest(unittest.TestCase):
         self.robot._deck['A1'].add(self.tiprack1, 'tiprack1')
         self.robot._deck['B1'].add(self.tiprack2, 'tiprack2')
 
-        self.p200 = pipette.Pipette(
+        self.p200 = Pipette(
             self.robot,
             max_volume=200,
             axis='b',
@@ -1472,7 +1426,6 @@ class PipetteTest(unittest.TestCase):
             name='pipette-for-transfer-tests'
         )
         self.p200.max_volume = 200
-        self.p200.update_calibrations()
 
         self.p200.move_to = mock.Mock()
 
@@ -1499,7 +1452,7 @@ class PipetteTest(unittest.TestCase):
         self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
     def test_tip_tracking_chain_multi_channel(self):
-        p200_multi = pipette.Pipette(
+        p200_multi = Pipette(
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],

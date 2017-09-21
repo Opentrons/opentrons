@@ -3,10 +3,34 @@ import pytest
 
 from opentrons import drivers
 from opentrons.containers import load as containers_load
-from opentrons.containers.placeable import Deck
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
-from opentrons.util.vector import Vector
+
+
+def test_pos_tracker_persistance(robot):
+    p200 = pipette.Pipette(
+        robot, axis='b', name='my-fancy-pancy-pipette'
+    )
+    plate = containers_load(robot, 'trough-12row', 'B2')
+    assert robot.max_deck_height() == 40
+
+    robot.move_head(x=10, y=10, z=10)
+    robot.calibrate_container_with_instrument(plate, p200, save=False)
+
+    assert robot.max_deck_height() == 50
+
+
+def test_calibrated_max_z(robot):
+    p200 = pipette.Pipette(
+        robot, axis='b', name='my-fancy-pancy-pipette'
+    )
+    plate = containers_load(robot, '96-flat', 'A1')
+    assert robot.max_deck_height() == 10.5
+
+    robot.move_head(x=10, y=10, z=10)
+    robot.calibrate_container_with_instrument(plate, p200, save=False)
+
+    assert robot.max_deck_height() == 20.5
 
 
 @pytest.fixture
@@ -65,47 +89,30 @@ class RobotTest(unittest.TestCase):
         self.robot._driver.connection = None
         self.assertRaises(RuntimeError, self.robot.home)
 
-    def test_calibrated_max_dimension(self):
-
-        expected = self.robot._deck.max_dimensions(self.robot._deck)
-        res = self.robot._calibrated_max_dimension()
-        self.assertEquals(res, expected)
-
-        p200 = pipette.Pipette(
-            self.robot, axis='b', name='my-fancy-pancy-pipette'
-        )
-        plate = containers_load(self.robot, '96-flat', 'A1')
-        self.robot.move_head(x=10, y=10, z=10)
-        p200.calibrate_position((plate, Vector(0, 0, 0)))
-
-        res = self.robot._calibrated_max_dimension()
-
-        expected = Vector(plate.max_dimensions(plate)) + Vector(10, 10, 10)
-        self.assertEquals(res, expected)
-
     def test_create_arc(self):
         p200 = pipette.Pipette(
             self.robot, axis='b', name='my-fancy-pancy-pipette'
         )
         plate = containers_load(self.robot, '96-flat', 'A1')
         plate2 = containers_load(self.robot, '96-flat', 'B1')
-
         self.robot.move_head(x=10, y=10, z=10)
-        p200.calibrate_position((plate, Vector(0, 0, 0)))
-        self.robot.move_head(x=10, y=10, z=100)
-        p200.calibrate_position((plate2, Vector(0, 0, 0)))
+        self.robot.calibrate_container_with_instrument(plate, p200, save=False)
 
         res = self.robot._create_arc((0, 0, 0), plate[0])
         expected = [
-            {'z': 100},
+            {'z': 25.5},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]
         self.assertEquals(res, expected)
 
-        res = self.robot._create_arc((0, 0, 0), plate[0])
+        self.robot.move_head(x=10, y=10, z=100)
+        self.robot.calibrate_container_with_instrument(
+            plate2, p200, save=False
+        )
+        res = self.robot._create_arc((0, 0, 0), plate2[0])
         expected = [
-            {'z': 20.5 + 5},
+            {'z': 100},
             {'x': 0, 'y': 0},
             {'z': 0}
         ]
@@ -121,7 +128,7 @@ class RobotTest(unittest.TestCase):
         self.assertEquals(res, drivers.VIRTUAL_SMOOTHIE_PORT)
 
     def test_robot_move_to(self):
-        self.robot.move_to((Deck(), (100, 0, 0)))
+        self.robot.move_to((self.robot._deck, (100, 0, 0)))
         position = self.robot._driver.get_head_position()['current']
         self.assertEqual(position, (100, 0, 0))
 

@@ -4,13 +4,16 @@
 
 import pytest
 import os
+import shutil
 import re
 
 from collections import namedtuple
 from opentrons.server import rpc
 from uuid import uuid4 as uuid
+from opentrons.data_storage import database
 
 # Uncomment to enable logging during tests
+
 # logging_config = dict(
 #     version=1,
 #     formatters={
@@ -45,6 +48,37 @@ Session = namedtuple(
 Protocol = namedtuple(
     'Protocol',
     ['text', 'filename'])
+
+# Note: When dummy_db or robot fixtures are used, this db is copied into a
+# a temp testing_db that is deleted in between tests to allow for db mutation
+MAIN_TESTER_DB = str(os.path.join(
+    os.path.dirname(
+        globals()["__file__"]), 'testing_database.db')
+)
+
+
+def print_db_path(db):
+    cursor = database.db_conn.cursor()
+    cursor.execute("PRAGMA database_list")
+    db_info = cursor.fetchone()
+    print("Database: ", db_info[2])
+
+
+# Builds a temp db to allow mutations during testing
+@pytest.fixture
+def dummy_db(tmpdir):
+    temp_db_path = str(tmpdir.mkdir('testing').join("database.db"))
+    shutil.copy2(MAIN_TESTER_DB, temp_db_path)
+    database.change_database(temp_db_path)
+    yield None
+    database.change_database(MAIN_TESTER_DB)
+    os.remove(temp_db_path)
+
+
+@pytest.fixture
+def robot(dummy_db):
+    from opentrons import Robot
+    return Robot()
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -101,7 +135,6 @@ def session(loop, test_client, request, session_manager):
 
     def finalizer():
         server.shutdown()
-
     request.addfinalizer(finalizer)
     return Session(server, socket, token, call)
 
@@ -116,3 +149,10 @@ def fuzzy_assert(result, expected):
         assert re.compile(
             exp.lower()).match(res.lower()), "{} didn't match {}" \
             .format(res, exp)
+
+
+def setup_testing_env():
+    database.change_database(MAIN_TESTER_DB)
+
+
+setup_testing_env()

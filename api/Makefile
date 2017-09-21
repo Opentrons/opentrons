@@ -8,7 +8,7 @@ install:
 	python setup.py install && pip install -r requirements.txt
 
 test:
-	pylama opentrons tests && py.test \
+	python -m pylama opentrons tests && python -m pytest \
 		--cov=opentrons \
 		--cov-report term-missing:skip-covered \
 		--cov-report xml:coverage.xml \
@@ -36,4 +36,4 @@ clean:
 		dist \
 		calibrations \
 		.coverage
-	find . -name __pycache__ -type d -print | xargs rm -rf
+	find . -name "*.pyc" -delete && find . -type d -name __pycache__ -delete

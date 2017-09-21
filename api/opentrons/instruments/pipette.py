@@ -1,18 +1,15 @@
-import copy
 import itertools
 
 from opentrons import commands
 
 from opentrons.containers import unpack_location
-from opentrons.containers.calibrator import Calibrator
 from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers
-from opentrons.instruments.instrument import Instrument
 
 
-class Pipette(Instrument):
+class Pipette:
 
     """
 
@@ -28,7 +25,6 @@ class Pipette(Instrument):
         * Instantiate a pipette with a maximum volume (uL)
         and an axis (`a` or `b`)
         * Design your protocol through the pipette's liquid-handling commands
-        * Run on the :any:`Robot` using :any:`run` or :any:`simulate`
 
     Parameters
     ----------
@@ -121,51 +117,19 @@ class Pipette(Instrument):
         self.min_volume = min_volume
         self.max_volume = max_volume or (min_volume + 1)
 
-        # NOTE: positions set to none in order to determine calibration state?
-        # self.positions = {
-        #     'top': None,
-        #     'bottom': None,
-        #     'blow_out': None,
-        #     'drop_tip': None
-        # }
-
         # FIXME
-        default_positions = {
+        default_plunger_positions = {
             'top': 0,
             'bottom': 10,
             'blow_out': 12,
             'drop_tip': 14
         }
-        self.positions = {}
-        self.positions.update(default_positions)
+        self.plunger_positions = {}
+        self.plunger_positions.update(default_plunger_positions)
 
-        self.calibrated_positions = copy.deepcopy(default_positions)
-
-        self.calibration_data = {}
-
-        # Pipette properties to persist between sessions
-        persisted_attributes = ['calibration_data', 'positions', 'max_volume']
-        persisted_key = '{axis}:{name}'.format(
-            axis=self.axis,
-            name=self.name)
-
-        self.init_calibrations(
-            key=persisted_key,
-            attributes=persisted_attributes)
-        self.load_persisted_data()
-
-        for key, val in self.positions.items():
+        for key, val in self.plunger_positions.items():
             if val is None:
-                self.positions[key] = default_positions[key]
-
-        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
-
-        if helpers.is_number(max_volume) and max_volume > 0:
-            self.max_volume = max_volume
-            self.update_calibrations()
-
-    def update_calibrator(self):
-        self.calibrator = Calibrator(self.robot._deck, self.calibration_data)
+                self.plunger_positions[key] = default_plunger_positions[key]
 
     def reset(self):
         """
@@ -308,6 +272,9 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> robot.reset() # doctest: +ELLIPSIS
+        <opentrons.robot.robot.Robot object at ...>
+        >>> plate = containers.load('96-flat', 'A1')
         >>> p200 = instruments.Pipette(
         ...     name='p200', axis='a', max_volume=200)
 
@@ -393,6 +360,7 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'C1')
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
@@ -503,6 +471,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'D1')
+
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
 
         >>> # mix 50uL in a Well, three times
@@ -598,6 +568,8 @@ class Pipette(Instrument):
         Examples
         --------
         ..
+        >>> plate = containers.load('96-flat', 'B2')
+
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -750,7 +722,7 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'A1')
+        >>> tiprack = containers.load('tiprack-200ul', 'A2')
         >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
         >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -818,7 +790,7 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'A2')
+        >>> tiprack = containers.load('tiprack-200ul', 'C2')
         >>> trash = containers.load('point', 'A3')
         >>> p200 = instruments.Pipette(axis='a', trash_container=trash)
         >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
@@ -865,7 +837,6 @@ class Pipette(Instrument):
         Notes
         -----
         `Pipette.home()` homes the `Robot`
-        (see :any:`run` and :any:`simulate`)
 
         Returns
         -------
@@ -904,7 +875,7 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'B1')
+        >>> plate = containers.load('96-flat', 'B3')
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -933,7 +904,7 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'B1')
+        >>> plate = containers.load('96-flat', 'A3')
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -1033,7 +1004,7 @@ class Pipette(Instrument):
         ..
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'B1')
+        >>> plate = containers.load('96-flat', 'D1')
         >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -1146,64 +1117,13 @@ class Pipette(Instrument):
 
         """
         if top is not None:
-            self.positions['top'] = top
+            self.plunger_positions['top'] = top
         if bottom is not None:
-            self.positions['bottom'] = bottom
+            self.plunger_positions['bottom'] = bottom
         if blow_out is not None:
-            self.positions['blow_out'] = blow_out
+            self.plunger_positions['blow_out'] = blow_out
         if drop_tip is not None:
-            self.positions['drop_tip'] = drop_tip
-
-        self.update_calibrations()
-
-        return self
-
-    def calibrate_position(self, location, current=None):
-        """
-        Save the position of a :any:`Placeable` (usually a :any:`Container`)
-        relative to this pipette.
-
-        Notes
-        -----
-        The saved position will be persisted under this pipette's `name`
-        and `axis` (see :any:`Pipette`)
-
-        Parameters
-        ----------
-        location : tuple(:any:`Placeable`, :any:`Vector`)
-            A tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
-
-        current : :any:`Vector`
-            The coordinate to save this container to
-            (Default: robot current position)
-
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'E2')
-        >>> p200 = instruments.Pipette(axis='a')
-        >>> robot.move_head(x=100, y=100, z=100)
-        >>> rel_pos = tiprack[0].from_center(x=0, y=0, z=-1, reference=tiprack)
-        >>> p200.calibrate_position((tiprack, rel_pos)) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        """
-        if not current:
-            current = self.robot._driver.get_head_position()['current']
-
-        self.calibration_data = self.calibrator.calibrate(
-            self.calibration_data,
-            location,
-            current)
-
-        self.update_calibrations()
+            self.plunger_positions['drop_tip'] = drop_tip
 
         return self
 
@@ -1227,8 +1147,6 @@ class Pipette(Instrument):
                 'min volume ({0} < {1})'.format(
                     self.max_volume, self.min_volume))
 
-        self.update_calibrations()
-
         return self
 
     def _get_plunger_position(self, position):
@@ -1238,7 +1156,7 @@ class Pipette(Instrument):
         Raises exception if the position has not been calibrated yet
         """
         try:
-            value = self.positions[position]
+            value = self.plunger_positions[position]
             if helpers.is_number(value):
                 return value
             else:

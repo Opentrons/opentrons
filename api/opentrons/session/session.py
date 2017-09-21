@@ -5,7 +5,7 @@ from opentrons import robot
 from opentrons.robot.robot import Robot
 from datetime import datetime
 
-from opentrons.broker import notify, subscribe, Notifications
+from opentrons.broker import publish, subscribe, Notifications
 from opentrons.commands import types
 
 
@@ -207,4 +207,4 @@ class Session(object):
         }
 
     def _on_state_changed(self):
-        notify(SESSION_TOPIC, self._snapshot())
+        publish(SESSION_TOPIC, self._snapshot())

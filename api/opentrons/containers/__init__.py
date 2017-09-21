@@ -2,8 +2,7 @@ from collections import OrderedDict
 import json
 import os
 
-from opentrons.containers.persisted_containers import get_persisted_container
-from opentrons.containers import persisted_containers
+from opentrons.data_storage import database
 from opentrons.containers.placeable import (
     Deck,
     Slot,
@@ -16,7 +15,6 @@ from opentrons.containers.calibrator import apply_calibration
 from opentrons.util import environment
 
 __all__ = [
-    get_persisted_container,
     Deck,
     Slot,
     Container,
@@ -38,14 +36,14 @@ def load(robot, container_name, slot, label=None, share=False):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
-    return robot.add_container(container_name, slot, label=label, share=share)
+    return robot.add_container(container_name, slot, label, share)
 
 
 def list():
-    return persisted_containers.list_container_names()
+    return database.list_all_containers()
 
 
-def create(name, grid, spacing, diameter, depth, volume=0):
+def create(name, grid, spacing, diameter, depth, volume, save=False):
     columns, rows = grid
     col_spacing, row_spacing = spacing
     custom_container = Container()
@@ -62,25 +60,35 @@ def create(name, grid, spacing, diameter, depth, volume=0):
             well_name = chr(c + ord('A')) + str(1 + r)
             coordinates = (c * col_spacing, r * row_spacing, 0)
             custom_container.add(well, well_name, coordinates)
-    json_container = container_to_json(custom_container, name)
-    save_custom_container(json_container)
-    persisted_containers.load_all_persisted_containers_from_disk()
+    if save:
+        database.save_new_container(custom_container, name)
+    return custom_container
 
 
-def container_to_json(c, name):
+# FIXME: [Jared - 8/31/17] This is not clean
+# fix it by using the same reference points
+# in saved containers and Container/Well objects
+def container_to_json(container, name):
     locations = []
-    for w in c:
-        x, y, z = w.coordinates()
+    for w in container:
+        x, y, z = w._coordinates + w.bottom()[1]
+        properties_dict = {
+            'x': x, 'y': y, 'z': z,
+            'depth': w.z_size(),
+            'total-liquid-volume': w.max_volume()
+        }
+        if w.properties.get('diameter') is not None:
+            properties_dict.update({'diameter': w.properties['diameter']})
+        else:
+            properties_dict.update({'width': w.properties['width'],
+                                    'length': w.properties['length']})
         locations.append((
             w.get_name(),
-            {
-                'x': x, 'y': y, 'z': z,
-                'depth': w.z_size(),
-                'diameter': w.x_size(),
-                'total-liquid-volume': w.max_volume()
-            }
+            properties_dict
+
         ))
-    return {name: {'locations': OrderedDict(locations)}}
+    return {name: {'origin-offset': dict(zip('xyz', container._coordinates)),
+                   'locations': OrderedDict(locations)}}
 
 
 def save_custom_container(data):

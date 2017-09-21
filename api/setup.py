@@ -31,7 +31,8 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'pyserial==3.2.1',
-    'aiohttp==2.2.3']
+    'aiohttp==2.2.3',
+    'numpy==1.13.0']
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 

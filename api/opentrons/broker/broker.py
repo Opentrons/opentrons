@@ -60,5 +60,5 @@ def subscribe(topic, handler):
     return unsubscribe
 
 
-def notify(topic, message):
+def publish(topic, message):
     [handler(message) for handler in subscriptions.get(topic, [])]

@@ -1,5 +1,5 @@
 from . import types
-from ..broker import notify
+from ..broker import publish as publish_msg
 import functools
 import inspect
 
@@ -246,7 +246,7 @@ magbead.delay = delay
 
 
 def publish(before, after, command, meta=None):
-    notify_command_topic = functools.partial(notify, topic=types.COMMAND)
+    notify_command_topic = functools.partial(publish_msg, topic=types.COMMAND)
 
     def decorator(f):
         @functools.wraps(f)

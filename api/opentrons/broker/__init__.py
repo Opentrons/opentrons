@@ -1,3 +1,4 @@
-from .broker import subscribe, notify, Notifications
+from .broker import subscribe, publish, Notifications
+from . import topics
 
-__all__ = [subscribe, notify, Notifications]
+__all__ = [subscribe, publish, Notifications, topics]

@@ -2,8 +2,7 @@ import itertools
 import pytest
 
 from datetime import datetime
-from opentrons.broker import notify
-
+from opentrons.broker import publish
 from opentrons.session import Session
 
 
@@ -23,7 +22,7 @@ async def test_load_from_text(session_manager, protocol):
 
 
 async def test_async_notifications(session_manager):
-    notify('session', {'name': 'foo', 'payload': {'bar': 'baz'}})
+    publish('session', {'name': 'foo', 'payload': {'bar': 'baz'}})
     # Get async iterator
     aiter = session_manager.notifications.__aiter__()
     # Then read the first item

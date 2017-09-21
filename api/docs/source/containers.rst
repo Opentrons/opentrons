@@ -165,8 +165,7 @@ Tube Racks
 tube-rack-.75ml
 -------------
 
-4x6 rack that holds .75 mL microcentrifuge tubes
-(A1, A1-D6)
+4x6 rack that holds .75 mL microcentrifuge tubes (A1, A1-D6)
 
 .. code-block:: python
 
@@ -272,8 +271,6 @@ See dimensions in diagram below.
 .. image:: img/labware_lib/384-plate.png
 
 
-**********************
-
 **************
 Containers
 **************
@@ -338,19 +335,18 @@ Through the API's call containers.create(), you can create simple grid container
 
 .. testcode:: containers_custom
 
-    containers.create(
+    custom_plate = containers.create(
         '3x6_plate',                    # name of you container
         grid=(3, 6),                    # specify amount of (columns, rows)
         spacing=(12, 12),               # distances (mm) between each (column, row)
         diameter=5,                     # diameter (mm) of each well on the plate
         depth=10,                       # depth (mm) of each well on the plate
-        volume=200)                     # optional: volume capacity of each well (uL)
+        volume=200,                     # optional: volume capacity of each well (uL)
+        save=False)
 
-When you create your custom container, then it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
+When you create your custom container it will return the custom plate. If you would like to save this container to the robot's containers library you can pass save=True and it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
 
 .. testcode:: containers_custom
-
-    custom_plate = containers.load('3x6_plate', 'D1')
 
     for well in custom_plate.wells():
         print(well)
