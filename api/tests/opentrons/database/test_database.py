@@ -7,9 +7,6 @@ from opentrons.instruments import Pipette
 from opentrons.util.vector import Vector
 
 
-def approx(n):
-    return pytest.approx(int(sum(n)))
-
 
 EXPECTED_CONTAINER_COORDS = {
     'tube-rack-5ml-96': (0.00, 0.00, 0.00),
@@ -22,7 +19,7 @@ EXPECTED_CONTAINER_COORDS = {
     '96-deep-well': (11.24, 14.34, 0.00),
     'PCR-strip-tall': (11.24, 14.34, 0.00),
     'tube-rack-2ml': (13.00, 16.00, 0.00),
-    'T25-flask': (42.75, 63.88, 0.00),
+    'T25-flask': (42.75, 63.875, 0.00),
     'tube-rack-15_50ml': (11.00, 19.00, 0.00),
     '5ml-3x4': (18.00, 19.00, 0.00),
     '96-PCR-flat': (11.24, 14.34, 0.00),
@@ -43,7 +40,7 @@ EXPECTED_CONTAINER_COORDS = {
     '96-well-plate-20mm': (11.24, 14.34, 0.00),
     'trough-12row-short': (42.75, 14.34, 0.00),
     '24-vial-rack': (13.67, 16.00, 0.00),
-    'trash-box': (42.75, 63.88, 0.00),
+    'trash-box': (42.75, 63.875, 0.00),
     'tiprack-1000ul': (11.24, 14.34, 0.00),
     '50ml_rack': (0.00, 0.00, 0.00),
     'tiprack-10ul-H': (11.24, 14.34, 0.00),
@@ -53,7 +50,7 @@ EXPECTED_CONTAINER_COORDS = {
     'tiprack-200ul': (11.24, 14.34, 0.00),
     'MALDI-plate': (9.00, 12.00, 0.00),
     'tiprack-10ul': (11.24, 14.34, 0.00),
-    'T75-flask': (42.75, 63.88, 0.00),
+    'T75-flask': (42.75, 63.875, 0.00),
     'e-gelgol': (11.24, 14.34, 0.00)
 }
 
@@ -115,20 +112,22 @@ def test_load_all_containers():
     containers = [database.load_container(container_name)
                   for container_name in database.list_all_containers()]
     containers_and_coords = \
-        {container.get_type(): approx(container._coordinates)
+        {container.get_type(): container._coordinates
          for container in containers}
 
-    assert containers_and_coords == {
-        k: approx(v) for k, v in EXPECTED_CONTAINER_COORDS.items()
-    }
+    for container, coords in containers_and_coords.items():
+        expected = Vector(EXPECTED_CONTAINER_COORDS[container])
+        assert coords[0] == expected[0]
+        assert coords[1] == expected[1]
+        assert coords[2] == expected[2]
 
 
 def test_calibrate_container(robot):
     pt = robot.pose_tracker
     plate1 = containers_load(robot, '96-flat', 'A1')
     plate2 = containers_load(robot, '96-flat', 'B1')
-    assert approx(pt[plate1].position) == approx((21.24, 24.34, 0.00))
-    assert approx(pt[plate2].position) == approx((112.24, 24.34, 0.00))
+    assert pt[plate1].position == Vector(21.24, 24.34, 0.00)
+    assert pt[plate2].position == Vector(112.24, 24.34, 0.00)
     assert plate1._coordinates == Vector(11.24, 14.34, 0.00)
     assert plate2._coordinates == Vector(11.24, 14.34, 0.00)
 

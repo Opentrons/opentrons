@@ -5,10 +5,7 @@ from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
 from opentrons.trackers.pose_tracker import Pose
 from opentrons.robot.robot import Robot
-
-
-def approx(n):
-    return pytest.approx(int(sum(n)))
+from opentrons.util.vector import Vector
 
 
 @pytest.fixture
@@ -36,23 +33,16 @@ def test_add_container_to_deck(robot):
 def test_calibrate_plate(robot, tmpdir):
     # Load container | Test positions of container and wells
     plate = containers_load(robot, '96-flat', 'A1')
-    assert approx(robot.pose_tracker[plate].position) == 45
-    assert approx(robot.pose_tracker[plate].position) ==\
-        approx((21.24, 24.34, 0.0))
-    assert approx(robot.pose_tracker[plate[2]].position) ==\
-        approx((39.24, 24.34, 10.5))
-    assert approx(robot.pose_tracker[plate[5]].position) == \
-        approx((66.24, 24.34, 10.5))
-    # Calibrate container with delta | Test is position was correctly adjusted
+    assert robot.pose_tracker[plate].position == Vector(21.24, 24.34, 0.0)
+    assert robot.pose_tracker[plate[2]].position == Vector(39.24, 24.34, 10.5)
+    assert robot.pose_tracker[plate[5]].position == Vector(66.24, 24.34, 10.5)
+
     cf.calibrate_container_with_delta(
         plate, robot.pose_tracker, 1, 3, 4, True
     )
-    assert approx(robot.pose_tracker[plate].position) ==\
-        approx((22.24, 27.34, 4.0))
-    assert approx(robot.pose_tracker[plate[2]].position) ==\
-        approx((40.24, 27.34, 14.5))
-    assert approx(robot.pose_tracker[plate[5]].position) ==\
-        approx((67.24, 27.34, 14.5))
+    assert robot.pose_tracker[plate].position == Vector(22.24, 27.34, 4.0)
+    assert robot.pose_tracker[plate[2]].position == Vector(40.24, 27.34, 14.5)
+    assert robot.pose_tracker[plate[5]].position == Vector(67.24, 27.34, 14.5)
 
 
 def test_add_pipette(robot):
@@ -64,9 +54,8 @@ def test_pipette_movement(robot):
     p200 = Pipette(robot, 'a')
     plate = containers_load(robot, '96-flat', 'A1')
     p200.move_to(plate[2])
-    assert approx(robot.pose_tracker[p200].position) == approx(
-        (39.24, 24.34, 10.5)
-    )
+    assert robot.pose_tracker[p200].position == Vector(39.24, 24.34, 10.5)
+
 
 
 def test_max_z(robot):
@@ -165,4 +154,4 @@ def test_faulty_access(pos_tracker):
 def test_relative_object_position(plate, p200, robot):
     robot.move_head(x=10, y=30, z=10)
     rel_pos = robot.pose_tracker.relative_object_position(p200, plate)
-    assert approx(rel_pos) == approx((-11.24, 5.66, 10))
+    assert rel_pos == Vector(-11.24, 5.66, 10)
