@@ -4,7 +4,7 @@ from opentrons.server import rpc
 
 # Setting root to None tells session to use session_manager as root
 @pytest.mark.parametrize('root', [None])
-async def test_notifications(session, session_manager, protocol, root):
+async def test_notifications(session, session_manager, protocol, root, connect):  # noqa
     root = session_manager
 
     await session.socket.receive_json()  # Skip init
@@ -28,10 +28,16 @@ async def test_notifications(session, session_manager, protocol, root):
     )
     await session.socket.receive_json()  # Skip ack
 
-    responses = []
+    # Crate another connection to use throughout the test
+    socket = await connect()
+    # Receive control message
+    res = await socket.receive_json()
+    assert res['$']['type'] == rpc.CONTROL_MESSAGE
 
+    responses = []
     while True:
-        res = await session.socket.receive_json()
+        # NOTE: we are using a second socket from here onwards
+        res = await socket.receive_json()
         if (res['$']['type'] == rpc.CALL_RESULT_MESSAGE):
             break
         responses.append(res)
@@ -45,8 +51,8 @@ async def test_notifications(session, session_manager, protocol, root):
         args=[]
     )
 
-    await session.socket.receive_json()  # Skip ack
-    res = await session.socket.receive_json()
+    await socket.receive_json()  # Skip ack
+    res = await socket.receive_json()
 
     assert len(res['data']['v']['command_log']['v']) == 105
     responses = [

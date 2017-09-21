@@ -85,8 +85,8 @@ class Server(object):
                     continue
 
                 # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
-                await client.drain()
-                client.send_str(json.dumps(payload))
+                asyncio.ensure_future(
+                    asyncio.gather(client.drain(), client.send_json(payload)))
             except Exception as e:
                 log.warning('Websocket {0}: {1}'.format(id(client), str(e)))
 
@@ -128,11 +128,14 @@ class Server(object):
         await ws.prepare(request)
         self.clients.append(ws)
 
-        ws.send_json({
-            '$': {'type': CONTROL_MESSAGE},
-            'root': self.call_and_serialize(lambda: self.root),
-            'type': self.call_and_serialize(lambda: type(self.root))
-        })
+        try:
+            await ws.send_json({
+                '$': {'type': CONTROL_MESSAGE},
+                'root': self.call_and_serialize(lambda: self.root),
+                'type': self.call_and_serialize(lambda: type(self.root))
+            })
+        except Exception as e:
+            log.error('While sending control message: ', e)
 
         try:
             # Async receive ws data until websocket is closed
@@ -280,7 +283,7 @@ class Server(object):
                     'Attempted to send into a closed socket {0}'
                     .format(client))
                 continue
-            log.info('Enqueuing {0} for {1}'.format(payload, client))
+            log.info('Enqueuing {0} for {1}'.format(id(payload), client))
             asyncio.run_coroutine_threadsafe(
                 self.send_queue.put((client, payload)), self.loop)
 
