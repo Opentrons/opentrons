@@ -91,7 +91,7 @@ export const actions = {
   },
 
   cancel () {
-    return {type: actionTypes.CANCEL}
+    return makeRobotAction({type: actionTypes.CANCEL})
   },
 
   cancelResponse (error) {
