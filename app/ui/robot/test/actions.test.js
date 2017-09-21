@@ -145,7 +145,10 @@ describe('robot actions', () => {
   })
 
   test('cancel action', () => {
-    const expected = {type: actionTypes.CANCEL}
+    const expected = {
+      type: actionTypes.CANCEL,
+      meta: {robotCommand: true}
+    }
 
     expect(actions.cancel()).toEqual(expected)
   })

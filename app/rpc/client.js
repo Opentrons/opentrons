@@ -20,10 +20,10 @@ let _uniqueId = 0
 const uuid = () => `id-${_uniqueId++}`
 
 // timeouts
-const HANDSHAKE_TIMEOUT = 10000
-const RECEIVE_CONTROL_TIMEOUT = 10000
-const CLOSE_TIMEOUT = 10000
-const CALL_ACK_TIMEOUT = 10000
+const HANDSHAKE_TIMEOUT = 5000
+const RECEIVE_CONTROL_TIMEOUT = 3000
+const CLOSE_TIMEOUT = 1000
+const CALL_ACK_TIMEOUT = 3000
 const CALL_RESULT_TIMEOUT = 240000
 
 // metadata constants
