@@ -7,7 +7,6 @@ from opentrons.instruments import Pipette
 from opentrons.util.vector import Vector
 
 
-
 EXPECTED_CONTAINER_OFFSETS = {
     'tube-rack-5ml-96': (0.00, 0.00, 0.00),
     'wheaton_vial_rack': (9.00, 9.00, 0.00),

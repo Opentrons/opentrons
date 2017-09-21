@@ -42,6 +42,7 @@ def test_containers_create(robot):
     database.delete_container(container_name)
     assert container_name not in containers_list()
 
+
 class ContainerTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()

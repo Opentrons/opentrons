@@ -57,7 +57,6 @@ def test_pipette_movement(robot):
     assert robot.pose_tracker[p200].position == Vector(39.24, 24.34, 10.5)
 
 
-
 def test_max_z(robot):
     containers_load(robot, '96-flat', 'A1')
     deck = robot._deck
