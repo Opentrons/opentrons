@@ -186,18 +186,21 @@ describe('robot selectors', () => {
           description: 'foo',
           handledAt: '2017-08-30T12:00:00Z',
           isCurrent: true,
+          isLast: false,
           children: [
             {
               id: 1,
               description: 'bar',
               handledAt: '2017-08-30T12:00:01Z',
               isCurrent: true,
+              isLast: false,
               children: [
                 {
                   id: 2,
                   description: 'baz',
                   handledAt: '2017-08-30T12:00:02Z',
                   isCurrent: true,
+                  isLast: true,
                   children: []
                 },
                 {
@@ -205,6 +208,7 @@ describe('robot selectors', () => {
                   description: 'qux',
                   handledAt: '',
                   isCurrent: false,
+                  isLast: false,
                   children: []
                 }
               ]
@@ -216,6 +220,7 @@ describe('robot selectors', () => {
           description: 'fizzbuzz',
           handledAt: '',
           isCurrent: false,
+          isLast: false,
           children: []
         }
       ])

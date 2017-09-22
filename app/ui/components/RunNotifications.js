@@ -20,7 +20,7 @@ function ErrorNotification (props) {
 
 function RunningNotification (props) {
   return (
-    <div>
+    <div className={styles.tip_wrapper}>
       <div className={styles.tip}>Tip</div>
       <div className={styles.tip_text}>Your protocol is now running. You may unplug your computer from the robot and reconnect later without affecting the job.</div>
     </div>
@@ -48,6 +48,8 @@ export default function RunNotifications (props) {
     notification = <PausedNotification />
   } else if (isRunning) {
     notification = <RunningNotification />
+  } else {
+    notification = <div className={styles.no_notification} />
   }
 
   return notification

@@ -1,3 +1,11 @@
+.no_notification {
+  height: 50px;
+}
+
+.tip_wrapper {
+  height: 50px;
+}
+
 .tip {
   display: inline-block;
   margin-left: 1rem;
@@ -23,7 +31,8 @@
 
 .notification_wrapper {
   display: grid;
-  height: 2rem;
+  margin: 7px 0;
+  height: 36px;
   padding: 0 1rem;
   line-height: 2rem;
   grid-template-columns: 2.1rem auto;

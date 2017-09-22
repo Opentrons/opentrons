@@ -9,21 +9,47 @@ export default class RunLog extends Component {
   }
 
   render () {
-    const { style, commands } = this.props
-    const commandItems = commands.map((command) => {
-      const {id, isCurrent, description} = command
-      const props = {
-        key: id,
-        className: classnames({[styles.current]: isCurrent})
-      }
-      // TODO: add ability to turn autoscroll on and off
-      if (isCurrent) props.ref = 'ensureVisible'
+    const {style, commands} = this.props
+    const makeCommandToTemplateMapper = (depth) => (command) => {
+      const {id, isCurrent, isLast, description, children, handledAt} = command
+      const style = [styles[`indent-${depth}`]]
+      const contents = [
+        <p className={style}>[{id}] : {description}</p>
+      ]
 
-      return (<p {...props}>[{id}] : {description}</p>)
-    })
+      if (children.length) {
+        contents.push(
+          <ol>
+            {children.map(makeCommandToTemplateMapper(depth + 1))}
+          </ol>
+        )
+      }
+
+      const liProps = {
+        key: id,
+        className: classnames(style, {
+          [styles.executed]: handledAt,
+          [styles.current]: isCurrent,
+          [styles.last_current]: isLast
+        })
+      }
+
+      if (isLast) liProps.ref = 'ensureVisible'
+
+      return (
+        <li {...liProps}>
+          {contents}
+        </li>
+      )
+    }
+
+    const commandItems = commands.map(makeCommandToTemplateMapper(0))
+
     return (
       <section className={classnames(style, styles.run_log_wrapper)}>
-        {commandItems}
+        <ol>
+          {commandItems}
+        </ol>
       </section>
     )
   }

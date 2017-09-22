@@ -113,9 +113,10 @@ export const selectors = {
           command.handledAt &&
           (!next || !next.handledAt)
         ) || false
+        const isLast = isCurrent && !command.children.length
         const children = command.children.map(idToCommandList(isCurrent))
 
-        return {...command, children, isCurrent}
+        return {...command, children, isCurrent, isLast}
       }
     }
   },
