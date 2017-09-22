@@ -10,8 +10,7 @@ RUN apt-get update
 RUN apt-get install gcc make git g++
 
 
-RUN pip install -r requirements.txt
-RUN pip install -r pyserial
+RUN pip install -r ./requirements.txt
 
 WORKDIR /usr/src/api
 
@@ -19,6 +18,7 @@ COPY ./api ./
 
 COPY data-user_storage.mount /etc/systemd/system/
 RUN systemctl enable data-user_storage.mount
+
 
 ENV INITSYSTEM on
 

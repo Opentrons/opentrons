@@ -1,4 +1,5 @@
 pylama
+pysrial
 pytest
 pytest-cov
 pytest-aiohttp
