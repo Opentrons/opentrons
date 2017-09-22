@@ -22,4 +22,4 @@ RUN systemctl enable data-user_storage.mount
 
 ENV INITSYSTEM on
 
-CMD ["python api/opentrons/server/main.py '0.0.0.0':8080"]
+CMD ["python api/opentrons/server/main.py"]
