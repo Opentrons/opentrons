@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from opentrons import server, robot
-from status_light import send_status
 import os
 from serial import SerialException
 
