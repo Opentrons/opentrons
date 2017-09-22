@@ -2,19 +2,16 @@
 # see more about dockerfile templates here:http://docs.resin.io/pages/deployment/docker-templates
 FROM resin/raspberrypi3-python:3.5-slim-20170705 
 
-WORKDIR /usr/src/api
+WORKDIR /usr/src
 
 
 COPY ./api/requirements.txt ./requirements.txt 
 RUN apt-get update
 RUN apt-get install gcc make git g++
 
-
 RUN pip install -r ./requirements.txt
 
-WORKDIR /usr/src/api
-
-COPY ./api ./
+COPY ./api ./api
 
 COPY data-user_storage.mount /etc/systemd/system/
 RUN systemctl enable data-user_storage.mount
@@ -22,4 +19,4 @@ RUN systemctl enable data-user_storage.mount
 
 ENV INITSYSTEM on
 
-CMD ["python api/opentrons/server/main.py"]
+CMD ["python ./api/opentrons/server/main.py '0.0.0.0':8080"]
