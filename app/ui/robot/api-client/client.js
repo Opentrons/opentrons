@@ -5,7 +5,6 @@ import {actions, actionTypes} from '../actions'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
-// const URL = 'ws://238d593.local:31950'
 const RUN_TIME_TICK_INTERVAL_MS = 200
 
 export default function client (dispatch) {

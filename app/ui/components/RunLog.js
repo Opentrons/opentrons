@@ -14,7 +14,7 @@ export default class RunLog extends Component {
       const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
       const contents = [
-        <p className={style} data-timestamp={handledAt}>[{id}] : {description}</p>
+        <p className={style}>[{id}] : {description}</p>
       ]
 
       if (children.length) {
@@ -25,7 +25,14 @@ export default class RunLog extends Component {
         )
       }
 
-      const liProps = {key: id, className: classnames({[styles.executed]: handledAt, [styles.current]: isCurrent, [styles.last_current]: isLast}, style)}
+      const liProps = {
+        key: id,
+        className: classnames(style, {
+          [styles.executed]: handledAt,
+          [styles.current]: isCurrent,
+          [styles.last_current]: isLast
+        })
+      }
 
       if (isLast) liProps.ref = 'ensureVisible'
 
