@@ -1,5 +1,4 @@
 // robot reducer
-import path from 'path'
 import padStart from 'lodash/padStart'
 import {actionTypes} from './actions'
 import NAME from './name'
@@ -180,7 +179,7 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.SESSION:
       return handleRequest(state, 'sessionRequest', payload, error, {
-        sessionName: path.basename(payload.file.name)
+        sessionName: payload.file.name
       })
 
     case actionTypes.SESSION_RESPONSE:
