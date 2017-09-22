@@ -4,8 +4,8 @@ from opentrons import server, robot
 import os
 from serial import SerialException
 
-def send_status(msg):
-    print('BOOT STATUS MSG: ', msg)
+def send_status(msg, status= "INFO"):
+    print('BOOT {}: {}'.format(status, msg))
 
 def connect_to_smoothie():
     if os.path.exists('/dev/ttyACM0'):
@@ -51,6 +51,16 @@ if __name__ == '__main__':
             send_status({'SERVER_ONLINE': True})
             print("server message: {}".format(server.start('0.0.0.0')))
             send_status({'SERVER_ONLINE': False})
+        else:
+            send_status({'SMOOTHIE_CONNECTED': False})
+            send_status({'SERVER_ONLINE': True})
+            send_status(
+                {'STARTING_OPENTRONS API WITHOUT SMOOTHIE CONNECTION': True},
+                'WARNING'
+            )
+            print("server message: {}".format(server.start('0.0.0.0')))
+            send_status({'SERVER_ONLINE': False})
+
         print("[SERVER SHUTDOWN] Server node terminated")
 
     # The server above should run indefinitely
