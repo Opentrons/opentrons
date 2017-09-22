@@ -18,5 +18,5 @@ RUN systemctl enable data-user_storage.mount
 
 
 ENV INITSYSTEM on
-
+RUN echo $PWD
 CMD ["python ./api/opentrons/server/main.py '0.0.0.0':8080"]
