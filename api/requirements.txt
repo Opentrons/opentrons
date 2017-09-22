@@ -1,5 +1,5 @@
 pylama
-pysrial
+pysrial==3.2.1
 pytest
 pytest-cov
 pytest-aiohttp
