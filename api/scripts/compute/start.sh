@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+cd /usr/src/api
 
 echo "[BOOT] Starting server"
-cd /usr/src/api
-python /usr/src/api/opentrons/server/main.py
+python /usr/src/api/opentrons/server/main.py '0.0.0.0':8080
 
