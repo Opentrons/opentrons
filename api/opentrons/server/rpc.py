@@ -37,7 +37,6 @@ class Server(object):
         self.executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
         self.clients = {}
-
         self.tasks = []
 
         self.app = web.Application()
@@ -122,6 +121,7 @@ class Server(object):
         """
 
         def task_done(future):
+            self.tasks.remove(future)
             exception = future.exception()
             if exception:
                 log.warning(
@@ -135,6 +135,9 @@ class Server(object):
 
         # upgrade to Websockets
         await client.prepare(request)
+
+        log.info('Tasks: {0}'.format(self.tasks))
+        log.info('Clients: {0}'.format(self.clients))
 
         try:
             log.debug('Sending root info to {0}'.format(client_id))
@@ -160,7 +163,7 @@ class Server(object):
                 'While reading from socket: {0}'
                 .format(traceback.format_exc()))
         finally:
-            log.info('Closing WebSocket {0}'.format(client_id))
+            log.info('Closing WebSocket {0}'.format(id(client)))
             client.close()
             del self.clients[client]
 
@@ -243,6 +246,8 @@ class Server(object):
                 log.error(
                     'WebSocket connection closed unexpectedly: {0}'.format(
                         message))
+            else:
+                log.warning('Unhanled WSMsgType: {0}'.format(message.type))
         except Exception as e:
             log.error('While processing request: {0}'.format(str(e)))
 
@@ -266,7 +271,7 @@ class Server(object):
             response['$']['status'] = 'error'
             call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
         finally:
-            log.info('Call result: {0}'.format(call_result))
+            log.debug('Call result: {0}'.format(call_result))
             response['data'] = call_result
         return response
 
@@ -290,7 +295,7 @@ class Server(object):
     def send(self, payload):
         for socket, value in self.clients.items():
             task, queue = value
-            log.info('Enqueuing {0} for {1}'.format(id(payload), id(socket)))
+            log.debug('Enqueuing {0} for {1}'.format(id(payload), id(socket)))
             asyncio.run_coroutine_threadsafe(queue.put(payload), self.loop)
 
 

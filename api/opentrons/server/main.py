@@ -60,7 +60,7 @@ def log_init():
             },
             'opentrons.server': {
                 'handlers': ['debug'],
-                'level': logging.DEBUG
+                'level': logging.INFO
             },
         }
     )
