@@ -1,5 +1,5 @@
-# base-image for python on any machine using a template variable,
-# see more about dockerfile templates here:http://docs.resin.io/pages/deployment/docker-templates
+# for more info about working with resin docker templates:
+# here:http://d cs.resin.io/pages/deployment/docker-templates
 FROM resin/raspberrypi3-python:3.5-slim-20170705 
 
 WORKDIR /usr/src
