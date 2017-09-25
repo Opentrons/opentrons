@@ -1,4 +1,3 @@
-import os
 import time
 
 import serial
@@ -59,7 +58,7 @@ def connect_to_robot():
         robot_write('G0F120000 M203.1 X500 Y300 Z70 A70 B40 C40')
         # steps/mm
         robot_write('M92 X160 Y160 Z800 A800 B767.38 C767.38 M52 M54')
-    except:
+    except Error:
         raise RuntimeError('Please connect to robot USB')
 
 
