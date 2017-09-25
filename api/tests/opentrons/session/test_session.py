@@ -4,6 +4,39 @@ import pytest
 from datetime import datetime
 from opentrons.broker import publish
 from opentrons.session import Session
+from opentrons.session import accumulate, get_labware
+
+
+@pytest.fixture
+def labware_setup():
+    from opentrons import containers, instruments
+
+    tip_racks = \
+        [containers.load('tiprack-200ul', slot) for slot in ['A1', 'A2']]
+    plates = \
+        [containers.load('96-PCR-flat', slot) for slot in ['B1', 'B2']]
+
+    p100 = instruments.Pipette(
+        name='p100', axis='a', channels=8, tip_racks=tip_racks)
+
+    p1000 = instruments.Pipette(
+        name='p1000', axis='a', channels=8, tip_racks=tip_racks)
+
+    commands = [
+        {
+            'location': plates[0][0],
+            'instrument': p100
+        },
+        {
+            'location': plates[1]
+        },
+        {
+            'locations': [plates[1], plates[0][0]],
+            'instrument': p1000
+        }
+    ]
+
+    return (p100, p1000), tip_racks, plates, commands
 
 
 async def test_load_from_text(session_manager, protocol):
@@ -124,3 +157,87 @@ def test_error_append(run_session):
         {'error': foo},
         {'error': bar}
     ]
+
+
+def test_get_instruments_and_containers(labware_setup):
+    def get_item_id(item):
+        return item['id']
+
+    instruments, tip_racks, plates, commands = labware_setup
+    p100, p1000 = instruments
+
+    instruments, containers, interactions = \
+        accumulate([get_labware(command) for command in commands])
+
+    session = Session(name='', text='')
+    session._instruments.update(set(instruments))
+    session._containers.update(set(containers))
+    session._interactions.update(set(interactions))
+
+    assert \
+        sorted(session.get_instruments(), key=get_item_id) == \
+        sorted([{
+            'tip_racks': tip_racks,
+            'name': 'p100',
+            'channels': 8,
+            'containers': {id(plates[0])},
+            'id': id(p100)
+        }, {
+            'tip_racks': tip_racks,
+            'name': 'p1000',
+            'channels': 8,
+            'containers': {id(plates[1]), id(plates[0])},
+            'id': id(p1000)
+        }], key=get_item_id)
+
+    assert \
+        sorted(session.get_containers(), key=get_item_id) == \
+        sorted([{
+            'id': id(plates[0]),
+            'name': '96-PCR-flat',
+            'instruments': {id(p100), id(p1000)},
+            'type': '96-PCR-flat',
+            'slot': 'B1'
+        }, {
+            'id': id(plates[1]),
+            'name': '96-PCR-flat',
+            'instruments': {id(p1000)},
+            'type': '96-PCR-flat',
+            'slot': 'B2'
+        }], key=get_item_id)
+
+
+def test_accumulate():
+    res = \
+        accumulate([
+            (['a'], ['d'], ['g', 'h']),
+            (['b', 'c'], ['e', 'f'], ['i'])
+        ])
+
+    assert res == (['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i'])
+    assert accumulate([]) == ([], [], [])
+
+
+def test_get_labware(labware_setup):
+    instruments, tip_racks, plates, commands = labware_setup
+    p100, p1000 = instruments
+
+    assert get_labware(commands[0]) == \
+        ([p100], [plates[0]], [(p100, plates[0])])
+
+    assert get_labware(commands[1]) == \
+        ([], [plates[1]], [])
+
+    assert get_labware(commands[2]) == \
+        ([p1000],
+         [plates[1], plates[0]],
+         [(p1000, plates[1]), (p1000, plates[0])])
+
+    res = accumulate([get_labware(command) for command in commands])
+
+    assert [set(item) for item in res] == \
+        [
+            {p1000, p100},
+            {plates[0], plates[1]},
+            {(p1000, plates[1]), (p1000, plates[0]), (p100, plates[0])}
+        ]

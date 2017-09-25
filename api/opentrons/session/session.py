@@ -1,16 +1,16 @@
 import ast
+from functools import reduce
 
 from opentrons.commands import tree
 from opentrons import robot
 from opentrons.robot.robot import Robot
 from datetime import datetime
-
+from opentrons.containers import get_container, Container
 from opentrons.broker import publish, subscribe, Notifications
 from opentrons.commands import types
 
 
-VALID_STATES = set(
-    ['loaded', 'running', 'finished', 'stopped', 'paused'])
+VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 SESSION_TOPIC = 'session'
 
 
@@ -67,11 +67,48 @@ class Session(object):
         self.command_log = {}
         self.errors = []
 
+        self._containers = set()
+        self._instruments = set()
+        self._interactions = set()
+
         try:
             self.refresh()
         except Exception as e:
             self.close()
             raise e
+
+    def get_instruments(self):
+        return [
+            {
+                'id': id(instrument),
+                'name': instrument.name,
+                'channels': instrument.channels,
+                'tip_racks': instrument.tip_racks,
+                'containers': {
+                    id(container)
+                    for _instrument, container in
+                    self._interactions
+                    if _instrument == instrument}
+            }
+            for instrument in self._instruments
+        ]
+
+    def get_containers(self):
+        return [
+            {
+                'id': id(container),
+                'name': container.get_name(),
+                'type': container.get_type(),
+                'slot': container.parent.get_name(),
+                'instruments': {
+                    id(instrument)
+                    for instrument, _container in
+                    self._interactions
+                    if _container == container
+                }
+            }
+            for container in self._containers
+        ]
 
     def on_command(self, message):
         if message['$'] == 'before':
@@ -93,6 +130,11 @@ class Session(object):
     def _simulate(self):
         stack = []
         res = []
+        commands = []
+
+        self._containers.clear()
+        self._instruments.clear()
+        self._interactions.clear()
 
         def on_command(message):
             payload = message['payload']
@@ -101,6 +143,8 @@ class Session(object):
             )
 
             if message['$'] == 'before':
+                commands.append(payload)
+
                 res.append(
                     {
                         'level': len(stack),
@@ -116,6 +160,14 @@ class Session(object):
             self.run()
         finally:
             unsubscribe()
+
+            # Accumulate containers, instruments, interactions from commands
+            containers, instruments, interactions = accumulate(
+                [get_labware(command) for command in commands])
+
+            self._containers.update(containers)
+            self._instruments.update(instruments)
+            self._interactions.update(interactions)
 
         return res
 
@@ -208,3 +260,36 @@ class Session(object):
 
     def _on_state_changed(self):
         publish(SESSION_TOPIC, self._snapshot())
+
+
+def accumulate(iterable):
+    return reduce(
+        lambda x, y: tuple([x + y for x, y in zip(x, y)]),
+        iterable,
+        ([], [], []))
+
+
+def get_labware(command):
+    containers = []
+    instruments = []
+    interactions = []
+
+    location = command.get('location')
+    instrument = command.get('instrument')
+    locations = command.get('locations')
+
+    if location:
+        containers.append(get_container(location))
+
+    if locations:
+        containers.extend(
+            [get_container(location) for location in locations])
+
+    containers = [c for c in containers if c is not None]
+
+    if instrument:
+        instruments.append(instrument)
+        interactions.extend(
+            [(instrument, container) for container in containers])
+
+    return instruments, containers, interactions

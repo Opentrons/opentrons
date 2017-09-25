@@ -28,6 +28,14 @@ def unpack_location(location):
     return (placeable, Vector(coordinates))
 
 
+def get_container(location):
+    obj, _ = unpack_location(location)
+    if isinstance(obj, Container):
+        return obj
+    if isinstance(obj.parent, Container):
+        return obj.parent
+
+
 def humanize_location(location):
     well, _ = unpack_location(location)
     return repr(well)

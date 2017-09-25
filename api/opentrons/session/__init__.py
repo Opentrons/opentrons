@@ -1,6 +1,8 @@
-from .session import Session, SessionManager
+from .session import *
 
 __all__ = [
     Session,
-    SessionManager
+    SessionManager,
+    accumulate,
+    get_labware
 ]

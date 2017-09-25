@@ -9,7 +9,8 @@ from opentrons.containers.placeable import (
     Container,
     Well,
     WellSeries,
-    unpack_location
+    unpack_location,
+    get_container
 )
 from opentrons.containers.calibrator import apply_calibration
 from opentrons.util import environment
@@ -21,7 +22,8 @@ __all__ = [
     Well,
     WellSeries,
     unpack_location,
-    apply_calibration]
+    apply_calibration,
+    get_container]
 
 
 def load(robot, container_name, slot, label=None, share=False):
