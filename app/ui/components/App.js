@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Route} from 'react-router'
 
 import Nav from '../containers/Nav'
 
@@ -47,13 +48,16 @@ export default function App (props) {
   return (
     <div className={grid.wrapper}>
       <Nav />
-      <main className={grid.task}>
-        <header className={grid.header}>
-          {runButton}
-        </header>
-        {runControl}
-        {runLog}
-      </main>
+      // TODO(mc, 2017-09-25): replace render prop with component prop per page
+      <Route exact path='/' render={() => (
+        <main className={grid.task}>
+          <header className={grid.header}>
+            {runButton}
+          </header>
+          {runControl}
+          {runLog}
+        </main>
+      )} />
     </div>
   )
 }

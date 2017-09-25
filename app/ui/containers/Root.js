@@ -1,6 +1,7 @@
 // top-level container
 import React from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
 import {
   actions as interfaceActions,
@@ -60,4 +61,4 @@ function Root (props) {
   )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Root)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Root))
