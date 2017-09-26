@@ -35,8 +35,8 @@ const SetupPanel = props => {
   return (
     <div className={styles.nav_panel}>
       <section className={styles.links}>
-        <Link to='/setup/instruments'>Set Up Pipettes</Link>
-        <Link to='/setup/labware'>Set Up Labware</Link>
+        <Link to='/setup-instruments'>Set Up Pipettes</Link>
+        <Link to='/setup-deck'>Set Up Labware</Link>
         <Link to='/run'>Run</Link>
       </section>
     </div>

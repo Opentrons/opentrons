@@ -45,7 +45,6 @@ const mapDispatchToProps = (dispatch) => {
     // interface
     onNavClick: () => dispatch(interfaceActions.toggleNavPanel()),
     onNavIconClick: (panel) => () => {
-      console.log(`${panel} clicked`)
       dispatch(interfaceActions.setCurrentNavPanel(panel))
     },
 

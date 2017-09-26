@@ -1,8 +1,11 @@
 import React from 'react'
-import {Route} from 'react-router'
+import {Switch, Route} from 'react-router'
 
 import Nav from '../containers/Nav'
-import ConnectedRunControl from '../containers/ConnectedRunControl'
+
+import Run from '../pages/Run'
+import SetupInstruments from '../pages/SetupInstruments'
+import SetupDeck from '../pages/SetupDeck'
 
 import grid from './Grid.css'
 
@@ -10,9 +13,11 @@ export default function App () {
   return (
     <div className={grid.wrapper}>
       <Nav />
-      <div className={grid.task}>
-        <Route path='/run' component={ConnectedRunControl} />
-      </div>
+      <Switch>
+        <Route path='/run' component={Run} />
+        <Route path='/setup-instruments/:side?' component={SetupInstruments} />
+        <Route path='/setup-deck' component={SetupDeck} />
+      </Switch>
     </div>
   )
 }

@@ -9,9 +9,8 @@ function NavLink (props) {
   const {name, iconSrc, onClick, isDisabled} = props
 
   return (
-    <li>
+    <li key={name}>
       <button
-        key={name}
         onClick={onClick}
         disabled={isDisabled}
         className={styles.nav_icon}
