@@ -1,15 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styles from './RunControl.css'
 import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
+
+import grid from './Grid.css'
+import styles from './RunControl.css'
 
 export default function RunControl (props) {
   const {
     isRunning,
     isPaused,
     errors,
-    style,
     sessionName,
     startTime,
     runTime,
@@ -39,7 +40,7 @@ export default function RunControl (props) {
   )
 
   return (
-    <section className={style}>
+    <section className={grid.controls}>
       <div className={styles.btn_wrapper}>
         <div className={styles.file_info}>
           FILE NAME: {sessionName}

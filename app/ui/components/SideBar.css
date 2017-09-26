@@ -13,6 +13,15 @@
     'connect' 75px;
 }
 
+.nav_icon_list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.nav_icon_list li {
+  display: block;
+}
+
 .nav_info {
   grid-area: info;
   position: relative;
@@ -29,14 +38,19 @@
   z-index: 100;
 }
 
-.upload_icon,
-.design_icon,
-.setup_icon {
+.nav_icon {
+  background-color: inherit;
   border-bottom: solid 2px rgba(151, 151, 151, 0.1);
   text-align: center;
   height: 75px;
   transition: all 100 linear;
   cursor: pointer;
+  padding: 1rem;
+}
+
+.nav_icon[disabled] {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .upload_icon img {

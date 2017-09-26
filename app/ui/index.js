@@ -26,7 +26,7 @@ import {
 } from './robot'
 
 // components
-import Root from './containers/Root'
+import App from './components/App'
 
 const reducer = combineReducers({
   [INTERFACE_NAME]: interfaceReducer,
@@ -45,14 +45,12 @@ const middleware = applyMiddleware(
 
 const store = createStore(reducer, middleware)
 
-// TODO(mc, 2017-09-25): Once other containers take over root, this should
-// be changed to renderApp instead
-const renderRoot = () => ReactDom.render(
+const renderApp = () => ReactDom.render(
   (
     <AppContainer>
       <Provider store={store}>
         <ConnectedRouter history={history}>
-          <Root />
+          <App />
         </ConnectedRouter>
       </Provider>
     </AppContainer>
@@ -61,11 +59,11 @@ const renderRoot = () => ReactDom.render(
 )
 
 if (module.hot) {
-  module.hot.accept('./containers/Root', renderRoot)
+  module.hot.accept('./components/App', renderApp)
 }
 
 if (process.env.NODE_ENV === 'development') {
   global.store = store
 }
 
-renderRoot()
+renderApp()
