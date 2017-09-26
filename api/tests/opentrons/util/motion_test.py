@@ -44,22 +44,20 @@ def robot_write(data):
 
 def connect_to_robot():
     global robot_port
-    try:
-        print('Connecting to robot...')
-        robot_port = serial.Serial(
-            port=robot_portname, baudrate=robot_baud)
-        robot_write('')
-        robot_write('M999')
-        # current
-        robot_write('M907 X1.5 Y1.5 Z0.7 A0.7 B0.2 C0.2')
-        # acceleration
-        robot_write('M204 S5000 X2500 Y2000 Z2000 A2000 B2000 C2000')
-        # speeds
-        robot_write('G0F120000 M203.1 X500 Y300 Z70 A70 B40 C40')
-        # steps/mm
-        robot_write('M92 X160 Y160 Z800 A800 B767.38 C767.38 M52 M54')
-    except Error:
-        raise RuntimeError('Please connect to robot USB')
+    print('Connecting to robot...')
+    robot_port = serial.Serial(
+        port=robot_portname, baudrate=robot_baud)
+    robot_write('')
+    robot_write('M999')
+    # current
+    robot_write('M907 X1.5 Y1.5 Z0.7 A0.7 B0.2 C0.2')
+    # acceleration
+    robot_write('M204 S5000 X2500 Y2000 Z2000 A2000 B2000 C2000')
+    # speeds
+    robot_write('G0F120000 M203.1 X500 Y300 Z70 A70 B40 C40')
+    # steps/mm
+    robot_write('M92 X160 Y160 Z800 A800 B767.38 C767.38 M52 M54')
+    raise RuntimeError('Please connect to robot USB')
 
 
 def home(axis=''):
