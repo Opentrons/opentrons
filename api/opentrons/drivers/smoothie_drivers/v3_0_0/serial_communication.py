@@ -6,6 +6,10 @@ DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 SMOOTHIE_BOARD_NAME = 'FT232R'
+
+ERROR_KEYWORD = b'error'
+ALARM_KEYWORD = b'ALARM'
+
 BAUDRATE = 14400
 
 
@@ -30,11 +34,14 @@ def serial_with_temp_timeout(serial_connection, timeout):
 
 
 def _parse_smoothie_response(response):
-    if 'ALARM' in
+    if ERROR_KEYWORD in response or ALARM_KEYWORD in response:
+        print("[SMOOTHIE ISSUE]: ", response)
+
     if DRIVER_ACK in response:
-        return response
+        parsed_response = response.split(DRIVER_ACK)[0]
+        return parsed_response
     else:
-        return ''
+        return None
 
 def clear_buffer(serial_connection):
     serial_connection.reset_input_buffer()
@@ -48,8 +55,10 @@ def _write_to_device_and_return(cmd, device_connection):
     # print("writing to smoothie: {}".format(command.encode()))
     device_connection.write(command.encode())
     response = device_connection.read_until(DRIVER_ACK)
+    print('RESPONSE: ', response)
+
     clean_response = _parse_smoothie_response(response)
-    return clean_response
+    return clean_response.decode()
 
 
 def _connect(port_name, baudrate):
@@ -60,7 +69,7 @@ def _attempt_command_recovery(command, serial_conn):
     '''Recovery after following a failed write_and_return() atempt'''
     with serial_with_temp_timeout(serial_conn, RECOVERY_TIMEOUT) as device:
        response =  _write_to_device_and_return(command, device)
-    if not response:
+    if response is None:
         raise RuntimeError(
             "Recovery attempted - no valid smoothie response "
             "for command: {} in {} seconds".format(command, RECOVERY_TIMEOUT))
@@ -72,7 +81,7 @@ def write_and_return(command, serial_connection, timeout=None):
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(serial_connection, timeout) as device_connection:
         response = _write_to_device_and_return(command, device_connection)
-    if not response: # this could be more robust - maybe a `try` `except`?
+    if response is None: # this could be more robust - maybe a `try` `except`?
         response = _attempt_command_recovery(command, serial_connection)
     return response
 
