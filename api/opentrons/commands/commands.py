@@ -26,6 +26,7 @@ def home(axis):
 
 
 def aspirate(volume, location, rate, self):
+    instrument = self
     location = drop_coodrinates(location)
     text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
         volume=volume, location=location, rate=rate
@@ -33,7 +34,7 @@ def aspirate(volume, location, rate, self):
     return make_command(
         name=types.ASPIRATE,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'volume': volume,
             'location': location,
             'rate': rate,
@@ -43,6 +44,7 @@ def aspirate(volume, location, rate, self):
 
 
 def dispense(volume, location, rate, self):
+    instrument = self
     location = drop_coodrinates(location)
     text = 'Dispensing {volume} uL into {location}'.format(
         volume=volume, location=location, rate=rate
@@ -51,7 +53,7 @@ def dispense(volume, location, rate, self):
     return make_command(
         name=types.DISPENSE,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'volume': volume,
             'location': location,
             'rate': rate,
@@ -61,6 +63,7 @@ def dispense(volume, location, rate, self):
 
 
 def consolidate(volume, source, dest, self):
+    instrument = self
     text = 'Consolidating {volume} from {source} to {dest}'.format(
         volume=volume,
         source=source,
@@ -69,7 +72,7 @@ def consolidate(volume, source, dest, self):
     return make_command(
         name=types.CONSOLIDATE,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'locations': [source, dest],
             'volume': volume,
             'source': source,
@@ -80,6 +83,7 @@ def consolidate(volume, source, dest, self):
 
 
 def distribute(volume, source, dest, self):
+    instrument = self
     text = 'Distributing {volume} from {source} to {dest}'.format(
         volume=volume,
         source=source,
@@ -88,7 +92,7 @@ def distribute(volume, source, dest, self):
     return make_command(
         name=types.DISTRIBUTE,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'locations': [source, dest],
             'volume': volume,
             'source': source,
@@ -99,6 +103,7 @@ def distribute(volume, source, dest, self):
 
 
 def transfer(volume, source, dest, self):
+    instrument = self
     text = 'Transferring {volume} from {source} to {dest}'.format(
         volume=volume,
         source=source,
@@ -107,7 +112,7 @@ def transfer(volume, source, dest, self):
     return make_command(
         name=types.TRANSFER,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'locations': [source, dest],
             'volume': volume,
             'source': source,
@@ -128,13 +133,14 @@ def comment(msg):
 
 
 def mix(repetitions, volume, location, self):
+    instrument = self
     text = 'Mixing {repetitions} times with a volume of {volume}ul'.format(
         repetitions=repetitions, volume=volume
     )
     return make_command(
         name=types.MIX,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'location': location,
             'volume': volume,
             'repetitions': repetitions,
@@ -144,6 +150,7 @@ def mix(repetitions, volume, location, self):
 
 
 def blow_out(location, self):
+    instrument = self
     location = drop_coodrinates(location)
     text = 'Blowing out'
 
@@ -153,7 +160,7 @@ def blow_out(location, self):
     return make_command(
         name=types.BLOW_OUT,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'location': location,
             'text': text
         }
@@ -161,11 +168,12 @@ def blow_out(location, self):
 
 
 def touch_tip(self):
+    instrument = self
     text = 'Touching tip'
     return make_command(
         name=types.TOUCH_TIP,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'text': text
         }
     )
@@ -192,12 +200,13 @@ def return_tip():
 
 
 def pick_up_tip(location, self):
+    instrument = self
     location = drop_coodrinates(location)
     text = 'Picking up tip {location}'.format(location=location)
     return make_command(
         name=types.PICK_UP_TIP,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'location': location,
             'text': text
         }
@@ -205,12 +214,13 @@ def pick_up_tip(location, self):
 
 
 def drop_tip(location, self):
+    instrument = self
     location = drop_coodrinates(location)
     text = 'Dropping tip {location}'.format(location=location)
     return make_command(
         name=types.DROP_TIP,
         payload={
-            'instrument': self,
+            'instrument': instrument,
             'location': location,
             'text': text
         }
