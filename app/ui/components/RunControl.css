@@ -1,14 +1,24 @@
 .btn_wrapper {
+  background-color: #777;
+  grid-area: header;
   display: grid;
-  grid-template-areas: "file  pause cancel";
-  grid-template-columns: auto 10rem 10rem;
+  height:75px;
+  grid-template-areas: "file  pause cancel run";
+  grid-template-columns: auto 10rem 10rem 10rem;
 }
 
 .file_info {
-  margin: 1rem;
+  margin-left: 1rem;
   grid-area: file;
   font-family: 'trons';
-  color: grey;
+  line-height: 75px;
+  color: white;
+}
+
+.btn_run {
+  composes: btn from './Util.css';
+  grid-area: run;
+  margin: 1rem;
 }
 
 .btn_pause {
@@ -23,10 +33,16 @@
   margin: 1rem;
 }
 
+
+.controls{
+  background-color: #EEE;
+}
+
+
 .progress {
   display: grid;
   grid-template:
-    "report . timer" 72px
+    "tip . timer" 75px
     "progress_bar progress_bar progress_bar" 35px;
   grid-template-columns: repeat(3 [cols] 1fr);
 }
