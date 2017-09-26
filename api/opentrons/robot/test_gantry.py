@@ -1,7 +1,7 @@
-from opentrons.robot import gantry
+from opentrons.robot import gantry, base
 from opentrons  import instruments
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
-
+from opentrons.trackers.pose_tracker import PoseTracker
 
 def avg(n1, n2):
     return (n1 + n2 / 2.0)
@@ -9,25 +9,22 @@ def avg(n1, n2):
 pip = instruments.Pipette('a', max_volume=200)
 driver = driver_3_0.SmoothieDriver_3_0_0()
 
-
+pose_tracker = PoseTracker()
 gant = gantry.Gantry(driver)
 gant.add_instrument('c', pip)
-print(pip.motor)
+base = base.Base(pose_tracker)
+frame_probe = base._probe
 
-
-
-probe_dimensions = {'length': 44, 'width': 35, 'height':63}
-probe_center = {'z': 227.0, 'c': 18.9997, 'b': 18.9997, 'a': 109.0, 'x': 267.748, 'y': 290.4987}
 probing_distance = 10
 switch_offset = 4  # because they're angled and have holes
 max_expected_tip_length = 90
-
+probe_height = 63
 
 #FIXME: Offset calculations should alraedy be reflected in switch_position
 def _probe_switch(axis, probing_distance, switch_position):
     switch_position[axis] -= probing_distance
 
-    safe_height = probe_dimensions['height'] + max_expected_tip_length
+    safe_height = probe_height + max_expected_tip_length
     if 'z' in switch_position:
         driver.move(z=safe_height)
     else:
@@ -46,45 +43,45 @@ def _probe_switch(axis, probing_distance, switch_position):
     return probed_pos
 
 
-def probe(pipette):
-    # for axis is 'xya':
-    #     _probe_switch(axis, )
+def run_probe(pipette):
+    # # for axis is 'xya':
+    # #     _probe_switch(axis, )
+    #
+    # switch_pos_1 = {
+    #     'x': probe_center['x'] - (probe_dimensions['width'] / 2),
+    #     'y': probe_center['y'] - switch_offset,
+    #     'a': probe_dimensions['height'] + 1
+    # }
+    #
+    # switch_pos_2 = {
+    #     'x': probe_center['x'] + (probe_dimensions['width'] / 2),
+    #     'y': probe_center['y'] - switch_offset,
+    #     'a': probe_dimensions['height'] + 1
+    # }
+    #
+    # switch_pos_3 = {
+    #     'x': probe_center['x'] - switch_offset,
+    #     'y': probe_center['y'] + (probe_dimensions['length'] / 2),
+    #     'a': probe_dimensions['height'] + 1
+    # }
+    #
+    # switch_pos_4 = {
+    #     'x': probe_center['x'] - switch_offset,
+    #     'y': probe_center['y'] - (probe_dimensions['length'] / 2),
+    #     'a': probe_dimensions['height'] + 1
+    # }
+    #
+    # switch_pos_5 = {
+    #     'x': probe_center['x'],
+    #     'y': probe_center['y'] + switch_offset,
+    #     'a': probe_dimensions['height']
+    # }
 
-    switch_pos_1 = {
-        'x': probe_center['x'] - (probe_dimensions['width'] / 2),
-        'y': probe_center['y'] - switch_offset,
-        'a': probe_dimensions['height'] + 1
-    }
-
-    switch_pos_2 = {
-        'x': probe_center['x'] + (probe_dimensions['width'] / 2),
-        'y': probe_center['y'] - switch_offset,
-        'a': probe_dimensions['height'] + 1
-    }
-
-    switch_pos_3 = {
-        'x': probe_center['x'] - switch_offset,
-        'y': probe_center['y'] + (probe_dimensions['length'] / 2),
-        'a': probe_dimensions['height'] + 1
-    }
-
-    switch_pos_4 = {
-        'x': probe_center['x'] - switch_offset,
-        'y': probe_center['y'] - (probe_dimensions['length'] / 2),
-        'a': probe_dimensions['height'] + 1
-    }
-
-    switch_pos_5 = {
-        'x': probe_center['x'],
-        'y': probe_center['y'] + switch_offset,
-        'a': probe_dimensions['height']
-    }
-
-    probe_1 = _probe_switch('x', probing_distance, switch_pos_1)
-    probe_2 = _probe_switch('x', -probing_distance, switch_pos_2)
-    probe_3 = _probe_switch('y', -probing_distance, switch_pos_3)
-    probe_4 = _probe_switch('y', probing_distance, switch_pos_4)
-    probe_5 = _probe_switch('a', -max_expected_tip_length, switch_pos_5)
+    probe_1 = _probe_switch('x', probing_distance, frame_probe.left_switch)
+    probe_2 = _probe_switch('x', -probing_distance, frame_probe.right_switch)
+    probe_3 = _probe_switch('y', -probing_distance, frame_probe.back_switch)
+    probe_4 = _probe_switch('y', probing_distance, frame_probe.front_switch)
+    probe_5 = _probe_switch('a', -max_expected_tip_length, frame_probe.top_switch)
 
     print('PROBE_1: ', probe_1)
     print('PROBE_2: ', probe_2)
@@ -106,7 +103,7 @@ def calibrate_pipette(probing_values, probe):
 
 
 driver.home()
-probe(pip)
+run_probe(pip)
 
 
 
