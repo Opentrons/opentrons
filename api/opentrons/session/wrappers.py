@@ -43,6 +43,3 @@ class Instrument:
                 .format(type(obj)))
 
         self._instrument.move_to(obj)
-
-    def move_to_front(self):
-        self._instrument.move_to(PIPETTE_CHANGE_POSITION)
