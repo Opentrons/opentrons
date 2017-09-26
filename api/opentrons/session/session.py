@@ -1,13 +1,14 @@
 import ast
+from datetime import datetime
 from functools import reduce
 
-from opentrons.commands import tree
+from .wrappers import Container, Instrument
+
+from opentrons.broker import publish, subscribe, Notifications
+from opentrons.commands import tree, types
 from opentrons import robot
 from opentrons.robot.robot import Robot
-from datetime import datetime
-from opentrons.containers import get_container, Container
-from opentrons.broker import publish, subscribe, Notifications
-from opentrons.commands import types
+from opentrons.containers import get_container
 
 
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
@@ -21,7 +22,7 @@ class SessionManager(object):
             SESSION_TOPIC, self._notifications.on_notify)
         self.session = None
         self.robot = Robot()
-        # TODO (artyom, 09182017): This is to support the future
+        # TODO (artyom, 20170918): This is to support the future
         # concept of archived sessions. To be reworked when more details
         # are available
         self.sessions = []
@@ -79,34 +80,27 @@ class Session(object):
 
     def get_instruments(self):
         return [
-            {
-                'id': id(instrument),
-                'name': instrument.name,
-                'channels': instrument.channels,
-                'tip_racks': instrument.tip_racks,
-                'containers': {
-                    id(container)
+            Instrument(
+                instrument=instrument,
+                containers=[
+                    container
                     for _instrument, container in
                     self._interactions
-                    if _instrument == instrument}
-            }
+                    if _instrument == instrument
+                ])
             for instrument in self._instruments
         ]
 
     def get_containers(self):
         return [
-            {
-                'id': id(container),
-                'name': container.get_name(),
-                'type': container.get_type(),
-                'slot': container.parent.get_name(),
-                'instruments': {
-                    id(instrument)
+            Container(
+                container=container,
+                instruments=[
+                    instrument
                     for instrument, _container in
                     self._interactions
                     if _container == container
-                }
-            }
+                ])
             for container in self._containers
         ]
 
@@ -162,8 +156,8 @@ class Session(object):
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands
-            containers, instruments, interactions = accumulate(
-                [get_labware(command) for command in commands])
+            containers, instruments, interactions = _accumulate(
+                [_get_labware(command) for command in commands])
 
             self._containers.update(containers)
             self._instruments.update(instruments)
@@ -262,14 +256,14 @@ class Session(object):
         publish(SESSION_TOPIC, self._snapshot())
 
 
-def accumulate(iterable):
+def _accumulate(iterable):
     return reduce(
         lambda x, y: tuple([x + y for x, y in zip(x, y)]),
         iterable,
         ([], [], []))
 
 
-def get_labware(command):
+def _get_labware(command):
     containers = []
     instruments = []
     interactions = []
