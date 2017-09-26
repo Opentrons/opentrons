@@ -87,6 +87,8 @@ class Pipette:
         self.axis = axis.lower()
         self.channels = channels
 
+        self.motor = None
+
         if not name:
             name = self.__class__.__name__
         self.name = name
@@ -119,10 +121,10 @@ class Pipette:
 
         # FIXME
         default_plunger_positions = {
-            'top': 0,
-            'bottom': 10,
-            'blow_out': 12,
-            'drop_tip': 14
+            'top': 17,
+            'bottom': 0,
+            'blow_out': -4,
+            'drop_tip': -7
         }
         self.plunger_positions = {}
         self.plunger_positions.update(default_plunger_positions)
@@ -320,7 +322,7 @@ class Pipette:
         speed = self.speeds['aspirate'] * rate
 
         self._position_for_aspirate(location)
-        self.motor.speed(speed)
+        self.motor.set_speed(speed)
         self.motor.move(destination)
         self.current_volume += volume  # update after actual aspirate
         return self
@@ -403,7 +405,7 @@ class Pipette:
         destination = bottom - distance
         speed = self.speeds['dispense'] * rate
 
-        self.motor.speed(speed)
+        self.motor.set_speed(speed)
         self.motor.move(destination)
         self.current_volume -= volume  # update after actual dispense
 
@@ -1371,6 +1373,9 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    @property
-    def motor(self):
-        return self.robot.get_motor(self.axis)
+    # @property
+    # def motor(self):
+    #     return self.robot.get_motor(self.axis)
+
+    def home_now(self):
+        self.motor.home()
