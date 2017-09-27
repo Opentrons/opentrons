@@ -1,6 +1,6 @@
 # Uncomment to enable logging during tests
-import logging
-from logging.config import dictConfig
+# import logging
+# from logging.config import dictConfig
 
 import pytest
 import os
@@ -14,32 +14,32 @@ from opentrons.data_storage import database
 
 # Uncomment to enable logging during tests
 
-logging_config = dict(
-    version=1,
-    formatters={
-        'basic': {
-            'format':
-            '[Line %(lineno)s] %(message)s'
-        }
-    },
-    handlers={
-        'debug': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
-        }
-    },
-    loggers={
-        '__main__': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-        'opentrons.server': {
-            'handlers': ['debug'],
-            'level': logging.DEBUG
-        },
-    }
-)
-dictConfig(logging_config)
+# logging_config = dict(
+#     version=1,
+#     formatters={
+#         'basic': {
+#             'format':
+#             '[Line %(lineno)s] %(message)s'
+#         }
+#     },
+#     handlers={
+#         'debug': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'basic',
+#         }
+#     },
+#     loggers={
+#         '__main__': {
+#             'handlers': ['debug'],
+#             'level': logging.DEBUG
+#         },
+#         'opentrons.server': {
+#             'handlers': ['debug'],
+#             'level': logging.DEBUG
+#         },
+#     }
+# )
+# dictConfig(logging_config)
 
 Session = namedtuple(
     'Session',
