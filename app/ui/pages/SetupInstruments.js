@@ -1,7 +1,8 @@
 // setup instruments component
 import React from 'react'
-
+import Header from '../components/Header'
 import Page from '../components/Page'
+import PipetteConfig from '../components/PipetteConfig'
 
 const DEFAULT_SIDE = 'left'
 
@@ -11,8 +12,8 @@ export default function SetupInstrumentsPage (props) {
 
   return (
     <Page>
-      <h1>hello instruments</h1>
-      <h2>setup {side} pipette</h2>
+      <Header />
+      <PipetteConfig side={side} />
     </Page>
   )
 }
