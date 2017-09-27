@@ -1,4 +1,6 @@
 .bar_wrapper {
+  box-sizing: border-box;
+  height: 2rem;
   border: 1px solid grey;
   width: 100%;
   overflow: hidden;

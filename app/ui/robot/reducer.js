@@ -134,7 +134,6 @@ export const selectors = {
     const commands = selectors.getCommands(allState)
 
     if (!commands.length) return ''
-
     return commands[0].handledAt
   },
 

@@ -1,41 +1,20 @@
 @value colors: './Util.css';
 @value green, red, blue from colors;
 
-.nav_icons {
-  grid-area: menu;
-  border-right: 1px solid silver;
+.sidebar {
+  width: 375px;
   display: grid;
-  grid-template:
-    'upload' 75px
-    'design' 75px
-    'setup' 75px
-    '.' 468px
-    'connect' 75px;
+  grid-template-columns: 75px 300px;
+}
+
+.nav_icons, .nav_info {
+  border-right: 1px solid silver;
 }
 
 .nav_icon_list {
   list-style: none;
   padding-left: 0;
-}
-
-.nav_icon_list li {
-  display: block;
-}
-
-.nav_info {
-  grid-area: info;
-  position: relative;
-}
-
-.close {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  font-size: 0.75rem;
-  padding: 1rem;
-  cursor: pointer;
-  color: grey;
-  z-index: 100;
+  text-align: center;
 }
 
 .nav_icon {
@@ -43,6 +22,7 @@
   border-bottom: solid 2px rgba(151, 151, 151, 0.1);
   text-align: center;
   height: 75px;
+  width: 75px;
   transition: all 100 linear;
   cursor: pointer;
   padding: 1rem;
@@ -53,27 +33,17 @@
   cursor: default;
 }
 
-.upload_icon img {
-  margin: 0.75rem auto;
-  width: 2.25rem;
-}
-
-.design_icon img,
-.setup_icon img {
-  margin: 1.25rem auto;
-  width: 2rem;
-}
-
 .connection_status {
   cursor: pointer;
   grid-area: connect;
+  border-bottom: solid 2px rgba(151, 151, 151, 0.1);
 }
 
 .status {
   width: 35px;
   height: 35px;
   padding: 5px;
-  margin: auto;
+  margin: 1rem auto;
   border-radius: 50%;
   background-color: #d8d8d8;
 }

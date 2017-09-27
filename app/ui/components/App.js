@@ -7,11 +7,11 @@ import Run from '../pages/Run'
 import SetupInstruments from '../pages/SetupInstruments'
 import SetupDeck from '../pages/SetupDeck'
 
-import grid from './Grid.css'
+import styles from './App.css'
 
 export default function App () {
   return (
-    <div className={grid.wrapper}>
+    <div className={styles.wrapper}>
       <Nav />
       <Switch>
         <Route path='/run' component={Run} />

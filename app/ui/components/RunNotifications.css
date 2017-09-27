@@ -1,19 +1,21 @@
 .no_notification {
-  height: 50px;
+  height: 4rem;
 }
 
 .tip_wrapper {
-  height: 50px;
+  height: 2rem;
+  padding: .5rem 0;
+  vertical-align: middle;
 }
 
 .tip {
   display: inline-block;
   margin-left: 1rem;
-  width: 50px;
-  height: 50px;
+  width:3rem;
+  height: 3rem;
   border-radius: 50%;
   border: 2px solid grey;
-  line-height: 48px;
+  line-height: 3rem;
   text-align: center;
   text-transform: uppercase;
   font-family: 'trons';
@@ -31,11 +33,10 @@
 
 .notification_wrapper {
   display: grid;
-  margin: 7px 0;
-  height: 36px;
-  padding: 0 1rem;
+  height: 2rem;
+  padding: 0.75rem 1rem 1rem ;
   line-height: 2rem;
-  grid-template-columns: 2.1rem auto;
+  grid-template-columns: 2rem auto;
   font-family: 'sans';
   font-size: 0.75rem;
 }

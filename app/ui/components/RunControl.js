@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import moment from 'moment'
 import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
 import styles from './RunControl.css'
@@ -20,7 +21,18 @@ export default function RunControl (props) {
     onCancelClick
   } = props
 
+  const hasError = errors.length > 0
+  const onPauseResumeClick = isPaused
+    ? onResumeClick
+    : onPauseClick
+
+  const pauseResumeText = isPaused
+    ? 'Resume'
+    : 'Pause'
+
   let runButton
+  let pauseResumeButton
+  let cancelButton
   if (!isRunning) {
     runButton = (
       <button
@@ -31,27 +43,30 @@ export default function RunControl (props) {
         Run Job
       </button>
     )
+  } else {
+    pauseResumeButton = (
+      <button
+        onClick={onPauseResumeClick}
+        className={styles.btn_pause}
+        disabled={!isRunning}
+      >
+        {pauseResumeText}
+      </button>
+    )
+    cancelButton =
+      <button
+        onClick={onCancelClick}
+        className={styles.btn_cancel}
+        disabled={!isRunning}
+      >
+        Cancel Job
+      </button>
   }
 
-  const hasError = errors.length > 0
-  const onPauseResumeClick = isPaused
-    ? onResumeClick
-    : onPauseClick
-
-  const pauseResumeText = isPaused
-    ? 'Resume'
-    : 'Pause'
-
-  const pauseResumeButton = (
-    <button
-      onClick={onPauseResumeClick}
-      className={styles.btn_pause}
-      disabled={!isRunning}
-    >
-      {pauseResumeText}
-    </button>
-  )
-
+  let startTimeStamp
+  if (startTime) {
+    startTimeStamp = `Start Time: ${moment(startTime).format('hh:mm:ss a')}`
+  }
   return (
     <span>
       <div className={styles.btn_wrapper}>
@@ -60,28 +75,18 @@ export default function RunControl (props) {
         </div>
         {runButton}
         {pauseResumeButton}
-        <button
-          onClick={onCancelClick}
-          className={styles.btn_cancel}
-          disabled={!isRunning}
-        >
-          Cancel Job
-        </button>
+        {cancelButton}
       </div>
 
       <section className={styles.controls}>
+        <div className={styles.timer}>
+          <div className={styles.start_time}>{startTimeStamp}</div>
+          <div className={styles.time_elapsed}>{runTime}</div>
+        </div>
         <div className={styles.notifications}>
           <RunNotifications {...{isRunning, isPaused, errors, hasError}} />
         </div>
-
-        <div className={styles.progress} >
-          { hasError && <button className={styles.btn_error}>Report Error</button> }
-          <div className={styles.timer}>
-            {runTime}
-          </div>
-          <RunProgress style={styles.progress_bar} {...{runProgress, isPaused, hasError}} />
-        </div>
-
+        <RunProgress style={styles.progress} {...{runProgress, isPaused, hasError}} />
       </section>
     </span>
   )
