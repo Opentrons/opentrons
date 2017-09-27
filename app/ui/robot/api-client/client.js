@@ -54,6 +54,8 @@ export default function client (dispatch) {
   }
 
   function connect () {
+    if (rpcClient) return dispatch(actions.connectResponse())
+
     RpcClient(URL)
       .then((c) => {
         rpcClient = c

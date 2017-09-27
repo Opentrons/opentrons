@@ -59,12 +59,20 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
+  function sendAction (state, action) {
+    receive(state, action)
+
+    return delay(1)
+  }
+
+  const sendConnect = (state = {}) => sendAction(state, actions.connect())
+  const sendDisconnect = (state = {}) => sendAction(state, actions.disconnect())
+
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
       expect(RpcClient).toHaveBeenCalledTimes(0)
-      receive({}, actions.connect())
 
-      return delay(1)
+      return sendConnect()
         .then(() => expect(RpcClient).toHaveBeenCalledTimes(1))
     })
 
@@ -75,9 +83,7 @@ describe('api client', () => {
       robot.get_serial_ports_list = jest.fn()
         .mockReturnValueOnce(Promise.resolve(['/dev/tty.usbserial']))
 
-      receive({}, actions.connect())
-
-      return delay(1)
+      return sendConnect()
         .then(() => {
           expect(robot.get_serial_ports_list).toHaveBeenCalled()
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
@@ -89,9 +95,8 @@ describe('api client', () => {
       const expectedResponse = actions.connectResponse(error)
 
       RpcClient.mockReturnValueOnce(Promise.reject(error))
-      receive({}, actions.connect())
 
-      return delay(1)
+      return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
@@ -103,18 +108,29 @@ describe('api client', () => {
       robot.get_serial_ports_list = jest.fn()
         .mockReturnValueOnce(Promise.reject(error))
 
-      receive({}, actions.connect())
-
-      return delay(1)
+      return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('dispatch CONNECT_RESPONSE success if already connected', () => {
+      const expectedResponse = actions.connectResponse()
+
+      return sendConnect()
+        .then(() => {
+          RpcClient.mockClear()
+          dispatch.mockClear()
+          return sendConnect()
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+          expect(RpcClient).toHaveBeenCalledTimes(0)
+        })
     })
 
     test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
       const expected = actions.disconnectResponse()
 
-      receive({}, actions.disconnect())
-
-      return delay(1)
+      return sendDisconnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -122,11 +138,9 @@ describe('api client', () => {
       const expected = actions.disconnectResponse()
 
       rpcClient.close.mockReturnValueOnce(Promise.resolve())
-      receive({}, actions.connect())
 
-      return delay(1)
-        .then(() => receive({}, actions.disconnect()))
-        .then(() => delay(1))
+      return sendConnect()
+        .then(() => sendDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -134,11 +148,9 @@ describe('api client', () => {
       const expected = actions.disconnectResponse(new Error('AH'))
 
       rpcClient.close.mockReturnValueOnce(Promise.reject(new Error('AH')))
-      receive({}, actions.connect())
 
-      return delay(1)
-        .then(() => receive({}, actions.disconnect()))
-        .then(() => delay(1))
+      return sendConnect()
+        .then(() => sendDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
