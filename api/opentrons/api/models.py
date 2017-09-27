@@ -5,13 +5,10 @@ class Container:
         self.name = container.get_name()
         self.type = container.get_type()
         self.slot = container.parent.get_name()
-        self.instruments = {
+        self.instruments = [
             Instrument(instrument)
-            for instrument in set(instruments)}
-        self.wells = {
-            well.get_name(): Well(well)
-            for well in container
-        }
+            for instrument in instruments]
+        self.wells = [Well(well) for well in container]
 
 
 class Well:
@@ -32,15 +29,7 @@ class Instrument:
         self.tip_racks = [
             Container(container)
             for container in instrument.tip_racks]
-        self.containers = {
+        self.containers = [
             Container(container)
-            for container in set(containers)
-        }
-
-    def move_to(self, obj):
-        if not isinstance(obj, Well) and not isinstance(obj, Container):
-            raise TypeError(
-                'Expected argument to be Well or Container, got {0} instead'
-                .format(type(obj)))
-
-        self._instrument.move_to(obj)
+            for container in containers
+        ]

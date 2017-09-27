@@ -1,7 +1,4 @@
 class CalibrationManager:
-    # TODO (artyom, 20170927): we might not need to pass
-    # robot here, instead, pass it to each method
-    # explicitly
     def __init__(self, loop=None):
         self._loop = loop
 

@@ -23,6 +23,7 @@ class Notifications(object):
 
     def on_notify(self, message):
         def thread_has_event_loop():
+            print(message)
             try:
                 asyncio.get_event_loop()
             except RuntimeError as e:

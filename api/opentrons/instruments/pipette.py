@@ -813,7 +813,7 @@ class Pipette:
             location = location.bottom(self._drop_tip_offset)
 
         @commands.publish.both(command=commands.drop_tip)
-        def _drop_tip(location, self=self):
+        def _drop_tip(location, instrument=self):
             if location:
                 self.move_to(location, strategy='arc')
 

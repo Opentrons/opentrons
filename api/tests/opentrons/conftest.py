@@ -1,6 +1,6 @@
 # Uncomment to enable logging during tests
-# import logging
-# from logging.config import dictConfig
+import logging
+from logging.config import dictConfig
 
 import pytest
 import os
@@ -14,32 +14,32 @@ from opentrons.data_storage import database
 
 # Uncomment to enable logging during tests
 
-# logging_config = dict(
-#     version=1,
-#     formatters={
-#         'basic': {
-#             'format':
-#             '[Line %(lineno)s] %(message)s'
-#         }
-#     },
-#     handlers={
-#         'debug': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'basic',
-#         }
-#     },
-#     loggers={
-#         '__main__': {
-#             'handlers': ['debug'],
-#             'level': logging.DEBUG
-#         },
-#         'opentrons.server': {
-#             'handlers': ['debug'],
-#             'level': logging.DEBUG
-#         },
-#     }
-# )
-# dictConfig(logging_config)
+logging_config = dict(
+    version=1,
+    formatters={
+        'basic': {
+            'format':
+            '[Line %(lineno)s] %(message)s'
+        }
+    },
+    handlers={
+        'debug': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'basic',
+        }
+    },
+    loggers={
+        '__main__': {
+            'handlers': ['debug'],
+            'level': logging.DEBUG
+        },
+        'opentrons.server': {
+            'handlers': ['debug'],
+            'level': logging.DEBUG
+        },
+    }
+)
+dictConfig(logging_config)
 
 Session = namedtuple(
     'Session',
@@ -96,15 +96,19 @@ def protocol(request):
 
 
 @pytest.fixture
-def session_manager(loop):
-    from opentrons.api import SessionManager
-    with SessionManager(loop=loop) as s:
-        yield s
-    return
+def main_router(loop):
+    from opentrons.api import MainRouter
+    with MainRouter(loop=loop) as router:
+        yield router
 
 
 @pytest.fixture
-def session(loop, test_client, request, session_manager):
+def session_manager(main_router):
+    return main_router.session_manager
+
+
+@pytest.fixture
+def session(loop, test_client, request, main_router):
     """
     Create testing session. Tests using this fixture are expected
     to have @pytest.mark.parametrize('root', [value]) decorator set.
@@ -114,7 +118,8 @@ def session(loop, test_client, request, session_manager):
     try:
         root = request.getfuncargvalue('root')
         if not root:
-            root = session_manager
+            root = main_router
+        # Assume test fixture has init to attach test loop
         root.init(loop)
     except Exception as e:
         pass
