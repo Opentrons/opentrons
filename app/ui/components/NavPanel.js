@@ -13,9 +13,7 @@ const UploadPanel = props => {
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>
-        <button className={styles.btn_new}>
-          New File
-        </button>
+
         <label className={styles.btn_upload}>
           Upload
           <input
