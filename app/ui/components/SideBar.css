@@ -17,15 +17,22 @@
   text-align: center;
 }
 
+.nav_icon_list li {
+
+  height: 4rem;
+  line-height: 4rem;
+}
+
+
 .nav_icon {
+  display: block;
+  width: 100%;
   background-color: inherit;
   border-bottom: solid 2px rgba(151, 151, 151, 0.1);
   text-align: center;
-  height: 75px;
-  width: 75px;
+  height: 4rem;
   transition: all 100 linear;
   cursor: pointer;
-  padding: 1rem;
 }
 
 .nav_icon[disabled] {

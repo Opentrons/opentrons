@@ -34,7 +34,7 @@
 
 .controls{
   background-color: #EEE;
-  height: 8rem;
+  height: 9rem;
 }
 
 .notifications{
@@ -42,7 +42,7 @@
 }
 
 .timer {
-  height: 2rem;
+  height: 3rem;
   color: grey;
   font-family: 'sans';
 
@@ -54,7 +54,7 @@
   display: inline-block;
   line-height: 2rem;
   font-size: 1rem;
-  padding: 0 1rem;
+  padding: 1rem;
 }
 
 .time_elapsed{
