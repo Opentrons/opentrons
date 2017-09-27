@@ -11,7 +11,8 @@
   grid-template-columns: 75px 300px;
 }
 
-.nav_icons, .nav_info {
+.nav_icons,
+.nav_info {
   border-right: 1px solid silver;
 }
 
@@ -22,11 +23,9 @@
 }
 
 .nav_icon_list li {
-
   height: 4rem;
   line-height: 4rem;
 }
-
 
 .nav_icon {
   display: block;

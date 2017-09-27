@@ -17,10 +17,6 @@ import setupIconSrc from '../img/icon_setup.svg'
 
 import SideBar from '../components/SideBar'
 
-const NAV_LINKS = [
-
-]
-
 const mapStateToProps = (state) => {
   const isConnected = state.robot.isConnected
   return {

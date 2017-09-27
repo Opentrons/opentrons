@@ -4,14 +4,14 @@
 
 .tip_wrapper {
   height: 2rem;
-  padding: .5rem 0;
+  padding: 0.5rem 0;
   vertical-align: middle;
 }
 
 .tip {
   display: inline-block;
   margin-left: 1rem;
-  width:3rem;
+  width: 3rem;
   height: 3rem;
   border-radius: 50%;
   border: 2px solid grey;
@@ -34,7 +34,7 @@
 .notification_wrapper {
   display: grid;
   height: 2rem;
-  padding: 0.75rem 1rem 1rem ;
+  padding: 0.75rem 1rem 1rem;
   line-height: 2rem;
   grid-template-columns: 2rem auto;
   font-family: 'sans';

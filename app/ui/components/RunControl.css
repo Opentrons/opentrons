@@ -1,7 +1,7 @@
 .btn_wrapper {
   background-color: #777;
   display: grid;
-  height:4rem;
+  height: 4rem;
   grid-template-areas: "file  . pause run";
   grid-template-columns: auto 10rem 10rem 10rem;
 }
@@ -32,12 +32,12 @@
   margin: 1rem;
 }
 
-.controls{
-  background-color: #EEE;
+.controls {
+  background-color: #eee;
   height: 9rem;
 }
 
-.notifications{
+.notifications {
   height: 4rem;
 }
 
@@ -45,10 +45,10 @@
   height: 3rem;
   color: grey;
   font-family: 'sans';
-
 }
 
-.time_elapsed, .start_time {
+.time_elapsed,
+.start_time {
   height: 2rem;
   width: 50%;
   display: inline-block;
@@ -57,13 +57,13 @@
   padding: 1rem;
 }
 
-.time_elapsed{
+.time_elapsed {
   font-size: 1.75rem;
-  line-height:2.25rem;
+  line-height: 2.25rem;
   text-align: right;
 }
 
-.progress{
-  height:2rem;
+.progress {
+  height: 2rem;
 }
 

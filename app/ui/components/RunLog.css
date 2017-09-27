@@ -2,9 +2,8 @@
   box-sizing: border-box;
   font-family: 'sans';
   overflow-y: scroll;
-  border:1rem solid white;
-
-  max-height:34rem;
+  border: 1rem solid white;
+  max-height: 34rem;
 }
 
 ol {

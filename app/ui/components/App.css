@@ -12,3 +12,11 @@
   font-family: 'sans';
   position: fixed;
 }
+
+.task_header {
+  background-color: #777;
+  height: 4rem;
+  line-height: 4rem;
+  color: white;
+  padding: 0 1rem;
+}

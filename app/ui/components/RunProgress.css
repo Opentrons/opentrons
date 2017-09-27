@@ -2,8 +2,8 @@
   box-sizing: border-box;
   height: 2rem;
   border: 1px solid grey;
-  border-left-width: 0px;
-  border-right-width: 0px;
+  border-left-width: 0;
+  border-right-width: 0;
   width: 100%;
   overflow: hidden;
 }
