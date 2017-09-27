@@ -1,10 +1,9 @@
-PIPETTE_CHANGE_POSITION = (50, 50, 50)
-
-
 class CalibrationManager:
-    def __init__(self, robot, loop=None):
+    # TODO (artyom, 20170927): we might not need to pass
+    # robot here, instead, pass it to each method
+    # explicitly
+    def __init__(self, loop=None):
         self._loop = loop
-        self._robot = robot
 
     def tip_probe(self, instrument):
         raise NotImplemented()

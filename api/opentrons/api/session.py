@@ -22,10 +22,6 @@ class SessionManager(object):
             SESSION_TOPIC, self._notifications.on_notify)
         self.session = None
         self.robot = Robot()
-        # TODO (artyom, 20170918): This is to support the future
-        # concept of archived sessions. To be reworked when more details
-        # are available
-        self.sessions = []
 
     @property
     def notifications(self):
@@ -39,16 +35,14 @@ class SessionManager(object):
         self._unsubscribe()
 
     def clear(self):
-        for session in self.sessions:
-            session.close()
-        self.sessions.clear()
+        if self.session is not None:
+            self.session.close()
 
     def create(self, name, text):
         self.clear()
 
         with self._notifications.snooze():
             self.session = Session(name=name, text=text)
-            self.sessions.append(self.session)
         # Can't do it from session's __init__ because notifications are snoozed
         self.session.set_state('loaded')
         return self.session

@@ -1,10 +1,10 @@
 from .session import Session, SessionManager
-from .shell import Shell
+from .routers import MainRouter
 from .calibration import CalibrationManager
 
 __all__ = [
     Session,
     SessionManager,
-    Shell,
+    MainRouter,
     CalibrationManager
 ]

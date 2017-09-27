@@ -97,7 +97,7 @@ def protocol(request):
 
 @pytest.fixture
 def session_manager(loop):
-    from opentrons.session import SessionManager
+    from opentrons.api import SessionManager
     with SessionManager(loop=loop) as s:
         yield s
     return

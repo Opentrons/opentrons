@@ -3,8 +3,8 @@ import pytest
 
 from datetime import datetime
 from opentrons.broker import publish
-from opentrons.session import Session
-from opentrons.session.session import _accumulate, _get_labware
+from opentrons.api import Session
+from opentrons.api.session import _accumulate, _get_labware
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def labware_setup():
         name='p100', axis='a', channels=8, tip_racks=tip_racks)
 
     p1000 = instruments.Pipette(
-        name='p1000', axis='a', channels=8, tip_racks=tip_racks)
+        name='p1000', axis='b', channels=8, tip_racks=tip_racks)
 
     commands = [
         {
@@ -169,15 +169,16 @@ def test_get_instruments_and_containers(labware_setup):
     instruments, containers, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
-    session = Session(name='', text='')
-    session._instruments.update(set(instruments))
-    session._containers.update(set(containers))
-    session._interactions.update(set(interactions))
+    with Session(name='', text='') as session:
+        session._instruments.update(set(instruments))
+        session._containers.update(set(containers))
+        session._interactions.update(set(interactions))
 
-    instruments = sorted(session.get_instruments(), key=get_name)
-    containers = sorted(session.get_containers(), key=get_name)
+        instruments = sorted(session.get_instruments(), key=get_name)
+        containers = sorted(session.get_containers(), key=get_name)
 
     assert {i.name for i in instruments} == {'p100', 'p1000'}
+    assert {i.axis for i in instruments} == {'a', 'b'}
     assert {i.id for i in instruments} == {id(p100), id(p1000)}
     assert [[t.slot for t in i.tip_racks] for i in instruments] == \
         [['A1', 'A2'], ['A1', 'A2']]

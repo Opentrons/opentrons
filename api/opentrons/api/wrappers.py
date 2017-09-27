@@ -28,6 +28,7 @@ class Instrument:
         self.id = id(instrument)
         self.name = instrument.name
         self.channels = instrument.channels
+        self.axis = instrument.axis
         self.tip_racks = [
             Container(container)
             for container in instrument.tip_racks]
@@ -39,7 +40,7 @@ class Instrument:
     def move_to(self, obj):
         if not isinstance(obj, Well) and not isinstance(obj, Container):
             raise TypeError(
-                'Expected argument to me Well or Container, got {0} instead'
+                'Expected argument to be Well or Container, got {0} instead'
                 .format(type(obj)))
 
         self._instrument.move_to(obj)
