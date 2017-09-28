@@ -1,22 +1,23 @@
 .pipette_group {
   padding: 2rem 1rem;
-}
-
-.pipette_wrapper {
-  width: 50%;
   display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-areas: 'left right'
 }
 
 .left {
+  grid-area: left;
+  display: grid;
   grid-template-columns: 90% 10%;
-  grid-template-areas: 'info img'
+  grid-template-areas: 'info img';
 }
 
 .right {
+  grid-area: right;
+  display: grid;
   grid-template-columns: 90% 10%;
-  grid-template-areas: 'img info'
+  grid-template-areas: 'img info';
 }
-
 
 .pipette_toggle {
   width: 100%;
@@ -67,4 +68,8 @@
   font-family: 'trons';
   text-transform: uppercase;
   color: white;
+}
+
+h3 {
+  text-transform: capitalize;
 }
