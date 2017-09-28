@@ -1,21 +1,32 @@
 import React from 'react'
 import classnames from 'classnames'
+import {Link} from 'react-router-dom'
 import styles from './PipetteConfig.css'
 
 export default function PipetteConfig (props) {
   const {side, instruments} = props
-  return (
-    <section className={styles.pipette_group}>
 
-      <div className={classnames(styles.pipette_wrapper, styles[instruments[0].axis])}>
-
+  const pipettes = instruments.map((pipette) => {
+    const isActive = side === pipette.axis
+    const route = `/setup-instruments/${pipette.axis}`
+    return (
+      <div
+        className={classnames(styles[pipette.axis], {[styles.active]: isActive})}
+        key={pipette.axis}
+      >
+        <Link to={route}
+          className={classnames(
+            styles.pipette_toggle,
+            styles[`toggle_${pipette.axis}`]
+          )}
+        >
+          {pipette.axis}
+        </Link>
         <div className={styles.pipette_info}>
-          <button className={styles.pipette_toggle}>{side}</button>
-
           <h2 className={styles.title}>Pipette</h2>
-          <h3>{instruments[0].channels}-Channel ({instruments[0].volume}ul) </h3>
+          <h3>{pipette.channels}-Channel ({pipette.volume}ul) </h3>
           <h2 className={styles.title}>Suggested Tip Type</h2>
-          <h3>{instruments[0].volume}ul</h3>
+          <h3>{pipette.volume}ul</h3>
           <div className={styles.info}>
             <span className={styles.alert}>!</span>
             <p>For accuracy, tip dimensions must be defined using the Tip Probe tool.</p>
@@ -26,8 +37,13 @@ export default function PipetteConfig (props) {
         <div className={styles.pipette_icon}>
           img
         </div>
-
       </div>
+    )
+  })
+  return (
+    <section className={styles.pipette_group}>
+
+      {pipettes}
 
     </section>
   )

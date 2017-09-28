@@ -8,26 +8,58 @@
 .left {
   grid-area: left;
   display: grid;
-  grid-template-columns: 90% 10%;
-  grid-template-areas: 'info img';
+  grid-template-columns: 85% 15%;
+  grid-template-areas:
+    'toggle toggle'
+    'info img';
+  opacity: 0.5;
 }
 
 .right {
   grid-area: right;
   display: grid;
-  grid-template-columns: 90% 10%;
-  grid-template-areas: 'img info';
+  grid-template-columns: 15% 85%;
+  grid-template-areas:
+    'toggle toggle'
+    'img info';
+  opacity: 0.5;
+}
+
+.left:hover,
+.right:hover {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.active {
+  opacity: 1;
+}
+
+.active button {
+  cursor: pointer;
 }
 
 .pipette_toggle {
+  grid-area: toggle;
   width: 100%;
   height: 4rem;
+  border-radius: 0.25rem;
   background-color: #777;
-  text-transform: uppercase;
-  line-height: 4rem;
   font-size: 2rem;
   color: white;
-  border-radius: 0.25rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  line-height: 4rem;
+  cursor: pointer;
+}
+
+.pipette_info {
+  grid-area: info;
+}
+
+.pipette_icon {
+  grid-area: img;
 }
 
 .title {
