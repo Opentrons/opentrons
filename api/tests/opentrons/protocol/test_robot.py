@@ -41,6 +41,7 @@ def robot():
 
 
 def test_get_serial_ports_list(robot, monkeypatch):
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
     assert 'Virtual Smoothie' not in robot.get_serial_ports_list()
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     assert 'Virtual Smoothie' in robot.get_serial_ports_list()

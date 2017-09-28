@@ -50,7 +50,7 @@ class TickTock(object):
     def __init__(self):
         self.value = 0
 
-    # Called by test fixture to set loop
+    # Called by session test fixture to set loop
     def init(self, loop):
         self.notifications = Notifications(loop)
 

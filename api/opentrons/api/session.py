@@ -1,55 +1,26 @@
 import ast
+from datetime import datetime
+from functools import reduce
 
-from opentrons.commands import tree
+from .models import Container, Instrument
+
+from opentrons.broker import publish, subscribe
+from opentrons.commands import tree, types
 from opentrons import robot
 from opentrons.robot.robot import Robot
-from datetime import datetime
-
-from opentrons.broker import publish, subscribe, Notifications
-from opentrons.commands import types
+from opentrons.containers import get_container
 
 
-VALID_STATES = set(
-    ['loaded', 'running', 'finished', 'stopped', 'paused'])
-SESSION_TOPIC = 'session'
+VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 
 
 class SessionManager(object):
     def __init__(self, loop=None):
-        self._notifications = Notifications(loop=loop)
-        self._unsubscribe = subscribe(
-            SESSION_TOPIC, self._notifications.on_notify)
         self.session = None
         self.robot = Robot()
-        # TODO (artyom, 09182017): This is to support the future
-        # concept of archived sessions. To be reworked when more details
-        # are available
-        self.sessions = []
-
-    @property
-    def notifications(self):
-        return self._notifications
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.clear()
-        self._unsubscribe()
-
-    def clear(self):
-        for session in self.sessions:
-            session.close()
-        self.sessions.clear()
 
     def create(self, name, text):
-        self.clear()
-
-        with self._notifications.snooze():
-            self.session = Session(name=name, text=text)
-            self.sessions.append(self.session)
-        # Can't do it from session's __init__ because notifications are snoozed
-        self.session.set_state('loaded')
+        self.session = Session(name=name, text=text)
         return self.session
 
     def get_session(self):
@@ -57,34 +28,48 @@ class SessionManager(object):
 
 
 class Session(object):
+    TOPIC = 'session'
+
     def __init__(self, name, text):
         self.name = name
         self.protocol_text = text
         self.protocol = None
         self.state = None
-        self._unsubscribe = subscribe(types.COMMAND, self.on_command)
         self.commands = []
         self.command_log = {}
         self.errors = []
 
-        try:
-            self.refresh()
-        except Exception as e:
-            self.close()
-            raise e
+        self._containers = []
+        self._instruments = []
+        self._interactions = []
 
-    def on_command(self, message):
-        if message['$'] == 'before':
-            self.log_append()
+        self.refresh()
 
-    def close(self):
-        self._unsubscribe()
+    def get_instruments(self):
+        return [
+            Instrument(
+                instrument=instrument,
+                containers=[
+                    container
+                    for _instrument, container in
+                    self._interactions
+                    if _instrument == instrument
+                ])
+            for instrument in self._instruments
+        ]
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
+    def get_containers(self):
+        return [
+            Container(
+                container=container,
+                instruments=[
+                    instrument
+                    for instrument, _container in
+                    self._interactions
+                    if _container == container
+                ])
+            for container in self._containers
+        ]
 
     def clear_logs(self):
         self.command_log.clear()
@@ -93,6 +78,11 @@ class Session(object):
     def _simulate(self):
         stack = []
         res = []
+        commands = []
+
+        self._containers.clear()
+        self._instruments.clear()
+        self._interactions.clear()
 
         def on_command(message):
             payload = message['payload']
@@ -101,6 +91,8 @@ class Session(object):
             )
 
             if message['$'] == 'before':
+                commands.append(payload)
+
                 res.append(
                     {
                         'level': len(stack),
@@ -117,6 +109,14 @@ class Session(object):
         finally:
             unsubscribe()
 
+            # Accumulate containers, instruments, interactions from commands
+            containers, instruments, interactions = _accumulate(
+                [_get_labware(command) for command in commands])
+
+            self._containers.extend(_dedupe(containers))
+            self._instruments.extend(_dedupe(instruments))
+            self._interactions.extend(_dedupe(interactions))
+
         return res
 
     def refresh(self):
@@ -126,7 +126,6 @@ class Session(object):
             parsed = ast.parse(self.protocol_text)
             self.protocol = compile(parsed, filename=self.name, mode='exec')
             self.commands = tree.from_list(self._simulate())
-            self.command_log.clear()
         finally:
             if self.errors:
                 raise Exception(*self.errors)
@@ -153,8 +152,14 @@ class Session(object):
         # with the one from a newly constructed robot
         robot.__dict__ = {**Robot().__dict__}
         self.clear_logs()
+        _unsubscribe = None
+
+        def on_command(message):
+            if message['$'] == 'before':
+                self.log_append()
 
         if devicename is not None:
+            _unsubscribe = subscribe(types.COMMAND, on_command)
             self.set_state('running')
             robot.connect(devicename)
 
@@ -164,15 +169,21 @@ class Session(object):
             self.error_append(e)
             raise e
         finally:
-            self.set_state('finished')
+            if _unsubscribe:
+                _unsubscribe()
+            # TODO (artyom, 20170927): we should fully separate
+            # run and simulate code
+            if devicename is not None:
+                self.set_state('finished')
             robot.disconnect()
 
         return self
 
     def set_state(self, state):
         if state not in VALID_STATES:
-            raise ValueError('Invalid state: {0}. Valid states are: {1}'
-                             .format(state, VALID_STATES))
+            raise ValueError(
+                'Invalid state: {0}. Valid states are: {1}'
+                .format(state, VALID_STATES))
         self.state = state
         self._on_state_changed()
 
@@ -195,6 +206,7 @@ class Session(object):
 
     def _snapshot(self):
         return {
+            'topic': Session.TOPIC,
             'name': 'state',
             'payload': {
                 'name': self.name,
@@ -207,4 +219,46 @@ class Session(object):
         }
 
     def _on_state_changed(self):
-        publish(SESSION_TOPIC, self._snapshot())
+        publish(Session.TOPIC, self._snapshot())
+
+
+def _accumulate(iterable):
+    return reduce(
+        lambda x, y: tuple([x + y for x, y in zip(x, y)]),
+        iterable,
+        ([], [], []))
+
+
+def _dedupe(iterable):
+    acc = set()
+
+    for item in iterable:
+        if item not in acc:
+            acc.add(item)
+            yield item
+
+
+def _get_labware(command):
+    containers = []
+    instruments = []
+    interactions = []
+
+    location = command.get('location')
+    instrument = command.get('instrument')
+    locations = command.get('locations')
+
+    if location:
+        containers.append(get_container(location))
+
+    if locations:
+        containers.extend(
+            [get_container(location) for location in locations])
+
+    containers = [c for c in containers if c is not None]
+
+    if instrument:
+        instruments.append(instrument)
+        interactions.extend(
+            [(instrument, container) for container in containers])
+
+    return instruments, containers, interactions

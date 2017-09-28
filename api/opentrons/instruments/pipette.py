@@ -748,7 +748,7 @@ class Pipette:
         presses = (1 if not helpers.is_number(presses) else presses)
 
         @commands.publish.both(command=commands.pick_up_tip)
-        def _pick_up_tip(location):
+        def _pick_up_tip(location, instrument=self):
             self.motor.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
 
@@ -813,7 +813,7 @@ class Pipette:
             location = location.bottom(self._drop_tip_offset)
 
         @commands.publish.both(command=commands.drop_tip)
-        def _drop_tip(location):
+        def _drop_tip(location, instrument=self):
             if location:
                 self.move_to(location, strategy='arc')
 

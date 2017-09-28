@@ -15,11 +15,12 @@ async def test_notifications(session, session_manager, protocol, root):
     )
 
     await session.socket.receive_json()  # Skip ack
-    res = await session.socket.receive_json()
 
+    res = await session.socket.receive_json()  # Get notification
     assert res['data']['v']['payload']['v']['state'] == 'loaded'
 
-    res = await session.socket.receive_json()
+    res = await session.socket.receive_json()  # Get call result
+
     await session.call(
         id=res['data']['i'],
         name='run',
