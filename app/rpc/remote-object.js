@@ -12,6 +12,8 @@ function isRemoteObject (source) {
 }
 
 export default function RemoteObject (context, source, seen) {
+  seen = seen || new Map()
+
   if (Array.isArray(source)) {
     return Promise.all(source.map((s) => RemoteObject(context, s, seen)))
   }
@@ -19,8 +21,6 @@ export default function RemoteObject (context, source, seen) {
   if (!isRemoteObject(source)) {
     return Promise.resolve(source)
   }
-
-  seen = seen || new Map()
 
   const id = source.i
   const value = source.v
