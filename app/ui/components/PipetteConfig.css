@@ -4,7 +4,19 @@
 
 .pipette_wrapper {
   width: 50%;
+  display: grid;
 }
+
+.left {
+  grid-template-columns: 90% 10%;
+  grid-template-areas: 'info img'
+}
+
+.right {
+  grid-template-columns: 90% 10%;
+  grid-template-areas: 'img info'
+}
+
 
 .pipette_toggle {
   width: 100%;
@@ -20,4 +32,39 @@
 .title {
   font-size: 0.75rem;
   text-transform: uppercase;
+  margin: 2rem 0 0.25rem;
+}
+
+.info {
+  border: 2px solid silver;
+  border-radius: 0.25rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* this will move up to utils for imports across components */
+.alert {
+  background-color: silver;
+  color: white;
+  height: 1rem;
+  width: 1rem;
+  margin: 0.5rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  display: block;
+  float: left;
+}
+
+.btn_probe {
+  background-color: #777;
+  border-radius: 0.25rem;
+  height: 3rem;
+  width: 100%;
+  margin-top: 1rem;
+  line-height: 3rem;
+  font-size: 1rem;
+  font-family: 'trons';
+  text-transform: uppercase;
+  color: white;
 }
