@@ -2,7 +2,7 @@
   padding: 2rem 1rem;
   display: grid;
   grid-template-columns: 50% 50%;
-  grid-template-areas: 'left right'
+  grid-template-areas: 'left right';
 }
 
 .left {
