@@ -524,7 +524,7 @@ class Robot(object):
         self._previous_container = this_container
 
         return [
-            {instrument.axis: arc_top},
+            {'z': arc_top, 'a': arc_top},
             {'x': destination[0], 'y': destination[1]},
             {instrument.axis: arrival_z}
         ]
@@ -584,8 +584,8 @@ class Robot(object):
             'slots': {
                 'x_offset': 0,
                 'y_offset': 0,
-                'col_offset': 134.5,
-                'row_offset': 91.15
+                'col_offset': 132.58,
+                'row_offset': 90.5
             }
         }
         slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
