@@ -9,11 +9,13 @@ database_path = environment.get_path('DATABASE_FILE')
 # ======================== Private Functions ======================== #
 
 
-# FIXME: (JG 9/19/17) This zip() return is just code smell due to Vector class
+
+#FIXME: The x and y in the 'zip' below are reverse! This is a hack for OTtwo alpha
 def _parse_container_obj(container: Container):
-    return dict(zip('xyz', container._coordinates))
+    return dict(zip('yxz', container._coordinates))
 
 
+#FIXME: SHOULD NOT BE SWITCHING X AND Y - JUST A HACK FOR OTtwo ALPHA!!
 def _parse_well_obj(well: Well):
     r_x, r_y, r_z = well._coordinates + well.bottom()[1]
     location, depth = well.get_name(), well.z_size()
@@ -22,8 +24,8 @@ def _parse_well_obj(well: Well):
     width, length = well.properties['width'], well.properties['length']
     return {
         'location': location,
-        'x': r_x,
-        'y': r_y,
+        'x': r_y,
+        'y': r_x,
         'z': r_z,
         'depth': depth,
         'volume': volume,

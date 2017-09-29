@@ -1,5 +1,5 @@
 
-probe_center = {'z': 109.0, 'x': 267.748, 'y': 290.4987}
+probe_center = {'z': 63.0, 'x': 267.748, 'y': 289}
 probe_dimensions = {'length': 44, 'width': 35, 'height':63}
 
 
@@ -67,6 +67,7 @@ class Base:
     """
     def __init__(self, pose_tracker):
         self.pose_tracker = pose_tracker
+        print(self.pose_tracker)
         self.pose_tracker.create_root_object(self, 0,0,0)
         self._probe = self.setup_probe()
 
