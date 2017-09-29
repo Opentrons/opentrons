@@ -15,7 +15,15 @@ export default function RemoteObject (context, source, seen) {
   seen = seen || new Map()
 
   if (Array.isArray(source)) {
-    return Promise.all(source.map((s) => RemoteObject(context, s, seen)))
+    // iterate over the children serially, waiting for each RemoteObject
+    // to resolve before moving on to the next one. Returns a promise that
+    // resolves to an array of RemoteObjects. Bluebird would make this cleaner
+    return source.reduce((result, s) => result.then((acc) => {
+      return RemoteObject(context, s, seen).then((remote) => {
+        acc.push(remote)
+        return acc
+      })
+    }), Promise.resolve([]))
   }
 
   if (!isRemoteObject(source)) {
