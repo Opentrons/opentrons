@@ -11,7 +11,7 @@ from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 
 
 
-DEFAULT_STEPS_PER_MM = 'M92 X160.427 Y160.851 Z800 A800 B767.38 C767.38'
+DEFAULT_STEPS_PER_MM = 'M92 X160.6738 Y160.5829 Z800 A800 B767.38 C767.38'
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z70 A70 B40 C40'
 DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
 DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
@@ -34,8 +34,11 @@ GCODES = {'HOME': 'G28.2',
           'SET_SPEED': 'G0F'}
 
 
-def _parse_axis_values(string):
-    parsed_values = string.split(' ')
+def _parse_axis_values(raw_axis_values):
+    try:
+        parsed_values = raw_axis_values.split(' ')
+    except:
+        raise RuntimeError("GOT THIS: ", raw_axis_values)
     parsed_values = parsed_values[2:]
     dict =  {
         s.split(':')[0].lower(): float(s.split(':')[1])
@@ -48,7 +51,15 @@ def _parse_axis_values(string):
 class SmoothieDriver_3_0_0:
 
     def __init__(self):
+
+        self.simulating = True #FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
+
+
+    # FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
+    def connect(self):
         self.connection = serial_communication.connect()
+        self.simulating = False
+
         self._setup()
 
     @property
@@ -56,6 +67,10 @@ class SmoothieDriver_3_0_0:
         parsed_position = _parse_axis_values(
             self._send_command(GCODES['CURRENT_POSITION'])
         )
+
+        if parsed_position is None:
+            raise RuntimeError("Failure in smoothie position retreival")
+
         return parsed_position
 
     @property
@@ -98,8 +113,15 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
+        if self.simulating == True:
+            print('Simulating command: ', command)
+            return "Virtual!"
+            # return virtual_driver.write_and_return(command)
         '''Sends command to serial'''
         command_line = command +' M400'
+
+        print('Running command: ', command)
+
         return serial_communication.write_and_return(
             command_line, self.connection, timeout)
 
@@ -162,5 +184,7 @@ class SmoothieDriver_3_0_0:
     #TODO: Write GPIO low
     def kill(self):
         pass
+
+
 
     # ----------- END Public interface ------------ #

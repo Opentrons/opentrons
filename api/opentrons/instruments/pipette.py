@@ -9,6 +9,12 @@ from opentrons.containers.placeable import (
 from opentrons.helpers import helpers
 
 
+class PipetteTip:
+    def __init__(self, length):
+        self.length = length
+
+
+
 class Pipette:
 
     """
@@ -73,7 +79,7 @@ class Pipette:
     def __init__(
             self,
             robot,
-            axis,
+            mount,
             name=None,
             channels=1,
             min_volume=0,
@@ -84,10 +90,12 @@ class Pipette:
             dispense_speed=500):
 
         self.robot = robot
-        self.axis = axis.lower()
+        self.mount = mount
         self.channels = channels
 
-        self.motor = None
+        self.attached_tip = None
+        self.instrument_actuator = None
+        self.instrument_mover = None
 
         if not name:
             name = self.__class__.__name__
@@ -105,7 +113,7 @@ class Pipette:
 
         self.reset_tip_tracking()
 
-        self.robot.add_instrument(self.axis, self)
+        self.robot.add_instrument(self.mount, self)
 
         self.placeables = []
         self.previous_placeable = None
@@ -322,8 +330,8 @@ class Pipette:
         speed = self.speeds['aspirate'] * rate
 
         self._position_for_aspirate(location)
-        self.motor.set_speed(speed)
-        self.motor.move(destination)
+        self.instrument_actuator.set_speed(speed)
+        self.instrument_actuator.move(destination)
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -405,8 +413,8 @@ class Pipette:
         destination = bottom - distance
         speed = self.speeds['dispense'] * rate
 
-        self.motor.set_speed(speed)
-        self.motor.move(destination)
+        self.instrument_actuator.set_speed(speed)
+        self.instrument_actuator.move(destination)
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -424,7 +432,7 @@ class Pipette:
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.motor.move(self._get_plunger_position('bottom'))
+            self.instrument_actuator.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
         if location:
@@ -532,7 +540,7 @@ class Pipette:
         """
 
         self.move_to(location, strategy='arc')
-        self.motor.move(self._get_plunger_position('blow_out'))
+        self.instrument_actuator.move(self._get_plunger_position('blow_out'))
         self.current_volume = 0
 
         return self
@@ -751,16 +759,15 @@ class Pipette:
 
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(location):
-            self.motor.move(self._get_plunger_position('bottom'))
+            self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
 
-            if location:
-                self.move_to(location, strategy='arc')
+            self.move_to(self.current_tip().bottom(0), strategy='arc')
 
             tip_plunge = 6
             for i in range(int(presses) - 1):
-                self.robot.move_head(z=tip_plunge, mode='relative')
-                self.robot.move_head(z=-tip_plunge, mode='relative')
+                self.move_to(self.current_tip().bottom(tip_plunge), strategy='direct')
+                self.move_to(self.current_tip().bottom(0), strategy='direct')
 
             return self
 
@@ -819,11 +826,11 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
-            self.motor.move(self._get_plunger_position('drop_tip'))
+            self.instrument_actuator.move(self._get_plunger_position('drop_tip'))
             if home_after:
-                self.motor.home()
+                self.instrument_actuator.home()
 
-            self.motor.move(self._get_plunger_position('bottom'))
+            self.instrument_actuator.move(self._get_plunger_position('bottom'))
 
             self.current_volume = 0
             self.current_tip(None)
@@ -855,7 +862,7 @@ class Pipette:
         @commands.publish.both(command=commands.home)
         def _home(axis):
             self.current_volume = 0
-            self.motor.home()
+            self.instrument_actuator.home()
 
         _home(self.axis)
         return self
@@ -1048,7 +1055,7 @@ class Pipette:
         seconds = seconds % 60
         seconds += float(minutes * 60)
 
-        self.motor.wait(seconds)
+        self.instrument_actuator.wait(seconds)
 
         return self
 
@@ -1373,9 +1380,16 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    # @property
-    # def motor(self):
-    #     return self.robot.get_motor(self.axis)
 
-    def home_now(self):
-        self.motor.home()
+
+    def _move(self, x=None, y=None, z=None):
+        if self.attached_tip and z is not None:
+            z += self.attached_tip.length
+        print("IN PIP MOVEMENT COMMAND")
+        print("MY AXIS IS: ", self.axis)
+        print("MY MOVER AXIS IS: ", self.instrument_mover.mount.mount_axis)
+
+        self.instrument_mover.move(x, y, z)
+
+    def _probe(self, axis, movement):
+        return self.instrument_mover.probe(axis, movement)
