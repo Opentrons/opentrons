@@ -82,6 +82,7 @@ class Pose(object):
 
 
 class PoseTracker(object):
+
     '''
     Tracks pose of all objects on deck using a dictionary and a tree.
     _pose_dict is a dict that maps objects to poses (np arrays)
@@ -90,10 +91,14 @@ class PoseTracker(object):
         an object is a child of another if, when that objects moves,
         its child does as well.
     '''
+    pose_tracker_singleton = None #FIXME: [JG & Andy | 9/27] HACKY SINGLETON
+
     def __init__(self):
+        print('POSE TRACKER CREATED')
         self._root_nodes = []
         self._pose_dict = {}
         self._node_dict = {}
+
         subscribe(topics.MOVEMENT, self._object_moved)
 
     def __getitem__(self, obj):
@@ -178,3 +183,8 @@ class PoseTracker(object):
 
     def relative_object_position(self, target_object, reference_object):
         return self[target_object].position - self[reference_object].position
+
+    def clear_all(self):
+        self._root_nodes = []
+        self._pose_dict = {}
+        self._node_dict = {}
