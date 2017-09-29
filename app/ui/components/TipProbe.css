@@ -1,0 +1,18 @@
+.probe_msg {
+  padding: 2rem;
+}
+
+.btn_probe {
+  background-color: #777;
+  border-radius: 0.25rem;
+  height: 3rem;
+  padding: 0 3rem;
+  display: block;
+  margin: 0 auto;
+  margin-top: 1rem;
+  line-height: 3rem;
+  font-size: 1rem;
+  font-family: 'trons';
+  text-transform: uppercase;
+  color: white;
+}

@@ -3,6 +3,7 @@ import React from 'react'
 import Header from '../components/Header'
 import Page from '../components/Page'
 import ConnectedPipetteConfig from '../containers/ConnectedPipetteConfig'
+import ConnectedTipProbe from '../containers/ConnectedTipProbe'
 
 const DEFAULT_SIDE = 'left'
 
@@ -14,6 +15,7 @@ export default function SetupInstrumentsPage (props) {
     <Page>
       <Header />
       <ConnectedPipetteConfig side={side} />
+      <ConnectedTipProbe />
     </Page>
   )
 }
