@@ -6,6 +6,8 @@ from opentrons.server import rpc
 
 
 class Foo(object):
+    STATIC = 'static'
+
     def __init__(self, value):
         self.value = value
 
@@ -73,15 +75,18 @@ async def test_call(session, root):
 
 @pytest.mark.parametrize('root', [Foo(0)])
 async def test_init(session, root):
+    serialized_type = session.server.call_and_serialize(lambda: type(root))
     expected = {
         'root': {
             'i': id(root),
             't': type_id(root),
             'v': {'value': 0}
         },
-        'type': session.server.call_and_serialize(lambda: type(root)),
+        'type': serialized_type,
         '$': {'type': rpc.CONTROL_MESSAGE}}
 
+    assert serialized_type['v']['STATIC'] == 'static', \
+        'Class attributes are serialized correctly'
     res = await session.socket.receive_json()
     assert res == expected
 
