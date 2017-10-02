@@ -1,14 +1,23 @@
 .btn_wrapper {
+  background-color: #777;
   display: grid;
-  grid-template-areas: "file  pause cancel";
-  grid-template-columns: auto 10rem 10rem;
+  height: 4rem;
+  grid-template-areas: "file  . pause run";
+  grid-template-columns: auto 10rem 10rem 10rem;
 }
 
 .file_info {
-  margin: 1rem;
+  margin-left: 1rem;
   grid-area: file;
   font-family: 'trons';
-  color: grey;
+  line-height: 4rem;
+  color: white;
+}
+
+.btn_run {
+  composes: btn from './Util.css';
+  grid-area: run;
+  margin: 1rem;
 }
 
 .btn_pause {
@@ -19,35 +28,42 @@
 
 .btn_cancel {
   composes: btn from './Util.css';
-  grid-area: cancel;
+  grid-area: run;
   margin: 1rem;
 }
 
-.progress {
-  display: grid;
-  grid-template:
-    "report . timer" 72px
-    "progress_bar progress_bar progress_bar" 35px;
-  grid-template-columns: repeat(3 [cols] 1fr);
+.controls {
+  background-color: #eee;
+  height: 9rem;
 }
 
-.btn_error {
-  composes: btn from './Util.css';
-  grid-area: report;
-  margin: 0 0 1rem 1rem;
+.notifications {
+  height: 4rem;
 }
 
 .timer {
-  grid-area: timer;
-  font-size: 3rem;
-  padding-right: 1rem;
-  text-align: right;
-  line-height: 3rem;
+  height: 3rem;
   color: grey;
   font-family: 'sans';
 }
 
-.progress_bar {
-  grid-area: progress_bar;
+.time_elapsed,
+.start_time {
+  height: 2rem;
+  width: 50%;
+  display: inline-block;
+  line-height: 2rem;
+  font-size: 1rem;
+  padding: 1rem;
+}
+
+.time_elapsed {
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  text-align: right;
+}
+
+.progress {
+  height: 2rem;
 }
 

@@ -48,16 +48,18 @@
 }
 
 .title {
-  font-size: 14px;
+  font-size: 1rem;
+  line-height: 4rem;
   font-weight: 800;
   text-transform: uppercase;
+  padding: 0;
 }
 
 /* Connect */
 
 .connection_info {
   grid-area: details;
-  padding: 3rem 1rem;
+  padding: 0 rem;
 }
 
 .connection_toggle {

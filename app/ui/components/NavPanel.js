@@ -1,19 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
+
 import Button from './Button'
 import styles from './NavPanel.css'
 
 const UploadPanel = props => {
-  const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
-  const files = recentFiles.map((file, index) => {
-    return <p key={index}>{file}</p>
-  })
+  // const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
+  // const files = recentFiles.map((file, index) => {
+  //   return <p key={index}>{file}</p>
+  // })
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>
-        <button className={styles.btn_new}>
-          New File
-        </button>
         <label className={styles.btn_upload}>
           Upload
           <input
@@ -23,42 +22,21 @@ const UploadPanel = props => {
           />
         </label>
         <h2 className={styles.title}>Recently Uploaded</h2>
-        {files}
       </section>
     </div>
   )
 }
 
 const SetupPanel = props => {
-  const {isRunning, isReadyToRun, onRunClick} = props
-  let runButton
-  if (!isRunning) {
-    runButton = (
-      <Button
-        onClick={onRunClick}
-        disabled={!isReadyToRun}
-        style={styles.btn_run}
-      >
-        Run Job
-      </Button>
-    )
-  }
   return (
     <div className={styles.nav_panel}>
       <section className={styles.links}>
-        <a href='#'>Set Up Pipettes</a>
-        <a href='#'>Set Up Deck</a>
-        <a href='#'>Set Up Reagents</a>
-        {runButton}
+        <Link to='/setup-instruments'>Set Up Pipettes</Link>
+        <Link to='/setup-deck'>Set Up Labware</Link>
+        <Link to='/run'>Run</Link>
       </section>
     </div>
   )
-}
-
-SetupPanel.propTypes = {
-  isRunning: PropTypes.bool.isRequired,
-  isReadyToRun: PropTypes.bool.isRequired,
-  onRunClick: PropTypes.func.isRequired
 }
 
 const ConnectPanel = props => {
@@ -113,7 +91,12 @@ const panel = (props) => ({
 
 export default function NavPanel (props) {
   const {currentNavPanelTask} = props
-  return <div >{panel(props)[currentNavPanelTask]}</div>
+
+  return (
+    <div>
+      {panel(props)[currentNavPanelTask]}
+    </div>
+  )
 }
 
 NavPanel.propTypes = {
