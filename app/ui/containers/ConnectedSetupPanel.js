@@ -7,9 +7,9 @@ const mapStateToProps = (state) => {
   return {
     instruments: [
       {
-        axis: 'left', // axis: 'b'from api
-        channels: 'single', // channels: 1 from api
-        volume: 200, // max_volume: 200 from api
+        axis: 'left',
+        channels: 'single',
+        volume: 200,
         isProbed: false
       },
       {
@@ -25,10 +25,11 @@ const mapStateToProps = (state) => {
         slot: 'B1',
         type: 'tiprack-200ul',
         isConfirmed: false
-      },{
+      }, {
         name: 'tiprack2',
         slot: 'B2',
         type: 'tiprack-200ul',
+        isConfirmed: true
       }
     ]
   }

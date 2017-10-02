@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
 import ConnectedSetupPanel from '../containers/ConnectedSetupPanel'
 import Button from './Button'
 import styles from './NavPanel.css'
