@@ -6,14 +6,13 @@ import Button from './Button'
 import styles from './NavPanel.css'
 
 const UploadPanel = props => {
-  const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
-  const files = recentFiles.map((file, index) => {
-    return <p key={index}>{file}</p>
-  })
+  // const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
+  // const files = recentFiles.map((file, index) => {
+  //   return <p key={index}>{file}</p>
+  // })
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>
-
         <label className={styles.btn_upload}>
           Upload
           <input
@@ -23,7 +22,6 @@ const UploadPanel = props => {
           />
         </label>
         <h2 className={styles.title}>Recently Uploaded</h2>
-        {files}
       </section>
     </div>
   )

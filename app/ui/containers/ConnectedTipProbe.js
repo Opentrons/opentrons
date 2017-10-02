@@ -14,10 +14,10 @@ const mapStateToProps = (state) => ({
     axis: 'left',
     channels: 'single',
     volume: 200,
-    tipIsPreparingForProbe: false,
+    tipIsPreparingForProbe: true,
     tipIsReadyForProbe: false,
     tipIsProbing: false,
-    tipIsProbed: true
+    tipIsProbed: false
   }
 })
 
