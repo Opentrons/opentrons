@@ -52,12 +52,9 @@ def _write_to_device_and_return(cmd, device_connection):
     - Wait for ack return
     - return parsed response'''
     command = cmd + '\r\n'
-    # print("writing to smoothie: {}".format(command.encode()))
     device_connection.write(command.encode())
-    print('SENDING: ', command.encode())
 
     response = device_connection.read_until(DRIVER_ACK)
-    print('RESPONSE: ', response)
 
     clean_response = _parse_smoothie_response(response)
     if clean_response:
