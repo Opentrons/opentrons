@@ -759,7 +759,7 @@ class Pipette:
         presses = (1 if not helpers.is_number(presses) else presses)
 
         @commands.publish.both(command=commands.pick_up_tip)
-        def _pick_up_tip(location):
+        def _pick_up_tip(self, location):
             self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
 
@@ -772,7 +772,7 @@ class Pipette:
 
             return self
 
-        return _pick_up_tip(location)
+        return _pick_up_tip(self, location)
 
     def drop_tip(self, location=None, home_after=True):
         """
