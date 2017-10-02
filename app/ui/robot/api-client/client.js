@@ -63,7 +63,7 @@ export default function client (dispatch) {
           .on('notification', handleRobotNotification)
           .on('error', handleClientError)
 
-        sessionManager = rpcClient.remote
+        sessionManager = rpcClient.remote.session_manager
         session = sessionManager.session
         robot = sessionManager.robot
 
