@@ -12,7 +12,11 @@ const mapStateToProps = (state) => {
         axis: 'left',
         channels: 'single',
         volume: 200,
+<<<<<<< HEAD
         isProbed: true
+=======
+        isProbed: false
+>>>>>>> fix lint
       },
       {
         axis: 'right',
