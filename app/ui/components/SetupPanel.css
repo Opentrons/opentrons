@@ -25,6 +25,7 @@ h1 {
 
 .pipette_group > a,
 .labware_group > a {
+  color: gray;
   text-decoration: none;
   font-size: 1rem;
   background-color: #eee;
