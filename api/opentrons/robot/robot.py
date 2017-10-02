@@ -24,6 +24,8 @@ log = get_logger(__name__)
 # FIXME: (Jared 9/18/17)
 # This should be a head object - but using a string now to avoid scope creep
 
+DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0}
+
 
 class InstrumentMosfet(object):
     """
@@ -624,7 +626,7 @@ class Robot(object):
         self.add_slots_to_deck()
         # Setup Deck as root object for pose tracker
         self.pose_tracker.create_root_object(
-            self._deck, *self._deck._coordinates
+            self._deck, **DECK_OFFSET
         )
 
         for slot in self._deck:
