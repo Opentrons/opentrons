@@ -28,7 +28,7 @@ function LabwareLinks (props) {
   let isDisabled = !isTiprack && !tipracksConfirmed
   return (
     <li key={slot}>
-      <Link to={url} className={classnames({[styles.disabled] : isDisabled}, calibrationStyle)}>
+      <Link to={url} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
         [{slot}] {name}
       </Link>
     </li>
@@ -49,7 +49,7 @@ export default function SetupPanel (props) {
   let tiprackList = []
   let labwareList = []
   labware.map((lab) => {
-    if (lab.isTiprack ) {
+    if (lab.isTiprack) {
       tiprackList.push(LabwareLinks({...lab}))
     } else {
       labwareList.push(LabwareLinks(
