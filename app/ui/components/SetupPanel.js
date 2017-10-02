@@ -19,7 +19,7 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, slot, type, isConfirmed} = props
+  const {name, slot, isConfirmed} = props
   const url = `/setup-deck/${slot}`
   const style = isConfirmed
     ? styles.confirmed
@@ -42,22 +42,22 @@ export default function SetupPanel (props) {
     ...l
   }))
   const pipetteSetup =
-  <section className={styles.pipette_group}>
-    <Link to='/setup-instruments'>Pipette Setup</Link>
-    <ul>
-      {instrumentList}
-    </ul>
-  </section>
+    <section className={styles.pipette_group}>
+      <Link to='/setup-instruments'>Pipette Setup</Link>
+      <ul>
+        {instrumentList}
+      </ul>
+    </section>
 
   let labwareSetup
   if (instrumentsConfirmed) {
     labwareSetup =
-    <section className={styles.labware_group}>
-      <Link to='/setup-deck'>Labware Setup</Link>
-      <ul>
-        {labwareList}
-      </ul>
-    </section>
+      <section className={styles.labware_group}>
+        <Link to='/setup-deck'>Labware Setup</Link>
+        <ul>
+          {labwareList}
+        </ul>
+      </section>
   }
 
   return (

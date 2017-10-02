@@ -5,7 +5,7 @@ import SetupPanel from '../components/SetupPanel'
 
 const mapStateToProps = (state) => {
   return {
-    instrumentsConfirmed : true, // all pipettes confirmed ? show labware
+    instrumentsConfirmed: true, // all pipettes confirmed ? show labware
     instruments: [
       {
         axis: 'left',

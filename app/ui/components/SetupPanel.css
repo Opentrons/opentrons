@@ -10,7 +10,8 @@ h1 {
   padding: 0 1rem;
 }
 
-.pipette_group > a, .labware_group > a {
+.pipette_group > a,
+.labware_group > a {
   color: gray;
   text-decoration: none;
   font-size: 1rem;
@@ -21,7 +22,8 @@ h1 {
   padding-left: 1rem;
 }
 
-.pipette_group li, .labware_group li {
+.pipette_group li,
+.labware_group li {
   list-style-type: none;
   margin: 0;
 }
