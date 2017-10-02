@@ -1,0 +1,78 @@
+h1 {
+  line-height: 75px;
+  height: 75px;
+  padding: 0;
+  margin: 0 1rem;
+}
+
+.links {
+  grid-area: details;
+  padding: 0 1rem;
+}
+
+.pipette_group > a, .labware_group > a {
+  color: gray;
+  text-decoration: none;
+  font-size: 1rem;
+  background-color: #eee;
+  display: block;
+  height: 3rem;
+  line-height: 3rem;
+  padding-left: 1rem;
+}
+
+.pipette_group li, .labware_group li {
+  list-style-type: none;
+  margin: 0;
+}
+
+.labware_group {
+  margin-top: 2rem;
+}
+
+ul li a {
+  color: black;
+  text-decoration: none;
+  background-color: #efefef;
+  display: block;
+  padding: 0.5rem 0;
+  line-height: 1rem;
+  font-size: 0.75rem;
+}
+
+li a::before {
+  display: block;
+  float: left;
+  content: '';
+  border-radius: 0.5rem;
+  color: white;
+  text-align: center;
+  height: 1rem;
+  width: 1rem;
+  margin: 0.5rem 0.5rem 1rem 1rem;
+}
+
+.labware_group li a::before {
+  margin: 0 0.5rem 0.5rem 1rem;
+}
+
+a:hover {
+  background-color: #ccc;
+}
+
+.alert::before {
+  content: '!';
+  background-color: silver;
+}
+
+.axis {
+  text-transform: uppercase;
+  display: block;
+  line-height: 1rem;
+}
+
+.type {
+  text-transform: capitalize;
+  display: block;
+  line-height: 1rem;
+}
