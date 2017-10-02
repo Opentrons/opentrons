@@ -418,6 +418,7 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
 
         self._driver.move(*args, **kwargs)
+        self.gantry._publish_position()
 
     #DEPRECATED
     def move_plunger(self, *args, **kwargs):
@@ -597,7 +598,7 @@ class Robot(object):
 
     def get_max_robot_rows(self):
         # TODO: dynamically figure out robot rows
-        return 3
+        return 4
 
     def add_slots_to_deck(self):
         robot_rows = self.get_max_robot_rows()
