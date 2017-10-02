@@ -21,42 +21,40 @@ const mapStateToProps = (state) => {
         isProbed: false
       }
     ],
-
     isTipracksConfirmed: false, // all tipracks confirmed ? unlock other labware
     isLabwareConfirmed: false, // all labware confirmed ? show run button
-
     labware: [
       {
         name: 'tiprack',
-        slot: 'B1',
+        slot: 'A1',
         type: 'tiprack-200ul',
         isConfirmed: false,
         isTiprack: true
       }, {
         name: 'tiprack2',
-        slot: 'B2',
+        slot: 'A2',
         type: 'tiprack-200ul',
         isConfirmed: false,
         isTiprack: true
-      },
-      {
+      },{
         name: 'trough',
-        slot: 'C1',
+        slot: 'B1',
         type: 'trough-12row',
         isConfirmed: false,
         isTiprack: false
       }, {
         name: 'plate',
-        slot: 'D1',
+        slot: 'C1',
         type: '96-PCR-flat',
         isConfirmed: false,
         isTiprack: false
       }, {
         name: 'tuberack',
-        slot: 'D2',
+        slot: 'C2',
         type: 'tube-rack-2ml',
         isConfirmed: false,
         isTiprack: false
+        isConfirmed: false
       }
     ]
   }
