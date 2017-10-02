@@ -44,7 +44,6 @@ def _parse_axis_values(raw_axis_values):
         s.split(':')[0].lower(): float(s.split(':')[1])
         for s in parsed_values
     }
-    print('PARSED_DICT: ', dict)
     return dict
 
 
@@ -68,8 +67,11 @@ class SmoothieDriver_3_0_0:
             self._send_command(GCODES['CURRENT_POSITION'])
         )
 
-        if parsed_position is None:
-            raise RuntimeError("Failure in smoothie position retreival")
+        #FIXME (JG | 10/1/17) recovery attempt hack
+        if 'x' not in parsed_position:
+            parsed_position = _parse_axis_values(
+                self._send_command(GCODES['CURRENT_POSITION'])
+            )
 
         return parsed_position
 
@@ -119,9 +121,6 @@ class SmoothieDriver_3_0_0:
             # return virtual_driver.write_and_return(command)
         '''Sends command to serial'''
         command_line = command +' M400'
-
-        print('Running command: ', command)
-
         return serial_communication.write_and_return(
             command_line, self.connection, timeout)
 

@@ -6,8 +6,9 @@ from opentrons import robot
 
 
 
-RIGHT_MOUNT_OFFSET = {'x':26.16, 'y':17.82, 'z':0.0}
-LEFT_MOUNT_OFFSET = {'x':-10.1801, 'y':-13.2385 , 'z':0.0}
+RIGHT_MOUNT_OFFSET = {'x':0, 'y':0, 'z':0.0}
+
+LEFT_MOUNT_OFFSET = {'x':-38.351, 'y':30.2024, 'z':0.0}
 
 
 LEFT_INSTRUMENT_ACTUATOR = 'b'
@@ -82,8 +83,6 @@ class InstrumentMover(object):
         goal_inst_pos = \
             resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
 
-        print("GOAL POSITION!: ", goal_inst_pos)
-
         goal_x, goal_y, _ = pose_funcs.target_inst_position(
             self.gantry._pose_tracker, self.gantry, self.instrument, **goal_inst_pos)
         self.gantry.move(x=goal_x, y=goal_y)
@@ -118,9 +117,9 @@ class Gantry:
         self._pose_tracker = pose_tracker
 
     def _setup_mounts(self):
-        self.left_mount = Mount(self.driver, self, LEFT_Z_AXIS, LEFT_INSTRUMENT_ACTUATOR)
-        self.right_mount = Mount(self.driver, self, RIGHT_Z_AXIS, RIGHT_INSTRUMENT_ACTUATOR)
-        self._pose_tracker.track_object(self, self.left_mount, **LEFT_MOUNT_OFFSET) #FIXME: Use real mount offsets
+        self.left_mount = Mount(self.driver, self, LEFT_Z_AXIS, LEFT_INSTRUMENT_ACTUATOR, LEFT_MOUNT_OFFSET)
+        self.right_mount = Mount(self.driver, self, RIGHT_Z_AXIS, RIGHT_INSTRUMENT_ACTUATOR, RIGHT_MOUNT_OFFSET)
+        self._pose_tracker.track_object(self, self.left_mount, **LEFT_MOUNT_OFFSET)
         self._pose_tracker.track_object(self, self.right_mount, **RIGHT_MOUNT_OFFSET)
 
     def _position_from_driver(self):
@@ -156,16 +155,16 @@ class Gantry:
 
 class Mount:
 
-    def __init__(self, driver, gantry, mount_axis, actuator_axis):
+    def __init__(self, driver, gantry, mount_axis, actuator_axis, offset):
         self.instrument = None
         self.driver = driver
         self.gantry = gantry
         self.mount_axis = mount_axis
         self.actuator_axis = actuator_axis
+        self.offset = offset
 
     def _position_from_driver(self):
         position = _coords_for_axes(self.driver, self.mount_axis)
-        print("POS FROM DRIVER IS: ", position)
         return {'z': position[self.mount_axis]}
 
     def _publish_position(self):
@@ -184,9 +183,8 @@ class Mount:
         self.instrument = instrument
         instrument.instrument_actuator = InstrumentActuator(self.driver, self.actuator_axis, instrument)
         instrument.instrument_mover = InstrumentMover(self.gantry, self, instrument) #WHat is a mover?
-        print("MOUNT AXIS:", self.mount_axis)
-        print("MOTOR AXIS:", self.actuator_axis)
         instrument.axis = self.mount_axis
+        instrument.mount_obj = self
 
         self.gantry._pose_tracker.track_object(self, instrument, 0, 0, 0)
 
