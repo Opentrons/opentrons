@@ -1,6 +1,20 @@
+.setup_panel {
+  display: grid;
+  height: 100%;
+  padding: 0 1rem;
+  grid-template:
+    'title' 75px
+    'details' 38rem
+    'btn_bottom' auto;
+  font-family: 'sans';
+  font-size: 14px;
+  line-height: 2rem;
+  color: grey;
+}
+
 h1 {
-  line-height: 75px;
-  height: 75px;
+  grid-area: title;
+  line-height: 4rem;
   padding: 0;
   margin: 0 1rem;
 }
@@ -77,4 +91,18 @@ a:hover {
   text-transform: capitalize;
   display: block;
   line-height: 1rem;
+}
+
+.run_link {
+  grid-area: btn_bottom;
+  border: 0.5rem;
+  background-color: #777;
+  display: block;
+  width: 100%;
+  line-height: 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: 'trons';
+  color: white;
 }

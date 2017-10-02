@@ -21,7 +21,7 @@ const mapStateToProps = (state) => {
       }
     ],
     tipracksConfirmed: false, // all tipracks confirmed ? unlock other labware
-    labwareConfirmed: false, // all labware confirmed ? show run button
+    labwareConfirmed: true, // all labware confirmed ? show run button
     labware: [
       {
         name: 'tiprack',

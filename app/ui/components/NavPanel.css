@@ -4,7 +4,7 @@
   padding: 0 1rem;
   grid-template:
     'details' 675px
-    'connect_toggle' auto;
+    'btn_bottom' auto;
   font-family: 'sans';
   font-size: 14px;
   line-height: 2rem;
@@ -63,7 +63,7 @@
 }
 
 .connection_toggle {
-  grid-area: connect_toggle;
+  grid-area: btn_bottom;
   padding: 1rem;
 }
 

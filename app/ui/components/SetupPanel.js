@@ -34,7 +34,7 @@ function LabwareLinks (props) {
 }
 
 export default function SetupPanel (props) {
-  const {instruments, labware, instrumentsConfirmed} = props
+  const {instruments, labware, instrumentsConfirmed, labwareConfirmed} = props
   const instrumentList = instruments.map((i) => PipetteLinks({
     ...i
   }))
@@ -60,14 +60,19 @@ export default function SetupPanel (props) {
       </section>
   }
 
+  let runLink
+  if (labwareConfirmed) {
+    runLink = <Link to='/run' className={styles.run_link}>Run Protocol</Link>
+  }
+
   return (
-    <div className={styles.nav_panel}>
+    <div className={styles.setup_panel}>
       <h1>Prepare Robot for RUN</h1>
       <section className={styles.links}>
         {pipetteSetup}
         {labwareSetup}
-        <Link to='/run'>Run</Link>
       </section>
+      {runLink}
     </div>
   )
 }
