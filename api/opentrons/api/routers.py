@@ -6,11 +6,17 @@ from opentrons.broker import subscribe, Notifications
 class MainRouter:
     def __init__(self, loop=None):
         self._notifications = Notifications(loop=loop)
+
+        self._unsubscribe = []
+        self._unsubscribe += [subscribe(
+            Session.TOPIC,
+            self._notifications.on_notify)]
+        self._unsubscribe += [subscribe(
+            CalibrationManager.TOPIC,
+            self._notifications.on_notify)]
+
         self.session_manager = SessionManager(loop=loop)
         self.calibration_manager = CalibrationManager(loop=loop)
-        self._unsubscribe = subscribe(
-            Session.TOPIC,
-            self._notifications.on_notify)
 
     @property
     def notifications(self):
@@ -20,4 +26,5 @@ class MainRouter:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._unsubscribe()
+        for unsubscribe in self._unsubscribe:
+            unsubscribe()
