@@ -75,6 +75,11 @@ a:hover {
   background-color: #ccc;
 }
 
+a.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .alert::before {
   content: '!';
   background-color: silver;

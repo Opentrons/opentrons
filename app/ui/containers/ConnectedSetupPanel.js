@@ -6,6 +6,7 @@ import SetupPanel from '../components/SetupPanel'
 const mapStateToProps = (state) => {
   return {
     instrumentsConfirmed: true, // all pipettes confirmed ? show labware
+
     instruments: [
       {
         axis: 'left',
@@ -20,35 +21,42 @@ const mapStateToProps = (state) => {
         isProbed: false
       }
     ],
+
     tipracksConfirmed: false, // all tipracks confirmed ? unlock other labware
-    labwareConfirmed: true, // all labware confirmed ? show run button
+    labwareConfirmed: false, // all labware confirmed ? show run button
+
     labware: [
       {
         name: 'tiprack',
         slot: 'B1',
         type: 'tiprack-200ul',
-        isConfirmed: false
+        isConfirmed: false,
+        isTiprack: true
       }, {
         name: 'tiprack2',
         slot: 'B2',
         type: 'tiprack-200ul',
-        isConfirmed: false
+        isConfirmed: false,
+        isTiprack: true
       },
       {
         name: 'trough',
         slot: 'C1',
         type: 'trough-12row',
-        isConfirmed: false
+        isConfirmed: false,
+        isTiprack: false
       }, {
         name: 'plate',
         slot: 'D1',
         type: '96-PCR-flat',
-        isConfirmed: false
+        isConfirmed: false,
+        isTiprack: false
       }, {
         name: 'tuberack',
         slot: 'D2',
         type: 'tube-rack-2ml',
-        isConfirmed: false
+        isConfirmed: false,
+        isTiprack: false
       }
     ]
   }
