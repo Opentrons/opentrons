@@ -35,11 +35,11 @@ function LabwareLinks (props) {
 
 export default function SetupPanel (props) {
   const {instruments, labware, instrumentsConfirmed, labwareConfirmed} = props
-  const instrumentList = instruments.map((i) => PipetteLinks({
-    ...i
+  const instrumentList = instruments.map((inst) => PipetteLinks({
+    ...inst
   }))
-  const labwareList = labware.map((l) => LabwareLinks({
-    ...l
+  const labwareList = labware.map((lab) => LabwareLinks({
+    ...lab
   }))
   const pipetteSetup =
     <section className={styles.pipette_group}>

@@ -21,7 +21,6 @@ h1 {
 
 .links {
   grid-area: details;
-  padding: 0 1rem;
 }
 
 .pipette_group > a,
@@ -95,14 +94,14 @@ a:hover {
 
 .run_link {
   grid-area: btn_bottom;
-  border: 0.5rem;
-  background-color: #777;
   display: block;
   width: 100%;
+  border-radius: 0.5rem;
+  background-color: #777;
+  font-family: 'trons';
+  color: white;
   line-height: 3rem;
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-  font-family: 'trons';
-  color: white;
 }
