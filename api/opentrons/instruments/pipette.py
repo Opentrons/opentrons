@@ -80,6 +80,7 @@ class Pipette:
             self,
             robot,
             mount,
+            mount_obj=None,
             name=None,
             channels=1,
             min_volume=0,
@@ -1385,9 +1386,6 @@ class Pipette:
     def _move(self, x=None, y=None, z=None):
         if self.attached_tip and z is not None:
             z += self.attached_tip.length
-        print("IN PIP MOVEMENT COMMAND")
-        print("MY AXIS IS: ", self.axis)
-        print("MY MOVER AXIS IS: ", self.instrument_mover.mount.mount_axis)
 
         self.instrument_mover.move(x, y, z)
 

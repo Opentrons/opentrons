@@ -1,10 +1,9 @@
 
-probe_center = {'z': 63.0, 'x': 267.748, 'y': 289}
+probe_center = {'z': 68.0, 'x': 266.8637, 'y': 291.8181}
 probe_dimensions = {'length': 44, 'width': 35, 'height':63}
 
-
 class Probe:
-    def __init__(self, width, length, height, position_offset, pose_tracker, switch_offset=4):
+    def __init__(self, width, length, height, position_offset, pose_tracker, switch_offset=1):
         self.length, self.width, self.height = length, width, height
         self.switch_offset = switch_offset
         self._offset = position_offset
@@ -17,9 +16,9 @@ class Probe:
     @property
     def left_switch(self):
         return {
-            'x': self.pose.x - self.width / 2,
+            'x': self.pose.x - (self.width / 2),
             'y': self.pose.y - self.switch_offset,
-            'z': self.pose.z
+            'z': self.height
         }
 
     @property
