@@ -1,14 +1,15 @@
 import ast
+from copy import copy
 from datetime import datetime
 from functools import reduce
 
-from .models import Container, Instrument
-
 from opentrons.broker import publish, subscribe
+from opentrons.containers import get_container
 from opentrons.commands import tree, types
 from opentrons import robot
 from opentrons.robot.robot import Robot
-from opentrons.containers import get_container
+
+from .models import Container, Instrument
 
 
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
@@ -43,6 +44,9 @@ class Session(object):
         self._instruments = []
         self._interactions = []
 
+        self.instruments = None
+        self.containers = None
+
         self.refresh()
 
     def get_instruments(self):
@@ -76,6 +80,8 @@ class Session(object):
         self.errors.clear()
 
     def _simulate(self):
+        self._reset()
+
         stack = []
         res = []
         commands = []
@@ -105,12 +111,15 @@ class Session(object):
         unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
-            self.run()
+            exec(self._protocol, {})
+        except Exception as e:
+            self.error_append(e)
+            raise e
         finally:
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands
-            containers, instruments, interactions = _accumulate(
+            instruments, containers, interactions = _accumulate(
                 [_get_labware(command) for command in commands])
 
             self._containers.extend(_dedupe(containers))
@@ -120,7 +129,7 @@ class Session(object):
         return res
 
     def refresh(self):
-        self.clear_logs()
+        self._reset()
 
         try:
             parsed = ast.parse(self.protocol_text)
@@ -129,6 +138,10 @@ class Session(object):
         finally:
             if self.errors:
                 raise Exception(*self.errors)
+
+            self.containers = self.get_containers()
+            self.instruments = self.get_instruments()
+
             self.set_state('loaded')
         return self
 
@@ -147,21 +160,16 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self, devicename=None):
-        # HACK: hard reset singleton by replacing all of it's attributes
-        # with the one from a newly constructed robot
-        robot.__dict__ = {**Robot().__dict__}
-        self.clear_logs()
-        _unsubscribe = None
-
+    def run(self, devicename):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
 
-        if devicename is not None:
-            _unsubscribe = subscribe(types.COMMAND, on_command)
-            self.set_state('running')
-            robot.connect(devicename)
+        self._reset()
+
+        _unsubscribe = subscribe(types.COMMAND, on_command)
+        self.set_state('running')
+        robot.connect(devicename)
 
         try:
             exec(self._protocol, {})
@@ -169,12 +177,8 @@ class Session(object):
             self.error_append(e)
             raise e
         finally:
-            if _unsubscribe:
-                _unsubscribe()
-            # TODO (artyom, 20170927): we should fully separate
-            # run and simulate code
-            if devicename is not None:
-                self.set_state('finished')
+            _unsubscribe()
+            self.set_state('finished')
             robot.disconnect()
 
         return self
@@ -204,18 +208,24 @@ class Session(object):
         )
         self._on_state_changed()
 
+    def _reset(self):
+        # HACK: hard reset singleton by replacing all of it's attributes
+        # with the one from a newly constructed robot
+        robot.__dict__ = {**Robot().__dict__}
+        self.clear_logs()
+
+    # TODO (artyom, 20171003): along with calibration, consider extracting this
+    # into abstract base class or find any other way to keep notifications
+    # consistent across all managers
     def _snapshot(self):
         return {
             'topic': Session.TOPIC,
             'name': 'state',
-            'payload': {
-                'name': self.name,
-                'state': self.state,
-                'protocol_text': self.protocol_text,
-                'commands': self.commands.copy(),
-                'command_log': self.command_log.copy(),
-                'errors': self.errors.copy()
-            }
+            # we are making a copy to avoid the scenario
+            # when object state is updated elsewhere before
+            # it is serialized and transferred
+            'payload': copy(self)
+
         }
 
     def _on_state_changed(self):
