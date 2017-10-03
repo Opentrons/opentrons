@@ -2,10 +2,13 @@
 // takes a dispatch (send) function and returns a receive handler
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
+import {constants} from '../reducer'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
 const RUN_TIME_TICK_INTERVAL_MS = 200
+
+const NO_INTERVAL = -1
 
 export default function client (dispatch) {
   let rpcClient
@@ -14,6 +17,9 @@ export default function client (dispatch) {
   let robot
   // TODO(mc, 2017-08-29): remove when server handles serial port
   let serialPort
+
+  // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
+  let runTimerInterval = NO_INTERVAL
 
   return function receive (state, action) {
     const {type} = action
@@ -95,6 +101,7 @@ export default function client (dispatch) {
         // TODO(mc, 2017-09-07): remove when server handles serial port
         serialPort = null
 
+        clearRunTimerInterval()
         dispatch(actions.disconnectResponse())
       })
       .catch((error) => dispatch(actions.disconnectResponse(error)))
@@ -126,16 +133,11 @@ export default function client (dispatch) {
   }
 
   function run (state, action) {
-    const interval = setInterval(
-      () => dispatch(actions.tickRunTime()),
-      RUN_TIME_TICK_INTERVAL_MS
-    )
-
-    // TODO(mc, 2017-09-07): consider using Bluebird disposers for the interval
+    setRunTimerInterval()
     session.run(serialPort)
       .then(() => dispatch(actions.runResponse()))
       .catch((error) => dispatch(actions.runResponse(error)))
-      .then(() => clearInterval(interval))
+      .then(() => clearRunTimerInterval())
   }
 
   function pause (state, action) {
@@ -156,10 +158,31 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.cancelResponse(error)))
   }
 
+  function setRunTimerInterval () {
+    if (runTimerInterval === NO_INTERVAL) {
+      runTimerInterval = setInterval(
+        () => dispatch(actions.tickRunTime()),
+        RUN_TIME_TICK_INTERVAL_MS
+      )
+    }
+  }
+
+  function clearRunTimerInterval () {
+    clearInterval(runTimerInterval)
+    runTimerInterval = NO_INTERVAL
+  }
+
   function handleApiSession (apiSession) {
     const {name, protocol_text, commands, command_log, state} = apiSession
     const protocolCommands = []
     const protocolCommandsById = {}
+
+    // ensure run timer is running or stopped
+    if (state === constants.RUNNING) {
+      setRunTimerInterval()
+    } else {
+      clearRunTimerInterval()
+    }
 
     // TODO(mc, 2017-08-30): Use a reduce
     commands.forEach(makeHandleCommand())

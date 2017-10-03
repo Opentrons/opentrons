@@ -4,47 +4,44 @@ import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
 import {actions} from '../'
 
+import MockRobot from './__mocks__/robot'
+import MockSession from './__mocks__/session'
+
 jest.mock('../../../rpc/client')
 
 describe('api client', () => {
   let dispatch
-  let receive
+  let sendToClient
   let rpcClient
   let robot
-  // let session
+  let session
   let sessionManager
 
-  // TODO(mc, 2017-09-14): build or pull in a proper FileReader Jest mock
-  // let _oldFileReader
-  // beforeAll(() => {
-  //   if (global.FileReader) {
-  //     _oldFileReader = global.FileReader
-  //   }
-  //
-  //   global.FileReader = jest.fn()
-  // })
-  //
-  // afterAll(() => {
-  //   if (_oldFileReader) {
-  //     global.FileReader = _oldFileReader
-  //   } else {
-  //     delete global.FileReader
-  //   }
-  // })
+  let _global = {}
+  beforeAll(() => {
+    _global = {setInterval, clearInterval}
+
+    global.setInterval = jest.fn()
+    global.clearInterval = jest.fn()
+  })
+
+  afterAll(() => {
+    Object.keys(_global).forEach((method) => (global[method] = _global[method]))
+  })
 
   beforeEach(() => {
     // TODO(mc, 2017-08-29): this is a pretty nasty mock. Probably a sign we
     // need to simplify the RPC client
     // mock robot, session, and session manager
-    robot = {
-      // TODO(mc, 2017-09-07): remove when server handles serial port
-      get_serial_ports_list: jest.fn(() => Promise.resolve(['/dev/tty.USB0']))
-    }
-    // session = {}
-    sessionManager = {robot}
+    robot = MockRobot()
+    session = MockSession()
 
     // mock rpc client
+    sessionManager = {robot, session}
     rpcClient = {
+      // TODO(mc, 2017-09-22): these jest promise mocks are causing promise
+      // rejection warnings. These warnings are Jest's fault for nextTick stuff
+      // http://clarkdave.net/2016/09/node-v6-6-and-asynchronously-handled-promise-rejections/
       on: jest.fn(() => rpcClient),
       close: jest.fn(),
       remote: {
@@ -53,22 +50,22 @@ describe('api client', () => {
     }
 
     dispatch = jest.fn()
-    receive = client(dispatch)
     RpcClient.mockImplementation(() => Promise.resolve(rpcClient))
+
+    const _receive = client(dispatch)
+
+    sendToClient = (state, action) => {
+      _receive(state, action)
+      return delay(1)
+    }
   })
 
   afterEach(() => {
     RpcClient.mockReset()
   })
 
-  function sendAction (state, action) {
-    receive(state, action)
-
-    return delay(1)
-  }
-
-  const sendConnect = (state = {}) => sendAction(state, actions.connect())
-  const sendDisconnect = (state = {}) => sendAction(state, actions.disconnect())
+  const sendConnect = (state = {}) => sendToClient(state, actions.connect())
+  const sendDisconnect = (state = {}) => sendToClient(state, actions.disconnect())
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
@@ -154,6 +151,14 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+  })
+
+  describe('running', () => {
+    test('start a timer when the run starts', () => {
+      return sendConnect()
+        .then(() => sendToClient({}, actions.run()))
+        .then(() => expect(global.setInterval).toHaveBeenCalled())
     })
   })
 })

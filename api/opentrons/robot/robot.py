@@ -165,7 +165,7 @@ class Robot(object):
         self.can_pop_command.set()
 
         self.mode = None
-        self.smoothie_drivers = {
+        self._smoothie_drivers = {
             'live': None,
             'simulate': drivers.get_virtual_driver(
                 options={'limit_switches': False}
@@ -182,7 +182,7 @@ class Robot(object):
 
         null_driver.move = _null
         null_driver.home = _null
-        self.smoothie_drivers['null'] = null_driver
+        self._smoothie_drivers['null'] = null_driver
 
         self._driver = drivers.get_virtual_driver()
         self.disconnect()
@@ -345,13 +345,13 @@ class Robot(object):
             device = drivers.get_serial_driver(port)
 
         self._driver = device
-        self.smoothie_drivers['live'] = device
+        self._smoothie_drivers['live'] = device
 
         # set virtual smoothie do have same dimensions as real smoothie
         ot_v = device.ot_version
-        self.smoothie_drivers['simulate'].ot_version = ot_v
-        self.smoothie_drivers['simulate_switches'].ot_version = ot_v
-        self.smoothie_drivers['null'].ot_version = ot_v
+        self._smoothie_drivers['simulate'].ot_version = ot_v
+        self._smoothie_drivers['simulate_switches'].ot_version = ot_v
+        self._smoothie_drivers['null'].ot_version = ot_v
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -508,13 +508,13 @@ class Robot(object):
         ]
 
     def set_connection(self, mode):
-        if mode not in self.smoothie_drivers:
+        if mode not in self._smoothie_drivers:
             raise ValueError(
                 'mode expected to be "live", "simulate_switches", '
                 'or "simulate", {} provided'.format(mode)
             )
 
-        d = self.smoothie_drivers[mode]
+        d = self._smoothie_drivers[mode]
 
         # set VirtualSmoothie's coordinates to be the same as physical robot
         if d and d.is_simulating():

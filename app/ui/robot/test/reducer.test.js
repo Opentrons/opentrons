@@ -148,7 +148,7 @@ describe('robot reducer', () => {
 
     expect(reducer(state, action)).toEqual({
       sessionRequest: {inProgress: true, error: null},
-      sessionName: 'foo.py'
+      sessionName: '/path/to/foo.py'
     })
   })
 
@@ -247,7 +247,7 @@ describe('robot reducer', () => {
     })
   })
 
-  test('handled tickRunTime', () => {
+  test('handles tickRunTime', () => {
     const state = {runTime: 0}
     const action = {type: actionTypes.TICK_RUN_TIME}
 

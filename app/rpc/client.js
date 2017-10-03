@@ -114,6 +114,10 @@ class RpcContext extends EventEmitter {
   resolveTypeValues (source) {
     const typeId = source.t
 
+    if (!this._resultTypes.has(typeId)) {
+      this._resultTypes.set(typeId, REMOTE_TYPE_OBJECT)
+    }
+
     if (this._resultTypes.get(source.i) === REMOTE_TYPE_OBJECT) {
       return Promise.resolve({})
     }

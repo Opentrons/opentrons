@@ -156,6 +156,14 @@ def fuzzy_assert(result, expected):
             .format(res, exp)
 
 
+@pytest.fixture
+def connect(session, test_client):
+    async def _connect():
+        client = await test_client(session.server.app)
+        return await client.ws_connect('/')
+    return _connect
+
+
 def setup_testing_env():
     database.change_database(MAIN_TESTER_DB)
 
