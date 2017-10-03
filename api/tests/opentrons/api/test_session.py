@@ -233,3 +233,10 @@ def test_get_labware(labware_setup):
             [plates[0], plates[1]],
             [(p100, plates[0]), (p1000, plates[0]), (p1000, plates[1])]
         ]
+
+
+async def test_session_model_functional(session_manager, protocol):
+    session = session_manager.create(name='<blank>', text=protocol.text)
+    assert [container.name for container in session.containers] == \
+           ['tiprack', 'trough', 'plate']
+    assert [instrument.name for instrument in session.instruments] == ['p200']

@@ -30,10 +30,12 @@ def unpack_location(location):
 
 def get_container(location):
     obj, _ = unpack_location(location)
-    if isinstance(obj, Container):
-        return obj
-    if isinstance(obj.parent, Container):
-        return obj.parent
+
+    for obj in obj.get_trace():
+        # TODO(artyom 20171003): WellSeries will go away once we start
+        # supporting multi-channel properly
+        if isinstance(obj, Container) and not isinstance(obj, WellSeries):
+            return obj
 
 
 def humanize_location(location):
@@ -107,7 +109,7 @@ class Placeable(object):
         """
         Return full path to the :Placeable: for debugging
         """
-        return ''.join([str(i) for i in reversed(self.get_trace())])
+        return ''.join([str(i) for i in reversed(list(self.get_trace()))])
 
     def __str__(self):
         if not self.parent:
@@ -192,25 +194,20 @@ class Placeable(object):
 
     def get_trace(self, reference=None):
         """
-        Returns a list of parents up to :reference:, including reference
+        Returns a generator of parents up to :reference:, including reference
         If :reference: is *None* root is assumed
         Closest ancestor goes first
         """
-        def get_next_parent():
-            item = self
-            while item:
-                yield item
-                if item == reference:
-                    break
-                item = item.parent
+        item = self
+        while item:
+            yield item
+            if item == reference:
+                return
+            item = item.parent
 
-        trace = list(get_next_parent())
-
-        if reference is not None and reference not in trace:
+        if reference is not None:
             raise Exception(
                 'Reference {} is not in Ancestry'.format(reference))
-
-        return trace
 
     def coordinates(self, reference=None):
         """
