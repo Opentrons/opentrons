@@ -51,7 +51,7 @@ export default function PipetteConfig (props) {
 PipetteConfig.propTypes = {
   instruments: PropTypes.arrayOf(PropTypes.shape({
     axis: PropTypes.string.isRequired,
-    channels: PropTypes.number.isRequired,
+    channels: PropTypes.string.isRequired,
     volume: PropTypes.number.isRequired,
     isProbed: PropTypes.bool.isRequired
   })).isRequired
