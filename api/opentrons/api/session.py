@@ -111,7 +111,7 @@ class Session(object):
         unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
-            exec(self.protocol, {})
+            exec(self._protocol, {})
         except Exception as e:
             self.error_append(e)
             raise e
