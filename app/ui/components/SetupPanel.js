@@ -58,26 +58,6 @@ export default function SetupPanel (props) {
     return result
   }, {tiprackList: [], labwareList: []})
 
-  const pipetteSetup =
-    <section className={styles.pipette_group}>
-      <Link to='/setup-instruments'>Pipette Setup</Link>
-      <ul>
-        {instrumentList}
-      </ul>
-    </section>
-
-  let labwareSetup
-  if (isInstrumentsConfirmed) {
-    labwareSetup =
-      <section className={styles.labware_group}>
-        <Link to='/setup-deck'>Labware Setup</Link>
-        <ul>
-          {tiprackList}
-          {labwareList}
-        </ul>
-      </section>
-  }
-
   let runLink
   if (isLabwareConfirmed) {
     runLink = <Link to='/run' className={styles.run_link}>Run Protocol</Link>
@@ -87,8 +67,19 @@ export default function SetupPanel (props) {
     <div className={styles.setup_panel}>
       <h1>Prepare Robot for RUN</h1>
       <section className={styles.links}>
-        {pipetteSetup}
-        {labwareSetup}
+        <section className={styles.pipette_group}>
+          <Link to='/setup-instruments'>Pipette Setup</Link>
+          <ul>
+            {instrumentList}
+          </ul>
+        </section>
+        <section className={classnames({[styles.unavailable]: !isInstrumentsConfirmed}, styles.labware_group)}>
+          <Link to='/setup-deck'>Labware Setup</Link>
+          <ul>
+            {tiprackList}
+            {labwareList}
+          </ul>
+        </section>
       </section>
       {runLink}
     </div>

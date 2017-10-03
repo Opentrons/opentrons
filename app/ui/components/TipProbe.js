@@ -69,10 +69,10 @@ export default function TipProbe (props) {
 }
 
 TipProbe.propTypes = {
-  currentInstrument: PropTypes.arrayOf(PropTypes.shape({
+  currentInstrument: PropTypes.shape({
     volume: PropTypes.number.isRequired,
     tipIsPreparingForProbe: PropTypes.bool.isRequired,
     tipIsProbing: PropTypes.bool.isRequired,
     tipIsProbed: PropTypes.bool.isRequired
-  })).isRequired
+  }).isRequired
 }

@@ -45,6 +45,11 @@ h1 {
   margin-top: 2rem;
 }
 
+.unavailable {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
 ul li a {
   color: black;
   text-decoration: none;
