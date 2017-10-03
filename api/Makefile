@@ -5,7 +5,7 @@ SHELL := /bin/bash
 .PHONY: test docs publish clean install exe dev
 
 install:
-	python setup.py install && pip install -r requirements.txt
+	pip install -r requirements.txt && pip install -e .
 
 test:
 	python -m pylama opentrons tests && python -m pytest \

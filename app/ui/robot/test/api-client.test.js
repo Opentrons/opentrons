@@ -47,7 +47,9 @@ describe('api client', () => {
     rpcClient = {
       on: jest.fn(() => rpcClient),
       close: jest.fn(),
-      remote: sessionManager
+      remote: {
+        session_manager: sessionManager
+      }
     }
 
     dispatch = jest.fn()
