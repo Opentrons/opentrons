@@ -1,7 +1,4 @@
-import pytest
 from unittest import mock
-
-from fixtures import main_router, model
 
 
 def state(state):
