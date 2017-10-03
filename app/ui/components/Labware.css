@@ -1,0 +1,32 @@
+.empty_slot,
+.slot {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+}
+
+.empty_slot {
+  background-color: #eee;
+  font-family: 'sans';
+  color: white;
+  font-size: 3rem;
+}
+
+.slot {
+  border: 2px solid silver;
+}
+
+.selected {
+  border: 4px solid silver;
+}
+
+.disabled {
+  background-color: grey;
+}
+
+.deck img {
+  width: 100%;
+}
