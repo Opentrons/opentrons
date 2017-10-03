@@ -47,17 +47,17 @@ export default function SetupPanel (props) {
   const instrumentList = instruments.map((inst) => PipetteLinks({
     ...inst
   }))
-  let tiprackList = []
-  let labwareList = []
-  labware.map((lab) => {
+
+  const {tiprackList, labwareList} = labware.reduce((result, lab) => {
+    const links = LabwareLinks({...lab, isTipracksConfirmed})
     if (lab.isTiprack) {
-      tiprackList.push(LabwareLinks({...lab}))
+      result.tiprackList.push(links)
     } else {
-      labwareList.push(LabwareLinks(
-        {...lab, isTipracksConfirmed}
-      ))
+      result.labwareList.push(links)
     }
-  })
+    return result
+  }, {tiprackList: [], labwareList: []})
+
   const pipetteSetup =
     <section className={styles.pipette_group}>
       <Link to='/setup-instruments'>Pipette Setup</Link>
