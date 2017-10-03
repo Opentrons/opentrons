@@ -1,5 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './SetupPanel.css'
 
@@ -20,12 +21,12 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, slot, isConfirmed, isTiprack, tipracksConfirmed} = props
+  const {name, slot, isConfirmed, isTiprack, isTipracksConfirmed} = props
   const url = `/setup-deck/${slot}`
   const calibrationStyle = isConfirmed
     ? styles.confirmed
     : styles.alert
-  let isDisabled = !isTiprack && !tipracksConfirmed
+  let isDisabled = !isTiprack && !isTipracksConfirmed
   return (
     <li key={slot}>
       <Link to={url} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
@@ -39,9 +40,9 @@ export default function SetupPanel (props) {
   const {
     instruments,
     labware,
-    instrumentsConfirmed,
-    labwareConfirmed,
-    tipracksConfirmed
+    isInstrumentsConfirmed,
+    isLabwareConfirmed,
+    isTipracksConfirmed
   } = props
   const instrumentList = instruments.map((inst) => PipetteLinks({
     ...inst
@@ -53,7 +54,7 @@ export default function SetupPanel (props) {
       tiprackList.push(LabwareLinks({...lab}))
     } else {
       labwareList.push(LabwareLinks(
-        {...lab, tipracksConfirmed}
+        {...lab, isTipracksConfirmed}
       ))
     }
   })
@@ -66,7 +67,7 @@ export default function SetupPanel (props) {
     </section>
 
   let labwareSetup
-  if (instrumentsConfirmed) {
+  if (isInstrumentsConfirmed) {
     labwareSetup =
       <section className={styles.labware_group}>
         <Link to='/setup-deck'>Labware Setup</Link>
@@ -78,7 +79,7 @@ export default function SetupPanel (props) {
   }
 
   let runLink
-  if (labwareConfirmed) {
+  if (isLabwareConfirmed) {
     runLink = <Link to='/run' className={styles.run_link}>Run Protocol</Link>
   }
 
@@ -92,4 +93,23 @@ export default function SetupPanel (props) {
       {runLink}
     </div>
   )
+}
+
+SetupPanel.propTypes = {
+  instruments: PropTypes.arrayOf(PropTypes.shape({
+    axis: PropTypes.string.isRequired,
+    channels: PropTypes.number.isRequired,
+    volume: PropTypes.number.isRequired,
+    isProbed: PropTypes.bool.isRequired
+  })).isRequired,
+  labware: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    slot: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    isConfirmed: PropTypes.bool.isRequired,
+    isTiprack: PropTypes.bool.isRequired
+  })).isRequired,
+  isInstrumentsConfirmed: PropTypes.bool.isRequired,
+  isTipracksConfirmed: PropTypes.bool.isRequired,
+  isLabwareConfirmed: PropTypes.bool.isRequired
 }

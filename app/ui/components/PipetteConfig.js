@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import styles from './PipetteConfig.css'
 
@@ -42,9 +43,16 @@ export default function PipetteConfig (props) {
   })
   return (
     <section className={styles.pipette_group}>
-
       {pipettes}
-
     </section>
   )
+}
+
+PipetteConfig.propTypes = {
+  instruments: PropTypes.arrayOf(PropTypes.shape({
+    axis: PropTypes.string.isRequired,
+    channels: PropTypes.number.isRequired,
+    volume: PropTypes.number.isRequired,
+    isProbed: PropTypes.bool.isRequired
+  })).isRequired
 }
