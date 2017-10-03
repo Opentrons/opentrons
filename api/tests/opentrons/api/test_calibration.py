@@ -8,7 +8,7 @@ def state(state):
     def _match(item):
         return item['name'] == 'state' and \
                item['topic'] == 'calibration' and \
-               item['payload']['state'] == state
+               item['payload'].state == state
 
     return _match
 

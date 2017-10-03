@@ -1,14 +1,15 @@
 import ast
+from copy import copy
 from datetime import datetime
 from functools import reduce
 
-from .models import Container, Instrument
-
 from opentrons.broker import publish, subscribe
+from opentrons.containers import get_container
 from opentrons.commands import tree, types
 from opentrons import robot
 from opentrons.robot.robot import Robot
-from opentrons.containers import get_container
+
+from .models import Container, Instrument
 
 
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
@@ -213,18 +214,18 @@ class Session(object):
         robot.__dict__ = {**Robot().__dict__}
         self.clear_logs()
 
+    # TODO (artyom, 20171003): along with calibration, consider extracting this
+    # into abstract base class or find any other way to keep notifications
+    # consistent across all managers
     def _snapshot(self):
         return {
             'topic': Session.TOPIC,
             'name': 'state',
-            'payload': {
-                'name': self.name,
-                'state': self.state,
-                'protocol_text': self.protocol_text,
-                'commands': self.commands.copy(),
-                'command_log': self.command_log.copy(),
-                'errors': self.errors.copy()
-            }
+            # we are making a copy to avoid the scenario
+            # when object state is updated elsewhere before
+            # it is serialized and transferred
+            'payload': copy(self)
+
         }
 
     def _on_state_changed(self):

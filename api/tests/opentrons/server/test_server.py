@@ -134,13 +134,14 @@ async def test_get_object_by_id(session, root):
                 'data': {
                     'i': type_id(session.server.root),
                     't': id(type),
-                    'v': set([
+                    'v': {
+                        'STATIC',
                         'value',
                         'throw',
                         'next',
                         'combine',
                         'add'
-                       ])
+                       }
                     }
                 }
     # We care only about dictionary keys, since we don't want

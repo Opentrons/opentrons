@@ -91,9 +91,9 @@ async def test_load_and_run(main_router, session_manager, protocol):
         name, payload = notification['name'], notification['payload']
         if (name == 'state'):
             index += 1  # Command log in sync with add-command events emitted
-            state = payload['state']
+            state = payload.state
             res.append(state)
-            if payload['state'] == 'finished':
+            if payload.state == 'finished':
                 break
 
     assert [key for key, _ in itertools.groupby(res)] == \

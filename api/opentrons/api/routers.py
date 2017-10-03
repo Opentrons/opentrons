@@ -1,6 +1,7 @@
+from opentrons.broker import subscribe, Notifications
+
 from .session import SessionManager, Session
 from .calibration import CalibrationManager
-from opentrons.broker import subscribe, Notifications
 
 
 class MainRouter:

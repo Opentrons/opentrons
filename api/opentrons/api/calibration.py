@@ -1,6 +1,9 @@
+from copy import copy
+
 from opentrons.robot.robot import Robot
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
+
 from .models import Container
 
 
@@ -57,13 +60,14 @@ class CalibrationManager:
                 save=True
             )
 
+    # TODO (artyom, 20171003): along with session, consider extracting this
+    # into abstract base class or find any other way to keep notifications
+    # consistent across all managers
     def _snapshot(self):
         return {
             'topic': CalibrationManager.TOPIC,
             'name': 'state',
-            'payload': {
-                'state': self.state,
-            }
+            'payload': copy(self)
         }
 
     def _on_state_changed(self):
