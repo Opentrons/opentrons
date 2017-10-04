@@ -227,14 +227,14 @@ describe('api client', () => {
     test('maps api instruments and intruments by axis', () => {
       const expected = actions.sessionResponse(null, expect.objectContaining({
         protocolInstrumentsByAxis: {
-          left: {axis: 'left', name: 'p200', channels: 1, volume: 200},
-          right: {axis: 'right', name: 'p50', channels: 8, volume: 50}
+          left: {_id: 2, axis: 'left', name: 'p200', channels: 1, volume: 200},
+          right: {_id: 1, axis: 'right', name: 'p50', channels: 8, volume: 50}
         }
       }))
 
       session.instruments = [
-        {axis: 'a', name: 'p50', channels: 8},
-        {axis: 'b', name: 'p200', channels: 1}
+        {_id: 1, axis: 'a', name: 'p50', channels: 8},
+        {_id: 2, axis: 'b', name: 'p200', channels: 1}
       ]
 
       return sendConnect()
@@ -244,16 +244,16 @@ describe('api client', () => {
     test('maps api containers to labware by slot', () => {
       const expected = actions.sessionResponse(null, expect.objectContaining({
         protocolLabwareBySlot: {
-          1: {id: 'A1', slot: 1, name: 'a1', type: 'tiprack', isTiprack: true},
-          5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
-          9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+          1: {_id: 1, id: 'A1', slot: 1, name: 'a', type: 'tiprack', isTiprack: true},
+          5: {_id: 2, id: 'B2', slot: 5, name: 'b', type: 'B', isTiprack: false},
+          9: {_id: 3, id: 'C3', slot: 9, name: 'c', type: 'C', isTiprack: false}
         }
       }))
 
       session.containers = [
-        {slot: 'A1', name: 'a1', type: 'tiprack'},
-        {slot: 'B2', name: 'b2', type: 'b'},
-        {slot: 'C3', name: 'c3', type: 'c'}
+        {_id: 1, slot: 'A1', name: 'a', type: 'tiprack'},
+        {_id: 2, slot: 'B2', name: 'b', type: 'B'},
+        {_id: 3, slot: 'C3', name: 'c', type: 'C'}
       ]
 
       return sendConnect()

@@ -241,19 +241,19 @@ export default function client (dispatch) {
     }
 
     function apiInstrumentToInstrument (apiInstrument) {
-      const {axis: originalAxis, name, channels} = apiInstrument
+      const {_id, axis: originalAxis, name, channels} = apiInstrument
       const axis = INSTRUMENT_AXES[originalAxis]
       const volume = Number(name.match(RE_VOLUME)[1])
 
-      protocolInstrumentsByAxis[axis] = {axis, name, channels, volume}
+      protocolInstrumentsByAxis[axis] = {_id, axis, name, channels, volume}
     }
 
     function apiContainerToContainer (apiContainer) {
-      const {name, type, slot: id} = apiContainer
+      const {_id, name, type, slot: id} = apiContainer
       const isTiprack = RE_TIPRACK.test(type)
       const slot = letterSlotToNumberSlot(id)
 
-      protocolLabwareBySlot[slot] = {name, id, slot, type, isTiprack}
+      protocolLabwareBySlot[slot] = {_id, name, id, slot, type, isTiprack}
     }
   }
 

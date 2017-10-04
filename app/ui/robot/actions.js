@@ -7,15 +7,31 @@ const makeRobotActionName = (action) => makeActionName(NAME, action)
 const makeRobotAction = (action) => ({...action, meta: {robotCommand: true}})
 
 export const actionTypes = {
-  // requests and responses
+  // connect and disconnect
   CONNECT: makeRobotActionName('CONNECT'),
   CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
   DISCONNECT: makeRobotActionName('DISCONNECT'),
   DISCONNECT_RESPONSE: makeRobotActionName('DISCONNECT_RESPONSE'),
+
+  // protocol loading
   SESSION: makeRobotActionName('SESSION'),
   SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
+
+  // calibration
   HOME: makeRobotActionName('HOME'),
   HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  MOVE_TIP_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
+  MOVE_TIP_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
+  PROBE_TIP: makeRobotActionName('PROBE_TIP'),
+  PROBE_TIP_RESPONSE: makeRobotActionName('PROBE_TIP_RESPONSE'),
+  MOVE_TO: makeRobotActionName('MOVE_TO'),
+  MOVE_TO_RESPONSE: makeRobotActionName('MOVE_TO_RESPONSE'),
+  JOG: makeRobotActionName('JOG'),
+  JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
+  UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
+  UPDATE_OFFSET_RESPONSE: makeRobotActionName('UPDATE_OFFSET_RESPONSE'),
+
+  // protocol run controls
   RUN: makeRobotActionName('RUN'),
   RUN_RESPONSE: makeRobotActionName('RUN_RESPONSE'),
   PAUSE: makeRobotActionName('PAUSE'),
@@ -24,6 +40,7 @@ export const actionTypes = {
   RESUME_RESPONSE: makeRobotActionName('RESUME_RESPONSE'),
   CANCEL: makeRobotActionName('CANCEL'),
   CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE'),
+
   TICK_RUN_TIME: makeRobotActionName('TICK_RUN_TIME')
 }
 
@@ -64,6 +81,79 @@ export const actions = {
 
   homeResponse (error = null) {
     return {type: actionTypes.HOME_RESPONSE, error}
+  },
+
+  moveTipToFront (instrument) {
+    return makeRobotAction({
+      type: actionTypes.MOVE_TIP_TO_FRONT,
+      payload: {instrument}
+    })
+  },
+
+  moveTipToFrontResponse (error = null) {
+    const action = {
+      type: actionTypes.MOVE_TIP_TO_FRONT_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  probeTip (instrument) {
+    return makeRobotAction({type: actionTypes.PROBE_TIP, payload: {instrument}})
+  },
+
+  probeTipResponse (error = null) {
+    const action = {type: actionTypes.PROBE_TIP_RESPONSE, error: error != null}
+    if (error) action.payload = error
+
+    return action
+  },
+
+  moveTo (instrument, labware) {
+    return makeRobotAction({
+      type: actionTypes.MOVE_TO,
+      payload: {instrument, labware}
+    })
+  },
+
+  moveToResponse (error = null) {
+    const action = {type: actionTypes.MOVE_TO_RESPONSE, error: error != null}
+    if (error) action.payload = error
+
+    return action
+  },
+
+  jog (instrument, coordinates) {
+    return makeRobotAction({
+      type: actionTypes.JOG,
+      payload: {instrument, coordinates}
+    })
+  },
+
+  jogResponse (error = null) {
+    const action = {type: actionTypes.JOG_RESPONSE, error: error != null}
+    if (error) action.payload = error
+
+    return action
+  },
+
+  updateOffset (instrument, labware) {
+    return makeRobotAction({
+      type: actionTypes.UPDATE_OFFSET,
+      payload: {instrument, labware}
+    })
+  },
+
+  updateOffsetResponse (error = null) {
+    const action = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
   },
 
   run () {
