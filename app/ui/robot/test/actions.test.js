@@ -96,27 +96,27 @@ describe('robot actions', () => {
 
   test('move tip to front action', () => {
     const expected = {
-      type: actionTypes.MOVE_TIP_TO_FRONT,
+      type: actionTypes.MOVE_TO_FRONT,
       payload: {instrument: 'right'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.moveTipToFront('right')).toEqual(expected)
+    expect(actions.moveToFront('right')).toEqual(expected)
   })
 
   test('move tip to front response action', () => {
     const success = {
-      type: actionTypes.MOVE_TIP_TO_FRONT_RESPONSE,
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: false
     }
     const failure = {
-      type: actionTypes.MOVE_TIP_TO_FRONT_RESPONSE,
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: true,
       payload: new Error('AH')
     }
 
-    expect(actions.moveTipToFrontResponse()).toEqual(success)
-    expect(actions.moveTipToFrontResponse(new Error('AH'))).toEqual(failure)
+    expect(actions.moveToFrontResponse()).toEqual(success)
+    expect(actions.moveToFrontResponse(new Error('AH'))).toEqual(failure)
   })
 
   test('probe tip action', () => {

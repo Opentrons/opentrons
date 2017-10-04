@@ -36,7 +36,7 @@ export default function client (dispatch) {
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
       case actionTypes.HOME: return home(state, action)
-      case actionTypes.MOVE_TIP_TO_FRONT: return moveTipToFront(state, action)
+      case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
       case actionTypes.MOVE_TO: return moveTo(state, action)
       case actionTypes.JOG: return jog(state, action)
@@ -122,13 +122,13 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.homeResponse(error)))
   }
 
-  function moveTipToFront (state, action) {
+  function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
 
     remote.calibration_manager.move_to_front(instrument)
-      .then(() => dispatch(actions.moveTipToFrontResponse()))
-      .catch((error) => dispatch(actions.moveTipToFrontResponse(error)))
+      .then(() => dispatch(actions.moveToFrontResponse()))
+      .catch((error) => dispatch(actions.moveToFrontResponse(error)))
   }
 
   function probeTip (state, action) {

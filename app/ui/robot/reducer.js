@@ -29,13 +29,14 @@ export const constants = {
 // state helpers
 const makeRequestState = () => ({inProgress: false, error: null})
 
-const handleRequest = (state, request, payload, error, props = {}) => ({
+const handleRequest = (state, request, _, props = {}) => ({
   ...state,
   ...props,
   [request]: {...state[request], inProgress: true, error: null}
 })
 
-const handleResponse = (state, request, payload, error, props = {}) => ({
+// TODO(mc, 2017-10-04): Update this function to handle FSA where error is bool
+const handleResponse = (state, request, error, props = {}) => ({
   ...state,
   ...props,
   [request]: {...state[request], inProgress: false, error}
@@ -62,6 +63,11 @@ const INITIAL_STATE = {
 
   // robot calibration and setup
   homeRequest: makeRequestState(),
+  moveToFrontRequest: makeRequestState(),
+  probeTipRequest: makeRequestState(),
+  moveToRequest: makeRequestState(),
+  jogRequest: makeRequestState(),
+  updateOffsetRequest: makeRequestState(),
 
   // running a protocol
   runRequest: makeRequestState(),
@@ -71,6 +77,7 @@ const INITIAL_STATE = {
   runTime: 0
 }
 
+// TODO(mc, 2017-10-04): move selectors to own file
 export const selectors = {
   getState (allState) {
     return allState[NAME]
@@ -175,7 +182,7 @@ export const selectors = {
 
     return constants.INSTRUMENT_AXES.map((axis) => {
       const instrument = protocolInstrumentsByAxis[axis] || {axis}
-      const calibration = instrumentCalibrationByAxis[axis] || {}
+      const calibration = instrumentCalibrationByAxis[axis] || {isProbed: false}
 
       if (instrument.channels === 1) {
         instrument.channels = constants.SINGLE_CHANNEL
@@ -205,20 +212,25 @@ export const selectors = {
 export function reducer (state = INITIAL_STATE, action) {
   const {type, payload, error} = action
 
+  // TODO(mc, 2017-10-04): remove when all actions are actually FSA compliant
+  const errorPayload = error === true
+    ? payload
+    : null
+
   switch (type) {
     case actionTypes.CONNECT:
-      return handleRequest(state, 'connectRequest', payload, error)
+      return handleRequest(state, 'connectRequest', error)
 
     case actionTypes.CONNECT_RESPONSE:
-      return handleResponse(state, 'connectRequest', payload, error, {
+      return handleResponse(state, 'connectRequest', error, {
         isConnected: error == null
       })
 
     case actionTypes.DISCONNECT:
-      return handleRequest(state, 'disconnectRequest', payload, error)
+      return handleRequest(state, 'disconnectRequest', error)
 
     case actionTypes.DISCONNECT_RESPONSE:
-      return handleResponse(state, 'disconnectRequest', payload, error, {
+      return handleResponse(state, 'disconnectRequest', error, {
         isConnected: error != null,
         sessionName: error ? state.sessionName : '',
         protocolText: error ? state.protocolText : '',
@@ -229,50 +241,74 @@ export function reducer (state = INITIAL_STATE, action) {
       })
 
     case actionTypes.SESSION:
-      return handleRequest(state, 'sessionRequest', payload, error, {
+      return handleRequest(state, 'sessionRequest', error, {
         sessionName: payload.file.name
       })
 
     case actionTypes.SESSION_RESPONSE:
-      return handleResponse(state, 'sessionRequest', payload, error, payload.session)
+      return handleResponse(state, 'sessionRequest', error, payload.session)
 
     case actionTypes.HOME:
-      return handleRequest(state, 'homeRequest', payload, error)
+      return handleRequest(state, 'homeRequest', error)
 
     case actionTypes.HOME_RESPONSE:
-      return handleResponse(state, 'homeRequest', payload, error)
+      return handleResponse(state, 'homeRequest', error)
+
+    case actionTypes.MOVE_TO_FRONT:
+      return handleRequest(state, 'moveToFrontRequest', errorPayload)
+
+    case actionTypes.MOVE_TO_FRONT_RESPONSE:
+      return handleResponse(state, 'moveToFrontRequest', errorPayload)
+
+    case actionTypes.PROBE_TIP:
+      return handleRequest(state, 'probeTipRequest', errorPayload)
+
+    case actionTypes.PROBE_TIP_RESPONSE:
+      return handleResponse(state, 'probeTipRequest', errorPayload)
+
+    case actionTypes.MOVE_TO:
+      return handleRequest(state, 'moveToRequest', errorPayload)
+
+    case actionTypes.MOVE_TO_RESPONSE:
+      return handleResponse(state, 'moveToRequest', errorPayload)
+
+    case actionTypes.JOG:
+      return handleRequest(state, 'jogRequest', errorPayload)
+
+    case actionTypes.JOG_RESPONSE:
+      return handleResponse(state, 'jogRequest', errorPayload)
+
+    case actionTypes.UPDATE_OFFSET:
+      return handleRequest(state, 'updateOffsetRequest', errorPayload)
+
+    case actionTypes.UPDATE_OFFSET_RESPONSE:
+      return handleResponse(state, 'updateOffsetRequest', errorPayload)
 
     case actionTypes.RUN:
-      return handleRequest(state, 'runRequest', payload, error, {
-        runTime: 0
-      })
+      return handleRequest(state, 'runRequest', error, {runTime: 0})
 
     case actionTypes.RUN_RESPONSE:
-      return handleResponse(state, 'runRequest', payload, error)
+      return handleResponse(state, 'runRequest', error)
 
     case actionTypes.PAUSE:
-      return handleRequest(state, 'pauseRequest', payload, error)
+      return handleRequest(state, 'pauseRequest', error)
 
     case actionTypes.PAUSE_RESPONSE:
-      return handleResponse(state, 'pauseRequest', payload, error, {
-        isPaused: error == null
-      })
+      return handleResponse(state, 'pauseRequest', error, {isPaused: !error})
 
     case actionTypes.RESUME:
-      return handleRequest(state, 'resumeRequest', payload, error)
+      return handleRequest(state, 'resumeRequest', error)
 
     case actionTypes.RESUME_RESPONSE:
-      return handleResponse(state, 'resumeRequest', payload, error, {
-        isPaused: error != null
-      })
+      return handleResponse(state, 'resumeRequest', error, {isPaused: !!error})
 
     case actionTypes.CANCEL:
-      return handleRequest(state, 'cancelRequest', payload, error)
+      return handleRequest(state, 'cancelRequest', error)
 
     case actionTypes.CANCEL_RESPONSE:
-      return handleResponse(state, 'cancelRequest', payload, error, {
-        isRunning: error != null,
-        isPaused: error != null
+      return handleResponse(state, 'cancelRequest', error, {
+        isRunning: !!error,
+        isPaused: !!error
       })
 
     case actionTypes.TICK_RUN_TIME:

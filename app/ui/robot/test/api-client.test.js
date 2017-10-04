@@ -283,9 +283,9 @@ describe('api client', () => {
       }
     })
 
-    test('handles MOVE_TIP_TO_FRONT success', () => {
-      const action = actions.moveTipToFront('left')
-      const expectedResponse = actions.moveTipToFrontResponse()
+    test('handles MOVE_TO_FRONT success', () => {
+      const action = actions.moveToFront('left')
+      const expectedResponse = actions.moveToFrontResponse()
 
       calibrationManager.move_to_front.mockReturnValue(Promise.resolve())
 
@@ -298,9 +298,9 @@ describe('api client', () => {
         })
     })
 
-    test('handles MOVE_TIP_TO_FRONT failure', () => {
-      const action = actions.moveTipToFront('left')
-      const expectedResponse = actions.moveTipToFrontResponse(new Error('AH'))
+    test('handles MOVE_TO_FRONT failure', () => {
+      const action = actions.moveToFront('left')
+      const expectedResponse = actions.moveToFrontResponse(new Error('AH'))
 
       calibrationManager.move_to_front
         .mockReturnValue(Promise.reject(new Error('AH')))

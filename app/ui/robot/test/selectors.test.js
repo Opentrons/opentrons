@@ -232,7 +232,8 @@ describe('robot selectors', () => {
   test('get instruments', () => {
     const state = makeState({
       protocolInstrumentsByAxis: {
-        left: {axis: 'left', channels: 8, volume: 200}
+        left: {axis: 'left', channels: 8, volume: 200},
+        right: {axis: 'right', channels: 1, volume: 50}
       },
       instrumentCalibrationByAxis: {
         left: {isProbed: true}
@@ -241,7 +242,7 @@ describe('robot selectors', () => {
 
     expect(getInstruments(state)).toEqual([
       {axis: 'left', channels: 'multi', volume: 200, isProbed: true},
-      {axis: 'right'}
+      {axis: 'right', channels: 'single', volume: 50, isProbed: false}
     ])
   })
 

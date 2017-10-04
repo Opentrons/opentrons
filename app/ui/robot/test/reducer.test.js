@@ -31,6 +31,11 @@ describe('robot reducer', () => {
       protocolLabwareBySlot: {},
 
       homeRequest: {inProgress: false, error: null},
+      moveToFrontRequest: {inProgress: false, error: null},
+      probeTipRequest: {inProgress: false, error: null},
+      moveToRequest: {inProgress: false, error: null},
+      jogRequest: {inProgress: false, error: null},
+      updateOffsetRequest: {inProgress: false, error: null},
 
       runRequest: {inProgress: false, error: null},
       pauseRequest: {inProgress: false, error: null},
@@ -216,6 +221,136 @@ describe('robot reducer', () => {
 
     expect(reducer(state, action)).toEqual({
       homeRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles moveToFront action', () => {
+    const state = {moveToFrontRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.MOVE_TO_FRONT}
+
+    expect(reducer(state, action)).toEqual({
+      moveToFrontRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles moveToFrontResponse action', () => {
+    const state = {moveToFrontRequest: {inProgress: true, error: null}}
+    const success = {type: actionTypes.MOVE_TO_FRONT_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      moveToFrontRequest: {inProgress: false, error: null}
+    })
+    expect(reducer(state, failure)).toEqual({
+      moveToFrontRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles probeTip action', () => {
+    const state = {probeTipRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.PROBE_TIP}
+
+    expect(reducer(state, action)).toEqual({
+      probeTipRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles probeTipResponse action', () => {
+    const state = {probeTipRequest: {inProgress: true, error: null}}
+    const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.PROBE_TIP_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      probeTipRequest: {inProgress: false, error: null}
+    })
+    expect(reducer(state, failure)).toEqual({
+      probeTipRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles moveTo action', () => {
+    const state = {moveToRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.MOVE_TO}
+
+    expect(reducer(state, action)).toEqual({
+      moveToRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles moveToResponse action', () => {
+    const state = {moveToRequest: {inProgress: true, error: null}}
+    const success = {type: actionTypes.MOVE_TO_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.MOVE_TO_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      moveToRequest: {inProgress: false, error: null}
+    })
+    expect(reducer(state, failure)).toEqual({
+      moveToRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles jog action', () => {
+    const state = {jogRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.JOG}
+
+    expect(reducer(state, action)).toEqual({
+      jogRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles jogResponse action', () => {
+    const state = {jogRequest: {inProgress: true, error: null}}
+    const success = {type: actionTypes.JOG_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.JOG_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      jogRequest: {inProgress: false, error: null}
+    })
+    expect(reducer(state, failure)).toEqual({
+      jogRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles updateOffset action', () => {
+    const state = {updateOffsetRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.UPDATE_OFFSET}
+
+    expect(reducer(state, action)).toEqual({
+      updateOffsetRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles updateOffsetResponse action', () => {
+    const state = {updateOffsetRequest: {inProgress: true, error: null}}
+    const success = {type: actionTypes.UPDATE_OFFSET_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      updateOffsetRequest: {inProgress: false, error: null}
+    })
+    expect(reducer(state, failure)).toEqual({
+      updateOffsetRequest: {inProgress: false, error: new Error('AH')}
     })
   })
 
