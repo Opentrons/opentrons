@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import styles from './PipetteConfig.css'
+import singlePipetteSrc from '../img/pipette_single.png'
 
 export default function PipetteConfig (props) {
   const {side, instruments} = props
@@ -36,7 +37,7 @@ export default function PipetteConfig (props) {
         </div>
 
         <div className={styles.pipette_icon}>
-          <img src='../img/pipette_single.png' />
+          <img src={singlePipetteSrc} />
         </div>
       </div>
     )
