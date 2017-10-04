@@ -4,7 +4,7 @@ import {NavLink} from 'react-router-dom'
 import styles from './Labware.css'
 
 export default function Labware (props) {
-  let {
+  const {
     type,
     slot,
     isDeckmapReviewed,
@@ -13,7 +13,7 @@ export default function Labware (props) {
     isTiprack
   } = props
   const url = `/setup-deck/${slot}`
-  let slotStyle = {
+  const slotStyle = {
     gridArea: `slot-${slot}`
   }
   let confirmationMsg
@@ -39,9 +39,9 @@ export default function Labware (props) {
         {confirmationMsg}
       </NavLink>
     )
-  } else {
-    return (
-      <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
-    )
   }
+  return (
+    <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
+  )
+
 }

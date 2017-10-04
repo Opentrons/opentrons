@@ -111,15 +111,3 @@
 h3 {
   text-transform: capitalize;
 }
-
-.alert {
-  background-color: silver;
-  color: white;
-  height: 1rem;
-  width: 1rem;
-  margin: 0.5rem;
-  text-align: center;
-  border-radius: 0.5rem;
-  display: block;
-  float: left;
-}

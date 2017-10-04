@@ -1,5 +1,5 @@
 import React from 'react'
-import {NavLink} from 'react-router-dom'
+import {Link} from 'react-router-dom'
 import Labware from './Labware'
 import styles from './DeckConfig.css'
 
@@ -35,7 +35,7 @@ const BeginCalibrationPrompt = () => {
       <p>Click [Move To Well] to initiate calibration sequence.</p>
       <button
         className={styles.robot_action}
-        onClick={console.log('move to slot action, needs slot from state/route?')}
+        onClick={() => console.log('move to slot action, needs slot from state/route?')}
       >
         Move To Well A1
       </button>
@@ -63,13 +63,13 @@ const ConfirmCalibrationPrompt = (props) => {
       >
         Yes
       </button>
-      <NavLink
+      <Link
         to={url}
         className={styles.btn_modal}
         onClick={() => console.log('open jog modal')}
       >
         No
-      </NavLink>
+      </Link>
     </div>
   )
 }

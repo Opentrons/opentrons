@@ -9,7 +9,7 @@
 .review_deck > div {
   margin: 0 auto;
   width: 100%;
-  height: calc(100% * 0.75);
+  height: 75%;
   padding: 1rem 4rem;
 }
 
