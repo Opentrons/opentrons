@@ -28,7 +28,8 @@
 
 .continue,
 .robot_action,
-.confirm {
+.confirm,
+.btn_modal{
   margin-top: 1rem;
   font-size: 1rem;
   padding: 0 3rem;
@@ -41,6 +42,12 @@
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.btn_modal {
+  display: inline-block;
+  width: 8rem;
+  padding: 0;
 }
 
 .confirm {

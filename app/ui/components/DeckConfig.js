@@ -1,4 +1,5 @@
 import React from 'react'
+import {NavLink} from 'react-router-dom'
 import Labware from './Labware'
 import styles from './DeckConfig.css'
 
@@ -21,7 +22,7 @@ const LabwareNotification = (props) => {
   if (isMoving) {
     return <RobotIsMovingPrompt />
   } else if (isOverWell) {
-    return <ConfirmCalibrationPrompt />
+    return <ConfirmCalibrationPrompt {...props} />
   } else {
     return <BeginCalibrationPrompt />
   }
@@ -50,22 +51,25 @@ const RobotIsMovingPrompt = () => {
   )
 }
 
-const ConfirmCalibrationPrompt = () => {
+const ConfirmCalibrationPrompt = (props) => {
+  const {currentLabware} = props
+  const url = `/setup-deck/${currentLabware.slot}/jog`
   return (
     <div className={styles.prompt}>
-      <h3>Is Pipette accurately centered over well/tip A1?</h3>
+      <h3>Is Pipette accurately centered over {currentLabware.slot} A1?</h3>
       <button
         className={styles.confirm}
         onClick={() => console.log('advance to next labware')}
       >
         Yes
       </button>
-      <button
-        className={styles.confirm}
+      <NavLink
+        to={url}
+        className={styles.btn_modal}
         onClick={() => console.log('open jog modal')}
       >
         No
-      </button>
+      </NavLink>
     </div>
   )
 }

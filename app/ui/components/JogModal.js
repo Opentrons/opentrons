@@ -1,9 +1,18 @@
 import React from 'react'
+import {NavLink} from 'react-router-dom'
+import styles from './JogModal.css'
 
 export default function JogModal (props) {
+  const {currentLabware} = props
+  const url = `/setup-deck/${currentLabware.slot}`
   return (
-    <div>
-      <h1>Modal</h1>
+    <div className={styles.modal_wrapper}>
+      <div className={styles.jog_modal}>
+        <NavLink to={url} className={styles.close}>X</NavLink>
+        <p>Using the arrow buttons, jog the pipette along the x, y and z
+        axis to improve accuracy. Press confirm position to save.
+        </p>
+      </div>
     </div>
   )
 }

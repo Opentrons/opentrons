@@ -1,0 +1,40 @@
+.modal_wrapper {
+  background-color: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 675px;
+  padding-top: 4rem;
+}
+
+.modal_wrapper:target {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.jog_modal {
+  width: 400px;
+  height: 400px;
+  border-radius: 0.5rem;
+  position: relative;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: #ddd;
+}
+
+a.close {
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  color: black;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0.5rem;
+  text-decoration: none;
+}
+
+.jog_modal p {
+	text-align: center;
+	font-size: 0.75rem;
+}
