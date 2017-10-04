@@ -73,5 +73,6 @@ export default function RemoteObject (context, source, seen) {
       return result
     }, {}))
 
-  return Promise.all([props, methods]).then(([p, m]) => Object.assign(remote, p, m))
+  return Promise.all([props, methods])
+    .then(([p, m]) => Object.assign(remote, p, m, {_id: id}))
 }

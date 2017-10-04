@@ -40,7 +40,7 @@ describe('rpc remote object factory', () => {
     context.resolveTypeValues.mockReturnValueOnce(Promise.resolve({}))
 
     return RemoteObject(context, source)
-      .then((remote) => expect(remote).toEqual({foo: 'bar'}))
+      .then((remote) => expect(remote).toEqual({_id: 1, foo: 'bar'}))
   })
 
   test('deserializes an object with remote methods from type', () => {
@@ -53,7 +53,7 @@ describe('rpc remote object factory', () => {
     return RemoteObject(context, source)
       .then((remote) => {
         expect(context.resolveTypeValues).toHaveBeenCalledWith(source)
-        expect(remote).toEqual({foo: 'bar', baz: expect.any(Function)})
+        expect(remote).toEqual({_id: 1, foo: 'bar', baz: expect.any(Function)})
         return remote.baz(1, 2, 3)
       })
       .then((result) => {
@@ -72,7 +72,7 @@ describe('rpc remote object factory', () => {
       .then((remote) => {
         expect(context.resolveTypeValues).toHaveBeenCalledWith(source)
         expect(context.resolveTypeValues).toHaveBeenCalledWith(child)
-        expect(remote).toEqual({foo: 'bar', bar: {baz: 'qux'}})
+        expect(remote).toEqual({_id: 1, foo: 'bar', bar: {_id: 2, baz: 'qux'}})
       })
   })
 
@@ -89,8 +89,9 @@ describe('rpc remote object factory', () => {
         expect(context.resolveTypeValues).toHaveBeenCalledWith(child1)
         expect(context.resolveTypeValues).toHaveBeenCalledWith(child2)
         expect(remote).toEqual({
+          _id: 1,
           foo: 'bar',
-          children: [{baz: 'qux'}, {fizz: 'buzz'}]
+          children: [{_id: 3, baz: 'qux'}, {_id: 2, fizz: 'buzz'}]
         })
       })
   })
@@ -109,8 +110,9 @@ describe('rpc remote object factory', () => {
         // only need 4 type resolutions because of childDup
         expect(context.resolveTypeValues).toHaveBeenCalledTimes(4)
         expect(remote).toEqual({
-          parent1: {c: {foo: 'foo'}},
-          parent2: {c: {foo: 'foo'}}
+          _id: 34,
+          parent1: {_id: 32, c: {_id: 31, foo: 'foo'}},
+          parent2: {_id: 33, c: {_id: 31, foo: 'foo'}}
         })
       })
   })
