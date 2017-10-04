@@ -27,7 +27,7 @@ const mapStateToProps = (state) => ({
       name: 'tiprack',
       id: 'A1',
       type: 'tiprack-200ul',
-      isConfirmed: false,
+      isConfirmed: true,
       isTiprack: true
     }, {
       slot: 2,
@@ -48,7 +48,7 @@ const mapStateToProps = (state) => ({
       name: 'tiprack2',
       id: 'A2',
       type: 'tiprack-200ul',
-      isConfirmed: false,
+      isConfirmed: true,
       isTiprack: true
     }, {slot: 5},
     {

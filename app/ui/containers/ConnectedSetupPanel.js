@@ -17,25 +17,25 @@ const mapStateToProps = (state) => {
         axis: 'right',
         channels: 'multi',
         volume: 200,
-        isProbed: false
+        isProbed: true
       }
     ],
     isTipracksConfirmed: true, // all tipracks confirmed ? unlock other labware
-    isLabwareConfirmed: false, // all labware confirmed ? show run button
+    isLabwareConfirmed: true, // all labware confirmed ? show run button
     labware: [
       {
         name: 'tiprack',
         slot: 1,
         id: 'A1',
         type: 'tiprack-200ul',
-        isConfirmed: false,
+        isConfirmed: true,
         isTiprack: true
       }, {
         name: 'tiprack2',
         slot: 4,
         id: 'A2',
         type: 'tiprack-200ul',
-        isConfirmed: false,
+        isConfirmed: true,
         isTiprack: true
       }, {
         name: 'trough',

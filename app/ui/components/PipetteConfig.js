@@ -36,7 +36,7 @@ export default function PipetteConfig (props) {
         </div>
 
         <div className={styles.pipette_icon}>
-          img
+          <img src='../img/pipette_single.png' />
         </div>
       </div>
     )
