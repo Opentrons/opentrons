@@ -50,7 +50,7 @@ describe('api client', () => {
     }
 
     dispatch = jest.fn()
-    RpcClient.mockImplementation(() => Promise.resolve(rpcClient))
+    RpcClient.mockReturnValue(Promise.resolve(rpcClient))
 
     const _receive = client(dispatch)
 
@@ -64,8 +64,8 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
-  const sendConnect = (state = {}) => sendToClient(state, actions.connect())
-  const sendDisconnect = (state = {}) => sendToClient(state, actions.disconnect())
+  const sendConnect = () => sendToClient({}, actions.connect())
+  const sendDisconnect = () => sendToClient({}, actions.disconnect())
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
@@ -78,9 +78,6 @@ describe('api client', () => {
     // TODO(mc, 2017-09-06): remove when server handles serial port
     test('dispatch CONNECT_RESPONSE once client has serial list', () => {
       const expectedResponse = actions.connectResponse()
-
-      robot.get_serial_ports_list = jest.fn()
-        .mockReturnValueOnce(Promise.resolve(['/dev/tty.usbserial']))
 
       return sendConnect()
         .then(() => {
@@ -159,6 +156,108 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient({}, actions.run()))
         .then(() => expect(global.setInterval).toHaveBeenCalled())
+    })
+  })
+
+  describe('session responses', () => {
+    test('disptaches session on connect', () => {
+      const expected = actions.sessionResponse(null, {
+        sessionName: session.name,
+        sessionState: session.state,
+        sessionErrors: [],
+        protocolText: session.protocol_text,
+        protocolCommands: [],
+        protocolCommandsById: {},
+        protocolInstrumentsByAxis: {},
+        protocolLabwareBySlot: {}
+      })
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('handles connnect without session', () => {
+      const notExpected = actions.sessionResponse(null, expect.anything())
+
+      sessionManager.session = null
+
+      return sendConnect()
+        .then(() => expect(dispatch).not.toHaveBeenCalledWith(notExpected))
+    })
+
+    test('maps api session commands and command log to commands', () => {
+      const expected = actions.sessionResponse(null, expect.objectContaining({
+        protocolCommands: [0, 4],
+        protocolCommandsById: {
+          0: {id: 0, description: 'a', handledAt: 0, children: [1]},
+          1: {id: 1, description: 'b', handledAt: 1, children: [2, 3]},
+          2: {id: 2, description: 'c', handledAt: 2, children: []},
+          3: {id: 3, description: 'd', handledAt: '', children: []},
+          4: {id: 4, description: 'e', handledAt: '', children: []}
+        }
+      }))
+
+      session.commands = [
+        {
+          id: 0,
+          description: 'a',
+          children: [
+            {
+              id: 1,
+              description: 'b',
+              children: [
+                {id: 2, description: 'c', children: []},
+                {id: 3, description: 'd', children: []}
+              ]
+            }
+          ]
+        },
+        {id: 4, description: 'e', children: []}
+      ]
+      session.command_log = {
+        0: {timestamp: 0},
+        1: {timestamp: 1},
+        2: {timestamp: 2}
+      }
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('maps api instruments and intruments by axis', () => {
+      const expected = actions.sessionResponse(null, expect.objectContaining({
+        protocolInstrumentsByAxis: {
+          left: {axis: 'left', name: 'p200', channels: 1, volume: 200},
+          right: {axis: 'right', name: 'p50', channels: 8, volume: 50}
+        }
+      }))
+
+      session.instruments = [
+        {axis: 'a', name: 'p50', channels: 8},
+        {axis: 'b', name: 'p200', channels: 1}
+      ]
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('maps api containers to labware by slot', () => {
+      const expected = actions.sessionResponse(null, expect.objectContaining({
+        protocolLabwareBySlot: {
+          1: {id: 'A1', slot: 1, name: 'a1', type: 'tiprack', isTiprack: true},
+          5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
+          9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+        }
+      }))
+
+      session.containers = [
+        {slot: 'A1', name: 'a1', type: 'tiprack'},
+        {slot: 'B2', name: 'b2', type: 'b'},
+        {slot: 'C3', name: 'c3', type: 'c'}
+      ]
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
 })

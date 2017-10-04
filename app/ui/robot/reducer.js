@@ -15,12 +15,21 @@ export const constants = {
   PAUSED: 'paused',
   ERROR: 'error',
   FINISHED: 'finished',
-  STOPPED: 'stopped'
+  STOPPED: 'stopped',
+
+  // deck layout
+  INSTRUMENT_AXES: ['left', 'right'],
+  DECK_SLOTS: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+
+  // pipette channels
+  SINGLE_CHANNEL: 'single',
+  MULTI_CHANNEL: 'multi'
 }
 
 // state helpers
 const getModuleState = (state) => state[NAME]
 const makeRequestState = () => ({inProgress: false, error: null})
+// const makeInstrumentState = () => ({})
 
 const handleRequest = (state, request, payload, error, props = {}) => ({
   ...state,
@@ -44,11 +53,14 @@ const INITIAL_STATE = {
   // TODO(mc, 2017-08-24): move session to its own state module or sub-reducer
   sessionRequest: makeRequestState(),
   sessionName: '',
+  sessionState: '',
+  sessionErrors: [],
+
   protocolText: '',
   protocolCommands: [],
   protocolCommandsById: {},
-  sessionErrors: [],
-  sessionState: '',
+  protocolInstrumentsByAxis: {},
+  protocolLabwareBySlot: {},
 
   // robot calibration and setup
   homeRequest: makeRequestState(),
@@ -148,6 +160,40 @@ export const selectors = {
     const seconds = padStart(runTimeSeconds % 60, 2, '0')
 
     return `${hours}:${minutes}:${seconds}`
+  },
+
+  getInstruments (allState) {
+    const {
+      protocolInstrumentsByAxis,
+      instrumentCalibrationByAxis
+    } = getModuleState(allState)
+
+    return constants.INSTRUMENT_AXES.map((axis) => {
+      const instrument = protocolInstrumentsByAxis[axis] || {axis}
+      const calibration = instrumentCalibrationByAxis[axis] || {}
+
+      if (instrument.channels === 1) {
+        instrument.channels = constants.SINGLE_CHANNEL
+      } else if (instrument.channels > 1) {
+        instrument.channels = constants.MULTI_CHANNEL
+      }
+
+      return {...instrument, ...calibration}
+    })
+  },
+
+  getDeck (allState) {
+    const {
+      protocolLabwareBySlot,
+      labwareConfirmationBySlot
+    } = getModuleState(allState)
+
+    return constants.DECK_SLOTS.map((slot) => {
+      const labware = protocolLabwareBySlot[slot] || {slot}
+      const confirmation = labwareConfirmationBySlot[slot] || {}
+
+      return {...labware, ...confirmation}
+    })
   }
 }
 

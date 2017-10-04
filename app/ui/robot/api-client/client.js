@@ -9,6 +9,12 @@ const URL = 'ws://127.0.0.1:31950'
 const RUN_TIME_TICK_INTERVAL_MS = 200
 
 const NO_INTERVAL = -1
+const RE_VOLUME = /.*?(\d+).*?/
+const RE_TIPRACK = /tiprack/i
+const INSTRUMENT_AXES = {
+  b: 'left',
+  a: 'right'
+}
 
 export default function client (dispatch) {
   let rpcClient
@@ -173,9 +179,19 @@ export default function client (dispatch) {
   }
 
   function handleApiSession (apiSession) {
-    const {name, protocol_text, commands, command_log, state} = apiSession
+    const {
+      name,
+      protocol_text,
+      commands,
+      command_log,
+      state,
+      instruments,
+      containers
+    } = apiSession
     const protocolCommands = []
     const protocolCommandsById = {}
+    const protocolInstrumentsByAxis = {}
+    const protocolLabwareBySlot = {}
 
     // ensure run timer is running or stopped
     if (state === constants.RUNNING) {
@@ -186,16 +202,22 @@ export default function client (dispatch) {
 
     // TODO(mc, 2017-08-30): Use a reduce
     commands.forEach(makeHandleCommand())
+    instruments.forEach(apiInstrumentToInstrument)
+    containers.forEach(apiContainerToContainer)
 
-    dispatch(actions.sessionResponse(null, {
+    const payload = {
       sessionName: name,
       protocolText: protocol_text,
       protocolCommands,
       protocolCommandsById,
+      protocolInstrumentsByAxis,
+      protocolLabwareBySlot,
       // TODO(mc, 2017-09-06): handle session errors
       sessionErrors: [],
       sessionState: state
-    }))
+    }
+
+    dispatch(actions.sessionResponse(null, payload))
 
     function makeHandleCommand (depth = 0) {
       return function handleCommand (command) {
@@ -217,6 +239,22 @@ export default function client (dispatch) {
         }
       }
     }
+
+    function apiInstrumentToInstrument (apiInstrument) {
+      const {axis: originalAxis, name, channels} = apiInstrument
+      const axis = INSTRUMENT_AXES[originalAxis]
+      const volume = Number(name.match(RE_VOLUME)[1])
+
+      protocolInstrumentsByAxis[axis] = {axis, name, channels, volume}
+    }
+
+    function apiContainerToContainer (apiContainer) {
+      const {name, type, slot: id} = apiContainer
+      const isTiprack = RE_TIPRACK.test(type)
+      const slot = letterSlotToNumberSlot(id)
+
+      protocolLabwareBySlot[slot] = {name, id, slot, type, isTiprack}
+    }
   }
 
   function handleRobotNotification (message) {
@@ -232,4 +270,16 @@ export default function client (dispatch) {
   function handleClientError (error) {
     console.error(error)
   }
+}
+
+// TODO(mc, 2017-10-03): be less "clever" about this
+// map A1 -> 1, B1 -> 2, C1 -> 3, A2 -> 4, ..., B4 -> 11
+function letterSlotToNumberSlot (slot) {
+  // split two-char string into charcodes
+  const [col, row] = Array.from(slot.toUpperCase()).map((c) => c.charCodeAt(0))
+
+  // slot = (col where A === 1, B === 2, C === 3) + 3 * (row - 1)
+  // 'A'.charCodeAt(0) === 65, '1'.charCodeAt(0) === 49
+  // before simplification: 3 * (row - 49) + (col - 64)
+  return (3 * row + col - 211)
 }

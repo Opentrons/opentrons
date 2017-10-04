@@ -21,11 +21,14 @@ describe('robot reducer', () => {
 
       sessionRequest: {inProgress: false, error: null},
       sessionName: '',
+      sessionErrors: [],
+      sessionState: '',
+
       protocolText: '',
       protocolCommands: [],
       protocolCommandsById: {},
-      sessionErrors: [],
-      sessionState: '',
+      protocolInstrumentsByAxis: {},
+      protocolLabwareBySlot: {},
 
       homeRequest: {inProgress: false, error: null},
 

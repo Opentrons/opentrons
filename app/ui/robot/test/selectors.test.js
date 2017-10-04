@@ -13,7 +13,9 @@ const {
   getIsRunning,
   getIsPaused,
   getIsDone,
-  getRunTime
+  getRunTime,
+  getInstruments,
+  getDeck
 } = selectors
 
 describe('robot selectors', () => {
@@ -225,5 +227,71 @@ describe('robot selectors', () => {
         }
       ])
     })
+  })
+
+  test('get instruments', () => {
+    const state = makeState({
+      protocolInstrumentsByAxis: {
+        left: {axis: 'left', channels: 8, volume: 200}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true}
+      }
+    })
+
+    expect(getInstruments(state)).toEqual([
+      {axis: 'left', channels: 'multi', volume: 200, isProbed: true},
+      {axis: 'right'}
+    ])
+  })
+
+  test('get deck', () => {
+    const state = makeState({
+      protocolLabwareBySlot: {
+        1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
+        5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
+        9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+      },
+      labwareConfirmationBySlot: {
+        1: {isConfirmed: false},
+        5: {isConfirmed: true},
+        9: {isConfirmed: false}
+      }
+    })
+
+    expect(getDeck(state)).toEqual([
+      {
+        slot: 1,
+        id: 'A1',
+        name: 'a1',
+        type: 'a',
+        isTiprack: true,
+        isConfirmed: false
+      },
+      {slot: 2},
+      {slot: 3},
+      {slot: 4},
+      {
+        slot: 5,
+        id: 'B2',
+        name: 'b2',
+        type: 'b',
+        isTiprack: false,
+        isConfirmed: true
+      },
+      {slot: 6},
+      {slot: 7},
+      {slot: 8},
+      {
+        slot: 9,
+        id: 'C3',
+        name: 'c3',
+        type: 'c',
+        isTiprack: false,
+        isConfirmed: false
+      },
+      {slot: 10},
+      {slot: 11}
+    ])
   })
 })
