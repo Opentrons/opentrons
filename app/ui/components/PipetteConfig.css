@@ -1,6 +1,7 @@
 .pipette_group {
   padding: 2rem 1rem;
   display: grid;
+  grid-column-gap: 0.25rem;
   grid-template-columns: 50% 50%;
   grid-template-areas: 'left right';
 }
@@ -8,7 +9,7 @@
 .left {
   grid-area: left;
   display: grid;
-  grid-template-columns: 85% 15%;
+  grid-template-columns: 80% 20%;
   grid-template-areas:
     'toggle toggle'
     'info img';
@@ -18,7 +19,7 @@
 .right {
   grid-area: right;
   display: grid;
-  grid-template-columns: 15% 85%;
+  grid-template-columns: 20% 80%;
   grid-template-areas:
     'toggle toggle'
     'img info';
@@ -60,6 +61,11 @@
 
 .pipette_icon {
   grid-area: img;
+  text-align: center;
+}
+
+.pipette_icon img {
+  height: 100%;
 }
 
 .title {
@@ -104,16 +110,4 @@
 
 h3 {
   text-transform: capitalize;
-}
-
-.alert {
-  background-color: silver;
-  color: white;
-  height: 1rem;
-  width: 1rem;
-  margin: 0.5rem;
-  text-align: center;
-  border-radius: 0.5rem;
-  display: block;
-  float: left;
 }

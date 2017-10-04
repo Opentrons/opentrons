@@ -16,7 +16,7 @@ export default function App () {
       <Switch>
         <Route path='/run' component={Run} />
         <Route path='/setup-instruments/:side?' component={SetupInstruments} />
-        <Route path='/setup-deck' component={SetupDeck} />
+        <Route path='/setup-deck/:slot?' component={SetupDeck} />
       </Switch>
     </div>
   )

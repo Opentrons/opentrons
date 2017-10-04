@@ -5,10 +5,6 @@ import Button from './Button'
 import styles from './NavPanel.css'
 
 const UploadPanel = props => {
-  // const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
-  // const files = recentFiles.map((file, index) => {
-  //   return <p key={index}>{file}</p>
-  // })
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>

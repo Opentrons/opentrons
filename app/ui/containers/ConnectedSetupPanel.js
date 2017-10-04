@@ -5,8 +5,7 @@ import SetupPanel from '../components/SetupPanel'
 
 const mapStateToProps = (state) => {
   return {
-    isInstrumentsConfirmed: false, // all pipettes confirmed ? show labware
-
+    isInstrumentsConfirmed: true, // all pipettes confirmed ? show labware
     instruments: [
       {
         axis: 'left',
@@ -18,42 +17,44 @@ const mapStateToProps = (state) => {
         axis: 'right',
         channels: 'multi',
         volume: 200,
-        isProbed: false
+        isProbed: true
       }
     ],
-
-    isTipracksConfirmed: false, // all tipracks confirmed ? unlock other labware
-    isLabwareConfirmed: false, // all labware confirmed ? show run button
-
+    isTipracksConfirmed: true, // all tipracks confirmed ? unlock other labware
+    isLabwareConfirmed: true, // all labware confirmed ? show run button
     labware: [
       {
         name: 'tiprack',
-        slot: 'B1',
+        slot: 1,
+        id: 'A1',
         type: 'tiprack-200ul',
-        isConfirmed: false,
+        isConfirmed: true,
         isTiprack: true
       }, {
         name: 'tiprack2',
-        slot: 'B2',
+        slot: 4,
+        id: 'A2',
         type: 'tiprack-200ul',
-        isConfirmed: false,
+        isConfirmed: true,
         isTiprack: true
-      },
-      {
+      }, {
         name: 'trough',
-        slot: 'C1',
+        slot: 2,
+        id: 'B1',
         type: 'trough-12row',
         isConfirmed: false,
         isTiprack: false
       }, {
         name: 'plate',
-        slot: 'D1',
+        slot: 3,
+        id: 'C1',
         type: '96-PCR-flat',
         isConfirmed: false,
         isTiprack: false
       }, {
         name: 'tuberack',
-        slot: 'D2',
+        slot: 6,
+        id: 'C2',
         type: 'tube-rack-2ml',
         isConfirmed: false,
         isTiprack: false

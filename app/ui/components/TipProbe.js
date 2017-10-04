@@ -21,6 +21,14 @@ PrepareForProbe.propTypes = {
   volume: PropTypes.number.isRequired
 }
 
+function RobotIsMoving (props) {
+  return (
+    <section className={styles.probe_msg} >
+      <h3>Robot is moving..</h3>
+    </section>
+  )
+}
+
 function ProbeInitiated (props) {
   return (
     <section className={styles.probe_msg} >
@@ -51,13 +59,16 @@ export default function TipProbe (props) {
   const {currentInstrument} = props
   const {
     tipIsPreparingForProbe,
+    tipIsReadyForProbe,
     tipIsProbing,
     tipIsProbed
   } = currentInstrument
 
   let probeMessage = null
-  if (tipIsPreparingForProbe) {
+  if (tipIsReadyForProbe) {
     probeMessage = <PrepareForProbe {...currentInstrument} />
+  } else if (tipIsPreparingForProbe) {
+    probeMessage = <RobotIsMoving />
   } else if (tipIsProbing) {
     probeMessage = <ProbeInitiated />
   } else if (tipIsProbed) {
