@@ -116,4 +116,18 @@ describe('rpc remote object factory', () => {
         })
       })
   })
+
+  test('remote method object arg with _id,', () => {
+    const source = {i: 1, t: 2, v: {}}
+    const typeValues = {method: {}}
+
+    context.resolveTypeValues.mockReturnValueOnce(Promise.resolve(typeValues))
+    context.callRemote.mockReturnValueOnce(Promise.resolve('call result!'))
+
+    return RemoteObject(context, source)
+      .then((remote) => remote.method({_id: 'foo'}))
+      .then((result) => expect(context.callRemote)
+        .toHaveBeenCalledWith(1, 'method', [{i: 'foo'}])
+      )
+  })
 })

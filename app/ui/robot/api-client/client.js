@@ -2,7 +2,7 @@
 // takes a dispatch (send) function and returns a receive handler
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
-import {constants} from '../reducer'
+import {constants, selectors} from '../reducer'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
@@ -18,6 +18,7 @@ const INSTRUMENT_AXES = {
 
 export default function client (dispatch) {
   let rpcClient
+  let remote
   let sessionManager
   let session
   let robot
@@ -31,37 +32,19 @@ export default function client (dispatch) {
     const {type} = action
 
     switch (type) {
-      case actionTypes.CONNECT:
-        connect(state, action)
-        break
-
-      case actionTypes.DISCONNECT:
-        disconnect(state, action)
-        break
-
-      case actionTypes.SESSION:
-        createSession(state, action)
-        break
-
-      case actionTypes.HOME:
-        home(state, action)
-        break
-
-      case actionTypes.RUN:
-        run(state, action)
-        break
-
-      case actionTypes.PAUSE:
-        pause(state, action)
-        break
-
-      case actionTypes.RESUME:
-        resume(state, action)
-        break
-
-      case actionTypes.CANCEL:
-        cancel(state, action)
-        break
+      case actionTypes.CONNECT: return connect(state, action)
+      case actionTypes.DISCONNECT: return disconnect(state, action)
+      case actionTypes.SESSION: return createSession(state, action)
+      case actionTypes.HOME: return home(state, action)
+      case actionTypes.MOVE_TIP_TO_FRONT: return moveTipToFront(state, action)
+      case actionTypes.PROBE_TIP: return probeTip(state, action)
+      case actionTypes.MOVE_TO: return moveTo(state, action)
+      case actionTypes.JOG: return jog(state, action)
+      case actionTypes.UPDATE_OFFSET: return updateOffset(state, action)
+      case actionTypes.RUN: return run(state, action)
+      case actionTypes.PAUSE: return pause(state, action)
+      case actionTypes.RESUME: return resume(state, action)
+      case actionTypes.CANCEL: return cancel(state, action)
     }
   }
 
@@ -75,7 +58,8 @@ export default function client (dispatch) {
           .on('notification', handleRobotNotification)
           .on('error', handleClientError)
 
-        sessionManager = rpcClient.remote.session_manager
+        remote = rpcClient.remote
+        sessionManager = remote.session_manager
         session = sessionManager.session
         robot = sessionManager.robot
 
@@ -136,6 +120,57 @@ export default function client (dispatch) {
       .then(() => robot.disconnect())
       .then(() => dispatch(actions.homeResponse()))
       .catch((error) => dispatch(actions.homeResponse(error)))
+  }
+
+  function moveTipToFront (state, action) {
+    const {payload: {instrument: axis}} = action
+    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+
+    remote.calibration_manager.move_to_front(instrument)
+      .then(() => dispatch(actions.moveTipToFrontResponse()))
+      .catch((error) => dispatch(actions.moveTipToFrontResponse(error)))
+  }
+
+  function probeTip (state, action) {
+    const {payload: {instrument: axis}} = action
+    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+
+    remote.calibration_manager.tip_probe(instrument)
+      .then(() => dispatch(actions.probeTipResponse()))
+      .catch((error) => dispatch(actions.probeTipResponse(error)))
+  }
+
+  function moveTo (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
+    const {
+      protocolInstrumentsByAxis: instruments,
+      protocolLabwareBySlot: labwares
+    } = selectors.getState(state)
+
+    remote.calibration_manager.move_to(instruments[axis], labwares[slot])
+      .then(() => dispatch(actions.moveToResponse()))
+      .catch((error) => dispatch(actions.moveToResponse(error)))
+  }
+
+  function jog (state, action) {
+    const {payload: {instrument: axis, coordinates}} = action
+    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+
+    remote.calibration_manager.jog(instrument, coordinates)
+      .then(() => dispatch(actions.jogResponse()))
+      .catch((error) => dispatch(actions.jogResponse(error)))
+  }
+
+  function updateOffset (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
+    const {
+      protocolInstrumentsByAxis: instruments,
+      protocolLabwareBySlot: labwares
+    } = selectors.getState(state)
+
+    remote.calibration_manager.update_offset(labwares[slot], instruments[axis])
+      .then(() => dispatch(actions.updateOffsetResponse()))
+      .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
 
   function run (state, action) {

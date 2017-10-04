@@ -1,5 +1,5 @@
 // mock rpc session
-// based on api/opentrons/session/session.py
+// based on api/opentrons/api/session.py
 export default function MockSession () {
   return {
     name: 'MOCK SESSION',

@@ -2,10 +2,11 @@
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
-import {actions} from '../'
+import {NAME, actions} from '../'
 
 import MockRobot from './__mocks__/robot'
 import MockSession from './__mocks__/session'
+import MockCalibrationMangager from './__mocks__/calibration-manager'
 
 jest.mock('../../../rpc/client')
 
@@ -16,6 +17,7 @@ describe('api client', () => {
   let robot
   let session
   let sessionManager
+  let calibrationManager
 
   let _global = {}
   beforeAll(() => {
@@ -35,6 +37,7 @@ describe('api client', () => {
     // mock robot, session, and session manager
     robot = MockRobot()
     session = MockSession()
+    calibrationManager = MockCalibrationMangager()
 
     // mock rpc client
     sessionManager = {robot, session}
@@ -45,7 +48,8 @@ describe('api client', () => {
       on: jest.fn(() => rpcClient),
       close: jest.fn(),
       remote: {
-        session_manager: sessionManager
+        session_manager: sessionManager,
+        calibration_manager: calibrationManager
       }
     }
 
@@ -160,7 +164,7 @@ describe('api client', () => {
   })
 
   describe('session responses', () => {
-    test('disptaches session on connect', () => {
+    test('dispatches session on connect', () => {
       const expected = actions.sessionResponse(null, {
         sessionName: session.name,
         sessionState: session.state,
@@ -258,6 +262,159 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+  })
+
+  describe('calibration', () => {
+    let state
+    beforeEach(() => {
+      state = {
+        [NAME]: {
+          protocolInstrumentsByAxis: {
+            left: {_id: 'inst-2'},
+            right: {_id: 'inst-1'}
+          },
+          protocolLabwareBySlot: {
+            1: {_id: 'lab-1'},
+            5: {_id: 'lab-2'},
+            9: {_id: 'lab-3'}
+          }
+        }
+      }
+    })
+
+    test('handles MOVE_TIP_TO_FRONT success', () => {
+      const action = actions.moveTipToFront('left')
+      const expectedResponse = actions.moveTipToFrontResponse()
+
+      calibrationManager.move_to_front.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.move_to_front)
+            .toHaveBeenCalledWith({_id: 'inst-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles MOVE_TIP_TO_FRONT failure', () => {
+      const action = actions.moveTipToFront('left')
+      const expectedResponse = actions.moveTipToFrontResponse(new Error('AH'))
+
+      calibrationManager.move_to_front
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles PROBE_TIP success', () => {
+      const action = actions.probeTip('right')
+      const expectedResponse = actions.probeTipResponse()
+
+      calibrationManager.tip_probe.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.tip_probe)
+            .toHaveBeenCalledWith({_id: 'inst-1'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles PROBE_TIP failure', () => {
+      const action = actions.probeTip('right')
+      const expectedResponse = actions.probeTipResponse(new Error('AH'))
+
+      calibrationManager.tip_probe
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles MOVE_TO success', () => {
+      const action = actions.moveTo('left', 5)
+      const expectedResponse = actions.moveToResponse()
+
+      calibrationManager.move_to.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.move_to)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles MOVE_TO failure', () => {
+      const action = actions.moveTo('left', 5)
+      const expectedResponse = actions.moveToResponse(new Error('AH'))
+
+      calibrationManager.move_to
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles JOG success', () => {
+      const action = actions.jog('left', {x: 0.5})
+      const expectedResponse = actions.jogResponse()
+
+      calibrationManager.jog.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.jog)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {x: 0.5})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles JOG failure', () => {
+      const action = actions.jog('left', {y: 0.5})
+      const expectedResponse = actions.jogResponse(new Error('AH'))
+
+      calibrationManager.jog.mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles UPDATE_OFFSET success', () => {
+      const action = actions.updateOffset('left', 9)
+      const expectedResponse = actions.updateOffsetResponse()
+
+      calibrationManager.update_offset.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.update_offset)
+            .toHaveBeenCalledWith({_id: 'lab-3'}, {_id: 'inst-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles UPDATE_OFFSET failure', () => {
+      const action = actions.updateOffset('left', 9)
+      const expectedResponse = actions.updateOffsetResponse(new Error('AH'))
+
+      calibrationManager.update_offset
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
   })
 })

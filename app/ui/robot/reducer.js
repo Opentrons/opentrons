@@ -27,9 +27,7 @@ export const constants = {
 }
 
 // state helpers
-const getModuleState = (state) => state[NAME]
 const makeRequestState = () => ({inProgress: false, error: null})
-// const makeInstrumentState = () => ({})
 
 const handleRequest = (state, request, payload, error, props = {}) => ({
   ...state,
@@ -74,23 +72,27 @@ const INITIAL_STATE = {
 }
 
 export const selectors = {
+  getState (allState) {
+    return allState[NAME]
+  },
+
   getSessionName (allState) {
-    return getModuleState(allState).sessionName
+    return selectors.getState(allState).sessionName
   },
 
   getConnectionStatus (allState) {
-    const state = getModuleState(allState)
+    const state = selectors.getState(allState)
     if (state.isConnected) return constants.CONNECTED
     if (state.connectRequest.inProgress) return constants.CONNECTING
     return constants.DISCONNECTED
   },
 
   getIsReadyToRun (allState) {
-    return getModuleState(allState).sessionState === constants.LOADED
+    return selectors.getState(allState).sessionState === constants.LOADED
   },
 
   getIsRunning (allState) {
-    const {sessionState} = getModuleState(allState)
+    const {sessionState} = selectors.getState(allState)
     return (
       sessionState === constants.RUNNING ||
       sessionState === constants.PAUSED
@@ -98,11 +100,11 @@ export const selectors = {
   },
 
   getIsPaused (allState) {
-    return getModuleState(allState).sessionState === constants.PAUSED
+    return selectors.getState(allState).sessionState === constants.PAUSED
   },
 
   getIsDone (allState) {
-    const {sessionState} = getModuleState(allState)
+    const {sessionState} = selectors.getState(allState)
     return (
       sessionState === constants.ERROR ||
       sessionState === constants.FINISHED ||
@@ -111,7 +113,10 @@ export const selectors = {
   },
 
   getCommands (allState) {
-    const {protocolCommands, protocolCommandsById} = getModuleState(allState)
+    const {
+      protocolCommands,
+      protocolCommandsById
+    } = selectors.getState(allState)
 
     return protocolCommands.map(idToCommandList(true))
 
@@ -149,7 +154,7 @@ export const selectors = {
   },
 
   getRunTime (allState) {
-    const {runTime} = getModuleState(allState)
+    const {runTime} = selectors.getState(allState)
     const startTime = selectors.getStartTime(allState)
     const runTimeSeconds = (runTime && startTime)
       ? Math.floor((runTime - Date.parse(startTime)) / 1000)
@@ -166,7 +171,7 @@ export const selectors = {
     const {
       protocolInstrumentsByAxis,
       instrumentCalibrationByAxis
-    } = getModuleState(allState)
+    } = selectors.getState(allState)
 
     return constants.INSTRUMENT_AXES.map((axis) => {
       const instrument = protocolInstrumentsByAxis[axis] || {axis}
@@ -186,7 +191,7 @@ export const selectors = {
     const {
       protocolLabwareBySlot,
       labwareConfirmationBySlot
-    } = getModuleState(allState)
+    } = selectors.getState(allState)
 
     return constants.DECK_SLOTS.map((slot) => {
       const labware = protocolLabwareBySlot[slot] || {slot}
