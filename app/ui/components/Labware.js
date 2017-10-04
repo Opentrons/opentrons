@@ -29,7 +29,6 @@ export default function Labware (props) {
   if (type) {
     const disabled = !isTipracksConfirmed && !isTiprack
     return (
-
       <NavLink to={url}
         style={slotStyle}
         activeClassName={styles.active}
@@ -43,5 +42,4 @@ export default function Labware (props) {
   return (
     <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
   )
-
 }
