@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import styles from './TipProbe.css'
 
 function PrepareForProbe (props) {
@@ -14,6 +15,10 @@ function PrepareForProbe (props) {
       <button className={styles.btn_probe} onClick={console.log('onInitiateTipProbeClick')}>Initiate Tip Probe</button>
     </section>
   )
+}
+
+PrepareForProbe.propTypes = {
+  volume: PropTypes.number.isRequired
 }
 
 function ProbeInitiated (props) {
@@ -38,6 +43,10 @@ function ProbeSuccess (props) {
   )
 }
 
+ProbeSuccess.propTypes = {
+  volume: PropTypes.number.isRequired
+}
+
 export default function TipProbe (props) {
   const {currentInstrument} = props
   const {
@@ -54,7 +63,16 @@ export default function TipProbe (props) {
   } else if (tipIsProbed) {
     probeMessage = <ProbeSuccess {...currentInstrument} />
   } else {
-    probeMessage = <div />
+    probeMessage = null
   }
   return probeMessage
+}
+
+TipProbe.propTypes = {
+  currentInstrument: PropTypes.shape({
+    volume: PropTypes.number.isRequired,
+    tipIsPreparingForProbe: PropTypes.bool.isRequired,
+    tipIsProbing: PropTypes.bool.isRequired,
+    tipIsProbed: PropTypes.bool.isRequired
+  }).isRequired
 }

@@ -6,9 +6,9 @@
 }
 
 .sidebar {
-  width: 325px;
+  width: 350px;
   display: grid;
-  grid-template-columns: 75px 250px;
+  grid-template-columns: 75px 275px;
 }
 
 .nav_icons,
