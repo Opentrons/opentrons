@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import DeckConfig from '../components/DeckConfig'
 
 const mapStateToProps = (state) => ({
-<<<<<<< HEAD
+
   // interface
   isMoving: false,
   isOverWell: true,
@@ -18,8 +18,6 @@ const mapStateToProps = (state) => ({
   },
 
   // robot
-=======
->>>>>>> separate deckmap function
   isDeckmapReviewed: true,
   isTipracksConfirmed: true,
   isLabwareConfirmed: false,

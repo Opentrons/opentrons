@@ -8,7 +8,7 @@ import ConnectedJogModal from '../containers/ConnectedJogModal'
 
 export default function SetupDeckPage (props) {
   const {match} = props
-  const currentSlot = match.params.slot || '1'
+  const currentSlot = parseInt(match.params.slot) || 1
   return (
     <Page>
       <Header />

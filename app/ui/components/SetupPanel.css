@@ -115,3 +115,7 @@ a.disabled {
   text-decoration: none;
   text-transform: uppercase;
 }
+
+.active {
+  background-color: #bbb;
+}

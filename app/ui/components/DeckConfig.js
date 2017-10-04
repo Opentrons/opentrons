@@ -3,7 +3,6 @@ import Labware from './Labware'
 import styles from './DeckConfig.css'
 
 const DeckMap = (props) => {
-
   const {
     deck
   } = props

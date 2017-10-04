@@ -1,5 +1,5 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import {NavLink} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import styles from './SetupPanel.css'
@@ -12,10 +12,10 @@ function PipetteLinks (props) {
     : styles.alert
   return (
     <li key={axis}>
-      <Link to={url} className={style}>
+      <NavLink to={url} className={style} activeClassName={styles.active}>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{channels}-Channel ({volume}ul)</span>
-      </Link>
+      </NavLink>
     </li>
   )
 }
@@ -29,9 +29,9 @@ function LabwareLinks (props) {
   let isDisabled = !isTiprack && !isTipracksConfirmed
   return (
     <li key={slot}>
-      <Link to={url} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
+      <NavLink to={url} activeClassName={styles.active} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
         [{slot}] {name}
-      </Link>
+      </NavLink>
     </li>
   )
 }
@@ -60,7 +60,7 @@ export default function SetupPanel (props) {
 
   let runLink
   if (isLabwareConfirmed) {
-    runLink = <Link to='/run' className={styles.run_link}>Run Protocol</Link>
+    runLink = <NavLink to='/run' className={styles.run_link}>Run Protocol</NavLink>
   }
 
   return (
@@ -68,13 +68,13 @@ export default function SetupPanel (props) {
       <h1>Prepare Robot for RUN</h1>
       <section className={styles.links}>
         <section className={styles.pipette_group}>
-          <Link to='/setup-instruments'>Pipette Setup</Link>
+          <NavLink to='/setup-instruments'>Pipette Setup</NavLink>
           <ul>
             {instrumentList}
           </ul>
         </section>
         <section className={classnames({[styles.unavailable]: !isInstrumentsConfirmed}, styles.labware_group)}>
-          <Link to='/setup-deck'>Labware Setup</Link>
+          <NavLink to='/setup-deck'>Labware Setup</NavLink>
           <ul>
             {tiprackList}
             {labwareList}
@@ -89,13 +89,13 @@ export default function SetupPanel (props) {
 SetupPanel.propTypes = {
   instruments: PropTypes.arrayOf(PropTypes.shape({
     axis: PropTypes.string.isRequired,
-    channels: PropTypes.number.isRequired,
+    channels: PropTypes.string.isRequired,
     volume: PropTypes.number.isRequired,
     isProbed: PropTypes.bool.isRequired
   })).isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
-    slot: PropTypes.string.isRequired,
+    slot: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
     isConfirmed: PropTypes.bool.isRequired,
     isTiprack: PropTypes.bool.isRequired
