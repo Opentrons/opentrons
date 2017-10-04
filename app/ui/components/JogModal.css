@@ -20,6 +20,7 @@
   margin: 4rem auto;
   padding: 2rem;
   background: #ddd;
+  text-align: center;
 }
 
 a.close {
@@ -34,7 +35,27 @@ a.close {
   text-decoration: none;
 }
 
+.jog_controls {
+  width: 100%;
+  height: 200px;
+  display: grid;
+}
+
 .jog_modal p {
-	text-align: center;
-	font-size: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.btn_confirm {
+  margin: 1rem;
+  font-size: 1rem;
+  padding: 0 3rem;
+  border-radius: 0.5rem;
+  background-color: #777;
+  font-family: 'trons';
+  color: white;
+  line-height: 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
 }

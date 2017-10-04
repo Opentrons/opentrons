@@ -18,7 +18,7 @@ const mapStateToProps = (state) => ({
   },
 
   // robot
-  isDeckmapReviewed: false,
+  isDeckmapReviewed: true,
   isTipracksConfirmed: true,
   isLabwareConfirmed: false,
   deck: [

@@ -6,9 +6,7 @@ import styles from './Labware.css'
 export default function Labware (props) {
   let {
     type,
-    name,
     slot,
-    currentSlot,
     isDeckmapReviewed,
     isConfirmed,
     isTipracksConfirmed,
@@ -27,7 +25,6 @@ export default function Labware (props) {
   !isDeckmapReviewed
   ? labwareLabel = <div className={styles.label}>{type}</div>
   : labwareLabel = null
-
 
   if (type) {
     const disabled = !isTipracksConfirmed && !isTiprack
