@@ -9,6 +9,7 @@ export default function Labware (props) {
     name,
     slot,
     currentSlot,
+    isDeckmapReviewed,
     isConfirmed,
     isTipracksConfirmed,
     isTiprack
@@ -18,10 +19,16 @@ export default function Labware (props) {
     gridArea: `slot-${slot}`
   }
   let confirmationMsg
-  if (!isConfirmed) {
-    confirmationMsg = <div>Position Unconfirmed</div>
+  if (!isConfirmed && isDeckmapReviewed) {
+    confirmationMsg = <div className={styles.status}>Position Unconfirmed</div>
   }
-  // const isSelected = slot === currentSlot
+
+  let labwareLabel
+  !isDeckmapReviewed
+  ? labwareLabel = <div className={styles.label}>{type}</div>
+  : labwareLabel = null
+
+
   if (type) {
     const disabled = !isTipracksConfirmed && !isTiprack
     return (
@@ -31,8 +38,7 @@ export default function Labware (props) {
         activeClassName={styles.active}
         className={classnames({[styles.disabled]: disabled}, styles.slot)}
       >
-        {name}
-        {currentSlot}
+        {labwareLabel}
         {confirmationMsg}
       </NavLink>
     )
