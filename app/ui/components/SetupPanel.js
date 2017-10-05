@@ -6,32 +6,30 @@ import styles from './SetupPanel.css'
 
 function PipetteLinks (props) {
   const {axis, volume, channels, isProbed} = props
-  const url = `/setup-instruments/${axis}`
   const style = isProbed
     ? styles.confirmed
     : styles.alert
   return (
     <li key={axis}>
-      <NavLink to={url} className={style} activeClassName={styles.active_pip}>
+      <button className={style}>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{channels}-Channel ({volume}ul)</span>
-      </NavLink>
+      </button>
     </li>
   )
 }
 
 function LabwareLinks (props) {
   const {name, slot, isConfirmed, isTiprack, isTipracksConfirmed} = props
-  const url = `/setup-deck/${slot}`
   const calibrationStyle = isConfirmed
     ? styles.confirmed
     : styles.alert
   let isDisabled = !isTiprack && !isTipracksConfirmed
   return (
     <li key={slot}>
-      <NavLink to={url} activeClassName={styles.active_lab} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
+      <button className={classnames({[styles.disabled]: isDisabled}, calibrationStyle, styles.btn_labware)}>
         [{slot}] {name}
-      </NavLink>
+      </button>
     </li>
   )
 }

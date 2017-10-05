@@ -1,29 +1,25 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
 import styles from './PipetteConfig.css'
 import singlePipetteSrc from '../img/pipette_single.png'
 
 export default function PipetteConfig (props) {
-  const {side, instruments} = props
-
+  const {instruments} = props
   const pipettes = instruments.map((pipette) => {
-    const isActive = side === pipette.axis
-    const route = `/setup-instruments/${pipette.axis}`
     return (
       <div
-        className={classnames(styles[pipette.axis], {[styles.active]: isActive})}
+        className={styles[pipette.axis]}
         key={pipette.axis}
       >
-        <Link to={route}
+        <div
           className={classnames(
             styles.pipette_toggle,
             styles[`toggle_${pipette.axis}`]
           )}
         >
           {pipette.axis}
-        </Link>
+        </div>
         <div className={styles.pipette_info}>
           <h2 className={styles.title}>Pipette</h2>
           <h3>{pipette.channels}-Channel ({pipette.volume}ul) </h3>

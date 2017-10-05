@@ -60,7 +60,7 @@ h1 {
   font-size: 0.75rem;
 }
 
-.step_list li a::before {
+.step_list li button::before {
   display: block;
   float: left;
   content: '';
@@ -72,23 +72,34 @@ h1 {
   margin: 0.5rem 0.5rem 1rem 1rem;
 }
 
-.labware_group li a::before {
-  margin: 0 0.5rem 0.5rem 1rem;
+.step_list button {
+  background-color: #eee;
+  width: 100%;
+  display: block;
+  height: 3rem;
+  padding: 0.5rem;
+  text-align: left;
+  line-height: 1.5rem;
 }
 
-.step_list a:hover {
+.step_list button:hover {
   background-color: #ccc;
 }
 
-a.disabled {
+button.disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+button.btn_labware {
+  line-height: 2rem;
 }
 
 .step_list .alert::before {
   content: '!';
   background-color: silver;
   color: white;
+  line-height: 1rem;
 }
 
 .axis {

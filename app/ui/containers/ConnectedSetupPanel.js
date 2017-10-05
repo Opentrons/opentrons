@@ -17,7 +17,7 @@ const mapStateToProps = (state) => {
         axis: 'right',
         channels: 'multi',
         volume: 200,
-        isProbed: true
+        isProbed: false
       }
     ],
     isTipracksConfirmed: true, // all tipracks confirmed ? unlock other labware

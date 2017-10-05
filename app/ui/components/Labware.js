@@ -1,6 +1,5 @@
 import React from 'react'
 import classnames from 'classnames'
-import {NavLink} from 'react-router-dom'
 import styles from './Labware.css'
 
 export default function Labware (props) {
@@ -12,7 +11,6 @@ export default function Labware (props) {
     isTipracksConfirmed,
     isTiprack
   } = props
-  const url = `/setup-deck/${slot}`
   const slotStyle = {
     gridArea: `slot-${slot}`
   }
@@ -29,15 +27,14 @@ export default function Labware (props) {
   if (type) {
     const disabled = !isTipracksConfirmed && !isTiprack
     return (
-      <NavLink to={url}
+      <div
         style={slotStyle}
-        activeClassName={styles.active}
         className={classnames({[styles.disabled]: disabled}, styles.slot)}
       >
         <img src={require(`../img/labware/${type}.png`)} />
         {labwareLabel}
         {confirmationMsg}
-      </NavLink>
+      </div>
     )
   }
   return (
