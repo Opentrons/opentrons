@@ -1,7 +1,9 @@
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import styles from './PipetteConfig.css'
+import singlePipetteSrc from '../img/pipette_single.png'
 
 export default function PipetteConfig (props) {
   const {side, instruments} = props
@@ -35,16 +37,23 @@ export default function PipetteConfig (props) {
         </div>
 
         <div className={styles.pipette_icon}>
-          img
+          <img src={singlePipetteSrc} />
         </div>
       </div>
     )
   })
   return (
     <section className={styles.pipette_group}>
-
       {pipettes}
-
     </section>
   )
+}
+
+PipetteConfig.propTypes = {
+  instruments: PropTypes.arrayOf(PropTypes.shape({
+    axis: PropTypes.string.isRequired,
+    channels: PropTypes.string.isRequired,
+    volume: PropTypes.number.isRequired,
+    isProbed: PropTypes.bool.isRequired
+  })).isRequired
 }

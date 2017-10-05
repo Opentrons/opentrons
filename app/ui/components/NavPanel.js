@@ -1,15 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
-
+import ConnectedSetupPanel from '../containers/ConnectedSetupPanel'
 import Button from './Button'
 import styles from './NavPanel.css'
 
 const UploadPanel = props => {
-  // const recentFiles = ['bradford_assay.py', '384_plate_filling.py', 'dilution_PCR.py'] // should come from props/state
-  // const files = recentFiles.map((file, index) => {
-  //   return <p key={index}>{file}</p>
-  // })
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>
@@ -22,18 +17,6 @@ const UploadPanel = props => {
           />
         </label>
         <h2 className={styles.title}>Recently Uploaded</h2>
-      </section>
-    </div>
-  )
-}
-
-const SetupPanel = props => {
-  return (
-    <div className={styles.nav_panel}>
-      <section className={styles.links}>
-        <Link to='/setup-instruments'>Set Up Pipettes</Link>
-        <Link to='/setup-deck'>Set Up Labware</Link>
-        <Link to='/run'>Run</Link>
       </section>
     </div>
   )
@@ -85,7 +68,7 @@ ConnectPanel.propTypes = {
 const panel = (props) => ({
   upload: <UploadPanel {...props} />,
   connect: <ConnectPanel {...props} />,
-  setup: <SetupPanel {...props} />,
+  setup: <ConnectedSetupPanel />,
   design: <div>design...</div>
 })
 

@@ -3,7 +3,7 @@ from opentrons import containers, instruments
 
 # a 12 row trough for sources, and 96 well plate for output
 trough = containers.load('trough-12row', 'C1', 'trough')
-plate = containers.load('96-PCR-flat', 'D1', 'plate')
+plate = containers.load('96-PCR-flat', 'A1', 'plate')
 
 # a tip rack for our pipette
 p200rack = containers.load('tiprack-200ul', 'B1', 'tiprack')
@@ -11,7 +11,7 @@ p200rack = containers.load('tiprack-200ul', 'B1', 'tiprack')
 # create a p200 pipette on robot axis B
 p200 = instruments.Pipette(
     name="p200",
-    axis="b",
+    mount="left",
     min_volume=20,
     max_volume=200,
     tip_racks=[p200rack]

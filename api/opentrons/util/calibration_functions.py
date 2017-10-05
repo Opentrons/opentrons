@@ -112,7 +112,6 @@ def calibrate_pipette(probing_values, probe):
 
 def probe_instrument(instrument, robot):
     robot.home()
-    robot.connect()
     pose_tracker = robot.pose_tracker
 
     frame_base = base.Base(pose_tracker)
@@ -164,10 +163,9 @@ def jog(instrument, distance, axis, robot):
     pose_tracker = robot.pose_tracker
     position = \
         dict(zip('xyz', pose_tracker[instrument].position))
-    print("pos1", position)
     position[axis] += distance
-    print("pos2", position)
     instrument._move(**position)
+
 
 
 

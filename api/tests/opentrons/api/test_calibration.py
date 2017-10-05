@@ -79,3 +79,11 @@ async def test_update_container_offset(main_router, model):
             instrument=model.instrument._instrument,
             save=True
         )
+
+
+async def test_tip_probe_functional(main_router, protocol):
+    session = main_router.session_manager.create(
+        name='<blank>', text=protocol.text)
+    main_router.calibration_manager._robot._driver.simulating = True
+    main_router.calibration_manager.move_to_front(session.instruments[0])
+    main_router.calibration_manager.tip_probe(session.instruments[0])

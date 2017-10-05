@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import styles from './TipProbe.css'
 
 function PrepareForProbe (props) {
@@ -12,6 +13,18 @@ function PrepareForProbe (props) {
         <li>Place a previously used or otherwise discarded <strong>{volume} ul</strong> tip on the pipette.</li>
       </ol>
       <button className={styles.btn_probe} onClick={console.log('onInitiateTipProbeClick')}>Initiate Tip Probe</button>
+    </section>
+  )
+}
+
+PrepareForProbe.propTypes = {
+  volume: PropTypes.number.isRequired
+}
+
+function RobotIsMoving (props) {
+  return (
+    <section className={styles.probe_msg} >
+      <h3>Robot is moving..</h3>
     </section>
   )
 }
@@ -38,23 +51,39 @@ function ProbeSuccess (props) {
   )
 }
 
+ProbeSuccess.propTypes = {
+  volume: PropTypes.number.isRequired
+}
+
 export default function TipProbe (props) {
   const {currentInstrument} = props
   const {
     tipIsPreparingForProbe,
+    tipIsReadyForProbe,
     tipIsProbing,
     tipIsProbed
   } = currentInstrument
 
   let probeMessage = null
-  if (tipIsPreparingForProbe) {
+  if (tipIsReadyForProbe) {
     probeMessage = <PrepareForProbe {...currentInstrument} />
+  } else if (tipIsPreparingForProbe) {
+    probeMessage = <RobotIsMoving />
   } else if (tipIsProbing) {
     probeMessage = <ProbeInitiated />
   } else if (tipIsProbed) {
     probeMessage = <ProbeSuccess {...currentInstrument} />
   } else {
-    probeMessage = <div />
+    probeMessage = null
   }
   return probeMessage
+}
+
+TipProbe.propTypes = {
+  currentInstrument: PropTypes.shape({
+    volume: PropTypes.number.isRequired,
+    tipIsPreparingForProbe: PropTypes.bool.isRequired,
+    tipIsProbing: PropTypes.bool.isRequired,
+    tipIsProbed: PropTypes.bool.isRequired
+  }).isRequired
 }

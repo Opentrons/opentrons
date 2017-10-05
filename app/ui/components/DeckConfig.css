@@ -1,0 +1,74 @@
+.review_deck {
+  background-color: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  top: 0;
+  height: 100%;
+  padding-top: 4rem;
+}
+
+.review_deck > div {
+  margin: 0 auto;
+  width: 100%;
+  height: 75%;
+  padding: 1rem 4rem;
+}
+
+.deck_calibration > div {
+  margin: 0 auto;
+  width: 38rem;
+  height: 30rem;
+}
+
+.review_message {
+  height: 10rem;
+  text-align: center;
+  padding: 1rem 4rem;
+  color: white;
+}
+
+.continue,
+.robot_action,
+.confirm,
+.btn_modal {
+  margin-top: 1rem;
+  font-size: 1rem;
+  padding: 0 3rem;
+  border-radius: 0.5rem;
+  background-color: #777;
+  font-family: 'trons';
+  color: white;
+  line-height: 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn_modal {
+  display: inline-block;
+  width: 8rem;
+  padding: 0;
+}
+
+.confirm {
+  margin: 0 1rem;
+}
+
+.deck {
+  box-sizing: border-box;
+  padding: 1rem 2rem;
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-auto-columns: 1fr;
+  grid-template:
+    'slot-10 slot-11 .' 1fr
+    'slot-7 slot-8 slot-9' 1fr
+    'slot-4 slot-5 slot-6' 1fr
+    'slot-1 slot-2 slot-3' 1fr;
+}
+
+.prompt {
+  text-align: center;
+  padding: 1rem 2rem;
+  line-height: 2rem;
+}

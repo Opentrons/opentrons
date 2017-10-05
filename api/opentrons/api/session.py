@@ -18,7 +18,7 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
-        self.robot = Robot()
+        self.robot = robot
 
     def create(self, name, text):
         self.session = Session(name=name, text=text)
@@ -111,11 +111,13 @@ class Session(object):
         unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
+            robot._driver.simulating = True
             exec(self._protocol, {})
         except Exception as e:
             self.error_append(e)
             raise e
         finally:
+            robot._driver.simulating = False
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands
@@ -169,7 +171,6 @@ class Session(object):
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
         self.set_state('running')
-        robot.connect(devicename)
 
         try:
             exec(self._protocol, {})
@@ -179,7 +180,6 @@ class Session(object):
         finally:
             _unsubscribe()
             self.set_state('finished')
-            robot.disconnect()
 
         return self
 
@@ -211,7 +211,7 @@ class Session(object):
     def _reset(self):
         # HACK: hard reset singleton by replacing all of it's attributes
         # with the one from a newly constructed robot
-        robot.__dict__ = {**Robot().__dict__}
+        robot.reset()
         self.clear_logs()
 
     # TODO (artyom, 20171003): along with calibration, consider extracting this

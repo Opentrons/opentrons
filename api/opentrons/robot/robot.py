@@ -403,22 +403,9 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-
         self.gantry.home()
 
-
-
-        # self._driver.calm_down()
-        # if args:
-        #     self._update_axis_homed(*args)
-        #     self._driver.home(*args)
-        # else:
-        #     self._update_axis_homed('xyzab')
-        #     self._driver.home('z')
-        #     self._driver.home('x', 'y', 'b', 'a')
-
     def move_head(self, *args, **kwargs):
-
         self._driver.move(*args, **kwargs)
         self.gantry._publish_position()
 

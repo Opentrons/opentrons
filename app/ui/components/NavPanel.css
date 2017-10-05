@@ -4,7 +4,7 @@
   padding: 0 1rem;
   grid-template:
     'details' 675px
-    'connect_toggle' auto;
+    'btn_bottom' auto;
   font-family: 'sans';
   font-size: 14px;
   line-height: 2rem;
@@ -63,7 +63,7 @@
 }
 
 .connection_toggle {
-  grid-area: connect_toggle;
+  grid-area: btn_bottom;
   padding: 1rem;
 }
 
@@ -73,26 +73,3 @@
   text-align: center;
 }
 
-/* Setup */
-
-.links {
-  grid-area: details;
-  padding-top: 2rem;
-}
-
-.links > a {
-  display: block;
-  color: silver;
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 1rem;
-  line-height: 3rem;
-}
-
-.btn_run {
-  composes: btn;
-  background-color: transparent;
-
-  /* TODO: extract assets from soon to be updated sketch files */
-  background-image: url(../../ui/img/icon_fileupload.svg);
-}
