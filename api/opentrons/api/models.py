@@ -20,7 +20,7 @@ class Instrument:
         self.id = id(instrument)
         self.name = instrument.name
         self.channels = instrument.channels
-        self.axis = instrument.axis
+        self.mount = instrument.mount
         self.tip_racks = [
             Container(container)
             for container in instrument.tip_racks]

@@ -44,7 +44,7 @@ def _probe_instrument_axis(instrument, axis, probing_movement, probe_location, s
 
     if axis is not 'z': #FIXME: [JG & Andy | 9/27/17] this edge case should not be handled here
         probing_pos[axis] -= probing_movement
-
+    print(instrument)
     instrument._move(z=safe_height)
     instrument._move(x=probing_pos['x'], y=probing_pos['y'])
     instrument._move(z=probing_pos['z'])
@@ -112,7 +112,6 @@ def calibrate_pipette(probing_values, probe):
 
 def probe_instrument(instrument, robot):
     robot.home()
-    robot.connect()
     pose_tracker = robot.pose_tracker
 
     frame_base = base.Base(pose_tracker)

@@ -1,4 +1,5 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
+from os import environ
 
 '''
 - Driver is responsible for providing an interface for motion control
@@ -50,19 +51,28 @@ def _parse_axis_values(raw_axis_values):
 class SmoothieDriver_3_0_0:
 
     def __init__(self):
-
-        self.simulating = True #FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
-
+        self.simulating = True  # FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
 
     # FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
     def connect(self):
-        self.connection = serial_communication.connect()
         self.simulating = False
+
+        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
+            self.simulating = True
+            return
+
+        self.connection = serial_communication.connect()
 
         self._setup()
 
+    def disconnect(self):
+        self.simulating = True
+
     @property
     def position(self):
+        if self.simulating:
+            return {axis: 0 for axis in 'xyzabc'}
+    
         parsed_position = _parse_axis_values(
             self._send_command(GCODES['CURRENT_POSITION'])
         )

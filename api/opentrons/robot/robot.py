@@ -242,6 +242,8 @@ class Robot(object):
         self.gantry = gantry.Gantry(self._driver, self.pose_tracker)
         self.pose_tracker.create_root_object(self.gantry, x=0, y=0, z=0)
         self.gantry._setup_mounts()
+        print('setup_gantry', self.gantry)
+
 
 
     def add_instrument(self, mount, instrument):
@@ -418,7 +420,7 @@ class Robot(object):
         #     self._driver.home('x', 'y', 'b', 'a')
 
     def move_head(self, *args, **kwargs):
-
+        print('move_head', self)
         self._driver.move(*args, **kwargs)
         self.gantry._publish_position()
 
