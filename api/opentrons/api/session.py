@@ -18,7 +18,6 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
-        self.robot = robot
 
     def create(self, name, text):
         self.session = Session(name=name, text=text)
@@ -111,6 +110,8 @@ class Session(object):
         unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
+            # TODO (artyom, 20171005): this will go away
+            # once robot / driver simulation flow is fixed
             robot._driver.simulating = True
             exec(self._protocol, {})
         except Exception as e:
@@ -162,7 +163,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self, devicename):
+    def run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -173,6 +174,7 @@ class Session(object):
         self.set_state('running')
 
         try:
+            robot.home()
             exec(self._protocol, {})
         except Exception as e:
             self.error_append(e)
@@ -209,8 +211,6 @@ class Session(object):
         self._on_state_changed()
 
     def _reset(self):
-        # HACK: hard reset singleton by replacing all of it's attributes
-        # with the one from a newly constructed robot
         robot.reset()
         self.clear_logs()
 

@@ -8,6 +8,8 @@ class MainRouter:
     def __init__(self, loop=None):
         self._notifications = Notifications(loop=loop)
 
+        # TODO (artyom 20171005): once connect/simulate sequence for the robot
+        # is refined, consider moving this elsewhere
         robot.connect()
 
         self._unsubscribe = []

@@ -24,8 +24,7 @@ def model():
     from opentrons import robot, instruments, containers
     from opentrons.robot.robot import Robot
 
-    # robot.__dict__ = {**Robot().__dict__}
-    print('model', robot.gantry)
+    robot.__dict__ = {**Robot().__dict__}
 
     pipette = instruments.Pipette(mount='left')
     plate = containers.load('96-flat', 'A1')

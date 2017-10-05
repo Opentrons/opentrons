@@ -10,14 +10,12 @@ def state(state):
     return _match
 
 
-async def test_tip_probe(main_router):
-    # TODO (artyom, 20171002): remove create=True once driver code is merged
+async def test_tip_probe(main_router, model):
     with mock.patch(
-         'opentrons.util.calibration_functions.probe_instrument',
-         create=True) as patch:
-        main_router.calibration_manager.tip_probe('instrument')
+         'opentrons.util.calibration_functions.probe_instrument') as patch:
+        main_router.calibration_manager.tip_probe(model.instrument)
         patch.assert_called_with(
-            'instrument',
+            model.instrument._instrument,
             main_router.calibration_manager._robot)
 
         await main_router.wait_until(state('probing'))
@@ -25,10 +23,8 @@ async def test_tip_probe(main_router):
 
 
 async def test_move_to_front(main_router, model):
-    # TODO (artyom, 20171002): remove create=True once driver code is merged
     with mock.patch(
-         'opentrons.util.calibration_functions.move_instrument_for_probing_prep',  # NOQA
-         create=True) as patch:
+         'opentrons.util.calibration_functions.move_instrument_for_probing_prep') as patch:  # NOQA
 
         main_router.calibration_manager.move_to_front(model.instrument)
         patch.assert_called_with(
