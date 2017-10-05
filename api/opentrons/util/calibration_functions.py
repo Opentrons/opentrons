@@ -158,7 +158,7 @@ def move_instrument_for_probing_prep(instrument, robot):
 
 
 
-def jog(instrument, distance, axis, robot):
+def jog_instrument(instrument, distance, axis, robot):
     '''move position relative to current instrument position'''
     pose_tracker = robot.pose_tracker
     position = \
