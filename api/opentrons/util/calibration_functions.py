@@ -44,7 +44,7 @@ def _probe_instrument_axis(instrument, axis, probing_movement, probe_location, s
 
     if axis is not 'z': #FIXME: [JG & Andy | 9/27/17] this edge case should not be handled here
         probing_pos[axis] -= probing_movement
-    print(instrument)
+
     instrument._move(z=safe_height)
     instrument._move(x=probing_pos['x'], y=probing_pos['y'])
     instrument._move(z=probing_pos['z'])
@@ -155,6 +155,16 @@ def probe_instrument(instrument, robot):
 def move_instrument_for_probing_prep(instrument, robot):
     position = {instrument.axis: 150, 'x':150, 'y':150}
     robot.move_head(**position)
+
+
+
+def jog_instrument(instrument, distance, axis, robot):
+    '''move position relative to current instrument position'''
+    pose_tracker = robot.pose_tracker
+    position = \
+        dict(zip('xyz', pose_tracker[instrument].position))
+    position[axis] += distance
+    instrument._move(**position)
 
 
 
