@@ -22,9 +22,8 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 @pytest.fixture
 def model():
     from opentrons import robot, instruments, containers
-    from opentrons.robot.robot import Robot
 
-    robot.__dict__ = {**Robot().__dict__}
+    robot.reset()
 
     pipette = instruments.Pipette(mount='left')
     plate = containers.load('96-flat', 'A1')
