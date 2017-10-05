@@ -1,21 +1,24 @@
 import React from 'react'
+import {NavLink} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import NavPanel from './NavPanel'
 import styles from './SideBar.css'
 
-function NavLink (props) {
-  const {name, iconSrc, onClick, isDisabled} = props
+function NavigationLink (props) {
+  const {name, iconSrc, onClick, isDisabled, to} = props
 
   return (
     <li key={name}>
-      <button
+      <NavLink
+        to={to}
         onClick={onClick}
         disabled={isDisabled}
         className={styles.nav_icon}
+        activeClassName={styles.active_step}
       >
         <img src={iconSrc} alt={name} />
-      </button>
+      </NavLink>
     </li>
   )
 }
@@ -42,7 +45,7 @@ ConnectionIndicator.propTypes = {
 
 export default function SideBar (props) {
   const {isNavPanelOpen, onNavIconClick} = props
-  const navLinks = props.navLinks.map((link) => NavLink({
+  const navLinks = props.navLinks.map((link) => NavigationLink({
     onClick: onNavIconClick(link.name),
     ...link
   }))
@@ -51,7 +54,7 @@ export default function SideBar (props) {
     <aside className={classnames(styles.sidebar, { [styles.open]: isNavPanelOpen })}>
       <nav className={styles.nav_icons} >
         <ConnectionIndicator {...props} />
-        <ol>
+        <ol className={styles.nav_icon_list}>
           {navLinks}
         </ol>
       </nav>

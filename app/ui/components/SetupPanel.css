@@ -50,7 +50,7 @@ h1 {
   pointer-events: none;
 }
 
-ul li a {
+.step_list li a {
   color: black;
   text-decoration: none;
   background-color: #efefef;
@@ -60,7 +60,7 @@ ul li a {
   font-size: 0.75rem;
 }
 
-li a::before {
+.step_list li a::before {
   display: block;
   float: left;
   content: '';
@@ -76,7 +76,7 @@ li a::before {
   margin: 0 0.5rem 0.5rem 1rem;
 }
 
-a:hover {
+.step_list a:hover {
   background-color: #ccc;
 }
 
@@ -85,9 +85,10 @@ a.disabled {
   pointer-events: none;
 }
 
-.alert::before {
+.step_list .alert::before {
   content: '!';
   background-color: silver;
+  color: white;
 }
 
 .axis {
@@ -116,6 +117,6 @@ a.disabled {
   text-transform: uppercase;
 }
 
-.active {
+.step_list a.active_lab {
   background-color: #bbb;
 }

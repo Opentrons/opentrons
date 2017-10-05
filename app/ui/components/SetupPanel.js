@@ -12,7 +12,7 @@ function PipetteLinks (props) {
     : styles.alert
   return (
     <li key={axis}>
-      <NavLink to={url} className={style} activeClassName={styles.active}>
+      <NavLink to={url} className={style} activeClassName={styles.active_pip}>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{channels}-Channel ({volume}ul)</span>
       </NavLink>
@@ -29,7 +29,7 @@ function LabwareLinks (props) {
   let isDisabled = !isTiprack && !isTipracksConfirmed
   return (
     <li key={slot}>
-      <NavLink to={url} activeClassName={styles.active} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
+      <NavLink to={url} activeClassName={styles.active_lab} className={classnames({[styles.disabled]: isDisabled}, calibrationStyle)}>
         [{slot}] {name}
       </NavLink>
     </li>
@@ -69,13 +69,13 @@ export default function SetupPanel (props) {
       <section className={styles.links}>
         <section className={styles.pipette_group}>
           <NavLink to='/setup-instruments'>Pipette Setup</NavLink>
-          <ul>
+          <ul className={styles.step_list}>
             {instrumentList}
           </ul>
         </section>
         <section className={classnames({[styles.unavailable]: !isInstrumentsConfirmed}, styles.labware_group)}>
           <NavLink to='/setup-deck'>Labware Setup</NavLink>
-          <ul>
+          <ul className={styles.step_list}>
             {tiprackList}
             {labwareList}
           </ul>

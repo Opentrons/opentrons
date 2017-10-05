@@ -3,6 +3,7 @@ import {Switch, Route} from 'react-router'
 
 import Nav from '../containers/Nav'
 
+import Upload from '../pages/Upload'
 import Run from '../pages/Run'
 import SetupInstruments from '../pages/SetupInstruments'
 import SetupDeck from '../pages/SetupDeck'
@@ -15,6 +16,7 @@ export default function App () {
       <Nav />
       <Switch>
         <Route path='/run' component={Run} />
+        <Route path='/upload' component={Upload} />
         <Route path='/setup-instruments/:side?' component={SetupInstruments} />
         <Route path='/setup-deck/:slot?' component={SetupDeck} />
       </Switch>

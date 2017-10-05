@@ -12,14 +12,14 @@ export default function JogModal (props) {
 
           <button
             className={styles.btn_x_neg}
-            onClick={() => console.log ('jog x neg')}
+            onClick={() => console.log('jog x neg')}
           >
             &#8592;
           </button>
 
           <button
             className={styles.btn_x_pos}
-            onClick={() => console.log ('jog x neg')}
+            onClick={() => console.log('jog x pos')}
           >
             &#8594;
           </button>
