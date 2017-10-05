@@ -21,6 +21,7 @@ class Instrument:
         self.name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
+        self.axis = 'a' if self.mount == 'right' else 'b'
         self.tip_racks = [
             Container(container)
             for container in instrument.tip_racks]
