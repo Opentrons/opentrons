@@ -34,6 +34,7 @@ export default function Labware (props) {
         activeClassName={styles.active}
         className={classnames({[styles.disabled]: disabled}, styles.slot)}
       >
+        <img src={require(`../img/labware/${type}.png`)} />
         {labwareLabel}
         {confirmationMsg}
       </NavLink>
