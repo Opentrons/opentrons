@@ -83,7 +83,7 @@ h1 {
 }
 
 .step_list button:hover,
-.step_list a:hover  {
+.step_list a:hover {
   background-color: #ccc;
 }
 
@@ -105,7 +105,7 @@ button.btn_labware {
 
 .step_list .confirmed::before {
   content: '✓';
-  background-color: #05C1B3;
+  background-color: #05c1b3;
   color: white;
   line-height: 1rem;
 }

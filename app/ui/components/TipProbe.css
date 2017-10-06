@@ -31,4 +31,9 @@
   font-family: 'trons';
   text-transform: uppercase;
   color: white;
+  cursor: pointer;
+}
+
+.btn_probe[disabled] {
+  pointer-events: none;
 }

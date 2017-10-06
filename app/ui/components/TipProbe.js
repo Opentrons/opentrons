@@ -3,18 +3,23 @@ import PropTypes from 'prop-types'
 import styles from './TipProbe.css'
 
 function PrepareForProbe (props) {
-  const {instrument, onProbeTipClick} = props
-  const {volume} = instrument
+  const {volume, isCurrent, onProbeTipClick} = props
   return (
-    <section className={styles.probe_msg} >
-      <h3>Complete the following steps prior to clicking [Initiate Tip Probe]</h3>
+    <span >
+      <p>Complete the following steps prior to clicking [Initiate Tip Probe]</p>
       <ol>
         <li>Remove all labware from deck.</li>
         <li>Remove trash bin to reveal Tip Probe tool.</li>
         <li>Place a previously used or otherwise discarded <strong>{volume} ul</strong> tip on the pipette.</li>
       </ol>
-      <button className={styles.btn_probe} onClick={onProbeTipClick}>Continue</button>
-    </section>
+      <button
+        className={styles.btn_probe}
+        onClick={onProbeTipClick}
+        disabled={!isCurrent}
+      >
+        Continue
+      </button>
+    </span>
   )
 }
 
@@ -42,7 +47,7 @@ function ProbeSuccess (props) {
 }
 
 function DefaultMessage (props) {
-  const {onPrepareClick, isProbed} = props
+  const {onPrepareClick, isProbed, isCurrent} = props
   const infoIcon = isProbed
     ? '✓'
     : '!'
@@ -53,7 +58,7 @@ function DefaultMessage (props) {
     <span>
       <span className={styles.alert}>{infoIcon}</span>
       {infoMessage}
-      <button className={styles.btn_probe} onClick={onPrepareClick}>Initiate Tip Probe</button>
+      <button className={styles.btn_probe} onClick={onPrepareClick} disabled={!isCurrent}>Initiate Tip Probe</button>
     </span>
   )
 }
@@ -64,16 +69,16 @@ ProbeSuccess.propTypes = {
 
 export default function TipProbe (props) {
   const {onPrepareClick, onProbeTipClick, instrument, currentCalibration} = props
-  const {isProbed, axis, isCurrent} = instrument || {}
+  const {isCurrent} = instrument || {}
   const {isPreparingForProbe, isReadyForProbe, isProbing} = currentCalibration
 
   let probeMessage = null
-  if (isReadyForProbe) {
+  if (isReadyForProbe && isCurrent) {
     probeMessage = <PrepareForProbe {...instrument} onProbeTipClick={onProbeTipClick} />
   } else if ((isPreparingForProbe || isProbing) && isCurrent) {
     probeMessage = <RobotIsMoving />
   } else {
-    probeMessage = <DefaultMessage {...instrument} onPrepareClick={onProbeTipClick} />
+    probeMessage = <DefaultMessage {...instrument} onPrepareClick={onPrepareClick} />
   }
 
   return probeMessage

@@ -8,10 +8,10 @@ import styles from './PipetteConfig.css'
 import singlePipetteSrc from '../img/pipette_single.png'
 
 export default function PipetteConfig (props) {
-  const {instruments, onPrepareClick} = props
+  const {instruments} = props
 
   const pipettes = instruments.map((instrument) => {
-    const {name, axis, channels, isCurrent, isProbed, volume} = instrument
+    const {name, axis, channels, isCurrent, volume} = instrument
     const isUsed = name != null
 
     const style = classnames(styles.pipette, styles[axis], {
@@ -32,10 +32,6 @@ export default function PipetteConfig (props) {
       ? `${volume} ul`
       : 'N/A'
 
-    const infoIcon = isProbed
-      ? '✓'
-      : '!'
-
     return (
       <div className={style} key={axis}>
         <div className={linkStyle}>
@@ -55,7 +51,7 @@ export default function PipetteConfig (props) {
             {tipType}
           </h3>
           <div className={styles.info}>
-            <ConnectedTipProbe instrument={instrument}/>
+            <ConnectedTipProbe instrument={instrument} />
           </div>
         </div>
 
