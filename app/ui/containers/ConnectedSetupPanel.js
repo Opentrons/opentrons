@@ -1,67 +1,25 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
+import {
+  selectors as robotSelectors,
+  actions as robotActions
+} from '../robot'
 import SetupPanel from '../components/SetupPanel'
 
-const mapStateToProps = (state) => {
-  return {
-    isInstrumentsConfirmed: true, // all pipettes confirmed ? show labware
-    instruments: [
-      {
-        axis: 'left',
-        channels: 'single',
-        volume: 200,
-        isProbed: true
-      },
-      {
-        axis: 'right',
-        channels: 'multi',
-        volume: 200,
-        isProbed: false
-      }
-    ],
-    isTipracksConfirmed: true, // all tipracks confirmed ? unlock other labware
-    isLabwareConfirmed: true, // all labware confirmed ? show run button
-    labware: [
-      {
-        name: 'tiprack',
-        slot: 1,
-        id: 'A1',
-        type: 'tiprack-200ul',
-        isConfirmed: true,
-        isTiprack: true
-      }, {
-        name: 'tiprack2',
-        slot: 4,
-        id: 'A2',
-        type: 'tiprack-200ul',
-        isConfirmed: true,
-        isTiprack: true
-      }, {
-        name: 'trough',
-        slot: 2,
-        id: 'B1',
-        type: 'trough-12row',
-        isConfirmed: false,
-        isTiprack: false
-      }, {
-        name: 'plate',
-        slot: 3,
-        id: 'C1',
-        type: '96-PCR-flat',
-        isConfirmed: false,
-        isTiprack: false
-      }, {
-        name: 'tuberack',
-        slot: 6,
-        id: 'C2',
-        type: 'tube-rack-2ml',
-        isConfirmed: false,
-        isTiprack: false
-      }
-    ]
-  }
-}
+const mapStateToProps = (state) => ({
+  instrumentsAreCalibrated: robotSelectors.getInstrumentsAreCalibrated(state),
+  isTipracksConfirmed: false, // all tipracks confirmed ? unlock other labware
+  isLabwareConfirmed: false, // all labware confirmed ? show run button
+
+  instruments: robotSelectors.getInstruments(state),
+  labware: robotSelectors.getLabware(state)
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  setInstrument: (axis) => () => dispatch(robotActions.setCurrentInstrument(axis)),
+  setLabware: (slot) => () => dispatch(robotActions.setCurrentLabware(slot))
+})
 
 function ConnectedSetupPanel (props) {
   return (
@@ -69,4 +27,4 @@ function ConnectedSetupPanel (props) {
   )
 }
 
-export default connect(mapStateToProps)(ConnectedSetupPanel)
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectedSetupPanel)

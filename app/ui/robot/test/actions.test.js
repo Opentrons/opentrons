@@ -94,6 +94,24 @@ describe('robot actions', () => {
     expect(actions.homeResponse(new Error('AHHH'))).toEqual(expected)
   })
 
+  test('set current instrument', () => {
+    const expected = {
+      type: actionTypes.SET_CURRENT_INSTRUMENT,
+      payload: {instrument: 'right'}
+    }
+
+    expect(actions.setCurrentInstrument('right')).toEqual(expected)
+  })
+
+  test('set current labware', () => {
+    const expected = {
+      type: actionTypes.SET_CURRENT_LABWARE,
+      payload: {labware: 2}
+    }
+
+    expect(actions.setCurrentLabware(2)).toEqual(expected)
+  })
+
   test('move tip to front action', () => {
     const expected = {
       type: actionTypes.MOVE_TO_FRONT,

@@ -102,6 +102,12 @@ button.btn_labware {
   line-height: 1rem;
 }
 
+.step_list .confirmed::before {
+  content: '✓';
+  background-color: green;
+  color: white;
+}
+
 .axis {
   text-transform: uppercase;
   display: block;
@@ -109,7 +115,6 @@ button.btn_labware {
 }
 
 .type {
-  text-transform: capitalize;
   display: block;
   line-height: 1rem;
 }

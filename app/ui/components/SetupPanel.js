@@ -2,32 +2,44 @@ import React from 'react'
 import {NavLink} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import capitalize from 'lodash/capitalize'
+
 import styles from './SetupPanel.css'
 
 function PipetteLinks (props) {
-  const {axis, volume, channels, isProbed} = props
-  const style = isProbed
+  const {axis, name, volume, channels, isProbed, onClick} = props
+  const isDisabled = name == null
+
+  const style = isProbed || isDisabled
     ? styles.confirmed
     : styles.alert
+
+  const description = !isDisabled
+    ? `${capitalize(channels)}-channel (${volume} ul)`
+    : 'N/A'
+
   return (
     <li key={axis}>
-      <button className={style}>
+      <button className={style} onClick={onClick}>
         <span className={styles.axis}>{axis}</span>
-        <span className={styles.type}>{channels}-Channel ({volume}ul)</span>
+        <span className={styles.type}>{description}</span>
       </button>
     </li>
   )
 }
 
 function LabwareLinks (props) {
-  const {name, slot, isConfirmed, isTiprack, isTipracksConfirmed} = props
-  const calibrationStyle = isConfirmed
-    ? styles.confirmed
-    : styles.alert
-  let isDisabled = !isTiprack && !isTipracksConfirmed
+  const {name, slot, isConfirmed, isTiprack, isTipracksConfirmed, onClick} = props
+  const isDisabled = !isTiprack && !isTipracksConfirmed
+  const buttonStyle = classnames(styles.btn_labware, {
+    [styles.confirmed]: isConfirmed,
+    [styles.alert]: !isConfirmed,
+    [styles.disabled]: isDisabled
+  })
+
   return (
     <li key={slot}>
-      <button className={classnames({[styles.disabled]: isDisabled}, calibrationStyle, styles.btn_labware)}>
+      <button className={buttonStyle} onClick={onClick} disabled={isDisabled}>
         [{slot}] {name}
       </button>
     </li>
@@ -38,16 +50,22 @@ export default function SetupPanel (props) {
   const {
     instruments,
     labware,
-    isInstrumentsConfirmed,
+    instrumentsAreCalibrated,
     isLabwareConfirmed,
-    isTipracksConfirmed
+    isTipracksConfirmed,
+    setInstrument,
+    setLabware
   } = props
-  const instrumentList = instruments.map((inst) => PipetteLinks({
-    ...inst
-  }))
+  const instrumentList = instruments.map((inst) => {
+    const onClick = setInstrument(inst.axis)
+
+    return PipetteLinks({...inst, onClick})
+  })
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
-    const links = LabwareLinks({...lab, isTipracksConfirmed})
+    const onClick = setLabware(lab.slot)
+    const links = LabwareLinks({...lab, isTipracksConfirmed, onClick})
+
     if (lab.isTiprack) {
       result.tiprackList.push(links)
     } else {
@@ -71,7 +89,7 @@ export default function SetupPanel (props) {
             {instrumentList}
           </ul>
         </section>
-        <section className={classnames({[styles.unavailable]: !isInstrumentsConfirmed}, styles.labware_group)}>
+        <section className={classnames({[styles.unavailable]: !instrumentsAreCalibrated}, styles.labware_group)}>
           <NavLink to='/setup-deck'>Labware Setup</NavLink>
           <ul className={styles.step_list}>
             {tiprackList}
@@ -85,11 +103,13 @@ export default function SetupPanel (props) {
 }
 
 SetupPanel.propTypes = {
+  setInstrument: PropTypes.func.isRequired,
   instruments: PropTypes.arrayOf(PropTypes.shape({
     axis: PropTypes.string.isRequired,
-    channels: PropTypes.string.isRequired,
-    volume: PropTypes.number.isRequired,
-    isProbed: PropTypes.bool.isRequired
+    name: PropTypes.string,
+    channels: PropTypes.string,
+    volume: PropTypes.number,
+    isProbed: PropTypes.bool
   })).isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -98,7 +118,7 @@ SetupPanel.propTypes = {
     isConfirmed: PropTypes.bool.isRequired,
     isTiprack: PropTypes.bool.isRequired
   })).isRequired,
-  isInstrumentsConfirmed: PropTypes.bool.isRequired,
+  instrumentsAreCalibrated: PropTypes.bool.isRequired,
   isTipracksConfirmed: PropTypes.bool.isRequired,
   isLabwareConfirmed: PropTypes.bool.isRequired
 }

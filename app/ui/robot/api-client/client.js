@@ -126,6 +126,9 @@ export default function client (dispatch) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
 
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 2000)
+
     remote.calibration_manager.move_to_front(instrument)
       .then(() => dispatch(actions.moveToFrontResponse()))
       .catch((error) => dispatch(actions.moveToFrontResponse(error)))
@@ -134,6 +137,9 @@ export default function client (dispatch) {
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.probeTipResponse()), 2000)
 
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
@@ -293,12 +299,10 @@ export default function client (dispatch) {
   }
 
   function handleRobotNotification (message) {
-    const {name, payload} = message
+    const {topic, payload} = message
 
-    switch (name) {
-      case 'state':
-        handleApiSession(payload)
-        break
+    switch (topic) {
+      case 'session': return handleApiSession(payload)
     }
   }
 
@@ -307,8 +311,13 @@ export default function client (dispatch) {
   }
 }
 
+// swap OT1 protocol slot to OT2 protocol slot
 // TODO(mc, 2017-10-03): be less "clever" about this
-// map A1 -> 1, B1 -> 2, C1 -> 3, A2 -> 4, ..., B4 -> 11
+// 4 10|11|_t
+// 3 _7|_8|_9
+// 2 _4|_5|_6
+// 1 _1|_2|_3
+//    A  B  C
 function letterSlotToNumberSlot (slot) {
   // split two-char string into charcodes
   const [col, row] = Array.from(slot.toUpperCase()).map((c) => c.charCodeAt(0))

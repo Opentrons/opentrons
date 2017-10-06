@@ -7,13 +7,13 @@ import ConnectedDeckConfig from '../containers/ConnectedDeckConfig'
 import ConnectedJogModal from '../containers/ConnectedJogModal'
 
 export default function SetupDeckPage (props) {
-  const {match} = props
-  const currentSlot = parseInt(match.params.slot) || 1
+  const {match: {url}} = props
+
   return (
     <Page>
       <Header />
-      <ConnectedDeckConfig currentSlot={currentSlot} />
-      <Route path={`${match.url}/jog`} component={ConnectedJogModal} />
+      <ConnectedDeckConfig />
+      <Route path={`${url}/jog`} component={ConnectedJogModal} />
     </Page>
   )
 }

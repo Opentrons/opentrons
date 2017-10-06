@@ -6,34 +6,37 @@
   grid-template-areas: 'left right';
 }
 
+.pipette {
+  display: grid;
+}
+
 .left {
   grid-area: left;
-  display: grid;
   grid-template-columns: 80% 20%;
   grid-template-areas:
     'toggle toggle'
     'info img';
-  opacity: 0.5;
 }
 
 .right {
   grid-area: right;
-  display: grid;
   grid-template-columns: 20% 80%;
   grid-template-areas:
     'toggle toggle'
     'img info';
+}
+
+.inactive,
+.disabled {
   opacity: 0.5;
 }
 
-.left:hover,
-.right:hover {
-  opacity: 1;
-  pointer-events: all;
+.pipette:hover {
+  opacity: 0.9;
 }
 
-.active {
-  opacity: 1;
+.disabled {
+  pointer-events: none;
 }
 
 .active button {
@@ -106,8 +109,5 @@
   font-family: 'trons';
   text-transform: uppercase;
   color: white;
-}
-
-h3 {
-  text-transform: capitalize;
+  cursor: pointer;
 }

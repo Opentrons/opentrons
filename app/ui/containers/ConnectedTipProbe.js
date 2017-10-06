@@ -4,25 +4,17 @@ import {connect} from 'react-redux'
 import TipProbe from '../components/TipProbe'
 
 import {
-  actions as robotActions
-  // selectors as robotSelectors
+  actions as robotActions,
+  selectors as robotSelectors
 } from '../robot'
 
-const mapStateToProps = (state) => ({
-  // ?: getCurrentInstrument selector?
-  currentInstrument: {
-    axis: 'left',
-    channels: 'single',
-    volume: 200,
-    tipIsPreparingForProbe: false,
-    tipIsReadyForProbe: false,
-    tipIsProbing: false,
-    tipIsProbed: true
-  }
+const mapStateToProps = (state, props) => ({
+  currentInstrument: robotSelectors.getCurrentInstrument(state),
+  currentCalibration: robotSelectors.getCurrentInstrumentCalibration(state)
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  onInitiateTipProbeClick: () => dispatch(robotActions.intitateTipProbe())
+const mapDispatchToProps = (dispatch, props) => ({
+  onProbeTipClick: (axis) => () => dispatch(robotActions.probeTip(axis))
 })
 
 function ConnectedTipProbe (props) {

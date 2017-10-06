@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styles from './TipProbe.css'
 
 function PrepareForProbe (props) {
-  const {volume} = props
+  const {volume, onProbeTipClick} = props
   return (
     <section className={styles.probe_msg} >
       <h3>Complete the following steps prior to clicking [Initiate Tip Probe]</h3>
@@ -12,7 +12,7 @@ function PrepareForProbe (props) {
         <li>Remove trash bin to reveal Tip Probe tool.</li>
         <li>Place a previously used or otherwise discarded <strong>{volume} ul</strong> tip on the pipette.</li>
       </ol>
-      <button className={styles.btn_probe} onClick={console.log('onInitiateTipProbeClick')}>Initiate Tip Probe</button>
+      <button className={styles.btn_probe} onClick={onProbeTipClick}>Initiate Tip Probe</button>
     </section>
   )
 }
@@ -46,7 +46,6 @@ function ProbeSuccess (props) {
         <li>Remove tip by hand and discard.</li>
         <li>Replace trash bin on top of Tip Probe tool once all tips have been defined.</li>
       </ol>
-      <button className={styles.btn_probe} onClick={console.log('close, next pipette route?')}>Close</button>
     </section>
   )
 }
@@ -56,34 +55,34 @@ ProbeSuccess.propTypes = {
 }
 
 export default function TipProbe (props) {
-  const {currentInstrument} = props
-  const {
-    tipIsPreparingForProbe,
-    tipIsReadyForProbe,
-    tipIsProbing,
-    tipIsProbed
-  } = currentInstrument
+  const {onProbeTipClick, currentInstrument, currentCalibration} = props
+  const {isProbed, axis} = currentInstrument || {}
+  const {isPreparingForProbe, isReadyForProbe, isProbing} = currentCalibration
 
   let probeMessage = null
-  if (tipIsReadyForProbe) {
-    probeMessage = <PrepareForProbe {...currentInstrument} />
-  } else if (tipIsPreparingForProbe) {
+  if (isReadyForProbe) {
+    probeMessage = <PrepareForProbe {...currentInstrument} onProbeTipClick={onProbeTipClick(axis)} />
+  } else if (isPreparingForProbe) {
     probeMessage = <RobotIsMoving />
-  } else if (tipIsProbing) {
+  } else if (isProbing) {
     probeMessage = <ProbeInitiated />
-  } else if (tipIsProbed) {
+  } else if (isProbed) {
     probeMessage = <ProbeSuccess {...currentInstrument} />
   } else {
     probeMessage = null
   }
+
   return probeMessage
 }
 
 TipProbe.propTypes = {
+  onProbeTipClick: PropTypes.func.isRequired,
   currentInstrument: PropTypes.shape({
-    volume: PropTypes.number.isRequired,
-    tipIsPreparingForProbe: PropTypes.bool.isRequired,
-    tipIsProbing: PropTypes.bool.isRequired,
-    tipIsProbed: PropTypes.bool.isRequired
+    volume: PropTypes.number.isRequired
+  }),
+  currentCalibration: PropTypes.shape({
+    isPreparingForProbe: PropTypes.bool,
+    isReadyForProbe: PropTypes.bool,
+    isProbing: PropTypes.bool
   }).isRequired
 }

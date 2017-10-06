@@ -15,7 +15,8 @@ const {
   getIsDone,
   getRunTime,
   getInstruments,
-  getDeck
+  getInstrumentsAreCalibrated,
+  getLabware
 } = selectors
 
 describe('robot selectors', () => {
@@ -246,6 +247,42 @@ describe('robot selectors', () => {
     ])
   })
 
+  test('get instruments are calibrated', () => {
+    const twoPipettesCalibrated = makeState({
+      protocolInstrumentsByAxis: {
+        left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
+        right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true},
+        right: {isProbed: true}
+      }
+    })
+
+    const twoPipettesNotCalibrated = makeState({
+      protocolInstrumentsByAxis: {
+        left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
+        right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true}
+      }
+    })
+
+    const onePipetteCalibrated = makeState({
+      protocolInstrumentsByAxis: {
+        left: {name: 'p200', axis: 'left', channels: 8, volume: 200}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true}
+      }
+    })
+
+    expect(getInstrumentsAreCalibrated(twoPipettesCalibrated)).toBe(true)
+    expect(getInstrumentsAreCalibrated(twoPipettesNotCalibrated)).toBe(false)
+    expect(getInstrumentsAreCalibrated(onePipetteCalibrated)).toBe(true)
+  })
+
   test('get deck', () => {
     const state = makeState({
       protocolLabwareBySlot: {
@@ -260,7 +297,7 @@ describe('robot selectors', () => {
       }
     })
 
-    expect(getDeck(state)).toEqual([
+    expect(getLabware(state)).toEqual([
       {
         slot: 1,
         id: 'A1',

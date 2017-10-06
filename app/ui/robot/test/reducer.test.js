@@ -30,6 +30,13 @@ describe('robot reducer', () => {
       protocolInstrumentsByAxis: {},
       protocolLabwareBySlot: {},
 
+      instrumentCalibrationByAxis: {},
+      labwareConfirmationBySlot: {},
+      currentInstrument: '',
+      // TODO(mc, 2017-10-05): Make labware ID a string for consistency
+      currentLabware: 0,
+      // currentInstrumentCalibration: {},
+
       homeRequest: {inProgress: false, error: null},
       moveToFrontRequest: {inProgress: false, error: null},
       probeTipRequest: {inProgress: false, error: null},
@@ -224,17 +231,57 @@ describe('robot reducer', () => {
     })
   })
 
+  test('handles setCurrentInstrument', () => {
+    const state = {currentInstrument: 'right'}
+    const action = {
+      type: actionTypes.SET_CURRENT_INSTRUMENT,
+      payload: {instrument: 'left'}
+    }
+
+    expect(reducer(state, action)).toEqual({currentInstrument: 'left'})
+  })
+
+  test('handles setCurrentLabware', () => {
+    const state = {currentLabware: 3}
+    const action = {
+      type: actionTypes.SET_CURRENT_LABWARE,
+      payload: {labware: 6}
+    }
+
+    expect(reducer(state, action)).toEqual({currentLabware: 6})
+  })
+
   test('handles moveToFront action', () => {
-    const state = {moveToFrontRequest: {inProgress: false, error: new Error()}}
-    const action = {type: actionTypes.MOVE_TO_FRONT}
+    const state = {
+      moveToFrontRequest: {inProgress: false, error: new Error()},
+      currentInstrumentCalibration: {},
+      instrumentCalibrationByAxis: {left: {isProbed: true}}
+    }
+    const action = {
+      type: actionTypes.MOVE_TO_FRONT,
+      payload: {instrument: 'left'}
+    }
 
     expect(reducer(state, action)).toEqual({
-      moveToFrontRequest: {inProgress: true, error: null}
+      moveToFrontRequest: {inProgress: true, error: null},
+      instrumentCalibrationByAxis: {left: {isProbed: false}},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: true
+      }
     })
   })
 
   test('handles moveToFrontResponse action', () => {
-    const state = {moveToFrontRequest: {inProgress: true, error: null}}
+    const state = {
+      moveToFrontRequest: {inProgress: true, error: null},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: true,
+        isReadyForProbe: false
+      }
+    }
+
     const success = {type: actionTypes.MOVE_TO_FRONT_RESPONSE, error: false}
     const failure = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
@@ -243,24 +290,53 @@ describe('robot reducer', () => {
     }
 
     expect(reducer(state, success)).toEqual({
-      moveToFrontRequest: {inProgress: false, error: null}
+      moveToFrontRequest: {inProgress: false, error: null},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: false,
+        isReadyForProbe: true
+      }
     })
     expect(reducer(state, failure)).toEqual({
-      moveToFrontRequest: {inProgress: false, error: new Error('AH')}
+      moveToFrontRequest: {inProgress: false, error: new Error('AH')},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: false,
+        isReadyForProbe: false
+      }
     })
   })
 
   test('handles probeTip action', () => {
-    const state = {probeTipRequest: {inProgress: false, error: new Error()}}
-    const action = {type: actionTypes.PROBE_TIP}
+    const state = {
+      probeTipRequest: {inProgress: false, error: new Error()},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isReadyForProbe: true,
+        isProbing: false
+      }
+    }
+    const action = {type: actionTypes.PROBE_TIP, payload: {instrument: 'right'}}
 
     expect(reducer(state, action)).toEqual({
-      probeTipRequest: {inProgress: true, error: null}
+      probeTipRequest: {inProgress: true, error: null},
+      currentInstrumentCalibration: {
+        axis: 'right',
+        isReadyForProbe: false,
+        isProbing: true
+      }
     })
   })
 
   test('handles probeTipResponse action', () => {
-    const state = {probeTipRequest: {inProgress: true, error: null}}
+    const state = {
+      probeTipRequest: {inProgress: true, error: null},
+      currentInstrumentCalibration: {axis: 'right', isProbing: true},
+      instrumentCalibrationByAxis: {
+        left: {isProbed: false},
+        right: {isProbed: false}
+      }
+    }
     const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
     const failure = {
       type: actionTypes.PROBE_TIP_RESPONSE,
@@ -269,10 +345,20 @@ describe('robot reducer', () => {
     }
 
     expect(reducer(state, success)).toEqual({
-      probeTipRequest: {inProgress: false, error: null}
+      probeTipRequest: {inProgress: false, error: null},
+      currentInstrumentCalibration: {axis: 'right', isProbing: false},
+      instrumentCalibrationByAxis: {
+        left: {isProbed: false},
+        right: {isProbed: true}
+      }
     })
     expect(reducer(state, failure)).toEqual({
-      probeTipRequest: {inProgress: false, error: new Error('AH')}
+      probeTipRequest: {inProgress: false, error: new Error('AH')},
+      currentInstrumentCalibration: {axis: 'right', isProbing: false},
+      instrumentCalibrationByAxis: {
+        left: {isProbed: false},
+        right: {isProbed: false}
+      }
     })
   })
 
