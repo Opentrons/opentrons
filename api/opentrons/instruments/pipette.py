@@ -14,9 +14,7 @@ class PipetteTip:
         self.length = length
 
 
-
 class Pipette:
-
     """
 
     Through this class you can can:
@@ -1380,8 +1378,6 @@ class Pipette:
         for key in keys:
             self.speeds[key] = kwargs.get(key)
         return self
-
-
 
     def _move(self, x=None, y=None, z=None):
         if self.attached_tip and z is not None:

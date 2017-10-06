@@ -4,13 +4,11 @@ from os import environ
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
-  communications 
+  communications
 
 - Driver is NOT responsible interpreting the motions in any way or knowing anything
   about what the axes are used for
 '''
-
-
 
 DEFAULT_STEPS_PER_MM = 'M92 X160.6738 Y160.5829 Z800 A800 B767.38 C767.38'
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z50 A50 B40 C40'
@@ -41,7 +39,7 @@ def _parse_axis_values(raw_axis_values):
     except:
         raise RuntimeError("GOT THIS: ", raw_axis_values)
     parsed_values = parsed_values[2:]
-    dict =  {
+    dict = {
         s.split(':')[0].lower(): float(s.split(':')[1])
         for s in parsed_values
     }
@@ -51,9 +49,23 @@ def _parse_axis_values(raw_axis_values):
 class SmoothieDriver_3_0_0:
 
     def __init__(self):
-        self.simulating = True  # FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
+        self._position = None
+        self.log = []
+        self._reset_position()
+        self.simulating = True
 
-    # FIXME (JG 9/28/17): Should have a more thought out way of simulating vs really running
+    def _reset_position(self):
+        self._position = {axis: 0 for axis in 'xyzabc'}
+        self.log += [self._position.copy()]
+
+    def _update_position(self, target):
+        self._position.update({
+            axis: value for axis, value in target.items() if value is not None
+        })
+        self.log += [self._position.copy()]
+
+    # FIXME (JG 9/28/17): Should have a more thought out
+    # way of simulating vs really running
     def connect(self):
         self.simulating = False
 
@@ -71,13 +83,13 @@ class SmoothieDriver_3_0_0:
     @property
     def position(self):
         if self.simulating:
-            return {axis: 0 for axis in 'xyzabc'}
-    
+            return self._position
+
         parsed_position = _parse_axis_values(
             self._send_command(GCODES['CURRENT_POSITION'])
         )
 
-        #FIXME (JG | 10/1/17) recovery attempt hack
+        # FIXME (JG | 10/1/17) recovery attempt hack
         if 'x' not in parsed_position:
             parsed_position = _parse_axis_values(
                 self._send_command(GCODES['CURRENT_POSITION'])
@@ -87,6 +99,8 @@ class SmoothieDriver_3_0_0:
 
     @property
     def target_position(self):
+        if self.simulating:
+            return self._position
         return self._send_command(GCODES['TARGET_POSITION'])
 
     @property
@@ -117,7 +131,7 @@ class SmoothieDriver_3_0_0:
     def _reset_from_error(self):
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
-    #TODO: Write GPIO low
+    # TODO: Write GPIO low
     def _reboot(self):
         pass
 
@@ -125,15 +139,13 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
-        if self.simulating == True:
-            print('Simulating command: ', command)
+        if self.simulating:
             return "Virtual!"
             # return virtual_driver.write_and_return(command)
         '''Sends command to serial'''
-        command_line = command +' M400'
+        command_line = command + ' M400'
         return serial_communication.write_and_return(
             command_line, self.connection, timeout)
-
 
     def _setup(self):
         self._reset_from_error()
@@ -143,8 +155,10 @@ class SmoothieDriver_3_0_0:
         self._send_command(DEFAULT_STEPS_PER_MM)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
 
-
     def _home_all(self):
+        if self.simulating:
+            return self._reset_position()
+
         command = GCODES['HOME'] + 'ZA ' \
                   + GCODES['HOME'] + 'XBC ' \
                   + GCODES['HOME'] + 'Y'
@@ -152,22 +166,28 @@ class SmoothieDriver_3_0_0:
 
     # ----------- END Private functions ----------- #
 
-
     # ----------- Public interface ---------------- #
-
     def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
-        target_position = { 'X':x, 'Y':y, 'Z':z, 'A':a, 'B':b, 'C':c}
+        if self.simulating:
+            self._update_position({
+                axis: value
+                for axis, value in zip('xyzabc', [x, y, z, a, b, c])
+            })
+
+        target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
         coords = [axis + str(coords)
                   for axis, coords in target_position.items()
                   if coords is not None]
         command = GCODES['MOVE'] + ''.join(coords)
         self._send_command(command)
 
-
     def home(self, axis=None):
         if not axis:
             self._home_all()
         else:
+            if self.simulating:
+                return self._update_position({axis: 0 for axis in axis})
+
             axes_to_home = [ax for ax in axis.upper() if ax in AXES_SAFE_TO_HOME]
             if axes_to_home:
                 command = GCODES['HOME'] + ''.join(axes_to_home)
@@ -193,7 +213,5 @@ class SmoothieDriver_3_0_0:
     #TODO: Write GPIO low
     def kill(self):
         pass
-
-
 
     # ----------- END Public interface ------------ #

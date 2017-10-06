@@ -5,13 +5,23 @@ from opentrons.api import models
 from collections import namedtuple
 
 
+def state(topic, state):
+    def _match(item):
+        return \
+            item['name'] == 'state' and \
+            item['topic'] == topic and \
+            item['payload'].state == state
+
+    return _match
+
+
 async def wait_until(matcher, notifications, timeout=1, loop=None):
     result = []
     for coro in iter(notifications.__anext__, None):
         done, pending = await asyncio.wait([coro], timeout=timeout)
 
         if pending:
-            raise TimeoutError('While waiting for {0}'.format(matcher))
+            raise TimeoutError('Notifications: {0}'.format(result))
 
         result += [done.pop().result()]
 
@@ -38,12 +48,16 @@ def model():
 
 
 @pytest.fixture
-def main_router(loop):
+def main_router(loop, monkeypatch):
     from opentrons.api.routers import MainRouter
+    from opentrons import robot
 
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     with MainRouter(loop=loop) as router:
         router.wait_until = partial(
             wait_until,
             notifications=router.notifications,
             loop=loop)
         yield router
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+    robot.reset()
