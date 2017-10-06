@@ -20,7 +20,10 @@ def flip_wells(wells):
 
     for well, opposite_offset in zip(sorted_wells, opposite_y_offsets):
         x, y, z = well._coordinates
-        well._coordinates = Vector(x, opposite_offset, 0) # Clear
+        well._coordinates = Vector(x, opposite_offset, 0)
+        length, width = (well.properties['length'], well.properties['width'])
+        well.properties['length'] = width
+        well.properties['width'] = length
 
 
 def rotate_container_for_alpha(container):

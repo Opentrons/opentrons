@@ -761,12 +761,12 @@ class Pipette:
             self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
 
-            self.move_to(self.current_tip().bottom(0), strategy='arc')
+            self.move_to(self.current_tip().top(0), strategy='arc')
 
             tip_plunge = 6
             for i in range(int(presses) - 1):
-                self.move_to(self.current_tip().bottom(tip_plunge), strategy='direct')
-                self.move_to(self.current_tip().bottom(0), strategy='direct')
+                self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
+                self.move_to(self.current_tip().top(0), strategy='direct')
 
             return self
 
