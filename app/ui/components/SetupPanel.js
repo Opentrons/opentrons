@@ -84,7 +84,7 @@ export default function SetupPanel (props) {
       <h1>Prepare Robot for RUN</h1>
       <section className={styles.links}>
         <section className={styles.pipette_group}>
-          <NavLink to='/setup-instruments'>Pipette Setup</NavLink>
+          <NavLink to='/setup-instruments' activeClassName={styles.active}>Pipette Setup</NavLink>
           <ul className={styles.step_list}>
             {instrumentList}
           </ul>
@@ -92,7 +92,7 @@ export default function SetupPanel (props) {
         <section className={classnames(styles.labware_group, {
           [styles.unavailable]: !instrumentsCalibrated})
         }>
-          <NavLink to='/setup-deck'>Labware Setup</NavLink>
+          <NavLink to='/setup-deck' activeClassName={styles.active}>Labware Setup</NavLink>
           <ul className={styles.step_list}>
             {tiprackList}
             {labwareList}

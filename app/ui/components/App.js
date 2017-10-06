@@ -2,7 +2,7 @@ import React from 'react'
 import {Switch, Route} from 'react-router'
 import Nav from '../containers/Nav'
 
-import Upload from '../pages/Upload'
+import Home from '../pages/Home'
 import Run from '../pages/Run'
 import SetupInstruments from '../pages/SetupInstruments'
 import SetupDeck from '../pages/SetupDeck'
@@ -14,8 +14,8 @@ export default function App () {
     <div className={styles.wrapper}>
       <Nav />
       <Switch>
+        <Route exact path='/' component={Home} />
         <Route path='/run' component={Run} />
-        <Route path='/upload' component={Upload} />
         <Route path='/setup-instruments' component={SetupInstruments} />
         <Route path='/setup-deck' component={SetupDeck} />
       </Switch>

@@ -82,7 +82,8 @@ h1 {
   line-height: 1.5rem;
 }
 
-.step_list button:hover {
+.step_list button:hover,
+.step_list a:hover  {
   background-color: #ccc;
 }
 
@@ -104,8 +105,9 @@ button.btn_labware {
 
 .step_list .confirmed::before {
   content: '✓';
-  background-color: green;
+  background-color: #05C1B3;
   color: white;
+  line-height: 1rem;
 }
 
 .axis {
@@ -133,6 +135,7 @@ button.btn_labware {
   text-transform: uppercase;
 }
 
-.step_list a.active_lab {
+.pipette_group a.active {
   background-color: #bbb;
+  color: white;
 }
