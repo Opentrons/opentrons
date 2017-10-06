@@ -19,7 +19,7 @@ export default function Labware (props) {
     labwareReviewed,
     isConfirmed,
     isCurrent,
-    isDisabled
+    isDisabled,
   } = props
 
   const slotStyle = {gridArea: `slot-${slot}`}
@@ -32,7 +32,8 @@ export default function Labware (props) {
 
   const style = classnames(styles.slot, {
     [styles.active]: isCurrent,
-    [styles.disabled]: isDisabled
+    [styles.disabled]: isDisabled,
+    [styles.confirmed]: isConfirmed
   })
 
   const confirmationMsg = (!isConfirmed && labwareReviewed)
@@ -44,7 +45,7 @@ export default function Labware (props) {
     : null
 
   return (
-    <div style={slotStyle} className={style}>
+    <div style={slotStyle} className={style} data-lab={type}>
       {labwareLabel}
       {confirmationMsg}
     </div>

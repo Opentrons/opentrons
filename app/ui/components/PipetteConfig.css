@@ -8,6 +8,7 @@
 
 .pipette {
   display: grid;
+  vertical-align: top;
 }
 
 .left {
@@ -31,16 +32,8 @@
   opacity: 0.5;
 }
 
-.pipette:hover {
-  opacity: 0.9;
-}
-
 .disabled {
   pointer-events: none;
-}
-
-.active button {
-  cursor: pointer;
 }
 
 .pipette_toggle {
@@ -60,6 +53,7 @@
 
 .pipette_info {
   grid-area: info;
+  min-height: 375px;
 }
 
 .pipette_icon {
@@ -68,7 +62,7 @@
 }
 
 .pipette_icon img {
-  height: 100%;
+  height: 75%;
 }
 
 .title {

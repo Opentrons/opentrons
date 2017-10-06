@@ -26,12 +26,21 @@ a {
 }
 
 .slot.active {
-  border: 4px solid grey;
+  border: 4px solid #111;
 }
 
 .disabled {
-  background-color: grey;
+  opacity: 0.4;
   pointer-events: none;
+}
+
+.confirmed {
+  background-color: #ddd;
+}
+
+.confirmed::before{
+  content: '✓ ' attr(data-lab) ;
+  color: #777;
 }
 
 .slot img {
@@ -39,7 +48,6 @@ a {
 }
 
 .label,
-.label_hover,
 .status {
   position: absolute;
   bottom: 0;

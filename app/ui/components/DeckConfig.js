@@ -19,7 +19,7 @@ function DeckMap (props) {
   const labware = props.labware.map((lab) => (<Labware
     {...lab}
     key={lab.slot}
-    isDisabled={!lab.isTiprack && tipracksConfirmed}
+    isDisabled={!lab.isTiprack && !tipracksConfirmed}
     labwareReviewed={labwareReviewed}
   />))
 
