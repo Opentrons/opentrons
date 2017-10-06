@@ -404,7 +404,17 @@ export function reducer (state = INITIAL_STATE, action) {
       return handleRequest(state, 'updateOffsetRequest', errorPayload)
 
     case actionTypes.UPDATE_OFFSET_RESPONSE:
-      return handleResponse(state, 'updateOffsetRequest', errorPayload)
+      return handleResponse(state, 'updateOffsetRequest', errorPayload, {
+        labwareConfirmationBySlot: {
+          ...state.labwareConfirmationBySlot,
+          [state.currentLabwareConfirmation.slot]: {isConfirmed: true}
+        },
+        currentLabwareConfirmation: {
+          slot: 0,
+          isMoving: false,
+          isOverWell: false
+        }
+      })
 
     case actionTypes.SET_LABWARE_CONFIRMED:
       return {

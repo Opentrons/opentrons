@@ -1,21 +1,25 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
+import {
+  selectors as robotSelectors,
+  actions as robotActions
+} from '../robot'
+
 import JogModal from '../components/JogModal'
 
 const mapStateToProps = (state) => ({
-  currentLabware: {
-    slot: 1,
-    id: 'A1',
-    name: 'tiprack',
-    type: 'tiprack-200ul',
-    isConfirmed: false,
-    isTiprack: true
-  }
+  labware: robotSelectors.getCurrentLabware(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  // jog actions...
+  jog: (axis, direction) => () => {
+    // TODO(mc, 2017-10-06): don't hardcode the pipette and pass slot in via props
+    dispatch(robotActions.jog('left', axis, direction))
+  },
+  updateOffset: (labware) => () => {
+    dispatch(robotActions.updateOffset('left', labware))
+  }
 })
 
 function ConnectedJogModal (props) {

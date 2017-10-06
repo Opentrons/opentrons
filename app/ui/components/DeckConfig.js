@@ -1,5 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
+
 import Labware from './Labware'
 import styles from './DeckConfig.css'
 
@@ -108,6 +110,7 @@ ConfirmCalibrationPrompt.propTypes = {
 function ConfirmCalibrationPrompt (props) {
   const {labware, onYesClick} = props
 
+  // TODO(mc, 2017-10-06): use props for no button href
   return (
     <div className={styles.prompt}>
       <h3>
@@ -119,12 +122,9 @@ function ConfirmCalibrationPrompt (props) {
       >
         Yes
       </button>
-      <button
-        className={styles.btn_modal}
-        onClick={() => console.log('open jog modal')}
-      >
+      <Link className={styles.btn_modal} to='/setup-deck/jog'>
         No
-      </button>
+      </Link>
     </div>
   )
 }

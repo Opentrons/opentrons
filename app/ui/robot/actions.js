@@ -145,10 +145,10 @@ export const actions = {
     return action
   },
 
-  jog (instrument, coordinates) {
+  jog (instrument, axis, direction) {
     return makeRobotAction({
       type: actionTypes.JOG,
-      payload: {instrument, coordinates}
+      payload: {instrument, axis}
     })
   },
 

@@ -1,5 +1,7 @@
 // robot api client
 // takes a dispatch (send) function and returns a receive handler
+import {push} from 'react-router-redux'
+
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
 import {constants, selectors} from '../reducer'
@@ -15,6 +17,8 @@ const INSTRUMENT_AXES = {
   b: 'left',
   a: 'right'
 }
+
+const DEFAULT_JOG_DISTANCE_MM = '0.25'
 
 export default function client (dispatch) {
   let rpcClient
@@ -158,11 +162,17 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
 
+  // TODO(mc, 2017-10-06): signature is instrument, distance, axis
+  // axis is x, y, z, not left and right (which we will call mount)
   function jog (state, action) {
-    const {payload: {instrument: axis, coordinates}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+    const {payload: {instrument: instrumentAxis, axis, direction}} = action
+    const instrument = selectors.getState(state).protocolInstrumentsByAxis[instrumentAxis]
+    const distance = DEFAULT_JOG_DISTANCE_MM * direction
 
-    remote.calibration_manager.jog(instrument, coordinates)
+    // FIXME(mc, 2017-10-06): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.jogResponse()), 2000)
+
+    remote.calibration_manager.jog(instrument, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
       .catch((error) => dispatch(actions.jogResponse(error)))
   }
@@ -174,8 +184,21 @@ export default function client (dispatch) {
       protocolLabwareBySlot: labwares
     } = selectors.getState(state)
 
-    remote.calibration_manager.update_offset(labwares[slot], instruments[axis])
-      .then(() => dispatch(actions.updateOffsetResponse()))
+    // TODO(mc, 2017-10-06)
+
+    // FIXME(mc, 2017-10-06): DEBUG CODE
+    // return setTimeout(() => {
+    //   dispatch(actions.updateOffsetResponse())
+    //   dispatch(push('/setup-deck'))
+    // }, 2000)
+
+    remote.calibration_manager.update_container_offset(labwares[slot], instruments[axis])
+      .then(() => {
+        dispatch(actions.updateOffsetResponse())
+        // TODO(mc, 2017-10-06): do this without a double dispatch
+        // also this hardcoded URL is a bad idea™
+        dispatch(push('/setup-deck'))
+      })
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
 
