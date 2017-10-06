@@ -1,0 +1,25 @@
+# http://docs.resin.io/pages/deployment/docker-templates
+#TODO: (JG 10/5/17)
+# - pre-build packages requiring native compilation to reduce image size
+# - Use setup.py through pip install instead of copying over and using setup.py
+
+FROM resin/raspberrypi3-python:3.5-slim-20170705
+
+WORKDIR /usr/src
+
+COPY ./api/requirements.txt ./requirements.txt 
+RUN apt-get update
+RUN apt-get install gcc make git g++
+
+
+RUN pip install -r ./requirements.txt
+
+COPY ./api ./api
+
+COPY data-user_storage.mount /etc/systemd/system/
+RUN systemctl enable data-user_storage.mount
+
+RUN pip install numpy
+ENV INITSYSTEM on
+RUN echo $PWD
+CMD ["/usr/src/api/scripts/compute/start.sh"]
