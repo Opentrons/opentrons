@@ -45,7 +45,6 @@ export default function Labware (props) {
 
   return (
     <div style={slotStyle} className={style}>
-      <img src={require(`../img/labware/${type}.png`)} />
       {labwareLabel}
       {confirmationMsg}
     </div>

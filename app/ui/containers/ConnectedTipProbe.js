@@ -9,12 +9,14 @@ import {
 } from '../robot'
 
 const mapStateToProps = (state, props) => ({
+  instrument: props.instrument,
   currentInstrument: robotSelectors.getCurrentInstrument(state),
   currentCalibration: robotSelectors.getCurrentInstrumentCalibration(state)
 })
 
 const mapDispatchToProps = (dispatch, props) => ({
-  onProbeTipClick: (axis) => () => dispatch(robotActions.probeTip(axis))
+  onPrepareClick: () => dispatch(robotActions.moveToFront(props.instrument.axis)),
+  onProbeTipClick: () => dispatch(robotActions.probeTip(props.instrument.axis))
 })
 
 function ConnectedTipProbe (props) {

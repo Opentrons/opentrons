@@ -3,14 +3,15 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import capitalize from 'lodash/capitalize'
 
+import ConnectedTipProbe from '../containers/ConnectedTipProbe'
 import styles from './PipetteConfig.css'
 import singlePipetteSrc from '../img/pipette_single.png'
 
 export default function PipetteConfig (props) {
   const {instruments, onPrepareClick} = props
 
-  const pipettes = instruments.map((pipette) => {
-    const {name, axis, channels, isCurrent, isProbed, volume} = pipette
+  const pipettes = instruments.map((instrument) => {
+    const {name, axis, channels, isCurrent, isProbed, volume} = instrument
     const isUsed = name != null
 
     const style = classnames(styles.pipette, styles[axis], {
@@ -35,14 +36,10 @@ export default function PipetteConfig (props) {
       ? '✓'
       : '!'
 
-    const infoMessage = isProbed
-      ? (<p>Instrument has been calibrated successfully by Tip Probe</p>)
-      : (<p>Tip dimensions must be defined using the Tip Probe tool</p>)
-
     return (
       <div className={style} key={axis}>
         <div className={linkStyle}>
-          {pipette.axis}
+          {axis}
         </div>
         <div className={styles.pipette_info}>
           <h2 className={styles.title}>
@@ -58,16 +55,8 @@ export default function PipetteConfig (props) {
             {tipType}
           </h3>
           <div className={styles.info}>
-            <span className={styles.alert}>{infoIcon}</span>
-            {infoMessage}
+            <ConnectedTipProbe instrument={instrument}/>
           </div>
-          <button
-            className={styles.btn_probe}
-            onClick={onPrepareClick(axis)}
-            disabled={!isCurrent}
-          >
-            Prepare Pipette Tip
-          </button>
         </div>
 
         <div className={styles.pipette_icon}>

@@ -83,6 +83,7 @@
   margin-top: 1rem;
   padding: 0.5rem;
   font-size: 0.75rem;
+  min-height: 7.1rem;
 }
 
 /* this will move up to utils for imports across components */
