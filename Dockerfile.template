@@ -19,7 +19,8 @@ COPY ./api ./api
 COPY data-user_storage.mount /etc/systemd/system/
 RUN systemctl enable data-user_storage.mount
 
-
+RUN pip install numpy
+ENV RUNNING_ON_PI=1
 ENV INITSYSTEM on
 RUN echo $PWD
 CMD ["/usr/src/api/scripts/compute/start.sh"]

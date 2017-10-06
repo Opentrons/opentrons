@@ -8,7 +8,7 @@ from opentrons import robot
 
 RIGHT_MOUNT_OFFSET = {'x':0, 'y':0, 'z':0.0}
 
-LEFT_MOUNT_OFFSET = {'x':-38.351, 'y':30.2024, 'z':0.0}
+LEFT_MOUNT_OFFSET = {'x':-37.351, 'y':30.5024, 'z':7.0}
 
 
 LEFT_INSTRUMENT_ACTUATOR = 'b'
