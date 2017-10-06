@@ -1,14 +1,8 @@
+from conftest import state
 from unittest import mock
+from functools import partial
 
-
-def state(state):
-    def _match(item):
-        return item['name'] == 'state' and \
-               item['topic'] == 'calibration' and \
-               item['payload'].state == state
-
-    return _match
-
+state = partial(state, 'calibration')
 
 async def test_tip_probe(main_router, model):
     with mock.patch(
@@ -48,15 +42,25 @@ async def test_move_to(main_router, model):
 
 
 async def test_jog(main_router, model):
-    # TODO (artyom, 20171002): remove create=True once driver code is merged
-    with mock.patch.object(
-             model.instrument._instrument, 'jog', create=True) as jog:
-        main_router.calibration_manager.jog(
-            model.instrument,
-            (1, 2, 3)
-        )
+    from opentrons import robot
 
-        jog.assert_called_with((1, 2, 3))
+    with mock.patch('opentrons.util.calibration_functions.jog_instrument') as jog:  # NOQA
+        for distance, axis in zip((1, 2, 3), 'xyz'):
+            main_router.calibration_manager.jog(
+                model.instrument,
+                distance,
+                axis
+            )
+
+        expected = [
+            mock.call(
+                model.instrument._instrument,
+                distance,
+                axis,
+                robot)
+            for axis, distance in zip('xyz', (1, 2, 3))]
+
+        assert jog.mock_calls == expected
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -75,11 +79,3 @@ async def test_update_container_offset(main_router, model):
             instrument=model.instrument._instrument,
             save=True
         )
-
-
-async def test_tip_probe_functional(main_router, protocol):
-    session = main_router.session_manager.create(
-        name='<blank>', text=protocol.text)
-    main_router.calibration_manager._robot._driver.simulating = True
-    main_router.calibration_manager.move_to_front(session.instruments[0])
-    main_router.calibration_manager.tip_probe(session.instruments[0])

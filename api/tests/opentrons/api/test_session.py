@@ -101,7 +101,7 @@ async def test_load_and_run(main_router, session_manager, protocol):
         'Run should emit state change to "running" and then to "finished"'
     assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
-    session.run(devicename='Virtual Smoothie')
+    session.run()
     assert len(session.command_log) == 105, \
         "Clears command log on the next run"
 

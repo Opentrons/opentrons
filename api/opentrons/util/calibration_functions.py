@@ -153,9 +153,8 @@ def probe_instrument(instrument, robot):
 
 
 def move_instrument_for_probing_prep(instrument, robot):
-    position = {instrument.axis: 150, 'x':150, 'y':150}
+    position = {instrument.axis: 150, 'x': 150, 'y': 150}
     robot.move_head(**position)
-
 
 
 def jog_instrument(instrument, distance, axis, robot):
@@ -165,19 +164,3 @@ def jog_instrument(instrument, distance, axis, robot):
         dict(zip('xyz', pose_tracker[instrument].position))
     position[axis] += distance
     instrument._move(**position)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
