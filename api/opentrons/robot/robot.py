@@ -673,11 +673,22 @@ class Robot(object):
         self.pose_tracker.track_object(
             container.parent, container, *container._coordinates
         )
+
+
+
         for well in container:
+            center_x, center_y, _ = well.top()[1] #TODO JG 10/6/17: Stop tracking wells inconsistently
+            offset_x, offset_y, offset_z = well._coordinates
+
+
             self.pose_tracker.track_object(
                 container,
                 well,
-                *(well._coordinates + well.top()[1])
+                **{
+                    'x':offset_x + center_x,
+                    'y':offset_y + center_y,
+                    'z':offset_z
+                }
             )
 
     def pause(self):
