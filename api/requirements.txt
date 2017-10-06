@@ -1,4 +1,5 @@
 pylama
+pyserial==3.2.1
 pytest
 pytest-cov
 pytest-aiohttp
