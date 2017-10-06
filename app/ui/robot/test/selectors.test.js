@@ -15,7 +15,7 @@ const {
   getIsDone,
   getRunTime,
   getInstruments,
-  getInstrumentsAreCalibrated,
+  getInstrumentsCalibrated,
   getLabware
 } = selectors
 
@@ -278,9 +278,9 @@ describe('robot selectors', () => {
       }
     })
 
-    expect(getInstrumentsAreCalibrated(twoPipettesCalibrated)).toBe(true)
-    expect(getInstrumentsAreCalibrated(twoPipettesNotCalibrated)).toBe(false)
-    expect(getInstrumentsAreCalibrated(onePipetteCalibrated)).toBe(true)
+    expect(getInstrumentsCalibrated(twoPipettesCalibrated)).toBe(true)
+    expect(getInstrumentsCalibrated(twoPipettesNotCalibrated)).toBe(false)
+    expect(getInstrumentsCalibrated(onePipetteCalibrated)).toBe(true)
   })
 
   test('get deck', () => {

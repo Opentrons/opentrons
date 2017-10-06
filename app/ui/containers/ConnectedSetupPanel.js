@@ -8,9 +8,9 @@ import {
 import SetupPanel from '../components/SetupPanel'
 
 const mapStateToProps = (state) => ({
-  instrumentsAreCalibrated: robotSelectors.getInstrumentsAreCalibrated(state),
-  isTipracksConfirmed: false, // all tipracks confirmed ? unlock other labware
-  isLabwareConfirmed: false, // all labware confirmed ? show run button
+  instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
+  tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
+  labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
 
   instruments: robotSelectors.getInstruments(state),
   labware: robotSelectors.getLabware(state)

@@ -71,6 +71,7 @@ const INITIAL_STATE = {
     isReadyForProbe: false,
     isProbing: false
   },
+  labwareReviewed: false,
   currentLabware: 0,
   currentLabwareCalibration: {
     isMoving: false
@@ -217,7 +218,7 @@ export const selectors = {
     return selectors.getInstruments(allState).find((i) => i.isCurrent)
   },
 
-  getInstrumentsAreCalibrated (allState) {
+  getInstrumentsCalibrated (allState) {
     const instruments = selectors.getInstruments(allState)
 
     return instruments.every((i) => i.name == null || i.isProbed)
@@ -244,6 +245,10 @@ export const selectors = {
     })
   },
 
+  getLabwareReviewed (allState) {
+    return selectors.getState(allState).labwareReviewed
+  },
+
   getCurrentLabware (allState) {
     return selectors.getLabware(allState).find((lw) => lw.isCurrent)
   },
@@ -252,8 +257,13 @@ export const selectors = {
     return selectors.getLabware(allState).filter((lw) => lw.isTiprack)
   },
 
-  getTipracksAreConfirmed (allState) {
+  getTipracksConfirmed (allState) {
     return selectors.getTipracks(allState).every((t) => t.isConfirmed)
+  },
+
+  getLabwareConfirmed (allState) {
+    return selectors.getLabware(allState)
+      .every((t) => t.name == null || t.isConfirmed)
   }
 }
 
@@ -290,7 +300,8 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.SESSION:
       return handleRequest(state, 'sessionRequest', error, {
-        sessionName: payload.file.name
+        sessionName: payload.file.name,
+        labwareReviewed: false
       })
 
     case actionTypes.SESSION_RESPONSE:
@@ -307,6 +318,9 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.SET_CURRENT_LABWARE:
       return {...state, currentLabware: payload.labware}
+
+    case actionTypes.SET_LABWARE_REVIEWED:
+      return {...state, labwareReviewed: true}
 
     case actionTypes.MOVE_TO_FRONT:
       return handleRequest(state, 'moveToFrontRequest', errorPayload, {

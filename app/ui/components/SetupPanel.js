@@ -29,8 +29,8 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, slot, isConfirmed, isTiprack, isTipracksConfirmed, onClick} = props
-  const isDisabled = !isTiprack && !isTipracksConfirmed
+  const {name, slot, isConfirmed, isTiprack, tipracksConfirmed, onClick} = props
+  const isDisabled = !isTiprack && !tipracksConfirmed
   const buttonStyle = classnames(styles.btn_labware, {
     [styles.confirmed]: isConfirmed,
     [styles.alert]: !isConfirmed,
@@ -50,9 +50,9 @@ export default function SetupPanel (props) {
   const {
     instruments,
     labware,
-    instrumentsAreCalibrated,
-    isLabwareConfirmed,
-    isTipracksConfirmed,
+    instrumentsCalibrated,
+    labwareConfirmed,
+    tipracksConfirmed,
     setInstrument,
     setLabware
   } = props
@@ -62,19 +62,20 @@ export default function SetupPanel (props) {
   ))
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
-    const onClick = setLabware(lab.slot)
-    const links = LabwareLinks({...lab, isTipracksConfirmed, onClick})
+    const {slot, name, isTiprack} = lab
+    const onClick = setLabware(slot)
+    const links = LabwareLinks({...lab, tipracksConfirmed, onClick})
 
-    if (lab.name && lab.isTiprack) {
+    if (name && isTiprack) {
       result.tiprackList.push(links)
-    } else if (lab.name) {
+    } else if (name) {
       result.labwareList.push(links)
     }
 
     return result
   }, {tiprackList: [], labwareList: []})
 
-  const runLink = isLabwareConfirmed
+  const runLink = labwareConfirmed
     ? (<NavLink to='/run' className={styles.run_link}>Run Protocol</NavLink>)
     : null
 
@@ -89,7 +90,7 @@ export default function SetupPanel (props) {
           </ul>
         </section>
         <section className={classnames(styles.labware_group, {
-          [styles.unavailable]: !instrumentsAreCalibrated})
+          [styles.unavailable]: !instrumentsCalibrated})
         }>
           <NavLink to='/setup-deck'>Labware Setup</NavLink>
           <ul className={styles.step_list}>
@@ -120,7 +121,7 @@ SetupPanel.propTypes = {
     isConfirmed: PropTypes.bool,
     isTiprack: PropTypes.bool
   })).isRequired,
-  instrumentsAreCalibrated: PropTypes.bool.isRequired,
-  isTipracksConfirmed: PropTypes.bool.isRequired,
-  isLabwareConfirmed: PropTypes.bool.isRequired
+  instrumentsCalibrated: PropTypes.bool.isRequired,
+  tipracksConfirmed: PropTypes.bool.isRequired,
+  labwareConfirmed: PropTypes.bool.isRequired
 }

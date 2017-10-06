@@ -16,7 +16,7 @@ export default function Labware (props) {
   const {
     type,
     slot,
-    isDeckmapReviewed,
+    labwareReviewed,
     isConfirmed,
     isCurrent,
     isDisabled
@@ -35,11 +35,11 @@ export default function Labware (props) {
     [styles.disabled]: isDisabled
   })
 
-  const confirmationMsg = (!isConfirmed && isDeckmapReviewed)
+  const confirmationMsg = (!isConfirmed && labwareReviewed)
     ? (<div className={styles.status}>Position Unconfirmed</div>)
     : null
 
-  const labwareLabel = !isDeckmapReviewed
+  const labwareLabel = !labwareReviewed
     ? (<div className={styles.label}>{type}</div>)
     : null
 

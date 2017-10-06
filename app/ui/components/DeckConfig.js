@@ -4,21 +4,21 @@ import Labware from './Labware'
 import styles from './DeckConfig.css'
 
 DeckMap.propTypes = {
-  tipracksAreConfirmed: PropTypes.bool.isRequired,
-  isDeckmapReviewed: PropTypes.bool.isRequired,
+  tipracksConfirmed: PropTypes.bool.isRequired,
+  labwareReviewed: PropTypes.bool.isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     slot: PropTypes.number.isRequired
   })).isRequired
 }
 
 function DeckMap (props) {
-  const {tipracksAreConfirmed, isDeckmapReviewed} = props
+  const {tipracksConfirmed, labwareReviewed} = props
 
   const labware = props.labware.map((lab) => (<Labware
     {...lab}
     key={lab.slot}
-    isDisabled={!lab.isTiprack && tipracksAreConfirmed}
-    isDeckmapReviewed={isDeckmapReviewed}
+    isDisabled={!lab.isTiprack && tipracksConfirmed}
+    labwareReviewed={labwareReviewed}
   />))
 
   return (
@@ -93,21 +93,26 @@ function ConfirmCalibrationPrompt (props) {
 }
 
 DeckConfig.propTypes = {
-  isDeckmapReviewed: PropTypes.bool.isRequired
+  labwareReviewed: PropTypes.bool.isRequired,
+  setLabwareReviewed: PropTypes.func.isRequired
 }
 
 export default function DeckConfig (props) {
-  const {isDeckmapReviewed} = props
+  const {labwareReviewed, setLabwareReviewed} = props
   const deckMap = (<DeckMap {...props} />)
 
-  if (!isDeckmapReviewed) {
+  if (!labwareReviewed) {
     return (
       <section className={styles.review_deck}>
         {deckMap}
         <div className={styles.review_message}>
-          <p>To begin labware setup, position your tipracks and
-          dry containers on designated deck slots as illustrated above.</p>
-          <button className={styles.continue}>Continue</button>
+          <p>
+            To begin labware setup, position your tipracks and
+            dry containers on designated deck slots as illustrated above.
+          </p>
+          <button className={styles.continue} onClick={setLabwareReviewed}>
+            Continue
+          </button>
         </div>
       </section>
     )

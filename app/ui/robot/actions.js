@@ -18,6 +18,7 @@ export const actionTypes = {
   SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
 
   // calibration
+  SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
   HOME: makeRobotActionName('HOME'),
@@ -83,6 +84,10 @@ export const actions = {
 
   setCurrentLabware (labware) {
     return {type: actionTypes.SET_CURRENT_LABWARE, payload: {labware}}
+  },
+
+  setLabwareReviewed () {
+    return {type: actionTypes.SET_LABWARE_REVIEWED}
   },
 
   home (axes) {
