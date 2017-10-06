@@ -8,18 +8,20 @@ import {
 import DeckConfig from '../components/DeckConfig'
 
 const mapStateToProps = (state) => ({
-  isMoving: false,
-  isOverWell: true,
-
   labware: robotSelectors.getLabware(state),
   currentLabware: robotSelectors.getCurrentLabware(state),
   labwareReviewed: robotSelectors.getLabwareReviewed(state),
   tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-  labwareConfirmed: robotSelectors.getLabwareConfirmed(state)
+  labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
+
+  currentLabwareConfirmation: robotSelectors.getCurrentLabwareConfirmation(state)
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed())
+const mapDispatchToProps = (dispatch, props) => ({
+  setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
+  // TODO(mc, 2017-10-06): don't hardcode the pipette and pass slot in via props
+  moveToContainer: (slot) => () => dispatch(robotActions.moveTo('left', slot)),
+  setLabwareConfirmed: (slot) => () => dispatch(robotActions.setLabwareConfirmed(slot))
 })
 
 function ConnectedDeckConfig (props) {

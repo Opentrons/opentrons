@@ -63,18 +63,23 @@ const INITIAL_STATE = {
   protocolLabwareBySlot: {},
 
   // robot calibration and setup
+  // TODO(mc, 2017-10-06): currentInstrumentCalibration and currentLabware-
+  // Confirmation are not well thought out; fix when API state is expanded
   instrumentCalibrationByAxis: {},
   labwareConfirmationBySlot: {},
   currentInstrument: '',
   currentInstrumentCalibration: {
+    axis: '',
     isPreparingForProbe: false,
     isReadyForProbe: false,
     isProbing: false
   },
   labwareReviewed: false,
   currentLabware: 0,
-  currentLabwareCalibration: {
-    isMoving: false
+  currentLabwareConfirmation: {
+    slot: 0,
+    isMoving: false,
+    isOverWell: false
   },
 
   homeRequest: makeRequestState(),
@@ -264,6 +269,10 @@ export const selectors = {
   getLabwareConfirmed (allState) {
     return selectors.getLabware(allState)
       .every((t) => t.name == null || t.isConfirmed)
+  },
+
+  getCurrentLabwareConfirmation (allState) {
+    return selectors.getState(allState).currentLabwareConfirmation
   }
 }
 
@@ -367,10 +376,23 @@ export function reducer (state = INITIAL_STATE, action) {
       })
 
     case actionTypes.MOVE_TO:
-      return handleRequest(state, 'moveToRequest', errorPayload)
+      return handleRequest(state, 'moveToRequest', errorPayload, {
+        currentLabwareConfirmation: {
+          ...state.currentLabwareConfirmation,
+          slot: payload.labware,
+          isMoving: true,
+          isOverWell: false
+        }
+      })
 
     case actionTypes.MOVE_TO_RESPONSE:
-      return handleResponse(state, 'moveToRequest', errorPayload)
+      return handleResponse(state, 'moveToRequest', errorPayload, {
+        currentLabwareConfirmation: {
+          ...state.currentLabwareConfirmation,
+          isMoving: false,
+          isOverWell: !error
+        }
+      })
 
     case actionTypes.JOG:
       return handleRequest(state, 'jogRequest', errorPayload)
@@ -383,6 +405,20 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.UPDATE_OFFSET_RESPONSE:
       return handleResponse(state, 'updateOffsetRequest', errorPayload)
+
+    case actionTypes.SET_LABWARE_CONFIRMED:
+      return {
+        ...state,
+        labwareConfirmationBySlot: {
+          ...state.labwareConfirmationBySlot,
+          [payload.labware]: {isConfirmed: true}
+        },
+        currentLabwareConfirmation: {
+          slot: 0,
+          isMoving: false,
+          isOverWell: false
+        }
+      }
 
     case actionTypes.RUN:
       return handleRequest(state, 'runRequest', error, {runTime: 0})

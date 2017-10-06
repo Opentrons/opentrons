@@ -29,31 +29,61 @@ function DeckMap (props) {
 }
 
 LabwareNotification.propTypes = {
+  labware: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    slot: PropTypes.number.isRequired
+  }),
   isMoving: PropTypes.bool.isRequired,
-  isOverWell: PropTypes.bool.isRequired
+  isOverWell: PropTypes.bool.isRequired,
+  moveToContainer: PropTypes.func.isRequired,
+  setLabwareConfirmed: PropTypes.func.isRequired
 }
 
 function LabwareNotification (props) {
-  const {isMoving, isOverWell} = props
+  const {
+    labware,
+    isMoving,
+    isOverWell,
+    moveToContainer,
+    setLabwareConfirmed
+  } = props
 
-  if (isMoving) {
-    return <RobotIsMovingPrompt />
-  } else if (isOverWell) {
-    return <ConfirmCalibrationPrompt {...props} />
-  } else {
-    return <BeginCalibrationPrompt />
+  if (!labware) return null
+  if (isMoving) return (<RobotIsMovingPrompt />)
+  if (isOverWell) {
+    return (
+      <ConfirmCalibrationPrompt
+        {...props}
+        onYesClick={setLabwareConfirmed(labware.slot)}
+      />
+    )
   }
+
+  return (
+    <BeginCalibrationPrompt
+      {...labware}
+      onClick={moveToContainer(labware.slot)}
+    />
+  )
 }
 
-function BeginCalibrationPrompt () {
+function BeginCalibrationPrompt (props) {
+  const {name, type, slot, isConfirmed, onClick} = props
+
+  const title = isConfirmed
+    ? `${name} (${type}, slot ${slot}, confirmed)`
+    : `${name} (${type}, slot ${slot})`
+
+  const message = isConfirmed
+    ? 'Click [Move To Well] to initiate calibration sequence again.'
+    : 'Click [Move To Well] to initiate calibration sequence'
+
   return (
     <div className={styles.prompt}>
-      <h3>Some labware is selected.</h3>
-      <p>Click [Move To Well] to initiate calibration sequence.</p>
-      <button
-        className={styles.robot_action}
-        onClick={() => console.log('move to slot action, needs slot from state/route?')}
-      >
+      <h3>{title}</h3>
+      <p>{message}</p>
+      <button className={styles.robot_action} onClick={onClick}>
         Move To Well A1
       </button>
     </div>
@@ -68,17 +98,24 @@ function RobotIsMovingPrompt () {
   )
 }
 
-function ConfirmCalibrationPrompt (props) {
-  const {currentLabware} = props
+ConfirmCalibrationPrompt.propTypes = {
+  labware: PropTypes.shape({
+    slot: PropTypes.number.isRequired
+  }).isRequired,
+  onYesClick: PropTypes.func.isRequired
+}
 
-  if (!currentLabware) return null
+function ConfirmCalibrationPrompt (props) {
+  const {labware, onYesClick} = props
 
   return (
     <div className={styles.prompt}>
-      <h3>Is Pipette accurately centered over {currentLabware.slot} A1?</h3>
+      <h3>
+        {`Is Pipette accurately centered over slot ${labware.slot} A1 well?`}
+      </h3>
       <button
         className={styles.confirm}
-        onClick={() => console.log('advance to next labware')}
+        onClick={onYesClick}
       >
         Yes
       </button>
@@ -94,11 +131,23 @@ function ConfirmCalibrationPrompt (props) {
 
 DeckConfig.propTypes = {
   labwareReviewed: PropTypes.bool.isRequired,
-  setLabwareReviewed: PropTypes.func.isRequired
+  setLabwareReviewed: PropTypes.func.isRequired,
+  currentLabware: PropTypes.object,
+  currentLabwareConfirmation: PropTypes.object.isRequired,
+  moveToContainer: PropTypes.func.isRequired,
+  setLabwareConfirmed: PropTypes.func.isRequired
 }
 
 export default function DeckConfig (props) {
-  const {labwareReviewed, setLabwareReviewed} = props
+  const {
+    labwareReviewed,
+    setLabwareReviewed,
+    currentLabware,
+    currentLabwareConfirmation,
+    moveToContainer,
+    setLabwareConfirmed
+  } = props
+
   const deckMap = (<DeckMap {...props} />)
 
   if (!labwareReviewed) {
@@ -123,7 +172,12 @@ export default function DeckConfig (props) {
       <div className={styles.deck_calibration}>
         {deckMap}
       </div>
-      <LabwareNotification {...props} />
+      <LabwareNotification
+        {...currentLabwareConfirmation}
+        labware={currentLabware}
+        moveToContainer={moveToContainer}
+        setLabwareConfirmed={setLabwareConfirmed}
+      />
     </section>
   )
 }

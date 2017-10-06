@@ -33,6 +33,7 @@ export const actionTypes = {
   JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
   UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
   UPDATE_OFFSET_RESPONSE: makeRobotActionName('UPDATE_OFFSET_RESPONSE'),
+  SET_LABWARE_CONFIRMED: makeRobotActionName('SET_LABWARE_CONFIRMED'),
 
   // protocol run controls
   RUN: makeRobotActionName('RUN'),
@@ -173,6 +174,10 @@ export const actions = {
     if (error) action.payload = error
 
     return action
+  },
+
+  setLabwareConfirmed (labware) {
+    return {type: actionTypes.SET_LABWARE_CONFIRMED, payload: {labware}}
   },
 
   run () {

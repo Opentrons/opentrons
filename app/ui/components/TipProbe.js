@@ -87,7 +87,7 @@ export default function TipProbe (props) {
 TipProbe.propTypes = {
   onProbeTipClick: PropTypes.func.isRequired,
   instrument: PropTypes.shape({
-    volume: PropTypes.number.isRequired
+    volume: PropTypes.number
   }),
   currentCalibration: PropTypes.shape({
     isPreparingForProbe: PropTypes.bool,
