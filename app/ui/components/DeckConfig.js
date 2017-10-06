@@ -1,24 +1,41 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import PropTypes from 'prop-types'
 import Labware from './Labware'
 import styles from './DeckConfig.css'
 
-const DeckMap = (props) => {
-  const {
-    deck
-  } = props
-  const deckMap = deck.map((lab) => {
-    return <Labware key={lab.slot} {...lab} {...props} />
-  })
+DeckMap.propTypes = {
+  tipracksAreConfirmed: PropTypes.bool.isRequired,
+  isDeckmapReviewed: PropTypes.bool.isRequired,
+  labware: PropTypes.arrayOf(PropTypes.shape({
+    slot: PropTypes.number.isRequired
+  })).isRequired
+}
+
+function DeckMap (props) {
+  const {tipracksAreConfirmed, isDeckmapReviewed} = props
+
+  const labware = props.labware.map((lab) => (<Labware
+    {...lab}
+    key={lab.slot}
+    isDisabled={!lab.isTiprack && tipracksAreConfirmed}
+    isDeckmapReviewed={isDeckmapReviewed}
+  />))
+
   return (
     <div className={styles.deck}>
-      {deckMap}
+      {labware}
     </div>
   )
 }
 
-const LabwareNotification = (props) => {
+LabwareNotification.propTypes = {
+  isMoving: PropTypes.bool.isRequired,
+  isOverWell: PropTypes.bool.isRequired
+}
+
+function LabwareNotification (props) {
   const {isMoving, isOverWell} = props
+
   if (isMoving) {
     return <RobotIsMovingPrompt />
   } else if (isOverWell) {
@@ -28,7 +45,7 @@ const LabwareNotification = (props) => {
   }
 }
 
-const BeginCalibrationPrompt = () => {
+function BeginCalibrationPrompt () {
   return (
     <div className={styles.prompt}>
       <h3>Some labware is selected.</h3>
@@ -43,7 +60,7 @@ const BeginCalibrationPrompt = () => {
   )
 }
 
-const RobotIsMovingPrompt = () => {
+function RobotIsMovingPrompt () {
   return (
     <div className={styles.prompt}>
       <h3>Robot Moving To [slot] well A1</h3>
@@ -51,9 +68,11 @@ const RobotIsMovingPrompt = () => {
   )
 }
 
-const ConfirmCalibrationPrompt = (props) => {
+function ConfirmCalibrationPrompt (props) {
   const {currentLabware} = props
-  const url = `/setup-deck/${currentLabware.slot}/jog`
+
+  if (!currentLabware) return null
+
   return (
     <div className={styles.prompt}>
       <h3>Is Pipette accurately centered over {currentLabware.slot} A1?</h3>
@@ -63,24 +82,28 @@ const ConfirmCalibrationPrompt = (props) => {
       >
         Yes
       </button>
-      <Link
-        to={url}
+      <button
         className={styles.btn_modal}
         onClick={() => console.log('open jog modal')}
       >
         No
-      </Link>
+      </button>
     </div>
   )
 }
 
+DeckConfig.propTypes = {
+  isDeckmapReviewed: PropTypes.bool.isRequired
+}
+
 export default function DeckConfig (props) {
   const {isDeckmapReviewed} = props
+  const deckMap = (<DeckMap {...props} />)
 
   if (!isDeckmapReviewed) {
     return (
       <section className={styles.review_deck}>
-        <DeckMap {...props} />
+        {deckMap}
         <div className={styles.review_message}>
           <p>To begin labware setup, position your tipracks and
           dry containers on designated deck slots as illustrated above.</p>
@@ -88,14 +111,14 @@ export default function DeckConfig (props) {
         </div>
       </section>
     )
-  } else {
-    return (
-      <section>
-        <div className={styles.deck_calibration}>
-          <DeckMap {...props} />
-        </div>
-        <LabwareNotification {...props} />
-      </section>
-    )
   }
+
+  return (
+    <section>
+      <div className={styles.deck_calibration}>
+        {deckMap}
+      </div>
+      <LabwareNotification {...props} />
+    </section>
+  )
 }

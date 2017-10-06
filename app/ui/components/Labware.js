@@ -1,6 +1,16 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
+
 import styles from './Labware.css'
+
+Labware.propTypes = {
+  slot: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  isConfirmed: PropTypes.bool,
+  isCurrent: PropTypes.bool,
+  isDisabled: PropTypes.bool
+}
 
 export default function Labware (props) {
   const {
@@ -8,36 +18,36 @@ export default function Labware (props) {
     slot,
     isDeckmapReviewed,
     isConfirmed,
-    isTipracksConfirmed,
-    isTiprack
+    isCurrent,
+    isDisabled
   } = props
-  const slotStyle = {
-    gridArea: `slot-${slot}`
-  }
-  let confirmationMsg
-  if (!isConfirmed && isDeckmapReviewed) {
-    confirmationMsg = <div className={styles.status}>Position Unconfirmed</div>
-  }
 
-  let labwareLabel
-  !isDeckmapReviewed
-  ? labwareLabel = <div className={styles.label}>{type}</div>
-  : labwareLabel = null
+  const slotStyle = {gridArea: `slot-${slot}`}
 
-  if (type) {
-    const disabled = !isTipracksConfirmed && !isTiprack
+  if (!type) {
     return (
-      <div
-        style={slotStyle}
-        className={classnames({[styles.disabled]: disabled}, styles.slot)}
-      >
-        <img src={require(`../img/labware/${type}.png`)} />
-        {labwareLabel}
-        {confirmationMsg}
-      </div>
+      <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
     )
   }
+
+  const style = classnames(styles.slot, {
+    [styles.active]: isCurrent,
+    [styles.disabled]: isDisabled
+  })
+
+  const confirmationMsg = (!isConfirmed && isDeckmapReviewed)
+    ? (<div className={styles.status}>Position Unconfirmed</div>)
+    : null
+
+  const labwareLabel = !isDeckmapReviewed
+    ? (<div className={styles.label}>{type}</div>)
+    : null
+
   return (
-    <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
+    <div style={slotStyle} className={style}>
+      <img src={require(`../img/labware/${type}.png`)} />
+      {labwareLabel}
+      {confirmationMsg}
+    </div>
   )
 }

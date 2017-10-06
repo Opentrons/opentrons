@@ -72,6 +72,9 @@ const INITIAL_STATE = {
     isProbing: false
   },
   currentLabware: 0,
+  currentLabwareCalibration: {
+    isMoving: false
+  },
 
   homeRequest: makeRequestState(),
   moveToFrontRequest: makeRequestState(),
@@ -238,7 +241,7 @@ export const selectors = {
       const confirmation = labwareConfirmationBySlot[slot] || {}
 
       return {...labware, ...confirmation, isCurrent: currentLabware === slot}
-    }).filter((lw) => lw.name)
+    })
   },
 
   getCurrentLabware (allState) {
@@ -247,6 +250,10 @@ export const selectors = {
 
   getTipracks (allState) {
     return selectors.getLabware(allState).filter((lw) => lw.isTiprack)
+  },
+
+  getTipracksAreConfirmed (allState) {
+    return selectors.getTipracks(allState).every((t) => t.isConfirmed)
   }
 }
 
