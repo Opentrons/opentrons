@@ -21,6 +21,8 @@ class Instrument:
         self.name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
+        # TODO(artyom, 20171006): with axis removed from the instrument
+        # we still need to pass it to the UI for now
         self.axis = 'a' if self.mount == 'right' else 'b'
         self.tip_racks = [
             Container(container)

@@ -60,7 +60,7 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file):
     for axis in 'xyz':
         main_router.calibration_manager.jog(session.instruments[0], 1.0, axis)
 
-    # Jog is expected to produce to position updates
+    # Jog is expected to produce three position updates
     assert len(robot._driver.log) == 3
 
     # Check the sequence of position updates for each axis
