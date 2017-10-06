@@ -7,6 +7,8 @@ IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
 IS_LINUX = sys.platform == 'linux'
 
+PI_DATA_PATH = '/data/user_storage/opentrons_data/'
+
 
 def infer_app_data_dir():
     home = os.path.expanduser('~')
@@ -24,6 +26,10 @@ def infer_app_data_dir():
         return os.getcwd()
 
     app_data = os.path.join(app_data, *app_data_dir_suffix)
+
+    if os.environ.get('RUNNING_ON_PI'):
+        app_data = PI_DATA_PATH
+
 
     return (app_data if os.path.exists(app_data) else os.getcwd())
 
