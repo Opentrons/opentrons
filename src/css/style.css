@@ -25,6 +25,15 @@ h2 {
   text-align: center;
 }
 
+/* MIXINS */
+
+.disableSelect {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 /* DECK */
 
 .deck {
@@ -42,6 +51,7 @@ h2 {
   background-color: lightgray;
   position: relative;
   text-align: center;
+  composes: disableSelect;
 }
 
 .deckSlot > label {
@@ -62,6 +72,8 @@ h2 {
   background-color: gray;
   color: black;
   margin: 10px;
+  cursor: pointer;
+  composes: disableSelect;
 }
 
 .addLabware:hover {
@@ -86,6 +98,7 @@ h2 {
   background-color: gray;
   border: 3px solid darkgray;
   z-index: 500;
+  composes: disableSelect;
 }
 
 .labwareDropdown label {
@@ -116,4 +129,5 @@ h2 {
   position: absolute;
   right: 0;
   top: 0;
+  cursor: pointer;
 }

@@ -2,26 +2,25 @@ import React from 'react'
 
 import styles from '../css/style.css'
 
-const AddLabware = () => (
+const AddLabware = props => (
   <div
-    onClick={e => console.log('TODO: addLabware action')}
+    {...props}
     className={styles.addLabware}>
       Add Labware
   </div>
 )
 
-const DeckSlot = ({slotName}) => (
+const DeckSlot = ({slotName, container, children}) => (
   <div className={styles.deckSlot}>
-    <label>{slotName}</label>
-    <AddLabware />
-    {slotName === 'A1' && <LabwareDropdown />}
+    {container || <label>{slotName}</label>}
+    {children}
   </div>
 )
 
-const LabwareDropdown = () => (
+const LabwareDropdown = (onClose) => (
   <div className={styles.labwareDropdown}>
     <label>Labware Type</label>
-    <div className='close' onClick={e => console.log('TODO: labwareDropdown CLOSE action')}>X</div>
+    <div className='close' onClick={onClose}>X</div>
     <ul>
       <li>Tip Rack</li>
       <li>Tube Rack</li>
@@ -38,7 +37,7 @@ const LabwareDropdown = () => (
   </div>
 )
 
-const Deck = () => {
+const Deck = ({loadedContainers, canAdd, modeLabwareSelection, openLabwareDropdown, closeLabwareDropdown}) => {
   const slotnames = [
     'A3', 'B3', 'C3', 'D3', 'E3',
     'A2', 'B2', 'C2', 'D2', 'E2',
@@ -48,7 +47,16 @@ const Deck = () => {
   return (
     <div className={styles.deck}>
       {slotnames.map((slotName, i) =>
-        <DeckSlot key={i} slotName={slotName} />
+        <DeckSlot
+          key={i}
+          slotName={slotName}
+          container={loadedContainers[slotName]}
+        >
+          {(slotName === canAdd) && (modeLabwareSelection
+            ? <LabwareDropdown onClose={e => closeLabwareDropdown({slotName})} />
+            : <AddLabware onClick={e => { console.log('clicked add labware', e); openLabwareDropdown({slotName}) }} />
+          )}
+        </DeckSlot>
       )}</div>
   )
 }
