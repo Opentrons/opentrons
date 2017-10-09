@@ -1,6 +1,7 @@
 @value slotWidth: 85.47;
 @value slotHeight: 127.76;
-@value slotScale: 0.12rem;
+@value slotScale: 0.125rem;
+@value slotGap: 10px;
 
 /*COLORS*/
 @value lightgray: #e9e9e9;
@@ -29,8 +30,11 @@ h2 {
 .deck {
   border: 3px solid darkgray;
   display: grid;
-  grid-gap: 10px;
+  grid-gap: slotGap;
+  padding: slotGap;
+  margin: auto;
   grid-template-columns: repeat(5, calc(slotWidth * slotScale));
+  width: calc((slotWidth * slotScale * 5) + (slotGap * 4))
 }
 
 .deckSlot {

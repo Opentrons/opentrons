@@ -21,7 +21,7 @@ const DeckSlot = ({slotName}) => (
 const LabwareDropdown = () => (
   <div className={styles.labwareDropdown}>
     <label>Labware Type</label>
-    <div className='close'>X</div>
+    <div className='close' onClick={e => console.log('TODO: labwareDropdown CLOSE action')}>X</div>
     <ul>
       <li>Tip Rack</li>
       <li>Tube Rack</li>
