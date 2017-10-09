@@ -3,9 +3,9 @@ var webpack = require('webpack')
 
 module.exports = {
   entry: [
-    'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:8080',
-    'webpack/hot/only-dev-server',
+    // 'react-hot-loader/patch',
+    // 'webpack-dev-server/client?http://localhost:8080',
+    // 'webpack/hot/only-dev-server',
     './src/index.js'
   ],
 
@@ -22,18 +22,27 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              localIdentName: '[path][name]__[local]--[hash:base64:5]'
+            }
+          }
+        ]
       }
     ]
   },
 
   devServer: {
-    historyApiFallback: true,
-    hot: true
+    historyApiFallback: true
+    // hot: true
   },
 
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin()
   ]
 }

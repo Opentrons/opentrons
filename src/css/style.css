@@ -10,3 +10,8 @@ a {
 a:hover {
   color: purple;
 }
+
+.deck {
+  color: green;
+  font-size: 18pt;
+}
