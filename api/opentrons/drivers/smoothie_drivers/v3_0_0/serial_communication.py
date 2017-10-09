@@ -46,6 +46,7 @@ def _parse_smoothie_response(response):
 def clear_buffer(serial_connection):
     serial_connection.reset_input_buffer()
 
+
 def _write_to_device_and_return(cmd, device_connection):
     '''Writes to a serial device.
     - Formats command

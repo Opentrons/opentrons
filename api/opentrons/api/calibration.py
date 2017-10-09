@@ -45,16 +45,17 @@ class CalibrationManager:
                 .format(type(obj)))
 
         self._set_state('moving')
+
         instrument._instrument.move_to(obj._container[0])
         self._set_state('ready')
 
     def jog(self, instrument, distance, axis):
         self._set_state('moving')
         calibration_functions.jog_instrument(
-            instrument._instrument,
-            distance,
-            axis,
-            self._robot
+            instrument=instrument._instrument,
+            distance=distance,
+            axis=axis,
+            robot=self._robot
         )
         self._set_state('ready')
 

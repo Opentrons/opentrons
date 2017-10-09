@@ -7,6 +7,7 @@ def target_inst_position(
     Resolves where a moving component needs to move to in order
     to position an attached instrument at some target location
     '''
+
     rel_pos = pose_tracker[mover].position - pose_tracker[instrument].position
     mover_target = np.array([x, y, z] + rel_pos)
     return mover_target

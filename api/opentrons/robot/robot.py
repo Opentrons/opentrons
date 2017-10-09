@@ -478,17 +478,17 @@ class Robot(object):
         offset = coordinates - placeable.top()[1]
         target = self.pose_tracker[placeable].position + offset.coordinates
 
-        coordinates = pos_funcs.target_inst_position(
-            self.pose_tracker, self.gantry, instrument, *target)
+        other_instrument = {instrument} ^ set(self._instruments.values())
+        other_instrument.pop().mount_obj.home()
 
         if strategy == 'arc':
-            arc_coords = self._create_arc(coordinates, instrument, placeable)
+            arc_coords = self._create_arc(target, instrument, placeable)
             for coord in arc_coords:
-                self._driver.move(**coord)
-        elif strategy == 'direct':
-            position = {'x':coordinates[0], 'y': coordinates[1], instrument.axis: coordinates[2]}
+                instrument._move(**coord)
 
-            self._driver.move(**position)
+        elif strategy == 'direct':
+            position = {'x':coordinates[0], 'y': coordinates[1], 'z': coordinates[2]}
+            instrument._move(**position)
         else:
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
@@ -507,6 +507,8 @@ class Robot(object):
 
         travel_height = self.max_deck_height() + self.arc_height
 
+
+
         _, _, robot_max_z = self.dimensions #TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
@@ -514,9 +516,9 @@ class Robot(object):
         self._previous_container = this_container
 
         return [
-            {'z': arc_top, 'a': arc_top},
+            {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
-            {instrument.axis: arrival_z}
+            {'z': arrival_z}
         ]
 
 

@@ -51,8 +51,6 @@ class InstrumentActuator(object):
 
     def move(self, value):
         ''' Move motor '''
-        print("VALUE: ", value)
-
         self.driver.move(**{self.axis:value})
 
     def home(self):
@@ -90,7 +88,6 @@ class InstrumentMover(object):
         _, _, goal_z = pose_funcs.target_inst_position(
             self.gantry._pose_tracker, self.mount, self.instrument, **goal_inst_pos)
         self.mount.move(z=goal_z)
-
 
 
     #TODO: this
@@ -187,6 +184,10 @@ class Mount:
         instrument.mount_obj = self
 
         self.gantry._pose_tracker.track_object(self, instrument, 0, 0, 0)
+
+    def home(self):
+        self.driver.home(self.mount_axis)
+        self._publish_position()
 
 # FIXME: The following should eventually live in the robot
 #

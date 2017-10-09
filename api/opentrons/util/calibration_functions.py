@@ -116,9 +116,9 @@ def probe_instrument(instrument, robot):
 
     frame_base = base.Base(pose_tracker)
     frame_probe = frame_base._probe
-    max_expected_tip_length = 90
+    max_expected_tip_length = 130
 
-    probing_distance = 21
+    probing_distance = 15
 
 
 
@@ -157,7 +157,7 @@ def move_instrument_for_probing_prep(instrument, robot):
     robot.move_head(**position)
 
 
-def jog_instrument(instrument, distance, axis, robot):
+def jog_instrument(instrument, axis, robot, distance):
     '''move position relative to current instrument position'''
     pose_tracker = robot.pose_tracker
     position = \

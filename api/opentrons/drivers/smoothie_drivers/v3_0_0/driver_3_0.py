@@ -25,7 +25,6 @@ GCODES = {'HOME': 'G28.2',
           'MOVE': 'G0',
           'DWELL': 'G4',
           'CURRENT_POSITION': 'M114.2',
-          'TARGET_POSITION': 'M114.4',
           'LIMIT_SWITCH_STATUS': 'M119',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
@@ -34,10 +33,7 @@ GCODES = {'HOME': 'G28.2',
 
 
 def _parse_axis_values(raw_axis_values):
-    try:
-        parsed_values = raw_axis_values.split(' ')
-    except:
-        raise RuntimeError("GOT THIS: ", raw_axis_values)
+    parsed_values = raw_axis_values.split(' ')
     parsed_values = parsed_values[2:]
     dict = {
         s.split(':')[0].lower(): float(s.split(':')[1])
@@ -85,23 +81,15 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             return self._position
 
-        parsed_position = _parse_axis_values(
-            self._send_command(GCODES['CURRENT_POSITION'])
-        )
+        try:
+            position_response = self._send_command(GCODES['CURRENT_POSITION'])
+            parsed_position = _parse_axis_values(position_response)
+        except TypeError:
+            position_response = self._send_command(GCODES['CURRENT_POSITION']) #Recovery attempt
+            parsed_position = _parse_axis_values(position_response)
 
-        # FIXME (JG | 10/1/17) recovery attempt hack
-        if 'x' not in parsed_position:
-            parsed_position = _parse_axis_values(
-                self._send_command(GCODES['CURRENT_POSITION'])
-            )
 
         return parsed_position
-
-    @property
-    def target_position(self):
-        if self.simulating:
-            return self._position
-        return self._send_command(GCODES['TARGET_POSITION'])
 
     @property
     def switch_state(self):
@@ -139,11 +127,11 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
+        command_line = command + ' M400'
         if self.simulating:
             return "Virtual!"
             # return virtual_driver.write_and_return(command)
         '''Sends command to serial'''
-        command_line = command + ' M400'
         return serial_communication.write_and_return(
             command_line, self.connection, timeout)
 
