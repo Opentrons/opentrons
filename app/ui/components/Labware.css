@@ -38,8 +38,8 @@ a {
   background-color: #ddd;
 }
 
-.confirmed::before{
-  content: '✓ ' attr(data-lab) ;
+.confirmed::before {
+  content: '✓ ' attr(data-lab);
   color: #777;
 }
 

@@ -19,7 +19,7 @@ export default function Labware (props) {
     labwareReviewed,
     isConfirmed,
     isCurrent,
-    isDisabled,
+    isDisabled
   } = props
 
   const slotStyle = {gridArea: `slot-${slot}`}
