@@ -1,0 +1,12 @@
+h2 {
+  color: gray;
+}
+
+a {
+  text-decoration: none;
+  color: blue;
+}
+
+a:hover {
+  color: purple;
+}

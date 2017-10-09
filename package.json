@@ -1,0 +1,32 @@
+{
+  "name": "protocol-designer-prototype",
+  "version": "1.0.0",
+  "description": "Protocol designer prototype",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard",
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "private": true,
+  "author": "Opentrons",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-router-dom": "^4.1.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-latest": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.4",
+    "react-hot-loader": "^3.0.0-beta.7",
+    "standard": "^10.0.3",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1"
+  }
+}
