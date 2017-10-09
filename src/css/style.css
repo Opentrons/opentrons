@@ -1,17 +1,115 @@
+@value slotWidth: 85.47;
+@value slotHeight: 127.76;
+@value slotScale: 0.12rem;
+
+/*COLORS*/
+@value lightgray: #e9e9e9;
+
+/* GLOBAL STYLES! */
+
+body {
+  font-family: georgia sans-serif;
+}
+
+ul {
+  list-style-type: none;
+}
+
+div {
+  border-radius: 5px;
+}
+
 h2 {
   color: gray;
+  text-align: center;
 }
 
-a {
-  text-decoration: none;
-  color: blue;
-}
-
-a:hover {
-  color: purple;
-}
+/* DECK */
 
 .deck {
-  color: green;
-  font-size: 18pt;
+  border: 3px solid darkgray;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(5, calc(slotWidth * slotScale));
+}
+
+.deckSlot {
+  height: calc(slotHeight * slotScale);
+  background-color: lightgray;
+  position: relative;
+  text-align: center;
+}
+
+.deckSlot > label {
+  font-size: 30pt;
+  color: white;
+  position: inherit;
+  top: 30pt;
+}
+
+/* -------------------- */
+
+.addLabware {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 14pt;
+  background-color: gray;
+  color: black;
+  margin: 10px;
+}
+
+.addLabware:hover {
+  font-weight: bold;
+}
+
+.addLabware::after {
+  font-size: 20pt;
+  content: "+";
+  display: block;
+}
+
+/* -------------------- */
+
+.labwareDropdown {
+  position: absolute;
+  bottom: 0;
+  color: black;
+  text-align: left;
+  font-size: 10pt;
+  width: calc(slotWidth * slotScale * 1.5);
+  background-color: gray;
+  border: 3px solid darkgray;
+  z-index: 500;
+}
+
+.labwareDropdown label {
+  color: black;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.labwareDropdown > ul {
+  background-color: white;
+  overflow-y: scroll;
+}
+
+/* Bold single menu items or single subitem only */
+.labwareDropdown > ul li:hover {
+  font-weight: bold;
+}
+
+.labwareDropdown > ul li ul:hover {
+  font-weight: normal;
+}
+
+.labwareDropdown > ul li ul li:hover {
+  font-weight: bold;
+}
+
+.labwareDropdown :global(.close) {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
