@@ -190,11 +190,11 @@ describe('robot actions', () => {
   test('jog action', () => {
     const expected = {
       type: actionTypes.JOG,
-      payload: {instrument: 'left', coordinates: {x: 3}},
+      payload: {instrument: 'left', axis: 'x', direction: -1},
       meta: {robotCommand: true}
     }
 
-    expect(actions.jog('left', {x: 3})).toEqual(expected)
+    expect(actions.jog('left', 'x', -1)).toEqual(expected)
   })
 
   test('jog response action', () => {

@@ -23,11 +23,6 @@ const DEFAULT_JOG_DISTANCE_MM = '0.25'
 export default function client (dispatch) {
   let rpcClient
   let remote
-  let sessionManager
-  let session
-  let robot
-  // TODO(mc, 2017-08-29): remove when server handles serial port
-  let serialPort
 
   // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
   let runTimerInterval = NO_INTERVAL
@@ -39,7 +34,7 @@ export default function client (dispatch) {
       case actionTypes.CONNECT: return connect(state, action)
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
-      case actionTypes.HOME: return home(state, action)
+      // case actionTypes.HOME: return home(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
       case actionTypes.MOVE_TO: return moveTo(state, action)
@@ -63,20 +58,11 @@ export default function client (dispatch) {
           .on('error', handleClientError)
 
         remote = rpcClient.remote
-        sessionManager = remote.session_manager
-        session = sessionManager.session
-        robot = sessionManager.robot
 
-        if (session) handleApiSession(session)
+        if (remote.session_manager.session) {
+          handleApiSession(remote.session_manager.session)
+        }
 
-        return robot.get_serial_ports_list()
-      })
-      // TODO(mc, 2017-08-29): serial port connection should not be the
-      // responsibility of the client. Remove when backend handles it
-      .then((p) => {
-        if (!p.length) return Promise.reject(new Error('No serial ports found'))
-
-        serialPort = p[0]
         dispatch(actions.connectResponse())
       })
       .catch((e) => dispatch(actions.connectResponse(e)))
@@ -87,13 +73,9 @@ export default function client (dispatch) {
 
     rpcClient.close()
       .then(() => {
-        // null out saved client and session
+        // null out saved client and remote
         rpcClient = null
-        sessionManager = null
-        session = null
-        robot = null
-        // TODO(mc, 2017-09-07): remove when server handles serial port
-        serialPort = null
+        remote = null
 
         clearRunTimerInterval()
         dispatch(actions.disconnectResponse())
@@ -107,23 +89,16 @@ export default function client (dispatch) {
     const reader = new FileReader()
 
     reader.onload = function handleProtocolRead (event) {
-      sessionManager.create(name, event.target.result)
+      remote.session_manager.create(name, event.target.result)
         .then((apiSession) => {
-          session = apiSession
+          // TODO(mc, 2017-10-09): This seems like an API responsibility
+          remote.session_manager.session = apiSession
           handleApiSession(apiSession, true)
         })
         .catch((error) => dispatch(actions.sessionResponse(error)))
     }
 
     return reader.readAsText(file)
-  }
-
-  function home (state, action) {
-    robot.connect(serialPort)
-      .then(() => robot.home())
-      .then(() => robot.disconnect())
-      .then(() => dispatch(actions.homeResponse()))
-      .catch((error) => dispatch(actions.homeResponse(error)))
   }
 
   function moveToFront (state, action) {
@@ -204,26 +179,26 @@ export default function client (dispatch) {
 
   function run (state, action) {
     setRunTimerInterval()
-    session.run(serialPort)
+    remote.session_manager.session.run()
       .then(() => dispatch(actions.runResponse()))
       .catch((error) => dispatch(actions.runResponse(error)))
       .then(() => clearRunTimerInterval())
   }
 
   function pause (state, action) {
-    session.pause()
+    remote.session_manager.session.pause()
       .then(() => dispatch(actions.pauseResponse()))
       .catch((error) => dispatch(actions.pauseResponse(error)))
   }
 
   function resume (state, action) {
-    session.resume()
+    remote.session_manager.session.resume()
       .then(() => dispatch(actions.resumeResponse()))
       .catch((error) => dispatch(actions.resumeResponse(error)))
   }
 
   function cancel (state, action) {
-    session.stop()
+    remote.session_manager.session.stop()
       .then(() => dispatch(actions.cancelResponse()))
       .catch((error) => dispatch(actions.cancelResponse(error)))
   }

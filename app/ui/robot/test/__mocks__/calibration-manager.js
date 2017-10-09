@@ -6,6 +6,6 @@ export default function MockCalibrationManager () {
     tip_probe: jest.fn(),
     move_to: jest.fn(),
     jog: jest.fn(),
-    update_offset: jest.fn()
+    update_container_offset: jest.fn()
   }
 }

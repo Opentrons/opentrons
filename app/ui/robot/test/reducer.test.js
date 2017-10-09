@@ -35,7 +35,18 @@ describe('robot reducer', () => {
       currentInstrument: '',
       // TODO(mc, 2017-10-05): Make labware ID a string for consistency
       currentLabware: 0,
-      // currentInstrumentCalibration: {},
+      labwareReviewed: false,
+      currentLabwareConfirmation: {
+        slot: 0,
+        isMoving: false,
+        isOverWell: false
+      },
+      currentInstrumentCalibration: {
+        axis: '',
+        isPreparingForProbe: false,
+        isReadyForProbe: false,
+        isProbing: false
+      },
 
       homeRequest: {inProgress: false, error: null},
       moveToFrontRequest: {inProgress: false, error: null},
@@ -154,7 +165,8 @@ describe('robot reducer', () => {
   test('handles session with file', () => {
     const state = {
       sessionRequest: {inProgress: false, error: new Error('AH')},
-      sessionName: ''
+      sessionName: '',
+      labwareReviewed: true
     }
     const action = {
       type: actionTypes.SESSION,
@@ -163,7 +175,8 @@ describe('robot reducer', () => {
 
     expect(reducer(state, action)).toEqual({
       sessionRequest: {inProgress: true, error: null},
-      sessionName: '/path/to/foo.py'
+      sessionName: '/path/to/foo.py',
+      labwareReviewed: false
     })
   })
 
@@ -363,16 +376,25 @@ describe('robot reducer', () => {
   })
 
   test('handles moveTo action', () => {
-    const state = {moveToRequest: {inProgress: false, error: new Error()}}
-    const action = {type: actionTypes.MOVE_TO}
+    const state = {
+      moveToRequest: {inProgress: false, error: new Error()},
+      currentLabwareConfirmation: {slot: 5, isMoving: false, isOverWell: true}
+    }
+
+    const action = {type: actionTypes.MOVE_TO, payload: {labware: 3}}
 
     expect(reducer(state, action)).toEqual({
-      moveToRequest: {inProgress: true, error: null}
+      moveToRequest: {inProgress: true, error: null},
+      currentLabwareConfirmation: {slot: 3, isMoving: true, isOverWell: false}
     })
   })
 
   test('handles moveToResponse action', () => {
-    const state = {moveToRequest: {inProgress: true, error: null}}
+    const state = {
+      moveToRequest: {inProgress: true, error: null},
+      currentLabwareConfirmation: {slot: 4, isMoving: true, isOverWell: false}
+    }
+
     const success = {type: actionTypes.MOVE_TO_RESPONSE, error: false}
     const failure = {
       type: actionTypes.MOVE_TO_RESPONSE,
@@ -381,10 +403,12 @@ describe('robot reducer', () => {
     }
 
     expect(reducer(state, success)).toEqual({
-      moveToRequest: {inProgress: false, error: null}
+      moveToRequest: {inProgress: false, error: null},
+      currentLabwareConfirmation: {slot: 4, isMoving: false, isOverWell: true}
     })
     expect(reducer(state, failure)).toEqual({
-      moveToRequest: {inProgress: false, error: new Error('AH')}
+      moveToRequest: {inProgress: false, error: new Error('AH')},
+      currentLabwareConfirmation: {slot: 4, isMoving: false, isOverWell: false}
     })
   })
 
@@ -424,7 +448,12 @@ describe('robot reducer', () => {
   })
 
   test('handles updateOffsetResponse action', () => {
-    const state = {updateOffsetRequest: {inProgress: true, error: null}}
+    const state = {
+      updateOffsetRequest: {inProgress: true, error: null},
+      currentLabwareConfirmation: {slot: 2, isMoving: false, isOverWell: false},
+      labwareConfirmationBySlot: {2: {isConfirmed: false}}
+    }
+
     const success = {type: actionTypes.UPDATE_OFFSET_RESPONSE, error: false}
     const failure = {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
@@ -433,10 +462,14 @@ describe('robot reducer', () => {
     }
 
     expect(reducer(state, success)).toEqual({
-      updateOffsetRequest: {inProgress: false, error: null}
+      updateOffsetRequest: {inProgress: false, error: null},
+      currentLabwareConfirmation: {slot: 0, isMoving: false, isOverWell: false},
+      labwareConfirmationBySlot: {2: {isConfirmed: true}}
     })
     expect(reducer(state, failure)).toEqual({
-      updateOffsetRequest: {inProgress: false, error: new Error('AH')}
+      updateOffsetRequest: {inProgress: false, error: new Error('AH')},
+      currentLabwareConfirmation: {slot: 2, isMoving: false, isOverWell: false},
+      labwareConfirmationBySlot: {2: {isConfirmed: false}}
     })
   })
 
