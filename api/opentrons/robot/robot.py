@@ -479,7 +479,8 @@ class Robot(object):
         target = self.pose_tracker[placeable].position + offset.coordinates
 
         other_instrument = {instrument} ^ set(self._instruments.values())
-        other_instrument.pop().mount_obj.home()
+        if not len(other_instrument) == 0:
+            other_instrument.pop().mount_obj.home()
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, instrument, placeable)
