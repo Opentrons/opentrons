@@ -9,7 +9,8 @@
 /* GLOBAL STYLES! */
 
 body {
-  font-family: georgia sans-serif;
+  /*font-family: georgia sans-serif;*/
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 ul {
@@ -25,6 +26,35 @@ h2 {
   text-align: center;
 }
 
+label {
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+input, textarea {
+  border: 1px solid gray;
+}
+
+button {
+  font-size: 24pt;
+  color: lightgray;
+  text-transform: uppercase;
+  border: 3px solid lightgray;
+  padding: 3px;
+  border-radius: 3px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: lightgray;
+  color: white;
+}
+
+textarea {
+  resize: none;
+}
+
 /* MIXINS */
 
 .disableSelect {
@@ -32,6 +62,24 @@ h2 {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* General */
+
+.circle {
+  display: inline-block;
+  border-radius: 1000px;
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.8rem;
 }
 
 /* DECK */
@@ -54,11 +102,55 @@ h2 {
   composes: disableSelect;
 }
 
+.deckSlot img {
+  height: calc(slotHeight * slotScale);
+  width: calc(slotWidth * slotScale);
+}
+
 .deckSlot > label {
   font-size: 30pt;
   color: white;
   position: inherit;
   top: 30pt;
+}
+
+.containerOverlay {
+  composes: overlay;
+  z-index: 100;
+  color: lightgray;
+  text-transform: uppercase;
+}
+
+.containerOverlay > * {
+  visibility: hidden;
+}
+
+.containerOverlay:hover {
+  background-color: rgba(100, 100, 100, 0.8);
+}
+
+.containerOverlay:hover > * {
+  visibility: visible;
+  margin-top: 40pt;
+  cursor: pointer;
+}
+
+.containerOverlay > *:hover {
+  font-weight: bold;
+}
+
+.containerOverlayAddIngred::after {
+  font-size: 30pt;
+  display: block;
+
+  content: "+";
+}
+
+.containerOverlayRemove::after {
+  font-size: 20pt;
+  display: block;
+
+  content: "✕";
 }
 
 /* -------------------- */
@@ -73,6 +165,7 @@ h2 {
   color: black;
   margin: 10px;
   cursor: pointer;
+  text-transform: uppercase;
   composes: disableSelect;
 }
 
@@ -82,8 +175,9 @@ h2 {
 
 .addLabware::after {
   font-size: 20pt;
-  content: "+";
   display: block;
+
+  content: "+";
 }
 
 /* -------------------- */
@@ -125,9 +219,222 @@ h2 {
   font-weight: bold;
 }
 
-.labwareDropdown :global(.close) {
+/* TODO: can this be a mixin instead? */
+:global(.close) {
   position: absolute;
   right: 0;
   top: 0;
   cursor: pointer;
+}
+
+/* ----- */
+
+.ingredientModal {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  bottom: 18%;
+  background-color: rgba(100, 100, 100, 0.8);
+  z-index: 1000;
+  border-radius: 0;
+  border: 3px solid gray;
+}
+
+.ingredientModal :global(.close) {
+  font-size: 30pt;
+  margin: 10pt;
+  color: white;
+}
+
+.ingredientModal :global(.close):hover {
+  color: lightgray;
+}
+
+@value ingredientPanelSidebarWidth: 40%;
+
+.ingredientPanelSidebar {
+  border-radius: 0;
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  width: ingredientPanelSidebarWidth;
+  background-color: white;
+  border-right: 3px solid gray;
+  float: left;
+}
+
+.ingredientPanelSidebar label {
+  border-bottom: 1px solid gray;
+  border-radius: 0;
+  display: block;
+}
+
+.ingredientPanelSidebar label > * {
+  display: inline-block;
+  padding-left: 8pt;
+  padding-right: 8pt;
+  color: gray;
+}
+
+.ingredientPanelSidebar > label {
+  font-size: 1.5em;
+}
+
+.ingredientPanelSidebar > label > *:not(:first-child) {
+  border-left: 1px solid gray;
+  border-radius: 0;
+  color: black;
+}
+
+.ingredientPanelSidebar section {
+  margin: 12pt;
+  box-shadow: 0px 0px 10px 3px darkgrey;
+  border-radius: 3px;
+  padding: 0.2em 1em;
+}
+
+.ingredientPanelSidebar .deleteIngredient {
+  cursor: pointer;
+  float: right;
+  font-size: 12pt;
+}
+
+.ingredLabel {
+  font-weight: bold;
+}
+
+.ingredLabel::after {
+  content: ' ';
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 8pt;
+  border-radius: 100px;
+  background-color: red;
+}
+
+.editButton {
+  background-color: lightgray;
+  font-size: 0.8em;
+}
+
+.addIngredientButton {
+  margin-left: 30%; /* HACK doesn't work with diff widths */
+}
+
+.ingredientPanelContent {
+  border-radius: 0;
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  width: calc(100% - ingredientPanelSidebarWidth - 3px);
+}
+
+.containerDetail::after {
+  /* Horizontal line */
+  content: ' ';
+  display: block;
+  background-color: lightgray;
+  width: 70%;
+  height: 3px;
+  margin: 30px auto;
+}
+
+.ingredientInlineDetail {
+  margin: 0.4em 0;
+  color: darkgray;
+}
+
+.ingredientInlineDetail div {
+  width: 5em;
+  display: inline-block;
+}
+
+.ingredientInlineDetail label {
+  display: inline-block;
+  width: 30%;
+  background-color: lightgray;
+  border: none;
+}
+
+.ingredientInlineDetail input {
+  display: inline-block;
+  width: 30%;
+}
+
+.ingredientInlineDetail div::after {
+  content: 'µL';
+  display: inline-block;
+  position: absolute;
+  padding-left: 0.2em;
+}
+
+.ingredientPropertiesEntry {
+  background-color: white;
+  margin: 1em;
+  padding: 0 1.5em;
+  border: 3px solid darkgray;
+  border-radius: 15px;
+}
+
+.ingredientPropertiesEntry h1 {
+  font-size: 10pt;
+  font-weight: inherit;
+  text-transform: uppercase;
+  float: left;
+  width: 100%;
+}
+
+.ingredientPropertiesEntry h1 > * {
+  display: inline-block;
+  margin: 0;
+  color: gray;
+}
+
+.ingredientPropertiesEntry h1 div:first-of-type {
+  border-bottom: 1px solid gray;
+  margin-right: 1em;
+  color: black;
+}
+
+.ingredientPropertiesEntry span {
+  display: inline-block;
+  margin: 0.5em 0;
+  width: 100%;
+}
+
+.ingredientPropertiesEntry form span {
+  border: 1px solid gray;
+}
+
+.ingredientPropertiesEntry span input {
+  float: right;
+  border: none;
+  border-left: inherit;
+}
+
+.ingredientPropertiesEntry form {
+  width: 50%;
+  color: gray;
+  display: inline-block;
+}
+
+.ingredientPropertiesEntry form textarea {
+  width: 95%;
+  height: 5em;
+  border: none;
+  border-top: inherit;
+}
+
+.ingredientPropRightSide {
+  display: inline-block;
+  float: right;
+  width: 40%;
+  padding: 5%;
+}
+
+.ingredientPropRightSide button:last-child {
+  margin-left: 0.4em;
+  margin-top: 1em;
 }

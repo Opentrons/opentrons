@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import pickBy from 'lodash/pickBy'
 
 const sortedSlotnames = [].concat.apply( // flatten
   [],
@@ -22,19 +23,29 @@ const modeLabwareSelection = handleActions({
   SELECT_LABWARE_TO_ADD: (state, action) => false // close window when labware is selected
 }, false)
 
+const modeIngredientSelection = handleActions({
+  OPEN_INGREDIENT_SELECTOR: (state, action) => action.payload,
+  CLOSE_INGREDIENT_SELECTOR: (state, action) => null
+}, null)
+
 const loadedContainers = handleActions({
-  SELECT_LABWARE_TO_ADD: (state, action) => ({...state, [nextEmptySlot(state)]: action.payload})
-}, {}) // 'A1': '96-deep-well'})
+  SELECT_LABWARE_TO_ADD: (state, action) => ({...state, [nextEmptySlot(state)]: action.payload}),
+  DELETE_CONTAINER_AT_SLOT: (state, action) => pickBy(state, (value, key) => key !== action.payload)
+}, {})
 
 const rootReducer = combineReducers({
   modeLabwareSelection,
+  modeIngredientSelection,
   loadedContainers
 })
 
 // SELECTORS
 
 export const selectors = {
-  modeLabwareSelection: state => state.default.modeLabwareSelection,
+  activeModals: state => ({
+    labwareSelection: state.default.modeLabwareSelection,
+    ingredientSelection: state.default.modeIngredientSelection
+  }),
   loadedContainers: state => state.default.loadedContainers,
   canAdd: state => nextEmptySlot(state.default.loadedContainers)
 }
