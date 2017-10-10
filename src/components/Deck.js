@@ -38,7 +38,7 @@ const LabwareDropdown = ({onClose, selectLabwareToAdd}) => (
   </div>
 )
 
-const Deck = ({loadedContainers, canAdd, modeLabwareSelection, openLabwareDropdown, closeLabwareDropdown, selectLabwareToAdd}) => (
+const Deck = ({loadedContainers, canAdd, modeLabwareSelection, openLabwareSelector, closeLabwareSelector, selectLabwareToAdd}) => (
   <div className={styles.deck}>
     {slotnames.map((slotName, i) =>
       <DeckSlot
@@ -48,10 +48,10 @@ const Deck = ({loadedContainers, canAdd, modeLabwareSelection, openLabwareDropdo
       >
         {(slotName === canAdd) && (modeLabwareSelection
           ? <LabwareDropdown
-            onClose={e => closeLabwareDropdown({slotName})}
+            onClose={e => closeLabwareSelector({slotName})}
             selectLabwareToAdd={selectLabwareToAdd}
           />
-          : <AddLabware onClick={e => openLabwareDropdown({slotName})} />
+          : <AddLabware onClick={e => openLabwareSelector({slotName})} />
         )}
       </DeckSlot>
     )}</div>

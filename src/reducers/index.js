@@ -17,8 +17,8 @@ const nextEmptySlot = loadedContainersSubstate => {
 // REDUCERS
 
 const modeLabwareSelection = handleActions({
-  OPEN_LABWARE_DROPDOWN: (state, action) => true,
-  CLOSE_LABWARE_DROPDOWN: (state, action) => false,
+  OPEN_LABWARE_SELECTOR: (state, action) => true,
+  CLOSE_LABWARE_SELECTOR: (state, action) => false,
   SELECT_LABWARE_TO_ADD: (state, action) => false // close window when labware is selected
 }, false)
 

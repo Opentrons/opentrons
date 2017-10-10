@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { selectors } from '../reducers'
-import { openLabwareDropdown, closeLabwareDropdown, selectLabwareToAdd } from '../actions'
+import { openLabwareSelector, closeLabwareSelector, selectLabwareToAdd } from '../actions'
 import Deck from './Deck.js'
 
 const ConnectedDeck = connect(
@@ -12,8 +12,8 @@ const ConnectedDeck = connect(
     modeLabwareSelection: selectors.modeLabwareSelection(state)
   }),
   {
-    openLabwareDropdown,
-    closeLabwareDropdown,
+    openLabwareSelector,
+    closeLabwareSelector,
     selectLabwareToAdd
   }
 )(Deck)
