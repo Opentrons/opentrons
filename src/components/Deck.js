@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { slotnames } from '../constants.js'
 import styles from '../css/style.css'
 
 const AddLabware = props => (
@@ -17,7 +18,7 @@ const DeckSlot = ({slotName, container, children}) => (
   </div>
 )
 
-const LabwareDropdown = (onClose) => (
+const LabwareDropdown = ({onClose, selectLabwareToAdd}) => (
   <div className={styles.labwareDropdown}>
     <label>Labware Type</label>
     <div className='close' onClick={onClose}>X</div>
@@ -26,9 +27,9 @@ const LabwareDropdown = (onClose) => (
       <li>Tube Rack</li>
       <li>Well Plate ▼</li>
       <li><ul>
-        <li>96 Deep Well Plate</li>
-        <li>96 Well Plate (Tall)</li>
-        <li>96 Well Plate (Flat)</li>
+        <li onClick={e => selectLabwareToAdd('96-deep')}>96 Deep Well Plate</li>
+        <li onClick={e => selectLabwareToAdd('96-tall')}>96 Well Plate (Tall)</li>
+        <li onClick={e => selectLabwareToAdd('96-flat')}>96 Well Plate (Flat)</li>
       </ul></li>
       <li>PCR Strip</li>
       <li>And so</li>
@@ -37,28 +38,23 @@ const LabwareDropdown = (onClose) => (
   </div>
 )
 
-const Deck = ({loadedContainers, canAdd, modeLabwareSelection, openLabwareDropdown, closeLabwareDropdown}) => {
-  const slotnames = [
-    'A3', 'B3', 'C3', 'D3', 'E3',
-    'A2', 'B2', 'C2', 'D2', 'E2',
-    'A1', 'B1', 'C1', 'D1', 'E1'
-  ]
-
-  return (
-    <div className={styles.deck}>
-      {slotnames.map((slotName, i) =>
-        <DeckSlot
-          key={i}
-          slotName={slotName}
-          container={loadedContainers[slotName]}
-        >
-          {(slotName === canAdd) && (modeLabwareSelection
-            ? <LabwareDropdown onClose={e => closeLabwareDropdown({slotName})} />
-            : <AddLabware onClick={e => { console.log('clicked add labware', e); openLabwareDropdown({slotName}) }} />
-          )}
-        </DeckSlot>
-      )}</div>
-  )
-}
+const Deck = ({loadedContainers, canAdd, modeLabwareSelection, openLabwareDropdown, closeLabwareDropdown, selectLabwareToAdd}) => (
+  <div className={styles.deck}>
+    {slotnames.map((slotName, i) =>
+      <DeckSlot
+        key={i}
+        slotName={slotName}
+        container={loadedContainers[slotName]}
+      >
+        {(slotName === canAdd) && (modeLabwareSelection
+          ? <LabwareDropdown
+            onClose={e => closeLabwareDropdown({slotName})}
+            selectLabwareToAdd={selectLabwareToAdd}
+          />
+          : <AddLabware onClick={e => openLabwareDropdown({slotName})} />
+        )}
+      </DeckSlot>
+    )}</div>
+)
 
 export default Deck

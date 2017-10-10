@@ -1,17 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { selectors } from '../reducers'
+import { openLabwareDropdown, closeLabwareDropdown, selectLabwareToAdd } from '../actions'
 import Deck from './Deck.js'
 
 const ConnectedDeck = connect(
   state => ({
-    loadedContainers: {'A1': '96-deep-well'},
-    canAdd: 'B1',
-    modeLabwareSelection: false
+    loadedContainers: selectors.loadedContainers(state),
+    canAdd: selectors.canAdd(state),
+    modeLabwareSelection: selectors.modeLabwareSelection(state)
   }),
   {
-    openLabwareDropdown: payload => ({type: 'openLabwareDropdown', payload}),
-    closeLabwareDropdown: payload => ({type: 'closeLabwareDropdown', payload})
+    openLabwareDropdown,
+    closeLabwareDropdown,
+    selectLabwareToAdd
   }
 )(Deck)
 
