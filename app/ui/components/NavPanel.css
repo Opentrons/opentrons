@@ -1,13 +1,9 @@
 .nav_panel {
-  display: grid;
+  position: relative;
   height: 100%;
   padding: 0 1rem;
-  grid-template:
-    'details' 675px
-    'btn_bottom' auto;
   font-family: 'sans';
-  font-size: 14px;
-  line-height: 2rem;
+  font-size: 0.75rem;
   color: grey;
 }
 
@@ -29,7 +25,6 @@
   background-size: 1rem;
   background-repeat: no-repeat;
   background-position: 0.5rem center;
-  margin-bottom: 0.5rem;
 }
 
 .btn_upload {
@@ -57,13 +52,11 @@
 
 /* Connect */
 
-.connection_info {
-  grid-area: details;
-  padding: 0 rem;
-}
-
 .connection_toggle {
-  grid-area: btn_bottom;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 1rem;
 }
 
@@ -72,4 +65,3 @@
   padding-left: 0;
   text-align: center;
 }
-

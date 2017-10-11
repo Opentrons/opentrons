@@ -43,23 +43,24 @@ ConnectionIndicator.propTypes = {
 
 export default function SideBar (props) {
   const {isNavPanelOpen, onNavIconClick} = props
+  const style = classnames(styles.sidebar, {[styles.open]: isNavPanelOpen})
   const navLinks = props.navLinks.map((link) => NavLink({
     onClick: onNavIconClick(link.name),
     ...link
   }))
 
   return (
-    <aside className={classnames(styles.sidebar, { [styles.open]: isNavPanelOpen })}>
+    <div className={style}>
       <nav className={styles.nav_icons} >
-        <ConnectionIndicator {...props} />
         <ol className={styles.nav_icon_list}>
           {navLinks}
         </ol>
+        <ConnectionIndicator {...props} />
       </nav>
       <section className={styles.nav_info}>
         <NavPanel {...props} />
       </section>
-    </aside>
+    </div>
   )
 }
 
@@ -71,5 +72,6 @@ SideBar.propTypes = {
   })).isRequired,
   isConnected: PropTypes.bool.isRequired,
   isNavPanelOpen: PropTypes.bool.isRequired,
-  onNavClick: PropTypes.func.isRequired
+  toggleNavOpen: PropTypes.func.isRequired,
+  onNavIconClick: PropTypes.func.isRequired
 }

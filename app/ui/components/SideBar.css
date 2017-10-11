@@ -6,14 +6,23 @@
 }
 
 .sidebar {
-  width: 350px;
   display: grid;
   grid-template-columns: 75px 275px;
+  width: 75px;
+  overflow: hidden;
+}
+
+.sidebar.open {
+  width: 350px;
 }
 
 .nav_icons,
 .nav_info {
   border-right: 1px solid silver;
+}
+
+.nav_icons {
+  position: relative;
 }
 
 .nav_icon_list {
@@ -50,9 +59,13 @@
 }
 
 .connection_status {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   cursor: pointer;
+  width: 75px;
   height: 74px;
-  border-bottom: solid 2px rgba(151, 151, 151, 0.1);
+  border-top: solid 2px rgba(151, 151, 151, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;

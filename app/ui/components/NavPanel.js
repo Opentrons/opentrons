@@ -65,20 +65,21 @@ ConnectPanel.propTypes = {
   onDisconnectClick: PropTypes.func.isRequired
 }
 
-const panel = (props) => ({
-  upload: <UploadPanel {...props} />,
-  connect: <ConnectPanel {...props} />,
-  setup: <ConnectedSetupPanel />,
-  design: <div>design...</div>
-})
+const PANELS_BY_NAME = {
+  upload: UploadPanel,
+  connect: ConnectPanel,
+  setup: ConnectedSetupPanel
+}
 
 export default function NavPanel (props) {
   const {currentNavPanelTask} = props
 
+  if (!(currentNavPanelTask in PANELS_BY_NAME)) return null
+
+  const Panel = PANELS_BY_NAME[currentNavPanelTask]
+
   return (
-    <div>
-      {panel(props)[currentNavPanelTask]}
-    </div>
+    <Panel {...props} />
   )
 }
 

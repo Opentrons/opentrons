@@ -17,7 +17,6 @@ const ANALYZER = process.env.ANALYZER === 'true'
 const PORT = process.env.PORT
 
 const JS_BUNDLE_ENTRY = path.join(__dirname, './ui/index.js')
-
 const OUTPUT_PATH = path.join(__dirname, 'ui/dist')
 const JS_OUTPUT_NAME = 'bundle.js'
 const CSS_OUTPUT_NAME = 'style.css'

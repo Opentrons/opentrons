@@ -7,6 +7,7 @@ import Run from '../pages/Run'
 import SetupInstruments from '../pages/SetupInstruments'
 import SetupDeck from '../pages/SetupDeck'
 
+import './App.global.css'
 import styles from './App.css'
 
 export default function App () {

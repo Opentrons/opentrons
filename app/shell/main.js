@@ -68,6 +68,7 @@ function createWindow () {
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#showing-window-gracefully
   const mainWindow = new BrowserWindow({
     show: false,
+    useContentSize: true,
     width: 1024,
     height: 768,
     webPreferences: {

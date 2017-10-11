@@ -9,7 +9,7 @@ const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
   isNavPanelOpen: false,
-  currentNavPanelTask: 'connect'
+  currentNavPanelTask: ''
 }
 
 export const selectors = {
@@ -45,7 +45,14 @@ export function reducer (state = INITIAL_STATE, action) {
       return {...state, isNavPanelOpen: !state.isNavPanelOpen}
 
     case actionTypes.SET_CURRENT_NAV_PANEL:
-      return {...state, currentNavPanelTask: payload.panel, isNavPanelOpen: true}
+      return {
+        ...state,
+        currentNavPanelTask: payload.panel,
+        isNavPanelOpen: (
+          !state.isNavPanelOpen ||
+          payload.panel !== state.currentNavPanelTask
+        )
+      }
   }
   return state
 }
