@@ -5,11 +5,12 @@ import NavPanel from './NavPanel'
 import styles from './SideBar.css'
 
 function NavLink (props) {
-  const {name, iconSrc, onClick, isDisabled} = props
+  const {name, iconSrc, onClick, isDisabled, to} = props
 
   return (
     <li key={name}>
       <button
+        to={to}
         onClick={onClick}
         disabled={isDisabled}
         className={styles.nav_icon}
@@ -51,7 +52,7 @@ export default function SideBar (props) {
     <aside className={classnames(styles.sidebar, { [styles.open]: isNavPanelOpen })}>
       <nav className={styles.nav_icons} >
         <ConnectionIndicator {...props} />
-        <ol>
+        <ol className={styles.nav_icon_list}>
           {navLinks}
         </ol>
       </nav>

@@ -26,24 +26,32 @@ a {
 }
 
 .slot.active {
-  border: 4px solid grey;
+  border: 4px solid #111;
 }
 
 .disabled {
-  background-color: grey;
+  opacity: 0.4;
   pointer-events: none;
 }
 
-.deck img {
+.confirmed {
+  background-color: #ddd;
+}
+
+.confirmed::before {
+  content: '✓ ' attr(data-lab);
+  color: #777;
+}
+
+.slot img {
   width: 100%;
 }
 
 .label,
-.label_hover,
 .status {
   position: absolute;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.7);
   width: 100%;
   height: 2rem;
   text-align: center;

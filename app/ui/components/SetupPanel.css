@@ -50,7 +50,7 @@ h1 {
   pointer-events: none;
 }
 
-ul li a {
+.step_list li a {
   color: black;
   text-decoration: none;
   background-color: #efefef;
@@ -60,7 +60,7 @@ ul li a {
   font-size: 0.75rem;
 }
 
-li a::before {
+.step_list li button::before {
   display: block;
   float: left;
   content: '';
@@ -72,22 +72,42 @@ li a::before {
   margin: 0.5rem 0.5rem 1rem 1rem;
 }
 
-.labware_group li a::before {
-  margin: 0 0.5rem 0.5rem 1rem;
+.step_list button {
+  background-color: #eee;
+  width: 100%;
+  display: block;
+  height: 3rem;
+  padding: 0.5rem;
+  text-align: left;
+  line-height: 1.5rem;
 }
 
-a:hover {
+.step_list button:hover,
+.step_list a:hover {
   background-color: #ccc;
 }
 
-a.disabled {
+button.disabled {
   opacity: 0.5;
   pointer-events: none;
 }
 
-.alert::before {
+button.btn_labware {
+  line-height: 2rem;
+}
+
+.step_list .alert::before {
   content: '!';
   background-color: silver;
+  color: white;
+  line-height: 1rem;
+}
+
+.step_list .confirmed::before {
+  content: '✓';
+  background-color: #05c1b3;
+  color: white;
+  line-height: 1rem;
 }
 
 .axis {
@@ -97,7 +117,6 @@ a.disabled {
 }
 
 .type {
-  text-transform: capitalize;
   display: block;
   line-height: 1rem;
 }
@@ -116,6 +135,7 @@ a.disabled {
   text-transform: uppercase;
 }
 
-.active {
+.pipette_group a.active {
   background-color: #bbb;
+  color: white;
 }

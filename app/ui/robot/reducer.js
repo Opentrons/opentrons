@@ -1,4 +1,5 @@
 // robot reducer
+// TODO(mc, 2017-10-05): Split into sub-reducers or different redux modules
 import padStart from 'lodash/padStart'
 import {actionTypes} from './actions'
 import NAME from './name'
@@ -62,6 +63,25 @@ const INITIAL_STATE = {
   protocolLabwareBySlot: {},
 
   // robot calibration and setup
+  // TODO(mc, 2017-10-06): currentInstrumentCalibration and currentLabware-
+  // Confirmation are not well thought out; fix when API state is expanded
+  instrumentCalibrationByAxis: {},
+  labwareConfirmationBySlot: {},
+  currentInstrument: '',
+  currentInstrumentCalibration: {
+    axis: '',
+    isPreparingForProbe: false,
+    isReadyForProbe: false,
+    isProbing: false
+  },
+  labwareReviewed: false,
+  currentLabware: 0,
+  currentLabwareConfirmation: {
+    slot: 0,
+    isMoving: false,
+    isOverWell: false
+  },
+
   homeRequest: makeRequestState(),
   moveToFrontRequest: makeRequestState(),
   probeTipRequest: makeRequestState(),
@@ -177,7 +197,8 @@ export const selectors = {
   getInstruments (allState) {
     const {
       protocolInstrumentsByAxis,
-      instrumentCalibrationByAxis
+      instrumentCalibrationByAxis,
+      currentInstrument
     } = selectors.getState(allState)
 
     return constants.INSTRUMENT_AXES.map((axis) => {
@@ -190,22 +211,68 @@ export const selectors = {
         instrument.channels = constants.MULTI_CHANNEL
       }
 
-      return {...instrument, ...calibration}
+      return {
+        ...instrument,
+        ...calibration,
+        isCurrent: axis === currentInstrument
+      }
     })
   },
 
-  getDeck (allState) {
+  getCurrentInstrument (allState) {
+    return selectors.getInstruments(allState).find((i) => i.isCurrent)
+  },
+
+  getInstrumentsCalibrated (allState) {
+    const instruments = selectors.getInstruments(allState)
+
+    return instruments.every((i) => i.name == null || i.isProbed)
+  },
+
+  getCurrentInstrumentCalibration (allState) {
+    const state = selectors.getState(allState)
+
+    return state.currentInstrumentCalibration
+  },
+
+  getLabware (allState) {
     const {
       protocolLabwareBySlot,
-      labwareConfirmationBySlot
+      labwareConfirmationBySlot,
+      currentLabware
     } = selectors.getState(allState)
 
     return constants.DECK_SLOTS.map((slot) => {
       const labware = protocolLabwareBySlot[slot] || {slot}
       const confirmation = labwareConfirmationBySlot[slot] || {}
 
-      return {...labware, ...confirmation}
+      return {...labware, ...confirmation, isCurrent: currentLabware === slot}
     })
+  },
+
+  getLabwareReviewed (allState) {
+    return selectors.getState(allState).labwareReviewed
+  },
+
+  getCurrentLabware (allState) {
+    return selectors.getLabware(allState).find((lw) => lw.isCurrent)
+  },
+
+  getTipracks (allState) {
+    return selectors.getLabware(allState).filter((lw) => lw.isTiprack)
+  },
+
+  getTipracksConfirmed (allState) {
+    return selectors.getTipracks(allState).every((t) => t.isConfirmed)
+  },
+
+  getLabwareConfirmed (allState) {
+    return selectors.getLabware(allState)
+      .every((t) => t.name == null || t.isConfirmed)
+  },
+
+  getCurrentLabwareConfirmation (allState) {
+    return selectors.getState(allState).currentLabwareConfirmation
   }
 }
 
@@ -242,7 +309,8 @@ export function reducer (state = INITIAL_STATE, action) {
 
     case actionTypes.SESSION:
       return handleRequest(state, 'sessionRequest', error, {
-        sessionName: payload.file.name
+        sessionName: payload.file.name,
+        labwareReviewed: false
       })
 
     case actionTypes.SESSION_RESPONSE:
@@ -254,23 +322,77 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.HOME_RESPONSE:
       return handleResponse(state, 'homeRequest', error)
 
+    case actionTypes.SET_CURRENT_INSTRUMENT:
+      return {...state, currentInstrument: payload.instrument}
+
+    case actionTypes.SET_CURRENT_LABWARE:
+      return {...state, currentLabware: payload.labware}
+
+    case actionTypes.SET_LABWARE_REVIEWED:
+      return {...state, labwareReviewed: true}
+
     case actionTypes.MOVE_TO_FRONT:
-      return handleRequest(state, 'moveToFrontRequest', errorPayload)
+      return handleRequest(state, 'moveToFrontRequest', errorPayload, {
+        instrumentCalibrationByAxis: {
+          ...state.instrumentCalibrationByAxis,
+          [payload.instrument]: {isProbed: false}
+        },
+        currentInstrumentCalibration: {
+          ...state.currentInstrumentCalibration,
+          axis: payload.instrument,
+          isPreparingForProbe: true
+        }
+      })
 
     case actionTypes.MOVE_TO_FRONT_RESPONSE:
-      return handleResponse(state, 'moveToFrontRequest', errorPayload)
+      return handleResponse(state, 'moveToFrontRequest', errorPayload, {
+        currentInstrumentCalibration: {
+          ...state.currentInstrumentCalibration,
+          isPreparingForProbe: false,
+          isReadyForProbe: !error
+        }
+      })
 
     case actionTypes.PROBE_TIP:
-      return handleRequest(state, 'probeTipRequest', errorPayload)
+      return handleRequest(state, 'probeTipRequest', errorPayload, {
+        currentInstrumentCalibration: {
+          ...state.currentInstrumentCalibration,
+          axis: payload.instrument,
+          isReadyForProbe: false,
+          isProbing: true
+        }
+      })
 
     case actionTypes.PROBE_TIP_RESPONSE:
-      return handleResponse(state, 'probeTipRequest', errorPayload)
+      return handleResponse(state, 'probeTipRequest', errorPayload, {
+        currentInstrumentCalibration: {
+          ...state.currentInstrumentCalibration,
+          isProbing: false
+        },
+        instrumentCalibrationByAxis: {
+          ...state.instrumentCalibrationByAxis,
+          [state.currentInstrumentCalibration.axis]: {isProbed: !error}
+        }
+      })
 
     case actionTypes.MOVE_TO:
-      return handleRequest(state, 'moveToRequest', errorPayload)
+      return handleRequest(state, 'moveToRequest', errorPayload, {
+        currentLabwareConfirmation: {
+          ...state.currentLabwareConfirmation,
+          slot: payload.labware,
+          isMoving: true,
+          isOverWell: false
+        }
+      })
 
     case actionTypes.MOVE_TO_RESPONSE:
-      return handleResponse(state, 'moveToRequest', errorPayload)
+      return handleResponse(state, 'moveToRequest', errorPayload, {
+        currentLabwareConfirmation: {
+          ...state.currentLabwareConfirmation,
+          isMoving: false,
+          isOverWell: !error
+        }
+      })
 
     case actionTypes.JOG:
       return handleRequest(state, 'jogRequest', errorPayload)
@@ -282,7 +404,33 @@ export function reducer (state = INITIAL_STATE, action) {
       return handleRequest(state, 'updateOffsetRequest', errorPayload)
 
     case actionTypes.UPDATE_OFFSET_RESPONSE:
-      return handleResponse(state, 'updateOffsetRequest', errorPayload)
+      return handleResponse(state, 'updateOffsetRequest', errorPayload, {
+        labwareConfirmationBySlot: {
+          ...state.labwareConfirmationBySlot,
+          [state.currentLabwareConfirmation.slot]: {isConfirmed: !error}
+        },
+        currentLabwareConfirmation: {
+          ...state.currentLabwareConfirmation,
+          slot: (!error
+            ? 0
+            : state.currentLabwareConfirmation.slot
+          )
+        }
+      })
+
+    case actionTypes.SET_LABWARE_CONFIRMED:
+      return {
+        ...state,
+        labwareConfirmationBySlot: {
+          ...state.labwareConfirmationBySlot,
+          [payload.labware]: {isConfirmed: true}
+        },
+        currentLabwareConfirmation: {
+          slot: 0,
+          isMoving: false,
+          isOverWell: false
+        }
+      }
 
     case actionTypes.RUN:
       return handleRequest(state, 'runRequest', error, {runTime: 0})
