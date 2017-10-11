@@ -1,4 +1,7 @@
 import React from 'react'
+import cx from 'classnames'
+
+import Plate from './Plate.js'
 
 import { slotnames } from '../constants.js'
 import styles from '../css/style.css'
@@ -120,7 +123,13 @@ const Deck = props => {
           </div>
 
           <div className={styles.ingredientPanelContent}>
-            <div className={styles.containerDetail}>Plate here</div>
+            <div className={styles.containerDetail}>
+              <Plate
+                wellMatrix={[[3, 4, 3, 4, 1, 11], [3, 4, 3, 4, 1, 11], [3, 4, 3, 4, 1, 11], [3, 4, 3, 4, 1, 11]]}
+                Well={props => <div className={cx(styles.circle, styles.well)}>{props.wellContent}</div>}
+                showLabels
+              />
+            </div>
             {/* <button>Add Ingredient</button> */}
             {/* TODO:  ^^^ Add button back in conditionally */}
             <div className={styles.ingredientPropertiesEntry}>
