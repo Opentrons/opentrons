@@ -28,8 +28,8 @@ class Plate extends React.Component {
 
   makeLowerLabels () {
     const { wellMatrix } = this.props
-    return range(0, wellMatrix.length + 1).map((i) => (
-      <div className={styles.row_label} key={i}>{i !== 0 && wellMatrix.length - i + 1}</div>
+    return wellMatrix.map((_row, i) => (
+      <div className={styles.row_label} key={i}>{wellMatrix.length - i}</div>
     ))
   }
 
@@ -43,23 +43,28 @@ class Plate extends React.Component {
 
     return (
       <section className={styles.aspect_ratio}>
-        <div {...otherProps}
-          className={classnames(styles[className], styles.wrapper)}
-        >
-          {this.makeColumns().map(this.wrapColumn)}
+        <div className={styles.layoutWrapper}>
+
+          <div {...otherProps}
+            className={classnames(styles[className], styles.plate)}
+          >
+            {this.makeColumns().map(this.wrapColumn)}
+          </div>
+
+          {showLabels &&
+            <div className={styles.row_labels}>
+              {this.wrapColumn(this.makeLowerLabels())}
+            </div>
+          }
+
+          {showLabels &&
+            <div className={styles.column_labels} style={{'--colNum': wellMatrix[0].length}}>
+              {wellMatrix[0].map((_row, i) =>
+                <div className={styles.col_label} key={i}>{intToAlphabetLetter(i)}</div>
+              )}
+            </div>
+          }
         </div>
-        {showLabels &&
-          <div className={styles.number_labels}>
-            {this.wrapColumn(this.makeLowerLabels())}}
-          </div>
-        }
-        {showLabels &&
-          <div className={styles.letter_labels}>
-            {wellMatrix[0].map((_row, i) =>
-              <div className={styles.col_label} key={i}>{intToAlphabetLetter(i)}</div>
-            )}
-          </div>
-        }
       </section>
     )
   }

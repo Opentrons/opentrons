@@ -2,9 +2,10 @@
 @value blue, lightGrey, medGrey, darkGrey, plateBg from colors;
 
 .aspect_ratio{
-  height: 0;
+  height: 50vh;
+  width: calc(50vh * 86 / 127);
   overflow: hidden;
-  padding-top: calc(127 / 86 * 100%);
+  /*padding-left: calc(86 / 127 * 100%);*/
   background: transparent;
   position: relative;
   max-height:68vh;
@@ -12,51 +13,74 @@
 /*  border-width: 0 1rem 1rem 0;
   border-color:grey;*/
 
+  background-color: white;
 }
-.wrapper{
-	box-sizing: border-box;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+
+.layoutWrapper {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-auto-columns: 2rem auto;
+  grid-template:
+     'rows plate' auto
+     '.    cols' 2rem;
+
+  padding-right: 1rem;
+}
+
+.plate {
+  grid-area: plate;
+
+	/*box-sizing: border-box;*/
 
 	display:grid;
 	grid-auto-flow: column;
 	grid-auto-columns: 1fr;
 	direction: ltr;
 	text-align: center;
-	background-color: plateBg;
-	padding:0 1rem 1rem 0;
 	font-family:'Open Sans', sans-serif;
-	color:white;
 	font-size:.7rem;
 	font-weight:600;
 
 }
 
 
-.row_label{
-	grid-column: 1;
-	display:flex;
-	justify-content: center;
-	align-items: center;
+.row_labels {
+  display: grid;
+	grid-area: rows;
+  grid-auto-rows: 1fr;
 }
 
-.row_label:first-child:before{
-	content: 'X';
-	opacity:0;
 
-}
-
-.grid_col{
+.grid_col {
 	display:grid;
 	/*grid-template-rows: repeat(auto-fill, 1fr);*/
-	grid-auto-rows: 1fr;
 }
 
-.grid_col > div:first-child{
-	display:flex;
-	justify-content: center;
-	align-items: center;
+.grid_col > * {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.column_labels {
+  grid-area: cols;
+  display: grid;
+  /*grid-auto-columns: minmax(100px, auto);*/
+  /*grid-auto-flow: row;
+  grid-auto-columns: 1fr;*/
+  /*grid-template-columns: auto;*/
+  /*grid-template-rows: repeat(var(--rowNum), var(--gridHeight));*/
+  grid-template-columns: repeat(var(--colNum), auto);
+}
+
+.column_labels > * {
+  text-align: center;
 }

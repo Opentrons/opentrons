@@ -1,5 +1,5 @@
 import React from 'react'
-import cx from 'classnames'
+// import cx from 'classnames'
 
 import Plate from './Plate.js'
 
@@ -108,15 +108,15 @@ const Deck = props => {
               <div className={styles.ingredientInlineDetail}>
                 <div>
                   <label>A1</label>
-                  <input value={20} onChange={e => console.log('TODO')} />
+                  <input placeholder='20' />
                 </div>
                 <div>
                   <label>B1</label>
-                  <input value={20} onChange={e => console.log('TODO')} />
+                  <input placeholder='20' />
                 </div>
                 <div>
                   <label>C1</label>
-                  <input value={20} onChange={e => console.log('TODO')} />
+                  <input placeholder='20' />
                 </div>
               </div>
             </section>
@@ -139,7 +139,13 @@ const Deck = props => {
                   [9, 10, 11, 12, 13, 14, 15, 16],
                   [1, 2, 3, 4, 5, 6, 7, 8]
                 ]}
-                Well={props => <div className={cx(styles.circle, styles.well)}>{props.wellContent}</div>}
+                Well={props =>
+                  <div
+                    className={styles.wellRound}
+                    data-well-number={props.wellContent}
+                    // style={{backgroundColor: 'red'}}
+                  />
+                }
                 showLabels
               />
             </div>
