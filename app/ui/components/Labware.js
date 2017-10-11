@@ -1,45 +1,53 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import {NavLink} from 'react-router-dom'
+
 import styles from './Labware.css'
+
+Labware.propTypes = {
+  slot: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  isConfirmed: PropTypes.bool,
+  isCurrent: PropTypes.bool,
+  isDisabled: PropTypes.bool
+}
 
 export default function Labware (props) {
   const {
     type,
     slot,
-    isDeckmapReviewed,
+    labwareReviewed,
     isConfirmed,
-    isTipracksConfirmed,
-    isTiprack
+    isCurrent,
+    isDisabled
   } = props
-  const url = `/setup-deck/${slot}`
-  const slotStyle = {
-    gridArea: `slot-${slot}`
-  }
-  let confirmationMsg
-  if (!isConfirmed && isDeckmapReviewed) {
-    confirmationMsg = <div className={styles.status}>Position Unconfirmed</div>
-  }
 
-  let labwareLabel
-  !isDeckmapReviewed
-  ? labwareLabel = <div className={styles.label}>{type}</div>
-  : labwareLabel = null
+  const slotStyle = {gridArea: `slot-${slot}`}
 
-  if (type) {
-    const disabled = !isTipracksConfirmed && !isTiprack
+  if (!type) {
     return (
-      <NavLink to={url}
-        style={slotStyle}
-        activeClassName={styles.active}
-        className={classnames({[styles.disabled]: disabled}, styles.slot)}
-      >
-        {labwareLabel}
-        {confirmationMsg}
-      </NavLink>
+      <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
     )
   }
+
+  const style = classnames(styles.slot, {
+    [styles.active]: isCurrent,
+    [styles.disabled]: isDisabled,
+    [styles.confirmed]: isConfirmed
+  })
+
+  const confirmationMsg = (!isConfirmed && labwareReviewed)
+    ? (<div className={styles.status}>Position Unconfirmed</div>)
+    : null
+
+  const labwareLabel = !labwareReviewed
+    ? (<div className={styles.label}>{type}</div>)
+    : null
+
   return (
-    <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
+    <div style={slotStyle} className={style} data-lab={type}>
+      {labwareLabel}
+      {confirmationMsg}
+    </div>
   )
 }

@@ -1,5 +1,7 @@
 // robot api client
 // takes a dispatch (send) function and returns a receive handler
+import {push} from 'react-router-redux'
+
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
 import {constants, selectors} from '../reducer'
@@ -16,14 +18,11 @@ const INSTRUMENT_AXES = {
   a: 'right'
 }
 
+const DEFAULT_JOG_DISTANCE_MM = '0.25'
+
 export default function client (dispatch) {
   let rpcClient
   let remote
-  let sessionManager
-  let session
-  let robot
-  // TODO(mc, 2017-08-29): remove when server handles serial port
-  let serialPort
 
   // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
   let runTimerInterval = NO_INTERVAL
@@ -35,7 +34,7 @@ export default function client (dispatch) {
       case actionTypes.CONNECT: return connect(state, action)
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
-      case actionTypes.HOME: return home(state, action)
+      // case actionTypes.HOME: return home(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
       case actionTypes.MOVE_TO: return moveTo(state, action)
@@ -59,20 +58,11 @@ export default function client (dispatch) {
           .on('error', handleClientError)
 
         remote = rpcClient.remote
-        sessionManager = remote.session_manager
-        session = sessionManager.session
-        robot = sessionManager.robot
 
-        if (session) handleApiSession(session)
+        if (remote.session_manager.session) {
+          handleApiSession(remote.session_manager.session)
+        }
 
-        return robot.get_serial_ports_list()
-      })
-      // TODO(mc, 2017-08-29): serial port connection should not be the
-      // responsibility of the client. Remove when backend handles it
-      .then((p) => {
-        if (!p.length) return Promise.reject(new Error('No serial ports found'))
-
-        serialPort = p[0]
         dispatch(actions.connectResponse())
       })
       .catch((e) => dispatch(actions.connectResponse(e)))
@@ -83,13 +73,9 @@ export default function client (dispatch) {
 
     rpcClient.close()
       .then(() => {
-        // null out saved client and session
+        // null out saved client and remote
         rpcClient = null
-        sessionManager = null
-        session = null
-        robot = null
-        // TODO(mc, 2017-09-07): remove when server handles serial port
-        serialPort = null
+        remote = null
 
         clearRunTimerInterval()
         dispatch(actions.disconnectResponse())
@@ -103,9 +89,10 @@ export default function client (dispatch) {
     const reader = new FileReader()
 
     reader.onload = function handleProtocolRead (event) {
-      sessionManager.create(name, event.target.result)
+      remote.session_manager.create(name, event.target.result)
         .then((apiSession) => {
-          session = apiSession
+          // TODO(mc, 2017-10-09): This seems like an API responsibility
+          remote.session_manager.session = apiSession
           handleApiSession(apiSession, true)
         })
         .catch((error) => dispatch(actions.sessionResponse(error)))
@@ -114,17 +101,12 @@ export default function client (dispatch) {
     return reader.readAsText(file)
   }
 
-  function home (state, action) {
-    robot.connect(serialPort)
-      .then(() => robot.home())
-      .then(() => robot.disconnect())
-      .then(() => dispatch(actions.homeResponse()))
-      .catch((error) => dispatch(actions.homeResponse(error)))
-  }
-
   function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 2000)
 
     remote.calibration_manager.move_to_front(instrument)
       .then(() => dispatch(actions.moveToFrontResponse()))
@@ -134,6 +116,9 @@ export default function client (dispatch) {
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.probeTipResponse()), 2000)
 
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
@@ -152,11 +137,17 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
 
+  // TODO(mc, 2017-10-06): signature is instrument, distance, axis
+  // axis is x, y, z, not left and right (which we will call mount)
   function jog (state, action) {
-    const {payload: {instrument: axis, coordinates}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+    const {payload: {instrument: instrumentAxis, axis, direction}} = action
+    const instrument = selectors.getState(state).protocolInstrumentsByAxis[instrumentAxis]
+    const distance = DEFAULT_JOG_DISTANCE_MM * direction
 
-    remote.calibration_manager.jog(instrument, coordinates)
+    // FIXME(mc, 2017-10-06): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.jogResponse()), 2000)
+
+    remote.calibration_manager.jog(instrument, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
       .catch((error) => dispatch(actions.jogResponse(error)))
   }
@@ -168,33 +159,46 @@ export default function client (dispatch) {
       protocolLabwareBySlot: labwares
     } = selectors.getState(state)
 
-    remote.calibration_manager.update_offset(labwares[slot], instruments[axis])
-      .then(() => dispatch(actions.updateOffsetResponse()))
+    // TODO(mc, 2017-10-06)
+
+    // FIXME(mc, 2017-10-06): DEBUG CODE
+    // return setTimeout(() => {
+    //   dispatch(actions.updateOffsetResponse())
+    //   dispatch(push('/setup-deck'))
+    // }, 2000)
+
+    remote.calibration_manager.update_container_offset(labwares[slot], instruments[axis])
+      .then(() => {
+        dispatch(actions.updateOffsetResponse())
+        // TODO(mc, 2017-10-06): do this without a double dispatch
+        // also this hardcoded URL is a bad idea™
+        dispatch(push('/setup-deck'))
+      })
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
 
   function run (state, action) {
     setRunTimerInterval()
-    session.run(serialPort)
+    remote.session_manager.session.run()
       .then(() => dispatch(actions.runResponse()))
       .catch((error) => dispatch(actions.runResponse(error)))
       .then(() => clearRunTimerInterval())
   }
 
   function pause (state, action) {
-    session.pause()
+    remote.session_manager.session.pause()
       .then(() => dispatch(actions.pauseResponse()))
       .catch((error) => dispatch(actions.pauseResponse(error)))
   }
 
   function resume (state, action) {
-    session.resume()
+    remote.session_manager.session.resume()
       .then(() => dispatch(actions.resumeResponse()))
       .catch((error) => dispatch(actions.resumeResponse(error)))
   }
 
   function cancel (state, action) {
-    session.stop()
+    remote.session_manager.session.stop()
       .then(() => dispatch(actions.cancelResponse()))
       .catch((error) => dispatch(actions.cancelResponse(error)))
   }
@@ -293,12 +297,10 @@ export default function client (dispatch) {
   }
 
   function handleRobotNotification (message) {
-    const {name, payload} = message
+    const {topic, payload} = message
 
-    switch (name) {
-      case 'state':
-        handleApiSession(payload)
-        break
+    switch (topic) {
+      case 'session': return handleApiSession(payload)
     }
   }
 
@@ -307,8 +309,13 @@ export default function client (dispatch) {
   }
 }
 
+// swap OT1 protocol slot to OT2 protocol slot
 // TODO(mc, 2017-10-03): be less "clever" about this
-// map A1 -> 1, B1 -> 2, C1 -> 3, A2 -> 4, ..., B4 -> 11
+// 4 10|11|_t
+// 3 _7|_8|_9
+// 2 _4|_5|_6
+// 1 _1|_2|_3
+//    A  B  C
 function letterSlotToNumberSlot (slot) {
   // split two-char string into charcodes
   const [col, row] = Array.from(slot.toUpperCase()).map((c) => c.charCodeAt(0))

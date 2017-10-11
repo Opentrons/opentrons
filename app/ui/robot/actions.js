@@ -18,6 +18,9 @@ export const actionTypes = {
   SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
 
   // calibration
+  SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
+  SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
+  SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
   HOME: makeRobotActionName('HOME'),
   HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
@@ -30,6 +33,7 @@ export const actionTypes = {
   JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
   UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
   UPDATE_OFFSET_RESPONSE: makeRobotActionName('UPDATE_OFFSET_RESPONSE'),
+  SET_LABWARE_CONFIRMED: makeRobotActionName('SET_LABWARE_CONFIRMED'),
 
   // protocol run controls
   RUN: makeRobotActionName('RUN'),
@@ -75,6 +79,18 @@ export const actions = {
     return {type: actionTypes.SESSION_RESPONSE, payload: {session}, error}
   },
 
+  setCurrentInstrument (instrument) {
+    return {type: actionTypes.SET_CURRENT_INSTRUMENT, payload: {instrument}}
+  },
+
+  setCurrentLabware (labware) {
+    return {type: actionTypes.SET_CURRENT_LABWARE, payload: {labware}}
+  },
+
+  setLabwareReviewed () {
+    return {type: actionTypes.SET_LABWARE_REVIEWED}
+  },
+
   home (axes) {
     const action = makeRobotAction({type: actionTypes.HOME})
     if (axes != null) action.payload = {axes}
@@ -94,7 +110,7 @@ export const actions = {
     })
   },
 
-  moveToFrontResponse (error = null) {
+  moveToFrontResponse (error = null, instrument) {
     const action = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: error != null
@@ -129,10 +145,10 @@ export const actions = {
     return action
   },
 
-  jog (instrument, coordinates) {
+  jog (instrument, axis, direction) {
     return makeRobotAction({
       type: actionTypes.JOG,
-      payload: {instrument, coordinates}
+      payload: {instrument, axis, direction}
     })
   },
 
@@ -158,6 +174,10 @@ export const actions = {
     if (error) action.payload = error
 
     return action
+  },
+
+  setLabwareConfirmed (labware) {
+    return {type: actionTypes.SET_LABWARE_CONFIRMED, payload: {labware}}
   },
 
   run () {

@@ -1,23 +1,21 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
+import {
+  actions as robotActions,
+  selectors as robotSelectors
+} from '../robot'
+
 import PipetteConfig from '../components/PipetteConfig'
 
 const mapStateToProps = (state) => ({
-  instruments: [
-    {
-      axis: 'left', // axis: 'b'from api
-      channels: 'single', // channels: 1 from api
-      volume: 200, // max_volume: 200 from api
-      isProbed: false
-    },
-    {
-      axis: 'right',
-      channels: 'multi',
-      volume: 200,
-      isProbed: false
-    }
-  ]
+  instruments: robotSelectors.getInstruments(state),
+  currentInstrument: robotSelectors.getCurrentInstrument(state)
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  // TODO(mc, 2017-10-05): pass axis in via props to ease GC pressure
+  onPrepareClick: (axis) => () => dispatch(robotActions.moveToFront(axis))
 })
 
 function ConnectedPipetteConfig (props) {
@@ -26,4 +24,4 @@ function ConnectedPipetteConfig (props) {
   )
 }
 
-export default connect(mapStateToProps)(ConnectedPipetteConfig)
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectedPipetteConfig)

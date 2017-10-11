@@ -24,8 +24,8 @@ const mapStateToProps = (state) => {
     isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
     currentNavPanelTask: interfaceSelectors.getCurrentNavPanelTask(state),
     navLinks: [
-      {name: 'upload', iconSrc: uploadIconSrc, isDisabled: !isConnected},
-      {name: 'setup', iconSrc: setupIconSrc, isDisabled: !isConnected}
+      {name: 'upload', iconSrc: uploadIconSrc, isDisabled: !isConnected, to: '/upload'},
+      {name: 'setup', iconSrc: setupIconSrc, isDisabled: !isConnected, to: '/setup-instruments'}
     ],
 
     // robot

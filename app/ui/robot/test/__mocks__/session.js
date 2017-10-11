@@ -10,6 +10,6 @@ export default function MockSession () {
     instruments: [],
     containers: [],
 
-    run: jest.fn(() => Promise.resolve())
+    run: jest.fn()
   }
 }

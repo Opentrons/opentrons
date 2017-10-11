@@ -4,7 +4,6 @@ import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
 import {NAME, actions} from '../'
 
-import MockRobot from './__mocks__/robot'
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
 
@@ -14,7 +13,6 @@ describe('api client', () => {
   let dispatch
   let sendToClient
   let rpcClient
-  let robot
   let session
   let sessionManager
   let calibrationManager
@@ -35,12 +33,11 @@ describe('api client', () => {
     // TODO(mc, 2017-08-29): this is a pretty nasty mock. Probably a sign we
     // need to simplify the RPC client
     // mock robot, session, and session manager
-    robot = MockRobot()
     session = MockSession()
     calibrationManager = MockCalibrationMangager()
 
     // mock rpc client
-    sessionManager = {robot, session}
+    sessionManager = {session}
     rpcClient = {
       // TODO(mc, 2017-09-22): these jest promise mocks are causing promise
       // rejection warnings. These warnings are Jest's fault for nextTick stuff
@@ -73,19 +70,13 @@ describe('api client', () => {
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
+      const expectedResponse = actions.connectResponse()
+
       expect(RpcClient).toHaveBeenCalledTimes(0)
 
       return sendConnect()
-        .then(() => expect(RpcClient).toHaveBeenCalledTimes(1))
-    })
-
-    // TODO(mc, 2017-09-06): remove when server handles serial port
-    test('dispatch CONNECT_RESPONSE once client has serial list', () => {
-      const expectedResponse = actions.connectResponse()
-
-      return sendConnect()
         .then(() => {
-          expect(robot.get_serial_ports_list).toHaveBeenCalled()
+          expect(RpcClient).toHaveBeenCalledTimes(1)
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -95,18 +86,6 @@ describe('api client', () => {
       const expectedResponse = actions.connectResponse(error)
 
       RpcClient.mockReturnValueOnce(Promise.reject(error))
-
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
-    })
-
-    // TODO(mc, 2017-09-06): remove when server handles serial port
-    test('dispatch CONNECT_RESPONSE error if get_serial... fails', () => {
-      const error = new Error('AHH get_serial_ports_list')
-      const expectedResponse = actions.connectResponse(error)
-
-      robot.get_serial_ports_list = jest.fn()
-        .mockReturnValueOnce(Promise.reject(error))
 
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
@@ -157,6 +136,8 @@ describe('api client', () => {
 
   describe('running', () => {
     test('start a timer when the run starts', () => {
+      session.run.mockReturnValue(Promise.resolve())
+
       return sendConnect()
         .then(() => sendToClient({}, actions.run()))
         .then(() => expect(global.setInterval).toHaveBeenCalled())
@@ -365,7 +346,7 @@ describe('api client', () => {
     })
 
     test('handles JOG success', () => {
-      const action = actions.jog('left', {x: 0.5})
+      const action = actions.jog('left', 'y', -1)
       const expectedResponse = actions.jogResponse()
 
       calibrationManager.jog.mockReturnValue(Promise.resolve())
@@ -374,13 +355,13 @@ describe('api client', () => {
         .then(() => sendToClient(state, action))
         .then(() => {
           expect(calibrationManager.jog)
-            .toHaveBeenCalledWith({_id: 'inst-2'}, {x: 0.5})
+            .toHaveBeenCalledWith({_id: 'inst-2'}, -0.25, 'y')
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
 
     test('handles JOG failure', () => {
-      const action = actions.jog('left', {y: 0.5})
+      const action = actions.jog('left', 'x', 1)
       const expectedResponse = actions.jogResponse(new Error('AH'))
 
       calibrationManager.jog.mockReturnValue(Promise.reject(new Error('AH')))
@@ -394,12 +375,13 @@ describe('api client', () => {
       const action = actions.updateOffset('left', 9)
       const expectedResponse = actions.updateOffsetResponse()
 
-      calibrationManager.update_offset.mockReturnValue(Promise.resolve())
+      calibrationManager.update_container_offset
+        .mockReturnValue(Promise.resolve())
 
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.update_offset)
+          expect(calibrationManager.update_container_offset)
             .toHaveBeenCalledWith({_id: 'lab-3'}, {_id: 'inst-2'})
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
@@ -409,7 +391,7 @@ describe('api client', () => {
       const action = actions.updateOffset('left', 9)
       const expectedResponse = actions.updateOffsetResponse(new Error('AH'))
 
-      calibrationManager.update_offset
+      calibrationManager.update_container_offset
         .mockReturnValue(Promise.reject(new Error('AH')))
 
       return sendConnect()

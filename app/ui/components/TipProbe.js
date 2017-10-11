@@ -3,17 +3,23 @@ import PropTypes from 'prop-types'
 import styles from './TipProbe.css'
 
 function PrepareForProbe (props) {
-  const {volume} = props
+  const {volume, isCurrent, onProbeTipClick} = props
   return (
-    <section className={styles.probe_msg} >
-      <h3>Complete the following steps prior to clicking [Initiate Tip Probe]</h3>
+    <span >
+      <p>Complete the following steps prior to clicking [Initiate Tip Probe]</p>
       <ol>
         <li>Remove all labware from deck.</li>
         <li>Remove trash bin to reveal Tip Probe tool.</li>
         <li>Place a previously used or otherwise discarded <strong>{volume} ul</strong> tip on the pipette.</li>
       </ol>
-      <button className={styles.btn_probe} onClick={console.log('onInitiateTipProbeClick')}>Initiate Tip Probe</button>
-    </section>
+      <button
+        className={styles.btn_probe}
+        onClick={onProbeTipClick}
+        disabled={!isCurrent}
+      >
+        Continue
+      </button>
+    </span>
   )
 }
 
@@ -23,31 +29,37 @@ PrepareForProbe.propTypes = {
 
 function RobotIsMoving (props) {
   return (
-    <section className={styles.probe_msg} >
-      <h3>Robot is moving..</h3>
-    </section>
-  )
-}
-
-function ProbeInitiated (props) {
-  return (
-    <section className={styles.probe_msg} >
-      <h3>Tip Probe Finding Tip...</h3>
-    </section>
+    <h3>Robot is moving..</h3>
   )
 }
 
 function ProbeSuccess (props) {
   const {volume} = props
   return (
-    <section className={styles.probe_msg} >
-      <h3>Tip dimensions for <strong>{volume} ul</strong> tips are now defined.</h3>
+    <span>
+      <p>Tip dimensions for <strong>{volume} ul</strong> tips are now defined.</p>
       <ol>
         <li>Remove tip by hand and discard.</li>
         <li>Replace trash bin on top of Tip Probe tool once all tips have been defined.</li>
       </ol>
-      <button className={styles.btn_probe} onClick={console.log('close, next pipette route?')}>Close</button>
-    </section>
+    </span>
+  )
+}
+
+function DefaultMessage (props) {
+  const {onPrepareClick, isProbed, isCurrent} = props
+  const infoIcon = isProbed
+    ? '✓'
+    : '!'
+  const infoMessage = isProbed
+    ? (<p>Instrument has been calibrated successfully by Tip Probe</p>)
+    : (<p>Tip dimensions must be defined using the Tip Probe tool</p>)
+  return (
+    <span>
+      <span className={styles.alert}>{infoIcon}</span>
+      {infoMessage}
+      <button className={styles.btn_probe} onClick={onPrepareClick} disabled={!isCurrent}>Initiate Tip Probe</button>
+    </span>
   )
 }
 
@@ -56,34 +68,30 @@ ProbeSuccess.propTypes = {
 }
 
 export default function TipProbe (props) {
-  const {currentInstrument} = props
-  const {
-    tipIsPreparingForProbe,
-    tipIsReadyForProbe,
-    tipIsProbing,
-    tipIsProbed
-  } = currentInstrument
+  const {onPrepareClick, onProbeTipClick, instrument, currentCalibration} = props
+  const {isCurrent} = instrument || {}
+  const {isPreparingForProbe, isReadyForProbe, isProbing} = currentCalibration
 
   let probeMessage = null
-  if (tipIsReadyForProbe) {
-    probeMessage = <PrepareForProbe {...currentInstrument} />
-  } else if (tipIsPreparingForProbe) {
+  if (isReadyForProbe && isCurrent) {
+    probeMessage = <PrepareForProbe {...instrument} onProbeTipClick={onProbeTipClick} />
+  } else if ((isPreparingForProbe || isProbing) && isCurrent) {
     probeMessage = <RobotIsMoving />
-  } else if (tipIsProbing) {
-    probeMessage = <ProbeInitiated />
-  } else if (tipIsProbed) {
-    probeMessage = <ProbeSuccess {...currentInstrument} />
   } else {
-    probeMessage = null
+    probeMessage = <DefaultMessage {...instrument} onPrepareClick={onPrepareClick} />
   }
+
   return probeMessage
 }
 
 TipProbe.propTypes = {
-  currentInstrument: PropTypes.shape({
-    volume: PropTypes.number.isRequired,
-    tipIsPreparingForProbe: PropTypes.bool.isRequired,
-    tipIsProbing: PropTypes.bool.isRequired,
-    tipIsProbed: PropTypes.bool.isRequired
+  onProbeTipClick: PropTypes.func.isRequired,
+  instrument: PropTypes.shape({
+    volume: PropTypes.number
+  }),
+  currentCalibration: PropTypes.shape({
+    isPreparingForProbe: PropTypes.bool,
+    isReadyForProbe: PropTypes.bool,
+    isProbing: PropTypes.bool
   }).isRequired
 }

@@ -1,5 +1,21 @@
 .probe_msg {
-  padding: 2rem;
+  border: 2px solid silver;
+  border-radius: 0.25rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.alert {
+  background-color: silver;
+  color: white;
+  height: 1rem;
+  width: 1rem;
+  margin: 0.5rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  display: block;
+  float: left;
 }
 
 .btn_probe {
@@ -15,4 +31,9 @@
   font-family: 'trons';
   text-transform: uppercase;
   color: white;
+  cursor: pointer;
+}
+
+.btn_probe[disabled] {
+  pointer-events: none;
 }

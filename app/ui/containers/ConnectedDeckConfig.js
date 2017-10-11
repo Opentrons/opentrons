@@ -1,70 +1,27 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
+import {
+  selectors as robotSelectors,
+  actions as robotActions
+} from '../robot'
 import DeckConfig from '../components/DeckConfig'
 
 const mapStateToProps = (state) => ({
+  labware: robotSelectors.getLabware(state),
+  currentLabware: robotSelectors.getCurrentLabware(state),
+  labwareReviewed: robotSelectors.getLabwareReviewed(state),
+  tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
+  labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
 
-  // interface
-  isMoving: false,
-  isOverWell: true,
-  currentLabware: {
-    slot: 1,
-    id: 'A1',
-    name: 'tiprack',
-    type: 'tiprack-200ul',
-    isConfirmed: false,
-    isTiprack: true
-  },
+  currentLabwareConfirmation: robotSelectors.getCurrentLabwareConfirmation(state)
+})
 
-  // robot
-  isDeckmapReviewed: true,
-  isTipracksConfirmed: true,
-  isLabwareConfirmed: false,
-  deck: [
-    {
-      slot: 1,
-      name: 'tiprack',
-      id: 'A1',
-      type: 'tiprack-200ul',
-      isConfirmed: true,
-      isTiprack: true
-    }, {
-      slot: 2,
-      name: 'trough',
-      id: 'B1',
-      type: 'trough-12row',
-      isConfirmed: false,
-      isTiprack: false
-    }, {
-      slot: 3,
-      name: 'plate',
-      id: 'C1',
-      type: '96-PCR-flat',
-      isConfirmed: false,
-      isTiprack: false
-    }, {
-      slot: 4,
-      name: 'tiprack2',
-      id: 'A2',
-      type: 'tiprack-200ul',
-      isConfirmed: true,
-      isTiprack: true
-    }, {slot: 5},
-    {
-      slot: 6,
-      name: 'tuberack',
-      id: 'C2',
-      type: 'tube-rack-2ml',
-      isConfirmed: false,
-      isTiprack: false
-    },
-    {slot: 7},
-    {slot: 8},
-    {slot: 9},
-    {slot: 10},
-    {slot: 11}
-  ]
+const mapDispatchToProps = (dispatch, props) => ({
+  setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
+  // TODO(mc, 2017-10-06): don't hardcode the pipette and pass slot in via props
+  moveToContainer: (slot) => () => dispatch(robotActions.moveTo('left', slot)),
+  setLabwareConfirmed: (slot) => () => dispatch(robotActions.setLabwareConfirmed(slot))
 })
 
 function ConnectedDeckConfig (props) {
@@ -73,4 +30,4 @@ function ConnectedDeckConfig (props) {
   )
 }
 
-export default connect(mapStateToProps)(ConnectedDeckConfig)
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectedDeckConfig)
