@@ -4,7 +4,7 @@ const GoogleFontsPlugin = require('google-fonts-webpack-plugin')
 
 module.exports = {
   entry: [
-    // 'react-hot-loader/patch',
+    'react-hot-loader/patch',
     // 'webpack-dev-server/client?http://localhost:8080',
     // 'webpack/hot/only-dev-server',
     './src/index.js'

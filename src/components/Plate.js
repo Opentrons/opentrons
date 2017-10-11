@@ -10,29 +10,32 @@ import styles from './Plate.css'
 const intToAlphabetLetter = (i, lowerCase = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
 
+// TODO factor out. (NEW)
+const transpose = matrix => matrix[0].map((_col, i) =>
+  matrix.map(row => row[i])
+)
+
 class Plate extends React.Component {
-  makeRows () {
-    const { wellMatrix, Well, showLabels } = this.props
-    return wellMatrix.map((row, y) =>
-      row.map((wellContent, x) => [
-        // optional row label cell
-        showLabels && x === 0 && <div className={styles.col_label} key='row-label'>{intToAlphabetLetter(wellMatrix.length - y - 1)}</div>,
-        // well cell
+  makeColumns () {
+    const { wellMatrix, Well } = this.props
+
+    return transpose(wellMatrix).map((row, y) =>
+      row.map((wellContent, x) =>
         <Well {...{x, y, wellContent, key: x}} />
-      ])
+      )
     )
   }
 
   makeLowerLabels () {
     const { wellMatrix } = this.props
-    return range(0, wellMatrix[0].length + 1).map((i) => (
-      <div className={styles.row_label} key={i}>{i !== 0 && wellMatrix[0].length - i + 1}</div>
+    return range(0, wellMatrix.length + 1).map((i) => (
+      <div className={styles.row_label} key={i}>{i !== 0 && wellMatrix.length - i + 1}</div>
     ))
   }
 
-  wrapRow (wells, key) {
+  wrapColumn (wells) {
     // wrap a row of wells in a .row div
-    return <div key={key} className={styles.grid_col}>{wells}</div>
+    return <div className={styles.grid_col}>{wells}</div>
   }
 
   render () {
@@ -43,9 +46,20 @@ class Plate extends React.Component {
         <div {...otherProps}
           className={classnames(styles[className], styles.wrapper)}
         >
-          {this.makeRows().map(this.wrapRow)}
+          {this.makeColumns().map(this.wrapColumn)}
         </div>
-        {showLabels && this.wrapRow(this.makeLowerLabels(), 'col-labels')}
+        {showLabels &&
+          <div className={styles.number_labels}>
+            {this.wrapColumn(this.makeLowerLabels())}}
+          </div>
+        }
+        {showLabels &&
+          <div className={styles.letter_labels}>
+            {wellMatrix[0].map((_row, i) =>
+              <div className={styles.col_label} key={i}>{intToAlphabetLetter(i)}</div>
+            )}
+          </div>
+        }
       </section>
     )
   }

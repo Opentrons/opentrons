@@ -4,7 +4,7 @@
 .aspect_ratio{
   height: 0;
   overflow: hidden;
-  padding-top: calc(86 / 127 * 100%);
+  padding-top: calc(127 / 86 * 100%);
   background: transparent;
   position: relative;
   max-height:68vh;
@@ -24,7 +24,7 @@
 	display:grid;
 	grid-auto-flow: column;
 	grid-auto-columns: 1fr;
-	direction: rtl;
+	direction: ltr;
 	text-align: center;
 	background-color: plateBg;
 	padding:0 1rem 1rem 0;
