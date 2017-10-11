@@ -54,10 +54,10 @@ async def test_jog(main_router, model):
 
         expected = [
             mock.call(
-                model.instrument._instrument,
-                distance,
-                axis,
-                robot)
+                instrument=model.instrument._instrument,
+                distance=distance,
+                axis=axis,
+                robot=robot)
             for axis, distance in zip('xyz', (1, 2, 3))]
 
         assert jog.mock_calls == expected
