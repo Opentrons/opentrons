@@ -2,6 +2,8 @@ import React from 'react'
 // import cx from 'classnames'
 
 import Plate from './Plate.js'
+
+import SelectionRect from '../containers/SelectionRect.js'
 import ClickAndDragWell from '../containers/ClickAndDragWell.js'
 
 import { slotnames } from '../constants.js'
@@ -125,6 +127,7 @@ const Deck = props => {
 
           <div className={styles.ingredientPanelContent}>
             <div className={styles.containerDetail}>
+              <SelectionRect />
               <Plate
                 wellMatrix={[
                   [89, 90, 91, 92, 93, 94, 95, 96],
@@ -144,14 +147,7 @@ const Deck = props => {
                 showLabels
               />
             </div>
-            <div style={{
-              position: 'fixed',
-              left: '592px',
-              top: '452px',
-              width: (642 - 592) + 'px',
-              height: (452 - 408) + 'px',
-              backgroundColor: 'rgba(0, 0, 255, 0.5)'
-            }} />
+
             {/* <button>Add Ingredient</button> */}
             {/* TODO:  ^^^ Add button back in conditionally */}
             <div className={styles.ingredientPropertiesEntry}>

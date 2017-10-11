@@ -1,7 +1,13 @@
 import { createActions } from 'redux-actions'
 
-console.log({createActions})
+// Payload mappers
+const mouseCoordPayload = e => ({
+  x: e.clientX,
+  y: e.clientY,
+  targetData: e.target && e.target.dataset
+})
 
+// Actions
 export const {
   openLabwareSelector,
   closeLabwareSelector,
@@ -11,7 +17,11 @@ export const {
 
   selectLabwareToAdd,
 
-  deleteContainerAtSlot
+  deleteContainerAtSlot,
+
+  mouseDownOnWell,
+  mouseUpOnWell,
+  mouseUpOnNonwell
 } = createActions({
   OPEN_LABWARE_SELECTOR: undefined,
   CLOSE_LABWARE_SELECTOR: undefined,
@@ -21,5 +31,9 @@ export const {
 
   SELECT_LABWARE_TO_ADD: undefined,
 
-  DELETE_CONTAINER_AT_SLOT: undefined
+  DELETE_CONTAINER_AT_SLOT: undefined,
+
+  MOUSE_DOWN_ON_WELL: mouseCoordPayload,
+  MOUSE_UP_ON_WELL: mouseCoordPayload,
+  MOUSE_DOWN_ON_NONWELL: mouseCoordPayload
 })

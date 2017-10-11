@@ -1,11 +1,16 @@
 import Well from '../components/Well.js'
 import { connect } from 'react-redux'
 
+import {
+  mouseDownOnWell,
+  mouseUpOnWell
+} from '../actions'
+
 const ClickAndDragWell = connect(
-  state => ({}),
+  undefined,
   {
-    onMouseDown: a => { console.log('down'); return ({type: 'mousedown'}) },
-    onMouseUp: a => { console.log('up'); return ({type: 'mouseup'}) }
+    onMouseDown: mouseDownOnWell,
+    onMouseUp: mouseUpOnWell
   }
 )(Well)
 
