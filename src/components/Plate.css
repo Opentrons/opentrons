@@ -1,19 +1,26 @@
 @value colors: './Util.css';
 @value blue, lightGrey, medGrey, darkGrey, plateBg from colors;
 
+@value labelColor: gray;
+
 .aspect_ratio{
   height: 50vh;
   width: calc(50vh * 86 / 127);
   overflow: hidden;
-  /*padding-left: calc(86 / 127 * 100%);*/
   background: transparent;
   position: relative;
   max-height:68vh;
   box-sizing: border-box;
-/*  border-width: 0 1rem 1rem 0;
-  border-color:grey;*/
+  margin: auto;
+
+  border: 3px solid darkgray;
+  border-radius: 10px;
 
   background-color: white;
+
+  /* text selection messes up drag & drop */
+  user-select: none;
+  cursor: default;
 }
 
 .layoutWrapper {
@@ -54,12 +61,12 @@
   display: grid;
 	grid-area: rows;
   grid-auto-rows: 1fr;
+  color: labelColor;
 }
 
 
 .grid_col {
 	display:grid;
-	/*grid-template-rows: repeat(auto-fill, 1fr);*/
 }
 
 .grid_col > * {
@@ -73,14 +80,10 @@
 .column_labels {
   grid-area: cols;
   display: grid;
-  /*grid-auto-columns: minmax(100px, auto);*/
-  /*grid-auto-flow: row;
-  grid-auto-columns: 1fr;*/
-  /*grid-template-columns: auto;*/
-  /*grid-template-rows: repeat(var(--rowNum), var(--gridHeight));*/
   grid-template-columns: repeat(var(--colNum), auto);
 }
 
 .column_labels > * {
   text-align: center;
+  color: labelColor;
 }

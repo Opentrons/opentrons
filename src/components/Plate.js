@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import range from 'lodash/range'
 
 import styles from './Plate.css'
 
@@ -19,9 +18,9 @@ class Plate extends React.Component {
   makeColumns () {
     const { wellMatrix, Well } = this.props
 
-    return transpose(wellMatrix).map((row, y) =>
-      row.map((wellContent, x) =>
-        <Well {...{x, y, wellContent, key: x}} />
+    return transpose(wellMatrix).map((row, x) =>
+      row.map((wellContent, y) =>
+        <Well {...{x, y: row.length - y - 1, wellContent, key: y}} />
       )
     )
   }

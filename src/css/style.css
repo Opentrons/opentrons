@@ -87,14 +87,13 @@ textarea {
 /* WELLS */
 
 .wellRound {
-  /*width: 100%;
-  height: 100%;*/
   display: flex;
+  border-radius: 0;
 }
 
 .wellRound::after {
   color: lightgray;
-  background-color: white;
+  background-color: var(--well-color);
   box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
   content: attr(data-well-number);
   display: flex;
@@ -108,6 +107,10 @@ textarea {
   height: 2em;
   margin: auto;
   font-size: 1rem;
+}
+
+.wellRound:hover {
+  background-color: lightgray;
 }
 
 /* DECK */

@@ -2,6 +2,7 @@ import React from 'react'
 // import cx from 'classnames'
 
 import Plate from './Plate.js'
+import ClickAndDragWell from '../containers/ClickAndDragWell.js'
 
 import { slotnames } from '../constants.js'
 import styles from '../css/style.css'
@@ -139,16 +140,18 @@ const Deck = props => {
                   [9, 10, 11, 12, 13, 14, 15, 16],
                   [1, 2, 3, 4, 5, 6, 7, 8]
                 ]}
-                Well={props =>
-                  <div
-                    className={styles.wellRound}
-                    data-well-number={props.wellContent}
-                    // style={{backgroundColor: 'red'}}
-                  />
-                }
+                Well={ClickAndDragWell}
                 showLabels
               />
             </div>
+            <div style={{
+              position: 'fixed',
+              left: '592px',
+              top: '452px',
+              width: (642 - 592) + 'px',
+              height: (452 - 408) + 'px',
+              backgroundColor: 'rgba(0, 0, 255, 0.5)'
+            }} />
             {/* <button>Add Ingredient</button> */}
             {/* TODO:  ^^^ Add button back in conditionally */}
             <div className={styles.ingredientPropertiesEntry}>
