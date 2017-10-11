@@ -488,7 +488,7 @@ class Robot(object):
                 instrument._move(**coord)
 
         elif strategy == 'direct':
-            position = {'x':coordinates[0], 'y': coordinates[1], 'z': coordinates[2]}
+            position = {'x': target[0], 'y': target[1], 'z': target[2]}
             instrument._move(**position)
         else:
             raise RuntimeError(
