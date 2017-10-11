@@ -478,6 +478,8 @@ class Robot(object):
         offset = coordinates - placeable.top()[1]
         target = self.pose_tracker[placeable].position + offset.coordinates
 
+        print('[ROBOT] moving to {} at coordinates {}'.format(placeable, target))
+
         other_instrument = {instrument} ^ set(self._instruments.values())
         if not len(other_instrument) == 0:
             other_instrument.pop().mount_obj.home()

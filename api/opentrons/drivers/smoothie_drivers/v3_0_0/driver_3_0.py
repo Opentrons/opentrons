@@ -124,12 +124,13 @@ class SmoothieDriver_3_0_0:
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
         command_line = command + ' M400'
+
         if self.simulating:
-            return "Virtual!"
-            # return virtual_driver.write_and_return(command)
-        '''Sends command to serial'''
-        return serial_communication.write_and_return(
-            command_line, self.connection, timeout)
+            print('[DRIVER - SIMULATING] sending command {}'.format(repr(command_line)))
+        else:
+            print('[DRIVER] sending command {}'.format(repr(command_line)))
+            return serial_communication.write_and_return(
+                command_line, self.connection, timeout)
 
     def _setup(self):
         self._reset_from_error()
