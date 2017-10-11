@@ -45,14 +45,10 @@ def _parse_axis_values(raw_axis_values):
 class SmoothieDriver_3_0_0:
 
     def __init__(self):
-        self._position = None
+        self._position = {}
         self.log = []
-        self._reset_position()
+        self._update_position({axis: 0 for axis in AXES})
         self.simulating = True
-
-    def _reset_position(self):
-        self._position = {axis: 0 for axis in 'xyzabc'}
-        self.log += [self._position.copy()]
 
     def _update_position(self, target):
         self._position.update({
@@ -79,7 +75,7 @@ class SmoothieDriver_3_0_0:
     @property
     def position(self):
         if self.simulating:
-            return self._position
+            return {k.lower(): v for k, v in self._position.items()}
 
         try:
             position_response = self._send_command(GCODES['CURRENT_POSITION'])
@@ -144,9 +140,6 @@ class SmoothieDriver_3_0_0:
         self._send_command(GCODES['ABSOLUTE_COORDS'])
 
     def _home_all(self):
-        if self.simulating:
-            return self._reset_position()
-
         command = GCODES['HOME'] + 'ZA ' \
                   + GCODES['HOME'] + 'XBC ' \
                   + GCODES['HOME'] + 'Y'
@@ -170,14 +163,16 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
 
     def home(self, axis=None):
+        homed_positions = {'X': 395, 'Y': 345, 'Z': 228, 'A': 228, 'B': 20, 'C': 20}
         if not axis:
+            if self.simulating:
+                self._update_position(homed_positions)
             self._home_all()
         else:
-            if self.simulating:
-                return self._update_position({axis: 0 for axis in axis})
-
             axes_to_home = [ax for ax in axis.upper() if ax in AXES_SAFE_TO_HOME]
             if axes_to_home:
+                if self.simulating:
+                    self._update_position({axis: homed_positions[axis] for axis in axes_to_home})
                 command = GCODES['HOME'] + ''.join(axes_to_home)
                 self._send_command(command)
             else:

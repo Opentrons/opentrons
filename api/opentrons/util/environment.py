@@ -5,7 +5,7 @@ settings = {}
 
 IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
-IS_LINUX = sys.platform == 'linux'
+IS_LINUX = sys.platform.startswith('linux')
 
 PI_DATA_PATH = '/data/user_storage/opentrons_data/'
 

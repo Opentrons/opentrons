@@ -6,8 +6,6 @@ from conftest import state
 
 @pytest.mark.parametrize('protocol_file', ['dinosaur.py'])
 async def test_load_probe_run(main_router, protocol, protocol_file):
-    driver = robot._driver
-
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
 
@@ -21,14 +19,14 @@ async def test_load_probe_run(main_router, protocol, protocol_file):
     # TODO (artyom 20171011): instrument public interface of a pose tracker
     # to collect movement logs
     assert robot._driver.log == \
-        [{'x': 150, 'b': 0, 'c': 0, 'y': 150, 'a': 65.0, 'z': 150}]
+        [{'X': 150, 'B': 0, 'C': 0, 'Y': 150, 'A': 65.0, 'Z': 150}]
 
     main_router.calibration_manager.tip_probe(session.instruments[0])
     await main_router.wait_until(state('calibration', 'ready'))
 
     # Check the log for positions consistent with tip probe sequence
-    # assert robot._driver.log == \
-    #     [{'x': 150, 'b': 0, 'c': 0, 'y': 150, 'a': 65.0, 'z': 150}]
+    assert robot._driver.log == \
+        [{'X': 150, 'B': 0, 'C': 0, 'Y': 150, 'A': 65.0, 'Z': 150}]
 
     session.run()
 
