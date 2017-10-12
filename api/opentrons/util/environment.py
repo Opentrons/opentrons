@@ -30,8 +30,11 @@ def infer_app_data_dir():
     if os.environ.get('RUNNING_ON_PI'):
         app_data = PI_DATA_PATH
 
+    if not os.path.exists(app_data):
+        # todo (Ben Morris 2017-10-12): create the directory if it does not exist
+        pass
 
-    return (app_data if os.path.exists(app_data) else os.getcwd())
+    return app_data
 
 
 def refresh():

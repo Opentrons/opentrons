@@ -110,7 +110,6 @@ class SmoothieDriver_3_0_0:
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
-
     def set_power(self, axis, value):
         ''' set total movement speed in mm/second'''
         command = '{}{}{}'.format(GCODES['SET_POWER'], axis.upper(), str(value))

@@ -157,7 +157,7 @@ def test_relative_object_position(plate, p200, robot):
 
 
 def test_get_object_ancestors(robot, plate):
-    pose_tracker = robot.pose_tracker # type: PoseTracker
-    ancestors = pose_tracker.get_object_ancestors(plate[2]) # find ancestors of arbitrary well
-    assert ancestors == [robot._deck, robot._deck['A1'], plate, plate[2]]
+    ps = robot.pose_tracker  # type: PoseTracker
+    ancestors = ps._get_transform_sequence(plate[2])  # find ancestor posess of arbitrary well
+    assert ancestors == [ps[robot._deck], ps[robot._deck['A1']], ps[plate], ps[plate[2]]]
     
