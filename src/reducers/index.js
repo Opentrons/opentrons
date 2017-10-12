@@ -33,10 +33,19 @@ const loadedContainers = handleActions({
   DELETE_CONTAINER_AT_SLOT: (state, action) => pickBy(state, (value, key) => key !== action.payload)
 }, {})
 
+// TODO: rename x0 y0 'static' and x1 y1 'dynamic' -> first on mousedown, latter on mousemove
+const initialWellSelectionRectState = {x0: 200, y0: 300, x1: 300, y1: 400}
+const wellSelectionRect = handleActions({
+  BEGIN_SELECTION_RECT: (state, action) => ({x0: action.payload.x, x1: action.payload.x + 10, y0: action.payload.y, y1: action.payload.y + 10}),
+  MOVE_SELECTION_RECT: (state, action) => ({...state, x1: action.payload.x, y1: action.payload.y}),
+  END_SELECTION_RECT: () => initialWellSelectionRectState
+}, initialWellSelectionRectState)
+
 const rootReducer = combineReducers({
   modeLabwareSelection,
   modeIngredientSelection,
-  loadedContainers
+  loadedContainers,
+  wellSelectionRect
 })
 
 // SELECTORS
@@ -47,7 +56,8 @@ export const selectors = {
     ingredientSelection: state.default.modeIngredientSelection
   }),
   loadedContainers: state => state.default.loadedContainers,
-  canAdd: state => nextEmptySlot(state.default.loadedContainers)
+  canAdd: state => nextEmptySlot(state.default.loadedContainers),
+  selectionRectCoords: state => state.default.wellSelectionRect
 }
 
 export default rootReducer

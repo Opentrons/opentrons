@@ -20,7 +20,7 @@ class Plate extends React.Component {
 
     return transpose(wellMatrix).map((row, x) =>
       row.map((wellContent, y) =>
-        <Well {...{x, y: row.length - y - 1, wellContent, key: y}} />
+        <Well x={x} y={row.length - y - 1} wellContent={wellContent} key={y} />
       )
     )
   }
@@ -32,9 +32,9 @@ class Plate extends React.Component {
     ))
   }
 
-  wrapColumn (wells) {
+  wrapColumn (wells, key) {
     // wrap a row of wells in a .row div
-    return <div className={styles.grid_col}>{wells}</div>
+    return <div className={styles.grid_col} key={key}>{wells}</div>
   }
 
   render () {

@@ -19,9 +19,9 @@ export const {
 
   deleteContainerAtSlot,
 
-  mouseDownOnWell,
-  mouseUpOnWell,
-  mouseUpOnNonwell
+  beginSelectionRect,
+  moveSelectionRect,
+  endSelectionRect
 } = createActions({
   OPEN_LABWARE_SELECTOR: undefined,
   CLOSE_LABWARE_SELECTOR: undefined,
@@ -33,7 +33,7 @@ export const {
 
   DELETE_CONTAINER_AT_SLOT: undefined,
 
-  MOUSE_DOWN_ON_WELL: mouseCoordPayload,
-  MOUSE_UP_ON_WELL: mouseCoordPayload,
-  MOUSE_DOWN_ON_NONWELL: mouseCoordPayload
+  BEGIN_SELECTION_RECT: mouseCoordPayload,
+  MOVE_SELECTION_RECT: mouseCoordPayload,
+  END_SELECTION_RECT: undefined
 })
