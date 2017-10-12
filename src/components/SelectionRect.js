@@ -15,6 +15,7 @@ class SelectionRect extends React.Component {
     return <div
       style={{
         position: 'fixed',
+        pointerEvents: 'none', // prevents this div from occluding wells during document.elementFromPoint sampling
         zIndex: 1000,
         borderRadius: 0,
         left: Math.min(xStart, xDynamic) + 'px',
@@ -23,7 +24,6 @@ class SelectionRect extends React.Component {
         height: Math.abs(yDynamic - yStart) + 'px',
         backgroundColor: 'rgba(0, 0, 255, 0.5)' // <- TODO: use css for colors
       }}
-      onMouseMove={e => console.log('mousemove', e.clientX, e.clientY)}
     />
   }
 
@@ -47,22 +47,26 @@ class SelectionRect extends React.Component {
     this.setState({ positions: {...this.state.positions, xDynamic: e.clientX, yDynamic: e.clientY} })
 
     this.props.onSelectionMove &&
-      this.props.onSelectionMove(this.getRect(this.state.positions))
+      this.props.onSelectionMove(e, this.getRect(this.state.positions))
   }
 
   handleMouseUp (e) {
     window.removeEventListener('mousemove', this.handleDrag)
     window.removeEventListener('mouseup', this.handleMouseUp)
 
-    // call onSelectionDone callback with {x0, x1, y0, y1} of selection rectangle
-    this.props.onSelectionDone &&
-      this.props.onSelectionDone(this.getRect(this.state.positions))
-    // then clear the rectangle
+    const finalRect = this.getRect(this.state.positions)
+
+    // clear the rectangle
     this.setState({ positions: null })
+
+    // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
+    this.props.onSelectionDone &&
+      this.props.onSelectionDone(e, finalRect)
   }
 
   render () {
     const { children } = this.props
+
     return (
       <div onMouseDown={this.handleMouseDown}>
         {this.state.positions && this.renderRect(this.state.positions)}
@@ -73,8 +77,10 @@ class SelectionRect extends React.Component {
 }
 
 SelectionRect.propTypes = {
+  // callbacks with (event, rect)
   onSelectionMove: PropTypes.func,
   onSelectionDone: PropTypes.func,
+
   children: PropTypes.element
 }
 

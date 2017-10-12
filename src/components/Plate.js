@@ -25,6 +25,10 @@ class Plate extends React.Component {
     )
   }
 
+  test () {
+    return ['a', 'b', 1, 2]
+  }
+
   makeLowerLabels () {
     const { wellMatrix } = this.props
     return wellMatrix.map((_row, i) => (

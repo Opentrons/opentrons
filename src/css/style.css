@@ -89,6 +89,7 @@ textarea {
 .wellRound {
   display: flex;
   border-radius: 0;
+  background-color: var(--well-selection-color);
 }
 
 .wellRound::after {
@@ -107,10 +108,6 @@ textarea {
   height: 2em;
   margin: auto;
   font-size: 1rem;
-}
-
-.wellRound:hover {
-  background-color: lightgray;
 }
 
 /* DECK */

@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
+import range from 'lodash/range'
 
 const sortedSlotnames = [].concat.apply( // flatten
   [],
@@ -33,19 +34,31 @@ const loadedContainers = handleActions({
   DELETE_CONTAINER_AT_SLOT: (state, action) => pickBy(state, (value, key) => key !== action.payload)
 }, {})
 
-// TODO: rename x0 y0 'static' and x1 y1 'dynamic' -> first on mousedown, latter on mousemove
-const initialWellSelectionRectState = {x0: 200, y0: 300, x1: 300, y1: 400}
-const wellSelectionRect = handleActions({
-  BEGIN_SELECTION_RECT: (state, action) => ({x0: action.payload.x, x1: action.payload.x + 10, y0: action.payload.y, y1: action.payload.y + 10}),
-  MOVE_SELECTION_RECT: (state, action) => ({...state, x1: action.payload.x, y1: action.payload.y}),
-  END_SELECTION_RECT: () => initialWellSelectionRectState
-}, initialWellSelectionRectState)
+const selectedWellsInitialState = {preselected: {}, selected: {}}
+const selectedWells = handleActions({
+  PRESELECT_WELLS: (state, action) => action.payload.append
+    ? {...state, preselected: action.payload.wells}
+    : {selected: {}, preselected: action.payload.wells},
+  SELECT_WELLS: (state, action) => ({
+    preselected: {},
+    selected: {
+      ...(action.payload.append ? state.selected : {}),
+      ...action.payload.wells
+    }
+  }),
+  DESELECT_WELLS: () => selectedWellsInitialState
+}, selectedWellsInitialState)
+
+const wellMatrixDims = handleActions({
+  // TODO!!!!!!!!
+}, {rows: 12, columns: 8})
 
 const rootReducer = combineReducers({
   modeLabwareSelection,
   modeIngredientSelection,
   loadedContainers,
-  wellSelectionRect
+  selectedWells,
+  wellMatrixDims
 })
 
 // SELECTORS
@@ -57,7 +70,18 @@ export const selectors = {
   }),
   loadedContainers: state => state.default.loadedContainers,
   canAdd: state => nextEmptySlot(state.default.loadedContainers),
-  selectionRectCoords: state => state.default.wellSelectionRect
+  wellMatrix: state => range(state.default.wellMatrixDims.rows - 1, -1, -1).map(
+    rowNum => range(state.default.wellMatrixDims.columns).map(
+      colNum => {
+        const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
+        return {
+          number: rowNum * state.default.wellMatrixDims.columns + colNum + 1,
+          preselected: wellKey in state.default.selectedWells.preselected,
+          selected: wellKey in state.default.selectedWells.selected
+        }
+      }
+    )
+  )
 }
 
 export default rootReducer
