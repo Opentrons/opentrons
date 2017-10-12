@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styles from './TipProbe.css'
+import progressGifSrc from '../img/loading.gif'
 
 function PrepareForProbe (props) {
   const {volume, isCurrent, onProbeTipClick} = props
   return (
-    <span >
+    <span className={styles.info}>
       <p>Complete the following steps prior to clicking [Initiate Tip Probe]</p>
       <ol>
         <li>Remove all labware from deck.</li>
@@ -29,14 +30,17 @@ PrepareForProbe.propTypes = {
 
 function RobotIsMoving (props) {
   return (
-    <h3>Robot is moving..</h3>
+    <span className={styles.info}>
+      <h3 className={styles.title}>Robot is Moving</h3>
+      <img src={progressGifSrc} className={styles.progress} />
+    </span>
   )
 }
 
 function ProbeSuccess (props) {
   const {volume} = props
   return (
-    <span>
+    <span className={styles.info}>
       <p>Tip dimensions for <strong>{volume} ul</strong> tips are now defined.</p>
       <ol>
         <li>Remove tip by hand and discard.</li>
@@ -56,9 +60,12 @@ function DefaultMessage (props) {
     : (<p>Tip dimensions must be defined using the Tip Probe tool</p>)
   return (
     <span>
-      <span className={styles.alert}>{infoIcon}</span>
-      {infoMessage}
-      <button className={styles.btn_probe} onClick={onPrepareClick} disabled={!isCurrent}>Initiate Tip Probe</button>
+      <span className={styles.info}>
+        <span className={styles.alert}>{infoIcon}</span>
+        {infoMessage}
+        <button className={styles.btn_probe} onClick={onPrepareClick} disabled={!isCurrent}>Start Tip Probe</button>
+      </span>
+      <p className={styles.warning}>ATTENTION:  REMOVE ALL LABWARE AND TRASH BIN FROM DECK BEFORE STARTING TIP PROBE.</p>
     </span>
   )
 }

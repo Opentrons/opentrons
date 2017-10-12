@@ -1,9 +1,11 @@
-.probe_msg {
+.info {
+  display: block;
   border: 2px solid silver;
   border-radius: 0.25rem;
   margin-top: 1rem;
   padding: 0.5rem;
   font-size: 0.75rem;
+  min-height: 7.1rem;
 }
 
 .alert {
@@ -34,6 +36,28 @@
   cursor: pointer;
 }
 
+.warning {
+  visibility: hidden;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.info:hover + .warning {
+  visibility: visible;
+}
+
 .btn_probe[disabled] {
   pointer-events: none;
+}
+
+h3.title {
+  text-align: center;
+}
+
+.progress {
+  width: 4rem;
+  height: 3rem;
+  display: block;
+  margin: 0 auto;
 }

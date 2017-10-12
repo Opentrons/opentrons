@@ -55,9 +55,7 @@ export default function PipetteConfig (props) {
           <h3>
             {tipType}
           </h3>
-          <div className={styles.info}>
-            <ConnectedTipProbe instrument={instrument} />
-          </div>
+          <ConnectedTipProbe instrument={instrument} />
         </div>
 
         <div className={styles.pipette_icon}>

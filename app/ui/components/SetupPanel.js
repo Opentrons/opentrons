@@ -78,7 +78,9 @@ export default function SetupPanel (props) {
   const runLink = labwareConfirmed
     ? (<NavLink to='/run' className={styles.run_link}>Run Protocol</NavLink>)
     : null
-
+  const labwareMsg = !instrumentsCalibrated
+    ? <p className={styles.labware_alert}>Labware setup is disabled until pipette setup is complete.</p>
+    : null
   return (
     <div className={styles.setup_panel}>
       <h1>Prepare Robot for RUN</h1>
@@ -89,11 +91,10 @@ export default function SetupPanel (props) {
             {instrumentList}
           </ul>
         </section>
-        <section className={classnames(styles.labware_group, {
-          [styles.unavailable]: !instrumentsCalibrated})
-        }>
+        <section className={styles.labware_group}>
           <NavLink to='/setup-deck' activeClassName={styles.active}>Labware Setup</NavLink>
-          <ul className={styles.step_list}>
+          {labwareMsg}
+          <ul className={classnames({[styles.unavailable]: !instrumentsCalibrated}, styles.step_list)}>
             {tiprackList}
             {labwareList}
           </ul>

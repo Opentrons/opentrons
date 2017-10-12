@@ -1,5 +1,6 @@
 .setup_panel {
   display: grid;
+  width: 275px;
   height: 100%;
   padding: 0 1rem;
   grid-template:
@@ -45,8 +46,18 @@ h1 {
   margin-top: 2rem;
 }
 
+.labware_alert {
+  width: 100%;
+  padding: 0 1rem;
+  background-color: #eee;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-style: italic;
+  height: 3rem;
+}
+
 .unavailable {
-  opacity: 0.2;
+  opacity: 0.1;
   pointer-events: none;
 }
 

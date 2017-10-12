@@ -14,8 +14,9 @@ function NavLink (props) {
         className={classnames({[styles.active]: isActive}, styles.nav_icon)}
       >
         <img src={iconSrc} alt={name} />
+        <ToolTip msg={msg} />
       </button>
-      <ToolTip msg={msg} />
+
     </li>
   )
 }

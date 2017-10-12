@@ -54,11 +54,22 @@
 /* Connect */
 
 .connection_toggle {
-  padding: 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
 .btn_connect {
   composes: btn;
   padding-left: 0;
   text-align: center;
+  background-color: #999;
+  color: white;
+}
+
+.btn_connect:hover {
+  background-color: #777;
 }
