@@ -45,7 +45,7 @@ class CalibrationManager:
                 .format(type(obj)))
 
         self._set_state('moving')
-
+        print("MOVING TO: {}".format(obj._container[0]))
         instrument._instrument.move_to(obj._container[0])
         self._set_state('ready')
 

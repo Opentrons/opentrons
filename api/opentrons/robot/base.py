@@ -1,6 +1,6 @@
 
-probe_center = {'z': 68.0, 'x': 266.8637, 'y': 291.8181}
-probe_dimensions = {'length': 44, 'width': 35, 'height':63}
+probe_center = {'z': 68.0, 'x': 268.4, 'y': 291.8181}
+probe_dimensions = {'length': 47.74, 'width': 38, 'height':63}
 
 class Probe:
     def __init__(self, width, length, height, position_offset, pose_tracker, switch_offset=1):

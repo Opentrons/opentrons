@@ -477,6 +477,7 @@ class Robot(object):
         # this checks if coordinates doesn't equal top
         offset = coordinates - placeable.top()[1]
         target = self.pose_tracker[placeable].position + offset.coordinates
+        print('[ROBOT] using offset of {}'.format(offset))
 
         print('[ROBOT] moving to {} at coordinates {}'.format(placeable, target))
 
@@ -821,7 +822,6 @@ class Robot(object):
         expected_position = self.pose_tracker[well].position
 
         # calibrate will well bottom, but track top of well
-        expected_position[2] -= well.properties['depth']
         true_position = self.pose_tracker[instrument].position
         calib.calibrate_container_with_delta(
             container,

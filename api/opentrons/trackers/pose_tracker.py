@@ -1,7 +1,10 @@
 import numpy as np
+from functools import reduce
+
 from opentrons.containers.placeable import WellSeries
 from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.broker import topics, subscribe
+
 
 
 def flatten(S):
@@ -50,7 +53,12 @@ class Pose(object):
     # TODO: (JG 9/19/17) Revisit this once we start dealing with rotation
     # to make sure we are doing this in the most expected way
     def __mul__(self, other):
-        return Pose(*self._pose.dot(other)[:3])
+        if not isinstance(other, Pose):
+            other_pose = Pose(*other[:3])
+        else:
+            other_pose = other
+
+        return Pose(*self._pose.dot(other_pose._pose).T[3][:3])
 
     @property
     def x(self):
@@ -103,12 +111,15 @@ class PoseTracker(object):
 
     def __getitem__(self, obj):
         try:
-            return self._pose_dict[obj]
+            ancestor_poses =  [self._pose_dict[item] for item in self.get_object_ancestors(obj)]
         except KeyError:
             # FIXME:(Jared 09/12) remove WellSeries
             if isinstance(obj, WellSeries):
-                return self._pose_dict[obj[0]]
-            raise KeyError("Object pose is not tracked: {}".format(obj))
+                ancestor_poses = self.get_object_ancestors(obj[0])
+            else:
+                raise KeyError("Object pose is not tracked: {}".format(obj))
+
+        return reduce(lambda parent, child: parent * child, ancestor_poses)
 
     def __contains__(self, item):
         return item in self._pose_dict
@@ -128,25 +139,20 @@ class PoseTracker(object):
             tree_repr += pos_context
         return tree_repr
 
-    def get_objects_in_subtree(self, root):
-        '''Returns a list of objects in a subtree using a DFS tree traversal'''
-        return flatten([root, [self.get_objects_in_subtree(item)
-                               for item in self.get_object_children(root)]])
-
     def max_z_in_subtree(self, root):
         return max([self[obj].z for obj in
                     self.get_objects_in_subtree(root)])
 
     def track_object(self, parent, obj, x, y, z):
         '''Adds an object to the dict of object positions'''
-        parent_position = self[parent].position
-        obj_position = parent_position + [x, y, z]
-        object_pose = Pose(*obj_position)
+        # parent_position = self[parent].position
+        # obj_position = parent_position + [x, y, z]
+        relative_object_pose = Pose(x=x, y=y, z=z)
         node = Node(obj)
 
         self._node_dict[parent].add_child(node)
         self._node_dict[obj] = node
-        self._pose_dict[obj] = object_pose
+        self._pose_dict[obj] = relative_object_pose
 
     def create_root_object(self, obj, x, y, z):
         '''Create a root node in the position tree. Though this could be done
@@ -158,6 +164,18 @@ class PoseTracker(object):
         self[obj] = pose
         self._node_dict[obj] = node
         self._root_nodes.append(node)
+
+    def get_objects_in_subtree(self, root):
+        return flatten([root, [self.get_objects_in_subtree(item)
+                               for item in self.get_object_children(root)]])
+
+
+    def get_object_ancestors(self, root):
+        '''Returns a list of objects in a subtree using a DFS tree traversal'''
+        root_node = self._node_dict[root]
+        if root_node.parent is None:
+            return [root]
+        return flatten([self.get_object_ancestors(root_node.parent.value), root])
 
     def get_object_children(self, obj):
         '''Returns a list of child objects'''

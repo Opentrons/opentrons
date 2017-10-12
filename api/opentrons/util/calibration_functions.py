@@ -36,6 +36,7 @@ from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from opentrons.trackers.pose_tracker import PoseTracker
 from opentrons.instruments.pipette import PipetteTip
 
+DEFAULT_TIP_LENGTH = 90
 
 
 #FIXME: Offset calculations should alraedy be reflected in switch_position
@@ -139,17 +140,18 @@ def probe_instrument(instrument, robot):
 
     #Update the position using the info
     robot.pose_tracker.translate_object(instrument, x=x_delta, y=y_delta, z=0)
-    instrument.mount_obj.offset['x'] += x_delta
-    instrument.mount_obj.offset['y'] += y_delta
+    instrument.mount_obj.offset['x'] -= x_delta
+    instrument.mount_obj.offset['y'] -= y_delta
 
     #Note: This uses a 'tip' object which the pipette checks when it moves.
     #This is how the instrument knows what height to go to
-    instrument.attached_tip = PipetteTip(length=40)
+    instrument._add_tip(DEFAULT_TIP_LENGTH)
 
 
     probe_5 = _probe_instrument_axis(instrument, 'z', -max_expected_tip_length, frame_probe.top_switch, frame_probe.top_switch['z'], robot)
 
-    #TODO: calibrate tip length here
+    instrument._remove_tip(DEFAULT_TIP_LENGTH)
+
 
 
 def move_instrument_for_probing_prep(instrument, robot):

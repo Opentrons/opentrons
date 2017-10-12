@@ -29,7 +29,8 @@ GCODES = {'HOME': 'G28.2',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
-          'SET_SPEED': 'G0F'}
+          'SET_SPEED': 'G0F',
+          'SET_POWER': 'M907'}
 
 
 def _parse_axis_values(raw_axis_values):
@@ -110,6 +111,11 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
 
 
+    def set_power(self, axis, value):
+        ''' set total movement speed in mm/second'''
+        command = '{}{}{}'.format(GCODES['SET_POWER'], axis.upper(), str(value))
+        self._send_command(command)
+
     # ----------- Private functions --------------- #
 
     def _reset_from_error(self):
@@ -117,8 +123,6 @@ class SmoothieDriver_3_0_0:
 
     # TODO: Write GPIO low
     def _reboot(self):
-        pass
-
         self._setup()
 
     # Potential place for command optimization (buffering, flushing, etc)
