@@ -20,6 +20,7 @@ right = 'a'
 current_pipette = right
 
 status_text = urwid.Text('')
+<<<<<<< HEAD
 current_position = (0, 0, 0)
 
 # 200uL tip. Used during calibration process
@@ -28,10 +29,13 @@ current_position = (0, 0, 0)
 TIP_LENGTH = 46
 # Smoothie Z value when Deck's Z=0
 Z_OFFSET = 45
+=======
+>>>>>>> functioning calibration cli
 
 # Reference point being calibrated
 point_number = 0
 
+<<<<<<< HEAD
 # (0, 0) is in bottom-left corner
 # Expected reference points
 expected = [
@@ -81,14 +85,66 @@ def step():
     """
     Given current step index return step value in mm
     """
+=======
+# Top-left
+# expected = [
+#     (64,    354.70),  # 1
+#     (329,   354.70),  # 3
+#     (196.50, 83.70),  # 11
+# ]
+
+
+# (0, 0) in bottom-left
+expected = [
+    (64.0, 2.30),       # 1
+    (329.0, 2.30),      # 3
+    (196.50, 273.80)    # 11
+]
+
+# Has X, Y only. To be able to calculate Z
+# we need known points of variable height.
+# Deck's zero Z is Smoothie's 140.0
+actual = [
+    (33.0, 5.25),
+    (298.0, 6.25),
+    (169.5, 276.0),
+]
+
+# These correspond to sharp edge
+# of machined numbers on the deck
+# to test translation accuracy.
+test_points = [
+    (332.13, 47.41),   # 3
+    (190.65, 227.57),  # 8
+    (330.14, 222.78)   # 9
+]
+
+# T * World = Smoothie
+T = \
+    array([[1.00094340e+00,   1.33517495e-02,  -3.10910864e+01],
+           [2.83018868e-03,   9.95856354e-01,   2.27839831e+00],
+           [8.67361738e-19,   1.60461922e-17,   1.00000000e+00]])
+
+# To showcase what uncalibrated robot looks like
+# T = \
+#     array([[1.0,  0.0,  0.0],
+#            [0.0,  1.0,  0.0],
+#            [0.0,  0.0,  1.0]])
+
+
+def step():
+>>>>>>> functioning calibration cli
     return steps[step_index]
 
 
 def position():
+<<<<<<< HEAD
     """
     Read position from driver into a tuple and map 3-rd value
     to the axis of a pipette currently used
     """
+=======
+>>>>>>> functioning calibration cli
     while True:
         try:
             p = driver.position
@@ -102,6 +158,7 @@ def position():
 
 
 def status(text):
+<<<<<<< HEAD
     """
     Refresh status in a text box
     """
@@ -110,14 +167,22 @@ def status(text):
         # Highlight point being calibrated
         ('* ' if point_number == point else '') + "{0} {1}"
         # Display actual and expected coordinates
+=======
+    points = '\n'.join([
+        ('* ' if point_number == point else '') + "{0} {1}"
+>>>>>>> functioning calibration cli
         .format(coord[0], coord[1])
         for point, coord in enumerate(zip(actual, expected))
     ])
 
     text = '\n'.join([
         points,
+<<<<<<< HEAD
         'Smoothie: {0}'.format(current_position),
         'World: {0}'.format(tuple(dot(inv(T), list(current_position) + [1])[:-1])),  # NOQA
+=======
+        'Position: {0}'.format(position()),
+>>>>>>> functioning calibration cli
         'Step: {0}'.format(step()),
         'Current stage: ' + current_pipette,
         'Message: ' + text
@@ -127,9 +192,13 @@ def status(text):
 
 
 def jog(axis, direction, step):
+<<<<<<< HEAD
     global current_position
     driver.move(**{axis: driver.position[axis] + direction * step})
     current_position = position()
+=======
+    driver.move(**{axis: driver.position[axis] + direction * step})
+>>>>>>> functioning calibration cli
     status('Jog: ' + repr([axis, str(direction), str(step)]))
 
 key_mappings = {
@@ -143,7 +212,11 @@ key_mappings = {
 
 
 def key_pressed(key):
+<<<<<<< HEAD
     global current_position, current_pipette, step_index, point_number, T
+=======
+    global current_pipette, step_index, point_number, T
+>>>>>>> functioning calibration cli
 
     if not isinstance(key, str):  # mouse clicked?
         return
@@ -184,6 +257,7 @@ def key_pressed(key):
         driver.home('za')
         driver.home('bcx')
         driver.home()
+<<<<<<< HEAD
         current_position = position()
         status('Homed')
     # calculate transformation matrix
@@ -194,6 +268,16 @@ def key_pressed(key):
             status(repr(e))
         else:
             status(repr(XY))
+=======
+    # calculate transformation matrix
+    elif key == ' ':
+        try:
+            T = solve(expected, actual)
+        except Exception as e:
+            status(repr(e))
+        else:
+            status(repr(T))
+>>>>>>> functioning calibration cli
     else:
         try:
             key_mappings[key]()
@@ -201,6 +285,7 @@ def key_pressed(key):
             status('invalid key: ' + repr(key))
 
 
+<<<<<<< HEAD
 # move to test points based on current matrix value
 def validate(index):
     v = array(list(test_points[index]) + [1])
@@ -215,6 +300,17 @@ def validate(index):
     x, y, z, _ = dot(T, v)
     driver.move(**{'x': x, 'y': y})
     driver.move(**{current_pipette: z})
+=======
+# move to test points based on T value
+def validate(index):
+    v = array(list(test_points[index]) + [1])
+    x, y, _ = dot(T, v)
+    _, _, z = position()
+    if z < 170:
+        jog(current_pipette, +1, 30)
+    driver.move(**{'x': x, 'y': y})
+    driver.move(**{current_pipette: 140})
+>>>>>>> functioning calibration cli
 
 
 def main():
