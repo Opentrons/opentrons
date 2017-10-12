@@ -3,6 +3,8 @@ import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import range from 'lodash/range'
 
+import { containerDims } from '../constants.js'
+
 const sortedSlotnames = [].concat.apply( // flatten
   [],
   [1, 2, 3].map(num => ['A', 'B', 'C', 'D', 'E'].map(letter => letter + num))
@@ -25,7 +27,7 @@ const modeLabwareSelection = handleActions({
 }, false)
 
 const modeIngredientSelection = handleActions({
-  OPEN_INGREDIENT_SELECTOR: (state, action) => action.payload,
+  OPEN_INGREDIENT_SELECTOR: (state, action) => ({slotName: action.payload.slotName}),
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -37,8 +39,7 @@ const loadedContainers = handleActions({
 const selectedWellsInitialState = {preselected: {}, selected: {}}
 const selectedWells = handleActions({
   PRESELECT_WELLS: (state, action) => action.payload.append
-    ? {...state, preselected: action.payload.wells}
-    : {selected: {}, preselected: action.payload.wells},
+    ? {...state, preselected: action.payload.wells} : {selected: {}, preselected: action.payload.wells},
   SELECT_WELLS: (state, action) => ({
     preselected: {},
     selected: {
@@ -49,16 +50,11 @@ const selectedWells = handleActions({
   DESELECT_WELLS: () => selectedWellsInitialState
 }, selectedWellsInitialState)
 
-const wellMatrixDims = handleActions({
-  // TODO!!!!!!!!
-}, {rows: 12, columns: 8})
-
 const rootReducer = combineReducers({
   modeLabwareSelection,
   modeIngredientSelection,
   loadedContainers,
-  selectedWells,
-  wellMatrixDims
+  selectedWells
 })
 
 // SELECTORS
@@ -66,22 +62,34 @@ const rootReducer = combineReducers({
 export const selectors = {
   activeModals: state => ({
     labwareSelection: state.default.modeLabwareSelection,
-    ingredientSelection: state.default.modeIngredientSelection
+    ingredientSelection: state.default.modeIngredientSelection && {
+      slotName: state.default.modeIngredientSelection.slotName,
+      // "mix in" selected containerName from loadedContainers
+      containerName: state.default.loadedContainers[state.default.modeIngredientSelection.slotName]}
   }),
   loadedContainers: state => state.default.loadedContainers,
   canAdd: state => nextEmptySlot(state.default.loadedContainers),
-  wellMatrix: state => range(state.default.wellMatrixDims.rows - 1, -1, -1).map(
-    rowNum => range(state.default.wellMatrixDims.columns).map(
-      colNum => {
-        const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
-        return {
-          number: rowNum * state.default.wellMatrixDims.columns + colNum + 1,
-          preselected: wellKey in state.default.selectedWells.preselected,
-          selected: wellKey in state.default.selectedWells.selected
+  wellMatrix: state => {
+    const containerType = state.default.loadedContainers[state.default.modeIngredientSelection.slotName] // TODO: DRY this up
+    const { rows, columns } = containerDims[containerType] || {rows: 12, columns: 8}
+
+    if (!(containerType in containerDims)) {
+      console.warn(`no info in containerDims for "${containerType}", falling back to 8x12`)
+    }
+
+    return range(rows - 1, -1, -1).map(
+      rowNum => range(columns).map(
+        colNum => {
+          const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
+          return {
+            number: rowNum * columns + colNum + 1,
+            preselected: wellKey in state.default.selectedWells.preselected,
+            selected: wellKey in state.default.selectedWells.selected
+          }
         }
-      }
+      )
     )
-  )
+  }
 }
 
 export default rootReducer

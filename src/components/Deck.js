@@ -94,7 +94,7 @@ const Deck = props => {
           <div className={styles.ingredientPanelSidebar}>
             <label>
               <div>Slot {activeModals.ingredientSelection.slotName}</div>
-              <div>Container TODO</div>
+              <div>Container {activeModals.ingredientSelection.containerName}</div>
             </label>
 
             {/* Each section is a detail view of 1 ingredient */}
@@ -166,7 +166,7 @@ const Deck = props => {
           key={i}
           slotName={slotName}
           container={loadedContainers[slotName]}
-          onAddIngredientsClick={e => openIngredientSelector({slotName})}  /* containerName */
+          onAddIngredientsClick={e => openIngredientSelector({slotName})}
           onRemoveContainerClick={e => deleteContainerAtSlot(slotName)}
         >
           {(slotName === canAdd) && (activeModals.labwareSelection

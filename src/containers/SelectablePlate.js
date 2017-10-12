@@ -7,11 +7,13 @@ import { preselectWells, selectWells } from '../actions'
 
 // WORST HACK EVER. Samples pixels to find collision. (Ideally you'd only check bounds of each Well component,
 // but I can't get the bounds of each well without doing some ugly registration into Redux or passing all around...)
+// Is using document.getElementsByClassName and getting their bounding boxes and checking for collisions LESS hacky?
+// (It'll be more performant. But is there any downside to using getElementsByClassName in React?)
 const getCollidingWells = rectPositions => {
   // Returns obj of selected wells under a collision rect
   // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
   const { x0, y0, x1, y1 } = rectPositions
-  const resolution = 5
+  const resolution = 10
 
   // HACK: Sample pixels under collision rect, if they're wells then save their X, Y positions in the wellMatrix.
   let selectedWells = {}
