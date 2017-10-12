@@ -10,14 +10,10 @@ from os import environ
   about what the axes are used for
 '''
 
-# DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38' #Avagdro
-
-DEFAULT_STEPS_PER_MM = 'M92 X160 Y160 Z800 A800 B767.38 C767.38' #Ibn
-
-DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z50 A50 B70 C8'
-DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000'
-DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.6 C0.6'
-
+DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z800 A800 B767.38 C767.38'
+DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z50 A50 B40 C40'
+DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
+DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
 
 AXES_SAFE_TO_HOME = 'XZABC' # Y cannot be homed without homing all
 AXES = 'XYZABC'
@@ -147,9 +143,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(GCODES['ABSOLUTE_COORDS'])
 
     def _home_all(self):
-        command = GCODES['HOME'] + 'ZA ' \
-                  + GCODES['HOME'] + 'XBC ' \
-                  + GCODES['HOME'] + 'Y'
+        command = GCODES['HOME'] + 'Y'
         self._send_command(command, timeout=30)
 
     # ----------- END Private functions ----------- #
