@@ -19,24 +19,28 @@ import SideBar from '../components/SideBar'
 
 const mapStateToProps = (state) => {
   const isConnected = state.robot.isConnected
+  const isOpen = interfaceSelectors.getIsNavPanelOpen(state)
+  const activeTask = interfaceSelectors.getCurrentNavPanelTask(state)
 
   return {
     // interface
-    isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
-    currentNavPanelTask: interfaceSelectors.getCurrentNavPanelTask(state),
+    isNavPanelOpen: isOpen,
+    currentNavPanelTask: activeTask,
     navLinks: [
       {
         name: 'upload',
         iconSrc: uploadIconSrc,
         isDisabled: !isConnected,
-        to: '/upload'
+        isActive: isOpen && activeTask === 'upload',
+        msg: 'Upload File'
       },
       {
         name: 'setup',
         iconSrc: setupIconSrc,
         // TODO(mc, 2017-10-11): this needs a selector
         isDisabled: !(state.robot.protocolText),
-        to: '/setup-instruments'
+        isActive: isOpen && activeTask === 'setup',
+        msg: 'Prep For Run'
       }
     ],
 

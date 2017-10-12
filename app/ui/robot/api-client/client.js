@@ -91,6 +91,7 @@ export default function client (dispatch) {
     reader.onload = function handleProtocolRead (event) {
       remote.session_manager.create(name, event.target.result)
         .then((apiSession) => {
+          console.log('got session', apiSession)
           // TODO(mc, 2017-10-09): This seems like an API responsibility
           remote.session_manager.session = apiSession
           handleApiSession(apiSession, true)
@@ -218,6 +219,7 @@ export default function client (dispatch) {
   }
 
   function handleApiSession (apiSession) {
+    console.log(apiSession)
     const {
       name,
       protocol_text,
@@ -240,9 +242,9 @@ export default function client (dispatch) {
     }
 
     // TODO(mc, 2017-08-30): Use a reduce
-    commands.forEach(makeHandleCommand())
-    instruments.forEach(apiInstrumentToInstrument)
-    containers.forEach(apiContainerToContainer)
+    ;(commands || []).forEach(makeHandleCommand())
+    ;(instruments || []).forEach(apiInstrumentToInstrument)
+    ;(containers || []).forEach(apiContainerToContainer)
 
     const payload = {
       sessionName: name,
@@ -299,9 +301,13 @@ export default function client (dispatch) {
   function handleRobotNotification (message) {
     const {topic, payload} = message
 
+    console.log(message)
+
     switch (topic) {
       case 'session': return handleApiSession(payload)
     }
+
+    console.log('Unhandled message!')
   }
 
   function handleClientError (error) {

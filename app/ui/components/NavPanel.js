@@ -16,7 +16,6 @@ const UploadPanel = props => {
             onChange={props.onUpload}
           />
         </label>
-        <h2 className={styles.title}>Recently Uploaded</h2>
       </section>
     </div>
   )

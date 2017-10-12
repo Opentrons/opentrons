@@ -1,6 +1,7 @@
 .nav_panel {
   position: relative;
   height: 100%;
+  width: 275px;
   padding: 0 1rem;
   font-family: 'sans';
   font-size: 0.75rem;
@@ -53,11 +54,7 @@
 /* Connect */
 
 .connection_toggle {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .btn_connect {

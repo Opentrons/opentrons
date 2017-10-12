@@ -5,34 +5,41 @@ import NavPanel from './NavPanel'
 import styles from './SideBar.css'
 
 function NavLink (props) {
-  const {name, iconSrc, onClick, isDisabled, to} = props
-
+  const {name, iconSrc, onClick, isDisabled, isActive, msg} = props
   return (
     <li key={name}>
       <button
-        to={to}
         onClick={onClick}
         disabled={isDisabled}
-        className={styles.nav_icon}
+        className={classnames({[styles.active]: isActive}, styles.nav_icon)}
       >
         <img src={iconSrc} alt={name} />
       </button>
+      <ToolTip msg={msg} />
     </li>
   )
 }
 
+function ToolTip (props) {
+  const {msg} = props
+  return (
+    <span className={styles.tooltip}>{msg}</span>
+  )
+}
+
 const ConnectionIndicator = props => {
-  const {isConnected, onNavIconClick} = props
+  const {isConnected, onNavIconClick, isActive} = props
   // TODO(mc): handle connection in progress (state is in place for this)
   const style = isConnected
     ? styles.connected
     : styles.disconnected
-
+  const toolTipMessage = 'Connect Robot'
   return (
-    <div className={styles.connection_status} onClick={onNavIconClick('connect')}>
+    <div className={classnames({[styles.active]: isActive}, styles.connection_status)} onClick={onNavIconClick('connect')}>
       <div className={styles.status}>
         <div className={style} />
       </div>
+      <ToolTip msg={toolTipMessage} />
     </div>
   )
 }
@@ -42,12 +49,14 @@ ConnectionIndicator.propTypes = {
 }
 
 export default function SideBar (props) {
-  const {isNavPanelOpen, onNavIconClick} = props
+  const {isNavPanelOpen, onNavIconClick, currentNavPanelTask} = props
   const style = classnames(styles.sidebar, {[styles.open]: isNavPanelOpen})
   const navLinks = props.navLinks.map((link) => NavLink({
     onClick: onNavIconClick(link.name),
     ...link
   }))
+
+  const connectIsActive = isNavPanelOpen && currentNavPanelTask === 'connect'
 
   return (
     <div className={style}>
@@ -55,7 +64,7 @@ export default function SideBar (props) {
         <ol className={styles.nav_icon_list}>
           {navLinks}
         </ol>
-        <ConnectionIndicator {...props} />
+        <ConnectionIndicator {...props} isActive={connectIsActive} />
       </nav>
       <section className={styles.nav_info}>
         <NavPanel {...props} />
@@ -73,5 +82,6 @@ SideBar.propTypes = {
   isConnected: PropTypes.bool.isRequired,
   isNavPanelOpen: PropTypes.bool.isRequired,
   toggleNavOpen: PropTypes.func.isRequired,
-  onNavIconClick: PropTypes.func.isRequired
+  onNavIconClick: PropTypes.func.isRequired,
+  currentNavPanelTask: PropTypes.string.isRequired
 }
