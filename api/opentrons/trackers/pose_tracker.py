@@ -197,7 +197,7 @@ class PoseTracker(object):
         '''Calculates an object movement as diff between current position
         and previous - translates moved object by the difference'''
         mover, *new_pos = new_pos_msg
-        self.translate_object(mover, *(new_pos - self._pose_dict[mover].position))
+        self.translate_object(mover, *(new_pos - self[mover].position))
 
     def relative_object_position(self, target_object, reference_object):
         return self._pose_dict[target_object].position - self._pose_dict[reference_object].position

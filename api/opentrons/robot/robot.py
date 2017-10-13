@@ -519,12 +519,13 @@ class Robot(object):
 
         self._previous_container = this_container
 
-        return [
+        strategy = [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
             {'z': arrival_z}
         ]
-
+        print("[Arc Strategy] up to {}, across to {}, down to {}".format(*strategy))
+        return strategy
 
     # DEPRECATED
     def set_connection(self, mode):

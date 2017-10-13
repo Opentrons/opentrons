@@ -8,6 +8,19 @@ def target_inst_position(
     to position an attached instrument at some target location
     '''
 
+    print('---[POSE FUNC] mover: {}, instrument{}, target_position: {}'.format(mover, instrument, (x,y,z)))
+
+    print("---[POSE FUNC] mover_position: {}".format(pose_tracker[mover].position))
+    print("---[POSE FUNC] instrument_position: {}".format(pose_tracker[instrument].position))
+
+
     rel_pos = pose_tracker[mover].position - pose_tracker[instrument].position
+
+    print('---[POSE FUNC] relative position: {}'.format(rel_pos))
+
     mover_target = np.array([x, y, z] + rel_pos)
+
+    print('---[POSE FUNC] mover target: {}'.format(mover_target))
+
+
     return mover_target

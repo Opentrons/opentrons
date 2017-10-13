@@ -5,7 +5,6 @@ from opentrons.broker import publish, topics
 from opentrons import robot
 
 
-
 RIGHT_MOUNT_OFFSET = {'x':0, 'y':0, 'z':0.0}
 
 LEFT_MOUNT_OFFSET = {'x':-37.351, 'y':30.5024, 'z':7.0}
@@ -29,6 +28,7 @@ def resolve_all_coordinates(tracked_object, pose_tracker, x=None, y=None, z=None
     if y is None: y = current_pose.y
     if z is None: z = current_pose.z
 
+    print("---[resolve_all_coordinates] result: {}".format((x,y,z)))
     return {'x':x, 'y':y, 'z':z}
 
 
@@ -77,17 +77,36 @@ class InstrumentMover(object):
         self.instrument = instrument
 
     def move(self, x=None, y=None, z=None):
-        ''' Move motor '''
+        ''' Move motor
+        - Resolve the full x,y,z goal position for the instrument
+
+        - Determine the target gantry position given the instrument offset for the gantry in x, y (since the gantry
+        can only move in x,y)
+        - Move the gantry to the target x,y
+
+        - Determine the target mount position given the instrument offset for the gantry in z (since the mount
+        can only move in z)
+        - Move the mount to the target z
+        '''
+
+        print('--[InstrumentMover.move] move: {}'.format((x, y, z)))
+
         goal_inst_pos = \
             resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
+
+        print('--[InstrumentMover.move] absolute goal: {}'.format(goal_inst_pos))
 
         goal_x, goal_y, _ = pose_funcs.target_inst_position(
             self.gantry._pose_tracker, self.gantry, self.instrument, **goal_inst_pos)
         self.gantry.move(x=goal_x, y=goal_y)
 
+        print('--[InstrumentMover.move] gantry target x,y: {}'.format((goal_x, goal_y)))
+
         _, _, goal_z = pose_funcs.target_inst_position(
             self.gantry._pose_tracker, self.mount, self.instrument, **goal_inst_pos)
         self.mount.move(z=goal_z)
+
+        print('--[InstrumentMover.move] mount target z: {}'.format(goal_z))
 
 
     #TODO: this

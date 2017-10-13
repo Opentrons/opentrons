@@ -1382,14 +1382,15 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
-        print('[PIP] moving to {}'.format((x,y,z)))
+        print('-[Pipette._move] moving to {}'.format((x,y,z)))
         self.instrument_mover.move(x, y, z)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.pose_tracker[self].z -= length
+        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
+
 
     def _remove_tip(self, length):
-        self.robot.pose_tracker[self].z += length
+        self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)
