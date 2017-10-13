@@ -16,18 +16,28 @@ const AddLabware = props => (
 
 // TODO: move to utils
 const getImg = containerName => {
-  const nameToImg = {
-    '96-deep': '96-plate',
-    '96-tall': '96-plate',
-    '96-flat': '96-plate',
-    'trough-12row': 'trough-12row',
-    'tube-rack-2ml': 'tube-rack-2ml',
-    'trash-box': 'trash-box'
-    // TODO: add the rest
+  const getUrl = imageFileName => `https://s3.amazonaws.com/opentrons-images/website/labware/${imageFileName}.png`
+
+  const plates96 = [
+    '96-deep',
+    '96-tall',
+    '96-flat'
+  ]
+
+  const noImage = [
+    '96-custom',
+    'PCR-strip-tall'
+  ]
+
+  if (plates96.some(x => x === containerName)) {
+    return getUrl('96-plate')
   }
-  return 'https://s3.amazonaws.com/opentrons-images/website/labware/' +
-    (nameToImg[containerName] || 'custom') +
-    '.png'
+
+  if (noImage.some(x => x === containerName)) {
+    return getUrl('custom')
+  }
+
+  return getUrl(containerName)
 }
 
 const DeckSlot = ({slotName, container, children, onAddIngredientsClick, onRemoveContainerClick}) => (
@@ -50,26 +60,57 @@ const DeckSlot = ({slotName, container, children, onAddIngredientsClick, onRemov
   </div>
 )
 
+class Accordion extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {collapsed: true}
+  }
+  render () {
+    const { children, title } = this.props
+    const { collapsed } = this.state
+    return (
+      <li onClick={e => this.setState({collapsed: !collapsed})}>
+        <label>{title} {collapsed ? '►' : '▼'}</label>
+        {!collapsed && <li><ul>
+          {children}
+        </ul></li>}
+      </li>
+    )
+  }
+}
+
 const LabwareDropdown = ({onClose, selectLabwareToAdd}) => (
   <div className={styles.labwareDropdown}>
     <label>Labware Type</label>
     <div className='close' onClick={onClose}>X</div>
     <ul>
-      <li>Tip Rack</li>
-      <li>Tube Rack ▼</li>
-      <li><ul>
+      <Accordion title='Tip Rack'>
+        <li onClick={e => selectLabwareToAdd('tiprack-10ul')}>10uL Tip Rack</li>
+        <li onClick={e => selectLabwareToAdd('tiprack-200ul')}>200uL Tip Rack</li>
+        <li onClick={e => selectLabwareToAdd('tiprack-1000ul')}>1000uL Tip Rack</li>
+        <li onClick={e => selectLabwareToAdd('tiprack-1000ul-chem')}>10x10 1000uL Chem-Tip Rack</li>
+      </Accordion>
+      <Accordion title='Tube Rack'>
+        <li onClick={e => selectLabwareToAdd('tube-rack-.75ml')}>0.75mL Tube Rack</li>
         <li onClick={e => selectLabwareToAdd('tube-rack-2ml')}>2mL Tube Rack</li>
-      </ul></li>
-      <li>Well Plate ▼</li>
-      <li><ul>
+        <li onClick={e => selectLabwareToAdd('tube-rack-15_50ml')}>15mL x 6 + 50mL x 4 Tube Rack</li>
+      </Accordion>
+      <Accordion title='Well Plate'>
         <li onClick={e => selectLabwareToAdd('96-deep')}>96 Deep Well Plate</li>
         <li onClick={e => selectLabwareToAdd('96-tall')}>96 Well Plate (Tall)</li>
         <li onClick={e => selectLabwareToAdd('96-flat')}>96 Well Plate (Flat)</li>
         <li onClick={e => selectLabwareToAdd('96-custom')}>96 Well Plate (CUSTOM)</li>
-      </ul></li>
-      <li>PCR Strip</li>
-      <li>And so</li>
-      <li>on and so on</li>
+        <li onClick={e => selectLabwareToAdd('384-plate')}>384 Well Plate</li>
+      </Accordion>
+      <Accordion title='Trough'>
+        <li onClick={e => selectLabwareToAdd('trough-12row')}>12-row Trough</li>
+      </Accordion>
+      <Accordion title='PCR Strip'>
+        <li onClick={e => selectLabwareToAdd('PCR-strip-tall')}>PCR Strip Tall</li>
+      </Accordion>
+      <Accordion title='Trash'>
+        <li onClick={e => selectLabwareToAdd('trash-box')}>Trash Box</li>
+      </Accordion>
     </ul>
   </div>
 )
@@ -158,7 +199,7 @@ const Deck = props => {
               </div>
             </div>
           </div>
-          <div className='close' onClick={e => closeIngredientSelector()}>➡</div>
+          <div className='close' onClick={e => closeIngredientSelector()}>⟳</div>
         </div>
       }
       {slotnames.map((slotName, i) =>
