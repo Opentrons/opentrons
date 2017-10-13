@@ -9,3 +9,46 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.fixed {
+  position: fixed;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.absolute__fill {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.inline {
+  display: inline;
+}
+
+.block {
+  display: block;
+}
+
+.inline_block {
+  display: inline-block;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex__items_center {
+  align-items: center;
+}
+
+.flex__justify_center {
+  justify-content: center;
+}

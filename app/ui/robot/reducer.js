@@ -6,6 +6,7 @@ import NAME from './name'
 
 // miscellaneous constants
 export const constants = {
+  // connection states
   DISCONNECTED: 'disconnected',
   CONNECTING: 'connecting',
   CONNECTED: 'connected',
@@ -101,6 +102,14 @@ const INITIAL_STATE = {
 export const selectors = {
   getState (allState) {
     return allState[NAME]
+  },
+
+  getUploadInProgress (allState) {
+    return selectors.getState(allState).sessionRequest.inProgress
+  },
+
+  getUploadError (allState) {
+    return selectors.getState(allState).sessionRequest.error
   },
 
   getSessionName (allState) {

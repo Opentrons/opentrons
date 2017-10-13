@@ -79,6 +79,7 @@ export default function client (dispatch) {
 
         clearRunTimerInterval()
         dispatch(actions.disconnectResponse())
+        dispatch(push('/'))
       })
       .catch((error) => dispatch(actions.disconnectResponse(error)))
   }
@@ -91,14 +92,15 @@ export default function client (dispatch) {
     reader.onload = function handleProtocolRead (event) {
       remote.session_manager.create(name, event.target.result)
         .then((apiSession) => {
-          console.log('got session', apiSession)
           // TODO(mc, 2017-10-09): This seems like an API responsibility
           remote.session_manager.session = apiSession
+          // TODO(mc, 2017-10-12) batch these updates and don't hardcode URL
           handleApiSession(apiSession, true)
         })
         .catch((error) => dispatch(actions.sessionResponse(error)))
     }
 
+    dispatch(push('/upload'))
     return reader.readAsText(file)
   }
 
@@ -160,8 +162,6 @@ export default function client (dispatch) {
       protocolLabwareBySlot: labwares
     } = selectors.getState(state)
 
-    // TODO(mc, 2017-10-06)
-
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {
     //   dispatch(actions.updateOffsetResponse())
@@ -170,9 +170,9 @@ export default function client (dispatch) {
 
     remote.calibration_manager.update_container_offset(labwares[slot], instruments[axis])
       .then(() => {
-        dispatch(actions.updateOffsetResponse())
         // TODO(mc, 2017-10-06): do this without a double dispatch
         // also this hardcoded URL is a bad idea™
+        dispatch(actions.updateOffsetResponse())
         dispatch(push('/setup-deck'))
       })
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
@@ -219,7 +219,6 @@ export default function client (dispatch) {
   }
 
   function handleApiSession (apiSession) {
-    console.log(apiSession)
     const {
       name,
       protocol_text,

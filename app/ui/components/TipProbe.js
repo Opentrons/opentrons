@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+
 import styles from './TipProbe.css'
-import progressGifSrc from '../img/loading.gif'
+import {Spinner} from './icons'
 
 function PrepareForProbe (props) {
   const {volume, isCurrent, onProbeTipClick} = props
@@ -32,7 +33,7 @@ function RobotIsMoving (props) {
   return (
     <span className={styles.info}>
       <h3 className={styles.title}>Robot is Moving</h3>
-      <img src={progressGifSrc} className={styles.progress} />
+      <Spinner className={styles.progress} />
     </span>
   )
 }

@@ -19,7 +19,7 @@ function PipetteLinks (props) {
     : 'N/A'
 
   return (
-    <li key={axis}>
+    <li>
       <button className={style} onClick={onClick}>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{description}</span>
@@ -38,7 +38,7 @@ function LabwareLinks (props) {
   })
 
   return (
-    <li key={slot}>
+    <li>
       <button className={buttonStyle} onClick={onClick} disabled={isDisabled}>
         [{slot}] {name}
       </button>
@@ -58,13 +58,20 @@ export default function SetupPanel (props) {
   } = props
 
   const instrumentList = instruments.map((i) => (
-    <PipetteLinks {...i} onClick={setInstrument(i.axis)} />
+    <PipetteLinks {...i} key={i.axis} onClick={setInstrument(i.axis)} />
   ))
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack} = lab
     const onClick = setLabware(slot)
-    const links = LabwareLinks({...lab, tipracksConfirmed, onClick})
+    const links = (
+      <LabwareLinks
+        {...lab}
+        key={slot}
+        tipracksConfirmed={tipracksConfirmed}
+        onClick={onClick}
+      />
+    )
 
     if (name && isTiprack) {
       result.tiprackList.push(links)
