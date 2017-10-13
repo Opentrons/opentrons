@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import pickBy from 'lodash/pickBy'
+// import pickBy from 'lodash/pickBy'
 import range from 'lodash/range'
 
 import { containerDims } from '../constants.js'
@@ -33,7 +33,21 @@ const modeIngredientSelection = handleActions({
 
 const loadedContainers = handleActions({
   SELECT_LABWARE_TO_ADD: (state, action) => ({...state, [nextEmptySlot(state)]: action.payload}),
-  DELETE_CONTAINER_AT_SLOT: (state, action) => pickBy(state, (value, key) => key !== action.payload)
+  DELETE_CONTAINER_AT_SLOT: (state, action) => {
+    // For leaving open slots functionality, do this one-liner instead
+    // return pickBy(state, (value, key) => key !== action.payload)}
+
+    const deletedSlot = action.payload
+    const deletedIdx = sortedSlotnames.findIndex(slot => slot === deletedSlot)
+    // Summary:
+    //  {A1: 'alex', B1: 'brock', C1: 'charlie'} ==(delete slot B1)==> {A1: 'alex', B1: 'charlie'}
+    const nextState = sortedSlotnames.reduce((acc, slotName, i) => slotName === deletedSlot || !(slotName in state)
+      ? acc
+      : ({...acc, [sortedSlotnames[i < deletedIdx ? i : i - 1]]: state[slotName]}),
+      {})
+    console.log(nextState)
+    return nextState
+  }
 }, {})
 
 const selectedWellsInitialState = {preselected: {}, selected: {}}
