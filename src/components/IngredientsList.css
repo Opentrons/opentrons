@@ -1,0 +1,226 @@
+input {
+  width: 100%;
+}
+
+label {
+  color: gray;
+  text-transform: none;
+}
+
+.ingredientsList {
+  height: 100%;
+  background-color: white;
+}
+
+.ingredientsList section > label {
+  border-bottom: 1px solid gray;
+  display: block;
+}
+
+.ingredListHeaderLabel {
+  border-bottom: 1px solid gray;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  color: gray;
+}
+
+.ingredListHeaderLabel > * {
+  text-align: center;
+  font-size: 1.5em;
+  width: 100%;
+}
+
+.ingredListHeaderLabel > *:first-child {
+  border-right: 1px solid gray;
+  border-radius: 0;
+  color: white;
+  background-color: lightgray;
+}
+
+.ingredientsList section {
+  margin: 12pt;
+  box-shadow: 0px 0px 10px 3px darkgrey;
+  border-radius: 3px;
+  padding: 0.2em 1em;
+}
+
+.ingredientsList section > label {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ingredientsList section > label .ingredLabel {
+  flex: 1;
+}
+
+.ingredientsList section footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ingredientsList section footer .editButton {
+  border: 2px lightgray solid;
+  padding: 2px;
+}
+
+.deleteIngredient {
+  cursor: pointer;
+  float: right;
+  font-size: 12pt;
+  color: gray;
+}
+
+.editButton {
+  color: darkgray;
+  border-color: gray;
+  font-size: inherit;
+  margin: 1px;
+  border-width: 1px;
+  cursor: pointer;
+}
+
+.deleteIngredient:hover, .editButton:hover {
+  color: white;
+  background-color: lightgray
+}
+
+/* --------- */
+
+.ingredLabel {
+  font-weight: bold;
+  margin-left: 0.2rem;
+}
+
+.addIngredientButton {
+  margin-left: 30%; /* HACK doesn't work with diff widths */
+}
+
+/* -------- */
+
+.ingredientInlineDetail {
+  margin: 0.4em 0;
+  color: darkgray;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ingredientInlineDetail div {
+  display: flex;
+  width: 5rem;
+  margin: 0.25rem;
+}
+
+.ingredientInlineDetail label {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  background-color: lightgray;
+  border: none;
+  flex: 2;
+  text-align: center;
+}
+
+.ingredientInlineDetail input {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  flex: 3;
+  text-align: center;
+}
+
+/*.ingredientInlineDetail input::after {
+  content: 'µL';
+  position: absolute;
+  padding-right: 0.2em;
+}*/
+
+/* TODO: reuse this */
+
+.circle {
+  border-radius: 1000px;
+  background-color: gray; /* <-- set inline */
+  /*background-color: --color-swatch;*/
+  height: 0.8rem;
+  width: 0.8rem;
+  margin-right: 0.1rem;
+}
+
+/* ------- */
+
+.leftPill {
+  padding: 2px 0 2px 0.5rem;
+  background-color: lightgray;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 3;
+}
+
+.rightPill {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  display: flex;
+  flex: 5;
+}
+
+.innerList {
+  overflow-y: scroll;
+  height: 15vh;
+}
+
+/* ------- */
+
+.ingredientInstanceItem {
+  display: flex;
+  width: 100%;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.ingredientInstanceItem input {
+  text-align: center;
+  font-size: inherit;
+}
+
+/* ------- */
+
+.singleIngred {
+  margin: 0 1rem;
+  border: 2px solid gray;
+
+}
+
+.singleIngred label::before {
+  content: ' ';
+  display: inline-block;
+  border-radius: 1000px;
+  background-color: gray; /* <-- set inline */
+  background-color: var(--swatch-color);
+  height: 0.8rem;
+  width: 0.8rem;
+  margin-left: 1rem;
+  margin-right:0.25rem;
+}
+
+.singleIngred * {
+  padding: 0;
+}
+
+.singleIngred label {
+  font-weight: bold;
+}
+
+.singleIngred input {
+  border-top: none;
+  border-bottom: none;
+}
+
+.singleIngred .deleteIngredient {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1px solid gray;
+  width: 5rem;
+  text-align: center;
+}

@@ -301,73 +301,12 @@ textarea {
 @value ingredientPanelSidebarWidth: 40%;
 
 .ingredientPanelSidebar {
-  border-radius: 0;
-  position: relative;
+  float: left;
   display: inline-block;
+  position: relative;
   height: 100%;
   width: ingredientPanelSidebarWidth;
-  background-color: white;
   border-right: 3px solid gray;
-  float: left;
-}
-
-.ingredientPanelSidebar label {
-  border-bottom: 1px solid gray;
-  border-radius: 0;
-  display: block;
-}
-
-.ingredientPanelSidebar label > * {
-  display: inline-block;
-  padding-left: 8pt;
-  padding-right: 8pt;
-  color: gray;
-}
-
-.ingredientPanelSidebar > label {
-  font-size: 1.5em;
-}
-
-.ingredientPanelSidebar > label > *:not(:first-child) {
-  border-left: 1px solid gray;
-  border-radius: 0;
-  color: black;
-}
-
-.ingredientPanelSidebar section {
-  margin: 12pt;
-  box-shadow: 0px 0px 10px 3px darkgrey;
-  border-radius: 3px;
-  padding: 0.2em 1em;
-}
-
-.ingredientPanelSidebar .deleteIngredient {
-  cursor: pointer;
-  float: right;
-  font-size: 12pt;
-}
-
-.ingredLabel {
-  font-weight: bold;
-}
-
-.ingredLabel::after {
-  content: ' ';
-  display: inline-block;
-  width: 0.8em;
-  height: 0.8em;
-  margin-left: 8pt;
-  border-radius: 100px;
-  background-color: red;
-}
-
-.editButton {
-  background-color: lightgray;
-  font-size: 0.8em;
-}
-
-.addIngredientButton {
-  margin-left: 30%; /* HACK doesn't work with diff widths */
 }
 
 .ingredientPanelContent {
@@ -388,34 +327,6 @@ textarea {
   margin: 30px auto;
 }
 
-.ingredientInlineDetail {
-  margin: 0.4em 0;
-  color: darkgray;
-}
-
-.ingredientInlineDetail div {
-  width: 5em;
-  display: inline-block;
-}
-
-.ingredientInlineDetail label {
-  display: inline-block;
-  width: 30%;
-  background-color: lightgray;
-  border: none;
-}
-
-.ingredientInlineDetail input {
-  display: inline-block;
-  width: 30%;
-}
-
-.ingredientInlineDetail div::after {
-  content: 'µL';
-  display: inline-block;
-  position: absolute;
-  padding-left: 0.2em;
-}
 
 .ingredientPropertiesEntry {
   background-color: white;

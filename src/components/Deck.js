@@ -5,6 +5,7 @@ import { slotnames } from '../constants.js'
 import styles from '../css/style.css'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
+import IngredientsList from './IngredientsList.js'
 
 const AddLabware = props => (
   <div
@@ -133,34 +134,9 @@ const Deck = props => {
         <div className={styles.ingredientModal}>
 
           <div className={styles.ingredientPanelSidebar}>
-            <label>
-              <div>Slot {activeModals.ingredientSelection.slotName}</div>
-              <div>Container {activeModals.ingredientSelection.containerName}</div>
-            </label>
-
-            {/* Each section is a detail view of 1 ingredient */}
-            <section>
-              <label>
-                <div className={styles.ingredLabel}>Sample 1</div>
-                <div className='circle' style={{backgroundColor: 'red'}} />
-                <div className={styles.editButton}>EDIT</div>
-                <div className={styles.deleteIngredient}>✕</div>
-              </label>
-              <div className={styles.ingredientInlineDetail}>
-                <div>
-                  <label>A1</label>
-                  <input placeholder='20' />
-                </div>
-                <div>
-                  <label>B1</label>
-                  <input placeholder='20' />
-                </div>
-                <div>
-                  <label>C1</label>
-                  <input placeholder='20' />
-                </div>
-              </div>
-            </section>
+            <IngredientsList
+              slotName={activeModals.ingredientSelection.slotName}
+              containerName={activeModals.ingredientSelection.containerName} />
           </div>
 
           <div className={styles.ingredientPanelContent}>
