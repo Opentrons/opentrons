@@ -2,29 +2,23 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import NavPanel from './NavPanel'
+import ToolTip from './ToolTip'
 import styles from './SideBar.css'
 
 function NavLink (props) {
   const {name, iconSrc, onClick, isDisabled, isActive, msg} = props
   return (
-    <li key={name}>
+    <li key={name} className='tooltip_parent'>
       <button
         onClick={onClick}
         disabled={isDisabled}
         className={classnames({[styles.active]: isActive}, styles.nav_icon)}
       >
         <img src={iconSrc} alt={name} />
-        <ToolTip msg={msg} />
+        <ToolTip msg={msg} pos='left' />
       </button>
 
     </li>
-  )
-}
-
-function ToolTip (props) {
-  const {msg} = props
-  return (
-    <span className={styles.tooltip}>{msg}</span>
   )
 }
 
@@ -36,11 +30,11 @@ const ConnectionIndicator = props => {
     : styles.disconnected
   const toolTipMessage = 'Connect Robot'
   return (
-    <div className={classnames({[styles.active]: isActive}, styles.connection_status)} onClick={onNavIconClick('connect')}>
+    <div className={classnames({[styles.active]: isActive}, styles.connection_status, 'tooltip_parent')} onClick={onNavIconClick('connect')}>
       <div className={styles.status}>
         <div className={style} />
       </div>
-      <ToolTip msg={toolTipMessage} />
+      <ToolTip msg={toolTipMessage} pos='left' />
     </div>
   )
 }
@@ -51,7 +45,7 @@ ConnectionIndicator.propTypes = {
 
 export default function SideBar (props) {
   const {isNavPanelOpen, onNavIconClick, currentNavPanelTask} = props
-  const style = classnames(styles.sidebar, {[styles.open]: isNavPanelOpen})
+  const style = classnames(styles.sidebar, {[styles.open]: isNavPanelOpen, 'tooltip_hidden': isNavPanelOpen})
   const navLinks = props.navLinks.map((link) => NavLink({
     onClick: onNavIconClick(link.name),
     ...link

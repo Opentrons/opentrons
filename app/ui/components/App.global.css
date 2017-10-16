@@ -52,3 +52,83 @@ body {
 .flex__justify_center {
   justify-content: center;
 }
+
+/*** TOOLTIPS ***/
+.tooltip_parent:hover .tooltip {
+  visibility: visible;
+}
+
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  border-radius: 6px;
+  background-color: black;
+  font-size: 1rem;
+  line-height: 3rem;
+  color: #fff;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.tooltip_left {
+  top: 15%;
+  left: 80%;
+  width: 10rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.tooltip_left::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -1.5rem;
+  border-width: 1.5rem;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+
+.tooltip_bottom {
+  top: 75%;
+  left: -80%;
+  width: 10rem;
+  font-size: 0.75rem;
+  line-height: 2rem;
+}
+
+.tooltip_bottom::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;
+  left: 13%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent black;
+}
+
+.tooltip_top {
+  bottom: 100%;
+  left: 0;
+  width: 15rem;
+  line-height: 1rem;
+  padding: 1rem;
+  font-size: 0.75rem;
+}
+
+.tooltip_top::after {
+  content: " ";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent;
+}
+
+.tooltip_hidden .tooltip_left {
+  display: none;
+}

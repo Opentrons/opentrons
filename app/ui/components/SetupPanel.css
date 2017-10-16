@@ -5,7 +5,7 @@
   padding: 0 1rem;
   grid-template:
     'title' 75px
-    'details' 38rem
+    'details' 40rem
     'btn_bottom' auto;
   font-family: 'sans';
   font-size: 14px;
@@ -71,18 +71,6 @@ h1 {
   font-size: 0.75rem;
 }
 
-.step_list li button::before {
-  display: block;
-  float: left;
-  content: '';
-  border-radius: 0.5rem;
-  color: white;
-  text-align: center;
-  height: 1rem;
-  width: 1rem;
-  margin: 0.5rem 0.5rem 1rem 1rem;
-}
-
 .step_list button {
   background-color: #eee;
   width: 100%;
@@ -107,18 +95,27 @@ button.btn_labware {
   line-height: 2rem;
 }
 
-.step_list .alert::before {
-  content: '!';
-  background-color: silver;
+.alert,
+.confirmed {
+  position: relative;
+  display: block;
+  float: left;
+  border-radius: 0.5rem;
   color: white;
+  text-align: center;
+  height: 1rem;
+  width: 1rem;
+  margin: 0.5rem 0.5rem 1rem 1rem;
+  background-color: silver;
   line-height: 1rem;
 }
 
-.step_list .confirmed::before {
-  content: '✓';
-  background-color: #05c1b3;
-  color: white;
-  line-height: 1rem;
+.alert::before {
+  content: '!';
+}
+
+.confirmed {
+  visibility: hidden;
 }
 
 .axis {
@@ -133,17 +130,21 @@ button.btn_labware {
 }
 
 .run_link {
-  grid-area: btn_bottom;
-  display: block;
-  width: 100%;
-  border-radius: 0.5rem;
-  background-color: #777;
-  font-family: 'trons';
-  color: white;
-  line-height: 3rem;
+  composes: btn from './Util.css';
   text-align: center;
-  text-decoration: none;
-  text-transform: uppercase;
+  width: 100%;
+  display: block;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  background-color: #777;
+  color: white;
+  position: relative;
+}
+
+.disabled {
+  background-color: transparent;
+  border: 1px solid silver;
+  color: silver;
 }
 
 .pipette_group a.active {
