@@ -18,11 +18,12 @@ class SelectionRect extends React.Component {
         pointerEvents: 'none', // prevents this div from occluding wells during document.elementFromPoint sampling
         zIndex: 1000,
         borderRadius: 0,
+        border: '1px gray dashed',
         left: Math.min(xStart, xDynamic) + 'px',
         top: Math.min(yStart, yDynamic) + 'px',
         width: Math.abs(xDynamic - xStart) + 'px',
         height: Math.abs(yDynamic - yStart) + 'px',
-        backgroundColor: 'rgba(0, 0, 255, 0.5)' // <- TODO: use css for colors
+        backgroundColor: 'rgba(0, 120, 255, 0.2)' // <- TODO: use css for colors
       }}
     />
   }

@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import cx from 'classnames'
 
 import styles from '../css/style.css'
 
@@ -7,16 +8,16 @@ const Well = ({x, y, wellContent, ...otherProps}) => {
   const { preselected, selected, number } = wellContent
   return (
     <div
-      className={styles.wellRound}
+      className={cx(styles.wellRound, {[styles.selected]: selected, [styles.highlighted]: preselected})}
       data-well-number={number}
       data-well-x={x}
       data-well-y={y}
       style={{
         '--well-selection-color': selected
-        ? 'gray'
-        : (preselected ? 'lightblue' : 'transparent'),
-        '--well-color': 'white'}} // <- set well color here (probably, add it in wellMatrix)
-
+          ? 'blue' // <- set color swatch for ingredient here
+          : (preselected ? 'lightcyan' : 'transparent'),
+        '--well-fill-color': 'transparent'  // <- set well fill color here (probably, add it in wellMatrix)
+      }}
       {...otherProps}
       />
   )

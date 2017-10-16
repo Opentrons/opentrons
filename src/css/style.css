@@ -90,16 +90,28 @@ textarea {
 
 .wellRound {
   display: flex;
-  border-radius: 0;
-  background-color: var(--well-selection-color);
+  box-sizing: border-box;
+
+  border-radius: 1000px;
+  border: 2px solid transparent;
+  padding: 2px;
+  margin: 2px;
+}
+
+.wellRound.highlighted {
+  border: 2px solid blue;
 }
 
 .wellRound::after {
-  color: lightgray;
-  background-color: var(--well-color);
-  box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
-  content: attr(data-well-number);
   display: flex;
+  box-sizing: border-box;
+
+  background-color: var(--well-fill-color);
+  border: 2px solid black;
+  /*box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);*/
+
+  content: attr(data-well-number);
+  color: transparent;
 
   justify-content: center;
   align-items: center;
@@ -110,6 +122,10 @@ textarea {
   height: 2em;
   margin: auto;
   font-size: 1rem;
+}
+
+.wellRound.selected::after {
+  border: 4px solid var(--well-selection-color);
 }
 
 /* DECK */
