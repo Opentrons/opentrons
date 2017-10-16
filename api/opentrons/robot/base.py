@@ -1,6 +1,14 @@
 
-probe_center = {'z': 68.0, 'x': 268.4, 'y': 291.8181}
-probe_dimensions = {'length': 47.74, 'width': 38, 'height':63}
+# probe_center = {'z': 68.0, 'x': 268.4, 'y': 291.8181} # Ibn
+# probe_dimensions = {'length': 47.74, 'width': 38, 'height':63}
+
+probe_center = {'z': 57.81, 'x': 259.8, 'y': 298.875} # Avagadro
+probe_dimensions = {'length': 41, 'width': 38.7, 'height':57.81}
+
+#x_left = 240.4500
+#x_right = 279.1500
+#y_front  X:259.7500 Y:278.3750 Z:225.5000 A:68.8100 B:18.0002 C:18.0002
+#y_back   X:259.7500 Y:319.3750 Z:225.5000 A:68.8100 B:18.0002 C:18.0002
 
 class Probe:
     def __init__(self, width, length, height, position_offset, pose_tracker, switch_offset=1):

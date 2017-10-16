@@ -15,10 +15,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   jog: (axis, direction) => () => {
     // TODO(mc, 2017-10-06): don't hardcode the pipette and pass slot in via props
-    dispatch(robotActions.jog('left', axis, direction))
+    dispatch(robotActions.jog('right', axis, direction))
   },
   updateOffset: (labware) => () => {
-    dispatch(robotActions.updateOffset('left', labware))
+    dispatch(robotActions.updateOffset('right', labware))
   }
 })
 

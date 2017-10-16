@@ -765,11 +765,12 @@ class Pipette:
 
             self.move_to(self.current_tip().top(0), strategy='arc')
 
-            tip_plunge = 6
+            tip_plunge = -16
             for i in range(int(presses) - 1):
                 self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
             self._add_tip(DEFAULT_TIP_LENGTH)
+            self.instrument_mover.home()
             return self
 
         return _pick_up_tip(self, location)

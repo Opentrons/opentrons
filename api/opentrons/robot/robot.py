@@ -20,11 +20,10 @@ from opentrons.broker import subscribe
 
 log = get_logger(__name__)
 
+# DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
 
-# FIXME: (Jared 9/18/17)
-# This should be a head object - but using a string now to avoid scope creep
 
-DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0}
+DECK_OFFSET = {'x': -31.45, 'y':-.1, 'z':7} # Avagadro
 
 
 class InstrumentMosfet(object):

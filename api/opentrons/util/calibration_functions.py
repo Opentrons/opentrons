@@ -44,7 +44,7 @@ def _probe_instrument_axis(instrument, axis, probing_movement, probe_location, s
     probing_pos = probe_location.copy()
 
     if axis is not 'z': #FIXME: [JG & Andy | 9/27/17] this edge case should not be handled here
-        probing_pos[axis] -= probing_movement
+        probing_pos[axis] -= (probing_movement*.75)
 
     instrument._move(z=safe_height)
     instrument._move(x=probing_pos['x'], y=probing_pos['y'])
@@ -132,16 +132,16 @@ def probe_instrument(instrument, robot):
     avg_x = ((probe_x_left + probe_x_right)/ 2.0) + instrument.mount_obj.offset['x']
     avg_y = (probe_y_bottom + probe_y_top) / 2.0 + instrument.mount_obj.offset['y']
 
-    x_delta =  avg_x - frame_probe.top_switch['x']
-    y_delta = avg_y - frame_probe.top_switch['y']
+    x_delta =  frame_probe.top_switch['x'] - avg_x
+    y_delta = frame_probe.top_switch['y'] - avg_y
 
     print('DELTAS: x={}, y={}'.format(x_delta, y_delta))
 
 
-    #Update the position using the info
-    robot.pose_tracker.translate_object(instrument, x=x_delta, y=y_delta, z=0)
-    instrument.mount_obj.offset['x'] -= x_delta
-    instrument.mount_obj.offset['y'] -= y_delta
+    # #Update the position using the info
+    # robot.pose_tracker.translate_object(instrument, x=x_delta, y=y_delta, z=0)
+    # instrument.mount_obj.offset['x'] += x_delta
+    # instrument.mount_obj.offset['y'] += y_delta
 
     #Note: This uses a 'tip' object which the pipette checks when it moves.
     #This is how the instrument knows what height to go to

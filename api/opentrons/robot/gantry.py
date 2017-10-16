@@ -109,12 +109,13 @@ class InstrumentMover(object):
         print('--[InstrumentMover.move] mount target z: {}'.format(goal_z))
 
 
-    #TODO: this
     def probe(self, axis_to_probe, probing_movement):
         if axis_to_probe is 'z':
             axis_to_probe = self.mount.mount_axis
         return self.gantry.probe_axis(axis_to_probe, probing_movement)
 
+    def home(self):
+        self.mount.home()
 
 class Gantry:
     '''
