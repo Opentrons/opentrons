@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard",
-    "build": "webpack",
+    "build": "npm run lint && webpack -p && cp index.html dist/",
     "start": "webpack-dev-server --hot"
   },
   "private": true,

@@ -1,6 +1,6 @@
 var webpack = require('webpack')
 const GoogleFontsPlugin = require('google-fonts-webpack-plugin')
-// var path = require('path')
+var path = require('path')
 
 module.exports = {
   entry: [
@@ -11,7 +11,8 @@ module.exports = {
   ],
 
   output: {
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    path: path.join(__dirname, 'dist')
   },
 
   module: {
