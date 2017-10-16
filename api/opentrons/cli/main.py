@@ -20,6 +20,7 @@ right = 'a'
 current_pipette = right
 
 status_text = urwid.Text('')
+current_position = (0, 0, 0)
 
 # Reference point being calibrated
 point_number = 0
@@ -96,7 +97,8 @@ def status(text):
 
     text = '\n'.join([
         points,
-        'Position: {0}'.format(position()),
+        'Smoothie: {0}'.format(current_position),
+        'World: {0}'.format(tuple(dot(inv(T), list(current_position[:-1]) + [1]))),  # NOQA
         'Step: {0}'.format(step()),
         'Current stage: ' + current_pipette,
         'Message: ' + text
@@ -106,7 +108,9 @@ def status(text):
 
 
 def jog(axis, direction, step):
+    global current_position
     driver.move(**{axis: driver.position[axis] + direction * step})
+    current_position = position()
     status('Jog: ' + repr([axis, str(direction), str(step)]))
 
 key_mappings = {
@@ -120,7 +124,7 @@ key_mappings = {
 
 
 def key_pressed(key):
-    global current_pipette, step_index, point_number, T
+    global current_position, current_pipette, step_index, point_number, T
 
     if not isinstance(key, str):  # mouse clicked?
         return
@@ -161,6 +165,8 @@ def key_pressed(key):
         driver.home('za')
         driver.home('bcx')
         driver.home()
+        current_position = position()
+        status('Homed')
     # calculate transformation matrix
     elif key == ' ':
         try:
