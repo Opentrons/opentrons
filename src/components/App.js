@@ -1,16 +1,16 @@
 import React from 'react'
-import { BrowserRouter, Route } from 'react-router-dom'
+import { HashRouter, Route } from 'react-router-dom'
 
 import Home from './Home'
 import About from './About'
 
 const App = () => (
-  <BrowserRouter>
+  <HashRouter>
     <div className='container'>
       <Route exact path='/' component={Home} />
       <Route path='/about' component={About} />
     </div>
-  </BrowserRouter>
+  </HashRouter>
 )
 
 export default App
