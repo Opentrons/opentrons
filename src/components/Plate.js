@@ -20,25 +20,19 @@ class Plate extends React.Component {
 
     return transpose(wellMatrix).map((row, x) =>
       row.map((wellContent, y) =>
-        <Well x={x} y={row.length - y - 1} wellContent={wellContent} key={y} />
+        <Well x={x} y={row.length - y - 1} data-row-num={row.length - y} wellContent={wellContent} key={y} />
       )
     )
   }
 
-  test () {
-    return ['a', 'b', 1, 2]
-  }
-
-  makeLowerLabels () {
-    const { wellMatrix } = this.props
-    return wellMatrix.map((_row, i) => (
-      <div className={styles.row_label} key={i}>{wellMatrix.length - i}</div>
-    ))
-  }
-
-  wrapColumn (wells, key) {
+  wrapColumn = (wells, colIdx) => {
     // wrap a row of wells in a .row div
-    return <div className={styles.grid_col} key={key}>{wells}</div>
+    return <div className={styles.grid_col} key={colIdx}>
+      {wells}
+      {this.props.showLabels &&
+        <div className={styles.col_label} key={'letterLabel' + colIdx}>{intToAlphabetLetter(colIdx)}</div>
+      }
+    </div>
   }
 
   render () {
@@ -47,7 +41,6 @@ class Plate extends React.Component {
     return (
       <section className={styles.aspect_ratio}>
         <div className={styles.layoutWrapper}>
-
           <div {...otherProps}
             className={classnames(styles[className], styles.plate)}
           >
@@ -55,17 +48,7 @@ class Plate extends React.Component {
           </div>
 
           {showLabels &&
-            <div className={styles.row_labels}>
-              {this.wrapColumn(this.makeLowerLabels())}
-            </div>
-          }
-
-          {showLabels &&
-            <div className={styles.column_labels} style={{'--colNum': wellMatrix[0].length}}>
-              {wellMatrix[0].map((_row, i) =>
-                <div className={styles.col_label} key={i}>{intToAlphabetLetter(i)}</div>
-              )}
-            </div>
+            <div className={styles.row_labels_filler} />
           }
         </div>
       </section>

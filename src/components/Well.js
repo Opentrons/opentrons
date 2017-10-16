@@ -19,7 +19,7 @@ const Well = ({x, y, wellContent, ...otherProps}) => {
         '--well-fill-color': 'transparent'  // <- set well fill color here (probably, add it in wellMatrix)
       }}
       {...otherProps}
-      />
+      ><div className={styles.innerWell} /></div>
   )
 }
 
