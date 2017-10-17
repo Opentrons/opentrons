@@ -4,7 +4,8 @@ import {push} from 'react-router-redux'
 
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
-import {constants, selectors} from '../reducer'
+import * as constants from '../constants'
+import * as selectors from '../selectors'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
@@ -106,7 +107,7 @@ export default function client (dispatch) {
 
   function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 2000)
@@ -118,7 +119,7 @@ export default function client (dispatch) {
 
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 2000)
@@ -130,14 +131,14 @@ export default function client (dispatch) {
 
   function moveTo (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const {
-      protocolInstrumentsByAxis: instruments,
-      protocolLabwareBySlot: labwares
-    } = selectors.getState(state)
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const labware = selectors.getLabwareBySlot(state)[slot]
 
     // FIXME - MORE DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToResponse()), 2000)
-    remote.calibration_manager.move_to(instruments[axis], labwares[slot])
+
+    remote.calibration_manager.move_to(instrument, labware)
+
       .then(() => dispatch(actions.moveToResponse()))
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
@@ -146,7 +147,7 @@ export default function client (dispatch) {
   // axis is x, y, z, not left and right (which we will call mount)
   function jog (state, action) {
     const {payload: {instrument: instrumentAxis, axis, direction}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[instrumentAxis]
+    const instrument = selectors.getInstrumentsByAxis(state)[instrumentAxis]
     const distance = DEFAULT_JOG_DISTANCE_MM * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
@@ -159,10 +160,8 @@ export default function client (dispatch) {
 
   function updateOffset (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const {
-      protocolInstrumentsByAxis: instruments,
-      protocolLabwareBySlot: labwares
-    } = selectors.getState(state)
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const labware = selectors.getLabwareBySlot(state)[slot]
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {
@@ -170,7 +169,7 @@ export default function client (dispatch) {
     //   dispatch(push('/setup-deck'))
     // }, 2000)
 
-    remote.calibration_manager.update_container_offset(labwares[slot], instruments[axis])
+    remote.calibration_manager.update_container_offset(labware, instrument)
       .then(() => {
         // TODO(mc, 2017-10-06): do this without a double dispatch
         // also this hardcoded URL is a bad idea™
@@ -248,15 +247,14 @@ export default function client (dispatch) {
     ;(containers || []).forEach(apiContainerToContainer)
 
     const payload = {
-      sessionName: name,
+      name,
+      state,
+      errors: [],
       protocolText: protocol_text,
       protocolCommands,
       protocolCommandsById,
       protocolInstrumentsByAxis,
-      protocolLabwareBySlot,
-      // TODO(mc, 2017-09-06): handle session errors
-      sessionErrors: [],
-      sessionState: state
+      protocolLabwareBySlot
     }
 
     dispatch(actions.sessionResponse(null, payload))

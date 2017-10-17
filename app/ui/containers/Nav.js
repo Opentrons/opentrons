@@ -9,7 +9,8 @@ import {
 
 import {
   actions as robotActions,
-  selectors as robotSelectors
+  selectors as robotSelectors,
+  constants as robotConstants
 } from '../robot'
 
 import uploadIconSrc from '../img/icon_file.svg'
@@ -18,7 +19,9 @@ import setupIconSrc from '../img/icon_setup.svg'
 import SideBar from '../components/SideBar'
 
 const mapStateToProps = (state) => {
-  const isConnected = state.robot.isConnected
+  const connectionStatus = robotSelectors.getConnectionStatus(state)
+  const isConnected = connectionStatus === robotConstants.CONNECTED
+  const sessionIsLoaded = robotSelectors.getSessionIsLoaded(state)
   const isOpen = interfaceSelectors.getIsNavPanelOpen(state)
   const activeTask = interfaceSelectors.getCurrentNavPanelTask(state)
 
@@ -38,7 +41,7 @@ const mapStateToProps = (state) => {
         name: 'setup',
         iconSrc: setupIconSrc,
         // TODO(mc, 2017-10-11): this needs a selector
-        isDisabled: !(state.robot.protocolText),
+        isDisabled: !sessionIsLoaded,
         isActive: isOpen && activeTask === 'setup',
         msg: 'Prep For Run'
       }

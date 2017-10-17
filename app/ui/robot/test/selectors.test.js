@@ -4,8 +4,11 @@ import {NAME, selectors, constants} from '../'
 const makeState = (state) => ({[NAME]: state})
 
 const {
-  getSessionName,
   getConnectionStatus,
+  getUploadInProgress,
+  getUploadError,
+  getSessionName,
+  getSessionIsLoaded,
   getCommands,
   getRunProgress,
   getStartTime,
@@ -20,20 +23,66 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
+  test('getConnectionStatus', () => {
+    const state = {
+      connection: {
+        isConnected: false,
+        connectRequest: {inProgress: false},
+        disconnectRequest: {inProgress: false}
+      }
+    }
+    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTED)
+
+    state.connection = {
+      isConnected: false,
+      connectRequest: {inProgress: true},
+      disconnectRequest: {inProgress: false}
+    }
+    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTING)
+
+    state.connection = {
+      isConnected: true,
+      connectRequest: {inProgress: false},
+      disconnectRequest: {inProgress: false}
+    }
+    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
+
+    state.connection = {
+      isConnected: true,
+      connectRequest: {inProgress: false},
+      disconnectRequest: {inProgress: true}
+    }
+    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTING)
+  })
+
+  test('getUploadInProgress', () => {
+    let state = makeState({session: {sessionRequest: {inProgress: true}}})
+    expect(getUploadInProgress(state)).toBe(true)
+
+    state = makeState({session: {sessionRequest: {inProgress: false}}})
+    expect(getUploadInProgress(state)).toBe(false)
+  })
+
+  test('getUploadError', () => {
+    let state = makeState({session: {sessionRequest: {error: null}}})
+    expect(getUploadError(state)).toBe(null)
+
+    state = makeState({session: {sessionRequest: {error: new Error('AH')}}})
+    expect(getUploadError(state)).toEqual(new Error('AH'))
+  })
+
   test('getSessionName', () => {
-    const state = makeState({sessionName: 'foobar.py'})
+    const state = makeState({session: {name: 'foobar.py'}})
+
     expect(getSessionName(state)).toBe('foobar.py')
   })
 
-  test('getConnectionStatus', () => {
-    let state = {isConnected: false, connectRequest: {inProgress: false}}
-    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTED)
+  test('getSessionIsLoaded', () => {
+    let state = makeState({session: {state: constants.LOADED}})
+    expect(getSessionIsLoaded(state)).toBe(true)
 
-    state = {...state, connectRequest: {inProgress: true}}
-    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTING)
-
-    state = {isConnected: true, connectRequest: {inProgress: false}}
-    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
+    state = makeState({session: {state: ''}})
+    expect(getSessionIsLoaded(state)).toBe(false)
   })
 
   test('getIsReadyToRun', () => {
@@ -47,8 +96,9 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
-      const state = makeState({sessionState})
+      const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
+
       expect(getIsReadyToRun(state)).toBe(expected)
     })
   })
@@ -64,7 +114,7 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
-      const state = makeState({sessionState})
+      const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
       expect(getIsRunning(state)).toBe(expected)
     })
@@ -81,7 +131,7 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
-      const state = makeState({sessionState})
+      const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
       expect(getIsPaused(state)).toBe(expected)
     })
@@ -98,7 +148,7 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
-      const state = makeState({sessionState})
+      const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
       expect(getIsDone(state)).toBe(expected)
     })
@@ -106,37 +156,39 @@ describe('robot selectors', () => {
 
   describe('command based', () => {
     const state = makeState({
-      protocolCommands: [0, 4],
-      protocolCommandsById: {
-        0: {
-          id: 0,
-          description: 'foo',
-          handledAt: '2017-08-30T12:00:00Z',
-          children: [1]
-        },
-        1: {
-          id: 1,
-          description: 'bar',
-          handledAt: '2017-08-30T12:00:01Z',
-          children: [2, 3]
-        },
-        2: {
-          id: 2,
-          description: 'baz',
-          handledAt: '2017-08-30T12:00:02Z',
-          children: []
-        },
-        3: {
-          id: 3,
-          description: 'qux',
-          handledAt: '',
-          children: []
-        },
-        4: {
-          id: 4,
-          description: 'fizzbuzz',
-          handledAt: '',
-          children: []
+      session: {
+        protocolCommands: [0, 4],
+        protocolCommandsById: {
+          0: {
+            id: 0,
+            description: 'foo',
+            handledAt: '2017-08-30T12:00:00Z',
+            children: [1]
+          },
+          1: {
+            id: 1,
+            description: 'bar',
+            handledAt: '2017-08-30T12:00:01Z',
+            children: [2, 3]
+          },
+          2: {
+            id: 2,
+            description: 'baz',
+            handledAt: '2017-08-30T12:00:02Z',
+            children: []
+          },
+          3: {
+            id: 3,
+            description: 'qux',
+            handledAt: '',
+            children: []
+          },
+          4: {
+            id: 4,
+            description: 'fizzbuzz',
+            handledAt: '',
+            children: []
+          }
         }
       }
     })
@@ -150,17 +202,18 @@ describe('robot selectors', () => {
     })
 
     test('getStartTime without commands', () => {
-      expect(getStartTime(makeState({protocolCommands: []})))
+      expect(getStartTime(makeState({session: {protocolCommands: []}})))
         .toEqual('')
     })
 
     test('getRunTime', () => {
       const testGetRunTime = (seconds, expected) => {
         const stateWithRunTime = {
-          ...state,
           [NAME]: {
-            ...state[NAME],
-            runTime: Date.parse('2017-08-30T12:00:00.123Z') + (1000 * seconds)
+            session: {
+              ...state[NAME].session,
+              runTime: Date.parse('2017-08-30T12:00:00.123Z') + (1000 * seconds)
+            }
           }
         }
 
@@ -178,7 +231,7 @@ describe('robot selectors', () => {
     })
 
     test('getRunTime without commands', () => {
-      expect(getRunTime(makeState({protocolCommands: []})))
+      expect(getRunTime(makeState({session: {protocolCommands: []}})))
         .toEqual('00:00:00')
     })
 
@@ -232,62 +285,78 @@ describe('robot selectors', () => {
 
   test('get instruments', () => {
     const state = makeState({
-      currentInstrument: 'left',
-      protocolInstrumentsByAxis: {
-        left: {axis: 'left', channels: 8, volume: 200},
-        right: {axis: 'right', channels: 1, volume: 50}
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200},
+          right: {axis: 'right', name: 'p50s', channels: 1, volume: 50}
+        }
       },
-      instrumentCalibrationByAxis: {
-        left: {isProbed: true}
+      calibration: {
+        instrumentsByAxis: {
+          left: constants.PROBING
+        }
       }
     })
 
     expect(getInstruments(state)).toEqual([
       {
         axis: 'left',
+        name: 'p200m',
         channels: 'multi',
         volume: 200,
-        isProbed: true,
-        isCurrent: true
+        calibration: constants.PROBING
       },
       {
         axis: 'right',
+        name: 'p50s',
         channels: 'single',
         volume: 50,
-        isProbed: false,
-        isCurrent: false
+        calibration: constants.UNPROBED
       }
     ])
   })
 
   test('get instruments are calibrated', () => {
     const twoPipettesCalibrated = makeState({
-      protocolInstrumentsByAxis: {
-        left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
-        right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
+          right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+        }
       },
-      instrumentCalibrationByAxis: {
-        left: {isProbed: true},
-        right: {isProbed: true}
+      calibration: {
+        instrumentsByAxis: {
+          left: constants.PROBED,
+          right: constants.PROBED
+        }
       }
     })
 
     const twoPipettesNotCalibrated = makeState({
-      protocolInstrumentsByAxis: {
-        left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
-        right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
+          right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+        }
       },
-      instrumentCalibrationByAxis: {
-        left: {isProbed: true}
+      calibration: {
+        instrumentsByAxis: {
+          left: constants.UNPROBED,
+          right: constants.UNPROBED
+        }
       }
     })
 
     const onePipetteCalibrated = makeState({
-      protocolInstrumentsByAxis: {
-        left: {name: 'p200', axis: 'left', channels: 8, volume: 200}
+      session: {
+        protocolInstrumentsByAxis: {
+          right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+        }
       },
-      instrumentCalibrationByAxis: {
-        left: {isProbed: true}
+      calibration: {
+        instrumentsByAxis: {
+          right: constants.PROBED
+        }
       }
     })
 
@@ -298,16 +367,18 @@ describe('robot selectors', () => {
 
   test('get labware', () => {
     const state = makeState({
-      currentLabware: 5,
-      protocolLabwareBySlot: {
-        1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
-        5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
-        9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+      session: {
+        protocolLabwareBySlot: {
+          1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
+          5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
+          9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+        }
       },
-      labwareConfirmationBySlot: {
-        1: {isConfirmed: false},
-        5: {isConfirmed: true},
-        9: {isConfirmed: false}
+      calibration: {
+        labwareBySlot: {
+          1: constants.UNCONFIRMED,
+          5: constants.CONFIRMED
+        }
       }
     })
 
@@ -318,35 +389,32 @@ describe('robot selectors', () => {
         name: 'a1',
         type: 'a',
         isTiprack: true,
-        isConfirmed: false,
-        isCurrent: false
+        calibration: constants.UNCONFIRMED
       },
-      {slot: 2, isCurrent: false},
-      {slot: 3, isCurrent: false},
-      {slot: 4, isCurrent: false},
+      {slot: 2},
+      {slot: 3},
+      {slot: 4},
       {
         slot: 5,
         id: 'B2',
         name: 'b2',
         type: 'b',
         isTiprack: false,
-        isConfirmed: true,
-        isCurrent: true
+        calibration: constants.CONFIRMED
       },
-      {slot: 6, isCurrent: false},
-      {slot: 7, isCurrent: false},
-      {slot: 8, isCurrent: false},
+      {slot: 6},
+      {slot: 7},
+      {slot: 8},
       {
         slot: 9,
         id: 'C3',
         name: 'c3',
         type: 'c',
         isTiprack: false,
-        isConfirmed: false,
-        isCurrent: false
+        calibration: constants.UNCONFIRMED
       },
-      {slot: 10, isCurrent: false},
-      {slot: 11, isCurrent: false}
+      {slot: 10},
+      {slot: 11}
     ])
   })
 })
