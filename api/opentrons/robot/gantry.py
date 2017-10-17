@@ -44,10 +44,10 @@ DELTA = \
     ])
 
 
-def translate(x, y, z, mount_axis, operator=lambda a: a):
+def _translate(x, y, z, mount_axis, operator=lambda a: a):
     v = array([x, y, z, 1])
     transform = T
-    if mount_axis == 'z':
+    if mount_axis == RIGHT_Z_AXIS:
         transform = dot(transform, DELTA)
 
     x, y, z, _ = dot(operator(transform), v)
@@ -132,7 +132,7 @@ class InstrumentMover(object):
         position = self.mount.driver.position
 
         # current smoothie -> world
-        current_world = translate(
+        current_world = _translate(
             x=position['x'],
             y=position['y'],
             z=position[mount_axis],
@@ -142,7 +142,7 @@ class InstrumentMover(object):
         print('[MOVE] current WORLD: ', current_world)
 
         # world -> smoothie
-        target = translate(
+        target = _translate(
             x=x if x is not None else current_world['x'],
             y=y if y is not None else current_world['y'],
             z=z + z_offset if z is not None else current_world[mount_axis],

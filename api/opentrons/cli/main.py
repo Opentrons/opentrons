@@ -144,7 +144,7 @@ key_mappings = {
 
 
 def key_pressed(key):
-    global current_position, current_pipette, step_index, point_number, T
+    global current_position, current_pipette, step_index, point_number, XY
 
     if not isinstance(key, str):  # mouse clicked?
         return
