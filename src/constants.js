@@ -11,3 +11,6 @@ export const containerDims = {
   'trough-12row': {rows: 12, columns: 1, wellShape: 'rectangle'},
   '384-plate': {rows: 24, columns: 16, wellShape: 'circle-small'}
 }
+
+// The '.ot-selectable' classname is used to find collisions with SelectionRect
+export const SELECTABLE_CLASS = 'ot-selectable'

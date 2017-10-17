@@ -2,13 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
+import { SELECTABLE_CLASS } from '../constants.js'
 import styles from '../css/style.css'
 
 const Well = ({x, y, wellContent, ...otherProps}) => {
   const { preselected, selected, number } = wellContent
   return (
     <div
-      className={cx(styles.wellRound, {[styles.selected]: selected, [styles.highlighted]: preselected})}
+      className={cx(SELECTABLE_CLASS, styles.wellRound, {[styles.selected]: selected, [styles.highlighted]: preselected})}
       data-well-number={number}
       data-well-x={x}
       data-well-y={y}

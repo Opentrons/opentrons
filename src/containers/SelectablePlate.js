@@ -1,33 +1,47 @@
 import { connect } from 'react-redux'
-import range from 'lodash/range'
+// import range from 'lodash/range'
 
 import SelectablePlate from '../components/SelectablePlate.js'
 import { selectors } from '../reducers'
 import { preselectWells, selectWells } from '../actions'
+import { SELECTABLE_CLASS } from '../constants.js'
 
-// WORST HACK EVER. Samples pixels to find collision. (Ideally you'd only check bounds of each Well component,
-// but I can't get the bounds of each well without doing some ugly registration into Redux or passing all around...)
-// Is using document.getElementsByClassName and getting their bounding boxes and checking for collisions LESS hacky?
-// (It'll be more performant. But is there any downside to using getElementsByClassName in React?)
+const inRange = (value) => (range0, range1) => (
+  value >= Math.min(range0, range1) &&
+  value <= Math.max(range0, range1)
+)
+
 const getCollidingWells = rectPositions => {
   // Returns obj of selected wells under a collision rect
   // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
   const { x0, y0, x1, y1 } = rectPositions
-  const resolution = 10
 
-  // HACK: Sample pixels under collision rect, if they're wells then save their X, Y positions in the wellMatrix.
-  let selectedWells = {}
-  range(x0, x1 + resolution, resolution).forEach(xSample =>
-    range(y0, y1 + resolution, resolution).forEach(ySample => {
-      const collidingElem = document.elementFromPoint(xSample, ySample)
-      if ('wellX' in collidingElem.dataset && 'wellY' in collidingElem.dataset) {
-        const wellX = collidingElem.dataset['wellX']
-        const wellY = collidingElem.dataset['wellY']
-        selectedWells[wellX + ',' + wellY] = [wellX, wellY]
-      }
-    })
-  )
-  return selectedWells
+  // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
+  const selectableElems = [...document.querySelectorAll('.' + SELECTABLE_CLASS)]
+
+  const collidedElems = selectableElems.filter((selectableElem, i) => {
+    const { left, right, top, bottom } = selectableElem.getBoundingClientRect()
+
+    return (
+      (inRange(left)(x0, x1) || inRange(right)(x0, x1)) &&
+      (inRange(top)(y0, y1) || inRange(bottom)(y0, y1))
+    ) || (
+      (inRange(x0)(left, right) || inRange(x1)(left, right)) &&
+      (inRange(y0)(top, bottom) || inRange(y1)(top, bottom))
+    )
+  })
+
+  const collidedWellData = collidedElems.reduce((acc, elem) => {
+    if ('wellX' in elem.dataset && 'wellY' in elem.dataset) {
+      const wellX = elem.dataset['wellX']
+      const wellY = elem.dataset['wellY']
+      const wellKey = wellX + ',' + wellY
+      return {...acc, [wellKey]: [wellX, wellY]}
+    }
+    return acc
+  }, {})
+
+  return collidedWellData
 }
 
 export default connect(
