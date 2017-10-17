@@ -23,6 +23,14 @@ const mapDispatchToProps = (dispatch, props) => ({
   setLabwareConfirmed: (slot) => () => dispatch(robotActions.setLabwareConfirmed(slot))
 })
 
+// const mergeProps = (stateProps, dispatchProps) => {
+//   const props = {...stateProps, ...dispatchProps}
+
+//   if (!stateProps.labwareReviewed) props.moveToContainer = () => () => {}
+
+//   return props
+// }
+
 function ConnectedDeckConfig (props) {
   return (
     <DeckConfig {...props} />

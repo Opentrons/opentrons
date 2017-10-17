@@ -9,10 +9,10 @@ import singlePipetteSrc from '../img/pipette_single.png'
 import multiPipetteSrc from '../img/pipette_multi.png'
 
 export default function PipetteConfig (props) {
-  const {instruments} = props
+  const {instruments, side} = props
 
   const pipettes = instruments.map((instrument) => {
-    const {name, axis, channels, isCurrent, volume} = instrument
+    const {name, axis, channels, volume} = instrument
     const isUsed = name != null
 
     const img = channels === 'single'
@@ -21,7 +21,7 @@ export default function PipetteConfig (props) {
 
     const style = classnames(styles.pipette, styles[axis], {
       [styles.disabled]: !isUsed,
-      [styles.inactive]: !isCurrent
+      [styles.inactive]: axis !== side
     })
 
     const linkStyle = classnames(

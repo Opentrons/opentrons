@@ -53,7 +53,7 @@ function LabwareNotification (props) {
   } = props
 
   if (!labware) return null
-  if (isMoving) return (<RobotIsMovingPrompt />)
+  if (isMoving) return null
   if (isOverWell) {
     return (
       <ConfirmCalibrationPrompt
@@ -62,7 +62,7 @@ function LabwareNotification (props) {
       />
     )
   }
-
+  // Move This to setupPanel, ifIsCalibrated
   return (
     <BeginCalibrationPrompt
       {...labware}
@@ -93,13 +93,13 @@ function BeginCalibrationPrompt (props) {
   )
 }
 
-function RobotIsMovingPrompt () {
-  return (
-    <div className={styles.prompt}>
-      <h3>Robot Moving To well A1</h3>
-    </div>
-  )
-}
+// function RobotIsMovingPrompt () {
+//   return (
+//     <div className={styles.prompt}>
+//       <h3>Robot Moving To well A1</h3>
+//     </div>
+//   )
+// }
 
 ConfirmCalibrationPrompt.propTypes = {
   labware: PropTypes.shape({
@@ -142,25 +142,29 @@ DeckConfig.propTypes = {
 export default function DeckConfig (props) {
   const {
     labwareReviewed,
-    setLabwareReviewed,
     currentLabware,
     currentLabwareConfirmation,
     moveToContainer,
-    setLabwareConfirmed
+    setLabwareConfirmed,
+    slot
   } = props
+  const onConfirmClick = moveToContainer(slot)
+
   const deckMap = (<DeckMap {...props} />)
 
+  // TODO: current labware needs to be set while navigating to route
   if (!labwareReviewed) {
     return (
       <section className={styles.review_deck}>
-        {deckMap}
+        <div>
+          {deckMap}
+        </div>
         <div className={styles.review_message}>
           <p>
-            To begin labware setup, position your tipracks and
-            dry containers on designated deck slots as illustrated above.
+            Before entering Labware Setup, check that your labware is positioned correctly in the deck slots as illustrated above.
           </p>
-          <button className={styles.continue} onClick={setLabwareReviewed}>
-            Continue
+          <button className={styles.continue} onClick={onConfirmClick}>
+            CONTINUE MOVING TO {currentLabware.type}
           </button>
         </div>
       </section>

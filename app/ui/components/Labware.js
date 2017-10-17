@@ -32,12 +32,13 @@ export default function Labware (props) {
     )
   }
 
-  const style = classnames(styles.slot, {
-    [styles.confirmed]: isConfirmed,
-    [styles.active]: isCurrent && !isMoving,
-    [styles.disabled]: isDisabled,
-    [styles.confirmed]: isConfirmed && !isMoving
-  })
+  const style = labwareReviewed
+    ? classnames(styles.slot, {
+      [styles.active]: isCurrent && !isMoving,
+      [styles.disabled]: isDisabled,
+      [styles.confirmed]: isConfirmed && !isCurrent
+    })
+    : styles.slot
 
   const confirmationMsg = (!isConfirmed && labwareReviewed && !isCurrent)
     ? (<div className={styles.status}>Position Unconfirmed</div>)

@@ -33,9 +33,6 @@
 .inactive,
 .disabled {
   opacity: 0.5;
-}
-
-.disabled {
   pointer-events: none;
 }
 

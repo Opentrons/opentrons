@@ -15,17 +15,18 @@
 
 h1 {
   grid-area: title;
-  line-height: 4rem;
   padding: 0;
-  margin: 0 1rem;
+  margin: 0;
+  line-height: 3.5rem;
+  font-size: 1.25rem;
 }
 
 .links {
   grid-area: details;
 }
 
-.pipette_group > a,
-.labware_group > a {
+.pipette_group h3,
+.labware_group h3 {
   color: gray;
   text-decoration: none;
   font-size: 1rem;
@@ -66,17 +67,9 @@ h1 {
   pointer-events: none;
 }
 
-.step_list li a {
+.step_list button,
+.step_list a {
   color: black;
-  text-decoration: none;
-  background-color: #efefef;
-  display: block;
-  padding: 0.5rem 0;
-  line-height: 1rem;
-  font-size: 0.75rem;
-}
-
-.step_list button {
   background-color: #eee;
   width: 100%;
   display: block;
@@ -84,20 +77,26 @@ h1 {
   padding: 0.5rem;
   text-align: left;
   line-height: 1.5rem;
+  font-size: 0.75rem;
 }
 
 .step_list button:hover,
 .step_list a:hover {
-  background-color: #ccc;
+  background-color: #cdcdcd;
 }
 
-button.disabled {
+button.disabled,
+a.disabled {
   opacity: 0.5;
   pointer-events: none;
 }
 
-button.btn_labware {
+.step_list a.btn_labware {
   line-height: 2rem;
+}
+
+li:nth-child(odd) a.btn_labware {
+  background-color: #ccc;
 }
 
 .alert,
@@ -152,7 +151,7 @@ button.btn_labware {
   color: silver;
 }
 
-.pipette_group a.active {
-  background-color: #bbb;
-  color: white;
+.step_list li a.active,
+li:nth-child(odd) a.btn_labware.active {
+  background-color: #ddd;
 }

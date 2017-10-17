@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 import styles from './Splash.css'
 
-const STYLE = classnames('absolute absolute--fill', styles.placeholder)
+const STYLE = classnames('absolute absolute__fill', styles.placeholder)
 
 export default function Splash () {
   return (

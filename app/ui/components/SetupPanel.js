@@ -9,6 +9,7 @@ import styles from './SetupPanel.css'
 function PipetteLinks (props) {
   const {axis, name, volume, channels, isProbed, onClick} = props
   const isDisabled = name == null
+  const url = `/setup-instruments/${axis}`
 
   const statusStyle = isProbed || isDisabled
     ? styles.confirmed
@@ -20,31 +21,37 @@ function PipetteLinks (props) {
 
   return (
     <li>
-      <button onClick={onClick}>
+      <NavLink to={url} onClick={onClick} activeClassName={styles.active}>
         <span className={classnames(statusStyle, 'tooltip_parent')}>
           <ToolTip msg='Tip not found' pos='bottom' />
         </span>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{description}</span>
-      </button>
+      </NavLink>
     </li>
   )
 }
 
 function LabwareLinks (props) {
-  const {name, isConfirmed, isTiprack, tipracksConfirmed, onClick} = props
+  const {name, slot, isConfirmed, isTiprack, tipracksConfirmed, onClick} = props
   const isDisabled = !isTiprack && !tipracksConfirmed
   const buttonStyle = classnames(styles.btn_labware, {[styles.disabled]: isDisabled})
   const statusStyle = classnames({[styles.confirmed]: isConfirmed, [styles.alert]: !isConfirmed})
-
+  const url = `/setup-deck/${slot}`
   return (
     <li>
-      <button className={buttonStyle} onClick={onClick} disabled={isDisabled}>
+      <NavLink
+        to={url}
+        activeClassName={styles.active}
+        className={buttonStyle}
+        onClick={onClick}
+        disabled={isDisabled}
+      >
         <span className={classnames(statusStyle, 'tooltip_parent')}>
           <ToolTip msg='Position unconfirmed' pos='bottom' />
         </span>
         {name}
-      </button>
+      </NavLink>
     </li>
   )
 }
@@ -66,7 +73,7 @@ export default function SetupPanel (props) {
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack} = lab
-    const onClick = setLabware(slot)
+    const onClick = setLabware(slot) // setLabwareReviewed(false)
     const links = (
       <LabwareLinks
         {...lab}
@@ -98,13 +105,13 @@ export default function SetupPanel (props) {
       <h1>Prepare Robot for RUN</h1>
       <section className={styles.links}>
         <section className={styles.pipette_group}>
-          <NavLink to='/setup-instruments' activeClassName={styles.active}>Pipette Setup</NavLink>
+          <h3>Pipette Setup</h3>
           <ul className={styles.step_list}>
             {instrumentList}
           </ul>
         </section>
         <section className={styles.labware_group}>
-          <NavLink to='/setup-deck' activeClassName={styles.active}>Labware Setup</NavLink>
+          <h3>Labware Setup</h3>
           {labwareMsg}
           <ul className={classnames({[styles.unavailable]: !instrumentsCalibrated}, styles.step_list)}>
             {tiprackList}
