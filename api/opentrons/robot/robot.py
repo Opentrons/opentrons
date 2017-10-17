@@ -28,6 +28,7 @@ log = get_logger(__name__)
 DECK_OFFSET = {'x': 0, 'y': 0, 'z': 0}
 MAX_INSTRUMENT_HEIGHT = 227.0000
 
+
 class InstrumentMosfet(object):
     """
     Provides access to MagBead's MOSFET.

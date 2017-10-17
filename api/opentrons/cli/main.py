@@ -82,54 +82,6 @@ def step():
     """
     Given current step index return step value in mm
     """
-=======
-# Top-left
-# expected = [
-#     (64,    354.70),  # 1
-#     (329,   354.70),  # 3
-#     (196.50, 83.70),  # 11
-# ]
-
-
-# (0, 0) in bottom-left
-expected = [
-    (64.0, 2.30),       # 1
-    (329.0, 2.30),      # 3
-    (196.50, 273.80)    # 11
-]
-
-# Has X, Y only. To be able to calculate Z
-# we need known points of variable height.
-# Deck's zero Z is Smoothie's 140.0
-actual = [
-    (33.0, 5.25),
-    (298.0, 6.25),
-    (169.5, 276.0),
-]
-
-# These correspond to sharp edge
-# of machined numbers on the deck
-# to test translation accuracy.
-test_points = [
-    (332.13, 47.41),   # 3
-    (190.65, 227.57),  # 8
-    (330.14, 222.78)   # 9
-]
-
-# T * World = Smoothie
-T = \
-    array([[1.00094340e+00,   1.33517495e-02,  -3.10910864e+01],
-           [2.83018868e-03,   9.95856354e-01,   2.27839831e+00],
-           [8.67361738e-19,   1.60461922e-17,   1.00000000e+00]])
-
-# To showcase what uncalibrated robot looks like
-# T = \
-#     array([[1.0,  0.0,  0.0],
-#            [0.0,  1.0,  0.0],
-#            [0.0,  0.0,  1.0]])
-
-
-def step():
     return steps[step_index]
 
 
