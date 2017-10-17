@@ -68,6 +68,7 @@ class Placeable(object):
         self.children_by_name = OrderedDict()
         self.children_by_reference = OrderedDict()
         self._coordinates = Vector(0, 0, 0)
+        self._max_dimensions = {}
 
         self.parent = parent
 

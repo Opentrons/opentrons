@@ -3,6 +3,8 @@ from opentrons.util import pose_functions as pose_funcs
 from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.broker import publish, topics
 from opentrons import robot
+from numpy import array, dot, isclose, insert
+from numpy.linalg import inv
 
 
 RIGHT_MOUNT_OFFSET = {'x':0, 'y':0, 'z':0.0}
@@ -15,6 +17,42 @@ RIGHT_INSTRUMENT_ACTUATOR = 'c'
 
 LEFT_Z_AXIS = 'z'
 RIGHT_Z_AXIS = 'a'
+
+Z_OFFSET = 45
+
+# World -> Smoothie
+# use cli/main.py to perform factory calibration
+XY = \
+    array([[  2.00633580e+00,   1.16263441e-02,  -4.51928609e+02],
+           [ -3.34703575e-03,   1.95997984e+00,  -3.65876516e+02],
+           [ -4.83204440e-19,   1.73472348e-18,   1.00000000e+00]])
+
+# Add column and row to make it a 3D transform
+T = insert(
+        insert(XY, 2, [0, 0, 0], axis=1),
+        2,
+        [0, 0, 1, Z_OFFSET],
+        axis=0)
+
+# Right Pipette -> Left Pipette (in World)
+DELTA = \
+    array([
+        [1, 0, 0, 37.20],
+        [0, 1, 0, -30.69],
+        [0, 0, 1, 1.13],
+        [0, 0, 0, 1]
+    ])
+
+
+def translate(x, y, z, mount_axis, operator=lambda a: a):
+    v = array([x, y, z, 1])
+    transform = T
+    if mount_axis == 'z':
+        transform = dot(transform, DELTA)
+
+    x, y, z, _ = dot(operator(transform), v)
+
+    return {'x': x, 'y': y, mount_axis: z}
 
 
 def resolve_all_coordinates(tracked_object, pose_tracker, x=None, y=None, z=None):
@@ -39,6 +77,7 @@ def _coords_for_axes(driver, axes):
         in driver.position.items()
         if axis in axes
     }
+
 
 class InstrumentActuator(object):
     """
@@ -76,7 +115,7 @@ class InstrumentMover(object):
         self.mount = mount
         self.instrument = instrument
 
-    def move(self, x=None, y=None, z=None):
+    def move(self, x=None, y=None, z=None, z_offset=0):
         ''' Move motor
         - Resolve the full x,y,z goal position for the instrument
 
@@ -88,30 +127,51 @@ class InstrumentMover(object):
         can only move in z)
         - Move the mount to the target z
         '''
+        mount_axis = self.mount.mount_axis
+        driver = self.mount.driver
+        position = self.mount.driver.position
 
-        print('--[InstrumentMover.move] move: {}'.format((x, y, z)))
+        # current smoothie -> world
+        current_world = translate(
+            x=position['x'],
+            y=position['y'],
+            z=position[mount_axis],
+            mount_axis=self.mount.mount_axis,
+            operator=inv)
 
-        goal_inst_pos = \
-            resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
+        print('[MOVE] current WORLD: ', current_world)
 
-        print('--[InstrumentMover.move] absolute goal: {}'.format(goal_inst_pos))
+        # world -> smoothie
+        target = translate(
+            x=x if x is not None else current_world['x'],
+            y=y if y is not None else current_world['y'],
+            z=z + z_offset if z is not None else current_world[mount_axis],
+            mount_axis=self.mount.mount_axis)
 
-        goal_x, goal_y, _ = pose_funcs.target_inst_position(
-            self.gantry._pose_tracker, self.gantry, self.instrument, **goal_inst_pos)
-        self.gantry.move(x=goal_x, y=goal_y)
+        print('[MOVE] position: ', position)
+        print('[MOVE] target SMOOTHIE: ', target)
 
-        print('--[InstrumentMover.move] gantry target x,y: {}'.format((goal_x, goal_y)))
+        axis_to_move = [
+            axis
+            for axis, value
+            in {'x': x, 'y': y, self.mount.mount_axis: z}.items()
+            if value is not None
+        ]
 
-        goal_inst_pos = \
-            resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
+        target = {
+            axis: value for axis, value
+            in target.items()
+            if axis in axis_to_move
+        }
 
+        print('[MOVE] actual move: ', target)
 
-        _, _, goal_z = pose_funcs.target_inst_position(
-            self.gantry._pose_tracker, self.mount, self.instrument, **goal_inst_pos)
-        self.mount.move(z=goal_z)
-
-        print('--[InstrumentMover.move] mount target z: {}'.format(goal_z))
-
+        driver.move(**{
+            axis: value for axis, value in target.items()
+            if axis in 'xy'})
+        driver.move(**{
+            axis: value for axis, value in target.items()
+            if axis == self.mount.mount_axis})
 
     def probe(self, axis_to_probe, probing_movement):
         if axis_to_probe is 'z':
@@ -120,6 +180,7 @@ class InstrumentMover(object):
 
     def home(self):
         self.mount.home()
+
 
 class Gantry:
     '''

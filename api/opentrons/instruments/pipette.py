@@ -14,7 +14,8 @@ class PipetteTip:
         self.length = length
 
 # This should come from configuration if tip length is not already in db
-DEFAULT_TIP_LENGTH = 53.2
+DEFAULT_TIP_LENGTH = 46
+
 
 class Pipette:
     """
@@ -93,7 +94,7 @@ class Pipette:
         self.robot = robot
         self.mount = mount
         self.channels = channels
-
+        self._z_offset = 0
         self.attached_tip = None
         self.instrument_actuator = None
         self.instrument_mover = None
@@ -765,10 +766,10 @@ class Pipette:
 
             self.move_to(self.current_tip().top(0), strategy='arc')
 
-            tip_plunge = -7
+            tip_plunge = 5
             for i in range(int(presses) - 1):
-                self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
+                self.move_to(self.current_tip().top(-tip_plunge), strategy='direct')
             self._add_tip(DEFAULT_TIP_LENGTH)
             self.instrument_mover.home()
             return self
@@ -1383,15 +1384,16 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
-        print('-[Pipette._move] moving to {}'.format((x,y,z)))
-        self.instrument_mover.move(x, y, z)
+        print('-[Pipette._move] moving to {}'.format((x, y, z)))
+        self.instrument_mover.move(x, y, z, self._z_offset)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
-
+        # TODO: account for tip offset during jog to avoid
+        # jogging in tip offset increments when tip is on
+        self._z_offset = length
 
     def _remove_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)
+        self._z_offset = 0

@@ -75,8 +75,8 @@ class SmoothieDriver_3_0_0:
     @property
     def position(self):
         if self.simulating:
-            return {k.lower(): v for k, v in self._position.items()}
-
+            res = {k.lower(): v for k, v in self._position.items()}
+            return res
         try:
             position_response = self._send_command(GCODES['CURRENT_POSITION'])
             parsed_position = _parse_axis_values(position_response)
@@ -128,9 +128,10 @@ class SmoothieDriver_3_0_0:
         command_line = command + ' M400'
 
         if self.simulating:
-            print('[DRIVER - SIMULATING] sending command {}'.format(repr(command_line)))
+            pass
+            # print('[DRIVER - SIMULATING] sending command {}'.format(repr(command_line)))
         else:
-            print('[DRIVER] sending command {}'.format(repr(command_line)))
+            # print('[DRIVER] sending command {}'.format(repr(command_line)))
             return serial_communication.write_and_return(
                 command_line, self.connection, timeout)
 
@@ -153,7 +154,7 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             self._update_position({
                 axis: value
-                for axis, value in zip('xyzabc', [x, y, z, a, b, c])
+                for axis, value in zip('XYZABC', [x, y, z, a, b, c])
             })
 
         target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
@@ -164,7 +165,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
 
     def home(self, axis=None):
-        homed_positions = {'X': 395, 'Y': 345, 'Z': 228, 'A': 228, 'B': 20, 'C': 20}
+        homed_positions = {'X': 400, 'Y': -282, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
         if not axis:
             if self.simulating:
                 self._update_position(homed_positions)
@@ -173,7 +174,8 @@ class SmoothieDriver_3_0_0:
             axes_to_home = [ax for ax in axis.upper() if ax in AXES_SAFE_TO_HOME]
             if axes_to_home:
                 if self.simulating:
-                    self._update_position({axis: homed_positions[axis] for axis in axes_to_home})
+                    pos = {axis: homed_positions[axis] for axis in axes_to_home}
+                    self._update_position(pos)
                 command = GCODES['HOME'] + ''.join(axes_to_home)
                 self._send_command(command)
             else:

@@ -22,8 +22,10 @@ log = get_logger(__name__)
 
 # DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
 
+# FIXME: (Jared 9/18/17)
+# This should be a head object - but using a string now to avoid scope creep
 
-DECK_OFFSET = {'x': -31.45, 'y':-20.1, 'z':0} # Avagadro
+DECK_OFFSET = {'x': 0, 'y': 0, 'z': 0}
 MAX_INSTRUMENT_HEIGHT = 227.0000
 
 class InstrumentMosfet(object):
@@ -623,6 +625,7 @@ class Robot(object):
         )
 
         for slot in self._deck:
+            print('Slot: ', slot, slot._coordinates)
             self.pose_tracker.track_object(
                 self._deck,
                 slot,

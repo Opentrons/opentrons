@@ -50,7 +50,6 @@ def migrate_containers_and_wells():
     for container_name in list_container_names():
         print('migrating {} from json to database'.format(container_name))
         container = get_persisted_container(container_name)
-
         container = rotate_container_for_alpha(container)
         print("CONTAINER: {}, {}".format(container_name, container._coordinates))
 
