@@ -41,7 +41,7 @@ function LabwareLinks (props) {
     <li>
       <button className={buttonStyle} onClick={onClick} disabled={isDisabled}>
         <span className={classnames(statusStyle, 'tooltip_parent')}>
-          <ToolTip msg='Not confirmed' pos='bottom' />
+          <ToolTip msg='Position unconfirmed' pos='bottom' />
         </span>
         {name}
       </button>
@@ -85,10 +85,13 @@ export default function SetupPanel (props) {
     return result
   }, {tiprackList: [], labwareList: []})
 
-  const runLinkStyles = classnames({[styles.disabled]: !labwareConfirmed}, styles.run_link, 'tooltip_parent')
+  const runLinkStyles = classnames({[styles.inactive]: !labwareConfirmed}, styles.run_link, 'tooltip_parent')
   const runLinkWarning = 'Pipette and labware setup must be complete before you can RUN protocol'
   const labwareMsg = !instrumentsCalibrated
     ? <p className={styles.labware_alert}>Labware setup is disabled until pipette setup is complete.</p>
+    : null
+  const pipetteMsg = !tipracksConfirmed && instrumentsCalibrated
+    ? <p className={classnames(styles.labware_alert, styles.tiprack)}>Tipracks must be setup first.</p>
     : null
   return (
     <div className={styles.setup_panel}>
@@ -107,6 +110,7 @@ export default function SetupPanel (props) {
             {tiprackList}
             {labwareList}
           </ul>
+          {pipetteMsg}
         </section>
       </section>
       <NavLink to='/run' className={runLinkStyles}>

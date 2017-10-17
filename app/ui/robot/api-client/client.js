@@ -135,6 +135,8 @@ export default function client (dispatch) {
       protocolLabwareBySlot: labwares
     } = selectors.getState(state)
 
+    // FIXME - MORE DEBUG CODE
+    // return setTimeout(() => dispatch(actions.moveToResponse()), 2000)
     remote.calibration_manager.move_to(instruments[axis], labwares[slot])
       .then(() => dispatch(actions.moveToResponse()))
       .catch((error) => dispatch(actions.moveToResponse(error)))

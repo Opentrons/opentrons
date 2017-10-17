@@ -1,4 +1,5 @@
 .task {
   flex: 1 1;
   border-left: 1px solid silver;
+  position: relative;
 }

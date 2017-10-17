@@ -14,13 +14,14 @@ DeckMap.propTypes = {
 }
 
 function DeckMap (props) {
-  const {tipracksConfirmed, labwareReviewed} = props
-
+  const {tipracksConfirmed, labwareReviewed, currentLabwareConfirmation} = props
+  const {isMoving} = currentLabwareConfirmation
   const labware = props.labware.map((lab) => (<Labware
     {...lab}
     key={lab.slot}
     isDisabled={!lab.isTiprack && !tipracksConfirmed}
     labwareReviewed={labwareReviewed}
+    isMoving={isMoving}
   />))
 
   return (
@@ -95,7 +96,7 @@ function BeginCalibrationPrompt (props) {
 function RobotIsMovingPrompt () {
   return (
     <div className={styles.prompt}>
-      <h3>Robot Moving To [slot] well A1</h3>
+      <h3>Robot Moving To well A1</h3>
     </div>
   )
 }
@@ -147,7 +148,6 @@ export default function DeckConfig (props) {
     moveToContainer,
     setLabwareConfirmed
   } = props
-
   const deckMap = (<DeckMap {...props} />)
 
   if (!labwareReviewed) {

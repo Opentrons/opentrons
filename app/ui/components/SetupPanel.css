@@ -56,6 +56,11 @@ h1 {
   height: 3rem;
 }
 
+.labware_alert.tiprack {
+  height: 2rem;
+  line-height: 2rem;
+}
+
 .unavailable {
   opacity: 0.1;
   pointer-events: none;
@@ -141,7 +146,7 @@ button.btn_labware {
   position: relative;
 }
 
-.disabled {
+.inactive {
   background-color: transparent;
   border: 1px solid silver;
   color: silver;

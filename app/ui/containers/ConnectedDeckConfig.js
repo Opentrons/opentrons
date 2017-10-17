@@ -13,7 +13,6 @@ const mapStateToProps = (state) => ({
   labwareReviewed: robotSelectors.getLabwareReviewed(state),
   tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
   labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
-
   currentLabwareConfirmation: robotSelectors.getCurrentLabwareConfirmation(state)
 })
 
