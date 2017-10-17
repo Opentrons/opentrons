@@ -15,8 +15,8 @@ const AddLabware = props => (
   </div>
 )
 
-// TODO: move to utils
-const getImg = containerName => {
+// TODO: use container component instead
+const getPlateTopdownImg = containerName => {
   const getUrl = imageFileName => `https://s3.amazonaws.com/opentrons-images/website/labware/${imageFileName}.png`
 
   const plates96 = [
@@ -44,7 +44,7 @@ const getImg = containerName => {
 const DeckSlot = ({slotName, container, children, onAddIngredientsClick, onRemoveContainerClick}) => (
   <div className={styles.deckSlot}>
     {container
-      ? <img src={getImg(container)} />
+      ? <img src={getPlateTopdownImg(container)} />
       : <label>{slotName}</label>}
 
     {container &&
@@ -72,49 +72,83 @@ class Accordion extends React.Component {
     return (
       <li onClick={e => this.setState({collapsed: !collapsed})}>
         <label>{title} {collapsed ? '►' : '▼'}</label>
-        {!collapsed && <li><ul>
+        {!collapsed && <ul>
           {children}
-        </ul></li>}
+        </ul>}
       </li>
     )
   }
 }
 
-const LabwareDropdown = ({onClose, selectLabwareToAdd}) => (
-  <div className={styles.labwareDropdown}>
-    <label>Labware Type</label>
-    <div className='close' onClick={onClose}>X</div>
-    <ul>
-      <Accordion title='Tip Rack'>
-        <li onClick={e => selectLabwareToAdd('tiprack-10ul')}>10uL Tip Rack</li>
-        <li onClick={e => selectLabwareToAdd('tiprack-200ul')}>200uL Tip Rack</li>
-        <li onClick={e => selectLabwareToAdd('tiprack-1000ul')}>1000uL Tip Rack</li>
-        <li onClick={e => selectLabwareToAdd('tiprack-1000ul-chem')}>10x10 1000uL Chem-Tip Rack</li>
-      </Accordion>
-      <Accordion title='Tube Rack'>
-        <li onClick={e => selectLabwareToAdd('tube-rack-.75ml')}>0.75mL Tube Rack</li>
-        <li onClick={e => selectLabwareToAdd('tube-rack-2ml')}>2mL Tube Rack</li>
-        <li onClick={e => selectLabwareToAdd('tube-rack-15_50ml')}>15mL x 6 + 50mL x 4 Tube Rack</li>
-      </Accordion>
-      <Accordion title='Well Plate'>
-        <li onClick={e => selectLabwareToAdd('96-deep')}>96 Deep Well Plate</li>
-        <li onClick={e => selectLabwareToAdd('96-tall')}>96 Well Plate (Tall)</li>
-        <li onClick={e => selectLabwareToAdd('96-flat')}>96 Well Plate (Flat)</li>
-        <li onClick={e => selectLabwareToAdd('96-custom')}>96 Well Plate (CUSTOM)</li>
-        <li onClick={e => selectLabwareToAdd('384-plate')}>384 Well Plate</li>
-      </Accordion>
-      <Accordion title='Trough'>
-        <li onClick={e => selectLabwareToAdd('trough-12row')}>12-row Trough</li>
-      </Accordion>
-      <Accordion title='PCR Strip'>
-        <li onClick={e => selectLabwareToAdd('PCR-strip-tall')}>PCR Strip Tall</li>
-      </Accordion>
-      <Accordion title='Trash'>
-        <li onClick={e => selectLabwareToAdd('trash-box')}>Trash Box</li>
-      </Accordion>
-    </ul>
-  </div>
+const LabwareItem = ({selectLabwareToAdd, containerType, containerImgUrl, displayName}) => (
+  <li
+    className={styles.labwareListItem}
+    onClick={e => selectLabwareToAdd(containerType)}
+    style={containerImgUrl && {'--image-url': `url(${containerImgUrl})`
+    }}
+  >
+    {displayName}
+  </li>
 )
+
+const LabwareDropdown = ({onClose, selectLabwareToAdd}) => {
+  const labwareItemMapper = (item, key) => (
+    <LabwareItem key={key}
+      containerType={item[0]}
+      displayName={item[1]}
+      selectLabwareToAdd={selectLabwareToAdd}
+      containerImgUrl={item.length >= 3 && `http://docs.opentrons.com/_images/${item[2]}.png`}
+    />
+  )
+
+  return (
+    <div className={styles.labwareDropdown}>
+      <label>Labware Type</label>
+      <div className='close' onClick={onClose}>X</div>
+      <ul>
+        <Accordion title='Tip Rack'>
+          {[
+            ['tiprack-10ul', '10uL Tip Rack', 'Tiprack-10ul'],
+            ['tiprack-200ul', '200uL Tip Rack', 'Tiprack-200ul'],
+            ['tiprack-1000ul', '1000uL Tip Rack', 'Tiprack-200ul'],
+            ['tiprack-1000ul-chem', '10x10 1000uL Chem-Tip Rack', 'Tiprack-1000ul-chem']
+          ].map(labwareItemMapper)}
+        </Accordion>
+        <Accordion title='Tube Rack'>
+          {[
+            ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
+            ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
+            ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml']
+          ].map(labwareItemMapper)}
+        </Accordion>
+        <Accordion title='Well Plate'>
+          {[
+            ['96-deep', '96 Deep Well Plate', '96-Deep-Well'],
+            ['96-tall', '96 Well Plate (Tall)', '96-PCR-Tall'],
+            ['96-flat', '96 Well Plate (Flat)', '96-PCR-Flatt'],
+            ['96-custom', '96 Well Plate (CUSTOM)', '96-PCR-Flatt'],
+            ['384-plate', '384 Well Plate', '384-plate']
+          ].map(labwareItemMapper)}
+        </Accordion>
+        <Accordion title='Trough'>
+          {[
+            ['trough-12row', '12-row Trough', 'Trough-12row']
+          ].map(labwareItemMapper)}
+        </Accordion>
+        <Accordion title='PCR Strip'>
+          {[
+            ['PCR-strip-tall', 'PCR Strip Tall', '96-PCR-Strip']
+          ].map(labwareItemMapper)}
+        </Accordion>
+        <Accordion title='Trash'>
+          {[
+            ['trash-box', 'Trash Box']
+          ].map(labwareItemMapper)}
+        </Accordion>
+      </ul>
+    </div>
+  )
+}
 
 const Deck = props => {
   const {

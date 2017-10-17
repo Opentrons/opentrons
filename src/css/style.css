@@ -255,7 +255,8 @@ textarea {
 
 .labwareDropdown > ul {
   background-color: white;
-  overflow-y: scroll;
+  /* Overflowing, even just y, messes with tooltips... */
+  /*overflow-y: scroll;*/
 }
 
 /*.labwareDropdown > ul li ul li {
@@ -395,4 +396,30 @@ textarea {
 .ingredientPropRightSide button:last-child {
   margin-left: 0.4em;
   margin-top: 1em;
+}
+
+/* ----- */
+
+.labwareListItem {
+  position: relative;
+  width: 100%;
+}
+
+.labwareListItem:hover::after {
+  /*display: none;*/
+  content: var(--image-url);
+  background-size: 80px 60px;
+  border: 2px solid darkgray;
+  position: absolute;
+
+  /* Images too large, and need to be cropped from left */
+  zoom: 0.5;
+  clip-path: inset(0px 0px 0px 360px);
+
+  top: 0;
+  /*left: calc(slotWidth * slotScale * 1);*/
+  left: 0;
+  /*width: 200px;
+  height: 200px;*/
+  z-index: 5000;
 }
