@@ -23,7 +23,7 @@ log = get_logger(__name__)
 # DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
 
 
-DECK_OFFSET = {'x': -31.45, 'y':-.1, 'z':7} # Avagadro
+DECK_OFFSET = {'x': -31.45, 'y':-20.1, 'z':0} # Avagadro
 
 
 class InstrumentMosfet(object):

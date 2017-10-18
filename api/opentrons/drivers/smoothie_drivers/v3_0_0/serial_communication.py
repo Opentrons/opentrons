@@ -81,10 +81,10 @@ def _attempt_command_recovery(command, serial_conn):
 def write_and_return(command, serial_connection, timeout=None):
     '''Write a command and return the response'''
     clear_buffer(serial_connection)
-    with serial_with_temp_timeout(serial_connection, timeout) as device_connection:
+    with serial_with_temp_timeout(serial_connection, 30) as device_connection: #CHANGED DEFAULT TIMEOUT TO 30
         response = _write_to_device_and_return(command, device_connection)
-    if response is None: # this could be more robust - maybe a `try` `except`?
-        response = _attempt_command_recovery(command, serial_connection)
+    # if response is None: # this could be more robust - maybe a `try` `except`?
+    #     response = _attempt_command_recovery(command, serial_connection)
     return response
 
 

@@ -102,6 +102,10 @@ class InstrumentMover(object):
 
         print('--[InstrumentMover.move] gantry target x,y: {}'.format((goal_x, goal_y)))
 
+        goal_inst_pos = \
+            resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
+
+
         _, _, goal_z = pose_funcs.target_inst_position(
             self.gantry._pose_tracker, self.mount, self.instrument, **goal_inst_pos)
         self.mount.move(z=goal_z)
@@ -142,7 +146,7 @@ class Gantry:
     def _position_from_driver(self):
         return _coords_for_axes(self.driver, self.free_axes)
 
-    def move(self, x, y):
+    def move(self, x=None, y=None):
         ''' Moves the Gantry in the x, y plane '''
         self.driver.move(x=x, y=y)
         self._publish_position()

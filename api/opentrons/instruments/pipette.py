@@ -765,7 +765,7 @@ class Pipette:
 
             self.move_to(self.current_tip().top(0), strategy='arc')
 
-            tip_plunge = -16
+            tip_plunge = -7
             for i in range(int(presses) - 1):
                 self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
