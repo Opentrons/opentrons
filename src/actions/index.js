@@ -1,11 +1,5 @@
 import { createActions } from 'redux-actions'
-
-// Payload mappers
-// const mouseCoordPayload = e => ({
-//   x: e.clientX,
-//   y: e.clientY,
-//   targetData: e.target && e.target.dataset
-// })
+import { selectors } from '../reducers'
 
 // Actions
 export const {
@@ -23,7 +17,9 @@ export const {
   selectWells,
   deselectWells,
 
-  editIngredientGroup
+  editModeIngredientGroup,
+  // editIngredient,
+  deleteIngredientGroup
 } = createActions({
   OPEN_LABWARE_SELECTOR: undefined,
   CLOSE_LABWARE_SELECTOR: undefined,
@@ -39,5 +35,15 @@ export const {
   SELECT_WELLS: undefined,
   DESELECT_WELLS: undefined,
 
-  EDIT_INGREDIENT_GROUP: undefined // Payload example: {group: 2, wellName: 'H1' (wellName is optional)}
+  EDIT_MODE_INGREDIENT_GROUP: undefined, // Payload example: {group: 2, wellName: 'H1' (wellName is optional)}
+  DELETE_INGREDIENT_GROUP: undefined
 })
+
+// editIngredient needs access to the larger state, so it's a thunk
+export const editIngredient = payload => (dispatch, getState) => (dispatch({
+  type: 'EDIT_INGREDIENT',
+  payload: {
+    ...payload,
+    slotName: selectors.selectedContainerSlot(getState())
+  }
+}))

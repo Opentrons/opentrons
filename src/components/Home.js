@@ -15,7 +15,7 @@ import Deck from './Deck.js'
 
 const ConnectedDeck = connect(
   state => ({
-    loadedContainers: selectors.loadedContainers(state),
+    loadedContainers: selectors.loadedContainersBySlot(state),
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state)
   }),

@@ -6,18 +6,18 @@ import get from 'lodash/get'
 // TODO factor into CSS or constants or elsewhere
 const swatchColors = ['blue', 'orange', 'red', 'purple', 'green', 'yellow', 'brown', 'pink']
 
-const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editIngredientGroup, ...otherProps}) => {
+const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editModeIngredientGroup, deleteIngredientGroup, ...otherProps}) => {
   if (ingredCategoryData.wells.length === 1) {
     // Single ingredient, card is rendered differently
     return (
       <div className={styles.singleIngred} >
         <IngredIndividual
+          canDelete
           name={ingredCategoryData.name}
           wellName={ingredCategoryData.wells[0]}
           volume={ingredCategoryData.volume}
           concentration={ingredCategoryData.concentration}
-          ingredCategoryIdx={ingredCategoryIdx}
-          editIngredientGroup={editIngredientGroup}
+          {...{ingredCategoryIdx, editModeIngredientGroup, deleteIngredientGroup}}
           {...otherProps} />
       </div>
     )
@@ -39,14 +39,13 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editIngredientG
               wellName={wellName}
               volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
               concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
-              ingredCategoryIdx={ingredCategoryIdx}
-              editIngredientGroup={editIngredientGroup}
+              {...{ingredCategoryIdx, editModeIngredientGroup, deleteIngredientGroup}}
             />
           )
           // Not individualized, but multiple wells
           : <div className={styles.ingredientInlineDetail}>
-            {ingredCategoryData.wells.map(wellName =>
-              <div>
+            {ingredCategoryData.wells.map((wellName, i) =>
+              <div key={i}>
                 <label>{wellName}</label>
                 <input placeholder={ingredCategoryData.volume + ' uL'} />
               </div>
@@ -55,33 +54,33 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editIngredientG
       }
 
       <footer>
-        <div className={styles.editButton} onClick={e => editIngredientGroup({group: ingredCategoryIdx})}>EDIT</div>
+        <div className={styles.editButton} onClick={e => editModeIngredientGroup({group: ingredCategoryIdx})}>EDIT</div>
         <div>▼</div>
-        <div className={styles.deleteIngredient}>✕</div>
+        <div className={styles.deleteIngredient} onClick={e => deleteIngredientGroup({group: ingredCategoryIdx})}>✕</div>
       </footer>
     </section>
   )
 }
 
-const IngredIndividual = ({name, wellName, volume, concentration, canDelete, ingredCategoryIdx, editIngredientGroup, ...otherProps}) => (
+const IngredIndividual = ({name, wellName, volume, concentration, canDelete, ingredCategoryIdx, editModeIngredientGroup, deleteIngredientGroup, ...otherProps}) => (
   <div {...otherProps}
     className={styles.ingredientInstanceItem}
     style={{'--swatch-color': swatchColors[ingredCategoryIdx]}}
   >
     <div className={styles.leftPill}>
       <label>{name}</label>
-      <button className={styles.editButton} onClick={e => editIngredientGroup({wellName, group: ingredCategoryIdx})}>EDIT</button>
+      <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, group: ingredCategoryIdx})}>EDIT</button>
     </div>
     <div className={styles.rightPill}>
       <input placeholder={wellName} />
       <input placeholder={volume + ' uL'} />
       <input placeholder={concentration === null ? '-' : concentration + '%'} />
-      {canDelete && <div className={styles.deleteIngredient}>✕</div>}
+      {canDelete && <div className={styles.deleteIngredient} onClick={e => deleteIngredientGroup({wellName, group: ingredCategoryIdx})}>✕</div>}
     </div>
   </div>
 )
 
-const IngredientsList = ({slotName, containerName, containerType, ingredients, editIngredientGroup}) => (
+const IngredientsList = ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredientGroup}) => (
   <div className={styles.ingredientsList}>
     <div className={styles.ingredListHeaderLabel}>
       <div>Slot {slotName}</div>
@@ -92,7 +91,7 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients, e
     </div>
 
     {ingredients.map((ingredCategoryData, i) =>
-      <IngredGroupCard key={i} ingredCategoryIdx={i} {...{editIngredientGroup, ingredCategoryData}} />)
+      <IngredGroupCard key={i} ingredCategoryIdx={i} {...{editModeIngredientGroup, deleteIngredientGroup, ingredCategoryData}} />)
     }
 
     {/* Each section is a detail view of 1 ingredient */}

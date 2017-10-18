@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import { createSelector } from 'reselect'
 // import pickBy from 'lodash/pickBy'
 import range from 'lodash/range'
 
@@ -9,6 +10,44 @@ const sortedSlotnames = [].concat.apply( // flatten
   [],
   [1, 2, 3].map(num => ['A', 'B', 'C', 'D', 'E'].map(letter => letter + num))
 )
+
+// HACK DEBUG
+
+const defaultIngredients = [
+  {
+    name: 'Blood Samples',
+
+    wells: ['C2', 'C3', 'C4'],
+    wellDetails: {
+      C3: { volume: 100, concentration: 10, name: 'Special Sample' }
+    },
+
+    volume: 20, // required. in uL
+    concentration: null, // optional number, a %
+    description: 'blah', // optional string
+
+    individualized: true // when false, ignore wellDetails
+    // (we should probably delete wellDetails if individualized is set false -> true)
+  },
+  {
+    name: 'Control',
+    wells: ['A1'],
+    wellDetails: null,
+    volume: 50,
+    concentration: null,
+    description: '',
+    individualized: false
+  },
+  {
+    name: 'Buffer',
+    wells: ['H1', 'H2', 'H3', 'H4'],
+    wellDetails: null,
+    volume: 100,
+    concentration: 50,
+    description: '',
+    individualized: false
+  }
+]
 
 // UTILS
 
@@ -27,8 +66,8 @@ const modeLabwareSelection = handleActions({
 }, false)
 
 const modeIngredientSelection = handleActions({
-  OPEN_INGREDIENT_SELECTOR: (state, action) => ({slotName: action.payload.slotName}),
-  EDIT_INGREDIENT_GROUP: (state, action) => ({...state, selectedIngredientGroup: action.payload}),
+  OPEN_INGREDIENT_SELECTOR: (state, action) => ({slotName: action.payload.slotName, selectedIngredientGroup: null}),
+  EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({...state, selectedIngredientGroup: action.payload}),
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -66,31 +105,55 @@ const selectedWells = handleActions({
   CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState
 }, selectedWellsInitialState)
 
+const ingredients = handleActions({
+  EDIT_INGREDIENT: (state, action) => state, // TODO
+  // Remove the deleted group (referenced by array index)
+  DELETE_INGREDIENT_GROUP: (state, action) => state.filter((_, i) => i !== action.payload.group)
+}, defaultIngredients)
+
 const rootReducer = combineReducers({
   modeLabwareSelection,
   modeIngredientSelection,
   loadedContainers,
-  selectedWells
+  selectedWells,
+  ingredients
 })
 
 // SELECTORS
 
-export const selectors = {
-  activeModals: state => ({
-    labwareSelection: state.default.modeLabwareSelection,
-    ingredientSelection: state.default.modeIngredientSelection && {
-      slotName: state.default.modeIngredientSelection.slotName,
+const rootSelector = state => state.default
+
+const activeModals = createSelector(
+  rootSelector,
+  state => ({
+    labwareSelection: state.modeLabwareSelection,
+    ingredientSelection: state.modeIngredientSelection && {
+      slotName: state.modeIngredientSelection.slotName,
       // "mix in" selected containerName from loadedContainers
-      containerName: state.default.loadedContainers[state.default.modeIngredientSelection.slotName]}
-  }),
-  loadedContainers: state => state.default.loadedContainers,
-  canAdd: state => nextEmptySlot(state.default.loadedContainers),
-  wellMatrix: state => {
-    const containerType = state.default.loadedContainers[state.default.modeIngredientSelection.slotName] // TODO: DRY this up
+      containerName: state.loadedContainers[state.modeIngredientSelection.slotName]}
+  })
+)
+
+const loadedContainersBySlot = createSelector(
+  rootSelector,
+  state => state.loadedContainers
+)
+
+const canAdd = createSelector(
+  loadedContainersBySlot,
+  loadedContainers => nextEmptySlot(loadedContainers)
+)
+
+const wellMatrix = createSelector(
+  state => rootSelector(state).modeIngredientSelection,
+  loadedContainersBySlot,
+  state => rootSelector(state).selectedWells,
+  (modeIngredientSelection, loadedContainers, selectedWells) => {
+    const containerType = loadedContainers[modeIngredientSelection.slotName] // TODO: DRY this up
     const { rows, columns } = containerDims[containerType] || {rows: 12, columns: 8}
 
     if (!(containerType in containerDims)) {
-      console.warn(`no info in containerDims for "${containerType}", falling back to 8x12`)
+      console.warn(`wellMatrix selector sez: no info in containerDims for "${containerType}", falling back to 8x12`)
     }
 
     return range(rows - 1, -1, -1).map(
@@ -99,14 +162,47 @@ export const selectors = {
           const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
           return {
             number: rowNum * columns + colNum + 1,
-            preselected: wellKey in state.default.selectedWells.preselected,
-            selected: wellKey in state.default.selectedWells.selected
+            preselected: wellKey in selectedWells.preselected,
+            selected: wellKey in selectedWells.selected
           }
         }
       )
     )
-  },
-  numWellsSelected: state => Object.keys(state.default.selectedWells.selected).length
+  }
+)
+
+const allIngredients = createSelector(
+  rootSelector,
+  state => state.ingredients
+)
+
+const numWellsSelected = createSelector(
+  state => rootSelector(state).selectedWells,
+  selectedWells => Object.keys(selectedWells.selected).length)
+
+// Currently selected container's slot (labware view, aka ingredient selection mode)
+const selectedContainerSlot = createSelector(
+  rootSelector,
+  state => state.modeIngredientSelection.slotName
+)
+
+const selectedIngredientGroup = createSelector(
+  allIngredients,
+  selectedContainerSlot,
+  (allIngredients, selectedContainerSlot) => {
+    return allIngredients.filter(ingredGroup => selectedContainerSlot in ingredGroup.locations)
+  }
+)
+
+export const selectors = {
+  activeModals,
+  loadedContainersBySlot,
+  canAdd,
+  wellMatrix,
+  numWellsSelected,
+  ingredients: state => state.default.ingredients, // TODO
+  selectedContainerSlot,
+  selectedIngredientGroup
 }
 
 export default rootReducer

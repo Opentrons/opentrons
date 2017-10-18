@@ -14,10 +14,15 @@ npm start # Starts the app on http://localhost:8080/
 [
   {
     name: 'Blood Samples',
-
-    wells: ['C2', 'C3', 'C4'],
-    wellDetails: {
-      C2: { volume: 100, concentration: 10, name: 'Special Sample' /* could have description too, but doesn't need to have any keys. */ }
+    locations: {
+      // [slotName]: [wellName, wellName, etc] for all slots.
+      A1: ['C2', 'C3', 'C4'],
+    },
+    wellDetails: { // also referenced wellDetails[slotName][wellName]
+      A1: {
+        C2: { volume: 100, concentration: 10, name: 'Special Sample' }
+        /* ^^ could have description too, but doesn't need to have any keys. */
+      }
     },
 
     volume: 20, // required. in uL
@@ -29,7 +34,9 @@ npm start # Starts the app on http://localhost:8080/
   },
   {
     name: 'Control',
-    wells: ['A1'],
+    locations: {
+      'A1': ['A1']
+    },
     wellDetails: null,
     volume: 50,
     concentration: null,
@@ -38,11 +45,13 @@ npm start # Starts the app on http://localhost:8080/
   },
   {
     name: 'Buffer',
-    wells: ['H1', 'H2', 'H3', 'H4'],
+    locations: {
+      'A1': ['H1', 'H2', 'H3', 'H4']
+    },
     wellDetails: null,
     volume: 100,
     concentration: 50,
-    description: ''
+    description: '',
     individualized: false
   }
 ]
