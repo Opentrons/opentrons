@@ -3,7 +3,7 @@
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
-  test('connect action', () => {
+  test('CONNECT action', () => {
     const expected = {
       type: actionTypes.CONNECT,
       meta: {robotCommand: true}
@@ -12,17 +12,22 @@ describe('robot actions', () => {
     expect(actions.connect()).toEqual(expected)
   })
 
-  test('connect response action', () => {
-    // TODO(mc, 2017-10-02): In FSA, action.error is bool, payload is an Error
-    const expected = {
+  test('CONNECT_RESPONSE action', () => {
+    const success = {
       type: actionTypes.CONNECT_RESPONSE,
-      error: new Error('AHHH')
+      error: false
+    }
+    const failure = {
+      type: actionTypes.CONNECT_RESPONSE,
+      error: true,
+      payload: new Error('AH')
     }
 
-    expect(actions.connectResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.connectResponse()).toEqual(success)
+    expect(actions.connectResponse(new Error('AH'))).toEqual(failure)
   })
 
-  test('disconnect action', () => {
+  test('DISCONNECT action', () => {
     const expected = {
       type: actionTypes.DISCONNECT,
       meta: {robotCommand: true}
@@ -31,14 +36,19 @@ describe('robot actions', () => {
     expect(actions.disconnect()).toEqual(expected)
   })
 
-  test('disconnect response action', () => {
-    // TODO(mc, 2017-10-02): In FSA, action.error is bool, payload is an Error
-    const expected = {
+  test('DISCONNECT_RESPONSE action', () => {
+    const success = {
       type: actionTypes.DISCONNECT_RESPONSE,
-      error: new Error('AHHH')
+      error: false
+    }
+    const failure = {
+      type: actionTypes.DISCONNECT_RESPONSE,
+      error: true,
+      payload: new Error('AH')
     }
 
-    expect(actions.disconnectResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.disconnectResponse()).toEqual(success)
+    expect(actions.disconnectResponse(new Error('AH'))).toEqual(failure)
   })
 
   test('session action', () => {
@@ -53,63 +63,31 @@ describe('robot actions', () => {
   })
 
   test('session response', () => {
+    const session = {state: 'READY'}
     const error = new Error('AH')
-    const session = {name: 'session-name'}
-    // TODO(mc, 2017-10-02): In FSA, action.error is bool, payload is an Error
-    const expected = {
+
+    const success = {
       type: actionTypes.SESSION_RESPONSE,
-      payload: {session},
-      error
+      payload: session,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.SESSION_RESPONSE,
+      payload: error,
+      error: true
     }
 
-    expect(actions.sessionResponse(error, session)).toEqual(expected)
+    expect(actions.sessionResponse(null, session)).toEqual(success)
+    expect(actions.sessionResponse(error)).toEqual(failure)
   })
 
-  test('home action without axes', () => {
+  test('set labware reviewed action', () => {
     const expected = {
-      type: actionTypes.HOME,
-      meta: {robotCommand: true}
+      type: actionTypes.SET_LABWARE_REVIEWED,
+      payload: false
     }
 
-    expect(actions.home()).toEqual(expected)
-  })
-
-  test('home action with axes', () => {
-    const expected = {
-      type: actionTypes.HOME,
-      payload: {axes: 'xy'},
-      meta: {robotCommand: true}
-    }
-
-    expect(actions.home('xy')).toEqual(expected)
-  })
-
-  test('home response action', () => {
-    // TODO(mc, 2017-10-02): In FSA, action.error is bool, payload is an Error
-    const expected = {
-      type: actionTypes.HOME_RESPONSE,
-      error: new Error('AHHH')
-    }
-
-    expect(actions.homeResponse(new Error('AHHH'))).toEqual(expected)
-  })
-
-  test('set current instrument', () => {
-    const expected = {
-      type: actionTypes.SET_CURRENT_INSTRUMENT,
-      payload: {instrument: 'right'}
-    }
-
-    expect(actions.setCurrentInstrument('right')).toEqual(expected)
-  })
-
-  test('set current labware', () => {
-    const expected = {
-      type: actionTypes.SET_CURRENT_LABWARE,
-      payload: {labware: 2}
-    }
-
-    expect(actions.setCurrentLabware(2)).toEqual(expected)
+    expect(actions.setLabwareReviewed(false)).toEqual(expected)
   })
 
   test('move tip to front action', () => {
@@ -237,6 +215,15 @@ describe('robot actions', () => {
     expect(actions.updateOffsetResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('confirm labware action', () => {
+    const expected = {
+      type: actionTypes.CONFIRM_LABWARE,
+      payload: {labware: 2}
+    }
+
+    expect(actions.confirmLabware(2)).toEqual(expected)
+  })
+
   test('run action', () => {
     const expected = {
       type: actionTypes.RUN,
@@ -247,12 +234,15 @@ describe('robot actions', () => {
   })
 
   test('run response action', () => {
-    const expected = {
+    const success = {type: actionTypes.RUN_RESPONSE, error: false}
+    const failure = {
       type: actionTypes.RUN_RESPONSE,
-      error: new Error('AHHH')
+      payload: new Error('AH'),
+      error: true
     }
 
-    expect(actions.runResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.runResponse()).toEqual(success)
+    expect(actions.runResponse(new Error('AH'))).toEqual(failure)
   })
 
   test('pause action', () => {
@@ -265,12 +255,15 @@ describe('robot actions', () => {
   })
 
   test('pause response action', () => {
-    const expected = {
+    const success = {type: actionTypes.PAUSE_RESPONSE, error: false}
+    const failure = {
       type: actionTypes.PAUSE_RESPONSE,
-      error: new Error('AHHH')
+      payload: new Error('AH'),
+      error: true
     }
 
-    expect(actions.pauseResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.pauseResponse()).toEqual(success)
+    expect(actions.pauseResponse(new Error('AH'))).toEqual(failure)
   })
 
   test('resume action', () => {
@@ -283,12 +276,15 @@ describe('robot actions', () => {
   })
 
   test('resume response action', () => {
-    const expected = {
+    const success = {type: actionTypes.RESUME_RESPONSE, error: false}
+    const failure = {
       type: actionTypes.RESUME_RESPONSE,
-      error: new Error('AHHH')
+      payload: new Error('AHHH'),
+      error: true
     }
 
-    expect(actions.resumeResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.resumeResponse()).toEqual(success)
+    expect(actions.resumeResponse(new Error('AHHH'))).toEqual(failure)
   })
 
   test('cancel action', () => {
@@ -301,12 +297,15 @@ describe('robot actions', () => {
   })
 
   test('cancel response action', () => {
-    const expected = {
+    const success = {type: actionTypes.CANCEL_RESPONSE, error: false}
+    const failure = {
       type: actionTypes.CANCEL_RESPONSE,
-      error: new Error('AHHH')
+      payload: new Error('AHHH'),
+      error: true
     }
 
-    expect(actions.cancelResponse(new Error('AHHH'))).toEqual(expected)
+    expect(actions.cancelResponse()).toEqual(success)
+    expect(actions.cancelResponse(new Error('AHHH'))).toEqual(failure)
   })
 
   test('tick run time action', () => {

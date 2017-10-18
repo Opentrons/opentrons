@@ -1,4 +1,3 @@
-import React from 'react'
 import {connect} from 'react-redux'
 
 import {
@@ -9,8 +8,7 @@ import {
 import PipetteConfig from '../components/PipetteConfig'
 
 const mapStateToProps = (state) => ({
-  instruments: robotSelectors.getInstruments(state),
-  currentInstrument: robotSelectors.getCurrentInstrument(state)
+  instruments: robotSelectors.getInstruments(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
@@ -18,10 +16,4 @@ const mapDispatchToProps = (dispatch) => ({
   onPrepareClick: (axis) => () => dispatch(robotActions.moveToFront(axis))
 })
 
-function ConnectedPipetteConfig (props) {
-  return (
-    <PipetteConfig {...props} />
-  )
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ConnectedPipetteConfig)
+export default connect(mapStateToProps, mapDispatchToProps)(PipetteConfig)

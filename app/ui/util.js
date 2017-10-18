@@ -1,4 +1,5 @@
 // utility functions
+
 export function makeActionName (moduleName, actionName) {
   return `${moduleName}:${actionName}`
 }

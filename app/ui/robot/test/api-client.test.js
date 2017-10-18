@@ -145,11 +145,11 @@ describe('api client', () => {
   })
 
   describe('session responses', () => {
-    test('dispatches session on connect', () => {
+    test('dispatches sessionResponse on connect', () => {
       const expected = actions.sessionResponse(null, {
-        sessionName: session.name,
-        sessionState: session.state,
-        sessionErrors: [],
+        name: session.name,
+        state: session.state,
+        errors: [],
         protocolText: session.protocol_text,
         protocolCommands: [],
         protocolCommandsById: {},
@@ -251,14 +251,16 @@ describe('api client', () => {
     beforeEach(() => {
       state = {
         [NAME]: {
-          protocolInstrumentsByAxis: {
-            left: {_id: 'inst-2'},
-            right: {_id: 'inst-1'}
-          },
-          protocolLabwareBySlot: {
-            1: {_id: 'lab-1'},
-            5: {_id: 'lab-2'},
-            9: {_id: 'lab-3'}
+          session: {
+            protocolInstrumentsByAxis: {
+              left: {_id: 'inst-2'},
+              right: {_id: 'inst-1'}
+            },
+            protocolLabwareBySlot: {
+              1: {_id: 'lab-1'},
+              5: {_id: 'lab-2'},
+              9: {_id: 'lab-3'}
+            }
           }
         }
       }

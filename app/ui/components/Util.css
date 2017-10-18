@@ -36,6 +36,7 @@ button:focus { outline: 0; }
 }
 
 .btn {
+  margin: 0;
   border-radius: 2px;
   border: 1px solid silver;
   background-color: #fff;

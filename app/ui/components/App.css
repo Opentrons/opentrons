@@ -1,7 +1,6 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 .wrapper {
@@ -19,4 +18,8 @@
   line-height: 4rem;
   color: white;
   padding: 0 1rem;
+}
+
+.task_header a {
+  color: white;
 }
