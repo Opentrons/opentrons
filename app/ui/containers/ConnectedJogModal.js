@@ -1,12 +1,16 @@
 import {connect} from 'react-redux'
 
 import {
+  selectors as robotSelectors,
   actions as robotActions
 } from '../robot'
 
 import JogModal from '../components/JogModal'
 
-const mapStateToProps = (state) => ({})
+const mapStateToProps = (state) => ({
+  isJogging: robotSelectors.getJogInProgress(state),
+  isUpdating: robotSelectors.getOffsetUpdateInProgress(state)
+})
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   const {slot} = ownProps
