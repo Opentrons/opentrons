@@ -1,8 +1,8 @@
 // setup instruments component
 import React from 'react'
 import {Route} from 'react-router'
-import Header from '../components/Header'
 import Page from '../components/Page'
+import SessionHeader from '../containers/SessionHeader'
 import ConnectedDeckConfig from '../containers/ConnectedDeckConfig'
 import ConnectedJogModal from '../containers/ConnectedJogModal'
 
@@ -12,7 +12,7 @@ export default function SetupDeckPage (props) {
 
   return (
     <Page>
-      <Header />
+      <SessionHeader />
       <ConnectedDeckConfig slot={slot} />
       <Route path={`${url}/jog`} component={ConnectedJogModal} />
     </Page>

@@ -16,6 +16,17 @@ const UploadPanel = props => {
             onChange={props.onUpload}
           />
         </label>
+
+        <label className={styles.file_drop}>
+         Drag and drop protocol
+            file here.
+          <input
+            className={styles.file}
+            type='file'
+            onChange={props.onUpload}
+          />
+        </label>
+
       </section>
     </div>
   )
