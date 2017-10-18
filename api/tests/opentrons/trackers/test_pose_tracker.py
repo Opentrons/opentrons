@@ -76,7 +76,7 @@ def test_add_pipette(robot):
 def test_get_object_children(robot):
     plate = containers_load(robot, '96-flat', 'B2')
     children = robot.pose_tracker.get_object_children(plate)
-    children == plate.get_children_list()
+    assert children == plate.get_children_list()
 
 
 def test_pose_equality():
