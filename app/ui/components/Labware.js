@@ -4,13 +4,21 @@ import classnames from 'classnames'
 import {Spinner} from './icons'
 import styles from './Labware.css'
 
+import {constants as robotConstants} from '../robot'
+
+const {UNCONFIRMED, MOVING_TO_SLOT, OVER_SLOT, CONFIRMED} = robotConstants
+
 Labware.propTypes = {
   slot: PropTypes.number.isRequired,
   type: PropTypes.string,
-  isConfirmed: PropTypes.bool,
   isCurrent: PropTypes.bool,
   isDisabled: PropTypes.bool,
-  isMoving: PropTypes.bool
+  calibration: PropTypes.oneOf([
+    UNCONFIRMED,
+    MOVING_TO_SLOT,
+    OVER_SLOT,
+    CONFIRMED
+  ])
 }
 
 export default function Labware (props) {
@@ -18,12 +26,13 @@ export default function Labware (props) {
     type,
     slot,
     labwareReviewed,
-    isConfirmed,
     isCurrent,
     isDisabled,
-    isMoving
+    calibration
   } = props
 
+  const isMoving = calibration === MOVING_TO_SLOT
+  const isConfirmed = calibration === CONFIRMED
   const slotStyle = {gridArea: `slot-${slot}`}
 
   if (!type) {
@@ -40,11 +49,11 @@ export default function Labware (props) {
     })
     : styles.slot
 
-  const confirmationMsg = (!isConfirmed && labwareReviewed && !isCurrent)
+  const confirmationMsg = (labwareReviewed && !isConfirmed && !isMoving)
     ? (<div className={styles.status}>Position Unconfirmed</div>)
     : null
 
-  const confirmationFade = (labwareReviewed && isConfirmed && isCurrent)
+  const confirmationFade = (isConfirmed && isCurrent)
   ? (<div className={styles.confirmed_fade}>Confirmed</div>)
   : null
 

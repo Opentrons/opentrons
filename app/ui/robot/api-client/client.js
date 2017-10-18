@@ -110,7 +110,7 @@ export default function client (dispatch) {
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
-    return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
+    // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
 
     remote.calibration_manager.move_to_front(instrument)
       .then(() => dispatch(actions.moveToFrontResponse()))
@@ -122,7 +122,7 @@ export default function client (dispatch) {
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
-    return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
+    // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
 
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))

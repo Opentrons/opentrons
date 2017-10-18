@@ -43,26 +43,23 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, slot, calibration, isTiprack, tipracksConfirmed, onClick} = props
+  const {name, calibration, isTiprack, tipracksConfirmed, onClick} = props
   const isDisabled = !isTiprack && !tipracksConfirmed
   const isConfirmed = calibration === robotConstants.CONFIRMED
 
   const buttonStyle = classnames(styles.btn_labware, {
     [styles.disabled]: isDisabled
   })
+
   const statusStyle = classnames({
     [styles.confirmed]: isConfirmed,
     [styles.alert]: !isConfirmed
   })
 
-  const url = `/setup-deck/${slot}`
-
   return (
     <li>
-      <NavLink
-        to={url}
+      <button
         className={buttonStyle}
-        activeClassName={styles.active}
         onClick={onClick}
         disabled={isDisabled}
       >
@@ -70,7 +67,7 @@ function LabwareLinks (props) {
           <ToolTip msg='Position unconfirmed' pos='bottom' />
         </span>
         {name}
-      </NavLink>
+      </button>
     </li>
   )
 }
@@ -82,6 +79,7 @@ export default function SetupPanel (props) {
     instrumentsCalibrated,
     labwareConfirmed,
     tipracksConfirmed,
+    setLabware,
     clearLabwareReviewed
   } = props
 
@@ -91,13 +89,14 @@ export default function SetupPanel (props) {
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack} = lab
-    // const onClick = setLabware(slot)
+    const onClick = setLabware(slot)
+
     const links = (
       <LabwareLinks
         {...lab}
         key={slot}
         tipracksConfirmed={tipracksConfirmed}
-        // onClick={onClick}
+        onClick={onClick}
       />
     )
 
@@ -118,6 +117,7 @@ export default function SetupPanel (props) {
   const pipetteMsg = !tipracksConfirmed && instrumentsCalibrated
     ? <p className={classnames(styles.labware_alert, styles.tiprack)}>Tipracks must be setup first.</p>
     : null
+
   return (
     <div className={styles.setup_panel}>
       <h1>Prepare Robot for RUN</h1>

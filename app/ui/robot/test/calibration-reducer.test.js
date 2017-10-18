@@ -186,6 +186,7 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO action', () => {
     const state = {
       calibration: {
+        labwareReviewed: false,
         moveToRequest: {inProgress: false, error: new Error()},
         labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UNCONFIRMED}
       }
@@ -196,6 +197,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
+      labwareReviewed: true,
       moveToRequest: {inProgress: true, error: null, slot: 3},
       labwareBySlot: {3: constants.MOVING_TO_SLOT, 5: constants.UNCONFIRMED}
     })
