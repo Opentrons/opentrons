@@ -53,6 +53,10 @@ button:hover {
   color: white;
 }
 
+button.disabled {
+  background-color: #EEE;
+}
+
 textarea {
   resize: none;
 }

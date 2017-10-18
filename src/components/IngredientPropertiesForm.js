@@ -63,7 +63,7 @@ class IngredientPropertiesBox extends React.Component {
             <label>Color Swatch</label>
             <div className={styles.circle} style={{backgroundColor: 'red'}} />
           </span> */}
-          <Button active={numWellsSelected} onClick={e => onSave(this.state.input)}>Save</Button>
+          <Button disabled={numWellsSelected <= 0} onClick={e => onSave(this.state.input)}>Save</Button>
           <button onClick={onCancel}>Cancel</button>
         </div>
       </div>
