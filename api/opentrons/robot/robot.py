@@ -24,7 +24,7 @@ log = get_logger(__name__)
 
 
 DECK_OFFSET = {'x': -31.45, 'y':-20.1, 'z':0} # Avagadro
-
+MAX_INSTRUMENT_HEIGHT = 227.0000
 
 class InstrumentMosfet(object):
     """
@@ -482,7 +482,7 @@ class Robot(object):
 
         other_instrument = {instrument} ^ set(self._instruments.values())
         if not len(other_instrument) == 0:
-            other_instrument.pop().mount_obj.home()
+            other_instrument.pop()._move(z=MAX_INSTRUMENT_HEIGHT)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, instrument, placeable)
