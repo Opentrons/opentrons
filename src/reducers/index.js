@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { createSelector } from 'reselect'
-// import pickBy from 'lodash/pickBy'
+// import pick from 'lodash/pick'
+import get from 'lodash/get'
 import range from 'lodash/range'
 
 import { containerDims } from '../constants.js'
@@ -102,7 +103,8 @@ const selectedWells = handleActions({
     }
   }),
   DESELECT_WELLS: () => selectedWellsInitialState,
-  CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState
+  CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
+  EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({selected: action.payload.selectedWells, preselected: {}})
 }, selectedWellsInitialState)
 
 const ingredients = handleActions({
@@ -144,8 +146,13 @@ const canAdd = createSelector(
   loadedContainers => nextEmptySlot(loadedContainers)
 )
 
+const selectedSlot = createSelector(
+  rootSelector,
+  state => state.modeIngredientSelection.slotName
+)
+
 const wellMatrix = createSelector(
-  state => rootSelector(state).modeIngredientSelection,
+  selectedSlot,
   loadedContainersBySlot,
   state => rootSelector(state).selectedWells,
   (modeIngredientSelection, loadedContainers, selectedWells) => {
@@ -186,12 +193,41 @@ const selectedContainerSlot = createSelector(
   state => state.modeIngredientSelection.slotName
 )
 
-const selectedIngredientGroup = createSelector(
+const ingredientGroupsForSelectedContainer = createSelector(
   allIngredients,
   selectedContainerSlot,
   (allIngredients, selectedContainerSlot) => {
-    return allIngredients.filter(ingredGroup => selectedContainerSlot in ingredGroup.locations)
+    return allIngredients.filter(ingredGroup =>
+      ingredGroup &&
+      ingredGroup.locations &&
+      selectedContainerSlot in ingredGroup.locations
+    )
   }
+)
+
+// returns selected group id (index in array of all ingredients), or undefined.
+const selectedIngredientGroupId = createSelector(
+  rootSelector,
+  state => get(state, 'modeIngredientSelection.selectedIngredientGroup.group')
+)
+
+const selectedIngredientGroup = createSelector(
+  selectedIngredientGroupId,
+  allIngredients,
+  (ingredGroupId, allIngredients) => (allIngredients.length - 1 >= ingredGroupId)
+    ? allIngredients[ingredGroupId]
+    : null
+)
+
+const selectedIngredientProperties = createSelector(
+  selectedIngredientGroup,
+  ingredGroup => ingredGroup // ingredGroup may be null or undefined
+    ? {
+      volume: ingredGroup.volume,
+      concentration: ingredGroup.concentration,
+      name: ingredGroup.name
+    }
+    : {}
 )
 
 export const selectors = {
@@ -202,7 +238,9 @@ export const selectors = {
   numWellsSelected,
   ingredients: state => state.default.ingredients, // TODO
   selectedContainerSlot,
-  selectedIngredientGroup
+  ingredientGroupsForSelectedContainer,
+  selectedIngredientProperties,
+  selectedIngredientGroupId
 }
 
 export default rootReducer

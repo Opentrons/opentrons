@@ -13,10 +13,9 @@ const makeInputField = ({setSubstate, getSubstate}) => ({accessor, ...otherProps
   />
 }
 
-class IngredientPropertiesBox extends React.Component {
+class IngredientPropertiesForm extends React.Component {
   constructor (props) {
     super(props)
-
     this.state = {
       input: {
         name: this.props.name || null,
@@ -31,6 +30,17 @@ class IngredientPropertiesBox extends React.Component {
         this.setState({input: {...this.state.input, [inputKey]: inputValue}})
       },
       getSubstate: inputKey => this.state.input[inputKey]
+    })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { name, volume, description } = this.state.input
+    this.setState({
+      input: {
+        name: nextProps.name || name,
+        volume: nextProps.volume || volume,
+        description: nextProps.description || description
+      }
     })
   }
 
@@ -71,7 +81,7 @@ class IngredientPropertiesBox extends React.Component {
   }
 }
 
-IngredientPropertiesBox.propTypes = {
+IngredientPropertiesForm.propTypes = {
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   numWellsSelected: PropTypes.number.isRequired,
@@ -81,4 +91,4 @@ IngredientPropertiesBox.propTypes = {
   description: PropTypes.string
 }
 
-export default IngredientPropertiesBox
+export default IngredientPropertiesForm
