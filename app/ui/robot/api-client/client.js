@@ -110,7 +110,7 @@ export default function client (dispatch) {
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
-    return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
+    // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
 
     remote.calibration_manager.move_to_front(instrument)
       .then(() => dispatch(actions.moveToFrontResponse()))
@@ -122,7 +122,7 @@ export default function client (dispatch) {
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
-    return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
+    // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
 
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
@@ -135,7 +135,7 @@ export default function client (dispatch) {
     const labware = selectors.getLabwareBySlot(state)[slot]
 
     // FIXME - MORE DEBUG CODE
-    return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
+    // return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
 
     remote.calibration_manager.move_to(instrument, labware)
 
@@ -151,7 +151,7 @@ export default function client (dispatch) {
     const distance = DEFAULT_JOG_DISTANCE_MM * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
-    return setTimeout(() => dispatch(actions.jogResponse()), 1000)
+    // return setTimeout(() => dispatch(actions.jogResponse()), 1000)
 
     remote.calibration_manager.jog(instrument, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
@@ -164,10 +164,10 @@ export default function client (dispatch) {
     const labware = selectors.getLabwareBySlot(state)[slot]
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
-    return setTimeout(() => {
-      dispatch(actions.updateOffsetResponse())
-      dispatch(push(`/setup-deck/${slot}`))
-    }, 2000)
+    // return setTimeout(() => {
+    //   dispatch(actions.updateOffsetResponse())
+    //   dispatch(push(`/setup-deck/${slot}`))
+    // }, 2000)
 
     remote.calibration_manager.update_container_offset(labware, instrument)
       .then(() => {
