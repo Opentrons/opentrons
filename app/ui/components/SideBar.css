@@ -16,10 +16,20 @@
   width: 350px;
 }
 
+.close {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  cursor: pointer;
+  color: silver;
+  z-index: 100;
+}
+
 .sidebar .nav_info {
   width: 0;
   overflow: hidden;
   transition: width 0.5s ease-in-out;
+  position: relative;
 }
 
 .sidebar.open .nav_info {
@@ -57,9 +67,8 @@
   cursor: pointer;
 }
 
-.nav_icon[disabled],
-.nav_icon[disabled] + span {
-  opacity: 0.5;
+.nav_icon[disabled] img {
+  filter: opacity(40%);
   cursor: default;
 }
 

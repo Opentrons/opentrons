@@ -19,3 +19,7 @@
   color: white;
   padding: 0 1rem;
 }
+
+.task_header a {
+  color: white;
+}

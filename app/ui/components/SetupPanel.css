@@ -13,6 +13,12 @@
   color: grey;
 }
 
+.close {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+}
+
 h1 {
   grid-area: title;
   padding: 0;
@@ -49,17 +55,11 @@ h1 {
 
 .labware_alert {
   width: 100%;
-  padding: 0 1rem;
+  padding: 0.5rem 1rem;
   background-color: #eee;
   font-size: 0.75rem;
   line-height: 1rem;
   font-style: italic;
-  height: 3rem;
-}
-
-.labware_alert.tiprack {
-  height: 2rem;
-  line-height: 2rem;
 }
 
 .unavailable {
@@ -91,7 +91,7 @@ a.disabled {
   pointer-events: none;
 }
 
-.step_list a.btn_labware {
+.step_list button.btn_labware {
   line-height: 2rem;
 }
 

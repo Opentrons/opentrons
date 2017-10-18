@@ -115,7 +115,7 @@ export default function SetupPanel (props) {
     ? <p className={styles.labware_alert}>Labware setup is disabled until pipette setup is complete.</p>
     : null
   const pipetteMsg = !tipracksConfirmed && instrumentsCalibrated
-    ? <p className={classnames(styles.labware_alert, styles.tiprack)}>Tipracks must be setup first.</p>
+    ? <p className={styles.labware_alert}>Tipracks must be setup first.</p>
     : null
 
   return (
@@ -130,12 +130,12 @@ export default function SetupPanel (props) {
         </section>
         <section className={styles.labware_group}>
           <h3>Labware Setup</h3>
-          {labwareMsg}
           <ul className={classnames({[styles.unavailable]: !instrumentsCalibrated}, styles.step_list)}>
             {tiprackList}
             {labwareList}
           </ul>
           {pipetteMsg}
+          {labwareMsg}
         </section>
       </section>
       <NavLink to='/run' className={runLinkStyles}>

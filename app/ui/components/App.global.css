@@ -61,7 +61,7 @@ body {
 .tooltip {
   visibility: hidden;
   position: absolute;
-  z-index: 1;
+  z-index: 100;
   border-radius: 6px;
   background-color: black;
   font-size: 1rem;
@@ -69,6 +69,10 @@ body {
   color: #fff;
   text-align: center;
   text-transform: uppercase;
+}
+
+[disabled] .tooltip {
+  background-color: silver;
 }
 
 .tooltip_left {
@@ -90,6 +94,10 @@ body {
   border-color: transparent black transparent transparent;
 }
 
+[disabled] .tooltip_left::after {
+  border-color: transparent silver transparent transparent;
+}
+
 .tooltip_bottom {
   top: 75%;
   left: -80%;
@@ -107,6 +115,10 @@ body {
   border-width: 5px;
   border-style: solid;
   border-color: transparent transparent black;
+}
+
+[disabled] .tooltip_bottom::after {
+  border-color: transparent transparent silver;
 }
 
 .tooltip_top {
@@ -127,6 +139,10 @@ body {
   border-width: 5px;
   border-style: solid;
   border-color: black transparent transparent;
+}
+
+[disabled] .tooltip_top::after {
+  border-color: silver transparent transparent;
 }
 
 .tooltip_hidden .tooltip_left {

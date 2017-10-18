@@ -44,7 +44,7 @@ ConnectionIndicator.propTypes = {
 }
 
 export default function SideBar (props) {
-  const {isNavPanelOpen, onNavIconClick, currentNavPanelTask} = props
+  const {isNavPanelOpen, onNavIconClick, currentNavPanelTask, toggleNavOpen} = props
   const style = classnames(styles.sidebar, {[styles.open]: isNavPanelOpen, 'tooltip_hidden': isNavPanelOpen})
   const navLinks = props.navLinks.map((link) => NavLink({
     onClick: onNavIconClick(link.name),
@@ -62,6 +62,7 @@ export default function SideBar (props) {
         <ConnectionIndicator {...props} isActive={connectIsActive} />
       </nav>
       <section className={styles.nav_info}>
+        <span className={styles.close} onClick={toggleNavOpen}>X</span>
         <NavPanel {...props} />
       </section>
     </div>
