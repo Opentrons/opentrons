@@ -166,7 +166,7 @@ export default function client (dispatch) {
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {
     //   dispatch(actions.updateOffsetResponse())
-    //   dispatch(push('/setup-deck'))
+    //   dispatch(push(`/setup-deck/${slot}`))
     // }, 2000)
 
     remote.calibration_manager.update_container_offset(labware, instrument)
@@ -174,7 +174,7 @@ export default function client (dispatch) {
         // TODO(mc, 2017-10-06): do this without a double dispatch
         // also this hardcoded URL is a bad idea™
         dispatch(actions.updateOffsetResponse())
-        dispatch(push('/setup-deck'))
+        dispatch(push(`/setup-deck/${slot}`))
       })
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }

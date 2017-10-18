@@ -219,3 +219,11 @@ export function getTipracksConfirmed (state) {
 export function getLabwareConfirmed (state) {
   return getUnconfirmedLabware(state).length === 0
 }
+
+export function getJogInProgress (state) {
+  return getCalibrationState(state).jogRequest.inProgress
+}
+
+export function getOffsetUpdateInProgress (state) {
+  return getCalibrationState(state).updateOffsetRequest.inProgress
+}

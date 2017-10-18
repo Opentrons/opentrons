@@ -1,9 +1,10 @@
 .modal_wrapper {
   background-color: rgba(0, 0, 0, 0.8);
-  position: fixed;
+  position: absolute;
   top: 0;
+  left: 0;
   height: 100%;
-  width: 675px;
+  width: 100%;
   padding-top: 4rem;
 }
 
@@ -49,6 +50,12 @@ a.close {
   background-color: #333;
   color: white;
   font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn[disabled],
+.btn.disabled {
+  cursor: default;
 }
 
 .btn_back {
@@ -106,4 +113,11 @@ a.close {
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.spinner {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 3rem;
 }
