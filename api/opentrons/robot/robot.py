@@ -18,6 +18,9 @@ from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
 
+from numpy import array, dot, insert
+
+
 log = get_logger(__name__)
 
 # DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
@@ -27,6 +30,28 @@ log = get_logger(__name__)
 
 DECK_OFFSET = {'x': 0, 'y': 0, 'z': 0}
 MAX_INSTRUMENT_HEIGHT = 227.0000
+
+# World -> Smoothie transformation matrix for XY plane
+# use cli/main.py to perform factory calibration
+# TODO(artyom 20171017): round these numbers
+# TODO(artyom 20171017): move to config
+
+XY = \
+    array([[2.00633580e+00,   1.16263441e-02,  -4.51928609e+02],
+           [-3.34703575e-03,   1.95997984e+00,  -3.65876516e+02],
+           [-4.83204440e-19,   1.73472348e-18,   1.00000000e+00]])
+
+# Smoothie coordinate for Z axis when 200ul tip is touching the deck
+Z_OFFSET = 45
+# Can be used to compensate for Z steps per mm mismatch
+Z_SCALE = 1
+
+# 3D transform for gantry
+FACTORY_CALIBRATION = insert(
+        insert(XY, 2, [0, 0, 0], axis=1),
+        2,
+        [0, 0, Z_SCALE, Z_OFFSET],
+        axis=0)
 
 
 class InstrumentMosfet(object):
@@ -169,8 +194,6 @@ class Robot(object):
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
         self.dimensions = (395, 345, 228)
 
-
-
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
@@ -199,8 +222,6 @@ class Robot(object):
         # self._driver = drivers.get_virtual_driver()
         # self.disconnect()
         self.arc_height = 5
-
-
 
         # self.set_connection('simulate')
 
@@ -242,9 +263,13 @@ class Robot(object):
 
     def setup_gantry(self):
         self.gantry = gantry.Gantry(self._driver, self.pose_tracker)
-        self.pose_tracker.create_root_object(self.gantry, x=0, y=0, z=0)
-        self.gantry._setup_mounts()
+        # Inject an artificial object to hold factory calibration
+        self.pose_tracker.create_root_object(
+            'calibration', x=0, y=0, z=0, transform=FACTORY_CALIBRATION)
+        self.pose_tracker.track_object(
+            'calibration', self.gantry, x=0, y=0, z=0)
 
+        self.gantry._setup_mounts()
 
     def add_instrument(self, mount, instrument):
         """
@@ -409,9 +434,9 @@ class Robot(object):
 
     def move_head(self, *args, **kwargs):
         self._driver.move(*args, **kwargs)
-        self.gantry._publish_position()
+        self.gantry._update_pose()
 
-    #DEPRECATED
+    # DEPRECATED
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -622,7 +647,10 @@ class Robot(object):
         self.add_slots_to_deck()
         # Setup Deck as root object for pose tracker
         self.pose_tracker.create_root_object(
-            self._deck, **DECK_OFFSET
+            'world', x=0, y=0, z=0
+        )
+        self.pose_tracker.track_object(
+            'world', self._deck, **DECK_OFFSET
         )
 
         for slot in self._deck:

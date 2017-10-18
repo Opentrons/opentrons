@@ -6,6 +6,9 @@ from opentrons.containers.placeable import WellSeries
 from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.broker import topics, subscribe
 
+from numpy import dot, array
+from numpy.linalg import inv
+
 
 def flatten(S):
     if S == []:
@@ -38,31 +41,38 @@ class Node(object):
 
 
 class Pose(object):
-    def __init__(self, x: float, y: float, z: float) -> None:
-        self._pose = np.identity(4)
-        self._pose[0][3] = x
-        self._pose[1][3] = y
-        self._pose[2][3] = z
+    zero = np.array([0, 0, 0, 1])
+
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z: float,
+        transform: np.ndarray=np.identity(4)
+    ) -> None:
+        self._transform = transform
+        self._pose = array([
+            [1.0, 0.0, 0.0,   x],
+            [0.0, 1.0, 0.0,   y],
+            [0.0, 0.0, 1.0,   z],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
 
     def __repr__(self):
-        return repr(self._pose)
+        return repr(self._pose) + '\n' + repr(self._transform)
 
     def __eq__(self, other):
-        return (self._pose == other._pose).all()
+        return (self.T == other.T).all()
 
-    # TODO: (JG 9/19/17) Revisit this once we start dealing with rotation
-    # to make sure we are doing this in the most expected way
     def __mul__(self, other):
         if not isinstance(other, Pose):
-            other_pose = Pose(*other[:3])
-        else:
-            other_pose = other
+            other = Pose(*other[:3])
 
-        return Pose(*self._pose.dot(other_pose._pose).T[3][:3])
+        return Pose(x=0, y=0, z=0, transform=self.T.dot(other.T))
 
     @property
     def x(self):
-        return self._pose[0][3]
+        return self.position[0]
 
     @x.setter
     def x(self, val):
@@ -70,7 +80,7 @@ class Pose(object):
 
     @property
     def y(self):
-        return self._pose[1][3]
+        return self.position[1]
 
     @y.setter
     def y(self, val):
@@ -78,19 +88,22 @@ class Pose(object):
 
     @property
     def z(self):
-        return self._pose[2][3]
+        return self.position[2]
 
     @z.setter
     def z(self, val):
         self._pose[2][3] = val
 
     @property
+    def T(self):
+        return dot(self._pose, self._transform)
+
+    @property
     def position(self):
-        return np.array([self.x, self.y, self.z])
+        return tuple(dot(self.T, Pose.zero)[:-1])
 
 
 class PoseTracker(object):
-
     '''
     Tracks pose of all objects on deck using a dictionary and a tree. A pose is a transformation matrix that contains
     the position and rotation information for one object relative to another.
@@ -103,12 +116,9 @@ class PoseTracker(object):
     pose_tracker_singleton = None #FIXME: [JG & Andy | 9/27] HACKY SINGLETON
 
     def __init__(self):
-        print('POSE TRACKER CREATED')
         self._root_nodes = []
         self._pose_dict = {}
         self._node_dict = {}
-
-        subscribe(topics.MOVEMENT, self._on_move_position)
 
     def relative(self, obj) -> Pose:
         '''
@@ -152,21 +162,21 @@ class PoseTracker(object):
         return max([self.absolute(obj).z for obj in
                     self.get_objects_in_subtree(root)])
 
-    def track_object(self, parent, obj, x, y, z):
+    def track_object(self, parent, obj, x, y, z, transform=np.identity(4)):
         '''Adds an object to the dict of object positions'''
-        relative_object_pose = Pose(x=x, y=y, z=z)
+        relative_object_pose = Pose(x=x, y=y, z=z, transform=transform)
         node = Node(obj)
 
         self._node_dict[parent].add_child(node)
         self._node_dict[obj] = node
         self._pose_dict[obj] = relative_object_pose
 
-    def create_root_object(self, obj, x, y, z):
+    def create_root_object(self, obj, x, y, z, transform=np.identity(4)):
         '''Create a root node in the position tree. Though this could be done
         in the track_object() function if no parent is passed, we require
         this to be explicit because creating a new mapping context should
         not be a default behavior'''
-        pose = Pose(x, y, z)
+        pose = Pose(x, y, z, transform=transform)
         node = Node(obj)
         self._pose_dict[obj] = pose
         self._node_dict[obj] = node
@@ -188,19 +198,27 @@ class PoseTracker(object):
         node = self._node_dict[obj]
         return [child.value for child in node.children]
 
-    def translate_object(self, obj, x, y, z):
+    def translate_object(self, obj, x, y, z, transform=np.identity(4)):
         '''Translates a single object'''
-        new_pose = self.relative(obj) * [x, y, z, 1]
+        new_pose = self.relative(obj) * Pose(x, y, z, transform)
         self._pose_dict[obj] = new_pose
 
-    def _on_move_position(self, new_pos_msg: new_pos_msg):
-        '''Calculates an object movement as diff between current position
-        and previous - translates moved object by the difference'''
-        mover, *new_pos = new_pos_msg
-        self.translate_object(mover, *(new_pos - self[mover].position))
+    def relative_object_position(self, reference_object, target_object):
+        """
+        Returns a World Coordinates vector such as, when added
+        to world coordinates of reference_object returns world coordinates
+        of target_object
+        """
+        def reverse_transform(poses):
+            return reduce(
+                lambda p1, p2: p1.dot(p2),
+                [inv(pose._transform).dot(pose._pose) for pose in poses]
+            ).dot((0, 0, 0, 1))[:-1]
 
-    def relative_object_position(self, target_object, reference_object):
-        return self._pose_dict[target_object].position - self._pose_dict[reference_object].position
+        target = self._get_transform_sequence(target_object)
+        reference = self._get_transform_sequence(reference_object)
+
+        return tuple(reverse_transform(target) - reverse_transform(reference))
 
     def clear_all(self):
         self._root_nodes = []

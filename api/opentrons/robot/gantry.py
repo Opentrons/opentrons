@@ -3,13 +3,12 @@ from opentrons.util import pose_functions as pose_funcs
 from opentrons.trackers.move_msgs import new_pos_msg
 from opentrons.broker import publish, topics
 from opentrons import robot
-from numpy import array, dot, isclose, insert
+
 from numpy.linalg import inv
+from numpy import dot
 
-
-RIGHT_MOUNT_OFFSET = {'x':0, 'y':0, 'z':0.0}
-
-LEFT_MOUNT_OFFSET = {'x':-37.351, 'y':30.5024, 'z':7.0}
+RIGHT_MOUNT_OFFSET = {'x': 0.0, 'y': 0.0, 'z': 0.0}
+LEFT_MOUNT_OFFSET = {'x': -37.351, 'y': 30.5024, 'z': 1.13}
 
 
 LEFT_INSTRUMENT_ACTUATOR = 'b'
@@ -17,42 +16,6 @@ RIGHT_INSTRUMENT_ACTUATOR = 'c'
 
 LEFT_Z_AXIS = 'z'
 RIGHT_Z_AXIS = 'a'
-
-Z_OFFSET = 45
-
-# World -> Smoothie
-# use cli/main.py to perform factory calibration
-XY = \
-    array([[  2.00633580e+00,   1.16263441e-02,  -4.51928609e+02],
-           [ -3.34703575e-03,   1.95997984e+00,  -3.65876516e+02],
-           [ -4.83204440e-19,   1.73472348e-18,   1.00000000e+00]])
-
-# Add column and row to make it a 3D transform
-T = insert(
-        insert(XY, 2, [0, 0, 0], axis=1),
-        2,
-        [0, 0, 1, Z_OFFSET],
-        axis=0)
-
-# Right Pipette -> Left Pipette (in World)
-DELTA = \
-    array([
-        [1, 0, 0, 37.20],
-        [0, 1, 0, -30.69],
-        [0, 0, 1, 1.13],
-        [0, 0, 0, 1]
-    ])
-
-
-def _translate(x, y, z, mount_axis, operator=lambda a: a):
-    v = array([x, y, z, 1])
-    transform = T
-    if mount_axis == RIGHT_Z_AXIS:
-        transform = dot(transform, DELTA)
-
-    x, y, z, _ = dot(operator(transform), v)
-
-    return {'x': x, 'y': y, mount_axis: z}
 
 
 def resolve_all_coordinates(tracked_object, pose_tracker, x=None, y=None, z=None):
@@ -66,11 +29,12 @@ def resolve_all_coordinates(tracked_object, pose_tracker, x=None, y=None, z=None
     if y is None: y = current_pose.y
     if z is None: z = current_pose.z
 
-    print("---[resolve_all_coordinates] result: {}".format((x,y,z)))
-    return {'x':x, 'y':y, 'z':z}
+    print("---[resolve_all_coordinates] result: {}".format((x, y, z)))
+    return (x, y, z)
 
 
 def _coords_for_axes(driver, axes):
+    print('driver.position', driver.position)
     return {
         axis: value
         for axis, value
@@ -90,7 +54,7 @@ class InstrumentActuator(object):
 
     def move(self, value):
         ''' Move motor '''
-        self.driver.move(**{self.axis:value})
+        self.driver.move(**{self.axis: value})
 
     def home(self):
         ''' Home plunger motor '''
@@ -115,63 +79,34 @@ class InstrumentMover(object):
         self.mount = mount
         self.instrument = instrument
 
-    def move(self, x=None, y=None, z=None, z_offset=0):
-        ''' Move motor
-        - Resolve the full x,y,z goal position for the instrument
+    def move(self, x=None, y=None, z=None):
+        from functools import reduce
 
-        - Determine the target gantry position given the instrument offset for the gantry in x, y (since the gantry
-        can only move in x,y)
-        - Move the gantry to the target x,y
+        # TODO: this is needed to have up to date values in pose tree
+        # should find a more graceful way to do it
+        self.gantry._update_pose()
+        self.mount._update_pose()
 
-        - Determine the target mount position given the instrument offset for the gantry in z (since the mount
-        can only move in z)
-        - Move the mount to the target z
-        '''
-        mount_axis = self.mount.mount_axis
-        driver = self.mount.driver
-        position = self.mount.driver.position
+        tracker = self.gantry._pose_tracker
 
-        # current smoothie -> world
-        current_world = _translate(
-            x=position['x'],
-            y=position['y'],
-            z=position[mount_axis],
-            mount_axis=self.mount.mount_axis,
-            operator=inv)
+        current = tracker.relative_object_position('world', self.instrument)
+        pose = tracker[self.instrument]
 
-        print('[MOVE] current WORLD: ', current_world)
-
-        # world -> smoothie
-        target = _translate(
-            x=x if x is not None else current_world['x'],
-            y=y if y is not None else current_world['y'],
-            z=z + z_offset if z is not None else current_world[mount_axis],
-            mount_axis=self.mount.mount_axis)
-
-        print('[MOVE] position: ', position)
-        print('[MOVE] target SMOOTHIE: ', target)
-
-        axis_to_move = [
-            axis
-            for axis, value
-            in {'x': x, 'y': y, self.mount.mount_axis: z}.items()
-            if value is not None
+        print('current WORLD: ', current)
+        print('move arguments: ', [x, y, z])
+        # Replace None values for x, y, z with current position values
+        # This gives us world coordinates of the intended move
+        x, y, z = [
+            current if destination is None else destination
+            for destination, current
+            in zip((x, y, z), current)
         ]
+        print('will move to WORLD: ', [x, y, z])
+        # Apply pose transformation to get driver coordinates
+        x, y, z = (tracker['calibration'] * (x, y, z)).position
 
-        target = {
-            axis: value for axis, value
-            in target.items()
-            if axis in axis_to_move
-        }
-
-        print('[MOVE] actual move: ', target)
-
-        driver.move(**{
-            axis: value for axis, value in target.items()
-            if axis in 'xy'})
-        driver.move(**{
-            axis: value for axis, value in target.items()
-            if axis == self.mount.mount_axis})
+        self.gantry.move(x=x, y=y)
+        self.mount.move(z=z)
 
     def probe(self, axis_to_probe, probing_movement):
         if axis_to_probe is 'z':
@@ -204,18 +139,15 @@ class Gantry:
         self._pose_tracker.track_object(self, self.left_mount, **LEFT_MOUNT_OFFSET)
         self._pose_tracker.track_object(self, self.right_mount, **RIGHT_MOUNT_OFFSET)
 
-    def _position_from_driver(self):
-        return _coords_for_axes(self.driver, self.free_axes)
-
-    def move(self, x=None, y=None):
+    def move(self, x, y):
         ''' Moves the Gantry in the x, y plane '''
         self.driver.move(x=x, y=y)
-        self._publish_position()
+        self._update_pose()
 
-    def _publish_position(self):
-        new_position = resolve_all_coordinates(self, self._pose_tracker, **self._position_from_driver())
-        new_position_msg = new_pos_msg(self, **new_position)
-        publish(topics.MOVEMENT, new_position_msg)
+    def _update_pose(self):
+        pose = self._pose_tracker.relative(self)
+        coordinates = _coords_for_axes(self.driver, self.free_axes)
+        pose.x, pose.y = coordinates['x'], coordinates['y']
 
     def mount_instrument(self, instrument, instrument_mount):
         if instrument_mount is 'left':
@@ -225,18 +157,15 @@ class Gantry:
         else:
             raise RuntimeError('Invalid instrument mount. Valid mounts are "right" and "left"')
 
-
     def probe_axis(self, axis, probing_movement):
         return self.driver.probe_axis(axis, probing_movement)
 
-
     def home(self):
         self.driver.home()
-        self._publish_position()
+        self._update_pose()
 
 
 class Mount:
-
     def __init__(self, driver, gantry, mount_axis, actuator_axis, offset):
         self.instrument = None
         self.driver = driver
@@ -245,18 +174,13 @@ class Mount:
         self.actuator_axis = actuator_axis
         self.offset = offset
 
-    def _position_from_driver(self):
-        position = _coords_for_axes(self.driver, self.mount_axis)
-        return {'z': position[self.mount_axis]}
-
-    def _publish_position(self):
-        new_position = resolve_all_coordinates(self, self.gantry._pose_tracker, **self._position_from_driver())
-        new_position_msg = new_pos_msg(self, **new_position)
-        publish(topics.MOVEMENT, new_position_msg)
+    def _update_pose(self):
+        pose = self.gantry._pose_tracker.relative(self)
+        pose.z, = _coords_for_axes(self.driver, self.mount_axis).values()
 
     def move(self, z):
         self.driver.move(**{self.mount_axis: z})
-        self._publish_position()
+        self._update_pose()
 
     def add_instrument(self, instrument):
         if self.instrument is not None:
@@ -272,7 +196,7 @@ class Mount:
 
     def home(self):
         self.driver.home(self.mount_axis)
-        self._publish_position()
+        self._update_pose()
 
 # FIXME: The following should eventually live in the robot
 #

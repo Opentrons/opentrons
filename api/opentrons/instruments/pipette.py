@@ -94,7 +94,6 @@ class Pipette:
         self.robot = robot
         self.mount = mount
         self.channels = channels
-        self._z_offset = 0
         self.attached_tip = None
         self.instrument_actuator = None
         self.instrument_mover = None
@@ -1385,15 +1384,13 @@ class Pipette:
 
     def _move(self, x=None, y=None, z=None):
         print('-[Pipette._move] moving to {}'.format((x, y, z)))
-        self.instrument_mover.move(x, y, z, self._z_offset)
+        self.instrument_mover.move(x, y, z)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        # TODO: account for tip offset during jog to avoid
-        # jogging in tip offset increments when tip is on
-        self._z_offset = length
+        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
 
     def _remove_tip(self, length):
-        self._z_offset = 0
+        self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)
