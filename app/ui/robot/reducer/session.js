@@ -24,7 +24,7 @@ const INITIAL_STATE = {
   errors: [],
   protocolText: '',
   protocolCommands: [],
-  protocolIntrumentsByAxis: {},
+  protocolInstrumentsByAxis: {},
   protocolLabwareBySlot: {},
 
   // running a protocol

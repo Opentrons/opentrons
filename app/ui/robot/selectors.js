@@ -149,16 +149,19 @@ export function getInstruments (state) {
   const {instrumentsByAxis: calibrationByAxis} = getCalibrationState(state)
 
   return INSTRUMENT_AXES.map((axis) => {
-    const instrument = protocolInstrumentsByAxis[axis] || {axis}
+    let instrument = protocolInstrumentsByAxis[axis] || {axis}
 
     if (instrument.channels === 1) {
-      instrument.channels = SINGLE_CHANNEL
+      instrument = {...instrument, channels: SINGLE_CHANNEL}
     } else if (instrument.channels > 1) {
-      instrument.channels = MULTI_CHANNEL
+      instrument = {...instrument, channels: MULTI_CHANNEL}
     }
 
     if (instrument.name) {
-      instrument.calibration = calibrationByAxis[axis] || UNPROBED
+      instrument = {
+        ...instrument,
+        calibration: calibrationByAxis[axis] || UNPROBED
+      }
     }
 
     return instrument
@@ -181,10 +184,13 @@ export function getLabware (state) {
   const {labwareBySlot: calibrationBySlot} = getCalibrationState(state)
 
   return DECK_SLOTS.map((slot) => {
-    const labware = protocolLabwareBySlot[slot] || {slot}
+    let labware = protocolLabwareBySlot[slot] || {slot}
 
     if (labware.name) {
-      labware.calibration = calibrationBySlot[slot] || UNCONFIRMED
+      labware = {
+        ...labware,
+        calibration: calibrationBySlot[slot] || UNCONFIRMED
+      }
     }
 
     return labware

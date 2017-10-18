@@ -20,7 +20,7 @@ describe('robot reducer - session', () => {
       errors: [],
       protocolText: '',
       protocolCommands: [],
-      protocolIntrumentsByAxis: {},
+      protocolInstrumentsByAxis: {},
       protocolLabwareBySlot: {},
 
       // running a protocol

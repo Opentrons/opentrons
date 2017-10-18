@@ -1,4 +1,3 @@
-import React from 'react'
 import {connect} from 'react-redux'
 
 import {
@@ -17,14 +16,9 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  setInstrument: (axis) => () => dispatch(robotActions.setCurrentInstrument(axis)),
-  setLabware: (slot) => () => dispatch(robotActions.setCurrentLabware(slot))
+  clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false))
+  // setInstrument: (axis) => () => dispatch(robotActions.setCurrentInstrument(axis)),
+  // setLabware: (slot) => () => dispatch(robotActions.setCurrentLabware(slot))
 })
 
-function ConnectedSetupPanel (props) {
-  return (
-    <SetupPanel {...props} />
-  )
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ConnectedSetupPanel)
+export default connect(mapStateToProps, mapDispatchToProps)(SetupPanel)

@@ -6,12 +6,16 @@ import capitalize from 'lodash/capitalize'
 import ToolTip from './ToolTip'
 import styles from './SetupPanel.css'
 
+import {constants as robotConstants} from '../robot'
+
 function PipetteLinks (props) {
-  const {axis, name, volume, channels, isProbed, onClick} = props
+  const {axis, name, volume, channels, calibration, onClick} = props
   const isDisabled = name == null
   const url = `/setup-instruments/${axis}`
 
-  const statusStyle = isProbed || isDisabled
+  const linkStyle = classnames({[styles.disabled]: isDisabled})
+
+  const statusStyle = isDisabled || calibration === robotConstants.PROBED
     ? styles.confirmed
     : styles.alert
 
@@ -21,7 +25,13 @@ function PipetteLinks (props) {
 
   return (
     <li>
-      <NavLink to={url} onClick={onClick} activeClassName={styles.active}>
+      <NavLink
+        to={url}
+        onClick={onClick}
+        className={linkStyle}
+        activeClassName={styles.active}
+        disabled={isDisabled}
+      >
         <span className={classnames(statusStyle, 'tooltip_parent')}>
           <ToolTip msg='Tip not found' pos='bottom' />
         </span>
@@ -33,17 +43,26 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, slot, isConfirmed, isTiprack, tipracksConfirmed, onClick} = props
+  const {name, slot, calibration, isTiprack, tipracksConfirmed, onClick} = props
   const isDisabled = !isTiprack && !tipracksConfirmed
-  const buttonStyle = classnames(styles.btn_labware, {[styles.disabled]: isDisabled})
-  const statusStyle = classnames({[styles.confirmed]: isConfirmed, [styles.alert]: !isConfirmed})
+  const isConfirmed = calibration === robotConstants.CONFIRMED
+
+  const buttonStyle = classnames(styles.btn_labware, {
+    [styles.disabled]: isDisabled
+  })
+  const statusStyle = classnames({
+    [styles.confirmed]: isConfirmed,
+    [styles.alert]: !isConfirmed
+  })
+
   const url = `/setup-deck/${slot}`
+
   return (
     <li>
       <NavLink
         to={url}
-        activeClassName={styles.active}
         className={buttonStyle}
+        activeClassName={styles.active}
         onClick={onClick}
         disabled={isDisabled}
       >
@@ -63,23 +82,22 @@ export default function SetupPanel (props) {
     instrumentsCalibrated,
     labwareConfirmed,
     tipracksConfirmed,
-    setInstrument,
-    setLabware
+    clearLabwareReviewed
   } = props
 
   const instrumentList = instruments.map((i) => (
-    <PipetteLinks {...i} key={i.axis} onClick={setInstrument(i.axis)} />
+    <PipetteLinks {...i} key={i.axis} onClick={clearLabwareReviewed} />
   ))
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack} = lab
-    const onClick = setLabware(slot) // setLabwareReviewed(false)
+    // const onClick = setLabware(slot)
     const links = (
       <LabwareLinks
         {...lab}
         key={slot}
         tipracksConfirmed={tipracksConfirmed}
-        onClick={onClick}
+        // onClick={onClick}
       />
     )
 
@@ -129,22 +147,32 @@ export default function SetupPanel (props) {
 }
 
 SetupPanel.propTypes = {
-  setInstrument: PropTypes.func.isRequired,
-  setLabware: PropTypes.func.isRequired,
   instruments: PropTypes.arrayOf(PropTypes.shape({
     axis: PropTypes.string.isRequired,
     name: PropTypes.string,
     channels: PropTypes.string,
     volume: PropTypes.number,
-    isProbed: PropTypes.bool
+    calibration: PropTypes.oneOf([
+      robotConstants.UNPROBED,
+      robotConstants.PREPARING_TO_PROBE,
+      robotConstants.READY_TO_PROBE,
+      robotConstants.PROBING,
+      robotConstants.PROBED
+    ])
   })).isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     slot: PropTypes.number.isRequired,
     name: PropTypes.string,
     type: PropTypes.string,
-    isConfirmed: PropTypes.bool,
-    isTiprack: PropTypes.bool
+    isTiprack: PropTypes.bool,
+    calibration: PropTypes.oneOf([
+      robotConstants.UNCONFIRMED,
+      robotConstants.MOVING_TO_SLOT,
+      robotConstants.OVER_SLOT,
+      robotConstants.CONFIRMED
+    ])
   })).isRequired,
+  clearLabwareReviewed: PropTypes.func.isRequired,
   instrumentsCalibrated: PropTypes.bool.isRequired,
   tipracksConfirmed: PropTypes.bool.isRequired,
   labwareConfirmed: PropTypes.bool.isRequired

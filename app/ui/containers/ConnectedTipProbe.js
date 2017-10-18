@@ -1,28 +1,22 @@
-import React from 'react'
 import {connect} from 'react-redux'
 
 import TipProbe from '../components/TipProbe'
 
 import {
-  actions as robotActions,
-  selectors as robotSelectors
+  actions as robotActions
 } from '../robot'
 
-const mapStateToProps = (state, props) => ({
-  instrument: props.instrument,
-  currentInstrument: robotSelectors.getCurrentInstrument(state),
-  currentCalibration: robotSelectors.getCurrentInstrumentCalibration(state)
+const mapStateToProps = (state, ownProps) => ({
+  instrument: ownProps.instrument
 })
 
-const mapDispatchToProps = (dispatch, props) => ({
-  onPrepareClick: () => dispatch(robotActions.moveToFront(props.instrument.axis)),
-  onProbeTipClick: () => dispatch(robotActions.probeTip(props.instrument.axis))
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  onPrepareClick: () => {
+    dispatch(robotActions.moveToFront(ownProps.instrument.axis))
+  },
+  onProbeTipClick: () => {
+    dispatch(robotActions.probeTip(ownProps.instrument.axis))
+  }
 })
 
-function ConnectedTipProbe (props) {
-  return (
-    <TipProbe {...props} />
-  )
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ConnectedTipProbe)
+export default connect(mapStateToProps, mapDispatchToProps)(TipProbe)

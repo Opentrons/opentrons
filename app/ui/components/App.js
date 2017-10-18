@@ -18,8 +18,8 @@ export default function App () {
       <Switch>
         <Route exact path='/' component={Home} />
         <Route path='/upload' component={Upload} />
-        <Route path='/setup-instruments/:side?' component={SetupInstruments} />
-        <Route path='/setup-deck/:slot?' component={SetupDeck} />
+        <Route path='/setup-instruments/:side' component={SetupInstruments} />
+        <Route path='/setup-deck/:slot' component={SetupDeck} />
         <Route path='/run' component={Run} />
       </Switch>
     </div>
