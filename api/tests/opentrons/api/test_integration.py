@@ -5,18 +5,37 @@ from conftest import state
 
 
 @pytest.fixture
-def smoke():
+def smoke(virtual_smoothie_env):
     robot.connect()
     robot._driver.home('za')
     robot._driver.home('bcx')
     robot._driver.home()
-    print('after home: ', robot._driver.log)
     robot._driver.log.clear()
     from tests.opentrons.data import smoke
 
 
+def log_by_axis(log, axis):
+    from functools import reduce
+
+    def reducer(e1, e2):
+        return {
+            axis: e1[axis] + [round(e2[axis])]
+            for axis in axis
+        }
+
+    return reduce(reducer, log, {axis: [] for axis in axis})
+
+
 def test_smoke(smoke):
+    by_axis = log_by_axis(robot._driver.log, 'XYA')
+    coords = [
+        (x, y, z)
+        for x, y, z
+        in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
+    ]
+    print(coords)
     assert robot._driver.log == []
+
 
 # @pytest.mark.parametrize('protocol_file', ['dinosaur.py'])
 # async def test_load_probe_run(main_router, protocol, protocol_file):

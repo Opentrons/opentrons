@@ -34,7 +34,6 @@ def resolve_all_coordinates(tracked_object, pose_tracker, x=None, y=None, z=None
 
 
 def _coords_for_axes(driver, axes):
-    print('driver.position', driver.position)
     return {
         axis: value
         for axis, value
@@ -88,9 +87,7 @@ class InstrumentMover(object):
         self.mount._update_pose()
 
         tracker = self.gantry._pose_tracker
-
         current = tracker.relative_object_position('world', self.instrument)
-        pose = tracker[self.instrument]
 
         print('current WORLD: ', current)
         print('move arguments: ', [x, y, z])

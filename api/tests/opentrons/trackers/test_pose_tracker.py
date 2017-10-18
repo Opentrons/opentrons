@@ -41,19 +41,19 @@ def test_add_container_to_deck(robot):
     assert plate in robot.pose_tracker
 
 
-# def test_calibrate_plate(robot, tmpdir):
-#     # Load container | Test positions of container and wells
-#     plate = containers_load(robot, '96-flat', 'A1')
-#     assert robot.pose_tracker[plate].position == Vector(14.34, 11.24, 0.0)
-#     assert robot.pose_tracker[plate[2]].position == Vector(14.34, 24.34, 10.5)
-#     assert robot.pose_tracker[plate[5]].position == Vector(66.24, 24.34, 10.5)
+def test_calibrate_plate(robot, tmpdir):
+    # Load container | Test positions of container and wells
+    plate = containers_load(robot, '96-flat', 'A1')
+    assert robot.pose_tracker[plate].position == Vector(14.34, 11.24, 0.0)
+    assert robot.pose_tracker[plate[2]].position == Vector(14.34, 56.24, 0.0)
+    assert robot.pose_tracker[plate[5]].position == Vector(14.34, 29.24, 0.0)
 
-#     cf.calibrate_container_with_delta(
-#         plate, robot.pose_tracker, 1, 3, 4, True
-#     )
-#     assert robot.pose_tracker[plate].position == Vector(22.24, 27.34, 4.0)
-#     assert robot.pose_tracker[plate[2]].position == Vector(40.24, 27.34, 14.5)
-#     assert robot.pose_tracker[plate[5]].position == Vector(67.24, 27.34, 14.5)
+    cf.calibrate_container_with_delta(
+        plate, robot.pose_tracker, 1, 3, 4, True
+    )
+    assert robot.pose_tracker[plate].position == Vector(15.34, 14.24, 4.0)
+    assert robot.pose_tracker[plate[2]].position == Vector(15.34, 59.24, 4.0)
+    assert robot.pose_tracker[plate[5]].position == Vector(15.34, 32.24, 4.0)
 
 
 def test_add_pipette(robot):
@@ -116,7 +116,7 @@ def test_faulty_access(pose_tracker):
         pose_tracker[p300]
 
 
-def test_basics(pose_tracker):
+def test_basics():
     tracker = PoseTracker()
     transform = array([
         [1, 0, 0, 0],

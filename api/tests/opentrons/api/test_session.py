@@ -107,7 +107,7 @@ async def test_load_and_run(main_router, session_manager, protocol):
 
 
 @pytest.fixture
-def run_session():
+def run_session(virtual_smoothie_env):
     return Session('dino', 'from opentrons import robot')
 
 
@@ -158,7 +158,7 @@ def test_error_append(run_session):
     ]
 
 
-def test_get_instruments_and_containers(labware_setup):
+def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     instruments, tip_racks, plates, commands = labware_setup
     p100, p1000 = instruments
 
@@ -240,3 +240,20 @@ async def test_session_model_functional(session_manager, protocol):
     assert [container.name for container in session.containers] == \
            ['tiprack', 'trough', 'plate']
     assert [instrument.name for instrument in session.instruments] == ['p200']
+
+
+# TODO(artyom 20171018): design a small protocol specifically for the test
+@pytest.mark.parametrize('protocol_file', ['bradford_assay.py'])
+async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
+    """
+    Bradford Assay is using drop_tip() with no arguments that assumes
+    tip drop into trash-box. In this test we are confirming that
+    that trash location is being inferred from a command, and trash
+    is listed as a container for a protocol, as well as a container
+    instruments are interacting with.
+    """
+    session = session_manager.create(name='<blank>', text=protocol.text)
+
+    assert 'trash-box' in [c.name for c in session.get_containers()]
+    containers = sum([i.containers for i in session.get_instruments()], [])
+    assert 'trash-box' in [c.name for c in containers]

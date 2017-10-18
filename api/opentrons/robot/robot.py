@@ -18,15 +18,11 @@ from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
 
-from numpy import array, dot, insert
+from numpy import array, dot, insert, add, subtract
 
 
 log = get_logger(__name__)
 
-# DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
-
-# FIXME: (Jared 9/18/17)
-# This should be a head object - but using a string now to avoid scope creep
 
 DECK_OFFSET = {'x': 0, 'y': 0, 'z': 0}
 MAX_INSTRUMENT_HEIGHT = 227.0000
@@ -35,7 +31,6 @@ MAX_INSTRUMENT_HEIGHT = 227.0000
 # use cli/main.py to perform factory calibration
 # TODO(artyom 20171017): round these numbers
 # TODO(artyom 20171017): move to config
-
 XY = \
     array([[2.00633580e+00,   1.16263441e-02,  -4.51928609e+02],
            [-3.34703575e-03,   1.95997984e+00,  -3.65876516e+02],
@@ -51,7 +46,8 @@ FACTORY_CALIBRATION = insert(
         insert(XY, 2, [0, 0, 0], axis=1),
         2,
         [0, 0, Z_SCALE, Z_OFFSET],
-        axis=0)
+        axis=0
+    )
 
 
 class InstrumentMosfet(object):
@@ -502,11 +498,8 @@ class Robot(object):
 
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
-        offset = coordinates - placeable.top()[1]
-        target = self.pose_tracker[placeable].position + offset.coordinates
-        print('[ROBOT] using offset of {}'.format(offset))
-
-        print('[ROBOT] moving to {} at coordinates {}'.format(placeable, target))
+        offset = subtract(coordinates, placeable.top()[1])
+        target = add(self.pose_tracker[placeable].position, offset.coordinates)
 
         other_instrument = {instrument} ^ set(self._instruments.values())
         if not len(other_instrument) == 0:
@@ -538,8 +531,6 @@ class Robot(object):
 
         travel_height = self.max_deck_height() + self.arc_height
 
-
-
         _, _, robot_max_z = self.dimensions #TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
@@ -551,7 +542,6 @@ class Robot(object):
             {'x': destination[0], 'y': destination[1]},
             {'z': arrival_z}
         ]
-        print("[Arc Strategy] up to {}, across to {}, down to {}".format(*strategy))
         return strategy
 
     # DEPRECATED
@@ -654,7 +644,6 @@ class Robot(object):
         )
 
         for slot in self._deck:
-            print('Slot: ', slot, slot._coordinates)
             self.pose_tracker.track_object(
                 self._deck,
                 slot,

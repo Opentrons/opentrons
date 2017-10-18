@@ -142,17 +142,30 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Public interface ---------------- #
     def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
+        from numpy import isclose
+        target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
+
+        def should_process_coords(coords, axis):
+            return (coords is not None) \
+                and (not isclose(coords, self.position[axis.lower()]))
+
+        coords = [axis + str(coords)
+                  for axis, coords in target_position.items()
+                  if should_process_coords(coords, axis)]
+
+        if not coords:
+            return
+
+        command = GCODES['MOVE'] + ''.join(coords)
+
+        print('command: ', command)
+
+        self._send_command(command)
+
         self._update_position({
             axis: value
             for axis, value in zip('XYZABC', [x, y, z, a, b, c])
         })
-
-        target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
-        coords = [axis + str(coords)
-                  for axis, coords in target_position.items()
-                  if coords is not None]
-        command = GCODES['MOVE'] + ''.join(coords)
-        self._send_command(command)
 
     def home(self, axis=None):
         homed_positions = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}

@@ -767,8 +767,10 @@ class Pipette:
 
             tip_plunge = 5
             for i in range(int(presses) - 1):
-                self.move_to(self.current_tip().top(0), strategy='direct')
-                self.move_to(self.current_tip().top(-tip_plunge), strategy='direct')
+                a = self.current_tip().top(0)
+                b = self.current_tip().top(-tip_plunge)
+                self.move_to(a, strategy='direct')
+                self.move_to(b, strategy='direct')
             self._add_tip(DEFAULT_TIP_LENGTH)
             self.instrument_mover.home()
             return self
@@ -1383,7 +1385,6 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
-        print('-[Pipette._move] moving to {}'.format((x, y, z)))
         self.instrument_mover.move(x, y, z)
 
     def _probe(self, axis, movement):
