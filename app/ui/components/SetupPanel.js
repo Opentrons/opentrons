@@ -118,6 +118,9 @@ export default function SetupPanel (props) {
     ? <p className={styles.labware_alert}>Tipracks must be setup first.</p>
     : null
 
+  const runWarning = !labwareConfirmed
+    ? <ToolTip msg={runLinkWarning} pos='top' />
+    : null
   return (
     <div className={styles.setup_panel}>
       <h1>Prepare Robot for RUN</h1>
@@ -140,7 +143,7 @@ export default function SetupPanel (props) {
       </section>
       <NavLink to='/run' className={runLinkStyles}>
         Run Protocol
-        <ToolTip msg={runLinkWarning} pos='top' />
+        {runWarning}
       </NavLink>
     </div>
   )

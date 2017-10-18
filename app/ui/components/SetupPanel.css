@@ -140,12 +140,17 @@ li:nth-child(odd) a.btn_labware {
   display: block;
   height: 2.5rem;
   line-height: 2.5rem;
-  background-color: #777;
+  background-color: #999;
   color: white;
   position: relative;
 }
 
-.inactive {
+.run_link:hover {
+  background-color: #777;
+}
+
+.inactive,
+.inactive:hover {
   background-color: transparent;
   border: 1px solid silver;
   color: silver;

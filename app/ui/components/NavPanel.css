@@ -32,7 +32,7 @@
   composes: btn;
   background-color: #999;
   color: white;
-  background-image: url(../../ui/img/icon_fileupload.svg);
+  background-image: url(../../ui/img/icon_fileupload.png);
 }
 
 .btn_new {
