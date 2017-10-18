@@ -21,7 +21,9 @@ export const {
 
   preselectWells,
   selectWells,
-  deselectWells
+  deselectWells,
+
+  editIngredientGroup
 } = createActions({
   OPEN_LABWARE_SELECTOR: undefined,
   CLOSE_LABWARE_SELECTOR: undefined,
@@ -35,5 +37,7 @@ export const {
 
   PRESELECT_WELLS: undefined,
   SELECT_WELLS: undefined,
-  DESELECT_WELLS: undefined
+  DESELECT_WELLS: undefined,
+
+  EDIT_INGREDIENT_GROUP: undefined // Payload example: {group: 2, wellName: 'H1' (wellName is optional)}
 })

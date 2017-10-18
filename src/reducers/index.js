@@ -28,6 +28,7 @@ const modeLabwareSelection = handleActions({
 
 const modeIngredientSelection = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action) => ({slotName: action.payload.slotName}),
+  EDIT_INGREDIENT_GROUP: (state, action) => ({...state, selectedIngredientGroup: action.payload}),
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -61,7 +62,8 @@ const selectedWells = handleActions({
       ...action.payload.wells
     }
   }),
-  DESELECT_WELLS: () => selectedWellsInitialState
+  DESELECT_WELLS: () => selectedWellsInitialState,
+  CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState
 }, selectedWellsInitialState)
 
 const rootReducer = combineReducers({

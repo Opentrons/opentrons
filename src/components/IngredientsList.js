@@ -6,17 +6,18 @@ import get from 'lodash/get'
 // TODO factor into CSS or constants or elsewhere
 const swatchColors = ['blue', 'orange', 'red', 'purple', 'green', 'yellow', 'brown', 'pink']
 
-const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, ...otherProps}) => {
+const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editIngredientGroup, ...otherProps}) => {
   if (ingredCategoryData.wells.length === 1) {
     // Single ingredient, card is rendered differently
     return (
       <div className={styles.singleIngred} >
         <IngredIndividual
           name={ingredCategoryData.name}
-          ingredCategoryIdx={ingredCategoryIdx}
           wellName={ingredCategoryData.wells[0]}
           volume={ingredCategoryData.volume}
           concentration={ingredCategoryData.concentration}
+          ingredCategoryIdx={ingredCategoryIdx}
+          editIngredientGroup={editIngredientGroup}
           {...otherProps} />
       </div>
     )
@@ -38,6 +39,8 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, ...otherProps})
               wellName={wellName}
               volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
               concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
+              ingredCategoryIdx={ingredCategoryIdx}
+              editIngredientGroup={editIngredientGroup}
             />
           )
           // Not individualized, but multiple wells
@@ -52,7 +55,7 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, ...otherProps})
       }
 
       <footer>
-        <div className={styles.editButton}>EDIT</div>
+        <div className={styles.editButton} onClick={e => editIngredientGroup({group: ingredCategoryIdx})}>EDIT</div>
         <div>▼</div>
         <div className={styles.deleteIngredient}>✕</div>
       </footer>
@@ -60,14 +63,14 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, ...otherProps})
   )
 }
 
-const IngredIndividual = ({name, wellName, volume, concentration, canDelete, ingredCategoryIdx, ...otherProps}) => (
+const IngredIndividual = ({name, wellName, volume, concentration, canDelete, ingredCategoryIdx, editIngredientGroup, ...otherProps}) => (
   <div {...otherProps}
     className={styles.ingredientInstanceItem}
     style={{'--swatch-color': swatchColors[ingredCategoryIdx]}}
   >
     <div className={styles.leftPill}>
       <label>{name}</label>
-      <button className={styles.editButton}>EDIT</button>
+      <button className={styles.editButton} onClick={e => editIngredientGroup({wellName, group: ingredCategoryIdx})}>EDIT</button>
     </div>
     <div className={styles.rightPill}>
       <input placeholder={wellName} />
@@ -78,7 +81,7 @@ const IngredIndividual = ({name, wellName, volume, concentration, canDelete, ing
   </div>
 )
 
-const IngredientsList = ({slotName, containerName, containerType, ingredients}) => (
+const IngredientsList = ({slotName, containerName, containerType, ingredients, editIngredientGroup}) => (
   <div className={styles.ingredientsList}>
     <div className={styles.ingredListHeaderLabel}>
       <div>Slot {slotName}</div>
@@ -89,7 +92,7 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients}) 
     </div>
 
     {ingredients.map((ingredCategoryData, i) =>
-      <IngredGroupCard key={i} ingredCategoryIdx={i} ingredCategoryData={ingredCategoryData} />)
+      <IngredGroupCard key={i} ingredCategoryIdx={i} {...{editIngredientGroup, ingredCategoryData}} />)
     }
 
     {/* Each section is a detail view of 1 ingredient */}
