@@ -146,6 +146,7 @@ function handleMoveTo (state, action) {
 
   return {
     ...state,
+    labwareReviewed: true,
     moveToRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: MOVING_TO_SLOT}
   }

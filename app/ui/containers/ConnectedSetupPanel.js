@@ -1,4 +1,5 @@
 import {connect} from 'react-redux'
+import {push} from 'react-router-redux'
 
 import {
   selectors as robotSelectors,
@@ -7,6 +8,7 @@ import {
 import SetupPanel from '../components/SetupPanel'
 
 const mapStateToProps = (state) => ({
+  labwareReviewed: robotSelectors.getLabwareReviewed(state),
   instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
   tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
   labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
@@ -16,9 +18,31 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false))
-  // setInstrument: (axis) => () => dispatch(robotActions.setCurrentInstrument(axis)),
-  // setLabware: (slot) => () => dispatch(robotActions.setCurrentLabware(slot))
+  clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false)),
+  setLabware: (slot) => () => dispatch(push(`/setup-deck/${slot}`)),
+  // TODO(mc, 2017-10-06): don't hardcode the pipette
+  moveToContainer: (slot) => () => dispatch(robotActions.moveTo('left', slot))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(SetupPanel)
+const mergeProps = (stateProps, dispatchProps) => {
+  const props = {...stateProps, ...dispatchProps}
+
+  if (props.labwareReviewed) {
+    const setLabware = props.setLabware
+    const moveToContainer = props.moveToContainer
+
+    props.setLabware = (slot) => () => {
+      // TODO(mc, 2017-10-06): batch or rethink this double dispatch
+      setLabware(slot)()
+      moveToContainer(slot)()
+    }
+  }
+
+  return props
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  mergeProps
+)(SetupPanel)
