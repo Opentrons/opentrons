@@ -49,7 +49,8 @@ export const editIngredient = payload => (dispatch, getState) => {
     payload: {
       ...payload,
       slotName: selectors.selectedContainerSlot(state),
-      groupId: selectors.selectedIngredientGroupId(state)
+      groupId: selectors.selectedIngredientGroupId(state),
+      wells: selectors.selectedWellNames(state) // TODO use locations: [slotName]: [selected wells]
     }
   })
 }

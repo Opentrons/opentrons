@@ -69,6 +69,7 @@ const modeLabwareSelection = handleActions({
 const modeIngredientSelection = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action) => ({slotName: action.payload.slotName, selectedIngredientGroup: null}),
   EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({...state, selectedIngredientGroup: action.payload}),
+  EDIT_INGREDIENT: (state, action) => ({...state, selectedIngredientGroup: null}), // unselect ingredient group when edited.
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -108,7 +109,21 @@ const selectedWells = handleActions({
 }, selectedWellsInitialState)
 
 const ingredients = handleActions({
-  EDIT_INGREDIENT: (state, action) => state, // TODO
+  EDIT_INGREDIENT: (state, action) => (
+    (action.payload.groupId !== undefined && action.payload.groupId !== null)
+      // Modify existing ingredient
+      ? state
+      // No groupId, create new ingredient
+      : state.concat({
+        name: action.payload.name,
+        volume: action.payload.volume,
+        concentration: action.payload.concentration,
+        description: action.payload.description,
+        individualized: action.payload.individualized, // TODO!
+
+        wells: action.payload.wells || ['A1', 'A2'] // TODO!
+      })
+  ),
   // Remove the deleted group (referenced by array index)
   DELETE_INGREDIENT_GROUP: (state, action) => state.filter((_, i) => i !== action.payload.group)
 }, defaultIngredients)
@@ -183,6 +198,16 @@ const allIngredients = createSelector(
   state => state.ingredients
 )
 
+const selectedWellNames = createSelector(
+  state => rootSelector(state).selectedWells.selected,
+  selectedWells => Object.values(selectedWells).map(well => {
+    console.log({selectedWells, rr: Object.values(selectedWells), well})
+    const col = well[0]
+    const row = well[1]
+    return String.fromCharCode(65 + col) + (row + 1)
+  }) // TODO factor to util
+)
+
 const numWellsSelected = createSelector(
   state => rootSelector(state).selectedWells,
   selectedWells => Object.keys(selectedWells.selected).length)
@@ -236,6 +261,7 @@ export const selectors = {
   canAdd,
   wellMatrix,
   numWellsSelected,
+  selectedWellNames,
   ingredients: state => state.default.ingredients, // TODO
   selectedContainerSlot,
   ingredientGroupsForSelectedContainer,

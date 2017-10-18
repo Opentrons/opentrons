@@ -36,7 +36,7 @@ const getCollidingWells = rectPositions => {
       const wellX = elem.dataset['wellX']
       const wellY = elem.dataset['wellY']
       const wellKey = wellX + ',' + wellY
-      return {...acc, [wellKey]: [wellX, wellY]}
+      return {...acc, [wellKey]: [parseInt(wellX), parseInt(wellY)]}
     }
     return acc
   }, {})
