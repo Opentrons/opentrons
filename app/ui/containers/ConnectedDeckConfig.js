@@ -1,4 +1,5 @@
 import {connect} from 'react-redux'
+import {push} from 'react-router-redux'
 
 import {
   selectors as robotSelectors,
@@ -12,11 +13,13 @@ const mapStateToProps = (state, ownProps) => {
   const currentLabware = labware.find((lab) => lab.slot === slot)
 
   return {
+    labwareReviewed: robotSelectors.getLabwareReviewed(state),
     labware,
     currentLabware,
-    labwareReviewed: robotSelectors.getLabwareReviewed(state),
     tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-    labwareConfirmed: robotSelectors.getLabwareConfirmed(state)
+    labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
+    unconfirmedLabware: robotSelectors.getUnconfirmedLabware(state),
+    unconfirmedTipracks: robotSelectors.getUnconfirmedTipracks(state)
   }
 }
 
@@ -26,9 +29,32 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
     // TODO(mc, 2017-10-06): don't hardcode the pipette
-    moveToContainer: () => dispatch(robotActions.moveTo('left', slot)),
-    setLabwareConfirmed: () => dispatch(robotActions.confirmLabware(slot))
+    moveToLabware: () => dispatch(robotActions.moveTo('left', slot)),
+    setLabwareConfirmed: () => dispatch(robotActions.confirmLabware(slot)),
+    moveToNextLabware: (nextSlot) => () => {
+      dispatch(push(`/setup-deck/${nextSlot}`))
+      dispatch(robotActions.moveTo('left', nextSlot))
+    }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeckConfig)
+const mergeProps = (stateProps, dispatchProps) => {
+  const props = {...stateProps, ...dispatchProps}
+  const {moveToNextLabware, unconfirmedLabware, unconfirmedTipracks} = props
+
+  if (unconfirmedTipracks[0]) {
+    props.nextLabware = unconfirmedTipracks[0]
+    props.moveToNextLabware = moveToNextLabware(unconfirmedTipracks[0].slot)
+  } else if (unconfirmedLabware[0]) {
+    props.nextLabware = unconfirmedLabware[0]
+    props.moveToNextLabware = moveToNextLabware(unconfirmedLabware[0].slot)
+  }
+
+  return props
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  mergeProps
+)(DeckConfig)

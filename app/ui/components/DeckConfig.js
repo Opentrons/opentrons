@@ -9,14 +9,14 @@ import {constants as robotConstants} from '../robot'
 const {UNCONFIRMED, MOVING_TO_SLOT, OVER_SLOT, CONFIRMED} = robotConstants
 
 DeckMap.propTypes = {
-  tipracksConfirmed: PropTypes.bool.isRequired,
   labwareReviewed: PropTypes.bool.isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     slot: PropTypes.number.isRequired
   })).isRequired,
   currentLabware: PropTypes.shape({
     slot: PropTypes.number.isRequired
-  }).isRequired
+  }).isRequired,
+  tipracksConfirmed: PropTypes.bool.isRequired
 }
 
 function DeckMap (props) {
@@ -49,48 +49,53 @@ LabwareNotification.propTypes = {
       CONFIRMED
     ])
   }),
-  moveToContainer: PropTypes.func.isRequired,
+  nextLabware: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    slot: PropTypes.number.isRequired
+  }),
+  moveToLabware: PropTypes.func.isRequired,
+  moveToNextLabware: PropTypes.func,
   setLabwareConfirmed: PropTypes.func.isRequired
 }
 
 function LabwareNotification (props) {
   const {
     labware,
-    moveToContainer,
-    setLabwareConfirmed
+    moveToLabware,
+    setLabwareConfirmed,
+    nextLabware,
+    moveToNextLabware
   } = props
 
-  if (!labware) return null
-  if (labware.calibration === MOVING_TO_SLOT) return null
+  if (!labware || labware.calibration === MOVING_TO_SLOT) return null
+
   if (labware.calibration === OVER_SLOT) {
     return (
-      <ConfirmCalibrationPrompt
-        {...labware}
-        onYesClick={setLabwareConfirmed}
+      <ConfirmCalibrationPrompt {...labware} onYesClick={setLabwareConfirmed} />
+    )
+  }
+
+  if (labware.calibration === CONFIRMED) {
+    return (
+      <NextCalibrationPrompt
+        labware={labware}
+        nextLabware={nextLabware}
+        onClick={moveToNextLabware}
       />
     )
   }
 
   // Move This to setupPanel, ifIsCalibrated
   return (
-    <BeginCalibrationPrompt
-      {...labware}
-      onClick={moveToContainer}
-    />
+    <BeginCalibrationPrompt {...labware} onClick={moveToLabware} />
   )
 }
 
 function BeginCalibrationPrompt (props) {
-  const {name, type, slot, calibration, onClick} = props
-  const isConfirmed = calibration === CONFIRMED
-
-  const title = isConfirmed
-    ? `${name} (${type}, slot ${slot}, confirmed)`
-    : `${name} (${type}, slot ${slot})`
-
-  const message = isConfirmed
-    ? 'Click [Move To Well] to initiate calibration sequence again.'
-    : 'Click [Move To Well] to initiate calibration sequence'
+  const {name, type, slot, onClick} = props
+  const title = `${name} (${type}, slot ${slot})`
+  const message = 'Click [Move To Well] to initiate calibration sequence'
 
   return (
     <div className={styles.prompt}>
@@ -98,6 +103,23 @@ function BeginCalibrationPrompt (props) {
       <p>{message}</p>
       <button className={styles.robot_action} onClick={onClick}>
         Move To Well A1
+      </button>
+    </div>
+  )
+}
+
+function NextCalibrationPrompt (props) {
+  const {labware, nextLabware, onClick} = props
+  const title = `${labware.name} (${labware.type}, slot ${labware.slot}) confirmed`
+
+  if (!nextLabware) return null
+
+  return (
+    <div className={styles.prompt}>
+      <h3>{title}</h3>
+      <button className={styles.robot_action} onClick={onClick}>
+        Move to next labware
+        ({nextLabware.type}, slot {nextLabware.slot})
       </button>
     </div>
   )
@@ -141,7 +163,8 @@ function ConfirmCalibrationPrompt (props) {
 DeckConfig.propTypes = {
   labwareReviewed: PropTypes.bool.isRequired,
   setLabwareReviewed: PropTypes.func.isRequired,
-  moveToContainer: PropTypes.func.isRequired,
+  moveToLabware: PropTypes.func.isRequired,
+  moveToNextLabware: PropTypes.func.isRequired,
   setLabwareConfirmed: PropTypes.func.isRequired,
   currentLabware: PropTypes.shape({
     slot: PropTypes.number.isRequired,
@@ -151,14 +174,21 @@ DeckConfig.propTypes = {
       OVER_SLOT,
       CONFIRMED
     ])
-  }).isRequired
+  }).isRequired,
+  nextLabware: PropTypes.shape({
+    slot: PropTypes.number.isRequired,
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired
+  })
 }
 
 export default function DeckConfig (props) {
   const {
     labwareReviewed,
     currentLabware,
-    moveToContainer,
+    nextLabware,
+    moveToLabware,
+    moveToNextLabware,
     setLabwareConfirmed
   } = props
 
@@ -175,7 +205,7 @@ export default function DeckConfig (props) {
           <p>
             Before entering Labware Setup, check that your labware is positioned correctly in the deck slots as illustrated above.
           </p>
-          <button className={styles.continue} onClick={moveToContainer}>
+          <button className={styles.continue} onClick={moveToLabware}>
             CONTINUE MOVING TO {currentLabware.type} IN SLOT {currentLabware.slot}
           </button>
         </div>
@@ -190,7 +220,9 @@ export default function DeckConfig (props) {
       </div>
       <LabwareNotification
         labware={currentLabware}
-        moveToContainer={moveToContainer}
+        nextLabware={nextLabware}
+        moveToLabware={moveToLabware}
+        moveToNextLabware={moveToNextLabware}
         setLabwareConfirmed={setLabwareConfirmed}
       />
     </section>

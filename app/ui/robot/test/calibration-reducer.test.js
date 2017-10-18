@@ -35,6 +35,17 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, action).calibration).toEqual(state.calibration)
   })
 
+  test('handles SESSION', () => {
+    const expected = reducer(undefined, {}).calibration
+    const state = {calibration: {dummy: 'state'}}
+    const action = {
+      type: actionTypes.SESSION,
+      payload: {file: {name: 'foobar.py'}}
+    }
+
+    expect(reducer(state, action).calibration).toEqual(expected)
+  })
+
   test('handles SET_LABWARE_REVIEWED action', () => {
     const setToTrue = {type: actionTypes.SET_LABWARE_REVIEWED, payload: true}
     const setToFalse = {type: actionTypes.SET_LABWARE_REVIEWED, payload: false}

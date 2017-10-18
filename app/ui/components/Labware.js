@@ -33,6 +33,7 @@ export default function Labware (props) {
 
   const isMoving = calibration === MOVING_TO_SLOT
   const isConfirmed = calibration === CONFIRMED
+  const isUnconfirmed = calibration === UNCONFIRMED
   const slotStyle = {gridArea: `slot-${slot}`}
 
   if (!type) {
@@ -49,11 +50,11 @@ export default function Labware (props) {
     })
     : styles.slot
 
-  const confirmationMsg = (labwareReviewed && !isConfirmed && !isMoving)
+  const confirmationMsg = (labwareReviewed && isUnconfirmed)
     ? (<div className={styles.status}>Position Unconfirmed</div>)
     : null
 
-  const confirmationFade = (isConfirmed && isCurrent)
+  const confirmationFade = (isConfirmed && isCurrent && labwareReviewed)
   ? (<div className={styles.confirmed_fade}>Confirmed</div>)
   : null
 

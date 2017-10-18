@@ -15,6 +15,7 @@ import {
 } from '../constants'
 
 const {
+  SESSION,
   DISCONNECT_RESPONSE,
   SET_LABWARE_REVIEWED,
   // TODO(mc, 2017-10-17): implement home when api.calibration_manager can home
@@ -49,6 +50,7 @@ const INITIAL_STATE = {
 export default function calibrationReducer (state = INITIAL_STATE, action) {
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
+    case SESSION: return handleSession(state, action)
     case SET_LABWARE_REVIEWED: return handleSetLabwareReviewed(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
@@ -68,6 +70,10 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
 
 function handleDisconnectResponse (state, action) {
   if (action.error) return state
+  return INITIAL_STATE
+}
+
+function handleSession (state, action) {
   return INITIAL_STATE
 }
 

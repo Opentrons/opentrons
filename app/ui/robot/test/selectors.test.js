@@ -19,7 +19,9 @@ const {
   getRunTime,
   getInstruments,
   getInstrumentsCalibrated,
-  getLabware
+  getLabware,
+  getUnconfirmedTipracks,
+  getUnconfirmedLabware
 } = selectors
 
 describe('robot selectors', () => {
@@ -365,56 +367,96 @@ describe('robot selectors', () => {
     expect(getInstrumentsCalibrated(onePipetteCalibrated)).toBe(true)
   })
 
-  test('get labware', () => {
-    const state = makeState({
-      session: {
-        protocolLabwareBySlot: {
-          1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
-          5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
-          9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+  describe('labware selectors', () => {
+    let state
+
+    beforeEach(() => {
+      state = makeState({
+        session: {
+          protocolLabwareBySlot: {
+            1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
+            5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
+            9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+          }
+        },
+        calibration: {
+          labwareBySlot: {
+            1: constants.UNCONFIRMED,
+            5: constants.CONFIRMED
+          }
         }
-      },
-      calibration: {
-        labwareBySlot: {
-          1: constants.UNCONFIRMED,
-          5: constants.CONFIRMED
-        }
-      }
+      })
     })
 
-    expect(getLabware(state)).toEqual([
-      {
-        slot: 1,
-        id: 'A1',
-        name: 'a1',
-        type: 'a',
-        isTiprack: true,
-        calibration: constants.UNCONFIRMED
-      },
-      {slot: 2},
-      {slot: 3},
-      {slot: 4},
-      {
-        slot: 5,
-        id: 'B2',
-        name: 'b2',
-        type: 'b',
-        isTiprack: false,
-        calibration: constants.CONFIRMED
-      },
-      {slot: 6},
-      {slot: 7},
-      {slot: 8},
-      {
-        slot: 9,
-        id: 'C3',
-        name: 'c3',
-        type: 'c',
-        isTiprack: false,
-        calibration: constants.UNCONFIRMED
-      },
-      {slot: 10},
-      {slot: 11}
-    ])
+    test('get labware', () => {
+      expect(getLabware(state)).toEqual([
+        {
+          slot: 1,
+          id: 'A1',
+          name: 'a1',
+          type: 'a',
+          isTiprack: true,
+          calibration: constants.UNCONFIRMED
+        },
+        {slot: 2},
+        {slot: 3},
+        {slot: 4},
+        {
+          slot: 5,
+          id: 'B2',
+          name: 'b2',
+          type: 'b',
+          isTiprack: false,
+          calibration: constants.CONFIRMED
+        },
+        {slot: 6},
+        {slot: 7},
+        {slot: 8},
+        {
+          slot: 9,
+          id: 'C3',
+          name: 'c3',
+          type: 'c',
+          isTiprack: false,
+          calibration: constants.UNCONFIRMED
+        },
+        {slot: 10},
+        {slot: 11}
+      ])
+    })
+
+    test('get unconfirmed tipracks', () => {
+      expect(getUnconfirmedTipracks(state)).toEqual([
+        {
+          slot: 1,
+          id: 'A1',
+          name: 'a1',
+          type: 'a',
+          isTiprack: true,
+          calibration: constants.UNCONFIRMED
+        }
+      ])
+    })
+
+    test('get unconfirmed labware', () => {
+      expect(getUnconfirmedLabware(state)).toEqual([
+        {
+          slot: 1,
+          id: 'A1',
+          name: 'a1',
+          type: 'a',
+          isTiprack: true,
+          calibration: constants.UNCONFIRMED
+        },
+        {
+          slot: 9,
+          id: 'C3',
+          name: 'c3',
+          type: 'c',
+          isTiprack: false,
+          calibration: constants.UNCONFIRMED
+        }
+      ])
+    })
   })
 })

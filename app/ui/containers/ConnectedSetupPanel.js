@@ -8,20 +8,19 @@ import {
 import SetupPanel from '../components/SetupPanel'
 
 const mapStateToProps = (state) => ({
+  instruments: robotSelectors.getInstruments(state),
+  labware: robotSelectors.getLabware(state),
   labwareReviewed: robotSelectors.getLabwareReviewed(state),
   instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
   tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-  labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
-
-  instruments: robotSelectors.getInstruments(state),
-  labware: robotSelectors.getLabware(state)
+  labwareConfirmed: robotSelectors.getLabwareConfirmed(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false)),
   setLabware: (slot) => () => dispatch(push(`/setup-deck/${slot}`)),
   // TODO(mc, 2017-10-06): don't hardcode the pipette
-  moveToContainer: (slot) => () => dispatch(robotActions.moveTo('left', slot))
+  moveToLabware: (slot) => () => dispatch(robotActions.moveTo('left', slot))
 })
 
 const mergeProps = (stateProps, dispatchProps) => {
@@ -29,12 +28,12 @@ const mergeProps = (stateProps, dispatchProps) => {
 
   if (props.labwareReviewed) {
     const setLabware = props.setLabware
-    const moveToContainer = props.moveToContainer
+    const moveToLabware = props.moveToLabware
 
     props.setLabware = (slot) => () => {
       // TODO(mc, 2017-10-06): batch or rethink this double dispatch
       setLabware(slot)()
-      moveToContainer(slot)()
+      moveToLabware(slot)()
     }
   }
 

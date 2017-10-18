@@ -201,15 +201,21 @@ export function getLabwareReviewed (state) {
   return getCalibrationState(state).labwareReviewed
 }
 
-export function getTipracks (state) {
-  return getLabware(state).filter((lw) => lw.isTiprack)
+export function getUnconfirmedLabware (state) {
+  return getLabware(state).filter((lw) => (
+    lw.type != null &&
+    lw.calibration !== CONFIRMED
+  ))
+}
+
+export function getUnconfirmedTipracks (state) {
+  return getUnconfirmedLabware(state).filter((lw) => lw.isTiprack)
 }
 
 export function getTipracksConfirmed (state) {
-  return getTipracks(state).every((t) => t.calibration === CONFIRMED)
+  return getUnconfirmedTipracks(state).length === 0
 }
 
 export function getLabwareConfirmed (state) {
-  return getLabware(state)
-    .every((t) => t.name == null || t.calibration === CONFIRMED)
+  return getUnconfirmedLabware(state).length === 0
 }
