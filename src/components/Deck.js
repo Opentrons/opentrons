@@ -6,6 +6,7 @@ import styles from '../css/style.css'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
 import IngredientsList from './IngredientsList.js'
+import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
 
 const AddLabware = props => (
   <div
@@ -180,34 +181,7 @@ const Deck = props => {
 
             {/* <button>Add Ingredient</button> */}
             {/* TODO:  ^^^ Add button back in conditionally */}
-            <div className={styles.ingredientPropertiesEntry}>
-              <h1>
-                <div>Ingredient Properties</div>
-                <div>(TODO) Well(s) Selected</div>
-              </h1>
-              <form>
-                <span>
-                  <label>Name</label>
-                  <input />
-                </span>
-                <span>
-                  <label>Volume</label> (µL)
-                  <input />
-                </span>
-                <span>
-                  <label>Description</label>
-                  <textarea />
-                </span>
-              </form>
-              <div className={styles.ingredientPropRightSide}>
-                <span>
-                  <label>Color Swatch</label>
-                  <div className={styles.circle} style={{backgroundColor: 'red'}} />
-                </span>
-                <button>Save</button>
-                <button>Cancel</button>
-              </div>
-            </div>
+            <IngredientPropertiesForm />
           </div>
           <div className='close' onClick={e => closeIngredientSelector()}>⟳</div>
         </div>

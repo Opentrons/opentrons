@@ -103,7 +103,8 @@ export const selectors = {
         }
       )
     )
-  }
+  },
+  numWellsSelected: state => Object.keys(state.default.selectedWells.selected).length
 }
 
 export default rootReducer
