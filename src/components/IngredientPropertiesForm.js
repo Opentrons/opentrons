@@ -7,8 +7,11 @@ import Button from './Button.js'
 const makeInputField = ({setSubstate, getSubstate}) => ({accessor, ...otherProps}) => {
   return <input
     id={accessor}
+    checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
     value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
-    onChange={e => setSubstate(accessor, e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
+    onChange={e => otherProps.type === 'checkbox'
+      ? setSubstate(accessor, !getSubstate(accessor))
+      : setSubstate(accessor, e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
     {...otherProps}
   />
 }
@@ -20,7 +23,9 @@ class IngredientPropertiesForm extends React.Component {
       input: {
         name: this.props.name || null,
         volume: this.props.volume || null,
-        description: this.props.description || null
+        description: this.props.description || null,
+        concentration: this.props.concentration || null,
+        individualize: this.props.individualize || false
       }
     }
 
@@ -34,12 +39,14 @@ class IngredientPropertiesForm extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { name, volume, description } = this.state.input
+    const { name, volume, description, concentration, individualize } = this.state.input
     this.setState({
       input: {
         name: nextProps.name || name,
         volume: nextProps.volume || volume,
-        description: nextProps.description || description
+        description: nextProps.description || description,
+        concentration: nextProps.concentration || concentration,
+        individualize: nextProps.individualize || individualize
       }
     })
   }
@@ -66,6 +73,14 @@ class IngredientPropertiesForm extends React.Component {
           <span>
             <label>Description</label>
             <Field accessor='description' />
+          </span>
+          <span>
+            <label>Concentration</label>
+            <Field accessor='concentration' />
+          </span>
+          <span>
+            <label>Individualize</label>
+            <Field accessor='individualize' type={'checkbox'} />
           </span>
         </form>
         <div className={styles.ingredientPropRightSide}>

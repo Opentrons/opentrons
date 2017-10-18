@@ -29,8 +29,8 @@ npm start # Starts the app on http://localhost:8080/
     concentration: null, // optional number, a %
     description: 'blah', // optional string
 
-    individualized: true // when false, ignore wellDetails
-    // (we should probably delete wellDetails if individualized is set false -> true)
+    individualize: true // when false, ignore wellDetails
+    // (we should probably delete wellDetails if individualize is set false -> true)
   },
   {
     name: 'Control',
@@ -41,7 +41,7 @@ npm start # Starts the app on http://localhost:8080/
     volume: 50,
     concentration: null,
     description: '',
-    individualized: false
+    individualize: false
   },
   {
     name: 'Buffer',
@@ -52,15 +52,15 @@ npm start # Starts the app on http://localhost:8080/
     volume: 100,
     concentration: 50,
     description: '',
-    individualized: false
+    individualize: false
   }
 ]
 ```
 
 Colors are assigned by position in the outermost array, as is the order top to bottom of how ingredient cards show up
 
-`wellDetails` allows any individual well to use its own settings for volume, concentration, and maybe description -- only used when `individualized === true`. Otherwise, wells inherit the default settings from their ingredient category.
+`wellDetails` allows any individual well to use its own settings for volume, concentration, and maybe description -- only used when `individualize === true`. Otherwise, wells inherit the default settings from their ingredient category.
 
   * If a 'settings' key (volume/description/concentration) is not present in the `wellDetails` (or has value `undefined`), then the well will inherit the value of that setting from its category defaults. But it CAN have a falsey value: `''` or `0` will override defaults.
 
-(I'm on the fence about whether `individualized` should really just be `!!wellDetails`... but it might as well be more explicit for now. This gives us the ability to store well details, toggle them off, then toggle back on.)
+(I'm on the fence about whether `individualize` should really just be `!!wellDetails`... but it might as well be more explicit for now. This gives us the ability to store well details, toggle them off, then toggle back on.)

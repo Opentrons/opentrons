@@ -31,8 +31,8 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editModeIngredi
         <div>{ingredCategoryData.wells.length} Wells</div>
       </label>
 
-      {ingredCategoryData.individualized
-          // Is individualized, allow 'wellDetails' values to override
+      {ingredCategoryData.individualize
+          // Is individualize, allow 'wellDetails' values to override
           ? ingredCategoryData.wells.map((wellName, i) =>
             <IngredIndividual key={i}
               name={get(ingredCategoryData, ['wellDetails', wellName, 'name'], `Sample ${i + 1}`)}
@@ -42,7 +42,7 @@ const IngredGroupCard = ({ingredCategoryData, ingredCategoryIdx, editModeIngredi
               {...{ingredCategoryIdx, editModeIngredientGroup, deleteIngredientGroup}}
             />
           )
-          // Not individualized, but multiple wells
+          // Not individualize, but multiple wells
           : <div className={styles.ingredientInlineDetail}>
             {ingredCategoryData.wells.map((wellName, i) =>
               <div key={i}>
@@ -95,7 +95,7 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients, e
     }
 
     {/* Each section is a detail view of 1 ingredient */}
-    {/* Ingred category 'individualized' */}
+    {/* Ingred category 'individualize' */}
     {/* <IngredGroupCard title='Blood Samples' swatchColor='dodgerblue'>
       <div className={styles.innerList}>
         {[1, 2, 3, 4, 5, 6, 7, 8].map(i =>
@@ -107,7 +107,7 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients, e
     {/* <div className={styles.singleIngred} >
       <IngredIndividual name='Control' swatchColor='red' canDelete />
     </div> */}
-    {/* Ingred category not 'individualized' */}
+    {/* Ingred category not 'individualize' */}
     {/* <IngredGroupCard title='Buffer' swatchColor='orange'>
       <div className={styles.ingredientInlineDetail}>
         {['A12', 'B12', 'C12', 'D12', 'E12', 'F12', 'G12', 'H12'].map(wellName =>

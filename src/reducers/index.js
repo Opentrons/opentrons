@@ -27,8 +27,8 @@ const defaultIngredients = [
     concentration: null, // optional number, a %
     description: 'blah', // optional string
 
-    individualized: true // when false, ignore wellDetails
-    // (we should probably delete wellDetails if individualized is set false -> true)
+    individualize: true // when false, ignore wellDetails
+    // (we should probably delete wellDetails if individualize is set false -> true)
   },
   {
     name: 'Control',
@@ -37,7 +37,7 @@ const defaultIngredients = [
     volume: 50,
     concentration: null,
     description: '',
-    individualized: false
+    individualize: false
   },
   {
     name: 'Buffer',
@@ -46,7 +46,7 @@ const defaultIngredients = [
     volume: 100,
     concentration: 50,
     description: '',
-    individualized: false
+    individualize: false
   }
 ]
 
@@ -112,16 +112,15 @@ const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => (
     (action.payload.groupId !== undefined && action.payload.groupId !== null)
       // Modify existing ingredient
-      ? state
+      ? state // TODO: modifying doesn't work now
       // No groupId, create new ingredient
       : state.concat({
         name: action.payload.name,
         volume: action.payload.volume,
         concentration: action.payload.concentration,
         description: action.payload.description,
-        individualized: action.payload.individualized, // TODO!
-
-        wells: action.payload.wells || ['A1', 'A2'] // TODO!
+        individualize: action.payload.individualize,
+        wells: action.payload.wells
       })
   ),
   // Remove the deleted group (referenced by array index)
