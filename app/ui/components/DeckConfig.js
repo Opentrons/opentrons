@@ -153,7 +153,7 @@ function ConfirmCalibrationPrompt (props) {
       >
         Yes
       </button>
-      <Link className={styles.btn_modal} to='/setup-deck/jog'>
+      <Link className={styles.btn_modal} to={`/setup-deck/${slot}/jog`}>
         No
       </Link>
     </div>
