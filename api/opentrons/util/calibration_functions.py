@@ -34,11 +34,14 @@ def calibrate_pipette(probing_values, probe):
 
 
 def probe_instrument(instrument, robot):
-    robot.home()
+    robot._driver.home('za')
+    robot._driver.home('bcx')
+    robot._driver.home()
+
     pose_tracker = robot.pose_tracker
 
-    size = array((30.0, 30, 12.5, 10))
-    top = array((289.8, 296.4, 67.25, 0))
+    size = array((30.0, 30, 25.5, 20))
+    top = array((289.8, 296.4, 65.25, 0))
     _, _, height, _ = size
 
     center = array(top) - (0, 0, height, 0)
@@ -54,22 +57,30 @@ def probe_instrument(instrument, robot):
     coords = [switch * size + center for switch in switches]
     instrument._add_tip(DEFAULT_TIP_LENGTH)
 
-    for switch in coords:
-        x, y, z, length = switch
+    for coord, switch in zip(coords, switches):
+        x, y, z, length = coord
+        sx, sy, sz, _ = switch
+
         axis = 'z'
-        if x:
+        if sx != 0:
             axis = 'x'
-        elif y:
+        elif sy:
             axis = 'y'
         else:
             axis = 'z'
 
-        instrument._move(z=z+height*2)
+        instrument._move(z=z+height*2+DEFAULT_TIP_LENGTH)
         instrument._move(x=x, y=y)
         instrument._move(z=z)
         instrument._probe(axis, length)
 
+        instrument._move(x=x, y=y)
+
     instrument._remove_tip(DEFAULT_TIP_LENGTH)
+
+    robot._driver.home('za')
+    robot._driver.home('bcx')
+    robot._driver.home()
 
 
 def move_instrument_for_probing_prep(instrument, robot):

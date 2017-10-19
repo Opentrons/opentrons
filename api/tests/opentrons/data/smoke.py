@@ -8,12 +8,12 @@ pipette = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack],
-    max_volume=50,
+    max_volume=200,
     mount="right",
     channels=1
 )
 
 pipette.pick_up_tip()
-for well1, well2 in zip(plate[:-1], plate[1:]):
-    pipette.aspirate(well1)
-    pipette.dispense(well2)
+for well1, well2 in zip(plate[:-1:2], plate[1::2]):
+    pipette.move_to(well1.bottom())
+    pipette.move_to(well2.bottom())

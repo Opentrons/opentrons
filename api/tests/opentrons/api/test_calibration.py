@@ -5,21 +5,19 @@ from opentrons import robot
 
 state = partial(state, 'calibration')
 
-async def test_tip_probe_functional(main_router, model, virtual_smoothie_env):
-    robot.connect()
-    robot._driver.home('za')
-    robot._driver.home('bcx')
-    robot._driver.home()
-    robot._driver.log.clear()
-    main_router.calibration_manager.tip_probe(model.instrument)
-    by_axis = log_by_axis(robot._driver.log, 'XYA')
-    coords = [
-        (x, y, z)
-        for x, y, z
-        in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
-    ]
 
-    print(coords)
+async def test_tip_probe_functional(main_router, model):  # , virtual_smoothie_env):
+    while True:
+        robot._driver.log.clear()
+        main_router.calibration_manager.tip_probe(model.instrument)
+        by_axis = log_by_axis(robot._driver.log, 'XYA')
+        coords = [
+            (x, y, z)
+            for x, y, z
+            in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
+        ]
+
+    # print(coords)
 
 
 async def test_tip_probe(main_router, model):

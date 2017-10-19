@@ -45,7 +45,10 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 def model():
     from opentrons import robot, instruments, containers
 
-    robot.reset()
+    robot.connect()
+    robot._driver.home('za')
+    robot._driver.home('bcx')
+    robot._driver.home()
 
     pipette = instruments.Pipette(mount='right')
     plate = containers.load('96-flat', 'A1')

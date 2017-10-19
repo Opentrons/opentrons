@@ -14,7 +14,7 @@ from os import environ
 DISABLE_AXIS = 'BC'
 
 DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
-DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z50 A50 B40 C40'
+DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X900 Y550 Z140 A140 B40 C40'
 DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
 DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
 
@@ -64,9 +64,10 @@ class SmoothieDriver_3_0_0:
     def connect(self):
         self.simulating = False
 
-        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            self.simulating = True
-            return
+        # if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
+        #     print('simul!')
+        #     self.simulating = True
+        #     return
 
         self.connection = serial_communication.connect()
 
@@ -99,6 +100,7 @@ class SmoothieDriver_3_0_0:
 
     def set_speed(self, value):
         ''' set total movement speed in mm/second'''
+        print(value)
         speed = value * SEC_PER_MIN
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
