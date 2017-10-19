@@ -27,36 +27,40 @@ current_position = (0, 0, 0)
 # without tip on
 TIP_LENGTH = 46
 # Smoothie Z value when Deck's Z=0
-Z_OFFSET = 45
 current_position = (0, 0, 0)
+Z_OFFSET = 3.75
 
 # Reference point being calibrated
 point_number = 0
 
 # (0, 0) is in bottom-left corner
 # Expected reference points
+# v0
+# expected = [
+#     (64.0, -2.5 + 90.5),        # 4
+#     (329.16, -2.5 + 90.5),      # 6
+#     (196.58, 274.0)             # 11
+# ]
 expected = [
-    (64.0, -2.5 + 90.5),        # 4
-    (329.16, -2.5 + 90.5),      # 6
-    (196.58, 274.0)             # 11
+    (64.0, 92.8),       # 1
+    (329.0, 92.8),      # 3
+    (196.50, 273.80)    # 11
 ]
-
 # Expected
 # Updated during calibration process when you press ENTER
 # Default values don't matter and get overridden when ENTER is pressed
 actual = [
-    (-301.00000021211997, -300.50000034319999),
-    (230.99999983788001, -297.5000003477),
-    (228.66666650148005, 66.499998972299977),
+    (33.0, 5.25),
+    (298.0, 6.25),
+    (169.5, 276.0),
 ]
-
 # Accessible through 1,2,3 ... keyboard keys to test
 # calibration by moving to known locations
 test_points = [
-    (64.0, -2.5 + 90.5, TIP_LENGTH),            # 4
-    (329.16, -2.5 + 90.5, TIP_LENGTH),          # 6
-    (196.58, 274.0, TIP_LENGTH),                # 11
-    (196.58, -2.5 + 90.5, TIP_LENGTH+127.8)     # 5?
+    (64.0, 92.8, TIP_LENGTH),            # 4
+    (329.0, 92.8, TIP_LENGTH),          # 6
+    (196.50, 183.30, TIP_LENGTH),                # 11
+    (196.50, 273.80, TIP_LENGTH+127.8)     # 5?
 ]
 
 # World > Smoothie XY-plane transformation
@@ -65,9 +69,9 @@ test_points = [
 # if you want to test points or to measure real-world objects
 # using the tool
 XY = \
-    array([[  2.00633580e+00,   1.16263441e-02,  -4.51928609e+02],
-           [ -3.34703575e-03,   1.95997984e+00,  -3.65876516e+02],
-           [ -4.83204440e-19,   1.73472348e-18,   1.00000000e+00]])
+    array([[  9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
+           [ -3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
+           [ -5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
 
 # Add fixed Z offset which is known so we don't have to calibrate for height
 # during calibration process
@@ -183,7 +187,7 @@ def key_pressed(key):
     # home
     elif key == '\\':
         driver.home('za')
-        driver.home('bcx')
+        driver.home('x')
         driver.home()
         current_position = position()
         status('Homed')

@@ -70,12 +70,10 @@ class Base:
     """
     def __init__(self, pose_tracker):
         self.pose_tracker = pose_tracker
-        print(self.pose_tracker)
         self.pose_tracker.create_root_object(self, 0,0,0)
         self._probe = self.setup_probe()
 
     def setup_probe(self):
         probe = Probe(position_offset=probe_center, pose_tracker = self.pose_tracker, **probe_dimensions)
         self.pose_tracker.track_object(self, probe, **probe._offset)
-        print("PROBE: ", probe)
         return probe

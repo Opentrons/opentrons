@@ -10,12 +10,15 @@ from os import environ
   about what the axes are used for
 '''
 
-DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z800 A800 B767.38 C767.38'
+# Ignore these axis when sending move command
+DISABLE_AXIS = 'BC'
+
+DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z50 A50 B40 C40'
 DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
 DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
 
-AXES_SAFE_TO_HOME = 'XZABC' # Y cannot be homed without homing all
+AXES_SAFE_TO_HOME = 'XZABC'  # Y cannot be homed without homing all
 AXES = 'XYZABC'
 
 SEC_PER_MIN = 60
@@ -146,6 +149,8 @@ class SmoothieDriver_3_0_0:
         target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
 
         def should_process_coords(coords, axis):
+            if axis in DISABLE_AXIS:
+                return False
             return (coords is not None) \
                 and (not isclose(coords, self.position[axis.lower()]))
 
@@ -158,7 +163,7 @@ class SmoothieDriver_3_0_0:
 
         command = GCODES['MOVE'] + ''.join(coords)
 
-        print('command: ', command)
+        # print('command: ', command)
 
         self._send_command(command)
 
@@ -167,12 +172,20 @@ class SmoothieDriver_3_0_0:
             for axis, value in zip('XYZABC', [x, y, z, a, b, c])
         })
 
-    def home(self, axis=None):
+    def home(self, axis=''):
+        axis = axis.upper()
+
         homed_positions = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
         if not axis:
             self._update_position(homed_positions)
             self._home_all()
         else:
+            # Ignore homing for disabled axis
+            axis = ''.join([axis for axis in axis if axis not in DISABLE_AXIS])
+
+            if not axis:
+                return
+
             axes_to_home = [ax for ax in axis.upper() if ax in AXES_SAFE_TO_HOME]
             if axes_to_home:
                 pos = {axis: homed_positions[axis] for axis in axes_to_home}

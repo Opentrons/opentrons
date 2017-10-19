@@ -15,6 +15,18 @@ def state(topic, state):
     return _match
 
 
+def log_by_axis(log, axis):
+    from functools import reduce
+
+    def reducer(e1, e2):
+        return {
+            axis: e1[axis] + [round(e2[axis])]
+            for axis in axis
+        }
+
+    return reduce(reducer, log, {axis: [] for axis in axis})
+
+
 async def wait_until(matcher, notifications, timeout=1, loop=None):
     result = []
     for coro in iter(notifications.__anext__, None):
@@ -35,7 +47,7 @@ def model():
 
     robot.reset()
 
-    pipette = instruments.Pipette(mount='left')
+    pipette = instruments.Pipette(mount='right')
     plate = containers.load('96-flat', 'A1')
 
     instrument = models.Instrument(pipette)

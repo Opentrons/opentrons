@@ -1,8 +1,8 @@
 from opentrons import containers, instruments, robot
 
-tiprack = containers.load('tiprack-200ul', 'C2')
+tiprack = containers.load('tiprack-200ul', 'B3')
 trash = containers.load('trash-box', 'C4')
-plate = containers.load('96-PCR-flat', 'C3')
+plate = containers.load('96-PCR-flat', 'B2')
 
 pipette = instruments.Pipette(
     name="p200",
@@ -14,5 +14,6 @@ pipette = instruments.Pipette(
 )
 
 pipette.pick_up_tip()
-pipette.aspirate(plate[0])
-pipette.dispense(plate[1])
+for well1, well2 in zip(plate[:-1], plate[1:]):
+    pipette.aspirate(well1)
+    pipette.dispense(well2)

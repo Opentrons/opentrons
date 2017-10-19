@@ -5,10 +5,10 @@ from opentrons.broker import publish, topics
 from opentrons import robot
 
 from numpy.linalg import inv
-from numpy import dot
+from numpy import dot, subtract
 
-RIGHT_MOUNT_OFFSET = {'x': 0.0, 'y': 0.0, 'z': 0.0}
-LEFT_MOUNT_OFFSET = {'x': -37.351, 'y': 30.5024, 'z': 1.13}
+RIGHT_MOUNT_OFFSET = (0.0, 0.0, 0.0)
+LEFT_MOUNT_OFFSET = (-37.14, 32.12, -2.5)
 
 
 LEFT_INSTRUMENT_ACTUATOR = 'b'
@@ -78,6 +78,14 @@ class InstrumentMover(object):
         self.mount = mount
         self.instrument = instrument
 
+    def jog(self, axis, distance):
+        axis = axis.lower()
+        tracker = self.gantry._pose_tracker
+        current = tracker.relative_object_position('world', self.instrument)
+        current = subtract(current, self.mount.offset)
+        current = dict(zip('xyz', current))
+        self.move(**{axis: current[axis] + distance})
+
     def move(self, x=None, y=None, z=None):
         from functools import reduce
 
@@ -88,11 +96,15 @@ class InstrumentMover(object):
 
         tracker = self.gantry._pose_tracker
         current = tracker.relative_object_position('world', self.instrument)
-
-        print('current WORLD: ', current)
-        print('move arguments: ', [x, y, z])
         # Replace None values for x, y, z with current position values
         # This gives us world coordinates of the intended move
+
+        # TODO: incorporate mount offsets into pose tracker properly
+        x, y, z = [
+            None if arg is None else arg + offset
+            for arg, offset in zip((x, y, z), self.mount.offset)
+        ]
+
         x, y, z = [
             current if destination is None else destination
             for destination, current
@@ -133,8 +145,8 @@ class Gantry:
     def _setup_mounts(self):
         self.left_mount = Mount(self.driver, self, LEFT_Z_AXIS, LEFT_INSTRUMENT_ACTUATOR, LEFT_MOUNT_OFFSET)
         self.right_mount = Mount(self.driver, self, RIGHT_Z_AXIS, RIGHT_INSTRUMENT_ACTUATOR, RIGHT_MOUNT_OFFSET)
-        self._pose_tracker.track_object(self, self.left_mount, **LEFT_MOUNT_OFFSET)
-        self._pose_tracker.track_object(self, self.right_mount, **RIGHT_MOUNT_OFFSET)
+        self._pose_tracker.track_object(self, self.left_mount, x=0, y=0, z=0)
+        self._pose_tracker.track_object(self, self.right_mount, x=0, y=0, z=0)
 
     def move(self, x, y):
         ''' Moves the Gantry in the x, y plane '''

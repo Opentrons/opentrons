@@ -97,7 +97,7 @@ class Pipette:
         self.attached_tip = None
         self.instrument_actuator = None
         self.instrument_mover = None
-
+        self._z_offset = 0
         if not name:
             name = self.__class__.__name__
         self.name = name
@@ -1385,13 +1385,19 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
+        if z is not None:
+            z += self._z_offset
+
         self.instrument_mover.move(x, y, z)
+
+    def _jog(self, axis, distance):
+        self.instrument_mover.jog(axis, distance)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
+        self._z_offset += length
 
     def _remove_tip(self, length):
         self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)

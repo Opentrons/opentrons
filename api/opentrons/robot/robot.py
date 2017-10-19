@@ -32,12 +32,12 @@ MAX_INSTRUMENT_HEIGHT = 227.0000
 # TODO(artyom 20171017): round these numbers
 # TODO(artyom 20171017): move to config
 XY = \
-    array([[2.00633580e+00,   1.16263441e-02,  -4.51928609e+02],
-           [-3.34703575e-03,   1.95997984e+00,  -3.65876516e+02],
-           [-4.83204440e-19,   1.73472348e-18,   1.00000000e+00]])
+    array([[  9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
+           [ -3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
+           [ -5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
 
 # Smoothie coordinate for Z axis when 200ul tip is touching the deck
-Z_OFFSET = 45
+Z_OFFSET = 3.75
 # Can be used to compensate for Z steps per mm mismatch
 Z_SCALE = 1
 
@@ -840,14 +840,17 @@ class Robot(object):
                                             ):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
-        expected_position = self.pose_tracker[well].position
 
         # calibrate will well bottom, but track top of well
-        true_position = self.pose_tracker[instrument].position
+        delta = self.pose_tracker.relative_object_position(
+            well,
+            instrument
+        )
+
         calib.calibrate_container_with_delta(
             container,
             self.pose_tracker,
-            *(true_position - expected_position), save
+            *delta, save
         )
 
     def max_deck_height(self):
