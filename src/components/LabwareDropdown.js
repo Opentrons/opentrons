@@ -2,10 +2,10 @@ import React from 'react'
 import Accordion from './Accordion.js'
 import styles from '../css/style.css'
 
-const LabwareItem = ({selectLabwareToAdd, containerType, containerImgUrl, displayName}) => (
+const LabwareItem = ({createContainerAtSlot, containerType, containerImgUrl, displayName}) => (
   <li
     className={styles.labwareListItem}
-    onClick={e => selectLabwareToAdd(containerType)}
+    onClick={e => createContainerAtSlot(containerType)}
     style={containerImgUrl && {'--image-url': `url(${containerImgUrl})`
     }}
   >
@@ -13,12 +13,12 @@ const LabwareItem = ({selectLabwareToAdd, containerType, containerImgUrl, displa
   </li>
 )
 
-const LabwareDropdown = ({onClose, selectLabwareToAdd}) => {
+const LabwareDropdown = ({onClose, createContainerAtSlot}) => {
   const labwareItemMapper = (item, key) => (
     <LabwareItem key={key}
       containerType={item[0]}
       displayName={item[1]}
-      selectLabwareToAdd={selectLabwareToAdd}
+      createContainerAtSlot={createContainerAtSlot}
       containerImgUrl={item.length >= 3 && `http://docs.opentrons.com/_images/${item[2]}.png`}
     />
   )

@@ -1,12 +1,14 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { createSelector } from 'reselect'
+
+import findKey from 'lodash/findKey'
+import get from 'lodash/get'
+import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
-import get from 'lodash/get'
-import findKey from 'lodash/findKey'
-import isNil from 'lodash/isNil'
 import range from 'lodash/range'
+import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
 import { containerDims, toWellName } from '../constants.js'
@@ -21,7 +23,9 @@ const sortedSlotnames = [].concat.apply( // flatten
 const nextEmptySlot = loadedContainersSubstate => {
   // Next empty slot in the sorted slotnames order. Or null if no more slots.
   const nextEmptySlotIdx = sortedSlotnames.findIndex(slot => !(slot in loadedContainersSubstate))
-  return nextEmptySlotIdx >= sortedSlotnames.length ? null : sortedSlotnames[nextEmptySlotIdx]
+  const result = nextEmptySlotIdx >= sortedSlotnames.length ? null : sortedSlotnames[nextEmptySlotIdx]
+  console.log('nextEmptySlot', {loadedContainersSubstate, result})
+  return result
 }
 
 // REDUCERS
@@ -31,7 +35,7 @@ const nextEmptySlot = loadedContainersSubstate => {
 const modeLabwareSelection = handleActions({
   OPEN_LABWARE_SELECTOR: (state, action) => true,
   CLOSE_LABWARE_SELECTOR: (state, action) => false,
-  SELECT_LABWARE_TO_ADD: (state, action) => false // close window when labware is selected
+  CREATE_CONTAINER_AT_SLOT: (state, action) => false // close window when labware is selected
 }, false)
 
 const selectedSlotName = handleActions({
@@ -46,22 +50,36 @@ const selectedIngredientGroup = handleActions({
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
-const loadedContainers = handleActions({
-  SELECT_LABWARE_TO_ADD: (state, action) => ({...state, [nextEmptySlot(state)]: action.payload}),
+const containers = handleActions({
+  CREATE_CONTAINER_AT_SLOT: (state, action) => ({
+    ...state,
+    [action.payload + 'pretendThisIsUniqueString']: {
+      slotName: (() => {
+        // HACK DEBUG
+        const r = nextEmptySlot(_loadedContainersBySlot(state))
+        console.log('container reducer', {r, loadedC: _loadedContainersBySlot(state)})
+        return r
+      })(),
+      type: action.payload,
+      name: action.payload + 'TODO-NAME'
+    }
+  }),
   DELETE_CONTAINER_AT_SLOT: (state, action) => {
     // For leaving open slots functionality, do this one-liner instead
-    // return pickBy(state, (value, key) => key !== action.payload)}
+    return pickBy(state, (value, key) => value.slotName !== action.payload)
 
-    const deletedSlot = action.payload
-    const deletedIdx = sortedSlotnames.findIndex(slot => slot === deletedSlot)
-    // Summary:
-    //  {A1: 'alex', B1: 'brock', C1: 'charlie'} ==(delete slot B1)==> {A1: 'alex', B1: 'charlie'}
-    const nextState = sortedSlotnames.reduce((acc, slotName, i) => slotName === deletedSlot || !(slotName in state)
-      ? acc
-      : ({...acc, [sortedSlotnames[i < deletedIdx ? i : i - 1]]: state[slotName]}),
-      {})
+    // TODO: make the slots slide backward again
 
-    return nextState
+    // const deletedSlot = action.payload
+    // const deletedIdx = sortedSlotnames.findIndex(slot => slot === deletedSlot)
+    // // Summary:
+    // //  {A1: 'alex', B1: 'brock', C1: 'charlie'} ==(delete slot B1)==> {A1: 'alex', B1: 'charlie'}
+    // const nextState = sortedSlotnames.reduce((acc, slotName, i) => slotName === deletedSlot || !(slotName in state)
+    //   ? acc
+    //   : ({...acc, [sortedSlotnames[i < deletedIdx ? i : i - 1]]: state[slotName]}),
+    //   {})
+    //
+    // return nextState
   }
 }, {})
 
@@ -120,7 +138,7 @@ const rootReducer = combineReducers({
   modeLabwareSelection,
   selectedSlotName,
   selectedIngredientGroup,
-  loadedContainers,
+  containers,
   selectedWells,
   ingredients
 })
@@ -129,10 +147,29 @@ const rootReducer = combineReducers({
 
 const rootSelector = state => state.default
 
+const _loadedContainersBySlot = containers =>
+  reduce(containers, (acc, container, containerId) => (container.slotName)
+    ? {...acc, [container.slotName]: container.type}
+    : acc
+  , {})
+
 const loadedContainersBySlot = createSelector(
-  rootSelector,
-  state => state.loadedContainers
+  state => rootSelector(state).containers,
+  containers => {
+    console.log(
+    'loadedContainersBySlot (public selector)', {
+      containers,
+      res: _loadedContainersBySlot(containers)
+    })
+    // HACK
+    return _loadedContainersBySlot(containers)
+  }
 )
+
+// const loadedContainersBySlot = (state) => {
+//   console.log({state})
+//   return {A1: '96-custom'}
+// }
 
 const canAdd = createSelector(
   loadedContainersBySlot,

@@ -74,7 +74,7 @@ const Deck = props => {
     deleteContainerAtSlot,
     openLabwareSelector,
     closeLabwareSelector,
-    selectLabwareToAdd } = props
+    createContainerAtSlot } = props
 
   return (
     <div className={styles.deck}>
@@ -108,7 +108,7 @@ const Deck = props => {
           {(slotName === canAdd) && (activeModals.labwareSelection
             ? <LabwareDropdown
               onClose={e => closeLabwareSelector({slotName})}
-              selectLabwareToAdd={selectLabwareToAdd}
+              createContainerAtSlot={createContainerAtSlot}
             />
             : <AddLabware onClick={e => openLabwareSelector({slotName})} />
           )}

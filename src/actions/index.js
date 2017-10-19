@@ -9,8 +9,7 @@ export const {
   openIngredientSelector,
   closeIngredientSelector,
 
-  selectLabwareToAdd,
-
+  createContainerAtSlot,
   deleteContainerAtSlot,
 
   preselectWells,
@@ -27,8 +26,7 @@ export const {
   OPEN_INGREDIENT_SELECTOR: undefined,
   CLOSE_INGREDIENT_SELECTOR: undefined,
 
-  SELECT_LABWARE_TO_ADD: undefined,
-
+  CREATE_CONTAINER_AT_SLOT: undefined, // TODO: actually, the slot is ignored.
   DELETE_CONTAINER_AT_SLOT: undefined,
 
   PRESELECT_WELLS: undefined,

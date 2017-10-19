@@ -6,7 +6,7 @@ import {
   closeLabwareSelector,
   openIngredientSelector,
   closeIngredientSelector,
-  selectLabwareToAdd,
+  createContainerAtSlot,
   deleteContainerAtSlot
 } from '../actions'
 
@@ -22,7 +22,7 @@ const ConnectedDeck = connect(
   {
     openLabwareSelector,
     closeLabwareSelector,
-    selectLabwareToAdd,
+    createContainerAtSlot,
     openIngredientSelector,
     closeIngredientSelector,
     deleteContainerAtSlot
