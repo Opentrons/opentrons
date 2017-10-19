@@ -35,7 +35,7 @@ export const {
   SELECT_WELLS: undefined,
   DESELECT_WELLS: undefined,
 
-  EDIT_MODE_INGREDIENT_GROUP: payload => ({...payload, selectedWells: {'0,1': [0, 1]}}),
+  EDIT_MODE_INGREDIENT_GROUP: undefined, // payload => ({...payload, selectedWells: {'0,1': [0, 1]}}),
   // Payload example: {group: 2, wellName: 'H1' (wellName is optional)}
   // TODO: ^^^ get [col, row] from wellName, and wellName from either action.payload.wellName, or ingredients[action.payload.group]
   DELETE_INGREDIENT_GROUP: undefined

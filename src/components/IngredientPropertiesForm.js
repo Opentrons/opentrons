@@ -4,14 +4,14 @@ import styles from '../css/style.css'
 
 import Button from './Button.js'
 
-const makeInputField = ({setSubstate, getSubstate}) => ({accessor, ...otherProps}) => {
+const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...otherProps}) => {
   return <input
     id={accessor}
     checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
     value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
     onChange={e => otherProps.type === 'checkbox'
       ? setSubstate(accessor, !getSubstate(accessor))
-      : setSubstate(accessor, e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
+      : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
     {...otherProps}
   />
 }
@@ -39,20 +39,44 @@ class IngredientPropertiesForm extends React.Component {
 
   componentWillReceiveProps (nextProps) {
     const { name, volume, description, concentration, individualize } = this.state.input
-    this.setState({
-      input: {
-        name: nextProps.name || name,
-        volume: nextProps.volume || volume,
-        description: nextProps.description || description,
-        concentration: nextProps.concentration || concentration,
-        individualize: nextProps.individualize || individualize
-      }
-    })
+
+    if (!nextProps.selectedIngredientProperties) {
+      this.setState({
+        input: {
+          name: null,
+          volume: null,
+          description: null,
+          concentration: null,
+          individualize: false
+        }
+      })
+    } else {
+      this.setState({
+        input: {
+          name: nextProps.selectedIngredientProperties.name || name,
+          volume: nextProps.selectedIngredientProperties.volume || volume,
+          description: nextProps.selectedIngredientProperties.description || description,
+          concentration: nextProps.selectedIngredientProperties.concentration || concentration,
+          individualize: nextProps.selectedIngredientProperties.individualize || individualize
+        }
+      })
+    }
   }
 
   render () {
-    const { numWellsSelected, onSave, onCancel } = this.props
+    const { numWellsSelected, onSave, onCancel, selectedIngredientProperties } = this.props
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
+
+    if (!selectedIngredientProperties && numWellsSelected <= 0) {
+      console.log(this.props)
+      return (
+        <div style={{margin: '0 20%'}}>
+          <Button disabled>
+            Select Wells to Add an Ingredient
+          </Button>
+        </div>
+      )
+    }
 
     return (
       <div className={styles.ingredientPropertiesEntry}>
@@ -60,6 +84,7 @@ class IngredientPropertiesForm extends React.Component {
           <div>Ingredient Properties</div>
           <div>{numWellsSelected} Well(s) Selected</div>
         </h1>
+
         <form>
           <span>
             <label>Name</label>
@@ -67,7 +92,7 @@ class IngredientPropertiesForm extends React.Component {
           </span>
           <span>
             <label>Volume</label> (µL)
-            <Field accessor='volume' />
+            <Field numeric accessor='volume' />
           </span>
           <span>
             <label>Description</label>
@@ -75,19 +100,25 @@ class IngredientPropertiesForm extends React.Component {
           </span>
           <span>
             <label>Concentration</label>
-            <Field accessor='concentration' />
+            <Field numeric accessor='concentration' />
           </span>
           <span>
             <label>Individualize</label>
             <Field accessor='individualize' type={'checkbox'} />
           </span>
         </form>
+
         <div className={styles.ingredientPropRightSide}>
+
+          {selectedIngredientProperties &&
+            <div><label>Editing: "{selectedIngredientProperties.name}"</label></div>}
+
           {/* <span>
             <label>Color Swatch</label>
             <div className={styles.circle} style={{backgroundColor: 'red'}} />
           </span> */}
-          <Button disabled={numWellsSelected <= 0} onClick={e => onSave(this.state.input)}>Save</Button>
+
+          <Button /* disabled={TODO: validate input here} */ onClick={e => onSave(this.state.input)}>Save</Button>
           <button onClick={onCancel}>Cancel</button>
         </div>
       </div>
@@ -100,9 +131,11 @@ IngredientPropertiesForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   numWellsSelected: PropTypes.number.isRequired,
 
-  name: PropTypes.string,
-  volume: PropTypes.number,
-  description: PropTypes.string
+  selectedIngredientProperties: PropTypes.shape({
+    name: PropTypes.string,
+    volume: PropTypes.number,
+    description: PropTypes.string
+  })
 }
 
 export default IngredientPropertiesForm

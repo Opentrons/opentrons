@@ -6,7 +6,7 @@ import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
 export default connect(
   state => ({
     numWellsSelected: selectors.numWellsSelected(state),
-    ...selectors.selectedIngredientProperties(state)
+    selectedIngredientProperties: selectors.selectedIngredientProperties(state)
   }),
   {
     onSave: editIngredient,

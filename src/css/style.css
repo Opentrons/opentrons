@@ -55,6 +55,8 @@ button:hover {
 
 button.disabled {
   background-color: #EEE;
+  color: lightgray;
+  cursor: default;
 }
 
 textarea {

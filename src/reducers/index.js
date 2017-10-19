@@ -5,8 +5,9 @@ import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import get from 'lodash/get'
 import findKey from 'lodash/findKey'
-import set from 'lodash/set' // <- careful, this mutates the object
+import isNil from 'lodash/isNil'
 import range from 'lodash/range'
+import set from 'lodash/set' // <- careful, this mutates the object
 
 import { containerDims, toWellName } from '../constants.js'
 
@@ -75,8 +76,8 @@ const selectedWells = handleActions({
       ...action.payload.wells
     }
   }),
-  EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({selected: action.payload.selectedWells, preselected: {}}),
   // Actions that cause "deselect everything" behavior:
+  EDIT_MODE_INGREDIENT_GROUP: (state, action) => selectedWellsInitialState, // ({selected: action.payload.selectedWells, preselected: {}}),
   DESELECT_WELLS: () => selectedWellsInitialState,
   CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
   EDIT_INGREDIENT: () => selectedWellsInitialState
@@ -86,7 +87,7 @@ const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
     const editableIngredFields = ['name', 'volume', 'concentration', 'description', 'individualize']
     const { groupId, slotName } = action.payload
-    if (groupId !== undefined && groupId !== null) {
+    if (!isNil(groupId)) {
       // GroupId was given, edit existing ingredient
       return set(
         {...state},
@@ -216,17 +217,17 @@ const selectedIngredientGroupId = createSelector(
   state => get(state, ['selectedIngredientGroup', 'groupId'])
 )
 
-const selectedIngredientGroupObj = createSelector(
+const _selectedIngredientGroupObj = createSelector(
   selectedIngredientGroupId,
   allIngredients,
   (ingredGroupId, allIngredients) => allIngredients[ingredGroupId] || null
 )
 
 const selectedIngredientProperties = createSelector(
-  selectedIngredientGroupObj,
-  ingredGroup => (ingredGroup !== null && ingredGroup !== undefined)
+  _selectedIngredientGroupObj,
+  ingredGroup => (!isNil(ingredGroup))
     ? pick(ingredGroup, ['name', 'volume', 'concentration', 'description', 'individualize'])
-    : {} // <-- TODO: Defaults for new ingred group eg {name: 'Sample', volume: 10}
+    : null
 )
 
 const wellMatrix = createSelector(
