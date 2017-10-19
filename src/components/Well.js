@@ -2,14 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import { SELECTABLE_CLASS } from '../constants.js'
+import { SELECTABLE_CLASS, swatchColors } from '../constants.js'
 import styles from '../css/style.css'
 
 const Well = ({x, y, wellContent, ...otherProps}) => {
-  const { preselected, selected, number } = wellContent
+  const { preselected, selected, number, ingredientGroupId } = wellContent
+  const isFilled = (ingredientGroupId !== null && ingredientGroupId !== undefined)
   return (
     <div
-      className={cx(SELECTABLE_CLASS, styles.wellRound, {[styles.selected]: selected, [styles.highlighted]: preselected})}
+      className={cx(
+        styles.wellRound,
+        {[styles.selected]: selected, [styles.highlighted]: preselected, [SELECTABLE_CLASS]: !isFilled}
+      )}
       data-well-number={number}
       data-well-x={x}
       data-well-y={y}
@@ -17,7 +21,9 @@ const Well = ({x, y, wellContent, ...otherProps}) => {
         '--well-selection-color': selected
           ? 'blue' // <- set color swatch for ingredient here
           : (preselected ? 'lightcyan' : 'transparent'),
-        '--well-fill-color': 'transparent'  // <- set well fill color here (probably, add it in wellMatrix)
+        '--well-fill-color': isFilled
+          ? swatchColors(ingredientGroupId)
+          : 'transparent'  // <- set well fill color here (probably, add it in wellMatrix)
       }}
       {...otherProps}
       ><div className={styles.innerWell} /></div>
@@ -30,7 +36,8 @@ Well.propTypes = {
   wellContent: PropTypes.shape({
     number: PropTypes.number,
     selected: PropTypes.bool,
-    preselected: PropTypes.bool
+    preselected: PropTypes.bool,
+    ingredientGroupId: PropTypes.number
   }).isRequired
 }
 

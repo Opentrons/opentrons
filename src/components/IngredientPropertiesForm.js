@@ -31,7 +31,6 @@ class IngredientPropertiesForm extends React.Component {
 
     this.Field = makeInputField({
       setSubstate: (inputKey, inputValue) => {
-        console.log({inputKey, inputValue})
         this.setState({input: {...this.state.input, [inputKey]: inputValue}})
       },
       getSubstate: inputKey => this.state.input[inputKey]

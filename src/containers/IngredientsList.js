@@ -11,8 +11,8 @@ export default connect(
     return {
       slotName: activeModals.ingredientSelection.slotName,
       containerName: activeModals.ingredientSelection.containerName,
-      containerType: activeModals.ingredientSelection.containerName,
-      ingredients: selectors.ingredients(state)
+      containerType: activeModals.ingredientSelection.containerName, // TODO name vs type
+      ingredients: selectors.ingredientsForContainer(state)
     }
   },
   {

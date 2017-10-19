@@ -8,17 +8,17 @@ npm run build # Building the application.
 npm start # Starts the app on http://localhost:8080/
 ```
 
-# Ingredient state shape
+# Internal Ingredient state shape
 
 ```javascript
-[
-  {
+{
+  1: {
     name: 'Blood Samples',
     locations: {
       // [slotName]: [wellName, wellName, etc] for all slots.
-      A1: ['C2', 'C3', 'C4'],
+      A1: ['C2', 'C3', 'C4']
     },
-    wellDetails: { // also referenced wellDetails[slotName][wellName]
+    wellDetailsByLocation: { // also referenced wellDetailsByLocation[slotName][wellName]
       A1: {
         C2: { volume: 100, concentration: 10, name: 'Special Sample' }
         /* ^^ could have description too, but doesn't need to have any keys. */
@@ -29,32 +29,32 @@ npm start # Starts the app on http://localhost:8080/
     concentration: null, // optional number, a %
     description: 'blah', // optional string
 
-    individualize: true // when false, ignore wellDetails
-    // (we should probably delete wellDetails if individualize is set false -> true)
+    individualize: true // when false, ignore wellDetailsByLocation
+    // (we should probably delete wellDetailsByLocation if individualize is set false -> true)
   },
-  {
+  2: {
     name: 'Control',
     locations: {
       'A1': ['A1']
     },
-    wellDetails: null,
+    wellDetailsByLocation: null,
     volume: 50,
     concentration: null,
     description: '',
     individualize: false
   },
-  {
+  3: {
     name: 'Buffer',
     locations: {
       'A1': ['H1', 'H2', 'H3', 'H4']
     },
-    wellDetails: null,
+    wellDetailsByLocation: null,
     volume: 100,
     concentration: 50,
     description: '',
     individualize: false
   }
-]
+}
 ```
 
 Colors are assigned by position in the outermost array, as is the order top to bottom of how ingredient cards show up

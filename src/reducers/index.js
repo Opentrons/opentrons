@@ -1,54 +1,19 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { createSelector } from 'reselect'
-// import pick from 'lodash/pick'
+import pick from 'lodash/pick'
+import pickBy from 'lodash/pickBy'
 import get from 'lodash/get'
+import findKey from 'lodash/findKey'
+import set from 'lodash/set' // <- careful, this mutates the object
 import range from 'lodash/range'
 
-import { containerDims } from '../constants.js'
+import { containerDims, toWellName } from '../constants.js'
 
 const sortedSlotnames = [].concat.apply( // flatten
   [],
   [1, 2, 3].map(num => ['A', 'B', 'C', 'D', 'E'].map(letter => letter + num))
 )
-
-// HACK DEBUG
-
-const defaultIngredients = [
-  {
-    name: 'Blood Samples',
-
-    wells: ['C2', 'C3', 'C4'],
-    wellDetails: {
-      C3: { volume: 100, concentration: 10, name: 'Special Sample' }
-    },
-
-    volume: 20, // required. in uL
-    concentration: null, // optional number, a %
-    description: 'blah', // optional string
-
-    individualize: true // when false, ignore wellDetails
-    // (we should probably delete wellDetails if individualize is set false -> true)
-  },
-  {
-    name: 'Control',
-    wells: ['A1'],
-    wellDetails: null,
-    volume: 50,
-    concentration: null,
-    description: '',
-    individualize: false
-  },
-  {
-    name: 'Buffer',
-    wells: ['H1', 'H2', 'H3', 'H4'],
-    wellDetails: null,
-    volume: 100,
-    concentration: 50,
-    description: '',
-    individualize: false
-  }
-]
 
 // UTILS
 
@@ -103,29 +68,45 @@ const selectedWells = handleActions({
       ...action.payload.wells
     }
   }),
+  EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({selected: action.payload.selectedWells, preselected: {}}),
+  // Actions that cause "deselect everything" behavior:
   DESELECT_WELLS: () => selectedWellsInitialState,
   CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
-  EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({selected: action.payload.selectedWells, preselected: {}})
+  EDIT_INGREDIENT: () => selectedWellsInitialState
 }, selectedWellsInitialState)
 
 const ingredients = handleActions({
-  EDIT_INGREDIENT: (state, action) => (
-    (action.payload.groupId !== undefined && action.payload.groupId !== null)
-      // Modify existing ingredient
-      ? state // TODO: modifying doesn't work now
-      // No groupId, create new ingredient
-      : state.concat({
-        name: action.payload.name,
-        volume: action.payload.volume,
-        concentration: action.payload.concentration,
-        description: action.payload.description,
-        individualize: action.payload.individualize,
-        wells: action.payload.wells
-      })
-  ),
+  EDIT_INGREDIENT: (state, action) => {
+    const editableIngredFields = ['name', 'volume', 'concentration', 'description', 'individualize']
+    const { groupId, slotName } = action.payload
+    if (groupId !== undefined && groupId !== null) {
+      // GroupId was given, edit existing ingredient
+      return set(
+        {...state},
+        groupId,
+        {
+          ...state[groupId],
+          ...pick(action.payload, editableIngredFields)
+          // TODO: changing wells and wellDetails
+        }
+      )
+    }
+    // No groupId, create new ingredient
+    const newGroupId = Object.keys(state).length === 0
+      ? 0
+      : Math.max(...Object.keys(state).map(key => parseInt(key))) + 1
+
+    return {
+      ...state,
+      [newGroupId]: {
+        ...pick(action.payload, editableIngredFields),
+        locations: { [slotName]: action.payload.wells }
+      }
+    }
+  },
   // Remove the deleted group (referenced by array index)
-  DELETE_INGREDIENT_GROUP: (state, action) => state.filter((_, i) => i !== action.payload.group)
-}, defaultIngredients)
+  DELETE_INGREDIENT_GROUP: (state, action) => pickBy(state, (value, key) => key !== action.payload.groupId)
+}, {})
 
 const rootReducer = combineReducers({
   modeLabwareSelection,
@@ -165,32 +146,26 @@ const selectedSlot = createSelector(
   state => state.modeIngredientSelection.slotName
 )
 
-const wellMatrix = createSelector(
+// Uses selectedSlot to determine container
+const selectedContainerType = createSelector(
   selectedSlot,
   loadedContainersBySlot,
-  state => rootSelector(state).selectedWells,
-  (modeIngredientSelection, loadedContainers, selectedWells) => {
-    const containerType = loadedContainers[modeIngredientSelection.slotName] // TODO: DRY this up
-    const { rows, columns } = containerDims[containerType] || {rows: 12, columns: 8}
-
-    if (!(containerType in containerDims)) {
-      console.warn(`wellMatrix selector sez: no info in containerDims for "${containerType}", falling back to 8x12`)
-    }
-
-    return range(rows - 1, -1, -1).map(
-      rowNum => range(columns).map(
-        colNum => {
-          const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
-          return {
-            number: rowNum * columns + colNum + 1,
-            preselected: wellKey in selectedWells.preselected,
-            selected: wellKey in selectedWells.selected
-          }
-        }
-      )
-    )
-  }
+  (slotName, allContainers) => allContainers[slotName]
 )
+
+// Given ingredientsForContainer obj and rowNum, colNum,
+// returns the groupId (string key) of that well, or `undefined`
+const ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
+  const wellName = toWellName({rowNum, colNum})
+  // const matches = Object.keys(ingredientsForContainer)
+  //   .filter(ingredGroupId =>
+  //     ingredientsForContainer[ingredGroupId].wells.includes(wellName))
+  // return matches[0]
+  const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
+  const matches = get(ingredientsForContainer, [matchedKey, 'groupId'])
+  console.log({ingredientsForContainer, wellName, matches, matchedKey})
+  return matches
+}
 
 const allIngredients = createSelector(
   rootSelector,
@@ -200,10 +175,9 @@ const allIngredients = createSelector(
 const selectedWellNames = createSelector(
   state => rootSelector(state).selectedWells.selected,
   selectedWells => Object.values(selectedWells).map(well => {
-    console.log({selectedWells, rr: Object.values(selectedWells), well})
     const col = well[0]
     const row = well[1]
-    return String.fromCharCode(65 + col) + (row + 1)
+    return toWellName({colNum: col, rowNum: row})
   }) // TODO factor to util
 )
 
@@ -217,41 +191,81 @@ const selectedContainerSlot = createSelector(
   state => state.modeIngredientSelection.slotName
 )
 
-const ingredientGroupsForSelectedContainer = createSelector(
+const ingredientsForContainer = createSelector(
   allIngredients,
   selectedContainerSlot,
   (allIngredients, selectedContainerSlot) => {
-    return allIngredients.filter(ingredGroup =>
-      ingredGroup &&
-      ingredGroup.locations &&
-      selectedContainerSlot in ingredGroup.locations
-    )
+    const ingredGroupFromIdx = (allIngredients, idx) => allIngredients[idx]
+
+    const ingredGroupConvert = (ingredGroup, groupId) => ({
+      ...ingredGroup,
+      groupId,
+      // Convert deck-wide data to container-specific
+      wells: ingredGroup.locations[selectedContainerSlot],
+      wellDetails: get(ingredGroup, ['wellDetailsByLocation', selectedContainerSlot]),
+      // Hide the deck-wide data
+      locations: undefined,
+      wellDetailsByLocation: undefined
+    })
+
+    return Object.keys(allIngredients).map(idx => {
+      const ingredGroup = ingredGroupFromIdx(allIngredients, idx)
+      return ingredGroup.locations && selectedContainerSlot in ingredGroup.locations
+        ? ingredGroupConvert(ingredGroup, idx)
+        : false
+    }).filter(ingred => ingred !== false)
   }
 )
 
 // returns selected group id (index in array of all ingredients), or undefined.
+// groupId is a string eg '42'
 const selectedIngredientGroupId = createSelector(
   rootSelector,
-  state => get(state, 'modeIngredientSelection.selectedIngredientGroup.group')
+  state => get(state, 'modeIngredientSelection.selectedIngredientGroup.groupId')
 )
 
 const selectedIngredientGroup = createSelector(
   selectedIngredientGroupId,
   allIngredients,
-  (ingredGroupId, allIngredients) => (allIngredients.length - 1 >= ingredGroupId)
-    ? allIngredients[ingredGroupId]
-    : null
+  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId] || null
 )
 
 const selectedIngredientProperties = createSelector(
   selectedIngredientGroup,
-  ingredGroup => ingredGroup // ingredGroup may be null or undefined
-    ? {
-      volume: ingredGroup.volume,
-      concentration: ingredGroup.concentration,
-      name: ingredGroup.name
-    }
-    : {}
+  ingredGroup => (ingredGroup !== null && ingredGroup !== undefined)
+    ? pick(ingredGroup, ['name', 'volume', 'concentration', 'description', 'individualize'])
+    : {} // <-- TODO: Defaults for new ingred group eg {name: 'Sample', volume: 10}
+)
+
+const wellMatrix = createSelector(
+  selectedSlot,
+  selectedContainerType,
+  ingredientsForContainer,
+  state => rootSelector(state).selectedWells,
+  (modeIngredientSelection, containerType, ingredientsForContainer, selectedWells) => {
+    const { rows, columns, wellShape } = containerDims(containerType)
+
+    return range(rows - 1, -1, -1).map(
+      rowNum => range(columns).map(
+        colNum => {
+          const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
+          // parse the ingredientGroupId to int, or set to null if the well is empty
+          const _ingredientGroupId = ingredAtWell(ingredientsForContainer)({rowNum, colNum})
+          const ingredientGroupId = (_ingredientGroupId !== undefined)
+            ? parseInt(_ingredientGroupId, 10)
+            : null
+
+          return {
+            number: rowNum * columns + colNum + 1,
+            wellShape,
+            preselected: wellKey in selectedWells.preselected,
+            selected: wellKey in selectedWells.selected,
+            ingredientGroupId
+          }
+        }
+      )
+    )
+  }
 )
 
 export const selectors = {
@@ -261,9 +275,8 @@ export const selectors = {
   wellMatrix,
   numWellsSelected,
   selectedWellNames,
-  ingredients: state => state.default.ingredients, // TODO
   selectedContainerSlot,
-  ingredientGroupsForSelectedContainer,
+  ingredientsForContainer,
   selectedIngredientProperties,
   selectedIngredientGroupId
 }

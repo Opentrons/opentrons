@@ -10,6 +10,7 @@ label {
 .ingredientsList {
   height: 100%;
   background-color: white;
+  overflow-y: scroll;
 }
 
 .ingredientsList section > label {
