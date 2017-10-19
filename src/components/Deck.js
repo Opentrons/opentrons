@@ -78,7 +78,7 @@ const Deck = props => {
 
   return (
     <div className={styles.deck}>
-      {activeModals.ingredientSelection &&
+      {activeModals.ingredientSelection && activeModals.ingredientSelection.slotName &&
         <div className={styles.ingredientModal}>
 
           <div className={styles.ingredientPanelSidebar}>

@@ -44,7 +44,7 @@ class Plate extends React.Component {
           <div {...otherProps}
             className={classnames(styles[className], styles.plate)}
           >
-            {this.makeColumns().map(this.wrapColumn)}
+            {wellMatrix && this.makeColumns().map(this.wrapColumn)}
           </div>
 
           {showLabels &&

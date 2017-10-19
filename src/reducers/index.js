@@ -25,16 +25,23 @@ const nextEmptySlot = loadedContainersSubstate => {
 
 // REDUCERS
 
+// modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
+// (this state just toggles a modal)
 const modeLabwareSelection = handleActions({
   OPEN_LABWARE_SELECTOR: (state, action) => true,
   CLOSE_LABWARE_SELECTOR: (state, action) => false,
   SELECT_LABWARE_TO_ADD: (state, action) => false // close window when labware is selected
 }, false)
 
-const modeIngredientSelection = handleActions({
-  OPEN_INGREDIENT_SELECTOR: (state, action) => ({slotName: action.payload.slotName, selectedIngredientGroup: null}),
-  EDIT_MODE_INGREDIENT_GROUP: (state, action) => ({...state, selectedIngredientGroup: action.payload}),
-  EDIT_INGREDIENT: (state, action) => ({...state, selectedIngredientGroup: null}), // unselect ingredient group when edited.
+const selectedSlotName = handleActions({
+  OPEN_INGREDIENT_SELECTOR: (state, action) => action.payload.slotName,
+  CLOSE_INGREDIENT_SELECTOR: (state, action) => null
+}, null)
+
+const selectedIngredientGroup = handleActions({
+  OPEN_INGREDIENT_SELECTOR: (state, action) => null,
+  EDIT_MODE_INGREDIENT_GROUP: (state, action) => action.payload,
+  EDIT_INGREDIENT: (state, action) => null, // unselect ingredient group when edited.
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -52,7 +59,7 @@ const loadedContainers = handleActions({
       ? acc
       : ({...acc, [sortedSlotnames[i < deletedIdx ? i : i - 1]]: state[slotName]}),
       {})
-    console.log(nextState)
+
     return nextState
   }
 }, {})
@@ -110,7 +117,8 @@ const ingredients = handleActions({
 
 const rootReducer = combineReducers({
   modeLabwareSelection,
-  modeIngredientSelection,
+  selectedSlotName,
+  selectedIngredientGroup,
   loadedContainers,
   selectedWells,
   ingredients
@@ -119,17 +127,6 @@ const rootReducer = combineReducers({
 // SELECTORS
 
 const rootSelector = state => state.default
-
-const activeModals = createSelector(
-  rootSelector,
-  state => ({
-    labwareSelection: state.modeLabwareSelection,
-    ingredientSelection: state.modeIngredientSelection && {
-      slotName: state.modeIngredientSelection.slotName,
-      // "mix in" selected containerName from loadedContainers
-      containerName: state.loadedContainers[state.modeIngredientSelection.slotName]}
-  })
-)
 
 const loadedContainersBySlot = createSelector(
   rootSelector,
@@ -141,14 +138,15 @@ const canAdd = createSelector(
   loadedContainers => nextEmptySlot(loadedContainers)
 )
 
-const selectedSlot = createSelector(
+// Currently selected container's slot
+const selectedContainerSlot = createSelector(
   rootSelector,
-  state => state.modeIngredientSelection.slotName
+  state => state.selectedSlotName
 )
 
-// Uses selectedSlot to determine container
+// Uses selectedSlot to determine container type
 const selectedContainerType = createSelector(
-  selectedSlot,
+  selectedContainerSlot,
   loadedContainersBySlot,
   (slotName, allContainers) => allContainers[slotName]
 )
@@ -163,7 +161,7 @@ const ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
   // return matches[0]
   const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
   const matches = get(ingredientsForContainer, [matchedKey, 'groupId'])
-  console.log({ingredientsForContainer, wellName, matches, matchedKey})
+
   return matches
 }
 
@@ -184,12 +182,6 @@ const selectedWellNames = createSelector(
 const numWellsSelected = createSelector(
   state => rootSelector(state).selectedWells,
   selectedWells => Object.keys(selectedWells.selected).length)
-
-// Currently selected container's slot (labware view, aka ingredient selection mode)
-const selectedContainerSlot = createSelector(
-  rootSelector,
-  state => state.modeIngredientSelection.slotName
-)
 
 const ingredientsForContainer = createSelector(
   allIngredients,
@@ -221,28 +213,30 @@ const ingredientsForContainer = createSelector(
 // groupId is a string eg '42'
 const selectedIngredientGroupId = createSelector(
   rootSelector,
-  state => get(state, 'modeIngredientSelection.selectedIngredientGroup.groupId')
+  state => get(state, ['selectedIngredientGroup', 'groupId'])
 )
 
-const selectedIngredientGroup = createSelector(
+const selectedIngredientGroupObj = createSelector(
   selectedIngredientGroupId,
   allIngredients,
   (ingredGroupId, allIngredients) => allIngredients[ingredGroupId] || null
 )
 
 const selectedIngredientProperties = createSelector(
-  selectedIngredientGroup,
+  selectedIngredientGroupObj,
   ingredGroup => (ingredGroup !== null && ingredGroup !== undefined)
     ? pick(ingredGroup, ['name', 'volume', 'concentration', 'description', 'individualize'])
     : {} // <-- TODO: Defaults for new ingred group eg {name: 'Sample', volume: 10}
 )
 
 const wellMatrix = createSelector(
-  selectedSlot,
   selectedContainerType,
   ingredientsForContainer,
   state => rootSelector(state).selectedWells,
-  (modeIngredientSelection, containerType, ingredientsForContainer, selectedWells) => {
+  (containerType, ingredientsForContainer, selectedWells) => {
+    if (!containerType) {
+      return undefined
+    }
     const { rows, columns, wellShape } = containerDims(containerType)
 
     return range(rows - 1, -1, -1).map(
@@ -266,6 +260,21 @@ const wellMatrix = createSelector(
       )
     )
   }
+)
+
+// TODO: just use the individual selectors separately, no need to combine it into 'activeModals'
+// -- so you'd have to refactor the props of the containers that use this selector too
+const activeModals = createSelector(
+  rootSelector,
+  selectedContainerSlot,
+  selectedContainerType,
+  (state, slotName, containerType) => ({
+    labwareSelection: state.modeLabwareSelection,
+    ingredientSelection: {
+      slotName,
+      containerName: containerType
+    }
+  })
 )
 
 export const selectors = {
