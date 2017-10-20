@@ -6,7 +6,7 @@ export const {
   openLabwareSelector,
   closeLabwareSelector,
 
-  openIngredientSelector,
+  // openIngredientSelector,
   closeIngredientSelector,
 
   createContainer,
@@ -22,7 +22,7 @@ export const {
   OPEN_LABWARE_SELECTOR: undefined,
   CLOSE_LABWARE_SELECTOR: undefined,
 
-  OPEN_INGREDIENT_SELECTOR: undefined,
+  // OPEN_INGREDIENT_SELECTOR: undefined,
   CLOSE_INGREDIENT_SELECTOR: undefined,
 
   CREATE_CONTAINER: undefined,
@@ -39,15 +39,23 @@ export const {
 })
 
 // Using thunks to get access to the larger state
+export const openIngredientSelector = payload => (dispatch, getState) => {
+  return dispatch({
+    type: 'OPEN_INGREDIENT_SELECTOR',
+    payload: selectors.containerById(payload.containerId)(getState())
+  })
+}
 
 export const editIngredient = payload => (dispatch, getState) => {
   const state = getState()
+  const container = selectors.selectedContainer(state)
+
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
       ...payload,
       // slotName: selectors.selectedContainerSlot(state),
-      containerId: selectors.selectedContainerId(state),
+      containerId: container && container.containerId,
       groupId: selectors.selectedIngredientGroupId(state),
       wells: selectors.selectedWellNames(state) // TODO use locations: [slotName]: [selected wells]
     }

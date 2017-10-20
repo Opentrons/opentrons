@@ -1,48 +1,31 @@
+// NOTE: This mixed container + component does a lot right now:
+//
+// On an empty slot:
+// * Renders a slot on the deck
+// * Renders Add Labware mouseover button
+//
+// On a slot with a container:
+// * Renders a SelectablePlate in the slot
+// * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
+
 import React from 'react'
 import { connect } from 'react-redux'
 
 import styles from '../css/style.css'
 
 import { selectors } from '../reducers'
-import { openIngredientSelector, deleteContainer, createContainer, openLabwareSelector, closeLabwareSelector } from '../actions'
+import {
+  openIngredientSelector,
+
+  createContainer,
+  deleteContainer,
+
+  openLabwareSelector,
+  closeLabwareSelector
+} from '../actions'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
 import LabwareDropdown from '../components/LabwareDropdown.js'
-
-// TODO: this div doesn't need to be a component!
-const AddLabware = props => (
-  <div
-    {...props}
-    className={styles.addLabware}>
-      Add Labware
-  </div>
-)
-
-// TODO: use container component instead
-// const getPlateTopdownImg = containerName => {
-//   const getUrl = imageFileName => `https://s3.amazonaws.com/opentrons-images/website/labware/${imageFileName}.png`
-//
-//   const plates96 = [
-//     '96-deep',
-//     '96-tall',
-//     '96-flat'
-//   ]
-//
-//   const noImage = [
-//     '96-custom',
-//     'PCR-strip-tall'
-//   ]
-//
-//   if (plates96.some(x => x === containerName)) {
-//     return getUrl('96-plate')
-//   }
-//
-//   if (noImage.some(x => x === containerName)) {
-//     return getUrl('custom')
-//   }
-//
-//   return getUrl(containerName)
-// }
 
 const LabwareContainer = ({
   slotName,
@@ -62,7 +45,6 @@ const LabwareContainer = ({
   <div className={styles.deckSlot}>
     {containerType
       ? <SelectablePlate containerId={containerId} cssFillParent />
-      // <img src={getPlateTopdownImg(containerType)} />
       : <label>{slotName}</label>}
 
     {containerType && // if there's no containerType, assume it's empty
@@ -80,7 +62,9 @@ const LabwareContainer = ({
         onClose={e => closeLabwareSelector({slotName})}
         createContainer={createContainer}
       />
-      : <AddLabware onClick={e => openLabwareSelector({slotName})} />
+      : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
+            Add Labware
+        </div>
     )}
   </div>
 )

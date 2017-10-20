@@ -3,6 +3,7 @@ import get from 'lodash/get'
 
 import styles from './IngredientsList.css'
 import { swatchColors } from '../constants.js'
+import { humanize } from '../utils.js'
 
 const IngredGroupCard = ({ingredCategoryData, editModeIngredientGroup, deleteIngredientGroup, ...otherProps}) => {
   const { groupId } = ingredCategoryData
@@ -84,10 +85,11 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients, e
   <div className={styles.ingredientsList}>
     <div className={styles.ingredListHeaderLabel}>
       <div>Slot {slotName}</div>
-      <div>Container {containerName}</div>
+      <div>{containerName}</div>
     </div>
     <div>
-      <div>Type {containerType}</div>
+      {/* TODO: use display container type, not '96-flat' */}
+      <div>{humanize(containerType)}</div>
     </div>
 
     {ingredients.map((ingredCategoryData, i) =>

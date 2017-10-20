@@ -8,10 +8,12 @@ import IngredientsList from '../components/IngredientsList.js'
 export default connect(
   state => {
     const activeModals = selectors.activeModals(state)
+    const container = selectors.selectedContainer(state)
+
     return {
       slotName: activeModals.ingredientSelection.slotName,
-      containerName: activeModals.ingredientSelection.containerName,
-      containerType: activeModals.ingredientSelection.containerName, // TODO name vs type
+      containerName: container.name,
+      containerType: container.type,
       ingredients: selectors.ingredientsForContainer(state)
     }
   },

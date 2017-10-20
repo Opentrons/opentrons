@@ -12,9 +12,7 @@ import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
 import { containerDims, toWellName } from '../constants.js'
-
-// Not really a UUID, but close enough...?
-const uuid = () => new Date().getTime() + '.' + Math.random()
+import { humanize, uuid } from '../utils.js'
 
 const sortedSlotnames = [].concat.apply( // flatten
   [],
@@ -42,10 +40,7 @@ const modeLabwareSelection = handleActions({
 }, false)
 
 const selectedContainer = handleActions({
-  OPEN_INGREDIENT_SELECTOR: (state, action) => ({
-    containerId: action.payload.containerId,
-    slotName: action.payload.slotName
-  }),
+  OPEN_INGREDIENT_SELECTOR: (state, action) => action.payload,
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -62,7 +57,7 @@ const containers = handleActions({
     [uuid() + ':' + action.payload]: {
       slotName: nextEmptySlot(_loadedContainersBySlot(state)),
       type: action.payload,
-      name: action.payload + 'TODO-NAME'
+      name: humanize(action.payload)
     }
   }),
   DELETE_CONTAINER: (state, action) => {
@@ -171,10 +166,20 @@ const selectedContainerSlot = createSelector(
   state => get(state, ['selectedContainer', 'slotName'])
 )
 
-const selectedContainerId = createSelector(
+const selectedContainerSelector = createSelector(
   rootSelector,
-  state => get(state, ['selectedContainer', 'containerId'])
+  state => state.selectedContainer
 )
+
+const containerById = containerId => state => {
+  const container = rootSelector(state).containers
+  return container && container[containerId]
+    ? {
+      ...container[containerId],
+      containerId
+    }
+    : null
+}
 
 const containersBySlot = createSelector(
   state => rootSelector(state).containers,
@@ -196,12 +201,8 @@ const selectedContainerType = createSelector(
 
 // Given ingredientsForContainer obj and rowNum, colNum,
 // returns the groupId (string key) of that well, or `undefined`
-const ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
+const _ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
   const wellName = toWellName({rowNum, colNum})
-  // const matches = Object.keys(ingredientsForContainer)
-  //   .filter(ingredGroupId =>
-  //     ingredientsForContainer[ingredGroupId].wells.includes(wellName))
-  // return matches[0]
   const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
   const matches = get(ingredientsForContainer, [matchedKey, 'groupId'])
 
@@ -249,8 +250,12 @@ const _ingredientsForContainerId = (allIngredients, containerId) => {
 }
 const ingredientsForContainer = createSelector(
   allIngredients,
-  selectedContainerId,
-  _ingredientsForContainerId
+  selectedContainerSelector,
+  (allIngredients, selectedContainer) => {
+    return selectedContainer.containerId
+    ? _ingredientsForContainerId(allIngredients, selectedContainer.containerId)
+    : null
+  }
 )
 
 // returns selected group id (index in array of all ingredients), or undefined.
@@ -284,7 +289,7 @@ const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells) =
       colNum => {
         const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
         // parse the ingredientGroupId to int, or set to null if the well is empty
-        const _ingredientGroupId = ingredAtWell(ingredientsForContainer)({rowNum, colNum})
+        const _ingredientGroupId = _ingredAtWell(ingredientsForContainer)({rowNum, colNum})
         const ingredientGroupId = (_ingredientGroupId !== undefined)
           ? parseInt(_ingredientGroupId, 10)
           : null
@@ -352,7 +357,8 @@ export const selectors = {
   numWellsSelected,
   selectedWellNames,
   selectedContainerSlot,
-  selectedContainerId,
+  selectedContainer: selectedContainerSelector,
+  containerById,
   ingredientsForContainer,
   selectedIngredientProperties,
   selectedIngredientGroupId
