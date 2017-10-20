@@ -12,7 +12,7 @@ import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
 import { containerDims, toWellName } from '../constants.js'
-import { humanize, uuid } from '../utils.js'
+import { uuid } from '../utils.js'
 
 const sortedSlotnames = [].concat.apply( // flatten
   [],
@@ -54,10 +54,10 @@ const selectedIngredientGroup = handleActions({
 const containers = handleActions({
   CREATE_CONTAINER: (state, action) => ({
     ...state,
-    [uuid() + ':' + action.payload]: {
-      slotName: nextEmptySlot(_loadedContainersBySlot(state)),
-      type: action.payload,
-      name: humanize(action.payload)
+    [uuid() + ':' + action.payload.containerType]: {
+      slotName: action.payload.slotName || nextEmptySlot(_loadedContainersBySlot(state)),
+      type: action.payload.containerType,
+      name: null // create with null name, so we force explicit naming.
     }
   }),
   DELETE_CONTAINER: (state, action) => {
@@ -76,6 +76,10 @@ const containers = handleActions({
     //   {})
     //
     // return nextState
+  },
+  MODIFY_CONTAINER: (state, action) => {
+    const { containerId, modify } = action.payload
+    return {...state, [containerId]: {...state[containerId], ...modify}}
   }
 }, {})
 

@@ -13,12 +13,14 @@ import { connect } from 'react-redux'
 
 import styles from '../css/style.css'
 
+import { humanize } from '../utils.js'
 import { selectors } from '../reducers'
 import {
   openIngredientSelector,
 
   createContainer,
   deleteContainer,
+  modifyContainer,
 
   openLabwareSelector,
   closeLabwareSelector
@@ -29,8 +31,11 @@ import LabwareDropdown from '../components/LabwareDropdown.js'
 
 const LabwareContainer = ({
   slotName,
-  containerType,
+
   containerId,
+  containerType,
+  containerName,
+
   canAdd,
 
   activeModals,
@@ -38,36 +43,57 @@ const LabwareContainer = ({
 
   createContainer,
   deleteContainer,
+  modifyContainer,
 
   openLabwareSelector,
   closeLabwareSelector
-}) => (
-  <div className={styles.deckSlot}>
-    {containerType
-      ? <SelectablePlate containerId={containerId} cssFillParent />
-      : <label>{slotName}</label>}
+}) => {
+  const hasName = containerName !== null
+  // HACK: should use a stateful input component
+  const containerNameInputId = slotName
 
-    {containerType && // if there's no containerType, assume it's empty
-      <div className={styles.containerOverlay}>
-        <div className={styles.containerOverlayAddIngred} onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
-          Add Ingredients
-        </div>
-        <div className={styles.containerOverlayRemove} onClick={() => deleteContainer({containerId, slotName, containerType})}>
-          Remove {containerType}
-        </div>
-      </div>}
+  return (
+    <div className={styles.deckSlot}>
+      {containerType
+        ? <SelectablePlate containerId={containerId} cssFillParent />
+        : <label>{slotName}</label>}
 
-    {(slotName === canAdd) && (activeModals.labwareSelection
-      ? <LabwareDropdown
-        onClose={e => closeLabwareSelector({slotName})}
-        createContainer={createContainer}
-      />
-      : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
-            Add Labware
-        </div>
-    )}
-  </div>
-)
+      {containerType && // if there's no containerType, assume it's empty
+        <div className={styles.containerOverlay}>
+
+          {!hasName && <div className={styles.containerOverlayNameIt}>
+            <label>Name:</label>
+            <input id={containerNameInputId} placeholder={humanize(containerType)} />
+            <div onClick={() => modifyContainer({
+              containerId,
+              modify: {name: document.getElementById(containerNameInputId).value}})}>‎✔</div>
+            <div onClick={() => modifyContainer({
+              containerId,
+              modify: {name: humanize(containerType)}})}>‎✕</div>
+          </div>}
+
+          {hasName && <div className={styles.containerOverlayAddIngred} onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
+            Add Ingredients
+          </div>}
+
+          {hasName && <div className={styles.containerOverlayRemove} onClick={() => deleteContainer({containerId, slotName, containerType})}>
+            <p>Remove {containerName}</p>
+          </div>}
+
+        </div>}
+
+      {(slotName === canAdd) && (activeModals.labwareSelection
+        ? <LabwareDropdown
+          onClose={e => closeLabwareSelector({slotName})}
+          onContainerChoose={containerType => createContainer({slotName, containerType})}
+        />
+        : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
+              Add Labware
+          </div>
+      )}
+    </div>
+  )
+}
 
 export default connect(
   (state, ownProps) => {
@@ -84,6 +110,7 @@ export default connect(
   {
     createContainer,
     deleteContainer,
+    modifyContainer,
 
     openIngredientSelector,
     openLabwareSelector,

@@ -11,6 +11,7 @@ export const {
 
   createContainer,
   deleteContainer,
+  modifyContainer,
 
   preselectWells,
   selectWells,
@@ -27,6 +28,7 @@ export const {
 
   CREATE_CONTAINER: undefined,
   DELETE_CONTAINER: undefined,
+  MODIFY_CONTAINER: undefined, // {containerId, modify: {fieldToModify1: newValue1, fieldToModify2: newValue2}}
 
   PRESELECT_WELLS: undefined,
   SELECT_WELLS: undefined,
