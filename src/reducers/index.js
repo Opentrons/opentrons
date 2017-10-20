@@ -13,6 +13,9 @@ import set from 'lodash/set' // <- careful, this mutates the object
 
 import { containerDims, toWellName } from '../constants.js'
 
+// Not really a UUID, but close enough...?
+const uuid = () => new Date().getTime() + '.' + Math.random()
+
 const sortedSlotnames = [].concat.apply( // flatten
   [],
   [1, 2, 3].map(num => ['A', 'B', 'C', 'D', 'E'].map(letter => letter + num))
@@ -35,11 +38,14 @@ const nextEmptySlot = loadedContainersSubstate => {
 const modeLabwareSelection = handleActions({
   OPEN_LABWARE_SELECTOR: (state, action) => true,
   CLOSE_LABWARE_SELECTOR: (state, action) => false,
-  CREATE_CONTAINER_AT_SLOT: (state, action) => false // close window when labware is selected
+  CREATE_CONTAINER: (state, action) => false // close window when labware is selected
 }, false)
 
-const selectedSlotName = handleActions({
-  OPEN_INGREDIENT_SELECTOR: (state, action) => action.payload.slotName,
+const selectedContainer = handleActions({
+  OPEN_INGREDIENT_SELECTOR: (state, action) => ({
+    containerId: action.payload.containerId,
+    slotName: action.payload.slotName
+  }),
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -51,22 +57,17 @@ const selectedIngredientGroup = handleActions({
 }, null)
 
 const containers = handleActions({
-  CREATE_CONTAINER_AT_SLOT: (state, action) => ({
+  CREATE_CONTAINER: (state, action) => ({
     ...state,
-    [action.payload + 'pretendThisIsUniqueString']: {
-      slotName: (() => {
-        // HACK DEBUG
-        const r = nextEmptySlot(_loadedContainersBySlot(state))
-        console.log('container reducer', {r, loadedC: _loadedContainersBySlot(state)})
-        return r
-      })(),
+    [uuid() + ':' + action.payload]: {
+      slotName: nextEmptySlot(_loadedContainersBySlot(state)),
       type: action.payload,
       name: action.payload + 'TODO-NAME'
     }
   }),
-  DELETE_CONTAINER_AT_SLOT: (state, action) => {
+  DELETE_CONTAINER: (state, action) => {
     // For leaving open slots functionality, do this one-liner instead
-    return pickBy(state, (value, key) => value.slotName !== action.payload)
+    return pickBy(state, (value, key) => key !== action.payload.containerId)
 
     // TODO: make the slots slide backward again
 
@@ -104,7 +105,7 @@ const selectedWells = handleActions({
 const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
     const editableIngredFields = ['name', 'volume', 'concentration', 'description', 'individualize']
-    const { groupId, slotName } = action.payload
+    const { groupId, containerId } = action.payload
     if (!isNil(groupId)) {
       // GroupId was given, edit existing ingredient
       return set(
@@ -117,7 +118,8 @@ const ingredients = handleActions({
         }
       )
     }
-    // No groupId, create new ingredient
+    // No groupId, create new ingredient groupId by adding 1 to the highest ID
+    // TODO: use uuid
     const newGroupId = Object.keys(state).length === 0
       ? 0
       : Math.max(...Object.keys(state).map(key => parseInt(key))) + 1
@@ -126,7 +128,7 @@ const ingredients = handleActions({
       ...state,
       [newGroupId]: {
         ...pick(action.payload, editableIngredFields),
-        locations: { [slotName]: action.payload.wells }
+        locations: { [containerId]: action.payload.wells }
       }
     }
   },
@@ -136,7 +138,7 @@ const ingredients = handleActions({
 
 const rootReducer = combineReducers({
   modeLabwareSelection,
-  selectedSlotName,
+  selectedContainer,
   selectedIngredientGroup,
   containers,
   selectedWells,
@@ -179,7 +181,23 @@ const canAdd = createSelector(
 // Currently selected container's slot
 const selectedContainerSlot = createSelector(
   rootSelector,
-  state => state.selectedSlotName
+  state => get(state, ['selectedContainer', 'slotName'])
+)
+
+const selectedContainerId = createSelector(
+  rootSelector,
+  state => get(state, ['selectedContainer', 'containerId'])
+)
+
+const containersBySlot = createSelector(
+  state => rootSelector(state).containers,
+  containers => reduce(containers, (acc, containerObj, containerId) =>
+    ({
+      ...acc,
+      // NOTE: containerId added in so you still have a reference
+      [containerObj.slotName]: {...containerObj, containerId}
+    })
+  , {})
 )
 
 // Uses selectedSlot to determine container type
@@ -223,16 +241,16 @@ const numWellsSelected = createSelector(
 
 const ingredientsForContainer = createSelector(
   allIngredients,
-  selectedContainerSlot,
-  (allIngredients, selectedContainerSlot) => {
+  selectedContainerId,
+  (allIngredients, selectedContainerId) => {
     const ingredGroupFromIdx = (allIngredients, idx) => allIngredients[idx]
 
     const ingredGroupConvert = (ingredGroup, groupId) => ({
       ...ingredGroup,
       groupId,
       // Convert deck-wide data to container-specific
-      wells: ingredGroup.locations[selectedContainerSlot],
-      wellDetails: get(ingredGroup, ['wellDetailsByLocation', selectedContainerSlot]),
+      wells: ingredGroup.locations[selectedContainerId],
+      wellDetails: get(ingredGroup, ['wellDetailsByLocation', selectedContainerId]),
       // Hide the deck-wide data
       locations: undefined,
       wellDetailsByLocation: undefined
@@ -240,7 +258,7 @@ const ingredientsForContainer = createSelector(
 
     return Object.keys(allIngredients).map(idx => {
       const ingredGroup = ingredGroupFromIdx(allIngredients, idx)
-      return ingredGroup.locations && selectedContainerSlot in ingredGroup.locations
+      return ingredGroup.locations && selectedContainerId in ingredGroup.locations
         ? ingredGroupConvert(ingredGroup, idx)
         : false
     }).filter(ingred => ingred !== false)
@@ -315,14 +333,17 @@ const activeModals = createSelector(
   })
 )
 
+// TODO: prune selectors
 export const selectors = {
   activeModals,
   loadedContainersBySlot,
+  containersBySlot,
   canAdd,
   wellMatrix,
   numWellsSelected,
   selectedWellNames,
   selectedContainerSlot,
+  selectedContainerId,
   ingredientsForContainer,
   selectedIngredientProperties,
   selectedIngredientGroupId

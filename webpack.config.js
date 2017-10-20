@@ -43,6 +43,8 @@ module.exports = {
     // hot: true
   },
 
+  devtool: process.env.NODE_ENV !== 'production' ? 'eval-source-map' : false,
+
   plugins: [
     // new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),

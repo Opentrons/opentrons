@@ -9,15 +9,14 @@ export const {
   openIngredientSelector,
   closeIngredientSelector,
 
-  createContainerAtSlot,
-  deleteContainerAtSlot,
+  createContainer,
+  deleteContainer,
 
   preselectWells,
   selectWells,
   deselectWells,
 
   editModeIngredientGroup,
-  // editIngredient,
   deleteIngredientGroup
 } = createActions({
   OPEN_LABWARE_SELECTOR: undefined,
@@ -26,8 +25,8 @@ export const {
   OPEN_INGREDIENT_SELECTOR: undefined,
   CLOSE_INGREDIENT_SELECTOR: undefined,
 
-  CREATE_CONTAINER_AT_SLOT: undefined, // TODO: actually, the slot is ignored.
-  DELETE_CONTAINER_AT_SLOT: undefined,
+  CREATE_CONTAINER: undefined,
+  DELETE_CONTAINER: undefined,
 
   PRESELECT_WELLS: undefined,
   SELECT_WELLS: undefined,
@@ -39,14 +38,16 @@ export const {
   DELETE_INGREDIENT_GROUP: undefined
 })
 
-// editIngredient needs access to the larger state, so it's a thunk
+// Using thunks to get access to the larger state
+
 export const editIngredient = payload => (dispatch, getState) => {
   const state = getState()
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
       ...payload,
-      slotName: selectors.selectedContainerSlot(state),
+      // slotName: selectors.selectedContainerSlot(state),
+      containerId: selectors.selectedContainerId(state),
       groupId: selectors.selectedIngredientGroupId(state),
       wells: selectors.selectedWellNames(state) // TODO use locations: [slotName]: [selected wells]
     }

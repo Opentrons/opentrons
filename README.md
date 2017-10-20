@@ -64,3 +64,23 @@ Colors are assigned by position in the outermost array, as is the order top to b
   * If a 'settings' key (volume/description/concentration) is not present in the `wellDetails` (or has value `undefined`), then the well will inherit the value of that setting from its category defaults. But it CAN have a falsey value: `''` or `0` will override defaults.
 
 (I'm on the fence about whether `individualize` should really just be `!!wellDetails`... but it might as well be more explicit for now. This gives us the ability to store well details, toggle them off, then toggle back on.)
+
+
+## Containers state shape
+
+```javascript
+  {
+    [uniqueContainerId]: {
+      type: '96-flat',
+      name: 'Samples Plate',
+      slotName: 'A2'
+    },
+    [uniqueContainerId2]: {
+      type: '384-flat',
+      name: 'Destination Plate',
+      slotName: 'B2'
+    }
+  }
+```
+
+Each unique container ID is created from timestamp + random number + container type.

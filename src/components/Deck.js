@@ -9,6 +9,7 @@ import LabwareDropdown from './LabwareDropdown.js'
 import SelectablePlate from '../containers/SelectablePlate.js'
 import IngredientsList from '../containers/IngredientsList.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
+import LabwareContainer from '../containers/LabwareContainer.js'
 
 const AddLabware = props => (
   <div
@@ -18,63 +19,17 @@ const AddLabware = props => (
   </div>
 )
 
-// TODO: use container component instead
-const getPlateTopdownImg = containerName => {
-  const getUrl = imageFileName => `https://s3.amazonaws.com/opentrons-images/website/labware/${imageFileName}.png`
-
-  const plates96 = [
-    '96-deep',
-    '96-tall',
-    '96-flat'
-  ]
-
-  const noImage = [
-    '96-custom',
-    'PCR-strip-tall'
-  ]
-
-  if (plates96.some(x => x === containerName)) {
-    return getUrl('96-plate')
-  }
-
-  if (noImage.some(x => x === containerName)) {
-    return getUrl('custom')
-  }
-
-  return getUrl(containerName)
-}
-
-const DeckSlot = ({slotName, container, children, onAddIngredientsClick, onRemoveContainerClick}) => (
-  <div className={styles.deckSlot}>
-    {container
-      ? <img src={getPlateTopdownImg(container)} />
-      : <label>{slotName}</label>}
-
-    {container &&
-      <div className={styles.containerOverlay}>
-        <div className={styles.containerOverlayAddIngred} onClick={onAddIngredientsClick}>
-          Add Ingredients
-        </div>
-        <div className={styles.containerOverlayRemove} onClick={onRemoveContainerClick}>
-          Remove {container}
-        </div>
-      </div>}
-
-    {children}
-  </div>
-)
-
 const Deck = props => {
   const {
-    loadedContainers,
+    // loadedContainers,
     canAdd,
     activeModals,
-    openIngredientSelector,
+    // openIngredientSelector,
     closeIngredientSelector,
-    deleteContainerAtSlot,
+    // deleteContainer,
     openLabwareSelector,
     closeLabwareSelector,
-    createContainerAtSlot } = props
+    createContainer } = props
 
   return (
     <div className={styles.deck}>
@@ -98,21 +53,18 @@ const Deck = props => {
         </div>
       }
       {slotnames.map((slotName, i) =>
-        <DeckSlot
+        <LabwareContainer
           key={i}
           slotName={slotName}
-          container={loadedContainers[slotName]}
-          onAddIngredientsClick={e => openIngredientSelector({slotName})}
-          onRemoveContainerClick={e => deleteContainerAtSlot(slotName)}
         >
           {(slotName === canAdd) && (activeModals.labwareSelection
             ? <LabwareDropdown
               onClose={e => closeLabwareSelector({slotName})}
-              createContainerAtSlot={createContainerAtSlot}
+              createContainer={createContainer}
             />
             : <AddLabware onClick={e => openLabwareSelector({slotName})} />
           )}
-        </DeckSlot>
+        </LabwareContainer>
       )}
     </div>
   )
