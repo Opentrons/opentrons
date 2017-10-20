@@ -132,7 +132,7 @@ class Pipette:
         default_plunger_positions = {
             'top': 17,
             'bottom': 0,
-            'blow_out': -4,
+            'blow_out': -1,
             'drop_tip': -7
         }
         self.plunger_positions = {}
