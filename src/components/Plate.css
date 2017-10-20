@@ -12,9 +12,10 @@
   /*overflow: hidden;*/
   background: transparent;
   position: relative;
-  /*max-height:68vh;*/
+  max-height: 55vh;
   box-sizing: border-box;
-  margin: auto;
+  margin: 0 auto;
+  padding: 0;
 
   border: 3px solid darkgray;
   border-radius: 10px;
@@ -24,6 +25,11 @@
   /* text selection messes up drag & drop */
   user-select: none;
   cursor: default;
+}
+
+.fillParent {
+  background-color: white;
+  user-select: none;
 }
 
 .layoutWrapper {

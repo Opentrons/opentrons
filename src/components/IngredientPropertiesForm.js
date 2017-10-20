@@ -68,7 +68,6 @@ class IngredientPropertiesForm extends React.Component {
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
     if (!selectedIngredientProperties && numWellsSelected <= 0) {
-      console.log(this.props)
       return (
         <div style={{margin: '0 20%'}}>
           <Button disabled>

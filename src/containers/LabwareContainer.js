@@ -6,6 +6,7 @@ import styles from '../css/style.css'
 import { selectors } from '../reducers'
 import { openIngredientSelector, deleteContainer, createContainer, openLabwareSelector, closeLabwareSelector } from '../actions'
 
+import SelectablePlate from '../containers/SelectablePlate.js'
 import LabwareDropdown from '../components/LabwareDropdown.js'
 
 // TODO: this div doesn't need to be a component!
@@ -18,30 +19,30 @@ const AddLabware = props => (
 )
 
 // TODO: use container component instead
-const getPlateTopdownImg = containerName => {
-  const getUrl = imageFileName => `https://s3.amazonaws.com/opentrons-images/website/labware/${imageFileName}.png`
-
-  const plates96 = [
-    '96-deep',
-    '96-tall',
-    '96-flat'
-  ]
-
-  const noImage = [
-    '96-custom',
-    'PCR-strip-tall'
-  ]
-
-  if (plates96.some(x => x === containerName)) {
-    return getUrl('96-plate')
-  }
-
-  if (noImage.some(x => x === containerName)) {
-    return getUrl('custom')
-  }
-
-  return getUrl(containerName)
-}
+// const getPlateTopdownImg = containerName => {
+//   const getUrl = imageFileName => `https://s3.amazonaws.com/opentrons-images/website/labware/${imageFileName}.png`
+//
+//   const plates96 = [
+//     '96-deep',
+//     '96-tall',
+//     '96-flat'
+//   ]
+//
+//   const noImage = [
+//     '96-custom',
+//     'PCR-strip-tall'
+//   ]
+//
+//   if (plates96.some(x => x === containerName)) {
+//     return getUrl('96-plate')
+//   }
+//
+//   if (noImage.some(x => x === containerName)) {
+//     return getUrl('custom')
+//   }
+//
+//   return getUrl(containerName)
+// }
 
 const LabwareContainer = ({
   slotName,
@@ -60,7 +61,8 @@ const LabwareContainer = ({
 }) => (
   <div className={styles.deckSlot}>
     {containerType
-      ? <img src={getPlateTopdownImg(containerType)} />
+      ? <SelectablePlate containerId={containerId} cssFillParent />
+      // <img src={getPlateTopdownImg(containerType)} />
       : <label>{slotName}</label>}
 
     {containerType && // if there's no containerType, assume it's empty

@@ -45,9 +45,16 @@ const getCollidingWells = rectPositions => {
 }
 
 export default connect(
-  state => ({
-    wellMatrix: selectors.wellMatrix(state)
-  }),
+  (state, ownProps) => {
+    // containerId prop overrides default behavior of using the 'selected' containerId
+    const { containerId } = ownProps
+
+    return {
+      wellMatrix: containerId
+        ? selectors.wellMatrixById(containerId)(state)
+        : selectors.wellMatrixSelectedContainer(state)
+    }
+  },
   {
     // HACK-Y action mapping
     onSelectionMove: (e, rect) => preselectWells({wells: getCollidingWells(rect), append: e.shiftKey}),

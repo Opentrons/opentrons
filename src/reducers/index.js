@@ -157,21 +157,8 @@ const _loadedContainersBySlot = containers =>
 
 const loadedContainersBySlot = createSelector(
   state => rootSelector(state).containers,
-  containers => {
-    console.log(
-    'loadedContainersBySlot (public selector)', {
-      containers,
-      res: _loadedContainersBySlot(containers)
-    })
-    // HACK
-    return _loadedContainersBySlot(containers)
-  }
+  containers => _loadedContainersBySlot(containers)
 )
-
-// const loadedContainersBySlot = (state) => {
-//   console.log({state})
-//   return {A1: '96-custom'}
-// }
 
 const canAdd = createSelector(
   loadedContainersBySlot,
@@ -239,30 +226,31 @@ const numWellsSelected = createSelector(
   state => rootSelector(state).selectedWells,
   selectedWells => Object.keys(selectedWells.selected).length)
 
+const _ingredientsForContainerId = (allIngredients, containerId) => {
+  const ingredGroupFromIdx = (allIngredients, idx) => allIngredients[idx]
+
+  const ingredGroupConvert = (ingredGroup, groupId) => ({
+    ...ingredGroup,
+    groupId,
+    // Convert deck-wide data to container-specific
+    wells: ingredGroup.locations[containerId],
+    wellDetails: get(ingredGroup, ['wellDetailsByLocation', containerId]),
+    // Hide the deck-wide data
+    locations: undefined,
+    wellDetailsByLocation: undefined
+  })
+
+  return Object.keys(allIngredients).map(idx => {
+    const ingredGroup = ingredGroupFromIdx(allIngredients, idx)
+    return ingredGroup.locations && containerId in ingredGroup.locations
+    ? ingredGroupConvert(ingredGroup, idx)
+    : false
+  }).filter(ingred => ingred !== false)
+}
 const ingredientsForContainer = createSelector(
   allIngredients,
   selectedContainerId,
-  (allIngredients, selectedContainerId) => {
-    const ingredGroupFromIdx = (allIngredients, idx) => allIngredients[idx]
-
-    const ingredGroupConvert = (ingredGroup, groupId) => ({
-      ...ingredGroup,
-      groupId,
-      // Convert deck-wide data to container-specific
-      wells: ingredGroup.locations[selectedContainerId],
-      wellDetails: get(ingredGroup, ['wellDetailsByLocation', selectedContainerId]),
-      // Hide the deck-wide data
-      locations: undefined,
-      wellDetailsByLocation: undefined
-    })
-
-    return Object.keys(allIngredients).map(idx => {
-      const ingredGroup = ingredGroupFromIdx(allIngredients, idx)
-      return ingredGroup.locations && selectedContainerId in ingredGroup.locations
-        ? ingredGroupConvert(ingredGroup, idx)
-        : false
-    }).filter(ingred => ingred !== false)
-  }
+  _ingredientsForContainerId
 )
 
 // returns selected group id (index in array of all ingredients), or undefined.
@@ -285,37 +273,56 @@ const selectedIngredientProperties = createSelector(
     : null
 )
 
-const wellMatrix = createSelector(
+const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells) => {
+  if (!containerType) {
+    return undefined
+  }
+  const { rows, columns, wellShape } = containerDims(containerType)
+
+  return range(rows - 1, -1, -1).map(
+    rowNum => range(columns).map(
+      colNum => {
+        const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
+        // parse the ingredientGroupId to int, or set to null if the well is empty
+        const _ingredientGroupId = ingredAtWell(ingredientsForContainer)({rowNum, colNum})
+        const ingredientGroupId = (_ingredientGroupId !== undefined)
+          ? parseInt(_ingredientGroupId, 10)
+          : null
+
+        return {
+          number: rowNum * columns + colNum + 1,
+          wellShape,
+          preselected: wellKey in selectedWells.preselected,
+          selected: wellKey in selectedWells.selected,
+          ingredientGroupId
+        }
+      }
+    )
+  )
+}
+
+const _allWellMatricesById = createSelector(
+  state => rootSelector(state).containers,
+  containers => reduce(containers, (acc, container, containerId) => {
+    const wellMatrix = _getWellMatrix(container.type, _ingredientsForContainerId(containerId), selectedWellsInitialState)
+
+    return {
+      ...acc,
+      [containerId]: wellMatrix
+    }
+  }, {})
+)
+
+const wellMatrixById = containerId => state => {
+  const allWellMatrices = _allWellMatricesById(state)
+  return allWellMatrices && allWellMatrices[containerId]
+}
+
+const wellMatrixSelectedContainer = createSelector(
   selectedContainerType,
   ingredientsForContainer,
   state => rootSelector(state).selectedWells,
-  (containerType, ingredientsForContainer, selectedWells) => {
-    if (!containerType) {
-      return undefined
-    }
-    const { rows, columns, wellShape } = containerDims(containerType)
-
-    return range(rows - 1, -1, -1).map(
-      rowNum => range(columns).map(
-        colNum => {
-          const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
-          // parse the ingredientGroupId to int, or set to null if the well is empty
-          const _ingredientGroupId = ingredAtWell(ingredientsForContainer)({rowNum, colNum})
-          const ingredientGroupId = (_ingredientGroupId !== undefined)
-            ? parseInt(_ingredientGroupId, 10)
-            : null
-
-          return {
-            number: rowNum * columns + colNum + 1,
-            wellShape,
-            preselected: wellKey in selectedWells.preselected,
-            selected: wellKey in selectedWells.selected,
-            ingredientGroupId
-          }
-        }
-      )
-    )
-  }
+  _getWellMatrix
 )
 
 // TODO: just use the individual selectors separately, no need to combine it into 'activeModals'
@@ -339,7 +346,8 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   canAdd,
-  wellMatrix,
+  wellMatrixSelectedContainer,
+  wellMatrixById,
   numWellsSelected,
   selectedWellNames,
   selectedContainerSlot,

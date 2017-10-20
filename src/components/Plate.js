@@ -36,10 +36,10 @@ class Plate extends React.Component {
   }
 
   render () {
-    const { showLabels, className, transpose, wellMatrix, Well, ...otherProps } = this.props
+    const { showLabels, className, transpose, wellMatrix, Well, cssFillParent, ...otherProps } = this.props
 
     return (
-      <section className={styles.aspect_ratio}>
+      <section className={cssFillParent ? styles.fillParent : styles.aspect_ratio}>
         <div className={styles.layoutWrapper}>
           <div {...otherProps}
             className={classnames(styles[className], styles.plate)}
@@ -59,7 +59,7 @@ class Plate extends React.Component {
 Plate.propTypes = {
   wellMatrix: PropTypes.array.isRequired,
   showLabels: PropTypes.bool,
-
+  cssFillParent: PropTypes.bool, // if true, plate stretches to fill parent element, instead of having its own aspect ratio
   transpose: PropTypes.bool,
 
   Well: PropTypes.func.isRequired // this fn should return a Well React element
