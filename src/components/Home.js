@@ -2,12 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import {
-  openLabwareSelector,
-  closeLabwareSelector,
-  openIngredientSelector,
-  closeIngredientSelector,
-  createContainer,
-  deleteContainer
+  closeIngredientSelector
 } from '../actions'
 
 import { selectors } from '../reducers'
@@ -15,17 +10,10 @@ import Deck from './Deck.js'
 
 const ConnectedDeck = connect(
   state => ({
-    loadedContainers: selectors.loadedContainersBySlot(state),
-    canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state)
   }),
   {
-    openLabwareSelector,
-    closeLabwareSelector,
-    createContainer,
-    openIngredientSelector,
-    closeIngredientSelector,
-    deleteContainer
+    closeIngredientSelector
   }
 )(Deck)
 

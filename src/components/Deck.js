@@ -4,35 +4,24 @@ import React from 'react'
 import { slotnames } from '../constants.js'
 import styles from '../css/style.css'
 
-import LabwareDropdown from './LabwareDropdown.js'
-
 import SelectablePlate from '../containers/SelectablePlate.js'
 import IngredientsList from '../containers/IngredientsList.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 
-const AddLabware = props => (
-  <div
-    {...props}
-    className={styles.addLabware}>
-      Add Labware
-  </div>
-)
-
 const Deck = props => {
   const {
     // loadedContainers,
-    canAdd,
     activeModals,
     // openIngredientSelector,
-    closeIngredientSelector,
     // deleteContainer,
-    openLabwareSelector,
-    closeLabwareSelector,
-    createContainer } = props
+    closeIngredientSelector
+  } = props
 
   return (
     <div className={styles.deck}>
+
+      {/* Ingredient selection modal. TODO: move out of Deck to Home... */}
       {activeModals.ingredientSelection && activeModals.ingredientSelection.slotName &&
         <div className={styles.ingredientModal}>
 
@@ -52,19 +41,12 @@ const Deck = props => {
           <div className='close' onClick={e => closeIngredientSelector()}>⟳</div>
         </div>
       }
+      {/* The actual deck */}
       {slotnames.map((slotName, i) =>
         <LabwareContainer
           key={i}
           slotName={slotName}
-        >
-          {(slotName === canAdd) && (activeModals.labwareSelection
-            ? <LabwareDropdown
-              onClose={e => closeLabwareSelector({slotName})}
-              createContainer={createContainer}
-            />
-            : <AddLabware onClick={e => openLabwareSelector({slotName})} />
-          )}
-        </LabwareContainer>
+        />
       )}
     </div>
   )

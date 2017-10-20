@@ -4,7 +4,18 @@ import { connect } from 'react-redux'
 import styles from '../css/style.css'
 
 import { selectors } from '../reducers'
-import { openIngredientSelector, deleteContainer } from '../actions'
+import { openIngredientSelector, deleteContainer, createContainer, openLabwareSelector, closeLabwareSelector } from '../actions'
+
+import LabwareDropdown from '../components/LabwareDropdown.js'
+
+// TODO: this div doesn't need to be a component!
+const AddLabware = props => (
+  <div
+    {...props}
+    className={styles.addLabware}>
+      Add Labware
+  </div>
+)
 
 // TODO: use container component instead
 const getPlateTopdownImg = containerName => {
@@ -32,7 +43,21 @@ const getPlateTopdownImg = containerName => {
   return getUrl(containerName)
 }
 
-const LabwareContainer = ({slotName, containerType, containerId, children, openIngredientSelector, deleteContainer}) => (
+const LabwareContainer = ({
+  slotName,
+  containerType,
+  containerId,
+  canAdd,
+
+  activeModals,
+  openIngredientSelector,
+
+  createContainer,
+  deleteContainer,
+
+  openLabwareSelector,
+  closeLabwareSelector
+}) => (
   <div className={styles.deckSlot}>
     {containerType
       ? <img src={getPlateTopdownImg(containerType)} />
@@ -48,19 +73,35 @@ const LabwareContainer = ({slotName, containerType, containerId, children, openI
         </div>
       </div>}
 
-    {children}
+    {(slotName === canAdd) && (activeModals.labwareSelection
+      ? <LabwareDropdown
+        onClose={e => closeLabwareSelector({slotName})}
+        createContainer={createContainer}
+      />
+      : <AddLabware onClick={e => openLabwareSelector({slotName})} />
+    )}
   </div>
 )
 
 export default connect(
   (state, ownProps) => {
     const container = selectors.containersBySlot(state)[ownProps.slotName]
-    return (container)
+    const containerInfo = (container)
       ? { containerType: container.type, containerId: container.containerId, containerName: container.name }
       : {}
+    return {
+      ...containerInfo,
+      canAdd: selectors.canAdd(state),
+      activeModals: selectors.activeModals(state)
+    }
   },
   {
+    createContainer,
+    deleteContainer,
+
     openIngredientSelector,
-    deleteContainer
+    openLabwareSelector,
+
+    closeLabwareSelector
   }
 )(LabwareContainer)
