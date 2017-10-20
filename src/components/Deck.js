@@ -31,7 +31,7 @@ const Deck = props => {
 
           <div className={styles.ingredientPanelContent}>
             <div className={styles.containerDetail}>
-              <SelectablePlate />
+              <SelectablePlate showLabels />
             </div>
 
             {/* <button>Add Ingredient</button> */}

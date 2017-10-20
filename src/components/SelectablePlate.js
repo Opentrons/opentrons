@@ -4,13 +4,13 @@ import Plate from './Plate.js'
 import SelectionRect from '../components/SelectionRect.js'
 import Well from '../components/Well.js'
 
-const SelectablePlate = ({wellMatrix, onSelectionMove, onSelectionDone, cssFillParent}) => (
+const SelectablePlate = ({wellMatrix, onSelectionMove, onSelectionDone, containerId, ...otherProps}) => (
+  // containerId not passed into Plate, don't unpack into otherProps --------^
   <SelectionRect {...{onSelectionMove, onSelectionDone}}>
     <Plate
-      wellMatrix={wellMatrix}
       Well={Well}
-      cssFillParent={cssFillParent}
-      showLabels
+      wellMatrix={wellMatrix}
+      {...otherProps}
     />
   </SelectionRect>
 )

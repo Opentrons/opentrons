@@ -302,9 +302,10 @@ const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells) =
 }
 
 const _allWellMatricesById = createSelector(
+  allIngredients,
   state => rootSelector(state).containers,
-  containers => reduce(containers, (acc, container, containerId) => {
-    const wellMatrix = _getWellMatrix(container.type, _ingredientsForContainerId(containerId), selectedWellsInitialState)
+  (allIngredients, containers) => reduce(containers, (acc, container, containerId) => {
+    const wellMatrix = _getWellMatrix(container.type, _ingredientsForContainerId(allIngredients, containerId), selectedWellsInitialState)
 
     return {
       ...acc,
