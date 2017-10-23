@@ -1,0 +1,105 @@
+.ingredientPropertiesEntry {
+  background-color: white;
+  margin: 1em;
+  padding: 0 1.5em;
+  border: 3px solid darkgray;
+  border-radius: 15px;
+}
+
+.ingredientPropertiesEntry h1 {
+  font-size: 10pt;
+  font-weight: inherit;
+  text-transform: uppercase;
+  float: left;
+  width: 100%;
+}
+
+.ingredientPropertiesEntry h1 > * {
+  display: inline-block;
+  border-radius: 0;
+  margin: 0;
+  color: gray;
+  float: right;
+}
+
+.ingredientPropertiesEntry h1 div:first-of-type {
+  border-bottom: 1px solid gray;
+  margin-right: 1em;
+  color: black;
+  float: left;
+}
+
+.ingredientPropertiesEntry span {
+  display: inline-block;
+  margin: 0.5em 0;
+  width: 100%;
+}
+
+.ingredientPropertiesEntry form {
+  color: gray;
+  display: inline-block;
+}
+
+.ingredientPropertiesEntry form > span {
+  border: 1px solid gray;
+  padding-left: 0.2rem;
+}
+
+.ingredientPropertiesEntry span input {
+  float: right;
+  border: none;
+}
+
+.ingredientPropertiesEntry .checkbox {
+  border: none;
+  display: flex;
+  align-items: flex-end;
+}
+
+.checkbox input {
+  zoom: 2;
+  width: 1em;
+  padding: 0;
+  margin: 0;
+}
+
+.checkbox label {
+  flex: 1;
+  text-transform: none;
+}
+
+.ingredientPropertiesEntry .halfWidth {
+  display: inline-block;
+  width: 30%;
+  margin-right: 5%;
+}
+
+.ingredientPropertiesEntry textarea {
+  width: 95%;
+  height: 5em;
+  border: none;
+}
+
+.ingredientPropertiesEntry button {
+  text-transform: none;
+  background-color: #5b5b5b;
+  color: white;
+  font-size: 16pt;
+  border-radius: 3px;
+  border: none;
+  padding: 0.2rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ingredientPropertiesEntry button:nth-of-type(2) {
+  margin-left: 1em;
+}
+
+.deleteIngred {
+  float: right;
+}
+
+.deleteIngred::before {
+  content: url("https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/delete.png");
+  margin-right: 1rem;
+}

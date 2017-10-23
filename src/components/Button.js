@@ -5,14 +5,12 @@ import styles from '../css/style.css'
 
 // Disables onClick behavior if props.disabled is true.
 
-const Button = props => (
+const Button = ({disabled, onClick, className, ...otherProps}) => (
   <button
-    onClick={!props.disabled && props.onClick}
-    className={classnames({ [styles.disabled]: props.disabled }, styles.btn)}
-    id={props.id}
-  >
-    {props.children}
-  </button>
+    onClick={!disabled && onClick}
+    className={classnames({ [styles.disabled]: disabled }, styles.btn, className)}
+    {...otherProps}
+  />
 )
 
 Button.propTypes = {

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { editIngredient, editModeIngredientGroup } from '../actions'
+import { editIngredient, editModeIngredientGroup, deleteIngredient } from '../actions'
 import { selectors } from '../reducers'
 import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
 
@@ -10,6 +10,7 @@ export default connect(
   }),
   {
     onSave: editIngredient,
-    onCancel: () => editModeIngredientGroup(null) // call with no args
+    onCancel: () => editModeIngredientGroup(null), // call with no args
+    onDelete: groupId => deleteIngredient({groupId})
   }
 )(IngredientPropertiesForm)

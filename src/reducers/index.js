@@ -45,9 +45,10 @@ const selectedContainer = handleActions({
 }, null)
 
 const selectedIngredientGroup = handleActions({
+  EDIT_MODE_INGREDIENT_GROUP: (state, action) => action.payload, // selected ingredient group to edit
   OPEN_INGREDIENT_SELECTOR: (state, action) => null,
-  EDIT_MODE_INGREDIENT_GROUP: (state, action) => action.payload,
   EDIT_INGREDIENT: (state, action) => null, // unselect ingredient group when edited.
+  DELETE_INGREDIENT: (state, action) => null, // unselect ingredient group when deleted.
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
@@ -286,13 +287,15 @@ const selectedIngredientGroupId = createSelector(
 const _selectedIngredientGroupObj = createSelector(
   selectedIngredientGroupId,
   allIngredients,
-  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId] || null
+  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
+    ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
+    : null
 )
 
 const selectedIngredientProperties = createSelector(
   _selectedIngredientGroupObj,
   ingredGroup => (!isNil(ingredGroup))
-    ? pick(ingredGroup, ['name', 'volume', 'concentration', 'description', 'individualize'])
+    ? pick(ingredGroup, ['name', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
     : null
 )
 

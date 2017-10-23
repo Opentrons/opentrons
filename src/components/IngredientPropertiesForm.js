@@ -1,11 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styles from '../css/style.css'
+import styles from './IngredientPropertiesForm.css'
 
 import Button from './Button.js'
 
 const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...otherProps}) => {
-  return <input
+  const ElementType = (otherProps.type === 'textarea')
+    ? 'textarea'
+    : 'input'
+
+  return <ElementType
     id={accessor}
     checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
     value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
@@ -64,7 +68,7 @@ class IngredientPropertiesForm extends React.Component {
   }
 
   render () {
-    const { numWellsSelected, onSave, onCancel, selectedIngredientProperties } = this.props
+    const { numWellsSelected, onSave, onCancel, onDelete, selectedIngredientProperties } = this.props
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
     if (!selectedIngredientProperties && numWellsSelected <= 0) {
@@ -89,37 +93,40 @@ class IngredientPropertiesForm extends React.Component {
             <label>Name</label>
             <Field accessor='name' />
           </span>
-          <span>
-            <label>Volume</label> (µL)
+          <span className={styles.checkbox}>
+            <Field accessor='individualize' type='checkbox' />
+            <label>Serialize Name (ie, Sample 1, Sample 2, Sample 2...)</label>
+          </span>
+          <span className={styles.halfWidth}>
+            <label>Volume (µL)</label>
             <Field numeric accessor='volume' />
           </span>
-          <span>
-            <label>Description</label>
-            <Field accessor='description' />
-          </span>
-          <span>
-            <label>Concentration</label>
+          <span className={styles.halfWidth}>
+            <label>Concentration (%)</label>
             <Field numeric accessor='concentration' />
           </span>
           <span>
-            <label>Individualize</label>
-            <Field accessor='individualize' type={'checkbox'} />
+            <label>Description</label>
+            <Field accessor='description' type='textarea' />
           </span>
         </form>
 
-        <div className={styles.ingredientPropRightSide}>
+        {/* selectedIngredientProperties &&
+          <div><label>Editing: "{selectedIngredientProperties.name}"</label></div> */}
 
-          {selectedIngredientProperties &&
-            <div><label>Editing: "{selectedIngredientProperties.name}"</label></div>}
+        {/* <span>
+          <label>Color Swatch</label>
+          <div className={styles.circle} style={{backgroundColor: 'red'}} />
+        </span> */}
 
-          {/* <span>
-            <label>Color Swatch</label>
-            <div className={styles.circle} style={{backgroundColor: 'red'}} />
-          </span> */}
-
-          <Button /* disabled={TODO: validate input here} */ onClick={e => onSave(this.state.input)}>Save</Button>
-          <button onClick={onCancel}>Cancel</button>
-        </div>
+        <Button /* disabled={TODO: validate input here} */ onClick={e => onSave(this.state.input)}>Save</Button>
+        <Button onClick={onCancel}>Cancel</Button>
+        {selectedIngredientProperties && selectedIngredientProperties.groupId &&
+          <Button className={styles.deleteIngred} onClick={() =>
+            window.confirm('Are you sure you want to delete all ingredients in this group?') &&
+            onDelete(selectedIngredientProperties.groupId)
+          }>Delete Ingredient</Button>
+        }
       </div>
     )
   }
@@ -128,12 +135,14 @@ class IngredientPropertiesForm extends React.Component {
 IngredientPropertiesForm.propTypes = {
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
   numWellsSelected: PropTypes.number.isRequired,
 
   selectedIngredientProperties: PropTypes.shape({
     name: PropTypes.string,
     volume: PropTypes.number,
-    description: PropTypes.string
+    description: PropTypes.string,
+    groupId: PropTypes.string
   })
 }
 
