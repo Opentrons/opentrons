@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 
 import { selectors } from '../reducers'
-import { editModeIngredientGroup, deleteIngredientGroup } from '../actions'
+import { editModeIngredientGroup, deleteIngredient } from '../actions'
 
 import IngredientsList from '../components/IngredientsList.js'
 
@@ -14,11 +14,12 @@ export default connect(
       slotName: activeModals.ingredientSelection.slotName,
       containerName: container.name,
       containerType: container.type,
-      ingredients: selectors.ingredientsForContainer(state)
+      ingredients: selectors.ingredientsForContainer(state),
+      selectedIngredientGroupId: selectors.selectedIngredientGroupId(state)
     }
   },
   {
     editModeIngredientGroup,
-    deleteIngredientGroup
+    deleteIngredient
   }
 )(IngredientsList)

@@ -5,83 +5,62 @@ import styles from './IngredientsList.css'
 import { swatchColors } from '../constants.js'
 import { humanize } from '../utils.js'
 
-const IngredGroupCard = ({ingredCategoryData, editModeIngredientGroup, deleteIngredientGroup, ...otherProps}) => {
-  const { groupId } = ingredCategoryData
-
-  if (ingredCategoryData.wells.length === 1) {
-    // Single ingredient, card is rendered differently
-    return (
-      <div className={styles.singleIngred} >
-        <IngredIndividual
-          canDelete
-          name={ingredCategoryData.name}
-          wellName={ingredCategoryData.wells[0]}
-          volume={ingredCategoryData.volume}
-          concentration={ingredCategoryData.concentration}
-          {...{groupId, editModeIngredientGroup, deleteIngredientGroup}}
-          {...otherProps} />
-      </div>
-    )
+class IngredGroupCard extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {isExpanded: true}
   }
 
-  return (
-    <section>
-      <label>
-        <div className={styles.circle} style={{backgroundColor: swatchColors(groupId)}} />
-        <div className={styles.ingredLabel}>{ingredCategoryData.name}</div>
-        <div>{ingredCategoryData.wells.length} Wells</div>
-      </label>
+  toggleAccordion = () => this.setState({isExpanded: !this.state.isExpanded})
 
-      {ingredCategoryData.individualize
-          // Is individualize, allow 'wellDetails' values to override
-          ? ingredCategoryData.wells.map((wellName, i) =>
-            <IngredIndividual key={i}
-              name={get(ingredCategoryData, ['wellDetails', wellName, 'name'], `Sample ${i + 1}`)}
-              wellName={wellName}
-              volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
-              concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
-              {...{groupId, editModeIngredientGroup, deleteIngredientGroup}}
-            />
-          )
-          // Not individualize, but multiple wells
-          : <div className={styles.ingredientInlineDetail}>
-            {ingredCategoryData.wells.map((wellName, i) =>
-              <div key={i}>
-                <label>{wellName}</label>
-                <input placeholder={ingredCategoryData.volume + ' uL'} />
-              </div>
-            )}
-          </div>
-      }
+  render () {
+    const {ingredCategoryData, editModeIngredientGroup, deleteIngredient, selected, ...otherProps} = this.props
+    const { groupId } = ingredCategoryData
+    const { isExpanded } = this.state
 
-      <footer>
-        <div className={styles.editButton} onClick={e => editModeIngredientGroup({groupId})}>EDIT</div>
-        <div>▼</div>
-        <div className={styles.deleteIngredient} onClick={e => deleteIngredientGroup({groupId})}>✕</div>
-      </footer>
-    </section>
-  )
+    return (
+      <section {...otherProps} className={selected && styles.selected}>
+        <label>
+          <div onClick={() => this.toggleAccordion()} className={styles.arrowDropdown}>{isExpanded ? '▼' : '►'}</div>
+          <div className={styles.circle} style={{backgroundColor: swatchColors(groupId)}} />
+          <div className={styles.ingredLabel}>{ingredCategoryData.name}</div>
+          {/* <div>{ingredCategoryData.wells.length} Wells</div> */}
+          <div className={styles.editButton} onClick={e => editModeIngredientGroup({groupId})}>EDIT</div>
+        </label>
+
+        {isExpanded && ingredCategoryData.wells.map((wellName, i) =>
+          <IngredIndividual key={i}
+            name={get(ingredCategoryData, ['wellDetails', wellName, 'name'], `Sample ${i + 1}`)}
+            wellName={wellName}
+            canDelete
+            volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
+            concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
+            {...{groupId, editModeIngredientGroup, deleteIngredient}}
+          />
+        )}
+      </section>
+    )
+  }
 }
 
-const IngredIndividual = ({name, wellName, volume, concentration, canDelete, groupId, editModeIngredientGroup, deleteIngredientGroup, ...otherProps}) => (
+const IngredIndividual = ({name, wellName, volume, concentration, canDelete, groupId, editModeIngredientGroup, deleteIngredient, ...otherProps}) => (
   <div {...otherProps}
     className={styles.ingredientInstanceItem}
     style={{'--swatch-color': swatchColors(groupId)}}
   >
-    <div className={styles.leftPill}>
-      <label>{name}</label>
-      <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button>
-    </div>
-    <div className={styles.rightPill}>
-      <input placeholder={wellName} />
-      <input placeholder={volume + ' uL'} />
-      <input placeholder={concentration === null ? '-' : concentration + '%'} />
-      {canDelete && <div className={styles.deleteIngredient} onClick={e => deleteIngredientGroup({wellName, groupId})}>✕</div>}
-    </div>
+    <div>{wellName}</div>
+    <div>{name}</div>
+    <div>{volume + 'uL'}</div>
+    {/* <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
+    <div>{concentration === null ? '-' : concentration + '%'}</div>
+    {canDelete && <div className={styles.deleteIngredient} onClick={
+        e => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
+        deleteIngredient({wellName, groupId})
+      }>✕</div>}
   </div>
 )
 
-const IngredientsList = ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredientGroup}) => (
+const IngredientsList = ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) => (
   <div className={styles.ingredientsList}>
     <div className={styles.ingredListHeaderLabel}>
       <div>Slot {slotName}</div>
@@ -93,7 +72,12 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients, e
     </div>
 
     {ingredients.map((ingredCategoryData, i) =>
-      <IngredGroupCard key={i} {...{editModeIngredientGroup, deleteIngredientGroup, ingredCategoryData}} />)
+      <IngredGroupCard key={i} {...{
+        editModeIngredientGroup,
+        deleteIngredient,
+        ingredCategoryData,
+        selected: selectedIngredientGroupId === ingredCategoryData.groupId
+      }} />)
     }
 
   </div>

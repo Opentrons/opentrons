@@ -18,6 +18,11 @@ label {
   display: block;
 }
 
+.arrowDropdown {
+  color: black;
+  margin-right: 0.5rem;
+}
+
 .ingredListHeaderLabel {
   border-bottom: 1px solid gray;
   display: flex;
@@ -41,9 +46,13 @@ label {
 
 .ingredientsList section {
   margin: 12pt;
-  box-shadow: 0px 0px 10px 3px darkgrey;
-  border-radius: 3px;
+  /*box-shadow: 0px 0px 10px 3px darkgrey;*/
+  border-radius: 0;
   padding: 0.2em 1em;
+}
+
+.ingredientsList section.selected {
+  border: 1rem solid skyblue;
 }
 
 .ingredientsList section > label {
@@ -73,7 +82,8 @@ label {
 }
 
 .editButton {
-  color: darkgray;
+  color: gray;
+  font-weight: bold;
   border-color: gray;
   font-size: inherit;
   margin: 1px;
@@ -148,7 +158,7 @@ label {
 
 /* ------- */
 
-.leftPill {
+/*.leftPill {
   padding: 2px 0 2px 0.5rem;
   background-color: lightgray;
   border-top-right-radius: 0;
@@ -169,15 +179,28 @@ label {
 .innerList {
   overflow-y: scroll;
   height: 15vh;
-}
+}*/
 
 /* ------- */
 
 .ingredientInstanceItem {
   display: flex;
-  width: 100%;
+  /*width: 100%;
   padding-top: 2px;
-  padding-bottom: 2px;
+  padding-bottom: 2px;*/
+  flex-direction: row;
+  justify-content: space-between;
+  border-radius: 0;
+  padding: 0.25rem;
+}
+
+.ingredientInstanceItem:nth-child(odd) {
+  background-color: #eee;
+}
+
+.ingredientInstanceItem div:first-child {
+  margin-left: 0.5rem;
+  color: gray;
 }
 
 .ingredientInstanceItem input {

@@ -72,10 +72,9 @@ const LabwareContainer = ({
             <input id={containerNameInputId}
               placeholder={humanize(containerType)}
               // Quick HACK to have enter key submit the rename action
-              onKeyDown={e => {
-                console.log(e.key, e.target.value)
+              onKeyDown={e =>
                 e.key === 'Enter' && modifyContainer({containerId, modify: {name: e.target.value}})
-              }}
+              }
             />
             {/* HACK: using id selector instead of stateful input field... */}
             <div className={styles.btn} onClick={() => modifyContainer(

@@ -132,7 +132,21 @@ const ingredients = handleActions({
     }
   },
   // Remove the deleted group (referenced by array index)
-  DELETE_INGREDIENT_GROUP: (state, action) => pickBy(state, (value, key) => key !== action.payload.groupId)
+  DELETE_INGREDIENT: (state, action) => {
+    const { wellName, groupId, containerId } = action.payload
+    return (wellName)
+      ? {
+        ...state,
+        [groupId]: {
+          ...state[groupId],
+          locations: {
+            ...state[groupId].locations,
+            [containerId]: state[groupId].locations[containerId].filter(well => well !== wellName)
+          }
+        }
+      }
+      : pickBy(state, (value, key) => key !== groupId)
+  }
 }, {})
 
 const rootReducer = combineReducers({
