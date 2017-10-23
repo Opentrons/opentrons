@@ -38,14 +38,14 @@ def test_command_tree():
             'description': 'A',
             'id': 0,
             'children': [{
-                    'description': 'B',
-                    'id': 1,
-                    'children': [{
-                                'description': 'C',
-                                'id': 2,
-                                'children': []
-                            }]
-                    }]
+                'description': 'B',
+                'id': 1,
+                'children': [{
+                    'description': 'C',
+                    'id': 2,
+                    'children': []
+                }]
+            }]
         },
         {
             'description': 'D',

@@ -17,10 +17,10 @@ def labware_setup():
         [containers.load('96-PCR-flat', slot, slot) for slot in ['B1', 'B2']]
 
     p100 = instruments.Pipette(
-        name='p100', axis='a', channels=8, tip_racks=tip_racks)
+        name='p100', mount='right', channels=8, tip_racks=tip_racks)
 
     p1000 = instruments.Pipette(
-        name='p1000', axis='b', channels=8, tip_racks=tip_racks)
+        name='p1000', mount='left', channels=8, tip_racks=tip_racks)
 
     commands = [
         {
@@ -73,7 +73,7 @@ async def test_load_protocol_with_error(session_manager):
     exception = args['error']
 
     assert datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
-    assert type(exception) == NameError
+    assert isinstance(exception, NameError)
     assert str(exception) == "name 'blah' is not defined"
 
 
@@ -82,7 +82,7 @@ async def test_load_and_run(main_router, session_manager, protocol):
     assert main_router.notifications.queue.qsize() == 0
     assert session.command_log == {}
     assert session.state == 'loaded'
-    session.run(devicename='Virtual Smoothie')
+    session.run()
     assert len(session.command_log) == 105
 
     res = []
@@ -101,7 +101,7 @@ async def test_load_and_run(main_router, session_manager, protocol):
         'Run should emit state change to "running" and then to "finished"'
     assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
-    session.run(devicename='Virtual Smoothie')
+    session.run()
     assert len(session.command_log) == 105, \
         "Clears command log on the next run"
 

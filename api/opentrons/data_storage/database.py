@@ -9,7 +9,6 @@ database_path = environment.get_path('DATABASE_FILE')
 # ======================== Private Functions ======================== #
 
 
-# FIXME: (JG 9/19/17) This zip() return is just code smell due to Vector class
 def _parse_container_obj(container: Container):
     return dict(zip('xyz', container._coordinates))
 
@@ -81,7 +80,7 @@ def _delete_container_object_in_db(db, container_name: str):
 def _create_well_obj_in_db(db, container_name: str, well: Well):
     well_data = _parse_well_obj(well)
     db_queries.insert_well_into_db(
-            db_conn=db, container_name=container_name, **well_data
+        db_conn=db, container_name=container_name, **well_data
     )
 
 

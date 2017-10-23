@@ -1,5 +1,5 @@
 from opentrons.broker import subscribe, Notifications
-
+from opentrons import robot
 from .session import SessionManager, Session
 from .calibration import CalibrationManager
 
@@ -7,6 +7,10 @@ from .calibration import CalibrationManager
 class MainRouter:
     def __init__(self, loop=None):
         self._notifications = Notifications(loop=loop)
+
+        # TODO (artyom 20171005): once connect/simulate sequence for the robot
+        # is refined, consider moving this elsewhere
+        robot.connect()
 
         self._unsubscribe = []
         self._unsubscribe += [subscribe(

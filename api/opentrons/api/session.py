@@ -7,7 +7,6 @@ from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container
 from opentrons.commands import tree, types
 from opentrons import robot
-from opentrons.robot.robot import Robot
 
 from .models import Container, Instrument
 
@@ -18,7 +17,6 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
-        self.robot = Robot()
 
     def create(self, name, text):
         self.session = Session(name=name, text=text)
@@ -111,11 +109,15 @@ class Session(object):
         unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
+            # TODO (artyom, 20171005): this will go away
+            # once robot / driver simulation flow is fixed
+            robot._driver.disconnect()
             exec(self._protocol, {})
         except Exception as e:
             self.error_append(e)
             raise e
         finally:
+            robot._driver.connect()
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands
@@ -160,7 +162,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self, devicename):
+    def run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -169,9 +171,9 @@ class Session(object):
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
         self.set_state('running')
-        robot.connect(devicename)
 
         try:
+            robot.home()
             exec(self._protocol, {})
         except Exception as e:
             self.error_append(e)
@@ -179,7 +181,6 @@ class Session(object):
         finally:
             _unsubscribe()
             self.set_state('finished')
-            robot.disconnect()
 
         return self
 
@@ -209,9 +210,7 @@ class Session(object):
         self._on_state_changed()
 
     def _reset(self):
-        # HACK: hard reset singleton by replacing all of it's attributes
-        # with the one from a newly constructed robot
-        robot.__dict__ = {**Robot().__dict__}
+        robot.reset()
         self.clear_logs()
 
     # TODO (artyom, 20171003): along with calibration, consider extracting this

@@ -1,6 +1,6 @@
 from copy import copy
 
-from opentrons.robot.robot import Robot
+from opentrons import robot
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
 
@@ -15,8 +15,7 @@ class CalibrationManager:
 
     def __init__(self, loop=None):
         self._loop = loop
-        self._robot = Robot()
-
+        self._robot = robot
         self.state = None
 
     def _set_state(self, state):
@@ -28,7 +27,8 @@ class CalibrationManager:
 
     def tip_probe(self, instrument):
         self._set_state('probing')
-        calibration_functions.probe_instrument(instrument, self._robot)
+        calibration_functions.probe_instrument(
+            instrument._instrument, self._robot)
         self._set_state('ready')
 
     def move_to_front(self, instrument):
@@ -45,20 +45,26 @@ class CalibrationManager:
                 .format(type(obj)))
 
         self._set_state('moving')
+        print("MOVING TO: {}".format(obj._container[0]))
         instrument._instrument.move_to(obj._container[0])
         self._set_state('ready')
 
-    def jog(self, instrument, coordinates):
+    def jog(self, instrument, distance, axis):
         self._set_state('moving')
-        instrument._instrument.jog(coordinates)
+        calibration_functions.jog_instrument(
+            instrument=instrument._instrument,
+            distance=distance,
+            axis=axis,
+            robot=self._robot
+        )
         self._set_state('ready')
 
     def update_container_offset(self, container, instrument):
         self._robot.calibrate_container_with_instrument(
-                container=container._container,
-                instrument=instrument._instrument,
-                save=True
-            )
+            container=container._container,
+            instrument=instrument._instrument,
+            save=True
+        )
 
     # TODO (artyom, 20171003): along with session, consider extracting this
     # into abstract base class or find any other way to keep notifications

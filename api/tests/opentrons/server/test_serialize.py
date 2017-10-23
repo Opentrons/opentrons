@@ -24,10 +24,10 @@ def instance():
     a3 = A({})
 
     root = A({
-                'a': a1,
-                'b': [a2, 'b', 1],
-                'c': {'a': 1, 'b': [1, 2, a3]},
-            })
+        'a': a1,
+        'b': [a2, 'b', 1],
+        'c': {'a': 1, 'b': [1, 2, a3]},
+    })
     root.update({'circular': root})
 
     return (root, a1, a2, a3)
@@ -113,6 +113,6 @@ def test_ordered_dict():
         'i': id(a),
         't': type_id(a),
         'v': {'a': {
-                'i': id(b),
-                't': type_id(b),
-                'v': {'b': 1}}}}
+            'i': id(b),
+            't': type_id(b),
+            'v': {'b': 1}}}}
