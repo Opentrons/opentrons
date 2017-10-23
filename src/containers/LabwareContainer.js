@@ -68,15 +68,26 @@ const LabwareContainer = ({
         <div className={styles.containerOverlay}>
 
           {!hasName && <div className={styles.containerOverlayNameIt}>
-            <label>Name:</label>
-            <input id={containerNameInputId} placeholder={humanize(containerType)} />
-            <div onClick={() => modifyContainer({
-              containerId,
-              modify: {name: document.getElementById(containerNameInputId).value}})}>‎✔</div>
-            <div onClick={() => modifyContainer({
-              containerId,
-              modify: {name: humanize(containerType)}})}>‎✕</div>
-          </div>}
+            <label>Name this labware:</label>
+            <input id={containerNameInputId}
+              placeholder={humanize(containerType)}
+              // Quick HACK to have enter key submit the rename action
+              onKeyDown={e => {
+                console.log(e.key, e.target.value)
+                e.key === 'Enter' && modifyContainer({containerId, modify: {name: e.target.value}})
+              }}
+            />
+            {/* HACK: using id selector instead of stateful input field... */}
+            <div className={styles.btn} onClick={() => modifyContainer(
+              {
+                containerId,
+                modify: {
+                  name: document.getElementById(containerNameInputId).value || humanize(containerType)
+                }
+              }
+            )}>Save</div>
+            </div>
+          }
 
           {canAddIngreds && <div className={styles.containerOverlayAddIngred} onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
             Add Ingredients

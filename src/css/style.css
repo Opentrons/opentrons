@@ -43,7 +43,7 @@ input, textarea {
   border: 1px solid gray;
 }
 
-button {
+button, .btn {
   font-size: 24pt;
   color: lightgray;
   text-transform: uppercase;
@@ -54,12 +54,12 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button:hover, .btn:hover {
   background-color: lightgray;
   color: white;
 }
 
-button.disabled {
+button.disabled, .btn.disabled {
   background-color: #EEE;
   color: lightgray;
   cursor: default;
@@ -181,11 +181,16 @@ textarea {
   composes: overlay;
   z-index: 100;
   color: lightgray;
-  text-transform: uppercase;
+}
+
+.containerOverlay label {
+  color: white;
+  text-transform: none;
 }
 
 .containerOverlay > * {
   visibility: hidden;
+  margin: 1rem;
 }
 
 .containerOverlay:hover {
@@ -196,10 +201,6 @@ textarea {
   visibility: visible;
   margin-top: 40pt;
   cursor: pointer;
-}
-
-.containerOverlay > *:hover {
-  font-weight: bold;
 }
 
 .containerOverlayAddIngred::after {
