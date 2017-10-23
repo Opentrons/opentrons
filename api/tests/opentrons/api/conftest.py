@@ -42,9 +42,9 @@ def model():
     container = models.Container(plate)
 
     return namedtuple('model', 'instrument container')(
-            instrument=instrument,
-            container=container
-        )
+        instrument=instrument,
+        container=container
+    )
 
 
 @pytest.fixture

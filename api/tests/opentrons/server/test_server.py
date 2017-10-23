@@ -128,22 +128,22 @@ async def test_get_object_by_id(session, root):
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': {
-                    'i': type_id(session.server.root),
-                    't': id(type),
-                    'v': {
-                        'STATIC',
-                        'value',
-                        'throw',
-                        'next',
-                        'combine',
-                        'add'
-                       }
-                    }
-                }
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': {
+        'i': type_id(session.server.root),
+        't': id(type),
+        'v': {
+            'STATIC',
+            'value',
+            'throw',
+            'next',
+            'combine',
+            'add'
+        }
+    }
+    }
     # We care only about dictionary keys, since we don't want
     # to track ids of function objects
     res['data']['v'] = set(res['data']['v'])
@@ -164,10 +164,10 @@ async def test_call_on_result(session, root):
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 0}
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': 0}
     assert res == expected
 
     await session.call(
@@ -179,10 +179,10 @@ async def test_call_on_result(session, root):
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 1}
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': 1}
 
     assert res == expected
 
@@ -200,10 +200,10 @@ async def test_exception_on_call(session, root):
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'error',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 'Exception: Kaboom!'}
+        'token': session.token,
+        'status': 'error',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': 'Exception: Kaboom!'}
 
     assert res == expected
 
@@ -240,13 +240,13 @@ async def test_call_on_reference(session, root):
     assert foo_id != new_foo_id
 
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': {
-                    # i was popped out above
-                    't': type_id(root),
-                    'v': {'value': 1}}}
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': {
+        # i was popped out above
+        't': type_id(root),
+        'v': {'value': 1}}}
     assert res == expected
 
 

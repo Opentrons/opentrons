@@ -73,7 +73,7 @@ async def test_load_protocol_with_error(session_manager):
     exception = args['error']
 
     assert datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
-    assert type(exception) == NameError
+    assert isinstance(exception, NameError)
     assert str(exception) == "name 'blah' is not defined"
 
 

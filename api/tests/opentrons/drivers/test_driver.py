@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture
 def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import \
-         SmoothieDriver_3_0_0 as SmoothieDriver
+        SmoothieDriver_3_0_0 as SmoothieDriver
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     driver = SmoothieDriver()

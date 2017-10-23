@@ -4,9 +4,10 @@ from functools import partial
 
 state = partial(state, 'calibration')
 
+
 async def test_tip_probe(main_router, model):
     with mock.patch(
-         'opentrons.util.calibration_functions.probe_instrument') as patch:
+            'opentrons.util.calibration_functions.probe_instrument') as patch:
         main_router.calibration_manager.tip_probe(model.instrument)
         patch.assert_called_with(
             model.instrument._instrument,
@@ -71,9 +72,9 @@ async def test_update_container_offset(main_router, model):
             main_router.calibration_manager._robot,
             'calibrate_container_with_instrument') as call:
         main_router.calibration_manager.update_container_offset(
-                model.container,
-                model.instrument
-            )
+            model.container,
+            model.instrument
+        )
         call.assert_called_with(
             container=model.container._container,
             instrument=model.instrument._instrument,

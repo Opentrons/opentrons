@@ -3,7 +3,7 @@ import pytest
 from opentrons.util import calibration_functions as cf
 from opentrons.instruments import Pipette
 from opentrons.containers import load as containers_load
-from opentrons.trackers.pose_tracker import Pose, PoseTracker
+from opentrons.trackers.pose_tracker import Pose
 from opentrons.robot.robot import Robot
 from opentrons.util.vector import Vector
 
@@ -157,7 +157,8 @@ def test_relative_object_position(plate, p200, robot):
 
 
 def test_get_object_ancestors(robot, plate):
-    ps = robot.pose_tracker  # type: PoseTracker
-    ancestors = ps._get_transform_sequence(plate[2])  # find ancestor posess of arbitrary well
-    assert ancestors == [ps[robot._deck], ps[robot._deck['A1']], ps[plate], ps[plate[2]]]
-    
+    ps = robot.pose_tracker
+    # find ancestor posess of arbitrary well
+    ancestors = ps._get_transform_sequence(plate[2])
+    assert ancestors == [ps[robot._deck],
+                         ps[robot._deck['A1']], ps[plate], ps[plate[2]]]

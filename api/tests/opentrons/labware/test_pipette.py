@@ -897,70 +897,70 @@ class PipetteTest(unittest.TestCase):
             gradient=lambda x: 1.0 - x
         )
 
-        expected = \
-            ['Distributing (10, 80) from <Well A1> to <WellSeries: <Well A2><Well B2><Well '
-             'C2><Well D2><Well E2><Well F2><Well G2><Well H2>>',
-             'Transferring (10, 80) from <Well A1> to <WellSeries: <Well A2><Well B2><Well '
-             'C2><Well D2><Well E2><Well F2><Well G2><Well H2>>',
-             'Picking up tip None',
-             'Aspirating 160.0 uL from <Well A1> at 1 speed',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well A2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 80.0 uL into <Well A2>',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well B2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 70.0 uL into <Well B2>',
-             'Blowing out at <Well A1>',
-             'Touching tip',
-             'Aspirating 160.0 uL from <Well A1> at 1 speed',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well C2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 60.0 uL into <Well C2>',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well D2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 50.0 uL into <Well D2>',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well E2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 40.0 uL into <Well E2>',
-             'Blowing out at <Well A1>',
-             'Touching tip',
-             'Aspirating 70.0 uL from <Well A1> at 1 speed',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well F2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 30.0 uL into <Well F2>',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well G2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 20.000000000000004 uL into <Well G2>',
-             'Air gap',
-             'Aspirating 20 uL from None at 1.0 speed',
-             'Touching tip',
-             'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well H2>, (x=3.20, '
-             'y=3.20, z=15.50))',
-             'Dispensing 10.0 uL into <Well H2>',
-             'Blowing out at <Well A1>',
-             'Touching tip',
-             'Dropping tip None']
+        expected = [
+            'Distributing (10, 80) from <Well A1> to <WellSeries: <Well A2><Well B2><Well '
+            'C2><Well D2><Well E2><Well F2><Well G2><Well H2>>',
+            'Transferring (10, 80) from <Well A1> to <WellSeries: <Well A2><Well B2><Well '
+            'C2><Well D2><Well E2><Well F2><Well G2><Well H2>>',
+            'Picking up tip None',
+            'Aspirating 160.0 uL from <Well A1> at 1 speed',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well A2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 80.0 uL into <Well A2>',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well B2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 70.0 uL into <Well B2>',
+            'Blowing out at <Well A1>',
+            'Touching tip',
+            'Aspirating 160.0 uL from <Well A1> at 1 speed',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well C2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 60.0 uL into <Well C2>',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well D2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 50.0 uL into <Well D2>',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well E2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 40.0 uL into <Well E2>',
+            'Blowing out at <Well A1>',
+            'Touching tip',
+            'Aspirating 70.0 uL from <Well A1> at 1 speed',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well F2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 30.0 uL into <Well F2>',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well G2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 20.000000000000004 uL into <Well G2>',
+            'Air gap',
+            'Aspirating 20 uL from None at 1.0 speed',
+            'Touching tip',
+            'Dispensing 20 uL into (<Deck><Slot A2><Container 96-flat><Well H2>, (x=3.20, '
+            'y=3.20, z=15.50))',
+            'Dispensing 10.0 uL into <Well H2>',
+            'Blowing out at <Well A1>',
+            'Touching tip',
+            'Dropping tip None']
 
     def test_transfer_mix(self):
         self.p200.reset()

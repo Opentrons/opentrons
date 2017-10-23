@@ -7,7 +7,6 @@ from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container
 from opentrons.commands import tree, types
 from opentrons import robot
-from opentrons.robot.robot import Robot
 
 from .models import Container, Instrument
 

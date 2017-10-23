@@ -74,24 +74,24 @@ class IPythonConsoleLexer(Lexer):
                 insertions.append((len(curcode),
                                    [(0, Comment, line)]))
             elif input_prompt is not None:
-                insertions.append((len(curcode),
-                                   [(0, Generic.Prompt, input_prompt.group())]))
+                insertions.append(
+                    (len(curcode), [(0, Generic.Prompt, input_prompt.group())]))
                 curcode += line[input_prompt.end():]
             elif continue_prompt is not None:
-                insertions.append((len(curcode),
-                                   [(0, Generic.Prompt, continue_prompt.group())]))
+                insertions.append(
+                    (len(curcode), [(0, Generic.Prompt, continue_prompt.group())]))
                 curcode += line[continue_prompt.end():]
             elif output_prompt is not None:
                 # Use the 'error' token for output.  We should probably make
                 # our own token, but error is typicaly in a bright color like
                 # red, so it works fine for our output prompts.
-                insertions.append((len(curcode),
-                                   [(0, Generic.Error, output_prompt.group())]))
+                insertions.append(
+                    (len(curcode), [(0, Generic.Error, output_prompt.group())]))
                 curcode += line[output_prompt.end():]
             else:
                 if curcode:
-                    for item in do_insertions(insertions,
-                                              pylexer.get_tokens_unprocessed(curcode)):
+                    for item in do_insertions(
+                            insertions, pylexer.get_tokens_unprocessed(curcode)):
                         yield item
                         curcode = ''
                         insertions = []
@@ -110,6 +110,7 @@ def setup(app):
     # sphinx, by all means fix it here.  At least having this setup.py
     # suppresses the sphinx warning we'd get without it.
     pass
+
 
 #-----------------------------------------------------------------------------
 # Register the extension as a valid pygments lexer

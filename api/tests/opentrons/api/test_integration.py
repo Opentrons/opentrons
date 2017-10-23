@@ -35,8 +35,6 @@ async def test_load_probe_run(main_router, protocol, protocol_file):
 
 @pytest.mark.parametrize('protocol_file', ['bradford_assay.py'])
 async def test_load_jog_save_run(main_router, protocol, protocol_file):
-    driver = robot._driver
-
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
     await main_router.wait_until(state('session', 'loaded'))

@@ -1,13 +1,10 @@
 import os
 from threading import Event
 
-
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from . import gantry
 
 import opentrons.util.calibration_functions as calib
-import opentrons.util.pose_functions as pos_funcs
-
 
 from opentrons import containers, drivers
 from opentrons.containers import Container
@@ -23,8 +20,9 @@ log = get_logger(__name__)
 # DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
 
 
-DECK_OFFSET = {'x': -31.45, 'y':-20.1, 'z':0} # Avagadro
+DECK_OFFSET = {'x': -31.45, 'y': -20.1, 'z': 0}  # Avagadro
 MAX_INSTRUMENT_HEIGHT = 227.0000
+
 
 class InstrumentMosfet(object):
     """
@@ -63,6 +61,7 @@ class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
+
     def __init__(self, this_robot, axis):
         self.robot = this_robot
         self.axis = axis
@@ -166,8 +165,6 @@ class Robot(object):
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
         self.dimensions = (395, 345, 228)
 
-
-
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.can_pop_command = Event()
@@ -196,8 +193,6 @@ class Robot(object):
         # self._driver = drivers.get_virtual_driver()
         # self.disconnect()
         self.arc_height = 5
-
-
 
         # self.set_connection('simulate')
 
@@ -241,7 +236,6 @@ class Robot(object):
         self.gantry = gantry.Gantry(self._driver, self.pose_tracker)
         self.pose_tracker.create_root_object(self.gantry, x=0, y=0, z=0)
         self.gantry._setup_mounts()
-
 
     def add_instrument(self, mount, instrument):
         """
@@ -408,7 +402,7 @@ class Robot(object):
         self._driver.move(*args, **kwargs)
         self.gantry._publish_position()
 
-    #DEPRECATED
+    # DEPRECATED
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -478,7 +472,9 @@ class Robot(object):
         target = self.pose_tracker[placeable].position + offset.coordinates
         print('[ROBOT] using offset of {}'.format(offset))
 
-        print('[ROBOT] moving to {} at coordinates {}'.format(placeable, target))
+        print(
+            '[ROBOT] moving to {} at coordinates {}'.format(
+                placeable, target))
 
         other_instrument = {instrument} ^ set(self._instruments.values())
         if not len(other_instrument) == 0:
@@ -510,9 +506,7 @@ class Robot(object):
 
         travel_height = self.max_deck_height() + self.arc_height
 
-
-
-        _, _, robot_max_z = self.dimensions #TODO: Check what this does
+        _, _, robot_max_z = self.dimensions  # TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
 
@@ -523,7 +517,9 @@ class Robot(object):
             {'x': destination[0], 'y': destination[1]},
             {'z': arrival_z}
         ]
-        print("[Arc Strategy] up to {}, across to {}, down to {}".format(*strategy))
+        print(
+            "[Arc Strategy] up to {}, across to {}, down to {}".format(
+                *strategy))
         return strategy
 
     # DEPRECATED
@@ -548,8 +544,7 @@ class Robot(object):
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
-
-    #DEPRECATED
+    # DEPRECATED
     def disconnect(self):
         """
         Disconnects from the robot.
@@ -559,9 +554,6 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-
-
-
 
     def get_deck_slot_types(self):
         return 'slots'
@@ -680,20 +672,18 @@ class Robot(object):
             container.parent, container, *container._coordinates
         )
 
-
-
         for well in container:
-            center_x, center_y, _ = well.top()[1] #TODO JG 10/6/17: Stop tracking wells inconsistently
+            # TODO JG 10/6/17: Stop tracking wells inconsistently
+            center_x, center_y, _ = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
-
 
             self.pose_tracker.track_object(
                 container,
                 well,
                 **{
-                    'x':offset_x + center_x,
-                    'y':offset_y + center_y,
-                    'z':offset_z
+                    'x': offset_x + center_x,
+                    'y': offset_y + center_y,
+                    'z': offset_z
                 }
             )
 

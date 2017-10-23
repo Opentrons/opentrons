@@ -1,25 +1,25 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
 
-'''
+"""
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
   communications
 
-- Driver is NOT responsible interpreting the motions in any way or knowing anything
-  about what the axes are used for
-'''
+- Driver is NOT responsible interpreting the motions in any way or knowing
+  anything about what the axes are used for
+"""
 
 # DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38' #Avagdro
 
-DEFAULT_STEPS_PER_MM = 'M92 X160 Y160 Z800 A800 B767.38 C767.38' #Ibn
+DEFAULT_STEPS_PER_MM = 'M92 X160 Y160 Z800 A800 B767.38 C767.38'  # Ibn
 
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X500 Y300 Z50 A50 B70 C8'
 DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000'
 DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.6 C0.6'
 
 
-AXES_SAFE_TO_HOME = 'XZABC' # Y cannot be homed without homing all
+AXES_SAFE_TO_HOME = 'XZABC'  # Y cannot be homed without homing all
 AXES = 'XYZABC'
 
 SEC_PER_MIN = 60
@@ -85,22 +85,19 @@ class SmoothieDriver_3_0_0:
             position_response = self._send_command(GCODES['CURRENT_POSITION'])
             parsed_position = _parse_axis_values(position_response)
         except TypeError:
-            position_response = self._send_command(GCODES['CURRENT_POSITION']) #Recovery attempt
+            position_response = self._send_command(
+                GCODES['CURRENT_POSITION'])  # Recovery attempt
             parsed_position = _parse_axis_values(position_response)
-
 
         return parsed_position
 
     @property
     def switch_state(self):
-        '''Returns the state of all SmoothieBoard limit switches'''
+        """Returns the state of all SmoothieBoard limit switches"""
         return self._send_command(GCODES['SWITCH_STATUS'])
 
     @property
     def power(self):
-        pass
-
-    def set_power(self, power_dict):
         pass
 
     @property
@@ -108,14 +105,15 @@ class SmoothieDriver_3_0_0:
         pass
 
     def set_speed(self, value):
-        ''' set total movement speed in mm/second'''
+        """ set total movement speed in mm/second"""
         speed = value * SEC_PER_MIN
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
     def set_power(self, axis, value):
-        ''' set total movement speed in mm/second'''
-        command = '{}{}{}'.format(GCODES['SET_POWER'], axis.upper(), str(value))
+        """ set total movement speed in mm/second"""
+        command = '{}{}{}'.format(
+            GCODES['SET_POWER'], axis.upper(), str(value))
         self._send_command(command)
 
     # ----------- Private functions --------------- #
@@ -132,7 +130,8 @@ class SmoothieDriver_3_0_0:
         command_line = command + ' M400'
 
         if self.simulating:
-            print('[DRIVER - SIMULATING] sending command {}'.format(repr(command_line)))
+            print('[DRIVER - SIMULATING] sending command {}'.format(
+                repr(command_line)))
         else:
             print('[DRIVER] sending command {}'.format(repr(command_line)))
             return serial_communication.write_and_return(
@@ -148,8 +147,8 @@ class SmoothieDriver_3_0_0:
 
     def _home_all(self):
         command = GCODES['HOME'] + 'ZA ' \
-                  + GCODES['HOME'] + 'XBC ' \
-                  + GCODES['HOME'] + 'Y'
+            + GCODES['HOME'] + 'XBC ' \
+            + GCODES['HOME'] + 'Y'
         self._send_command(command, timeout=30)
 
     # ----------- END Private functions ----------- #
@@ -170,16 +169,24 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
 
     def home(self, axis=None):
-        homed_positions = {'X': 395, 'Y': 345, 'Z': 228, 'A': 228, 'B': 20, 'C': 20}
+        homed_positions = {
+            'X': 395,
+            'Y': 345,
+            'Z': 228,
+            'A': 228,
+            'B': 20,
+            'C': 20}
         if not axis:
             if self.simulating:
                 self._update_position(homed_positions)
             self._home_all()
         else:
-            axes_to_home = [ax for ax in axis.upper() if ax in AXES_SAFE_TO_HOME]
+            axes_to_home = [
+                ax for ax in axis.upper() if ax in AXES_SAFE_TO_HOME]
             if axes_to_home:
                 if self.simulating:
-                    self._update_position({axis: homed_positions[axis] for axis in axes_to_home})
+                    self._update_position(
+                        {axis: homed_positions[axis] for axis in axes_to_home})
                 command = GCODES['HOME'] + ''.join(axes_to_home)
                 self._send_command(command)
             else:
@@ -188,7 +195,8 @@ class SmoothieDriver_3_0_0:
     def delay(self, seconds):
         seconds = int(seconds)
         milliseconds = (seconds % 1.0) * 1000
-        command = GCODES['DWELL'] + 'S' + str(seconds) + 'P' + str(milliseconds)
+        command = GCODES['DWELL'] + 'S' + \
+            str(seconds) + 'P' + str(milliseconds)
         self._send_command(command)
 
     def probe_axis(self, axis, probing_distance):
@@ -200,7 +208,7 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axes {}".format(axis))
 
-    #TODO: Write GPIO low
+    # TODO: Write GPIO low
     def kill(self):
         pass
 

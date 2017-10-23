@@ -1,6 +1,6 @@
 import numpy as np
 from functools import reduce
-from typing import Dict, List
+from typing import List
 
 from opentrons.containers.placeable import WellSeries
 from opentrons.trackers.move_msgs import new_pos_msg
@@ -91,16 +91,17 @@ class Pose(object):
 
 class PoseTracker(object):
 
-    '''
-    Tracks pose of all objects on deck using a dictionary and a tree. A pose is a transformation matrix that contains
-    the position and rotation information for one object relative to another.
+    """
+    Tracks pose of all objects on deck using a dictionary and a tree. A pose
+    is a transformation matrix that contains the position and rotation
+    information for one object relative to another.
     _pose_dict is a dict that maps objects to poses (np arrays)
     _node_dict is a dict that maps objects to their nodes
         in the tree. The tree holds relationships between objects.
         an object is a child of another if, when that objects moves,
         its child does as well.
-    '''
-    pose_tracker_singleton = None #FIXME: [JG & Andy | 9/27] HACKY SINGLETON
+    """
+    pose_tracker_singleton = None  # FIXME: [JG & Andy | 9/27] HACKY SINGLETON
 
     def __init__(self):
         print('POSE TRACKER CREATED')
@@ -111,21 +112,25 @@ class PoseTracker(object):
         subscribe(topics.MOVEMENT, self._on_move_position)
 
     def relative(self, obj) -> Pose:
-        '''
+        """
         :param obj: an object whose Pose is tracked
-        :return: a Pose representing the relative Pose from the object's parent to itself
-        '''
+        :return: a Pose representing the relative Pose from the object's
+        parent to itself
+        """
         return self._pose_dict[obj]
 
     def absolute(self, obj) -> Pose:
-        '''
+        """
         :param obj: an object whose Pose is tracked
-        :return: a Pose representing the absolute Pose in the global coordinate system
-        '''
+        :return: a Pose representing the absolute Pose in the global
+        coordinate system
+        """
         if isinstance(obj, WellSeries):
-            ancestor_poses = self._get_transform_sequence(obj[0])  # type: List[Pose]
+            ancestor_poses = self._get_transform_sequence(
+                obj[0])  # type: List[Pose]
         else:
-            ancestor_poses = self._get_transform_sequence(obj)  # type: List[Pose]
+            ancestor_poses = self._get_transform_sequence(
+                obj)  # type: List[Pose]
 
         def reduce_fn(parent: Pose, child: Pose) -> Pose:
             return parent * child
@@ -153,7 +158,7 @@ class PoseTracker(object):
                     self.get_objects_in_subtree(root)])
 
     def track_object(self, parent, obj, x, y, z):
-        '''Adds an object to the dict of object positions'''
+        """Adds an object to the dict of object positions"""
         relative_object_pose = Pose(x=x, y=y, z=z)
         node = Node(obj)
 
@@ -162,10 +167,10 @@ class PoseTracker(object):
         self._pose_dict[obj] = relative_object_pose
 
     def create_root_object(self, obj, x, y, z):
-        '''Create a root node in the position tree. Though this could be done
+        """Create a root node in the position tree. Though this could be done
         in the track_object() function if no parent is passed, we require
         this to be explicit because creating a new mapping context should
-        not be a default behavior'''
+        not be a default behavior"""
         pose = Pose(x, y, z)
         node = Node(obj)
         self._pose_dict[obj] = pose
@@ -177,30 +182,32 @@ class PoseTracker(object):
                                for item in self.get_object_children(root)]])
 
     def _get_transform_sequence(self, root) -> List[Pose]:
-        '''Returns a list of objects in a subtree using a DFS tree traversal'''
+        """Returns a list of objects in a subtree using a DFS tree traversal"""
         root_node = self._node_dict[root]
         if root_node.parent is None:
             return [self.relative(root)]
-        return flatten([self._get_transform_sequence(root_node.parent.value), self.relative(root)])
+        return flatten([self._get_transform_sequence(
+            root_node.parent.value), self.relative(root)])
 
     def get_object_children(self, obj):
-        '''Returns a list of child objects'''
+        """Returns a list of child objects"""
         node = self._node_dict[obj]
         return [child.value for child in node.children]
 
     def translate_object(self, obj, x, y, z):
-        '''Translates a single object'''
+        """Translates a single object"""
         new_pose = self.relative(obj) * [x, y, z, 1]
         self._pose_dict[obj] = new_pose
 
     def _on_move_position(self, new_pos_msg: new_pos_msg):
-        '''Calculates an object movement as diff between current position
-        and previous - translates moved object by the difference'''
+        """Calculates an object movement as diff between current position
+        and previous - translates moved object by the difference"""
         mover, *new_pos = new_pos_msg
         self.translate_object(mover, *(new_pos - self[mover].position))
 
     def relative_object_position(self, target_object, reference_object):
-        return self._pose_dict[target_object].position - self._pose_dict[reference_object].position
+        return self._pose_dict[target_object].position - \
+            self._pose_dict[reference_object].position
 
     def clear_all(self):
         self._root_nodes = []

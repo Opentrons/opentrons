@@ -13,8 +13,10 @@ class PipetteTip:
     def __init__(self, length):
         self.length = length
 
+
 # This should come from configuration if tip length is not already in db
 DEFAULT_TIP_LENGTH = 53.2
+
 
 class Pipette:
     """
@@ -767,7 +769,9 @@ class Pipette:
 
             tip_plunge = -7
             for i in range(int(presses) - 1):
-                self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
+                self.move_to(
+                    self.current_tip().top(tip_plunge),
+                    strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
             self._add_tip(DEFAULT_TIP_LENGTH)
             self.instrument_mover.home()
@@ -828,7 +832,8 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
-            self.instrument_actuator.move(self._get_plunger_position('drop_tip'))
+            self.instrument_actuator.move(
+                self._get_plunger_position('drop_tip'))
             if home_after:
                 self.instrument_actuator.home()
 
@@ -841,7 +846,6 @@ class Pipette:
         return _drop_tip(location)
 
     def home(self):
-
         """
         Home the pipette's plunger axis during a protocol run
 
@@ -929,7 +933,6 @@ class Pipette:
 
     @commands.publish.both(command=commands.transfer)
     def transfer(self, volume, source, dest, **kwargs):
-
         """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
@@ -1383,15 +1386,15 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
-        print('-[Pipette._move] moving to {}'.format((x,y,z)))
+        print('-[Pipette._move] moving to {}'.format((x, y, z)))
         self.instrument_mover.move(x, y, z)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
-
+        self.robot.pose_tracker.translate_object(
+            self, x=0, y=0, z=(-1 * length))
 
     def _remove_tip(self, length):
         self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)
