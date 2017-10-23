@@ -30,7 +30,10 @@ class IngredGroupCard extends React.Component {
 
         {isExpanded && ingredCategoryData.wells.map((wellName, i) =>
           <IngredIndividual key={i}
-            name={get(ingredCategoryData, ['wellDetails', wellName, 'name'], `Sample ${i + 1}`)}
+            name={ingredCategoryData.individualize
+              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `${ingredCategoryData.name} ${i + 1}`)
+              : ' '
+            }
             wellName={wellName}
             canDelete
             volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
