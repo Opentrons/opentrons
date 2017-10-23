@@ -6,8 +6,7 @@ const LabwareItem = ({onContainerChoose, containerType, containerImgUrl, display
   <li
     className={styles.labwareListItem}
     onClick={e => onContainerChoose(containerType)}
-    style={containerImgUrl && {'--image-url': `url(${containerImgUrl})`
-    }}
+    style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
   >
     {displayName}
   </li>
@@ -15,6 +14,7 @@ const LabwareItem = ({onContainerChoose, containerType, containerImgUrl, display
 
 const LabwareDropdown = ({onClose, onContainerChoose}) => {
   const labwareItemMapper = (item, key) => (
+    // LabwareItem expects item = [containerType, displayName, containerImgUrl(optional)]
     <LabwareItem key={key}
       containerType={item[0]}
       displayName={item[1]}
@@ -57,14 +57,14 @@ const LabwareDropdown = ({onClose, onContainerChoose}) => {
             ['trough-12row', '12-row Trough', 'Trough-12row']
           ].map(labwareItemMapper)}
         </Accordion>
-        <Accordion title='PCR Strip'>
+        {/* <Accordion title='PCR Strip'>
           {[
             ['PCR-strip-tall', 'PCR Strip Tall', '96-PCR-Strip']
           ].map(labwareItemMapper)}
-        </Accordion>
+        </Accordion> */}
         <Accordion title='Trash'>
           {[
-            ['trash-box', 'Trash Box']
+            ['trash-box', 'Trash Box'] // no container img
           ].map(labwareItemMapper)}
         </Accordion>
       </ul>

@@ -4,6 +4,9 @@ export const slotnames = [
   'A1', 'B1', 'C1', 'D1', 'E1'
 ]
 
+// These 'nonfillable' container types render on the deck as an image instead of Wells
+export const nonFillableContainers = ['trash-box', 'tiprack-10ul', 'tiprack-200ul', 'tiprack-1000ul', 'tiprack-1000ul-chem']
+
 // TODO wellShape not used yet
 export const containerDims = containerType => {
   if (containerType.startsWith('96-')) {
@@ -22,9 +25,9 @@ export const containerDims = containerType => {
     return {rows: 12, columns: 1, wellShape: 'rectangle'}
   }
 
-  if (containerType.startsWith('PCR-strip')) {
-    return {rows: 1, columns: 8, wellShape: 'circle'}
-  }
+  // if (containerType.startsWith('PCR-strip')) {
+  //   return {rows: 1, columns: 8, wellShape: 'circle'}
+  // }
 
   // TODO: handle tipracks and trash container
 

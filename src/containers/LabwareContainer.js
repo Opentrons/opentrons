@@ -12,7 +12,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import styles from '../css/style.css'
-
+import { nonFillableContainers } from '../constants.js'
 import { humanize } from '../utils.js'
 import { selectors } from '../reducers'
 import {
@@ -52,10 +52,16 @@ const LabwareContainer = ({
   // HACK: should use a stateful input component
   const containerNameInputId = slotName
 
+  const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
+
   return (
     <div className={styles.deckSlot}>
       {containerType
-        ? <SelectablePlate containerId={containerId} cssFillParent />
+        ? (
+          nonFillableContainers.includes(containerType)
+            ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
+            : <SelectablePlate containerId={containerId} cssFillParent />
+          )
         : <label>{slotName}</label>}
 
       {containerType && // if there's no containerType, assume it's empty
@@ -72,11 +78,11 @@ const LabwareContainer = ({
               modify: {name: humanize(containerType)}})}>‎✕</div>
           </div>}
 
-          {hasName && <div className={styles.containerOverlayAddIngred} onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
+          {canAddIngreds && <div className={styles.containerOverlayAddIngred} onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
             Add Ingredients
           </div>}
 
-          {hasName && <div className={styles.containerOverlayRemove} onClick={() => deleteContainer({containerId, slotName, containerType})}>
+          {canAddIngreds && <div className={styles.containerOverlayRemove} onClick={() => deleteContainer({containerId, slotName, containerType})}>
             <p>Remove {containerName}</p>
           </div>}
 
