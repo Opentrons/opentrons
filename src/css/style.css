@@ -280,6 +280,7 @@ textarea {
 }
 
 /* TODO: can this be a mixin instead? */
+/* NOTE: this is only used by LabwareDropdown */
 :global(.close) {
   position: absolute;
   right: 0;
@@ -301,14 +302,27 @@ textarea {
   border: 3px solid gray;
 }
 
-.ingredientModal :global(.close) {
-  font-size: 30pt;
-  margin: 10pt;
+.ingredientModal .close {
   color: white;
+  font-size: 14pt;
+  text-transform: uppercase;
+  margin-right: 10pt;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
 }
 
-.ingredientModal :global(.close):hover {
-  color: lightgray;
+.ingredientModal .close p {
+  margin-right: 10pt;
+}
+
+.ingredientModal .close:hover {
+  /*color: lightgray;*/
+  -webkit-filter: brightness(0.75);
+  filter: brightness(0.75);
+  cursor: pointer;
 }
 
 @value ingredientPanelSidebarWidth: 40%;

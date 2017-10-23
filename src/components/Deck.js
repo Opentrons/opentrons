@@ -30,6 +30,10 @@ const Deck = props => {
           </div>
 
           <div className={styles.ingredientPanelContent}>
+            <div className={styles.close} onClick={e => closeIngredientSelector()}>
+              <p>Back to Deck Map</p>
+              <img src='https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/back.png' />
+            </div>
             <div className={styles.containerDetail}>
               <SelectablePlate showLabels />
             </div>
@@ -38,7 +42,6 @@ const Deck = props => {
             {/* TODO:  ^^^ Add button back in conditionally */}
             <IngredientPropertiesForm />
           </div>
-          <div className='close' onClick={e => closeIngredientSelector()}>⟳</div>
         </div>
       }
       {/* The actual deck */}
