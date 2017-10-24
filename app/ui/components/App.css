@@ -20,7 +20,7 @@
   padding: 0 1rem;
   display: grid;
   grid-template-columns: 2fr auto 10rem;
-  grid-template-areas: 'file . home'
+  grid-template-areas: 'file . home';
 }
 
 .task_header a {
