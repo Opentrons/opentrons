@@ -237,8 +237,10 @@ textarea {
   position: absolute;
   left: 2px;
   right: 2px;
+  top: 2px;
   bottom: 2px;
-  font-size: 14pt;
+  padding-top: 50%;
+  font-size: 12pt;
   background-color: gray;
   color: black;
   margin: 10px;
