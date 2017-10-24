@@ -35,7 +35,7 @@ Use ``point`` when there is only one position per container, such as the trash o
 
 .. code-block:: python
 
-    container.load('point', slot)
+    containers.load('point', slot)
 
 You can access the point position as ``container.wells('A1')`` or ``container.wells(0)``.
 
@@ -51,7 +51,7 @@ Tip rack for a 10 uL pipette (single or 8-channel)
 
 .. code-block:: python
 
-    container.load('tiprack-10ul', slot)
+    containers.load('tiprack-10ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -64,7 +64,7 @@ Tip rack for a single channel 10 uL pipette when the pipette is in the center po
 
 .. code-block:: python
 
-    container.load('tiprack-10ul-H', slot)
+    containers.load('tiprack-10ul-H', slot)
 
 **Accessing Tips:** *single channel* ``['E-H, 1-12']``
 
@@ -77,7 +77,7 @@ Tip rack for a 200 or 300 uL pipette (single or 8-channel)
 
 .. code-block:: python
 
-    container.load('tiprack-200ul', slot)
+    containers.load('tiprack-200ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -90,7 +90,7 @@ Tip rack for a 1000 uL pipette (single or 8-channel)
 
 .. code-block:: python
 
-    container.load('tiprack-1000ul', slot)
+    containers.load('tiprack-1000ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -103,7 +103,7 @@ Tip rack for 1000ul chem (10x10)
 
 .. code-block:: python
 
-    container.load('tiprack-1000ul-chem', slot)
+    containers.load('tiprack-1000ul-chem', slot)
 
 **Accessing Tips:** *single channel* ``[0]-[99]``
 
@@ -121,7 +121,7 @@ trough-12row
 
 .. code-block:: python
 
-    container.load('trough-12row', slot)
+    containers.load('trough-12row', slot)
 
 **Accessing Rows:** *single channel* ``['A1']-['A12']``, *8-channel* ``['A1']-['A12']``
 
@@ -140,7 +140,7 @@ tube-rack-.75ml
 
 .. code-block:: python
 
-    container.load('tube-rack-.75ml', slot)
+    containers.load('tube-rack-.75ml', slot)
 
 **Accessing Tubes:** *single channel* ``['A1']-['D6']``
 
@@ -153,7 +153,7 @@ tube-rack-2ml
 
 .. code-block:: python
 
-    container.load('tube-rack-2ml', slot)
+    containers.load('tube-rack-2ml', slot)
 
 **Accessing Tubes:** *single channel* ``['A1']-['D6']``
 
@@ -166,7 +166,7 @@ rack that holds 6 15 mL tubes and 4 50 mL tubes
 
 .. code-block:: python
 
-    container.load('tube-rack-15_50ml', slot)
+    containers.load('tube-rack-15_50ml', slot)
 
 **Accessing Tubes:** *single channel* ``['A1']-['A3'], ['B1']-['B3'], ['C1']-['C2'], ['D1']-['D2']``
 
@@ -183,7 +183,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('96-deep-well', slot)
+    containers.load('96-deep-well', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -196,7 +196,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('96-PCR-tall', slot)
+    containers.load('96-PCR-tall', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -209,7 +209,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('96-PCR-flat', slot)
+    containers.load('96-PCR-flat', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
@@ -222,7 +222,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('PCR-strip-tall', slot)
+    containers.load('PCR-strip-tall', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['A8']``, *8-channel* ``['A1']``
 
@@ -235,7 +235,7 @@ See dimensions in diagram below.
 
 .. code-block:: python
 
-    container.load('384-plate', slot)
+    containers.load('384-plate', slot)
 
 **Accessing Wells:** *single channel* ``['A1']-['P24']``, *multi-channel* ``['A1']-['A24]``
 
