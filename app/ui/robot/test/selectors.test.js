@@ -13,7 +13,10 @@ const {
   getIsRunning,
   getIsPaused,
   getIsDone,
-  getRunTime
+  getRunTime,
+  getInstruments,
+  getInstrumentsCalibrated,
+  getLabware
 } = selectors
 
 describe('robot selectors', () => {
@@ -225,5 +228,125 @@ describe('robot selectors', () => {
         }
       ])
     })
+  })
+
+  test('get instruments', () => {
+    const state = makeState({
+      currentInstrument: 'left',
+      protocolInstrumentsByAxis: {
+        left: {axis: 'left', channels: 8, volume: 200},
+        right: {axis: 'right', channels: 1, volume: 50}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true}
+      }
+    })
+
+    expect(getInstruments(state)).toEqual([
+      {
+        axis: 'left',
+        channels: 'multi',
+        volume: 200,
+        isProbed: true,
+        isCurrent: true
+      },
+      {
+        axis: 'right',
+        channels: 'single',
+        volume: 50,
+        isProbed: false,
+        isCurrent: false
+      }
+    ])
+  })
+
+  test('get instruments are calibrated', () => {
+    const twoPipettesCalibrated = makeState({
+      protocolInstrumentsByAxis: {
+        left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
+        right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true},
+        right: {isProbed: true}
+      }
+    })
+
+    const twoPipettesNotCalibrated = makeState({
+      protocolInstrumentsByAxis: {
+        left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
+        right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true}
+      }
+    })
+
+    const onePipetteCalibrated = makeState({
+      protocolInstrumentsByAxis: {
+        left: {name: 'p200', axis: 'left', channels: 8, volume: 200}
+      },
+      instrumentCalibrationByAxis: {
+        left: {isProbed: true}
+      }
+    })
+
+    expect(getInstrumentsCalibrated(twoPipettesCalibrated)).toBe(true)
+    expect(getInstrumentsCalibrated(twoPipettesNotCalibrated)).toBe(false)
+    expect(getInstrumentsCalibrated(onePipetteCalibrated)).toBe(true)
+  })
+
+  test('get labware', () => {
+    const state = makeState({
+      currentLabware: 5,
+      protocolLabwareBySlot: {
+        1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
+        5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
+        9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+      },
+      labwareConfirmationBySlot: {
+        1: {isConfirmed: false},
+        5: {isConfirmed: true},
+        9: {isConfirmed: false}
+      }
+    })
+
+    expect(getLabware(state)).toEqual([
+      {
+        slot: 1,
+        id: 'A1',
+        name: 'a1',
+        type: 'a',
+        isTiprack: true,
+        isConfirmed: false,
+        isCurrent: false
+      },
+      {slot: 2, isCurrent: false},
+      {slot: 3, isCurrent: false},
+      {slot: 4, isCurrent: false},
+      {
+        slot: 5,
+        id: 'B2',
+        name: 'b2',
+        type: 'b',
+        isTiprack: false,
+        isConfirmed: true,
+        isCurrent: true
+      },
+      {slot: 6, isCurrent: false},
+      {slot: 7, isCurrent: false},
+      {slot: 8, isCurrent: false},
+      {
+        slot: 9,
+        id: 'C3',
+        name: 'c3',
+        type: 'c',
+        isTiprack: false,
+        isConfirmed: false,
+        isCurrent: false
+      },
+      {slot: 10, isCurrent: false},
+      {slot: 11, isCurrent: false}
+    ])
   })
 })

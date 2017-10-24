@@ -3,9 +3,10 @@
 import re
 import sys
 import logging
+from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
-from opentrons.session import SessionManager
 from logging.config import dictConfig
+
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ def log_init():
             },
             'opentrons.server': {
                 'handlers': ['debug'],
-                'level': logging.DEBUG
+                'level': logging.INFO
             },
         }
     )
@@ -77,7 +78,7 @@ if __name__ == "__main__":
     # TODO(artyom, 20170828): consider moving class name definition into
     # command line arguments, so one could us as a shell starting various
     # RPC servers with different root objects from a command line
-    server = Server(SessionManager())
+    server = Server(MainRouter())
     print(
         'Started Opentrons API Server listening at ws://{host}:{port}/'
         .format(host=host, port=port))

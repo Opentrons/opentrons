@@ -36,10 +36,8 @@ class Server(object):
         # Allow for two concurrent calls max
         self.executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
-        self.clients = []
-
-        self.send_queue = Queue(loop=self.loop)
-        self.send_loop_task = self.loop.create_task(self.send_loop())
+        self.clients = {}
+        self.tasks = []
 
         self.app = web.Application()
         self.app.router.add_get('/', self.handler)
@@ -63,7 +61,7 @@ class Server(object):
         web.run_app(self.app, host=host, port=port)
 
     def shutdown(self):
-        self.send_loop_task.cancel()
+        [task.cancel() for task, _ in self.clients.values()]
         self.monitor_events_task.cancel()
 
     async def on_shutdown(self, app):
@@ -72,12 +70,33 @@ class Server(object):
                            message='Server shutdown')
         self.shutdown()
 
-    async def send_loop(self):
-        while True:
-            client, payload = await self.send_queue.get()
-            # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
-            await client.drain()
-            client.send_str(json.dumps(payload))
+    def send_worker(self, socket):
+        _id = id(socket)
+
+        def task_done(future):
+            exception = future.result()
+            if exception:
+                log.warning('Send task for socket {0}'.format(_id))
+            log.info('Send task for {0} finished'.format(_id))
+
+        async def send_task(socket, queue):
+            while True:
+                payload = await queue.get()
+                if socket.closed:
+                    log.warning('Websocket {0} closed'  # noqa
+                        .format(id(_id)))
+                    break
+
+                # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
+                await socket.drain()
+                await socket.send_json(payload)
+
+        queue = Queue(loop=self.loop)
+        task = self.loop.create_task(send_task(socket, queue))
+        task.add_done_callback(task_done)
+        log.info('Send task for {0} started'.format(_id))
+
+        return (task, queue)
 
     async def monitor_events(self, instance):
         async for event in instance.notifications:
@@ -100,38 +119,55 @@ class Server(object):
         """
         Receives HTTP request and negotiates up to a Websocket session
         """
-        log.debug('Starting handler for request: {0}'.format(request))
-        ws = web.WebSocketResponse()
+
+        def task_done(future):
+            self.tasks.remove(future)
+            exception = future.exception()
+            if exception:
+                log.warning(
+                    'While processing message: {0}\nDetails: {1}'.format(
+                        exception,
+                        traceback.format_exc())
+                )
+
+        client = web.WebSocketResponse()
+        client_id = id(client)
 
         # upgrade to Websockets
-        await ws.prepare(request)
-        self.clients.append(ws)
+        await client.prepare(request)
 
-        self.send({
-            '$': {'type': CONTROL_MESSAGE},
-            'root': self.call_and_serialize(lambda: self.root),
-            'type': self.call_and_serialize(lambda: type(self.root))
-        })
+        log.info('Tasks: {0}'.format(self.tasks))
+        log.info('Clients: {0}'.format(self.clients))
 
         try:
-            # Async receive ws data until websocket is closed
-            async for msg in ws:
+            log.debug('Sending root info to {0}'.format(client_id))
+            await client.send_json({
+                '$': {'type': CONTROL_MESSAGE},
+                'root': self.call_and_serialize(lambda: self.root),
+                'type': self.call_and_serialize(lambda: type(self.root))
+            })
+            log.debug('Root info sent to {0}'.format(client_id))
+        except Exception as e:
+            log.error('While sending root info to {0}: '.format(client_id), e)
+
+        try:
+            self.clients[client] = self.send_worker(client)
+            # Async receive client data until websocket is closed
+            async for msg in client:
                 log.debug('Received: {0}'.format(msg))
-                try:
-                    await self.process(msg)
-                except Exception as e:
-                    await ws.close()
-                    log.warning(
-                        'While processing message: {0}'
-                        .format(traceback.format_exc()))
+                task = self.loop.create_task(self.process(msg))
+                task.add_done_callback(task_done)
+                self.tasks += [task]
         except Exception as e:
             log.error(
                 'While reading from socket: {0}'
                 .format(traceback.format_exc()))
         finally:
-            self.clients.remove(ws)
+            log.info('Closing WebSocket {0}'.format(id(client)))
+            client.close()
+            del self.clients[client]
 
-        return ws
+        return client
 
     def build_call(self, _id, name, args):
         if _id not in self.objects:
@@ -210,6 +246,8 @@ class Server(object):
                 log.error(
                     'WebSocket connection closed unexpectedly: {0}'.format(
                         message))
+            else:
+                log.warning('Unhanled WSMsgType: {0}'.format(message.type))
         except Exception as e:
             log.error('While processing request: {0}'.format(str(e)))
 
@@ -233,7 +271,7 @@ class Server(object):
             response['$']['status'] = 'error'
             call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
         finally:
-            log.info('Call result: {0}'.format(call_result))
+            log.debug('Call result: {0}'.format(call_result))
             response['data'] = call_result
         return response
 
@@ -255,15 +293,10 @@ class Server(object):
         })
 
     def send(self, payload):
-        for client in self.clients:
-            if client.closed:
-                log.warning(
-                    'Attempted to send into a closed socket {0}'
-                    .format(client))
-                continue
-            log.info('Enqueuing {0} for {1}'.format(payload, client))
-            asyncio.run_coroutine_threadsafe(
-                self.send_queue.put((client, payload)), self.loop)
+        for socket, value in self.clients.items():
+            task, queue = value
+            log.debug('Enqueuing {0} for {1}'.format(id(payload), id(socket)))
+            asyncio.run_coroutine_threadsafe(queue.put(payload), self.loop)
 
 
 class SystemCalls(object):

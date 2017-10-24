@@ -1,67 +1,24 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-
+import {Switch, Route} from 'react-router'
 import Nav from '../containers/Nav'
 
-import Button from './Button'
-import RunControl from './RunControl'
-import RunLog from './RunLog'
-import grid from './Grid.css'
+import Home from '../pages/Home'
+import Run from '../pages/Run'
+import SetupInstruments from '../pages/SetupInstruments'
+import SetupDeck from '../pages/SetupDeck'
 
-export default function App (props) {
-  const {
-    isReadyToRun,
-    isRunning,
-    isDone,
-    onRunClick
-  } = props
-  let runControl
-  let runLog
+import styles from './App.css'
 
-  // mock prop for styling
-  const startTime = Date.now()
-  const timeRemaining = '00:03:25' // swap out for timer
-  let runButton
-  if (!isRunning) {
-    runButton = (
-      <Button
-        onClick={onRunClick}
-        disabled={!isReadyToRun}
-        style={grid.run}
-      >
-        Run Job
-      </Button>
-    )
-  }
-  if (isReadyToRun || isRunning || isDone) {
-    runControl = (
-      <RunControl
-        style={grid.controls}
-        {...{startTime, timeRemaining}}
-        {...props}
-      />
-    )
-    runLog = <RunLog style={grid.maintask} {...props} />
-  }
-
+export default function App () {
   return (
-    <div className={grid.wrapper}>
+    <div className={styles.wrapper}>
       <Nav />
-      <main className={grid.task}>
-        <header className={grid.header}>
-          {runButton}
-        </header>
-        {runControl}
-        {runLog}
-      </main>
+      <Switch>
+        <Route exact path='/' component={Home} />
+        <Route path='/run' component={Run} />
+        <Route path='/setup-instruments' component={SetupInstruments} />
+        <Route path='/setup-deck' component={SetupDeck} />
+      </Switch>
     </div>
   )
-}
-
-App.propTypes = {
-  isReadyToRun: PropTypes.bool.isRequired,
-  isRunning: PropTypes.bool.isRequired,
-  isPaused: PropTypes.bool.isRequired,
-  isDone: PropTypes.bool.isRequired,
-  onRunClick: PropTypes.func.isRequired
 }

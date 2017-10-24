@@ -96,15 +96,19 @@ def protocol(request):
 
 
 @pytest.fixture
-def session_manager(loop):
-    from opentrons.session import SessionManager
-    with SessionManager(loop=loop) as s:
-        yield s
-    return
+def main_router(loop):
+    from opentrons.api import MainRouter
+    with MainRouter(loop=loop) as router:
+        yield router
 
 
 @pytest.fixture
-def session(loop, test_client, request, session_manager):
+def session_manager(main_router):
+    return main_router.session_manager
+
+
+@pytest.fixture
+def session(loop, test_client, request, main_router):
     """
     Create testing session. Tests using this fixture are expected
     to have @pytest.mark.parametrize('root', [value]) decorator set.
@@ -114,7 +118,8 @@ def session(loop, test_client, request, session_manager):
     try:
         root = request.getfuncargvalue('root')
         if not root:
-            root = session_manager
+            root = main_router
+        # Assume test fixture has init to attach test loop
         root.init(loop)
     except Exception as e:
         pass
@@ -151,8 +156,23 @@ def fuzzy_assert(result, expected):
             .format(res, exp)
 
 
+@pytest.fixture
+def connect(session, test_client):
+    async def _connect():
+        client = await test_client(session.server.app)
+        return await client.ws_connect('/')
+    return _connect
+
+
 def setup_testing_env():
     database.change_database(MAIN_TESTER_DB)
+
+
+@pytest.fixture
+def virtual_smoothie_env(monkeypatch):
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    yield
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
 setup_testing_env()

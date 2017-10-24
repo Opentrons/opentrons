@@ -2,9 +2,9 @@
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WS from 'ws'
-// import log from 'winston'
 
-import Client from '../../rpc/client'
+import Client from '../client'
+import RemoteObject from '../remote-object'
 import {
   statuses,
   RESULT,
@@ -14,19 +14,18 @@ import {
   CONTROL_MESSAGE
 } from '../../rpc/message-types'
 
-// log.level = 'debug'
+jest.mock('../remote-object')
 
 const {SUCCESS, FAILURE} = statuses
 
-const EX_REMOTE = {i: 4, t: 5, v: {foo: 'bar'}}
-const EX_REMOTE_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
-const EX_CONTROL_MESSAGE = {
+const MOCK_REMOTE = {foo: 'bar', be_a_robot: jest.fn(), be_a_person: jest.fn()}
+const REMOTE = {i: 4, t: 5, v: {foo: 'bar'}}
+const REMOTE_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
+const CONTROL = {
   $: {type: CONTROL_MESSAGE},
-  root: EX_REMOTE,
-  type: EX_REMOTE_TYPE
+  root: REMOTE,
+  type: REMOTE_TYPE
 }
-
-const EX_ROOT_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
 
 const makeAckResponse = (token) => ({$: {type: ACK, token}})
 const makeNackResponse = (token, reason) => ({$: {type: NACK, token}, reason})
@@ -38,6 +37,7 @@ const makeCallResponse = (token, status, data) => ({
 describe('rpc client', () => {
   let url
   let wss
+  let ws
   let listeners
 
   function addListener (target, event, handler) {
@@ -89,6 +89,19 @@ describe('rpc client', () => {
     listeners.forEach(removeListener)
   })
 
+  function sendControlAndResolveRemote (handleMessage) {
+    addListener(wss, 'connection', (socket) => {
+      ws = new JsonWs(socket)
+
+      if (handleMessage) addListener(ws, 'message', handleMessage)
+
+      ws.send(CONTROL)
+    })
+
+    RemoteObject.mockReturnValueOnce(Promise.resolve(MOCK_REMOTE))
+  }
+
+  // TODO(mc, 2017-09-28): use fake timers for this test
   test('rejects if control message never comes', () => {
     const result = Client(url)
 
@@ -98,409 +111,220 @@ describe('rpc client', () => {
   })
 
   test('connects to ws server and resolves when control is received', () => {
-    addListener(wss, 'connection', (ws) => new JsonWs(ws).send(EX_CONTROL_MESSAGE))
+    sendControlAndResolveRemote()
 
-    return expect(Client(url)).resolves.toBeDefined()
+    return Client(url)
+      .then((client) => {
+        expect(client.remote).toBe(MOCK_REMOTE)
+        expect(RemoteObject).toHaveBeenCalledWith(client, REMOTE)
+      })
   })
 
-  test('resolves with a proxy for the remote object', () => {
-    addListener(wss, 'connection', (ws) => new JsonWs(ws).send(EX_CONTROL_MESSAGE))
+  describe('callRemote', () => {
+    const id = 123
+    const name = 'method_name'
+    const args = [1, 2, 3]
 
-    return expect(Client(url)).resolves.toMatchObject({
-      remote: {
-        foo: 'bar',
-        be_a_robot: expect.any(Function),
-        be_a_person: expect.any(Function)
-      }
-    })
-  })
+    test('calls remote methods and wraps result in RemoteObject', () => {
+      const mockRemote = {i: 42, t: 43, v: {}}
+      const mockResult = {foo: 'bar'}
+      const expectedMessage = {$: {token: expect.anything()}, id, name, args}
+      let client
+      let callMessage
 
-  describe('with good connection', () => {
-    let client
-    let ws
-
-    beforeEach(() => {
-      addListener(wss, 'connection', (websocket) => {
-        ws = new JsonWs(websocket)
-        ws.send(EX_CONTROL_MESSAGE)
-      })
-
-      return Client(url).then((c) => (client = c))
-    })
-
-    test('calls a method of a remote object', (done) => {
-      addListener(ws, 'message', (message) => {
-        expect(message).toEqual({
-          $: {
-            token: expect.anything()
-          },
-          id: EX_REMOTE.i,
-          name: 'be_a_person',
-          args: ['foo', 'bar']
-        })
-
-        done()
-      })
-
-      client.remote.be_a_person('foo', 'bar')
-    })
-
-    test('rejects the result of a failed method call', () => {
-      const exResponse = (token) => makeCallResponse(token, FAILURE, 'ahhh')
-
-      addListener(ws, 'message', (message) => {
+      sendControlAndResolveRemote((message) => {
         const token = message.$.token
+
+        callMessage = message
         setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(exResponse(token)), 5)
+        setTimeout(() => {
+          ws.send(makeCallResponse(token, SUCCESS, mockRemote))
+        }, 5)
       })
 
-      const result = client.remote.be_a_robot(1, 2)
-
-      return expect(result).rejects.toMatchObject({
-        message: expect.stringMatching(/ahhh/)
-      })
+      return Client(url)
+        .then((c) => {
+          client = c
+          RemoteObject.mockReturnValueOnce(Promise.resolve(mockResult))
+          return client.callRemote(id, name, args)
+        })
+        .then((result) => {
+          expect(callMessage).toEqual(expectedMessage)
+          expect(RemoteObject).toHaveBeenCalledWith(client, mockRemote)
+          expect(result).toEqual(mockResult)
+        })
     })
 
-    test("rejects the result of a nack'd method call", () => {
-      addListener(ws, 'message', (message) => {
+    test('rejects if call nacks', () => {
+      sendControlAndResolveRemote((message) => {
         const token = message.$.token
-        ws.send(makeNackResponse(token, 'You done messed up'))
+        setTimeout(() => ws.send(makeNackResponse(token, 'You done messed up')))
       })
 
-      const result = client.remote.be_a_person('Tim')
+      const call = Client(url)
+        .then((client) => client.callRemote(id, name, args))
 
-      return expect(result).rejects.toMatchObject({
+      return expect(call).rejects.toMatchObject({
         message: expect.stringMatching(/NACK.+You done messed up/)
       })
     })
 
-    test('resolves a null result of method call', () => {
-      addListener(ws, 'message', (message) => {
+    test('rejects if client errors during call', () => {
+      sendControlAndResolveRemote((message) => {
         const token = message.$.token
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, null)), 5)
+        const nack = makeNackResponse(token, 'You done messed up')
+        setTimeout(() => ws.send(nack), 1)
       })
 
-      return client.remote.be_a_person()
-        .then((result) => expect(result).toEqual(null))
-    })
+      const call = Client(url)
+        .then((client) => {
+          const result = client.callRemote(id, name, args)
+          setTimeout(() => client.emit('error', new Error('OH NO')), 1)
+          return result
+        })
 
-    test('resolves a primitive result of method call', () => {
-      const VALUE = 'foobar'
-
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, VALUE)), 5)
-      })
-
-      return client.remote.be_a_robot()
-        .then((result) => expect(result).toEqual(VALUE))
-    })
-
-    test('deserializes an array of primitives or null values', () => {
-      const VALUE = [1, null, 'foo']
-
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, VALUE)), 5)
-      })
-
-      return client.remote.be_a_person()
-        .then((result) => expect(result).toEqual(VALUE))
-    })
-
-    test('resolves an object result of a known type', () => {
-      const exResponse = (token) => makeCallResponse(
-        token,
-        SUCCESS,
-        {i: 1, t: EX_ROOT_TYPE.i, v: {baz: 'qux'}}
-      )
-
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(exResponse(token)), 5)
-      })
-
-      const result = client.remote.be_a_robot()
-
-      return expect(result).resolves.toMatchObject({
-        baz: 'qux',
-        be_a_robot: expect.any(Function),
-        be_a_person: expect.any(Function)
+      return expect(call).rejects.toMatchObject({
+        message: expect.stringMatching(/OH NO/)
       })
     })
 
-    test('resolves an object of unknown type by getting the type', () => {
-      const ID = 256
-      const TYPE_ID = 42
-      const instanceResponse = (token) => makeCallResponse(token, SUCCESS, {
-        i: ID,
-        t: TYPE_ID,
-        v: {a: 'bc'}
+    test('rejects if call is unsuccessful', () => {
+      sendControlAndResolveRemote((message) => {
+        const token = message.$.token
+        const ack = makeAckResponse(token)
+        const result = makeCallResponse(token, FAILURE, 'ahhh')
+        setTimeout(() => ws.send(ack), 1)
+        setTimeout(() => ws.send(result), 5)
       })
 
-      const typeResponse = (token) => makeCallResponse(token, SUCCESS, {
-        i: TYPE_ID,
-        t: 3,
-        v: {hello_world: {}}
-      })
+      const call = Client(url)
+        .then((client) => client.callRemote(id, name, args))
 
-      let messageCount = 0
-      let getTypeCall
-      addListener(ws, 'message', (message) => {
+      return expect(call).rejects.toMatchObject({
+        message: expect.stringMatching(/ahhh/)
+      })
+    })
+  })
+
+  describe('resolveTypeValues', () => {
+    test('resolves cached type objects', () => {
+      sendControlAndResolveRemote()
+
+      return Client(url)
+        .then((client) => client.resolveTypeValues(REMOTE))
+        .then((values) => expect(values).toEqual(REMOTE_TYPE.v))
+    })
+
+    test('resolves empty object for type types', () => {
+      sendControlAndResolveRemote()
+
+      return Client(url)
+        .then((client) => client.resolveTypeValues(REMOTE_TYPE))
+        .then((values) => expect(values).toEqual({}))
+    })
+
+    test('calls get object by id for unknown type objects', () => {
+      const instance = {i: 42, t: 101, v: {bar: 'baz'}}
+      const type = {i: 101, t: 3, v: {baz: {}}}
+      const expectedMessage = {
+        $: {token: expect.anything()},
+        id: null,
+        name: 'get_object_by_id',
+        args: [type.i]
+      }
+
+      let client
+      let getObjectByIdCall
+
+      sendControlAndResolveRemote((message) => {
         const token = message.$.token
 
-        if (messageCount === 0) {
-          // first message: should call be_a_person on remote root
-          // checked in previous test so no assertions here
-          setTimeout(() => ws.send(makeAckResponse(token)), 1)
-          setTimeout(() => ws.send(instanceResponse(token)), 5)
-        } else if (messageCount === 1) {
-          // second message should be a get_object_by_id for the type
-          getTypeCall = message
-          // return an ack, then return the type object
-          setTimeout(() => ws.send(makeAckResponse(token)), 1)
-          setTimeout(() => ws.send(typeResponse(token)), 5)
-        }
-
-        messageCount++
+        getObjectByIdCall = message
+        setTimeout(() => ws.send(makeAckResponse(token)), 1)
+        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, type)), 5)
       })
 
-      return client.remote.be_a_person()
-        .then((result) => {
-          expect(getTypeCall).toMatchObject({
-            id: null,
-            name: 'get_object_by_id',
-            args: [TYPE_ID]
-          })
-
-          expect(result).toEqual({
-            a: 'bc',
-            hello_world: expect.any(Function)
-          })
+      return Client(url)
+        .then((c) => {
+          client = c
+          RemoteObject.mockReturnValueOnce(Promise.resolve(type.v))
+          return client.resolveTypeValues(instance)
+        })
+        .then((typeValues) => {
+          expect(getObjectByIdCall).toEqual(expectedMessage)
+          expect(RemoteObject).toHaveBeenCalledWith(client, type)
+          expect(typeValues).toEqual(type.v)
         })
     })
 
-    test('creates remote objects for all non-primitive children', () => {
-      const EX_DEEP_TYPE_3 = {i: 11, t: 3, v: {thing_3: {}}}
-      const EX_DEEP_INSTANCE_3 = {i: 10, t: 11, v: {quux: 'quux'}}
+    test('will not ask for a type object more than once', () => {
+      const instance = {i: 42, t: 101, v: {bar: 'baz'}}
+      const type = {i: 101, t: 3, v: {baz: {}}}
+      let remoteCalls = 0
+      let client
 
-      const EX_DEEP_TYPE_2 = {i: 13, t: 3, v: {thing_2: {}}}
-      const EX_DEEP_INSTANCE_2 = {
-        i: 12,
-        t: 13,
-        v: {baz: 'baz', instance_3: EX_DEEP_INSTANCE_3}
-      }
-
-      const EX_DEEP_TYPE_1 = {i: 15, t: 3, v: {thing_1: {}}}
-      const EX_DEEP_INSTANCE_1 = {i: 14, t: 15, v: {bar: 'bar'}}
-
-      const EX_DEEP_TYPE_0 = {i: 17, t: 3, v: {thing_0: {}}}
-      const EX_DEEP_INSTANCE_0 = {
-        i: 16,
-        t: 17,
-        v: {foo: 'foo', instance_1: EX_DEEP_INSTANCE_1, instance_2: EX_DEEP_INSTANCE_2}
-      }
-
-      addListener(ws, 'message', (message) => {
+      sendControlAndResolveRemote((message) => {
         const token = message.$.token
-        const requestedId = message.args[0]
-        let response
 
-        // will be a bunch of control.get_object_by_id calls
-        // don't care about recursion order as long as result is correct
-        if (requestedId === EX_DEEP_TYPE_3.i) {
-          response = EX_DEEP_TYPE_3
-        } else if (requestedId === EX_DEEP_TYPE_2.i) {
-          response = EX_DEEP_TYPE_2
-        } else if (requestedId === EX_DEEP_TYPE_1.i) {
-          response = EX_DEEP_TYPE_1
-        } else if (requestedId === EX_DEEP_TYPE_0.i) {
-          response = EX_DEEP_TYPE_0
-        } else {
-          // else it wasn't a system get_object_by_id call
-          response = EX_DEEP_INSTANCE_0
-        }
-
+        remoteCalls++
         setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
+        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, type)), 5)
       })
 
-      const result = client.remote.be_a_person()
-
-      return expect(result).resolves.toEqual({
-        thing_0: expect.any(Function),
-        foo: 'foo',
-        instance_1: {
-          thing_1: expect.any(Function),
-          bar: 'bar'
-        },
-        instance_2: {
-          thing_2: expect.any(Function),
-          baz: 'baz',
-          instance_3: {
-            thing_3: expect.any(Function),
-            quux: 'quux'
-          }
-        }
-      })
-    })
-
-    test('deserializes remote objects with nested circular references', () => {
-      const CIRCULAR_TYPE = {i: 21, t: 3, v: {circle: {}}}
-      const CIRCULAR_INSTANCE = {
-        i: 20,
-        t: 21,
-        v: {foo: 'foo', self: {i: 20, t: 21, v: null}}
-      }
-
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        const requestedId = message.args[0]
-        let response
-
-        if (requestedId === CIRCULAR_TYPE.i) {
-          response = CIRCULAR_TYPE
-        } else {
-          response = CIRCULAR_INSTANCE
-        }
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
-      })
-
-      return client.remote.be_a_robot()
-        .then((remote) => expect(remote.self).toBe(remote))
-    })
-
-    test('deserializes remote object with sibling circular refs', () => {
-      const TYPE = {i: 30, t: 3, v: {}}
-      const CHILD_INSTANCE = {i: 31, t: 30, v: {foo: 'foo'}}
-      const CIRCULAR_CHILD_INSTANCE = {i: 31, t: 30, v: null}
-      const PARENT_INSTANCE = {
-        i: 32,
-        t: 30,
-        v: {circular: CIRCULAR_CHILD_INSTANCE, child: CHILD_INSTANCE}
-      }
-
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        const requestedId = message.args[0]
-        let response
-
-        if (requestedId === TYPE.i) {
-          response = TYPE
-        } else {
-          response = PARENT_INSTANCE
-        }
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
-      })
-
-      return client.remote.be_a_robot()
-        .then((remote) => {
-          expect(remote.circular).toBe(remote.child)
-          expect(remote.child).toEqual({foo: 'foo'})
+      return Client(url)
+        .then((c) => {
+          client = c
+          RemoteObject.mockReturnValue(Promise.resolve(type.v))
+          return client.resolveTypeValues(instance)
         })
+        .then(() => client.resolveTypeValues(instance))
+        .then(() => expect(remoteCalls).toBe(1))
     })
+  })
 
-    test('deserializes remote object with deep matching refs', () => {
-      const TYPE = {i: 30, t: 3, v: {}}
-      const CHILD = {i: 31, t: 30, v: {foo: 'foo'}}
-      const ALSO_CHILD = {i: 31, t: 30, v: null}
-      const PARENT_1 = {i: 32, t: 30, v: {c: ALSO_CHILD}}
-      const PARENT_2 = {i: 33, t: 30, v: {c: CHILD}}
-      const SUPERPARENT = {i: 34, t: 30, v: {a: PARENT_1, b: PARENT_2}}
+  test('emits notification data wrapped in RemoteObjects', (done) => {
+    const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: 'qux'}}
+    const notification = {$: {type: NOTIFICATION}, data: INSTANCE}
+    const mockRemote = {foo: 'bar', baz: 'qux'}
 
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        const requestedId = message.args[0]
-        let response
+    sendControlAndResolveRemote()
+    setTimeout(() => ws.send(notification), 10)
+    RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
 
-        if (requestedId === TYPE.i) {
-          response = TYPE
-        } else {
-          response = SUPERPARENT
-        }
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
-      })
-
-      return client.remote.be_a_person()
-        .then((remote) => {
-          expect(remote.a.c).toBe(remote.b.c)
-          expect(remote.a.c).toEqual({foo: 'foo'})
+    Client(url)
+      .then((client) => {
+        addListener(client, 'notification', (message) => {
+          expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE)
+          expect(message).toEqual(mockRemote)
+          done()
         })
-    })
-
-    test('deserializes object with null, primitive, and array children', () => {
-      const TYPE = {i: 30, t: 3, v: {}}
-      const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: null, qux: [1, 2]}}
-
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        const requestedId = message.args[0]
-        let response
-
-        if (requestedId === TYPE.i) {
-          response = TYPE
-        } else {
-          response = INSTANCE
-        }
-
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, response)), 5)
       })
+  })
 
-      return client.remote.be_a_robot()
-        .then((remote) => expect(remote).toEqual({
-          foo: 'bar',
-          baz: null,
-          qux: [1, 2]
-        }))
-    })
+  test('closes the socket', () => {
+    sendControlAndResolveRemote()
 
-    test('emits notification events', (done) => {
-      const TYPE = {i: 30, t: 3, v: {}}
-      const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: 'quux'}}
-      const notification = {$: {type: NOTIFICATION}, data: INSTANCE}
+    return Client(url)
+      .then((client) => client.close())
+      .then(() => expect(
+        ws.readyState === global.WebSocket.CLOSING ||
+        ws.readyState === global.WebSocket.CLOSED
+      ).toBe(true))
+  })
 
-      addListener(ws, 'message', (message) => {
-        const token = message.$.token
-        setTimeout(() => ws.send(makeAckResponse(token)), 1)
-        setTimeout(() => ws.send(makeCallResponse(token, SUCCESS, TYPE)), 5)
+  test('client.close resolves if the socket is already closed', () => {
+    let client
+    sendControlAndResolveRemote()
+
+    return Client(url)
+      .then((c) => {
+        client = c
+        return client.close()
       })
-
-      setTimeout(() => ws.send(notification), 5)
-
-      addListener(client, 'notification', (message) => {
-        expect(message).toEqual({foo: 'bar', baz: 'quux'})
-        done()
-      })
-    })
-
-    test('closes the socket', () => {
-      return client.close()
-        .then(() => expect(
-          ws.readyState === global.WebSocket.CLOSING ||
-          ws.readyState === global.WebSocket.CLOSED
-        ).toBe(true))
-    })
-
-    test('client.close resolves if the socket is already closed', () => {
-      return client.close()
-        .then(() => client.close())
-        .then(() => expect(
-          ws.readyState === global.WebSocket.CLOSING ||
-          ws.readyState === global.WebSocket.CLOSED
-        ).toBe(true))
-    })
+      .then(() => client.close())
+      .then(() => expect(
+        ws.readyState === global.WebSocket.CLOSING ||
+        ws.readyState === global.WebSocket.CLOSED
+      ).toBe(true))
   })
 })

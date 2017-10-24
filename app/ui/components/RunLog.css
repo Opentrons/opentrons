@@ -1,8 +1,9 @@
 .run_log_wrapper {
+  box-sizing: border-box;
   font-family: 'sans';
   overflow-y: scroll;
-  padding: 0 1rem 3rem;
-  border-top: 1rem solid white;
+  border: 1rem solid white;
+  max-height: 34rem;
 }
 
 ol {

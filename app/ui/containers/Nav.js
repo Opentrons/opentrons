@@ -12,19 +12,27 @@ import {
   selectors as robotSelectors
 } from '../robot'
 
+import uploadIconSrc from '../img/icon_file.svg'
+import setupIconSrc from '../img/icon_setup.svg'
+
 import SideBar from '../components/SideBar'
 
 const mapStateToProps = (state) => {
+  const isConnected = state.robot.isConnected
   return {
     // interface
     isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
     currentNavPanelTask: interfaceSelectors.getCurrentNavPanelTask(state),
+    navLinks: [
+      {name: 'upload', iconSrc: uploadIconSrc, isDisabled: !isConnected, to: '/upload'},
+      {name: 'setup', iconSrc: setupIconSrc, isDisabled: !isConnected, to: '/setup-instruments'}
+    ],
 
     // robot
-    isConnected: state.robot.isConnected,
     isReadyToRun: robotSelectors.getIsReadyToRun(state),
     isRunning: robotSelectors.getIsRunning(state),
-    connectionStatus: robotSelectors.getConnectionStatus(state)
+    connectionStatus: robotSelectors.getConnectionStatus(state),
+    isConnected
   }
 }
 
@@ -32,7 +40,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     // interface
     onNavClick: () => dispatch(interfaceActions.toggleNavPanel()),
-    onNavIconClick: (panel) => () => dispatch(interfaceActions.setCurrentNavPanel(panel)),
+    onNavIconClick: (panel) => () => {
+      dispatch(interfaceActions.setCurrentNavPanel(panel))
+    },
 
     // robot
     // TODO(mc): revisit when robot discovery / multiple robots is addressed

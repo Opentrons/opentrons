@@ -9,16 +9,14 @@ export default class RunLog extends Component {
   }
 
   render () {
-    const {style, commands} = this.props
+    const {commands} = this.props
     const makeCommandToTemplateMapper = (depth) => (command) => {
       const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
-      const contents = [
-        <p className={style}>[{id}] : {description}</p>
-      ]
+      let nestedList = null
 
       if (children.length) {
-        contents.push(
+        nestedList = (
           <ol>
             {children.map(makeCommandToTemplateMapper(depth + 1))}
           </ol>
@@ -38,7 +36,8 @@ export default class RunLog extends Component {
 
       return (
         <li {...liProps}>
-          {contents}
+          <p className={style}>[{id}] : {description}</p>
+          {nestedList}
         </li>
       )
     }
@@ -46,7 +45,7 @@ export default class RunLog extends Component {
     const commandItems = commands.map(makeCommandToTemplateMapper(0))
 
     return (
-      <section className={classnames(style, styles.run_log_wrapper)}>
+      <section className={styles.run_log_wrapper}>
         <ol>
           {commandItems}
         </ol>
@@ -55,13 +54,7 @@ export default class RunLog extends Component {
   }
 }
 
-/*
-Commenting out isRequired for some props for now, using local mock data for first pass
-*/
 RunLog.propTypes = {
-  style: PropTypes.string,
-  isConnected: PropTypes.bool.isRequired,
-  // TODO(mc, 2017-08-23): use PropTypes.shape (or whatever that method is)
-  // instead of object
+  // TODO(mc, 2017-08-23): use PropTypes.shape instead of object
   commands: PropTypes.arrayOf(PropTypes.object).isRequired
 }

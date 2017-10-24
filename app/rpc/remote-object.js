@@ -12,15 +12,23 @@ function isRemoteObject (source) {
 }
 
 export default function RemoteObject (context, source, seen) {
+  seen = seen || new Map()
+
   if (Array.isArray(source)) {
-    return Promise.all(source.map((s) => RemoteObject(context, s, seen)))
+    // iterate over the children serially, waiting for each RemoteObject
+    // to resolve before moving on to the next one. Returns a promise that
+    // resolves to an array of RemoteObjects. Bluebird would make this cleaner
+    return source.reduce((result, s) => result.then((acc) => {
+      return RemoteObject(context, s, seen).then((remote) => {
+        acc.push(remote)
+        return acc
+      })
+    }), Promise.resolve([]))
   }
 
   if (!isRemoteObject(source)) {
     return Promise.resolve(source)
   }
-
-  seen = seen || new Map()
 
   const id = source.i
   const value = source.v
@@ -43,7 +51,6 @@ export default function RemoteObject (context, source, seen) {
   }
 
   // get all props and resolve remote objects for any children
-  // TODO(mc): filter private fields
   const props = Object.keys(source.v)
     .map((key) => ({key, value: source.v[key]}))
     // TODO(mc): consider using Bluebird because this reduce is hard to read
@@ -55,15 +62,23 @@ export default function RemoteObject (context, source, seen) {
     )), Promise.resolve({}))
 
   // setup method calls based on type shape
-  // TODO(mc): filter "private" methods
   const methods = context.resolveTypeValues(source)
     .then((typeObject) => Object.keys(typeObject).reduce((result, key) => {
       result[key] = function remoteCall (...args) {
-        return context.callRemote(id, key, args)
+        // TODO(mc, 2017-10-04): recurse down arrays of objects, too
+        // TODO(mc, 2017-10-04): check if dicts need to be mapped to {v: obj}
+        const argsWithRemotes = args.map((a) => {
+          if (a._id != null) return {i: a._id}
+
+          return a
+        })
+
+        return context.callRemote(id, key, argsWithRemotes)
       }
 
       return result
     }, {}))
 
-  return Promise.all([props, methods]).then(([p, m]) => Object.assign(remote, p, m))
+  return Promise.all([props, methods])
+    .then(([p, m]) => Object.assign(remote, p, m, {_id: id}))
 }

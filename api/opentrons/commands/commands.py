@@ -1,5 +1,5 @@
 from . import types
-from ..broker import publish as publish_msg
+from ..broker import broker
 import functools
 import inspect
 
@@ -25,7 +25,7 @@ def home(axis):
     )
 
 
-def aspirate(volume, location, rate):
+def aspirate(instrument, volume, location, rate):
     location = drop_coodrinates(location)
     text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
         volume=volume, location=location, rate=rate
@@ -33,6 +33,7 @@ def aspirate(volume, location, rate):
     return make_command(
         name=types.ASPIRATE,
         payload={
+            'instrument': instrument,
             'volume': volume,
             'location': location,
             'rate': rate,
@@ -41,7 +42,7 @@ def aspirate(volume, location, rate):
     )
 
 
-def dispense(volume, location, rate):
+def dispense(instrument, volume, location, rate):
     location = drop_coodrinates(location)
     text = 'Dispensing {volume} uL into {location}'.format(
         volume=volume, location=location, rate=rate
@@ -50,6 +51,7 @@ def dispense(volume, location, rate):
     return make_command(
         name=types.DISPENSE,
         payload={
+            'instrument': instrument,
             'volume': volume,
             'location': location,
             'rate': rate,
@@ -58,7 +60,7 @@ def dispense(volume, location, rate):
     )
 
 
-def consolidate(volume, source, dest):
+def consolidate(instrument, volume, source, dest):
     text = 'Consolidating {volume} from {source} to {dest}'.format(
         volume=volume,
         source=source,
@@ -67,6 +69,8 @@ def consolidate(volume, source, dest):
     return make_command(
         name=types.CONSOLIDATE,
         payload={
+            'instrument': instrument,
+            'locations': [source, dest],
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -75,7 +79,7 @@ def consolidate(volume, source, dest):
     )
 
 
-def distribute(volume, source, dest):
+def distribute(instrument, volume, source, dest):
     text = 'Distributing {volume} from {source} to {dest}'.format(
         volume=volume,
         source=source,
@@ -84,6 +88,8 @@ def distribute(volume, source, dest):
     return make_command(
         name=types.DISTRIBUTE,
         payload={
+            'instrument': instrument,
+            'locations': [source, dest],
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -92,7 +98,7 @@ def distribute(volume, source, dest):
     )
 
 
-def transfer(volume, source, dest):
+def transfer(instrument, volume, source, dest):
     text = 'Transferring {volume} from {source} to {dest}'.format(
         volume=volume,
         source=source,
@@ -101,6 +107,8 @@ def transfer(volume, source, dest):
     return make_command(
         name=types.TRANSFER,
         payload={
+            'instrument': instrument,
+            'locations': [source, dest],
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -119,13 +127,15 @@ def comment(msg):
     )
 
 
-def mix(repetitions, volume):
+def mix(instrument, repetitions, volume, location):
     text = 'Mixing {repetitions} times with a volume of {volume}ul'.format(
         repetitions=repetitions, volume=volume
     )
     return make_command(
         name=types.MIX,
         payload={
+            'instrument': instrument,
+            'location': location,
             'volume': volume,
             'repetitions': repetitions,
             'text': text
@@ -133,7 +143,7 @@ def mix(repetitions, volume):
     )
 
 
-def blow_out(location):
+def blow_out(instrument, location):
     location = drop_coodrinates(location)
     text = 'Blowing out'
 
@@ -143,17 +153,19 @@ def blow_out(location):
     return make_command(
         name=types.BLOW_OUT,
         payload={
+            'instrument': instrument,
             'location': location,
             'text': text
         }
     )
 
 
-def touch_tip():
+def touch_tip(instrument):
     text = 'Touching tip'
     return make_command(
         name=types.TOUCH_TIP,
         payload={
+            'instrument': instrument,
             'text': text
         }
     )
@@ -179,23 +191,26 @@ def return_tip():
     )
 
 
-def pick_up_tip(location):
+def pick_up_tip(instrument, location):
     location = drop_coodrinates(location)
     text = 'Picking up tip {location}'.format(location=location)
     return make_command(
         name=types.PICK_UP_TIP,
         payload={
+            'instrument': instrument,
+            'location': location,
             'text': text
         }
     )
 
 
-def drop_tip(location):
+def drop_tip(instrument, location):
     location = drop_coodrinates(location)
     text = 'Dropping tip {location}'.format(location=location)
     return make_command(
         name=types.DROP_TIP,
         payload={
+            'instrument': instrument,
             'location': location,
             'text': text
         }
@@ -246,21 +261,35 @@ magbead.delay = delay
 
 
 def publish(before, after, command, meta=None):
-    notify_command_topic = functools.partial(publish_msg, topic=types.COMMAND)
+    publish_command = functools.partial(
+        broker.publish,
+        topic=types.COMMAND)
 
     def decorator(f):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
-            payload = _get_args(f, args, kwargs)
+            call_args = _get_args(f, args, kwargs)
             command_args = dict(
                 zip(
                     reversed(inspect.getargspec(command).args),
                     reversed(inspect.getargspec(command).defaults or [])))
 
+            # TODO (artyom, 20170927): we are doing this to be able to use
+            # the decorator in Instrument class methods, in which case
+            # self is effectively an instrument.
+            # To narrow the scope of this hack, we are checking if the command
+            # is expecting instrument first.
+            if 'instrument' in inspect.getargspec(command).args:
+                # We are also checking if call arguments have 'self' and
+                # don't have instruments specified, in which case instruments
+                # should take precedence.
+                if 'self' in call_args and 'instrument' not in call_args:
+                    call_args['instrument'] = call_args['self']
+
             command_args.update({
-                    key: payload[key]
+                    key: call_args[key]
                     for key in
-                    set(inspect.getargspec(command).args) & payload.keys()
+                    set(inspect.getargspec(command).args) & call_args.keys()
                 })
 
             if meta:
@@ -269,13 +298,13 @@ def publish(before, after, command, meta=None):
             payload = command(**command_args)
 
             if before:
-                notify_command_topic(
+                publish_command(
                     message={**payload, '$': 'before'})
 
             res = f(*args, **kwargs)
 
             if after:
-                notify_command_topic(
+                publish_command(
                     message={**payload, '$': 'after', 'return': res})
 
             return res

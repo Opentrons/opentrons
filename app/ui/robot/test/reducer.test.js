@@ -21,13 +21,39 @@ describe('robot reducer', () => {
 
       sessionRequest: {inProgress: false, error: null},
       sessionName: '',
-      protocolText: '',
-      protocolCommands: [],
-      protocolCommandsById: {},
       sessionErrors: [],
       sessionState: '',
 
+      protocolText: '',
+      protocolCommands: [],
+      protocolCommandsById: {},
+      protocolInstrumentsByAxis: {},
+      protocolLabwareBySlot: {},
+
+      instrumentCalibrationByAxis: {},
+      labwareConfirmationBySlot: {},
+      currentInstrument: '',
+      // TODO(mc, 2017-10-05): Make labware ID a string for consistency
+      currentLabware: 0,
+      labwareReviewed: false,
+      currentLabwareConfirmation: {
+        slot: 0,
+        isMoving: false,
+        isOverWell: false
+      },
+      currentInstrumentCalibration: {
+        axis: '',
+        isPreparingForProbe: false,
+        isReadyForProbe: false,
+        isProbing: false
+      },
+
       homeRequest: {inProgress: false, error: null},
+      moveToFrontRequest: {inProgress: false, error: null},
+      probeTipRequest: {inProgress: false, error: null},
+      moveToRequest: {inProgress: false, error: null},
+      jogRequest: {inProgress: false, error: null},
+      updateOffsetRequest: {inProgress: false, error: null},
 
       runRequest: {inProgress: false, error: null},
       pauseRequest: {inProgress: false, error: null},
@@ -139,7 +165,8 @@ describe('robot reducer', () => {
   test('handles session with file', () => {
     const state = {
       sessionRequest: {inProgress: false, error: new Error('AH')},
-      sessionName: ''
+      sessionName: '',
+      labwareReviewed: true
     }
     const action = {
       type: actionTypes.SESSION,
@@ -148,7 +175,8 @@ describe('robot reducer', () => {
 
     expect(reducer(state, action)).toEqual({
       sessionRequest: {inProgress: true, error: null},
-      sessionName: 'foo.py'
+      sessionName: '/path/to/foo.py',
+      labwareReviewed: false
     })
   })
 
@@ -216,6 +244,235 @@ describe('robot reducer', () => {
     })
   })
 
+  test('handles setCurrentInstrument', () => {
+    const state = {currentInstrument: 'right'}
+    const action = {
+      type: actionTypes.SET_CURRENT_INSTRUMENT,
+      payload: {instrument: 'left'}
+    }
+
+    expect(reducer(state, action)).toEqual({currentInstrument: 'left'})
+  })
+
+  test('handles setCurrentLabware', () => {
+    const state = {currentLabware: 3}
+    const action = {
+      type: actionTypes.SET_CURRENT_LABWARE,
+      payload: {labware: 6}
+    }
+
+    expect(reducer(state, action)).toEqual({currentLabware: 6})
+  })
+
+  test('handles moveToFront action', () => {
+    const state = {
+      moveToFrontRequest: {inProgress: false, error: new Error()},
+      currentInstrumentCalibration: {},
+      instrumentCalibrationByAxis: {left: {isProbed: true}}
+    }
+    const action = {
+      type: actionTypes.MOVE_TO_FRONT,
+      payload: {instrument: 'left'}
+    }
+
+    expect(reducer(state, action)).toEqual({
+      moveToFrontRequest: {inProgress: true, error: null},
+      instrumentCalibrationByAxis: {left: {isProbed: false}},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: true
+      }
+    })
+  })
+
+  test('handles moveToFrontResponse action', () => {
+    const state = {
+      moveToFrontRequest: {inProgress: true, error: null},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: true,
+        isReadyForProbe: false
+      }
+    }
+
+    const success = {type: actionTypes.MOVE_TO_FRONT_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      moveToFrontRequest: {inProgress: false, error: null},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: false,
+        isReadyForProbe: true
+      }
+    })
+    expect(reducer(state, failure)).toEqual({
+      moveToFrontRequest: {inProgress: false, error: new Error('AH')},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isPreparingForProbe: false,
+        isReadyForProbe: false
+      }
+    })
+  })
+
+  test('handles probeTip action', () => {
+    const state = {
+      probeTipRequest: {inProgress: false, error: new Error()},
+      currentInstrumentCalibration: {
+        axis: 'left',
+        isReadyForProbe: true,
+        isProbing: false
+      }
+    }
+    const action = {type: actionTypes.PROBE_TIP, payload: {instrument: 'right'}}
+
+    expect(reducer(state, action)).toEqual({
+      probeTipRequest: {inProgress: true, error: null},
+      currentInstrumentCalibration: {
+        axis: 'right',
+        isReadyForProbe: false,
+        isProbing: true
+      }
+    })
+  })
+
+  test('handles probeTipResponse action', () => {
+    const state = {
+      probeTipRequest: {inProgress: true, error: null},
+      currentInstrumentCalibration: {axis: 'right', isProbing: true},
+      instrumentCalibrationByAxis: {
+        left: {isProbed: false},
+        right: {isProbed: false}
+      }
+    }
+    const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.PROBE_TIP_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      probeTipRequest: {inProgress: false, error: null},
+      currentInstrumentCalibration: {axis: 'right', isProbing: false},
+      instrumentCalibrationByAxis: {
+        left: {isProbed: false},
+        right: {isProbed: true}
+      }
+    })
+    expect(reducer(state, failure)).toEqual({
+      probeTipRequest: {inProgress: false, error: new Error('AH')},
+      currentInstrumentCalibration: {axis: 'right', isProbing: false},
+      instrumentCalibrationByAxis: {
+        left: {isProbed: false},
+        right: {isProbed: false}
+      }
+    })
+  })
+
+  test('handles moveTo action', () => {
+    const state = {
+      moveToRequest: {inProgress: false, error: new Error()},
+      currentLabwareConfirmation: {slot: 5, isMoving: false, isOverWell: true}
+    }
+
+    const action = {type: actionTypes.MOVE_TO, payload: {labware: 3}}
+
+    expect(reducer(state, action)).toEqual({
+      moveToRequest: {inProgress: true, error: null},
+      currentLabwareConfirmation: {slot: 3, isMoving: true, isOverWell: false}
+    })
+  })
+
+  test('handles moveToResponse action', () => {
+    const state = {
+      moveToRequest: {inProgress: true, error: null},
+      currentLabwareConfirmation: {slot: 4, isMoving: true, isOverWell: false}
+    }
+
+    const success = {type: actionTypes.MOVE_TO_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.MOVE_TO_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      moveToRequest: {inProgress: false, error: null},
+      currentLabwareConfirmation: {slot: 4, isMoving: false, isOverWell: true}
+    })
+    expect(reducer(state, failure)).toEqual({
+      moveToRequest: {inProgress: false, error: new Error('AH')},
+      currentLabwareConfirmation: {slot: 4, isMoving: false, isOverWell: false}
+    })
+  })
+
+  test('handles jog action', () => {
+    const state = {jogRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.JOG}
+
+    expect(reducer(state, action)).toEqual({
+      jogRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles jogResponse action', () => {
+    const state = {jogRequest: {inProgress: true, error: null}}
+    const success = {type: actionTypes.JOG_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.JOG_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      jogRequest: {inProgress: false, error: null}
+    })
+    expect(reducer(state, failure)).toEqual({
+      jogRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles updateOffset action', () => {
+    const state = {updateOffsetRequest: {inProgress: false, error: new Error()}}
+    const action = {type: actionTypes.UPDATE_OFFSET}
+
+    expect(reducer(state, action)).toEqual({
+      updateOffsetRequest: {inProgress: true, error: null}
+    })
+  })
+
+  test('handles updateOffsetResponse action', () => {
+    const state = {
+      updateOffsetRequest: {inProgress: true, error: null},
+      currentLabwareConfirmation: {slot: 2, isMoving: false, isOverWell: false},
+      labwareConfirmationBySlot: {2: {isConfirmed: false}}
+    }
+
+    const success = {type: actionTypes.UPDATE_OFFSET_RESPONSE, error: false}
+    const failure = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(reducer(state, success)).toEqual({
+      updateOffsetRequest: {inProgress: false, error: null},
+      currentLabwareConfirmation: {slot: 0, isMoving: false, isOverWell: false},
+      labwareConfirmationBySlot: {2: {isConfirmed: true}}
+    })
+    expect(reducer(state, failure)).toEqual({
+      updateOffsetRequest: {inProgress: false, error: new Error('AH')},
+      currentLabwareConfirmation: {slot: 2, isMoving: false, isOverWell: false},
+      labwareConfirmationBySlot: {2: {isConfirmed: false}}
+    })
+  })
+
   test('handles run action', () => {
     const state = {
       runTime: now,
@@ -247,7 +504,7 @@ describe('robot reducer', () => {
     })
   })
 
-  test('handled tickRunTime', () => {
+  test('handles tickRunTime', () => {
     const state = {runTime: 0}
     const action = {type: actionTypes.TICK_RUN_TIME}
 

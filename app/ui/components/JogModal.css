@@ -1,0 +1,109 @@
+.modal_wrapper {
+  background-color: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 675px;
+  padding-top: 4rem;
+}
+
+.modal_wrapper:target {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.jog_modal {
+  width: 400px;
+  height: 400px;
+  border-radius: 0.5rem;
+  position: relative;
+  margin: 5rem auto;
+  padding: 3rem 2rem;
+  background: #ddd;
+  text-align: center;
+}
+
+a.close {
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  color: black;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0.5rem;
+  text-decoration: none;
+}
+
+.jog_controls {
+  margin: 1rem auto;
+  width: 16rem;
+  display: grid;
+  grid-gap: 0.25rem;
+  grid-template-rows: repeat(2, [row] 3rem);
+  grid-template-columns: repeat(5, [col] 3rem);
+}
+
+.btn {
+  border-radius: 0.25rem;
+  background-color: #333;
+  color: white;
+  font-size: 1rem;
+}
+
+.btn_y_neg {
+  composes: btn;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.btn_z_neg {
+  composes: btn;
+  grid-column: 5;
+  grid-row: 1;
+}
+
+.btn_x_neg {
+  composes: btn;
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.btn_y_pos {
+  composes: btn;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.btn_x_pos {
+  composes: btn;
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.btn_z_pos {
+  composes: btn;
+  grid-column: 5;
+  grid-row: 2;
+}
+
+.jog_modal p {
+  font-size: 0.75rem;
+  margin: 1rem 0;
+}
+
+.btn_confirm {
+  margin: 1rem;
+  font-size: 1rem;
+  width: 16rem;
+  padding: 0 3rem;
+  border-radius: 0.5rem;
+  background-color: #777;
+  font-family: 'trons';
+  color: white;
+  line-height: 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}

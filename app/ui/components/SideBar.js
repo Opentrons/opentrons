@@ -2,45 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import NavPanel from './NavPanel'
-import grid from './Grid.css'
 import styles from './SideBar.css'
 
-import uploadIconSrc from '../img/icon_file.svg'
-import designIconSrc from '../img/icon_design.svg'
-import setupIconSrc from '../img/icon_setup.svg'
+function NavLink (props) {
+  const {name, iconSrc, onClick, isDisabled, to} = props
 
-const UploadMenu = props => {
-  const {onNavIconClick} = props
   return (
-    <section className={styles.upload_menu} onClick={onNavIconClick('upload')}>
-      <div className={styles.upload_icon}>
-        <img src={uploadIconSrc} alt='upload' />
-      </div>
-    </section>
-  )
-}
-
-// TODO: (ka) these are just placeholder icons, refactor to reuse same component for upload, design, setup
-// with icon, style, and handler as props
-const DesignMenu = props => {
-  const {onNavIconClick} = props
-  return (
-    <section className={styles.design_menu} onClick={onNavIconClick('design')}>
-      <div className={styles.design_icon}>
-        <img src={designIconSrc} alt='design' />
-      </div>
-    </section>
-  )
-}
-
-const SetupMenu = props => {
-  const {onNavIconClick} = props
-  return (
-    <section className={styles.setup_menu} onClick={onNavIconClick('setup')}>
-      <div className={styles.setup_icon}>
-        <img src={setupIconSrc} alt='setup' />
-      </div>
-    </section>
+    <li key={name}>
+      <button
+        to={to}
+        onClick={onClick}
+        disabled={isDisabled}
+        className={styles.nav_icon}
+      >
+        <img src={iconSrc} alt={name} />
+      </button>
+    </li>
   )
 }
 
@@ -65,17 +42,21 @@ ConnectionIndicator.propTypes = {
 }
 
 export default function SideBar (props) {
-  const {isNavPanelOpen, onNavClick} = props
+  const {isNavPanelOpen, onNavIconClick} = props
+  const navLinks = props.navLinks.map((link) => NavLink({
+    onClick: onNavIconClick(link.name),
+    ...link
+  }))
+
   return (
-    <aside className={classnames(grid.nav_panel, { [grid.open]: isNavPanelOpen })}>
+    <aside className={classnames(styles.sidebar, { [styles.open]: isNavPanelOpen })}>
       <nav className={styles.nav_icons} >
-        <UploadMenu {...props} />
-        <DesignMenu {...props} />
-        <SetupMenu {...props} />
         <ConnectionIndicator {...props} />
+        <ol className={styles.nav_icon_list}>
+          {navLinks}
+        </ol>
       </nav>
       <section className={styles.nav_info}>
-        <span className={styles.close} onClick={onNavClick}>X</span>
         <NavPanel {...props} />
       </section>
     </aside>
@@ -83,6 +64,12 @@ export default function SideBar (props) {
 }
 
 SideBar.propTypes = {
+  navLinks: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    iconSrc: PropTypes.string.isRequired,
+    isDisabled: PropTypes.bool.isRequired
+  })).isRequired,
+  isConnected: PropTypes.bool.isRequired,
   isNavPanelOpen: PropTypes.bool.isRequired,
   onNavClick: PropTypes.func.isRequired
 }
