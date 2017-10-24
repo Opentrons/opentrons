@@ -56,55 +56,69 @@ const LabwareContainer = ({
 
   return (
     <div className={styles.deckSlot}>
-      {containerType
-        ? (
-          nonFillableContainers.includes(containerType)
-            ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
-            : <SelectablePlate containerId={containerId} cssFillParent />
-          )
-        : <label>{slotName}</label>}
+
+      {!hasName && <div className={styles.containerOverlayNameIt}>
+        <label>Name this labware:</label>
+        <input id={containerNameInputId}
+          placeholder={humanize(containerType)}
+          // Quick HACK to have enter key submit the rename action
+          onKeyDown={e =>
+            e.key === 'Enter' && modifyContainer({containerId, modify: {name: e.target.value}})
+          }
+        />
+        {/* HACK: using id selector instead of stateful input field... */}
+        <div className={styles.btn} onClick={() => modifyContainer(
+          {
+            containerId,
+            modify: {
+              name: document.getElementById(containerNameInputId).value || humanize(containerType)
+            }
+          }
+        )}>Save</div>
+        </div>
+      }
 
       {containerType && // if there's no containerType, assume it's empty
         <div className={styles.containerOverlay}>
 
-          {!hasName && <div className={styles.containerOverlayNameIt}>
-            <label>Name this labware:</label>
-            <input id={containerNameInputId}
-              placeholder={humanize(containerType)}
-              // Quick HACK to have enter key submit the rename action
-              onKeyDown={e =>
-                e.key === 'Enter' && modifyContainer({containerId, modify: {name: e.target.value}})
-              }
-            />
-            {/* HACK: using id selector instead of stateful input field... */}
-            <div className={styles.btn} onClick={() => modifyContainer(
-              {
-                containerId,
-                modify: {
-                  name: document.getElementById(containerNameInputId).value || humanize(containerType)
-                }
-              }
-            )}>Save</div>
-            </div>
-          }
-
-          {canAddIngreds && <div className={styles.containerOverlayAddIngred} onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
+          {canAddIngreds && <div className={styles.containerOverlayAddIngred}
+            onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
             Add Ingredients
           </div>}
 
-          {canAddIngreds && <div className={styles.containerOverlayRemove} onClick={() => deleteContainer({containerId, slotName, containerType})}>
+          <div className={styles.containerOverlayRemove}
+            style={canAddIngreds ? {} : {bottom: 0, position: 'absolute'}}
+            onClick={() =>
+              window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
+              deleteContainer({containerId, slotName, containerType})
+            }>
             <p>Remove {containerName}</p>
-          </div>}
+          </div>
 
         </div>}
 
-      {(slotName === canAdd) && (activeModals.labwareSelection
-        ? <LabwareDropdown
+      {containerType
+        ? (
+          <div>
+            <div className={styles.nameOverlay}>
+              <div>{humanize(containerType)}</div>
+              <div className={styles.containerName}>{containerName}</div>
+            </div>
+            {canAddIngreds
+              ? <SelectablePlate containerId={containerId} cssFillParent />
+              : <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
+            }
+          </div>
+        )
+        : <label>{slotName}</label>}
+
+      {!containerType && (activeModals.labwareSelection
+        ? (slotName === canAdd) && <LabwareDropdown
           onClose={e => closeLabwareSelector({slotName})}
           onContainerChoose={containerType => createContainer({slotName, containerType})}
         />
         : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
-              Add Labware
+            Add Labware
           </div>
       )}
     </div>

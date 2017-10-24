@@ -36,18 +36,23 @@
 }
 
 .ingredientPropertiesEntry form {
-  color: gray;
   display: inline-block;
+}
+
+.ingredientPropertiesEntry label {
+  color: #5b5b5b;
 }
 
 .ingredientPropertiesEntry form > span {
   border: 1px solid gray;
-  padding-left: 0.2rem;
+  padding: 0.2rem;
+  background-color: lightgray;
 }
 
-.ingredientPropertiesEntry span input {
-  float: right;
+.ingredientPropertiesEntry span input, textarea {
+  /*float: right;*/
   border: none;
+  font-size: 1.25rem;
 }
 
 .ingredientPropertiesEntry .checkbox {
@@ -75,9 +80,8 @@
 }
 
 .ingredientPropertiesEntry textarea {
-  width: 95%;
+  width: 98%;
   height: 5em;
-  border: none;
 }
 
 .ingredientPropertiesEntry button {

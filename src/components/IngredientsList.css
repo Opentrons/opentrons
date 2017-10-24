@@ -24,24 +24,29 @@ label {
 }
 
 .ingredListHeaderLabel {
-  border-bottom: 1px solid gray;
-  display: flex;
-  justify-content: space-between;
-  text-align: center;
-  color: gray;
-}
-
-.ingredListHeaderLabel > * {
-  text-align: center;
-  font-size: 1.5em;
-  width: 100%;
-}
-
-.ingredListHeaderLabel > *:first-child {
-  border-right: 1px solid gray;
-  border-radius: 0;
   color: white;
-  background-color: lightgray;
+  background-color: black;
+  padding: 1em;
+  border-radius: 0;
+}
+
+.flexRow {
+  display: flex;
+  align-items: baseline;
+}
+.ingredListHeaderLabel div {
+  text-align: left;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.ingredListHeaderLabel .containerName {
+  font-size: 1.5em;
+}
+
+.ingredListHeaderLabel .containerType {
+  padding: 0 1em;
+  font-weight: normal;
 }
 
 .ingredientsList section {
@@ -70,8 +75,21 @@ label {
 }
 
 .ingredientsList section footer .editButton {
+  /* NOTE: this footer was removed 2017-10-23 */
   border: 2px lightgray solid;
   padding: 2px;
+}
+
+.editButton {
+  color: white;
+  background-color: black;
+  font-weight: bold;
+  border-color: gray;
+  font-size: inherit;
+  margin: 1px;
+  border-width: 1px;
+  cursor: pointer;
+  padding: 0.1em 0.2em;
 }
 
 .deleteIngredient {
@@ -81,17 +99,7 @@ label {
   color: gray;
 }
 
-.editButton {
-  color: gray;
-  font-weight: bold;
-  border-color: gray;
-  font-size: inherit;
-  margin: 1px;
-  border-width: 1px;
-  cursor: pointer;
-}
-
-.deleteIngredient:hover, .editButton:hover {
+.deleteIngredient:hover, .editButton:hover, section.selected .editButton {
   color: white;
   background-color: lightgray
 }

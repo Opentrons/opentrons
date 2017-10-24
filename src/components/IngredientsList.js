@@ -31,7 +31,7 @@ class IngredGroupCard extends React.Component {
         {isExpanded && ingredCategoryData.wells.map((wellName, i) =>
           <IngredIndividual key={i}
             name={ingredCategoryData.individualize
-              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `${ingredCategoryData.name} ${i + 1}`)
+              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `Sample ${i + 1}`)
               : ' '
             }
             wellName={wellName}
@@ -66,12 +66,11 @@ const IngredIndividual = ({name, wellName, volume, concentration, canDelete, gro
 const IngredientsList = ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) => (
   <div className={styles.ingredientsList}>
     <div className={styles.ingredListHeaderLabel}>
-      <div>Slot {slotName}</div>
-      <div>{containerName}</div>
-    </div>
-    <div>
-      {/* TODO: use display container type, not '96-flat' */}
-      <div>{humanize(containerType)}</div>
+      <div className={styles.flexRow}>
+        <div>Slot {slotName}</div>
+        <div className={styles.containerType}>{humanize(containerType)}</div>
+      </div>
+      <div className={styles.containerName}>{containerName}</div>
     </div>
 
     {ingredients.map((ingredCategoryData, i) =>

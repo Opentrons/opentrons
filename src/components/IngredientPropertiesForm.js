@@ -73,10 +73,14 @@ class IngredientPropertiesForm extends React.Component {
 
     if (!selectedIngredientProperties && numWellsSelected <= 0) {
       return (
+        // TODO: style this properly
         <div style={{margin: '0 20%'}}>
-          <Button disabled>
+          <Button style={{color: 'gray'}} disabled>
             Select Wells to Add an Ingredient
           </Button>
+          <div style={{textAlign: 'center', color: 'white', 'paddingTop': '1rem'}}>
+            You can select multiple wells by dragging your mouse or holding shift.
+          </div>
         </div>
       )
     }
