@@ -3,7 +3,17 @@
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
+const DEV = process.env.NODE_ENV !== 'production'
 const DATA_URL_BYTE_LIMIT = 8192
+
+const CSS_MODULE_LOADER = {
+  loader: 'css-loader',
+  options: {
+    modules: true,
+    sourceMap: true,
+    localIdentName: '[name]__[local]__[hash:base64:5]'
+  }
+}
 
 module.exports = {
   // babel loader for JSX
@@ -34,25 +44,17 @@ module.exports = {
   // global CSS files
   globalCss: {
     test: /\.global\.css$/,
-    use: ExtractTextPlugin.extract({
-      use: 'css-loader',
-      fallback: 'style-loader'
-    })
+    use: DEV
+      ? ['style-loader', 'css-loader']
+      : ExtractTextPlugin.extract({use: 'css-loader', fallback: 'style-loader'})
   },
 
   // local CSS (CSS module) files
   localCss: {
     test: /^((?!\.global).)*\.css$/,
-    use: ExtractTextPlugin.extract({
-      use: {
-        loader: 'css-loader',
-        options: {
-          modules: true,
-          sourceMap: true,
-          localIdentName: '[name]__[local]__[hash:base64:5]'
-        }
-      }
-    })
+    use: DEV
+      ? ['style-loader', CSS_MODULE_LOADER]
+      : ExtractTextPlugin.extract({use: CSS_MODULE_LOADER})
   },
 
   // handlebars HTML templates
