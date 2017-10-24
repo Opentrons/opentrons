@@ -82,21 +82,26 @@ class SmoothieDriver_3_0_0:
     def _check_position_for_error(self, raw_position):
         parsed_position = _parse_axis_values(raw_position)
         _position_at_expected_thresh(parsed_position, self.cached_position)
-        self._update_position_cache(parsed_position)
         return parsed_position
 
     def update_position(self, is_retry=False):
         print("[Driver] refreshing driver position cache")
-        try:
-            position_response = self._send_command(GCODES['CURRENT_POSITION'])
-            self._accumulated_position_error = 0
-            return self._check_position_for_error(position_response)
-        except TypeError as e:
-            if is_retry:
-                raise e
-            else:
-                return self.update_position(is_retry=True)
-        return parsed_position
+        if self.simulating:
+            updated_position = self.cached_position
+
+        else:
+            try:
+                position_response = self._send_command(GCODES['CURRENT_POSITION'])
+                updated_position = self._check_position_for_error(position_response)
+            except TypeError as e:
+                if is_retry:
+                    raise e
+                else:
+                    self.update_position(is_retry=True)
+
+        self._update_position_cache(updated_position)
+        self._accumulated_position_error = 0
+
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
