@@ -1,4 +1,5 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import RunNotifications from './RunNotifications'
@@ -71,7 +72,7 @@ export default function RunControl (props) {
     <span>
       <div className={styles.btn_wrapper}>
         <div className={styles.file_info}>
-          {sessionName}
+          <Link to='/upload'>{sessionName}</Link>
         </div>
         {runButton}
         {pauseResumeButton}

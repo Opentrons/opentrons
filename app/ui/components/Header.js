@@ -6,7 +6,8 @@ export default function Header (props) {
   const {sessionName} = props
   return (
     <header className={styles.task_header}>
-      <Link to='/upload'>{sessionName}</Link>
+      <Link to='/upload' className={styles.file_info}>{sessionName}</Link>
+      <button className={styles.btn_home}>Home All</button>
     </header>
   )
 }

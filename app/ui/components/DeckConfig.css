@@ -2,6 +2,8 @@
   background-color: rgba(0, 0, 0, 0.8);
   position: fixed;
   top: 0;
+  right:0;
+  left:0;
   height: 100%;
   padding-top: 4rem;
 }
@@ -9,19 +11,13 @@
 .review_deck > div {
   margin: 0 auto;
   height: 75%;
-  padding: 1rem 4rem;
 }
-
-/* .deck_calibration > div {
-  margin: 0 auto;
-  width: 38rem;
-  height: 32rem;
-} */
 
 .review_message {
   height: 10rem;
   text-align: center;
-  padding: 1rem 4rem;
+  width: 38rem;
+  margin: 0 auto;
   color: white;
 }
 
