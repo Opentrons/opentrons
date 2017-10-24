@@ -14,7 +14,6 @@ class PipetteTip:
         self.length = length
 
 # This should come from configuration if tip length is not already in db
-DEFAULT_TIP_LENGTH = 53.2
 
 class Pipette:
     """
@@ -97,6 +96,8 @@ class Pipette:
         self.attached_tip = None
         self.instrument_actuator = None
         self.instrument_mover = None
+        self.DEFAULT_TIP_LENGTH = 53.2
+
 
         if not name:
             name = self.__class__.__name__
@@ -769,7 +770,7 @@ class Pipette:
             for i in range(int(presses) - 1):
                 self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
-            self._add_tip(DEFAULT_TIP_LENGTH)
+            self._add_tip(self.DEFAULT_TIP_LENGTH)
             self.instrument_mover.home()
             return self
 
@@ -836,7 +837,7 @@ class Pipette:
 
             self.current_volume = 0
             self.current_tip(None)
-            self._remove_tip(DEFAULT_TIP_LENGTH)
+            self._remove_tip(self.DEFAULT_TIP_LENGTH)
             return self
         return _drop_tip(location)
 
