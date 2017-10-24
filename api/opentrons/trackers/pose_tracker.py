@@ -103,7 +103,6 @@ class PoseTracker(object):
     pose_tracker_singleton = None #FIXME: [JG & Andy | 9/27] HACKY SINGLETON
 
     def __init__(self):
-        print('POSE TRACKER CREATED')
         self._root_nodes = []
         self._pose_dict = {}
         self._node_dict = {}

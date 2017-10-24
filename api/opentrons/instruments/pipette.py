@@ -1383,7 +1383,6 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
-        print('-[Pipette._move] moving to {}'.format((x,y,z)))
         self.instrument_mover.move(x, y, z)
 
     def _probe(self, axis, movement):
