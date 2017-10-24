@@ -9,7 +9,7 @@ database_path = environment.get_path('DATABASE_FILE')
 # ======================== Private Functions ======================== #
 
 
-# FIXME: (JG 9/19/17) This zip() return is just code smell due to Vector class
+
 def _parse_container_obj(container: Container):
     return dict(zip('xyz', container._coordinates))
 

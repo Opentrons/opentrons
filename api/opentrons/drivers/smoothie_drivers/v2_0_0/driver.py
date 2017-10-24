@@ -91,7 +91,6 @@ class SmoothieDriver_2_0_0(SmoothieDriver):
         self.STOPPED = 'Received a STOP signal and exited from movements'
 
         self.ignore_smoothie_sd = False
-
         self.config_dict = {}
 
         self.default_speeds = {}

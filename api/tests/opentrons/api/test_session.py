@@ -17,10 +17,10 @@ def labware_setup():
         [containers.load('96-PCR-flat', slot, slot) for slot in ['B1', 'B2']]
 
     p100 = instruments.Pipette(
-        name='p100', axis='a', channels=8, tip_racks=tip_racks)
+        name='p100', mount='right', channels=8, tip_racks=tip_racks)
 
     p1000 = instruments.Pipette(
-        name='p1000', axis='b', channels=8, tip_racks=tip_racks)
+        name='p1000', mount='left', channels=8, tip_racks=tip_racks)
 
     commands = [
         {
@@ -82,7 +82,7 @@ async def test_load_and_run(main_router, session_manager, protocol):
     assert main_router.notifications.queue.qsize() == 0
     assert session.command_log == {}
     assert session.state == 'loaded'
-    session.run(devicename='Virtual Smoothie')
+    session.run()
     assert len(session.command_log) == 105
 
     res = []
@@ -101,13 +101,13 @@ async def test_load_and_run(main_router, session_manager, protocol):
         'Run should emit state change to "running" and then to "finished"'
     assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
-    session.run(devicename='Virtual Smoothie')
+    session.run()
     assert len(session.command_log) == 105, \
         "Clears command log on the next run"
 
 
 @pytest.fixture
-def run_session():
+def run_session(virtual_smoothie_env):
     return Session('dino', 'from opentrons import robot')
 
 
@@ -158,7 +158,7 @@ def test_error_append(run_session):
     ]
 
 
-def test_get_instruments_and_containers(labware_setup):
+def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     instruments, tip_racks, plates, commands = labware_setup
     p100, p1000 = instruments
 
@@ -240,3 +240,20 @@ async def test_session_model_functional(session_manager, protocol):
     assert [container.name for container in session.containers] == \
            ['tiprack', 'trough', 'plate']
     assert [instrument.name for instrument in session.instruments] == ['p200']
+
+
+# TODO(artyom 20171018): design a small protocol specifically for the test
+@pytest.mark.parametrize('protocol_file', ['bradford_assay.py'])
+async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
+    """
+    Bradford Assay is using drop_tip() with no arguments that assumes
+    tip drop into trash-box. In this test we are confirming that
+    that trash location is being inferred from a command, and trash
+    is listed as a container for a protocol, as well as a container
+    instruments are interacting with.
+    """
+    session = session_manager.create(name='<blank>', text=protocol.text)
+
+    assert 'trash-box' in [c.name for c in session.get_containers()]
+    containers = sum([i.containers for i in session.get_instruments()], [])
+    assert 'trash-box' in [c.name for c in containers]

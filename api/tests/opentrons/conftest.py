@@ -168,4 +168,11 @@ def setup_testing_env():
     database.change_database(MAIN_TESTER_DB)
 
 
+@pytest.fixture
+def virtual_smoothie_env(monkeypatch):
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    yield
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
+
 setup_testing_env()
