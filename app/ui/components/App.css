@@ -1,7 +1,6 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 .wrapper {
@@ -19,4 +18,18 @@
   line-height: 4rem;
   color: white;
   padding: 0 1rem;
+  display: grid;
+  grid-template-columns: 2fr auto 10rem;
+  grid-template-areas: 'file . home';
+}
+
+.task_header a {
+  color: white;
+  grid-area: file;
+}
+
+.btn_home {
+  composes: btn from './Util.css';
+  grid-area: home;
+  margin: 1rem 0;
 }

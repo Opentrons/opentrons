@@ -4,7 +4,6 @@ from functools import partial
 from opentrons.api import models
 from collections import namedtuple
 
-
 def state(topic, state):
     def _match(item):
         return \
@@ -25,7 +24,6 @@ def log_by_axis(log, axis):
         }
 
     return reduce(reducer, log, {axis: [] for axis in axis})
-
 
 async def wait_until(matcher, notifications, timeout=1, loop=None):
     result = []
@@ -74,5 +72,6 @@ def main_router(loop, monkeypatch):
             notifications=router.notifications,
             loop=loop)
         yield router
+
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
     robot.reset()

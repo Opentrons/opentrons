@@ -9,7 +9,8 @@ import {
 
 import {
   actions as robotActions,
-  selectors as robotSelectors
+  selectors as robotSelectors,
+  constants as robotConstants
 } from '../robot'
 
 import uploadIconSrc from '../img/icon_file.svg'
@@ -18,14 +19,31 @@ import setupIconSrc from '../img/icon_setup.svg'
 import SideBar from '../components/SideBar'
 
 const mapStateToProps = (state) => {
-  const isConnected = state.robot.isConnected
+  const connectionStatus = robotSelectors.getConnectionStatus(state)
+  const isConnected = connectionStatus === robotConstants.CONNECTED
+  const sessionIsLoaded = robotSelectors.getSessionIsLoaded(state)
+  const isOpen = interfaceSelectors.getIsNavPanelOpen(state)
+  const activeTask = interfaceSelectors.getCurrentNavPanelTask(state)
+
   return {
     // interface
-    isNavPanelOpen: interfaceSelectors.getIsNavPanelOpen(state),
-    currentNavPanelTask: interfaceSelectors.getCurrentNavPanelTask(state),
+    isNavPanelOpen: isOpen,
+    currentNavPanelTask: activeTask,
     navLinks: [
-      {name: 'upload', iconSrc: uploadIconSrc, isDisabled: !isConnected, to: '/upload'},
-      {name: 'setup', iconSrc: setupIconSrc, isDisabled: !isConnected, to: '/setup-instruments'}
+      {
+        name: 'upload',
+        iconSrc: uploadIconSrc,
+        isDisabled: !isConnected,
+        isActive: isOpen && activeTask === 'upload',
+        msg: 'Upload File'
+      },
+      {
+        name: 'setup',
+        iconSrc: setupIconSrc,
+        isDisabled: !sessionIsLoaded,
+        isActive: isOpen && activeTask === 'setup',
+        msg: 'Prep For Run'
+      }
     ],
 
     // robot
@@ -39,7 +57,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     // interface
-    onNavClick: () => dispatch(interfaceActions.toggleNavPanel()),
+    toggleNavOpen: () => dispatch(interfaceActions.toggleNavPanel()),
     onNavIconClick: (panel) => () => {
       dispatch(interfaceActions.setCurrentNavPanel(panel))
     },

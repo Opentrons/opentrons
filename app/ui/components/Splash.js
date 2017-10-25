@@ -1,11 +1,12 @@
 import React from 'react'
+import classnames from 'classnames'
+
 import styles from './Splash.css'
-import otLogoSrc from '../img/opentrons_logo.png'
+
+const STYLE = classnames('absolute absolute__fill', styles.placeholder)
 
 export default function Splash () {
   return (
-    <div className={styles.placeholder}>
-      <img src={otLogoSrc} />
-    </div>
+    <div className={STYLE} />
   )
 }

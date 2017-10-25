@@ -1,11 +1,12 @@
 import React from 'react'
-import Page from '../components/Page'
-import Splash from '../components/Splash'
 
-export default function Upload () {
+import UploadStatus from '../containers/UploadStatus'
+import Page from '../components/Page'
+
+export default function UploadPage () {
   return (
     <Page>
-      <Splash />
+      <UploadStatus />
     </Page>
   )
 }

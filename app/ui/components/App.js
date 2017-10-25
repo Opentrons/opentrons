@@ -3,10 +3,12 @@ import {Switch, Route} from 'react-router'
 import Nav from '../containers/Nav'
 
 import Home from '../pages/Home'
-import Run from '../pages/Run'
+import Upload from '../pages/Upload'
 import SetupInstruments from '../pages/SetupInstruments'
 import SetupDeck from '../pages/SetupDeck'
+import Run from '../pages/Run'
 
+import './App.global.css'
 import styles from './App.css'
 
 export default function App () {
@@ -15,9 +17,10 @@ export default function App () {
       <Nav />
       <Switch>
         <Route exact path='/' component={Home} />
+        <Route path='/upload' component={Upload} />
+        <Route path='/setup-instruments/:side' component={SetupInstruments} />
+        <Route path='/setup-deck/:slot' component={SetupDeck} />
         <Route path='/run' component={Run} />
-        <Route path='/setup-instruments' component={SetupInstruments} />
-        <Route path='/setup-deck' component={SetupDeck} />
       </Switch>
     </div>
   )

@@ -6,13 +6,38 @@
 }
 
 .sidebar {
-  width: 350px;
   display: grid;
   grid-template-columns: 75px 275px;
+  width: 75px;
+  transition: width 0.5s ease-in-out;
 }
 
-.nav_icons,
-.nav_info {
+.sidebar.open {
+  width: 350px;
+}
+
+.close {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  cursor: pointer;
+  color: silver;
+  z-index: 100;
+}
+
+.sidebar .nav_info {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.5s ease-in-out;
+  position: relative;
+}
+
+.sidebar.open .nav_info {
+  width: 275px;
+}
+
+.nav_icons {
+  position: relative;
   border-right: 1px solid silver;
 }
 
@@ -26,12 +51,14 @@
   height: 4rem;
   line-height: 4rem;
   margin: 0;
+  position: relative;
 }
 
 .nav_icon {
   display: block;
   width: 100%;
   height: 100%;
+  position: relative;
   padding: 0.75rem;
   background-color: inherit;
   border-bottom: solid 2px rgba(151, 151, 151, 0.1);
@@ -40,9 +67,13 @@
   cursor: pointer;
 }
 
-.nav_icon[disabled] {
-  opacity: 0.5;
+.nav_icon[disabled] img {
+  filter: opacity(40%);
   cursor: default;
+}
+
+.active {
+  background-color: #ddd;
 }
 
 .nav_icon img {
@@ -50,9 +81,13 @@
 }
 
 .connection_status {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   cursor: pointer;
-  height: 74px;
-  border-bottom: solid 2px rgba(151, 151, 151, 0.1);
+  width: 75px;
+  height: 70px;
+  border-top: solid 2px rgba(151, 151, 151, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -64,7 +99,7 @@
   height: 35px;
   padding: 5px;
   border-radius: 50%;
-  background-color: #d8d8d8;
+  background-color: #bbb;
 }
 
 .connected {
@@ -78,7 +113,7 @@
 .disconnected {
   width: 25px;
   height: 25px;
-  background-color: silver;
+  background-color: #eee;
   border-radius: 50%;
   box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
 }

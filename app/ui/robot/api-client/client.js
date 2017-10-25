@@ -4,7 +4,8 @@ import {push} from 'react-router-redux'
 
 import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
-import {constants, selectors} from '../reducer'
+import * as constants from '../constants'
+import * as selectors from '../selectors'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
@@ -79,6 +80,7 @@ export default function client (dispatch) {
 
         clearRunTimerInterval()
         dispatch(actions.disconnectResponse())
+        dispatch(push('/'))
       })
       .catch((error) => dispatch(actions.disconnectResponse(error)))
   }
@@ -93,20 +95,19 @@ export default function client (dispatch) {
         .then((apiSession) => {
           // TODO(mc, 2017-10-09): This seems like an API responsibility
           remote.session_manager.session = apiSession
+          // TODO(mc, 2017-10-12) batch these updates and don't hardcode URL
           handleApiSession(apiSession, true)
         })
         .catch((error) => dispatch(actions.sessionResponse(error)))
     }
 
+    dispatch(push('/upload'))
     return reader.readAsText(file)
   }
 
   function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
-
-    // FIXME(mc, 2017-10-05): DEBUG CODE
-    // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 2000)
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     remote.calibration_manager.move_to_front(instrument)
       .then(() => dispatch(actions.moveToFrontResponse()))
@@ -115,10 +116,7 @@ export default function client (dispatch) {
 
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[axis]
-
-    // FIXME(mc, 2017-10-05): DEBUG CODE
-    // return setTimeout(() => dispatch(actions.probeTipResponse()), 2000)
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
@@ -127,12 +125,10 @@ export default function client (dispatch) {
 
   function moveTo (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const {
-      protocolInstrumentsByAxis: instruments,
-      protocolLabwareBySlot: labwares
-    } = selectors.getState(state)
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const labware = selectors.getLabwareBySlot(state)[slot]
 
-    remote.calibration_manager.move_to(instruments[axis], labwares[slot])
+    remote.calibration_manager.move_to(instrument, labware)
       .then(() => dispatch(actions.moveToResponse()))
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
@@ -141,11 +137,8 @@ export default function client (dispatch) {
   // axis is x, y, z, not left and right (which we will call mount)
   function jog (state, action) {
     const {payload: {instrument: instrumentAxis, axis, direction}} = action
-    const instrument = selectors.getState(state).protocolInstrumentsByAxis[instrumentAxis]
+    const instrument = selectors.getInstrumentsByAxis(state)[instrumentAxis]
     const distance = DEFAULT_JOG_DISTANCE_MM * direction
-
-    // FIXME(mc, 2017-10-06): DEBUG CODE
-    // return setTimeout(() => dispatch(actions.jogResponse()), 2000)
 
     remote.calibration_manager.jog(instrument, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
@@ -154,25 +147,15 @@ export default function client (dispatch) {
 
   function updateOffset (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const {
-      protocolInstrumentsByAxis: instruments,
-      protocolLabwareBySlot: labwares
-    } = selectors.getState(state)
+    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const labware = selectors.getLabwareBySlot(state)[slot]
 
-    // TODO(mc, 2017-10-06)
-
-    // FIXME(mc, 2017-10-06): DEBUG CODE
-    // return setTimeout(() => {
-    //   dispatch(actions.updateOffsetResponse())
-    //   dispatch(push('/setup-deck'))
-    // }, 2000)
-
-    remote.calibration_manager.update_container_offset(labwares[slot], instruments[axis])
+    remote.calibration_manager.update_container_offset(labware, instrument)
       .then(() => {
-        dispatch(actions.updateOffsetResponse())
         // TODO(mc, 2017-10-06): do this without a double dispatch
         // also this hardcoded URL is a bad idea™
-        dispatch(push('/setup-deck'))
+        dispatch(actions.updateOffsetResponse())
+        dispatch(push(`/setup-deck/${slot}`))
       })
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
@@ -240,20 +223,19 @@ export default function client (dispatch) {
     }
 
     // TODO(mc, 2017-08-30): Use a reduce
-    commands.forEach(makeHandleCommand())
-    instruments.forEach(apiInstrumentToInstrument)
-    containers.forEach(apiContainerToContainer)
+    ;(commands || []).forEach(makeHandleCommand())
+    ;(instruments || []).forEach(apiInstrumentToInstrument)
+    ;(containers || []).forEach(apiContainerToContainer)
 
     const payload = {
-      sessionName: name,
+      name,
+      state,
+      errors: [],
       protocolText: protocol_text,
       protocolCommands,
       protocolCommandsById,
       protocolInstrumentsByAxis,
-      protocolLabwareBySlot,
-      // TODO(mc, 2017-09-06): handle session errors
-      sessionErrors: [],
-      sessionState: state
+      protocolLabwareBySlot
     }
 
     dispatch(actions.sessionResponse(null, payload))
@@ -302,6 +284,8 @@ export default function client (dispatch) {
     switch (topic) {
       case 'session': return handleApiSession(payload)
     }
+
+    console.warn(`Unhandled message on ${topic}`, payload)
   }
 
   function handleClientError (error) {

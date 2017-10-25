@@ -14,6 +14,10 @@
   color: white;
 }
 
+.file_info a {
+  color: white;
+}
+
 .btn_run {
   composes: btn from './Util.css';
   grid-area: run;

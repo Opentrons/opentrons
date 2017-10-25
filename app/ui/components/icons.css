@@ -1,0 +1,27 @@
+/* styles for icon components */
+@value red, green from './Util.css';
+
+.circle {
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.success::before {
+  content: '✓';
+}
+
+.success {
+  background-color: green;
+  color: white;
+}
+
+.warning::before {
+  content: '!';
+}
+
+.warning {
+  background-color: red;
+  color: white;
+}

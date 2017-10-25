@@ -1,0 +1,48 @@
+/* Upload component styles */
+@value red, blue from './Util.css';
+
+.spinner {
+  width: 8rem;
+}
+
+.results {
+  max-width: 32rem;
+}
+
+.status_icon {
+  line-height: 1;
+  font-size: 4rem;
+  padding: 1rem;
+  width: 6rem;
+  height: 6rem;
+}
+
+.status_message {
+  padding-left: 2rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: grey;
+}
+
+.error {
+  color: red;
+}
+
+.details {
+  margin-bottom: 1.5rem;
+  padding-left: 8rem;
+  font-size: 1rem;
+  color: grey;
+}
+
+.file_details_title {
+  text-transform: uppercase;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: normal;
+}
+
+.open_setup_link {
+  cursor: pointer;
+  color: blue;
+}

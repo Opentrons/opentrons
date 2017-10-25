@@ -1,7 +1,6 @@
 import os
 from threading import Event
 
-
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from . import gantry
 

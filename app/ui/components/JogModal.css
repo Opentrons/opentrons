@@ -1,9 +1,10 @@
 .modal_wrapper {
   background-color: rgba(0, 0, 0, 0.8);
-  position: fixed;
+  position: absolute;
   top: 0;
+  left: 0;
   height: 100%;
-  width: 675px;
+  width: 100%;
   padding-top: 4rem;
 }
 
@@ -49,39 +50,45 @@ a.close {
   background-color: #333;
   color: white;
   font-size: 1rem;
+  cursor: pointer;
 }
 
-.btn_y_neg {
+.btn[disabled],
+.btn.disabled {
+  cursor: default;
+}
+
+.btn_back {
   composes: btn;
   grid-column: 2;
   grid-row: 1;
 }
 
-.btn_z_neg {
+.btn_up {
   composes: btn;
   grid-column: 5;
   grid-row: 1;
 }
 
-.btn_x_neg {
+.btn_left {
   composes: btn;
   grid-column: 1;
   grid-row: 2;
 }
 
-.btn_y_pos {
+.btn_forward {
   composes: btn;
   grid-column: 2;
   grid-row: 2;
 }
 
-.btn_x_pos {
+.btn_right {
   composes: btn;
   grid-column: 3;
   grid-row: 2;
 }
 
-.btn_z_pos {
+.btn_down {
   composes: btn;
   grid-column: 5;
   grid-row: 2;
@@ -106,4 +113,11 @@ a.close {
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.spinner {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 3rem;
 }
