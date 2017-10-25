@@ -17,7 +17,6 @@ function NavLink (props) {
         <img src={iconSrc} alt={name} />
         <ToolTip msg={msg} pos='left' />
       </button>
-
     </li>
   )
 }

@@ -21,7 +21,6 @@ DeckMap.propTypes = {
 
 function DeckMap (props) {
   const {tipracksConfirmed, labwareReviewed, currentLabware} = props
-
   const labware = props.labware.map((lab) => (<Labware
     {...lab}
     key={lab.slot}
@@ -124,14 +123,6 @@ function NextCalibrationPrompt (props) {
     </div>
   )
 }
-
-// function RobotIsMovingPrompt () {
-//   return (
-//     <div className={styles.prompt}>
-//       <h3>Robot Moving To well A1</h3>
-//     </div>
-//   )
-// }
 
 ConfirmCalibrationPrompt.propTypes = {
   slot: PropTypes.number.isRequired,

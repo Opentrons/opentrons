@@ -174,6 +174,10 @@ export const actions = {
     return {type: actionTypes.CONFIRM_LABWARE, payload: {labware}}
   },
 
+  setLabwareConfirmed (labware) {
+    return {type: actionTypes.SET_LABWARE_CONFIRMED, payload: {labware}}
+  },
+
   run () {
     return makeRobotAction({type: actionTypes.RUN})
   },
@@ -190,6 +194,7 @@ export const actions = {
     return makeRobotAction({type: actionTypes.PAUSE})
   },
 
+  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   pauseResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.PAUSE_RESPONSE, error: didError}
@@ -202,6 +207,7 @@ export const actions = {
     return makeRobotAction({type: actionTypes.RESUME})
   },
 
+  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   resumeResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.RESUME_RESPONSE, error: didError}
@@ -214,6 +220,7 @@ export const actions = {
     return makeRobotAction({type: actionTypes.CANCEL})
   },
 
+  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   cancelResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.CANCEL_RESPONSE, error: didError}

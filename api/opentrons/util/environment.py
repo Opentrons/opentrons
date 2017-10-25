@@ -5,7 +5,9 @@ settings = {}
 
 IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
-IS_LINUX = sys.platform == 'linux'
+IS_LINUX = sys.platform.startswith('linux')
+
+PI_DATA_PATH = '/data/user_storage/opentrons_data/'
 
 
 def infer_app_data_dir():
@@ -25,7 +27,14 @@ def infer_app_data_dir():
 
     app_data = os.path.join(app_data, *app_data_dir_suffix)
 
-    return (app_data if os.path.exists(app_data) else os.getcwd())
+    if os.environ.get('RUNNING_ON_PI'):
+        app_data = PI_DATA_PATH
+
+    if not os.path.exists(app_data):
+        # todo (Ben Morris 2017-10-12): create the directory if it does not exist
+        pass
+
+    return app_data
 
 
 def refresh():

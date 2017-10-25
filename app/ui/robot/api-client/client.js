@@ -123,7 +123,6 @@ export default function client (dispatch) {
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
-
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
       .catch((error) => dispatch(actions.probeTipResponse(error)))

@@ -121,6 +121,7 @@ export default function SetupPanel (props) {
   const runWarning = !labwareConfirmed
     ? <ToolTip msg={runLinkWarning} pos='top' />
     : null
+
   return (
     <div className={styles.setup_panel}>
       <h1>Prepare Robot for RUN</h1>

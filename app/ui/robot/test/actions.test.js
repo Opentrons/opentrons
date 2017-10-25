@@ -224,6 +224,149 @@ describe('robot actions', () => {
     expect(actions.confirmLabware(2)).toEqual(expected)
   })
 
+  test('set current instrument', () => {
+    const expected = {
+      type: actionTypes.SET_CURRENT_INSTRUMENT,
+      payload: {instrument: 'right'}
+    }
+
+    expect(actions.setCurrentInstrument('right')).toEqual(expected)
+  })
+
+  test('set current labware', () => {
+    const expected = {
+      type: actionTypes.SET_CURRENT_LABWARE,
+      payload: {labware: 2}
+    }
+
+    expect(actions.setCurrentLabware(2)).toEqual(expected)
+  })
+
+  test('move tip to front action', () => {
+    const expected = {
+      type: actionTypes.MOVE_TO_FRONT,
+      payload: {instrument: 'right'},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.moveToFront('right')).toEqual(expected)
+  })
+
+  test('move tip to front response action', () => {
+    const success = {
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.moveToFrontResponse()).toEqual(success)
+    expect(actions.moveToFrontResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('probe tip action', () => {
+    const expected = {
+      type: actionTypes.PROBE_TIP,
+      payload: {instrument: 'left'},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.probeTip('left')).toEqual(expected)
+  })
+
+  test('probe tip response action', () => {
+    const success = {
+      type: actionTypes.PROBE_TIP_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.PROBE_TIP_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.probeTipResponse()).toEqual(success)
+    expect(actions.probeTipResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('move to action', () => {
+    const expected = {
+      type: actionTypes.MOVE_TO,
+      payload: {instrument: 'left', labware: 3},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.moveTo('left', 3)).toEqual(expected)
+  })
+
+  test('move to response action', () => {
+    const success = {
+      type: actionTypes.MOVE_TO_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.MOVE_TO_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.moveToResponse()).toEqual(success)
+    expect(actions.moveToResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('jog action', () => {
+    const expected = {
+      type: actionTypes.JOG,
+      payload: {instrument: 'left', axis: 'x', direction: -1},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.jog('left', 'x', -1)).toEqual(expected)
+  })
+
+  test('jog response action', () => {
+    const success = {
+      type: actionTypes.JOG_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.JOG_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.jogResponse()).toEqual(success)
+    expect(actions.jogResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('update offset action', () => {
+    const expected = {
+      type: actionTypes.UPDATE_OFFSET,
+      payload: {instrument: 'left', labware: 2},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.updateOffset('left', 2)).toEqual(expected)
+  })
+
+  test('update offset response action', () => {
+    const success = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.updateOffsetResponse()).toEqual(success)
+    expect(actions.updateOffsetResponse(new Error('AH'))).toEqual(failure)
+  })
+
   test('run action', () => {
     const expected = {
       type: actionTypes.RUN,
