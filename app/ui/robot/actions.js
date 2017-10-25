@@ -12,6 +12,8 @@ export const actionTypes = {
   CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
   DISCONNECT: makeRobotActionName('DISCONNECT'),
   DISCONNECT_RESPONSE: makeRobotActionName('DISCONNECT_RESPONSE'),
+  ADD_DISCOVERED: makeRobotActionName('ADD_DISCOVERED'),
+  REMOVE_DISCOVERED: makeRobotActionName('REMOVE_DISCOVERED'),
 
   // protocol loading
   SESSION: makeRobotActionName('SESSION'),
@@ -73,6 +75,14 @@ export const actions = {
     if (didError) action.payload = error
 
     return action
+  },
+
+  addDiscovered (hostname) {
+    return {type: actionTypes.ADD_DISCOVERED, payload: {hostname}}
+  },
+
+  removeDiscovered (hostname) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: {hostname}}
   },
 
   // get session or make new session with protocol file

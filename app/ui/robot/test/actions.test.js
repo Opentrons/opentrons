@@ -51,6 +51,26 @@ describe('robot actions', () => {
     expect(actions.disconnectResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('ADD_DISCOVERED action', () => {
+    const hostname = '123456.local'
+    const expected = {
+      type: actionTypes.ADD_DISCOVERED,
+      payload: {hostname}
+    }
+
+    expect(actions.addDiscovered(hostname)).toEqual(expected)
+  })
+
+  test('REMOVE_DISCOVERED action', () => {
+    const hostname = '123456.local'
+    const expected = {
+      type: actionTypes.REMOVE_DISCOVERED,
+      payload: {hostname}
+    }
+
+    expect(actions.removeDiscovered(hostname)).toEqual(expected)
+  })
+
   test('session action', () => {
     const file = {name: '/foo/bar/baz.py'}
     const expected = {

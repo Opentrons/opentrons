@@ -10,7 +10,9 @@ describe('robot reducer - connection', () => {
     expect(getState(state)).toEqual({
       isConnected: false,
       connectRequest: {inProgress: false, error: null},
-      disconnectRequest: {inProgress: false, error: null}
+      disconnectRequest: {inProgress: false, error: null},
+      discovered: [],
+      discoveredByHostname: {}
     })
   })
 
@@ -109,6 +111,52 @@ describe('robot reducer - connection', () => {
     expect(getState(reducer(state, action))).toEqual({
       isConnected: true,
       disconnectRequest: {inProgress: false, error: new Error('AH')}
+    })
+  })
+
+  test('handles ADD_DISCOVERED action', () => {
+    const state = {
+      connection: {
+        discovered: ['abcdef.local'],
+        discoveredByHostname: {
+          'abcdef.local': {hostname: 'abcdef.local'}
+        }
+      }
+    }
+    const action = {
+      type: actionTypes.ADD_DISCOVERED,
+      payload: {hostname: '123456.local'}
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      discovered: ['abcdef.local', '123456.local'],
+      discoveredByHostname: {
+        'abcdef.local': {hostname: 'abcdef.local'},
+        '123456.local': {hostname: '123456.local'}
+      }
+    })
+  })
+
+  test('handles REMOVE_DISCOVERED action', () => {
+    const state = {
+      connection: {
+        discovered: ['abcdef.local', '123456.local'],
+        discoveredByHostname: {
+          'abcdef.local': {hostname: 'abcdef.local'},
+          '123456.local': {hostname: '123456.local'}
+        }
+      }
+    }
+    const action = {
+      type: actionTypes.REMOVE_DISCOVERED,
+      payload: {hostname: 'abcdef.local'}
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      discovered: ['123456.local'],
+      discoveredByHostname: {
+        '123456.local': {hostname: '123456.local'}
+      }
     })
   })
 })

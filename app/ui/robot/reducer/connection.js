@@ -1,17 +1,24 @@
 // robot connection state and reducer
+import omit from 'lodash/omit'
+import without from 'lodash/without'
+
 import {actionTypes} from '../actions'
 
 const {
   CONNECT,
   CONNECT_RESPONSE,
   DISCONNECT,
-  DISCONNECT_RESPONSE
+  DISCONNECT_RESPONSE,
+  ADD_DISCOVERED,
+  REMOVE_DISCOVERED
 } = actionTypes
 
 const INITIAL_STATE = {
   connectRequest: {inProgress: false, error: null},
   disconnectRequest: {inProgress: false, error: null},
-  isConnected: false
+  isConnected: false,
+  discovered: [],
+  discoveredByHostname: {}
 }
 
 export default function connectionReducer (state = INITIAL_STATE, action) {
@@ -20,6 +27,8 @@ export default function connectionReducer (state = INITIAL_STATE, action) {
     case CONNECT_RESPONSE: return handleConnectResponse(state, action)
     case DISCONNECT: return handleDisconnect(state, action)
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
+    case ADD_DISCOVERED: return handleAddDiscovered(state, action)
+    case REMOVE_DISCOVERED: return handleRemoveDiscovered(state, action)
   }
 
   return state
@@ -52,4 +61,28 @@ function handleDisconnectResponse (state, action) {
     : null
 
   return {...state, isConnected, disconnectRequest: {inProgress: false, error}}
+}
+
+function handleAddDiscovered (state, action) {
+  const {payload} = action
+  const {hostname} = payload
+
+  return {
+    ...state,
+    discovered: state.discovered.concat(hostname),
+    discoveredByHostname: {
+      ...state.discoveredByHostname,
+      [hostname]: payload
+    }
+  }
+}
+
+function handleRemoveDiscovered (state, action) {
+  const {payload: {hostname}} = action
+
+  return {
+    ...state,
+    discovered: without(state.discovered, hostname),
+    discoveredByHostname: omit(state.discoveredByHostname, hostname)
+  }
 }

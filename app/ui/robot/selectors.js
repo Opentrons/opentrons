@@ -43,6 +43,12 @@ export function getConnectionStatus (state) {
   return DISCONNECTED
 }
 
+export function getDiscovered (state) {
+  const {discovered, discoveredByHostname} = getConnectionState(state)
+
+  return discovered.map((hostname) => discoveredByHostname[hostname])
+}
+
 export function getUploadInProgress (state) {
   return getSessionState(state).sessionRequest.inProgress
 }
