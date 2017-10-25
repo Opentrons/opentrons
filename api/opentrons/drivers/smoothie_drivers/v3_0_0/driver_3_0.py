@@ -64,10 +64,9 @@ class SmoothieDriver_3_0_0:
     def connect(self):
         self.simulating = False
 
-        # if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-        #     print('simul!')
-        #     self.simulating = True
-        #     return
+        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
+            self.simulating = True
+            return
 
         self.connection = serial_communication.connect()
 

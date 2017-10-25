@@ -109,9 +109,6 @@ export default function client (dispatch) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
-    // FIXME(mc, 2017-10-05): DEBUG CODE
-    // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
-
     remote.calibration_manager.move_to_front(instrument)
       .then(() => dispatch(actions.moveToFrontResponse()))
       .catch((error) => dispatch(actions.moveToFrontResponse(error)))
@@ -121,8 +118,6 @@ export default function client (dispatch) {
     const {payload: {instrument: axis}} = action
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
 
-    // FIXME(mc, 2017-10-05): DEBUG CODE
-    // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
       .catch((error) => dispatch(actions.probeTipResponse(error)))
@@ -133,11 +128,7 @@ export default function client (dispatch) {
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
     const labware = selectors.getLabwareBySlot(state)[slot]
 
-    // FIXME - MORE DEBUG CODE
-    // return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
-
     remote.calibration_manager.move_to(instrument, labware)
-
       .then(() => dispatch(actions.moveToResponse()))
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
@@ -149,9 +140,6 @@ export default function client (dispatch) {
     const instrument = selectors.getInstrumentsByAxis(state)[instrumentAxis]
     const distance = DEFAULT_JOG_DISTANCE_MM * direction
 
-    // FIXME(mc, 2017-10-06): DEBUG CODE
-    // return setTimeout(() => dispatch(actions.jogResponse()), 1000)
-
     remote.calibration_manager.jog(instrument, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
       .catch((error) => dispatch(actions.jogResponse(error)))
@@ -161,12 +149,6 @@ export default function client (dispatch) {
     const {payload: {instrument: axis, labware: slot}} = action
     const instrument = selectors.getInstrumentsByAxis(state)[axis]
     const labware = selectors.getLabwareBySlot(state)[slot]
-
-    // FIXME(mc, 2017-10-06): DEBUG CODE
-    // return setTimeout(() => {
-    //   dispatch(actions.updateOffsetResponse())
-    //   dispatch(push(`/setup-deck/${slot}`))
-    // }, 2000)
 
     remote.calibration_manager.update_container_offset(labware, instrument)
       .then(() => {
@@ -299,13 +281,11 @@ export default function client (dispatch) {
   function handleRobotNotification (message) {
     const {topic, payload} = message
 
-    console.log(message)
-
     switch (topic) {
       case 'session': return handleApiSession(payload)
     }
 
-    console.log('Unhandled message!')
+    console.warn(`Unhandled message on ${topic}`, payload)
   }
 
   function handleClientError (error) {

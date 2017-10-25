@@ -75,12 +75,11 @@ export const actions = {
     return action
   },
 
-  // get session or make new session with protocol file
+  // make new session with protocol file
   session (file) {
     return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
   },
 
-  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   sessionResponse (error, session) {
     const didError = error != null
 
@@ -194,7 +193,6 @@ export const actions = {
     return makeRobotAction({type: actionTypes.PAUSE})
   },
 
-  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   pauseResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.PAUSE_RESPONSE, error: didError}
@@ -207,7 +205,6 @@ export const actions = {
     return makeRobotAction({type: actionTypes.RESUME})
   },
 
-  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   resumeResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.RESUME_RESPONSE, error: didError}
@@ -220,7 +217,6 @@ export const actions = {
     return makeRobotAction({type: actionTypes.CANCEL})
   },
 
-  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   cancelResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.CANCEL_RESPONSE, error: didError}

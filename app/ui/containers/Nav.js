@@ -40,7 +40,6 @@ const mapStateToProps = (state) => {
       {
         name: 'setup',
         iconSrc: setupIconSrc,
-        // TODO(mc, 2017-10-11): this needs a selector
         isDisabled: !sessionIsLoaded,
         isActive: isOpen && activeTask === 'setup',
         msg: 'Prep For Run'

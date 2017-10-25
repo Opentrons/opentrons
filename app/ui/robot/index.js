@@ -1,5 +1,4 @@
 // robot state module
-// split up into reducer.js, action.js, etc if / when necessary
 import reducer from './reducer'
 import * as selectors from './selectors'
 import * as constants from './constants'

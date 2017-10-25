@@ -55,8 +55,8 @@ export default function Labware (props) {
     : null
 
   const confirmationFade = (isConfirmed && isCurrent && labwareReviewed)
-  ? (<div className={styles.confirmed_fade}>Confirmed</div>)
-  : null
+    ? (<div className={styles.confirmed_fade}>Confirmed</div>)
+    : null
 
   const labwareLabel = !labwareReviewed
     ? (<div className={styles.label}>{type}</div>)
