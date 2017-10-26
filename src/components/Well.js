@@ -5,14 +5,14 @@ import cx from 'classnames'
 import { SELECTABLE_CLASS, swatchColors } from '../constants.js'
 import styles from '../css/style.css'
 
-const Well = ({x, y, wellContent, ...otherProps}) => {
+const Well = ({x, y, wellContent, selectable, ...otherProps}) => {
   const { preselected, selected, number, ingredientGroupId } = wellContent
   const isFilled = (ingredientGroupId !== null && ingredientGroupId !== undefined)
   return (
     <div
       className={cx(
         styles.wellRound,
-        {[styles.selected]: selected, [styles.highlighted]: preselected, [SELECTABLE_CLASS]: !isFilled}
+        {[styles.selected]: selected, [styles.highlighted]: preselected, [SELECTABLE_CLASS]: selectable && !isFilled}
       )}
       data-well-number={number}
       data-well-x={x}

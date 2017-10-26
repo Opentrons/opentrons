@@ -16,11 +16,16 @@ const transpose = matrix => matrix[0].map((_col, i) =>
 
 class Plate extends React.Component {
   makeColumns () {
-    const { wellMatrix, Well, showLabels } = this.props
+    const { wellMatrix, Well, selectable, showLabels } = this.props
 
     return transpose(wellMatrix).map((row, x) =>
       row.map((wellContent, y) =>
-        <Well x={x} y={row.length - y - 1} data-row-num={showLabels && row.length - y} wellContent={wellContent} key={y} />
+        <Well key={y}
+          selectable={selectable}
+          x={x}
+          y={row.length - y - 1}
+          data-row-num={showLabels && row.length - y}
+          wellContent={wellContent} />
       )
     )
   }

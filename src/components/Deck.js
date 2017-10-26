@@ -35,7 +35,7 @@ const Deck = props => {
               <img src='https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/back.png' />
             </div>
             <div className={styles.containerDetail}>
-              <SelectablePlate showLabels />
+              <SelectablePlate showLabels selectable />
             </div>
 
             {/* <button>Add Ingredient</button> */}

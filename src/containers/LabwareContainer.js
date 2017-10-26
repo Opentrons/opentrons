@@ -104,9 +104,9 @@ const LabwareContainer = ({
               <div>{humanize(containerType)}</div>
               <div className={styles.containerName}>{containerName}</div>
             </div>
-            {canAddIngreds
-              ? <SelectablePlate containerId={containerId} cssFillParent />
-              : <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
+            {nonFillableContainers.includes(containerType)
+              ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
+              : <SelectablePlate containerId={containerId} cssFillParent />
             }
           </div>
         )
