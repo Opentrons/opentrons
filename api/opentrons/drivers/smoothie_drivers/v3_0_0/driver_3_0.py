@@ -1,5 +1,7 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
+from numpy import insert, add, array
+from numpy.linalg import inv
 
 
 '''
@@ -7,27 +9,22 @@ from os import environ
 - Driver is the only system component that knows about GCODES or how smoothie
   communications
 
-- Driver is NOT responsible interpreting the motions in any way or
-  knowing anything about what the axes are used for
+- Driver is NOT responsible interpreting the motions in any way
+  or knowing anything about what the axes are used for
 '''
 
+# Ignore these axis when sending move or home command
+# TODO(artyom, ben 20171026): move to config
+DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
+DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X900 Y550 Z140 A140 B40 C40'
+DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
+DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
 
-
-DEFAULT_STEPS_PER_MM = 'M92 X81.474 Y80.16 Z400 A400 B767.38 C767.38'  # Franklin
-
-# DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'  # Avagdro
-
-#DEFAULT_STEPS_PER_MM = 'M92 X160 Y160 Z800 A800 B767.38 C767.38'  # Ibn
-
-DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X300 Y200 Z50 A50 B8 C8'
-DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000'
-DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.6 C0.6'
-
-
-MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
-
-AXES_SAFE_TO_HOME = 'XZABC'  # Y cannot be homed without homing all
-AXES = 'XYZABC'
+# TODO (artyom, ben 20171026): move to config
+HOMED_POSITIONS = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
+HOME_SEQUENCE = ['ZABC', 'X', 'Y']
+AXES = ''.join(HOME_SEQUENCE)
+DISABLE_AXES = 'BC'
 
 SEC_PER_MIN = 60
 POSITION_THRESH = .25
@@ -48,6 +45,29 @@ homed_positions = {
 }
 
 
+# World -> Smoothie calibration values for XY plane
+# use cli/main.py to perform factory calibration
+# TODO(artyom 20171017): move to config
+XY = \
+    array([[+9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
+           [-3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
+           [-5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
+
+# Smoothie coordinate for Z axis when 200ul tip is touching the deck
+Z_OFFSET = 3.75
+# Can be used to compensate for Z steps/mm mismatch
+Z_SCALE = 1
+
+CALIBRATION = insert(
+        insert(XY, 2, [0, 0, 0], axis=1),
+        2,
+        [0, 0, Z_SCALE, Z_OFFSET],
+        axis=0
+    )
+
+INVERSE_CALIBRATION = inv(CALIBRATION)
+
+
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.split(' ')
     parsed_values = parsed_values[2:]
@@ -59,7 +79,6 @@ def _parse_axis_values(raw_axis_values):
 
 
 class SmoothieDriver_3_0_0:
-
     def __init__(self):
         self._position = {}
         self.log = []
@@ -102,14 +121,64 @@ class SmoothieDriver_3_0_0:
         self.connection = serial_communication.connect()
         self._setup()
 
+    def _transform(self, matrix, defaults, state):
+        state = {
+            **defaults,
+            **{key: value for key, value in state.items() if value is not None}
+        }
+
+        xyz = matrix.dot([state[axis] for axis in 'XYZ'] + [1])[:-1]
+        xya = matrix.dot([state[axis] for axis in 'XYA'] + [1])[:-1]
+
+        return {
+            **state,
+            **{axis: value for axis, value in zip('XYZ', xyz)},
+            **{axis: value for axis, value in zip('XYA', xya)},
+        }
+
+    def to_world(self, state):
+        """
+        Args:
+            state: dict of Smoothie axis values
+                e.g.: {'X': x, 'Y': y, 'Z': z, 'A': a ... }
+
+        Returns:
+            A dict with XYZA keys replaced with calibrated values
+        """
+        defaults = self._position
+        return self._transform(INVERSE_CALIBRATION, defaults, state)
+
+    def from_world(self, state):
+        """
+        Args:
+            state: a dict of axis values to be converted into Smoothie
+                readable values
+                e.g.: {'X': x, 'Y': y, 'Z': z, 'A': a ... }
+
+        Returns:
+            A dict with XYZA keys replaced with calibrated values
+        """
+        defaults = self.to_world(self._position)
+        return self._transform(CALIBRATION, defaults, state)
+
     def disconnect(self):
         self.simulating = True
 
     @property
     def position(self):
-        return self._position
+        """
+        Smoothie axis values with calibration applied. Instead of sending
+        M114.2 we are storing target values in self._position since movement
+        and home commands are blocking and assumed to go the correct place.
+        Cases where Smoothie would not be in the correct place (such as if a
+        belt slips) would not be corrected by getting position with M114.2
+        because Smoothie would also not be aware of slippage.
+        """
+        res = {k.lower(): v for k, v in self.to_world(self._position).items()}
+        return res
 
-    def get_switch_state(self):
+    @property
+    def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
         return self._send_command(GCODES['SWITCH_STATUS'])
 
@@ -122,7 +191,9 @@ class SmoothieDriver_3_0_0:
     def set_power(self, axis, value):
         ''' set total movement speed in mm/second'''
         command = '{}{}{}'.format(
-            GCODES['SET_POWER'], axis.upper(), str(value)
+            GCODES['SET_POWER'],
+            axis.upper(),
+            value
         )
         self._send_command(command)
 
@@ -138,9 +209,8 @@ class SmoothieDriver_3_0_0:
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
         command_line = command + ' M400'
-        if self.simulating:
-            pass
-        else:
+
+        if not self.simulating:
             return serial_communication.write_and_return(
                 command_line, self.connection, timeout)
 
@@ -153,63 +223,81 @@ class SmoothieDriver_3_0_0:
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.home()
 
-    def _home_all(self):
-        command = GCODES['HOME'] + 'ZA ' \
-                  + GCODES['HOME'] + 'XBC ' \
-                  + GCODES['HOME'] + 'Y'
-        self._send_command(command, timeout=30)
-
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
     def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
-        target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
+        from numpy import isclose
+        target_position = self.from_world(
+            {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
+        )
+
+        def valid_movement(coords, axis):
+            return not (
+                (axis in DISABLE_AXES) or
+                (coords is None) or
+                isclose(coords, self._position[axis])
+            )
+
         coords = [axis + str(coords)
                   for axis, coords in target_position.items()
-                  if coords is not None]
-        command = GCODES['MOVE'] + ''.join(coords)
+                  if valid_movement(coords, axis)]
 
-        self._send_command(command)
+        if coords:
+            command = GCODES['MOVE'] + ''.join(coords)
+            self._send_command(command)
+            self._update_position(target_position)
 
-        self._update_position({
-            axis: value
-            for axis, value in zip('xyzabc', [x, y, z, a, b, c])
-        })
+    def home(self, axis=AXES):
+        axis = axis.upper()
 
-    def home(self, axis=None):
-        if not axis:
-            self._home_all()
-            self._update_position(homed_positions)
+        # If Y is requested make sure we home X first
+        if 'Y' in axis:
+            axis += 'X'
 
-        else:
-            axes_to_home = [
-                ax for ax in axis.upper()
-                if ax in AXES_SAFE_TO_HOME
-            ]
-            if axes_to_home:
-                command = GCODES['HOME'] + ''.join(axes_to_home)
-                self._send_command(command)
-                self._update_position({
-                    axis: homed_positions[axis] for axis in axes_to_home
-                })
+        # Narrow down home sequence to selected axes ignoring disabled axes
+        home_sequence = filter(
+            None,
+            [
+                ''.join(set(group) & set(axis) - set(DISABLE_AXES))
+                for group in HOME_SEQUENCE
+            ])
 
-            else:
-                raise RuntimeError('Cannot home axis: {}'.format(axis))
+        command = ' '.join([GCODES['HOME'] for axis in home_sequence])
+        self._send_command(command, timeout=30)
 
-    def delay(self, seconds):
-        command = \
-            GCODES['DWELL'] + 'S' + str(seconds)
+        position = HOMED_POSITIONS
+
+        if not self.simulating:
+            position = _parse_axis_values(
+                self._send_command(GCODES['CURRENT_POSITION'])
+            )
+
+        # Only update axes that have been selected for homing
+        self._update_position(
+            {
+                axis: position[axis]
+                for axis in ''.join(home_sequence)
+            }
+        )
+
+    def delay(self, sec):
+        sec = float(sec)
+        msec = (sec - int(sec)) * 1000
+        command = '{code}S{sec}P{msec}'.format(
+            code=GCODES['DWELL'],
+            sec=sec,
+            msec=msec
+        )
         self._send_command(command)
 
     def probe_axis(self, axis, probing_distance):
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
-            self.update_position()
-            position_return = self.position[axis]
-            return position_return
+            return self._position[axis.upper()]
         else:
-            raise RuntimeError("Cant probe axes {}".format(axis))
+            raise RuntimeError("Cant probe axis {}".format(axis))
 
     # TODO: Write GPIO low
     def kill(self):

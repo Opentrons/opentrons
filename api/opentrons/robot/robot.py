@@ -18,13 +18,11 @@ from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
 
+from numpy import array, dot, insert, add, subtract
+
+
 log = get_logger(__name__)
 
-# DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
-
-
-DECK_OFFSET = {'x': -31.45, 'y':-20.1, 'z':0} # Avagadro
-MAX_INSTRUMENT_HEIGHT = 227.0000
 
 class InstrumentMosfet(object):
     """
@@ -162,11 +160,8 @@ class Robot(object):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self.pose_tracker = pose_tracker.PoseTracker()
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
         self.dimensions = (395, 345, 228)
-
-
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
@@ -197,8 +192,6 @@ class Robot(object):
         # self.disconnect()
         self.arc_height = 5
 
-
-
         # self.set_connection('simulate')
 
         # TODO (artyom, 09182017): once protocol development experience
@@ -218,11 +211,10 @@ class Robot(object):
             * Runtime warnings
 
         """
+        self.poses = pose_tracker.add({}, 'world')
+
         self._runtime_warnings = []
         self._previous_container = None
-
-        self.pose_tracker.clear_all()
-        # 0,0,0, is smoothie pos w.r.t deck
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -238,10 +230,15 @@ class Robot(object):
         return self
 
     def setup_gantry(self):
-        self.gantry = gantry.Gantry(self._driver, self.pose_tracker)
-        self.pose_tracker.create_root_object(self.gantry, x=0, y=0, z=0)
-        self.gantry._setup_mounts()
+        self.gantry = gantry.Gantry(self._driver)
 
+        self.poses = pose_tracker.add(
+            self.poses,
+            self.gantry,
+            'world'
+        )
+
+        self.poses = self.gantry._setup_mounts(self.poses)
 
     def add_instrument(self, mount, instrument):
         """
@@ -267,8 +264,7 @@ class Robot(object):
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        self.gantry.mount_instrument(instrument, mount)
-        # TODO: Create real pipette offsets
+        self.poses = self.gantry.mount_instrument(self.poses, instrument, mount)
 
     def add_warning(self, warning_msg):
         """
@@ -402,13 +398,13 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        self.gantry.home()
+        self.poses = self.gantry.home(self.poses)
 
     def move_head(self, *args, **kwargs):
         self._driver.move(*args, **kwargs)
-        self.gantry._publish_position()
+        self.gantry._update_pose()
 
-    #DEPRECATED
+    # DEPRECATED
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -474,21 +470,33 @@ class Robot(object):
 
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
-        offset = coordinates - placeable.top()[1]
-        target = self.pose_tracker[placeable].position + offset.coordinates
+        offset = subtract(coordinates, placeable.top()[1])
 
+        if isinstance(placeable, containers.WellSeries):
+            placeable = placeable[0]
+
+        target = add(
+            pose_tracker.absolute(
+                self.poses,
+                placeable
+            ),
+            offset.coordinates
+        )
+
+        # use max_z instead
         other_instrument = {instrument} ^ set(self._instruments.values())
-        if not len(other_instrument) == 0:
-            other_instrument.pop()._move(z=MAX_INSTRUMENT_HEIGHT)
+        if other_instrument:
+            z = self.max_deck_height() + self.arc_height
+            self.poses = other_instrument.pop()._move(self.poses, z=z)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, instrument, placeable)
             for coord in arc_coords:
-                instrument._move(**coord)
+                self.poses = instrument._move(self.poses, **coord)
 
         elif strategy == 'direct':
             position = {'x': target[0], 'y': target[1], 'z': target[2]}
-            instrument._move(**position)
+            self.poses = instrument._move(self.poses, **position)
         else:
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
@@ -507,8 +515,6 @@ class Robot(object):
 
         travel_height = self.max_deck_height() + self.arc_height
 
-
-
         _, _, robot_max_z = self.dimensions #TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
@@ -520,7 +526,6 @@ class Robot(object):
             {'x': destination[0], 'y': destination[1]},
             {'z': arrival_z}
         ]
-        print("[Arc Strategy] up to {}, across to {}, down to {}".format(*strategy))
         return strategy
 
     # DEPRECATED
@@ -615,15 +620,18 @@ class Robot(object):
     def setup_deck(self):
         self.add_slots_to_deck()
         # Setup Deck as root object for pose tracker
-        self.pose_tracker.create_root_object(
-            self._deck, **DECK_OFFSET
+        self.poses = pose_tracker.add(
+            self.poses,
+            self._deck,
+            'world'
         )
 
         for slot in self._deck:
-            self.pose_tracker.track_object(
-                self._deck,
+            self.poses = pose_tracker.add(
+                self.poses,
                 slot,
-                *slot._coordinates
+                self._deck,
+                pose_tracker.Point(*slot._coordinates)
             )
 
     @property
@@ -673,25 +681,26 @@ class Robot(object):
         Add container and child wells to pose tracker. Sets container.parent
         (slot) as pose tracker parent
         """
-        self.pose_tracker.track_object(
-            container.parent, container, *container._coordinates
+        self.poses = pose_tracker.add(
+            self.poses,
+            container,
+            container.parent,
+            pose_tracker.Point(*container._coordinates)
         )
 
-
-
         for well in container:
-            center_x, center_y, _ = well.top()[1] #TODO JG 10/6/17: Stop tracking wells inconsistently
+            center_x, center_y, _ = well.top()[1]  # TODO JG 10/6/17: Stop tracking wells inconsistently
             offset_x, offset_y, offset_z = well._coordinates
 
-
-            self.pose_tracker.track_object(
-                container,
+            self.poses = pose_tracker.add(
+                self.poses,
                 well,
-                **{
-                    'x':offset_x + center_x,
-                    'y':offset_y + center_y,
-                    'z':offset_z
-                }
+                container,
+                pose_tracker.Point(
+                    center_x + offset_x,
+                    center_y + offset_y,
+                    offset_z
+                )
             )
 
     def pause(self):
@@ -816,15 +825,18 @@ class Robot(object):
                                             ):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
-        expected_position = self.pose_tracker[well].position
 
         # calibrate will well bottom, but track top of well
-        true_position = self.pose_tracker[instrument].position
+        delta = self.poses.relative_object_position(
+            well,
+            instrument
+        )
+
         calib.calibrate_container_with_delta(
             container,
-            self.pose_tracker,
-            *(true_position - expected_position), save
+            self.poses,
+            *delta, save
         )
 
     def max_deck_height(self):
-        return self.pose_tracker.max_z_in_subtree(self._deck)
+        return pose_tracker.max_z(self.poses, self._deck)

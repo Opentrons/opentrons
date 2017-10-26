@@ -7,6 +7,7 @@ from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers
+from opentrons.trackers import pose_tracker
 
 
 # This should come from configuration if tip length is not already in db
@@ -16,6 +17,9 @@ DEFAULT_TIP_LENGTH = 53.2
 class PipetteTip:
     def __init__(self, length):
         self.length = length
+
+# This should come from configuration if tip length is not already in db
+DEFAULT_TIP_LENGTH = 46
 
 
 class Pipette:
@@ -773,8 +777,8 @@ class Pipette:
             for i in range(int(presses) - 1):
                 self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
-            self._add_tip(self.tip_length)
-            self.instrument_mover.home()
+            self._add_tip(DEFAULT_TIP_LENGTH)
+            self.robot.poses = self.instrument_mover.home(self.robot.poses)
             return self
 
         return _pick_up_tip(self, location)
@@ -1386,15 +1390,19 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    def _move(self, x=None, y=None, z=None):
-        self.instrument_mover.move(x, y, z)
+    def _move(self, pose, x=None, y=None, z=None):
+        return self.instrument_mover.move(pose, x, y, z)
+
+    def _jog(self, pose, axis, distance):
+        return self.instrument_mover.jog(pose, axis, distance)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
-
+        x, y, z = pose_tracker.get(self.robot.poses, self)
+        self.robot.poses = pose_tracker.update(self.robot.poses, self, pose_tracker.Point(x, y, z+length))
 
     def _remove_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)
+        x, y, z = pose_tracker.get(self.robot.poses, self)
+        self.robot.poses = pose_tracker.update(self.robot.poses, self, pose_tracker.Point(x, y, z-length))
