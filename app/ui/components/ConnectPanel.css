@@ -1,0 +1,60 @@
+.connect_panel {
+  color: silver;
+}
+
+h1 {
+  margin: 0;
+  padding: 0 1rem;
+  font-size: 1.25rem;
+  line-height: 62px;
+  border-bottom: 2px solid #ddd;
+}
+
+.refresh {
+  position: absolute;
+  right: 2rem;
+  top: 1rem;
+  width: 2rem;
+  height: 2rem;
+  background-color: transparent;
+  font-size: 1.5rem;
+  color: silver;
+  cursor: pointer;
+}
+
+.robot_list {
+  list-style-type: none;
+}
+
+.robot_list li {
+  height: 6rem;
+  padding-top: 0.5rem;
+  border-bottom: 2px solid #ddd;
+  text-align: center;
+  margin: 0;
+}
+
+.btn {
+  composes: btn from './Util.css';
+  width: 50%;
+  margin: 0 auto;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding-left: 2rem;
+  text-align: left;
+  background-size: 1rem;
+  background-repeat: no-repeat;
+  background-position: 0.5rem center;
+}
+
+.btn_connect {
+  composes: btn;
+  padding-left: 0;
+  text-align: center;
+  background-color: #999;
+  color: white;
+}
+
+.btn_connect:hover {
+  background-color: #777;
+}
