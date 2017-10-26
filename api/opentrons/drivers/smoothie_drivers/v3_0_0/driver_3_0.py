@@ -255,7 +255,7 @@ class SmoothieDriver_3_0_0:
         if 'Y' in axis:
             axis += 'X'
 
-        # Narrow down home sequence to selected axes ignoring disabled axes
+        # Narrow down home sequence to requested axes ignoring disabled axes
         home_sequence = filter(
             None,
             [
@@ -263,7 +263,7 @@ class SmoothieDriver_3_0_0:
                 for group in HOME_SEQUENCE
             ])
 
-        command = ' '.join([GCODES['HOME'] for axis in home_sequence])
+        command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
 
         position = HOMED_POSITIONS

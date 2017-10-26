@@ -61,9 +61,8 @@ class InstrumentMover(object):
 
     def jog(self, pose, axis, distance):
         axis = axis.lower()
-        current = pose_tracker.absolute(pose, self.instrument)
-        current = dict(zip('xyz', current))
-        return self.move(pose, **{axis: current[axis] + distance})
+        current = pose_tracker.absolute(pose, self.instrument)._asdict()[axis]
+        return self.move(pose, **{axis: current + distance})
 
     def move(self, pose, x=None, y=None, z=None):
         # TODO: this is needed to have up to date values in pose tree

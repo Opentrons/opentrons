@@ -19,7 +19,7 @@ def translate(point: Point) -> np.ndarray:
 
 def scale(cx, cy, cz) -> np.ndarray:
     return np.array([
-        [ cx, 0.0, 0.0,   0],  # noqa
+        [ cx, 0.0, 0.0,   0],  # NOQA
         [0.0,  cy, 0.0,   0],
         [0.0, 0.0,  cz,   0],
         [0.0, 0.0, 0.0, 1.0]
@@ -31,8 +31,8 @@ def rotate(theta: float) -> np.ndarray:
     return np.array([
         [cos(theta), -sin(theta), 0.0,   0],
         [sin(theta),  cos(theta), 0.0,   0],
-        [       0.0,         0.0, 1.0,   0],  # noqa
-        [       0.0,         0.0, 0.0, 1.0]   # noqa
+        [       0.0,         0.0, 1.0,   0],  # NOQA
+        [       0.0,         0.0, 0.0, 1.0]   # NOQA
     ])
 
 
@@ -70,9 +70,13 @@ def add(
     else:
         state[parent] = state[parent].add(obj)
 
-    assert obj not in state
-    t = transform.dot(translate(point))
-    state[obj] = Node(parent=parent, children=[], transform=t)
+    assert obj not in state, 'object is already being tracked'
+
+    state[obj] = Node(
+        parent=parent,
+        children=[],
+        ransform=transform.dot(translate(point))
+    )
 
     return state
 
@@ -117,6 +121,7 @@ def ascend(state, obj) -> List[Node]:
 def absolute(state, obj, operator=np.dot, ref=(0, 0, 0)):
     from functools import reduce
     return reduce(
+        # a is always a vector and b is always a matrix
         lambda a, b: operator(b, a),
         [
             state[key].transform
@@ -129,8 +134,11 @@ def absolute(state, obj, operator=np.dot, ref=(0, 0, 0)):
 def relative(state, src, dst):
     """Relative vector from src (source) to dst (destination)"""
     from numpy.linalg import inv
-    ref = absolute(state, dst)
-    return absolute(state, src, operator=lambda a, b: inv(a).dot(b), ref=ref)
+    return absolute(
+        state,
+        src,
+        operator=lambda a, b: inv(a).dot(b),
+        ref=absolute(state, dst))
 
 
 def max_z(state, root):

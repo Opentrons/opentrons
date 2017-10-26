@@ -19,7 +19,7 @@ from opentrons import commands
 from opentrons.broker import subscribe
 
 from numpy import array, dot, insert, add, subtract
-
+from functools import lru_cache
 
 log = get_logger(__name__)
 
@@ -515,7 +515,7 @@ class Robot(object):
 
         travel_height = self.max_deck_height() + self.arc_height
 
-        _, _, robot_max_z = self.dimensions #TODO: Check what this does
+        _, _, robot_max_z = self.dimensions  # TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
 
@@ -838,5 +838,6 @@ class Robot(object):
             *delta, save
         )
 
+    @lru_cache()
     def max_deck_height(self):
         return pose_tracker.max_z(self.poses, self._deck)
