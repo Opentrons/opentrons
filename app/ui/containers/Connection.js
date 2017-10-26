@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
   const connectionStatus = robotSelectors.getConnectionStatus(state)
   const isConnected = connectionStatus === robotConstants.CONNECTED
   return {
+    scanning: true,
     discovered: [
       {hostname: 'bot.local'},
       {hostname: 'other.local'}

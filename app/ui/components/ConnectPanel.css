@@ -1,5 +1,16 @@
 .connect_panel {
   color: silver;
+  height: 100%;
+}
+
+.robot_results {
+  height: 85%;
+}
+
+.robot_results.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 h1 {
@@ -8,6 +19,16 @@ h1 {
   font-size: 1.25rem;
   line-height: 62px;
   border-bottom: 2px solid #ddd;
+}
+
+.spinner {
+  display: block;
+  height: 10rem;
+  margin: 0 auto;
+}
+
+.robot_list .spinner {
+  height: 5rem;
 }
 
 .refresh {
@@ -53,6 +74,20 @@ h1 {
   text-align: center;
   background-color: #999;
   color: white;
+}
+
+.robots_unfound {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.btn_refresh {
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+  border: none;
+  font-size: 8rem;
+  color: silver;
 }
 
 .btn_connect:hover {
