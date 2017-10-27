@@ -12,6 +12,7 @@ matrix:
       python: "3.5"
       env:
         - DEPLOY_DIR="linux"
+        - PUBLIC_REPO="$(git remote -v | tail -n 1 | sed s/.*opentrons\.git.*/true/g)"
       addons:
         apt:
           sources: &common_sources
@@ -38,7 +39,8 @@ cache:
     - .nvm
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d
+  - >  # load keys needed to publish to pypa only when building from public repo
+    if [[ "$PUBLIC_REPO" == "true" ]]; then (openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d) fi;
 
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
