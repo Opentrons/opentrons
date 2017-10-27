@@ -52,6 +52,7 @@ script:
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   # TODO(mc, 2017-08-28): use top level `make test`
   - make -C api test exe
+  - make -C api lint
   - > # Make docs on linux only
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
   # TODO(mc, 2017-08-28): use top level `make test`

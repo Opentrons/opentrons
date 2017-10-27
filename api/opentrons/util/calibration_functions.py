@@ -25,6 +25,7 @@ def calibrate_pipette(probing_values, probe):
 def probe_instrument(instrument, robot):
     robot.home()
 
+    # maximum distance to move during calibration attempt
     travel = 20
     # size along X, Y and Z
     size = array((30.0, 30, 25.5))
@@ -46,12 +47,17 @@ def probe_instrument(instrument, robot):
     # left, right, forward, backward, center on a probe
     #
     # X, Y, Z point and travel direction
+    # Z = -1 denotes the tip down for XY calibration
+    # Z =  1 denotes the tip up to begin Z calibration
+    # Travel direction is in the same axis as the non-zero
+    #   XY coordinate, or in the Z axis if both X and Y
+    #   are zero
     switches = [
         (-1, 0, -1,  1),
         (1,  0, -1, -1),
         (0, -1, -1,  1),
+        (0,  1, -1, -1),
         (0,  0,  1, -1),
-        (0,  1, -1, -1)
     ]
 
     coords = [switch[:-1] * size + center for switch in switches]
