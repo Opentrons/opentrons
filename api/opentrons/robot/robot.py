@@ -827,14 +827,15 @@ class Robot(object):
         well = container[0]
 
         # calibrate will well bottom, but track top of well
-        delta = self.poses.relative_object_position(
+        delta = pose_tracker.relative(
+            self.poses,
             well,
             instrument
         )
 
-        calib.calibrate_container_with_delta(
-            container,
+        self.poses = calib.calibrate_container_with_delta(
             self.poses,
+            container,
             *delta, save
         )
 

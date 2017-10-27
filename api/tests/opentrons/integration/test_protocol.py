@@ -34,15 +34,15 @@ class ProtocolTestCase(unittest.TestCase):
             trash_container=trash,
             tip_racks=[tiprack],
             min_volume=10,  # These are variable
-            axis="b",
+            mount='left',
             channels=1
         )
 
         instruments_list = self.robot.get_instruments()
-        self.assertEqual(instruments_list[0], ('B', p200))
+        self.assertEqual(instruments_list[0], ('left', p200))
 
         instruments_list = self.robot.get_instruments('myPipette')
-        self.assertEqual(instruments_list[0], ('B', p200))
+        self.assertEqual(instruments_list[0], ('left', p200))
 
     def test_deck_setup(self):
         deck = self.robot.deck

@@ -2,15 +2,18 @@
 # import logging
 # from logging.config import dictConfig
 
+import asyncio
 import pytest
 import os
 import shutil
 import re
 
 from collections import namedtuple
+from functools import partial
 from opentrons.server import rpc
 from uuid import uuid4 as uuid
 from opentrons.data_storage import database
+
 
 # Uncomment to enable logging during tests
 
@@ -96,13 +99,6 @@ def protocol(request):
 
 
 @pytest.fixture
-def main_router(loop):
-    from opentrons.api import MainRouter
-    with MainRouter(loop=loop) as router:
-        yield router
-
-
-@pytest.fixture
 def session_manager(main_router):
     return main_router.session_manager
 
@@ -173,6 +169,36 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     yield
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
+
+@pytest.fixture
+def main_router(loop, monkeypatch):
+    from opentrons.api.routers import MainRouter
+    from opentrons import robot
+
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    with MainRouter(loop=loop) as router:
+        router.wait_until = partial(
+            wait_until,
+            notifications=router.notifications,
+            loop=loop)
+        yield router
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+    robot.reset()
+
+
+async def wait_until(matcher, notifications, timeout=1, loop=None):
+    result = []
+    for coro in iter(notifications.__anext__, None):
+        done, pending = await asyncio.wait([coro], timeout=timeout)
+
+        if pending:
+            raise TimeoutError('Notifications: {0}'.format(result))
+
+        result += [done.pop().result()]
+
+        if matcher(result[-1]):
+            return result
 
 
 setup_testing_env()

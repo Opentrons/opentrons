@@ -1,9 +1,28 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
     Point, Node, add, children, ascend, absolute, relative, max_z,
-    stringify, update, remove, translate, scale, rotate
+    stringify, update, remove, translate
 )
-from numpy import isclose, array
+from numpy import isclose, array, ndarray
+
+
+def scale(cx, cy, cz) -> ndarray:
+    return array([
+        [ cx, 0.0, 0.0,   0],  # NOQA
+        [0.0,  cy, 0.0,   0],
+        [0.0, 0.0,  cz,   0],
+        [0.0, 0.0, 0.0, 1.0]
+    ])
+
+
+def rotate(theta: float) -> ndarray:
+    from math import sin, cos
+    return array([
+        [cos(theta), -sin(theta), 0.0,   0],
+        [sin(theta),  cos(theta), 0.0,   0],
+        [       0.0,         0.0, 1.0,   0],  # NOQA
+        [       0.0,         0.0, 0.0, 1.0]   # NOQA
+    ])
 
 
 @pytest.fixture

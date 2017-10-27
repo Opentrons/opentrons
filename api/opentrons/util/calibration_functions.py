@@ -1,20 +1,35 @@
 from numpy import array
+from opentrons.trackers.pose_tracker import (
+    update, Point, translate
+)
+from opentrons.util.vector import Vector
+from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 
-# TODO(artyom, ben 20171026): move to config
-DEFAULT_TIP_LENGTH = 46
+# maximum distance to move during calibration attempt
+PROBE_TRAVEL_DISTANCE = 20
+# size along X, Y and Z
+PROBE_SIZE = array((30.0, 30, 25.5))
+# coordinates of the top of the probe
+PROBE_TOP_COORDINATES = array((289.8, 296.4, 65.25))
 
 
 def calibrate_container_with_delta(
-        container, position_tracker, delta_x,
+        pose, container, delta_x,
         delta_y, delta_z, save, new_container_name=None
 ):
-    delta = (delta_x, delta_y, delta_z)
-    position_tracker.translate_object(container, *delta)
-    container._coordinates += delta
+    delta = Point(delta_x, delta_y, delta_z)
+    new_transform = pose[container].transform.dot(
+        translate(delta)
+    )
+    # Take first three elements of the last column
+    point = Point(*new_transform.T[-1][:-1])
+    pose = update(pose, container, point)
+    container._coordinates = Vector(*point)
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
     elif save:
         database.overwrite_container(container)
+    return pose
 
 
 def calibrate_pipette(probing_values, probe):
@@ -25,15 +40,9 @@ def calibrate_pipette(probing_values, probe):
 def probe_instrument(instrument, robot):
     robot.home()
 
-    # maximum distance to move during calibration attempt
-    travel = 20
-    # size along X, Y and Z
-    size = array((30.0, 30, 25.5))
-    # coordinates of the top of the probe
-    top = array((289.8, 296.4, 65.25))
-    *_, height = size
+    *_, height = PROBE_SIZE
 
-    center = array(top) - (0, 0, height)
+    center = PROBE_TOP_COORDINATES - (0, 0, height)
 
     #       Y ^
     #         * 1
@@ -60,7 +69,9 @@ def probe_instrument(instrument, robot):
         (0,  0,  1, -1),
     ]
 
-    coords = [switch[:-1] * size + center for switch in switches]
+    switch_center = PROBE_TOP_COORDINATES
+
+    coords = [switch[:-1] * PROBE_SIZE + center for switch in switches]
 
     instrument._add_tip(DEFAULT_TIP_LENGTH)
 
@@ -82,7 +93,7 @@ def probe_instrument(instrument, robot):
 
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
-        instrument._probe(axis, direction * travel)
+        instrument._probe(axis, direction * PROBE_TRAVEL_DISTANCE)
 
         robot.poses = instrument._move(robot.poses, x=x, y=y)
 

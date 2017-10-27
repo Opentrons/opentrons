@@ -66,7 +66,7 @@ def _write_to_device_and_return(cmd, device_connection):
 
 def _connect(port_name, baudrate):
     return serial.Serial(
-        port_name,
+        port=port_name,
         baudrate=baudrate,
         timeout=DEFAULT_SERIAL_TIMEOUT
     )

@@ -254,8 +254,20 @@ class SmoothieDriver_3_0_0:
         # If Y is requested make sure we home X first
         if 'Y' in axis:
             axis += 'X'
+        # If horizontal movement is requested, ensure we raise the instruments
+        if 'X' in axis:
+            axis += 'ZA'
+        # These two additions are safe even if they duplicate requested axes
+        # because of the use of set operations below, which will de-duplicate
+        # characters from the resulting string
 
-        # Narrow down home sequence to requested axes ignoring disabled axes
+        # HOME_SEQUENCE defines a pattern for homing, specifically that the
+        # ZABC axes should be homed first so that horizontal movement doesn't
+        # happen with the pipette down (which could bump into things). Then
+        # the X axis is homed, which has to happen before Y. Finally Y can be
+        # homed. This variable will contain the sequence just explained, but
+        # filters out unrequested axes using set intersection (&) and then
+        # filters out disabled axes using set difference (-)
         home_sequence = filter(
             None,
             [

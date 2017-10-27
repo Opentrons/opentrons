@@ -17,25 +17,6 @@ def translate(point: Point) -> np.ndarray:
     ])
 
 
-def scale(cx, cy, cz) -> np.ndarray:
-    return np.array([
-        [ cx, 0.0, 0.0,   0],  # NOQA
-        [0.0,  cy, 0.0,   0],
-        [0.0, 0.0,  cz,   0],
-        [0.0, 0.0, 0.0, 1.0]
-    ])
-
-
-def rotate(theta: float) -> np.ndarray:
-    from math import sin, cos
-    return np.array([
-        [cos(theta), -sin(theta), 0.0,   0],
-        [sin(theta),  cos(theta), 0.0,   0],
-        [       0.0,         0.0, 1.0,   0],  # NOQA
-        [       0.0,         0.0, 0.0, 1.0]   # NOQA
-    ])
-
-
 class Node(namedtuple('Node', 'parent children transform')):
     def add(self, child):
         return self._replace(children=self.children + [child])
@@ -45,7 +26,7 @@ class Node(namedtuple('Node', 'parent children transform')):
         children.remove(child)
         return self._replace(children=children)
 
-    def update(self, transform):
+    def update(self, transform: np.ndarray):
         res = self._replace(transform=transform)
         return res
 
@@ -75,7 +56,7 @@ def add(
     state[obj] = Node(
         parent=parent,
         children=[],
-        ransform=transform.dot(translate(point))
+        transform=transform.dot(translate(point))
     )
 
     return state
@@ -94,7 +75,7 @@ def remove(state, obj):
     return state
 
 
-def update(state, obj, point, transform=np.identity(4)):
+def update(state, obj, point: Point, transform=np.identity(4)):
     state = state.copy()
     state[obj] = state[obj].update(
         transform.dot(translate(point))

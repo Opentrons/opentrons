@@ -61,12 +61,13 @@ class InstrumentMover(object):
 
     def jog(self, pose, axis, distance):
         axis = axis.lower()
-        current = pose_tracker.absolute(pose, self.instrument)._asdict()[axis]
-        return self.move(pose, **{axis: current + distance})
+        current = pose_tracker.absolute(pose, self.instrument)
+        current = dict(zip('xyz', current))
+        return self.move(pose, **{axis: current[axis] + distance})
 
     def move(self, pose, x=None, y=None, z=None):
-        # TODO: this is needed to have up to date values in pose tree
-        # should find a more graceful way to do it
+        # TODO(artyom 20171020): this is needed to have up to date
+        # values in pose tree should find a more graceful way to do it
         pose = self.gantry._update_pose(pose)
         pose = self.mount._update_pose(pose)
 
@@ -185,7 +186,7 @@ class Mount:
 
         self.instrument = instrument
         instrument.instrument_actuator = InstrumentActuator(self.driver, self.actuator_axis, instrument)
-        instrument.instrument_mover = InstrumentMover(self.gantry, self, instrument)  # WHat is a mover?
+        instrument.instrument_mover = InstrumentMover(self.gantry, self, instrument)
         instrument.axis = self.mount_axis
         instrument.mount_obj = self
 

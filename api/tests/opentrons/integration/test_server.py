@@ -24,7 +24,7 @@ async def test_notifications(session, session_manager, protocol, root, connect):
     await session.call(
         id=res['data']['i'],
         name='run',
-        args=['Virtual Smoothie']
+        args=[]
     )
     await session.socket.receive_json()  # Skip ack
 
@@ -58,7 +58,7 @@ async def test_notifications(session, session_manager, protocol, root, connect):
     responses = [
         res for res in responses
         if res['data']['v']['name'] == 'state']
-    assert len(responses) == 107
+    assert len(responses) == 106
 
     states = [
         response['data']['v']['payload']['v']['state']
