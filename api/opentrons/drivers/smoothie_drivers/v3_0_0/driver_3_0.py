@@ -39,6 +39,9 @@ GCODES = {'HOME': 'G28.2',
           'SET_SPEED': 'G0F',
           'SET_POWER': 'M907'}
 
+homed_positions = {
+    'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 18.9997, 'C': 18.9997
+}
 
 def _position_at_expected_thresh(position, cached_position):
     '''Checks parsed position against cache and some threshold'''
@@ -66,29 +69,29 @@ def _parse_axis_values(raw_axis_values):
 class SmoothieDriver_3_0_0:
 
     def __init__(self):
-        self.cached_position = {}
+        self._cached_position = {}
         self.log = []
-        self._update_position_cache({axis: 0 for axis in AXES.lower()})
+        self._update_cached_position({axis: 0 for axis in AXES.lower()})
         self.simulating = True
         self._accumulated_position_error = 1
 
-    def _update_position_cache(self, target):
-        self.cached_position.update({
+    def _update_cached_position(self, target):
+        self._cached_position.update({
             axis.lower(): value for axis, value
             in target.items()
             if value is not None
         })
 
-        self.log += [self.cached_position.copy()]
+        self.log += [self._cached_position.copy()]
 
     def _check_position_for_error(self, raw_position):
         parsed_position = _parse_axis_values(raw_position)
-        _position_at_expected_thresh(parsed_position, self.cached_position)
+        _position_at_expected_thresh(parsed_position, self._cached_position)
         return parsed_position
 
     def update_position(self, is_retry=False):
         if self.simulating:
-            updated_position = self.cached_position
+            updated_position = self._cached_position
 
         else:
             try:
@@ -102,7 +105,7 @@ class SmoothieDriver_3_0_0:
                 else:
                     self.update_position(is_retry=True)
 
-        self._update_position_cache(updated_position)
+        self._update_cached_position(updated_position)
         self._accumulated_position_error = 0
 
     def connect(self):
@@ -119,7 +122,7 @@ class SmoothieDriver_3_0_0:
 
     @property
     def position(self):
-        return self.cached_position
+        return self._cached_position
 
     def get_switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
@@ -183,7 +186,7 @@ class SmoothieDriver_3_0_0:
 
         self._send_command(command)
 
-        self._update_position_cache({
+        self._update_cached_position({
             axis: value
             for axis, value in zip('xyzabc', [x, y, z, a, b, c])
         })
@@ -193,12 +196,9 @@ class SmoothieDriver_3_0_0:
             self.update_position()
 
     def home(self, axis=None):
-        homed_positions = {
-            'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 18.9997, 'C': 18.9997
-        }
         if not axis:
             self._home_all()
-            self._update_position_cache(homed_positions)
+            self._update_cached_position(homed_positions)
 
         else:
             axes_to_home = [
@@ -208,7 +208,7 @@ class SmoothieDriver_3_0_0:
             if axes_to_home:
                 command = GCODES['HOME'] + ''.join(axes_to_home)
                 self._send_command(command)
-                self._update_position_cache({
+                self._update_cached_position({
                     axis: homed_positions[axis] for axis in axes_to_home
                 })
 
