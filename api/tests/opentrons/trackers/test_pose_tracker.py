@@ -1,163 +1,204 @@
 import pytest
+import numpy as np
 
-from opentrons.util import calibration_functions as cf
-from opentrons.instruments import Pipette
-from opentrons.containers import load as containers_load
-from opentrons.trackers.pose_tracker import Pose, PoseTracker
-from opentrons.robot.robot import Robot
-from opentrons.util.vector import Vector
+from opentrons.trackers.pose_tracker import PoseTracker, Pose
 
 
-@pytest.fixture
-def pos_tracker(robot):
-    containers_load(robot, '96-flat', 'A1')
-    Pipette(robot, mount='left')
-    return robot.pose_tracker
+def empty_pose_tracker():
+    return PoseTracker()
 
 
-@pytest.fixture
-def p200(robot):
-    return Pipette(robot, mount='right')
+def single_root_pose_tracker():
+    '''
+    'root'
+        'child1'
+            'child3'
+                'child6'
+            'child4'
+        'child2'
+            'child5'
+        'child7'
+        'child8'
+        'child9'
+    '''
+    pt = PoseTracker()
+    root = 'root'
+    pt.create_root_object(root, 0, 0, 0) # global_position: 0, 0, 0
+    pt.track_object(root, 'child1', 1, 5, 2) # global_position: 1, 5, 2
+    pt.track_object(root, 'child2', 0, 2, -4) # global_position: 0, 2, -4
+    pt.track_object('child1', 'child3', 3, 1, 6) # global_position: 4, 6, 8
+    pt.track_object('child1', 'child4', 10, 9, 2) # global_position: 11, 14, 4
+    pt.track_object('child2', 'child5', 13, -2, 0) # global_position: 13, 0, -4
+    pt.track_object('child3', 'child6', 12, 20, 41) # global_position: 16, 26, 49
+    pt.track_object(root, 'child7', -10, 12, 14) # global_position: -10, 12, 14
+    pt.track_object(root, 'child8', 1, -2, -4) # global_position: 1, -2, -4
+    pt.track_object(root, 'child9', 0, 0, 0) # global_position: 0, 0, 0
+
+    correct_positions = {
+        'child2': [ 0.,  2., -4.],
+        'child3': [ 4.,  6.,  8.],
+        'child7': [-10.,  12.,  14.],
+        'child9': [ 0.,  0.,  0.],
+        'child6': [ 16.,  26.,  49.],
+        'child1': [ 1.,  5.,  2.],
+        'child5': [ 13.,   0.,  -4.],
+        'root': [ 0.,  0.,  0.],
+        'child4': [ 11.,  14.,   4.],
+        'child8': [ 1., -2., -4.]
+        }
+
+    return (pt, correct_positions)
 
 
-@pytest.fixture
-def plate(robot):
-    return containers_load(robot, '96-flat', 'A1')
+def dual_root_pose_tracker():
+    '''
+    'root1'
+        'child1'
+            'child3'
+        'child8'
 
 
-def test_add_container_to_deck(robot):
-    plate = containers_load(robot, '96-flat', 'A1')
-    assert plate in robot.pose_tracker
+    'root2'
+        'child2'
+            'child4'
+            'child5'
+                'child6'
+        'child7'
+            'child9'
+    '''
+    pose_tracker = PoseTracker()
+
+    pose_tracker.create_root_object('root1', 0, 0, 0) # global_position: 0, 0, 0
+    pose_tracker.create_root_object('root2', 1, 1, 1) # global_position: 1, 1, 1
+
+    pose_tracker.track_object('root1', 'child1', 1, 5, 2) # global_position: 1, 5, 2
+    pose_tracker.track_object('root2', 'child2', 0, 2, -4) # global_position: 1, 3, -3
+    pose_tracker.track_object('child1', 'child3', 3, 1, 6) # global_position: 4, 6, 8
+    pose_tracker.track_object('child2', 'child4', 10, 9, 2) # global_position: 11, 12, -1
+    pose_tracker.track_object('child2', 'child5', 13, -2, 0) # global_position: 14, 1, -3
+    pose_tracker.track_object('child5', 'child6', -10, 20, 29) # global_position: 4, 21, 26
+    pose_tracker.track_object('root2', 'child7', -10, 12, 14) # global_position: -9, 13, 15
+    pose_tracker.track_object('root1', 'child8', 1, -2, -4) # global_position: 1, -2, -4
+    pose_tracker.track_object('child7', 'child9', 0, 0, 0) # global_position: 0, 0, 0
+
+    correct_positions = {
+        'root1': [0., 0., 0.],
+        'child3': [4., 6., 8.],
+        'child7': [-9., 13., 15.],
+        'child2': [1., 3., -3.],
+        'child1': [1., 5., 2.],
+        'child6': [4., 21., 26.],
+        'root2': [1., 1., 1.],
+        'child9': [-9., 13., 15.],
+        'child4': [11., 12., -1.],
+        'child5': [14., 1., -3.],
+        'child8': [1., -2., -4.]
+    }
+
+    return (pose_tracker, correct_positions)
 
 
-def test_calibrate_plate(robot, tmpdir):
-    # Load container | Test positions of container and wells
-    plate = containers_load(robot, '96-flat', 'A1')
-    assert robot.pose_tracker[plate].position == Vector(21.24, 24.34, 0.0)
-    assert robot.pose_tracker[plate[2]].position == Vector(39.24, 24.34, 10.5)
-    assert robot.pose_tracker[plate[5]].position == Vector(66.24, 24.34, 10.5)
+def test_init():
+    pose_tracker = PoseTracker()
 
-    cf.calibrate_container_with_delta(
-        plate, robot.pose_tracker, 1, 3, 4, True
-    )
-    assert robot.pose_tracker[plate].position == Vector(22.24, 27.34, 4.0)
-    assert robot.pose_tracker[plate[2]].position == Vector(40.24, 27.34, 14.5)
-    assert robot.pose_tracker[plate[5]].position == Vector(67.24, 27.34, 14.5)
+    assert pose_tracker._root_nodes == []
+    assert pose_tracker._pose_dict == {}
+    assert pose_tracker._node_dict == {}
 
 
-def test_add_pipette(robot):
-    p200 = Pipette(robot, mount='left')
-    assert p200 in robot.pose_tracker
+@pytest.mark.parametrize("key, rel_x, rel_y, rel_z", [
+    ('example_key', 1, 2, 3),
+    (1, 4, 8, 10),
+    ('another_key', -6, 12, 30),
+    (True, 10, 200, -3),
+    ('True', 0, 0, 0)
+])
+def test_add_root_object(key, rel_x, rel_y, rel_z):
+    pose_tracker = PoseTracker()
+    pose_tracker.create_root_object(obj=key, x=rel_x, y=rel_y, z=rel_z)
+    node = pose_tracker._node_dict[key]
+
+    assert node in pose_tracker._root_nodes
+    assert key in pose_tracker._node_dict
+    assert key in pose_tracker._pose_dict
+
+    assert pose_tracker.relative(key) == Pose(rel_x, rel_y, rel_z)
+    assert pose_tracker.absolute(key) == Pose(rel_x, rel_y, rel_z)
+    assert pose_tracker.absolute(key) == pose_tracker.relative(key)
+
+    assert pose_tracker[key] == Pose(rel_x, rel_y, rel_z)
 
 
-def test_pipette_movement(robot):
-    p200 = Pipette(robot, mount='left')
-    plate = containers_load(robot, '96-flat', 'A1')
-    p200.move_to(plate[2])
-    assert robot.pose_tracker[p200].position == Vector(39.24, 24.34, 10.5)
+@pytest.mark.parametrize("pose_tracker, subtree_root, expected_max", [
+    (single_root_pose_tracker()[0], 'root', 49),
+    (single_root_pose_tracker()[0], 'child2', -4),
+    (dual_root_pose_tracker()[0], 'root2', 26),
+    (dual_root_pose_tracker()[0], 'root1', 8),
+    (dual_root_pose_tracker()[0], 'child7', 15)
+
+])
+def test_max_z_in_subtree(pose_tracker, subtree_root, expected_max):
+    assert pose_tracker.max_z_in_subtree(subtree_root) == expected_max
 
 
-def test_max_z(robot):
-    containers_load(robot, '96-flat', 'A1')
-    deck = robot._deck
-    assert robot.pose_tracker.max_z_in_subtree(deck) == 10.5
-
-    plate = containers_load(robot, 'small_vial_rack_16x45', 'B1')
-    assert robot.pose_tracker.max_z_in_subtree(deck) == 45
-
-    robot.pose_tracker.translate_object(plate, 0, 0, 1)
-    assert robot.pose_tracker.max_z_in_subtree(deck) == 46
-
-
-def test_get_object_children(robot):
-    plate = containers_load(robot, '96-flat', 'B2')
-    children = robot.pose_tracker.get_object_children(plate)
-    children == plate.get_children_list()
+@pytest.mark.parametrize("pose_tracker, correct_position_dict", [
+    single_root_pose_tracker(),
+    dual_root_pose_tracker()
+])
+def test_absolute_position(pose_tracker, correct_position_dict):
+    for key in correct_position_dict:
+        assert key in pose_tracker._node_dict
+        assert (pose_tracker[key].position == correct_position_dict[key]).all()
+        assert (pose_tracker.absolute(key).position == correct_position_dict[key]).all()
 
 
-def test_tree_printing(robot):
-    containers_load(robot, 'trough-12row', 'B2')
-    print_output = robot.pose_tracker.__str__()
-    EXPECTED_OUTPUT =\
-        "\n\n'head'" \
-        "\n\n\n<Deck>" \
-        "\n\t<Deck><Slot A1>" \
-        "\n\t<Deck><Slot A2>" \
-        "\n\t<Deck><Slot A3>" \
-        "\n\t<Deck><Slot B1>" \
-        "\n\t<Deck><Slot B2>" \
-        "\n\t\t<Deck><Slot B2><Container trough-12row>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A1>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A2>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A3>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A4>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A5>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A6>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A7>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A8>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A9>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A10>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A11>" \
-        "\n\t\t\t<Deck><Slot B2><Container trough-12row><Well A12>" \
-        "\n\t<Deck><Slot B3>" \
-        "\n\t<Deck><Slot C1>" \
-        "\n\t<Deck><Slot C2>" \
-        "\n\t<Deck><Slot C3>" \
-        "\n\t<Deck><Slot D1>" \
-        "\n\t<Deck><Slot D2>" \
-        "\n\t<Deck><Slot D3>" \
-        "\n\t<Deck><Slot E1>" \
-        "\n\t<Deck><Slot E2>" \
-        "\n\t<Deck><Slot E3>\n"
-
-    assert print_output == EXPECTED_OUTPUT
+@pytest.mark.parametrize("pose_tracker, key, descendants", [
+    (single_root_pose_tracker()[0], 'child4', []),
+    (single_root_pose_tracker()[0], 'child1', ['child3', 'child6', 'child4']),
+    (dual_root_pose_tracker()[0], 'root1', ['child1', 'child3', 'child8']),
+    (dual_root_pose_tracker()[0], 'child2', ['child4', 'child5', 'child6']),
+    (dual_root_pose_tracker()[0], 'child9', []),
+])
+def test_get_objects_in_subtree(pose_tracker, key, descendants):
+    subtree = pose_tracker.get_objects_in_subtree(key)
+    expected_subtree = descendants + [key]
+    assert len(set(subtree)) == len(descendants + [key])
+    assert set(subtree) == set(expected_subtree)
 
 
-def test_pose_equality():
-    pose1 = Pose(5, 10, 20)
-    pose2 = Pose(1, 2, 3)
-    assert not pose1 == pose2
+@pytest.mark.parametrize("pose_tracker, correct_position_dict, object_to_translate, translation", [
+    (single_root_pose_tracker()[0], single_root_pose_tracker()[1], 'root', {'x':1, 'y':2, 'z':3}),
+    (single_root_pose_tracker()[0], single_root_pose_tracker()[1], 'child1', {'x':-1, 'y':-3, 'z':0}),
+    (single_root_pose_tracker()[0], single_root_pose_tracker()[1], 'child5', {'x':1, 'y':2, 'z':3}),
+    (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1], 'root1', {'x':0, 'y':0, 'z':0}),
+    (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1], 'child7', {'x':-10, 'y':0, 'z':0}),
+    (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1], 'root2', {'x':11, 'y':29, 'z':3})
+])
+def test_translate_object(pose_tracker, correct_position_dict, object_to_translate, translation):
+    subtree = pose_tracker.get_objects_in_subtree(object_to_translate)
+    pose_tracker.translate_object(object_to_translate, **translation)
 
-    pose3 = pose2 * [4, 8, 17, 1]
-    assert pose1 == pose3
-
-
-def test_get_objects_in_subtree(robot):
-    plate = containers_load(robot, '96-flat', 'A1')
-    EXPECTED_SUBTREE = [plate] +\
-                       [well for well in plate] +\
-                       [robot._deck] +\
-                       [slot for slot in robot._deck]
-    deck_subtree = robot.pose_tracker.get_objects_in_subtree(robot._deck)
-    assert len(deck_subtree) == len(EXPECTED_SUBTREE)
-    assert set(deck_subtree) - set(EXPECTED_SUBTREE) == set()
-
-    trough = containers_load(robot, 'trough-12row', 'B1')
-    EXPECTED_SUBTREE += [trough] + [well for well in trough]
-    deck_subtree = robot.pose_tracker.get_objects_in_subtree(robot._deck)
-    assert len(deck_subtree) == len(EXPECTED_SUBTREE)
-    assert set(deck_subtree) - set(EXPECTED_SUBTREE) == set()
+    for tracked_object in subtree:
+        old_pose = Pose(*correct_position_dict[tracked_object])
+        expected_new_pose = old_pose * Pose(**translation)
+        expected_new_position = expected_new_pose.position
+        assert pose_tracker.absolute(tracked_object) == expected_new_pose
+        assert (pose_tracker.absolute(tracked_object).position == expected_new_position).all()
 
 
-def test_faulty_set(pos_tracker, robot):
-    with pytest.raises(TypeError):
-        pos_tracker[robot._deck] = 10
+@pytest.mark.parametrize("pose_tracker", [
+    (single_root_pose_tracker()[0]),
+    (dual_root_pose_tracker()[0])
+])
+def test_clear_all(pose_tracker):
+    assert not pose_tracker._root_nodes == []
+    assert not pose_tracker._pose_dict == {}
+    assert not pose_tracker._node_dict == {}
+
+    pose_tracker.clear_all()
+
+    assert pose_tracker._root_nodes == []
+    assert pose_tracker._pose_dict == {}
+    assert pose_tracker._node_dict == {}
 
 
-def test_faulty_access(pos_tracker):
-    p300 = Pipette(Robot(), mount='left')
-    with pytest.raises(KeyError):
-        pos_tracker[p300]
-
-
-def test_relative_object_position(plate, p200, robot):
-    robot.move_head(x=10, y=30, z=10)
-    rel_pos = robot.pose_tracker.relative_object_position(p200, plate)
-    assert rel_pos == Vector(-11.24, 5.66, 10)
-
-
-def test_get_object_ancestors(robot, plate):
-    ps = robot.pose_tracker  # type: PoseTracker
-    ancestors = ps._get_transform_sequence(plate[2])  # find ancestor posess of arbitrary well
-    assert ancestors == [ps[robot._deck], ps[robot._deck['A1']], ps[plate], ps[plate[2]]]
-    
