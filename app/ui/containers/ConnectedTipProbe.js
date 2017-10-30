@@ -12,10 +12,10 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onPrepareClick: () => {
-    dispatch(robotActions.moveToFront(ownProps.instrument.axis))
+    dispatch(robotActions.connect(ownProps.instrument.axis))
   },
   onProbeTipClick: () => {
-    dispatch(robotActions.probeTip(ownProps.instrument.axis))
+    dispatch(robotActions.disconnect(ownProps.instrument.axis))
   }
 })
 

@@ -5,10 +5,31 @@ import classnames from 'classnames'
 
 import styles from './icons.css'
 import spinnerSrc from '../img/loading.gif'
+import discoverSrc from '../img/icon_discover.png'
+import controlledUSBSrc from '../img/icon_usb_controlled.png'
+import availableUSBSrc from '../img/icon_usb.png'
 
 export function Spinner (props) {
   return (
     <ImageIcon {...props} src={spinnerSrc} />
+  )
+}
+
+export function Discover (props) {
+  return (
+    <ImageIcon {...props} src={discoverSrc} />
+  )
+}
+
+export function ControlledUSB (props) {
+  return (
+    <ImageIcon {...props} src={controlledUSBSrc} />
+  )
+}
+
+export function AvailableUSB (props) {
+  return (
+    <ImageIcon {...props} src={availableUSBSrc} />
   )
 }
 

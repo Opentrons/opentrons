@@ -1,7 +1,6 @@
 import {connect} from 'react-redux'
 
 import {
-  actions as robotActions,
   selectors as robotSelectors,
   constants as robotConstants
 } from '../robot'
@@ -12,21 +11,14 @@ const mapStateToProps = (state) => {
   const connectionStatus = robotSelectors.getConnectionStatus(state)
   const isConnected = connectionStatus === robotConstants.CONNECTED
   return {
-    scanning: true,
+    scanning: false,
     discovered: [
-      {hostname: 'bot.local'},
-      {hostname: 'other.local'}
+      {hostname: 'bot.local', isCurrent: false},
+      {hostname: 'other.local', isCurrent: true}
     ],
     connectionStatus: robotSelectors.getConnectionStatus(state),
     isConnected
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onConnectClick: () => dispatch(robotActions.connect()),
-    onDisconnectClick: () => dispatch(robotActions.disconnect())
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ConnectPanel)
+export default connect(mapStateToProps)(ConnectPanel)

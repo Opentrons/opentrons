@@ -2,59 +2,23 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Button from './Button'
+import DiscoveredRobot from '../containers/DiscoveredRobot'
 import {Spinner} from './icons'
 import styles from './ConnectPanel.css'
-
-function RobotItem (props) {
-  const {hostname, isConnected, onConnectClick, onDisconnectClick} = props
-  let connectButton
-  if (!isConnected) {
-    connectButton =
-      <Button
-        onClick={onConnectClick}
-        disabled={isConnected}
-        style={styles.btn_connect}
-      >
-        Take Control
-      </Button>
-  } else {
-    connectButton =
-      <Button
-        onClick={onDisconnectClick}
-        disabled={!isConnected}
-        style={styles.btn_connect}
-      >
-        Release Control
-      </Button>
-  }
-  return (
-    <li>
-      <div>{hostname}</div>
-      {connectButton}
-    </li>
-  )
-}
 
 export default function ConnectPanel (props) {
   const {
     scanning,
     isConnected,
-    onConnectClick,
-    onDisconnectClick,
     discovered
   } = props
 
   const robotList = discovered.map((robot) => {
     const {hostname} = robot
-    const connectBtnProps = {
-      isConnected,
-      onConnectClick,
-      onDisconnectClick
-    }
     return (
-      <RobotItem
-        {...robot}
-        {...connectBtnProps}
+      <DiscoveredRobot
+        robot={robot}
+        isConnected={isConnected}
         key={hostname}
       />
     )

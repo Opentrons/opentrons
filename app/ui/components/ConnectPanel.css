@@ -1,6 +1,7 @@
 .connect_panel {
   color: silver;
   height: 100%;
+  width: 17.2rem;
 }
 
 .robot_results {
@@ -29,6 +30,7 @@ h1 {
 
 .robot_list .spinner {
   height: 5rem;
+  margin-top: 1rem;
 }
 
 .refresh {
@@ -49,28 +51,40 @@ h1 {
 
 .robot_list li {
   height: 6rem;
-  padding-top: 0.5rem;
   border-bottom: 2px solid #ddd;
-  text-align: center;
   margin: 0;
 }
 
-.btn {
-  composes: btn from './Util.css';
-  width: 50%;
-  margin: 0 auto;
-  height: 2.5rem;
-  line-height: 2.5rem;
-  padding-left: 2rem;
-  text-align: left;
-  background-size: 1rem;
-  background-repeat: no-repeat;
-  background-position: 0.5rem center;
+.connection_type {
+  margin: -1rem 1rem 0;
+  height: 3rem;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.connection_info {
+  display: inline-block;
+  width: 13rem;
+  height: 6rem;
+}
+
+.connection_name {
+  line-height: 3rem;
+}
+
+.connection_name,
+.connection_btn {
+  width: 10rem;
+  display: block;
+  text-align: center;
 }
 
 .btn_connect {
-  composes: btn;
-  padding-left: 0;
+  composes: btn from './Util.css';
+  height: 2.5rem;
+  margin: 0 auto;
+  line-height: 2.5rem;
+  padding: 0 1rem;
   text-align: center;
   background-color: #999;
   color: white;
