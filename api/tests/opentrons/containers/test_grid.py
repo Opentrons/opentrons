@@ -88,7 +88,7 @@ class GridTestCase(unittest.TestCase):
             tip_racks=[tiprack],
             max_volume=200,
             min_volume=10,  # These are variable
-            axis="b",
+            mount='left',
             channels=1
         )
         p200.calibrate_plunger(top=0, bottom=10, blow_out=12, drop_tip=13)

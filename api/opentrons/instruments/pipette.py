@@ -73,11 +73,11 @@ class Pipette:
     >>> from opentrons import instruments, containers, robot
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> p1000 = instruments.Pipette(axis='a', max_volume=1000)
+    >>> p1000 = instruments.Pipette(mount='left', max_volume=1000)
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'B1')
     >>> p200 = instruments.Pipette(
     ...     name='p200',
-    ...     axis='b',
+    ...     mount='right',
     ...     max_volume=200,
     ...     tip_racks=[tip_rack_200ul])
     """

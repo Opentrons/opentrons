@@ -55,21 +55,6 @@ def _parse_axis_values(raw_axis_values):
     }
 
 
-def apply_transform_matrix(state, matrix, defaults):
-    state = {
-        **defaults,
-        **{key: value for key, value in state.items() if value is not None}
-    }
-
-    xyz = matrix.dot([state[axis] for axis in 'XYZ'] + [1])[:-1]
-    xya = matrix.dot([state[axis] for axis in 'XYA'] + [1])[:-1]
-
-    return {
-        **state,
-        **{axis: value for axis, value in zip('XYZ', xyz)},
-        **{axis: value for axis, value in zip('XYA', xya)},
-    }
-
 class SmoothieDriver_3_0_0:
     def __init__(self):
         self._position = {}
@@ -206,7 +191,7 @@ class SmoothieDriver_3_0_0:
             self._send_command(command)
             self._update_position(target_position)
 
-    def home(self, axis=AXES):
+    def home(self, axis=AXES, disabled=DISABLE_AXES):
         axis = axis.upper()
 
         # If Y is requested make sure we home X first
@@ -226,13 +211,12 @@ class SmoothieDriver_3_0_0:
         # homed. This variable will contain the sequence just explained, but
         # filters out unrequested axes using set intersection (&) and then
         # filters out disabled axes using set difference (-)
-        home_sequence = filter(
+        home_sequence = list(filter(
             None,
             [
-                ''.join(set(group) & set(axis) - set(DISABLE_AXES))
+                ''.join(set(group) & set(axis) - set(disabled))
                 for group in HOME_SEQUENCE
-            ])
-
+            ]))
         command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
 
@@ -245,8 +229,8 @@ class SmoothieDriver_3_0_0:
 
         # Only update axes that have been selected for homing
         homed = {
-            axis: position[axis]
-            for axis in ''.join(home_sequence)
+            ax: position[ax]
+            for ax in ''.join(home_sequence)
         }
         self._update_position(homed)
         return homed

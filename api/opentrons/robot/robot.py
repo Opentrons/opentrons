@@ -400,9 +400,10 @@ class Robot(object):
         """
         self.poses = self.gantry.home(self.poses)
 
+    # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
         self._driver.move(*args, **kwargs)
-        self.gantry._update_pose()
+        self.gantry._update_pose(self.poses)
 
     # DEPRECATED
     def move_plunger(self, *args, **kwargs):
