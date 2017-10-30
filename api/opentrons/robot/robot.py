@@ -1,9 +1,9 @@
 import os
 from threading import Event
-from numpy.linalg import inv
+
 
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
-from .gantry import Mover
+from . import gantry
 
 import opentrons.util.calibration_functions as calib
 import opentrons.util.pose_functions as pos_funcs
@@ -13,43 +13,15 @@ from opentrons import containers, drivers
 from opentrons.containers import Container
 from opentrons.util.log import get_logger
 from opentrons.trackers import pose_tracker
-from opentrons.trackers.pose_tracker import Point
 from opentrons.data_storage import database
 from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
-from opentrons.util.vector import Vector
 
 from numpy import array, dot, insert, add, subtract
 from functools import lru_cache
 
 log = get_logger(__name__)
-
-
-# World -> Smoothie calibration values for XY plane
-# use cli/main.py to perform factory calibration
-# TODO(artyom 20171017): move to config
-XY = \
-    array([[+9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
-           [-3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
-           [-5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
-
-# Smoothie coordinate for Z axis when 200ul tip is touching the deck
-Z_OFFSET = 3.75
-# Can be used to compensate for Z steps/mm mismatch
-Z_SCALE = 1
-
-CALIBRATION = insert(
-        insert(XY, 2, [0, 0, 0], axis=1),
-        2,
-        [0, 0, Z_SCALE, Z_OFFSET],
-        axis=0
-    )
-
-MOUNT_OFFSETS = {
-    'right': Point(0.0, 0.0, 0.0),
-    'left': Point(-37.14, 32.12, -2.5)
-}
 
 
 class InstrumentMosfet(object):
@@ -189,17 +161,6 @@ class Robot(object):
         only once instance of a robot.
         """
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
-
-        self._actuators = {
-            'left': Mover(self._driver, axis_mapping={'x': 'B'}),
-            'right': Mover(self._driver, axis_mapping={'x': 'C'})
-        }
-
-        self._movers = {
-            'left': Mover(driver=self._driver, axis_mapping={'z': 'Z'}),
-            'right': Mover(driver=self._driver, axis_mapping={'z': 'A'})
-        }
-
         self.dimensions = (395, 345, 228)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -269,31 +230,15 @@ class Robot(object):
         return self
 
     def setup_gantry(self):
-        driver = self._driver
-        left = self._movers['left']
-        right = self._movers['right']
-        gantry = Mover(
-            driver=driver,
-            axis_mapping={'x': 'X', 'y': 'Y'},
-            children=[left, right]
+        self.gantry = gantry.Gantry(self._driver)
+
+        self.poses = pose_tracker.add(
+            self.poses,
+            self.gantry,
+            'world'
         )
 
-        transform = CALIBRATION * array([
-            [1, 1, 1, 0],
-            [1, 1, 1, 0],
-            [1, 1, 1, 0],
-            [0, 0, 0, 1],
-        ])
-
-        self.poses = pose_tracker.bind(self.poses) \
-            .add(obj=driver, parent='world', transform=CALIBRATION) \
-            .add(obj=gantry, parent=driver) \
-            .add(obj=left, parent=gantry) \
-            .add(obj=right, parent=gantry) \
-            .add(obj='left', parent=left, transform=inv(transform)) \
-            .add(obj='right', parent=right, transform=inv(transform))
-
-        self.gantry = gantry
+        self.poses = self.gantry._setup_mounts(self.poses)
 
     def add_instrument(self, mount, instrument):
         """
@@ -319,18 +264,7 @@ class Robot(object):
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        instrument.instrument_actuator = self._actuators[mount]
-        instrument.instrument_mover = self._movers[mount]
-        # We are creating two pose_tracker entries for instrument
-        # one id(instrument) to store it's offset vector and another
-        # with zero offset, which can be increased/decreased by
-        # tip length for pickup and drop tip
-        self.poses = pose_tracker.add(
-            self.poses,
-            id(instrument),
-            parent=mount,
-            point=MOUNT_OFFSETS[mount]
-        ).add(instrument, parent=id(instrument))
+        self.poses = self.gantry.mount_instrument(self.poses, instrument, mount)
 
     def add_warning(self, warning_msg):
         """
@@ -532,14 +466,12 @@ class Robot(object):
         >>> robot.move_to(plate[0].top())
         """
 
-        print('move_to.location', location)
         placeable, coordinates = containers.unpack_location(location)
-        print('move_to.placeable.top', placeable.top())
 
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
-        print('offset', offset)
+
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 
@@ -629,6 +561,9 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
+
+
+
 
     def get_deck_slot_types(self):
         return 'slots'
@@ -891,24 +826,18 @@ class Robot(object):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
 
-        # calibrate well bottom, but track top of well
+        # calibrate will well bottom, but track top of well
         delta = pose_tracker.relative(
             self.poses,
-            instrument,
-            well
+            well,
+            instrument
         )
 
-        new_transform = inv(self.poses[container].transform).dot(
-            pose_tracker.translate(pose_tracker.Point(*delta))
+        self.poses = calib.calibrate_container_with_delta(
+            self.poses,
+            container,
+            *delta, save
         )
-
-        # Take first three elements of the last column
-        point = pose_tracker.Point(*new_transform.T[-1][:-1])
-        self.poses = pose_tracker.update(self.poses, container, point)
-        container._coordinates = Vector(*point)
-
-        if save:
-            database.overwrite_container(container)
 
     @lru_cache()
     def max_deck_height(self):

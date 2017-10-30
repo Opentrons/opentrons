@@ -2,6 +2,7 @@ from numpy import array
 from opentrons.trackers.pose_tracker import (
     update, Point, translate
 )
+from opentrons.util.vector import Vector
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 
 # maximum distance to move during calibration attempt
@@ -10,6 +11,25 @@ PROBE_TRAVEL_DISTANCE = 20
 PROBE_SIZE = array((30.0, 30, 25.5))
 # coordinates of the top of the probe
 PROBE_TOP_COORDINATES = array((289.8, 296.4, 65.25))
+
+
+def calibrate_container_with_delta(
+        pose, container, delta_x,
+        delta_y, delta_z, save, new_container_name=None
+):
+    delta = Point(delta_x, delta_y, delta_z)
+    new_transform = pose[container].transform.dot(
+        translate(delta)
+    )
+    # Take first three elements of the last column
+    point = Point(*new_transform.T[-1][:-1])
+    pose = update(pose, container, point)
+    container._coordinates = Vector(*point)
+    if save and new_container_name:
+        database.save_new_container(container, new_container_name)
+    elif save:
+        database.overwrite_container(container)
+    return pose
 
 
 def calibrate_pipette(probing_values, probe):

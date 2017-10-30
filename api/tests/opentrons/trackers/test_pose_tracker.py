@@ -27,14 +27,48 @@ def rotate(theta: float) -> ndarray:
 
 @pytest.fixture
 def state():
-    return add({}, 'root') \
-        .add('1', parent='root', point=Point(1, 2, 3)) \
-        .add('2', parent='root', point=Point(-1, -2, -3)) \
-        .add('1-1', parent='1', point=Point(11, 12, 13)) \
-        .add('1-1-1', parent='1-1', point=Point(0, 0, 0)) \
-        .add('1-2', parent='1', point=Point(21, 22, 23)) \
-        .add('2-1', parent='2', point=Point(-11, -12, -13)) \
-        .add('2-2', parent='2', point=Point(-21, -22, -23))
+    return {
+        'root': Node(
+                parent=None,
+                children=['1', '2'],
+                transform=translate(Point(0, 0, 0))
+            ),
+        '1': Node(
+                parent='root',
+                children=['1-1', '1-2'],
+                transform=translate(Point(1, 2, 3))
+            ),
+        '2': Node(
+                parent='root',
+                children=['2-1', '2-2'],
+                transform=translate(Point(-1, -2, -3))
+            ),
+        '1-1': Node(
+                parent='1',
+                children=['1-1-1'],
+                transform=translate(Point(11, 12, 13))
+            ),
+        '1-1-1': Node(
+                parent='1-1',
+                children=[],
+                transform=translate(Point(0, 0, 0))
+            ),
+        '1-2': Node(
+                parent='1',
+                children=[],
+                transform=translate(Point(21, 22, 23))
+            ),
+        '2-1': Node(
+                parent='2',
+                children=[],
+                transform=translate(Point(-11, -12, -13))
+            ),
+        '2-2': Node(
+                parent='2',
+                children=[],
+                transform=translate(Point(-21, -22, -23))
+            )
+    }
 
 
 def test_add():
@@ -55,7 +89,7 @@ def test_add():
         'child': Node(
             parent='root',
             children=[],
-            transform=translate(Point(-1, -2, -3)))
+            transform=translate(Point(1, 2, 3)))
     }
 
     with pytest.raises(AssertionError):
@@ -88,22 +122,51 @@ def test_ascend(state):
 
 def test_relative(state):
     from math import pi
-    assert (relative(state, src='1-1', dst='2-1') == (24., 28., 32.)).all()
-    state = \
-        add({}, 'root') \
-        .add('1', parent='root', transform=rotate(pi / 2.0)) \
-        .add('1-1', parent='1', point=Point(1, 0, 0)) \
-        .add('2', parent='root', point=Point(1, 0, 0))
+    assert (relative(state, src='1-1', dst='2-1') == (-24, -28, -32)).all()
+    state = {
+        'root': Node(
+                parent=None,
+                children=['1', '2'],
+                transform=scale(1, 1, 1)
+            ),
+        '1': Node(
+                parent='root',
+                children=['1-1'],
+                transform=rotate(pi / 2.0)
+            ),
+        '1-1': Node(
+                parent='1',
+                children=[],
+                transform=translate(Point(0, 0, 0))
+            ),
+        '2': Node(
+                parent='root',
+                children=[],
+                transform=translate(Point(1, 0, 0))
+            ),
+    }
+    assert isclose(relative(state, src='1-1', dst='2'), (0.0, -1.0, 0)).all()
+    assert isclose(relative(state, src='2', dst='1-1'), (-1.0, 0.0, 0)).all()
 
-    assert isclose(relative(state, src='1-1', dst='2'), (-1.0, -1.0, 0)).all()
-    assert isclose(relative(state, src='2', dst='1-1'), (0.0, 0.0, 0)).all()
-
-    state = add({}, 'root') \
-        .add('1', parent='root', transform=scale(2, 1, 1)) \
-        .add('1-1', parent='1', point=Point(1, 1, 1)) \
-
-    assert isclose(relative(state, src='root', dst='1-1'), (-2.0, -1.0, -1.0)).all()
-    assert isclose(relative(state, src='1-1', dst='root'), (0.5, 1.0, 1.0)).all()
+    state = {
+        'root': Node(
+                parent=None,
+                children=['1-1'],
+                transform=translate(Point(0, 0, 0))
+            ),
+        '1': Node(
+                parent=None,
+                children=['1-1'],
+                transform=scale(2, 1, 1)
+            ),
+        '1-1': Node(
+                parent='1',
+                children=[],
+                transform=translate(Point(1, 1, 1))
+            ),
+    }
+    assert isclose(relative(state, src='root', dst='1-1'), (2.0, 1.0, 1.0)).all()
+    assert isclose(relative(state, src='1-1', dst='root'), (-0.5, -1.0, -1.0)).all()
 
 
 def test_absolute(state):
@@ -118,7 +181,7 @@ def test_max_z(state):
 
 
 def test_stringify(state):
-    assert stringify(state, '1-2') == '1-2 [-21.0, -22.0, -23.0] [ 22.  24.  26.]'
+    assert stringify(state, '1-2') == '1-2 [21.0, 22.0, 23.0] [ 22.  24.  26.]'
     assert stringify(state) == '\n'.join(
         ['root [0.0, 0.0, 0.0] [ 0.  0.  0.]'] +
         [' ' + s for s in stringify(state, '1').split('\n')] +
@@ -142,8 +205,21 @@ def test_remove(state):
 
 def test_transform():
     from math import pi
-    state = add({}, 'root') \
-        .add('1', parent='root', transform=scale(2, 2, 2)) \
-        .add('1-1', parent='1', point=Point(1, 0, 0))
-
-    assert isclose(absolute(state, '1-1'), (0.5, 0, 0)).all()
+    state = {
+        'root': Node(
+                parent=None,
+                children=['1'],
+                transform=scale(2, 2, 2)
+            ),
+        '1': Node(
+                parent='root',
+                children=['1-1'],
+                transform=rotate(pi / 2.0)
+            ),
+        '1-1': Node(
+                parent='1',
+                children=[],
+                transform=translate(Point(1, 0, 0))
+            ),
+    }
+    assert isclose(absolute(state, '1-1'), (0, 2, 0)).all()

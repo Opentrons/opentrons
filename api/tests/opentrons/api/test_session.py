@@ -107,7 +107,7 @@ async def test_load_and_run(main_router, session_manager, protocol):
 
 
 @pytest.fixture
-def run_session(virtual_smoothie_env):
+def run_session():
     return Session('dino', 'from opentrons import robot')
 
 
@@ -158,7 +158,7 @@ def test_error_append(run_session):
     ]
 
 
-def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
+def test_get_instruments_and_containers(labware_setup):
     instruments, tip_racks, plates, commands = labware_setup
     p100, p1000 = instruments
 

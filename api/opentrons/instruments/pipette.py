@@ -86,6 +86,7 @@ class Pipette:
             self,
             robot,
             mount,
+            mount_obj=None,
             name=None,
             channels=1,
             min_volume=0,
@@ -339,7 +340,7 @@ class Pipette:
 
         self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
-        self.instrument_actuator.move(x=destination)
+        self.instrument_actuator.move(destination)
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -422,7 +423,7 @@ class Pipette:
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.set_speed(speed)
-        self.instrument_actuator.move(x=destination)
+        self.instrument_actuator.move(destination)
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -440,9 +441,7 @@ class Pipette:
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.instrument_actuator.move(
-                {},
-                x=self._get_plunger_position('bottom'))
+            self.instrument_actuator.move(self._get_plunger_position('bottom'))
 
         # then go inside the location
         if location:
@@ -550,7 +549,7 @@ class Pipette:
         """
 
         self.move_to(location, strategy='arc')
-        self.instrument_actuator.move({}, x=self._get_plunger_position('blow_out'))
+        self.instrument_actuator.move(self._get_plunger_position('blow_out'))
         self.current_volume = 0
 
         return self
@@ -769,9 +768,7 @@ class Pipette:
 
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(self, location):
-            self.instrument_actuator.move(
-                x=self._get_plunger_position('bottom')
-            )
+            self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
 
             self.move_to(self.current_tip().top(0), strategy='arc')
@@ -833,22 +830,17 @@ class Pipette:
         if isinstance(location, Placeable):
             # give space for the drop-tip mechanism
             location = location.bottom(self._drop_tip_offset)
-        well, offset = location
 
         @commands.publish.both(command=commands.drop_tip)
         def _drop_tip(location, instrument=self):
-            print('instrument.location ', location)
             if location:
                 self.move_to(location, strategy='arc')
-            self.instrument_actuator.move(
-                x=self._get_plunger_position('drop_tip')
-            )
-            if home_after:
-                self.instrument_actuator.home({})
 
-            self.instrument_actuator.move(
-                x=self._get_plunger_position('bottom')
-            )
+            self.instrument_actuator.move(self._get_plunger_position('drop_tip'))
+            if home_after:
+                self.instrument_actuator.home()
+
+            self.instrument_actuator.move(self._get_plunger_position('bottom'))
 
             self.current_volume = 0
             self.current_tip(None)
@@ -1399,15 +1391,7 @@ class Pipette:
         return self
 
     def _move(self, pose, x=None, y=None, z=None):
-        dx, dy, dz = \
-            pose_tracker.absolute(pose, self) - \
-            pose_tracker.absolute(pose, self.instrument_mover)
-
-        x, y, z = x and x - dx, y and y - dy, z and z - dz
-
-        pose = self.instrument_mover.move(pose, x, y, z)
-
-        return pose
+        return self.instrument_mover.move(pose, x, y, z)
 
     def _jog(self, pose, axis, distance):
         return self.instrument_mover.jog(pose, axis, distance)
@@ -1416,13 +1400,9 @@ class Pipette:
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.poses = pose_tracker.update(
-            self.robot.poses,
-            self,
-            pose_tracker.Point(0, 0, -length))
+        x, y, z = pose_tracker.get(self.robot.poses, self)
+        self.robot.poses = pose_tracker.update(self.robot.poses, self, pose_tracker.Point(x, y, z+length))
 
     def _remove_tip(self, length):
-        self.robot.poses = pose_tracker.update(
-            self.robot.poses,
-            self,
-            pose_tracker.Point(0, 0, length))
+        x, y, z = pose_tracker.get(self.robot.poses, self)
+        self.robot.poses = pose_tracker.update(self.robot.poses, self, pose_tracker.Point(x, y, z-length))

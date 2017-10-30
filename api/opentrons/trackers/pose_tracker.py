@@ -1,9 +1,6 @@
 import numpy as np
-from collections import namedtuple, UserDict
+from collections import namedtuple
 from typing import Dict, List
-from functools import partial
-from numpy.linalg import inv
-from functools import reduce
 
 
 class Point(namedtuple('Point', 'x y z')):
@@ -11,13 +8,12 @@ class Point(namedtuple('Point', 'x y z')):
         return str([*self])
 
 
-def translate(point) -> np.ndarray:
-    x, y, z = point
+def translate(point: Point) -> np.ndarray:
     return np.array([
-        [1.0, 0.0, 0.0,   x],
-        [0.0, 1.0, 0.0,   y],
-        [0.0, 0.0, 1.0,   z],
-        [0.0, 0.0, 0.0, 1.0]
+        [1.0, 0.0, 0.0, point.x],
+        [0.0, 1.0, 0.0, point.y],
+        [0.0, 0.0, 1.0, point.z],
+        [0.0, 0.0, 0.0,     1.0]
     ])
 
 
@@ -48,7 +44,7 @@ def add(
         point=Point(0, 0, 0),
         transform=np.identity(4)) -> Dict[object, Node]:
 
-    state = bind(state)
+    state = state.copy()
 
     if parent is None:
         assert not state, 'root node already exists — only one allowed'
@@ -60,7 +56,7 @@ def add(
     state[obj] = Node(
         parent=parent,
         children=[],
-        transform=transform.dot(inv(translate(point)))
+        transform=transform.dot(translate(point))
     )
 
     return state
@@ -82,7 +78,7 @@ def remove(state, obj):
 def update(state, obj, point: Point, transform=np.identity(4)):
     state = state.copy()
     state[obj] = state[obj].update(
-        transform.dot(inv(translate(point)))
+        transform.dot(translate(point))
     )
     return state
 
@@ -96,48 +92,39 @@ def children(state, obj, level=0):
     ], [])
 
 
-def ascend(state, obj, root=None) -> List[Node]:
-    if obj is root:
-        return []
+def ascend(state, obj) -> List[Node]:
     parent = state[obj].parent
-    return [obj] + ascend(state, obj=parent, root=root)
+    if parent is None:
+        return [obj]
+    return [obj] + ascend(state, parent)
 
 
-def forward(state, obj, root=None):
+def absolute(state, obj, operator=np.dot, ref=(0, 0, 0)):
+    from functools import reduce
     return reduce(
-        lambda a, b: a.dot(b),
+        # a is always a vector and b is always a matrix
+        lambda a, b: operator(b, a),
         [
             state[key].transform
-            for key in reversed(ascend(state, obj=obj, root=root))
+            for key in ascend(state, obj)
         ],
-        np.identity(4)
-    )
+        list(ref) + [1.0]
+    )[:-1]
 
 
-def reverse(state, obj, root=None):
-    return inv(reduce(
-        lambda a, b: a.dot(b),
-        [
-            state[key].transform
-            for key in ascend(state, obj=obj, root=root)
-        ],
-        np.identity(4)
-    ))
-
-
-def absolute(state, obj, root=None):
-    return reverse(state, obj, root).dot((0, 0, 0, 1))[:-1]
-
-
-def relative(state, src, dst, root=None):
+def relative(state, src, dst):
     """Relative vector from src (source) to dst (destination)"""
-    x, y, z = absolute(state, obj=src, root=root)
-    return forward(state, dst, root=root).dot((x, y, z, 1))[:-1]
+    from numpy.linalg import inv
+    return absolute(
+        state,
+        src,
+        operator=lambda a, b: inv(a).dot(b),
+        ref=absolute(state, dst))
 
 
 def max_z(state, root):
     return max([
-        Point(*absolute(state, obj=obj, root=root)).z
+        Point(*relative(state, src=root, dst=obj)).z
         for obj, _ in children(state, root)
     ])
 
@@ -159,11 +146,3 @@ def stringify(state, root=None):
 def get(state, obj):
     x, y, z, *_ = state[obj].transform.dot((0.0, 0.0, 0.0, 1.0))
     return Point(x, y, z)
-
-
-def bind(state):
-    state = UserDict(state.copy())
-    # add syntax sugar for chaining add operations
-    state.add = partial(add, state)
-
-    return state
