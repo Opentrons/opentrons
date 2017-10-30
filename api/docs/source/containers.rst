@@ -28,16 +28,33 @@ If you are interested in using your own container that is not included in the AP
 
 **********************
 
-Point
-=====
+Terminology
+===========
 
-Use ``point`` when there is only one position per container, such as the trash or a scale. 
+Deck Slots
+----------
+
+When writing an Opentrons protocol, you must specify how containers will be laid out on the robot. Containers are placed on the **deck**, in one of several **slots**. Slots are labeled starting from A1 in the bottom left, then going to A2, A3, and so on.
+
+**OT One-S Standards & Pro:**
+
+.. image:: img/DeckMapEmpty.png
+
+**OT One-S Hood:**
+
+The hood model has no 3rd row:
+
+.. image:: img/DeckMapEmptyHood.png
+
+``containers.load`` command
+=========================
+
+To load a container, use the ``containers.load`` function. For example, to load a 96-well flat plate into Slot A2 on the robot deck:
 
 .. code-block:: python
 
-    containers.load('point', slot)
-
-You can access the point position as ``container.wells('A1')`` or ``container.wells(0)``.
+  from opentrons import containers
+  myContainer = containers.load('96-flat', 'A2')
 
 **********************
 
@@ -241,6 +258,30 @@ See dimensions in diagram below.
 
 .. image:: img/labware_lib/384-plate.png
 
+**********************
+
+Trash & Point
+=============
+
+Trash box container
+----------
+
+A generic trash box for disposing of tips and liquids.
+
+.. code-block:: python
+
+    containers.load('trash-box', slot)
+
+Point
+-----
+
+Use ``point`` when there is only one position per container, such as the trash or a scale.
+
+.. code-block:: python
+
+    myContainer = containers.load('point', slot)
+
+You can access the point position as ``myContainer.wells('A1')`` or ``myContainer.wells(0)``.
 
 **********************
 
@@ -248,6 +289,7 @@ See dimensions in diagram below.
 
     from opentrons import containers, robot
     robot.reset()
+
 
 **************
 Containers
@@ -383,7 +425,7 @@ The OT-One deck and containers are all set up with the same coordinate system - 
 .. image:: img/well_iteration/Well_Iteration.png
 
 .. testcode:: individualwells
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -459,7 +501,7 @@ If we had to reference each well one at a time, our protocols could get very ver
 When describing a liquid transfer, we can point to groups of wells for the liquid's source and/or destination. Or, we can get a group of wells that we want to loop through.
 
 .. testcode:: multiwells
-    
+
     '''
     Examples in this section expect the following
     '''
@@ -510,7 +552,7 @@ Wells To
 Instead of having to list the name of every well, we can also create a range of wells with a start and end point. The first argument is the starting well, and the ``to=`` argument is the last well.
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', to='H1'):
         print(w)
 
@@ -531,7 +573,7 @@ will print out...
 Not only can we get every well between the start and end positions, but we can also set the ``step=`` size. The example below will access every 2nd well between ``'A1'`` and ``'H'``:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', to='H1', step=2):
         print(w)
 
@@ -548,7 +590,7 @@ will print out...
 These lists of wells can also move in the reverse direction along your container. For example, setting the ``to=`` argument to a well that comes before the starting position is allowed:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('H1', to='A1', step=2):
         print(w)
 
@@ -568,7 +610,7 @@ Wells Length
 Another way you can create a list of wells is by specifying the length= of the well list you need, in addition to the starting point. The example below will return eight wells, starting at well ``'A1'``:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', length=8):
         print(w)
 
@@ -589,7 +631,7 @@ will print out...
 And just like before, we can also set the ``step=`` argument. Except this time the example will be accessing every 3rd well, until a total of eight wells have been found:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('A1', length=8, step=3):
         print(w)
 
@@ -610,7 +652,7 @@ will print out...
 You can set the step= value to a negative number to move in the reverse direction along the container:
 
 .. testcode:: multiwells
-    
+
     for w in plate.wells('H11', length=8, step=-1):
         print(w)
 
