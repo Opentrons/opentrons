@@ -43,18 +43,6 @@ homed_positions = {
     'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 18.9997, 'C': 18.9997
 }
 
-def _position_at_expected_thresh(position, cached_position):
-    '''Checks parsed position against cache and some threshold'''
-    for axis in AXES.lower():
-        if axis not in position:
-            position[axis] = cached_position[axis]
-        if abs(position[axis] - cached_position[axis]) > POSITION_THRESH:
-            raise RuntimeError(
-                '[DRIVER ERROR] actual position: {}\ncached position: {}'
-                .format(position, cached_position)
-            )
-    return True
-
 
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.split(' ')
@@ -69,44 +57,36 @@ def _parse_axis_values(raw_axis_values):
 class SmoothieDriver_3_0_0:
 
     def __init__(self):
-        self._cached_position = {}
-        self.log = []
-        self._update_cached_position({axis: 0 for axis in AXES.lower()})
+        self._position = {}
+        self._update_position({axis: 0 for axis in AXES.lower()})
         self.simulating = True
-        self._accumulated_position_error = 1
 
-    def _update_cached_position(self, target):
-        self._cached_position.update({
+    def _update_position(self, target):
+        self._position.update({
             axis.lower(): value for axis, value
             in target.items()
             if value is not None
         })
 
-        self.log += [self._cached_position.copy()]
-
-    def _check_position_for_error(self, raw_position):
-        parsed_position = _parse_axis_values(raw_position)
-        _position_at_expected_thresh(parsed_position, self._cached_position)
-        return parsed_position
-
     def update_position(self, is_retry=False):
         if self.simulating:
-            updated_position = self._cached_position
+            updated_position = self._position
 
         else:
             try:
                 position_response = \
                     self._send_command(GCODES['CURRENT_POSITION'])
                 updated_position = \
-                    self._check_position_for_error(position_response)
+                    _parse_axis_values(position_response)
+            #TODO jmg 10/27: once we have a more concrete idea of how to do
+            #driver error recover, this should be a logged warning rather than an exception
             except TypeError as e:
                 if is_retry:
                     raise e
                 else:
                     self.update_position(is_retry=True)
 
-        self._update_cached_position(updated_position)
-        self._accumulated_position_error = 0
+        self._update_position(updated_position)
 
     def connect(self):
         self.simulating = False
@@ -122,7 +102,7 @@ class SmoothieDriver_3_0_0:
 
     @property
     def position(self):
-        return self._cached_position
+        return self._position
 
     def get_switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
@@ -186,19 +166,16 @@ class SmoothieDriver_3_0_0:
 
         self._send_command(command)
 
-        self._update_cached_position({
+        self._update_position({
             axis: value
             for axis, value in zip('xyzabc', [x, y, z, a, b, c])
         })
 
-        self._accumulated_position_error += MOVEMENT_ERROR_MARGIN
-        if self._accumulated_position_error > POSITION_THRESH:
-            self.update_position()
 
     def home(self, axis=None):
         if not axis:
             self._home_all()
-            self._update_cached_position(homed_positions)
+            self._update_position(homed_positions)
 
         else:
             axes_to_home = [
@@ -208,7 +185,7 @@ class SmoothieDriver_3_0_0:
             if axes_to_home:
                 command = GCODES['HOME'] + ''.join(axes_to_home)
                 self._send_command(command)
-                self._update_cached_position({
+                self._update_position({
                     axis: homed_positions[axis] for axis in axes_to_home
                 })
 
