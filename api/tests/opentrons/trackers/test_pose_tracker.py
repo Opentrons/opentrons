@@ -1,5 +1,4 @@
 import pytest
-import numpy as np
 
 from opentrons.trackers.pose_tracker import PoseTracker, Pose
 
@@ -23,28 +22,38 @@ def single_root_pose_tracker():
     '''
     pt = PoseTracker()
     root = 'root'
-    pt.create_root_object(root, 0, 0, 0) # global_position: 0, 0, 0
-    pt.track_object(root, 'child1', 1, 5, 2) # global_position: 1, 5, 2
-    pt.track_object(root, 'child2', 0, 2, -4) # global_position: 0, 2, -4
-    pt.track_object('child1', 'child3', 3, 1, 6) # global_position: 4, 6, 8
-    pt.track_object('child1', 'child4', 10, 9, 2) # global_position: 11, 14, 4
-    pt.track_object('child2', 'child5', 13, -2, 0) # global_position: 13, 0, -4
-    pt.track_object('child3', 'child6', 12, 20, 41) # global_position: 16, 26, 49
-    pt.track_object(root, 'child7', -10, 12, 14) # global_position: -10, 12, 14
-    pt.track_object(root, 'child8', 1, -2, -4) # global_position: 1, -2, -4
-    pt.track_object(root, 'child9', 0, 0, 0) # global_position: 0, 0, 0
+    pt.create_root_object(
+        root, 0, 0, 0)  # global_position: 0, 0, 0
+    pt.track_object(
+        root, 'child1', 1, 5, 2)  # global_position: 1, 5, 2
+    pt.track_object(
+        root, 'child2', 0, 2, -4)  # global_position: 0, 2, -4
+    pt.track_object(
+        'child1', 'child3', 3, 1, 6)  # global_position: 4, 6, 8
+    pt.track_object(
+        'child1', 'child4', 10, 9, 2)  # global_position: 11, 14, 4
+    pt.track_object(
+        'child2', 'child5', 13, -2, 0)  # global_position: 13, 0, -4
+    pt.track_object(
+        'child3', 'child6', 12, 20, 41)  # global_position: 16, 26, 49
+    pt.track_object(
+        root, 'child7', -10, 12, 14)  # global_position: -10, 12, 14
+    pt.track_object(
+        root, 'child8', 1, -2, -4)  # global_position: 1, -2, -4
+    pt.track_object(
+        root, 'child9', 0, 0, 0)  # global_position: 0, 0, 0
 
     correct_positions = {
-        'child2': [ 0.,  2., -4.],
-        'child3': [ 4.,  6.,  8.],
+        'child2': [0.,  2., -4.],
+        'child3': [4.,  6.,  8.],
         'child7': [-10.,  12.,  14.],
-        'child9': [ 0.,  0.,  0.],
-        'child6': [ 16.,  26.,  49.],
-        'child1': [ 1.,  5.,  2.],
-        'child5': [ 13.,   0.,  -4.],
-        'root': [ 0.,  0.,  0.],
-        'child4': [ 11.,  14.,   4.],
-        'child8': [ 1., -2., -4.]
+        'child9': [0.,  0.,  0.],
+        'child6': [16.,  26.,  49.],
+        'child1': [1.,  5.,  2.],
+        'child5': [13.,   0.,  -4.],
+        'root': [0.,  0.,  0.],
+        'child4': [11.,  14.,   4.],
+        'child8': [1., -2., -4.]
         }
 
     return (pt, correct_positions)
@@ -68,18 +77,29 @@ def dual_root_pose_tracker():
     '''
     pose_tracker = PoseTracker()
 
-    pose_tracker.create_root_object('root1', 0, 0, 0) # global_position: 0, 0, 0
-    pose_tracker.create_root_object('root2', 1, 1, 1) # global_position: 1, 1, 1
+    pose_tracker.create_root_object(
+        'root1', 0, 0, 0)  # global_position: 0, 0, 0
+    pose_tracker.create_root_object(
+        'root2', 1, 1, 1)  # global_position: 1, 1, 1
 
-    pose_tracker.track_object('root1', 'child1', 1, 5, 2) # global_position: 1, 5, 2
-    pose_tracker.track_object('root2', 'child2', 0, 2, -4) # global_position: 1, 3, -3
-    pose_tracker.track_object('child1', 'child3', 3, 1, 6) # global_position: 4, 6, 8
-    pose_tracker.track_object('child2', 'child4', 10, 9, 2) # global_position: 11, 12, -1
-    pose_tracker.track_object('child2', 'child5', 13, -2, 0) # global_position: 14, 1, -3
-    pose_tracker.track_object('child5', 'child6', -10, 20, 29) # global_position: 4, 21, 26
-    pose_tracker.track_object('root2', 'child7', -10, 12, 14) # global_position: -9, 13, 15
-    pose_tracker.track_object('root1', 'child8', 1, -2, -4) # global_position: 1, -2, -4
-    pose_tracker.track_object('child7', 'child9', 0, 0, 0) # global_position: 0, 0, 0
+    pose_tracker.track_object(
+        'root1', 'child1', 1, 5, 2)  # global_position: 1, 5, 2
+    pose_tracker.track_object(
+        'root2', 'child2', 0, 2, -4)  # global_position: 1, 3, -3
+    pose_tracker.track_object(
+        'child1', 'child3', 3, 1, 6)  # global_position: 4, 6, 8
+    pose_tracker.track_object(
+        'child2', 'child4', 10, 9, 2)  # global_position: 11, 12, -1
+    pose_tracker.track_object(
+        'child2', 'child5', 13, -2, 0)  # global_position: 14, 1, -3
+    pose_tracker.track_object(
+        'child5', 'child6', -10, 20, 29)  # global_position: 4, 21, 26
+    pose_tracker.track_object(
+        'root2', 'child7', -10, 12, 14)  # global_position: -9, 13, 15
+    pose_tracker.track_object(
+        'root1', 'child8', 1, -2, -4)  # global_position: 1, -2, -4
+    pose_tracker.track_object(
+        'child7', 'child9', 0, 0, 0)  # global_position: 0, 0, 0
 
     correct_positions = {
         'root1': [0., 0., 0.],
@@ -148,8 +168,10 @@ def test_max_z_in_subtree(pose_tracker, subtree_root, expected_max):
 def test_absolute_position(pose_tracker, correct_position_dict):
     for key in correct_position_dict:
         assert key in pose_tracker._node_dict
-        assert (pose_tracker[key].position == correct_position_dict[key]).all()
-        assert (pose_tracker.absolute(key).position == correct_position_dict[key]).all()
+        assert (pose_tracker[key].position ==
+                correct_position_dict[key]).all()
+        assert (pose_tracker.absolute(key).position ==
+                correct_position_dict[key]).all()
 
 
 @pytest.mark.parametrize("pose_tracker, key, descendants", [
@@ -166,15 +188,25 @@ def test_get_objects_in_subtree(pose_tracker, key, descendants):
     assert set(subtree) == set(expected_subtree)
 
 
-@pytest.mark.parametrize("pose_tracker, correct_position_dict, object_to_translate, translation", [
-    (single_root_pose_tracker()[0], single_root_pose_tracker()[1], 'root', {'x':1, 'y':2, 'z':3}),
-    (single_root_pose_tracker()[0], single_root_pose_tracker()[1], 'child1', {'x':-1, 'y':-3, 'z':0}),
-    (single_root_pose_tracker()[0], single_root_pose_tracker()[1], 'child5', {'x':1, 'y':2, 'z':3}),
-    (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1], 'root1', {'x':0, 'y':0, 'z':0}),
-    (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1], 'child7', {'x':-10, 'y':0, 'z':0}),
-    (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1], 'root2', {'x':11, 'y':29, 'z':3})
-])
-def test_translate_object(pose_tracker, correct_position_dict, object_to_translate, translation):
+@pytest.mark.parametrize(
+    "pose_tracker, correct_position_dict, object_to_translate, translation",
+    [
+        (single_root_pose_tracker()[0], single_root_pose_tracker()[1],
+         'root', {'x': 1, 'y': 2, 'z': 3}),
+        (single_root_pose_tracker()[0], single_root_pose_tracker()[1],
+         'child1', {'x': -1, 'y': -3, 'z': 0}),
+        (single_root_pose_tracker()[0], single_root_pose_tracker()[1],
+         'child5', {'x': 1, 'y': 2, 'z': 3}),
+        (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1],
+         'root1', {'x': 0, 'y': 0, 'z': 0}),
+        (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1],
+         'child7', {'x': -10, 'y': 0, 'z': 0}),
+        (dual_root_pose_tracker()[0], dual_root_pose_tracker()[1],
+         'root2', {'x': 11, 'y': 29, 'z': 3})
+    ]
+)
+def test_translate_object(pose_tracker, correct_position_dict,
+                          object_to_translate, translation):
     subtree = pose_tracker.get_objects_in_subtree(object_to_translate)
     pose_tracker.translate_object(object_to_translate, **translation)
 
@@ -183,7 +215,8 @@ def test_translate_object(pose_tracker, correct_position_dict, object_to_transla
         expected_new_pose = old_pose * Pose(**translation)
         expected_new_position = expected_new_pose.position
         assert pose_tracker.absolute(tracked_object) == expected_new_pose
-        assert (pose_tracker.absolute(tracked_object).position == expected_new_position).all()
+        assert (pose_tracker.absolute(tracked_object).position ==
+                expected_new_position).all()
 
 
 @pytest.mark.parametrize("pose_tracker", [
@@ -200,5 +233,3 @@ def test_clear_all(pose_tracker):
     assert pose_tracker._root_nodes == []
     assert pose_tracker._pose_dict == {}
     assert pose_tracker._node_dict == {}
-
-
