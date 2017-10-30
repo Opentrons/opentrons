@@ -1,4 +1,4 @@
-from opentrons import containers, instruments, robot
+from opentrons import containers, instruments
 
 tiprack = containers.load('tiprack-200ul', 'B3')
 trash = containers.load('trash-box', 'C4')

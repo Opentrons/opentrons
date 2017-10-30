@@ -106,7 +106,7 @@ def test_relative(state):
         .add('1', transform=scale(2, 1, 1)) \
         .add('1-1', parent='1', point=Point(1, 1, 1)) \
 
-    assert isclose(relative(state, src=ROOT, dst='1-1'), (-2.0, -1.0, -1.0)).all()
+    assert isclose(relative(state, src=ROOT, dst='1-1'), (-2.0, -1.0, -1.0)).all()  # NOQA
     assert isclose(relative(state, src='1-1', dst=ROOT), (0.5, 1.0, 1.0)).all()
 
 
@@ -146,7 +146,6 @@ def test_remove(state):
 
 
 def test_transform():
-    from math import pi
     state = init() \
         .add('1', parent=ROOT, transform=scale(2, 2, 2)) \
         .add('1-1', parent='1', point=Point(1, 0, 0))

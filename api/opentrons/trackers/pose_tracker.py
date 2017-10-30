@@ -16,9 +16,9 @@ class Point(namedtuple('Point', 'x y z')):
 def translate(point) -> np.ndarray:
     x, y, z = point
     return np.array([
-        [1.0, 0.0, 0.0,   x],
-        [0.0, 1.0, 0.0,   y],
-        [0.0, 0.0, 1.0,   z],
+        [1.0, 0.0, 0.0, x],
+        [0.0, 1.0, 0.0, y],
+        [0.0, 0.0, 1.0, z],
         [0.0, 0.0, 0.0, 1.0]
     ])
 
@@ -95,7 +95,7 @@ def children(state, obj, level=0):
     """ Returns a flattened list tuples of DFS traversal of subtree
     from object that contains descendant object and it's depth """
     return sum([
-        [(child, level)] + children(state, child, level+1)
+        [(child, level)] + children(state, child, level + 1)
         for child in state[obj].children
     ], [])
 

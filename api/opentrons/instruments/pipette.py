@@ -18,6 +18,7 @@ class PipetteTip:
     def __init__(self, length):
         self.length = length
 
+
 # This should come from configuration if tip length is not already in db
 DEFAULT_TIP_LENGTH = 46
 
@@ -775,7 +776,9 @@ class Pipette:
 
             tip_plunge = -7
             for i in range(int(presses) - 1):
-                self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
+                self.move_to(
+                    self.current_tip().top(tip_plunge),
+                    strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
             self._add_tip(DEFAULT_TIP_LENGTH)
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
@@ -836,7 +839,8 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
-            self.instrument_actuator.move(self._get_plunger_position('drop_tip'))
+            self.instrument_actuator.move(
+                self._get_plunger_position('drop_tip'))
             if home_after:
                 self.instrument_actuator.home()
 
@@ -849,7 +853,6 @@ class Pipette:
         return _drop_tip(location)
 
     def home(self):
-
         """
         Home the pipette's plunger axis during a protocol run
 
@@ -937,7 +940,6 @@ class Pipette:
 
     @commands.publish.both(command=commands.transfer)
     def transfer(self, volume, source, dest, **kwargs):
-
         """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
@@ -1401,8 +1403,12 @@ class Pipette:
 
     def _add_tip(self, length):
         x, y, z = pose_tracker.get(self.robot.poses, self)
-        self.robot.poses = pose_tracker.update(self.robot.poses, self, pose_tracker.Point(x, y, z+length))
+        self.robot.poses = pose_tracker.update(
+            self.robot.poses, self, pose_tracker.Point(
+                x, y, z + length))
 
     def _remove_tip(self, length):
         x, y, z = pose_tracker.get(self.robot.poses, self)
-        self.robot.poses = pose_tracker.update(self.robot.poses, self, pose_tracker.Point(x, y, z-length))
+        self.robot.poses = pose_tracker.update(
+            self.robot.poses, self, pose_tracker.Point(
+                x, y, z - length))

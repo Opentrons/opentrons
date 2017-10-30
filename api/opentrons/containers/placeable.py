@@ -189,8 +189,8 @@ class Placeable(object):
         If :reference: is *None* root is assumed
         """
         return list(reversed([item.get_name()
-                    for item in self.get_trace(reference)
-                    if item.get_name() is not None]))
+                              for item in self.get_trace(reference)
+                              if item.get_name() is not None]))
 
     def get_trace(self, reference=None):
         """
@@ -433,6 +433,7 @@ class Deck(Placeable):
     """
     This class implements behaviour specific to the Deck
     """
+
     def containers(self) -> list:
         """
         Returns all containers on a deck as a list
@@ -467,6 +468,7 @@ class Container(Placeable):
     """
     Class representing a container, also implements grid behavior
     """
+
     def __init__(self, *args, **kwargs):
         super(Container, self).__init__(*args, **kwargs)
         self.grid = None
@@ -674,6 +676,7 @@ class WellSeries(Container):
 
     Default well index can be overriden using :set_offset:
     """
+
     def __init__(self, wells, name=None):
         if isinstance(wells, dict):
             self.items = wells

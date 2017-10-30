@@ -1,7 +1,5 @@
-import unittest
 import pytest
 
-from opentrons import drivers
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot

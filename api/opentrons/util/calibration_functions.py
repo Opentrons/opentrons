@@ -63,14 +63,14 @@ def probe_instrument(instrument, robot):
     #   XY coordinate, or in the Z axis if both X and Y
     #   are zero
     switches = [
-        (-1, 0, -1,  1),
-        (1,  0, -1, -1),
-        (0, -1, -1,  1),
-        (0,  1, -1, -1),
-        (0,  0,  1, -1),
+        (-1, 0, -1, 1),
+        (1, 0, -1, -1),
+        (0, -1, -1, 1),
+        (0, 1, -1, -1),
+        (0, 0, 1, -1),
     ]
 
-    switch_center = PROBE_TOP_COORDINATES
+    center = PROBE_TOP_COORDINATES
 
     coords = [switch[:-1] * PROBE_SIZE + center for switch in switches]
 
@@ -89,7 +89,7 @@ def probe_instrument(instrument, robot):
         # TODO(artyom, ben 20171026): fine tune correct probing sequence
         robot.poses = instrument._move(
             robot.poses,
-            z=z+height*2+DEFAULT_TIP_LENGTH
+            z=z + height * 2 + DEFAULT_TIP_LENGTH
         )
 
         robot.poses = instrument._move(robot.poses, x=x, y=y)
@@ -109,7 +109,7 @@ def move_instrument_for_probing_prep(instrument, robot):
         robot.poses,
         x=191.5,
         y=75.0,
-        z=128+DEFAULT_TIP_LENGTH
+        z=128 + DEFAULT_TIP_LENGTH
     )
 
 

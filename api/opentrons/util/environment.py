@@ -31,7 +31,8 @@ def infer_app_data_dir():
         app_data = PI_DATA_PATH
 
     if not os.path.exists(app_data):
-        # todo (Ben Morris 2017-10-12): create the directory if it does not exist
+        # todo (Ben Morris 2017-10-12): create the directory if it does not
+        # exist
         pass
 
     return app_data

@@ -1,7 +1,5 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
-from numpy import insert, add, array
-from numpy.linalg import inv
 
 
 '''

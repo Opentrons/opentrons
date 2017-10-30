@@ -287,10 +287,10 @@ def publish(before, after, command, meta=None):
                     call_args['instrument'] = call_args['self']
 
             command_args.update({
-                    key: call_args[key]
-                    for key in
-                    set(inspect.getargspec(command).args) & call_args.keys()
-                })
+                key: call_args[key]
+                for key in
+                set(inspect.getargspec(command).args) & call_args.keys()
+            })
 
             if meta:
                 command_args['meta'] = meta

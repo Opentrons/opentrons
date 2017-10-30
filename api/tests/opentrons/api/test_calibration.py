@@ -6,7 +6,7 @@ from opentrons import robot
 state = partial(state, 'calibration')
 
 
-async def test_tip_probe_functional(main_router, model):  # , virtual_smoothie_env):
+async def test_tip_probe_functional(main_router, model, virtual_smoothie_env):
     robot._driver.log.clear()
     main_router.calibration_manager.tip_probe(model.instrument)
     by_axis = log_by_axis(robot._driver.log, 'XYA')
@@ -15,8 +15,7 @@ async def test_tip_probe_functional(main_router, model):  # , virtual_smoothie_e
         for x, y, z
         in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
     ]
-
-    # print(coords)
+    assert coords
 
 
 async def test_tip_probe(main_router, model):
@@ -29,6 +28,7 @@ async def test_tip_probe(main_router, model):
 
         await main_router.wait_until(state('probing'))
         await main_router.wait_until(state('ready'))
+
 
 async def test_move_to_front(main_router, model):
     with mock.patch(

@@ -61,10 +61,10 @@ class CalibrationManager:
 
     def update_container_offset(self, container, instrument):
         self._robot.calibrate_container_with_instrument(
-                container=container._container,
-                instrument=instrument._instrument,
-                save=True
-            )
+            container=container._container,
+            instrument=instrument._instrument,
+            save=True
+        )
 
     # TODO (artyom, 20171003): along with session, consider extracting this
     # into abstract base class or find any other way to keep notifications

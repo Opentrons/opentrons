@@ -1,13 +1,20 @@
 
-probe_center = {'z': 68.0, 'x': 268.4, 'y': 291.8181} # Ibn
-probe_dimensions = {'length': 47.74, 'width': 38, 'height':63}
+probe_center = {'z': 68.0, 'x': 268.4, 'y': 291.8181}  # Ibn
+probe_dimensions = {'length': 47.74, 'width': 38, 'height': 63}
 
 # probe_center = {'z': 57.81, 'x': 259.8, 'y': 298.875} # Avagadro
 # probe_dimensions = {'length': 41, 'width': 38.7, 'height':67.81}
 
 
 class Probe:
-    def __init__(self, width, length, height, position_offset, pose_tracker, switch_offset=1):
+    def __init__(
+            self,
+            width,
+            length,
+            height,
+            position_offset,
+            pose_tracker,
+            switch_offset=1):
         self.length, self.width, self.height = length, width, height
         self.switch_offset = switch_offset
         self._offset = position_offset
@@ -41,7 +48,6 @@ class Probe:
             'z': self.pose.z
         }
 
-
     @property
     def back_switch(self):
         return {
@@ -62,20 +68,25 @@ class Probe:
 class Base:
     """
     Responsible for:
-        - holding the concept of the base of the frame and construction of the probe
+        - holding the concept of the base of the frame and
+        construction of the probe
 
 
     Not responsible for:
         - nothing!
     """
+
     def __init__(self, pose_tracker):
         self.pose_tracker = pose_tracker
         print(self.pose_tracker)
-        self.pose_tracker.create_root_object(self, 0,0,0)
+        self.pose_tracker.create_root_object(self, 0, 0, 0)
         self._probe = self.setup_probe()
 
     def setup_probe(self):
-        probe = Probe(position_offset=probe_center, pose_tracker = self.pose_tracker, **probe_dimensions)
+        probe = Probe(
+            position_offset=probe_center,
+            pose_tracker=self.pose_tracker,
+            **probe_dimensions)
         self.pose_tracker.track_object(self, probe, **probe._offset)
         print("PROBE: ", probe)
         return probe

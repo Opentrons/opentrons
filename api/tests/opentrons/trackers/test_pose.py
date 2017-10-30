@@ -1,5 +1,4 @@
 import pytest
-import numpy as np
 
 from opentrons.trackers.pose_tracker import Point, translate
 

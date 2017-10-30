@@ -3,9 +3,7 @@ import pytest
 from opentrons.containers import load as containers_load
 from opentrons.containers.placeable import Well, Container
 from opentrons.data_storage import database
-from opentrons.instruments import Pipette
 from opentrons.util.vector import Vector
-from opentrons.trackers.pose_tracker import absolute, relative
 
 
 EXPECTED_CONTAINER_OFFSETS = {
@@ -122,7 +120,8 @@ def test_load_all_containers():
         assert offset[2] == expected_offset[2]
 
 
-# TODO (ben 20171030): fix and move to a relevant test suite--doesn't belong here
+# TODO (ben 20171030): fix and move to a relevant test
+# suite--doesn't belong here
 # def test_calibrate_container(robot):
 #     plate1 = containers_load(robot, '96-flat', 'A1')
 #     plate2 = containers_load(robot, '96-flat', 'B1')

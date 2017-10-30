@@ -12,7 +12,7 @@ def smoke(virtual_smoothie_env):
     robot.connect()
     robot.home()
     robot._driver.log.clear()
-    from tests.opentrons.data import smoke
+    from tests.opentrons.data import smoke  # NOQA
 
 
 def test_smoke(smoke):
@@ -22,6 +22,7 @@ def test_smoke(smoke):
         for x, y, z
         in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
     ]
+    assert coords
 
     # print(coords)
     # Move to pick up tip
@@ -63,9 +64,7 @@ def test_smoke(smoke):
 
 
 @pytest.mark.parametrize('protocol_file', ['bradford_assay.py'])
-async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db):
-    driver = robot._driver
-
+async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db):  # NOQA
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
     await main_router.wait_until(state('session', 'loaded'))

@@ -6,8 +6,6 @@ from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from . import gantry
 
 import opentrons.util.calibration_functions as calib
-import opentrons.util.pose_functions as pos_funcs
-
 
 from opentrons import containers, drivers
 from opentrons.containers import Container
@@ -18,7 +16,7 @@ from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
 
-from numpy import array, dot, insert, add, subtract
+from numpy import add, subtract
 from functools import lru_cache
 
 log = get_logger(__name__)
@@ -61,6 +59,7 @@ class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
+
     def __init__(self, this_robot, axis):
         self.robot = this_robot
         self.axis = axis
@@ -262,7 +261,8 @@ class Robot(object):
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        self.poses = self.gantry.mount_instrument(self.poses, instrument, mount)
+        self.poses = self.gantry.mount_instrument(
+            self.poses, instrument, mount)
 
     def add_warning(self, warning_msg):
         """
@@ -549,8 +549,7 @@ class Robot(object):
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
-
-    #DEPRECATED
+    # DEPRECATED
     def disconnect(self):
         """
         Disconnects from the robot.
@@ -560,9 +559,6 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-
-
-
 
     def get_deck_slot_types(self):
         return 'slots'
@@ -687,7 +683,8 @@ class Robot(object):
         )
 
         for well in container:
-            center_x, center_y, _ = well.top()[1]  # TODO JG 10/6/17: Stop tracking wells inconsistently
+            # TODO JG 10/6/17: Stop tracking wells inconsistently
+            center_x, center_y, _ = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
 
             self.poses = pose_tracker.add(
@@ -750,44 +747,45 @@ class Robot(object):
     def get_connected_port(self):
         return self._driver.get_connected_port()
 
-    def versions(self):
-        # TODO: Store these versions in config
-        return {
-            'firmware': {
-                'version': self._driver.get_firmware_version(),
-                'compatible': compatible['firmware']
-            },
-            'config': {
-                'version': self._driver.get_config_version(),
-                'compatible': compatible['config']
-            },
-            'ot_version': {
-                'version': self._driver.get_ot_version(),
-                'compatible': compatible['ot_version']
-            }
-        }
+    # TODO(artyom 20171030): discuss diagnostics and smoothie reporting
+    # def versions(self):
+    #     # TODO: Store these versions in config
+    #     return {
+    #         'firmware': {
+    #             'version': self._driver.get_firmware_version(),
+    #             'compatible': compatible['firmware']
+    #         },
+    #         'config': {
+    #             'version': self._driver.get_config_version(),
+    #             'compatible': compatible['config']
+    #         },
+    #         'ot_version': {
+    #             'version': self._driver.get_ot_version(),
+    #             'compatible': compatible['ot_version']
+    #         }
+    #     }
 
-    def diagnostics(self):
-        """
-        Access diagnostics information for the robot.
+    # def diagnostics(self):
+    #     """
+    #     Access diagnostics information for the robot.
 
-        Returns
-        -------
-        Dictionary with the following keys:
-            * ``axis_homed`` — axis that are currently in home position.
-            * ``switches`` — end stop switches currently hit.
-            * ``steps_per_mm`` — steps per millimeter calibration
-            values for ``x`` and ``y`` axis.
-        """
-        # TODO: Store these versions in config
-        return {
-            'axis_homed': self.axis_homed,
-            'switches': self._driver.switch_state(),
-            'steps_per_mm': {
-                'x': self._driver.get_steps_per_mm('x'),
-                'y': self._driver.get_steps_per_mm('y')
-            }
-        }
+    #     Returns
+    #     -------
+    #     Dictionary with the following keys:
+    #         * ``axis_homed`` — axis that are currently in home position.
+    #         * ``switches`` — end stop switches currently hit.
+    #         * ``steps_per_mm`` — steps per millimeter calibration
+    #         values for ``x`` and ``y`` axis.
+    #     """
+    #     # TODO: Store these versions in config
+    #     return {
+    #         'axis_homed': self.axis_homed,
+    #         'switches': self._driver.switch_state(),
+    #         'steps_per_mm': {
+    #             'x': self._driver.get_steps_per_mm('x'),
+    #             'y': self._driver.get_steps_per_mm('y')
+    #         }
+    #     }
 
     @commands.publish.before(command=commands.comment)
     def comment(self, msg):

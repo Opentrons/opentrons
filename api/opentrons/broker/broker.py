@@ -34,7 +34,7 @@ class Notifications(object):
             return
 
         future = asyncio.run_coroutine_threadsafe(
-                self.queue.put(message), self.loop)
+            self.queue.put(message), self.loop)
 
         if not thread_has_event_loop():
             futures.wait([future])
