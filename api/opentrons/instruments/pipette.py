@@ -770,7 +770,7 @@ class Pipette:
         def _pick_up_tip(self, location):
             self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
-
+            print('pickup tip top: ', self.current_tip().top(0))
             self.move_to(self.current_tip().top(0), strategy='arc')
 
             tip_plunge = -7

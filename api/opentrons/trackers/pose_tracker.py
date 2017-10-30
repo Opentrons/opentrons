@@ -5,6 +5,8 @@ from functools import partial
 from numpy.linalg import inv
 from functools import reduce
 
+ROOT = 'root'
+
 
 class Point(namedtuple('Point', 'x y z')):
     def __str__(self):
@@ -41,18 +43,20 @@ class Node(namedtuple('Node', 'parent children transform')):
             (transform1 == transform2).all()
 
 
+def init():
+    return add({}, ROOT, parent=None)
+
+
 def add(
         state: Dict[object, Node],
         obj,
-        parent=None,
+        parent=ROOT,
         point=Point(0, 0, 0),
         transform=np.identity(4)) -> Dict[object, Node]:
 
     state = bind(state)
 
-    if parent is None:
-        assert not state, 'root node already exists — only one allowed'
-    else:
+    if parent is not None:
         state[parent] = state[parent].add(obj)
 
     assert obj not in state, 'object is already being tracked'
@@ -126,11 +130,13 @@ def reverse(state, obj, root=None):
 
 
 def absolute(state, obj, root=None):
+    """absolute position of an object in a sub-tree of a root"""
     return reverse(state, obj, root).dot((0, 0, 0, 1))[:-1]
 
 
 def relative(state, src, dst, root=None):
-    """Relative vector from src (source) to dst (destination)"""
+    """Relative vector from src (source) to dst (destination)
+    in root's subtree. if root is none — in the entire tree"""
     x, y, z = absolute(state, obj=src, root=root)
     return forward(state, dst, root=root).dot((x, y, z, 1))[:-1]
 

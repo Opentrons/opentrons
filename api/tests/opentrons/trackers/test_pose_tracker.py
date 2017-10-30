@@ -1,7 +1,7 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
     Point, Node, add, children, ascend, absolute, relative, max_z,
-    stringify, update, remove, translate
+    stringify, update, remove, translate, init, ROOT
 )
 from numpy import isclose, array, ndarray
 
@@ -27,9 +27,9 @@ def rotate(theta: float) -> ndarray:
 
 @pytest.fixture
 def state():
-    return add({}, 'root') \
-        .add('1', parent='root', point=Point(1, 2, 3)) \
-        .add('2', parent='root', point=Point(-1, -2, -3)) \
+    return init() \
+        .add('1', point=Point(1, 2, 3)) \
+        .add('2', point=Point(-1, -2, -3)) \
         .add('1-1', parent='1', point=Point(11, 12, 13)) \
         .add('1-1-1', parent='1-1', point=Point(0, 0, 0)) \
         .add('1-2', parent='1', point=Point(21, 22, 23)) \
@@ -38,37 +38,41 @@ def state():
 
 
 def test_add():
-    state = {}
-    state = add(state, 'root')
+    state = init()
     assert state == {
-        'root': Node(
+        ROOT: Node(
             parent=None,
             children=[],
             transform=translate(Point(0, 0, 0)))
     }
-    state = add(state, 'child', 'root', Point(1, 2, 3))
+    state = add(state, obj='child', point=Point(1, 2, 3))
     assert state == {
-        'root': Node(
+        ROOT: Node(
             parent=None,
             children=['child'],
             transform=translate(Point(0, 0, 0))),
         'child': Node(
-            parent='root',
+            parent=ROOT,
             children=[],
             transform=translate(Point(-1, -2, -3)))
     }
 
     with pytest.raises(AssertionError):
-        add(state, 'child', 'root', Point(1, 2, 3))
+        add(state, obj='child', point=Point(1, 2, 3))
 
     with pytest.raises(KeyError):
-        add(state, 'new-child', 'another-root', Point(1, 2, 3))
+        add(
+            state,
+            obj='new-child',
+            parent='another-root',
+            point=Point(1, 2, 3)
+        )
 
 
 def test_children(state):
     assert children(state, '1') == [('1-1', 0), ('1-1-1', 1), ('1-2', 0)]
     assert children(state, '1-1') == [('1-1-1', 0)]
-    assert children(state, 'root') == [
+    assert children(state, ROOT) == [
         ('1', 0),
         ('1-1', 1),
         ('1-1-1', 2),
@@ -81,29 +85,29 @@ def test_children(state):
 
 
 def test_ascend(state):
-    assert ascend(state, '1-1-1') == ['1-1-1', '1-1', '1', 'root']
-    assert ascend(state, '1-1') == ['1-1', '1', 'root']
-    assert ascend(state, 'root') == ['root']
+    assert ascend(state, '1-1-1') == ['1-1-1', '1-1', '1', ROOT]
+    assert ascend(state, '1-1') == ['1-1', '1', ROOT]
+    assert ascend(state, ROOT) == [ROOT]
 
 
 def test_relative(state):
     from math import pi
     assert (relative(state, src='1-1', dst='2-1') == (24., 28., 32.)).all()
     state = \
-        add({}, 'root') \
-        .add('1', parent='root', transform=rotate(pi / 2.0)) \
+        init() \
+        .add('1', transform=rotate(pi / 2.0)) \
         .add('1-1', parent='1', point=Point(1, 0, 0)) \
-        .add('2', parent='root', point=Point(1, 0, 0))
+        .add('2', point=Point(1, 0, 0))
 
     assert isclose(relative(state, src='1-1', dst='2'), (-1.0, -1.0, 0)).all()
     assert isclose(relative(state, src='2', dst='1-1'), (0.0, 0.0, 0)).all()
 
-    state = add({}, 'root') \
-        .add('1', parent='root', transform=scale(2, 1, 1)) \
+    state = init() \
+        .add('1', transform=scale(2, 1, 1)) \
         .add('1-1', parent='1', point=Point(1, 1, 1)) \
 
-    assert isclose(relative(state, src='root', dst='1-1'), (-2.0, -1.0, -1.0)).all()
-    assert isclose(relative(state, src='1-1', dst='root'), (0.5, 1.0, 1.0)).all()
+    assert isclose(relative(state, src=ROOT, dst='1-1'), (-2.0, -1.0, -1.0)).all()
+    assert isclose(relative(state, src='1-1', dst=ROOT), (0.5, 1.0, 1.0)).all()
 
 
 def test_absolute(state):
@@ -118,9 +122,10 @@ def test_max_z(state):
 
 
 def test_stringify(state):
-    assert stringify(state, '1-2') == '1-2 [-21.0, -22.0, -23.0] [ 22.  24.  26.]'
+    assert stringify(state, '1-2') == \
+        '1-2 [-21.0, -22.0, -23.0] [ 22.  24.  26.]'
     assert stringify(state) == '\n'.join(
-        ['root [0.0, 0.0, 0.0] [ 0.  0.  0.]'] +
+        [ROOT + ' [0.0, 0.0, 0.0] [ 0.  0.  0.]'] +
         [' ' + s for s in stringify(state, '1').split('\n')] +
         [' ' + s for s in stringify(state, '2').split('\n')]
     )
@@ -133,17 +138,17 @@ def test_update(state):
 
 def test_remove(state):
     state = remove(state, '1')
-    assert {*state} == {'2-1', '2', '2-2', 'root'}
+    assert {*state} == {'2-1', '2', '2-2', ROOT}
     state = remove(state, '2')
-    assert {*state} == {'root'}
-    state = remove(state, 'root')
+    assert {*state} == {ROOT}
+    state = remove(state, ROOT)
     assert state == {}
 
 
 def test_transform():
     from math import pi
-    state = add({}, 'root') \
-        .add('1', parent='root', transform=scale(2, 2, 2)) \
+    state = init() \
+        .add('1', parent=ROOT, transform=scale(2, 2, 2)) \
         .add('1-1', parent='1', point=Point(1, 0, 0))
 
     assert isclose(absolute(state, '1-1'), (0.5, 0, 0)).all()

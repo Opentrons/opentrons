@@ -2,7 +2,6 @@
 
 import unittest
 from unittest import mock
-
 from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
@@ -301,19 +300,17 @@ class PipetteTest(unittest.TestCase):
 
     def test_pick_up_tip(self):
         last_well = self.tiprack1[-1]
-        target_pos = last_well.from_center(
-            x=0, y=0, z=-1,
-            reference=self.robot._deck)
+        target_pos = pose_tracker.absolute(self.robot.poses, last_well)
         self.p200.pick_up_tip(last_well)
-        current_pos = pose_tracker.absolute(robot.poses, p200)
-        self.assertEqual(current_pos, target_pos)
+        current_pos = pose_tracker.absolute(self.robot.poses, self.p200)
+        assert (current_pos == target_pos).all()
 
         last_well = self.tiprack1[-1]
         target_pos = last_well.from_center(
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well, presses=0)
-        current_pos = pose_tracker.absolute(robot.poses, p200)
+        current_pos = pose_tracker.absolute(self.robot.poses, self.p200)
         self.assertEqual(current_pos, target_pos)
 
         last_well = self.tiprack1[-1]
@@ -321,7 +318,7 @@ class PipetteTest(unittest.TestCase):
             x=0, y=0, z=-1,
             reference=self.robot._deck)
         self.p200.pick_up_tip(last_well, presses='a')
-        current_pos = pose_tracker.absolute(robot.poses, p200)
+        current_pos = pose_tracker.absolute(self.robot.poses, self.p200)
         self.assertEqual(current_pos, target_pos)
 
         self.p200.reset()
@@ -1366,13 +1363,9 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.pick_up_tip()
 
-        self.assertEqual(
-            self.p200.move_to.mock_calls,
-            [
-                self.build_move_to_bottom(self.tiprack1[0]),
-                self.build_move_to_bottom(self.tiprack1[1])
-            ]
-        )
+        assert self.p200.move_to.mock_calls == \
+            self.build_move_to_bottom(self.tiprack1[0]) + \
+            self.build_move_to_bottom(self.tiprack1[1])
 
     def test_simulate_plunger_while_enqueing(self):
 
@@ -1437,9 +1430,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack1[i]))
+            expected.extend(self.build_move_to_bottom(self.tiprack1[i]))
         for i in range(0, total_tips_per_plate):
-            expected.append(self.build_move_to_bottom(self.tiprack2[i]))
+            expected.extend(self.build_move_to_bottom(self.tiprack2[i]))
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
@@ -1474,9 +1467,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack1.rows[i]))
+            expected.extend(self.build_move_to_bottom(self.tiprack1.rows[i]))
         for i in range(0, 12):
-            expected.append(self.build_move_to_bottom(self.tiprack2.rows[i]))
+            expected.extend(self.build_move_to_bottom(self.tiprack2.rows[i]))
 
         self.assertEqual(
             p200_multi.move_to.mock_calls,
@@ -1505,8 +1498,12 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(self.p200.drop_tip.mock_calls, expected)
 
     def build_move_to_bottom(self, well):
-        return mock.call(
-            well.bottom(), strategy='arc')
+        plunge = -7
+        return [mock.call(well.top(), strategy='arc')] + \
+            [
+                mock.call(well.top(plunge * (i % 2)), strategy='direct')
+                for i in range(1, 5)
+            ]
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()

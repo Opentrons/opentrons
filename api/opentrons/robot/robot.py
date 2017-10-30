@@ -211,7 +211,7 @@ class Robot(object):
             * Runtime warnings
 
         """
-        self.poses = pose_tracker.add({}, 'world')
+        self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
         self._previous_container = None
@@ -235,9 +235,7 @@ class Robot(object):
         self.poses = pose_tracker.add(
             self.poses,
             self.gantry,
-            'world'
         )
-
         self.poses = self.gantry._setup_mounts(self.poses)
 
     def add_instrument(self, mount, instrument):
@@ -402,8 +400,8 @@ class Robot(object):
 
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
-        self._driver.move(*args, **kwargs)
-        self.gantry._update_pose(self.poses)
+        self.poses = self.gantry.move(self.poses, **kwargs)
+        self.poses = self.gantry._update_pose(self.poses)
 
     # DEPRECATED
     def move_plunger(self, *args, **kwargs):
@@ -623,8 +621,7 @@ class Robot(object):
         # Setup Deck as root object for pose tracker
         self.poses = pose_tracker.add(
             self.poses,
-            self._deck,
-            'world'
+            self._deck
         )
 
         for slot in self._deck:
@@ -755,7 +752,6 @@ class Robot(object):
 
     def versions(self):
         # TODO: Store these versions in config
-        compatible = self._driver.versions_compatible()
         return {
             'firmware': {
                 'version': self._driver.get_firmware_version(),
@@ -786,7 +782,7 @@ class Robot(object):
         # TODO: Store these versions in config
         return {
             'axis_homed': self.axis_homed,
-            'switches': self._driver.get_endstop_switches(),
+            'switches': self._driver.switch_state(),
             'steps_per_mm': {
                 'x': self._driver.get_steps_per_mm('x'),
                 'y': self._driver.get_steps_per_mm('y')

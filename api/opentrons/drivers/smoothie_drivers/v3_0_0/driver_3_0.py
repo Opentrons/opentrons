@@ -61,6 +61,7 @@ class SmoothieDriver_3_0_0:
         self.log = []
         self._update_position({axis: 0 for axis in AXES.lower()})
         self.simulating = True
+        self.connection = None
 
     def _update_position(self, target):
         self._position.update({
@@ -116,7 +117,7 @@ class SmoothieDriver_3_0_0:
     @property
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
-        return self._send_command(GCODES['SWITCH_STATUS'])
+        return self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
 
     @property
     def power(self):
