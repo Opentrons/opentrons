@@ -4,6 +4,7 @@ from opentrons.trackers.pose_tracker import (
 )
 from opentrons.util.vector import Vector
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
+from opentrons.data_storage import database
 
 # maximum distance to move during calibration attempt
 PROBE_TRAVEL_DISTANCE = 20

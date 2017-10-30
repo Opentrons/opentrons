@@ -20,7 +20,7 @@ RIGHT_Z_AXIS = 'a'
 
 
 def _coords_for_axes(driver, axes):
-    return {axis: driver.position[axis] for axis in axes}
+    return {axis: driver.position[axis.upper()] for axis in axes}
 
 
 class InstrumentActuator(object):
@@ -103,7 +103,7 @@ class Gantry:
     Not Response for:
         - Robot state, or any instrument specific actions
     '''
-    free_axes = 'xy'
+    free_axes = 'XY'
 
     def __init__(self, driver):
         self.left_mount = None
@@ -137,8 +137,8 @@ class Gantry:
             pose,
             self,
             pose_tracker.Point(
-                coordinates['x'],
-                coordinates['y'],
+                coordinates['X'],
+                coordinates['Y'],
                 z
             )
         )

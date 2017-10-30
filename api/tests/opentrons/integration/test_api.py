@@ -8,7 +8,7 @@ from opentrons.trackers import pose_tracker
 
 
 @pytest.fixture
-def smoke():  #  virtual_smoothie_env):
+def smoke(virtual_smoothie_env):
     robot.connect()
     robot.home()
     robot._driver.log.clear()
@@ -78,9 +78,8 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
 
     def instrument_procedure(index):
         def position(instrument):
-            return pose_tracker.relative(
+            return pose_tracker.absolute(
                 robot.poses,
-                'world',
                 instrument._instrument
             )
 
@@ -109,7 +108,7 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
         # main_router.calibration_manager.update_container_offset(
         #     container=session.containers[0],
         #     instrument=session.instruments[index])
-
+        #
         # pos = position(session.instruments[index])
 
         # TODO (artyom 20171011): move home to a proper API endpoint
@@ -119,7 +118,7 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
             session.instruments[index],
             session.containers[0])
 
-        # Last position should correspond to the value before
+        # Last position should correspond to the value when
         # 'update_container_offset' was called
         assert isclose(pos, position(session.instruments[index])).all()
 

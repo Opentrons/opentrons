@@ -19,19 +19,21 @@ def test_drop_tip_move_to(robot):
     x, y, z = (161.0, 116.7, 3.0)
 
     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
+    print('A', pose_tracker.absolute(robot.poses, p200))
     robot.calibrate_container_with_instrument(plate, p200, False)
 
-    print(robot.poses[p200])
+    print('B', pose_tracker.absolute(robot.poses, p200))
+    # p200.move_to(plate[0])
     p200.drop_tip(plate[0])
-    print(robot.poses[p200])
+    print('C', pose_tracker.absolute(robot.poses, p200))
 
     current_pos = pose_tracker.absolute(robot.poses, p200)
 
     assert current_pos == \
         Vector({
-            'x': 161.0,
-            'y': 116.7,
-            'z': 3.0 - p200._drop_tip_offset - DEFAULT_TIP_LENGTH
+            'x': x,
+            'y': y,
+            'z': z + p200._drop_tip_offset + DEFAULT_TIP_LENGTH
         })
 
 
