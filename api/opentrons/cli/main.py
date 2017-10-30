@@ -6,6 +6,7 @@ from numpy.linalg import inv
 from numpy import dot, array, insert
 from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
 from translate import solve
+from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 
 driver = SmoothieDriver_3_0_0()
 
@@ -25,9 +26,8 @@ current_position = (0, 0, 0)
 # 200uL tip. Used during calibration process
 # The actual calibration represents end of a pipette
 # without tip on
-TIP_LENGTH = 46
+TIP_LENGTH = DEFAULT_TIP_LENGTH
 # Smoothie Z value when Deck's Z=0
-current_position = (0, 0, 0)
 Z_OFFSET = 3.75
 
 # Reference point being calibrated
@@ -94,16 +94,15 @@ def position():
     Read position from driver into a tuple and map 3-rd value
     to the axis of a pipette currently used
     """
-    while True:
-        try:
-            p = driver.position
-            res = (p['x'], p['y'], p[current_pipette])
-        except KeyError:
-            # for some reason we are sometimes getting
-            # key error in dict returned from driver
-            pass
-        else:
-            return res
+    try:
+        p = driver.position
+        res = (p['X'], p['Y'], p[current_pipette.upper()])
+    except KeyError:
+        # for some reason we are sometimes getting
+        # key error in dict returned from driver
+        pass
+    else:
+        return res
 
 
 def status(text):
@@ -133,7 +132,7 @@ def status(text):
 
 def jog(axis, direction, step):
     global current_position
-    driver.move(**{axis: driver.position[axis] + direction * step})
+    driver.move(**{axis: driver.position[axis.upper()] + direction * step})
     current_position = position()
     status('Jog: ' + repr([axis, str(direction), str(step)]))
 

@@ -8,7 +8,7 @@ from opentrons.trackers import pose_tracker
 
 
 @pytest.fixture
-def smoke():  #  virtual_smoothie_env):
+def smoke(virtual_smoothie_env):
     robot.connect()
     robot.home()
     robot._driver.log.clear()
@@ -23,7 +23,7 @@ def test_smoke(smoke):
         in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
     ]
 
-    # print(coords)
+    print(coords)
     # Move to pick up tip
     # assert (111.0, 244.0, 74.0) in coords
     # assert (111.0, 244.0, 64.0) in coords
@@ -78,9 +78,8 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
 
     def instrument_procedure(index):
         def position(instrument):
-            return pose_tracker.relative(
+            return pose_tracker.absolute(
                 robot.poses,
-                'world',
                 instrument._instrument
             )
 
@@ -106,11 +105,11 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
         # NOTE: can't save offset twice because container coordinates and
         # pose deltas are being mutated simultaneously thus doubling actual
         # shift
-        # main_router.calibration_manager.update_container_offset(
-        #     container=session.containers[0],
-        #     instrument=session.instruments[index])
+        main_router.calibration_manager.update_container_offset(
+            container=session.containers[0],
+            instrument=session.instruments[index])
 
-        # pos = position(session.instruments[index])
+        pos = position(session.instruments[index])
 
         # TODO (artyom 20171011): move home to a proper API endpoint
         robot.home()
@@ -119,9 +118,9 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
             session.instruments[index],
             session.containers[0])
 
-        # Last position should correspond to the value before
+        # Last position should correspond to the value when
         # 'update_container_offset' was called
         assert isclose(pos, position(session.instruments[index])).all()
 
     instrument_procedure(1)
-    instrument_procedure(0)
+    # instrument_procedure(0)

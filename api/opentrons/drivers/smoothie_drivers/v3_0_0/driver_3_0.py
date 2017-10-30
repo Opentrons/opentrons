@@ -19,6 +19,7 @@ DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X900 Y550 Z140 A140 B40 C40'
 DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
 DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
+HOMING_OFFSETS = 'M206 X0'
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITIONS = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
@@ -45,37 +46,13 @@ homed_positions = {
 }
 
 
-# World -> Smoothie calibration values for XY plane
-# use cli/main.py to perform factory calibration
-# TODO(artyom 20171017): move to config
-XY = \
-    array([[+9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
-           [-3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
-           [-5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
-
-# Smoothie coordinate for Z axis when 200ul tip is touching the deck
-Z_OFFSET = 3.75
-# Can be used to compensate for Z steps/mm mismatch
-Z_SCALE = 1
-
-CALIBRATION = insert(
-        insert(XY, 2, [0, 0, 0], axis=1),
-        2,
-        [0, 0, Z_SCALE, Z_OFFSET],
-        axis=0
-    )
-
-INVERSE_CALIBRATION = inv(CALIBRATION)
-
-
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.split(' ')
     parsed_values = parsed_values[2:]
-    position = {
-        s.split(':')[0].lower(): float(s.split(':')[1])
+    return {
+        s.split(':')[0].upper(): float(s.split(':')[1])
         for s in parsed_values
     }
-    return position
 
 
 class SmoothieDriver_3_0_0:
@@ -87,9 +64,8 @@ class SmoothieDriver_3_0_0:
 
     def _update_position(self, target):
         self._position.update({
-            axis.lower(): value for axis, value
-            in target.items()
-            if value is not None
+            axis.upper(): value
+            for axis, value in target.items() if value is not None
         })
 
         self.log += [self._position.copy()]
@@ -121,60 +97,20 @@ class SmoothieDriver_3_0_0:
         self.connection = serial_communication.connect()
         self._setup()
 
-    def _transform(self, matrix, defaults, state):
-        state = {
-            **defaults,
-            **{key: value for key, value in state.items() if value is not None}
-        }
-
-        xyz = matrix.dot([state[axis] for axis in 'XYZ'] + [1])[:-1]
-        xya = matrix.dot([state[axis] for axis in 'XYA'] + [1])[:-1]
-
-        return {
-            **state,
-            **{axis: value for axis, value in zip('XYZ', xyz)},
-            **{axis: value for axis, value in zip('XYA', xya)},
-        }
-
-    def to_world(self, state):
-        """
-        Args:
-            state: dict of Smoothie axis values
-                e.g.: {'X': x, 'Y': y, 'Z': z, 'A': a ... }
-
-        Returns:
-            A dict with XYZA keys replaced with calibrated values
-        """
-        defaults = self._position
-        return self._transform(INVERSE_CALIBRATION, defaults, state)
-
-    def from_world(self, state):
-        """
-        Args:
-            state: a dict of axis values to be converted into Smoothie
-                readable values
-                e.g.: {'X': x, 'Y': y, 'Z': z, 'A': a ... }
-
-        Returns:
-            A dict with XYZA keys replaced with calibrated values
-        """
-        defaults = self.to_world(self._position)
-        return self._transform(CALIBRATION, defaults, state)
-
     def disconnect(self):
         self.simulating = True
 
     @property
     def position(self):
         """
-        Smoothie axis values with calibration applied. Instead of sending
-        M114.2 we are storing target values in self._position since movement
+        Instead of sending M114.2 we are storing target values
+        in self._position since movement
         and home commands are blocking and assumed to go the correct place.
         Cases where Smoothie would not be in the correct place (such as if a
         belt slips) would not be corrected by getting position with M114.2
         because Smoothie would also not be aware of slippage.
         """
-        res = {k.lower(): v for k, v in self.to_world(self._position).items()}
+        res = {k.upper(): v for k, v in self._position.items()}
         return res
 
     @property
@@ -182,10 +118,22 @@ class SmoothieDriver_3_0_0:
         '''Returns the state of all SmoothieBoard limit switches'''
         return self._send_command(GCODES['SWITCH_STATUS'])
 
-    def set_speed(self, value):
-        ''' set total movement speed in mm/second'''
-        speed = value * SEC_PER_MIN
-        command = GCODES['SET_SPEED'] + str(speed)
+    @property
+    def power(self):
+        pass
+
+    def set_power(self, power_dict):
+        pass
+
+    @property
+    def speed(self):
+        pass
+
+    def set_speed(self, values):
+        command = GCODES['SET_SPEED'] + ' ' + ' '.join([
+            '{axis}{value}'.format(axis=axis.upper(), value=value)
+            for axis, value in values.items()
+        ])
         self._send_command(command)
 
     def set_power(self, axis, value):
@@ -220,17 +168,15 @@ class SmoothieDriver_3_0_0:
         self._send_command(DEFAULT_CURRENT_CONTROL)
         self._send_command(DEFAULT_MAX_AXIS_SPEEDS)
         self._send_command(DEFAULT_STEPS_PER_MM)
+        self._send_command(HOMING_OFFSETS)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.home()
 
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
+    def move(self, target):
         from numpy import isclose
-        target_position = self.from_world(
-            {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
-        )
 
         def valid_movement(coords, axis):
             return not (
@@ -240,13 +186,13 @@ class SmoothieDriver_3_0_0:
             )
 
         coords = [axis + str(coords)
-                  for axis, coords in target_position.items()
+                  for axis, coords in target.items()
                   if valid_movement(coords, axis)]
 
         if coords:
             command = GCODES['MOVE'] + ''.join(coords)
             self._send_command(command)
-            self._update_position(target_position)
+            self._update_position(target)
 
     def home(self, axis=AXES):
         axis = axis.upper()
@@ -254,9 +200,11 @@ class SmoothieDriver_3_0_0:
         # If Y is requested make sure we home X first
         if 'Y' in axis:
             axis += 'X'
+
         # If horizontal movement is requested, ensure we raise the instruments
         if 'X' in axis:
             axis += 'ZA'
+
         # These two additions are safe even if they duplicate requested axes
         # because of the use of set operations below, which will de-duplicate
         # characters from the resulting string
@@ -284,14 +232,17 @@ class SmoothieDriver_3_0_0:
             position = _parse_axis_values(
                 self._send_command(GCODES['CURRENT_POSITION'])
             )
+            self._update_position(position)
+
+        homed = {
+            axis: position[axis]
+            for axis in ''.join(home_sequence)
+        }
 
         # Only update axes that have been selected for homing
-        self._update_position(
-            {
-                axis: position[axis]
-                for axis in ''.join(home_sequence)
-            }
-        )
+        self._update_position(homed)
+
+        return homed
 
     def delay(self, sec):
         sec = float(sec)
