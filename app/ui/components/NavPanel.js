@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import ConnectedSetupPanel from '../containers/ConnectedSetupPanel'
 import Connection from '../containers/Connection'
 import styles from './NavPanel.css'
@@ -8,7 +9,7 @@ const UploadPanel = props => {
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>
-        <label className={styles.btn_upload}>
+        <label className={classnames('btn', 'btn_dark', styles.btn_upload)}>
           Upload
           <input
             className={styles.file}

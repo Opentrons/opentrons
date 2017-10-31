@@ -1,4 +1,4 @@
-@value colors: './Util.css';
+@value colors: './App.global.css';
 @value green, red, blue from colors;
 
 * {

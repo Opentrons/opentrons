@@ -62,7 +62,7 @@ export default function ConnectPanel (props) {
   return (
     <div className={styles.connect_panel}>
       <h1>Connect to a Robot</h1>
-      <button className={styles.refresh}>&#x21ba;</button>
+      <button className={styles.refresh_icon}>&#x21ba;</button>
       <section className={searchStyles}>
         {discoveredRobots}
       </section>

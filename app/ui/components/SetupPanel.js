@@ -109,7 +109,7 @@ export default function SetupPanel (props) {
     return result
   }, {tiprackList: [], labwareList: []})
 
-  const runLinkStyles = classnames({[styles.inactive]: !labwareConfirmed}, styles.run_link, 'tooltip_parent')
+  const runLinkStyles = classnames({[styles.inactive]: !labwareConfirmed}, styles.run_link, 'tooltip_parent', 'btn', '.btn_dark')
   const runLinkWarning = 'Pipette and labware setup must be complete before you can RUN protocol'
   const labwareMsg = !instrumentsCalibrated
     ? <p className={styles.labware_alert}>Labware setup is disabled until pipette setup is complete.</p>
@@ -123,7 +123,7 @@ export default function SetupPanel (props) {
     : null
   return (
     <div className={styles.setup_panel}>
-      <h1>Prepare Robot for RUN</h1>
+      <h2 className={styles.title}>Prepare Robot for RUN</h2>
       <section className={styles.links}>
         <section className={styles.pipette_group}>
           <h3>Pipette Setup</h3>

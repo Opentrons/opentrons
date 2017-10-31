@@ -78,7 +78,6 @@
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
-    "devtron": "^1.4.0",
     "electron": "1.6.11",
     "electron-builder": "~19.27.3",
     "electron-builder-squirrel-windows": "~19.27.3",

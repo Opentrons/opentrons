@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import Button from './Button'
 import {ControlledUSB, AvailableUSB} from './icons'
 import styles from './ConnectPanel.css'
@@ -13,7 +14,7 @@ export default function RobotItem (props) {
     connectButton =
       <Button
         onClick={onConnectClick}
-        style={styles.btn_connect}
+        style={classnames('btn', 'btn_dark', styles.btn_connect)}
       >
         Take Control
       </Button>

@@ -15,21 +15,18 @@
 }
 
 .btn_run {
-  composes: btn from './Util.css';
   grid-area: run;
-  margin: 1rem;
+  margin: 0.75rem 1rem;
 }
 
 .btn_pause {
-  composes: btn from './Util.css';
   grid-area: pause;
-  margin: 1rem;
+  margin: 0.75rem 1rem;
 }
 
 .btn_cancel {
-  composes: btn from './Util.css';
   grid-area: run;
-  margin: 1rem;
+  margin: 0.75rem 1rem;
 }
 
 .controls {
