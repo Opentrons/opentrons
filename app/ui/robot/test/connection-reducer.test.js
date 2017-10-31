@@ -8,11 +8,34 @@ describe('robot reducer - connection', () => {
     const state = reducer(undefined, {})
 
     expect(getState(state)).toEqual({
+      isScanning: false,
+      discovered: [],
+      discoveredByHostname: {},
       isConnected: false,
       connectRequest: {inProgress: false, error: null},
-      disconnectRequest: {inProgress: false, error: null},
-      discovered: [],
-      discoveredByHostname: {}
+      disconnectRequest: {inProgress: false, error: null}
+    })
+  })
+
+  test('handles DISCOVER action', () => {
+    const state = {
+      connection: {isScanning: false}
+    }
+    const action = {type: actionTypes.DISCOVER}
+
+    expect(getState(reducer(state, action))).toEqual({
+      isScanning: true
+    })
+  })
+
+  test('handles DISCOVER_FINISH action', () => {
+    const state = {
+      connection: {isScanning: true}
+    }
+    const action = {type: actionTypes.DISCOVER_FINISH}
+
+    expect(getState(reducer(state, action))).toEqual({
+      isScanning: false
     })
   })
 

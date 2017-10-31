@@ -4,8 +4,9 @@ import {NAME, selectors, constants} from '../'
 const makeState = (state) => ({[NAME]: state})
 
 const {
-  getConnectionStatus,
+  getIsScanning,
   getDiscovered,
+  getConnectionStatus,
   getUploadInProgress,
   getUploadError,
   getSessionName,
@@ -26,6 +27,29 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
+  test('getIsScanning', () => {
+    const state = {connection: {isScanning: true}}
+
+    expect(getIsScanning(makeState(state))).toBe(true)
+  })
+
+  test('getDiscovered', () => {
+    const state = {
+      connection: {
+        discovered: ['abcdef.local', '123456.local'],
+        discoveredByHostname: {
+          'abcdef.local': {hostname: 'abcdef.local'},
+          '123456.local': {hostname: '123456.local'}
+        }
+      }
+    }
+
+    expect(getDiscovered(makeState(state))).toEqual([
+      {hostname: 'abcdef.local'},
+      {hostname: '123456.local'}
+    ])
+  })
+
   test('getConnectionStatus', () => {
     const state = {
       connection: {
@@ -56,23 +80,6 @@ describe('robot selectors', () => {
       disconnectRequest: {inProgress: true}
     }
     expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTING)
-  })
-
-  test('getDiscovered', () => {
-    const state = {
-      connection: {
-        discovered: ['abcdef.local', '123456.local'],
-        discoveredByHostname: {
-          'abcdef.local': {hostname: 'abcdef.local'},
-          '123456.local': {hostname: '123456.local'}
-        }
-      }
-    }
-
-    expect(getDiscovered(makeState(state))).toEqual([
-      {hostname: 'abcdef.local'},
-      {hostname: '123456.local'}
-    ])
   })
 
   test('getUploadInProgress', () => {

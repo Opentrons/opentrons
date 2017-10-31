@@ -7,13 +7,15 @@ const makeRobotActionName = (action) => makeActionName(NAME, action)
 const makeRobotAction = (action) => ({...action, meta: {robotCommand: true}})
 
 export const actionTypes = {
-  // connect and disconnect
+  // discovery, connect, and disconnect
+  DISCOVER: makeRobotActionName('DISCOVER'),
+  DISCOVER_FINISH: makeRobotActionName('DISCOVER_FINISH'),
+  ADD_DISCOVERED: makeRobotActionName('ADD_DISCOVERED'),
+  REMOVE_DISCOVERED: makeRobotActionName('REMOVE_DISCOVERED'),
   CONNECT: makeRobotActionName('CONNECT'),
   CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
   DISCONNECT: makeRobotActionName('DISCONNECT'),
   DISCONNECT_RESPONSE: makeRobotActionName('DISCONNECT_RESPONSE'),
-  ADD_DISCOVERED: makeRobotActionName('ADD_DISCOVERED'),
-  REMOVE_DISCOVERED: makeRobotActionName('REMOVE_DISCOVERED'),
 
   // protocol loading
   SESSION: makeRobotActionName('SESSION'),
@@ -51,6 +53,14 @@ export const actionTypes = {
 }
 
 export const actions = {
+  discover () {
+    return makeRobotAction({type: actionTypes.DISCOVER})
+  },
+
+  discoverFinish () {
+    return {type: actionTypes.DISCOVER_FINISH}
+  },
+
   // TODO(mc): connect should take a URL or robot identifier
   connect () {
     return makeRobotAction({type: actionTypes.CONNECT})

@@ -6,6 +6,7 @@ import RpcClient from '../../../rpc/client'
 import {actions, actionTypes} from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
+import {handleDiscover} from './discovery'
 
 // TODO(mc, 2017-08-29): don't hardcode this URL
 const URL = 'ws://127.0.0.1:31950'
@@ -32,6 +33,7 @@ export default function client (dispatch) {
     const {type} = action
 
     switch (type) {
+      case actionTypes.DISCOVER: return handleDiscover(dispatch, state, action)
       case actionTypes.CONNECT: return connect(state, action)
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)

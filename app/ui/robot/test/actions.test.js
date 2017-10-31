@@ -3,6 +3,43 @@
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
+  test('DISCOVER action', () => {
+    const expected = {
+      type: actionTypes.DISCOVER,
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.discover()).toEqual(expected)
+  })
+
+  test('DISCOVER_FINISH action', () => {
+    const expected = {
+      type: actionTypes.DISCOVER_FINISH
+    }
+
+    expect(actions.discoverFinish()).toEqual(expected)
+  })
+
+  test('ADD_DISCOVERED action', () => {
+    const hostname = '123456.local'
+    const expected = {
+      type: actionTypes.ADD_DISCOVERED,
+      payload: {hostname}
+    }
+
+    expect(actions.addDiscovered(hostname)).toEqual(expected)
+  })
+
+  test('REMOVE_DISCOVERED action', () => {
+    const hostname = '123456.local'
+    const expected = {
+      type: actionTypes.REMOVE_DISCOVERED,
+      payload: {hostname}
+    }
+
+    expect(actions.removeDiscovered(hostname)).toEqual(expected)
+  })
+
   test('CONNECT action', () => {
     const expected = {
       type: actionTypes.CONNECT,
@@ -49,26 +86,6 @@ describe('robot actions', () => {
 
     expect(actions.disconnectResponse()).toEqual(success)
     expect(actions.disconnectResponse(new Error('AH'))).toEqual(failure)
-  })
-
-  test('ADD_DISCOVERED action', () => {
-    const hostname = '123456.local'
-    const expected = {
-      type: actionTypes.ADD_DISCOVERED,
-      payload: {hostname}
-    }
-
-    expect(actions.addDiscovered(hostname)).toEqual(expected)
-  })
-
-  test('REMOVE_DISCOVERED action', () => {
-    const hostname = '123456.local'
-    const expected = {
-      type: actionTypes.REMOVE_DISCOVERED,
-      payload: {hostname}
-    }
-
-    expect(actions.removeDiscovered(hostname)).toEqual(expected)
   })
 
   test('session action', () => {

@@ -7,7 +7,9 @@ import styles from './icons.css'
 import spinnerSrc from '../img/loading.gif'
 import discoverSrc from '../img/icon_discover.png'
 import controlledUSBSrc from '../img/icon_usb_controlled.png'
+import controlledWifiSrc from '../img/icon_wifi_controlled.png'
 import availableUSBSrc from '../img/icon_usb.png'
+import availableWifiSrc from '../img/icon_wifi.png'
 
 export function Spinner (props) {
   return (
@@ -27,9 +29,21 @@ export function ControlledUSB (props) {
   )
 }
 
+export function ControlledWifi (props) {
+  return (
+    <ImageIcon {...props} src={controlledWifiSrc} />
+  )
+}
+
 export function AvailableUSB (props) {
   return (
     <ImageIcon {...props} src={availableUSBSrc} />
+  )
+}
+
+export function AvailableWifi (props) {
+  return (
+    <ImageIcon {...props} src={availableWifiSrc} />
   )
 }
 
