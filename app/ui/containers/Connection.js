@@ -14,10 +14,7 @@ const mapStateToProps = (state) => {
 
   return {
     isScanning: robotSelectors.getIsScanning(state),
-    discovered: [
-      {hostname: 'bot.local', isCurrent: false},
-      {hostname: 'other.local', isCurrent: true}
-    ],
+    discovered: robotSelectors.getDiscovered(state),
     connectionStatus: connectionStatus,
     isConnected
   }

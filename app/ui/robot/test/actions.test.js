@@ -43,10 +43,11 @@ describe('robot actions', () => {
   test('CONNECT action', () => {
     const expected = {
       type: actionTypes.CONNECT,
+      payload: {hostname: 'ot.local'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.connect()).toEqual(expected)
+    expect(actions.connect('ot.local')).toEqual(expected)
   })
 
   test('CONNECT_RESPONSE action', () => {

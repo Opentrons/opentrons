@@ -16,21 +16,14 @@ ConnectPanel.propTypes = {
 export default function ConnectPanel (props) {
   const {
     isScanning,
-    isConnected,
     onScanClick,
     discovered
   } = props
 
-  const robotList = discovered.map((robot) => {
-    const {hostname} = robot
-    return (
-      <DiscoveredRobot
-        robot={robot}
-        isConnected={isConnected}
-        key={hostname}
-      />
-    )
-  })
+  const robotList = discovered.map((robot) => (
+    <DiscoveredRobot key={robot.hostname} {...robot} />
+  ))
+
   const scanInProgress = isScanning
     ? (<li><Spinner className={styles.spinner} /></li>)
     : null
@@ -71,7 +64,9 @@ export default function ConnectPanel (props) {
   return (
     <div className={styles.connect_panel}>
       <h1>Connect to a Robot</h1>
-      <button className={styles.refresh_icon}>&#x21ba;</button>
+      <button className={styles.refresh_icon} onClick={onScanClick}>
+        &#x21ba;
+      </button>
       <section className={searchStyles}>
         {discoveredRobots}
       </section>

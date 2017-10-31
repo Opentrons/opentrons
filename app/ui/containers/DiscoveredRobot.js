@@ -3,27 +3,20 @@ import {connect} from 'react-redux'
 import RobotItem from '../components/RobotItem'
 
 import {
-  actions as robotActions,
-  selectors as robotSelectors,
-  constants as robotConstants
+  actions as robotActions
 } from '../robot'
 
-const mapStateToProps = (state, ownProps) => {
-  const connectionStatus = robotSelectors.getConnectionStatus(state)
-  const isConnected = connectionStatus === robotConstants.CONNECTED
+const mapStateToProps = (state, ownProps) => ownProps
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  // only allow disconnect if connected and vice versa
+  if (ownProps.isConnected) {
+    return {onDisconnectClick: () => dispatch(robotActions.disconnect())}
+  }
+
   return {
-    robot: ownProps.robot,
-    isConnected
+    onConnectClick: () => dispatch(robotActions.connect(ownProps.hostname))
   }
 }
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  onConnectClick: () => {
-    dispatch(robotActions.connect(ownProps.robot.hostname))
-  },
-  onDisconnectClick: () => {
-    dispatch(robotActions.disconnect(ownProps.robot.hostname))
-  }
-})
 
 export default connect(mapStateToProps, mapDispatchToProps)(RobotItem)

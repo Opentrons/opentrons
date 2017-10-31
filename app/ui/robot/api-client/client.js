@@ -8,13 +8,12 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 import {handleDiscover} from './discovery'
 
-// TODO(mc, 2017-08-29): don't hardcode this URL
-const URL = 'ws://127.0.0.1:31950'
+const PORT = 31950
 const RUN_TIME_TICK_INTERVAL_MS = 200
-
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tiprack/i
+// TODO(mc, 2017-10-31): API supports mount, so this can be removed
 const INSTRUMENT_AXES = {
   b: 'left',
   a: 'right'
@@ -29,6 +28,7 @@ export default function client (dispatch) {
   // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
   let runTimerInterval = NO_INTERVAL
 
+  // return an action handler
   return function receive (state, action) {
     const {type} = action
 
@@ -50,10 +50,10 @@ export default function client (dispatch) {
     }
   }
 
-  function connect () {
+  function connect (state, action) {
     if (rpcClient) return dispatch(actions.connectResponse())
 
-    RpcClient(URL)
+    RpcClient(`ws://${action.payload.hostname}:${PORT}`)
       .then((c) => {
         rpcClient = c
         rpcClient

@@ -19,9 +19,9 @@ const INITIAL_STATE = {
   isScanning: false,
   discovered: [],
   discoveredByHostname: {},
-  connectRequest: {inProgress: false, error: null},
-  disconnectRequest: {inProgress: false, error: null},
-  isConnected: false
+  connectedTo: '',
+  connectRequest: {inProgress: false, error: null, hostname: ''},
+  disconnectRequest: {inProgress: false, error: null}
 }
 
 export default function connectionReducer (state = INITIAL_STATE, action) {
@@ -56,15 +56,21 @@ function handleDiscoverFinish (state, action) {
 function handleAddDiscovered (state, action) {
   const {payload} = action
   const {hostname} = payload
+  let {discovered, discoveredByHostname} = state
 
-  return {
-    ...state,
-    discovered: state.discovered.concat(hostname),
-    discoveredByHostname: {
-      ...state.discoveredByHostname,
-      [hostname]: payload
+  if (discovered.indexOf(hostname) < 0) {
+    discovered = discovered.concat(hostname)
+  }
+
+  discoveredByHostname = {
+    ...discoveredByHostname,
+    [hostname]: {
+      ...discoveredByHostname[hostname],
+      ...payload
     }
   }
+
+  return {...state, discovered, discoveredByHostname}
 }
 
 function handleRemoveDiscovered (state, action) {
@@ -78,17 +84,28 @@ function handleRemoveDiscovered (state, action) {
 }
 
 function handleConnect (state, action) {
-  return {...state, connectRequest: {inProgress: true, error: null}}
+  const {payload: {hostname}} = action
+
+  return {...state, connectRequest: {inProgress: true, error: null, hostname}}
 }
 
 function handleConnectResponse (state, action) {
   const {error: didError} = action
-  const isConnected = !didError
-  const error = didError
-    ? action.payload
-    : null
+  let connectedTo = state.connectRequest.hostname
+  let error = null
+  let requestHostname = ''
 
-  return {...state, isConnected, connectRequest: {inProgress: false, error}}
+  if (didError) {
+    error = action.payload
+    requestHostname = connectedTo
+    connectedTo = ''
+  }
+
+  return {
+    ...state,
+    connectedTo,
+    connectRequest: {error, inProgress: false, hostname: requestHostname}
+  }
 }
 
 function handleDisconnect (state, action) {
@@ -98,10 +115,13 @@ function handleDisconnect (state, action) {
 // TODO(mc, 2017-10-04): disconnect response actions are not FSA compliant
 function handleDisconnectResponse (state, action) {
   const {error: didError} = action
-  const isConnected = !!didError
-  const error = didError
-    ? action.payload
-    : null
+  let connectedTo = ''
+  let error = null
 
-  return {...state, isConnected, disconnectRequest: {inProgress: false, error}}
+  if (didError) {
+    connectedTo = state.connectedTo
+    error = action.payload
+  }
+
+  return {...state, connectedTo, disconnectRequest: {error, inProgress: false}}
 }

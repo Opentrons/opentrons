@@ -62,8 +62,8 @@ export const actions = {
   },
 
   // TODO(mc): connect should take a URL or robot identifier
-  connect () {
-    return makeRobotAction({type: actionTypes.CONNECT})
+  connect (hostname) {
+    return makeRobotAction({type: actionTypes.CONNECT, payload: {hostname}})
   },
 
   connectResponse (error) {
