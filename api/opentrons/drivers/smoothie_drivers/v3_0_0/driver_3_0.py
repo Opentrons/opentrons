@@ -11,7 +11,6 @@ from os import environ
   or knowing anything about what the axes are used for
 '''
 
-# Ignore these axis when sending move or home command
 # TODO(artyom, ben 20171026): move to config
 DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X900 Y550 Z140 A140 B40 C40'
@@ -23,6 +22,7 @@ HOMING_OFFSETS = 'M206 X0'
 HOMED_POSITIONS = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
+# Ignore these axis when sending move or home command
 DISABLE_AXES = 'BC'
 
 SEC_PER_MIN = 60
@@ -59,7 +59,7 @@ class SmoothieDriver_3_0_0:
         self.log = []
         self._update_position({axis: 0 for axis in AXES.lower()})
         self.simulating = True
-        self.connection = None
+        self._connection = None
 
     def _update_position(self, target):
         self._position.update({
@@ -93,7 +93,8 @@ class SmoothieDriver_3_0_0:
             self.simulating = True
             return
 
-        self.connection = serial_communication.connect()
+        self._connection = serial_communication.connect()
+
         self._setup()
 
     def disconnect(self):
@@ -155,7 +156,7 @@ class SmoothieDriver_3_0_0:
 
         if not self.simulating:
             return serial_communication.write_and_return(
-                command_line, self.connection, timeout)
+                command_line, self._connection, timeout)
 
     def _setup(self):
         self._reset_from_error()
