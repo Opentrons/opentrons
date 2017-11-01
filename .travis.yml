@@ -40,7 +40,7 @@ before_install:
 
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
-  - echo node --version
+  - node --version
   - pip install pyyaml coveralls
   - cd api && make install && cd ..
   - cd app && make install && cd ..
