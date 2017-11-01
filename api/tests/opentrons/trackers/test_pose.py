@@ -11,10 +11,10 @@ from opentrons.trackers.pose_tracker import Pose
     (-30, -50, -10)
 ])
 def test_init(x, y, z):
-    pose_matrix = np.array([[ 1.,  0.,  0.,  x],
-                            [ 0.,  1.,  0.,  y],
-                            [ 0.,  0.,  1.,  z],
-                            [ 0.,  0.,  0.,  1.]])
+    pose_matrix = np.array([[1.,  0.,  0.,  x],
+                            [0.,  1.,  0.,  y],
+                            [0.,  0.,  1.,  z],
+                            [0.,  0.,  0.,  1.]])
 
     test_pose = Pose(x=x, y=y, z=z)
     check_pose = Pose(x=x, y=y, z=z)
@@ -39,5 +39,3 @@ def test_mult(pose1, pose2, product):
 
     double_check = pose1._pose.dot(pose2._pose)
     assert (double_check == product._pose).all()
-
-

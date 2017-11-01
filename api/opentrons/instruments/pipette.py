@@ -9,12 +9,14 @@ from opentrons.containers.placeable import (
 from opentrons.helpers import helpers
 
 
+# This should come from configuration if tip length is not already in db
+DEFAULT_TIP_LENGTH = 53.2
+
+
 class PipetteTip:
     def __init__(self, length):
         self.length = length
 
-# This should come from configuration if tip length is not already in db
-DEFAULT_TIP_LENGTH = 53.2
 
 class Pipette:
     """
@@ -97,6 +99,8 @@ class Pipette:
         self.attached_tip = None
         self.instrument_actuator = None
         self.instrument_mover = None
+        self.tip_length = DEFAULT_TIP_LENGTH
+
 
         if not name:
             name = self.__class__.__name__
@@ -769,7 +773,7 @@ class Pipette:
             for i in range(int(presses) - 1):
                 self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
-            self._add_tip(DEFAULT_TIP_LENGTH)
+            self._add_tip(self.tip_length)
             self.instrument_mover.home()
             return self
 
@@ -836,7 +840,7 @@ class Pipette:
 
             self.current_volume = 0
             self.current_tip(None)
-            self._remove_tip(DEFAULT_TIP_LENGTH)
+            self._remove_tip(self.tip_length)
             return self
         return _drop_tip(location)
 
@@ -1383,7 +1387,6 @@ class Pipette:
         return self
 
     def _move(self, x=None, y=None, z=None):
-        print('-[Pipette._move] moving to {}'.format((x,y,z)))
         self.instrument_mover.move(x, y, z)
 
     def _probe(self, axis, movement):
