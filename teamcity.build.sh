@@ -4,7 +4,7 @@
 
 eval "$(pyenv init -)"
 mkdir -p ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh
-nvm install --lts && nvm use --lts
+nvm install $OT_NODE_VERSION && nvm use $OT_NODE_VERSION
 
 cd api && make clean install && cd ..
 cd app && make clean install && cd ..

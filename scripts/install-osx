@@ -8,7 +8,7 @@ export HOMEBREW_CACHE="$HOME/.cache/brew"
 export NVM_DIR="$(pwd)/.nvm"
 bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 source "$NVM_DIR/nvm.sh"
-nvm install --lts && nvm use --lts
+nvm install $OT_NODE_VERSION && nvm use $OT_NODE_VERSION
 
 # Brew contains Python 3.6. We need 3.5, so we are going to use pyenv
 # Brew's update process takes a while, so we check that pyenv is installed first

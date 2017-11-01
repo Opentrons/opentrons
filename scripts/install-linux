@@ -10,4 +10,4 @@ Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 export NVM_DIR="$(pwd)/.nvm"
 bash -c 'wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash'
 source "$NVM_DIR/nvm.sh"
-nvm install --lts && nvm use --lts
+nvm install $OT_NODE_VERSION && nvm use $OT_NODE_VERSION
