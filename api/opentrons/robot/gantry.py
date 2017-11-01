@@ -28,7 +28,6 @@ def resolve_all_coordinates(tracked_object, pose_tracker, x=None, y=None, z=None
     if y is None: y = current_pose.y
     if z is None: z = current_pose.z
 
-    print("---[resolve_all_coordinates] result: {}".format((x,y,z)))
     return {'x':x, 'y':y, 'z':z}
 
 
@@ -89,18 +88,15 @@ class InstrumentMover(object):
         - Move the mount to the target z
         '''
 
-        print('--[InstrumentMover.move] move: {}'.format((x, y, z)))
 
         goal_inst_pos = \
             resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
 
-        print('--[InstrumentMover.move] absolute goal: {}'.format(goal_inst_pos))
 
         goal_x, goal_y, _ = pose_funcs.target_inst_position(
             self.gantry._pose_tracker, self.gantry, self.instrument, **goal_inst_pos)
         self.gantry.move(x=goal_x, y=goal_y)
 
-        print('--[InstrumentMover.move] gantry target x,y: {}'.format((goal_x, goal_y)))
 
         goal_inst_pos = \
             resolve_all_coordinates(self.instrument, self.gantry._pose_tracker, x, y, z)
@@ -110,7 +106,6 @@ class InstrumentMover(object):
             self.gantry._pose_tracker, self.mount, self.instrument, **goal_inst_pos)
         self.mount.move(z=goal_z)
 
-        print('--[InstrumentMover.move] mount target z: {}'.format(goal_z))
 
 
     def probe(self, axis_to_probe, probing_movement):

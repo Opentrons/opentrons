@@ -476,9 +476,6 @@ class Robot(object):
         # this checks if coordinates doesn't equal top
         offset = coordinates - placeable.top()[1]
         target = self.pose_tracker[placeable].position + offset.coordinates
-        print('[ROBOT] using offset of {}'.format(offset))
-
-        print('[ROBOT] moving to {} at coordinates {}'.format(placeable, target))
 
         other_instrument = {instrument} ^ set(self._instruments.values())
         if not len(other_instrument) == 0:
@@ -580,7 +577,7 @@ class Robot(object):
             'slots': {
                 'x_offset': 0,
                 'y_offset': 0,
-                'col_offset': 132.58,
+                'col_offset': 132.50,
                 'row_offset': 90.5
             }
         }
