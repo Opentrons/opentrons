@@ -577,7 +577,7 @@ class Robot(object):
             'slots': {
                 'x_offset': 0,
                 'y_offset': 0,
-                'col_offset': 132.58,
+                'col_offset': 132.50,
                 'row_offset': 90.5
             }
         }
