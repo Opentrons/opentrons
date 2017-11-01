@@ -4,7 +4,6 @@ from opentrons.trackers import pose_tracker
 RIGHT_MOUNT_OFFSET = (0.0, 0.0, 0.0)
 LEFT_MOUNT_OFFSET = (-37.14, 32.12, -2.5)
 
-
 LEFT_INSTRUMENT_ACTUATOR = 'b'
 RIGHT_INSTRUMENT_ACTUATOR = 'c'
 
@@ -77,7 +76,10 @@ class InstrumentMover(object):
         gantry_x, gantry_y, _ = pose_tracker.absolute(pose_tree, self.gantry)
         _, _, mount_z = pose_tracker.absolute(pose_tree, self.mount)
 
-        pose_tree = self.gantry.move(pose_tree, x=gantry_x + dx, y=gantry_y + dy)
+        pose_tree = self.gantry.move(
+            pose_tree,
+            x=gantry_x + dx,
+            y=gantry_y + dy)
         return self.mount.move(pose_tree, z=mount_z + dz)
 
     def probe(self, axis_to_probe, probing_movement):

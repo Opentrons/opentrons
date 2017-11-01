@@ -19,7 +19,7 @@ def position(x, y, z, a, b, c):
 
 
 def test_functional(smoothie):
-    from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import HOMED_POSITIONS  # NOQA
+    from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import HOMED_POSITION  # NOQA
 
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
@@ -32,9 +32,9 @@ def test_functional(smoothie):
     smoothie.home(axis='abc', disabled='')
     assert smoothie.position == position(
         1, 1, 3,
-        HOMED_POSITIONS['A'],
-        HOMED_POSITIONS['B'],
-        HOMED_POSITIONS['C'])
+        HOMED_POSITION['A'],
+        HOMED_POSITION['B'],
+        HOMED_POSITION['C'])
 
     smoothie.home(disabled='')
-    assert smoothie.position == HOMED_POSITIONS
+    assert smoothie.position == HOMED_POSITION

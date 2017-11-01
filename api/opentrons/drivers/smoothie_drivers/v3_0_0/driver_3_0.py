@@ -19,7 +19,15 @@ DEFAULT_CURRENT_CONTROL = 'M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25'
 HOMING_OFFSETS = 'M206 X0'
 
 # TODO (artyom, ben 20171026): move to config
-HOMED_POSITIONS = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
+HOMED_POSITION = {
+    'X': 394,
+    'Y': 344,
+    'Z': 227,
+    'A': 227,
+    'B': 18.9997,
+    'C': 18.9997
+}
+
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
@@ -69,10 +77,14 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
-    def update_position(self, is_retry=False):
+    def update_position(self, default=None, is_retry=False):
+        if default is None:
+            default = self._position
+
         if self.simulating:
-            updated_position = self._position
-        else:
+            updated_position = default
+
+        if not self.simulating:
             try:
                 position_response = \
                     self._send_command(GCODES['CURRENT_POSITION'])
@@ -87,6 +99,8 @@ class SmoothieDriver_3_0_0:
 
         self._update_position(updated_position)
 
+    # FIXME (JG 9/28/17): Should have a more thought out
+    # way of simulating vs really running
     def connect(self):
         self.simulating = False
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
@@ -94,7 +108,6 @@ class SmoothieDriver_3_0_0:
             return
 
         self._connection = serial_communication.connect()
-
         self._setup()
 
     def disconnect(self):
@@ -221,7 +234,7 @@ class SmoothieDriver_3_0_0:
         command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
 
-        position = HOMED_POSITIONS
+        position = HOMED_POSITION
 
         if not self.simulating:
             position = _parse_axis_values(
@@ -233,16 +246,15 @@ class SmoothieDriver_3_0_0:
             ax: position[ax]
             for ax in ''.join(home_sequence)
         }
-        self._update_position(homed)
+
+        self.update_position(default=homed)
+
         return homed
 
-    def delay(self, sec):
-        sec = float(sec)
-        msec = (sec - int(sec)) * 1000
-        command = '{code}S{sec}P{msec}'.format(
+    def delay(self, seconds):
+        command = '{code}P{ms}'.format(
             code=GCODES['DWELL'],
-            sec=sec,
-            msec=msec
+            ms=int(seconds * 1000)
         )
         self._send_command(command)
 
