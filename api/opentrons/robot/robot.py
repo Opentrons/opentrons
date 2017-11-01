@@ -21,6 +21,10 @@ from functools import lru_cache
 
 log = get_logger(__name__)
 
+# Avogadro
+# DECK_OFFSET = (31.45, 20.1, 0)
+DECK_OFFSET = (-39.55, -6.9, 0)
+
 
 class InstrumentMosfet(object):
     """
@@ -525,6 +529,7 @@ class Robot(object):
             {'x': destination[0], 'y': destination[1]},
             {'z': arrival_z}
         ]
+
         return strategy
 
     # DEPRECATED
@@ -617,7 +622,8 @@ class Robot(object):
         # Setup Deck as root object for pose tracker
         self.poses = pose_tracker.add(
             self.poses,
-            self._deck
+            self._deck,
+            point=pose_tracker.Point(*DECK_OFFSET)
         )
 
         for slot in self._deck:
@@ -661,6 +667,19 @@ class Robot(object):
             label = container_name
         container = database.load_container(container_name)
         container.properties['type'] = container_name
+
+        container_x, container_y, container_z = container._coordinates
+
+        # infer z from height
+        if container_z == 0 and 'height' in container[0].properties:
+            container_z = container[0].properties['height']
+
+        from opentrons.util.vector import Vector
+        container._coordinates = Vector(
+            container_x,
+            container_y,
+            container_z)
+
         if self._deck[slot].has_children() and not share:
             raise RuntimeWarning(
                 'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
@@ -679,8 +698,7 @@ class Robot(object):
             self.poses,
             container,
             container.parent,
-            pose_tracker.Point(*container._coordinates)
-        )
+            pose_tracker.Point(*container._coordinates))
 
         for well in container:
             # TODO JG 10/6/17: Stop tracking wells inconsistently

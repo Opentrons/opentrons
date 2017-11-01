@@ -25,13 +25,13 @@ def test_pos_tracker_persistance(robot):
     )
     plate = containers_load(robot, 'trough-12row', 'B2')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 0
+    assert robot.max_deck_height() == 40.0
 
     robot.poses = p200._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 0
+    assert robot.max_deck_height() == 40.0
 
 
 def test_calibrated_max_z(robot):
@@ -40,13 +40,13 @@ def test_calibrated_max_z(robot):
     )
     plate = containers_load(robot, '96-flat', 'A1')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 0
+    assert robot.max_deck_height() == 10.5
 
     robot.move_head(x=10, y=10)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 0
+    assert robot.max_deck_height() == 10.5
 
 
 def test_get_serial_ports_list(robot, monkeypatch):
@@ -100,7 +100,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 5.0},
+        {'z': 15.5},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -115,7 +115,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 5},
+        {'z': 15.5},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -139,14 +139,21 @@ def test_robot_move_to(robot):
     p200 = pipette.Pipette(robot, mount='left', name='pipette')
     robot.move_to(instrument=p200, location=(robot._deck, (100, 0, 0)))
     assert isclose(
-        pose_tracker.absolute(robot.poses, p200), (100, 0, 0)
+        pose_tracker.relative(
+            robot.poses,
+            src=p200,
+            dst=robot.deck),
+        (100, 0, 0)
     ).all()
 
 
 def test_move_head(robot):
     robot.move_head(x=100, y=0)
     assert isclose(
-        pose_tracker.absolute(robot.poses, robot.gantry), (100, 0, 0)
+        pose_tracker.absolute(
+            robot.poses,
+            robot.gantry),
+        (100, 0, 0)
     ).all()
 
 

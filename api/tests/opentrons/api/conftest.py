@@ -27,12 +27,7 @@ def log_by_axis(log, axis):
 
 @pytest.fixture
 def model():
-    from opentrons import robot, instruments, containers
-
-    robot.connect()
-    robot._driver.home('za')
-    robot._driver.home('bcx')
-    robot._driver.home()
+    from opentrons import instruments, containers
 
     pipette = instruments.Pipette(mount='right')
     plate = containers.load('96-flat', 'A1')

@@ -1,7 +1,7 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
-    Point, Node, add, children, ascend, absolute, relative, max_z,
-    stringify, update, remove, translate, init, ROOT
+    Point, Node, add, descendants, ascend, absolute, relative, max_z,
+    update, remove, translate, init, ROOT
 )
 from numpy import isclose, array, ndarray
 
@@ -69,10 +69,10 @@ def test_add():
         )
 
 
-def test_children(state):
-    assert children(state, '1') == [('1-1', 0), ('1-1-1', 1), ('1-2', 0)]
-    assert children(state, '1-1') == [('1-1-1', 0)]
-    assert children(state, ROOT) == [
+def test_descendants(state):
+    assert descendants(state, '1') == [('1-1', 0), ('1-1-1', 1), ('1-2', 0)]
+    assert descendants(state, '1-1') == [('1-1-1', 0)]
+    assert descendants(state, ROOT) == [
         ('1', 0),
         ('1-1', 1),
         ('1-1-1', 2),
@@ -81,7 +81,7 @@ def test_children(state):
         ('2-1', 1),
         ('2-2', 1)
     ]
-    assert children(state, '1-1-1') == []
+    assert descendants(state, '1-1-1') == []
 
 
 def test_ascend(state):
@@ -119,16 +119,6 @@ def test_absolute(state):
 
 def test_max_z(state):
     assert max_z(state, '1') == 23
-
-
-def test_stringify(state):
-    assert stringify(state, '1-2') == \
-        '1-2 [-21.0, -22.0, -23.0] [ 22.  24.  26.]'
-    assert stringify(state) == '\n'.join(
-        [ROOT + ' [0.0, 0.0, 0.0] [ 0.  0.  0.]'] +
-        [' ' + s for s in stringify(state, '1').split('\n')] +
-        [' ' + s for s in stringify(state, '2').split('\n')]
-    )
 
 
 def test_update(state):

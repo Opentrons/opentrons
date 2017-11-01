@@ -172,18 +172,21 @@ def virtual_smoothie_env(monkeypatch):
 
 
 @pytest.fixture
-def main_router(loop, monkeypatch):
+def main_router(
+            loop,
+            virtual_smoothie_env,
+            monkeypatch
+        ):
     from opentrons.api.routers import MainRouter
     from opentrons import robot
 
-    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     with MainRouter(loop=loop) as router:
         router.wait_until = partial(
             wait_until,
             notifications=router.notifications,
             loop=loop)
         yield router
-    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
     robot.reset()
 
 

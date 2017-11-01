@@ -13,9 +13,9 @@ from os import environ
 
 # TODO(artyom, ben 20171026): move to config
 DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
-DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X900 Y550 Z140 A140 B40 C40'
-DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B1000 C1000'
-DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.25 C0.25'
+DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X600 Y400 Z120 A120 B50 C50'
+DEFAULT_ACCELERATION = 'M204 S10000 X2000 Y2000 Z1500 A1500 B2000 C2000'
+DEFAULT_CURRENT_CONTROL = 'M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25'
 HOMING_OFFSETS = 'M206 X0'
 
 # TODO (artyom, ben 20171026): move to config
@@ -217,6 +217,7 @@ class SmoothieDriver_3_0_0:
                 ''.join(set(group) & set(axis) - set(disabled))
                 for group in HOME_SEQUENCE
             ]))
+
         command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
 

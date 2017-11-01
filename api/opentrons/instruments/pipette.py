@@ -771,7 +771,6 @@ class Pipette:
         def _pick_up_tip(self, location):
             self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
-            print('pickup tip top: ', self.current_tip().top(0))
             self.move_to(self.current_tip().top(0), strategy='arc')
 
             tip_plunge = -7
@@ -1405,10 +1404,10 @@ class Pipette:
         x, y, z = pose_tracker.get(self.robot.poses, self)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
-                x, y, z + length))
+                x, y, z - length))
 
     def _remove_tip(self, length):
         x, y, z = pose_tracker.get(self.robot.poses, self)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
-                x, y, z - length))
+                x, y, z + length))

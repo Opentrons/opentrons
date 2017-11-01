@@ -72,7 +72,7 @@ def add(
 
 def remove(state, obj):
     state = state.copy()
-    nodes = children(state, obj) + [(obj, 0)]
+    nodes = descendants(state, obj) + [(obj, 0)]
 
     # remove object references from their parent's children
     for child, *_ in nodes:
@@ -91,11 +91,11 @@ def update(state, obj, point: Point, transform=np.identity(4)):
     return state
 
 
-def children(state, obj, level=0):
+def descendants(state, obj, level=0):
     """ Returns a flattened list tuples of DFS traversal of subtree
     from object that contains descendant object and it's depth """
     return sum([
-        [(child, level)] + children(state, child, level + 1)
+        [(child, level)] + descendants(state, child, level + 1)
         for child in state[obj].children
     ], [])
 
@@ -144,7 +144,7 @@ def relative(state, src, dst, root=None):
 def max_z(state, root):
     return max([
         Point(*absolute(state, obj=obj, root=root)).z
-        for obj, _ in children(state, root)
+        for obj, _ in descendants(state, root)
     ])
 
 
@@ -153,8 +153,8 @@ def stringify(state, root=None):
         root = ascend(state, next(iter(state)))[-1]
 
     info = [
-        (obj, level, get(state, obj), absolute(state, obj))
-        for obj, level in [(root, 0)] + children(state, root, level=1)]
+        (obj, level, get(state, obj), relative(state, src=obj, dst=root))
+        for obj, level in [(root, 0)] + descendants(state, root, level=1)]
 
     return '\n'.join([
         ' ' * level + '{} {} {}'.format(str(obj), relative, world)
@@ -163,8 +163,9 @@ def stringify(state, root=None):
 
 
 def get(state, obj):
-    x, y, z, *_ = state[obj].transform.dot((0.0, 0.0, 0.0, 1.0))
-    return Point(x, y, z)
+    return relative(state, src=obj, dst=state[obj].parent)
+    # x, y, z, *_ = state[obj].transform.dot((0.0, 0.0, 0.0, 1.0))
+    # return Point(x, y, z)
 
 
 def bind(state):

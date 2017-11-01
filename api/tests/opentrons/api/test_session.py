@@ -77,13 +77,20 @@ async def test_load_protocol_with_error(session_manager):
     assert str(exception) == "name 'blah' is not defined"
 
 
-async def test_load_and_run(main_router, session_manager, protocol):
+@pytest.mark.parametrize('protocol_file', ['testosaur.py'])
+async def test_load_and_run(
+            main_router,
+            session_manager,
+            protocol,
+            protocol_file
+        ):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert main_router.notifications.queue.qsize() == 0
     assert session.command_log == {}
     assert session.state == 'loaded'
+    main_router.calibration_manager.tip_probe(session.instruments[0])
     session.run()
-    assert len(session.command_log) == 105
+    assert len(session.command_log) == 6
 
     res = []
     index = 0
@@ -97,12 +104,11 @@ async def test_load_and_run(main_router, session_manager, protocol):
                 break
 
     assert [key for key, _ in itertools.groupby(res)] == \
-        ['loaded', 'running', 'finished'], \
-        'Run should emit state change to "running" and then to "finished"'
+        ['loaded', 'probing', 'ready', 'running', 'finished']
     assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
 
     session.run()
-    assert len(session.command_log) == 105, \
+    assert len(session.command_log) == 6, \
         "Clears command log on the next run"
 
 

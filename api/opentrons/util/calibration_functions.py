@@ -1,17 +1,22 @@
 from numpy import array
 from opentrons.trackers.pose_tracker import (
-    update, Point, translate
+    update, Point, get
 )
 from opentrons.util.vector import Vector
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
+
+# TODO(artyom 20171031): for some reason was unable to share this
+# constant with opentrons.robot, thus copying it here, until
+# moved to config
+DECK_OFFSET = (-39.55, -6.9, 0)
 
 # maximum distance to move during calibration attempt
 PROBE_TRAVEL_DISTANCE = 20
 # size along X, Y and Z
 PROBE_SIZE = array((30.0, 30, 25.5))
 # coordinates of the top of the probe
-PROBE_TOP_COORDINATES = array((289.8, 296.4, 65.25))
+PROBE_TOP_COORDINATES = array((289.8, 296.4, 65.25)) + DECK_OFFSET
 
 
 def calibrate_container_with_delta(
@@ -19,13 +24,11 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
     delta = Point(delta_x, delta_y, delta_z)
-    new_transform = pose[container].transform.dot(
-        translate(delta)
-    )
-    # Take first three elements of the last column
-    point = Point(*new_transform.T[-1][:-1])
-    pose = update(pose, container, point)
-    container._coordinates = Vector(*point)
+    new_coordinates = get(pose, container) - delta
+    pose = update(pose, container, new_coordinates)
+    container._coordinates = Vector(*new_coordinates)
+    # Since we are potentially changing Z, we want to
+    # invalidate cache for max_deck_height
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
     elif save:
@@ -70,8 +73,6 @@ def probe_instrument(instrument, robot):
         (0, 0, 1, -1),
     ]
 
-    center = PROBE_TOP_COORDINATES
-
     coords = [switch[:-1] * PROBE_SIZE + center for switch in switches]
 
     instrument._add_tip(DEFAULT_TIP_LENGTH)
@@ -89,7 +90,7 @@ def probe_instrument(instrument, robot):
         # TODO(artyom, ben 20171026): fine tune correct probing sequence
         robot.poses = instrument._move(
             robot.poses,
-            z=z + height * 2 + DEFAULT_TIP_LENGTH
+            z=z + 2 * height
         )
 
         robot.poses = instrument._move(robot.poses, x=x, y=y)

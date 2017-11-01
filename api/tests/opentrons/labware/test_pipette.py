@@ -403,7 +403,7 @@ class PipetteTest(unittest.TestCase):
             ['Blow', 'Well A1'],
             ['Drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -430,7 +430,7 @@ class PipetteTest(unittest.TestCase):
             ['Dispensing', '30', 'Well A2'],
             ['Blow', 'Well A1'],
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -477,7 +477,7 @@ class PipetteTest(unittest.TestCase):
             ['Return'],
             ['Drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
 
     def test_consolidate(self):
@@ -508,7 +508,8 @@ class PipetteTest(unittest.TestCase):
             ['Dispensing', '60', 'Well A2'],
             ['Drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected)
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -535,7 +536,7 @@ class PipetteTest(unittest.TestCase):
             ['Aspirating', '30', 'Well H1'],
             ['Dispensing', '60', 'Well A2'],
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -582,7 +583,7 @@ class PipetteTest(unittest.TestCase):
             ['Dispensing', '30', 'Well A2'],
             ['Drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
 
     def test_transfer(self):
@@ -685,7 +686,8 @@ class PipetteTest(unittest.TestCase):
             ['touch'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected)
         self.robot.clear_commands()
 
     def test_bad_transfer(self):
@@ -756,7 +758,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '100', 'Well B1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected)
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -765,9 +768,6 @@ class PipetteTest(unittest.TestCase):
             self.plate[0:4],
             self.plate[0:2]
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
         expected = [
             ['consolidating', '100'],
             ['transferring', '100'],
@@ -780,7 +780,9 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '200', 'Well B1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -803,7 +805,9 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '100', 'Well D1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
     def test_transfer_volume_control(self):
@@ -825,7 +829,10 @@ class PipetteTest(unittest.TestCase):
             'Dispensing 150.0 uL into <Well B1>',
             'Dropping tip <Well A1>']
 
-        assert expected == self.robot.commands()
+        assert expected == list(filter(
+            lambda s: 'Moving to' not in s,
+            self.robot.commands()
+        ))
 
         self.robot.clear_commands()
 
@@ -992,7 +999,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected)
         self.robot.clear_commands()
 
     def test_transfer_air_gap(self):
@@ -1003,9 +1011,6 @@ class PipetteTest(unittest.TestCase):
             self.plate[1],
             air_gap=20
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
         expected = [
             ['Transferring', '120'],
             ['pick'],
@@ -1016,7 +1021,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '120', 'Well B1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected)
         self.robot.clear_commands()
 
     def test_consolidate_air_gap(self):
@@ -1027,9 +1033,6 @@ class PipetteTest(unittest.TestCase):
             self.plate[2],
             air_gap=20
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
         expected = [
             ['consolidating', '60'],
             ['transferring', '60'],
@@ -1039,7 +1042,8 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '120', 'Well C1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected)
         self.robot.clear_commands()
 
     def test_distribute_air_gap(self):
@@ -1050,9 +1054,6 @@ class PipetteTest(unittest.TestCase):
             self.plate[0:2],
             air_gap=20
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
         expected = [
             ['distributing', '60'],
             ['transferring', '60'],
@@ -1069,7 +1070,9 @@ class PipetteTest(unittest.TestCase):
             ['blow', 'Well A1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
     def test_distribute_air_gap_and_disposal_vol(self):
@@ -1081,9 +1084,6 @@ class PipetteTest(unittest.TestCase):
             air_gap=20,
             disposal_vol=20
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
         expected = [
             ['distributing', '60'],
             ['transferring', '60'],
@@ -1100,7 +1100,9 @@ class PipetteTest(unittest.TestCase):
             ['blow', 'Well A1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
     def test_consolidate_mix(self):
@@ -1112,9 +1114,6 @@ class PipetteTest(unittest.TestCase):
             mix_before=(1, 10),
             mix_after=(1, 10)
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
         expected = [
             ['consolidating', '200'],
             ['transferring', '200'],
@@ -1131,7 +1130,9 @@ class PipetteTest(unittest.TestCase):
             ['dispensing'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
     def test_distribute_mix(self):
@@ -1143,9 +1144,6 @@ class PipetteTest(unittest.TestCase):
             mix_before=(1, 10),
             mix_after=(1, 10)
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
         expected = [
             ['distributing', '200'],
             ['transferring', '200'],
@@ -1162,7 +1160,9 @@ class PipetteTest(unittest.TestCase):
             ['dispensing', '200', 'Well C1'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
     def test_transfer_multichannel(self):
@@ -1176,9 +1176,6 @@ class PipetteTest(unittest.TestCase):
             blow_out=False,
             trash=False
         )
-        # from pprint import pprint
-        # print('\n\n***\n')
-        # pprint(self.robot.commands())
         expected = [
             ['Transferring', '200'],
             ['pick'],
@@ -1187,7 +1184,9 @@ class PipetteTest(unittest.TestCase):
             ['return'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+        fuzzy_assert(self.robot.commands(),
+                     expected=expected
+                     )
         self.robot.clear_commands()
 
     def test_transfer_single_channel(self):
@@ -1201,9 +1200,7 @@ class PipetteTest(unittest.TestCase):
             blow_out=False,
             trash=False
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+
         expected = [
             ['Transferring', '200'],
             ['pick'],
@@ -1242,7 +1239,11 @@ class PipetteTest(unittest.TestCase):
             ['return'],
             ['drop']
         ]
-        fuzzy_assert(result=self.robot.commands(), expected=expected)
+
+        fuzzy_assert(
+            self.robot.commands(),
+            expected=expected
+        )
         self.robot.clear_commands()
 
     def test_touch_tip(self):
@@ -1506,9 +1507,10 @@ class PipetteTest(unittest.TestCase):
         plunge = -7
         return [mock.call(well.top(), strategy='arc')] + \
             [
-                mock.call(well.top(plunge * (i % 2)), strategy='direct')
+                mock.call(well.top(PLUNGE_DISTANCE * (i % 2)),
+                          strategy='direct')
                 for i in range(1, 5)
-            ]
+        ]
 
     def test_drop_tip_to_trash(self):
         self.p200.move_to = mock.Mock()
