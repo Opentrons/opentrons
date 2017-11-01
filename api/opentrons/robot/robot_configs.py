@@ -49,7 +49,7 @@ Ada = robot_config(
 
 Rosalind = robot_config(
     name='Ibn al-Nafis',
-    steps_per_mm='M92 X80 Y80 Z400 A400 B767.38 C767.38',
+    steps_per_mm='M92 X81.474 Y80.16 Z400 A400 B767.38 C767.38',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25',
