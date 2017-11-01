@@ -22,8 +22,8 @@ from functools import lru_cache
 log = get_logger(__name__)
 
 # Avogadro
-# DECK_OFFSET = (31.45, 20.1, 0)
 DECK_OFFSET = (-39.55, -6.9, 0)
+MAX_INSTRUMENT_HEIGHT = 227.0000
 
 
 class InstrumentMosfet(object):
@@ -489,7 +489,7 @@ class Robot(object):
         # use max_z instead
         other_instrument = {instrument} ^ set(self._instruments.values())
         if other_instrument:
-            z = self.max_deck_height() + self.arc_height
+            z = MAX_INSTRUMENT_HEIGHT
             self.poses = other_instrument.pop()._move(self.poses, z=z)
 
         if strategy == 'arc':

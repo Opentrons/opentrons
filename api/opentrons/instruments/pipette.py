@@ -22,6 +22,13 @@ class PipetteTip:
 # This should come from configuration if tip length is not already in db
 DEFAULT_TIP_LENGTH = 46
 
+PLUNGER_POSITIONS = {
+    'top': 17,
+    'bottom': 2,
+    'blow_out': 0,
+    'drop_tip': -7
+}
+
 
 class Pipette:
     """
@@ -138,12 +145,7 @@ class Pipette:
         self.max_volume = max_volume or (min_volume + 1)
 
         # FIXME
-        default_plunger_positions = {
-            'top': 17,
-            'bottom': 0,
-            'blow_out': -1,
-            'drop_tip': -7
-        }
+        default_plunger_positions = PLUNGER_POSITIONS
         self.plunger_positions = {}
         self.plunger_positions.update(default_plunger_positions)
 
@@ -1391,11 +1393,11 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    def _move(self, pose, x=None, y=None, z=None):
-        return self.instrument_mover.move(pose, x, y, z)
+    def _move(self, pose_tree, x=None, y=None, z=None):
+        return self.instrument_mover.move(pose_tree, x, y, z)
 
-    def _jog(self, pose, axis, distance):
-        return self.instrument_mover.jog(pose, axis, distance)
+    def _jog(self, pose_tree, axis, distance):
+        return self.instrument_mover.jog(pose_tree, axis, distance)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)

@@ -54,19 +54,19 @@ class InstrumentMover(object):
         self.mount = mount
         self.instrument = instrument
 
-    def jog(self, pose, axis, distance):
+    def jog(self, pose_tree, axis, distance):
         axis = axis.lower()
-        current = pose_tracker.absolute(pose, self.instrument)
+        current = pose_tracker.absolute(pose_tree, self.instrument)
         current = dict(zip('xyz', current))
-        return self.move(pose, **{axis: current[axis] + distance})
+        return self.move(pose_tree, **{axis: current[axis] + distance})
 
-    def move(self, pose, x=None, y=None, z=None):
+    def move(self, pose_tree, x=None, y=None, z=None):
         # TODO(artyom 20171020): this is needed to have up to date
         # values in pose tree should find a more graceful way to do it
-        pose = self.gantry._update_pose(pose)
-        pose = self.mount._update_pose(pose)
+        pose_tree = self.gantry._update_pose(pose_tree)
+        pose_tree = self.mount._update_pose(pose_tree)
 
-        current = pose_tracker.absolute(pose, self.instrument)
+        current = pose_tracker.absolute(pose_tree, self.instrument)
 
         dx, dy, dz = [
             0 if destination is None else destination - current
@@ -74,19 +74,19 @@ class InstrumentMover(object):
             in zip((x, y, z), current)
         ]
 
-        gantry_x, gantry_y, _ = pose_tracker.absolute(pose, self.gantry)
-        _, _, mount_z = pose_tracker.absolute(pose, self.mount)
+        gantry_x, gantry_y, _ = pose_tracker.absolute(pose_tree, self.gantry)
+        _, _, mount_z = pose_tracker.absolute(pose_tree, self.mount)
 
-        pose = self.gantry.move(pose, x=gantry_x + dx, y=gantry_y + dy)
-        return self.mount.move(pose, z=mount_z + dz)
+        pose_tree = self.gantry.move(pose_tree, x=gantry_x + dx, y=gantry_y + dy)
+        return self.mount.move(pose_tree, z=mount_z + dz)
 
     def probe(self, axis_to_probe, probing_movement):
         if axis_to_probe is 'z':
             axis_to_probe = self.mount.mount_axis
         return self.gantry.probe_axis(axis_to_probe, probing_movement)
 
-    def home(self, pose):
-        return self.mount.home(pose)
+    def home(self, pose_tree):
+        return self.mount.home(pose_tree)
 
 
 class Gantry:
@@ -104,7 +104,7 @@ class Gantry:
         self.left_mount = None
         self.driver = driver
 
-    def _setup_mounts(self, pose):
+    def _setup_mounts(self, pose_tree):
         self.left_mount = Mount(
             self.driver,
             self,
@@ -118,28 +118,28 @@ class Gantry:
             RIGHT_INSTRUMENT_ACTUATOR,
             RIGHT_MOUNT_OFFSET)
 
-        pose = pose_tracker.add(
-            pose,
+        pose_tree = pose_tracker.add(
+            pose_tree,
             self.left_mount,
             self
         )
 
         return pose_tracker.add(
-            pose,
+            pose_tree,
             self.right_mount,
             self
         )
 
-    def move(self, pose, x, y):
+    def move(self, pose_tree, x, y):
         ''' Moves the Gantry in the x, y plane '''
         self.driver.move(x=x, y=y)
-        return self._update_pose(pose)
+        return self._update_pose(pose_tree)
 
-    def _update_pose(self, pose):
-        _, _, z = pose_tracker.get(pose, self)
+    def _update_pose(self, pose_tree):
+        _, _, z = pose_tracker.get(pose_tree, self)
         coordinates = _coords_for_axes(self.driver, self.free_axes)
         return pose_tracker.update(
-            pose,
+            pose_tree,
             self,
             pose_tracker.Point(
                 coordinates['X'],
@@ -148,7 +148,7 @@ class Gantry:
             )
         )
 
-    def mount_instrument(self, pose, instrument, instrument_mount):
+    def mount_instrument(self, pose_tree, instrument, instrument_mount):
         mount_config = {
             'left': (self.left_mount, pose_tracker.Point(*LEFT_MOUNT_OFFSET)),
             'right': (self.right_mount, pose_tracker.Point(*RIGHT_MOUNT_OFFSET))  # NOQA
@@ -157,14 +157,14 @@ class Gantry:
         mount, offset = mount_config[instrument_mount]
         mount.add_instrument(instrument)
 
-        return pose_tracker.add(pose, instrument, mount, offset)
+        return pose_tracker.add(pose_tree, instrument, mount, offset)
 
     def probe_axis(self, axis, probing_movement):
         return self.driver.probe_axis(axis, probing_movement)
 
-    def home(self, pose):
+    def home(self, pose_tree):
         self.driver.home()
-        return self._update_pose(pose)
+        return self._update_pose(pose_tree)
 
 
 class Mount:
@@ -176,16 +176,16 @@ class Mount:
         self.actuator_axis = actuator_axis
         self.offset = offset
 
-    def _update_pose(self, pose):
-        x, y, _ = pose_tracker.get(pose, self)
+    def _update_pose(self, pose_tree):
+        x, y, _ = pose_tracker.get(pose_tree, self)
         mount_z, = _coords_for_axes(self.driver, self.mount_axis).values()
         return pose_tracker.update(
-            pose, self, pose_tracker.Point(
+            pose_tree, self, pose_tracker.Point(
                 x, y, mount_z))
 
-    def move(self, pose, z):
+    def move(self, pose_tree, z):
         self.driver.move(**{self.mount_axis: z})
-        return self._update_pose(pose)
+        return self._update_pose(pose_tree)
 
     def add_instrument(self, instrument):
         if self.instrument is not None:
@@ -201,6 +201,6 @@ class Mount:
         instrument.axis = self.mount_axis
         instrument.mount_obj = self
 
-    def home(self, pose):
+    def home(self, pose_tree):
         self.driver.home(self.mount_axis)
-        return self._update_pose(pose)
+        return self._update_pose(pose_tree)

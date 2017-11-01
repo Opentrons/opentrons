@@ -9,7 +9,7 @@ from opentrons.data_storage import database
 # TODO(artyom 20171031): for some reason was unable to share this
 # constant with opentrons.robot, thus copying it here, until
 # moved to config
-DECK_OFFSET = (-39.55, -6.9, 0)
+DECK_OFFSET = (-44.55, -11.9, 0)
 
 # maximum distance to move during calibration attempt
 PROBE_TRAVEL_DISTANCE = 20
@@ -20,12 +20,12 @@ PROBE_TOP_COORDINATES = array((289.8, 296.4, 65.25)) + DECK_OFFSET
 
 
 def calibrate_container_with_delta(
-        pose, container, delta_x,
+        pose_tree, container, delta_x,
         delta_y, delta_z, save, new_container_name=None
 ):
     delta = Point(delta_x, delta_y, delta_z)
-    new_coordinates = get(pose, container) - delta
-    pose = update(pose, container, new_coordinates)
+    new_coordinates = get(pose_tree, container) - delta
+    pose_tree = update(pose_tree, container, new_coordinates)
     container._coordinates = Vector(*new_coordinates)
     # Since we are potentially changing Z, we want to
     # invalidate cache for max_deck_height
@@ -33,7 +33,7 @@ def calibrate_container_with_delta(
         database.save_new_container(container, new_container_name)
     elif save:
         database.overwrite_container(container)
-    return pose
+    return pose_tree
 
 
 def calibrate_pipette(probing_values, probe):

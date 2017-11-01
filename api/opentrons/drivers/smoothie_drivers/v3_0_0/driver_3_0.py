@@ -23,7 +23,7 @@ HOMED_POSITIONS = {'X': 394, 'Y': 344, 'Z': 227, 'A': 227, 'B': 20, 'C': 20}
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
-DISABLE_AXES = 'BC'
+DISABLE_AXES = ''
 
 SEC_PER_MIN = 60
 POSITION_THRESH = .25
