@@ -9,13 +9,14 @@ from opentrons.containers.placeable import (
 from opentrons.helpers import helpers
 
 
+# This should come from configuration if tip length is not already in db
 DEFAULT_TIP_LENGTH = 53.2
+
 
 class PipetteTip:
     def __init__(self, length):
         self.length = length
 
-# This should come from configuration if tip length is not already in db
 
 class Pipette:
     """

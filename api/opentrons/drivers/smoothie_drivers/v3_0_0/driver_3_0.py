@@ -197,10 +197,8 @@ class SmoothieDriver_3_0_0:
                 raise RuntimeError('Cannot home axis: {}'.format(axis))
 
     def delay(self, seconds):
-        seconds = int(seconds)
-        milliseconds = (seconds % 1.0) * 1000
         command = \
-            GCODES['DWELL'] + 'S' + str(seconds) + 'P' + str(milliseconds)
+            GCODES['DWELL'] + 'S' + str(seconds)
         self._send_command(command)
 
     def probe_axis(self, axis, probing_distance):
