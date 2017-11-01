@@ -195,6 +195,7 @@ button:focus {
   font-size: 14px;
   text-transform: uppercase;
   cursor: pointer;
+  background-color: transparent;
 }
 
 .btn:active {

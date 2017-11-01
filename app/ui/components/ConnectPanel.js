@@ -37,7 +37,7 @@ export default function ConnectPanel (props) {
         <h2>No robots found</h2>
         <p>Connect a robot via USB to use or setup WiFi</p>
         <Button
-          style={styles.btn_refresh}
+          style={classnames(styles.btn_refresh, styles.btn_large)}
           onClick={onScanClick}
         >
           &#x21ba;

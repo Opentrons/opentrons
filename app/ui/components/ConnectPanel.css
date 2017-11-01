@@ -93,16 +93,18 @@ h1 {
   padding: 2rem 1rem;
 }
 
-.btn_refresh {
+.btn_large.btn_refresh {
   display: block;
-  width: 50%;
+  height: 8rem;
   margin: 0 auto;
   border: none;
   font-size: 8rem;
+  background-color: transparent;
   color: silver;
 }
 
-.btn_refresh:hover {
+.btn_large.btn_refresh:hover {
   color: grey;
   background-color: transparent;
 }
+
