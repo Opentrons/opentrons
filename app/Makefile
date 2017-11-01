@@ -3,7 +3,7 @@ SHELL:=/bin/bash
 .PHONY: test clean install package
 
 install:
-	npm up
+	npm install
 
 ui/dist:
 	npm run build-renderer

@@ -40,6 +40,7 @@ before_install:
 
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
+  - node --version
   - pip install pyyaml coveralls
   - cd api && make install && cd ..
   - cd app && make install && cd ..
@@ -83,6 +84,7 @@ deploy:
 
 env:
   global:
+  - OT_NODE_VERSION: 6.11.5  # LTS Boron
   - ENCRYPTION_LABEL: c6cefc96bb2c
   - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
   - secure: XBRwYt3Bowc3klVy6FyXIfeyOBzFzrzMwRJbIz54L8Ov7o2qV8l+5M16iyOy8O8C1qTFMVyCmW3K+xHPQaMstq7rPeVACwJ9VpyQciaDAWVujhyhuN94hU0YtmB1KtmPUHdYCuD25eL5HJ2GDjmYqq/XUYyuX67rrPxT5b5z7Yf4kdkPyBIa5c+KyklYmJLdHGBJUuOfM7qvxOo7nlMyzU+LfgvtqM15g7eQIvXGDydi59lT6FOpW9J9h4Z2Nwmc2lHjxCxi5SI2NIR7K5DsqjtRi0eMcr1m098CA/T1Oh4c5qlG8Uoi+KpOcfcTuAP3VSFdbMgRFmtQ3gwJ71ZPB7GeqvLXSgriACl12n0uienOYrb6/X1Nujsl7Pxjh8KMiIBRcX2/46ecyeN+gP+6u9ic5mPRMFky1e2dqbbUTIeAw7397ufvtIPb0qW4mUMdu4NMkiRg01aF5ZmgVMXvnvQm/xyF+SC0Qtj9uOjZUzsj5DVnLuLHekP3OYpxRzFFzpjBZmdwCsEtwHH8PmuG/owa6Jmf4aXN50dgCL6oRPjWoH213jOdjplGI7ZMZXAigGrN9sT9Om67ZWNuN/TYgy+K3QIp2ELC6MmpJNuH9n8M1pCtynitSyvuW5YhG/j7VH3TKDogID3FOgPYAjfC0EshHt+Kl2GddaR3bpCa3XA=
