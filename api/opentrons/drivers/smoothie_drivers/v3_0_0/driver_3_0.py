@@ -58,6 +58,7 @@ class SmoothieDriver_3_0_0:
 
     def __init__(self):
         self._position = {}
+        self.log = []
         self._update_position({axis: 0 for axis in AXES.lower()})
         self.simulating = True
 
@@ -68,18 +69,18 @@ class SmoothieDriver_3_0_0:
             if value is not None
         })
 
+        self.log += [self._position.copy()]
+
     def update_position(self, is_retry=False):
         if self.simulating:
             updated_position = self._position
-
         else:
             try:
                 position_response = \
                     self._send_command(GCODES['CURRENT_POSITION'])
                 updated_position = \
                     _parse_axis_values(position_response)
-            #TODO jmg 10/27: once we have a more concrete idea of how to do
-            #driver error recover, this should be a logged warning rather than an exception
+                # TODO jmg 10/27: log warning rather than an exception
             except TypeError as e:
                 if is_retry:
                     raise e
@@ -170,7 +171,6 @@ class SmoothieDriver_3_0_0:
             axis: value
             for axis, value in zip('xyzabc', [x, y, z, a, b, c])
         })
-
 
     def home(self, axis=None):
         if not axis:
