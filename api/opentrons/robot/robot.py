@@ -15,15 +15,15 @@ from opentrons.data_storage import database
 from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
+from .robot_configs import current_config
 
 from numpy import add, subtract
 from functools import lru_cache
 
 log = get_logger(__name__)
 
-# Avogadro
-DECK_OFFSET = (-39.55, -6.9, 0)
-MAX_INSTRUMENT_HEIGHT = 227.0000
+DECK_OFFSET = current_config().deck_offset
+MAX_INSTRUMENT_HEIGHT = 220
 
 
 class InstrumentMosfet(object):
