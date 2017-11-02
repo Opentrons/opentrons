@@ -29,16 +29,33 @@ const getConnectionState = (state) => getState(state).connection
 const getSessionState = (state) => getState(state).session
 const getCalibrationState = (state) => getState(state).calibration
 
+export function getIsScanning (state) {
+  return getConnectionState(state).isScanning
+}
+
+export function getDiscovered (state) {
+  const {
+    discovered,
+    discoveredByHostname,
+    connectedTo
+  } = getConnectionState(state)
+
+  return discovered.map((hostname) => ({
+    ...discoveredByHostname[hostname],
+    isConnected: connectedTo === hostname
+  }))
+}
+
 export function getConnectionStatus (state) {
   const {
-    isConnected,
+    connectedTo,
     connectRequest: {inProgress: isConnecting},
     disconnectRequest: {inProgress: isDisconnecting}
   } = getConnectionState(state)
 
-  if (!isConnected && isConnecting) return CONNECTING
-  if (isConnected && !isDisconnecting) return CONNECTED
-  if (isConnected && isDisconnecting) return DISCONNECTING
+  if (!connectedTo && isConnecting) return CONNECTING
+  if (connectedTo && !isDisconnecting) return CONNECTED
+  if (connectedTo && isDisconnecting) return DISCONNECTING
 
   return DISCONNECTED
 }

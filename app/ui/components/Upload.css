@@ -1,5 +1,5 @@
 /* Upload component styles */
-@value red, blue from './Util.css';
+@value red, blue from './App.global.css';
 
 .spinner {
   width: 8rem;

@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import NavPanel from './NavPanel'
+import {Discover, ControlledUSB} from './icons'
 import ToolTip from './ToolTip'
 import styles from './SideBar.css'
 
@@ -25,15 +26,13 @@ function NavLink (props) {
 const ConnectionIndicator = props => {
   const {isConnected, onNavIconClick, isActive} = props
   // TODO(mc): handle connection in progress (state is in place for this)
-  const style = isConnected
-    ? styles.connected
-    : styles.disconnected
+  const controlledIcon = isConnected
+    ? <ControlledUSB />
+    : <Discover />
   const toolTipMessage = 'Connect Robot'
   return (
     <div className={classnames({[styles.active]: isActive}, styles.connection_status, 'tooltip_parent')} onClick={onNavIconClick('connect')}>
-      <div className={styles.status}>
-        <div className={style} />
-      </div>
+      {controlledIcon}
       <ToolTip msg={toolTipMessage} pos='left' />
     </div>
   )

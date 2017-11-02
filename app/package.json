@@ -74,11 +74,11 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-react-optimize": "^1.0.1",
     "babel-register": "^6.24.1",
+    "bonjour": "^3.5.0",
     "classnames": "^2.2.5",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
-    "devtron": "^1.4.0",
     "electron": "1.6.11",
     "electron-builder": "~19.27.3",
     "electron-builder-squirrel-windows": "~19.27.3",
@@ -114,7 +114,7 @@
     "webpack-bundle-analyzer": "^2.8.2",
     "webpack-dev-server": "~2.4.5",
     "winston": "^2.2.0",
-    "worker-loader": "0.8.0",
+    "worker-loader": "^1.1.0",
     "ws": "^3.1.0"
   },
   "dependencies": {

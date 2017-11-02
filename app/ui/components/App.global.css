@@ -1,3 +1,9 @@
+@value blue: #006FFF;
+@value teal: #05C1B3;
+@value mustard: #FFD252;
+@value green: #7ed321;
+@value red: #F00000;
+
 * {
   box-sizing: border-box;
 }
@@ -51,6 +57,29 @@ body {
 
 .flex__justify_center {
   justify-content: center;
+}
+
+/*** TYPOGRAPHY ***/
+@font-face {
+  font-family: 'trons';
+  src: url('../fonts/Geogtq-Rg-webfont.woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'sans';
+  src: url('../fonts/OpenSans-Regular-webfont.woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+.sans {
+  font-family: sans;
+}
+
+.trons {
+  font-family: trons;
 }
 
 /*** TOOLTIPS ***/
@@ -147,4 +176,53 @@ body {
 
 .tooltip_hidden .tooltip_left {
   display: none;
+}
+
+/*** BUTTONS ***/
+button {
+  border: none;
+}
+
+button:focus {
+  outline: 0;
+}
+
+.btn {
+  height: 2.5rem;
+  line-height: 2.5rem;
+  border-radius: 2px;
+  font-family: 'sans';
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.btn:active {
+  outline: none;
+  border: none;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.btn_light {
+  border: 1px solid silver;
+  background-color: #fff;
+  color: #666;
+}
+
+.btn_light:hover {
+  background-color: #eee;
+}
+
+.btn_dark {
+  background-color: #9b9b9b;
+  color: white;
+}
+
+.btn_dark:hover {
+  background-color: #777;
 }

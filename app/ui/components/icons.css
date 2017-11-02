@@ -1,5 +1,5 @@
 /* styles for icon components */
-@value red, green from './Util.css';
+@value red, green from './App.global.css';
 
 .circle {
   display: inline-block;
