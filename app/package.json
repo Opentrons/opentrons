@@ -124,7 +124,7 @@
     "electron-log": "^2.2.9",
     "electron-settings": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
-    "moment-timezone": "^0.5.13",
+    "moment": "^2.19.1",
     "shelljs": "^0.7.8",
     "zip-folder": "^1.0.0"
   }

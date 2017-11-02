@@ -6,6 +6,5 @@ trap 'exit' ERR
 export DISPLAY=':99.0'
 Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
-# We are managing Node versions through nvm, installing latest LTS version
-# nvm is pre-installed in Travis
-nvm install --lts && nvm use --lts
+# nvm is pre-installed in Travis Linux
+nvm install $OT_NODE_VERSION && nvm use $OT_NODE_VERSION
