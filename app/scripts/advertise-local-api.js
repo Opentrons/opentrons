@@ -5,7 +5,7 @@ const bonjour = require('bonjour')()
 console.log('Publishing local MDNS service for API')
 
 const service = bonjour.publish({
-  name: 'ot-local-api',
+  name: 'opentrons-local-api',
   host: 'localhost',
   port: 31950,
   // TODO(mc, 2017-10-26): we're relying right now on the fact that resin
