@@ -50,8 +50,10 @@ script:
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   # TODO(mc, 2017-08-28): use top level `make test`
   - make -C api test exe
-  - > # Make docs on linux only
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
+  - make -C api lint
+  # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
+  # - > # Make docs on linux only
+  #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
   # TODO(mc, 2017-08-28): use top level `make test`
   # TODO(mc, 2017-09-13): handle cross-platform distributables
   - make -C app package test && make -C app dist-${TRAVIS_OS_NAME}

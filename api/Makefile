@@ -8,11 +8,14 @@ install:
 	pip install -r requirements.txt && pip install -e .
 
 test:
-	python -m pylama opentrons tests && python -m pytest \
+	python -m pytest \
 		--cov=opentrons \
 		--cov-report term-missing:skip-covered \
 		--cov-report xml:coverage.xml \
 		tests
+
+lint:
+	python -m pylama opentrons tests
 
 docs:
 	cd docs && make html && make doctest

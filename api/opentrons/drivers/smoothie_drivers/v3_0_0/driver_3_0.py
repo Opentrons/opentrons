@@ -19,9 +19,13 @@ DEFAULT_STEPS_PER_MM = 'M92 X81.474 Y80.16 Z400 A400 B767.38 C767.38'  # Frankli
 
 #DEFAULT_STEPS_PER_MM = 'M92 X160 Y160 Z800 A800 B767.38 C767.38'  # Ibn
 
+PLUNGER_CURRENT_LOW = '0.1'
+PLUNGER_CURRENT_HIGH = '0.5'
+
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X300 Y200 Z50 A50 B8 C8'
 DEFAULT_ACCELERATION = 'M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000'
-DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B0.6 C0.6'
+DEFAULT_CURRENT_CONTROL = 'M907 X1.0 Y1.2 Z0.9 A0.9 B{0} C{0}'.format(
+    PLUNGER_CURRENT_LOW)
 
 
 MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
@@ -125,6 +129,7 @@ class SmoothieDriver_3_0_0:
             GCODES['SET_POWER'], axis.upper(), str(value)
         )
         self._send_command(command)
+        self._send_command(GCODES['DWELL'])
 
     # ----------- Private functions --------------- #
 
@@ -137,13 +142,23 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
-        command_line = command + ' M400'
         if self.simulating:
             pass
         else:
-            return serial_communication.write_and_return(
+            moving_plunger = ('B' in command or 'C' in command) \
+                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+
+            if moving_plunger:
+                self.set_power('BC', PLUNGER_CURRENT_HIGH)
+
+            command_line = command + ' M400'
+            ret_code = serial_communication.write_and_return(
                 command_line, self.connection, timeout)
 
+            if moving_plunger:
+                self.set_power('BC', PLUNGER_CURRENT_LOW)
+
+            return ret_code
     def _setup(self):
         self._reset_from_error()
         self._send_command(DEFAULT_ACCELERATION)
