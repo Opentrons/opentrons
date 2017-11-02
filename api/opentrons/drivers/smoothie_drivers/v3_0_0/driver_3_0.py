@@ -44,7 +44,7 @@ GCODES = {'HOME': 'G28.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
           'SET_SPEED': 'G0F',
-          'SET_POWER': 'M907'}
+          'SET_CURRENT': 'M907'}
 
 
 def _parse_axis_values(raw_axis_values):
@@ -128,7 +128,7 @@ class SmoothieDriver_3_0_0:
         return self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
 
     @property
-    def power(self):
+    def current(self):
         pass
 
     @property
@@ -141,15 +141,15 @@ class SmoothieDriver_3_0_0:
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
-    def set_power(self, axis, value):
+    def set_current(self, axes, value):
         ''' set total movement speed in mm/second'''
-        command = '{}{}{}'.format(
-            GCODES['SET_POWER'],
-            axis.upper(),
-            value
+        values = ['{}{}'.format(axis, value) for axis in axes]
+        command = '{} {}'.format(
+            GCODES['SET_CURRENT'],
+            ' '.join(values)
         )
         self._send_command(command)
-        self._send_command(GCODES['DWELL'])
+        self.delay(0.05)
 
     # ----------- Private functions --------------- #
 
@@ -169,14 +169,14 @@ class SmoothieDriver_3_0_0:
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
 
             if moving_plunger:
-                self.set_power('BC', PLUNGER_CURRENT_HIGH)
+                self.set_current('BC', PLUNGER_CURRENT_HIGH)
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
-                command_line, self.connection, timeout)
+                command_line, self._connection, timeout)
 
             if moving_plunger:
-                self.set_power('BC', PLUNGER_CURRENT_LOW)
+                self.set_current('BC', PLUNGER_CURRENT_LOW)
 
             return ret_code
 
@@ -194,7 +194,6 @@ class SmoothieDriver_3_0_0:
     def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
         from numpy import isclose
         target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
-        print('driver: ', target_position)
 
         def valid_movement(coords, axis):
             return not (
@@ -260,9 +259,11 @@ class SmoothieDriver_3_0_0:
         return homed
 
     def delay(self, seconds):
-        command = '{code}P{ms}'.format(
+        # per http://smoothieware.org/supported-g-codes:
+        # In grbl mode P is float seconds to comply with gcode standards
+        command = '{code}P{seconds}'.format(
             code=GCODES['DWELL'],
-            ms=int(seconds * 1000)
+            seconds=seconds
         )
         self._send_command(command)
 

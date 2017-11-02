@@ -1,4 +1,5 @@
 import pytest
+from tests.opentrons.conftest import fuzzy_assert
 
 
 @pytest.fixture
@@ -20,21 +21,43 @@ def position(x, y, z, a, b, c):
 
 def test_plunger_commands(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
+    from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
     command_log = []
     smoothie.simulating = False
 
-    def write_with_log(command):
+    def write_with_log(command, connection, timeout):
         command_log.append(command)
-        return serial_communication.DRIVER_ACK
+        return serial_communication.DRIVER_ACK.decode()
+
+    def _parse_axis_values(arg):
+        return smoothie.position
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
+    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
     smoothie.home()
     smoothie.move(x=0, y=1, z=2, a=3)
     smoothie.move(x=0, y=1, z=2, a=3, b=4, c=5)
 
-    assert command_log == []
+    fuzzy_assert(
+        result=command_log,
+        expected=[
+            ['M907 B0.5 C0.5 M400'],              # Set plunger current high
+            ['G4P0.05 M400'],                     # Dwell
+            ['G28.2[ABCZ]+ G28.2X G28.2Y M400'],  # Home
+            ['M907 B0.1 C0.1 M400'],              # Set plunger current low
+            ['G4P0.05 M400'],                       # Dwell
+            ['M114.2 M400'],                      # Get position
+            ['M114.2 M400'],                      # Get position
+            ['G0.+ M400'],                        # Move (non-plunger)
+            ['M907 B0.5 C0.5 M400'],              # Set plunger current high
+            ['G4P0.05 M400'],                       # Dwell
+            ['G0.+[BC].+ M400'],                  # Move (including BC)
+            ['M907 B0.1 C0.1 M400'],              # Set plunger current low
+            ['G4P0.05 M400']                      # Dwell
+        ]
+    )
 
 
 def test_functional(smoothie):
