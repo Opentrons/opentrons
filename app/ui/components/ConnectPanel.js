@@ -44,13 +44,6 @@ export default function ConnectPanel (props) {
         </Button>
       </div>
     )
-  } else if (isScanning && discovered.length === 0) {
-    searchStyles = classnames(styles.robot_results, styles.centered)
-    discoveredRobots = (
-      <div className={searchStyles}>
-        <Spinner className={styles.spinner} />
-      </div>
-    )
   } else {
     searchStyles = classnames(styles.robot_results)
     discoveredRobots = (

@@ -28,9 +28,11 @@ const {
 
 describe('robot selectors', () => {
   test('getIsScanning', () => {
-    const state = {connection: {isScanning: true}}
-
+    let state = {connection: {isScanning: true}}
     expect(getIsScanning(makeState(state))).toBe(true)
+
+    state = {connection: {isScanning: false}}
+    expect(getIsScanning(makeState(state))).toBe(false)
   })
 
   test('getDiscovered', () => {

@@ -61,7 +61,6 @@ export const actions = {
     return {type: actionTypes.DISCOVER_FINISH}
   },
 
-  // TODO(mc): connect should take a URL or robot identifier
   connect (hostname) {
     return makeRobotAction({type: actionTypes.CONNECT, payload: {hostname}})
   },
@@ -74,7 +73,6 @@ export const actions = {
     return action
   },
 
-  // TODO(mc, 2017-09-07): disconnect should take a URL or robot identifier
   disconnect () {
     return makeRobotAction({type: actionTypes.DISCONNECT})
   },

@@ -3,7 +3,7 @@ import Bonjour from 'bonjour'
 
 import {actions} from '../actions'
 
-const NAME_RE = /^ot/
+const NAME_RE = /^opentrons/
 const DISCOVERY_TIMEOUT_MS = 30000
 const UP_EVENT = 'up'
 const DOWN_EVENT = 'down'

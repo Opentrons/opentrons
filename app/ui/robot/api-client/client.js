@@ -8,6 +8,7 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 import {handleDiscover} from './discovery'
 
+// TODO(mc, 2017-11-01): get port from MDNS once API advertises proper port
 const PORT = 31950
 const RUN_TIME_TICK_INTERVAL_MS = 200
 const NO_INTERVAL = -1

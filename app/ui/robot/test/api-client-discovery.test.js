@@ -60,9 +60,9 @@ describe('api client - discovery', () => {
   test('dispatches ADD_DISCOVEREDs on new services', () => {
     // TODO(mc, 2017-10-30): change type to http when API advertises correctly
     const services = [
-      {name: 'ot-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
-      {name: 'ot-2', host: 'ot-2.local', port: '31950', type: 'ssh'},
-      {name: 'ot-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
+      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
+      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'ssh'},
+      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
     ]
 
     return sendToClient({}, actions.discover())
@@ -75,9 +75,9 @@ describe('api client - discovery', () => {
   test('dispatches REMOVE_DISCOVEREDs on service downs', () => {
     // TODO(mc, 2017-10-30): change type to http when API advertises correctly
     const services = [
-      {name: 'ot-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
-      {name: 'ot-2', host: 'ot-2.local', port: '31950', type: 'ssh'},
-      {name: 'ot-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
+      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
+      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'ssh'},
+      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
     ]
 
     return sendToClient({}, actions.discover())
@@ -91,7 +91,7 @@ describe('api client - discovery', () => {
     return sendToClient({}, actions.discover())
       .then(() => jest.runTimersToTime(30000))
       .then(() => browser.emit('up', {
-        name: 'ot-1',
+        name: 'opentrons-1',
         host: 'ot-1.local',
         port: '31950',
         type: 'ssh'
@@ -105,7 +105,7 @@ describe('api client - discovery', () => {
     return sendToClient({}, actions.discover())
       .then(() => jest.runTimersToTime(30000))
       .then(() => browser.emit('down', {
-        name: 'ot-1',
+        name: 'opentrons-1',
         host: 'ot-1.local',
         port: '31950',
         type: 'ssh'
@@ -117,9 +117,9 @@ describe('api client - discovery', () => {
 
   test('only dispatches for hosts with "ot" in the name', () => {
     const services = [
-      {name: 'ot-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
+      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
       {name: 'nope', host: 'nope.local', port: '31950', type: 'ssh'},
-      {name: 'ot-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
+      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
     ]
 
     return sendToClient({}, actions.discover())

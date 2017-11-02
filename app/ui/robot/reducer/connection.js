@@ -112,7 +112,6 @@ function handleDisconnect (state, action) {
   return {...state, disconnectRequest: {inProgress: true, error: null}}
 }
 
-// TODO(mc, 2017-10-04): disconnect response actions are not FSA compliant
 function handleDisconnectResponse (state, action) {
   const {error: didError} = action
   let connectedTo = ''

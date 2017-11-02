@@ -18,17 +18,7 @@ export default function RobotItem (props) {
   let connectionToggle
   let connectionStatus
 
-  if (!isConnected) {
-    connectionStatus = <AvailableUSB className={styles.connection_type} />
-    connectionToggle = (
-      <Button
-        onClick={onConnectClick}
-        style={classnames('btn', 'btn_dark', styles.btn_connect)}
-      >
-        Take Control
-      </Button>
-    )
-  } else {
+  if (isConnected) {
     connectionStatus = <ControlledUSB className={styles.connection_type} />
     connectionToggle = (
       <span>
@@ -39,6 +29,16 @@ export default function RobotItem (props) {
           Release Control
         </Button>
       </span>
+    )
+  } else {
+    connectionStatus = <AvailableUSB className={styles.connection_type} />
+    connectionToggle = (
+      <Button
+        onClick={onConnectClick}
+        style={classnames('btn', 'btn_dark', styles.btn_connect)}
+      >
+        Take Control
+      </Button>
     )
   }
 
