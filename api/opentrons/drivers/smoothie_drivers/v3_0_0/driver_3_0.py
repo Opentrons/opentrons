@@ -1,6 +1,7 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
-from opentrons.robot.robot_configs import config
+from opentrons.robot.robot_configs import \
+    config, PLUNGER_CURRENT_LOW, PLUNGER_CURRENT_HIGH
 
 
 '''
@@ -12,12 +13,9 @@ from opentrons.robot.robot_configs import config
   or knowing anything about what the axes are used for
 '''
 
-# TODO(artyom, ben 20171026): move to config
-DEFAULT_STEPS_PER_MM = config.steps_per_mm
-DEFAULT_MAX_AXIS_SPEEDS = config.max_speeds
-DEFAULT_ACCELERATION = config.acceleration
-DEFAULT_CURRENT_CONTROL = config.current
-HOMING_OFFSETS = 'M206 X0'
+# TODO (ben 2017112): figure out why fw setting wasn't working on Avogadro
+# and remove this
+HOMING_OFFSETS = 'M206 X5'
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
@@ -34,6 +32,7 @@ AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
 DISABLE_AXES = ''
 
+MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
 SEC_PER_MIN = 60
 
 GCODES = {'HOME': 'G28.2',
@@ -150,6 +149,7 @@ class SmoothieDriver_3_0_0:
             value
         )
         self._send_command(command)
+        self._send_command(GCODES['DWELL'])
 
     # ----------- Private functions --------------- #
 
@@ -162,11 +162,23 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
-        command_line = command + ' M400'
+        if self.simulating:
+            pass
+        else:
+            moving_plunger = ('B' in command or 'C' in command) \
+                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
 
-        if not self.simulating:
-            return serial_communication.write_and_return(
-                command_line, self._connection, timeout)
+            if moving_plunger:
+                self.set_power('BC', PLUNGER_CURRENT_HIGH)
+
+            command_line = command + ' M400'
+            ret_code = serial_communication.write_and_return(
+                command_line, self.connection, timeout)
+
+            if moving_plunger:
+                self.set_power('BC', PLUNGER_CURRENT_LOW)
+
+            return ret_code
 
     def _setup(self):
         self._reset_from_error()
