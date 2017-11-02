@@ -1,9 +1,7 @@
+from .robot_configs import config
 
-probe_center = {'z': 68.0, 'x': 268.4, 'y': 291.8181}  # Ibn
-probe_dimensions = {'length': 47.74, 'width': 38, 'height': 63}
-
-# probe_center = {'z': 57.81, 'x': 259.8, 'y': 298.875} # Avagadro
-# probe_dimensions = {'length': 41, 'width': 38.7, 'height':67.81}
+probe_center = config.probe_center
+probe_dimensions = config.probe_dimensions
 
 
 class Probe:
