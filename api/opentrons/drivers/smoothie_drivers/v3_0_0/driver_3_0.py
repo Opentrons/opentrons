@@ -65,7 +65,7 @@ class SmoothieDriver_3_0_0:
     def __init__(self):
         self._position = {}
         self.log = []
-        self._update_position({axis: 0 for axis in AXES.lower()})
+        self._update_position({axis: 0 for axis in AXES})
         self.simulating = True
         self._connection = None
 
@@ -82,7 +82,8 @@ class SmoothieDriver_3_0_0:
             default = self._position
 
         if self.simulating:
-            updated_position = default
+            updated_position = self._position.copy()
+            updated_position.update(**default)
 
         if not self.simulating:
             try:
@@ -95,7 +96,7 @@ class SmoothieDriver_3_0_0:
                 if is_retry:
                     raise e
                 else:
-                    self.update_position(is_retry=True)
+                    self.update_position(default=default, is_retry=True)
 
         self._update_position(updated_position)
 
@@ -179,14 +180,13 @@ class SmoothieDriver_3_0_0:
         self._send_command(DEFAULT_STEPS_PER_MM)
         self._send_command(HOMING_OFFSETS)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.home()
-
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
     def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
         from numpy import isclose
         target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
+        print('driver: ', target_position)
 
         def valid_movement(coords, axis):
             return not (

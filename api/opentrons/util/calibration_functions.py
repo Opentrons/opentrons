@@ -16,7 +16,7 @@ PROBE_TRAVEL_DISTANCE = 20
 # size along X, Y and Z
 PROBE_SIZE = array((30.0, 30, 25.5))
 # coordinates of the top of the probe
-PROBE_TOP_COORDINATES = array((289.8, 296.4, 65.25)) + DECK_OFFSET
+PROBE_TOP_COORDINATES = array((289.8, 296.4, 60.25)) + DECK_OFFSET
 
 
 def calibrate_container_with_delta(

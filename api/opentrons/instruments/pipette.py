@@ -1063,7 +1063,7 @@ class Pipette:
         seconds = seconds % 60
         seconds += float(minutes * 60)
 
-        self.instrument_actuator.wait(seconds)
+        self.instrument_actuator.delay(seconds)
 
         return self
 

@@ -2,7 +2,7 @@ from opentrons.trackers import pose_tracker
 
 # TODO(artyom 20171026): move to config
 RIGHT_MOUNT_OFFSET = (0.0, 0.0, 0.0)
-LEFT_MOUNT_OFFSET = (-37.14, 32.12, -2.5)
+LEFT_MOUNT_OFFSET = (-37.14, 32.12, +2.5)
 
 LEFT_INSTRUMENT_ACTUATOR = 'b'
 RIGHT_INSTRUMENT_ACTUATOR = 'c'
@@ -64,7 +64,7 @@ class InstrumentMover(object):
         # values in pose tree should find a more graceful way to do it
         pose_tree = self.gantry._update_pose(pose_tree)
         pose_tree = self.mount._update_pose(pose_tree)
-
+        print('will move to [x, y, z]', [x, y, z])
         current = pose_tracker.absolute(pose_tree, self.instrument)
 
         dx, dy, dz = [
