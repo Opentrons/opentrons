@@ -22,7 +22,7 @@ from functools import lru_cache
 
 log = get_logger(__name__)
 
-DECK_OFFSET = config().deck_offset
+DECK_OFFSET = config.deck_offset
 MAX_INSTRUMENT_HEIGHT = 220.0000
 
 
