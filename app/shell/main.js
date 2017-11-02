@@ -73,7 +73,9 @@ function createWindow () {
     height: 768,
     webPreferences: {
       devTools: DEV_MODE || DEBUG_MODE,
-      experimentalFeatures: true
+      experimentalFeatures: true,
+      // node integration needed for mdns robot discovery
+      nodeIntegrationInWorker: true
     }
   })
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import moment from 'moment'
 import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
@@ -37,7 +38,7 @@ export default function RunControl (props) {
     runButton = (
       <button
         onClick={onRunClick}
-        className={styles.btn_run}
+        className={classnames('btn', 'btn_light', styles.btn_run)}
         disabled={!isReadyToRun}
       >
         Run Job
@@ -47,7 +48,7 @@ export default function RunControl (props) {
     pauseResumeButton = (
       <button
         onClick={onPauseResumeClick}
-        className={styles.btn_pause}
+        className={classnames('btn', 'btn_light', styles.btn_pause)}
         disabled={!isRunning}
       >
         {pauseResumeText}
@@ -56,7 +57,7 @@ export default function RunControl (props) {
     cancelButton =
       <button
         onClick={onCancelClick}
-        className={styles.btn_cancel}
+        className={classnames('btn', 'btn_light', styles.btn_cancel)}
         disabled={!isRunning}
       >
         Cancel Job

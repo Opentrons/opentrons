@@ -77,7 +77,11 @@ dist-win: $(ui_target) $(shell_source)
 
 .PHONY: dev
 dev: clean
-	$(bin)/concurrently "$(MAKE) dev-server" "sleep 1 && $(MAKE) dev-app"
+	$(bin)/concurrently \
+		"$(MAKE) dev-server" \
+		"$(MAKE) dev-mdns" \
+		"sleep 3 && $(MAKE) dev-app" \
+
 
 .PHONY: dev-server
 dev-server:
@@ -86,6 +90,11 @@ dev-server:
 .PHONY: dev-app
 dev-app:
 	$(env)=development PORT=$(port) $(bin)/electron shell/main.js
+
+# TODO(mc, 2017-10-31): remove when API is capable of advertising itself
+.PHONY: dev-mdns
+dev-mdns:
+	$(env)=development node scripts/advertise-local-api.js
 
 # checks
 #####################################################################

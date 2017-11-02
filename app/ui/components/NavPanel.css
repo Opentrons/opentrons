@@ -15,10 +15,9 @@
   padding: 1rem 0.5rem 0.5rem;
 }
 
-.btn {
-  composes: btn from './Util.css';
-  width: 100%;
+.btn_upload {
   display: block;
+  width: 100%;
   height: 2.5rem;
   line-height: 2.5rem;
   padding-left: 2rem;
@@ -26,18 +25,9 @@
   background-size: 1rem;
   background-repeat: no-repeat;
   background-position: 0.5rem center;
-}
-
-.btn_upload {
-  composes: btn;
   background-color: #999;
   color: white;
   background-image: url(../../ui/img/icon_fileupload.png);
-}
-
-.btn_new {
-  composes: btn;
-  background-image: url(../../ui/img/icon_filenew.svg);
 }
 
 .file {
@@ -66,25 +56,4 @@
   border-radius: 6px;
   font-size: 1rem;
   text-align: center;
-}
-
-/* Connect */
-
-.connection_toggle {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 0.75rem 1rem;
-}
-
-.btn_connect {
-  composes: btn;
-  padding-left: 0;
-  text-align: center;
-  background-color: #999;
-  color: white;
-}
-
-.btn_connect:hover,
-.btn_upload:hover {
-  background-color: #777;
 }

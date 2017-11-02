@@ -7,7 +7,11 @@ const makeRobotActionName = (action) => makeActionName(NAME, action)
 const makeRobotAction = (action) => ({...action, meta: {robotCommand: true}})
 
 export const actionTypes = {
-  // connect and disconnect
+  // discovery, connect, and disconnect
+  DISCOVER: makeRobotActionName('DISCOVER'),
+  DISCOVER_FINISH: makeRobotActionName('DISCOVER_FINISH'),
+  ADD_DISCOVERED: makeRobotActionName('ADD_DISCOVERED'),
+  REMOVE_DISCOVERED: makeRobotActionName('REMOVE_DISCOVERED'),
   CONNECT: makeRobotActionName('CONNECT'),
   CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
   DISCONNECT: makeRobotActionName('DISCONNECT'),
@@ -49,9 +53,16 @@ export const actionTypes = {
 }
 
 export const actions = {
-  // TODO(mc): connect should take a URL or robot identifier
-  connect () {
-    return makeRobotAction({type: actionTypes.CONNECT})
+  discover () {
+    return makeRobotAction({type: actionTypes.DISCOVER})
+  },
+
+  discoverFinish () {
+    return {type: actionTypes.DISCOVER_FINISH}
+  },
+
+  connect (hostname) {
+    return makeRobotAction({type: actionTypes.CONNECT, payload: {hostname}})
   },
 
   connectResponse (error) {
@@ -62,7 +73,6 @@ export const actions = {
     return action
   },
 
-  // TODO(mc, 2017-09-07): disconnect should take a URL or robot identifier
   disconnect () {
     return makeRobotAction({type: actionTypes.DISCONNECT})
   },
@@ -73,6 +83,14 @@ export const actions = {
     if (didError) action.payload = error
 
     return action
+  },
+
+  addDiscovered (hostname) {
+    return {type: actionTypes.ADD_DISCOVERED, payload: {hostname}}
+  },
+
+  removeDiscovered (hostname) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: {hostname}}
   },
 
   // get session or make new session with protocol file

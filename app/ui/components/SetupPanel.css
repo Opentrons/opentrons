@@ -4,7 +4,7 @@
   height: 100%;
   padding: 0 1rem;
   grid-template:
-    'title' 75px
+    'title' 4rem
     'details' 40rem
     'btn_bottom' auto;
   font-family: 'sans';
@@ -19,12 +19,13 @@
   top: 0.25rem;
 }
 
-h1 {
+.title {
   grid-area: title;
   padding: 0;
   margin: 0;
   line-height: 3.5rem;
   font-size: 1.25rem;
+  border-bottom: none;
 }
 
 .links {
@@ -134,7 +135,6 @@ li:nth-child(odd) a.btn_labware {
 }
 
 .run_link {
-  composes: btn from './Util.css';
   text-align: center;
   width: 100%;
   display: block;

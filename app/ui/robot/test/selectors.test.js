@@ -4,6 +4,8 @@ import {NAME, selectors, constants} from '../'
 const makeState = (state) => ({[NAME]: state})
 
 const {
+  getIsScanning,
+  getDiscovered,
   getConnectionStatus,
   getUploadInProgress,
   getUploadError,
@@ -25,10 +27,36 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
+  test('getIsScanning', () => {
+    let state = {connection: {isScanning: true}}
+    expect(getIsScanning(makeState(state))).toBe(true)
+
+    state = {connection: {isScanning: false}}
+    expect(getIsScanning(makeState(state))).toBe(false)
+  })
+
+  test('getDiscovered', () => {
+    const state = {
+      connection: {
+        connectedTo: 'abcdef.local',
+        discovered: ['abcdef.local', '123456.local'],
+        discoveredByHostname: {
+          'abcdef.local': {hostname: 'abcdef.local'},
+          '123456.local': {hostname: '123456.local'}
+        }
+      }
+    }
+
+    expect(getDiscovered(makeState(state))).toEqual([
+      {hostname: 'abcdef.local', isConnected: true},
+      {hostname: '123456.local', isConnected: false}
+    ])
+  })
+
   test('getConnectionStatus', () => {
     const state = {
       connection: {
-        isConnected: false,
+        connectedTo: '',
         connectRequest: {inProgress: false},
         disconnectRequest: {inProgress: false}
       }
@@ -36,21 +64,21 @@ describe('robot selectors', () => {
     expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTED)
 
     state.connection = {
-      isConnected: false,
+      connectedTo: '',
       connectRequest: {inProgress: true},
       disconnectRequest: {inProgress: false}
     }
     expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTING)
 
     state.connection = {
-      isConnected: true,
+      connectedTo: 'ot.local',
       connectRequest: {inProgress: false},
       disconnectRequest: {inProgress: false}
     }
     expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
 
     state.connection = {
-      isConnected: true,
+      connectedTo: 'ot.local',
       connectRequest: {inProgress: false},
       disconnectRequest: {inProgress: true}
     }
