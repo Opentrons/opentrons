@@ -1,17 +1,23 @@
+# TODO: jmg 11/2 This file is meant to be a temporary
+# fix to make development easier and should be removed
+# once this configuration information is part of persistent robot data
+
 from collections import namedtuple
 
 CURRENT_ROBOT = 'B2-5'
 
 robot_config = namedtuple(
     'robot_config',
-    'name '
-    'steps_per_mm '
-    'max_speeds '
-    'acceleration '
-    'current '
-    'deck_offset '
-    'probe_center '
-    'probe_dimensions'
+    [
+        'name',
+        'steps_per_mm',
+        'max_speeds',
+        'acceleration',
+        'current',
+        'deck_offset',
+        'probe_center',
+        'probe_dimensions'
+    ]
 )
 
 Ibn = robot_config(
@@ -26,7 +32,7 @@ Ibn = robot_config(
 )
 
 Amadeo = robot_config(
-    name='Ibn al-Nafis',
+    name='Amedeo Avogadro',
     steps_per_mm='M92 X80 Y80 Z400 A400 B767.38 C767.38',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
@@ -37,7 +43,7 @@ Amadeo = robot_config(
 )
 
 Ada = robot_config(
-    name='Ibn al-Nafis',
+    name='Ada Lovelace',
     steps_per_mm='M92 X80 Y80 Z400 A400 B767.38 C767.38',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
@@ -48,8 +54,8 @@ Ada = robot_config(
 )
 
 Rosalind = robot_config(
-    name='Ibn al-Nafis',
-    steps_per_mm='M92 X81.474 Y80.16 Z400 A400 B767.38 C767.38',
+    name='Rosalind Franklin',
+    steps_per_mm='M92 X80.0254 Y80.16 Z400 A400 B767.38 C767.38',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25',
@@ -66,5 +72,5 @@ robots = {
 }
 
 
-def current_config():
+def config():
     return robots[CURRENT_ROBOT]

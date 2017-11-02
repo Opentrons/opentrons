@@ -1,7 +1,7 @@
-from .robot_configs import current_config
+from .robot_configs import config
 
-probe_center = current_config().probe_center
-probe_dimensions = current_config().probe_dimensions
+probe_center = config().probe_center
+probe_dimensions = config().probe_dimensions
 
 
 class Probe:

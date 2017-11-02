@@ -1,6 +1,6 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
-from opentrons.robot.robot_configs import current_config
+from opentrons.robot.robot_configs import config
 
 
 '''
@@ -13,10 +13,10 @@ from opentrons.robot.robot_configs import current_config
 '''
 
 # TODO(artyom, ben 20171026): move to config
-DEFAULT_STEPS_PER_MM = current_config().steps_per_mm
-DEFAULT_MAX_AXIS_SPEEDS = current_config().max_speeds
-DEFAULT_ACCELERATION = current_config().acceleration
-DEFAULT_CURRENT_CONTROL = current_config().current
+DEFAULT_STEPS_PER_MM = config().steps_per_mm
+DEFAULT_MAX_AXIS_SPEEDS = config().max_speeds
+DEFAULT_ACCELERATION = config().acceleration
+DEFAULT_CURRENT_CONTROL = config().current
 HOMING_OFFSETS = 'M206 X0'
 
 # TODO (artyom, ben 20171026): move to config
