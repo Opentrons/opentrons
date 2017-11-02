@@ -1,13 +1,29 @@
-from conftest import state
 from unittest import mock
 from functools import partial
+from conftest import state, log_by_axis
+from opentrons import robot
 
 state = partial(state, 'calibration')
+
+
+async def test_tip_probe_functional(main_router, model):
+    robot._driver.log.clear()
+    main_router.calibration_manager.tip_probe(model.instrument)
+    by_axis = log_by_axis(robot._driver.log, 'XYA')
+    coords = [
+        (x, y, z)
+        for x, y, z
+        in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
+    ]
+
+    assert coords
+
 
 async def test_tip_probe(main_router, model):
     with mock.patch(
          'opentrons.util.calibration_functions.probe_instrument') as patch:
         main_router.calibration_manager.tip_probe(model.instrument)
+
         patch.assert_called_with(
             model.instrument._instrument,
             main_router.calibration_manager._robot)
@@ -17,6 +33,8 @@ async def test_tip_probe(main_router, model):
 
 
 async def test_move_to_front(main_router, model):
+    robot.home()
+
     with mock.patch(
          'opentrons.util.calibration_functions.move_instrument_for_probing_prep') as patch:  # NOQA
 
@@ -79,3 +97,30 @@ async def test_update_container_offset(main_router, model):
             instrument=model.instrument._instrument,
             save=True
         )
+
+
+async def test_jog_calibrate(dummy_db, main_router, model):
+    from numpy import array, isclose
+    from opentrons.trackers import pose_tracker
+
+    container = model.container._container
+    pos1 = pose_tracker.relative(robot.poses, src=container, dst=robot.deck)
+    coordinates1 = container.coordinates()
+
+    main_router.calibration_manager.move_to(model.instrument, model.container)
+    main_router.calibration_manager.jog(model.instrument, 1, 'x')
+    main_router.calibration_manager.jog(model.instrument, 2, 'y')
+    main_router.calibration_manager.jog(model.instrument, 3, 'z')
+
+    main_router.calibration_manager.update_container_offset(
+        model.container,
+        model.instrument
+    )
+
+    pos2 = pose_tracker.relative(robot.poses, src=container, dst=robot.deck)
+    coordinates2 = container.coordinates()
+
+    assert isclose(pos1 + (1, 2, 3), pos2).all()
+    assert isclose(
+        array([*coordinates1]) + (1, 2, 3),
+        array([*coordinates2])).all()

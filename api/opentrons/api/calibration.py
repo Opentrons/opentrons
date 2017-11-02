@@ -33,6 +33,7 @@ class CalibrationManager:
 
     def move_to_front(self, instrument):
         self._set_state('moving')
+        self._robot.home()
         calibration_functions.move_instrument_for_probing_prep(
             instrument._instrument, self._robot
         )
@@ -45,7 +46,6 @@ class CalibrationManager:
                 .format(type(obj)))
 
         self._set_state('moving')
-        print("MOVING TO: {}".format(obj._container[0]))
         instrument._instrument.move_to(obj._container[0])
         self._set_state('ready')
 
@@ -61,10 +61,11 @@ class CalibrationManager:
 
     def update_container_offset(self, container, instrument):
         self._robot.calibrate_container_with_instrument(
-                container=container._container,
-                instrument=instrument._instrument,
-                save=True
-            )
+            container=container._container,
+            instrument=instrument._instrument,
+            save=True
+        )
+        self._robot.max_deck_height.cache_clear()
 
     # TODO (artyom, 20171003): along with session, consider extracting this
     # into abstract base class or find any other way to keep notifications

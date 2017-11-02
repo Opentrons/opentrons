@@ -1,168 +1,118 @@
+from numpy import array
+from opentrons.trackers.pose_tracker import (
+    update, Point, get
+)
+from opentrons.util.vector import Vector
+from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
-from opentrons.robot import base
-from opentrons.util import pose_functions as pos_funcs
 
-'''
- IDEA: For OT1, we calibrate everything with respect to one of the pipettes,
- including the other pipette. So, we have the user jog the first pipette
- to MY_PLATE[0]. Then calibrate the whole deck with respect to that pipette.
- Then the user brings the second pipette to any well that the first has already
- been to. This creates a relationship between second pipette and the first.
- Since the first already has a relationship with all the plates, we should
-then be able to avoid calibrating all the other plates with with the
-second pipette.
-'''
+# TODO(artyom 20171031): for some reason was unable to share this
+# constant with opentrons.robot, thus copying it here, until
+# moved to config
+DECK_OFFSET = (-44.55, -11.9, 0)
+
+# maximum distance to move during calibration attempt
+PROBE_TRAVEL_DISTANCE = 20
+# size along X, Y and Z
+PROBE_SIZE = array((30.0, 30, 25.5))
+# coordinates of the top of the probe
+PROBE_TOP_COORDINATES = array((289.8, 296.4, 60.25)) + DECK_OFFSET
 
 
 def calibrate_container_with_delta(
-        container, position_tracker, delta_x,
+        pose_tree, container, delta_x,
         delta_y, delta_z, save, new_container_name=None
 ):
-    delta = (delta_x, delta_y, delta_z)
-    position_tracker.translate_object(container, *delta)
-    container._coordinates += delta
+    delta = Point(delta_x, delta_y, delta_z)
+    new_coordinates = get(pose_tree, container) - delta
+    pose_tree = update(pose_tree, container, new_coordinates)
+    container._coordinates = Vector(*new_coordinates)
+    # Since we are potentially changing Z, we want to
+    # invalidate cache for max_deck_height
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
     elif save:
         database.overwrite_container(container)
-
-
-
-
-
-from opentrons.robot import gantry, base
-from opentrons  import instruments
-from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
-from opentrons.trackers.pose_tracker import PoseTracker
-from opentrons.instruments.pipette import PipetteTip
-
-DEFAULT_TIP_LENGTH = 90
-
-
-#FIXME: Offset calculations should alraedy be reflected in switch_position
-def _probe_instrument_axis(instrument, axis, probing_movement, probe_location, safe_height, robot):
-    probing_pos = probe_location.copy()
-
-    if axis is not 'z': #FIXME: [JG & Andy | 9/27/17] this edge case should not be handled here
-        probing_pos[axis] -= (probing_movement*.75)
-
-    instrument._move(z=safe_height)
-    instrument._move(x=probing_pos['x'], y=probing_pos['y'])
-    instrument._move(z=probing_pos['z'])
-    #
-    # if 'z' in switch_position:
-    #     driver.move(z=safe_height)
-    # else:
-    #     driver.move(a=safe_height)
-    # driver.move(x=switch_position.get('x'), y=switch_position.get('y'))
-    #
-    # # TODO: make this non-implicit
-    # driver.move(a=switch_position.get('a'), z=switch_position.get('z'))
-    probed_pos = instrument._probe(axis, probing_movement)
-    instrument._move(**probing_pos)
-    return probed_pos
-
-
-
-    # # for axis is 'xya':
-    # #     _probe_switch(axis, )
-    #
-    # switch_pos_1 = {
-    #     'x': probe_center['x'] - (probe_dimensions['width'] / 2),
-    #     'y': probe_center['y'] - switch_offset,
-    #     'a': probe_dimensions['height'] + 1
-    # }
-    #
-    # switch_pos_2 = {
-    #     'x': probe_center['x'] + (probe_dimensions['width'] / 2),
-    #     'y': probe_center['y'] - switch_offset,
-    #     'a': probe_dimensions['height'] + 1
-    # }
-    #
-    # switch_pos_3 = {
-    #     'x': probe_center['x'] - switch_offset,
-    #     'y': probe_center['y'] + (probe_dimensions['length'] / 2),
-    #     'a': probe_dimensions['height'] + 1
-    # }
-    #
-    # switch_pos_4 = {
-    #     'x': probe_center['x'] - switch_offset,
-    #     'y': probe_center['y'] - (probe_dimensions['length'] / 2),
-    #     'a': probe_dimensions['height'] + 1
-    # }
-    #
-    # switch_pos_5 = {
-    #     'x': probe_center['x'],
-    #     'y': probe_center['y'] + switch_offset,
-    #     'a': probe_dimensions['height']
-    # }
-
-
+    return pose_tree
 
 
 def calibrate_pipette(probing_values, probe):
     ''' Interprets values generated from tip probing returns '''
     pass
-    # x_left, x_right, y_top, y_bottom, z = probing_values
-    # probed_x = avg(x_left, x_right)
-    # probed_y = avg(y_top, y_bottom)
-    #
-    # update_position_with_delta((pobed_x, probed_y) - probe.position)
-    # save_tip_length(tip_type, probing_values['z'] - probe.height)
 
 
 def probe_instrument(instrument, robot):
     robot.home()
-    pose_tracker = robot.pose_tracker
 
-    frame_base = base.Base(pose_tracker)
-    frame_probe = frame_base._probe
-    max_expected_tip_length = 130
+    *_, height = PROBE_SIZE
 
-    probing_distance = 15
+    center = PROBE_TOP_COORDINATES - (0, 0, height)
 
+    #       Y ^
+    #         * 1
+    #         |
+    #   --*---+---*-->
+    #     -1  |   1  X
+    #         * -1
+    #         |
+    #
+    # We are using above mental model to define
+    # left, right, forward, backward, center on a probe
+    #
+    # X, Y, Z point and travel direction
+    # Z = -1 denotes the tip down for XY calibration
+    # Z =  1 denotes the tip up to begin Z calibration
+    # Travel direction is in the same axis as the non-zero
+    #   XY coordinate, or in the Z axis if both X and Y
+    #   are zero
+    switches = [
+        (-1, 0, -1, 1),
+        (1, 0, -1, -1),
+        (0, -1, -1, 1),
+        (0, 1, -1, -1),
+        (0, 0, 1, -1),
+    ]
 
+    coords = [switch[:-1] * PROBE_SIZE + center for switch in switches]
 
-    probe_x_left = _probe_instrument_axis(instrument, 'x', probing_distance, frame_probe.left_switch, frame_probe.top_switch['z'] + 90, robot)
-    probe_x_right = _probe_instrument_axis(instrument, 'x', -probing_distance, frame_probe.right_switch, frame_probe.top_switch['z'] + 90, robot)
-    probe_y_top = _probe_instrument_axis(instrument, 'y', -probing_distance, frame_probe.back_switch, frame_probe.top_switch['z'] + 90, robot)
-    probe_y_bottom = _probe_instrument_axis(instrument, 'y', probing_distance, frame_probe.front_switch, frame_probe.top_switch['z'] + 90, robot)
-
-
-    avg_x = ((probe_x_left + probe_x_right)/ 2.0) + instrument.mount_obj.offset['x']
-    avg_y = (probe_y_bottom + probe_y_top) / 2.0 + instrument.mount_obj.offset['y']
-
-    x_delta =  frame_probe.top_switch['x'] - avg_x
-    y_delta = frame_probe.top_switch['y'] - avg_y
-
-    print('DELTAS: x={}, y={}'.format(x_delta, y_delta))
-
-
-    # #Update the position using the info
-    # robot.pose_tracker.translate_object(instrument, x=x_delta, y=y_delta, z=0)
-    # instrument.mount_obj.offset['x'] += x_delta
-    # instrument.mount_obj.offset['y'] += y_delta
-
-    #Note: This uses a 'tip' object which the pipette checks when it moves.
-    #This is how the instrument knows what height to go to
     instrument._add_tip(DEFAULT_TIP_LENGTH)
 
+    for coord, switch in zip(coords, switches):
+        x, y, z = coord
+        sx, sy, sz, direction = switch
 
-    probe_5 = _probe_instrument_axis(instrument, 'z', -max_expected_tip_length, frame_probe.top_switch, frame_probe.top_switch['z'], robot)
+        axis = 'z'
+        if sx:
+            axis = 'x'
+        elif sy:
+            axis = 'y'
+
+        # TODO(artyom, ben 20171026): fine tune correct probing sequence
+        robot.poses = instrument._move(
+            robot.poses,
+            z=z + 2 * height
+        )
+
+        robot.poses = instrument._move(robot.poses, x=x, y=y)
+        robot.poses = instrument._move(robot.poses, z=z)
+        instrument._probe(axis, direction * PROBE_TRAVEL_DISTANCE)
+
+        robot.poses = instrument._move(robot.poses, x=x, y=y)
 
     instrument._remove_tip(DEFAULT_TIP_LENGTH)
 
+    robot.home()
 
 
 def move_instrument_for_probing_prep(instrument, robot):
-    position = {instrument.axis: 150, 'x': 150, 'y': 150}
-    robot.move_head(**position)
+    # TODO(artyom, ben 20171026): calculate from robot dimensions
+    robot.poses = instrument._move(
+        robot.poses,
+        x=191.5,
+        y=75.0,
+        z=128 + DEFAULT_TIP_LENGTH
+    )
 
 
 def jog_instrument(instrument, axis, robot, distance):
-    '''move position relative to current instrument position'''
-    pose_tracker = robot.pose_tracker
-    position = \
-        dict(zip('xyz', pose_tracker[instrument].position))
-    position[axis] += distance
-    instrument._move(**position)
+    robot.poses = instrument._jog(robot.poses, axis, distance)

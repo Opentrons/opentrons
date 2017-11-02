@@ -24,7 +24,7 @@ def from_list(commands):
         return [
             {
                 'description': key['description'],
-                'children': walk(subtree, level+1),
+                'children': walk(subtree, level + 1),
                 'id': key['id']
             }
             for key, subtree in subtrees(commands, level)

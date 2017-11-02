@@ -7,7 +7,6 @@ from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container
 from opentrons.commands import tree, types
 from opentrons import robot
-from opentrons.robot.robot import Robot
 
 from .models import Container, Instrument
 
@@ -96,14 +95,16 @@ class Session(object):
             )
 
             if message['$'] == 'before':
+                level = len(stack)
+
+                stack.append(message)
                 commands.append(payload)
 
                 res.append(
                     {
-                        'level': len(stack),
+                        'level': level,
                         'description': description,
                         'id': len(res)})
-                stack.append(message)
             else:
                 stack.pop()
 
@@ -137,7 +138,8 @@ class Session(object):
         try:
             parsed = ast.parse(self.protocol_text)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
-            self.commands = tree.from_list(self._simulate())
+            commands = self._simulate()
+            self.commands = tree.from_list(commands)
         finally:
             if self.errors:
                 raise Exception(*self.errors)

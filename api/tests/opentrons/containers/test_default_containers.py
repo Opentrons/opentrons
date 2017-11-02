@@ -9,7 +9,7 @@ def test_new_containers(robot):
     T75_flask = containers_load(robot, 'T75-flask', 'B1')
     T25_flask = containers_load(robot, 'T25-flask', 'B2')
     p200 = pipette.Pipette(
-        robot, axis='a', max_volume=1000, name='test-pipette'
+        robot, mount='right', max_volume=1000, name='test-pipette'
     )
     p200.aspirate(100, wheaton_vial_rack[0])
     p200.aspirate(100, tube_rack_80well[0])

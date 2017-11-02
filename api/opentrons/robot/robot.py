@@ -6,8 +6,6 @@ from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from . import gantry
 
 import opentrons.util.calibration_functions as calib
-import opentrons.util.pose_functions as pos_funcs
-
 
 from opentrons import containers, drivers
 from opentrons.containers import Container
@@ -18,13 +16,15 @@ from opentrons import helpers
 from opentrons import commands
 from opentrons.broker import subscribe
 
+from numpy import add, subtract
+from functools import lru_cache
+
 log = get_logger(__name__)
 
-# DECK_OFFSET = {'x': -27, 'y':-14.5, 'z':0} # Ibn
-
-
-DECK_OFFSET = {'x': -31.45, 'y':-20.1, 'z':0} # Avagadro
+# Avogadro
+DECK_OFFSET = (-39.55, -6.9, 0)
 MAX_INSTRUMENT_HEIGHT = 227.0000
+
 
 class InstrumentMosfet(object):
     """
@@ -63,6 +63,7 @@ class InstrumentMotor(object):
     """
     Provides access to Robot's head motor.
     """
+
     def __init__(self, this_robot, axis):
         self.robot = this_robot
         self.axis = axis
@@ -162,11 +163,8 @@ class Robot(object):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self.pose_tracker = pose_tracker.PoseTracker()
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
         self.dimensions = (395, 345, 228)
-
-
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
@@ -197,8 +195,6 @@ class Robot(object):
         # self.disconnect()
         self.arc_height = 5
 
-
-
         # self.set_connection('simulate')
 
         # TODO (artyom, 09182017): once protocol development experience
@@ -218,11 +214,10 @@ class Robot(object):
             * Runtime warnings
 
         """
+        self.poses = pose_tracker.init()
+
         self._runtime_warnings = []
         self._previous_container = None
-
-        self.pose_tracker.clear_all()
-        # 0,0,0, is smoothie pos w.r.t deck
 
         self._deck = containers.Deck()
         self.setup_deck()
@@ -238,10 +233,13 @@ class Robot(object):
         return self
 
     def setup_gantry(self):
-        self.gantry = gantry.Gantry(self._driver, self.pose_tracker)
-        self.pose_tracker.create_root_object(self.gantry, x=0, y=0, z=0)
-        self.gantry._setup_mounts()
+        self.gantry = gantry.Gantry(self._driver)
 
+        self.poses = pose_tracker.add(
+            self.poses,
+            self.gantry,
+        )
+        self.poses = self.gantry._setup_mounts(self.poses)
 
     def add_instrument(self, mount, instrument):
         """
@@ -267,8 +265,8 @@ class Robot(object):
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        self.gantry.mount_instrument(instrument, mount)
-        # TODO: Create real pipette offsets
+        self.poses = self.gantry.mount_instrument(
+            self.poses, instrument, mount)
 
     def add_warning(self, warning_msg):
         """
@@ -402,13 +400,14 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        self.gantry.home()
+        self.poses = self.gantry.home(self.poses)
 
+    # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
-        self._driver.move(*args, **kwargs)
-        self.gantry._publish_position()
+        self.poses = self.gantry.move(self.poses, **kwargs)
+        self.poses = self.gantry._update_pose(self.poses)
 
-    #DEPRECATED
+    # DEPRECATED
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
@@ -474,21 +473,33 @@ class Robot(object):
 
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
-        offset = coordinates - placeable.top()[1]
-        target = self.pose_tracker[placeable].position + offset.coordinates
+        offset = subtract(coordinates, placeable.top()[1])
 
+        if isinstance(placeable, containers.WellSeries):
+            placeable = placeable[0]
+
+        target = add(
+            pose_tracker.absolute(
+                self.poses,
+                placeable
+            ),
+            offset.coordinates
+        )
+
+        # use max_z instead
         other_instrument = {instrument} ^ set(self._instruments.values())
-        if not len(other_instrument) == 0:
-            other_instrument.pop()._move(z=MAX_INSTRUMENT_HEIGHT)
+        if other_instrument:
+            z = MAX_INSTRUMENT_HEIGHT
+            self.poses = other_instrument.pop()._move(self.poses, z=z)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, instrument, placeable)
             for coord in arc_coords:
-                instrument._move(**coord)
+                self.poses = instrument._move(self.poses, **coord)
 
         elif strategy == 'direct':
             position = {'x': target[0], 'y': target[1], 'z': target[2]}
-            instrument._move(**position)
+            self.poses = instrument._move(self.poses, **position)
         else:
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
@@ -507,9 +518,7 @@ class Robot(object):
 
         travel_height = self.max_deck_height() + self.arc_height
 
-
-
-        _, _, robot_max_z = self.dimensions #TODO: Check what this does
+        _, _, robot_max_z = self.dimensions  # TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
         arrival_z = min(destination[2], robot_max_z)
 
@@ -520,7 +529,7 @@ class Robot(object):
             {'x': destination[0], 'y': destination[1]},
             {'z': arrival_z}
         ]
-        print("[Arc Strategy] up to {}, across to {}, down to {}".format(*strategy))
+
         return strategy
 
     # DEPRECATED
@@ -545,8 +554,7 @@ class Robot(object):
         if self._driver and not self._driver.is_connected():
             self._driver.toggle_port()
 
-
-    #DEPRECATED
+    # DEPRECATED
     def disconnect(self):
         """
         Disconnects from the robot.
@@ -556,9 +564,6 @@ class Robot(object):
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
-
-
-
 
     def get_deck_slot_types(self):
         return 'slots'
@@ -615,15 +620,18 @@ class Robot(object):
     def setup_deck(self):
         self.add_slots_to_deck()
         # Setup Deck as root object for pose tracker
-        self.pose_tracker.create_root_object(
-            self._deck, **DECK_OFFSET
+        self.poses = pose_tracker.add(
+            self.poses,
+            self._deck,
+            point=pose_tracker.Point(*DECK_OFFSET)
         )
 
         for slot in self._deck:
-            self.pose_tracker.track_object(
-                self._deck,
+            self.poses = pose_tracker.add(
+                self.poses,
                 slot,
-                *slot._coordinates
+                self._deck,
+                pose_tracker.Point(*slot._coordinates)
             )
 
     @property
@@ -659,6 +667,19 @@ class Robot(object):
             label = container_name
         container = database.load_container(container_name)
         container.properties['type'] = container_name
+
+        container_x, container_y, container_z = container._coordinates
+
+        # infer z from height
+        if container_z == 0 and 'height' in container[0].properties:
+            container_z = container[0].properties['height']
+
+        from opentrons.util.vector import Vector
+        container._coordinates = Vector(
+            container_x,
+            container_y,
+            container_z)
+
         if self._deck[slot].has_children() and not share:
             raise RuntimeWarning(
                 'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
@@ -673,25 +694,26 @@ class Robot(object):
         Add container and child wells to pose tracker. Sets container.parent
         (slot) as pose tracker parent
         """
-        self.pose_tracker.track_object(
-            container.parent, container, *container._coordinates
-        )
-
-
+        self.poses = pose_tracker.add(
+            self.poses,
+            container,
+            container.parent,
+            pose_tracker.Point(*container._coordinates))
 
         for well in container:
-            center_x, center_y, _ = well.top()[1] #TODO JG 10/6/17: Stop tracking wells inconsistently
+            # TODO JG 10/6/17: Stop tracking wells inconsistently
+            center_x, center_y, _ = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
 
-
-            self.pose_tracker.track_object(
-                container,
+            self.poses = pose_tracker.add(
+                self.poses,
                 well,
-                **{
-                    'x':offset_x + center_x,
-                    'y':offset_y + center_y,
-                    'z':offset_z
-                }
+                container,
+                pose_tracker.Point(
+                    center_x + offset_x,
+                    center_y + offset_y,
+                    offset_z
+                )
             )
 
     def pause(self):
@@ -743,45 +765,45 @@ class Robot(object):
     def get_connected_port(self):
         return self._driver.get_connected_port()
 
-    def versions(self):
-        # TODO: Store these versions in config
-        compatible = self._driver.versions_compatible()
-        return {
-            'firmware': {
-                'version': self._driver.get_firmware_version(),
-                'compatible': compatible['firmware']
-            },
-            'config': {
-                'version': self._driver.get_config_version(),
-                'compatible': compatible['config']
-            },
-            'ot_version': {
-                'version': self._driver.get_ot_version(),
-                'compatible': compatible['ot_version']
-            }
-        }
+    # TODO(artyom 20171030): discuss diagnostics and smoothie reporting
+    # def versions(self):
+    #     # TODO: Store these versions in config
+    #     return {
+    #         'firmware': {
+    #             'version': self._driver.get_firmware_version(),
+    #             'compatible': compatible['firmware']
+    #         },
+    #         'config': {
+    #             'version': self._driver.get_config_version(),
+    #             'compatible': compatible['config']
+    #         },
+    #         'ot_version': {
+    #             'version': self._driver.get_ot_version(),
+    #             'compatible': compatible['ot_version']
+    #         }
+    #     }
 
-    def diagnostics(self):
-        """
-        Access diagnostics information for the robot.
+    # def diagnostics(self):
+    #     """
+    #     Access diagnostics information for the robot.
 
-        Returns
-        -------
-        Dictionary with the following keys:
-            * ``axis_homed`` — axis that are currently in home position.
-            * ``switches`` — end stop switches currently hit.
-            * ``steps_per_mm`` — steps per millimeter calibration
-            values for ``x`` and ``y`` axis.
-        """
-        # TODO: Store these versions in config
-        return {
-            'axis_homed': self.axis_homed,
-            'switches': self._driver.get_endstop_switches(),
-            'steps_per_mm': {
-                'x': self._driver.get_steps_per_mm('x'),
-                'y': self._driver.get_steps_per_mm('y')
-            }
-        }
+    #     Returns
+    #     -------
+    #     Dictionary with the following keys:
+    #         * ``axis_homed`` — axis that are currently in home position.
+    #         * ``switches`` — end stop switches currently hit.
+    #         * ``steps_per_mm`` — steps per millimeter calibration
+    #         values for ``x`` and ``y`` axis.
+    #     """
+    #     # TODO: Store these versions in config
+    #     return {
+    #         'axis_homed': self.axis_homed,
+    #         'switches': self._driver.switch_state(),
+    #         'steps_per_mm': {
+    #             'x': self._driver.get_steps_per_mm('x'),
+    #             'y': self._driver.get_steps_per_mm('y')
+    #         }
+    #     }
 
     @commands.publish.before(command=commands.comment)
     def comment(self, msg):
@@ -816,15 +838,20 @@ class Robot(object):
                                             ):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
-        expected_position = self.pose_tracker[well].position
 
         # calibrate will well bottom, but track top of well
-        true_position = self.pose_tracker[instrument].position
-        calib.calibrate_container_with_delta(
-            container,
-            self.pose_tracker,
-            *(true_position - expected_position), save
+        delta = pose_tracker.relative(
+            self.poses,
+            well,
+            instrument
         )
 
+        self.poses = calib.calibrate_container_with_delta(
+            self.poses,
+            container,
+            *delta, save
+        )
+
+    @lru_cache()
     def max_deck_height(self):
-        return self.pose_tracker.max_z_in_subtree(self._deck)
+        return pose_tracker.max_z(self.poses, self._deck)

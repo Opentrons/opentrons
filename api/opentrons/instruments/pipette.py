@@ -7,10 +7,18 @@ from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers
+from opentrons.trackers import pose_tracker
 
 
 # This should come from configuration if tip length is not already in db
-DEFAULT_TIP_LENGTH = 53.2
+DEFAULT_TIP_LENGTH = 46
+
+PLUNGER_POSITIONS = {
+    'top': 17,
+    'bottom': 2,
+    'blow_out': 0,
+    'drop_tip': -7
+}
 
 
 class PipetteTip:
@@ -69,11 +77,11 @@ class Pipette:
     >>> from opentrons import instruments, containers, robot
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> p1000 = instruments.Pipette(axis='a', max_volume=1000)
+    >>> p1000 = instruments.Pipette(mount='left', max_volume=1000)
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'B1')
     >>> p200 = instruments.Pipette(
     ...     name='p200',
-    ...     axis='b',
+    ...     mount='right',
     ...     max_volume=200,
     ...     tip_racks=[tip_rack_200ul])
     """
@@ -100,7 +108,6 @@ class Pipette:
         self.instrument_actuator = None
         self.instrument_mover = None
         self.tip_length = DEFAULT_TIP_LENGTH
-
 
         if not name:
             name = self.__class__.__name__
@@ -133,12 +140,7 @@ class Pipette:
         self.max_volume = max_volume or (min_volume + 1)
 
         # FIXME
-        default_plunger_positions = {
-            'top': 17,
-            'bottom': 0,
-            'blow_out': -1,
-            'drop_tip': -7
-        }
+        default_plunger_positions = PLUNGER_POSITIONS
         self.plunger_positions = {}
         self.plunger_positions.update(default_plunger_positions)
 
@@ -766,15 +768,16 @@ class Pipette:
         def _pick_up_tip(self, location):
             self.instrument_actuator.move(self._get_plunger_position('bottom'))
             self.current_volume = 0
-
             self.move_to(self.current_tip().top(0), strategy='arc')
 
             tip_plunge = -7
             for i in range(int(presses) - 1):
-                self.move_to(self.current_tip().top(tip_plunge), strategy='direct')
+                self.move_to(
+                    self.current_tip().top(tip_plunge),
+                    strategy='direct')
                 self.move_to(self.current_tip().top(0), strategy='direct')
             self._add_tip(self.tip_length)
-            self.instrument_mover.home()
+            self.robot.poses = self.instrument_mover.home(self.robot.poses)
             return self
 
         return _pick_up_tip(self, location)
@@ -832,7 +835,8 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
-            self.instrument_actuator.move(self._get_plunger_position('drop_tip'))
+            self.instrument_actuator.move(
+                self._get_plunger_position('drop_tip'))
             if home_after:
                 self.instrument_actuator.home()
 
@@ -845,7 +849,6 @@ class Pipette:
         return _drop_tip(location)
 
     def home(self):
-
         """
         Home the pipette's plunger axis during a protocol run
 
@@ -933,7 +936,6 @@ class Pipette:
 
     @commands.publish.both(command=commands.transfer)
     def transfer(self, volume, source, dest, **kwargs):
-
         """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
@@ -1061,7 +1063,7 @@ class Pipette:
         seconds = seconds % 60
         seconds += float(minutes * 60)
 
-        self.instrument_actuator.wait(seconds)
+        self.instrument_actuator.delay(seconds)
 
         return self
 
@@ -1386,15 +1388,23 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    def _move(self, x=None, y=None, z=None):
-        self.instrument_mover.move(x, y, z)
+    def _move(self, pose_tree, x=None, y=None, z=None):
+        return self.instrument_mover.move(pose_tree, x, y, z)
+
+    def _jog(self, pose_tree, axis, distance):
+        return self.instrument_mover.jog(pose_tree, axis, distance)
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z= (-1 * length))
-
+        x, y, z = pose_tracker.get(self.robot.poses, self)
+        self.robot.poses = pose_tracker.update(
+            self.robot.poses, self, pose_tracker.Point(
+                x, y, z - length))
 
     def _remove_tip(self, length):
-        self.robot.pose_tracker.translate_object(self, x=0, y=0, z=length)
+        x, y, z = pose_tracker.get(self.robot.poses, self)
+        self.robot.poses = pose_tracker.update(
+            self.robot.poses, self, pose_tracker.Point(
+                x, y, z + length))

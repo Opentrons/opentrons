@@ -22,7 +22,7 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
 
     # Shorthand for calling ourselves recursively
     object_tree = functools.partial(
-        _get_object_tree, max_depth, path, refs, depth+1)
+        _get_object_tree, max_depth, path, refs, depth + 1)
 
     path += [id(obj)]
 
