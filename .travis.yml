@@ -42,22 +42,22 @@ install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
   - node --version
   - pip install pyyaml coveralls
-  - cd api && make install && cd ..
-  - cd app && make install && cd ..
+  - make -C api install
+  - make -C app install
 
 script:
   - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
-  - cd api && make test exe && cd ..
+  - make -C api test exe
   - > # Make docs on linux only
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd api && make docs > /dev/null && cd ..) fi;
-  - cd app && make -j 2 build test test-e2e && make package && cd ..
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
+  - make -C app -j 2 build test test-e2e && make -C app package
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
 after_success:
-  - cd api && coveralls && cd ..
+  - cd api && coveralls; cd ..
 
 # Deploy the build version in an S3 bucket
 deploy:
@@ -66,7 +66,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: $(pwd)/app/dist
+    local-dir: app/dist
     upload-dir: $DEPLOY_DIR
     acl: public_read
     on:
@@ -77,7 +77,7 @@ deploy:
   # Publish API to PyPI and Anaconda
   - provider: script
     skip_cleanup: true
-    script: cd api && make publish && cd ..
+    script: make -C api publish
     on:
       # tags: true
       branch: master
