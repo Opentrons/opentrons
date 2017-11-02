@@ -43,7 +43,5 @@ def test_home(driver):
     )
 ])
 def test_move(target_movement, expected_new_position, homed_driver):
-    homed_driver.move(**{
-        target.lower(): value
-        for target, value in target_movement.items()})
+    homed_driver.move(target_movement)
     assert homed_driver.position == expected_new_position

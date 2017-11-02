@@ -65,10 +65,10 @@ def test_functional(smoothie):
 
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
-    smoothie.move(x=0, y=1, z=2, a=3, b=4, c=5)
+    smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3, 'B': 4, 'C': 5})
     assert smoothie.position == position(0, 1, 2, 3, 4, 5)
 
-    smoothie.move(x=1, z=3, c=6)
+    smoothie.move({'X': 1, 'Z': 3, 'C': 6})
     assert smoothie.position == position(1, 1, 3, 3, 4, 6)
 
     smoothie.home(axis='abc', disabled='')

@@ -24,7 +24,7 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
     delta = Point(delta_x, delta_y, delta_z)
-    new_coordinates = get(pose_tree, container) - delta
+    new_coordinates = get(pose_tree, container) + delta
     pose_tree = update(pose_tree, container, new_coordinates)
     container._coordinates = Vector(*new_coordinates)
     # Since we are potentially changing Z, we want to

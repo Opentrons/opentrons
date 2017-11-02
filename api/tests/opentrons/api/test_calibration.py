@@ -117,7 +117,7 @@ async def test_jog_calibrate(dummy_db, main_router, model):
         model.instrument
     )
 
-    pos2 = pose_tracker.relative(robot.poses, src=container, dst=robot.deck)
+    pos2 = pose_tracker.absolute(robot.poses, container)
     coordinates2 = container.coordinates()
 
     assert isclose(pos1 + (1, 2, 3), pos2).all()

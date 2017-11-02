@@ -136,10 +136,11 @@ class SmoothieDriver_3_0_0:
     def speed(self):
         pass
 
-    def set_speed(self, value):
-        ''' set total movement speed in mm/second'''
-        speed = value * SEC_PER_MIN
-        command = GCODES['SET_SPEED'] + str(speed)
+    def set_speed(self, values):
+        command = GCODES['SET_SPEED'] + ' ' + ' '.join([
+            '{axis}{value}'.format(axis=axis.upper(), value=value)
+            for axis, value in values.items()
+        ])
         self._send_command(command)
 
     def set_current(self, axes, value):
@@ -192,9 +193,8 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
+    def move(self, target):
         from numpy import isclose
-        target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
 
         def valid_movement(coords, axis):
             return not (
@@ -204,13 +204,13 @@ class SmoothieDriver_3_0_0:
             )
 
         coords = [axis + str(coords)
-                  for axis, coords in target_position.items()
+                  for axis, coords in target.items()
                   if valid_movement(coords, axis)]
 
         if coords:
             command = GCODES['MOVE'] + ''.join(coords)
             self._send_command(command)
-            self._update_position(target_position)
+            self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
         axis = axis.upper()

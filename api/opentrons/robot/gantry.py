@@ -1,208 +1,115 @@
-from opentrons.trackers import pose_tracker
-
-# TODO(artyom 20171026): move to config
-RIGHT_MOUNT_OFFSET = (0.0, 0.0, 0.0)
-LEFT_MOUNT_OFFSET = (-37.14, 32.12, +2.5)
-
-LEFT_INSTRUMENT_ACTUATOR = 'b'
-RIGHT_INSTRUMENT_ACTUATOR = 'c'
-
-LEFT_Z_AXIS = 'z'
-RIGHT_Z_AXIS = 'a'
+from ..trackers.pose_tracker import Point, absolute, forward, update, relative
 
 
-def _coords_for_axes(driver, axes):
-    return {axis: driver.position[axis.upper()] for axis in axes}
+class Mover:
+    def __init__(self, driver, axis_mapping, children=None):
+        self._driver = driver
+        self._parent = None
+        self._axis_mapping = axis_mapping
+        self._children = children or []
+        [child.attach(self) for child in self._children]
 
+    def attach(self, parent):
+        self._parent = parent
 
-class InstrumentActuator(object):
-    """
-    Provides access to Robot's head motor.
-    """
-
-    def __init__(self, driver, axis, instrument):
-        self.axis = axis
-        self.driver = driver
-        self.instrument = instrument
-
-    def move(self, value):
-        ''' Move motor '''
-        self.driver.move(**{self.axis: value})
-
-    def home(self):
-        ''' Home plunger motor '''
-        self.driver.home(self.axis)
-
-    # TODO: Should instruments be able to delay overall system operation?
-    def delay(self, seconds):
-        self.driver.delay(seconds)
-
-    # FIXME: Should instruments be able to set speed for overall system motion?
-    def set_speed(self, rate):
-        ''' Set combined motion speed '''
-        self.driver.set_speed(rate)
-
-
-class InstrumentMover(object):
-    """
-    Dispatches instrument movement calls to the appropriate movers
-    """
-
-    def __init__(self, gantry, mount, instrument):
-        self.gantry = gantry
-        self.mount = mount
-        self.instrument = instrument
-
-    def jog(self, pose_tree, axis, distance):
+    def jog(self, pose, axis, distance):
         axis = axis.lower()
-        current = pose_tracker.absolute(pose_tree, self.instrument)
-        current = dict(zip('xyz', current))
-        return self.move(pose_tree, **{axis: current[axis] + distance})
 
-    def move(self, pose_tree, x=None, y=None, z=None):
-        # TODO(artyom 20171020): this is needed to have up to date
-        # values in pose tree should find a more graceful way to do it
-        pose_tree = self.gantry._update_pose(pose_tree)
-        pose_tree = self.mount._update_pose(pose_tree)
-        print('will move to [x, y, z]', [x, y, z])
-        current = pose_tracker.absolute(pose_tree, self.instrument)
+        assert axis in 'xyz', "axis value should be x, y or z"
 
-        dx, dy, dz = [
-            0 if destination is None else destination - current
-            for destination, current
-            in zip((x, y, z), current)
-        ]
+        x, y, z = absolute(pose, self)
 
-        gantry_x, gantry_y, _ = pose_tracker.absolute(pose_tree, self.gantry)
-        _, _, mount_z = pose_tracker.absolute(pose_tree, self.mount)
-
-        pose_tree = self.gantry.move(
-            pose_tree,
-            x=gantry_x + dx,
-            y=gantry_y + dy)
-        return self.mount.move(pose_tree, z=mount_z + dz)
-
-    def probe(self, axis_to_probe, probing_movement):
-        if axis_to_probe is 'z':
-            axis_to_probe = self.mount.mount_axis
-        return self.gantry.probe_axis(axis_to_probe, probing_movement)
-
-    def home(self, pose_tree):
-        return self.mount.home(pose_tree)
-
-
-class Gantry:
-    '''
-    Responsible for:
-        - Gantry, independent of the instruments
-        - Providing driver resources to instruments
-
-    Not Response for:
-        - Robot state, or any instrument specific actions
-    '''
-    free_axes = 'XY'
-
-    def __init__(self, driver):
-        self.left_mount = None
-        self.driver = driver
-
-    def _setup_mounts(self, pose_tree):
-        self.left_mount = Mount(
-            self.driver,
-            self,
-            LEFT_Z_AXIS,
-            LEFT_INSTRUMENT_ACTUATOR,
-            LEFT_MOUNT_OFFSET)
-        self.right_mount = Mount(
-            self.driver,
-            self,
-            RIGHT_Z_AXIS,
-            RIGHT_INSTRUMENT_ACTUATOR,
-            RIGHT_MOUNT_OFFSET)
-
-        pose_tree = pose_tracker.add(
-            pose_tree,
-            self.left_mount,
-            self
-        )
-
-        return pose_tracker.add(
-            pose_tree,
-            self.right_mount,
-            self
-        )
-
-    def move(self, pose_tree, x, y):
-        ''' Moves the Gantry in the x, y plane '''
-        self.driver.move(x=x, y=y)
-        return self._update_pose(pose_tree)
-
-    def _update_pose(self, pose_tree):
-        _, _, z = pose_tracker.get(pose_tree, self)
-        coordinates = _coords_for_axes(self.driver, self.free_axes)
-        return pose_tracker.update(
-            pose_tree,
-            self,
-            pose_tracker.Point(
-                coordinates['X'],
-                coordinates['Y'],
-                z
+        return self.move(
+            pose,
+            *Point(
+                x=x + distance if axis == 'x' else x,
+                y=y + distance if axis == 'y' else y,
+                z=z + distance if axis == 'z' else z
             )
         )
 
-    def mount_instrument(self, pose_tree, instrument, instrument_mount):
-        mount_config = {
-            'left': (self.left_mount, pose_tracker.Point(*LEFT_MOUNT_OFFSET)),
-            'right': (self.right_mount, pose_tracker.Point(*RIGHT_MOUNT_OFFSET))  # NOQA
+    def move(self, pose=None, x=None, y=None, z=None):
+        pose = pose or {}
+
+        # Default coordinates that are None to current so we can
+        # pass them around safely
+        if self in pose:
+            current_x, current_y, current_z = absolute(pose, self)
+
+            if x is None:
+                x = current_x
+
+            if y is None:
+                y = current_y
+
+            if z is None:
+                z = current_z
+        else:
+            x, y, z = x or 0, y or 0, z or 0
+
+        if self._parent:
+            pose = self._parent.move(pose, x, y, z)
+
+        if self in pose:
+            # apply transformation
+            x, y, z = forward(pose, self._driver).dot((x, y, z, 1))[:-1]
+
+        target = Point(
+            x=x if 'x' in self._axis_mapping else 0,
+            y=y if 'y' in self._axis_mapping else 0,
+            z=z if 'z' in self._axis_mapping else 0
+        )
+
+        # driver axis to point axis value mapping
+        # NOTE: point._asdict() returns point as dictionary:
+        # {'x': x, 'y': y, 'z': z}
+        driver_target = {
+            driver_axis: target._asdict()[xyz]
+            for xyz, driver_axis in self._axis_mapping.items()
         }
+        self._driver.move(target=driver_target)
 
-        mount, offset = mount_config[instrument_mount]
-        mount.add_instrument(instrument)
+        # Update pose with the new value. Since stepper motors are open loop
+        # there is no need to to query diver for position
+        if self in pose:
+            return update(pose, self, target)
+        return pose
 
-        return pose_tracker.add(pose_tree, instrument, mount, offset)
+    def home(self, pose):
+        from functools import reduce
+        reduce(
+            lambda pose, child: child.home(pose),
+            self._children,
+            pose
+        )
 
-    def probe_axis(self, axis, probing_movement):
-        return self.driver.probe_axis(axis, probing_movement)
+        position = self._driver.home(axis=''.join(self._axis_mapping.values()))
+        # map from driver axis names to xyz and expand position
+        # into point object
+        point = Point(
+            x=position.get(self._axis_mapping.get('x', 'X'), 0.0),
+            y=position.get(self._axis_mapping.get('y', 'Y'), 0.0),
+            z=position.get(self._axis_mapping.get('z', 'Z'), 0.0)
+        )
+        print('HOME: ', point)
+        if self in pose:
+            return update(pose, self, point)
+        return pose
 
-    def home(self, pose_tree):
-        self.driver.home()
-        return self._update_pose(pose_tree)
+    def set_speed(self, value):
+        self._driver.set_speed({
+            axis: value
+            for axis in self._axis_mapping.values()
+        })
 
+    def probe(self, axis, movement):
+        axis = axis.lower()
 
-class Mount:
-    def __init__(self, driver, gantry, mount_axis, actuator_axis, offset):
-        self.instrument = None
-        self.driver = driver
-        self.gantry = gantry
-        self.mount_axis = mount_axis
-        self.actuator_axis = actuator_axis
-        self.offset = offset
+        if self._parent:
+            self._parent.probe(axis, movement)
 
-    def _update_pose(self, pose_tree):
-        x, y, _ = pose_tracker.get(pose_tree, self)
-        mount_z, = _coords_for_axes(self.driver, self.mount_axis).values()
-        return pose_tracker.update(
-            pose_tree, self, pose_tracker.Point(
-                x, y, mount_z))
+        if axis in self._axis_mapping:
+            self._driver.probe_axis(self._axis_mapping[axis], movement)
 
-    def move(self, pose_tree, z):
-        self.driver.move(**{self.mount_axis: z})
-        return self._update_pose(pose_tree)
-
-    def add_instrument(self, instrument):
-        if self.instrument is not None:
-            raise RuntimeError(
-                "This mount already has an instrument: {}".format(
-                    self.instrument))
-
-        self.instrument = instrument
-        instrument.instrument_actuator = InstrumentActuator(
-            self.driver, self.actuator_axis, instrument)
-        instrument.instrument_mover = InstrumentMover(
-            self.gantry, self, instrument)
-        instrument.axis = self.mount_axis
-        instrument.mount_obj = self
-
-    def home(self, pose_tree):
-        self.driver.home(self.mount_axis)
-        return self._update_pose(pose_tree)
+    def delay(self, seconds):
+        self._driver.delay(seconds)

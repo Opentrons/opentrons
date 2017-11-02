@@ -164,8 +164,6 @@ def stringify(state, root=None):
 
 def get(state, obj):
     return relative(state, src=obj, dst=state[obj].parent)
-    # x, y, z, *_ = state[obj].transform.dot((0.0, 0.0, 0.0, 1.0))
-    # return Point(x, y, z)
 
 
 def bind(state):
