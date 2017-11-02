@@ -5,6 +5,7 @@ import contextlib
 DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
+DEFAULT_WRITE_TIMEOUT = 30
 SMOOTHIE_BOARD_NAME = 'FT232R'
 
 ERROR_KEYWORD = b'error'
@@ -83,10 +84,12 @@ def _attempt_command_recovery(command, serial_conn):
     return response
 
 
-def write_and_return(command, serial_connection, timeout=None):
+def write_and_return(
+        command, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
     '''Write a command and return the response'''
     clear_buffer(serial_connection)
-    with serial_with_temp_timeout(serial_connection, 30) as device_connection:
+    with serial_with_temp_timeout(
+            serial_connection, timeout) as device_connection:
         response = _write_to_device_and_return(command, device_connection)
     return response
 

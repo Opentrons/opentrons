@@ -18,6 +18,25 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
+def test_plunger_commands(smoothie, monkeypatch):
+    from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
+    command_log = []
+    smoothie.simulating = False
+
+    def write_with_log(command):
+        command_log.append(command)
+        return serial_communication.DRIVER_ACK
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+
+    smoothie.home()
+    smoothie.move(x=0, y=1, z=2, a=3)
+    smoothie.move(x=0, y=1, z=2, a=3, b=4, c=5)
+
+    assert command_log == []
+
+
 def test_functional(smoothie):
     from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import HOMED_POSITION  # NOQA
 
