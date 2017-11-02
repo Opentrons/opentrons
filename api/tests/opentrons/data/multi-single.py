@@ -1,8 +1,8 @@
-from opentrons import containers, instruments, robot
+from opentrons import containers, instruments
 
+# from opentrons import robot
 # robot.connect()
 # robot.home()
-
 # print('homed')
 
 tiprack = containers.load('tiprack-200ul', 'C2')
