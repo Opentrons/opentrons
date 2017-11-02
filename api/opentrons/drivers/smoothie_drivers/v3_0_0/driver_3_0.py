@@ -12,10 +12,14 @@ from os import environ
 '''
 
 # TODO(artyom, ben 20171026): move to config
+PLUNGER_CURRENT_LOW = '0.1'
+PLUNGER_CURRENT_HIGH = '0.5'
+
 DEFAULT_STEPS_PER_MM = 'M92 X80 Y80 Z400 A400 B767.38 C767.38'
 DEFAULT_MAX_AXIS_SPEEDS = 'M203.1 X600 Y400 Z120 A120 B50 C50'
 DEFAULT_ACCELERATION = 'M204 S10000 X2000 Y2000 Z1500 A1500 B2000 C2000'
-DEFAULT_CURRENT_CONTROL = 'M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25'
+DEFAULT_CURRENT_CONTROL = 'M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(
+    PLUNGER_CURRENT_LOW)
 HOMING_OFFSETS = 'M206 X0'
 
 # TODO (artyom, ben 20171026): move to config
@@ -33,6 +37,7 @@ AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
 DISABLE_AXES = ''
 
+MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
 SEC_PER_MIN = 60
 POSITION_THRESH = .25
 
@@ -154,6 +159,7 @@ class SmoothieDriver_3_0_0:
             value
         )
         self._send_command(command)
+        self._send_command(GCODES['DWELL'])
 
     # ----------- Private functions --------------- #
 
@@ -166,11 +172,23 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
-        command_line = command + ' M400'
+        if self.simulating:
+            pass
+        else:
+            moving_plunger = ('B' in command or 'C' in command) \
+                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
 
-        if not self.simulating:
-            return serial_communication.write_and_return(
-                command_line, self._connection, timeout)
+            if moving_plunger:
+                self.set_power('BC', PLUNGER_CURRENT_HIGH)
+
+            command_line = command + ' M400'
+            ret_code = serial_communication.write_and_return(
+                command_line, self.connection, timeout)
+
+            if moving_plunger:
+                self.set_power('BC', PLUNGER_CURRENT_LOW)
+
+            return ret_code
 
     def _setup(self):
         self._reset_from_error()
