@@ -82,7 +82,13 @@ const containers = handleActions({
     const { containerId, modify } = action.payload
     return {...state, [containerId]: {...state[containerId], ...modify}}
   }
-}, {})
+}, {
+  'default-trash': {
+    type: 'trash-box',
+    name: 'Trash',
+    slotName: 'E3'
+  }
+})
 
 const selectedWellsInitialState = {preselected: {}, selected: {}}
 const selectedWells = handleActions({
