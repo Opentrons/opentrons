@@ -1,7 +1,8 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
-from opentrons.robot.robot_configs import \
+from opentrons.robot.robot_configs import (
     config, PLUNGER_CURRENT_LOW, PLUNGER_CURRENT_HIGH
+)
 
 
 '''
@@ -182,10 +183,10 @@ class SmoothieDriver_3_0_0:
 
     def _setup(self):
         self._reset_from_error()
-        self._send_command(DEFAULT_ACCELERATION)
-        self._send_command(DEFAULT_CURRENT_CONTROL)
-        self._send_command(DEFAULT_MAX_AXIS_SPEEDS)
-        self._send_command(DEFAULT_STEPS_PER_MM)
+        self._send_command(config.acceleration)
+        self._send_command(config.current)
+        self._send_command(config.max_speeds)
+        self._send_command(config.steps_per_mm)
         self._send_command(HOMING_OFFSETS)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
     # ----------- END Private functions ----------- #
