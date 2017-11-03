@@ -20,6 +20,7 @@ const {
   getIsDone,
   getRunTime,
   getInstruments,
+  getSingleChannel,
   getInstrumentsCalibrated,
   getLabware,
   getUnconfirmedTipracks,
@@ -344,6 +345,30 @@ describe('robot selectors', () => {
         calibration: constants.UNPROBED
       }
     ])
+  })
+
+  test('get single channel', () => {
+    const state = makeState({
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200},
+          right: {axis: 'right', name: 'p50s', channels: 1, volume: 50}
+        }
+      },
+      calibration: {
+        instrumentsByAxis: {
+          left: constants.PROBING
+        }
+      }
+    })
+
+    expect(getSingleChannel(state)).toEqual({
+      axis: 'right',
+      name: 'p50s',
+      channels: 'single',
+      volume: 50,
+      calibration: constants.UNPROBED
+    })
   })
 
   test('get instruments are calibrated', () => {
