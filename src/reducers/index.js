@@ -11,7 +11,7 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
-import { containerDims, toWellName } from '../constants.js'
+import { containerDims, toWellName, getMaxVolumes, wellKeyToXYList } from '../constants.js'
 import { uuid } from '../utils.js'
 
 const sortedSlotnames = [].concat.apply( // flatten
@@ -25,7 +25,6 @@ const nextEmptySlot = loadedContainersSubstate => {
   // Next empty slot in the sorted slotnames order. Or null if no more slots.
   const nextEmptySlotIdx = sortedSlotnames.findIndex(slot => !(slot in loadedContainersSubstate))
   const result = nextEmptySlotIdx >= sortedSlotnames.length ? null : sortedSlotnames[nextEmptySlotIdx]
-  console.log('nextEmptySlot', {loadedContainersSubstate, result})
   return result
 }
 
@@ -241,7 +240,6 @@ const _ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
   const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
   const matchedIngred = ingredientsForContainer[matchedKey]
 
-  console.log({ingredientsForContainer, matchedIngred, matchedKey})
   const ingredientNum = matchedIngred && matchedIngred.wells && matchedIngred.wells.findIndex(w => w === wellName) + 1
 
   return {...matchedIngred, ingredientNum, wellName}
@@ -264,6 +262,18 @@ const selectedWellNames = createSelector(
 const numWellsSelected = createSelector(
   state => rootSelector(state).selectedWells,
   selectedWells => Object.keys(selectedWells.selected).length)
+
+const selectedWellsMaxVolume = createSelector(
+  state => rootSelector(state).selectedWells,
+  selectedContainerType,
+  (selectedWells, selectedContainerType) => {
+    const allWells = Object.keys(selectedWells.selected).map(wellKeyToXYList)
+    const maxVolumesByWell = getMaxVolumes(selectedContainerType)
+    const maxVolumesList = Object.values(pick(maxVolumesByWell, allWells))
+
+    return Math.min(...maxVolumesList)
+  }
+)
 
 const _ingredientsForContainerId = (allIngredients, containerId) => {
   const ingredGroupFromIdx = (allIngredients, idx) => allIngredients[idx]
@@ -324,7 +334,7 @@ const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells, h
   if (!containerType) {
     return undefined
   }
-  const { rows, columns, wellShape } = containerDims(containerType)
+  const { rows, columns, wellShape, maxVolumes } = containerDims(containerType)
 
   return range(rows - 1, -1, -1).map(
     rowNum => range(columns).map(
@@ -340,6 +350,7 @@ const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells, h
           wellShape,
           preselected: selectedWells ? wellKey in selectedWells.preselected : false,
           highlighted: isHighlighted,
+          maxVolume: maxVolumes[ingredData.wellName] || maxVolumes.default,
           hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
           selected: selectedWells ? wellKey in selectedWells.selected : false,
           ...ingredData // TODO later: nest this so it looks cleaner?
@@ -399,6 +410,7 @@ export const selectors = {
   canAdd,
   wellMatrixSelectedContainer,
   numWellsSelected,
+  selectedWellsMaxVolume,
   selectedWellNames,
   selectedContainerSlot,
   selectedContainer: selectedContainerSelector,

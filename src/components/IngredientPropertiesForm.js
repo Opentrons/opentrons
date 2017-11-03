@@ -73,7 +73,10 @@ class IngredientPropertiesForm extends React.Component {
   }
 
   render () {
-    const { numWellsSelected, onSave, onCancel, onDelete, selectedIngredientProperties } = this.props
+    const { numWellsSelected, onSave, onCancel, onDelete, selectedIngredientProperties, selectedWellsMaxVolume } = this.props
+    const { volume, individualize } = this.state.input
+
+    const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
     if (!selectedIngredientProperties && numWellsSelected <= 0) {
@@ -108,12 +111,16 @@ class IngredientPropertiesForm extends React.Component {
                 <label> Serialize Name </label>
                 <Field accessor='individualize' type='checkbox' />
               </span>
-              {this.state.input.individualize && <Field accessor='serializeName' placeholder='Sample' />}
+              {individualize && <Field accessor='serializeName' placeholder='Sample' />}
             </span>
           </div>
           <div className={styles.middleRow}>
-            <span>
+            <span style={{borderColor: maxVolExceeded && 'red'}}>
               <label>Volume (µL)</label>
+              {maxVolExceeded && // TODO: clean up the styling for this
+                <label style={{color: 'red'}}>
+                  Warning: exceeded max volume per well: {selectedWellsMaxVolume}uL
+                </label>}
               <Field numeric accessor='volume' />
             </span>
             <span>
@@ -157,6 +164,7 @@ IngredientPropertiesForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   numWellsSelected: PropTypes.number.isRequired,
+  selectedWellsMaxVolume: PropTypes.number.isRequired,
 
   selectedIngredientProperties: PropTypes.shape({
     name: PropTypes.string,
