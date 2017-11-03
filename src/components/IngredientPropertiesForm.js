@@ -93,26 +93,36 @@ class IngredientPropertiesForm extends React.Component {
         </h1>
 
         <form>
-          <span>
-            <label>Name</label>
-            <Field accessor='name' />
-          </span>
-          <span className={styles.checkbox}>
-            <Field accessor='individualize' type='checkbox' />
-            <label>Serialize Name (ie, Sample 1, Sample 2, Sample 2...)</label>
-          </span>
-          <span className={styles.halfWidth}>
-            <label>Volume (µL)</label>
-            <Field numeric accessor='volume' />
-          </span>
-          <span className={styles.halfWidth}>
-            <label>Concentration (%)</label>
-            <Field numeric accessor='concentration' />
-          </span>
-          <span>
-            <label>Description</label>
-            <Field accessor='description' type='textarea' />
-          </span>
+          <div className={styles.flexRow}>
+            <span>
+              <label>Name</label>
+              <Field accessor='name' />
+            </span>
+            <span>
+              <span className={styles.checkbox}>
+                <label> Serialize Name </label>
+                <Field accessor='individualize' type='checkbox' />
+              </span>
+              {this.state.input.individualize && <Field accessor='serializeName' />}
+            </span>
+          </div>
+          <div className={styles.middleRow}>
+            <span>
+              <label>Volume (µL)</label>
+              <Field numeric accessor='volume' />
+            </span>
+            <span>
+              <label>Concentration</label>
+              <Field numeric accessor='concentration' />
+            </span>
+            <span className={styles.serializeNameExample}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
+          </div>
+          <div className={styles.flexRow}>
+            <span>
+              <label>Description</label>
+              <Field accessor='description' type='textarea' />
+            </span>
+          </div>
         </form>
 
         {/* selectedIngredientProperties &&
@@ -122,15 +132,16 @@ class IngredientPropertiesForm extends React.Component {
           <label>Color Swatch</label>
           <div className={styles.circle} style={{backgroundColor: 'red'}} />
         </span> */}
-
-        <Button /* disabled={TODO: validate input here} */ onClick={e => onSave(this.state.input)}>Save</Button>
-        <Button onClick={onCancel}>Cancel</Button>
-        {selectedIngredientProperties && selectedIngredientProperties.groupId &&
-          <Button className={styles.deleteIngred} onClick={() =>
-            window.confirm('Are you sure you want to delete all ingredients in this group?') &&
-            onDelete(selectedIngredientProperties.groupId)
-          }>Delete Ingredient</Button>
-        }
+        <div className={styles.buttonRow}>
+          <Button /* disabled={TODO: validate input here} */ onClick={e => onSave(this.state.input)}>Save</Button>
+          <Button onClick={onCancel}>Cancel</Button>
+          {selectedIngredientProperties && selectedIngredientProperties.groupId &&
+            <Button className={styles.deleteIngred} onClick={() =>
+              window.confirm('Are you sure you want to delete all ingredients in this group?') &&
+              onDelete(selectedIngredientProperties.groupId)
+            }>Delete Ingredient</Button>
+          }
+        </div>
       </div>
     )
   }

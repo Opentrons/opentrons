@@ -29,30 +29,42 @@
   float: left;
 }
 
-.ingredientPropertiesEntry span {
-  display: inline-block;
-  margin: 0.5em 0;
-  width: 100%;
-}
-
 .ingredientPropertiesEntry form {
   display: inline-block;
+  width: 100%;
 }
 
 .ingredientPropertiesEntry label {
   color: #5b5b5b;
 }
 
-.ingredientPropertiesEntry form > span {
+.flexRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flexRow > * {
+  margin: 0.2rem;
   border: 1px solid gray;
   padding: 0.2rem;
   background-color: lightgray;
+  flex: 1;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.buttonRow > * {
+  flex: calc(1/3);
+  margin: 0 0.2rem;
 }
 
 .ingredientPropertiesEntry span input, textarea {
   /*float: right;*/
   border: none;
-  font-size: 1.25rem;
+  /*font-size: 1.25rem;*/
 }
 
 .ingredientPropertiesEntry .checkbox {
@@ -61,22 +73,30 @@
   align-items: flex-end;
 }
 
+.middleRow {
+  composes: flexRow;
+  justify-content: flex-start;
+}
+
+.middleRow > * {
+  flex: 0.25;
+}
+
+.serializeNameExample {
+  background-color: transparent;
+  border: none;
+  color: lightgray;
+  text-align: center;
+}
+
 .checkbox input {
-  zoom: 2;
+  zoom: 1.75;
   width: 1em;
-  padding: 0;
-  margin: 0;
 }
 
 .checkbox label {
   flex: 1;
   text-transform: none;
-}
-
-.ingredientPropertiesEntry .halfWidth {
-  display: inline-block;
-  width: 30%;
-  margin-right: 5%;
 }
 
 .ingredientPropertiesEntry textarea {
@@ -93,10 +113,6 @@
   border: none;
   padding: 0.2rem 1rem;
   margin-bottom: 0.5rem;
-}
-
-.ingredientPropertiesEntry button:nth-of-type(2) {
-  margin-left: 1em;
 }
 
 .deleteIngred {

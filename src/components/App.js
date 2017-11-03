@@ -4,6 +4,10 @@ import { HashRouter, Route } from 'react-router-dom'
 import Home from './Home'
 import About from './About'
 
+// to clarify: normalize.css is an npm module
+// with a dot in its name, not a .css file in src/
+import 'normalize.css'
+
 const App = () => (
   <HashRouter>
     <div className='container'>
