@@ -118,7 +118,7 @@ class IngredientPropertiesForm extends React.Component {
             </span>
             <span>
               <label>Concentration</label>
-              <Field numeric accessor='concentration' />
+              <Field accessor='concentration' />
             </span>
             <span className={styles.serializeNameExample}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
           </div>

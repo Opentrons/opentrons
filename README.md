@@ -23,13 +23,13 @@ npm start # Starts the app on http://localhost:8080/
     },
     wellDetailsByLocation: { // also referenced wellDetailsByLocation[slotName][wellName]
       A1: {
-        C2: { volume: 100, concentration: 10, name: 'Special Sample' }
+        C2: { volume: 100, concentration: '1:10', name: 'Special Sample' }
         /* ^^ could have description too, but doesn't need to have any keys. */
       }
     },
 
     volume: 20, // required. in uL
-    concentration: null, // optional number, a %
+    concentration: null, // optional string, user sets units
     description: 'blah', // optional string
 
     individualize: true // when false, ignore wellDetailsByLocation
@@ -53,7 +53,7 @@ npm start # Starts the app on http://localhost:8080/
     },
     wellDetailsByLocation: null,
     volume: 100,
-    concentration: 50,
+    concentration: '50 mol/ng',
     description: '',
     individualize: false
   }
