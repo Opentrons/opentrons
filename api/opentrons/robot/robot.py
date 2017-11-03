@@ -23,33 +23,14 @@ from functools import lru_cache
 
 log = get_logger(__name__)
 
-DECK_OFFSET = config.deck_offset
 MAX_INSTRUMENT_HEIGHT = 220.0000
 
 
-# World -> Smoothie calibration values for XY plane
-# use cli/main.py to perform factory calibration
-# TODO(artyom 20171017): move to config
-XY = \
-    array([[+9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
-           [-3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
-           [-5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
-
-# Smoothie coordinate for Z axis when 200ul tip is touching the deck
-Z_OFFSET = 3.75
-# Can be used to compensate for Z steps/mm mismatch
-Z_SCALE = 1
-
-CALIBRATION = insert(
-        insert(XY, 2, [0, 0, 0], axis=1),
-        2,
-        [0, 0, Z_SCALE, Z_OFFSET],
-        axis=0
-    )
+CALIBRATION = config.gantry_calibration
 
 MOUNT_OFFSETS = {
     'right': pose_tracker.Point(0.0, 0.0, 0.0),
-    'left': pose_tracker.Point(-37.14, 32.12, -2.5)
+    'left': pose_tracker.Point(*config.instrument_offset)
 }
 
 
@@ -193,13 +174,26 @@ class Robot(object):
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
 
         self._actuators = {
-            'left': Mover(self._driver, axis_mapping={'x': 'B'}),
-            'right': Mover(self._driver, axis_mapping={'x': 'C'})
-        }
-
-        self._movers = {
-            'left': Mover(driver=self._driver, axis_mapping={'z': 'Z'}),
-            'right': Mover(driver=self._driver, axis_mapping={'z': 'A'})
+            'left': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    reference=id(CALIBRATION),
+                    axis_mapping={'z': 'Z'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    reference='volume-calibration-left',
+                    axis_mapping={'x': 'B'})
+            },
+            'right': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    reference=id(CALIBRATION),
+                    axis_mapping={'z': 'A'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    reference='volume-calibration-right',
+                    axis_mapping={'x': 'C'})
+            }
         }
 
         self.dimensions = (395, 345, 228)
@@ -272,31 +266,41 @@ class Robot(object):
 
     def setup_gantry(self):
         driver = self._driver
-        left = self._movers['left']
-        right = self._movers['right']
-        gantry = Mover(
+
+        left_carriage = self._actuators['left']['carriage']
+        right_carriage = self._actuators['right']['carriage']
+
+        left_plunger = self._actuators['left']['plunger']
+        right_plunger = self._actuators['right']['plunger']
+
+        self.gantry = Mover(
             driver=driver,
             axis_mapping={'x': 'X', 'y': 'Y'},
-            children=[left, right]
+            reference=id(CALIBRATION),
+            children=[left_carriage, right_carriage]
         )
 
         # Extract only transformation component
-        transform = CALIBRATION * array([
-            [1, 1, 1, 0],
-            [1, 1, 1, 0],
-            [1, 1, 1, 0],
-            [0, 0, 0, 1],
-        ])
+        inverse_transform = pose_tracker.inverse(
+            pose_tracker.transform(CALIBRATION))
 
         self.poses = pose_tracker.bind(self.poses) \
-            .add(obj=driver, transform=CALIBRATION) \
-            .add(obj=gantry, parent=driver) \
-            .add(obj=left, parent=gantry) \
-            .add(obj=right, parent=gantry) \
-            .add(obj='left', parent=left, transform=inv(transform)) \
-            .add(obj='right', parent=right, transform=inv(transform))
-
-        self.gantry = gantry
+            .add(obj=id(CALIBRATION), transform=CALIBRATION) \
+            .add(obj=self.gantry, parent=id(CALIBRATION)) \
+            .add(obj=left_carriage, parent=self.gantry) \
+            .add(obj=right_carriage, parent=self.gantry) \
+            .add(
+                obj='left',
+                parent=left_carriage,
+                transform=inverse_transform) \
+            .add(
+                obj='right',
+                parent=right_carriage,
+                transform=inverse_transform) \
+            .add(obj='volume-calibration-left') \
+            .add(obj='volume-calibration-right') \
+            .add(obj=left_plunger, parent='volume-calibration-left') \
+            .add(obj=right_plunger, parent='volume-calibration-right')
 
     def add_instrument(self, mount, instrument):
         """
@@ -322,8 +326,8 @@ class Robot(object):
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        instrument.instrument_actuator = self._actuators[mount]
-        instrument.instrument_mover = self._movers[mount]
+        instrument.instrument_actuator = self._actuators[mount]['plunger']
+        instrument.instrument_mover = self._actuators[mount]['carriage']
         # We are creating two pose_tracker entries for instrument
         # one id(instrument) to store it's offset vector and another
         # with zero offset, which can be increased/decreased by
@@ -467,7 +471,7 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        self.poses = self.gantry.home(self.poses)
+        self._driver.home()
 
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):

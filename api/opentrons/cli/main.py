@@ -15,9 +15,10 @@ steps = [0.25, 0.5, 1, 5, 10, 20, 40, 80]
 # Index of selected step
 step_index = 2
 
+SAFE_HEIGHT = 130
 
-left = 'z'
-right = 'a'
+left = 'Z'
+right = 'A'
 current_pipette = right
 
 status_text = urwid.Text('')
@@ -26,29 +27,22 @@ current_position = (0, 0, 0)
 # 200uL tip. Used during calibration process
 # The actual calibration represents end of a pipette
 # without tip on
-TIP_LENGTH = DEFAULT_TIP_LENGTH
+TIP_LENGTH = DEFAULT_TIP_LENGTH - 3
 # Smoothie Z value when Deck's Z=0
-Z_OFFSET = 3.75
+Z_OFFSET = 4.5
 
 # Reference point being calibrated
 point_number = 0
 
 # (0, 0) is in bottom-left corner
 # Expected reference points
-# v0
-# expected = [
-#     (64.0, -2.5 + 90.5),        # 4
-#     (329.16, -2.5 + 90.5),      # 6
-#     (196.58, 274.0)             # 11
-# ]
 expected = [
-    (64.0, 92.8),       # 1
-    (329.0, 92.8),      # 3
-    (196.50, 273.80)    # 11
+    (64.0, 92.8),       # dimple 4
+    (329.0, 92.8),      # dimple 6
+    (196.50, 273.80)    # dimple 11
 ]
-# Expected
-# Updated during calibration process when you press ENTER
-# Default values don't matter and get overridden when ENTER is pressed
+
+# Actuals get overridden when ENTER is pressed
 actual = [
     (33.0, 5.25),
     (298.0, 6.25),
@@ -57,10 +51,13 @@ actual = [
 # Accessible through 1,2,3 ... keyboard keys to test
 # calibration by moving to known locations
 test_points = [
-    (64.0, 92.8, TIP_LENGTH),            # 4
-    (329.0, 92.8, TIP_LENGTH),          # 6
-    (196.50, 183.30, TIP_LENGTH),                # 11
-    (196.50, 273.80, TIP_LENGTH+127.8)     # 5?
+    (64.0, 92.8, TIP_LENGTH),           # dimple 4
+    (329.0, 92.8, TIP_LENGTH),          # dimple 6
+    (196.50, 273.80, TIP_LENGTH),       # dimple 11
+    (132.50, 90.50, TIP_LENGTH),        # Slot 5
+    (332.13, 47.41, TIP_LENGTH),        # Corner of 3
+    (190.65, 227.57, TIP_LENGTH),       # Corner of 8
+    (330.14, 222.78, TIP_LENGTH),       # Corner of 9
 ]
 
 # World > Smoothie XY-plane transformation
@@ -69,17 +66,22 @@ test_points = [
 # if you want to test points or to measure real-world objects
 # using the tool
 XY = \
-    array([[  9.98113208e-01,  -5.52486188e-03,  -3.46165381e+01],
-           [ -3.77358491e-03,   1.00000000e+00,  -1.03084906e+01],
+    array([[  1.00188679e+00,  -1.38121547e-03,  -4.02423779e+01],
+           [ -1.32075472e-02,   9.95856354e-01,  -5.06868659e+00],
            [ -5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
+
 
 # Add fixed Z offset which is known so we don't have to calibrate for height
 # during calibration process
-T = insert(
+def add_z(XY):
+    return insert(
         insert(XY, 2, [0, 0, 0], axis=1),
         2,
         [0, 0, 1, Z_OFFSET],
         axis=0)
+
+
+T = add_z(XY)
 
 
 def step():
@@ -132,22 +134,22 @@ def status(text):
 
 def jog(axis, direction, step):
     global current_position
-    driver.move(**{axis: driver.position[axis.upper()] + direction * step})
+    driver.move({axis: driver.position[axis] + direction * step})
     current_position = position()
     status('Jog: ' + repr([axis, str(direction), str(step)]))
 
 key_mappings = {
     'q': lambda: jog(current_pipette, +1, step()),
     'a': lambda: jog(current_pipette, -1, step()),
-    'up': lambda: jog('y', +1, step()),
-    'down': lambda: jog('y', -1, step()),
-    'left': lambda: jog('x', -1, step()),
-    'right': lambda: jog('x', +1, step()),
+    'up': lambda: jog('Y', +1, step()),
+    'down': lambda: jog('Y', -1, step()),
+    'left': lambda: jog('X', -1, step()),
+    'right': lambda: jog('X', +1, step()),
 }
 
 
 def key_pressed(key):
-    global current_position, current_pipette, step_index, point_number, XY
+    global current_position, current_pipette, step_index, point_number, XY, T
 
     if not isinstance(key, str):  # mouse clicked?
         return
@@ -191,9 +193,12 @@ def key_pressed(key):
         current_position = position()
         status('Homed')
     # calculate transformation matrix
+    elif key == 'esc':
+        raise urwid.ExitMainLoop
     elif key == ' ':
         try:
             XY = solve(expected, actual)
+            T = add_z(XY)
         except Exception as e:
             status(repr(e))
         else:
@@ -210,15 +215,13 @@ def validate(index):
     v = array(list(test_points[index]) + [1])
     x, y, z, _ = dot(inv(T), list(position()) + [1])
 
-    safe_height = 130
-
-    if z < safe_height:
-        _, _, z, _ = dot(T, [x, y, safe_height, 1])
-        driver.move(**{current_pipette: z})
+    if z < SAFE_HEIGHT:
+        _, _, z, _ = dot(T, [x, y, SAFE_HEIGHT, 1])
+        driver.move({current_pipette: z})
 
     x, y, z, _ = dot(T, v)
-    driver.move(**{'x': x, 'y': y})
-    driver.move(**{current_pipette: z})
+    driver.move({'X': x, 'Y': y})
+    driver.move({current_pipette: z})
 
 
 def main():
@@ -231,11 +234,13 @@ def main():
     )
     ui_loop = urwid.MainLoop(
         root,
+        handle_mouse=False,
         unhandled_input=key_pressed,
         event_loop=event_loop)
     status('Hello!')
     ui_loop.run()
 
+    print('Calibration data: \n', T)
 
 if __name__ == "__main__":
     main()

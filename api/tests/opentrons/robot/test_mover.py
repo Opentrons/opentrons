@@ -22,14 +22,6 @@ def driver():
 
 
 def test_functional(driver):
-    left = Mover(driver, axis_mapping={'z': 'Z'})
-    right = Mover(driver, axis_mapping={'z': 'A'})
-    gantry = Mover(
-        driver,
-        axis_mapping={'x': 'X', 'y': 'Y'},
-        children=[left, right]
-    )
-
     scale = array([
         [2, 0, 0, -1],
         [0, 2, 0, -2],
@@ -44,9 +36,18 @@ def test_functional(driver):
         [0,     0,   0, 1],
     ])
 
+    left = Mover(driver=driver, axis_mapping={'z': 'Z'}, reference=id(scale))
+    right = Mover(driver=driver, axis_mapping={'z': 'A'}, reference=id(scale))
+    gantry = Mover(
+        driver=driver,
+        axis_mapping={'x': 'X', 'y': 'Y'},
+        reference=id(scale),
+        children=[left, right]
+    )
+
     state = init() \
-        .add(driver, transform=scale) \
-        .add(gantry, driver) \
+        .add(id(scale), transform=scale) \
+        .add(gantry, id(scale)) \
         .add(left, gantry) \
         .add(right, gantry) \
         .add('left', left, transform=back) \

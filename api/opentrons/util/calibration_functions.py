@@ -5,18 +5,15 @@ from opentrons.trackers.pose_tracker import (
 from opentrons.util.vector import Vector
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
+from ..robot.robot_configs import config
 
-# TODO(artyom 20171031): for some reason was unable to share this
-# constant with opentrons.robot, thus copying it here, until
-# moved to config
-DECK_OFFSET = (-44.55, -11.9, 0)
 
 # maximum distance to move during calibration attempt
 PROBE_TRAVEL_DISTANCE = 20
 # size along X, Y and Z
-PROBE_SIZE = array((30.0, 30, 25.5))
+PROBE_SIZE = array(config.probe_dimensions)
 # coordinates of the top of the probe
-PROBE_TOP_COORDINATES = array((289.8, 296.4, 60.25)) + DECK_OFFSET
+PROBE_TOP_COORDINATES = array(config.probe_center)
 
 
 def calibrate_container_with_delta(

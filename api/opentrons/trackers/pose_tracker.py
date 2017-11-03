@@ -16,11 +16,25 @@ class Point(namedtuple('Point', 'x y z')):
 def translate(point) -> np.ndarray:
     x, y, z = point
     return np.array([
-        [1.0, 0.0, 0.0, x],
-        [0.0, 1.0, 0.0, y],
-        [0.0, 0.0, 1.0, z],
+        [1.0, 0.0, 0.0,   x],
+        [0.0, 1.0, 0.0,   y],
+        [0.0, 0.0, 1.0,   z],
         [0.0, 0.0, 0.0, 1.0]
     ])
+
+
+def transform(matrix) -> np.ndarray:
+    """Extract transformation elements from a matrix"""
+    return matrix * np.array([
+        [1, 1, 1, 0],
+        [1, 1, 1, 0],
+        [1, 1, 1, 0],
+        [0, 0, 0, 1],
+    ])
+
+
+def inverse(matrix) -> np.ndarray:
+    return inv(matrix)
 
 
 class Node(namedtuple('Node', 'parent children transform')):
@@ -53,6 +67,9 @@ def add(
         parent=ROOT,
         point=Point(0, 0, 0),
         transform=np.identity(4)) -> Dict[object, Node]:
+
+    if isinstance(transform, list):
+        transform = np.array(transform)
 
     state = bind(state)
 
@@ -129,15 +146,15 @@ def reverse(state, obj, root=None):
     ))
 
 
-def absolute(state, obj, root=None):
+def absolute(state, obj, root=None, point=Point(0, 0, 0)):
     """absolute position of an object in a sub-tree of a root"""
-    return reverse(state, obj, root).dot((0, 0, 0, 1))[:-1]
+    return reverse(state, obj, root).dot((*point, 1))[:-1]
 
 
-def relative(state, src, dst, root=None):
+def relative(state, src, dst, root=None, src_point=Point(0, 0, 0)):
     """Relative vector from src (source) to dst (destination)
     in root's subtree. if root is none — in the entire tree"""
-    x, y, z = absolute(state, obj=src, root=root)
+    x, y, z = absolute(state, obj=src, root=root, point=src_point)
     return forward(state, dst, root=root).dot((x, y, z, 1))[:-1]
 
 

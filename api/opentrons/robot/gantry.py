@@ -1,9 +1,21 @@
-from ..trackers.pose_tracker import Point, absolute, forward, update, relative
+from ..trackers.pose_tracker import (
+    Point, absolute, update, relative, ROOT
+)
 
 
 class Mover:
-    def __init__(self, driver, axis_mapping, children=None):
+    def __init__(
+        self,
+        *,
+        driver,
+        axis_mapping,
+        reference,
+        origin=ROOT,
+        children=None
+    ):
         self._driver = driver
+        self._origin = origin
+        self._reference = driver if reference is None else reference
         self._parent = None
         self._axis_mapping = axis_mapping
         self._children = children or []
@@ -28,37 +40,31 @@ class Mover:
             )
         )
 
-    def move(self, pose=None, x=None, y=None, z=None):
-        pose = pose or {}
-
+    def move(self, pose, x=None, y=None, z=None):
         # Default coordinates that are None to current so we can
         # pass them around safely
-        if self in pose:
-            current_x, current_y, current_z = absolute(pose, self)
-
-            if x is None:
-                x = current_x
-
-            if y is None:
-                y = current_y
-
-            if z is None:
-                z = current_z
-        else:
-            x, y, z = x or 0, y or 0, z or 0
+        current_x, current_y, current_z = relative(
+            pose,
+            src=self,
+            dst=self._origin)
+        x = current_x if x is None else x
+        y = current_y if y is None else y
+        z = current_z if z is None else z
 
         if self._parent:
             pose = self._parent.move(pose, x, y, z)
 
-        if self in pose:
-            # apply transformation
-            x, y, z = forward(pose, self._driver).dot((x, y, z, 1))[:-1]
+        # apply transformation
+        x, y, z = relative(
+            pose,
+            src=self._origin,
+            dst=self._reference,
+            src_point=Point(x, y, z))
 
         target = Point(
             x=x if 'x' in self._axis_mapping else 0,
             y=y if 'y' in self._axis_mapping else 0,
-            z=z if 'z' in self._axis_mapping else 0
-        )
+            z=z if 'z' in self._axis_mapping else 0)
 
         # driver axis to point axis value mapping
         # NOTE: point._asdict() returns point as dictionary:
@@ -71,9 +77,7 @@ class Mover:
 
         # Update pose with the new value. Since stepper motors are open loop
         # there is no need to to query diver for position
-        if self in pose:
-            return update(pose, self, target)
-        return pose
+        return update(pose, self, target)
 
     def home(self, pose):
         from functools import reduce
@@ -91,10 +95,8 @@ class Mover:
             y=position.get(self._axis_mapping.get('y', 'Y'), 0.0),
             z=position.get(self._axis_mapping.get('z', 'Z'), 0.0)
         )
-        print('HOME: ', point)
-        if self in pose:
-            return update(pose, self, point)
-        return pose
+
+        return update(pose, self, point)
 
     def set_speed(self, value):
         self._driver.set_speed({

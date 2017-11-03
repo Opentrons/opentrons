@@ -164,11 +164,16 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
+<<<<<<< HEAD
         if self.simulating:
             pass
         else:
             moving_plunger = ('B' in command or 'C' in command) \
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+=======
+        print('sending: ', command)
+        command_line = command + ' M400'
+>>>>>>> move calibration data under robot_config, test on Avogadro
 
             if moving_plunger:
                 self.set_current('BC', PLUNGER_CURRENT_HIGH)
@@ -196,6 +201,8 @@ class SmoothieDriver_3_0_0:
     def move(self, target):
         from numpy import isclose
 
+        print('Driver target: ', target)
+
         def valid_movement(coords, axis):
             return not (
                 (axis in DISABLE_AXES) or
@@ -214,6 +221,8 @@ class SmoothieDriver_3_0_0:
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
         axis = axis.upper()
+
+        print('Homing: ', axis)
 
         # If Y is requested make sure we home X first
         if 'Y' in axis:

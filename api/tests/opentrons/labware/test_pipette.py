@@ -7,8 +7,9 @@ from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
 # from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
-# from opentrons.trackers import pose_tracker
+from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
+from numpy import isclose
 
 
 def test_drop_tip_move_to(robot):
@@ -32,25 +33,26 @@ def test_drop_tip_move_to(robot):
     #     })
 
 
-# TODO(artyom, 20171101): uncomment once we have plunger tracking back
-# def test_aspirate_move_to(robot):
-#     p200 = Pipette(robot, mount='left', max_volume=200)
+def test_aspirate_move_to(robot):
+    p200 = Pipette(robot, mount='left', max_volume=200)
 
-#     x, y, z = (161.0, 116.7, 0)
-#     plate = containers_load(robot, '96-flat', 'A1')
-#     well = plate[0]
-#     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
-#     location = (plate, pos)
+    x, y, z = (161.0, 116.7, 0)
+    plate = containers_load(robot, '96-flat', 'A1')
+    well = plate[0]
+    pos = well.from_center(x=0, y=0, z=-1, reference=plate)
+    print(well.properties)
+    location = (plate, pos)
 
-#     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
-#     robot.calibrate_container_with_instrument(plate, p200, False)
-#     p200.aspirate(100, location)
+    robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
+    robot.calibrate_container_with_instrument(plate, p200, False)
 
-#     current_pos = pose_tracker.absolute(robot.poses, p200)
-#     assert isclose(current_pos, (172.24, 131.04, 0)).all()
-#     current_pos = robot._driver.get_plunger_positions()['current']
+    p200.aspirate(100, location)
+    current_pos = pose_tracker.absolute(robot.poses, p200.instrument_actuator)
+    print(robot._driver.log)
+    assert (current_pos == (0.5, 0.0, 0.0)).all()
 
-#     assert current_pos == {'a': 0, 'b': 5.0}
+    current_pos = pose_tracker.absolute(robot.poses, p200)
+    assert isclose(current_pos, (172.24, 131.04, 0)).all()
 
 
 def test_blow_out_move_to(robot):
@@ -1347,7 +1349,6 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.p200.current_volume, 50)
 
     def test_pipette_home(self):
-        self.robot._driver.home = mock.Mock()
         self.p200.home()
         self.assertEquals(len(self.robot.commands()), 1)
 
