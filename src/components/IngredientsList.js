@@ -15,7 +15,7 @@ class IngredGroupCard extends React.Component {
 
   render () {
     const {ingredCategoryData, editModeIngredientGroup, deleteIngredient, selected, ...otherProps} = this.props
-    const { groupId } = ingredCategoryData
+    const { groupId, serializeName } = ingredCategoryData
     const { isExpanded } = this.state
 
     return (
@@ -31,7 +31,7 @@ class IngredGroupCard extends React.Component {
         {isExpanded && ingredCategoryData.wells.map((wellName, i) =>
           <IngredIndividual key={i}
             name={ingredCategoryData.individualize
-              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `Sample ${i + 1}`)
+              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `${serializeName || 'Sample'} ${i + 1}`)
               : ' '
             }
             wellName={wellName}
@@ -55,7 +55,7 @@ const IngredIndividual = ({name, wellName, volume, concentration, canDelete, gro
     <div>{name}</div>
     <div>{volume + 'uL'}</div>
     {/* <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
-    <div>{concentration === null ? '-' : concentration + '%'}</div>
+    <div>{concentration === null ? '-' : concentration}</div>
     {canDelete && <div className={styles.deleteIngredient} onClick={
         e => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
         deleteIngredient({wellName, groupId})

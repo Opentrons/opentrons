@@ -14,6 +14,9 @@ npm start # Starts the app on http://localhost:8080/
 {
   1: {
     name: 'Blood Samples',
+    serializeName: 'Blood Samp',
+      // Blood Samp 1, Blood Samp 2, etc.
+      // This field can be blank or not exist, falls back to name
     locations: {
       // [slotName]: [wellName, wellName, etc] for all slots.
       A1: ['C2', 'C3', 'C4']

@@ -104,7 +104,7 @@ const selectedWells = handleActions({
 
 const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
-    const editableIngredFields = ['name', 'volume', 'concentration', 'description', 'individualize']
+    const editableIngredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize']
     const { groupId, containerId } = action.payload
     if (!isNil(groupId)) {
       // GroupId was given, edit existing ingredient
@@ -297,7 +297,7 @@ const _selectedIngredientGroupObj = createSelector(
 const selectedIngredientProperties = createSelector(
   _selectedIngredientGroupObj,
   ingredGroup => (!isNil(ingredGroup))
-    ? pick(ingredGroup, ['name', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
+    ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
     : null
 )
 

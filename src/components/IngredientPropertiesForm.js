@@ -29,7 +29,10 @@ class IngredientPropertiesForm extends React.Component {
         volume: this.props.volume || null,
         description: this.props.description || null,
         concentration: this.props.concentration || null,
-        individualize: this.props.individualize || false
+        individualize: this.props.individualize || false,
+        serializeName: this.props.individualize
+          ? this.props.serializeName || this.props.name || null
+          : null
       }
     }
 
@@ -42,7 +45,7 @@ class IngredientPropertiesForm extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { name, volume, description, concentration, individualize } = this.state.input
+    const { name, volume, description, concentration, individualize, serializeName } = this.state.input
 
     if (!nextProps.selectedIngredientProperties) {
       this.setState({
@@ -51,7 +54,8 @@ class IngredientPropertiesForm extends React.Component {
           volume: null,
           description: null,
           concentration: null,
-          individualize: false
+          individualize: false,
+          serializeName: null
         }
       })
     } else {
@@ -61,7 +65,8 @@ class IngredientPropertiesForm extends React.Component {
           volume: nextProps.selectedIngredientProperties.volume || volume,
           description: nextProps.selectedIngredientProperties.description || description,
           concentration: nextProps.selectedIngredientProperties.concentration || concentration,
-          individualize: nextProps.selectedIngredientProperties.individualize || individualize
+          individualize: nextProps.selectedIngredientProperties.individualize || individualize,
+          serializeName: nextProps.selectedIngredientProperties.serializeName || serializeName
         }
       })
     }
@@ -103,7 +108,7 @@ class IngredientPropertiesForm extends React.Component {
                 <label> Serialize Name </label>
                 <Field accessor='individualize' type='checkbox' />
               </span>
-              {this.state.input.individualize && <Field accessor='serializeName' />}
+              {this.state.input.individualize && <Field accessor='serializeName' placeholder='Sample' />}
             </span>
           </div>
           <div className={styles.middleRow}>
