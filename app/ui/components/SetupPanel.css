@@ -63,11 +63,6 @@
   font-style: italic;
 }
 
-.unavailable {
-  opacity: 0.1;
-  pointer-events: none;
-}
-
 .step_list button,
 .step_list a {
   color: black;

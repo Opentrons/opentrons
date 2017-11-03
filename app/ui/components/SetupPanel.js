@@ -43,8 +43,16 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, calibration, isTiprack, tipracksConfirmed, onClick} = props
-  const isDisabled = !isTiprack && !tipracksConfirmed
+  const {
+    name,
+    calibration,
+    isTiprack,
+    instrumentsCalibrated,
+    tipracksConfirmed,
+    onClick
+  } = props
+
+  const isDisabled = !instrumentsCalibrated || !(isTiprack || tipracksConfirmed)
   const isConfirmed = calibration === robotConstants.CONFIRMED
 
   const buttonStyle = classnames(styles.btn_labware, {
@@ -95,6 +103,7 @@ export default function SetupPanel (props) {
       <LabwareLinks
         {...lab}
         key={slot}
+        instrumentsCalibrated={instrumentsCalibrated}
         tipracksConfirmed={tipracksConfirmed}
         onClick={onClick}
       />
@@ -140,7 +149,7 @@ export default function SetupPanel (props) {
         </section>
         <section className={styles.labware_group}>
           <h3>Labware Setup</h3>
-          <ul className={classnames({[styles.unavailable]: !instrumentsCalibrated}, styles.step_list)}>
+          <ul className={styles.step_list}>
             {tiprackList}
             {labwareList}
           </ul>
