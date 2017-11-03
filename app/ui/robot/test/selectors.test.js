@@ -324,6 +324,9 @@ describe('robot selectors', () => {
       calibration: {
         instrumentsByAxis: {
           left: constants.PROBING
+        },
+        probedByAxis: {
+          left: true
         }
       }
     })
@@ -334,14 +337,16 @@ describe('robot selectors', () => {
         name: 'p200m',
         channels: 'multi',
         volume: 200,
-        calibration: constants.PROBING
+        calibration: constants.PROBING,
+        probed: true
       },
       {
         axis: 'right',
         name: 'p50s',
         channels: 'single',
         volume: 50,
-        calibration: constants.UNPROBED
+        calibration: constants.UNPROBED,
+        probed: false
       }
     ])
   })
@@ -355,10 +360,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          left: constants.PROBED,
-          right: constants.PROBED
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {left: true, right: true}
       }
     })
 
@@ -370,10 +373,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          left: constants.UNPROBED,
-          right: constants.UNPROBED
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {left: false, right: false}
       }
     })
 
@@ -384,9 +385,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          right: constants.PROBED
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {right: true}
       }
     })
 

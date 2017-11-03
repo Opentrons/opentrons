@@ -15,7 +15,6 @@ import {
   FINISHED,
   STOPPED,
   UNPROBED,
-  PROBED,
   CONFIRMED,
   UNCONFIRMED,
   INSTRUMENT_AXES,
@@ -163,7 +162,10 @@ export function getInstrumentsByAxis (state) {
 
 export function getInstruments (state) {
   const protocolInstrumentsByAxis = getInstrumentsByAxis(state)
-  const {instrumentsByAxis: calibrationByAxis} = getCalibrationState(state)
+  const {
+    instrumentsByAxis: calibrationByAxis,
+    probedByAxis
+  } = getCalibrationState(state)
 
   return INSTRUMENT_AXES.map((axis) => {
     let instrument = protocolInstrumentsByAxis[axis] || {axis}
@@ -177,7 +179,8 @@ export function getInstruments (state) {
     if (instrument.name) {
       instrument = {
         ...instrument,
-        calibration: calibrationByAxis[axis] || UNPROBED
+        calibration: calibrationByAxis[axis] || UNPROBED,
+        probed: probedByAxis[axis] || false
       }
     }
 
@@ -189,7 +192,7 @@ export function getInstrumentsCalibrated (state) {
   const instruments = getInstruments(state)
 
   return instruments
-    .every((i) => i.name == null || i.calibration === PROBED)
+    .every((i) => i.name == null || i.probed)
 }
 
 export function getLabwareBySlot (state) {

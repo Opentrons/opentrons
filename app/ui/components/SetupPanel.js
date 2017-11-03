@@ -9,13 +9,13 @@ import styles from './SetupPanel.css'
 import {constants as robotConstants} from '../robot'
 
 function PipetteLinks (props) {
-  const {axis, name, volume, channels, calibration, onClick} = props
+  const {axis, name, volume, channels, probed, onClick} = props
   const isDisabled = name == null
   const url = `/setup-instruments/${axis}`
 
   const linkStyle = classnames({[styles.disabled]: isDisabled})
 
-  const statusStyle = isDisabled || calibration === robotConstants.PROBED
+  const statusStyle = isDisabled || probed
     ? styles.confirmed
     : styles.alert
 

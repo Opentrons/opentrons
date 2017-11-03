@@ -7,7 +7,11 @@ describe('robot reducer - calibration', () => {
 
     expect(state).toEqual({
       labwareReviewed: false,
+      // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
+      // axis. probedByAxis holds a flag for whether the instrument has been
+      // probed at least once by axis. Rethink or combine these states
       instrumentsByAxis: {},
+      probedByAxis: {},
       labwareBySlot: {},
 
       // homeRequest: {inProgress: false, error: null},
@@ -72,7 +76,7 @@ describe('robot reducer - calibration', () => {
         moveToFrontRequest: {inProgress: false, error: new Error()},
         instrumentsByAxis: {
           left: constants.UNPROBED,
-          right: constants.UNPROBED
+          right: constants.READY_TO_PROBE
         }
       }
     }
@@ -160,7 +164,8 @@ describe('robot reducer - calibration', () => {
         instrumentsByAxis: {
           left: constants.UNPROBED,
           right: constants.PROBING
-        }
+        },
+        probedByAxis: {}
       }
     }
     const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
@@ -179,6 +184,9 @@ describe('robot reducer - calibration', () => {
       instrumentsByAxis: {
         left: constants.UNPROBED,
         right: constants.PROBED
+      },
+      probedByAxis: {
+        right: true
       }
     })
     expect(reducer(state, failure).calibration).toEqual({
@@ -187,6 +195,31 @@ describe('robot reducer - calibration', () => {
         error: new Error('AH'),
         axis: 'right'
       },
+      instrumentsByAxis: {
+        left: constants.UNPROBED,
+        right: constants.UNPROBED
+      },
+      probedByAxis: {
+        right: false
+      }
+    })
+  })
+
+  test('handles RESET_TIP_PROBE', () => {
+    const state = {
+      calibration: {
+        instrumentsByAxis: {
+          left: constants.UNPROBED,
+          right: constants.PROBED
+        }
+      }
+    }
+    const action = {
+      type: actionTypes.RESET_TIP_PROBE,
+      payload: {instrument: 'right'}
+    }
+
+    expect(reducer(state, action).calibration).toEqual({
       instrumentsByAxis: {
         left: constants.UNPROBED,
         right: constants.UNPROBED

@@ -16,7 +16,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onPrepareClick: () => dispatch(robotActions.moveToFront(axis)),
     onProbeTipClick: () => dispatch(robotActions.probeTip(axis)),
-    onCancelClick: () => console.log(`Cancel tip probe for ${axis}`)
+    onCancelClick: () => dispatch(robotActions.resetTipProbe(axis))
   }
 }
 

@@ -17,6 +17,7 @@ TipProbe.propTypes = {
   instrument: PropTypes.shape({
     name: PropTypes.string,
     volume: PropTypes.number,
+    probed: PropTypes.bool,
     calibration: PropTypes.oneOf([
       UNPROBED,
       PREPARING_TO_PROBE,
@@ -61,17 +62,19 @@ function InfoBox (props) {
 }
 
 function TipProbeMessage (props) {
-  const {instrument: {calibration, volume}} = props
+  const {instrument: {probed, calibration, volume}} = props
   let icon = null
   let message = ''
 
   if (calibration === UNPROBED || calibration === PREPARING_TO_PROBE) {
-    icon = (
-      <Warning className={styles.alert} />
-    )
-    message = (
-      'For accuracy, you must define tip dimensions using the Tip Probe tool'
-    )
+    if (!probed) {
+      icon = (
+        <Warning className={styles.alert} />
+      )
+      message = (
+        'For accuracy, you must define tip dimensions using the Tip Probe tool'
+      )
+    }
   } else if (calibration === READY_TO_PROBE) {
     message = (
       <span>
@@ -136,7 +139,7 @@ function TipProbeButtonOrSpinner (props) {
 function TipProbeWarning (props) {
   const {instrument: {calibration}} = props
 
-  if (calibration === UNPROBED || calibration === PROBED) {
+  if (calibration === UNPROBED) {
     return (
       <p className={styles.warning}>
         ATTENTION:  REMOVE ALL LABWARE AND TRASH BIN FROM DECK BEFORE STARTING TIP PROBE.

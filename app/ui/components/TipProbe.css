@@ -24,8 +24,7 @@
   height: 3rem;
   padding: 0 3rem;
   display: block;
-  margin: 0 auto;
-  margin-top: 1.5rem;
+  margin: 1rem auto;
   line-height: 3rem;
   font-size: 1rem;
   font-family: 'trons';
@@ -64,8 +63,7 @@
   width: 4rem;
   height: 3rem;
   display: block;
-  margin: 0 auto;
-  margin-top: 1.5rem;
+  margin: 1rem auto;
 }
 
 .close {
