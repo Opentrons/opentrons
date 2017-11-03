@@ -44,7 +44,7 @@ GCODES = {'HOME': 'G28.2',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
-          'SET_SPEED': 'G0F',
+          'SET_SPEED': 'G0 {axis} F{value}',
           'SET_CURRENT': 'M907'}
 
 
@@ -137,11 +137,17 @@ class SmoothieDriver_3_0_0:
         pass
 
     def set_speed(self, values):
-        command = GCODES['SET_SPEED'] + ' ' + ' '.join([
-            '{axis}{value}'.format(axis=axis.upper(), value=value)
+        # reference: http://smoothieware.org/supported-g-codes
+        # “Push” the current feed-rate and seek-rate so that another one can
+        # be temporarily used, then the current one can be restored
+        self._send_command('M120')
+        [
+            self._send_command(
+                GCODES['SET_SPEED'].format(axis=axis, value=value))
             for axis, value in values.items()
-        ])
-        self._send_command(command)
+        ]
+        # Pop speed
+        self._send_command('M121')
 
     def set_current(self, axes, value):
         ''' set total movement speed in mm/second'''
@@ -164,16 +170,11 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
-<<<<<<< HEAD
         if self.simulating:
             pass
         else:
             moving_plunger = ('B' in command or 'C' in command) \
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
-=======
-        print('sending: ', command)
-        command_line = command + ' M400'
->>>>>>> move calibration data under robot_config, test on Avogadro
 
             if moving_plunger:
                 self.set_current('BC', PLUNGER_CURRENT_HIGH)
@@ -201,8 +202,6 @@ class SmoothieDriver_3_0_0:
     def move(self, target):
         from numpy import isclose
 
-        print('Driver target: ', target)
-
         def valid_movement(coords, axis):
             return not (
                 (axis in DISABLE_AXES) or
@@ -221,8 +220,6 @@ class SmoothieDriver_3_0_0:
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
         axis = axis.upper()
-
-        print('Homing: ', axis)
 
         # If Y is requested make sure we home X first
         if 'Y' in axis:

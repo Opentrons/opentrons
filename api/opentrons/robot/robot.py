@@ -334,10 +334,10 @@ class Robot(object):
         # tip length for pickup and drop tip
         self.poses = pose_tracker.add(
             self.poses,
-            id(instrument),
+            instrument,
             parent=mount,
             point=MOUNT_OFFSETS[mount]
-        ).add(instrument, parent=id(instrument))
+        )
 
     def add_warning(self, warning_msg):
         """
@@ -471,7 +471,7 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        self._driver.home()
+        self.poses = self.gantry.home(self.poses)
 
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):

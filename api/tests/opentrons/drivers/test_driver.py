@@ -37,8 +37,8 @@ def test_plunger_commands(smoothie, monkeypatch):
     monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
     smoothie.home()
-    smoothie.move(x=0, y=1, z=2, a=3)
-    smoothie.move(x=0, y=1, z=2, a=3, b=4, c=5)
+    smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3})
+    smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3, 'B': 4, 'C': 5})
 
     fuzzy_assert(
         result=command_log,

@@ -1427,13 +1427,13 @@ class Pipette:
         return self.instrument_mover.probe(axis, movement)
 
     def _add_tip(self, length):
+        x, y, z = pose_tracker.get(self.robot.poses, self)
         self.robot.poses = pose_tracker.update(
-            self.robot.poses,
-            self,
-            pose_tracker.Point(0, 0, -length))
+            self.robot.poses, self, pose_tracker.Point(
+                x, y, z - length))
 
     def _remove_tip(self, length):
+        x, y, z = pose_tracker.get(self.robot.poses, self)
         self.robot.poses = pose_tracker.update(
-            self.robot.poses,
-            self,
-            pose_tracker.Point(0, 0, length))
+            self.robot.poses, self, pose_tracker.Point(
+                x, y, z + length))
