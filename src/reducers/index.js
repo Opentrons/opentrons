@@ -87,7 +87,8 @@ const containers = handleActions({
 const selectedWellsInitialState = {preselected: {}, selected: {}}
 const selectedWells = handleActions({
   PRESELECT_WELLS: (state, action) => action.payload.append
-    ? {...state, preselected: action.payload.wells} : {selected: {}, preselected: action.payload.wells},
+    ? {...state, preselected: action.payload.wells}
+    : {selected: {}, preselected: action.payload.wells},
   SELECT_WELLS: (state, action) => ({
     preselected: {},
     selected: {
@@ -101,6 +102,11 @@ const selectedWells = handleActions({
   CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
   EDIT_INGREDIENT: () => selectedWellsInitialState
 }, selectedWellsInitialState)
+
+const highlightedIngredients = handleActions({
+  HOVER_WELL_BEGIN: (state, action) => ({ wells: action.payload }),
+  HOVER_WELL_END: (state, action) => ({}) // clear highlighting
+}, {})
 
 const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
@@ -156,7 +162,8 @@ const rootReducer = combineReducers({
   selectedIngredientGroup,
   containers,
   selectedWells,
-  ingredients
+  ingredients,
+  highlightedIngredients
 })
 
 // SELECTORS
@@ -221,13 +228,17 @@ const selectedContainerType = createSelector(
 )
 
 // Given ingredientsForContainer obj and rowNum, colNum,
-// returns the groupId (string key) of that well, or `undefined`
+// returns the ingred data for that well, or `undefined`
+// TODO SOON: document the ingredientsForContainer obj returned by that selector (it's upstream of this fn!)
 const _ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
   const wellName = toWellName({rowNum, colNum})
   const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
-  const matches = get(ingredientsForContainer, [matchedKey, 'groupId'])
+  const matchedIngred = ingredientsForContainer[matchedKey]
 
-  return matches
+  console.log({ingredientsForContainer, matchedIngred, matchedKey})
+  const ingredientNum = matchedIngred && matchedIngred.wells && matchedIngred.wells.findIndex(w => w === wellName) + 1
+
+  return {...matchedIngred, ingredientNum, wellName}
 }
 
 const allIngredients = createSelector(
@@ -301,7 +312,9 @@ const selectedIngredientProperties = createSelector(
     : null
 )
 
-const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells) => {
+const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells, highlightedWells) => {
+  // selectedWells and highlightedWells args may both be null,
+  // they're only relevant to the selected container.
   if (!containerType) {
     return undefined
   }
@@ -311,29 +324,35 @@ const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells) =
     rowNum => range(columns).map(
       colNum => {
         const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
-        // parse the ingredientGroupId to int, or set to null if the well is empty
-        const _ingredientGroupId = _ingredAtWell(ingredientsForContainer)({rowNum, colNum})
-        const ingredientGroupId = (_ingredientGroupId !== undefined)
-          ? parseInt(_ingredientGroupId, 10)
-          : null
+
+        // get ingred data, or set to null if the well is empty
+        const ingredData = _ingredAtWell(ingredientsForContainer)({rowNum, colNum}) || null
+
+        const isHighlighted = highlightedWells ? wellKey in highlightedWells : false
 
         return {
-          number: rowNum * columns + colNum + 1,
           wellShape,
-          preselected: wellKey in selectedWells.preselected,
-          selected: wellKey in selectedWells.selected,
-          ingredientGroupId
+          preselected: selectedWells ? wellKey in selectedWells.preselected : false,
+          highlighted: isHighlighted,
+          hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
+          selected: selectedWells ? wellKey in selectedWells.selected : false,
+          ...ingredData // TODO later: nest this so it looks cleaner?
         }
       }
     )
   )
 }
 
-const _allWellMatricesById = createSelector(
+const allWellMatricesById = createSelector(
   allIngredients,
   state => rootSelector(state).containers,
-  (allIngredients, containers) => reduce(containers, (acc, container, containerId) => {
-    const wellMatrix = _getWellMatrix(container.type, _ingredientsForContainerId(allIngredients, containerId), selectedWellsInitialState)
+  (allIngredients, containers, selectedWells) => reduce(containers, (acc, container, containerId) => {
+    const wellMatrix = _getWellMatrix(
+      container.type,
+      _ingredientsForContainerId(allIngredients, containerId),
+      null, // selectedWells is only for the selected container, so treat as empty selection.
+      null // so ig highlightedWells
+    )
 
     return {
       ...acc,
@@ -342,15 +361,11 @@ const _allWellMatricesById = createSelector(
   }, {})
 )
 
-const wellMatrixById = containerId => state => {
-  const allWellMatrices = _allWellMatricesById(state)
-  return allWellMatrices && allWellMatrices[containerId]
-}
-
 const wellMatrixSelectedContainer = createSelector(
   selectedContainerType,
   ingredientsForContainer,
-  state => rootSelector(state).selectedWells,
+  state => rootSelector(state).selectedWells, // wells are selected only for the selected container.
+  state => rootSelector(state).highlightedIngredients.wells,
   _getWellMatrix
 )
 
@@ -372,11 +387,11 @@ const activeModals = createSelector(
 // TODO: prune selectors
 export const selectors = {
   activeModals,
+  allWellMatricesById,
   loadedContainersBySlot,
   containersBySlot,
   canAdd,
   wellMatrixSelectedContainer,
-  wellMatrixById,
   numWellsSelected,
   selectedWellNames,
   selectedContainerSlot,

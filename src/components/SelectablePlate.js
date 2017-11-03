@@ -2,14 +2,14 @@ import React from 'react'
 import Plate from './Plate.js'
 
 import SelectionRect from '../components/SelectionRect.js'
-import Well from '../components/Well.js'
+import HoverableWell from '../containers/HoverableWell.js'
 
 const SelectablePlate = ({wellMatrix, onSelectionMove, onSelectionDone, containerId, selectable, ...otherProps}) => (
   // containerId not passed into Plate, so don't unpack into otherProps --------^
   <SelectionRect {...{onSelectionMove, onSelectionDone}}>
     <Plate
       selectable={selectable}
-      Well={Well}
+      Well={HoverableWell}
       wellMatrix={wellMatrix}
       {...otherProps}
     />

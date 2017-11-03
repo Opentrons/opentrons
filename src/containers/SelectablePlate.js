@@ -51,7 +51,7 @@ export default connect(
 
     return {
       wellMatrix: containerId
-        ? selectors.wellMatrixById(containerId)(state)
+        ? selectors.allWellMatricesById(state)[containerId]
         : selectors.wellMatrixSelectedContainer(state)
     }
   },

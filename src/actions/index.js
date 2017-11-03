@@ -1,6 +1,9 @@
 import { createActions } from 'redux-actions'
 import { selectors } from '../reducers'
 
+// Payload mappers
+const xyToSingleWellObj = (x, y) => ({ [(x + ',' + y)]: [x, y] })
+
 // Actions
 export const {
   openLabwareSelector,
@@ -17,7 +20,10 @@ export const {
   selectWells,
   deselectWells,
 
-  editModeIngredientGroup
+  editModeIngredientGroup,
+
+  hoverWellBegin,
+  hoverWellEnd
   // deleteIngredient
 } = createActions({
   OPEN_LABWARE_SELECTOR: undefined,
@@ -34,10 +40,13 @@ export const {
   SELECT_WELLS: undefined,
   DESELECT_WELLS: undefined,
 
-  EDIT_MODE_INGREDIENT_GROUP: undefined // payload => ({...payload, selectedWells: {'0,1': [0, 1]}}),
+  EDIT_MODE_INGREDIENT_GROUP: undefined, // payload => ({...payload, selectedWells: {'0,1': [0, 1]}}),
   // Payload example: {group: 2, wellName: 'H1' (wellName is optional)}
   // TODO: ^^^ get [col, row] from wellName, and wellName from either action.payload.wellName, or ingredients[action.payload.group]
   // DELETE_INGREDIENT: undefined
+
+  HOVER_WELL_BEGIN: xyToSingleWellObj,
+  HOVER_WELL_END: xyToSingleWellObj
 })
 
 export const deleteIngredient = payload => (dispatch, getState) => {

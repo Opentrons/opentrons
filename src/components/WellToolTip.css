@@ -1,0 +1,32 @@
+.wellToolTip {
+  position: absolute;
+  font-size: 1rem;
+  text-align: left;
+
+  background-color: white;
+  border: 1px solid gray;
+
+  padding: 0.5em;
+  z-index: 1;
+  top: 50px;
+}
+
+.wellToolTip h1 {
+  font-size: 1.5em;
+  margin: 0;
+}
+
+.infoRow {
+  display: flex;
+}
+
+.infoRow * {
+  color: gray;
+  width: auto;
+  white-space: nowrap;
+  margin: 0 1em;
+}
+
+.instanceName {
+  color: black;
+}

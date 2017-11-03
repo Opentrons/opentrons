@@ -3,18 +3,23 @@ import PropTypes from 'prop-types'
 import cx from 'classnames'
 
 import { SELECTABLE_CLASS, swatchColors } from '../constants.js'
-import styles from '../css/style.css'
+import WellToolTip from '../components/WellToolTip.js'
+
+import styles from '../css/style.css' // TODO use own styles
 
 const Well = ({x, y, wellContent, selectable, ...otherProps}) => {
-  const { preselected, selected, number, ingredientGroupId } = wellContent
-  const isFilled = (ingredientGroupId !== null && ingredientGroupId !== undefined)
+  const { preselected, selected, highlighted, hovered, groupId } = wellContent
+  const isFilled = (groupId !== null && groupId !== undefined)
   return (
     <div
       className={cx(
         styles.wellRound,
-        {[styles.selected]: selected, [styles.highlighted]: preselected, [SELECTABLE_CLASS]: selectable && !isFilled}
+        {[styles.selected]:
+          selected,
+          [styles.preselected]: preselected,
+          [styles.highlighted]: highlighted,
+          [SELECTABLE_CLASS]: selectable && !isFilled}
       )}
-      data-well-number={number}
       data-well-x={x}
       data-well-y={y}
       style={{
@@ -22,11 +27,14 @@ const Well = ({x, y, wellContent, selectable, ...otherProps}) => {
           ? 'blue' // <- set color swatch for ingredient here
           : (preselected ? 'lightcyan' : 'transparent'),
         '--well-fill-color': isFilled
-          ? swatchColors(ingredientGroupId)
+          ? swatchColors(parseInt(groupId, 10))
           : 'transparent'  // <- set well fill color here (probably, add it in wellMatrix)
       }}
       {...otherProps}
-      ><div className={styles.innerWell} /></div>
+      >
+      {/* TODO: hovered prop */}
+      {hovered && isFilled && <WellToolTip wellContent={wellContent} />}
+      <div className={styles.innerWell} /></div>
   )
 }
 
@@ -37,7 +45,9 @@ Well.propTypes = {
     number: PropTypes.number,
     selected: PropTypes.bool,
     preselected: PropTypes.bool,
-    ingredientGroupId: PropTypes.number
+    highlighted: PropTypes.bool,
+    hovered: PropTypes.bool,
+    groupId: PropTypes.string
   }).isRequired
 }
 

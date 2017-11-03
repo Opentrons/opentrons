@@ -118,7 +118,11 @@ textarea {
 }
 
 .wellRound.highlighted {
-  border: 2px solid blue; /* highlight color */
+  border: 2px solid yellow; /* highlight color */
+}
+
+.wellRound.preselected {
+  border: 2px solid powderblue; /* highlight color */
 }
 
 .wellRound .innerWell {
