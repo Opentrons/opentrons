@@ -173,9 +173,17 @@ body {
 }
 
 .tooltip_diagram {
-  left: -40%;
-  width: 24rem;
-  height: 20rem;
+  bottom: 130%;
+  left: -90%;
+  width: 35rem;
+  padding: 2rem;
+  background-color: white;
+  border: 2px solid black;
+}
+
+.tooltip_diagram img {
+  width: 100%;
+  height: auto;
 }
 
 .tooltip_diagram::after {

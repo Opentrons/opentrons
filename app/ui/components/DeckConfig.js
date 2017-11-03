@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom'
 import classnames from 'classnames'
 import Labware from './Labware'
 import ToolTip from './ToolTip'
+import Diagram from './Diagram'
 import styles from './DeckConfig.css'
 import {constants as robotConstants} from '../robot'
 
@@ -140,13 +141,13 @@ ConfirmCalibrationPrompt.propTypes = {
 }
 
 function ConfirmCalibrationPrompt (props) {
-  const {slot, onYesClick} = props
-  const toolTipMessage = 'plan and section view diagrams here'
+  const {slot, onYesClick, isTiprack} = props
+  const toolTipMessage = <Diagram isTiprack={isTiprack} />
   // TODO(mc, 2017-10-06): use props for no button href
   return (
     <div className={styles.prompt}>
       <h3>
-        Is Pipette &nbsp;
+        <strong>Is Pipette &nbsp;</strong>
         <span className={classnames(styles.centered_prompt, 'tooltip_parent')}>
           accurately centered
           <ToolTip msg={toolTipMessage} pos='diagram' className={styles.centered_diagram} />
