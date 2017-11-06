@@ -1,12 +1,17 @@
 import serial
 from serial.tools import list_ports
 import contextlib
+import os
 
 DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
-SMOOTHIE_BOARD_NAME = 'FT232R'
+
+SMOOTHIE_PORT_ID = 'FT232R'
+
+if os.environ.get('RUNNING_ON_PI'):
+    SMOOTHIE_PORT_ID = 'AMA'
 
 ERROR_KEYWORD = b'error'
 ALARM_KEYWORD = b'ALARM'
@@ -94,7 +99,7 @@ def write_and_return(
     return response
 
 
-def connect(device_name=SMOOTHIE_BOARD_NAME):
+def connect(device_name=SMOOTHIE_PORT_ID):
     '''
     Creates a serial connection
     :param device_name: defaults to 'Smoothieboard'

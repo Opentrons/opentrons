@@ -29,4 +29,4 @@ RUN systemctl enable data-user_storage.mount
 
 ENV RUNNING_ON_PI=1
 ENV INITSYSTEM on
-CMD ["/usr/src/compute/scripts/start.sh"]
+CMD ["/usr/src/compute/scripts/main_start.sh"]
