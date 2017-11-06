@@ -79,14 +79,15 @@
 }
 
 .middleRow > * {
-  flex: 0.25;
+  flex: calc(1/3);
 }
 
 .serializeNameExample {
+  flex: calc(2/3);
   background-color: transparent;
   border: none;
   color: lightgray;
-  text-align: center;
+  text-align: left;
 }
 
 .checkbox input {
@@ -101,7 +102,7 @@
 
 .ingredientPropertiesEntry textarea {
   width: 98%;
-  height: 5em;
+  height: 2em;
 }
 
 .ingredientPropertiesEntry button {

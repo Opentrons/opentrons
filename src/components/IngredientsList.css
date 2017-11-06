@@ -202,13 +202,24 @@ label {
   padding: 0.25rem;
 }
 
+.ingredientInstanceItem div {
+  flex: 1;
+}
+
 .ingredientInstanceItem:nth-child(odd) {
   background-color: #eee;
 }
 
 .ingredientInstanceItem div:first-child {
-  margin-left: 0.5rem;
+  /* Well name */
+  margin-left: 0.25rem;
   color: gray;
+  flex: 0.5;
+}
+
+.ingredientInstanceItem div:last-child {
+  /* X to delete */
+  flex: 0.25;
 }
 
 .ingredientInstanceItem input {

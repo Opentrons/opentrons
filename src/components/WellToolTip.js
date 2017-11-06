@@ -7,12 +7,12 @@ const WellToolTip = ({wellContent}) => (
   <div className={styles.wellToolTip}>
     <h1>{wellContent.name}</h1>
     <div className={styles.infoRow}>
-      {wellContent.individualize && <div className={styles.instanceName}>
-        {wellContent.serializeName || 'Sample'} {wellContent.ingredientNum}
-      </div>}
       <div>
         {wellContent.wellName}
       </div>
+      {wellContent.individualize && <div className={styles.instanceName}>
+        {wellContent.serializeName || 'Sample'} {wellContent.ingredientNum}
+      </div>}
       <div>
         {wellContent.volume} uL
       </div>

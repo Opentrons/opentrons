@@ -101,18 +101,21 @@ class IngredientPropertiesForm extends React.Component {
         </h1>
 
         <form>
-          <div className={styles.flexRow}>
+          <div className={styles.middleRow}>
             <span>
               <label>Name</label>
               <Field accessor='name' />
             </span>
+          </div>
+          <div className={styles.middleRow}>
             <span>
               <span className={styles.checkbox}>
-                <label> Serialize Name </label>
                 <Field accessor='individualize' type='checkbox' />
+                <label> Serialize Name </label>
               </span>
               {individualize && <Field accessor='serializeName' placeholder='Sample' />}
             </span>
+            <span className={styles.serializeNameExample}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
           </div>
           <div className={styles.middleRow}>
             <span style={{borderColor: maxVolExceeded && 'red'}}>
@@ -127,7 +130,6 @@ class IngredientPropertiesForm extends React.Component {
               <label>Concentration</label>
               <Field accessor='concentration' />
             </span>
-            <span className={styles.serializeNameExample}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
           </div>
           <div className={styles.flexRow}>
             <span>
