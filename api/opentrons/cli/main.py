@@ -44,22 +44,17 @@ expected = [
 ]
 
 # Actuals get overridden when ENTER is pressed
-actual = [
-    (33.0, 5.25),
-    (298.0, 6.25),
-    (169.5, 276.0),
-]
+actual = [(0, 0)] * 3
+
 # Accessible through 1,2,3 ... keyboard keys to test
 # calibration by moving to known locations
-test_points = [
-    (64.0, 92.8, TIP_LENGTH),           # dimple 4
-    (329.0, 92.8, TIP_LENGTH),          # dimple 6
-    (196.50, 273.80, TIP_LENGTH),       # dimple 11
-    (132.50, 90.50, TIP_LENGTH),        # Slot 5
-    (332.13, 47.41, TIP_LENGTH),        # Corner of 3
-    (190.65, 227.57, TIP_LENGTH),       # Corner of 8
-    (330.14, 222.78, TIP_LENGTH),       # Corner of 9
-]
+test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
+    [
+        (132.50, 90.50, TIP_LENGTH),        # Slot 5
+        (332.13, 47.41, TIP_LENGTH),        # Corner of 3
+        (190.65, 227.57, TIP_LENGTH),       # Corner of 8
+        (330.14, 222.78, TIP_LENGTH),       # Corner of 9
+    ]
 
 # World > Smoothie XY-plane transformation
 # Gets updated when you press SPACE after calibrating all points
@@ -85,7 +80,7 @@ def add_z(XY):
 T = add_z(XY)
 
 
-def step():
+def current_step():
     """
     Given current step index return step value in mm
     """
@@ -125,7 +120,7 @@ def status(text):
         points,
         'Smoothie: {0}'.format(current_position),
         'World: {0}'.format(tuple(dot(inv(T), list(current_position) + [1])[:-1])),  # NOQA
-        'Step: {0}'.format(step()),
+        'Step: {0}'.format(current_step()),
         'Current stage: ' + current_pipette,
         'Message: ' + text
     ])
@@ -141,12 +136,12 @@ def jog(axis, direction, step):
 
 
 key_mappings = {
-    'q': lambda: jog(current_pipette, +1, step()),
-    'a': lambda: jog(current_pipette, -1, step()),
-    'up': lambda: jog('Y', +1, step()),
-    'down': lambda: jog('Y', -1, step()),
-    'left': lambda: jog('X', -1, step()),
-    'right': lambda: jog('X', +1, step()),
+    'q': lambda: jog(current_pipette, +1, current_step()),
+    'a': lambda: jog(current_pipette, -1, current_step()),
+    'up': lambda: jog('Y', +1, current_step()),
+    'down': lambda: jog('Y', -1, current_step()),
+    'left': lambda: jog('X', -1, current_step()),
+    'right': lambda: jog('X', +1, current_step()),
 }
 
 
@@ -165,12 +160,12 @@ def key_pressed(key):
     elif key == '-':
         if step_index > 0:
             step_index -= 1
-        status('step: ' + repr(step()))
+        status('step: ' + repr(current_step()))
     # more travel
     elif key == '=':
         if step_index < len(steps) - 1:
             step_index += 1
-        status('step: ' + repr(step()))
+        status('step: ' + repr(current_step()))
     # skip calibration point
     elif key == 's':
         if (point_number < len(actual) - 1):

@@ -44,8 +44,12 @@ GCODES = {'HOME': 'G28.2',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
-          'SET_SPEED': 'G0 {axis} F{value}',
+          'SET_SPEED': 'G0F',
           'SET_CURRENT': 'M907'}
+
+# Number of digits after the decimal point for coordinates being sent
+# to Smoothie
+GCODE_ROUNDING_PRECISION = 3
 
 
 def _parse_axis_values(raw_axis_values):
@@ -136,18 +140,11 @@ class SmoothieDriver_3_0_0:
     def speed(self):
         pass
 
-    def set_speed(self, values):
-        # reference: http://smoothieware.org/supported-g-codes
-        # “Push” the current feed-rate and seek-rate so that another one can
-        # be temporarily used, then the current one can be restored
-        self._send_command('M120')
-        [
-            self._send_command(
-                GCODES['SET_SPEED'].format(axis=axis, value=value))
-            for axis, value in values.items()
-        ]
-        # Pop speed
-        self._send_command('M121')
+    def set_speed(self, value):
+        ''' set total movement speed in mm/second'''
+        speed = value * SEC_PER_MIN
+        command = GCODES['SET_SPEED'] + str(speed)
+        self._send_command(command)
 
     def set_current(self, axes, value):
         ''' set total movement speed in mm/second'''
@@ -210,7 +207,7 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        coords = [axis + str(round(coords, 3))
+        coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
                   for axis, coords in target.items()
                   if valid_movement(coords, axis)]
 

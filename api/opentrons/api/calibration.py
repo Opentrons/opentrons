@@ -27,8 +27,8 @@ class CalibrationManager:
 
     def tip_probe(self, instrument):
         self._set_state('probing')
-        # calibration_functions.probe_instrument(
-        #     instrument._instrument, self._robot)
+        calibration_functions.probe_instrument(
+            instrument._instrument, self._robot)
         self._set_state('ready')
 
     def move_to_front(self, instrument):

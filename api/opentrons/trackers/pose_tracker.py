@@ -23,7 +23,7 @@ def translate(point) -> np.ndarray:
     ])
 
 
-def transform(matrix) -> np.ndarray:
+def extract_transform(matrix) -> np.ndarray:
     """Extract transformation elements from a matrix"""
     return matrix * np.array([
         [1, 1, 1, 0],

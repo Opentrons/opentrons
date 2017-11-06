@@ -889,14 +889,14 @@ class Pipette:
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         @commands.publish.both(command=commands.home)
-        def home(mount):
+        def _home(mount):
             self.current_volume = 0
             self.robot.poses = self.instrument_actuator.home(self.robot.poses)
             # TODO(artyom, 20171103): confirm expected behavior on pipette.home
             # Are we homing stage and plunger or plunger only?
             # self.robot.poses = self.instrument_mover.home(self.robot.poses)
 
-        home(self.mount)
+        _home(self.mount)
         return self
 
     @commands.publish.both(command=commands.distribute)

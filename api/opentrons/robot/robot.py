@@ -281,7 +281,7 @@ class Robot(object):
 
         # Extract only transformation component
         inverse_transform = pose_tracker.inverse(
-            pose_tracker.transform(CALIBRATION))
+            pose_tracker.extract_transform(CALIBRATION))
 
         self.poses = pose_tracker.bind(self.poses) \
             .add(obj=id(CALIBRATION), transform=CALIBRATION) \

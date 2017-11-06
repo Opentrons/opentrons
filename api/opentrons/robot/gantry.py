@@ -41,8 +41,7 @@ class Mover:
         )
 
     def move(self, pose, x, y=0, z=0):
-        # Default coordinates that are None to current so we can
-        # pass them around safely
+        # Potential users of this method might need less than 3 axis
         if self._parent:
             pose = self._parent.move(pose, x, y, z)
 
@@ -53,28 +52,33 @@ class Mover:
             dst=self._reference,
             src_point=Point(x, y, z))
 
-        target = Point(
-            x=x if 'x' in self._axis_mapping else 0,
-            y=y if 'y' in self._axis_mapping else 0,
-            z=z if 'z' in self._axis_mapping else 0)
+        driver_target = {}
 
-        # driver axis to point axis value mapping
-        # NOTE: point._asdict() returns point as dictionary:
-        # {'x': x, 'y': y, 'z': z}
-        driver_target = {
-            driver_axis: target._asdict()[xyz]
-            for xyz, driver_axis in self._axis_mapping.items()
-        }
+        if 'x' in self._axis_mapping:
+            driver_target[self._axis_mapping['x']] = x
+        else:
+            x = 0
+
+        if 'y' in self._axis_mapping:
+            driver_target[self._axis_mapping['y']] = y
+        else:
+            y = 0
+
+        if 'z' in self._axis_mapping:
+            driver_target[self._axis_mapping['z']] = z
+        else:
+            z = 0
+
         self._driver.move(target=driver_target)
 
         # Update pose with the new value. Since stepper motors are open loop
         # there is no need to to query diver for position
-        return update(pose, self, target)
+        return update(pose, self, Point(x, y, z))
 
     def home(self, pose):
         from functools import reduce
         reduce(
-            lambda pose, child: child.home(pose),
+            lambda _pose, child: child.home(_pose),
             self._children,
             pose
         )
