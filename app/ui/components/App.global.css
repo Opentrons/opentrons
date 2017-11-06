@@ -150,7 +150,8 @@ body {
   border-color: transparent transparent silver;
 }
 
-.tooltip_top {
+.tooltip_top,
+.tooltip_diagram {
   bottom: 100%;
   left: 0;
   width: 15rem;
@@ -159,7 +160,8 @@ body {
   font-size: 0.75rem;
 }
 
-.tooltip_top::after {
+.tooltip_top::after,
+.tooltip_diagram::after {
   content: " ";
   position: absolute;
   top: 100%;
@@ -168,6 +170,25 @@ body {
   border-width: 5px;
   border-style: solid;
   border-color: black transparent transparent;
+}
+
+.tooltip_diagram {
+  bottom: 130%;
+  left: -90%;
+  width: 35rem;
+  padding: 2rem;
+  background-color: white;
+  border: 2px solid black;
+}
+
+.tooltip_diagram img {
+  width: 100%;
+  height: auto;
+}
+
+.tooltip_diagram::after {
+  margin-left: -10px;
+  border-width: 10px;
 }
 
 [disabled] .tooltip_top::after {
