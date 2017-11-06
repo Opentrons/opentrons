@@ -1412,13 +1412,23 @@ class Pipette:
         return self
 
     def _move(self, pose_tree, x=None, y=None, z=None):
+        current_x, current_y, current_z = pose_tracker.absolute(
+            pose_tree,
+            self)
+
+        x = current_x if x is None else x
+        y = current_y if y is None else y
+        z = current_z if z is None else z
+
         dx, dy, dz = \
             pose_tracker.absolute(pose_tree, self) - \
-            pose_tracker.absolute(pose_tree, self.instrument_mover)
+            pose_tracker.absolute(pose_tree, self.mount)
 
         x, y, z = x and x - dx, y and y - dy, z and z - dz
 
-        return self.instrument_mover.move(pose_tree, x, y, z)
+        res = self.instrument_mover.move(pose_tree, x, y, z)
+
+        return res
 
     def _jog(self, pose_tree, axis, distance):
         return self.instrument_mover.jog(pose_tree, axis, distance)

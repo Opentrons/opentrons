@@ -180,7 +180,7 @@ def stringify(state, root=None):
 
 
 def get(state, obj):
-    return relative(state, src=obj, dst=state[obj].parent)
+    return inv(state[obj].transform).dot((0, 0, 0, 1))[:-1]
 
 
 def bind(state):

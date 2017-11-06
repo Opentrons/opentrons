@@ -40,17 +40,9 @@ class Mover:
             )
         )
 
-    def move(self, pose, x=None, y=None, z=None):
+    def move(self, pose, x, y=0, z=0):
         # Default coordinates that are None to current so we can
         # pass them around safely
-        current_x, current_y, current_z = relative(
-            pose,
-            src=self,
-            dst=self._origin)
-        x = current_x if x is None else x
-        y = current_y if y is None else y
-        z = current_z if z is None else z
-
         if self._parent:
             pose = self._parent.move(pose, x, y, z)
 
@@ -99,10 +91,13 @@ class Mover:
         return update(pose, self, point)
 
     def set_speed(self, value):
-        self._driver.set_speed({
-            axis: value
-            for axis in self._axis_mapping.values()
-        })
+        pass
+        # TODO (artyom 20171105): uncomment once proper plunger speeds are
+        # defined
+        # self._driver.set_speed({
+        #     axis: value
+        #     for axis in self._axis_mapping.values()
+        # })
 
     def probe(self, axis, movement):
         axis = axis.lower()

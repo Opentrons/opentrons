@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+# pylama:ignore=C901
+
 import asyncio
 import urwid
 from numpy.linalg import inv
 from numpy import dot, array, insert
 from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
 from translate import solve
-from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 
 driver = SmoothieDriver_3_0_0()
 
@@ -27,7 +28,7 @@ current_position = (0, 0, 0)
 # 200uL tip. Used during calibration process
 # The actual calibration represents end of a pipette
 # without tip on
-TIP_LENGTH = DEFAULT_TIP_LENGTH - 3
+TIP_LENGTH = 47  # DEFAULT_TIP_LENGTH
 # Smoothie Z value when Deck's Z=0
 Z_OFFSET = 4.5
 
@@ -66,9 +67,9 @@ test_points = [
 # if you want to test points or to measure real-world objects
 # using the tool
 XY = \
-    array([[  1.00188679e+00,  -1.38121547e-03,  -4.02423779e+01],
-           [ -1.32075472e-02,   9.95856354e-01,  -5.06868659e+00],
-           [ -5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])
+    array([[  1.00094340e+00,  -3.45303867e-03,  -1.94897355e+01],    # NOQA
+           [  1.88679245e-03,   9.97237569e-01,  -1.66290112e+00],    # NOQA
+           [ -5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])   # NOQA
 
 
 # Add fixed Z offset which is known so we don't have to calibrate for height
@@ -137,6 +138,7 @@ def jog(axis, direction, step):
     driver.move({axis: driver.position[axis] + direction * step})
     current_position = position()
     status('Jog: ' + repr([axis, str(direction), str(step)]))
+
 
 key_mappings = {
     'q': lambda: jog(current_pipette, +1, step()),
@@ -241,6 +243,7 @@ def main():
     ui_loop.run()
 
     print('Calibration data: \n', T)
+
 
 if __name__ == "__main__":
     main()

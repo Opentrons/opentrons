@@ -17,8 +17,7 @@ from opentrons import commands
 from opentrons.broker import subscribe
 from .robot_configs import config
 
-from numpy import add, subtract, array, insert
-from numpy.linalg import inv
+from numpy import add, subtract
 from functools import lru_cache
 
 log = get_logger(__name__)
@@ -544,7 +543,6 @@ class Robot(object):
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
-
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 

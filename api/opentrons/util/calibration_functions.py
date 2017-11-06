@@ -2,7 +2,6 @@ from numpy import array
 from opentrons.trackers.pose_tracker import (
     update, Point, get
 )
-from opentrons.util.vector import Vector
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
 from ..robot.robot_configs import config
@@ -13,7 +12,7 @@ PROBE_TRAVEL_DISTANCE = 20
 # size along X, Y and Z
 PROBE_SIZE = array(config.probe_dimensions)
 # coordinates of the top of the probe
-PROBE_TOP_COORDINATES = array(config.probe_center)
+PROBE_BOTTOM_COORDINATES = array(config.probe_center)
 
 
 def calibrate_container_with_delta(
@@ -23,9 +22,7 @@ def calibrate_container_with_delta(
     delta = Point(delta_x, delta_y, delta_z)
     new_coordinates = get(pose_tree, container) + delta
     pose_tree = update(pose_tree, container, new_coordinates)
-    container._coordinates = Vector(*new_coordinates)
-    # Since we are potentially changing Z, we want to
-    # invalidate cache for max_deck_height
+    container._coordinates = container._coordinates + delta
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
     elif save:
@@ -43,7 +40,8 @@ def probe_instrument(instrument, robot):
 
     *_, height = PROBE_SIZE
 
-    center = PROBE_TOP_COORDINATES - (0, 0, height)
+    center = PROBE_BOTTOM_COORDINATES + (0, 0, height / 2.0)
+    print('Center: ', center)
 
     #       Y ^
     #         * 1
@@ -70,7 +68,7 @@ def probe_instrument(instrument, robot):
         (0, 0, 1, -1),
     ]
 
-    coords = [switch[:-1] * PROBE_SIZE + center for switch in switches]
+    coords = [(PROBE_SIZE / 2.0) * array(switch[:-1]) + center for switch in switches]
 
     instrument._add_tip(DEFAULT_TIP_LENGTH)
 

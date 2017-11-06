@@ -40,7 +40,6 @@ def test_aspirate_move_to(robot):
     plate = containers_load(robot, '96-flat', 'A1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
-    print(well.properties)
     location = (plate, pos)
 
     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
@@ -48,11 +47,10 @@ def test_aspirate_move_to(robot):
 
     p200.aspirate(100, location)
     current_pos = pose_tracker.absolute(robot.poses, p200.instrument_actuator)
-    print(robot._driver.log)
-    assert (current_pos == (0.5, 0.0, 0.0)).all()
+    assert (current_pos == (9.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p200)
-    assert isclose(current_pos, (172.24, 131.04, 0)).all()
+    assert isclose(current_pos, (175.34,  127.94,   10.25)).all()
 
 
 def test_blow_out_move_to(robot):

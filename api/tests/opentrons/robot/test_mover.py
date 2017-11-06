@@ -1,12 +1,10 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
-    bind, add, Point, absolute, stringify, relative, init
+    absolute, init
 )
 from opentrons.instruments import Pipette
 from opentrons.robot.gantry import Mover
-from collections import namedtuple
 from numpy import array, isclose
-from numpy.linalg import inv
 
 
 @pytest.fixture
@@ -70,7 +68,6 @@ def test_functional(driver):
 
 def test_integration(robot):
     left = Pipette(robot, mount='left')
-    right = Pipette(robot, mount='right')
     robot.home()
     pose = left._move(robot.poses, 1, 1, 1)
     assert isclose(absolute(pose, left), (1, 1, 1)).all()

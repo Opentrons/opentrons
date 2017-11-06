@@ -16,7 +16,7 @@ from opentrons.robot.robot_configs import (
 
 # TODO (ben 2017112): figure out why fw setting wasn't working on Avogadro
 # and remove this
-HOMING_OFFSETS = 'M206 X5'
+HOMING_OFFSETS = 'M206 X5 Y5'
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
@@ -179,6 +179,7 @@ class SmoothieDriver_3_0_0:
             if moving_plunger:
                 self.set_current('BC', PLUNGER_CURRENT_HIGH)
 
+            print(command)
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
@@ -209,7 +210,7 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        coords = [axis + str(coords)
+        coords = [axis + str(round(coords, 3))
                   for axis, coords in target.items()
                   if valid_movement(coords, axis)]
 
@@ -249,11 +250,6 @@ class SmoothieDriver_3_0_0:
         self._send_command(command, timeout=30)
 
         position = HOMED_POSITION
-
-        if not self.simulating:
-            position = _parse_axis_values(
-                self._send_command(GCODES['CURRENT_POSITION'])
-            )
 
         # Only update axes that have been selected for homing
         homed = {
