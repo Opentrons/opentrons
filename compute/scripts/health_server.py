@@ -6,12 +6,12 @@ from avahi.service import AvahiService
 
 IP_ADDRESS = '0.0.0.0'
 PORT = 31951
-UUID = os.environ.get.get('RESIN_DEVICE_UUID')
+UUID = os.environ.get('RESIN_DEVICE_UUID')
 service_name = 'opentrons-{}'.format(UUID)
 
 async def status(request):
     robot_status = {
-            'is_api_running': os.environ.get.get('API_IS_RUNNING'),
+            'is_api_running': os.environ.get('API_IS_RUNNING'),
             'machine_name': os.environ.get('ROBOT_NAME'),
             'commit_hash': os.environ.get('RESIN_APP_RELEASE'),
             'resin_app': os.environ.get('RESIN_APP_NAME'),
