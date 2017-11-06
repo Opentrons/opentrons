@@ -141,8 +141,8 @@ ConfirmCalibrationPrompt.propTypes = {
 }
 
 function ConfirmCalibrationPrompt (props) {
-  const {slot, onYesClick, isTiprack} = props
-  const toolTipMessage = <Diagram isTiprack={isTiprack} />
+  const {slot, onYesClick, isTiprack, type} = props
+  const toolTipMessage = <Diagram isTiprack={isTiprack} type={type} />
   // TODO(mc, 2017-10-06): use props for no button href
   return (
     <div className={styles.prompt}>
