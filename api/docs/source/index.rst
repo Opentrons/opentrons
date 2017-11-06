@@ -138,6 +138,7 @@ Table of Contents
   transfer
   robot
   modules
+  cookbook
   examples
   api
   calibration
