@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 
 import plateSingleSrc from '../img/labware/plate_single.png'
 import troughSingleSrc from '../img/labware/trough_single.png'
@@ -22,4 +23,9 @@ export default function Diagram (props) {
       <img src={labwareSrc} />
     </div>
   )
+}
+
+Diagram.propTypes = {
+  isTiprack: PropTypes.bool.isRequired,
+  type: PropTypes.string.isRequired
 }
