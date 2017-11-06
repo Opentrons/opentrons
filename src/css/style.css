@@ -323,12 +323,22 @@ textarea {
   border: 3px solid gray;
 }
 
-.ingredientModal .close {
+.ingredientModal .topBar {
   color: white;
   font-size: 14pt;
+  font-weight: bold;
   text-transform: uppercase;
   margin-right: 10pt;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.ingredientModal .info {
+  margin-left: 1em;
+}
+
+.ingredientModal .close {
   display: flex;
   flex-direction: row;
   align-items: center;

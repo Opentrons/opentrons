@@ -30,9 +30,12 @@ const Deck = props => {
           </div>
 
           <div className={styles.ingredientPanelContent}>
-            <div className={styles.close} onClick={e => closeIngredientSelector()}>
-              <p>Back to Deck Map</p>
-              <img src='https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/back.png' />
+            <div className={styles.topBar}>
+              <div className={styles.info}>Drag to select multiple wells</div>
+              <div className={styles.close} onClick={e => closeIngredientSelector()}>
+                <p>Back to Deck Map</p>
+                <img src='https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/back.png' />
+              </div>
             </div>
             <div className={styles.containerDetail}>
               <SelectablePlate showLabels selectable />

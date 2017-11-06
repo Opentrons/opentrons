@@ -80,17 +80,17 @@ class IngredientPropertiesForm extends React.Component {
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
     if (!selectedIngredientProperties && numWellsSelected <= 0) {
-      return (
+      return null // (
         // TODO: style this properly
-        <div style={{margin: '0 20%'}}>
-          <Button style={{color: 'gray'}} disabled>
-            Select Wells to Add an Ingredient
-          </Button>
-          <div style={{textAlign: 'center', color: 'white', 'paddingTop': '1rem'}}>
-            You can select multiple wells by dragging your mouse or holding shift.
-          </div>
-        </div>
-      )
+        // <div style={{margin: '0 20%'}}>
+        //   <Button style={{color: 'gray'}} disabled>
+        //     Select Wells to Add an Ingredient
+        //   </Button>
+        //   <div style={{textAlign: 'center', color: 'white', 'paddingTop': '1rem'}}>
+        //     You can select multiple wells by dragging your mouse or holding shift.
+        //   </div>
+        // </div>
+      // )
     }
 
     return (
