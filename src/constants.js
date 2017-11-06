@@ -87,11 +87,12 @@ export const swatchColors = n => {
   return colors[n % colors.length]
 }
 
+// These utils are great candidates for unit tests
 export const toWellName = ({rowNum, colNum}) => (
   String.fromCharCode(colNum + 65) + (rowNum + 1)
 )
 
 export const wellKeyToXYList = wellKey => {
   const [x, y] = wellKey.split(',').map(s => parseInt(s, 10))
-  return toWellName({rowNum: parseInt(x), colNum: y})
+  return toWellName({rowNum: parseInt(y), colNum: x})
 }
