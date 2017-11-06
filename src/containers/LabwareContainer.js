@@ -75,7 +75,10 @@ const LabwareContainer = ({
             }
           }
         )}>Save</div>
+        <div className={styles.btn} onClick={() => deleteContainer({containerId, slotName, containerType})}>
+          Delete
         </div>
+      </div>
       }
 
       {containerType && // if there's no containerType, assume it's empty

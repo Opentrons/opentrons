@@ -53,7 +53,7 @@ const IngredIndividual = ({name, wellName, volume, concentration, canDelete, gro
   >
     <div>{wellName}</div>
     <div>{name}</div>
-    <div>{volume + 'uL'}</div>
+    <div>{volume ? volume + 'uL' : '-'}</div>
     {/* <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
     <div>{concentration === null ? '-' : concentration}</div>
     {canDelete && <div className={styles.deleteIngredient} onClick={

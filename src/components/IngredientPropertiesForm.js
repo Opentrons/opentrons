@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+// import cx from 'classnames'
 import styles from './IngredientPropertiesForm.css'
 
 import Button from './Button.js'
@@ -102,7 +103,7 @@ class IngredientPropertiesForm extends React.Component {
 
         <form>
           <div className={styles.middleRow}>
-            <span>
+            <span className={styles.twoThirds}>
               <label>Name</label>
               <Field accessor='name' />
             </span>
