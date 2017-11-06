@@ -250,6 +250,28 @@ const allIngredients = createSelector(
   state => state.ingredients
 )
 
+// returns selected group id (index in array of all ingredients), or undefined.
+// groupId is a string eg '42'
+const selectedIngredientGroupId = createSelector(
+  rootSelector,
+  state => get(state, ['selectedIngredientGroup', 'groupId'])
+)
+
+const _selectedIngredientGroupObj = createSelector(
+  selectedIngredientGroupId,
+  allIngredients,
+  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
+    ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
+    : null
+)
+
+const selectedIngredientProperties = createSelector(
+  _selectedIngredientGroupObj,
+  ingredGroup => (!isNil(ingredGroup))
+    ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
+    : null
+)
+
 const selectedWellNames = createSelector(
   state => rootSelector(state).selectedWells.selected,
   selectedWells => Object.values(selectedWells).map(well => {
@@ -267,10 +289,14 @@ const selectedWellsMaxVolume = createSelector(
   state => rootSelector(state).selectedWells,
   selectedContainerType,
   (selectedWells, selectedContainerType) => {
-    const allWells = Object.keys(selectedWells.selected).map(wellKeyToXYList)
+    const selectedWellsXY = Object.keys(selectedWells.selected).map(wellKeyToXYList)
     const maxVolumesByWell = getMaxVolumes(selectedContainerType)
-    const maxVolumesList = Object.values(pick(maxVolumesByWell, allWells))
-
+    const maxVolumesList = (selectedWellsXY.length > 0)
+      // when wells are selected, only look at vols of selected wells
+      ? Object.values(pick(maxVolumesByWell, selectedWellsXY))
+      // when no wells selected (eg editing ingred group), look at all volumes.
+      // TODO LATER: look at filled wells, not all wells.
+      : Object.values(maxVolumesByWell)
     return Math.min(...maxVolumesList)
   }
 )
@@ -304,28 +330,6 @@ const ingredientsForContainer = createSelector(
     ? _ingredientsForContainerId(allIngredients, selectedContainer.containerId)
     : null
   }
-)
-
-// returns selected group id (index in array of all ingredients), or undefined.
-// groupId is a string eg '42'
-const selectedIngredientGroupId = createSelector(
-  rootSelector,
-  state => get(state, ['selectedIngredientGroup', 'groupId'])
-)
-
-const _selectedIngredientGroupObj = createSelector(
-  selectedIngredientGroupId,
-  allIngredients,
-  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
-    ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
-    : null
-)
-
-const selectedIngredientProperties = createSelector(
-  _selectedIngredientGroupObj,
-  ingredGroup => (!isNil(ingredGroup))
-    ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
-    : null
 )
 
 const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells, highlightedWells) => {
