@@ -37,11 +37,11 @@ a.close {
 }
 
 .jog_controls {
-  margin: 1rem auto;
+  margin: 2rem auto 1rem;
   width: 16rem;
   display: grid;
   grid-gap: 0.25rem;
-  grid-template-rows: repeat(2, [row] 3rem);
+  grid-template-rows: repeat(2, [row] 3rem) 2rem;
   grid-template-columns: repeat(5, [col] 3rem);
 }
 
@@ -51,6 +51,10 @@ a.close {
   color: white;
   font-size: 1rem;
   cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #111;
 }
 
 .btn[disabled],
@@ -99,6 +103,22 @@ a.close {
   margin: 1rem 0;
 }
 
+.jog_xy {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 2rem;
+}
+
+.jog_z {
+  grid-column: 5;
+  grid-row: 3;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 2rem;
+}
+
 .btn_confirm {
   margin: 1rem;
   font-size: 1rem;
@@ -113,6 +133,10 @@ a.close {
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.btn_confirm:hover {
+  background-color: #555;
 }
 
 .spinner {

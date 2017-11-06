@@ -23,6 +23,9 @@ export default function JogModal (props) {
   return (
     <div className={styles.modal_wrapper}>
       <div className={styles.jog_modal}>
+        <p>Using the arrow buttons, jog the pipette along the x, y and z
+        axis to improve accuracy. Press confirm position to save.
+        </p>
         <div className={styles.jog_controls}>
           <button
             className={styles.btn_left}
@@ -65,6 +68,8 @@ export default function JogModal (props) {
           >
             ↓
           </button>
+          <label className={styles.jog_xy}>X-Y Axis</label>
+          <label className={styles.jog_z}>Z Axis</label>
         </div>
         <Link to={url} className={styles.close}>X</Link>
         <button
@@ -74,9 +79,6 @@ export default function JogModal (props) {
         >
           {confirmButtonContents}
         </button>
-        <p>Using the arrow buttons, jog the pipette along the x, y and z
-        axis to improve accuracy. Press confirm position to save.
-        </p>
       </div>
     </div>
   )
