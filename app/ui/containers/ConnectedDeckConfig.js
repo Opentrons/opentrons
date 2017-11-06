@@ -13,13 +13,14 @@ const mapStateToProps = (state, ownProps) => {
   const currentLabware = labware.find((lab) => lab.slot === slot)
 
   return {
-    labwareReviewed: robotSelectors.getLabwareReviewed(state),
     labware,
     currentLabware,
+    labwareReviewed: robotSelectors.getLabwareReviewed(state),
     tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
     labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
     unconfirmedLabware: robotSelectors.getUnconfirmedLabware(state),
-    unconfirmedTipracks: robotSelectors.getUnconfirmedTipracks(state)
+    unconfirmedTipracks: robotSelectors.getUnconfirmedTipracks(state),
+    singleChannel: robotSelectors.getSingleChannel(state)
   }
 }
 
@@ -28,26 +29,43 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
   return {
     setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
-    // TODO(mc, 2017-10-06): don't hardcode the pipette
-    moveToLabware: () => dispatch(robotActions.moveTo('right', slot)),
+    moveToLabware: (axis) => () => dispatch(robotActions.moveTo(axis, slot)),
     setLabwareConfirmed: () => dispatch(robotActions.confirmLabware(slot)),
-    moveToNextLabware: (nextSlot) => () => {
+    moveToNextLabware: (axis, nextSlot) => () => {
       dispatch(push(`/setup-deck/${nextSlot}`))
-      dispatch(robotActions.moveTo('right', nextSlot))
+      dispatch(robotActions.moveTo(axis, nextSlot))
     }
   }
 }
 
+// TODO(mc, 2017-11-03): investigate whether or not we can just get access to
+// dispatch and/or state in here. I think we're overcomplicating things
 const mergeProps = (stateProps, dispatchProps) => {
   const props = {...stateProps, ...dispatchProps}
-  const {moveToNextLabware, unconfirmedLabware, unconfirmedTipracks} = props
+  const {
+    singleChannel,
+    moveToLabware,
+    moveToNextLabware,
+    unconfirmedLabware,
+    unconfirmedTipracks
+  } = props
+
+  // TODO(mc, 2017-11-03): this assumes a single channel pipette will be
+  // available, so revisit so we don't have to make that assumption
+  props.moveToLabware = moveToLabware(singleChannel.axis)
 
   if (unconfirmedTipracks[0]) {
     props.nextLabware = unconfirmedTipracks[0]
-    props.moveToNextLabware = moveToNextLabware(unconfirmedTipracks[0].slot)
+    props.moveToNextLabware = moveToNextLabware(
+      singleChannel.axis,
+      unconfirmedTipracks[0].slot
+    )
   } else if (unconfirmedLabware[0]) {
     props.nextLabware = unconfirmedLabware[0]
-    props.moveToNextLabware = moveToNextLabware(unconfirmedLabware[0].slot)
+    props.moveToNextLabware = moveToNextLabware(
+      singleChannel.axis,
+      unconfirmedLabware[0].slot
+    )
   }
 
   return props

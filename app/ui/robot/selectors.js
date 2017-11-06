@@ -188,6 +188,11 @@ export function getInstruments (state) {
   })
 }
 
+export function getSingleChannel (state) {
+  return getInstruments(state)
+    .find((instrument) => instrument.channels === SINGLE_CHANNEL)
+}
+
 export function getInstrumentsCalibrated (state) {
   const instruments = getInstruments(state)
 

@@ -13,27 +13,28 @@ const mapStateToProps = (state) => ({
   labwareReviewed: robotSelectors.getLabwareReviewed(state),
   instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
   tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-  labwareConfirmed: robotSelectors.getLabwareConfirmed(state)
+  labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
+  singleChannel: robotSelectors.getSingleChannel(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false)),
   setLabware: (slot) => () => dispatch(push(`/setup-deck/${slot}`)),
-  // TODO(mc, 2017-10-06): don't hardcode the pipette
-  moveToLabware: (slot) => () => dispatch(robotActions.moveTo('right', slot))
+  moveToLabware: (axis, slot) => () => dispatch(robotActions.moveTo(axis, slot))
 })
 
 const mergeProps = (stateProps, dispatchProps) => {
   const props = {...stateProps, ...dispatchProps}
 
+  // TODO(mc, 2017-11-03): this assumes a single channel pipette will be
+  // available, so revisit so we don't have to make that assumption
   if (props.labwareReviewed) {
-    const setLabware = props.setLabware
-    const moveToLabware = props.moveToLabware
+    const {singleChannel, setLabware, moveToLabware} = props
 
     props.setLabware = (slot) => () => {
       // TODO(mc, 2017-10-06): batch or rethink this double dispatch
       setLabware(slot)()
-      moveToLabware(slot)()
+      moveToLabware(singleChannel.axis, slot)()
     }
   }
 
