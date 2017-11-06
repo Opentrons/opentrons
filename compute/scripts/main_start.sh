@@ -3,6 +3,11 @@
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 cd /usr/src/api
 
+
+echo "[BOOT] Starting DHCP server"
+. /usr/src/compute/scripts/dhcp_server_init.sh
+
+
 echo "[BOOT] Starting server"
-python /usr/src/api/opentrons/server/main.py '0.0.0.0':31950
+. /usr/src/compute/scripts/api_server_init.sh
 

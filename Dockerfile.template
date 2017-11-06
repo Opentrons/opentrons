@@ -7,20 +7,26 @@ FROM resin/raspberrypi3-python:3.5-slim-20170705
 
 WORKDIR /usr/src
 
-COPY ./api/requirements.txt ./requirements.txt 
 RUN apt-get update
-RUN apt-get install gcc make git g++
-
-
-RUN pip install -r ./requirements.txt
-
+RUN apt-get install gcc make git g++ dnsmasq
 COPY ./api ./api
+COPY ./compute/scripts ./compute/scripts
+RUN pip install numpy
 
-COPY data-user_storage.mount /etc/systemd/system/
+RUN pip install -r ./api/requirements.txt
+
+# usb mounting config
+COPY ./compute/data-user_storage.mount /etc/systemd/system/
+
+# interface config for eth0
+COPY ./compute/interfaces /etc/network/interfaces
+COPY ./compute/eth0 /etc/network/interfaces.d/
+
+# dhcp server config for eth0
+COPY ./compute/dnsmasq.conf /etc/dnsmasq.conf
+
 RUN systemctl enable data-user_storage.mount
 
-RUN pip install numpy
 ENV RUNNING_ON_PI=1
 ENV INITSYSTEM on
-RUN echo $PWD
-CMD ["/usr/src/api/scripts/compute/start.sh"]
+CMD ["/usr/src/compute/scripts/start.sh"]
