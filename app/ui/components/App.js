@@ -13,7 +13,7 @@ import styles from './App.css'
 
 export default function App () {
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} onDragOver={onDragOver} onDrop={onDrop}>
       <Nav />
       <Switch>
         <Route exact path='/' component={Home} />
@@ -24,4 +24,12 @@ export default function App () {
       </Switch>
     </div>
   )
+}
+
+function onDragOver (event) {
+  event.preventDefault()
+}
+
+function onDrop (event) {
+  event.preventDefault()
 }

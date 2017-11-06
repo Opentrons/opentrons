@@ -70,7 +70,17 @@ const mapDispatchToProps = (dispatch) => {
     onRunClick: () => dispatch(robotActions.run()),
 
     // session
-    onUpload: (event) => dispatch(robotActions.session(event.target.files[0]))
+    onUpload: (event) => {
+      let files
+
+      if (event.dataTransfer) {
+        files = event.dataTransfer.files
+      } else {
+        files = event.target.files
+      }
+
+      dispatch(robotActions.session(files[0]))
+    }
   }
 }
 
