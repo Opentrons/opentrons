@@ -37,11 +37,11 @@ a.close {
 }
 
 .jog_controls {
-  margin: 1rem auto;
+  margin: 2rem auto 1rem;
   width: 16rem;
   display: grid;
   grid-gap: 0.25rem;
-  grid-template-rows: repeat(2, [row] 3rem);
+  grid-template-rows: repeat(2, [row] 3rem) 1rem;
   grid-template-columns: repeat(5, [col] 3rem);
 }
 
