@@ -70,7 +70,7 @@ body {
 @font-face {
   font-family: 'sans';
   src: url('../fonts/OpenSans-Regular-webfont.woff');
-  font-weight: 300;
+  font-weight: normal;
   font-style: normal;
 }
 

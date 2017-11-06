@@ -31,6 +31,7 @@ export const actionTypes = {
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
   PROBE_TIP_RESPONSE: makeRobotActionName('PROBE_TIP_RESPONSE'),
+  RESET_TIP_PROBE: makeRobotActionName('RESET_TIP_PROBE'),
   MOVE_TO: makeRobotActionName('MOVE_TO'),
   MOVE_TO_RESPONSE: makeRobotActionName('MOVE_TO_RESPONSE'),
   JOG: makeRobotActionName('JOG'),
@@ -141,6 +142,10 @@ export const actions = {
     if (error) action.payload = error
 
     return action
+  },
+
+  resetTipProbe (instrument) {
+    return {type: actionTypes.RESET_TIP_PROBE, payload: {instrument}}
   },
 
   moveTo (instrument, labware) {

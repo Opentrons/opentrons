@@ -178,6 +178,15 @@ describe('robot actions', () => {
     expect(actions.probeTipResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('reset tip probe action', () => {
+    const expected = {
+      type: actionTypes.RESET_TIP_PROBE,
+      payload: {instrument: 'right'}
+    }
+
+    expect(actions.resetTipProbe('right')).toEqual(expected)
+  })
+
   test('move to action', () => {
     const expected = {
       type: actionTypes.MOVE_TO,

@@ -25,6 +25,7 @@ const {
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
   PROBE_TIP_RESPONSE,
+  RESET_TIP_PROBE,
   MOVE_TO,
   MOVE_TO_RESPONSE,
   JOG,
@@ -37,6 +38,7 @@ const {
 const INITIAL_STATE = {
   labwareReviewed: false,
   instrumentsByAxis: {},
+  probedByAxis: {},
   labwareBySlot: {},
 
   // homeRequest: {inProgress: false, error: null},
@@ -56,6 +58,7 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
+    case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
     case MOVE_TO: return handleMoveTo(state, action)
     case MOVE_TO_RESPONSE: return handleMoveToResponse(state, action)
     case JOG: return handleJog(state, action)
@@ -81,14 +84,22 @@ function handleSetLabwareReviewed (state, action) {
   return {...state, labwareReviewed: action.payload}
 }
 
-// TODO(mc, 2017-10-17): probe tip should clear out any unprobed axes
 function handleMoveToFront (state, action) {
   const {payload: {instrument: axis}} = action
+  const instrumentsByAxis = Object.keys(state.instrumentsByAxis)
+    .filter((targetAxis) => targetAxis !== axis)
+    .reduce((calibration, targetAxis) => {
+      calibration[targetAxis] = UNPROBED
+      return calibration
+    }, {
+      ...state.instrumentsByAxis,
+      [axis]: PREPARING_TO_PROBE
+    })
 
   return {
     ...state,
-    moveToFrontRequest: {inProgress: true, error: null, axis},
-    instrumentsByAxis: {...state.instrumentsByAxis, [axis]: PREPARING_TO_PROBE}
+    instrumentsByAxis,
+    moveToFrontRequest: {inProgress: true, error: null, axis}
   }
 }
 
@@ -114,7 +125,6 @@ function handleMoveToFrontResponse (state, action) {
   }
 }
 
-// TODO(mc, 2017-10-17): probe tip should clear out any unprobed axes
 function handleProbeTip (state, action) {
   const {payload: {instrument: axis}} = action
 
@@ -143,7 +153,20 @@ function handleProbeTipResponse (state, action) {
       [axis]: !error
         ? PROBED
         : UNPROBED
+    },
+    probedByAxis: {
+      ...state.probedByAxis,
+      [axis]: state.probedByAxis[axis] || !error
     }
+  }
+}
+
+function handleResetTipProbe (state, action) {
+  const {payload: {instrument: axis}} = action
+
+  return {
+    ...state,
+    instrumentsByAxis: {...state.instrumentsByAxis, [axis]: UNPROBED}
   }
 }
 

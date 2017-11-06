@@ -10,13 +10,14 @@ const mapStateToProps = (state, ownProps) => ({
   instrument: ownProps.instrument
 })
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  onPrepareClick: () => {
-    dispatch(robotActions.moveToFront(ownProps.instrument.axis))
-  },
-  onProbeTipClick: () => {
-    dispatch(robotActions.probeTip(ownProps.instrument.axis))
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const {instrument: {axis}} = ownProps
+
+  return {
+    onPrepareClick: () => dispatch(robotActions.moveToFront(axis)),
+    onProbeTipClick: () => dispatch(robotActions.probeTip(axis)),
+    onCancelClick: () => dispatch(robotActions.resetTipProbe(axis))
   }
-})
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(TipProbe)
