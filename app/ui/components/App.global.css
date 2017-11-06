@@ -247,3 +247,12 @@ button:focus {
 .btn_dark:hover {
   background-color: #777;
 }
+
+.btn_blue {
+  background-color: #006fff;
+  color: white;
+}
+
+.btn_blue:hover {
+  background-color: #00f;
+}

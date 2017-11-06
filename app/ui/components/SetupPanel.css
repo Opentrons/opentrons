@@ -144,8 +144,8 @@ li:nth-child(odd) a.btn_labware {
   background-color: #777;
 }
 
-.inactive,
-.inactive:hover {
+.run_link.inactive,
+.run_link.inactive:hover {
   background-color: transparent;
   border: 1px solid silver;
   color: silver;

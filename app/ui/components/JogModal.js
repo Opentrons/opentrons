@@ -68,6 +68,8 @@ export default function JogModal (props) {
           >
             ↓
           </button>
+          <label className={styles.jog_xy}>X-Y Axis</label>
+          <label className={styles.jog_z}>Z Axis</label>
         </div>
         <Link to={url} className={styles.close}>X</Link>
         <button

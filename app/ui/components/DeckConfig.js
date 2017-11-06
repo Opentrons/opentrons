@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import classnames from 'classnames'
+
 import Labware from './Labware'
 import ToolTip from './ToolTip'
 import Diagram from './Diagram'
@@ -119,7 +120,7 @@ function NextCalibrationPrompt (props) {
   return (
     <div className={styles.prompt}>
       <h3>{title}</h3>
-      <button className={styles.robot_action} onClick={onClick}>
+      <button className={classnames('btn_blue', styles.robot_action)} onClick={onClick}>
         Move to next labware
         ({nextLabware.type}, slot {nextLabware.slot})
       </button>
