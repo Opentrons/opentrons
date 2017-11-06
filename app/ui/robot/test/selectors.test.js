@@ -361,9 +361,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          left: constants.PROBING
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {}
       }
     })
 
@@ -372,7 +371,8 @@ describe('robot selectors', () => {
       name: 'p50s',
       channels: 'single',
       volume: 50,
-      calibration: constants.UNPROBED
+      calibration: constants.UNPROBED,
+      probed: false
     })
   })
 
