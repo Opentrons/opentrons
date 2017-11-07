@@ -5,6 +5,10 @@ from datetime import datetime
 from opentrons.broker import publish
 from opentrons.api import Session
 from opentrons.api.session import _accumulate, _get_labware, _dedupe
+from conftest import state
+from functools import partial
+
+state = partial(state, 'session')
 
 
 @pytest.fixture
@@ -69,12 +73,7 @@ async def test_load_protocol_with_error(session_manager):
         assert session is None
 
     args, = e.value.args
-    timestamp = args['timestamp']
-    exception = args['error']
-
-    assert datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
-    assert type(exception) == NameError
-    assert str(exception) == "name 'blah' is not defined"
+    assert args == "name 'blah' is not defined"
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
@@ -263,3 +262,23 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
     assert 'trash-box' in [c.name for c in session.get_containers()]
     containers = sum([i.containers for i in session.get_instruments()], [])
     assert 'trash-box' in [c.name for c in containers]
+
+
+async def test_session_create_error(main_router):
+    with pytest.raises(SyntaxError):
+        main_router.session_manager.create(
+            name='<blank>',
+            text='syntax error ;(')
+
+    with pytest.raises(TimeoutError):
+        # No state change is expected
+        await main_router.wait_until(state('loaded'))
+
+    with pytest.raises(ZeroDivisionError):
+        main_router.session_manager.create(
+            name='<blank>',
+            text='1/0')
+
+    with pytest.raises(TimeoutError):
+        # No state change is expected
+        await main_router.wait_until(state('loaded'))

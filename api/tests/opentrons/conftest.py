@@ -196,6 +196,7 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
         done, pending = await asyncio.wait([coro], timeout=timeout)
 
         if pending:
+            [task.cancel() for task in pending]
             raise TimeoutError('Notifications: {0}'.format(result))
 
         result += [done.pop().result()]
