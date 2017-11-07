@@ -1,4 +1,3 @@
-from opentrons.containers import Well, WellSeries
 import pytest
 from opentrons.commands import stringify_location
 
