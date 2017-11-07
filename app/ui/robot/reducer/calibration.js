@@ -37,9 +37,18 @@ const {
 
 const INITIAL_STATE = {
   labwareReviewed: false,
+
+  // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
+  // axis. probedByAxis holds a flag for whether the instrument has been
+  // probed at least once by axis. Rethink or combine these states
   instrumentsByAxis: {},
   probedByAxis: {},
+
+  // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
+  // slot. confirmedBySlot holds a flag for whether the labware has been
+  // confirmed at least once. Rethink or combine these states
   labwareBySlot: {},
+  confirmedBySlot: {},
 
   // homeRequest: {inProgress: false, error: null},
   moveToFrontRequest: {inProgress: false, error: null},
@@ -230,6 +239,9 @@ function handleUpdateOffset (state, action) {
 function handleUpdateResponse (state, action) {
   const {updateOffsetRequest: {slot}} = state
   const {error, payload} = action
+  const confirmationStatus = !error
+    ? CONFIRMED
+    : OVER_SLOT
 
   return {
     ...state,
@@ -240,17 +252,17 @@ function handleUpdateResponse (state, action) {
         ? payload
         : null
     },
-    labwareBySlot: {
-      ...state.labwareBySlot,
-      [slot]: !error
-        ? CONFIRMED
-        : OVER_SLOT
-    }
+    labwareBySlot: {...state.labwareBySlot, [slot]: confirmationStatus},
+    confirmedBySlot: {...state.confirmedBySlot, [slot]: !error}
   }
 }
 
 function handleConfirmLabware (state, action) {
   const {payload: {labware: slot}} = action
 
-  return {...state, labwareBySlot: {...state.labwareBySlot, [slot]: CONFIRMED}}
+  return {
+    ...state,
+    labwareBySlot: {...state.labwareBySlot, [slot]: CONFIRMED},
+    confirmedBySlot: {...state.confirmedBySlot, [slot]: true}
+  }
 }

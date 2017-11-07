@@ -45,7 +45,7 @@ function PipetteLinks (props) {
 function LabwareLinks (props) {
   const {
     name,
-    calibration,
+    confirmed,
     isTiprack,
     instrumentsCalibrated,
     tipracksConfirmed,
@@ -53,15 +53,14 @@ function LabwareLinks (props) {
   } = props
 
   const isDisabled = !instrumentsCalibrated || !(isTiprack || tipracksConfirmed)
-  const isConfirmed = calibration === robotConstants.CONFIRMED
 
   const buttonStyle = classnames(styles.btn_labware, {
     [styles.disabled]: isDisabled
   })
 
   const statusStyle = classnames({
-    [styles.confirmed]: isConfirmed,
-    [styles.alert]: !isConfirmed
+    [styles.confirmed]: confirmed,
+    [styles.alert]: !confirmed
   })
 
   return (
