@@ -1,20 +1,22 @@
 from opentrons import containers, instruments
 
+# containers.robot.connect()
+# containers.robot.home()
 
-tiprack = containers.load('tiprack-200ul', 'B1')
-tiprack2 = containers.load('tiprack-200ul', 'B2')
-trash = containers.load('trash-box', 'C2')
+tiprack = containers.load('tiprack-200ul', 'B3')
+tiprack2 = containers.load('tiprack-200ul', 'B1')
+trash = containers.load('trash-box', 'C4')
 
 trough = containers.load('trough-12row', 'C1')
-plate = containers.load('96-PCR-flat', 'A1')
-tuberack = containers.load('tube-rack-2ml', 'A2')
+plate = containers.load('96-PCR-flat', 'C2')
+tuberack = containers.load('tube-rack-2ml', 'B2')
 
 m50 = instruments.Pipette(
     name="p200",
     trash_container=trash,
-    tip_racks=[tiprack, tiprack2],
+    tip_racks=[tiprack2],
     max_volume=50,
-    mount="right",
+    mount='left',
     channels=8
 )
 
@@ -23,14 +25,15 @@ p200 = instruments.Pipette(
     trash_container=trash,
     tip_racks=[tiprack],
     max_volume=200,
-    mount="left"
+    mount='right'
 )
+
 
 # dispense 6 standards from tube racks (A1, B1, C1, D1, A2, B2)
 # to first two rows of 96 well plate (duplicates, A1/A2, B1/B2 etc.)
-for i in range(6):
-    p200.distribute(
-        25, tuberack.wells(i), plate.cols(i).wells('1', '2'))
+# for i in range(6):
+#    p200.distribute(
+#        25, tuberack.wells(i), plate.cols(i).wells('1', '2'))
 
 # dispense 4 samples from tube rack (C2, D2, A3, B3)
 # to row 3 of 96 well plate (duplicates, A3/B3, C3/D3, E3/F3, G3/H3)
@@ -38,6 +41,7 @@ p200.distribute(
     50,
     tuberack.wells('C2', 'D2', 'A3', 'B3'),
     plate.rows('3'))
+
 
 # fill rows 4 to 11 with 25 uL of dilutent each
 m50.distribute(

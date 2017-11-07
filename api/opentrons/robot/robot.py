@@ -472,6 +472,9 @@ class Robot(object):
         """
         self.poses = self.gantry.home(self.poses)
 
+        self.poses = self._actuators['left']['plunger'].home(self.poses)
+        self.poses = self._actuators['right']['plunger'].home(self.poses)
+
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)

@@ -7,7 +7,7 @@ from collections import namedtuple
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 
-CURRENT_ROBOT = 'B2-5'
+CURRENT_ROBOT = 'B2-4'
 
 robot_config = namedtuple(
     'robot_config',
@@ -44,14 +44,19 @@ Amedeo = robot_config(
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25',
-    gantry_calibration=[
-            [ 1.00188679e+00,  -1.38121547e-03, 0.0,  -4.02423779e+01],   # NOQA
-            [-1.32075472e-02,   9.95856354e-01, 0.0,  -5.06868659e+00],   # NOQA
-            [            0.0,              0.0, 1.0,              4.5],   # NOQA
-            [-5.03305613e-19,   2.60208521e-18, 0.0,   1.00000000e+00]],  # NOQA
-    probe_center=(287.49022485728057, 295.14501721735377, 96.5),
-    instrument_offset=(-40.13513347,  28.33733321,  -0.25),  # left to right
-    probe_dimensions=(30.0, 30, 25.5),   # X, Y and Z measurements
+    gantry_calibration=[[  1.00283019e+00,  -4.83425414e-03,   0.00000000e+00,
+         -3.52323132e+01],
+       [ -1.13207547e-02,   9.97237569e-01,   0.00000000e+00,
+         -1.81761811e+00],
+       [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,
+          4.50000000e+00],
+       [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,
+          1.00000000e+00]],
+    probe_center=(289, 295, 55.0),
+    instrument_offset=(-37.99669417,  30.15314473,  -0.25),  # left to right
+    # X, Y and Z measurement of imaginary bounding box surrounding the probe
+    # giving safe distance to position for probing
+    probe_dimensions=(60.0, 60.0, 60.0),
     deck_offset=None
 )
 
@@ -75,8 +80,10 @@ Rosalind = robot_config(
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
     deck_offset=None,
-    probe_center=(287.49022485728057, 295.14501721735377, 0),
-    probe_dimensions=(40.0, 40.0, 53.0),
+    probe_center=(287, 295, 55.0),
+    # X, Y and Z measurement of imaginary bounding box surrounding the probe
+    # giving safe distance to position for probing
+    probe_dimensions=(50.0, 50.0, 53.0),
     gantry_calibration=[
         [  1.00094340e+00,  -3.45303867e-03,   0.00000000e+00,  -1.94897355e+01],    # NOQA
         [  1.88679245e-03,   9.97237569e-01,   0.00000000e+00,  -1.66290112e+00],    # NOQA

@@ -176,7 +176,6 @@ class SmoothieDriver_3_0_0:
             if moving_plunger:
                 self.set_current('BC', PLUNGER_CURRENT_HIGH)
 
-            print(command)
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)

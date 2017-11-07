@@ -7,7 +7,7 @@ import urwid
 from numpy.linalg import inv
 from numpy import dot, array, insert
 from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
-from translate import solve
+from solve import solve
 
 driver = SmoothieDriver_3_0_0()
 
@@ -28,7 +28,7 @@ current_position = (0, 0, 0)
 # 200uL tip. Used during calibration process
 # The actual calibration represents end of a pipette
 # without tip on
-TIP_LENGTH = 47  # DEFAULT_TIP_LENGTH
+TIP_LENGTH = 47
 # Smoothie Z value when Deck's Z=0
 Z_OFFSET = 4.5
 
@@ -62,9 +62,9 @@ test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
 # if you want to test points or to measure real-world objects
 # using the tool
 XY = \
-    array([[  1.00094340e+00,  -3.45303867e-03,  -1.94897355e+01],    # NOQA
-           [  1.88679245e-03,   9.97237569e-01,  -1.66290112e+00],    # NOQA
-           [ -5.03305613e-19,   2.60208521e-18,   1.00000000e+00]])   # NOQA
+    array([[  1.00283019e+00,  -4.83425414e-03, -3.52323132e+01],
+       [ -1.13207547e-02,   9.97237569e-01, -1.81761811e+00],
+       [ -5.03305613e-19,   2.60208521e-18, 1.00000000e+00]])   # NOQA
 
 
 # Add fixed Z offset which is known so we don't have to calibrate for height
@@ -237,7 +237,7 @@ def main():
     status('Hello!')
     ui_loop.run()
 
-    print('Calibration data: \n', T)
+    print('Calibration data: \n', repr(T))
 
 
 if __name__ == "__main__":

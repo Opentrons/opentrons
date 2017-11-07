@@ -105,12 +105,17 @@ class Mover:
 
     def probe(self, axis, movement):
         axis = axis.lower()
+        result = {}
 
         if self._parent:
-            self._parent.probe(axis, movement)
+            result = self._parent.probe(axis, movement)
 
         if axis in self._axis_mapping:
-            self._driver.probe_axis(self._axis_mapping[axis], movement)
+            result = self._driver.probe_axis(
+                        self._axis_mapping[axis],
+                        movement)
+
+        return result
 
     def delay(self, seconds):
         self._driver.delay(seconds)
