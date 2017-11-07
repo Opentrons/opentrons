@@ -41,16 +41,16 @@ describe('robot selectors', () => {
       connection: {
         connectedTo: 'abcdef.local',
         discovered: ['abcdef.local', '123456.local'],
-        discoveredByHostname: {
-          'abcdef.local': {hostname: 'abcdef.local'},
-          '123456.local': {hostname: '123456.local'}
+        discoveredByHost: {
+          'abcdef.local': {host: 'abcdef.local', name: 'foo'},
+          '123456.local': {host: '123456.local', name: 'bar'}
         }
       }
     }
 
     expect(getDiscovered(makeState(state))).toEqual([
-      {hostname: 'abcdef.local', isConnected: true},
-      {hostname: '123456.local', isConnected: false}
+      {host: 'abcdef.local', name: 'foo', isConnected: true},
+      {host: '123456.local', name: 'bar', isConnected: false}
     ])
   })
 

@@ -3,7 +3,7 @@ import Bonjour from 'bonjour'
 
 import {actions} from '../actions'
 
-const NAME_RE = /^opentrons/
+const NAME_RE = /^opentrons/i
 const DISCOVERY_TIMEOUT_MS = 30000
 const UP_EVENT = 'up'
 const DOWN_EVENT = 'down'
@@ -20,7 +20,7 @@ export function handleDiscover (dispatch, state, action) {
 
   function handleServiceUp (service) {
     if (NAME_RE.test(service.name)) {
-      dispatch(actions.addDiscovered(service.host))
+      dispatch(actions.addDiscovered(service))
     }
   }
 

@@ -74,7 +74,6 @@ h1 {
 
 .connection_name,
 .connection_btn {
-  width: 10rem;
   display: block;
   text-align: center;
 }
@@ -107,4 +106,3 @@ h1 {
   color: grey;
   background-color: transparent;
 }
-

@@ -54,7 +54,7 @@ export default function client (dispatch) {
   function connect (state, action) {
     if (rpcClient) return dispatch(actions.connectResponse())
 
-    RpcClient(`ws://${action.payload.hostname}:${PORT}`)
+    RpcClient(`ws://${action.payload.host}:${PORT}`)
       .then((c) => {
         rpcClient = c
         rpcClient

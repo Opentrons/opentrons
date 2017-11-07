@@ -21,29 +21,30 @@ describe('robot actions', () => {
   })
 
   test('ADD_DISCOVERED action', () => {
-    const hostname = '123456.local'
+    const name = 'Opentrons XYZ123'
+    const host = '123456.local'
     const expected = {
       type: actionTypes.ADD_DISCOVERED,
-      payload: {hostname}
+      payload: {host, name}
     }
 
-    expect(actions.addDiscovered(hostname)).toEqual(expected)
+    expect(actions.addDiscovered({host, name})).toEqual(expected)
   })
 
   test('REMOVE_DISCOVERED action', () => {
-    const hostname = '123456.local'
+    const host = '123456.local'
     const expected = {
       type: actionTypes.REMOVE_DISCOVERED,
-      payload: {hostname}
+      payload: {host}
     }
 
-    expect(actions.removeDiscovered(hostname)).toEqual(expected)
+    expect(actions.removeDiscovered(host)).toEqual(expected)
   })
 
   test('CONNECT action', () => {
     const expected = {
       type: actionTypes.CONNECT,
-      payload: {hostname: 'ot.local'},
+      payload: {host: 'ot.local'},
       meta: {robotCommand: true}
     }
 
