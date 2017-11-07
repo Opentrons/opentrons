@@ -2,12 +2,69 @@ from . import types
 from ..broker import broker
 import functools
 import inspect
+from opentrons.containers import Well, Container, Slot, WellSeries
 
 
-def drop_coodrinates(location):
+def stringify_location(location):
+    def get_slot(location):
+        trace = location.get_trace()
+        for item in trace:
+            if isinstance(item, Slot):
+                return item
+
+    slot_number_mapping = {
+        'A1': '1',
+        'B1': '2',
+        'C1': '3',
+        'A2': '4',
+        'B2': '5',
+        'C2': '6',
+        'A3': '7',
+        'B3': '8',
+        'C3': '9',
+        'A4': '10',
+        'B4': '11',
+        'C4': '12',
+    }
+
+    type_to_text = {
+        Slot: 'slot',
+        Container: 'container',
+        Well: 'well'
+    }
+
     if isinstance(location, tuple):
-        return location[0]
-    return location
+        location = location[0]
+
+    # Coordinates only
+    if location is None:
+        return '?'
+
+    # TODO(artyom, 20171107): this is to handle a case when
+    # container.rows('1', '2') returns a WellSeries of WellSeries
+    # the data structure should be fixed when WellSeries is phased out
+    if (isinstance(location, WellSeries) and
+            isinstance(location[0], WellSeries)):
+        location = WellSeries(
+            wells=[well for series in location for well in series])
+
+    if (isinstance(location, WellSeries)):
+        location = list(location)
+
+    if not (isinstance(location, WellSeries) or
+            isinstance(location, list) or
+            isinstance(location, tuple)):
+        location = [location]
+
+    multiple = len(location) > 1
+
+    return '{object_text}{suffix} {first}{last} in "{slot_text}"'.format(
+            object_text=type_to_text[type(location[0])],
+            suffix='s' if multiple else '',
+            first=location[0].get_name(),
+            last='..'+location[-1].get_name() if multiple else '',
+            slot_text=slot_number_mapping[get_slot(location[0]).get_name()]
+        )
 
 
 def make_command(name, payload):
@@ -26,9 +83,9 @@ def home(axis):
 
 
 def aspirate(instrument, volume, location, rate):
-    location = drop_coodrinates(location)
+    location_text = stringify_location(location)
     text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
-        volume=volume, location=location, rate=rate
+        volume=volume, location=location_text, rate=rate
     )
     return make_command(
         name=types.ASPIRATE,
@@ -43,9 +100,9 @@ def aspirate(instrument, volume, location, rate):
 
 
 def dispense(instrument, volume, location, rate):
-    location = drop_coodrinates(location)
+    location_text = stringify_location(location)
     text = 'Dispensing {volume} uL into {location}'.format(
-        volume=volume, location=location, rate=rate
+        volume=volume, location=location_text, rate=rate
     )
 
     return make_command(
@@ -63,8 +120,8 @@ def dispense(instrument, volume, location, rate):
 def consolidate(instrument, volume, source, dest):
     text = 'Consolidating {volume} from {source} to {dest}'.format(
         volume=volume,
-        source=source,
-        dest=dest
+        source=stringify_location(source),
+        dest=stringify_location(dest)
     )
     return make_command(
         name=types.CONSOLIDATE,
@@ -82,8 +139,8 @@ def consolidate(instrument, volume, source, dest):
 def distribute(instrument, volume, source, dest):
     text = 'Distributing {volume} from {source} to {dest}'.format(
         volume=volume,
-        source=source,
-        dest=dest
+        source=stringify_location(source),
+        dest=stringify_location(dest)
     )
     return make_command(
         name=types.DISTRIBUTE,
@@ -101,8 +158,8 @@ def distribute(instrument, volume, source, dest):
 def transfer(instrument, volume, source, dest):
     text = 'Transferring {volume} from {source} to {dest}'.format(
         volume=volume,
-        source=source,
-        dest=dest
+        source=stringify_location(source),
+        dest=stringify_location(dest)
     )
     return make_command(
         name=types.TRANSFER,
@@ -144,11 +201,11 @@ def mix(instrument, repetitions, volume, location):
 
 
 def blow_out(instrument, location):
-    location = drop_coodrinates(location)
+    location_text = stringify_location(location)
     text = 'Blowing out'
 
     if location is not None:
-        text += ' at {location}'.format(location=location)
+        text += ' at {location}'.format(location=location_text)
 
     return make_command(
         name=types.BLOW_OUT,
@@ -192,8 +249,8 @@ def return_tip():
 
 
 def pick_up_tip(instrument, location):
-    location = drop_coodrinates(location)
-    text = 'Picking up tip {location}'.format(location=location)
+    location_text = stringify_location(location)
+    text = 'Picking up tip {location}'.format(location=location_text)
     return make_command(
         name=types.PICK_UP_TIP,
         payload={
@@ -205,8 +262,8 @@ def pick_up_tip(instrument, location):
 
 
 def drop_tip(instrument, location):
-    location = drop_coodrinates(location)
-    text = 'Dropping tip {location}'.format(location=location)
+    location_text = stringify_location(location)
+    text = 'Dropping tip {location}'.format(location=location_text)
     return make_command(
         name=types.DROP_TIP,
         payload={
