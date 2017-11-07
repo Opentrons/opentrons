@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import plateSingleSrc from '../img/labware/plate_single.png'
 import troughSingleSrc from '../img/labware/trough_single.png'
+import tubeSingleSrc from '../img/labware/tuberack_single.png'
 import tiprackSingleSrc from '../img/labware/tiprack_single.png'
 
 Diagram.propTypes = {
@@ -19,6 +20,8 @@ export default function Diagram (props) {
     labwareSrc = tiprackSingleSrc
   } else if (type.includes('trough')) {
     labwareSrc = troughSingleSrc
+  } else if (type.includes('tube-rack')) {
+    labwareSrc = tubeSingleSrc
   } else {
     labwareSrc = plateSingleSrc
   }
