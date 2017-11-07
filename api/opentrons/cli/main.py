@@ -62,9 +62,10 @@ test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
 # if you want to test points or to measure real-world objects
 # using the tool
 XY = \
-    array([[  1.00283019e+00,  -4.83425414e-03, -3.52323132e+01],
-       [ -1.13207547e-02,   9.97237569e-01, -1.81761811e+00],
-       [ -5.03305613e-19,   2.60208521e-18, 1.00000000e+00]])   # NOQA
+    array([
+        [ 1.00, 0.00, -35.23],   # NOQA
+        [-0.01, 1.00,  -1.81],   # NOQA
+        [ 0.00, 0.00,   1.00]])  # NOQA
 
 
 # Add fixed Z offset which is known so we don't have to calibrate for height

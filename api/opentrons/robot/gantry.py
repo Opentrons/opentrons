@@ -6,23 +6,16 @@ from ..trackers.pose_tracker import (
 class Mover:
     def __init__(
         self,
-        *,
         driver,
         axis_mapping,
         reference,
         origin=ROOT,
-        children=None
     ):
         self._driver = driver
         self._origin = origin
         self._reference = driver if reference is None else reference
         self._parent = None
         self._axis_mapping = axis_mapping
-        self._children = children or []
-        [child.attach(self) for child in self._children]
-
-    def attach(self, parent):
-        self._parent = parent
 
     def jog(self, pose, axis, distance):
         axis = axis.lower()
@@ -40,12 +33,13 @@ class Mover:
             )
         )
 
-    def move(self, pose, x, y=0, z=0):
+    def move(self, pose, x=None, y=None, z=None):
         # Potential users of this method might need less than 3 axis
-        if self._parent:
-            pose = self._parent.move(pose, x, y, z)
 
-        # apply transformation
+        x = x if 'x' in self._axis_mapping else 0
+        y = y if 'y' in self._axis_mapping else 0
+        z = z if 'z' in self._axis_mapping else 0
+
         x, y, z = relative(
             pose,
             src=self._origin,
@@ -76,13 +70,6 @@ class Mover:
         return update(pose, self, Point(x, y, z))
 
     def home(self, pose):
-        from functools import reduce
-        reduce(
-            lambda _pose, child: child.home(_pose),
-            self._children,
-            pose
-        )
-
         position = self._driver.home(axis=''.join(self._axis_mapping.values()))
         # map from driver axis names to xyz and expand position
         # into point object

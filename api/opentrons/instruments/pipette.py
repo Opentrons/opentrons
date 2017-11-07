@@ -1426,12 +1426,20 @@ class Pipette:
 
         x, y, z = x and x - dx, y and y - dy, z and z - dz
 
-        res = self.instrument_mover.move(pose_tree, x, y, z)
+        pose_tree = self.robot.gantry.move(pose_tree, x=x, y=y)
+        pose_tree = self.instrument_mover.move(pose_tree, z=z)
 
-        return res
+        return pose_tree
 
     def _jog(self, pose_tree, axis, distance):
-        return self.instrument_mover.jog(pose_tree, axis, distance)
+        if axis == 'x':
+            pose_tree = self.robot.gantry.jog(pose_tree, axis, distance)
+        elif axis == 'y':
+            pose_tree = self.robot.gantry.jog(pose_tree, axis, distance)
+        elif axis == 'z':
+            pose_tree = self.instrument_mover.jog(pose_tree, axis, distance)
+
+        return pose_tree
 
     def _probe(self, axis, movement):
         return self.instrument_mover.probe(axis, movement)

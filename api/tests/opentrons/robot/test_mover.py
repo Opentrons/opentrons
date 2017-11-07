@@ -40,7 +40,6 @@ def test_functional(driver):
         driver=driver,
         axis_mapping={'x': 'X', 'y': 'Y'},
         reference=id(scale),
-        children=[left, right]
     )
 
     state = init() \
@@ -51,14 +50,16 @@ def test_functional(driver):
         .add('left', left, transform=back) \
         .add('right', right, transform=back)
 
-    state = left.move(state, 1, 1, 1)
+    state = gantry.move(state, x=1, y=1)
+    state = left.move(state, z=1)
 
     assert isclose(absolute(state, 'left'), (1, 1, 1)).all()
     assert isclose(absolute(state, 'right'), (1, 1, 1.5)).all()
-    state = right.move(state, 2, 2, 3)
+    state = gantry.move(state, x=2, y=2)
+    state = right.move(state, z=3)
     assert isclose(absolute(state, 'left'), (2, 2, 1)).all()
     assert isclose(absolute(state, 'right'), (2, 2, 3)).all()
-    state = right.jog(state, axis='x', distance=1)
+    state = gantry.jog(state, axis='x', distance=1)
     assert isclose(absolute(state, 'left'), (3, 2, 1)).all()
     assert isclose(absolute(state, 'right'), (3, 2, 3)).all()
     state = right.jog(state, axis='z', distance=1)

@@ -275,8 +275,7 @@ class Robot(object):
         self.gantry = Mover(
             driver=driver,
             axis_mapping={'x': 'X', 'y': 'Y'},
-            reference=id(CALIBRATION),
-            children=[left_carriage, right_carriage]
+            reference=id(CALIBRATION)
         )
 
         # Extract only transformation component
@@ -470,10 +469,18 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
-        self.poses = self.gantry.home(self.poses)
 
+        # Home pipettes first to avoid colliding with labware
+        # and to make sure tips are not in the liquid while
+        # homing plungers
+        self.poses = self._actuators['left']['carriage'].home(self.poses)
+        self.poses = self._actuators['right']['carriage'].home(self.poses)
+        # Then plungers
         self.poses = self._actuators['left']['plunger'].home(self.poses)
         self.poses = self._actuators['right']['plunger'].home(self.poses)
+        # Gantry goes last to avoid any further movement while
+        # close to XY switches so we are don't accidentally hit them
+        self.poses = self.gantry.home(self.poses)
 
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
