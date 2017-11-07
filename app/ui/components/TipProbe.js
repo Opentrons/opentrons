@@ -2,8 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {constants as robotConstants} from '../robot'
-import styles from './TipProbe.css'
 import {Spinner, Warning} from './icons'
+import InfoBox from './InfoBox'
+
+import styles from './TipProbe.css'
 
 const {
   UNPROBED,
@@ -32,32 +34,19 @@ TipProbe.propTypes = {
 }
 
 export default function TipProbe (props) {
+  const {instrument: {calibration}} = props
+  let onCancelClick
+
+  if (calibration === READY_TO_PROBE || calibration === PROBED) {
+    onCancelClick = props.onCancelClick
+  }
+
   return (
-    <InfoBox {...props}>
+    <InfoBox onCancelClick={onCancelClick} className={styles.info}>
       <TipProbeMessage {...props} />
       <TipProbeButtonOrSpinner {...props} />
       <TipProbeWarning {...props} />
     </InfoBox>
-  )
-}
-
-function InfoBox (props) {
-  const {instrument: {calibration}, onCancelClick} = props
-  let cancelButton = null
-
-  if (calibration === READY_TO_PROBE || calibration === PROBED) {
-    cancelButton = (
-      <span role='button' onClick={onCancelClick} className={styles.close}>
-        X
-      </span>
-    )
-  }
-
-  return (
-    <div className={styles.info}>
-      {cancelButton}
-      {props.children}
-    </div>
   )
 }
 
@@ -108,7 +97,7 @@ function TipProbeMessage (props) {
   }
 
   return (
-    <p>{icon}{message}</p>
+    <div className={message && styles.message}>{icon}{message}</div>
   )
 }
 
