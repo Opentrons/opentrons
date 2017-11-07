@@ -67,7 +67,7 @@ Rosalind = robot_config(
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(
         PLUNGER_CURRENT_LOW),
     deck_offset=(-31.45, -20.1, 0),
-    probe_center={'z': 57.81, 'x': 259.8, 'y': 298.875},
+    probe_center={'z': 60, 'x': 263, 'y': 285},
     probe_dimensions={'length': 41, 'width': 38.7, 'height': 67.81}
 )
 
