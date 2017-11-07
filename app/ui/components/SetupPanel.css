@@ -51,7 +51,7 @@
 }
 
 .labware_group {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .labware_alert {
@@ -127,6 +127,20 @@ li:nth-child(odd) a.btn_labware {
 .type {
   display: block;
   line-height: 1rem;
+}
+
+.run_message {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.run_message_item {
+  margin-bottom: 0.5rem;
+}
+
+.run_message_item:last-child {
+  margin-bottom: 0;
 }
 
 .run_link {

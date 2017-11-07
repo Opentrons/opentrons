@@ -7,11 +7,14 @@ import ToolTip from './ToolTip'
 import styles from './SetupPanel.css'
 
 import {constants as robotConstants} from '../robot'
+import InfoBox from './InfoBox'
 
 function PipetteLinks (props) {
-  const {axis, name, volume, channels, probed, onClick} = props
+  const {axis, name, volume, channels, probed, isRunning, onClick} = props
   const isDisabled = name == null
-  const url = `/setup-instruments/${axis}`
+  const url = isRunning
+    ? '#'
+    : `/setup-instruments/${axis}`
 
   const linkStyle = classnames({[styles.disabled]: isDisabled})
 
@@ -88,11 +91,18 @@ export default function SetupPanel (props) {
     labwareConfirmed,
     tipracksConfirmed,
     setLabware,
-    clearLabwareReviewed
+    clearLabwareReviewed,
+    isRunning,
+    run
   } = props
 
   const instrumentList = instruments.map((i) => (
-    <PipetteLinks {...i} key={i.axis} onClick={clearLabwareReviewed} />
+    <PipetteLinks
+      {...i}
+      key={i.axis}
+      isRunning={isRunning}
+      onClick={!isRunning && clearLabwareReviewed}
+    />
   ))
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
@@ -105,7 +115,7 @@ export default function SetupPanel (props) {
         key={slot}
         instrumentsCalibrated={instrumentsCalibrated}
         tipracksConfirmed={tipracksConfirmed}
-        onClick={onClick}
+        onClick={!isRunning && onClick}
       />
     )
 
@@ -142,6 +152,14 @@ export default function SetupPanel (props) {
     ? '/run'
     : '#'
 
+  const runMessage = labwareConfirmed
+    ? <RunMessage />
+    : null
+
+  const onRunClick = labwareConfirmed && !isRunning
+    ? run
+    : null
+
   return (
     <div className={styles.setup_panel}>
       <h2 className={styles.title}>Prepare Robot for RUN</h2>
@@ -160,13 +178,28 @@ export default function SetupPanel (props) {
           </ul>
           {pipetteMsg}
           {labwareMsg}
+          {runMessage}
         </section>
       </section>
-      <NavLink to={runLinkUrl} className={runLinkStyles}>
+      <NavLink to={runLinkUrl} className={runLinkStyles} onClick={onRunClick}>
         Run Protocol
         {runWarning}
       </NavLink>
     </div>
+  )
+}
+
+function RunMessage () {
+  return (
+    <InfoBox className={styles.run_message}>
+      <p className={styles.run_message_item}>
+        Hurray, your robot is now ready! Click [RUN PROTOCOL] to start your run.
+      </p>
+      <p className={styles.run_message_item}>
+        Tip: Try a dry run prior to adding your samples and re-agents to avoid
+        wasting materials.
+      </p>
+    </InfoBox>
   )
 }
 
@@ -199,5 +232,7 @@ SetupPanel.propTypes = {
   clearLabwareReviewed: PropTypes.func.isRequired,
   instrumentsCalibrated: PropTypes.bool.isRequired,
   tipracksConfirmed: PropTypes.bool.isRequired,
-  labwareConfirmed: PropTypes.bool.isRequired
+  labwareConfirmed: PropTypes.bool.isRequired,
+  isRunning: PropTypes.bool.isRequired,
+  run: PropTypes.func.isRequired
 }

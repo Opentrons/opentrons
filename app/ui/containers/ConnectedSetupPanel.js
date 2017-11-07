@@ -14,13 +14,15 @@ const mapStateToProps = (state) => ({
   instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
   tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
   labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
-  singleChannel: robotSelectors.getSingleChannel(state)
+  singleChannel: robotSelectors.getSingleChannel(state),
+  isRunning: robotSelectors.getIsRunning(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false)),
   setLabware: (slot) => () => dispatch(push(`/setup-deck/${slot}`)),
-  moveToLabware: (axis, slot) => () => dispatch(robotActions.moveTo(axis, slot))
+  moveToLabware: (axis, slot) => () => dispatch(robotActions.moveTo(axis, slot)),
+  run: () => dispatch(robotActions.run())
 })
 
 const mergeProps = (stateProps, dispatchProps) => {
