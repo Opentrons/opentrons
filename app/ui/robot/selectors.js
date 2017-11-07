@@ -15,7 +15,6 @@ import {
   FINISHED,
   STOPPED,
   UNPROBED,
-  CONFIRMED,
   UNCONFIRMED,
   INSTRUMENT_AXES,
   DECK_SLOTS,
@@ -206,7 +205,10 @@ export function getLabwareBySlot (state) {
 
 export function getLabware (state) {
   const protocolLabwareBySlot = getLabwareBySlot(state)
-  const {labwareBySlot: calibrationBySlot} = getCalibrationState(state)
+  const {
+    confirmedBySlot,
+    labwareBySlot: calibrationBySlot
+  } = getCalibrationState(state)
 
   return DECK_SLOTS.map((slot) => {
     let labware = protocolLabwareBySlot[slot] || {slot}
@@ -214,7 +216,8 @@ export function getLabware (state) {
     if (labware.name) {
       labware = {
         ...labware,
-        calibration: calibrationBySlot[slot] || UNCONFIRMED
+        calibration: calibrationBySlot[slot] || UNCONFIRMED,
+        confirmed: confirmedBySlot[slot] || false
       }
     }
 
@@ -227,10 +230,7 @@ export function getLabwareReviewed (state) {
 }
 
 export function getUnconfirmedLabware (state) {
-  return getLabware(state).filter((lw) => (
-    lw.type != null &&
-    lw.calibration !== CONFIRMED
-  ))
+  return getLabware(state).filter((lw) => (lw.type != null && !lw.confirmed))
 }
 
 export function getUnconfirmedTipracks (state) {

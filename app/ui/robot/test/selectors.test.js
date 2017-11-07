@@ -435,7 +435,11 @@ describe('robot selectors', () => {
         calibration: {
           labwareBySlot: {
             1: constants.UNCONFIRMED,
-            5: constants.CONFIRMED
+            5: constants.OVER_SLOT
+          },
+          confirmedBySlot: {
+            1: false,
+            5: true
           }
         }
       })
@@ -449,7 +453,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         },
         {slot: 2},
         {slot: 3},
@@ -460,7 +465,8 @@ describe('robot selectors', () => {
           name: 'b2',
           type: 'b',
           isTiprack: false,
-          calibration: constants.CONFIRMED
+          calibration: constants.OVER_SLOT,
+          confirmed: true
         },
         {slot: 6},
         {slot: 7},
@@ -471,7 +477,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         },
         {slot: 10},
         {slot: 11}
@@ -486,7 +493,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         }
       ])
     })
@@ -499,7 +507,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         },
         {
           slot: 9,
@@ -507,7 +516,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         }
       ])
     })

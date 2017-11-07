@@ -7,15 +7,21 @@ describe('robot reducer - calibration', () => {
 
     expect(state).toEqual({
       labwareReviewed: false,
+
       // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
       // axis. probedByAxis holds a flag for whether the instrument has been
       // probed at least once by axis. Rethink or combine these states
       instrumentsByAxis: {},
       probedByAxis: {},
-      labwareBySlot: {},
 
+      // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
+      // slot. confirmedBySlot holds a flag for whether the labware has been
+      // confirmed at least once. Rethink or combine these states
+      labwareBySlot: {},
+      confirmedBySlot: {},
+
+      // TODO(mc, 2017-11-07): figure out what's happening with home
       // homeRequest: {inProgress: false, error: null},
-      // TODO(mc, 2017-10-17): collapse moveToFront and probeTip request state
       moveToFrontRequest: {inProgress: false, error: null},
       probeTipRequest: {inProgress: false, error: null},
       moveToRequest: {inProgress: false, error: null},
@@ -319,7 +325,8 @@ describe('robot reducer - calibration', () => {
     const state = {
       calibration: {
         updateOffsetRequest: {inProgress: true, error: null, slot: 5},
-        labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT}
+        labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+        confirmedBySlot: {}
       }
     }
 
@@ -332,24 +339,28 @@ describe('robot reducer - calibration', () => {
 
     expect(reducer(state, success).calibration).toEqual({
       updateOffsetRequest: {inProgress: false, error: null, slot: 5},
-      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.CONFIRMED}
+      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.CONFIRMED},
+      confirmedBySlot: {5: true}
     })
     expect(reducer(state, failure).calibration).toEqual({
       updateOffsetRequest: {inProgress: false, error: new Error('AH'), slot: 5},
-      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT}
+      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+      confirmedBySlot: {5: false}
     })
   })
 
   test('handles CONFIRM_LABWARE action', () => {
     const state = {
       calibration: {
-        labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT}
+        labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+        confirmedBySlot: {}
       }
     }
     const action = {type: actionTypes.CONFIRM_LABWARE, payload: {labware: 5}}
 
     expect(reducer(state, action).calibration).toEqual({
-      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.CONFIRMED}
+      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.CONFIRMED},
+      confirmedBySlot: {5: true}
     })
   })
 })
