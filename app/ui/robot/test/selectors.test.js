@@ -225,7 +225,16 @@ describe('robot selectors', () => {
     })
 
     test('getRunProgress', () => {
-      expect(getRunProgress(state)).toEqual(50)
+      // leaves: 2, 3, 4; processed: 2
+      expect(getRunProgress(state)).toEqual(1 / 3 * 100)
+    })
+
+    test('getRunProgress with no commands', () => {
+      const state = makeState({
+        session: {protocolCommands: [], protocolCommandsById: {}}
+      })
+
+      expect(getRunProgress(state)).toEqual(0)
     })
 
     test('getStartTime', () => {

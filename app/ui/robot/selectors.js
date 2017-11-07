@@ -127,12 +127,20 @@ export function getCommands (state) {
   }
 }
 
-// TODO(mc, 2017-10-17): base this value on leaves rather than top level nodes
 export function getRunProgress (state) {
-  const commands = getCommands(state)
-  const currentCommand = commands.find((c) => c.isCurrent)
+  const leaves = getCommands(state).reduce(countLeaves, {handled: 0, total: 0})
 
-  return 100 * (commands.indexOf(currentCommand) + 1) / commands.length
+  if (!leaves.total) return 0
+
+  return 100 * (leaves.handled / leaves.total)
+
+  function countLeaves (result, cmd) {
+    if (cmd.children.length) return cmd.children.reduce(countLeaves, result)
+    if (cmd.handledAt) result.handled++
+    result.total++
+
+    return result
+  }
 }
 
 export function getStartTime (state) {
