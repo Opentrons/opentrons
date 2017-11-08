@@ -68,7 +68,7 @@ describe('api client - discovery', () => {
     return sendToClient({}, actions.discover())
       .then(() => services.forEach((s) => browser.emit('up', s)))
       .then(() => services.forEach((s) => {
-        expect(dispatch).toHaveBeenCalledWith(actions.addDiscovered(s.host))
+        expect(dispatch).toHaveBeenCalledWith(actions.addDiscovered(s))
       }))
   })
 
@@ -83,7 +83,8 @@ describe('api client - discovery', () => {
     return sendToClient({}, actions.discover())
       .then(() => services.forEach((s) => browser.emit('down', s)))
       .then(() => services.forEach((s) => {
-        expect(dispatch).toHaveBeenCalledWith(actions.removeDiscovered(s.host))
+        expect(dispatch)
+          .toHaveBeenCalledWith(actions.removeDiscovered(s.host))
       }))
   })
 
@@ -125,7 +126,7 @@ describe('api client - discovery', () => {
     return sendToClient({}, actions.discover())
       .then(() => services.forEach((s) => browser.emit('up', s)))
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(
-        actions.addDiscovered('nope.local')
+        actions.addDiscovered({host: 'nope.local'})
       ))
       .then(() => services.forEach((s) => browser.emit('down', s)))
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(

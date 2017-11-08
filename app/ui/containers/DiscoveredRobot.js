@@ -15,7 +15,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 
   return {
-    onConnectClick: () => dispatch(robotActions.connect(ownProps.hostname))
+    onConnectClick: () => dispatch(robotActions.connect(ownProps.host))
   }
 }
 

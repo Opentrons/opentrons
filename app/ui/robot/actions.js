@@ -62,8 +62,8 @@ export const actions = {
     return {type: actionTypes.DISCOVER_FINISH}
   },
 
-  connect (hostname) {
-    return makeRobotAction({type: actionTypes.CONNECT, payload: {hostname}})
+  connect (host) {
+    return makeRobotAction({type: actionTypes.CONNECT, payload: {host}})
   },
 
   connectResponse (error) {
@@ -86,12 +86,12 @@ export const actions = {
     return action
   },
 
-  addDiscovered (hostname) {
-    return {type: actionTypes.ADD_DISCOVERED, payload: {hostname}}
+  addDiscovered (service) {
+    return {type: actionTypes.ADD_DISCOVERED, payload: service}
   },
 
-  removeDiscovered (hostname) {
-    return {type: actionTypes.REMOVE_DISCOVERED, payload: {hostname}}
+  removeDiscovered (host) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: {host}}
   },
 
   // get session or make new session with protocol file
@@ -99,7 +99,6 @@ export const actions = {
     return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
   },
 
-  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   sessionResponse (error, session) {
     const didError = error != null
 

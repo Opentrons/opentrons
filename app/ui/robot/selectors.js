@@ -34,13 +34,13 @@ export function getIsScanning (state) {
 export function getDiscovered (state) {
   const {
     discovered,
-    discoveredByHostname,
+    discoveredByHost,
     connectedTo
   } = getConnectionState(state)
 
-  return discovered.map((hostname) => ({
-    ...discoveredByHostname[hostname],
-    isConnected: connectedTo === hostname
+  return discovered.map((host) => ({
+    ...discoveredByHost[host],
+    isConnected: connectedTo === host
   }))
 }
 

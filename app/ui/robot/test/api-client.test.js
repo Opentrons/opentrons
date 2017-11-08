@@ -65,7 +65,8 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
-  const sendConnect = () => sendToClient({}, actions.connect())
+  const HOST = 'ot.local'
+  const sendConnect = () => sendToClient({}, actions.connect(HOST))
   const sendDisconnect = () => sendToClient({}, actions.disconnect())
 
   describe('connect and disconnect', () => {
@@ -76,7 +77,7 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => {
-          expect(RpcClient).toHaveBeenCalledTimes(1)
+          expect(RpcClient).toHaveBeenCalledWith(`ws://${HOST}:31950`)
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
