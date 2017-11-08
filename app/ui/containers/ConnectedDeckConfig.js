@@ -31,6 +31,10 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
     moveToLabware: (axis) => () => dispatch(robotActions.moveTo(axis, slot)),
     setLabwareConfirmed: () => dispatch(robotActions.confirmLabware(slot)),
+    setCurrentLabware: (axis, slot) => () => {
+      dispatch(push(`/setup-deck/${slot}`))
+      dispatch(robotActions.moveTo(axis, slot))
+    },
     moveToNextLabware: (axis, nextSlot) => () => {
       dispatch(push(`/setup-deck/${nextSlot}`))
       dispatch(robotActions.moveTo(axis, nextSlot))

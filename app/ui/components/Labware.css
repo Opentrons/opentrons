@@ -23,6 +23,9 @@ a {
 .slot {
   border: 2px solid silver;
   background-color: #bbb;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .slot.active {
@@ -46,18 +49,16 @@ a {
   pointer-events: none;
 }
 
-.confirmed {
-  background-color: #ddd;
-}
-
-.confirmed::before {
-  content: '✓ ' attr(data-lab);
-  color: #777;
-}
-
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+    background-color: rgba(100, 100, 100);
+  }
+
+  to {
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0);
+  }
 }
 
 .confirmed_fade {
@@ -69,16 +70,13 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ddd;
   font-size: 1.25rem;
-  color: #777;
+  background-color: rgba(100, 100, 100, 1);
+  color: white;
+  font-weight: 300;
   animation: fadeOut 0.5s 1;
   animation-fill-mode: forwards;
   animation-delay: 2s;
-}
-
-.slot img {
-  width: 100%;
 }
 
 .slot img.spinner {
@@ -100,7 +98,7 @@ a {
 }
 
 .status {
-  top: 2.25rem;
+  top: 2.5rem;
 }
 
 .status::before {
