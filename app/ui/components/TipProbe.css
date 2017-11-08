@@ -1,12 +1,6 @@
 .info {
-  position: relative;
-  display: block;
-  border: 2px solid silver;
-  border-radius: 0.25rem;
   margin-top: 1rem;
-  padding: 1rem 0.75rem 0.5rem;
   font-size: 0.75rem;
-  min-height: 7.1rem;
 }
 
 .alert {
@@ -24,7 +18,7 @@
   height: 3rem;
   padding: 0 3rem;
   display: block;
-  margin: 1rem auto;
+  margin: 0 auto;
   line-height: 3rem;
   font-size: 1rem;
   font-family: 'trons';
@@ -55,8 +49,17 @@
   font-size: 1rem;
 }
 
+.message {
+  margin-bottom: 1rem;
+}
+
 .submessage {
   margin-bottom: 1rem;
+}
+
+.message:last-child,
+.submessage:last-child {
+  margin-bottom: 0;
 }
 
 .progress {
