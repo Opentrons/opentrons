@@ -173,12 +173,12 @@ def stringify(state, root=None):
         root = ascend(state, next(iter(state)))[-1]
 
     info = [
-        (obj, level, get(state, obj), change_base(state, src=obj, dst=root))
+        (obj, level, change_base(state, src=obj, dst=root))
         for obj, level in [(root, 0)] + descendants(state, root, level=1)]
 
     return '\n'.join([
-        ' ' * level + '{} {} {}'.format(str(obj), relative, world)
-        for obj, level, relative, world in info
+        ' ' * level + '{} {}'.format(str(obj), world)
+        for obj, level, world in info
     ])
 
 

@@ -313,6 +313,19 @@ class PipetteTest(unittest.TestCase):
     #         {'a': 0, 'b': 12.0}
     #     )
 
+    def test_add_tip(self):
+        """
+        This deals with z accrual behavior during tip add/remove, when +/- get
+        flipped in pose tracking logic
+        """
+        tip_length = 50
+        prior_position = pose_tracker.absolute(self.robot.poses, self.p200)
+        self.p200._add_tip(tip_length)
+        self.p200._remove_tip(tip_length)
+        new_position = pose_tracker.absolute(self.robot.poses, self.p200)
+
+        assert (new_position == prior_position).all()
+
     # # TODO (artyom, 20171102):  uncomment once calibration is fixed
     # def test_pick_up_tip(self):
     #     last_well = self.tiprack1[-1]

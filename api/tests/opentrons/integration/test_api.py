@@ -48,34 +48,6 @@ async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
     # assert (110.0, 135.0, 67.0) in coords
     # assert (110.0, 144.0, 58.0) in coords
 
-# @pytest.mark.parametrize('protocol_file', ['dinosaur.py'])
-# async def test_load_probe_run(main_router, protocol, protocol_file):
-#     session = main_router.session_manager.create(
-#         name='<blank>', text=protocol.text)
-
-#     await main_router.wait_until(state('session', 'loaded'))
-#     # Clear after simulation
-#     robot._driver.log.clear()
-
-#     main_router.calibration_manager.move_to_front(session.instruments[0])
-#     await main_router.wait_until(state('calibration', 'ready'))
-
-#     # TODO (artyom 20171011): instrument public interface of a pose tracker
-#     # to collect movement logs
-#     assert robot._driver.log == \
-#         [{'X': 150, 'B': 0, 'C': 0, 'Y': 150, 'A': 65.0, 'Z': 150}]
-
-#     main_router.calibration_manager.tip_probe(session.instruments[0])
-#     await main_router.wait_until(state('calibration', 'ready'))
-
-#     # Check the log for positions consistent with tip probe sequence
-#     assert robot._driver.log == \
-#         [{'X': 150, 'B': 0, 'C': 0, 'Y': 150, 'A': 65.0, 'Z': 150}]
-
-#     session.run()
-
-#     await main_router.wait_until(state('session', 'finished'))
-
 
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db):  # NOQA
