@@ -1412,17 +1412,18 @@ class Pipette:
         return self
 
     def _move(self, pose_tree, x=None, y=None, z=None):
-        current_x, current_y, current_z = pose_tracker.absolute(
+        current_x, current_y, current_z = pose_tracker.transform(
             pose_tree,
-            self)
+            src=self)
 
         x = current_x if x is None else x
         y = current_y if y is None else y
         z = current_z if z is None else z
 
-        dx, dy, dz = \
-            pose_tracker.absolute(pose_tree, self) - \
-            pose_tracker.absolute(pose_tree, self.mount)
+        dx, dy, dz = pose_tracker.transform(
+            pose_tree,
+            src=self,
+            dst=self.mount)
 
         x, y, z = x and x - dx, y and y - dy, z and z - dz
 
@@ -1442,16 +1443,29 @@ class Pipette:
         return pose_tree
 
     def _probe(self, axis, movement):
-        return self.instrument_mover.probe(axis, movement)
+        if axis == 'x':
+            value = self.robot.gantry.probe(axis, movement)
+        elif axis == 'y':
+            value = self.robot.gantry.probe(axis, movement)
+        elif axis == 'z':
+            value = self.instrument_mover.probe(axis, movement)
+
+        return value
 
     def _add_tip(self, length):
-        x, y, z = pose_tracker.get(self.robot.poses, self)
+        x, y, z = pose_tracker.transform(
+            self.robot.poses,
+            src=self.mount,
+            dst=self)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z - length))
 
     def _remove_tip(self, length):
-        x, y, z = pose_tracker.get(self.robot.poses, self)
+        x, y, z = pose_tracker.transform(
+            self.robot.poses,
+            src=self.mount,
+            dst=self)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z + length))

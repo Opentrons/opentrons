@@ -1,9 +1,10 @@
-import numpy as np
+import functools
+import itertools
 from collections import namedtuple, UserDict
 from typing import Dict, List
-from functools import partial
+
+import numpy as np
 from numpy.linalg import inv
-from functools import reduce
 
 ROOT = 'root'
 
@@ -117,50 +118,45 @@ def descendants(state, obj, level=0):
     ], [])
 
 
-def ascend(state, obj, root=None) -> List[Node]:
-    if obj is root:
-        return []
-    parent = state[obj].parent
-    return [obj] + ascend(state, obj=parent, root=root)
+def ascend(state, start, finish=ROOT) -> List[Node]:
+    if start is finish:
+        return [finish]
+    return [start] + ascend(state, start=state[start].parent, finish=finish)
 
 
-def forward(state, obj, root=None):
-    return reduce(
-        lambda a, b: a.dot(b),
-        [
-            state[key].transform
-            for key in reversed(ascend(state, obj=obj, root=root))
-        ],
-        np.identity(4)
-    )
+def transform(state, point=Point(0, 0, 0), src=ROOT, dst=ROOT):
+    """
+    Transforms point from source coordinate system to destination.
+    Point(0, 0, 0) means the origin of the source.
+    """
+    def fold(objects):
+        return functools.reduce(
+            lambda a, b: a.dot(b),
+            [state[key].transform for key in objects],
+            np.identity(4)
+        )
 
+    up, down = ascend(state, src), list(reversed(ascend(state, dst)))
 
-def reverse(state, obj, root=None):
-    return inv(reduce(
-        lambda a, b: a.dot(b),
-        [
-            state[key].transform
-            for key in ascend(state, obj=obj, root=root)
-        ],
-        np.identity(4)
-    ))
+    # Find common prefix. Last item is common root
+    root = [n1 for n1, n2 in zip(reversed(up), down) if n1 is n2].pop()
 
+    # Nodes up to root, EXCLUDING root
+    up = list(itertools.takewhile(lambda node: node is not root, up))
 
-def absolute(state, obj, root=None, point=Point(0, 0, 0)):
-    """absolute position of an object in a sub-tree of a root"""
-    return reverse(state, obj, root).dot((*point, 1))[:-1]
+    # Nodes down from root, EXCLUDING root
+    down = list(itertools.dropwhile(lambda node: node is not root, down))[1:]
 
+    # Point in root's coordinate system
+    point_in_root = inv(fold(up)).dot((*point, 1))
 
-def relative(state, src, dst, root=None, src_point=Point(0, 0, 0)):
-    """Relative vector from src (source) to dst (destination)
-    in root's subtree. if root is none — in the entire tree"""
-    x, y, z = absolute(state, obj=src, root=root, point=src_point)
-    return forward(state, dst, root=root).dot((x, y, z, 1))[:-1]
+    # Return point in destination's coordinate system
+    return fold(down).dot(point_in_root)[:-1]
 
 
 def max_z(state, root):
     return max([
-        Point(*absolute(state, obj=obj, root=root)).z
+        Point(*transform(state, src=obj, dst=root)).z
         for obj, _ in descendants(state, root)
     ])
 
@@ -170,7 +166,7 @@ def stringify(state, root=None):
         root = ascend(state, next(iter(state)))[-1]
 
     info = [
-        (obj, level, get(state, obj), relative(state, src=obj, dst=root))
+        (obj, level, get(state, obj), transform(state, src=obj, dst=root))
         for obj, level in [(root, 0)] + descendants(state, root, level=1)]
 
     return '\n'.join([
@@ -179,13 +175,9 @@ def stringify(state, root=None):
     ])
 
 
-def get(state, obj):
-    return inv(state[obj].transform).dot((0, 0, 0, 1))[:-1]
-
-
 def bind(state):
     state = UserDict(state.copy())
     # add syntax sugar for chaining add operations
-    state.add = partial(add, state)
+    state.add = functools.partial(add, state)
 
     return state

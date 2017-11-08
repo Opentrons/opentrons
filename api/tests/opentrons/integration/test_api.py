@@ -91,9 +91,9 @@ async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db)
 
     def instrument_procedure(index):
         def position(instrument):
-            return pose_tracker.absolute(
+            return pose_tracker.transform(
                 robot.poses,
-                instrument._instrument
+                src=instrument._instrument
             )
 
         main_router.calibration_manager.move_to(
