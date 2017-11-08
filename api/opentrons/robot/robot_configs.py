@@ -1,3 +1,7 @@
+# In this file we often align code for readability triggering PEP8 warnings
+# So...
+# pylama:skip=1
+
 # TODO: jmg 11/2 This file is meant to be a temporary
 # fix to make development easier and should be removed
 # once this configuration information is part of persistent robot data
@@ -44,14 +48,11 @@ Amedeo = robot_config(
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25',
-    gantry_calibration=[[  1.00283019e+00,  -4.83425414e-03,   0.00000000e+00,
-         -3.52323132e+01],
-       [ -1.13207547e-02,   9.97237569e-01,   0.00000000e+00,
-         -1.81761811e+00],
-       [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,
-          4.50000000e+00],
-       [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,
-          1.00000000e+00]],
+    gantry_calibration=[
+        [  1.00283019e+00,  -4.83425414e-03,   0.00000000e+00, -3.52323132e+01],
+        [ -1.13207547e-02,   9.97237569e-01,   0.00000000e+00, -1.81761811e+00],
+        [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,  4.50000000e+00],
+        [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,  1.00000000e+00]],
     probe_center=(289, 295, 55.0),
     instrument_offset=(-37.99669417,  30.15314473,  -0.25),  # left to right
     # X, Y and Z measurement of imaginary bounding box surrounding the probe
@@ -84,14 +85,11 @@ Rosalind = robot_config(
     # X, Y and Z measurement of imaginary bounding box surrounding the probe
     # giving safe distance to position for probing
     probe_dimensions=(60.0, 60.0, 60.0),
-    gantry_calibration=[[  9.99056604e-01,   4.83425414e-03,   0.00000000e+00,
-         -2.63882414e+01],
-       [ -9.43396226e-04,   1.00069061e+00,   0.00000000e+00,
-         -2.30371104e+00],
-       [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,
-          5.00000000e+00],
-       [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,
-          1.00000000e+00]],
+    gantry_calibration=[
+        [  9.99056604e-01,   4.83425414e-03,   0.00000000e+00, -2.63882414e+01],
+        [ -9.43396226e-04,   1.00069061e+00,   0.00000000e+00, -2.30371104e+00],
+        [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,  5.00000000e+00],
+        [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,  1.00000000e+00]],
     instrument_offset=(-37.43826124,  31.44202338,  -0.5)  # left to right
 )
 

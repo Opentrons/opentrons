@@ -50,7 +50,7 @@ def test_aspirate_move_to(robot):
     assert (current_pos == (9.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p200)
-    assert isclose(current_pos, (175.34,  127.94,   10.25)).all()
+    assert isclose(current_pos, (175.34,  127.94,   10)).all()
 
 
 def test_blow_out_move_to(robot):
