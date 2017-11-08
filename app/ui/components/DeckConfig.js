@@ -19,8 +19,7 @@ DeckMap.propTypes = {
   currentLabware: PropTypes.shape({
     slot: PropTypes.number.isRequired
   }).isRequired,
-  tipracksConfirmed: PropTypes.bool.isRequired,
-  setCurrentLabware: PropTypes.func.isRequired
+  tipracksConfirmed: PropTypes.bool.isRequired
 }
 
 function DeckMap (props) {
