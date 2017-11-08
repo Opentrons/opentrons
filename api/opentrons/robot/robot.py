@@ -3,7 +3,7 @@ from threading import Event
 
 
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
-from . import gantry
+from opentrons.robot.mover import Mover
 
 import opentrons.util.calibration_functions as calib
 
@@ -22,8 +22,15 @@ from functools import lru_cache
 
 log = get_logger(__name__)
 
-DECK_OFFSET = config.deck_offset
 MAX_INSTRUMENT_HEIGHT = 220.0000
+
+
+CALIBRATION = config.gantry_calibration
+
+MOUNT_OFFSETS = {
+    'right': pose_tracker.Point(0.0, 0.0, 0.0),
+    'left': pose_tracker.Point(*config.instrument_offset)
+}
 
 
 class InstrumentMosfet(object):
@@ -164,6 +171,34 @@ class Robot(object):
         only once instance of a robot.
         """
         self._driver = driver_3_0.SmoothieDriver_3_0_0()
+
+        self._actuators = {
+            'left': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst=id(CALIBRATION),
+                    axis_mapping={'z': 'Z'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst='volume-calibration-left',
+                    axis_mapping={'x': 'B'})
+            },
+            'right': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst=id(CALIBRATION),
+                    axis_mapping={'z': 'A'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst='volume-calibration-right',
+                    axis_mapping={'x': 'C'})
+            }
+        }
+
         self.dimensions = (395, 345, 228)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -205,7 +240,7 @@ class Robot(object):
         self._unsubscribe_commands = None
         self.reset()
 
-    def reset(self):
+    def reset(self, calibration=CALIBRATION):
         """
         Resets the state of the robot and clears:
             * Deck
@@ -233,13 +268,42 @@ class Robot(object):
         return self
 
     def setup_gantry(self):
-        self.gantry = gantry.Gantry(self._driver)
+        driver = self._driver
 
-        self.poses = pose_tracker.add(
-            self.poses,
-            self.gantry,
+        left_carriage = self._actuators['left']['carriage']
+        right_carriage = self._actuators['right']['carriage']
+
+        left_plunger = self._actuators['left']['plunger']
+        right_plunger = self._actuators['right']['plunger']
+
+        self.gantry = Mover(
+            driver=driver,
+            axis_mapping={'x': 'X', 'y': 'Y'},
+            src=pose_tracker.ROOT,
+            dst=id(CALIBRATION)
         )
-        self.poses = self.gantry._setup_mounts(self.poses)
+
+        # Extract only transformation component
+        inverse_transform = pose_tracker.inverse(
+            pose_tracker.extract_transform(CALIBRATION))
+
+        self.poses = pose_tracker.bind(self.poses) \
+            .add(obj=id(CALIBRATION), transform=CALIBRATION) \
+            .add(obj=self.gantry, parent=id(CALIBRATION)) \
+            .add(obj=left_carriage, parent=self.gantry) \
+            .add(obj=right_carriage, parent=self.gantry) \
+            .add(
+                obj='left',
+                parent=left_carriage,
+                transform=inverse_transform) \
+            .add(
+                obj='right',
+                parent=right_carriage,
+                transform=inverse_transform) \
+            .add(obj='volume-calibration-left') \
+            .add(obj='volume-calibration-right') \
+            .add(obj=left_plunger, parent='volume-calibration-left') \
+            .add(obj=right_plunger, parent='volume-calibration-right')
 
     def add_instrument(self, mount, instrument):
         """
@@ -265,8 +329,18 @@ class Robot(object):
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        self.poses = self.gantry.mount_instrument(
-            self.poses, instrument, mount)
+        instrument.instrument_actuator = self._actuators[mount]['plunger']
+        instrument.instrument_mover = self._actuators[mount]['carriage']
+        # We are creating two pose_tracker entries for instrument
+        # one id(instrument) to store it's offset vector and another
+        # with zero offset, which can be increased/decreased by
+        # tip length for pickup and drop tip
+        self.poses = pose_tracker.add(
+            self.poses,
+            instrument,
+            parent=mount,
+            point=MOUNT_OFFSETS[mount]
+        )
 
     def add_warning(self, warning_msg):
         """
@@ -400,12 +474,22 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
+
+        # Home pipettes first to avoid colliding with labware
+        # and to make sure tips are not in the liquid while
+        # homing plungers
+        self.poses = self._actuators['left']['carriage'].home(self.poses)
+        self.poses = self._actuators['right']['carriage'].home(self.poses)
+        # Then plungers
+        self.poses = self._actuators['left']['plunger'].home(self.poses)
+        self.poses = self._actuators['right']['plunger'].home(self.poses)
+        # Gantry goes last to avoid any further movement while
+        # close to XY switches so we are don't accidentally hit them
         self.poses = self.gantry.home(self.poses)
 
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
-        self.poses = self.gantry._update_pose(self.poses)
 
     # DEPRECATED
     def move_plunger(self, *args, **kwargs):
@@ -474,7 +558,6 @@ class Robot(object):
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
-
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 
@@ -622,8 +705,7 @@ class Robot(object):
         # Setup Deck as root object for pose tracker
         self.poses = pose_tracker.add(
             self.poses,
-            self._deck,
-            point=pose_tracker.Point(*DECK_OFFSET)
+            self._deck
         )
 
         for slot in self._deck:
@@ -839,11 +921,11 @@ class Robot(object):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
 
-        # calibrate will well bottom, but track top of well
-        delta = pose_tracker.relative(
+        # Get the relative position of well with respect to instrument
+        delta = pose_tracker.change_base(
             self.poses,
-            well,
-            instrument
+            src=instrument,
+            dst=well
         )
 
         self.poses = calib.calibrate_container_with_delta(

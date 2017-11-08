@@ -14,10 +14,6 @@ from opentrons.robot.robot_configs import (
   or knowing anything about what the axes are used for
 '''
 
-# TODO (ben 2017112): figure out why fw setting wasn't working on Avogadro
-# and remove this
-HOMING_OFFSETS = 'M206 X5'
-
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
     'X': 394,
@@ -46,6 +42,10 @@ GCODES = {'HOME': 'G28.2',
           'RESET_FROM_ERROR': 'M999',
           'SET_SPEED': 'G0F',
           'SET_CURRENT': 'M907'}
+
+# Number of digits after the decimal point for coordinates being sent
+# to Smoothie
+GCODE_ROUNDING_PRECISION = 3
 
 
 def _parse_axis_values(raw_axis_values):
@@ -187,14 +187,12 @@ class SmoothieDriver_3_0_0:
         self._send_command(config.current)
         self._send_command(config.max_speeds)
         self._send_command(config.steps_per_mm)
-        self._send_command(HOMING_OFFSETS)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, x=None, y=None, z=None, a=None, b=None, c=None):
+    def move(self, target):
         from numpy import isclose
-        target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
 
         def valid_movement(coords, axis):
             return not (
@@ -203,14 +201,14 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        coords = [axis + str(coords)
-                  for axis, coords in target_position.items()
+        coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
+                  for axis, coords in target.items()
                   if valid_movement(coords, axis)]
 
         if coords:
             command = GCODES['MOVE'] + ''.join(coords)
             self._send_command(command)
-            self._update_position(target_position)
+            self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
         axis = axis.upper()
@@ -244,11 +242,6 @@ class SmoothieDriver_3_0_0:
 
         position = HOMED_POSITION
 
-        if not self.simulating:
-            position = _parse_axis_values(
-                self._send_command(GCODES['CURRENT_POSITION'])
-            )
-
         # Only update axes that have been selected for homing
         homed = {
             ax: position[ax]
@@ -272,6 +265,7 @@ class SmoothieDriver_3_0_0:
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
+            self.update_position(self._position)
             return self._position[axis.upper()]
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))

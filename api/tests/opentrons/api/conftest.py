@@ -29,7 +29,7 @@ def log_by_axis(log, axis):
 def model():
     from opentrons import instruments, containers
 
-    pipette = instruments.Pipette(mount='right')
+    pipette = instruments.Pipette(mount='left')
     plate = containers.load('96-flat', 'A1')
 
     instrument = models.Instrument(pipette)

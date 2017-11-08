@@ -37,8 +37,14 @@ def test_plunger_commands(smoothie, monkeypatch):
     monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
     smoothie.home()
-    smoothie.move(x=0, y=1, z=2, a=3)
-    smoothie.move(x=0, y=1, z=2, a=3, b=4, c=5)
+    smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
+    smoothie.move({
+        'X': 10.987654321,
+        'Y': 1.12345678,
+        'Z': 2,
+        'A': 3,
+        'B': 4,
+        'C': 5})
 
     fuzzy_assert(
         result=command_log,
@@ -47,12 +53,11 @@ def test_plunger_commands(smoothie, monkeypatch):
             ['G4P0.05 M400'],                     # Dwell
             ['G28.2[ABCZ]+ G28.2X G28.2Y M400'],  # Home
             ['M907 B0.1 C0.1 M400'],              # Set plunger current low
-            ['G4P0.05 M400'],                       # Dwell
-            ['M114.2 M400'],                      # Get position
+            ['G4P0.05 M400'],                     # Dwell
             ['M114.2 M400'],                      # Get position
             ['G0.+ M400'],                        # Move (non-plunger)
             ['M907 B0.5 C0.5 M400'],              # Set plunger current high
-            ['G4P0.05 M400'],                       # Dwell
+            ['G4P0.05 M400'],                     # Dwell
             ['G0.+[BC].+ M400'],                  # Move (including BC)
             ['M907 B0.1 C0.1 M400'],              # Set plunger current low
             ['G4P0.05 M400']                      # Dwell
@@ -65,10 +70,10 @@ def test_functional(smoothie):
 
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
-    smoothie.move(x=0, y=1, z=2, a=3, b=4, c=5)
+    smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3, 'B': 4, 'C': 5})
     assert smoothie.position == position(0, 1, 2, 3, 4, 5)
 
-    smoothie.move(x=1, z=3, c=6)
+    smoothie.move({'X': 1, 'Z': 3, 'C': 6})
     assert smoothie.position == position(1, 1, 3, 3, 4, 6)
 
     smoothie.home(axis='abc', disabled='')

@@ -65,7 +65,7 @@ class Server(object):
         self.monitor_events_task.cancel()
 
     async def on_shutdown(self, app):
-        for ws in self.clients:
+        for ws in self.clients.copy():
             await ws.close(code=WSCloseCode.GOING_AWAY,
                            message='Server shutdown')
         self.shutdown()

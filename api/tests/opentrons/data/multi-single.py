@@ -5,7 +5,7 @@ from opentrons import containers, instruments
 # robot.home()
 # print('homed')
 
-tiprack = containers.load('tiprack-200ul', 'C2')
+tiprack = containers.load('tiprack-200ul', 'B3')
 trough = containers.load('trough-12row', 'C3')
 trash = containers.load('trash-box', 'C4')
 plate = containers.load('96-flat', 'B2')

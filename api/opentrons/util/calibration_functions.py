@@ -1,22 +1,18 @@
 from numpy import array
 from opentrons.trackers.pose_tracker import (
-    update, Point, get
+    update, Point, change_base
 )
-from opentrons.util.vector import Vector
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
+from ..robot.robot_configs import config
 
-# TODO(artyom 20171031): for some reason was unable to share this
-# constant with opentrons.robot, thus copying it here, until
-# moved to config
-DECK_OFFSET = (-44.55, -11.9, 0)
 
 # maximum distance to move during calibration attempt
-PROBE_TRAVEL_DISTANCE = 20
+PROBE_TRAVEL_DISTANCE = 30
 # size along X, Y and Z
-PROBE_SIZE = array((30.0, 30, 25.5))
+PROBE_SIZE = array(config.probe_dimensions)
 # coordinates of the top of the probe
-PROBE_TOP_COORDINATES = array((289.8, 296.4, 60.25)) + DECK_OFFSET
+PROBE_TOP_COORDINATES = array(config.probe_center)
 
 
 def calibrate_container_with_delta(
@@ -24,11 +20,12 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
     delta = Point(delta_x, delta_y, delta_z)
-    new_coordinates = get(pose_tree, container) - delta
+    new_coordinates = change_base(
+        pose_tree,
+        src=container,
+        dst=container.parent) + delta
     pose_tree = update(pose_tree, container, new_coordinates)
-    container._coordinates = Vector(*new_coordinates)
-    # Since we are potentially changing Z, we want to
-    # invalidate cache for max_deck_height
+    container._coordinates = container._coordinates + delta
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
     elif save:
@@ -46,7 +43,7 @@ def probe_instrument(instrument, robot):
 
     *_, height = PROBE_SIZE
 
-    center = PROBE_TOP_COORDINATES - (0, 0, height)
+    center = PROBE_TOP_COORDINATES * (1, 1, 0) + (0, 0, height / 2.0)
 
     #       Y ^
     #         * 1
@@ -66,16 +63,17 @@ def probe_instrument(instrument, robot):
     #   XY coordinate, or in the Z axis if both X and Y
     #   are zero
     switches = [
-        (-1, 0, -1, 1),
-        (1, 0, -1, -1),
-        (0, -1, -1, 1),
-        (0, 1, -1, -1),
-        (0, 0, 1, -1),
+        (-1, 0, -0.5,  1),
+        (1,  0, -0.5, -1),
+        (0, -1, -0.5,  1),
+        (0,  1, -0.5, -1),
+        (0,  0,    1, -1),
     ]
 
-    coords = [switch[:-1] * PROBE_SIZE + center for switch in switches]
-
+    coords = [switch[:-1] * PROBE_SIZE / 2.0 + center for switch in switches]
     instrument._add_tip(DEFAULT_TIP_LENGTH)
+
+    values = {'x': [], 'y': [], 'z': []}
 
     for coord, switch in zip(coords, switches):
         x, y, z = coord
@@ -87,20 +85,23 @@ def probe_instrument(instrument, robot):
         elif sy:
             axis = 'y'
 
-        # TODO(artyom, ben 20171026): fine tune correct probing sequence
-        robot.poses = instrument._move(
-            robot.poses,
-            z=z + 2 * height
-        )
-
+        robot.poses = instrument._move(robot.poses, z=height * 1.2)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
-        instrument._probe(axis, direction * PROBE_TRAVEL_DISTANCE)
 
-        robot.poses = instrument._move(robot.poses, x=x, y=y)
+        values[axis].append(
+            instrument._probe(
+                axis,
+                direction * PROBE_TRAVEL_DISTANCE
+            )
+        )
+
+        robot.poses = instrument._move(
+            robot.poses,
+            x=(x + sx * 5),
+            y=(y + sy * 5))
 
     instrument._remove_tip(DEFAULT_TIP_LENGTH)
-
     robot.home()
 
 

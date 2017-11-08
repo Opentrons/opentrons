@@ -1,9 +1,10 @@
-import numpy as np
+import functools
+import itertools
 from collections import namedtuple, UserDict
 from typing import Dict, List
-from functools import partial
+
+import numpy as np
 from numpy.linalg import inv
-from functools import reduce
 
 ROOT = 'root'
 
@@ -16,11 +17,25 @@ class Point(namedtuple('Point', 'x y z')):
 def translate(point) -> np.ndarray:
     x, y, z = point
     return np.array([
-        [1.0, 0.0, 0.0, x],
-        [0.0, 1.0, 0.0, y],
-        [0.0, 0.0, 1.0, z],
+        [1.0, 0.0, 0.0,   x],
+        [0.0, 1.0, 0.0,   y],
+        [0.0, 0.0, 1.0,   z],
         [0.0, 0.0, 0.0, 1.0]
     ])
+
+
+def extract_transform(matrix) -> np.ndarray:
+    """Extract transformation elements from a matrix"""
+    return matrix * np.array([
+        [1, 1, 1, 0],
+        [1, 1, 1, 0],
+        [1, 1, 1, 0],
+        [0, 0, 0, 1],
+    ])
+
+
+def inverse(matrix) -> np.ndarray:
+    return inv(matrix)
 
 
 class Node(namedtuple('Node', 'parent children transform')):
@@ -53,6 +68,9 @@ def add(
         parent=ROOT,
         point=Point(0, 0, 0),
         transform=np.identity(4)) -> Dict[object, Node]:
+
+    if isinstance(transform, list):
+        transform = np.array(transform)
 
     state = bind(state)
 
@@ -100,50 +118,52 @@ def descendants(state, obj, level=0):
     ], [])
 
 
-def ascend(state, obj, root=None) -> List[Node]:
-    if obj is root:
-        return []
-    parent = state[obj].parent
-    return [obj] + ascend(state, obj=parent, root=root)
+def ascend(state, start, finish=ROOT) -> List[Node]:
+    if start is finish:
+        return [finish]
+    return [start] + ascend(state, start=state[start].parent, finish=finish)
 
 
-def forward(state, obj, root=None):
-    return reduce(
-        lambda a, b: a.dot(b),
-        [
-            state[key].transform
-            for key in reversed(ascend(state, obj=obj, root=root))
-        ],
-        np.identity(4)
-    )
+def change_base(state, point=Point(0, 0, 0), src=ROOT, dst=ROOT):
+    """
+    Transforms point from source coordinate system to destination.
+    Point(0, 0, 0) means the origin of the source.
+    """
+    def fold(objects):
+        return functools.reduce(
+            lambda a, b: a.dot(b),
+            [state[key].transform for key in objects],
+            np.identity(4)
+        )
+
+    up, down = ascend(state, src), list(reversed(ascend(state, dst)))
+
+    # Find common prefix. Last item is common root
+    root = [n1 for n1, n2 in zip(reversed(up), down) if n1 is n2].pop()
+
+    # Nodes up to root, EXCLUDING root
+    up = list(itertools.takewhile(lambda node: node is not root, up))
+
+    # Nodes down from root, EXCLUDING root
+    down = list(itertools.dropwhile(lambda node: node is not root, down))[1:]
+
+    # Point in root's coordinate system
+    point_in_root = inv(fold(up)).dot((*point, 1))
+
+    # Return point in destination's coordinate system
+    return fold(down).dot(point_in_root)[:-1]
 
 
-def reverse(state, obj, root=None):
-    return inv(reduce(
-        lambda a, b: a.dot(b),
-        [
-            state[key].transform
-            for key in ascend(state, obj=obj, root=root)
-        ],
-        np.identity(4)
-    ))
-
-
-def absolute(state, obj, root=None):
-    """absolute position of an object in a sub-tree of a root"""
-    return reverse(state, obj, root).dot((0, 0, 0, 1))[:-1]
-
-
-def relative(state, src, dst, root=None):
-    """Relative vector from src (source) to dst (destination)
-    in root's subtree. if root is none — in the entire tree"""
-    x, y, z = absolute(state, obj=src, root=root)
-    return forward(state, dst, root=root).dot((x, y, z, 1))[:-1]
+def absolute(state, obj):
+    """
+    Get the (x, y, z) position of an object relative to origin of the pose tree
+    """
+    return change_base(state, src=obj)
 
 
 def max_z(state, root):
     return max([
-        Point(*absolute(state, obj=obj, root=root)).z
+        Point(*change_base(state, src=obj, dst=root)).z
         for obj, _ in descendants(state, root)
     ])
 
@@ -153,24 +173,18 @@ def stringify(state, root=None):
         root = ascend(state, next(iter(state)))[-1]
 
     info = [
-        (obj, level, get(state, obj), relative(state, src=obj, dst=root))
+        (obj, level, change_base(state, src=obj, dst=root))
         for obj, level in [(root, 0)] + descendants(state, root, level=1)]
 
     return '\n'.join([
-        ' ' * level + '{} {} {}'.format(str(obj), relative, world)
-        for obj, level, relative, world in info
+        ' ' * level + '{} {}'.format(str(obj), world)
+        for obj, level, world in info
     ])
-
-
-def get(state, obj):
-    return relative(state, src=obj, dst=state[obj].parent)
-    # x, y, z, *_ = state[obj].transform.dot((0.0, 0.0, 0.0, 1.0))
-    # return Point(x, y, z)
 
 
 def bind(state):
     state = UserDict(state.copy())
     # add syntax sugar for chaining add operations
-    state.add = partial(add, state)
+    state.add = functools.partial(add, state)
 
     return state

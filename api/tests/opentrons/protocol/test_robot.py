@@ -136,13 +136,12 @@ def test_create_arc(robot):
 
 
 def test_robot_move_to(robot):
-    p200 = pipette.Pipette(robot, mount='left', name='pipette')
+    p200 = pipette.Pipette(robot, mount='right', name='pipette')
     robot.move_to(instrument=p200, location=(robot._deck, (100, 0, 0)))
     assert isclose(
-        pose_tracker.relative(
+        pose_tracker.absolute(
             robot.poses,
-            src=p200,
-            dst=robot.deck),
+            p200),
         (100, 0, 0)
     ).all()
 
@@ -152,8 +151,8 @@ def test_move_head(robot):
     assert isclose(
         pose_tracker.absolute(
             robot.poses,
-            robot.gantry),
-        (100, 0, 0)
+            robot.gantry)[:2],
+        (100, 0, 0)[:2]
     ).all()
 
 

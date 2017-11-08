@@ -71,12 +71,12 @@ def make_command(name, payload):
     return {'name': name, 'payload': payload}
 
 
-def home(axis):
-    text = 'Homing pipette plunger on axis {axis}'.format(axis=axis)
+def home(mount):
+    text = 'Homing pipette plunger on mount {mount}'.format(mount=mount)
     return make_command(
         name=types.HOME,
         payload={
-            'axis': axis,
+            'axis': mount,
             'text': text
         }
     )

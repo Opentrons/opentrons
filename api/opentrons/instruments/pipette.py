@@ -338,7 +338,10 @@ class Pipette:
 
         self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
-        self.instrument_actuator.move(destination)
+        self.robot.poses = self.instrument_actuator.move(
+            self.robot.poses,
+            x=destination
+        )
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -421,7 +424,9 @@ class Pipette:
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.set_speed(speed)
-        self.instrument_actuator.move(destination)
+        self.robot.poses = self.instrument_actuator.move(
+            self.robot.poses,
+            x=destination)
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -439,7 +444,10 @@ class Pipette:
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
-            self.instrument_actuator.move(self._get_plunger_position('bottom'))
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=self._get_plunger_position('bottom')
+            )
 
         # then go inside the location
         if location:
@@ -547,7 +555,10 @@ class Pipette:
         """
 
         self.move_to(location, strategy='arc')
-        self.instrument_actuator.move(self._get_plunger_position('blow_out'))
+        self.robot.poses = self.instrument_actuator.move(
+            self.robot.poses,
+            x=self._get_plunger_position('blow_out')
+        )
         self.current_volume = 0
 
         return self
@@ -766,7 +777,10 @@ class Pipette:
 
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(self, location):
-            self.instrument_actuator.move(self._get_plunger_position('bottom'))
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=self._get_plunger_position('bottom')
+            )
             self.current_volume = 0
             self.move_to(self.current_tip().top(0), strategy='arc')
 
@@ -835,12 +849,18 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
-            self.instrument_actuator.move(
-                self._get_plunger_position('drop_tip'))
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=self._get_plunger_position('drop_tip'))
             if home_after:
-                self.instrument_actuator.home()
+                self.robot.poses = self.instrument_actuator.home(
+                    self.robot.poses
+                )
 
-            self.instrument_actuator.move(self._get_plunger_position('bottom'))
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=self._get_plunger_position('bottom')
+            )
 
             self.current_volume = 0
             self.current_tip(None)
@@ -869,11 +889,14 @@ class Pipette:
         <opentrons.instruments.pipette.Pipette object at ...>
         """
         @commands.publish.both(command=commands.home)
-        def _home(axis):
+        def _home(mount):
             self.current_volume = 0
-            self.instrument_actuator.home()
+            self.robot.poses = self.instrument_actuator.home(self.robot.poses)
+            # TODO(artyom, 20171103): confirm expected behavior on pipette.home
+            # Are we homing stage and plunger or plunger only?
+            # self.robot.poses = self.instrument_mover.home(self.robot.poses)
 
-        _home(self.axis)
+        _home(self.mount)
         return self
 
     @commands.publish.both(command=commands.distribute)
@@ -1389,22 +1412,56 @@ class Pipette:
         return self
 
     def _move(self, pose_tree, x=None, y=None, z=None):
-        return self.instrument_mover.move(pose_tree, x, y, z)
+        current_x, current_y, current_z = pose_tracker.absolute(
+            pose_tree,
+            self)
+
+        x = current_x if x is None else x
+        y = current_y if y is None else y
+        z = current_z if z is None else z
+
+        dx, dy, dz = pose_tracker.change_base(
+            pose_tree,
+            src=self,
+            dst=self.mount)
+
+        x, y, z = x and x - dx, y and y - dy, z and z - dz
+
+        pose_tree = self.robot.gantry.move(pose_tree, x=x, y=y)
+        pose_tree = self.instrument_mover.move(pose_tree, z=z)
+
+        return pose_tree
 
     def _jog(self, pose_tree, axis, distance):
-        return self.instrument_mover.jog(pose_tree, axis, distance)
+        if axis in 'xy':
+            pose_tree = self.robot.gantry.jog(pose_tree, axis, distance)
+        elif axis == 'z':
+            pose_tree = self.instrument_mover.jog(pose_tree, axis, distance)
+
+        return pose_tree
 
     def _probe(self, axis, movement):
-        return self.instrument_mover.probe(axis, movement)
+        assert axis in 'xyz', "Axis must be 'x', 'y', or 'z'"
+        if axis in 'xy':
+            value = self.robot.gantry.probe(axis, movement)
+        elif axis == 'z':
+            value = self.instrument_mover.probe(axis, movement)
+        return value
 
     def _add_tip(self, length):
-        x, y, z = pose_tracker.get(self.robot.poses, self)
+        x, y, z = pose_tracker.change_base(
+            self.robot.poses,
+            src=self,
+            dst=self.mount)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z - length))
 
     def _remove_tip(self, length):
-        x, y, z = pose_tracker.get(self.robot.poses, self)
+        x, y, z = pose_tracker.change_base(
+            self.robot.poses,
+            src=self,
+            dst=self.mount)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z + length))
