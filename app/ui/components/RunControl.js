@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
+// import classnames from 'classnames'
 import moment from 'moment'
 import RunNotifications from './RunNotifications'
 import RunProgress from './RunProgress'
@@ -8,61 +8,61 @@ import styles from './RunControl.css'
 
 export default function RunControl (props) {
   const {
-    isReadyToRun,
+    // isReadyToRun,
     isPaused,
     isRunning,
     errors,
     sessionName,
     startTime,
     runTime,
-    runProgress,
-    onRunClick,
-    onPauseClick,
-    onResumeClick,
-    onCancelClick
+    runProgress
+    // onRunClick,
+    // onPauseClick,
+    // onResumeClick,
+    // onCancelClick
   } = props
 
   const hasError = errors.length > 0
-  const onPauseResumeClick = isPaused
-    ? onResumeClick
-    : onPauseClick
+  // const onPauseResumeClick = isPaused
+  //   ? onResumeClick
+  //   : onPauseClick
 
-  const pauseResumeText = isPaused
-    ? 'Resume'
-    : 'Pause'
+  // const pauseResumeText = isPaused
+  //   ? 'Resume'
+  //   : 'Pause'
 
   let runButton
   let pauseResumeButton
   let cancelButton
-  if (!isRunning) {
-    runButton = (
-      <button
-        onClick={onRunClick}
-        className={classnames('btn', 'btn_light', styles.btn_run)}
-        disabled={!isReadyToRun}
-      >
-        Run Job
-      </button>
-    )
-  } else {
-    pauseResumeButton = (
-      <button
-        onClick={onPauseResumeClick}
-        className={classnames('btn', 'btn_light', styles.btn_pause)}
-        disabled={!isRunning}
-      >
-        {pauseResumeText}
-      </button>
-    )
-    cancelButton =
-      <button
-        onClick={onCancelClick}
-        className={classnames('btn', 'btn_light', styles.btn_cancel)}
-        disabled={!isRunning}
-      >
-        Cancel Job
-      </button>
-  }
+  // if (!isRunning) {
+  //   runButton = (
+  //     <button
+  //       onClick={onRunClick}
+  //       className={classnames('btn', 'btn_light', styles.btn_run)}
+  //       disabled={!isReadyToRun}
+  //     >
+  //       Run Job
+  //     </button>
+  //   )
+  // } else {
+  //   pauseResumeButton = (
+  //     <button
+  //       onClick={onPauseResumeClick}
+  //       className={classnames('btn', 'btn_light', styles.btn_pause)}
+  //       disabled={!isRunning}
+  //     >
+  //       {pauseResumeText}
+  //     </button>
+  //   )
+  //   cancelButton =
+  //     <button
+  //       onClick={onCancelClick}
+  //       className={classnames('btn', 'btn_light', styles.btn_cancel)}
+  //       disabled={!isRunning}
+  //     >
+  //       Cancel Job
+  //     </button>
+  // }
 
   let startTimeStamp
   if (startTime) {

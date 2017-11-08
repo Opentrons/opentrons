@@ -18,14 +18,14 @@ function ErrorNotification (props) {
   )
 }
 
-function RunningNotification (props) {
-  return (
-    <div className={styles.tip_wrapper}>
-      <div className={styles.tip}>Tip</div>
-      <div className={styles.tip_text}>Your protocol is now running. You may unplug your computer from the robot and reconnect later without affecting the job.</div>
-    </div>
-  )
-}
+// function RunningNotification (props) {
+//   return (
+//     <div className={styles.tip_wrapper}>
+//       <div className={styles.tip}>Tip</div>
+//       <div className={styles.tip_text}>Your protocol is now running. You may unplug your computer from the robot and reconnect later without affecting the job.</div>
+//     </div>
+//   )
+// }
 
 function PausedNotification (props) {
   return (
@@ -39,15 +39,20 @@ function PausedNotification (props) {
 }
 
 export default function RunNotifications (props) {
-  const {isRunning, isPaused, errors, hasError} = props
+  const {
+    // isRunning,
+    isPaused,
+    errors,
+    hasError
+  } = props
   let notification = null
 
   if (hasError) {
     notification = <ErrorNotification {...{errors}} />
   } else if (isPaused) {
     notification = <PausedNotification />
-  } else if (isRunning) {
-    notification = <RunningNotification />
+  // } else if (isRunning) {
+  //   notification = <RunningNotification />
   } else {
     notification = <div className={styles.no_notification} />
   }

@@ -12,7 +12,8 @@ const {
   PREPARING_TO_PROBE,
   READY_TO_PROBE,
   PROBING,
-  PROBED
+  PROBED,
+  MULTI_CHANNEL
 } = robotConstants
 
 TipProbe.propTypes = {
@@ -51,7 +52,7 @@ export default function TipProbe (props) {
 }
 
 function TipProbeMessage (props) {
-  const {instrument: {probed, calibration, volume}} = props
+  const {instrument: {probed, calibration, volume, channels}} = props
   let icon = null
   let message = ''
 
@@ -65,11 +66,15 @@ function TipProbeMessage (props) {
       )
     }
   } else if (calibration === READY_TO_PROBE) {
+    const tipLocation = channels === MULTI_CHANNEL
+      ? 'pipette channel closest to the rear of the robot'
+      : 'pipette'
+
     message = (
       <span>
         Place a previously used or otherwise discarded
         <strong>{` ${volume} uL `}</strong>
-        tip on the pipette and click CONTINUE.
+        tip on the {tipLocation} and click [CONTINUE].
       </span>
     )
   } else if (calibration === PROBING) {

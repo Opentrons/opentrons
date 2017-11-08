@@ -195,9 +195,9 @@ body {
   border-color: silver transparent transparent;
 }
 
-.tooltip_hidden .tooltip_left {
+/* .tooltip_hidden .tooltip_left {
   display: none;
-}
+} */
 
 /*** BUTTONS ***/
 button {

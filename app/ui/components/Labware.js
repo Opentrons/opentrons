@@ -47,7 +47,7 @@ export default function Labware (props) {
   // TODO: this is a workaround for user testing with labware images for Bradford
   // will be generated SVGs
   const containerImageURL = (type, active) => {
-    const reroutes = active
+    const reroutes = active && labwareReviewed
       ? {
         '96-flat': plateImgSrcActive,
         '96-PCR-flat': plateImgSrcActive,
