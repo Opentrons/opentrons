@@ -7,7 +7,7 @@ from collections import namedtuple
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 
-CURRENT_ROBOT = 'B2-4'
+CURRENT_ROBOT = 'B2-5'
 
 robot_config = namedtuple(
     'robot_config',
@@ -83,13 +83,16 @@ Rosalind = robot_config(
     probe_center=(287, 295, 55.0),
     # X, Y and Z measurement of imaginary bounding box surrounding the probe
     # giving safe distance to position for probing
-    probe_dimensions=(50.0, 50.0, 53.0),
-    gantry_calibration=[
-        [  1.00094340e+00,  -3.45303867e-03,   0.00000000e+00,  -1.94897355e+01],    # NOQA
-        [  1.88679245e-03,   9.97237569e-01,   0.00000000e+00,  -1.66290112e+00],    # NOQA
-        [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,   4.50000000e+00],    # NOQA
-        [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,   1.00000000e+00]],   # NOQA
-    instrument_offset=(-40.13513347,  28.33733321,  -0.25)  # left to right
+    probe_dimensions=(60.0, 60.0, 60.0),
+    gantry_calibration=[[  9.99056604e-01,   4.83425414e-03,   0.00000000e+00,
+         -2.63882414e+01],
+       [ -9.43396226e-04,   1.00069061e+00,   0.00000000e+00,
+         -2.30371104e+00],
+       [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,
+          5.00000000e+00],
+       [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,
+          1.00000000e+00]],
+    instrument_offset=(-37.43826124,  31.44202338,  -0.5)  # left to right
 )
 
 robots = {
