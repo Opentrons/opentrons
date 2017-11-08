@@ -15,6 +15,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   const {slot} = ownProps
+
   return {
     // TODO(mc, 2017-10-06): make jog buttons containers so we can get rid
     // of this supercurried function
@@ -29,8 +30,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
 // TODO(mc, 2017-11-03): investigate whether or not we can just get access to
 // dispatch and/or state in here. I think we're overcomplicating things
-const mergeProps = (stateProps, dispatchProps) => {
-  const props = {...stateProps, ...dispatchProps}
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+  const props = {...stateProps, ...dispatchProps, ...ownProps}
   const {singleChannel, jog, updateOffset} = props
 
   props.jog = jog(singleChannel.axis)

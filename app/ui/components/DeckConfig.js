@@ -153,7 +153,7 @@ function ConfirmCalibrationPrompt (props) {
           accurately centered
           <ToolTip msg={toolTipMessage} pos='diagram' className={styles.centered_diagram} />
         </span>
-         &nbsp; over slot {slot} A1 well?
+         &nbsp; over the A1 well of slot {slot}?
       </h3>
       <button
         className={styles.confirm}

@@ -6,6 +6,7 @@ import styles from './JogModal.css'
 import {Spinner} from './icons'
 
 JogModal.propTypes = {
+  slot: PropTypes.number.isRequired,
   jog: PropTypes.func.isRequired,
   updateOffset: PropTypes.func.isRequired,
   isJogging: PropTypes.bool.isRequired,

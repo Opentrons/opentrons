@@ -29,7 +29,7 @@
   font-size: 1rem;
   padding: 0 3rem;
   border-radius: 0.5rem;
-  background-color: #777;
+  background-color: #006fff;
   font-family: 'trons';
   color: white;
   line-height: 3rem;
@@ -54,7 +54,7 @@
   padding: 1rem 2rem;
   margin: 0 auto;
   width: 38rem;
-  height: 32rem;
+  height: 33rem;
   display: grid;
   grid-gap: 0.5rem;
   grid-auto-columns: 1fr;
