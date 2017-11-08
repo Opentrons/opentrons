@@ -141,7 +141,7 @@ class PipetteTest(unittest.TestCase):
     def test_aspirate_zero_volume(self):
         assert self.robot.commands() == []
         self.p200.aspirate(0)
-        assert self.robot.commands() == ['Aspirating 0 uL from None at 1.0 speed']  # noqa
+        assert self.robot.commands() == ['Aspirating 0 uL from ? at 1.0 speed']  # noqa
 
     def test_get_plunger_position(self):
 
@@ -394,23 +394,23 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
-            ['Distributing', '30', 'Well A1', 'Well B1'],
+            ['Distributing', '30', 'well A1', 'wells B1...A2'],
             ['Transferring'],
             ['Picking up tip'],
-            ['Aspirating', '190', 'Well A1'],
-            ['Dispensing', '30', 'Well B1'],
-            ['Dispensing', '30', 'Well C1'],
-            ['Dispensing', '30', 'Well D1'],
-            ['Dispensing', '30', 'Well E1'],
-            ['Dispensing', '30', 'Well F1'],
-            ['Dispensing', '30', 'Well G1'],
-            ['Blow', 'Well A1'],
+            ['Aspirating', '190', 'well A1'],
+            ['Dispensing', '30', 'well B1'],
+            ['Dispensing', '30', 'well C1'],
+            ['Dispensing', '30', 'well D1'],
+            ['Dispensing', '30', 'well E1'],
+            ['Dispensing', '30', 'well F1'],
+            ['Dispensing', '30', 'well G1'],
+            ['Blow', 'well A1'],
             ['Drop'],
             ['Pick'],
-            ['Aspirating', '70', 'Well A1'],
-            ['Dispensing', '30', 'Well H1'],
-            ['Dispensing', '30', 'Well A2'],
-            ['Blow', 'Well A1'],
+            ['Aspirating', '70', 'well A1'],
+            ['Dispensing', '30', 'well H1'],
+            ['Dispensing', '30', 'well A2'],
+            ['Blow', 'well A1'],
             ['Drop']
         ]
         fuzzy_assert(self.robot.commands(), expected=expected)
@@ -425,20 +425,20 @@ class PipetteTest(unittest.TestCase):
         )
 
         expected = [
-            ['Distributing', '30', 'Well A1', 'Well B1'],
+            ['Distributing', '30', 'well A1', 'wells B1...A2'],
             ['Transferring'],
-            ['Aspirating', '190', 'Well A1'],
-            ['Dispensing', '30', 'Well B1'],
-            ['Dispensing', '30', 'Well C1'],
-            ['Dispensing', '30', 'Well D1'],
-            ['Dispensing', '30', 'Well E1'],
-            ['Dispensing', '30', 'Well F1'],
-            ['Dispensing', '30', 'Well G1'],
-            ['Blow', 'Well A1'],
-            ['Aspirating', '70', 'Well A1'],
-            ['Dispensing', '30', 'Well H1'],
-            ['Dispensing', '30', 'Well A2'],
-            ['Blow', 'Well A1'],
+            ['Aspirating', '190', 'well A1'],
+            ['Dispensing', '30', 'well B1'],
+            ['Dispensing', '30', 'well C1'],
+            ['Dispensing', '30', 'well D1'],
+            ['Dispensing', '30', 'well E1'],
+            ['Dispensing', '30', 'well F1'],
+            ['Dispensing', '30', 'well G1'],
+            ['Blow', 'well A1'],
+            ['Aspirating', '70', 'well A1'],
+            ['Dispensing', '30', 'well H1'],
+            ['Dispensing', '30', 'well A2'],
+            ['Blow', 'well A1'],
         ]
         fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
@@ -466,24 +466,24 @@ class PipetteTest(unittest.TestCase):
         )
 
         expected = [
-            ['Transferring', '30', 'Well A1'],
+            ['Transferring', '30', 'well A1'],
             ['Pick'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well B1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well C1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well D1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well E1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well F1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well G1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well H1'],
-            ['Aspirating', '30', 'Well A1'],
-            ['Dispensing', '30', 'Well A2'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well B1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well C1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well D1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well E1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well F1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well G1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well H1'],
+            ['Aspirating', '30', 'well A1'],
+            ['Dispensing', '30', 'well A2'],
             ['Return'],
             ['Drop']
         ]
@@ -831,13 +831,13 @@ class PipetteTest(unittest.TestCase):
             blow_out=False
         )
         expected = [
-            'Transferring 300 from <Well A1> to <Well B1>',
-            'Picking up tip <Well A1>',
-            'Aspirating 150.0 uL from <Well A1> at 1 speed',
-            'Dispensing 150.0 uL into <Well B1>',
-            'Aspirating 150.0 uL from <Well A1> at 1 speed',
-            'Dispensing 150.0 uL into <Well B1>',
-            'Dropping tip <Well A1>']
+            'Transferring 300 from well A1 in "4" to well B1 in "4"',
+            'Picking up tip well A1 in "5"',
+            'Aspirating 150.0 uL from well A1 in "4" at 1 speed',
+            'Dispensing 150.0 uL into well B1 in "4"',
+            'Aspirating 150.0 uL from well A1 in "4" at 1 speed',
+            'Dispensing 150.0 uL into well B1 in "4"',
+            'Dropping tip well A1 in "1"']
 
         assert expected == list(filter(
             lambda s: 'Moving to' not in s,
@@ -1189,8 +1189,8 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['Transferring', '200'],
             ['pick'],
-            ['aspirating', '200', 'Well A1'],
-            ['dispensing', '200', 'Well A2'],
+            ['aspirating', '200', 'wells A1...H1'],
+            ['dispensing', '200', 'wells A2...H2'],
             ['return'],
             ['drop']
         ]
