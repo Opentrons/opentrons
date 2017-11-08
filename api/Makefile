@@ -2,7 +2,7 @@
 
 SHELL := /bin/bash
 
-.PHONY: test docs publish clean install exe dev
+.PHONY: test docs publish clean install dev
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -25,11 +25,6 @@ publish:
 
 dev:
 	python opentrons/server/main.py
-
-exe: dist/opentrons-api-server
-
-dist/opentrons-api-server:
-	pyinstaller opentrons-api-server.spec
 
 clean:
 	rm -rf \
