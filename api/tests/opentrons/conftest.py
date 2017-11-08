@@ -174,7 +174,7 @@ def virtual_smoothie_env(monkeypatch):
 @pytest.fixture
 def main_router(
             loop,
-            # virtual_smoothie_env,
+            virtual_smoothie_env,
             monkeypatch
         ):
     from opentrons.api.routers import MainRouter

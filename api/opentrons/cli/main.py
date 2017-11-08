@@ -58,9 +58,8 @@ test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
 
 # World > Smoothie XY-plane transformation
 # Gets updated when you press SPACE after calibrating all points
-# You can also default it to the last known good calibration
-# if you want to test points or to measure real-world objects
-# using the tool
+# Defaulted to values that would bring the robot close to test
+# point when 1, 2 or 3 is pressed
 XY = \
     array([
         [ 1.00, 0.00, -35.23],   # NOQA
