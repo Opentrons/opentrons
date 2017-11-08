@@ -270,6 +270,7 @@ class SmoothieDriver_3_0_0:
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
+            self.update_position(self._position)
             return self._position[axis.upper()]
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))

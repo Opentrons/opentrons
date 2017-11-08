@@ -92,10 +92,6 @@ class Mover:
 
     def probe(self, axis, movement):
         axis = axis.lower()
-        result = {}
-
-        if self._parent:
-            result = self._parent.probe(axis, movement)
 
         if axis in self._axis_mapping:
             result = self._driver.probe_axis(

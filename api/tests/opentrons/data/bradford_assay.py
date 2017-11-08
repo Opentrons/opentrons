@@ -1,5 +1,8 @@
 from opentrons import containers, instruments
 
+# containers.robot.connect()
+# containers.robot.home()
+
 tiprack = containers.load('tiprack-200ul', 'C3')
 tiprack2 = containers.load('tiprack-200ul', 'B4')
 trash = containers.load('trash-box', 'C4')
@@ -31,8 +34,8 @@ for i in range(6):
     p200.distribute(
         25, tuberack.wells(i), plate.cols(i).wells('1', '2'))
 
-# # dispense 4 samples from tube rack (C2, D2, A3, B3)
-# # to row 3 of 96 well plate (duplicates, A3/B3, C3/D3, E3/F3, G3/H3)
+# dispense 4 samples from tube rack (C2, D2, A3, B3)
+# to row 3 of 96 well plate (duplicates, A3/B3, C3/D3, E3/F3, G3/H3)
 p200.distribute(
     50,
     tuberack.wells('C2', 'D2', 'A3', 'B3'),
