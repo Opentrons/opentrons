@@ -1,6 +1,6 @@
 from numpy import array
 from opentrons.trackers.pose_tracker import (
-    update, Point, transform
+    update, Point, change_base
 )
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
@@ -20,7 +20,7 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
     delta = Point(delta_x, delta_y, delta_z)
-    new_coordinates = transform(
+    new_coordinates = change_base(
         pose_tree,
         src=container,
         dst=container.parent) + delta

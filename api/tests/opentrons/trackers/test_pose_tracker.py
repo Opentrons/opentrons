@@ -1,6 +1,6 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
-    Point, Node, add, descendants, ascend, transform, max_z,
+    Point, Node, add, descendants, ascend, change_base, max_z,
     update, remove, translate, init, ROOT
 )
 from numpy import isclose, array, ndarray
@@ -92,29 +92,33 @@ def test_ascend(state):
 
 def test_relative(state):
     from math import pi
-    assert (transform(state, src='1-1', dst='2-1') == (24., 28., 32.)).all()
+    assert (change_base(state, src='1-1', dst='2-1') == (24., 28., 32.)).all()
     state = \
         init() \
         .add('1', transform=rotate(pi / 2.0)) \
         .add('1-1', parent='1', point=Point(1, 0, 0)) \
         .add('2', point=Point(1, 0, 0))
 
-    assert isclose(transform(state, src='1-1', dst='2'), (-1.0, -1.0, 0)).all()
-    assert isclose(transform(state, src='2', dst='1-1'), (0.0, 0.0, 0)).all()
+    assert isclose(
+        change_base(state, src='1-1', dst='2'), (-1.0, -1.0, 0)).all()
+    assert isclose(
+        change_base(state, src='2', dst='1-1'), (0.0, 0.0, 0)).all()
 
     state = init() \
         .add('1', transform=scale(2, 1, 1)) \
         .add('1-1', parent='1', point=Point(1, 1, 1)) \
 
-    assert isclose(transform(state, src=ROOT, dst='1-1'), (-2.0, -1.0, -1.0)).all()  # NOQA
-    assert isclose(transform(state, src='1-1', dst=ROOT), (0.5, 1.0, 1.0)).all()  # NOQA
+    assert isclose(
+        change_base(state, src=ROOT, dst='1-1'), (-2.0, -1.0, -1.0)).all()
+    assert isclose(
+        change_base(state, src='1-1', dst=ROOT), (0.5, 1.0, 1.0)).all()
 
 
 def test_absolute(state):
-    assert (transform(state, src='1') == (1, 2, 3)).all()
-    assert (transform(state, src='1-1') == (12, 14, 16)).all()
-    assert (transform(state, src='2') == (-1, -2, -3)).all()
-    assert (transform(state, src='2-1') == (-12, -14, -16)).all()
+    assert (change_base(state, src='1') == (1, 2, 3)).all()
+    assert (change_base(state, src='1-1') == (12, 14, 16)).all()
+    assert (change_base(state, src='2') == (-1, -2, -3)).all()
+    assert (change_base(state, src='2-1') == (-12, -14, -16)).all()
 
 
 def test_max_z(state):
@@ -123,7 +127,7 @@ def test_max_z(state):
 
 def test_update(state):
     state = update(state, '1-1', Point(0, 0, 0))
-    assert (transform(state, src='1-1-1') == (1, 2, 3)).all()
+    assert (change_base(state, src='1-1-1') == (1, 2, 3)).all()
 
 
 def test_remove(state):
@@ -135,9 +139,9 @@ def test_remove(state):
     assert state == {}
 
 
-def test_transform():
+def test_change_base():
     state = init() \
         .add('1', parent=ROOT, transform=scale(2, 2, 2)) \
         .add('1-1', parent='1', point=Point(1, 0, 0))
 
-    assert isclose(transform(state, src='1-1'), (0.5, 0, 0)).all()
+    assert isclose(change_base(state, src='1-1'), (0.5, 0, 0)).all()

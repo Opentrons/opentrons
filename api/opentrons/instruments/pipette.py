@@ -1412,15 +1412,15 @@ class Pipette:
         return self
 
     def _move(self, pose_tree, x=None, y=None, z=None):
-        current_x, current_y, current_z = pose_tracker.transform(
+        current_x, current_y, current_z = pose_tracker.absolute(
             pose_tree,
-            src=self)
+            self)
 
         x = current_x if x is None else x
         y = current_y if y is None else y
         z = current_z if z is None else z
 
-        dx, dy, dz = pose_tracker.transform(
+        dx, dy, dz = pose_tracker.change_base(
             pose_tree,
             src=self,
             dst=self.mount)
@@ -1441,6 +1441,7 @@ class Pipette:
         return pose_tree
 
     def _probe(self, axis, movement):
+        assert axis in 'xyz', "Axis must be 'x', 'y', or 'z'"
         if axis in 'xy':
             value = self.robot.gantry.probe(axis, movement)
         elif axis == 'z':
@@ -1448,7 +1449,7 @@ class Pipette:
         return value
 
     def _add_tip(self, length):
-        x, y, z = pose_tracker.transform(
+        x, y, z = pose_tracker.change_base(
             self.robot.poses,
             src=self,
             dst=self.mount)
@@ -1457,7 +1458,7 @@ class Pipette:
                 x, y, z - length))
 
     def _remove_tip(self, length):
-        x, y, z = pose_tracker.transform(
+        x, y, z = pose_tracker.change_base(
             self.robot.poses,
             src=self,
             dst=self.mount)

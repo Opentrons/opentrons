@@ -14,10 +14,6 @@ from opentrons.robot.robot_configs import (
   or knowing anything about what the axes are used for
 '''
 
-# TODO (ben 2017112): figure out why fw setting wasn't working on Avogadro
-# and remove this
-HOMING_OFFSETS = 'M206 X5 Y5'
-
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
     'X': 394,
@@ -191,7 +187,6 @@ class SmoothieDriver_3_0_0:
         self._send_command(config.current)
         self._send_command(config.max_speeds)
         self._send_command(config.steps_per_mm)
-        self._send_command(HOMING_OFFSETS)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
     # ----------- END Private functions ----------- #
 

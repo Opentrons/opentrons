@@ -139,9 +139,9 @@ def test_robot_move_to(robot):
     p200 = pipette.Pipette(robot, mount='right', name='pipette')
     robot.move_to(instrument=p200, location=(robot._deck, (100, 0, 0)))
     assert isclose(
-        pose_tracker.transform(
+        pose_tracker.absolute(
             robot.poses,
-            src=p200),
+            p200),
         (100, 0, 0)
     ).all()
 
@@ -149,9 +149,9 @@ def test_robot_move_to(robot):
 def test_move_head(robot):
     robot.move_head(x=100, y=0)
     assert isclose(
-        pose_tracker.transform(
+        pose_tracker.absolute(
             robot.poses,
-            src=robot.gantry)[:2],
+            robot.gantry)[:2],
         (100, 0, 0)[:2]
     ).all()
 

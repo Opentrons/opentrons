@@ -1,9 +1,9 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
-    transform, init, ROOT
+    change_base, init, ROOT
 )
 from opentrons.instruments import Pipette
-from opentrons.robot.gantry import Mover
+from opentrons.robot.mover import Mover
 from numpy import array, isclose
 
 
@@ -62,22 +62,22 @@ def test_functional(driver):
     state = gantry.move(state, x=1, y=1)
     state = left.move(state, z=1)
 
-    assert isclose(transform(state, src='left'), (1, 1, 1)).all()
-    assert isclose(transform(state, src='right'), (1, 1, 1.5)).all()
+    assert isclose(change_base(state, src='left'), (1, 1, 1)).all()
+    assert isclose(change_base(state, src='right'), (1, 1, 1.5)).all()
     state = gantry.move(state, x=2, y=2)
     state = right.move(state, z=3)
-    assert isclose(transform(state, src='left'), (2, 2, 1)).all()
-    assert isclose(transform(state, src='right'), (2, 2, 3)).all()
+    assert isclose(change_base(state, src='left'), (2, 2, 1)).all()
+    assert isclose(change_base(state, src='right'), (2, 2, 3)).all()
     state = gantry.jog(state, axis='x', distance=1)
-    assert isclose(transform(state, src='left'), (3, 2, 1)).all()
-    assert isclose(transform(state, src='right'), (3, 2, 3)).all()
+    assert isclose(change_base(state, src='left'), (3, 2, 1)).all()
+    assert isclose(change_base(state, src='right'), (3, 2, 3)).all()
     state = right.jog(state, axis='z', distance=1)
-    assert isclose(transform(state, src='left'), (3, 2, 1)).all()
-    assert isclose(transform(state, src='right'), (3, 2, 4)).all()
+    assert isclose(change_base(state, src='left'), (3, 2, 1)).all()
+    assert isclose(change_base(state, src='right'), (3, 2, 4)).all()
 
 
 def test_integration(robot):
     left = Pipette(robot, mount='left')
     robot.home()
     pose = left._move(robot.poses, 1, 1, 1)
-    assert isclose(transform(pose, src=left), (1, 1, 1)).all()
+    assert isclose(change_base(pose, src=left), (1, 1, 1)).all()

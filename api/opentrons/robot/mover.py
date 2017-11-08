@@ -1,4 +1,4 @@
-from ..trackers.pose_tracker import Point, transform, update, ROOT
+from ..trackers.pose_tracker import Point, change_base, update, ROOT
 
 
 class Mover:
@@ -8,11 +8,11 @@ class Mover:
         self._dst = dst
         self._src = src
 
-    def jog(self, pose, axis, distance):
+    def jog(self, pose_tree, axis, distance):
         assert axis in 'xyz', "axis value should be x, y or z"
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 
-        x, y, z = transform(pose, src=self)
+        x, y, z = change_base(pose_tree, src=self)
 
         target = {
             'x': x if 'x' in self._axis_mapping else None,
@@ -22,11 +22,11 @@ class Mover:
 
         target[axis] += distance
 
-        return self.move(pose, **target)
+        return self.move(pose_tree, **target)
 
-    def move(self, pose, x=None, y=None, z=None):
+    def move(self, pose_tree, x=None, y=None, z=None):
         """
-        Dispatch move command to the driver transforming
+        Dispatch move command to the driver changing base of
         x, y and z from source coordinate system to destination.
 
         Value must be set for each axis that is mapped.
@@ -37,8 +37,8 @@ class Mover:
             _z = _z if z is not None else 0
             return _x, _y, _z
 
-        dst_x, dst_y, dst_z = transform(
-            pose,
+        dst_x, dst_y, dst_z = change_base(
+            pose_tree,
             src=self._src,
             dst=self._dst,
             point=Point(*defaults(x, y, z)))
@@ -61,9 +61,9 @@ class Mover:
 
         # Update pose with the new value. Since stepper motors are open loop
         # there is no need to to query diver for position
-        return update(pose, self, Point(*defaults(dst_x, dst_y, dst_z)))
+        return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
 
-    def home(self, pose):
+    def home(self, pose_tree):
         position = self._driver.home(axis=''.join(self._axis_mapping.values()))
         # map from driver axis names to xyz and expand position
         # into point object
@@ -73,7 +73,7 @@ class Mover:
             z=position.get(self._axis_mapping.get('z', 'Z'), 0.0)
         )
 
-        return update(pose, self, point)
+        return update(pose_tree, self, point)
 
     def set_speed(self, value):
         pass

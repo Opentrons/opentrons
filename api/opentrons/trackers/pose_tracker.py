@@ -124,7 +124,7 @@ def ascend(state, start, finish=ROOT) -> List[Node]:
     return [start] + ascend(state, start=state[start].parent, finish=finish)
 
 
-def transform(state, point=Point(0, 0, 0), src=ROOT, dst=ROOT):
+def change_base(state, point=Point(0, 0, 0), src=ROOT, dst=ROOT):
     """
     Transforms point from source coordinate system to destination.
     Point(0, 0, 0) means the origin of the source.
@@ -154,9 +154,16 @@ def transform(state, point=Point(0, 0, 0), src=ROOT, dst=ROOT):
     return fold(down).dot(point_in_root)[:-1]
 
 
+def absolute(state, obj):
+    """
+    Get the (x, y, z) position of an object relative to origin of the pose tree
+    """
+    return change_base(state, src=obj)
+
+
 def max_z(state, root):
     return max([
-        Point(*transform(state, src=obj, dst=root)).z
+        Point(*change_base(state, src=obj, dst=root)).z
         for obj, _ in descendants(state, root)
     ])
 
@@ -166,7 +173,7 @@ def stringify(state, root=None):
         root = ascend(state, next(iter(state)))[-1]
 
     info = [
-        (obj, level, get(state, obj), transform(state, src=obj, dst=root))
+        (obj, level, get(state, obj), change_base(state, src=obj, dst=root))
         for obj, level in [(root, 0)] + descendants(state, root, level=1)]
 
     return '\n'.join([

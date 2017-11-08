@@ -3,7 +3,7 @@ from threading import Event
 
 
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
-from .gantry import Mover
+from opentrons.robot.mover import Mover
 
 import opentrons.util.calibration_functions as calib
 
@@ -562,9 +562,9 @@ class Robot(object):
             placeable = placeable[0]
 
         target = add(
-            pose_tracker.transform(
+            pose_tracker.absolute(
                 self.poses,
-                src=placeable
+                placeable
             ),
             offset.coordinates
         )
@@ -921,8 +921,8 @@ class Robot(object):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
 
-        # calibrate will well bottom, but track top of well
-        delta = pose_tracker.transform(
+        # Get the relative position of well with respect to instrument
+        delta = pose_tracker.change_base(
             self.poses,
             src=instrument,
             dst=well

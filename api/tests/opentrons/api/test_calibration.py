@@ -104,7 +104,7 @@ async def test_jog_calibrate(dummy_db, main_router, model):
     from opentrons.trackers import pose_tracker
 
     container = model.container._container
-    pos1 = pose_tracker.transform(robot.poses, src=container, dst=robot.deck)
+    pos1 = pose_tracker.change_base(robot.poses, src=container, dst=robot.deck)
     coordinates1 = container.coordinates()
 
     main_router.calibration_manager.move_to(model.instrument, model.container)
@@ -117,7 +117,7 @@ async def test_jog_calibrate(dummy_db, main_router, model):
         model.instrument
     )
 
-    pos2 = pose_tracker.transform(robot.poses, src=container)
+    pos2 = pose_tracker.absolute(robot.poses, container)
     coordinates2 = container.coordinates()
 
     assert isclose(pos1 + (1, 2, 3), pos2).all()
