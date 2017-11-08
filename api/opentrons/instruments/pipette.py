@@ -1450,8 +1450,8 @@ class Pipette:
     def _add_tip(self, length):
         x, y, z = pose_tracker.transform(
             self.robot.poses,
-            src=self.mount,
-            dst=self)
+            src=self,
+            dst=self.mount)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z - length))
@@ -1459,8 +1459,8 @@ class Pipette:
     def _remove_tip(self, length):
         x, y, z = pose_tracker.transform(
             self.robot.poses,
-            src=self.mount,
-            dst=self)
+            src=self,
+            dst=self.mount)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z + length))
