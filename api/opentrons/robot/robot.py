@@ -176,25 +176,21 @@ class Robot(object):
             'left': {
                 'carriage': Mover(
                     driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst=id(CALIBRATION),
+                    reference=id(CALIBRATION),
                     axis_mapping={'z': 'Z'}),
                 'plunger': Mover(
                     driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst='volume-calibration-left',
+                    reference='volume-calibration-left',
                     axis_mapping={'x': 'B'})
             },
             'right': {
                 'carriage': Mover(
                     driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst=id(CALIBRATION),
+                    reference=id(CALIBRATION),
                     axis_mapping={'z': 'A'}),
                 'plunger': Mover(
                     driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst='volume-calibration-right',
+                    reference='volume-calibration-right',
                     axis_mapping={'x': 'C'})
             }
         }
@@ -279,8 +275,7 @@ class Robot(object):
         self.gantry = Mover(
             driver=driver,
             axis_mapping={'x': 'X', 'y': 'Y'},
-            src=pose_tracker.ROOT,
-            dst=id(CALIBRATION)
+            reference=id(CALIBRATION)
         )
 
         # Extract only transformation component
@@ -562,9 +557,9 @@ class Robot(object):
             placeable = placeable[0]
 
         target = add(
-            pose_tracker.transform(
+            pose_tracker.absolute(
                 self.poses,
-                src=placeable
+                placeable
             ),
             offset.coordinates
         )
@@ -922,7 +917,7 @@ class Robot(object):
         well = container[0]
 
         # calibrate will well bottom, but track top of well
-        delta = pose_tracker.transform(
+        delta = pose_tracker.relative(
             self.poses,
             src=instrument,
             dst=well

@@ -46,12 +46,10 @@ def test_aspirate_move_to(robot):
     robot.calibrate_container_with_instrument(plate, p200, False)
 
     p200.aspirate(100, location)
-    current_pos = pose_tracker.transform(
-        robot.poses,
-        src=p200.instrument_actuator)
+    current_pos = pose_tracker.absolute(robot.poses, p200.instrument_actuator)
     assert (current_pos == (9.5, 0.0, 0.0)).all()
 
-    current_pos = pose_tracker.transform(robot.poses, src=p200)
+    current_pos = pose_tracker.absolute(robot.poses, p200)
     assert isclose(current_pos, (175.34,  127.94,   10)).all()
 
 

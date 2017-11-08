@@ -1,6 +1,6 @@
 from numpy import array
 from opentrons.trackers.pose_tracker import (
-    update, Point, transform
+    update, Point, get
 )
 from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
@@ -20,10 +20,7 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
     delta = Point(delta_x, delta_y, delta_z)
-    new_coordinates = transform(
-        pose_tree,
-        src=container,
-        dst=container.parent) + delta
+    new_coordinates = get(pose_tree, container) + delta
     pose_tree = update(pose_tree, container, new_coordinates)
     container._coordinates = container._coordinates + delta
     if save and new_container_name:
@@ -86,6 +83,7 @@ def probe_instrument(instrument, robot):
             axis = 'y'
 
         robot.poses = instrument._move(robot.poses, z=height * 1.2)
+
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
@@ -101,7 +99,9 @@ def probe_instrument(instrument, robot):
             x=(x + sx * 5),
             y=(y + sy * 5))
 
+    print(values)
     instrument._remove_tip(DEFAULT_TIP_LENGTH)
+
     robot.home()
 
 
