@@ -394,7 +394,7 @@ class PipetteTest(unittest.TestCase):
         # print('\n\n***\n')
         # pprint(self.robot.commands())
         expected = [
-            ['Distributing', '30', 'well A1', 'wells B1..A2'],
+            ['Distributing', '30', 'well A1', 'wells B1...A2'],
             ['Transferring'],
             ['Picking up tip'],
             ['Aspirating', '190', 'well A1'],
@@ -425,7 +425,7 @@ class PipetteTest(unittest.TestCase):
         )
 
         expected = [
-            ['Distributing', '30', 'well A1', 'wells B1..A2'],
+            ['Distributing', '30', 'well A1', 'wells B1...A2'],
             ['Transferring'],
             ['Aspirating', '190', 'well A1'],
             ['Dispensing', '30', 'well B1'],
@@ -1189,8 +1189,8 @@ class PipetteTest(unittest.TestCase):
         expected = [
             ['Transferring', '200'],
             ['pick'],
-            ['aspirating', '200', 'wells A1..H1'],
-            ['dispensing', '200', 'wells A2..H2'],
+            ['aspirating', '200', 'wells A1...H1'],
+            ['dispensing', '200', 'wells A2...H2'],
             ['return'],
             ['drop']
         ]

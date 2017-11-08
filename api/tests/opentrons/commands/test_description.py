@@ -15,9 +15,10 @@ def containers():
 
 def test_all(containers):
     assert stringify_location(containers['1'][0]) == 'well A1 in "1"'
-    assert stringify_location(containers['1'].rows(0)) == 'wells A1..H1 in "1"'
+    assert stringify_location(containers['1'].rows(0)) == \
+        'wells A1...H1 in "1"'
     assert stringify_location(containers['11'][95]) == 'well H12 in "11"'
     assert stringify_location(containers['11'].cols(0)) == \
-        'wells A1..A12 in "11"'
+        'wells A1...A12 in "11"'
     assert stringify_location(containers['11'].cols('A', 'B')) == \
-        'wells A1..B12 in "11"'
+        'wells A1...B12 in "11"'

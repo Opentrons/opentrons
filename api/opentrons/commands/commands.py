@@ -62,7 +62,7 @@ def stringify_location(location):
             object_text=type_to_text[type(location[0])],
             suffix='s' if multiple else '',
             first=location[0].get_name(),
-            last='..'+location[-1].get_name() if multiple else '',
+            last='...'+location[-1].get_name() if multiple else '',
             slot_text=slot_number_mapping[get_slot(location[0]).get_name()]
         )
 
