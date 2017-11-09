@@ -1,6 +1,8 @@
 import React from 'react'
 import {Switch, Route} from 'react-router'
+
 import Nav from '../containers/Nav'
+import NavBar from './nav/NavBar'
 
 import Home from '../pages/Home'
 import Upload from '../pages/Upload'
@@ -13,7 +15,8 @@ import styles from './App.css'
 
 export default function App () {
   return (
-    <div className={styles.wrapper} onDragOver={onDragOver} onDrop={onDrop}>
+    <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
+      <NavBar />
       <Nav />
       <Switch>
         <Route exact path='/' component={Home} />
@@ -26,10 +29,6 @@ export default function App () {
   )
 }
 
-function onDragOver (event) {
-  event.preventDefault()
-}
-
-function onDrop (event) {
+function stopEvent (event) {
   event.preventDefault()
 }

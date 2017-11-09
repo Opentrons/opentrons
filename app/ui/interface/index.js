@@ -8,32 +8,32 @@ const makeInterfaceActionName = (action) => makeActionName(NAME, action)
 const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
-  isNavPanelOpen: false,
-  currentNavPanelTask: ''
+  isPanelOpen: false,
+  currentPanel: ''
 }
 
 export const selectors = {
-  getIsNavPanelOpen (allState) {
-    return getModuleState(allState).isNavPanelOpen
+  getIsPanelOpen (state) {
+    return getModuleState(state).isPanelOpen
   },
-  getCurrentNavPanelTask (allState) {
-    return getModuleState(allState).currentNavPanelTask
+
+  getCurrentPanel (state) {
+    return getModuleState(state).currentPanel
   }
 }
 
 export const actionTypes = {
-  TOGGLE_NAV_PANEL: makeInterfaceActionName('TOGGLE_NAV_PANEL'),
-  SET_CURRENT_NAV_PANEL: makeInterfaceActionName('SET_CURRENT_NAV_PANEL')
+  CLOSE_PANEL: makeInterfaceActionName('CLOSE_PANEL'),
+  SET_CURRENT_PANEL: makeInterfaceActionName('SET_CURRENT_PANEL')
 }
 
 export const actions = {
-  toggleNavPanel () {
-    return {
-      type: actionTypes.TOGGLE_NAV_PANEL
-    }
+  closePanel () {
+    return {type: actionTypes.CLOSE_PANEL}
   },
-  setCurrentNavPanel (panel) {
-    return {type: actionTypes.SET_CURRENT_NAV_PANEL, payload: {panel}}
+
+  setCurrentPanel (panel = '') {
+    return {type: actionTypes.SET_CURRENT_PANEL, payload: {panel}}
   }
 }
 
@@ -41,18 +41,12 @@ export function reducer (state = INITIAL_STATE, action) {
   const {type, payload} = action
 
   switch (type) {
-    case actionTypes.TOGGLE_NAV_PANEL:
-      return {...state, isNavPanelOpen: !state.isNavPanelOpen}
+    case actionTypes.CLOSE_PANEL:
+      return {...state, isPanelOpen: false}
 
-    case actionTypes.SET_CURRENT_NAV_PANEL:
-      return {
-        ...state,
-        currentNavPanelTask: payload.panel,
-        isNavPanelOpen: (
-          !state.isNavPanelOpen ||
-          payload.panel !== state.currentNavPanelTask
-        )
-      }
+    case actionTypes.SET_CURRENT_PANEL:
+      return {...state, isPanelOpen: true, currentPanel: payload.panel}
   }
+
   return state
 }

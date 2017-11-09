@@ -3,15 +3,15 @@
 import {actions, actionTypes} from '../'
 
 describe('interface actions', () => {
-  test('toggle nav panel', () => {
-    const expected = {type: actionTypes.TOGGLE_NAV_PANEL}
+  test('close nav panel', () => {
+    const expected = {type: actionTypes.CLOSE_PANEL}
 
-    expect(actions.toggleNavPanel()).toEqual(expected)
+    expect(actions.closePanel()).toEqual(expected)
   })
 
   test('set current nav panel', () => {
-    const expected = {type: actionTypes.SET_CURRENT_NAV_PANEL, payload: {panel: 'upload'}}
+    const expected = {type: actionTypes.SET_CURRENT_PANEL, payload: {panel: 'upload'}}
 
-    expect(actions.setCurrentNavPanel('upload')).toEqual(expected)
+    expect(actions.setCurrentPanel('upload')).toEqual(expected)
   })
 })
