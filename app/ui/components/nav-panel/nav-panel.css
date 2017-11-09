@@ -1,0 +1,42 @@
+@value grey from '../App.global.css';
+@value width: 18rem;
+@value border: 2px solid grey;
+
+.panel {
+  overflow: hidden;
+  width: width;
+  border-right: border;
+  transition: all 0.5s ease-in-out;
+}
+
+.closed {
+  width: 0;
+  border-right-width: 0;
+}
+
+.title_bar {
+  display: flex;
+  align-items: center;
+  width: width;
+  border-bottom: border;
+}
+
+.title {
+  margin: 0 auto 0 1rem;
+  line-height: 1.5;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.close_button {
+  line-height: 1;
+  font-size: 0.75rem;
+  border-width: 0;
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.panel_contents {
+  width: width;
+}
