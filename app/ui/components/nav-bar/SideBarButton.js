@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import ToolTip, {MEDIUM, RIGHT} from '../ToolTip'
-import styles from './nav.css'
+import styles from './nav-bar.css'
 
 SideBarButton.propTypes = {
   title: PropTypes.string.isRequired,

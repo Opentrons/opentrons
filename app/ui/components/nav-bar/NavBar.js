@@ -2,7 +2,7 @@
 import React from 'react'
 
 import NavButton from './NavButton'
-import styles from './nav.css'
+import styles from './nav-bar.css'
 
 const PANELS = [
   {name: 'upload', title: 'Upload File'},
