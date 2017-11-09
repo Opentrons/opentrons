@@ -12,7 +12,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  openSetupPanel: () => dispatch(interfaceActions.setCurrentNavPanel('setup'))
+  openSetupPanel: () => dispatch(interfaceActions.setCurrentPanel('setup'))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Upload)

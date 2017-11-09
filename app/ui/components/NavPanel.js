@@ -40,11 +40,11 @@ const PANELS_BY_NAME = {
 }
 
 export default function NavPanel (props) {
-  const {currentNavPanelTask} = props
+  const {currentPanel} = props
 
-  if (!(currentNavPanelTask in PANELS_BY_NAME)) return null
+  if (!(currentPanel in PANELS_BY_NAME)) return null
 
-  const Panel = PANELS_BY_NAME[currentNavPanelTask]
+  const Panel = PANELS_BY_NAME[currentPanel]
 
   return (
     <Panel {...props} />
@@ -52,7 +52,6 @@ export default function NavPanel (props) {
 }
 
 NavPanel.propTypes = {
-  isConnected: PropTypes.bool.isRequired,
-  currentNavPanelTask: PropTypes.string.isRequired,
+  currentPanel: PropTypes.string.isRequired,
   onUpload: PropTypes.func.isRequired
 }

@@ -3,11 +3,12 @@ import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import classnames from 'classnames'
 
+import {constants as robotConstants} from '../robot'
 import Labware from './Labware'
-import ToolTip from './ToolTip'
+import ToolTip, {TOP} from './ToolTip'
 import Diagram from './Diagram'
 import styles from './DeckConfig.css'
-import {constants as robotConstants} from '../robot'
+import tooltipStyles from './ToolTip.css'
 
 const {UNCONFIRMED, MOVING_TO_SLOT, OVER_SLOT, CONFIRMED} = robotConstants
 
@@ -149,9 +150,9 @@ function ConfirmCalibrationPrompt (props) {
     <div className={styles.prompt}>
       <h3>
         <strong>Is Pipette &nbsp;</strong>
-        <span className={classnames(styles.centered_prompt, 'tooltip_parent')}>
+        <span className={classnames(styles.centered_prompt, tooltipStyles.parent)}>
           accurately centered
-          <ToolTip msg={toolTipMessage} pos='diagram' className={styles.centered_diagram} />
+          <ToolTip style={TOP}>{toolTipMessage}</ToolTip>
         </span>
          &nbsp; over the A1 well of slot {slot}?
       </h3>
