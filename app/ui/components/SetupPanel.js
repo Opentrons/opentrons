@@ -3,11 +3,12 @@ import {NavLink} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import capitalize from 'lodash/capitalize'
-import ToolTip from './ToolTip'
-import styles from './SetupPanel.css'
 
 import {constants as robotConstants} from '../robot'
+import ToolTip, {TOP, BOTTOM_RIGHT} from './ToolTip'
 import InfoBox from './InfoBox'
+import styles from './SetupPanel.css'
+import tooltipStyles from './ToolTip.css'
 
 function PipetteLinks (props) {
   const {axis, name, volume, channels, probed, isRunning, onClick} = props
@@ -35,8 +36,8 @@ function PipetteLinks (props) {
         activeClassName={styles.active}
         disabled={isDisabled}
       >
-        <span className={classnames(statusStyle, 'tooltip_parent')}>
-          <ToolTip msg='Tip not found' pos='bottom' />
+        <span className={classnames(statusStyle, tooltipStyles.parent)}>
+          <ToolTip style={BOTTOM_RIGHT}>Tip not found</ToolTip>
         </span>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{description}</span>
@@ -73,8 +74,8 @@ function LabwareLinks (props) {
         onClick={onClick}
         disabled={isDisabled}
       >
-        <span className={classnames(statusStyle, 'tooltip_parent')}>
-          <ToolTip msg='Position unconfirmed' pos='bottom' />
+        <span className={classnames(statusStyle, tooltipStyles.parent)}>
+          <ToolTip style={BOTTOM_RIGHT}>Position unconfirmed</ToolTip>
         </span>
         {name}
       </button>
@@ -128,14 +129,14 @@ export default function SetupPanel (props) {
   }, {tiprackList: [], labwareList: []})
 
   const runLinkStyles = classnames(
-    'tooltip_parent',
     'btn',
     'btn_dark',
     styles.run_link,
+    tooltipStyles.parent,
     {[styles.inactive]: !labwareConfirmed}
   )
 
-  const runLinkWarning = 'Pipette and labware setup must be complete before you can RUN protocol'
+  const runLinkWarning = 'Pipette and labware setup\nmust be complete before\nyou can RUN protocol'
   const labwareMsg = !instrumentsCalibrated
     ? <p className={styles.labware_alert}>Labware setup is disabled until pipette setup is complete.</p>
     : null
@@ -144,7 +145,7 @@ export default function SetupPanel (props) {
     : null
 
   const runWarning = !labwareConfirmed
-    ? <ToolTip msg={runLinkWarning} pos='top' />
+    ? <ToolTip style={TOP}>{runLinkWarning}</ToolTip>
     : null
 
   const runLinkUrl = labwareConfirmed
