@@ -24,7 +24,7 @@ export default function ToolTip (props) {
   const className = classnames(styles.tooltip, style, size || SMALL)
 
   return (
-    <div className={className}>
+    <div className={className} role='tooltip'>
       {props.children}
     </div>
   )

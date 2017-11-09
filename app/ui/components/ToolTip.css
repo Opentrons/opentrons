@@ -15,16 +15,11 @@
   z-index: 999;
   line-height: 1.25;
   border-radius: 0.5rem;
-  padding: 0.625rem;
   white-space: pre;
   text-align: center;
   text-transform: uppercase;
   background-color: black;
   color: white;
-}
-
-.medium.tooltip {
-  padding: 0.875rem;
 }
 
 [disabled] .tooltip,
@@ -33,13 +28,17 @@
 }
 
 .small {
+  /* min-height == font-size * line-height + 2 * padding */
   min-height: 2rem;
   font-size: 0.75rem;
+  padding: 0.625rem;
 }
 
 .medium {
+  /* min-height == font-size * line-height + 2 * padding */
   min-height: 3rem;
   font-size: 1rem;
+  padding: 0.875rem;
 }
 
 .top,
