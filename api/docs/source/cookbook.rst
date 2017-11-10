@@ -7,11 +7,20 @@ Protocol Cookbook
 384 Plate Well Filling with 8-channel pipette
 =============================================
 
-An 8-channel pipette will fit into every other well on a 384 well plate:
-it can fit into A1 A3 A5 A7 A9 A11 A13, but not A1 A2.
-
 In the Opentrons API, the clearest way to direct an 8-channel pipette to a location
-is to pass it a ``WellSeries`` returned by ``myContainer.rows(row_number)``.
+is to use ``myContainer.rows(row_number)``, which returns a ``WellSeries`` object
+representing all the wells in a row.
+
+For a 96-well plate, you can simply specify ``my96Plate.rows(row_number)``, which will
+represent all 8 wells in that row.
+
+However, for a 384-well plate, an 8-channel pipette will fit into **every other well** in a row.
+The 8-channel can fit into A1 C1 E1 G1 I1 K1 M1 O1 of a 384-well plate, not A1 B1 C1 etc.
+
+``my384Plate.rows(row_number)`` will represent all 16 wells in a row.
+To get every other well starting from the A column, we can do ``row.wells('A', length=8, step=2)``.
+And to get every other well starting from the B column, do ``row.wells('B', length=8, step=2)``.
+
 
 .. testcode:: 384filling
 
@@ -29,7 +38,7 @@ is to pass it a ``WellSeries`` returned by ``myContainer.rows(row_number)``.
       tip_racks=[tiprack_1],
       trash_container=trash)
 
-  # create a list of staggered wells for each row,
+  # create a list of alternating wells for each row,
   # first starting from A then starting from B:
   # [A1-O1, B1-P1, A2-O2, B2-P2, A3-O3, B3-P3, ...]
 
@@ -41,14 +50,20 @@ is to pass it a ``WellSeries`` returned by ``myContainer.rows(row_number)``.
   # to transfer from the trough to every well in the 384 plate:
   p200.transfer(50, trough.wells('A1'), alternating_wells)
 
+Dispensing at the bottom while filling a 384 plate
+--------------------------------------------------
+
 To dispense at the **bottom** of every well in the 384 plate,
-we can take the first well from each row.
+we can take the first well from each row and use the ``Well.bottom()`` method
+to specify the bottom of the well.
 
 In the Opentrons API, when you give an 8-channel pipette a single well
 instead of a WellSeries row, the pipette will place its **leftmost** channel
 in the well you specify.
 
-So for a 384 plate, you should specify all the A and B wells.
+For a 384 plate, you should specify all the A and B wells. Since we already have
+alternating rows, we will take the first well in each row and specify to use that well's
+bottom with ``.bottom()``:
 
 .. testcode:: 384filling
 
