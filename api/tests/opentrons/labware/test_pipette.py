@@ -715,6 +715,22 @@ class PipetteTest(unittest.TestCase):
                      expected=expected)
         self.robot.clear_commands()
 
+    def test_transfer_air_gap_bigger_than_max_volume(self):
+        self.p200.reset()
+        self.assertRaises(
+            ValueError, self.p200.transfer,
+            30,
+            self.plate[0:8],
+            self.plate[1:9],
+            new_tip='always',
+            air_gap=10000,
+            disposal_vol=20,  # ignored by transfer
+            touch_tip=True,
+            blow_out=True,
+            trash=True
+        )
+        self.robot.clear_commands()
+
     def test_bad_transfer(self):
         self.p200.reset()
 

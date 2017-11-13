@@ -1050,6 +1050,11 @@ class Pipette:
         <opentrons.instruments.pipette.Pipette object at ...>
         """
 
+        if self.max_volume <= kwargs.get('air_gap', 0):
+            error_message = 'Air gap value({}) should be less than max volume({}).'.format(
+                kwargs.get('air_gap', 0), self.max_volume)
+            raise ValueError(error_message)
+
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 
         touch_tip = kwargs.get('touch_tip', False)
