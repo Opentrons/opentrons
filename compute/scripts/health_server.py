@@ -7,7 +7,7 @@ from avahi.service import AvahiService
 IP_ADDRESS = '0.0.0.0'
 PORT = 31951
 UUID = os.environ.get('RESIN_DEVICE_UUID')
-service_name = 'opentrons-{}'.format(UUID)
+service_name = 'opentrons-{}'.format(UUID[0:6])
 
 async def status(request):
     robot_status = {
