@@ -2,8 +2,7 @@
 
 SHELL := /bin/bash
 
-.PHONY: test docs publish clean install exe dev info_device sync_device active_devices \
-	blink_device ssh_device
+.PHONY: test docs publish clean install exe dev
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -30,18 +29,23 @@ dev:
 
 ########## [START] RESIN DEVICE ##########
 
+.PHONY: info_device
 info_device:
 	resin device $(OT_DEVICE_ID)
 
+.PHONY: sync_device
 sync_device: clean
 	resin sync $(OT_DEVICE_ID) --source ./ --destination /usr/src/api --progress
 
+.PHONY: blink_device
 blink_device:
 	resin device identify $(OT_DEVICE_ID)
 
+.PHONY: active_devices
 active_devices:
 	resin devices --app OTone | awk 'NR==1 || /true/'
 
+.PHONY: ssh_device
 ssh_device:
 	resin ssh $(OT_DEVICE_ID)
 
