@@ -22,8 +22,7 @@ from functools import lru_cache
 
 log = get_logger(__name__)
 
-MAX_INSTRUMENT_HEIGHT = 220.0000
-
+TIP_CLEARANCE = 42
 
 CALIBRATION = config.gantry_calibration
 
@@ -228,7 +227,7 @@ class Robot(object):
 
         # self._driver = drivers.get_virtual_driver()
         # self.disconnect()
-        self.arc_height = 5
+        self.arc_height = TIP_CLEARANCE
 
         # self.set_connection('simulate')
 
@@ -568,12 +567,14 @@ class Robot(object):
             ),
             offset.coordinates
         )
-
         # use max_z instead
         other_instrument = {instrument} ^ set(self._instruments.values())
         if other_instrument:
-            z = MAX_INSTRUMENT_HEIGHT
-            self.poses = other_instrument.pop()._move(self.poses, z=z)
+            other = other_instrument.pop()
+            _, _, z = pose_tracker.absolute(self.poses, other)
+            safe_height = self.max_deck_height() + TIP_CLEARANCE
+            if z < safe_height:
+                self.poses = other._move(self.poses, z=safe_height)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, instrument, placeable)
@@ -786,7 +787,6 @@ class Robot(object):
             # TODO JG 10/6/17: Stop tracking wells inconsistently
             center_x, center_y, _ = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
-
             self.poses = pose_tracker.add(
                 self.poses,
                 well,

@@ -350,7 +350,6 @@ class Placeable(object):
         :h: is between -1.0 and 1.0, relative to max Z
         """
         center = self.size() / 2.0
-
         r = r * center['x']
 
         return center + Vector(r * math.cos(theta),
@@ -359,7 +358,7 @@ class Placeable(object):
 
     def from_cartesian(self, x, y, z):
         """
-        Converts cartesian coordiantes within a placeable into a :Vector:
+        Converts cartesian coordinates within a placeable into a :Vector:
 
         The origin is assumed to be in the center of a Placeable
 
@@ -400,7 +399,6 @@ class Placeable(object):
         If :reference: :Placeable: is provided, returns
         the :Vector: within :reference: coordinate system
         """
-
         coordinates = self.from_center(
             r=radius,
             theta=(degrees / 180) * math.pi,

@@ -1,5 +1,7 @@
 from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
+from opentrons.trackers import pose_tracker
+from numpy import isclose
 
 
 def test_new_containers(robot):
@@ -16,3 +18,14 @@ def test_new_containers(robot):
     p200.aspirate(100, T75_flask[0])
     p200.aspirate(100, T25_flask[0])
     p200.dispense(trash_box)
+
+
+def test_fixed_trash(robot, dummy_db):
+    p200 = pipette.Pipette(
+        robot, mount='right', max_volume=1000, name='test-pipette'
+    )
+    trash = containers_load(robot, 'fixed-trash', 'C4')
+    p200.move_to(trash[0])
+    assert isclose(
+            pose_tracker.absolute(robot.poses, p200),
+            (345.0, 351.5, 110.0)).all()
