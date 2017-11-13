@@ -1,5 +1,6 @@
 import pytest
 from tests.opentrons.conftest import fuzzy_assert
+from threading import Thread
 
 
 @pytest.fixture
@@ -85,3 +86,36 @@ def test_functional(smoothie):
 
     smoothie.home(disabled='')
     assert smoothie.position == HOMED_POSITION
+
+
+def test_pause_resume(model):
+    from numpy import isclose
+    from opentrons.trackers import pose_tracker
+    from time import sleep
+
+    pipette = model.instrument._instrument
+    robot = model.robot
+
+    robot.home()
+    homed_coords = pose_tracker.absolute(robot.poses, pipette)
+
+    robot.pause()
+
+    def _move_head():
+        robot.poses = pipette._move(robot.poses, x=100, y=0, z=0)
+
+    thread = Thread(target=_move_head)
+    thread.start()
+    sleep(0.5)
+
+    # Check against home coordinates before calling resume to ensure that robot
+    # doesn't move while paused
+    coords = pose_tracker.absolute(robot.poses, pipette)
+    assert isclose(coords, homed_coords).all()
+
+    robot.resume()
+    thread.join()
+
+    coords = pose_tracker.absolute(robot.poses, pipette)
+    expected_coords = (100, 0, 0)
+    assert isclose(coords, expected_coords).all()

@@ -1,12 +1,13 @@
 from unittest import mock
 from functools import partial
-from conftest import state, log_by_axis
-from opentrons import robot
+from tests.opentrons.conftest import state, log_by_axis
 
 state = partial(state, 'calibration')
 
 
 async def test_tip_probe_functional(main_router, model):
+    robot = model.robot
+
     robot._driver.log.clear()
     main_router.calibration_manager.tip_probe(model.instrument)
     by_axis = log_by_axis(robot._driver.log, 'XYA')
@@ -26,13 +27,15 @@ async def test_tip_probe(main_router, model):
 
         patch.assert_called_with(
             model.instrument._instrument,
-            main_router.calibration_manager._robot)
+            model.robot)
 
         await main_router.wait_until(state('probing'))
         await main_router.wait_until(state('ready'))
 
 
 async def test_move_to_front(main_router, model):
+    robot = model.robot
+
     robot.home()
 
     with mock.patch(
@@ -41,7 +44,7 @@ async def test_move_to_front(main_router, model):
         main_router.calibration_manager.move_to_front(model.instrument)
         patch.assert_called_with(
             model.instrument._instrument,
-            main_router.calibration_manager._robot)
+            robot)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -60,8 +63,6 @@ async def test_move_to(main_router, model):
 
 
 async def test_jog(main_router, model):
-    from opentrons import robot
-
     with mock.patch('opentrons.util.calibration_functions.jog_instrument') as jog:  # NOQA
         for distance, axis in zip((1, 2, 3), 'xyz'):
             main_router.calibration_manager.jog(
@@ -75,7 +76,7 @@ async def test_jog(main_router, model):
                 instrument=model.instrument._instrument,
                 distance=distance,
                 axis=axis,
-                robot=robot)
+                robot=model.robot)
             for axis, distance in zip('xyz', (1, 2, 3))]
 
         assert jog.mock_calls == expected
@@ -86,7 +87,7 @@ async def test_jog(main_router, model):
 
 async def test_update_container_offset(main_router, model):
     with mock.patch.object(
-            main_router.calibration_manager._robot,
+            model.robot,
             'calibrate_container_with_instrument') as call:
         main_router.calibration_manager.update_container_offset(
                 model.container,
@@ -102,6 +103,8 @@ async def test_update_container_offset(main_router, model):
 async def test_jog_calibrate(dummy_db, main_router, model):
     from numpy import array, isclose
     from opentrons.trackers import pose_tracker
+
+    robot = model.robot
 
     container = model.container._container
     pos1 = pose_tracker.change_base(robot.poses, src=container, dst=robot.deck)

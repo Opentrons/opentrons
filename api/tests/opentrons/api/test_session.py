@@ -5,7 +5,7 @@ from datetime import datetime
 from opentrons.broker import publish
 from opentrons.api import Session
 from opentrons.api.session import _accumulate, _get_labware, _dedupe
-from conftest import state
+from tests.opentrons.conftest import state
 from functools import partial
 
 state = partial(state, 'session')
