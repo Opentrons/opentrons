@@ -10,11 +10,10 @@ PORT = 31951
 
 async def status(request):
     robot_status = {
-            'is_api_running': os.environ['API_IS_RUNNING'],
-            'machine_name': os.environ['ROBOT_NAME'],
-            'commit_hash': os.environ['RESIN_APP_RELEASE'],
-            'resin_app': os.environ['RESIN_APP_NAME'],
-            'resin_device_name': os.environ['RESIN_DEVICE_NAME_AT_INIT']
+            'api_is_running': os.environ.get('API_IS_RUNNING', False),
+            'commit_hash': os.environ.get('RESIN_APP_RELEASE'),
+            'resin_app': os.environ.get('RESIN_APP_NAME'),
+            'resin_device_name': os.environ.get('RESIN_DEVICE_NAME_AT_INIT')
         }
 
     return web.json_response(robot_status)

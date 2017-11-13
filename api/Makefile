@@ -31,6 +31,21 @@ exe: dist/opentrons-api-server
 dist/opentrons-api-server:
 	pyinstaller opentrons-api-server.spec
 
+
+########## [START] RESIN DEVICE ##########
+
+device_info:
+	resin device $(OT_DEVICE_ID)
+
+device_sync:
+	resin sync $(OT_DEVICE_ID) -s ~/OpenTrons/opentrons-api/api -d /usr/src/api -p
+
+active_devices:
+	resin devices --app OTone | awk 'NR==1 || /true/'
+
+########## [END] RESIN DEVICE ##########
+
+
 clean:
 	rm -rf \
 		__pycache__ \
