@@ -5,7 +5,7 @@ from avahi.service import AvahiService
 
 
 IP_ADDRESS = '0.0.0.0'
-PORT = '31951'
+PORT = 31951
 
 
 async def status(request):
@@ -25,5 +25,5 @@ if __name__ == "__main__":
     #TODO jmg 11/13/17: advertise an http service
     local_service = AvahiService("opentrons", "_ssh._tcp", PORT)
     health_server = web.Application()
-    health_server.route.add_get('/', status)
+    health_server.router.add_get('/', status)
     web.run_app(health_server, host=IP_ADDRESS, port=PORT)
