@@ -34,7 +34,7 @@ build: false # No need to run MSBuild
 build_script:
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test"'
   # Note: we are not running test-e2e on Windows due to problems with ChromeDriver
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && cd app && make -j 2 build test package"'
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && make -C app package test && make -C app dist-win"'
   - >
     %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist/win && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
 

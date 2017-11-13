@@ -39,6 +39,7 @@
     ]
   },
   "squirrelWindows": {
+    "useAppIdAsId": true,
     "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
   },
   "linux": {
