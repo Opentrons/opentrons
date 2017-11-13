@@ -34,8 +34,7 @@ info_device:
 	resin device $(OT_DEVICE_ID)
 
 sync_device: clean
-	resin sync $(OT_DEVICE_ID) --source ~/OpenTrons/opentrons-api/api \
-		--destination /usr/src/api --progress
+	resin sync $(OT_DEVICE_ID) --source ./ --destination /usr/src/api --progress
 
 blink_device:
 	resin device identify $(OT_DEVICE_ID)
