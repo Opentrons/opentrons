@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 
 .PHONY: test docs publish clean install exe dev info_device sync_device active_devices \
-	blink_devices ssh_device acquire_device release_device _check_user
+	blink_devices ssh_device acquire_device release_device _check_user set set_me
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -47,6 +47,7 @@ ssh_device: _check_user
 	resin ssh $(OT_DEVICE_ID)
 
 acquire_device:
+	$(eval OT_USER_ID = $(shell resin whoami |  awk '/USERNAME/{print $$2}'))
 	resin env add OT_USER $(OT_USER_ID) --device $(OT_DEVICE_ID)
 
 release_device:
@@ -57,13 +58,15 @@ release_device:
 
 _check_user:
 	@echo "verifying device ownership...";
-	$(eval DEVICE_USER = $(shell resin envs -v --device $(OT_DEVICE_ID) | awk '/OT_USER/{print $$3}'))
-	@if [ $(DEVICE_USER) = $(OT_USER_ID) ]; then\
+	$(eval OT_USER_ID = $(shell resin whoami |  awk '/USERNAME/{print $$2}'))
+	$(eval DEVICE_OWNER = $(shell resin envs -v --device $(OT_DEVICE_ID) | awk '/OT_USER/{print $$3}'))
+	@if [ $(DEVICE_OWNER) = $(OT_USER_ID) ]; then\
 		echo "device ownership confirmed"; \
 	else \
-		echo "Device user: $(DEVICE_USER) does not match OT_USER_ID: $(OT_USER_ID)";\
+		echo "Device user: $(DEVICE_OWNER) does not match OT_USER_ID: $(OT_USER_ID)";\
 		exit 1;\
   fi
+
 
 ########## [END] RESIN DEVICE ##########
 
