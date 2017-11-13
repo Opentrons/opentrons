@@ -8,7 +8,7 @@ FROM resin/raspberrypi3-python:3.5-slim-20170705
 WORKDIR /usr/src
 
 RUN apt-get update
-RUN apt-get install gcc make git g++ dnsmasq vim
+RUN apt-get install gcc make git g++ vim
 RUN pip install numpy
 
 COPY ./api ./api
