@@ -1,8 +1,6 @@
 #!/bin/bash
 
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-cd /usr/src/api
-
 
 echo "[BOOT] Starting health endpoint"
 python /usr/src/compute/scripts/health_server.py &
