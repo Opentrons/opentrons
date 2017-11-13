@@ -1,6 +1,6 @@
 {
-  "name": "ot-app",
-  "version": "3.0.0",
+  "name": "@opentrons/ot-app",
+  "version": "3.0.0-alpha",
   "description": "Opentrons desktop application",
   "main": "shell/main.js",
   "scripts": {
