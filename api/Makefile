@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 
 .PHONY: test docs publish clean install exe dev info_device sync_device active_devices \
-	blink_devices ssh_device acquire_device release_device _check_user set set_me
+	blink_device ssh_device
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -33,7 +33,7 @@ dev:
 info_device:
 	resin device $(OT_DEVICE_ID)
 
-sync_device: clean _check_user
+sync_device: clean
 	resin sync $(OT_DEVICE_ID) --source ~/OpenTrons/opentrons-api/api \
 		--destination /usr/src/api --progress
 
@@ -43,30 +43,8 @@ blink_device:
 active_devices:
 	resin devices --app OTone | awk 'NR==1 || /true/'
 
-ssh_device: _check_user
+ssh_device:
 	resin ssh $(OT_DEVICE_ID)
-
-acquire_device:
-	$(eval OT_USER_ID = $(shell resin whoami |  awk '/USERNAME/{print $$2}'))
-	resin env add OT_USER $(OT_USER_ID) --device $(OT_DEVICE_ID)
-
-release_device:
-	$(eval DEVICE_URL = $(shell resin device $(OT_DEVICE_ID) | awk '/DASHBOARD/{print $$3}' | sed 's:/[^/]*$$::'))
-	@echo "Release must be done through the Resin dashboard for now"
-	@echo "To release the device, delete the OT_USER enviornment variable through the resin dashboard at $(DEVICE_URL)/envvars"
-	@#resin env rm OT_USER --device $(OT_DEVICE_ID)
-
-_check_user:
-	@echo "verifying device ownership...";
-	$(eval OT_USER_ID = $(shell resin whoami |  awk '/USERNAME/{print $$2}'))
-	$(eval DEVICE_OWNER = $(shell resin envs -v --device $(OT_DEVICE_ID) | awk '/OT_USER/{print $$3}'))
-	@if [ $(DEVICE_OWNER) = $(OT_USER_ID) ]; then\
-		echo "device ownership confirmed"; \
-	else \
-		echo "Device user: $(DEVICE_OWNER) does not match OT_USER_ID: $(OT_USER_ID)";\
-		exit 1;\
-  fi
-
 
 ########## [END] RESIN DEVICE ##########
 
