@@ -5,7 +5,7 @@ cd /usr/src/api
 
 
 echo "[BOOT] Starting health endpoint"
-python /usr/src/compute/scripts/health_server.py
+python /usr/src/compute/scripts/health_server.py &
 
 echo "[BOOT] Starting DHCP server"
 . /usr/src/compute/scripts/dhcp_init.sh
