@@ -1,5 +1,6 @@
 import serial
 from serial.tools import list_ports
+from opentrons.robot.robot_configs import config
 import contextlib
 
 DRIVER_ACK = b'ok\r\nok\r\n'
@@ -11,7 +12,7 @@ SMOOTHIE_BOARD_NAME = 'FT232R'
 ERROR_KEYWORD = b'error'
 ALARM_KEYWORD = b'ALARM'
 
-BAUDRATE = 14400
+BAUDRATE = config.serial_speed
 
 
 def get_ports(device_name):

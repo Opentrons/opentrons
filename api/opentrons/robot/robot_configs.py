@@ -11,7 +11,7 @@ from collections import namedtuple
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 
-CURRENT_ROBOT = 'B2-5'
+CURRENT_ROBOT = 'B2-1'
 
 robot_config = namedtuple(
     'robot_config',
@@ -25,7 +25,8 @@ robot_config = namedtuple(
         'gantry_calibration',
         'instrument_offset',
         'probe_center',
-        'probe_dimensions'
+        'probe_dimensions',
+        'serial_speed'
     ]
 )
 
@@ -39,7 +40,8 @@ Ibn = robot_config(
     probe_center={'z': 68.0, 'x': 268.4, 'y': 291.8181},
     probe_dimensions={'length': 47.74, 'width': 38, 'height': 63},
     gantry_calibration=None,
-    instrument_offset=None
+    instrument_offset=None,
+    serial_speed=14400
 )
 
 Amedeo = robot_config(
@@ -58,7 +60,8 @@ Amedeo = robot_config(
     # X, Y and Z measurement of imaginary bounding box surrounding the probe
     # giving safe distance to position for probing
     probe_dimensions=(60.0, 60.0, 60.0),
-    deck_offset=None
+    deck_offset=None,
+    serial_speed=14400
 )
 
 Ada = robot_config(
@@ -71,7 +74,8 @@ Ada = robot_config(
     probe_center={'z': 57.81, 'x': 259.8, 'y': 298.875},
     probe_dimensions={'length': 41, 'width': 38.7, 'height': 67.81},
     gantry_calibration=None,
-    instrument_offset=None
+    instrument_offset=None,
+    serial_speed=14400
 )
 
 Rosalind = robot_config(
@@ -90,11 +94,33 @@ Rosalind = robot_config(
         [  3.77358491e-04,   9.97928177e-01,   0.00000000e+00,  -5.28188575e+00],
         [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,   4.50000000e+00],
         [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,   1.00000000e+00]],
-    instrument_offset=(-37.43826124,  31.44202338,  -0.5)  # left to right
+    instrument_offset=(-37.43826124,  31.44202338,  -0.5),  # left to right
+    serial_speed=14400
+)
+
+Korolev = robot_config(
+    name='Sergei Korolev',
+    steps_per_mm='M92 X80.0 Y80.0 Z400 A400 B767.38 C767.38',
+    max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
+    acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
+    current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
+    deck_offset=None,
+    probe_center=(287, 295, 55.0),
+    # X, Y and Z measurement of imaginary bounding box surrounding the probe
+    # giving safe distance to position for probing
+    probe_dimensions=(60.0, 60.0, 60.0),
+    gantry_calibration=[
+        [  1.00000000e+00,   2.48619898e-17,   0.00000000e+00,  -3.02300000e+01],
+        [  3.77358491e-04,   9.97928177e-01,   0.00000000e+00,  -5.28188575e+00],
+        [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00,   4.50000000e+00],
+        [ -5.03305613e-19,   2.60208521e-18,   0.00000000e+00,   1.00000000e+00]],
+    instrument_offset=(-37.43826124,  31.44202338,  -0.5),  # left to right
+    serial_speed=115200
 )
 
 robots = {
     'B1': Ibn,
+    'B2-1': Korolev,
     'B2-4': Amedeo,
     'B2-6': Ada,
     'B2-5': Rosalind

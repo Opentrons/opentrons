@@ -168,12 +168,12 @@ class Session(object):
                 self.log_append()
 
         self._reset()
-        self.resume()
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
         self.set_state('running')
 
         try:
+            self.resume()
             robot.home()
             exec(self._protocol, {})
         except Exception as e:

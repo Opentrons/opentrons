@@ -1,5 +1,6 @@
 import itertools
 import pytest
+import asyncio
 
 from datetime import datetime
 from opentrons.broker import publish
@@ -79,16 +80,34 @@ async def test_load_protocol_with_error(session_manager):
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 async def test_load_and_run(
             main_router,
-            session_manager,
             protocol,
-            protocol_file
+            protocol_file,
+            loop
         ):
-    session = session_manager.create(name='<blank>', text=protocol.text)
+
+    async def pause_resume(session, count=5, interval=5.0):
+        for _ in range(count):
+            await asyncio.sleep(interval)
+            print('Pause...')
+            session.pause()
+            await asyncio.sleep(interval)
+            print('Resume...')
+            session.resume()
+
+    session = main_router.session_manager.create(
+        name='<blank>',
+        text=protocol.text)
     assert main_router.notifications.queue.qsize() == 0
     assert session.command_log == {}
     assert session.state == 'loaded'
     main_router.calibration_manager.tip_probe(session.instruments[0])
-    session.run()
+    task = loop.run_in_executor(executor=None, func=session.run)
+
+    # Uncomment to test pause/resume sequence on a robot
+    # await asyncio.sleep(15.0)
+    # await pause_resume(session)
+
+    await task
     assert len(session.command_log) == 6
 
     res = []
@@ -105,7 +124,6 @@ async def test_load_and_run(
     assert [key for key, _ in itertools.groupby(res)] == \
         ['loaded', 'probing', 'ready', 'running', 'finished']
     assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
-
     session.run()
     assert len(session.command_log) == 6, \
         "Clears command log on the next run"

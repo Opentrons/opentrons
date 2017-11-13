@@ -62,6 +62,10 @@ def log_init():
                 'handlers': ['debug'],
                 'level': logging.INFO
             },
+            'aiohttp': {
+                'handlers': ['debug'],
+                'level': logging.INFO
+            },
         }
     )
     dictConfig(logging_config)
