@@ -1,3 +1,5 @@
+# https://github.com/resin-io-playground/resin-avahi-dbus/tree/master/avahi
+
 import dbus
 
 class AvahiServer:
