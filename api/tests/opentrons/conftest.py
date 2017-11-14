@@ -16,30 +16,6 @@ from opentrons.data_storage import database
 from opentrons.api import models
 
 
-def state(topic, state):
-    def _match(item):
-        return \
-            item['name'] == 'state' and \
-            item['topic'] == topic and \
-            item['payload'].state == state
-
-    return _match
-
-
-def log_by_axis(log, axis):
-    from functools import reduce
-
-    def reducer(e1, e2):
-        return {
-            axis: e1[axis] + [round(e2[axis])]
-            for axis in axis
-        }
-
-    return reduce(reducer, log, {axis: [] for axis in axis})
-
-
-
-
 # Uncomment to enable logging during tests
 
 # logging_config = dict(
@@ -83,6 +59,28 @@ MAIN_TESTER_DB = str(os.path.join(
     os.path.dirname(
         globals()["__file__"]), 'testing_database.db')
 )
+
+
+def state(topic, state):
+    def _match(item):
+        return \
+            item['name'] == 'state' and \
+            item['topic'] == topic and \
+            item['payload'].state == state
+
+    return _match
+
+
+def log_by_axis(log, axis):
+    from functools import reduce
+
+    def reducer(e1, e2):
+        return {
+            axis: e1[axis] + [round(e2[axis])]
+            for axis in axis
+        }
+
+    return reduce(reducer, log, {axis: [] for axis in axis})
 
 
 def print_db_path(db):

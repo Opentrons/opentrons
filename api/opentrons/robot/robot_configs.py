@@ -11,7 +11,7 @@ from collections import namedtuple
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 
-CURRENT_ROBOT = 'B2-1'
+CURRENT_ROBOT = 'B2-5'
 
 robot_config = namedtuple(
     'robot_config',
