@@ -1,4 +1,4 @@
-@value grey from '../App.global.css';
+@value blue, grey, dark_grey from '../App.global.css';
 @value width: 18rem;
 @value border: 2px solid grey;
 

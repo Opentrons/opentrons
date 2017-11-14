@@ -1,8 +1,8 @@
 import React from 'react'
 import {Switch, Route} from 'react-router'
 
-import NavBar from './nav-bar/NavBar'
-import NavPanel from './nav-panel/NavPanel'
+import NavBar from './NavBar'
+import NavPanel from './NavPanel'
 
 import Home from '../pages/Home'
 import Upload from '../pages/Upload'

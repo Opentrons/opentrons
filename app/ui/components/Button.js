@@ -7,6 +7,7 @@ const Button = props => (
   <button
     onClick={!props.disabled && props.onClick}
     className={classnames('btn', props.style, {disabled: props.disabled})}
+    title={props.title}
   >
     {props.children}
   </button>
@@ -15,7 +16,9 @@ const Button = props => (
 Button.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
-  style: PropTypes.string
+  // TODO(mc, 2017-11-13): rename to className
+  style: PropTypes.string,
+  title: PropTypes.string
 }
 
 export default Button

@@ -1,0 +1,72 @@
+@value border from '../nav-panel.css';
+
+.robot_list {
+  list-style: none;
+  margin-left: 0;
+}
+
+.robot_item {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-bottom: border;
+}
+
+.robot_icon {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* min-width: 0 needed to allow .robot_name truncation */
+.robot_controls {
+  flex: 1;
+  margin-left: 0.5rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.robot_name {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connect_button {
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.connect_button:hover {
+  background-color: #777;
+}
+
+.disconnected {
+  color: dark_grey;
+}
+
+.connected {
+  color: blue;
+}
+
+.scan_status {
+  padding: 1rem;
+  text-align: center;
+}
+
+/*
+ * TODO(mc, 2017-11-13): button.scan_button because of global .btn and the fact
+ * that scan_button is a text button instead of SVG. Remove when able
+*/
+.scan_button,
+button.scan_button {
+  display: block;
+  width: 5rem;
+  height: auto;
+  font-size: 5rem;
+  line-height: 1;
+  margin: 0.5rem auto;
+}
