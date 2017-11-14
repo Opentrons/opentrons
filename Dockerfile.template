@@ -1,7 +1,7 @@
 # http://docs.resin.io/pages/deployment/docker-templates
-#TODO: (JG 10/5/17)
+#TODO: (JG 11/14/17)
 # - pre-build packages requiring native compilation to reduce image size
-# - Use setup.py through pip install instead of copying over and using setup.py
+# Use make install for dependency installation
 
 FROM resin/raspberrypi3-python:3.5-slim-20170705
 
