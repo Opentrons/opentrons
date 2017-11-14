@@ -61,7 +61,7 @@ def log_init():
             'opentrons.server': {
                 'handlers': ['debug'],
                 'level': logging.INFO
-            },
+            }
         }
     )
     dictConfig(logging_config)

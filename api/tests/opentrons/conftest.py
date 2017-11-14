@@ -13,6 +13,7 @@ from functools import partial
 from opentrons.server import rpc
 from uuid import uuid4 as uuid
 from opentrons.data_storage import database
+from opentrons.api import models
 
 
 # Uncomment to enable logging during tests
@@ -58,6 +59,28 @@ MAIN_TESTER_DB = str(os.path.join(
     os.path.dirname(
         globals()["__file__"]), 'testing_database.db')
 )
+
+
+def state(topic, state):
+    def _match(item):
+        return \
+            item['name'] == 'state' and \
+            item['topic'] == topic and \
+            item['payload'].state == state
+
+    return _match
+
+
+def log_by_axis(log, axis):
+    from functools import reduce
+
+    def reducer(e1, e2):
+        return {
+            axis: e1[axis] + [round(e2[axis])]
+            for axis in axis
+        }
+
+    return reduce(reducer, log, {axis: [] for axis in axis})
 
 
 def print_db_path(db):
@@ -203,6 +226,24 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
         if matcher(result[-1]):
             return result
+
+
+@pytest.fixture
+def model(robot):
+    from opentrons.containers import load
+    from opentrons.instruments.pipette import Pipette
+
+    pipette = Pipette(robot, mount='right')
+    plate = load(robot, '96-flat', 'A1')
+
+    instrument = models.Instrument(pipette)
+    container = models.Container(plate)
+
+    return namedtuple('model', 'robot instrument container')(
+            robot=robot,
+            instrument=instrument,
+            container=container
+        )
 
 
 setup_testing_env()

@@ -3,6 +3,7 @@ from os import environ
 from opentrons.robot.robot_configs import (
     config, PLUNGER_CURRENT_LOW, PLUNGER_CURRENT_HIGH
 )
+from threading import Event
 
 
 '''
@@ -59,6 +60,9 @@ def _parse_axis_values(raw_axis_values):
 
 class SmoothieDriver_3_0_0:
     def __init__(self):
+        self.run_flag = Event()
+        self.run_flag.set()
+
         self._position = {}
         self.log = []
         self._update_position({axis: 0 for axis in AXES})
@@ -194,6 +198,8 @@ class SmoothieDriver_3_0_0:
     def move(self, target):
         from numpy import isclose
 
+        self.run_flag.wait()
+
         def valid_movement(coords, axis):
             return not (
                 (axis in DISABLE_AXES) or
@@ -211,6 +217,9 @@ class SmoothieDriver_3_0_0:
             self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
+
+        self.run_flag.wait()
+
         axis = axis.upper()
 
         # If Y is requested make sure we home X first
@@ -251,6 +260,12 @@ class SmoothieDriver_3_0_0:
         self.update_position(default=homed)
 
         return homed
+
+    def pause(self):
+        self.run_flag.clear()
+
+    def resume(self):
+        self.run_flag.set()
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:

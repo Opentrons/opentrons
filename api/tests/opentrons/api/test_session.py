@@ -5,7 +5,7 @@ from datetime import datetime
 from opentrons.broker import publish
 from opentrons.api import Session
 from opentrons.api.session import _accumulate, _get_labware, _dedupe
-from conftest import state
+from tests.opentrons.conftest import state
 from functools import partial
 
 state = partial(state, 'session')
@@ -79,23 +79,27 @@ async def test_load_protocol_with_error(session_manager):
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 async def test_load_and_run(
             main_router,
-            session_manager,
             protocol,
-            protocol_file
+            protocol_file,
+            loop
         ):
-    session = session_manager.create(name='<blank>', text=protocol.text)
+    session = main_router.session_manager.create(
+        name='<blank>',
+        text=protocol.text)
     assert main_router.notifications.queue.qsize() == 0
     assert session.command_log == {}
     assert session.state == 'loaded'
     main_router.calibration_manager.tip_probe(session.instruments[0])
-    session.run()
+    task = loop.run_in_executor(executor=None, func=session.run)
+
+    await task
     assert len(session.command_log) == 6
 
     res = []
     index = 0
     async for notification in main_router.notifications:
         name, payload = notification['name'], notification['payload']
-        if (name == 'state'):
+        if name == 'state':
             index += 1  # Command log in sync with add-command events emitted
             state = payload.state
             res.append(state)
@@ -105,7 +109,6 @@ async def test_load_and_run(
     assert [key for key, _ in itertools.groupby(res)] == \
         ['loaded', 'probing', 'ready', 'running', 'finished']
     assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
-
     session.run()
     assert len(session.command_log) == 6, \
         "Clears command log on the next run"

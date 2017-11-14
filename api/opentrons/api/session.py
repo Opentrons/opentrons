@@ -173,6 +173,7 @@ class Session(object):
         self.set_state('running')
 
         try:
+            self.resume()
             robot.home()
             exec(self._protocol, {})
         except Exception as e:

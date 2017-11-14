@@ -1,24 +1,17 @@
 import os
-from threading import Event
+from functools import lru_cache
+from numpy import add, subtract
 
-
+from opentrons import commands, containers, drivers, helpers
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from opentrons.robot.mover import Mover
-
-import opentrons.util.calibration_functions as calib
-
-from opentrons import containers, drivers
+from opentrons.robot.robot_configs import config
 from opentrons.containers import Container
 from opentrons.util.log import get_logger
 from opentrons.trackers import pose_tracker
 from opentrons.data_storage import database
-from opentrons import helpers
-from opentrons import commands
 from opentrons.broker import subscribe
-from .robot_configs import config
-
-from numpy import add, subtract
-from functools import lru_cache
+import opentrons.util.calibration_functions as calib
 
 log = get_logger(__name__)
 
@@ -201,9 +194,6 @@ class Robot(object):
         self.dimensions = (395, 345, 228)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
-
-        self.can_pop_command = Event()
-        self.can_pop_command.set()
 
         self.mode = None
         self._smoothie_drivers = {
@@ -802,29 +792,25 @@ class Robot(object):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """
-        self.can_pop_command.clear()
         self._driver.pause()
 
     def stop(self):
         """
         Stops execution of the protocol.
         """
-        self._driver.stop()
-        self.can_pop_command.set()
+        raise NotImplementedError
 
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
         """
-        self.can_pop_command.set()
         self._driver.resume()
 
     def halt(self):
         """
         Stops execution of both the protocol and the Smoothie board immediately
         """
-        self._driver.halt()
-        self.can_pop_command.set()
+        raise NotImplementedError
 
     def get_serial_ports_list(self):
         ports = []
@@ -834,6 +820,7 @@ class Robot(object):
         ports.extend(drivers.get_serial_ports_list())
         return ports
 
+    # TODO (ben 2017/11/13): rip out or implement these three methods
     def is_connected(self):
         if not self._driver:
             return False

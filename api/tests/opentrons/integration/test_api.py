@@ -1,7 +1,7 @@
 import pytest
 
 from opentrons import robot
-from ..api.conftest import state, log_by_axis
+from tests.opentrons.conftest import state, log_by_axis
 
 from numpy import isclose, subtract
 from opentrons.trackers import pose_tracker
