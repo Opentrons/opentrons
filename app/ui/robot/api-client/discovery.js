@@ -12,7 +12,7 @@ export function handleDiscover (dispatch, state, action) {
   // TODO(mc, 2017-10-26): we're relying right now on the fact that resin
   // advertises an SSH service. Instead, we should be registering an HTTP
   // service on port 31950 and listening for that instead
-  const browser = Bonjour().find({type: 'ssh'})
+  const browser = Bonjour().find({type: 'http'})
 
   setTimeout(finishDiscovery, DISCOVERY_TIMEOUT_MS)
   browser.on(UP_EVENT, handleServiceUp)

@@ -40,10 +40,9 @@ describe('api client - discovery', () => {
     }
   })
 
-  // TODO(mc, 2017-10-30): change type to http when API advertises correctly
   test('searches for SSH services', () => {
     return sendToClient({}, actions.discover())
-      .then(() => expect(bonjour.find).toHaveBeenCalledWith({type: 'ssh'}))
+      .then(() => expect(bonjour.find).toHaveBeenCalledWith({type: 'http'}))
   })
 
   test('sets a 30 second discovery timeout', () => {
@@ -58,11 +57,10 @@ describe('api client - discovery', () => {
   })
 
   test('dispatches ADD_DISCOVEREDs on new services', () => {
-    // TODO(mc, 2017-10-30): change type to http when API advertises correctly
     const services = [
-      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
-      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'ssh'},
-      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
+      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'http'},
+      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'http'},
+      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'http'}
     ]
 
     return sendToClient({}, actions.discover())
@@ -73,11 +71,10 @@ describe('api client - discovery', () => {
   })
 
   test('dispatches REMOVE_DISCOVEREDs on service downs', () => {
-    // TODO(mc, 2017-10-30): change type to http when API advertises correctly
     const services = [
-      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
-      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'ssh'},
-      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
+      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'http'},
+      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'http'},
+      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'http'}
     ]
 
     return sendToClient({}, actions.discover())
@@ -95,7 +92,7 @@ describe('api client - discovery', () => {
         name: 'opentrons-1',
         host: 'ot-1.local',
         port: '31950',
-        type: 'ssh'
+        type: 'http'
       }))
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(
         actions.addDiscovered(expect.anything())
@@ -109,7 +106,7 @@ describe('api client - discovery', () => {
         name: 'opentrons-1',
         host: 'ot-1.local',
         port: '31950',
-        type: 'ssh'
+        type: 'http'
       }))
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(
         actions.removeDiscovered(expect.anything())
@@ -118,9 +115,9 @@ describe('api client - discovery', () => {
 
   test('only dispatches for hosts with "ot" in the name', () => {
     const services = [
-      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'ssh'},
-      {name: 'nope', host: 'nope.local', port: '31950', type: 'ssh'},
-      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'ssh'}
+      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'http'},
+      {name: 'nope', host: 'nope.local', port: '31950', type: 'http'},
+      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'http'}
     ]
 
     return sendToClient({}, actions.discover())
