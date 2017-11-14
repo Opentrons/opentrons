@@ -1,0 +1,90 @@
+@value blue from '../App.global.css';
+
+.review_deck {
+  background-color: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: 4rem;
+}
+
+.review_message {
+  height: 10rem;
+  text-align: center;
+  color: white;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.btn_calibrate {
+  margin-top: 1rem;
+  font-size: 1rem;
+  padding: 0 3rem;
+  line-height: 3rem;
+  border-radius: 0.5rem;
+  font-family: 'trons';
+  text-transform: uppercase;
+  background-color: blue;
+  color: white;
+}
+
+.deck {
+  box-sizing: border-box;
+  padding: 1rem 2rem;
+  margin: 0 auto;
+  width: 38rem;
+  height: 33rem;
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-auto-columns: 1fr;
+  grid-template:
+    'slot-10 slot-11 .' 1fr
+    'slot-7 slot-8 slot-9' 1fr
+    'slot-4 slot-5 slot-6' 1fr
+    'slot-1 slot-2 slot-3' 1fr;
+}
+
+.empty_slot,
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+}
+
+.empty_slot {
+  background-color: #eee;
+  font-family: 'sans';
+  color: white;
+  font-size: 3rem;
+}
+
+.slot {
+  border: 2px solid silver;
+  background-color: #bbb;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.slot.active {
+  border: 4px solid #111;
+}
+
+.label,
+.status {
+  position: absolute;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  width: 100%;
+  height: 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: white;
+  text-decoration: none;
+  line-height: 2rem;
+}
