@@ -16,7 +16,7 @@ const service = {
   // TODO(mc, 2017-10-26): we're relying right now on the fact that resin
   // advertises an SSH service. Instead, we should be registering an HTTP
   // service on port 31950 and listening for that instead
-  type: 'ssh'
+  type: 'http'
 }
 
 bonjour.publish(service)

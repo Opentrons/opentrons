@@ -275,7 +275,7 @@ async def test_session_create_error(main_router):
 
     with pytest.raises(TimeoutError):
         # No state change is expected
-        await main_router.wait_until(state('loaded'))
+        await main_router.wait_until(lambda _: True)
 
     with pytest.raises(ZeroDivisionError):
         main_router.session_manager.create(
@@ -284,4 +284,4 @@ async def test_session_create_error(main_router):
 
     with pytest.raises(TimeoutError):
         # No state change is expected
-        await main_router.wait_until(state('loaded'))
+        await main_router.wait_until(lambda _: True)
