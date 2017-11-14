@@ -52,18 +52,6 @@ body {
   display: inline-block;
 }
 
-.flex {
-  display: flex;
-}
-
-.flex__items_center {
-  align-items: center;
-}
-
-.flex__justify_center {
-  justify-content: center;
-}
-
 /*** TYPOGRAPHY ***/
 @font-face {
   font-family: 'trons';

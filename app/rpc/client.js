@@ -6,6 +6,7 @@ import EventEmitter from 'events'
 
 import WebSocketClient from './websocket-client'
 import RemoteObject from './remote-object'
+import RemoteError from './remote-error'
 import {
   statuses,
   RESULT,
@@ -66,10 +67,10 @@ class RpcContext extends EventEmitter {
 
       const handleError = (reason) => {
         cleanup()
-        reject(new Error(`Error in ${name}(${args.join(', ')}): ${reason}`))
+        reject(new RemoteError(reason, name, args))
       }
 
-      const handleFailure = (result) => handleError(new Error(result))
+      const handleFailure = (result) => handleError(result)
       const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
 
       const handleAck = () => {
