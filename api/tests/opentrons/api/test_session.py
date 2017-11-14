@@ -1,6 +1,5 @@
 import itertools
 import pytest
-import asyncio
 
 from datetime import datetime
 from opentrons.broker import publish
@@ -84,16 +83,6 @@ async def test_load_and_run(
             protocol_file,
             loop
         ):
-
-    async def pause_resume(session, count=5, interval=5.0):
-        for _ in range(count):
-            await asyncio.sleep(interval)
-            print('Pause...')
-            session.pause()
-            await asyncio.sleep(interval)
-            print('Resume...')
-            session.resume()
-
     session = main_router.session_manager.create(
         name='<blank>',
         text=protocol.text)
@@ -103,10 +92,6 @@ async def test_load_and_run(
     main_router.calibration_manager.tip_probe(session.instruments[0])
     task = loop.run_in_executor(executor=None, func=session.run)
 
-    # Uncomment to test pause/resume sequence on a robot
-    # await asyncio.sleep(15.0)
-    # await pause_resume(session)
-
     await task
     assert len(session.command_log) == 6
 
@@ -114,7 +99,7 @@ async def test_load_and_run(
     index = 0
     async for notification in main_router.notifications:
         name, payload = notification['name'], notification['payload']
-        if (name == 'state'):
+        if name == 'state':
             index += 1  # Command log in sync with add-command events emitted
             state = payload.state
             res.append(state)
