@@ -2,6 +2,7 @@
 
 import dbus
 
+
 class AvahiServer:
     """ A server class to interact with the system Avahi server over dbus
     """
@@ -9,7 +10,9 @@ class AvahiServer:
     def __init__(self):
         self.bus = dbus.SystemBus()
         raw_server = self.bus.get_object('org.freedesktop.Avahi', '/')
-        self.server = dbus.Interface(raw_server, 'org.freedesktop.Avahi.Server')
+        self.server = dbus.Interface(
+                raw_server, 'org.freedesktop.Avahi.Server'
+                )
 
     def GetVersion(self):
         """Avahi Server Version Check, return avahi version string, eg. "avahi 0.6.32"

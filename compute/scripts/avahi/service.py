@@ -1,12 +1,12 @@
 # https://github.com/resin-io-playground/resin-avahi-dbus/tree/master/avahi
 
 import dbus
-import os
 from time import sleep
 
 from .server import AvahiServer
 
 class AvahiService:
+
 
     def __init__(self, service_name, service_type, port, txt=[], keep_alive=False):
         """Announce a service over Avahi through dbus
