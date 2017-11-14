@@ -32,7 +32,7 @@ robot_config = namedtuple(
 
 Ibn = robot_config(
     name='Ibn al-Nafis',
-    steps_per_mm='M92 X160 Y160 Z800 A800 B767.38 C767.38',
+    steps_per_mm='M92 X160 Y160 Z800 A800 B768 C768',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
@@ -46,7 +46,7 @@ Ibn = robot_config(
 
 Amedeo = robot_config(
     name='Amedeo Avogadro',
-    steps_per_mm='M92 X80 Y80 Z400 A400 B767.38 C767.38',
+    steps_per_mm='M92 X80 Y80 Z400 A400 B768 C768',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S1000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B0.25 C0.25',
@@ -66,7 +66,7 @@ Amedeo = robot_config(
 
 Ada = robot_config(
     name='Ada Lovelace',
-    steps_per_mm='M92 X80 Y80 Z400 A400 B767.38 C767.38',
+    steps_per_mm='M92 X80 Y80 Z400 A400 B768 C768',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
@@ -80,7 +80,7 @@ Ada = robot_config(
 
 Rosalind = robot_config(
     name='Rosalind Franklin',
-    steps_per_mm='M92 X80.0254 Y80.16 Z400 A400 B767.38 C767.38',
+    steps_per_mm='M92 X80.0254 Y80.16 Z400 A400 B768 C768',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
@@ -100,7 +100,7 @@ Rosalind = robot_config(
 
 Korolev = robot_config(
     name='Sergei Korolev',
-    steps_per_mm='M92 X80.0 Y80.0 Z400 A400 B767.38 C767.38',
+    steps_per_mm='M92 X80.0 Y80.0 Z400 A400 B768 C768',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
