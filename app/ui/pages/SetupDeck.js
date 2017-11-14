@@ -2,8 +2,9 @@
 import React from 'react'
 import {Route} from 'react-router'
 import Page from '../components/Page'
+import DeckConfig from '../components/deck/DeckConfig'
 import SessionHeader from '../containers/SessionHeader'
-import ConnectedDeckConfig from '../containers/ConnectedDeckConfig'
+// import ConnectedDeckConfig from '../containers/ConnectedDeckConfig'
 import ConnectedJogModal from '../containers/ConnectedJogModal'
 
 export default function SetupDeckPage (props) {
@@ -14,7 +15,7 @@ export default function SetupDeckPage (props) {
   return (
     <Page>
       <SessionHeader />
-      <ConnectedDeckConfig slot={slot} />
+      <DeckConfig slot={slot} />
       <Route path={`${url}/jog`} render={() => (
         <ConnectedJogModal slot={slot} />
       )} />
