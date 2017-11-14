@@ -115,9 +115,6 @@ class Session(object):
             # once robot / driver simulation flow is fixed
             robot._driver.disconnect()
             exec(self._protocol, {})
-        except Exception as e:
-            self.error_append(e)
-            raise e
         finally:
             robot._driver.connect()
             unsubscribe()
