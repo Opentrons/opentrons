@@ -1,4 +1,5 @@
 # https://github.com/resin-io-playground/resin-avahi-dbus/tree/master/avahi
+# Apache License, Version 2.0
 
 import dbus
 
