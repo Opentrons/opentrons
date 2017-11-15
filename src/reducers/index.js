@@ -51,7 +51,7 @@ const selectedIngredientGroup = handleActions({
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
 }, null)
 
-const containers = handleActions({
+export const containers = handleActions({
   CREATE_CONTAINER: (state, action) => ({
     ...state,
     [uuid() + ':' + action.payload.containerType]: {
@@ -113,7 +113,7 @@ const highlightedIngredients = handleActions({
   HOVER_WELL_END: (state, action) => ({}) // clear highlighting
 }, {})
 
-const ingredients = handleActions({
+export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
     const editableIngredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize']
     const { groupId, containerId } = action.payload
