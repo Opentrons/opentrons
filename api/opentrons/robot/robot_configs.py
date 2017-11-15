@@ -7,11 +7,12 @@
 # once this configuration information is part of persistent robot data
 
 from collections import namedtuple
+import os
 
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 
-CURRENT_ROBOT = 'B2-5'
+current_robot  = os.environ['OT_ROBOT_CONFIG']
 
 robot_config = namedtuple(
     'robot_config',
@@ -127,4 +128,4 @@ robots = {
 }
 
 
-config = robots[CURRENT_ROBOT]
+config = robots[current_robot]
