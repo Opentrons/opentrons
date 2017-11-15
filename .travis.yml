@@ -16,6 +16,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
     bucket: opentrons-protocol-designer
+    region: us-west-2
     skip_cleanup: true
     local-dir: dist/
     upload-dir: $TRAVIS_BRANCH
