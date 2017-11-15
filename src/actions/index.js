@@ -1,5 +1,6 @@
 import { createActions } from 'redux-actions'
 import { selectors } from '../reducers'
+import { uuid } from '../utils.js'
 
 // Payload mappers
 const xyToSingleWellObj = (x, y) => ({ [(x + ',' + y)]: [x, y] })
@@ -11,6 +12,8 @@ export const {
 
   // openIngredientSelector,
   closeIngredientSelector,
+
+  setCopyLabwareMode,
 
   createContainer,
   deleteContainer,
@@ -32,6 +35,8 @@ export const {
   // OPEN_INGREDIENT_SELECTOR: undefined,
   CLOSE_INGREDIENT_SELECTOR: undefined,
 
+  SET_COPY_LABWARE_MODE: undefined, // payload is containerId
+
   CREATE_CONTAINER: undefined,
   DELETE_CONTAINER: undefined,
   MODIFY_CONTAINER: undefined, // {containerId, modify: {fieldToModify1: newValue1, fieldToModify2: newValue2}}
@@ -48,6 +53,21 @@ export const {
   HOVER_WELL_BEGIN: xyToSingleWellObj,
   HOVER_WELL_END: xyToSingleWellObj
 })
+
+export const copyLabware = slotName => (dispatch, getState) => {
+  const state = getState()
+  const fromContainer = selectors.labwareToCopy(state)
+  return dispatch({
+    type: 'COPY_LABWARE',
+    payload: {
+      fromContainer,
+      toContainer: uuid() + ':' + fromContainer.split(':')[1],
+      // 'toContainer' is the containerId of the new clone.
+      // So you get 'uuid:containerType', or 'uuid:undefined' if you're cloning 'default-trash'.
+      toSlot: slotName
+    }
+  })
+}
 
 export const deleteIngredient = payload => (dispatch, getState) => {
   return dispatch({

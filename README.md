@@ -18,11 +18,11 @@ npm start # Starts the app on http://localhost:8080/
       // Blood Samp 1, Blood Samp 2, etc.
       // This field can be blank or not exist, falls back to name
     locations: {
-      // [slotName]: [wellName, wellName, etc] for all slots.
-      A1: ['C2', 'C3', 'C4']
+      // [containerId]: [wellName, wellName, etc] for all slots.
+      'containerIdOne': ['C2', 'C3', 'C4']
     },
-    wellDetailsByLocation: { // also referenced wellDetailsByLocation[slotName][wellName]
-      A1: {
+    wellDetailsByLocation: { // also referenced wellDetailsByLocation[containerId][wellName]
+      'containerIdOne': {
         C2: { volume: 100, concentration: '1:10', name: 'Special Sample' }
         /* ^^ could have description too, but doesn't need to have any keys. */
       }
@@ -38,7 +38,7 @@ npm start # Starts the app on http://localhost:8080/
   2: {
     name: 'Control',
     locations: {
-      'A1': ['A1']
+      'containerIdOne': ['A1']
     },
     wellDetailsByLocation: null,
     volume: 50,
@@ -49,7 +49,7 @@ npm start # Starts the app on http://localhost:8080/
   3: {
     name: 'Buffer',
     locations: {
-      'A1': ['H1', 'H2', 'H3', 'H4']
+      'containerIdOne': ['H1', 'H2', 'H3', 'H4']
     },
     wellDetailsByLocation: null,
     volume: 100,

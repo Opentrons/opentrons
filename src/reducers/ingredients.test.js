@@ -42,3 +42,65 @@ describe('DELETE_INGREDIENT action', () => {
     })
   })
 })
+
+describe('COPY_LABWARE action', () => {
+  test('copy single ingredient, and no more', () => {
+    const prevState = {
+      '3': {
+        name: 'Buffer',
+        locations: {
+          'myTrough': ['H1', 'H2', 'H3', 'H4']
+        },
+        wellDetailsByLocation: null,
+        volume: 100,
+        concentration: '50 mol/ng',
+        description: '',
+        individualize: false
+      },
+      '4': {
+        name: 'Other Ingred',
+        locations: {
+          'otherContainer': ['A1', 'A2', 'B3', 'B4']
+        },
+        wellDetailsByLocation: null,
+        volume: 10,
+        concentration: '100%',
+        description: '',
+        individualize: false
+      }
+    }
+
+    expect(ingredients(
+      prevState,
+      {
+        type: 'COPY_LABWARE',
+        payload: {fromContainer: 'myTrough', toContainer: 'newContainer', toSlot: 'A3'}
+      }
+    )).toEqual({
+      '3': {
+        name: 'Buffer',
+        locations: {
+          'myTrough': ['H1', 'H2', 'H3', 'H4'],
+          // Clone locations
+          'newContainer': ['H1', 'H2', 'H3', 'H4']
+        },
+        wellDetailsByLocation: null,
+        volume: 100,
+        concentration: '50 mol/ng',
+        description: '',
+        individualize: false
+      },
+      '4': {
+        name: 'Other Ingred',
+        locations: {
+          'otherContainer': ['A1', 'A2', 'B3', 'B4']
+        },
+        wellDetailsByLocation: null,
+        volume: 10,
+        concentration: '100%',
+        description: '',
+        individualize: false
+      }
+    })
+  })
+})

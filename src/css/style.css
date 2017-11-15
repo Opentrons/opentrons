@@ -186,6 +186,7 @@ textarea {
   composes: overlay;
   z-index: 100;
   color: lightgray;
+  fill: lightgray;
 }
 
 .containerOverlay label {
@@ -204,13 +205,13 @@ textarea {
 
 .containerOverlay:hover > * {
   visibility: visible;
-  margin-top: 40pt;
   cursor: pointer;
 }
 
-.containerOverlayAddIngred:hover, .containerOverlayRemove:hover {
+.containerOverlayAddIngred:hover, .containerOverlayRemove:hover, .containerOverlayCopy:hover {
   font-weight: bold;
   color: white;
+  fill: white;
 }
 
 .containerOverlayAddIngred::after {

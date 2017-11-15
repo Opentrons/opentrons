@@ -23,11 +23,16 @@ import {
   modifyContainer,
 
   openLabwareSelector,
-  closeLabwareSelector
+  closeLabwareSelector,
+
+  setCopyLabwareMode,
+  copyLabware
 } from '../actions'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
 import LabwareDropdown from '../components/LabwareDropdown.js'
+
+import CopyIcon from '../svg/CopyIcon.js'
 
 const LabwareContainer = ({
   slotName,
@@ -46,7 +51,11 @@ const LabwareContainer = ({
   modifyContainer,
 
   openLabwareSelector,
-  closeLabwareSelector
+  closeLabwareSelector,
+
+  setCopyLabwareMode,
+  labwareToCopy,
+  copyLabware
 }) => {
   const hasName = containerName !== null
   // HACK: should use a stateful input component
@@ -89,6 +98,14 @@ const LabwareContainer = ({
             Add Ingredients
           </div>}
 
+          <div className={styles.containerOverlayCopy}
+            onClick={() => setCopyLabwareMode(containerId)}
+          >
+            <div>Copy Labware</div>
+            {/* TODO: icon CSS class, diff sizes? */}
+            <CopyIcon style={{width: '20px', height: '20px'}} />
+          </div>
+
           <div className={styles.containerOverlayRemove}
             style={canAddIngreds ? {} : {bottom: 0, position: 'absolute'}}
             onClick={() =>
@@ -120,9 +137,12 @@ const LabwareContainer = ({
           onClose={e => closeLabwareSelector({slotName})}
           onContainerChoose={containerType => createContainer({slotName, containerType})}
         />
-        : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
+        : (labwareToCopy
+            ? <div className={styles.addLabware} onClick={() => copyLabware(slotName)}>Place Copy</div>
+            : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
             Add Labware
           </div>
+        )
       )}
     </div>
   )
@@ -137,7 +157,8 @@ export default connect(
     return {
       ...containerInfo,
       canAdd: selectors.canAdd(state),
-      activeModals: selectors.activeModals(state)
+      activeModals: selectors.activeModals(state),
+      labwareToCopy: selectors.labwareToCopy(state)
     }
   },
   {
@@ -148,6 +169,9 @@ export default connect(
     openIngredientSelector,
     openLabwareSelector,
 
-    closeLabwareSelector
+    closeLabwareSelector,
+
+    setCopyLabwareMode,
+    copyLabware
   }
 )(LabwareContainer)

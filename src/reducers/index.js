@@ -38,6 +38,13 @@ const modeLabwareSelection = handleActions({
   CREATE_CONTAINER: (state, action) => false // close window when labware is selected
 }, false)
 
+// If falsey, we aren't copying labware. Else, value should be the containerID we're
+// ready to copy.
+const copyLabwareMode = handleActions({
+  SET_COPY_LABWARE_MODE: (state, action) => action.payload, // payload should be containerID to copy
+  COPY_LABWARE: (state, action) => false // leave copy mode after performing a copy action
+}, false)
+
 const selectedContainer = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action) => action.payload,
   CLOSE_INGREDIENT_SELECTOR: (state, action) => null
@@ -80,6 +87,10 @@ export const containers = handleActions({
   MODIFY_CONTAINER: (state, action) => {
     const { containerId, modify } = action.payload
     return {...state, [containerId]: {...state[containerId], ...modify}}
+  },
+  COPY_LABWARE: (state, action) => {
+    const { fromContainer, toContainer, toSlot } = action.payload
+    return {...state, [toContainer]: {...state[fromContainer], slotName: toSlot}}
   }
 }, {
   'default-trash': {
@@ -158,11 +169,27 @@ export const ingredients = handleActions({
         }
       }
       : pickBy(state, (value, key) => key !== groupId)
+  },
+  COPY_LABWARE: (state, action) => {
+    const { fromContainer, toContainer } = action.payload
+    return reduce(state, (acc, ingredData, ingredId) => ({
+      ...acc,
+      [ingredId]: fromContainer in ingredData.locations
+        // this ingred has instances located in the container we're cloning,
+        // copy it into the 'toContainer' clone
+        ? {
+          ...ingredData,
+          locations: {...ingredData.locations, [toContainer]: ingredData.locations[fromContainer]}
+        }
+        // no instances in the clone parent, do nothing to this ingred
+        : ingredData
+    }), {})
   }
 }, {})
 
 const rootReducer = combineReducers({
   modeLabwareSelection,
+  copyLabwareMode,
   selectedContainer,
   selectedIngredientGroup,
   containers,
@@ -405,12 +432,15 @@ const activeModals = createSelector(
   })
 )
 
+const labwareToCopy = state => rootSelector(state).copyLabwareMode
+
 // TODO: prune selectors
 export const selectors = {
   activeModals,
   allWellMatricesById,
   loadedContainersBySlot,
   containersBySlot,
+  labwareToCopy,
   canAdd,
   wellMatrixSelectedContainer,
   numWellsSelected,

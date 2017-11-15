@@ -46,3 +46,43 @@ describe('DELETE_CONTAINER action', () => {
     })
   })
 })
+
+describe('COPY_LABWARE action', () => {
+  test('copy correct container', () => {
+    expect(containers(
+      {
+        clonePlate: {
+          type: '96-flat',
+          name: 'Samples Plate',
+          slotName: 'A2'
+        },
+        otherPlate: {
+          type: '384-flat',
+          name: 'Destination Plate',
+          slotName: 'B2'
+        }
+      },
+      {
+        type: 'COPY_LABWARE',
+        payload: {fromContainer: 'clonePlate', toContainer: 'newContainer', toSlot: 'A3'}
+      }
+    )).toEqual({
+      clonePlate: {
+        type: '96-flat',
+        name: 'Samples Plate',
+        slotName: 'A2'
+      },
+      newContainer: {
+        type: '96-flat',
+        name: 'Samples Plate',
+        slotName: 'A3'
+      },
+
+      otherPlate: {
+        type: '384-flat',
+        name: 'Destination Plate',
+        slotName: 'B2'
+      }
+    })
+  })
+})

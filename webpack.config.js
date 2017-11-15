@@ -23,6 +23,15 @@ module.exports = {
         exclude: /node_modules/
       },
       {
+        test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/,
+        use: {
+          loader: 'url-loader'
+          // options: {
+          //   limit: DATA_URL_BYTE_LIMIT
+          // }
+        }
+      },
+      {
         test: /\.css$/,
         use: [
           'style-loader',
