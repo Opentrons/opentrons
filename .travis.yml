@@ -1,0 +1,27 @@
+language: node_js
+node_js:
+  - "8.9.0"
+
+cache:
+  directories:
+    - "node_modules"
+
+script:
+  - npm test
+  - npm run lint
+  - npm run build
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: opentrons-protocol-designer
+    skip_cleanup: true
+    local-dir: dist/
+    upload-dir: $TRAVIS_BRANCH
+    acl: public_read
+    on:
+      all_branches: true
+      condition: $TRAVIS_TEST_RESULT = 0
+      repo: Opentrons/protocol-designer-prototype
+all_branches: true

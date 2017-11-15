@@ -9,7 +9,7 @@
   "scripts": {
     "test": "jest",
     "lint": "standard",
-    "build": "npm run lint && NODE_ENV=production webpack -p && cp index.html dist/",
+    "build": "NODE_ENV=production webpack -p && cp index.html dist/",
     "start": "webpack-dev-server --hot"
   },
   "private": true,
