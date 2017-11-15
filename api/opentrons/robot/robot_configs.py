@@ -12,7 +12,7 @@ import os
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 
-current_robot  = os.environ['OT_ROBOT_CONFIG']
+current_robot  = os.environ.get('OT_ROBOT_CONFIG', 'B2-5')
 
 robot_config = namedtuple(
     'robot_config',
