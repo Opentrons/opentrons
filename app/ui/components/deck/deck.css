@@ -18,18 +18,6 @@
   margin: 0 auto;
 }
 
-.btn_calibrate {
-  margin-top: 1rem;
-  font-size: 1rem;
-  padding: 0 3rem;
-  line-height: 3rem;
-  border-radius: 0.5rem;
-  font-family: 'trons';
-  text-transform: uppercase;
-  background-color: blue;
-  color: white;
-}
-
 .deck {
   box-sizing: border-box;
   padding: 1rem 2rem;
@@ -46,45 +34,23 @@
     'slot-1 slot-2 slot-3' 1fr;
 }
 
-.empty_slot,
-.slot {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.25rem;
-}
-
-.empty_slot {
-  background-color: #eee;
-  font-family: 'sans';
-  color: white;
-  font-size: 3rem;
-}
-
-.slot {
-  border: 2px solid silver;
-  background-color: #bbb;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.slot.active {
-  border: 4px solid #111;
-}
-
-.label,
-.status {
-  position: absolute;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  width: 100%;
-  height: 2rem;
+.prompt {
   text-align: center;
-  font-size: 0.75rem;
+  margin-top: 1rem;
+}
+
+.centered_prompt {
+  position: relative;
+  border-bottom: 1px solid black;
+  cursor: pointer;
+}
+
+a.btn_calibrate,
+button.btn_calibrate {
+  display: inline-block;
+  margin: 1rem;
+  font-size: 1rem;
+  padding: 0 3rem;
+  background-color: blue;
   color: white;
-  text-decoration: none;
-  line-height: 2rem;
 }

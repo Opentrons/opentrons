@@ -5,6 +5,7 @@ import {
 } from '../../robot'
 
 import CalibrateDeck from './CalibrateDeck'
+
 const mapStateToProps = (state, ownProps) => {
   const {slot} = ownProps
   return {

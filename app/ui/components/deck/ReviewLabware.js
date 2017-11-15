@@ -15,10 +15,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     currentLabware,
     labware,
-    tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-    unconfirmedTipracks: robotSelectors.getUnconfirmedTipracks(state),
-    unconfirmedLabware: robotSelectors.getUnconfirmedLabware(state),
-    labwareReviewed: robotSelectors.getLabwareReviewed(state),
     singleChannel: robotSelectors.getSingleChannel(state)
   }
 }

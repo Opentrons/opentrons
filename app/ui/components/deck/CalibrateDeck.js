@@ -1,8 +1,15 @@
 import React from 'react'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
+
 import Deck from './Deck'
 import ReviewLabware from './ReviewLabware'
-import styles from './deck.css' // Labware should have own styles once SVG wells generated
+import CalibrationPrompt from './CalibrationPrompt'
+import styles from './deck.css'
+
+CalibrateDeck.propTypes = {
+  slot: PropTypes.number.isRequired,
+  labwareReviewed: PropTypes.bool.isRequired
+}
 
 export default function CalibrateDeck (props) {
   const {labwareReviewed, slot} = props
@@ -17,6 +24,9 @@ export default function CalibrateDeck (props) {
   return (
     <section>
       <Deck slot={slot} />
+      <CalibrationPrompt slot={slot} />
     </section>
   )
 }
+
+// TODO: toggle nextlabwarelink and confirmlabwareLinks on yes action on no is a to
