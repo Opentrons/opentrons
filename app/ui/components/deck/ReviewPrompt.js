@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Button from '../Button'
 import styles from './deck.css'
+
 ReviewPrompt.propTypes = {
   setLabwareReviewed: PropTypes.func.isRequired,
   moveToLabware: PropTypes.func.isRequired,
@@ -17,9 +19,11 @@ export default function ReviewPrompt (props) {
       <p>
         Before entering Labware Setup, check that your labware is positioned correctly in the deck slots as illustrated above.
       </p>
-      <button className={styles.btn_calibrate} onClick={moveToLabware}>
+      <Button
+        style={styles.btn_calibrate}
+        onClick={moveToLabware}>
         CONTINUE MOVING TO {currentLabware.type} IN SLOT {currentLabware.slot}
-      </button>
+      </Button>
     </section>
   )
 }

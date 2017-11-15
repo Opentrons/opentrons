@@ -245,6 +245,10 @@ export function getUnconfirmedTipracks (state) {
   return getUnconfirmedLabware(state).filter((lw) => lw.isTiprack)
 }
 
+export function getNextLabware (state) {
+  return getUnconfirmedTipracks(state)[0] || getUnconfirmedLabware(state)[0]
+}
+
 export function getTipracksConfirmed (state) {
   return getUnconfirmedTipracks(state).length === 0
 }

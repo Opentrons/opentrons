@@ -3,7 +3,7 @@ import {NavLink} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {Spinner} from '../icons'
-import styles from './deck.css' // Labware should have own styles once SVG wells generated
+import styles from './labwareitem.css' // Labware should have own styles once SVG wells generated
 
 import {constants as robotConstants} from '../../robot'
 
@@ -45,7 +45,7 @@ export default function LabwareItem (props) {
 
   const isMoving = calibration === MOVING_TO_SLOT
   const isConfirmed = calibration === CONFIRMED
-  // const isUnconfirmed = calibration === UNCONFIRMED
+  const isUnconfirmed = calibration === UNCONFIRMED
   const url = `/setup-deck/${slot}`
 
   // TODO: import background image function
@@ -89,12 +89,18 @@ export default function LabwareItem (props) {
   const labwareLabel = !labwareReviewed
     ? (<div className={styles.label}>{type}</div>)
     : null
+  const confirmationMsg = (labwareReviewed && isUnconfirmed)
+    ? (<div className={styles.status}>Position Unconfirmed</div>)
+    : null
   const movingNotification = (isMoving && isCurrent)
     ? (
       <div className={styles.moving}>
         <Spinner className={styles.spinner} />
       </div>
     )
+    : null
+  const confirmationFade = (isConfirmed && isCurrent && labwareReviewed)
+    ? (<div className={styles.confirmed_fade}>Confirmed</div>)
     : null
 
   if (labwareReviewed) {
@@ -106,7 +112,9 @@ export default function LabwareItem (props) {
         activeClassName={styles.active}
         onClick={moveToLabware}
       >
+        {confirmationMsg}
         {movingNotification}
+        {confirmationFade}
       </NavLink>
     )
   }

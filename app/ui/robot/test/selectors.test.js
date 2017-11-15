@@ -24,7 +24,8 @@ const {
   getInstrumentsCalibrated,
   getLabware,
   getUnconfirmedTipracks,
-  getUnconfirmedLabware
+  getUnconfirmedLabware,
+  getNextLabware
 } = selectors
 
 describe('robot selectors', () => {
@@ -529,6 +530,30 @@ describe('robot selectors', () => {
           confirmed: false
         }
       ])
+    })
+
+    test('get next labware', () => {
+      expect(getNextLabware(state)).toEqual({
+        slot: 1,
+        id: 'A1',
+        name: 'a1',
+        type: 'a',
+        isTiprack: true,
+        calibration: constants.UNCONFIRMED,
+        confirmed: false
+      })
+
+      state[NAME].calibration.confirmedBySlot[1] = true
+
+      expect(getNextLabware(state)).toEqual({
+        slot: 9,
+        id: 'C3',
+        name: 'c3',
+        type: 'c',
+        isTiprack: false,
+        calibration: constants.UNCONFIRMED,
+        confirmed: false
+      })
     })
   })
 })
