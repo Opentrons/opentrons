@@ -4,7 +4,6 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const DEV = process.env.NODE_ENV !== 'production'
-const DATA_URL_BYTE_LIMIT = 8192
 
 const CSS_MODULE_LOADER = {
   loader: 'css-loader',
@@ -67,22 +66,12 @@ module.exports = {
   // TODO(mc, 2017-09-12): Add other font-types to the regex if we need them
   fonts: {
     test: /\.woff2?(\?v=\d+\.\d+\.\d+)?$/,
-    use: {
-      loader: 'url-loader',
-      options: {
-        limit: DATA_URL_BYTE_LIMIT
-      }
-    }
+    use: 'url-loader'
   },
 
   // common image formats (url loader)
   images: {
     test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/,
-    use: {
-      loader: 'url-loader',
-      options: {
-        limit: DATA_URL_BYTE_LIMIT
-      }
-    }
+    use: 'url-loader'
   }
 }
