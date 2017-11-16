@@ -11,7 +11,6 @@ matrix:
       sudo: false
       python: "3.5"
       env:
-        - DEPLOY_DIR="linux"
         - PUBLIC_REPO="$(git remote -v | tail -n 1 | sed s/.*opentrons\.git.*/true/g)"
       addons:
         apt:
@@ -26,8 +25,6 @@ matrix:
     # revisit OSX CI in the near future
     # - os: osx
     #   language: generic
-    #   env:
-    #     - DEPLOY_DIR="mac"
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
@@ -58,8 +55,7 @@ script:
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
   # TODO(mc, 2017-08-28): use top level `make test`
-  # TODO(mc, 2017-09-13): handle cross-platform distributables
-  - make -C app package test && make -C app dist-${TRAVIS_OS_NAME}
+  - make -C app package test && make -C app dist-osx dist-linux
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
@@ -74,11 +70,11 @@ deploy:
     bucket: ot-app-builds
     skip_cleanup: true
     local-dir: $(pwd)/app/dist
-    upload-dir: $DEPLOY_DIR
+    upload-dir: osx-linux
     acl: public_read
     on:
       condition: $TRAVIS_TEST_RESULT = 0
-      repo: OpenTrons/opentrons
+      repo: Opentrons/opentrons
       all_branches: true
 
   # Publish API to PyPI and Anaconda
