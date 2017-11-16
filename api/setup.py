@@ -49,6 +49,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
+        python_requires='>=3.5',
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,

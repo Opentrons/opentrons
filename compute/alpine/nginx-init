@@ -1,0 +1,28 @@
+#!/sbin/openrc-run
+# nginx http server start script
+
+depend() {
+  need localmount
+}
+
+start() {
+  local retval
+
+  ebegin "Starting nginx server"
+  start-stop-daemon --start \
+      --pidfile /var/run/nginx.pid \
+      --exec nginx
+  retval=$?
+  eend ${retval}
+  return ${retval}
+}
+
+stop() {
+  local retval
+
+  ebegin "Stopping nginx server"
+  start-stop-daemon --stop --pidfile /var/run/nginx.pid
+  retval=$?
+  eend ${retval}
+  return ${retval}
+}

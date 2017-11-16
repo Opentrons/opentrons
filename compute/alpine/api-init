@@ -1,0 +1,29 @@
+#!/sbin/openrc-run
+# Opentrons API server start script
+
+depend() {
+  need localmount
+}
+
+start() {
+  local retval
+
+  ebegin "Starting Opentrons API server"
+  start-stop-daemon --start \
+      --pidfile /var/run/api.pid \
+      --exec python -- \
+      -m opentrons.server.main 0.0.0.0:31950
+  retval=$?
+  eend ${retval}
+  return ${retval}
+}
+
+stop() {
+  local retval
+
+  ebegin "Stopping Opentrons API server"
+  start-stop-daemon --stop --pidfile /var/run/api.pid
+  retval=$?
+  eend ${retval}
+  return ${retval}
+}
