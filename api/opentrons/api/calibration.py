@@ -51,6 +51,19 @@ class CalibrationManager:
         inst.pick_up_tip(container._container[0])
         self._set_state('ready')
 
+    def drop_tip(self, instrument, container):
+        if not isinstance(container, Container):
+            raise ValueError(
+                'Invalid object type {0}. Expected models.Container'
+                .format(type(container)))
+
+        inst = instrument._instrument
+        log.debug('Dropping tip from {} in {} with {}'.format(
+            container.name, container.slot, instrument.name))
+        self._set_state('moving')
+        inst.drop_tip(container._container[0], home_after=False)
+        self._set_state('ready')
+
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.debug('Moving {}'.format(instrument.name))
