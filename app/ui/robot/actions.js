@@ -26,8 +26,8 @@ export const actionTypes = {
   SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
-  // HOME: makeRobotActionName('HOME'),
-  // HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  HOME: makeRobotActionName('HOME'),
+  HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
@@ -115,6 +115,20 @@ export const actions = {
 
   setLabwareReviewed (payload) {
     return {type: actionTypes.SET_LABWARE_REVIEWED, payload}
+  },
+
+  home (instrument) {
+    return makeRobotAction({
+      type: actionTypes.HOME,
+      payload: {instrument}
+    })
+  },
+
+  homeResponse (instrument) {
+    return makeRobotAction({
+      type: actionTypes.HOME_RESPONSE,
+      payload: {instrument}
+    })
   },
 
   moveToFront (instrument) {

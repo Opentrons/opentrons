@@ -11,16 +11,17 @@ import {
   UNCONFIRMED,
   MOVING_TO_SLOT,
   OVER_SLOT,
-  CONFIRMED
+  CONFIRMED,
+  HOMING,
+  HOMED
 } from '../constants'
 
 const {
   SESSION,
   DISCONNECT_RESPONSE,
   SET_LABWARE_REVIEWED,
-  // TODO(mc, 2017-10-17): implement home when api.calibration_manager can home
-  // HOME,
-  // HOME_RESPONSE,
+  HOME,
+  HOME_RESPONSE,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
@@ -50,7 +51,7 @@ const INITIAL_STATE = {
   labwareBySlot: {},
   confirmedBySlot: {},
 
-  // homeRequest: {inProgress: false, error: null},
+  homeRequest: {inProgress: false, error: null},
   moveToFrontRequest: {inProgress: false, error: null},
   probeTipRequest: {inProgress: false, error: null},
   moveToRequest: {inProgress: false, error: null},
@@ -65,6 +66,8 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case SET_LABWARE_REVIEWED: return handleSetLabwareReviewed(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
+    case HOME: return handleHome(state, action)
+    case HOME_RESPONSE: return handleHomeResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
     case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
@@ -208,6 +211,32 @@ function handleMoveToResponse (state, action) {
       [slot]: !error
         ? OVER_SLOT
         : UNCONFIRMED
+    }
+  }
+}
+
+function handleHome (state, action) {
+  const {payload: {instrument: axis}} = action
+
+  return {
+    ...state,
+    homeRequest: {inProgress: true, error: null, axis},
+    instrumentsByAxis: {...state.instrumentsByAxis, [axis]: HOMING}
+  }
+}
+
+function handleHomeResponse (state, action) {
+  const {homeRequest: {axis}} = state
+  const {payload, error} = action
+
+  return {
+    ...state,
+    homeRequest: {
+      ...state.homeRequest,
+      inProgress: false,
+      error: error
+        ? payload
+        : null
     }
   }
 }

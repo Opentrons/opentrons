@@ -29,6 +29,8 @@ export const UNCONFIRMED = 'unconfirmed'
 export const MOVING_TO_SLOT = 'moving-to-slot'
 export const OVER_SLOT = 'over-slot'
 export const CONFIRMED = 'confirmed'
+export const HOMING = 'homing'
+export const HOMED = 'homed'
 
 // deck layout
 export const INSTRUMENT_AXES = ['left', 'right']
