@@ -61,6 +61,10 @@ def log_init():
             'opentrons.server': {
                 'handlers': ['debug'],
                 'level': logging.INFO
+            },
+            'opentrons.api': {
+                'handlers': ['debug'],
+                'level': logging.DEBUG
             }
         }
     )

@@ -300,8 +300,9 @@ class Robot(object):
 
         Parameters
         ----------
-        axis : str
+        mount : str
             Specifies which axis the instruments is attached to.
+            Valid options are "left" or "right".
         instrument : Instrument
             An instance of a :class:`Pipette` to attached to the axis.
 
@@ -312,7 +313,7 @@ class Robot(object):
         ::
 
             from opentrons.instruments.pipette import Pipette
-            p200 = Pipette(axis='a')
+            p200 = Pipette(mount='left')
 
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
@@ -798,7 +799,8 @@ class Robot(object):
         """
         Stops execution of the protocol.
         """
-        raise NotImplementedError
+        self._driver.pause()
+        self.reset()
 
     def resume(self):
         """
@@ -810,6 +812,7 @@ class Robot(object):
         """
         Stops execution of both the protocol and the Smoothie board immediately
         """
+        # TODO (ben 20171116): make smoothie actions interruptable (no M400)
         raise NotImplementedError
 
     def get_serial_ports_list(self):
