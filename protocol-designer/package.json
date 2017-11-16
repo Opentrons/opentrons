@@ -1,6 +1,11 @@
 {
-  "engines": {
-    "node": "8.9.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenTrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
   },
   "name": "protocol-designer-prototype",
   "version": "1.0.0",
@@ -12,8 +17,10 @@
     "build": "NODE_ENV=production webpack -p && cp index.html dist/",
     "start": "webpack-dev-server --hot"
   },
-  "private": true,
-  "author": "Opentrons",
+  "bugs": {
+    "url": "https://github.com/OpenTrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/OpenTrons/opentrons",
   "license": "UNLICENSED",
   "standard": {
     "parser": "babel-eslint",
