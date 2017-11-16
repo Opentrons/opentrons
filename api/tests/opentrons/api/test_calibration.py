@@ -50,6 +50,29 @@ async def test_move_to_front(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+async def test_pick_up_tip(main_router, model):
+    with mock.patch.object(model.instrument._instrument, 'pick_up_tip') as pick_up_tip:  # NOQA
+        main_router.calibration_manager.pick_up_tip(
+            model.instrument,
+            model.container)
+
+        pick_up_tip.assert_called_with(model.container._container[0])
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
+async def test_home(main_router, model):
+    with mock.patch.object(model.instrument._instrument, 'home') as home:
+        main_router.calibration_manager.home(
+            model.instrument)
+
+        home.assert_called_with()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
 async def test_move_to(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
         main_router.calibration_manager.move_to(
