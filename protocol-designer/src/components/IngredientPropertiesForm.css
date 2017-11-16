@@ -1,0 +1,130 @@
+.ingredientPropertiesEntry {
+  background-color: white;
+  margin: 1em;
+  padding: 0 1.5em;
+  border: 3px solid darkgray;
+  border-radius: 15px;
+}
+
+.ingredientPropertiesEntry h1 {
+  font-size: 10pt;
+  font-weight: inherit;
+  text-transform: uppercase;
+  float: left;
+  width: 100%;
+}
+
+.ingredientPropertiesEntry h1 > * {
+  display: inline-block;
+  border-radius: 0;
+  margin: 0;
+  color: gray;
+  float: right;
+}
+
+.ingredientPropertiesEntry h1 div:first-of-type {
+  border-bottom: 1px solid gray;
+  margin-right: 1em;
+  color: black;
+  float: left;
+}
+
+.ingredientPropertiesEntry form {
+  display: inline-block;
+  width: 100%;
+}
+
+.ingredientPropertiesEntry label {
+  color: #5b5b5b;
+}
+
+.flexRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flexRow > * {
+  margin: 0.2rem;
+  border: 1px solid gray;
+  padding: 0.2rem;
+  background-color: lightgray;
+  flex: 1;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.buttonRow > * {
+  flex: calc(1/3);
+  margin: 0 0.2rem;
+}
+
+.ingredientPropertiesEntry span input, textarea {
+  /*float: right;*/
+  border: none;
+  /*font-size: 1.25rem;*/
+}
+
+.ingredientPropertiesEntry .checkbox {
+  border: none;
+  display: flex;
+  align-items: flex-end;
+}
+
+.middleRow {
+  composes: flexRow;
+  justify-content: flex-start;
+}
+
+.middleRow > * {
+  flex: calc(1/3);
+}
+
+.twoThirds {
+  flex: calc(2/3);
+}
+
+.serializeNameExample {
+  flex: calc(2/3);
+  background-color: transparent;
+  border: none;
+  color: lightgray;
+  text-align: left;
+}
+
+.checkbox input {
+  zoom: 1.75;
+  width: 1em;
+}
+
+.checkbox label {
+  flex: 1;
+  text-transform: none;
+}
+
+.ingredientPropertiesEntry textarea {
+  width: 98%;
+  height: 2em;
+}
+
+.ingredientPropertiesEntry button {
+  text-transform: none;
+  background-color: #5b5b5b;
+  color: white;
+  font-size: 16pt;
+  border-radius: 3px;
+  border: none;
+  padding: 0.2rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.deleteIngred {
+  float: right;
+}
+
+.deleteIngred::before {
+  content: url("https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/delete.png");
+  margin-right: 1rem;
+}
