@@ -34,6 +34,7 @@ cache:
   pip: true
   directories:
     - app/node_modules
+    - protocol-designer/node_modules
     - $HOME/.pyenv
     - $HOME/.cache/brew
     - .nvm
@@ -62,6 +63,9 @@ script:
   - make -C app package test && make -C app dist-${TRAVIS_OS_NAME}
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
+  # protocol designer
+  # TODO(ian, 2017-11-06): use makefile
+  - cd protocol-designer; npm install && npm run test && npm run lint && npm run build; cd ..
 
 after_success:
   - make coverage
@@ -87,6 +91,20 @@ deploy:
     script: make -C api publish
     on:
       tags: true
+
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: opentrons-protocol-designer
+    skip_cleanup: true
+    local-dir: $(pwd)/protocol-designer/dist/
+    upload-dir: $TRAVIS_BRANCH
+    acl: public_read
+    region: us-west-2
+    on:
+      condition: $TRAVIS_TEST_RESULT = 0
+      repo: Opentrons/opentrons
+      all_branches: true
 
 env:
   global:

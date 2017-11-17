@@ -1,13 +1,3 @@
-.*
-!.github
-!.gitattributes
-!.gitignore
-!.travis.yml
-!api/.coveragerc
-!api/.python-version
-!app/.babelrc
-!app/.gitignore
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
