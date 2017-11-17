@@ -22,5 +22,9 @@ COPY ./compute/data-user_storage.mount /etc/systemd/system/
 RUN systemctl enable data-user_storage.mount
 
 ENV RUNNING_ON_PI=1
+
+#port name for connecting to smoothie over serial
+ENV OT_SMOOTHIE_ID=AMA
+
 ENV INITSYSTEM on
 CMD ["/usr/src/compute/scripts/start.sh"]
