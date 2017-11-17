@@ -3,26 +3,6 @@ import PropTypes from 'prop-types'
 
 import styles from './WellToolTip.css'
 
-const WellToolTip = ({wellContent}) => (
-  <div className={styles.wellToolTip}>
-    <h1>{wellContent.name}</h1>
-    <div className={styles.infoRow}>
-      <div>
-        {wellContent.wellName}
-      </div>
-      {wellContent.individualize && <div className={styles.instanceName}>
-        {wellContent.serializeName || 'Sample'} {wellContent.ingredientNum}
-      </div>}
-      <div>
-        {wellContent.volume} uL
-      </div>
-      <div>
-        {wellContent.concentration || '-'}
-      </div>
-    </div>
-  </div>
-)
-
 WellToolTip.propTypes = {
   wellContent: PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -35,4 +15,24 @@ WellToolTip.propTypes = {
   }).isRequired
 }
 
-export default WellToolTip
+export default function WellToolTip ({wellContent}) {
+  return (
+    <div className={styles.wellToolTip}>
+      <h1>{wellContent.name}</h1>
+      <div className={styles.infoRow}>
+        <div>
+          {wellContent.wellName}
+        </div>
+        {wellContent.individualize && <div className={styles.instanceName}>
+          {wellContent.serializeName || 'Sample'} {wellContent.ingredientNum}
+        </div>}
+        <div>
+          {wellContent.volume} uL
+        </div>
+        <div>
+          {wellContent.concentration || '-'}
+        </div>
+      </div>
+    </div>
+  )
+}

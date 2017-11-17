@@ -34,7 +34,7 @@ import LabwareDropdown from '../components/LabwareDropdown.js'
 
 import CopyIcon from '../svg/CopyIcon.js'
 
-const LabwareContainer = ({
+function LabwareContainer ({
   slotName,
 
   containerId,
@@ -56,7 +56,7 @@ const LabwareContainer = ({
   setCopyLabwareMode,
   labwareToCopy,
   copyLabware
-}) => {
+}) {
   const hasName = containerName !== null
   // HACK: should use a stateful input component
   const containerNameInputId = slotName

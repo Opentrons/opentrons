@@ -2,17 +2,19 @@ import React from 'react'
 import Accordion from './Accordion.js'
 import styles from '../css/style.css'
 
-const LabwareItem = ({onContainerChoose, containerType, containerImgUrl, displayName}) => (
-  <li
-    className={styles.labwareListItem}
-    onClick={e => onContainerChoose(containerType)}
-    style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
-  >
-    {displayName}
-  </li>
-)
+function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displayName}) {
+  return (
+    <li
+      className={styles.labwareListItem}
+      onClick={e => onContainerChoose(containerType)}
+      style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
+    >
+      {displayName}
+    </li>
+  )
+}
 
-const LabwareDropdown = ({onClose, onContainerChoose}) => {
+export default function LabwareDropdown ({onClose, onContainerChoose}) {
   const labwareItemMapper = (item, key) => (
     // LabwareItem expects item = [containerType, displayName, containerImgUrl(optional)]
     <LabwareItem key={key}
@@ -71,5 +73,3 @@ const LabwareDropdown = ({onClose, onContainerChoose}) => {
     </div>
   )
 }
-
-export default LabwareDropdown

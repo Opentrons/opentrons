@@ -4,18 +4,18 @@ import classnames from 'classnames'
 import styles from '../css/style.css'
 
 // Disables onClick behavior if props.disabled is true.
-
-const Button = ({disabled, onClick, className, ...otherProps}) => (
-  <button
-    onClick={!disabled && onClick}
-    className={classnames({ [styles.disabled]: disabled }, styles.btn, className)}
-    {...otherProps}
-  />
-)
-
 Button.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func
 }
 
-export default Button
+export default function Button ({disabled, onClick, className, ...otherProps}) {
+  return (
+    <button
+      onClick={!disabled && onClick}
+      className={classnames({ [styles.disabled]: disabled }, styles.btn, className)}
+      // TODO Ian 2017-11-17 don't spread props into DOM <button>
+      {...otherProps}
+    />
+  )
+}

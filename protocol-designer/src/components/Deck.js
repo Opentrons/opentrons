@@ -9,7 +9,7 @@ import IngredientsList from '../containers/IngredientsList.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 
-const Deck = props => {
+export default function Deck (props) {
   const {
     // loadedContainers,
     activeModals,
@@ -57,5 +57,3 @@ const Deck = props => {
     </div>
   )
 }
-
-export default Deck

@@ -8,13 +8,13 @@ import About from './About'
 // with a dot in its name, not a .css file in src/
 import 'normalize.css'
 
-const App = () => (
-  <HashRouter>
-    <div className='container'>
-      <Route exact path='/' component={Home} />
-      <Route path='/about' component={About} />
-    </div>
-  </HashRouter>
-)
-
-export default App
+export default function App () {
+  return (
+    <HashRouter>
+      <div className='container'>
+        <Route exact path='/' component={Home} />
+        <Route path='/about' component={About} />
+      </div>
+    </HashRouter>
+  )
+}

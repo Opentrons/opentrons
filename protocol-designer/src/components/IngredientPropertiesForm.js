@@ -22,6 +22,21 @@ const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...o
 }
 
 class IngredientPropertiesForm extends React.Component {
+  static propTypes = {
+    onSave: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    numWellsSelected: PropTypes.number.isRequired,
+    selectedWellsMaxVolume: PropTypes.number.isRequired,
+
+    selectedIngredientProperties: PropTypes.shape({
+      name: PropTypes.string,
+      volume: PropTypes.number,
+      description: PropTypes.string,
+      groupId: PropTypes.string
+    })
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -160,21 +175,6 @@ class IngredientPropertiesForm extends React.Component {
       </div>
     )
   }
-}
-
-IngredientPropertiesForm.propTypes = {
-  onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  numWellsSelected: PropTypes.number.isRequired,
-  selectedWellsMaxVolume: PropTypes.number.isRequired,
-
-  selectedIngredientProperties: PropTypes.shape({
-    name: PropTypes.string,
-    volume: PropTypes.number,
-    description: PropTypes.string,
-    groupId: PropTypes.string
-  })
 }
 
 export default IngredientPropertiesForm

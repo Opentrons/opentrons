@@ -2,6 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 class SelectionRect extends React.Component {
+  static propTypes = {
+    // callbacks with (event, rect)
+    onSelectionMove: PropTypes.func,
+    onSelectionDone: PropTypes.func,
+
+    children: PropTypes.element
+  }
+
   constructor (props) {
     super(props)
     this.state = { positions: null }
@@ -75,14 +83,6 @@ class SelectionRect extends React.Component {
       </div>
     )
   }
-}
-
-SelectionRect.propTypes = {
-  // callbacks with (event, rect)
-  onSelectionMove: PropTypes.func,
-  onSelectionDone: PropTypes.func,
-
-  children: PropTypes.element
 }
 
 export default SelectionRect

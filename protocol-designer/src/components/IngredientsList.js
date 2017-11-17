@@ -46,43 +46,45 @@ class IngredGroupCard extends React.Component {
   }
 }
 
-const IngredIndividual = ({name, wellName, volume, concentration, canDelete, groupId, editModeIngredientGroup, deleteIngredient, ...otherProps}) => (
-  <div {...otherProps}
-    className={styles.ingredientInstanceItem}
-    style={{'--swatch-color': swatchColors(groupId)}}
-  >
-    <div>{wellName}</div>
-    <div>{name}</div>
-    <div>{volume ? volume + 'uL' : '-'}</div>
-    {/* <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
-    <div>{concentration === null ? '-' : concentration}</div>
-    {canDelete && <div className={styles.deleteIngredient} onClick={
-        e => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
-        deleteIngredient({wellName, groupId})
-      }>✕</div>}
-  </div>
-)
-
-const IngredientsList = ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) => (
-  <div className={styles.ingredientsList}>
-    <div className={styles.ingredListHeaderLabel}>
-      <div className={styles.flexRow}>
-        <div>Slot {slotName}</div>
-        <div className={styles.containerType}>{humanize(containerType)}</div>
-      </div>
-      <div className={styles.containerName}>{containerName}</div>
+function IngredIndividual ({name, wellName, volume, concentration, canDelete, groupId, editModeIngredientGroup, deleteIngredient, ...otherProps}) {
+  return (
+    <div {...otherProps}
+      className={styles.ingredientInstanceItem}
+      style={{'--swatch-color': swatchColors(groupId)}}
+    >
+      <div>{wellName}</div>
+      <div>{name}</div>
+      <div>{volume ? volume + 'uL' : '-'}</div>
+      {/* <button className={styles.editButton} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
+      <div>{concentration === null ? '-' : concentration}</div>
+      {canDelete && <div className={styles.deleteIngredient} onClick={
+          e => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
+          deleteIngredient({wellName, groupId})
+        }>✕</div>}
     </div>
+  )
+}
 
-    {ingredients.map((ingredCategoryData, i) =>
-      <IngredGroupCard key={i} {...{
-        editModeIngredientGroup,
-        deleteIngredient,
-        ingredCategoryData,
-        selected: selectedIngredientGroupId === ingredCategoryData.groupId
-      }} />)
-    }
+export default function IngredientsList ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) {
+  return (
+    <div className={styles.ingredientsList}>
+      <div className={styles.ingredListHeaderLabel}>
+        <div className={styles.flexRow}>
+          <div>Slot {slotName}</div>
+          <div className={styles.containerType}>{humanize(containerType)}</div>
+        </div>
+        <div className={styles.containerName}>{containerName}</div>
+      </div>
 
-  </div>
-)
+      {ingredients.map((ingredCategoryData, i) =>
+        <IngredGroupCard key={i} {...{
+          editModeIngredientGroup,
+          deleteIngredient,
+          ingredCategoryData,
+          selected: selectedIngredientGroupId === ingredCategoryData.groupId
+        }} />)
+      }
 
-export default IngredientsList
+    </div>
+  )
+}

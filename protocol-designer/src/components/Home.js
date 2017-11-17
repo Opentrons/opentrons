@@ -17,11 +17,11 @@ const ConnectedDeck = connect(
   }
 )(Deck)
 
-const Home = () => (
-  <div>
-    <ConnectedDeck />
-    <h2>Select labware you wish to add ingredients to</h2>
-  </div>
-)
-
-export default Home
+export default function Home () {
+  return (
+    <div>
+      <ConnectedDeck />
+      <h2>Select labware you wish to add ingredients to</h2>
+    </div>
+  )
+}
