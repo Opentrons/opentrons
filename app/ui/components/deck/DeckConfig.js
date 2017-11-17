@@ -6,12 +6,8 @@ import {
 
 import CalibrateDeck from './CalibrateDeck'
 
-const mapStateToProps = (state, ownProps) => {
-  const {slot} = ownProps
-  return {
-    slot,
-    labwareReviewed: robotSelectors.getLabwareReviewed(state)
-  }
-}
+const mapStateToProps = (state) => ({
+  labwareReviewed: robotSelectors.getLabwareReviewed(state)
+})
 
 export default connect(mapStateToProps)(CalibrateDeck)

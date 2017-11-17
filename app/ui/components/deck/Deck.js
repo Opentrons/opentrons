@@ -8,7 +8,7 @@ import {
 
 import DeckMap from './DeckMap'
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   const labware = robotSelectors.getLabware(state)
   return {
     labware,

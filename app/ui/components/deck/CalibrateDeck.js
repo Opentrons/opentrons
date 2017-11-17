@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 import Deck from './Deck'
 import ReviewLabware from './ReviewLabware'
@@ -13,18 +14,15 @@ CalibrateDeck.propTypes = {
 
 export default function CalibrateDeck (props) {
   const {labwareReviewed, slot} = props
-  if (!labwareReviewed) {
-    return (
-      <section className={styles.review_deck}>
-        <Deck slot={slot} />
-        <ReviewLabware slot={slot} />
-      </section>
-    )
-  }
+  const style = classnames({[styles.review_deck]: !labwareReviewed})
+  const Prompt = labwareReviewed
+    ? CalibrationPrompt
+    : ReviewLabware
+
   return (
-    <section>
+    <section className={style}>
       <Deck slot={slot} />
-      <CalibrationPrompt slot={slot} />
+      <Prompt slot={slot} />
     </section>
   )
 }

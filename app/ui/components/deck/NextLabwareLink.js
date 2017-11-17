@@ -9,7 +9,7 @@ import {
 
 import CalibrationLink from './CalibrationLink'
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   return {
     singleChannel: robotSelectors.getSingleChannel(state),
     nextLabware: robotSelectors.getNextLabware(state)

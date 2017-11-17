@@ -10,8 +10,9 @@ CalibrationLink.propTypes = {
 }
 
 export default function CalibrationLink (props) {
+  const style = classnames('btn', styles.btn_calibrate)
   return (
-    <Link className={classnames('btn', styles.btn_calibrate)} to={props.to} onClick={props.onClick} >
+    <Link className={style} to={props.to} onClick={props.onClick} >
       {props.children}
     </Link>
   )

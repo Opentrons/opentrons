@@ -73,35 +73,36 @@ export default function LabwareItem (props) {
   const slotStyle = type
     ? {gridArea: `slot-${slot}`, backgroundImage: `url(${containerImageURL(type, isCurrent)})`}
     : {gridArea: `slot-${slot}`}
-  const style = labwareReviewed
-  ? classnames(styles.slot, {
-    [styles.active]: isCurrent && !isMoving,
-    [styles.disabled]: isDisabled,
-    [styles.confirmed]: isConfirmed && !isCurrent
-  })
-  : styles.slot
+  let style
+  if (labwareReviewed) {
+    style = classnames(styles.slot, {
+      [styles.active]: isCurrent && !isMoving,
+      [styles.disabled]: isDisabled,
+      [styles.confirmed]: isConfirmed && !isCurrent
+    })
+  } else {
+    style = styles.slot
+  }
 
   if (!type) {
     return (
       <div style={slotStyle} className={styles.empty_slot}>{slot}</div>
     )
   }
-  const labwareLabel = !labwareReviewed
-    ? (<div className={styles.label}>{type}</div>)
-    : null
-  const confirmationMsg = (labwareReviewed && isUnconfirmed)
-    ? (<div className={styles.status}>Position Unconfirmed</div>)
-    : null
-  const movingNotification = (isMoving && isCurrent)
-    ? (
-      <div className={styles.moving}>
-        <Spinner className={styles.spinner} />
-      </div>
-    )
-    : null
-  const confirmationFade = (isConfirmed && isCurrent && labwareReviewed)
-    ? (<div className={styles.confirmed_fade}>Confirmed</div>)
-    : null
+  const labwareLabel = !labwareReviewed && (
+    <div className={styles.label}>{type}</div>
+  )
+  const confirmationMsg = labwareReviewed && isUnconfirmed && (
+    <div className={styles.status}>Position Unconfirmed</div>
+  )
+  const movingNotification = isMoving && isCurrent && (
+    <div className={styles.moving}>
+      <Spinner className={styles.spinner} />
+    </div>
+  )
+  const confirmationFade = isConfirmed && isCurrent && labwareReviewed && (
+    <div className={styles.confirmed_fade}>Confirmed</div>
+  )
 
   if (labwareReviewed) {
     return (
