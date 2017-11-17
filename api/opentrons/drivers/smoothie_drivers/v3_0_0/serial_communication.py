@@ -1,11 +1,16 @@
 import serial
 from serial.tools import list_ports
 import contextlib
+import os
 
 DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
+
+# Note: FT232R is the board id for communication over usb on UNIX systems.
+# This is set for serial communication in the Dockerfile
+smoothie_id = os.environ.get('OT_SMOOTHIE_ID', 'FT232R')
 
 ERROR_KEYWORD = b'error'
 ALARM_KEYWORD = b'ALARM'
@@ -91,10 +96,11 @@ def write_and_return(
     return response
 
 
-def connect(device_name, baudrate):
+def connect(device_name=smoothie_id, baudrate=115200):
     '''
     Creates a serial connection
     :param device_name: defaults to 'Smoothieboard'
+    :param baudrate: integer frequency for serial communication
     :return: serial.Serial connection
     '''
     smoothie_port = get_ports(device_name=device_name)[0]
