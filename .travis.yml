@@ -55,7 +55,7 @@ script:
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
   # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C app package test && make -C app dist-osx dist-linux
+  - make -C app package test && make -C app dist-posix
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
@@ -70,7 +70,7 @@ deploy:
     bucket: ot-app-builds
     skip_cleanup: true
     local-dir: $(pwd)/app/dist
-    upload-dir: osx-linux
+    upload-dir: ci-builds
     acl: public_read
     on:
       condition: $TRAVIS_TEST_RESULT = 0
