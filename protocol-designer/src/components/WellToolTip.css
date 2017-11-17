@@ -2,10 +2,8 @@
   position: absolute;
   font-size: 1rem;
   text-align: left;
-
   background-color: white;
   border: 1px solid gray;
-
   padding: 0.5em;
   z-index: 1;
   top: 50px;

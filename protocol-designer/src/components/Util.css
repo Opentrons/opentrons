@@ -2,59 +2,59 @@
 @value blue: #006FFF;
 @value teal: #05C1B3;
 @value mustard: #FFD252;
-
 @value darkGrey: #4a4a4a;
 @value medGrey: #d8d8d8;
 @value lightGrey: #eee;
-
 @value plateBg: #9b9b9b;
 
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700');
 
 @font-face {
-    font-family: 'trons';
-    /*src: url('../../fonts/Geogtq-Rg-webfont.woff2');*/
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'trons';
+
+  /* src: url('../../fonts/Geogtq-Rg-webfont.woff2'); */
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'sans';
-    /*src: url('../../fonts/OpenSans-Regular-webfont.woff');*/
-    font-weight: 200;
-    font-style: normal;
+  font-family: 'sans';
+
+  /* src: url('../../fonts/OpenSans-Regular-webfont.woff'); */
+  font-weight: 200;
+  font-style: normal;
 }
 
-.title{
-	font-family: 'Open Sans', sans-serif;
-	font-weight: 400;
-	color:#000;
+.title {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  color: #000;
 }
 
-.btn{
-	display:inline-block;
-	border-radius: 6px;
-	line-height: 30px;
-	padding:.2rem 1rem .1rem;
-	color:white;
-	background-color: blue;
-	border:none;
-	font-family:'AkkoPro-Medium', 'trons', sans-serif;
-	font-weight:500;
-	font-size:.875rem;
-	min-width: 10rem;
-	max-width:14.5rem;
+.btn {
+  display: inline-block;
+  border-radius: 6px;
+  line-height: 30px;
+  padding: 0.2rem 1rem 0.1rem;
+  color: white;
+  background-color: blue;
+  border: none;
+  font-family: 'AkkoPro-Medium', 'trons', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  min-width: 10rem;
+  max-width: 14.5rem;
   max-height: 4rem;
-	text-align: center;
-	text-decoration: none;
-	margin-right: .5rem;
+  text-align: center;
+  text-decoration: none;
+  margin-right: 0.5rem;
 }
 
-.btn:hover{
-	cursor:pointer;
+.btn:hover {
+  cursor: pointer;
 }
 
-.disabled{
-	background-color: medGrey;
-	pointer-events: none;
+.disabled {
+  background-color: medGrey;
+  pointer-events: none;
 }

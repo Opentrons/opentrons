@@ -34,6 +34,7 @@ label {
   display: flex;
   align-items: baseline;
 }
+
 .ingredListHeaderLabel div {
   text-align: left;
   font-size: 1em;
@@ -51,7 +52,8 @@ label {
 
 .ingredientsList section {
   margin: 12pt;
-  /*box-shadow: 0px 0px 10px 3px darkgrey;*/
+
+  /* box-shadow: 0px 0px 10px 3px darkgrey; */
   border-radius: 0;
   padding: 0.2em 1em;
 }
@@ -99,9 +101,11 @@ label {
   color: gray;
 }
 
-.deleteIngredient:hover, .editButton:hover, section.selected .editButton {
+.deleteIngredient:hover,
+.editButton:hover,
+section.selected .editButton {
   color: white;
-  background-color: lightgray
+  background-color: lightgray;
 }
 
 /* --------- */
@@ -147,18 +151,19 @@ label {
   text-align: center;
 }
 
-/*.ingredientInlineDetail input::after {
+/* .ingredientInlineDetail input::after {
   content: 'µL';
   position: absolute;
   padding-right: 0.2em;
-}*/
+} */
 
 /* TODO: reuse this */
 
 .circle {
   border-radius: 1000px;
   background-color: gray; /* <-- set inline */
-  /*background-color: --color-swatch;*/
+
+  /* background-color: --color-swatch; */
   height: 0.8rem;
   width: 0.8rem;
   margin-right: 0.1rem;
@@ -166,7 +171,7 @@ label {
 
 /* ------- */
 
-/*.leftPill {
+/* .leftPill {
   padding: 2px 0 2px 0.5rem;
   background-color: lightgray;
   border-top-right-radius: 0;
@@ -187,15 +192,16 @@ label {
 .innerList {
   overflow-y: scroll;
   height: 15vh;
-}*/
+} */
 
 /* ------- */
 
 .ingredientInstanceItem {
   display: flex;
-  /*width: 100%;
+
+  /* width: 100%;
   padding-top: 2px;
-  padding-bottom: 2px;*/
+  padding-bottom: 2px; */
   flex-direction: row;
   justify-content: space-between;
   border-radius: 0;
@@ -211,7 +217,7 @@ label {
 }
 
 .ingredientInstanceItem div:first-child {
-  /* Well name */
+  /*    Well name */
   margin-left: 0.25rem;
   color: gray;
   flex: 0.5;
@@ -232,7 +238,6 @@ label {
 .singleIngred {
   margin: 0 1rem;
   border: 2px solid gray;
-
 }
 
 .singleIngred label::before {
@@ -244,7 +249,7 @@ label {
   height: 0.8rem;
   width: 0.8rem;
   margin-left: 1rem;
-  margin-right:0.25rem;
+  margin-right: 0.25rem;
 }
 
 .singleIngred * {
