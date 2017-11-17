@@ -64,7 +64,7 @@ script:
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
   # protocol designer
-  # TODO (ian 2017116) use makefile
+  # TODO(ian, 2017-11-06): use makefile
   - cd protocol-designer; npm install && npm run test && npm run lint && npm run build; cd ..
 
 after_success:
