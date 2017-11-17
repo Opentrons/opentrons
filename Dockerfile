@@ -6,11 +6,11 @@ FROM resin/raspberrypi3-alpine:3.6
 
 # enable container init system.
 ENV INITSYSTEM on
-ENV RUNNING_ON_PI=1
+ENV RUNNING_ON_PI 1
+ENV DBUS_SYSTEM_BUS_ADDRESS unix:path=/host/run/dbus/system_bus_socket
 
 RUN apk add --update \
       gnupg \
-      dhcp \
       gcc \
       musl-dev \
       make \
@@ -51,6 +51,7 @@ RUN rc-update add api && \
 
 COPY ./compute/alpine/conf/rc.conf /etc/rc.conf
 COPY ./compute/alpine/conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./compute/alpine/conf/interfaces /etc/network/interfaces
 
 COPY ./compute/alpine/static /usr/share/nginx/html
 
