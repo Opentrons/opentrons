@@ -5,11 +5,11 @@ ENV INITSYSTEM on
 RUN apk add --update \
   gcc \
   musl-dev \
-  openssl \
   make \
   nginx \
   python3 \
   python3-dev \
+  gnupg \
   dhcp \
   && rm -rf /var/cache/apk/*
 
