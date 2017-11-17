@@ -1,6 +1,6 @@
-var webpack = require('webpack')
+const webpack = require('webpack')
 const GoogleFontsPlugin = require('google-fonts-webpack-plugin')
-var path = require('path')
+const path = require('path')
 
 module.exports = {
   entry: [

@@ -14,10 +14,7 @@ import set from 'lodash/set' // <- careful, this mutates the object
 import { containerDims, toWellName, getMaxVolumes, wellKeyToXYList } from '../constants.js'
 import { uuid } from '../utils.js'
 
-const sortedSlotnames = [].concat.apply( // flatten
-  [],
-  [1, 2, 3].map(num => ['A', 'B', 'C', 'D', 'E'].map(letter => letter + num))
-)
+const sortedSlotnames = ['A1', 'B1', 'C1', 'D1', 'E1', 'A2', 'B2', 'C2', 'D2', 'E2', 'A3', 'B3', 'C3', 'D3', 'E3']
 
 // UTILS
 
