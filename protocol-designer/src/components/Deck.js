@@ -23,21 +23,21 @@ export default function Deck (props) {
 
       {/* Ingredient selection modal. TODO: move out of Deck to Home... */}
       {activeModals.ingredientSelection && activeModals.ingredientSelection.slotName &&
-        <div className={styles.ingredientModal}>
+        <div className={styles.ingredient_modal}>
 
-          <div className={styles.ingredientPanelSidebar}>
+          <div className={styles.ingredient_panel_sidebar}>
             <IngredientsList />
           </div>
 
-          <div className={styles.ingredientPanelContent}>
-            <div className={styles.topBar}>
+          <div className={styles.ingredient_panel_content}>
+            <div className={styles.top_bar}>
               <div className={styles.info}>Drag to select multiple wells</div>
               <div className={styles.close} onClick={e => closeIngredientSelector()}>
                 <p>Back to Deck Map</p>
                 <img src='https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/back.png' />
               </div>
             </div>
-            <div className={styles.containerDetail}>
+            <div className={styles.container_detail}>
               <SelectablePlate showLabels selectable />
             </div>
 

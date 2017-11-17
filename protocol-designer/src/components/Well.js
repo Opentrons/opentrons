@@ -26,7 +26,7 @@ export default function Well ({x, y, wellContent, selectable, ...otherProps}) {
   return (
     <div
       className={cx(
-        styles.wellRound,
+        styles.well_round,
         {[styles.selected]:
           selected,
           [styles.preselected]: preselected,
@@ -47,6 +47,6 @@ export default function Well ({x, y, wellContent, selectable, ...otherProps}) {
       >
       {/* TODO: hovered prop */}
       {hovered && isFilled && <WellToolTip wellContent={wellContent} />}
-      <div className={styles.innerWell} /></div>
+      <div className={styles.inner_well} /></div>
   )
 }

@@ -1,4 +1,4 @@
-.wellToolTip {
+.well_tool_tip {
   position: absolute;
   font-size: 1rem;
   text-align: left;
@@ -9,22 +9,22 @@
   top: 50px;
 }
 
-.wellToolTip h1 {
+.well_tool_tip h1 {
   font-size: 1.5em;
   margin: 0;
 }
 
-.infoRow {
+.info_row {
   display: flex;
 }
 
-.infoRow * {
+.info_row * {
   color: gray;
   width: auto;
   white-space: nowrap;
   margin: 0 1em;
 }
 
-.instanceName {
+.instance_name {
   color: black;
 }

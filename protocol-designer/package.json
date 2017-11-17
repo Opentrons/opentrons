@@ -29,6 +29,9 @@
     ]
   },
   "stylelint": {
+    "rules": {
+      "selector-class-pattern": "^[a-z0-9_]+$"
+    },
     "extends": [
       "stylelint-config-standard",
       "stylelint-config-css-modules"

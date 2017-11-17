@@ -64,9 +64,9 @@ function LabwareContainer ({
   const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
 
   return (
-    <div className={styles.deckSlot}>
+    <div className={styles.deck_slot}>
 
-      {!hasName && <div className={styles.containerOverlayNameIt}>
+      {!hasName && <div className={styles.container_overlay_name_it}>
         <label>Name this labware:</label>
         <input id={containerNameInputId}
           placeholder={humanize(containerType)}
@@ -91,14 +91,14 @@ function LabwareContainer ({
       }
 
       {containerType && // if there's no containerType, assume it's empty
-        <div className={styles.containerOverlay}>
+        <div className={styles.container_overlay}>
 
-          {canAddIngreds && <div className={styles.containerOverlayAddIngred}
+          {canAddIngreds && <div className={styles.container_overlay_add_ingred}
             onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
             Add Ingredients
           </div>}
 
-          <div className={styles.containerOverlayCopy}
+          <div className={styles.container_overlay_copy}
             onClick={() => setCopyLabwareMode(containerId)}
           >
             <div>Copy Labware</div>
@@ -106,7 +106,7 @@ function LabwareContainer ({
             <CopyIcon style={{width: '20px', height: '20px'}} />
           </div>
 
-          <div className={styles.containerOverlayRemove}
+          <div className={styles.container_overlay_remove}
             style={canAddIngreds ? {} : {bottom: 0, position: 'absolute'}}
             onClick={() =>
               window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
@@ -120,9 +120,9 @@ function LabwareContainer ({
       {containerType
         ? (
           <div>
-            <div className={styles.nameOverlay}>
+            <div className={styles.name_overlay}>
               <div>{humanize(containerType)}</div>
-              <div className={styles.containerName}>{containerName}</div>
+              <div className={styles.container_name}>{containerName}</div>
             </div>
             {nonFillableContainers.includes(containerType)
               ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
@@ -138,8 +138,8 @@ function LabwareContainer ({
           onContainerChoose={containerType => createContainer({slotName, containerType})}
         />
         : (labwareToCopy
-            ? <div className={styles.addLabware} onClick={() => copyLabware(slotName)}>Place Copy</div>
-            : <div className={styles.addLabware} onClick={e => openLabwareSelector({slotName})}>
+            ? <div className={styles.add_labware} onClick={() => copyLabware(slotName)}>Place Copy</div>
+            : <div className={styles.add_labware} onClick={e => openLabwareSelector({slotName})}>
             Add Labware
           </div>
         )

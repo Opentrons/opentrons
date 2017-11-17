@@ -53,8 +53,8 @@ class Plate extends React.Component {
     const { showLabels, className, transpose, wellMatrix, Well, cssFillParent, ...otherProps } = this.props
 
     return (
-      <section className={cssFillParent ? styles.fillParent : styles.aspect_ratio}>
-        <div className={styles.layoutWrapper}>
+      <section className={cssFillParent ? styles.fill_parent : styles.aspect_ratio}>
+        <div className={styles.layout_wrapper}>
           <div {...otherProps}
             className={classnames(styles[className], styles.plate)}
           >

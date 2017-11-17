@@ -5,7 +5,7 @@ import styles from '../css/style.css'
 function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displayName}) {
   return (
     <li
-      className={styles.labwareListItem}
+      className={styles.labware_list_item}
       onClick={e => onContainerChoose(containerType)}
       style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
     >
@@ -26,7 +26,7 @@ export default function LabwareDropdown ({onClose, onContainerChoose}) {
   )
 
   return (
-    <div className={styles.labwareDropdown}>
+    <div className={styles.labware_dropdown}>
       <label>Labware Type</label>
       <div className='close' onClick={onClose}>X</div>
       <ul>

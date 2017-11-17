@@ -23,12 +23,12 @@
   cursor: default;
 }
 
-.fillParent {
+.fill_parent {
   background-color: white;
   user-select: none;
 }
 
-.layoutWrapper {
+.layout_wrapper {
   box-sizing: border-box;
   position: absolute;
   top: 0;

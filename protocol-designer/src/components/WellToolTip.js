@@ -17,13 +17,13 @@ WellToolTip.propTypes = {
 
 export default function WellToolTip ({wellContent}) {
   return (
-    <div className={styles.wellToolTip}>
+    <div className={styles.well_tool_tip}>
       <h1>{wellContent.name}</h1>
-      <div className={styles.infoRow}>
+      <div className={styles.info_row}>
         <div>
           {wellContent.wellName}
         </div>
-        {wellContent.individualize && <div className={styles.instanceName}>
+        {wellContent.individualize && <div className={styles.instance_name}>
           {wellContent.serializeName || 'Sample'} {wellContent.ingredientNum}
         </div>}
         <div>

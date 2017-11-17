@@ -1,4 +1,4 @@
-.ingredientPropertiesEntry {
+.ingredient_properties_entry {
   background-color: white;
   margin: 1em;
   padding: 0 1.5em;
@@ -6,7 +6,7 @@
   border-radius: 15px;
 }
 
-.ingredientPropertiesEntry h1 {
+.ingredient_properties_entry h1 {
   font-size: 10pt;
   font-weight: inherit;
   text-transform: uppercase;
@@ -14,7 +14,7 @@
   width: 100%;
 }
 
-.ingredientPropertiesEntry h1 > * {
+.ingredient_properties_entry h1 > * {
   display: inline-block;
   border-radius: 0;
   margin: 0;
@@ -22,28 +22,28 @@
   float: right;
 }
 
-.ingredientPropertiesEntry h1 div:first-of-type {
+.ingredient_properties_entry h1 div:first-of-type {
   border-bottom: 1px solid gray;
   margin-right: 1em;
   color: black;
   float: left;
 }
 
-.ingredientPropertiesEntry form {
+.ingredient_properties_entry form {
   display: inline-block;
   width: 100%;
 }
 
-.ingredientPropertiesEntry label {
+.ingredient_properties_entry label {
   color: #5b5b5b;
 }
 
-.flexRow {
+.flex_row {
   display: flex;
   justify-content: space-between;
 }
 
-.flexRow > * {
+.flex_row > * {
   margin: 0.2rem;
   border: 1px solid gray;
   padding: 0.2rem;
@@ -51,17 +51,17 @@
   flex: 1;
 }
 
-.buttonRow {
+.button_row {
   display: flex;
   justify-content: space-between;
 }
 
-.buttonRow > * {
+.button_row > * {
   flex: calc(1 / 3);
   margin: 0 0.2rem;
 }
 
-.ingredientPropertiesEntry span input,
+.ingredient_properties_entry span input,
 textarea {
   /* float: right; */
   border: none;
@@ -69,26 +69,26 @@ textarea {
   /* font-size: 1.25rem; */
 }
 
-.ingredientPropertiesEntry .checkbox {
+.ingredient_properties_entry .checkbox {
   border: none;
   display: flex;
   align-items: flex-end;
 }
 
-.middleRow {
-  composes: flexRow;
+.middle_row {
+  composes: flex_row;
   justify-content: flex-start;
 }
 
-.middleRow > * {
+.middle_row > * {
   flex: calc(1 / 3);
 }
 
-.twoThirds {
+.two_thirds {
   flex: calc(2 / 3);
 }
 
-.serializeNameExample {
+.serialize_name_example {
   flex: calc(2 / 3);
   background-color: transparent;
   border: none;
@@ -106,12 +106,12 @@ textarea {
   text-transform: none;
 }
 
-.ingredientPropertiesEntry textarea {
+.ingredient_properties_entry textarea {
   width: 98%;
   height: 2em;
 }
 
-.ingredientPropertiesEntry button {
+.ingredient_properties_entry button {
   text-transform: none;
   background-color: #5b5b5b;
   color: white;
@@ -122,11 +122,11 @@ textarea {
   margin-bottom: 0.5rem;
 }
 
-.deleteIngred {
+.delete_ingred {
   float: right;
 }
 
-.deleteIngred::before {
+.delete_ingred::before {
   content: url("https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/delete.png");
   margin-right: 1rem;
 }
