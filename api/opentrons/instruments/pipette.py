@@ -222,7 +222,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='arc'):
+    def move_to(self, location, strategy='arc', low_power_z=False):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -243,6 +243,11 @@ class Pipette:
             "direct" strategies will simply move in a straight line from
             the current position
 
+        low_power_z : bool
+            Setting this to True will cause the pipette to move at a low power
+            setting **in the Z axis only**, primarily to prevent damage to the
+            pipette in case of collision during calibration.
+
         Returns
         -------
 
@@ -252,7 +257,11 @@ class Pipette:
             return self
 
         self._associate_placeable(location)
-        self.robot.move_to(location, instrument=self, strategy=strategy)
+        self.robot.move_to(
+            location,
+            instrument=self,
+            strategy=strategy,
+            low_power_z=low_power_z)
 
         return self
 
@@ -723,7 +732,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3):
+    def pick_up_tip(self, location=None, presses=3, low_power_z=False):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -739,6 +748,16 @@ class Pipette:
             The :any:`Placeable` (:any:`Well`) to perform the pick_up_tip.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
+        presses : :any:int
+            The number of times to lower and then raise the pipette when
+            picking up a tip, to ensure a good seal (0 [zero] will result in
+            the pipette hovering over the tip but not picking it up--generally
+            not desireable, but could be used for dry-run)
+        low_power_z: : :any:bool
+            The power setting for picking up a tip. Should be False for normal
+            operation. Should be set to True for calibration where it is
+            possible for the pipette to collide with the tip rack, which could
+            damate the pipette.
 
         Returns
         -------
@@ -789,7 +808,11 @@ class Pipette:
                 self.move_to(
                     self.current_tip().top(tip_plunge),
                     strategy='direct')
-                self.move_to(self.current_tip().top(0), strategy='direct')
+                # add power setting here
+                self.move_to(
+                    self.current_tip().top(0),
+                    strategy='direct',
+                    low_power_z=low_power_z)
             self._add_tip(self.tip_length)
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
             return self
@@ -1411,7 +1434,7 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    def _move(self, pose_tree, x=None, y=None, z=None):
+    def _move(self, pose_tree, x=None, y=None, z=None, low_power_z=False):
         current_x, current_y, current_z = pose_tracker.absolute(
             pose_tree,
             self)
@@ -1427,8 +1450,14 @@ class Pipette:
 
         x, y, z = x and x - dx, y and y - dy, z and z - dz
 
-        pose_tree = self.robot.gantry.move(pose_tree, x=x, y=y)
-        pose_tree = self.instrument_mover.move(pose_tree, z=z)
+        pose_tree = self.robot.gantry.move(
+            pose_tree,
+            x=x,
+            y=y)
+        pose_tree = self.instrument_mover.move(
+            pose_tree,
+            z=z,
+            low_power_z=low_power_z)
 
         return pose_tree
 
