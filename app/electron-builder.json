@@ -28,7 +28,6 @@
   },
   "mac": {
     "target": [
-      "dmg",
       "zip"
     ],
     "category": "productivity"

@@ -47,5 +47,5 @@ deploy:
     secret_access_key: $(AWS_SECRET_KEY)
     bucket: ot-app-builds
     set_public: true
-    folder: win
+    folder: ci-builds
     artifact: OTAppWin
