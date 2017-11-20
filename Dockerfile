@@ -1,13 +1,16 @@
 # Use this for local development
-FROM resin/amd64-alpine:3.6
+# FROM resin/amd64-alpine:3.6
 
 # Use this for running on a robot
-# FROM resin/raspberrypi3-alpine:3.6
+FROM resin/raspberrypi3-alpine:3.6
 
 # enable container init system.
 ENV INITSYSTEM on
 ENV RUNNING_ON_PI 1
 ENV DBUS_SYSTEM_BUS_ADDRESS unix:path=/host/run/dbus/system_bus_socket
+
+RUN mkdir -p /data/packages/
+ENV PYTHONPATH /data/packages/
 
 RUN apk add --update \
       avahi \

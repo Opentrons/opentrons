@@ -33,8 +33,7 @@ INSTALL_REQUIRES = [
     'pyserial==3.2.1',
     'aiohttp==2.3.2',
     'numpy==1.13.0',
-    'urwid==1.3.1',
-    'dbus-python==1.2.4']
+    'urwid==1.3.1']
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
