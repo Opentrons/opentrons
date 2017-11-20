@@ -40,6 +40,9 @@ start() {
   local iface= ret=1
   ebegin "Starting networking"
 
+  # Override hostname with resin's device name
+  hostname $RESIN_DEVICE_NAME_AT_INIT
+
   # Enable ipv6 networking
   modprobe ipv6
   echo "ipv6" >> /etc/modules
