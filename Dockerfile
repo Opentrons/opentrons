@@ -7,7 +7,6 @@ FROM resin/raspberrypi3-alpine:3.6
 # enable container init system.
 ENV INITSYSTEM on
 ENV RUNNING_ON_PI 1
-ENV DBUS_SYSTEM_BUS_ADDRESS unix:path=/host/run/dbus/system_bus_socket
 
 RUN mkdir -p /data/packages/
 ENV PYTHONPATH /data/packages/
@@ -44,13 +43,15 @@ COPY ./compute/alpine/services/updates /etc/init.d/
 COPY ./compute/alpine/services/networking /etc/init.d/
 
 COPY ./compute/alpine/services/avahi/api.service /etc/avahi/services/
+RUN rm /etc/avahi/services/ssh.service
 
 COPY ./compute/alpine/scripts/* /usr/local/bin/
 COPY ./compute/scripts/announce_mdns.py /usr/local/bin/
 
 RUN rc-update add api && \
     rc-update add nginx && \
-    rc-update add updates
+    rc-update add updates && \
+    rc-update add avahi-daemon
 
 COPY ./compute/alpine/conf/rc.conf /etc/rc.conf
 COPY ./compute/alpine/conf/nginx.conf /etc/nginx/nginx.conf
