@@ -39,7 +39,11 @@ find_running_ifaces() {
 start() {
   local iface= ret=1
   ebegin "Starting networking"
+
+  # Enable ipv6 networking
+  modprobe ipv6
   echo "ipv6" >> /etc/modules
+
   eindent
   for iface in $(find_ifaces); do
     local r=0
