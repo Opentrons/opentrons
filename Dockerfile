@@ -40,6 +40,7 @@ COPY ./compute/alpine/services/api /etc/init.d/api
 COPY ./compute/alpine/services/nginx /etc/init.d/nginx
 COPY ./compute/alpine/services/mdns-advertiser /etc/init.d/mdns-advertiser
 COPY ./compute/alpine/services/updates /etc/init.d/updates
+COPY ./compute/alpine/services/networking /etc/init.d/networking
 
 COPY ./compute/alpine/scripts/* /usr/local/bin/
 COPY ./compute/scripts/announce_mdns.py /usr/local/bin/

@@ -1,4 +1,13 @@
+# modprobe ipv6
+# echo "ipv6" >> /etc/modules
+
+auto lo
+iface lo inet loopback
+
 auto eth0
-iface eth0 inet static
-    address 169.254.1.1
-    netmask 255.255.0.0
+
+# https://en.wikipedia.org/wiki/IPv6#Link_local_address
+iface eth0 inet6 manual
+        pre-up echo 1 > /proc/sys/net/ipv6/conf/eth0/accept_ra
+
+iface eth0 inet dhcp
