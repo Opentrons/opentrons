@@ -88,12 +88,31 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles PICKUP_AND_HOME_RESPONSE success', () => {
+  test('handles PICKUP_AND_HOME_RESPONSE action', () => {
+    const state = {
+      calibration: {
+        pickupRequest: {inProgress: true, error: null, slot: 5},
+        labwareBySlot: {5: constants.PICKING_UP}
+      }
+    }
 
-  })
+    const success = {type: actionTypes.PICKUP_AND_HOME_RESPONSE}
 
-  test('handles PICKUP_AND_HOME_RESPONSE failure', () => {
+    const failure = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
 
+    expect(reducer(state, success).calibration).toEqual({
+      pickupRequest: {inProgress: false, error: null, slot: 5},
+      labwareBySlot: {5: constants.HOMED}
+    })
+
+    expect(reducer(state, failure).calibration).toEqual({
+      pickupRequest: {inProgress: false, error: new Error('AH'), slot: 5},
+      labwareBySlot: {5: constants.UNCONFIRMED}
+    })
   })
 
   test('handles MOVE_TO_FRONT action', () => {

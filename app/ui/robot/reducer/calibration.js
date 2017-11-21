@@ -12,8 +12,8 @@ import {
   MOVING_TO_SLOT,
   OVER_SLOT,
   CONFIRMED,
-  PICKING_UP
-  // HOMED
+  PICKING_UP,
+  HOMED
 } from '../constants'
 
 const {
@@ -21,7 +21,7 @@ const {
   DISCONNECT_RESPONSE,
   SET_LABWARE_REVIEWED,
   PICKUP_AND_HOME,
-  // HOME_RESPONSE,
+  PICKUP_AND_HOME_RESPONSE,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
@@ -67,6 +67,8 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
     case PICKUP_AND_HOME: return handlePickupAndHome(state, action)
+    case PICKUP_AND_HOME_RESPONSE:
+      return handlePickupAndHomeResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
     case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
@@ -224,21 +226,27 @@ function handlePickupAndHome (state, action) {
   }
 }
 
-// function handleHomeResponse (state, action) {
-//   const {homeRequest: {axis}} = state
-//   const {payload, error} = action
+function handlePickupAndHomeResponse (state, action) {
+  const {pickupRequest: {slot}} = state
+  const {payload, error} = action
 
-//   return {
-//     ...state,
-//     homeRequest: {
-//       ...state.homeRequest,
-//       inProgress: false,
-//       error: error
-//         ? payload
-//         : null
-//     }
-//   }
-// }
+  return {
+    ...state,
+    pickupRequest: {
+      ...state.pickupRequest,
+      inProgress: false,
+      error: error
+        ? payload
+        : null
+    },
+    labwareBySlot: {
+      ...state.labwareBySlot,
+      [slot]: error
+        ? UNCONFIRMED
+        : HOMED
+    }
+  }
+}
 
 function handleJog (state, action) {
   return {...state, jogRequest: {inProgress: true, error: null}}
