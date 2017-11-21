@@ -246,4 +246,18 @@ def model(robot):
         )
 
 
+@pytest.fixture
+def smoothie(monkeypatch):
+    from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import \
+         SmoothieDriver_3_0_0 as SmoothieDriver
+    from opentrons.robot import robot_configs
+
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    driver = SmoothieDriver(robot_configs.load())
+    driver.connect()
+    yield driver
+    driver.disconnect()
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
+
 setup_testing_env()

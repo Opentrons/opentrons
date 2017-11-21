@@ -6,10 +6,12 @@ import asyncio
 import urwid
 from numpy.linalg import inv
 from numpy import dot, array, insert
+from opentrons.robot import robot_configs
 from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
 from solve import solve
 
-driver = SmoothieDriver_3_0_0()
+config = robot_configs.load()
+driver = SmoothieDriver_3_0_0(config=config)
 
 # Distance increments for jog
 steps = [0.25, 0.5, 1, 5, 10, 20, 40, 80]
@@ -29,8 +31,6 @@ current_position = (0, 0, 0)
 # The actual calibration represents end of a pipette
 # without tip on
 TIP_LENGTH = 47
-# Smoothie Z value when Deck's Z=0
-Z_OFFSET = 4.5
 
 # Reference point being calibrated
 point_number = 0
@@ -56,15 +56,13 @@ test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
         (330.14, 222.78, TIP_LENGTH),       # Corner of 9
     ]
 
-# World > Smoothie XY-plane transformation
-# Gets updated when you press SPACE after calibrating all points
-# Defaulted to values that would bring the robot close to test
-# point when 1, 2 or 3 is pressed
-XY = \
-    array([
-        [ 1.00, 0.00, -35.23],   # NOQA
-        [-0.01, 1.00,  -1.81],   # NOQA
-        [ 0.00, 0.00,   1.00]])  # NOQA
+
+T = config.gantry_calibration
+XY = None
+
+# 3rd row, 4th column corresponds to Z-shift in
+# heterogeneous 4x4 matrix T
+Z_OFFSET = T[2][3]
 
 
 # Add fixed Z offset which is known so we don't have to calibrate for height
@@ -75,9 +73,6 @@ def add_z(XY):
         2,
         [0, 0, 1, Z_OFFSET],
         axis=0)
-
-
-T = add_z(XY)
 
 
 def current_step():
@@ -147,9 +142,6 @@ key_mappings = {
 
 def key_pressed(key):
     global current_position, current_pipette, step_index, point_number, XY, T
-
-    if not isinstance(key, str):  # mouse clicked?
-        return
 
     if key == 'z':
         current_pipette = left if current_pipette == right else right
