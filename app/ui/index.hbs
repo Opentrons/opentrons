@@ -14,7 +14,7 @@
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-T2569M8');</script>
+  })(window,document,'script','{{htmlWebpackPlugin.options.gtmConfig.DATA_LAYER_NAME}}','{{htmlWebpackPlugin.options.gtmConfig.ID}}');</script>
   {{! End Google Tag Manager }}
 
   {{! Intercom }}
@@ -24,7 +24,7 @@
 
 <body>
   {{! Google Tag Manager (noscript) }}
-  <noscript><iframe src='https://www.googletagmanager.com/ns.html?id=GTM-T2569M8' height='0' width='0' style='display:none;visibility:hidden'></iframe></noscript>
+  <noscript><iframe src='https://www.googletagmanager.com/ns.html?id={{htmlWebpackPlugin.options.gtmConfig.ID}}' height='0' width='0' style='display:none;visibility:hidden'></iframe></noscript>
   {{! End Google Tag Manager (noscript) }}
 
   <div id='root'></div>

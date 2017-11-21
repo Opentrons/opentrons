@@ -25,12 +25,24 @@ import {
   apiClientMiddleware as robotApiMiddleware
 } from './robot'
 
+// analytics state
+import {
+  NAME as ANALYTICS_NAME,
+  reducer as analyticsReducer,
+  middleware as analyticsMiddleware
+} from './analytics'
+
+// analytics events map
+// in a separate file for separation of concerns / DI / cicular dep prevention
+import analyticsEventsMap from './analytics/events-map'
+
 // components
 import App from './components/App'
 
 const reducer = combineReducers({
   [INTERFACE_NAME]: interfaceReducer,
   [ROBOT_NAME]: robotReducer,
+  [ANALYTICS_NAME]: analyticsReducer,
   router: routerReducer
 })
 
@@ -38,6 +50,7 @@ const history = createHistory()
 
 const middleware = applyMiddleware(
   robotApiMiddleware,
+  analyticsMiddleware(analyticsEventsMap),
   routerMiddleware(history),
   // TODO(mc): log to file instead of console in prod
   createLogger()

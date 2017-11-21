@@ -1,10 +1,11 @@
 // robot actions and action types
 // action helpers
 import {makeActionName} from '../util'
+import {tagAction as tagForAnalytics} from '../analytics'
 import {_NAME as NAME} from './constants'
 
 const makeRobotActionName = (action) => makeActionName(NAME, action)
-const makeRobotAction = (action) => ({...action, meta: {robotCommand: true}})
+const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 export const actionTypes = {
   // discovery, connect, and disconnect
@@ -55,7 +56,7 @@ export const actionTypes = {
 
 export const actions = {
   discover () {
-    return makeRobotAction({type: actionTypes.DISCOVER})
+    return tagForRobotApi({type: actionTypes.DISCOVER})
   },
 
   discoverFinish () {
@@ -63,19 +64,20 @@ export const actions = {
   },
 
   connect (host) {
-    return makeRobotAction({type: actionTypes.CONNECT, payload: {host}})
+    return tagForRobotApi({type: actionTypes.CONNECT, payload: {host}})
   },
 
   connectResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.CONNECT_RESPONSE, error: didError}
-    if (didError) action.payload = error
 
-    return action
+    if (didError) return {...action, payload: error}
+
+    return tagForAnalytics(action)
   },
 
   disconnect () {
-    return makeRobotAction({type: actionTypes.DISCONNECT})
+    return tagForRobotApi({type: actionTypes.DISCONNECT})
   },
 
   disconnectResponse (error) {
@@ -96,7 +98,7 @@ export const actions = {
 
   // get session or make new session with protocol file
   session (file) {
-    return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
+    return tagForRobotApi({type: actionTypes.SESSION, payload: {file}})
   },
 
   sessionResponse (error, session) {
@@ -116,7 +118,7 @@ export const actions = {
   },
 
   moveToFront (instrument) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
       payload: {instrument}
     })
@@ -133,7 +135,7 @@ export const actions = {
   },
 
   probeTip (instrument) {
-    return makeRobotAction({type: actionTypes.PROBE_TIP, payload: {instrument}})
+    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {instrument}})
   },
 
   probeTipResponse (error = null) {
@@ -148,7 +150,7 @@ export const actions = {
   },
 
   moveTo (instrument, labware) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.MOVE_TO,
       payload: {instrument, labware}
     })
@@ -162,7 +164,7 @@ export const actions = {
   },
 
   jog (instrument, axis, direction) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.JOG,
       payload: {instrument, axis, direction}
     })
@@ -176,7 +178,7 @@ export const actions = {
   },
 
   updateOffset (instrument, labware) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.UPDATE_OFFSET,
       payload: {instrument, labware}
     })
@@ -197,7 +199,7 @@ export const actions = {
   },
 
   run () {
-    return makeRobotAction({type: actionTypes.RUN})
+    return tagForRobotApi({type: actionTypes.RUN})
   },
 
   runResponse (error) {
@@ -209,7 +211,7 @@ export const actions = {
   },
 
   pause () {
-    return makeRobotAction({type: actionTypes.PAUSE})
+    return tagForRobotApi({type: actionTypes.PAUSE})
   },
 
   pauseResponse (error) {
@@ -221,7 +223,7 @@ export const actions = {
   },
 
   resume () {
-    return makeRobotAction({type: actionTypes.RESUME})
+    return tagForRobotApi({type: actionTypes.RESUME})
   },
 
   resumeResponse (error) {
@@ -233,7 +235,7 @@ export const actions = {
   },
 
   cancel () {
-    return makeRobotAction({type: actionTypes.CANCEL})
+    return tagForRobotApi({type: actionTypes.CANCEL})
   },
 
   cancelResponse (error) {

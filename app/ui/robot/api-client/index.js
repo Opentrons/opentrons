@@ -20,6 +20,6 @@ export default function apiClientMiddleware (store) {
       worker.postMessage({state, action})
     }
 
-    next(action)
+    return next(action)
   }
 }
