@@ -544,9 +544,9 @@ class PipetteTest(unittest.TestCase):
             self.plate['A2'],
             new_tip='never'
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
         expected = [
             ['Consolidating', '30'],
             ['Transferring', '30'],
@@ -625,9 +625,9 @@ class PipetteTest(unittest.TestCase):
             blow_out=True,
             trash=True
         )
-        from pprint import pprint
-        print('\n\n***\n')
-        pprint(self.robot.commands())
+        # from pprint import pprint
+        # print('\n\n***\n')
+        # pprint(self.robot.commands())
         expected = [
             ['Transferring', '30'],
             ['pick'],
@@ -1278,44 +1278,74 @@ class PipetteTest(unittest.TestCase):
         self.p200.touch_tip(self.plate[1], radius=0.5)
 
         expected = [
-            mock.call(self.plate[0], instrument=self.p200, strategy='arc'),
+            mock.call(self.plate[0],
+                      instrument=self.p200,
+                      low_power_z=False,
+                      strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 7.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 7.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
-                instrument=self.p200, strategy='direct'),
-            mock.call(self.plate[1], instrument=self.p200, strategy='arc'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
+            mock.call(self.plate[1],
+                      instrument=self.p200,
+                      low_power_z=False,
+                      strategy='arc'),
             mock.call(
                 (self.plate[1], (4.80, 3.20, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[1], (1.60, 3.20, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 4.80, 10.50)),
-                instrument=self.p200, strategy='direct'),
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 1.60, 10.50)),
-                instrument=self.p200, strategy='direct')
+                instrument=self.p200,
+                low_power_z=False,
+                strategy='direct')
         ]
 
         self.assertEquals(expected, self.p200.robot.move_to.mock_calls)
@@ -1464,6 +1494,11 @@ class PipetteTest(unittest.TestCase):
         for i in range(0, total_tips_per_plate):
             expected.extend(self.build_move_to_bottom(self.tiprack2[i]))
 
+        # from pprint import pprint
+        # print('Mock calls')
+        # pprint(self.p200.move_to.mock_calls)
+        # print('Expected')
+        # pprint(expected)
         self.assertEqual(
             self.p200.move_to.mock_calls,
             expected
@@ -1501,6 +1536,10 @@ class PipetteTest(unittest.TestCase):
         for i in range(0, 12):
             expected.extend(self.build_move_to_bottom(self.tiprack2.rows[i]))
 
+        # print('Mock calls')
+        # pprint(p200_multi.move_to.mock_calls)
+        # print('Expected')
+        # pprint(expected)
         self.assertEqual(
             p200_multi.move_to.mock_calls,
             expected
@@ -1529,11 +1568,12 @@ class PipetteTest(unittest.TestCase):
 
     def build_move_to_bottom(self, well):
         plunge = -7
-        return [mock.call(well.top(), strategy='arc')] + \
-            [
-                mock.call(well.top(plunge * (i % 2)),
-                          strategy='direct')
-                for i in range(1, 5)
+        return [
+            mock.call(well.top(), strategy='arc'),
+            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(), low_power_z=False, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(), low_power_z=False, strategy='direct')
         ]
 
     def test_drop_tip_to_trash(self):
@@ -1543,10 +1583,10 @@ class PipetteTest(unittest.TestCase):
         self.p200.drop_tip()
 
         assert self.p200.move_to.mock_calls[0] == \
-            mock.call(self.tiprack1[0].top(), strategy='arc')
+            mock.call(self.tiprack1[0].top(),
+                      strategy='arc')
 
         assert self.p200.move_to.mock_calls[-1] == \
             mock.call(
                 self.trash[0].top(self.p200._drop_tip_offset),
-                strategy='arc'
-            )
+                strategy='arc')

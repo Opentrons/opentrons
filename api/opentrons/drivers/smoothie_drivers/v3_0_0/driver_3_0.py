@@ -1,9 +1,10 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
 from opentrons.robot.robot_configs import (
-    config, PLUNGER_CURRENT_LOW, PLUNGER_CURRENT_HIGH
+    config, PLUNGER_CURRENT_LOW, PLUNGER_CURRENT_HIGH, DEFAULT_POWER
 )
 from threading import Event
+from copy import copy
 
 
 '''
@@ -64,6 +65,7 @@ class SmoothieDriver_3_0_0:
         self.run_flag.set()
 
         self._position = {}
+        self._power_settings = DEFAULT_POWER
         self.log = []
         self._update_position({axis: 0 for axis in AXES})
         self.simulating = True
@@ -133,8 +135,8 @@ class SmoothieDriver_3_0_0:
         return self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
 
     @property
-    def current(self):
-        pass
+    def power(self):
+        return self._power_settings
 
     @property
     def speed(self):
@@ -146,9 +148,15 @@ class SmoothieDriver_3_0_0:
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
-    def set_current(self, axes, value):
-        ''' set total movement speed in mm/second'''
-        values = ['{}{}'.format(axis, value) for axis in axes]
+    def set_power(self, settings):
+        ''' set total movement speed in mm/second
+        settings
+            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
+            and floating point number for setting (generally between 0.1 and 2)
+        '''
+        self._power_settings.update(settings)
+        values = ['{}{}'.format(axis, value)
+                  for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
             GCODES['SET_CURRENT'],
             ' '.join(values)
@@ -167,21 +175,34 @@ class SmoothieDriver_3_0_0:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
+        """
+        Submit a GCODE command to the robot, followed by M400 to block until
+        done. This method also ensures that any command on the B or C axis
+        (the axis for plunger control) do current ramp-up and ramp-down, so
+        that plunger motors rest at a low current to prevent burn-out.
+
+        :param command: the GCODE to submit to the robot
+        :param timeout: the time to wait before returning (indefinite wait if
+            this is set to none
+        """
         if self.simulating:
             pass
         else:
+            # TODO (ben 20171117): modify all axes to dwell at low current
             moving_plunger = ('B' in command or 'C' in command) \
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
 
             if moving_plunger:
-                self.set_current('BC', PLUNGER_CURRENT_HIGH)
+                self.set_power({axis: PLUNGER_CURRENT_HIGH
+                                for axis in 'BC'})
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
 
             if moving_plunger:
-                self.set_current('BC', PLUNGER_CURRENT_LOW)
+                self.set_power({axis: PLUNGER_CURRENT_LOW
+                                for axis in 'BC'})
 
             return ret_code
 
@@ -195,7 +216,7 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target):
+    def move(self, target, low_power_z=False):
         from numpy import isclose
 
         self.run_flag.wait()
@@ -208,13 +229,26 @@ class SmoothieDriver_3_0_0:
             )
 
         coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                  for axis, coords in target.items()
+                  for axis, coords in sorted(target.items())
                   if valid_movement(coords, axis)]
+
+        low_power_axes = [axis
+                          for axis, _ in sorted(target.items())
+                          if axis in 'ZA']
+        prior_power = copy(self._power_settings)
+
+        if low_power_z:
+            new_power = {axis: 0.1
+                         for axis in low_power_axes}
+            self.set_power(new_power)
 
         if coords:
             command = GCODES['MOVE'] + ''.join(coords)
             self._send_command(command)
             self._update_position(target)
+
+        if low_power_z:
+            self.set_power(prior_power)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 

@@ -56,7 +56,8 @@ async def test_pick_up_tip(main_router, model):
             model.instrument,
             model.container)
 
-        pick_up_tip.assert_called_with(model.container._container[0])
+        pick_up_tip.assert_called_with(
+            model.container._container[0], low_power_z=True)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))

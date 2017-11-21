@@ -5,18 +5,12 @@ from opentrons.trackers.pose_tracker import (
 from opentrons.instruments import Pipette
 from opentrons.robot.mover import Mover
 from numpy import array, isclose
+from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
 
 
 @pytest.fixture
 def driver():
-    class Driver:
-        def move(self, target):
-            pass
-
-        def home(self, axis):
-            pass
-
-    return Driver()
+    return SmoothieDriver_3_0_0()
 
 
 def test_functional(driver):

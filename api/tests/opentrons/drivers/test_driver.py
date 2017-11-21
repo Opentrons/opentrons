@@ -88,6 +88,34 @@ def test_functional(smoothie):
     assert smoothie.position == HOMED_POSITION
 
 
+power = []
+
+
+def test_low_power_z(model):
+    from opentrons.robot.robot_configs import DEFAULT_POWER
+    import types
+    driver = model.robot._driver
+    smoothie.simulating = False
+
+    set_power = driver.set_power
+
+    def set_power_mock(self, target):
+        global power
+        power.append(target)
+
+        set_power(target)
+
+    driver.set_power = types.MethodType(set_power_mock, driver)
+
+    driver.move({'A': 100}, low_power_z=False)
+    # Instrument in `model` is configured to right mount, which is the A axis
+    # on the Smoothie (see `Robot._actuators`)
+    assert power == []
+
+    driver.move({'A': 10}, low_power_z=True)
+    assert power == [{'A': 0.1}, DEFAULT_POWER]
+
+
 def test_pause_resume(model):
     from numpy import isclose
     from opentrons.trackers import pose_tracker
