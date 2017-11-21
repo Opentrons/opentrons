@@ -1462,6 +1462,7 @@ class Pipette:
         return pose_tree
 
     def _jog(self, pose_tree, axis, distance):
+        assert axis in 'xyz', "Axis must be 'x', 'y', or 'z'"
         if axis in 'xy':
             pose_tree = self.robot.gantry.jog(pose_tree, axis, distance)
         elif axis == 'z':
@@ -1469,13 +1470,14 @@ class Pipette:
 
         return pose_tree
 
-    def _probe(self, axis, movement):
+    def _probe(self, pose_tree, axis, movement):
         assert axis in 'xyz', "Axis must be 'x', 'y', or 'z'"
         if axis in 'xy':
-            value = self.robot.gantry.probe(axis, movement)
+            value = self.robot.gantry.probe(pose_tree, axis, movement)
         elif axis == 'z':
-            value = self.instrument_mover.probe(axis, movement)
-        return value
+            value = self.instrument_mover.probe(pose_tree, axis, movement)
+
+        return pose_tree
 
     def _add_tip(self, length):
         x, y, z = pose_tracker.change_base(

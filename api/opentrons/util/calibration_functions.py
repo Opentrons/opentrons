@@ -1,12 +1,10 @@
 from numpy import array
+from numpy.linalg import norm
+
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
 from opentrons.data_storage import database
-
-
-# maximum distance to move during calibration attempt
-PROBE_TRAVEL_DISTANCE = 30
 
 
 def calibrate_container_with_delta(
@@ -35,16 +33,6 @@ def calibrate_pipette(probing_values, probe):
 def probe_instrument(instrument, robot):
     robot.home()
 
-    # size along X, Y and Z
-    probe_size = array(robot.config.probe_dimensions)
-
-    # coordinates of the top of the probe
-    probe_top_coordinates = array(robot.config.probe_center)
-
-    *_, height = probe_size
-
-    center = probe_top_coordinates * (1, 1, 0) + (0, 0, height / 2.0)
-
     #       Y ^
     #         * 1
     #         |
@@ -57,54 +45,69 @@ def probe_instrument(instrument, robot):
     # left, right, forward, backward, center on a probe
     #
     # X, Y, Z point and travel direction
-    # Z = -1 denotes the tip down for XY calibration
-    # Z =  1 denotes the tip up to begin Z calibration
-    # Travel direction is in the same axis as the non-zero
-    #   XY coordinate, or in the Z axis if both X and Y
-    #   are zero
-    switches = [
-        (-1, 0, -0.5,  1),
-        (1,  0, -0.5, -1),
-        (0, -1, -0.5,  1),
-        (0,  1, -0.5, -1),
-        (0,  0,    1, -1),
-    ]
+    # Z = 0 denotes the tip down for XY calibration
+    # Z = 1 denotes the tip up to begin Z calibration
 
-    coords = [switch[:-1] * probe_size / 2.0 + center for switch in switches]
+    # size along X, Y and Z
+    probe_size = array(robot.config.probe_dimensions)
+    switches = [
+        (0.2,   -1, 0),
+        (0.2,    1, 0),
+        ( -1, -0.2, 0),
+        (  1, -0.2, 0),
+        (  0, -0.2, 1),
+    ]
+    center = array(robot.config.probe_center)
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
 
     instrument._add_tip(tip_length)
 
-    values = {'x': [], 'y': [], 'z': []}
+    acc = []
 
-    for coord, switch in zip(coords, switches):
-        x, y, z = coord
-        sx, sy, sz, direction = switch
+    for switch in switches:
+        mask = [abs(s) == 1 for s in switch]
+        inv_mask = [not bit for bit in mask]
 
-        axis = 'z'
-        if sx:
+        sx, sy, sz = switch
+        probing_vector = array((sx, sy, sz)) * probe_size
+        x, y, z = probing_vector + center
+
+        if abs(sx) == 1:
             axis = 'x'
-        elif sy:
+        elif abs(sy) == 1:
             axis = 'y'
+        else:
+            axis = 'z'
 
-        robot.poses = instrument._move(robot.poses, z=height * 1.2)
+        robot.poses = instrument._move(robot.poses, z=size_z * 1.2)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
-        values[axis].append(
-            instrument._probe(
-                axis,
-                direction * PROBE_TRAVEL_DISTANCE
-            )
+        robot.poses = instrument._probe(
+            robot.poses,
+            axis,
+            -norm(probing_vector)
         )
+
+        x, y, z = absolute(robot.poses, instrument) * mask
+        acc.append(array(x, y, z))
+
+        # after probing two points along the same axis
+        # average them out, update center and clear accumulator
+        if len(acc) == 2:
+            center = center * inv_mask + (acc[0] * mask + acc[1] * mask) / 2.0
+            acc.clear()
 
         robot.poses = instrument._move(
             robot.poses,
             x=(x + sx * 5),
-            y=(y + sy * 5))
+            y=(y + sy * 5),
+            z=(z + sz * 5))
 
     instrument._remove_tip(tip_length)
     robot.home()
+
+    return acc.pop()
 
 
 def move_instrument_for_probing_prep(instrument, robot):
