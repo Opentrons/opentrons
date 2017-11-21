@@ -156,7 +156,7 @@ class SmoothieDriver_3_0_0:
         '''
         self._power_settings.update(settings)
         values = ['{}{}'.format(axis, value)
-                  for axis, value in settings.items()]
+                  for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
             GCODES['SET_CURRENT'],
             ' '.join(values)
@@ -229,11 +229,11 @@ class SmoothieDriver_3_0_0:
             )
 
         coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                  for axis, coords in target.items()
+                  for axis, coords in sorted(target.items())
                   if valid_movement(coords, axis)]
 
         low_power_axes = [axis
-                          for axis, _ in target.items()
+                          for axis, _ in sorted(target.items())
                           if axis in 'ZA']
         prior_power = copy(self._power_settings)
 
