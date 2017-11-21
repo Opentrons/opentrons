@@ -1,5 +1,5 @@
 // robot actions tests
-
+import {tagAction as tagForAnalytics} from '../../analytics'
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
@@ -52,10 +52,10 @@ describe('robot actions', () => {
   })
 
   test('CONNECT_RESPONSE action', () => {
-    const success = {
+    const success = tagForAnalytics({
       type: actionTypes.CONNECT_RESPONSE,
       error: false
-    }
+    })
     const failure = {
       type: actionTypes.CONNECT_RESPONSE,
       error: true,
