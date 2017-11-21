@@ -20,9 +20,8 @@ describe('robot reducer - calibration', () => {
       labwareBySlot: {},
       confirmedBySlot: {},
 
-      // TODO(mc, 2017-11-07): figure out what's happening with home
-      // homeRequest: {inProgress: false, error: null},
-      moveToFrontRequest: {inProgress: false, error: null},
+      pickupRequest: {inProgress: false, error: null, slot: 0},
+      moveToFrontRequest: {inProgress: false, error: null, axis: ''},
       probeTipRequest: {inProgress: false, error: null},
       moveToRequest: {inProgress: false, error: null},
       jogRequest: {inProgress: false, error: null},
@@ -71,10 +70,31 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  // TODO(mc, 2017-10-17): implement home when api.calibration_manager can home
-  // test('handles HOME action', () => {})
-  // test('handles HOME_RESPONSE success', () => {})
-  // test('handles HOME_RESPONSE failure', () => {})
+  test('handles PICKUP_AND_HOME action', () => {
+    const state = {
+      calibration: {
+        pickupRequest: {inProgress: false, error: new Error(), slot: 0},
+        labwareBySlot: {5: constants.UNCONFIRMED}
+      }
+    }
+
+    const action = {
+      type: actionTypes.PICKUP_AND_HOME,
+      payload: {instrument: 'left', labware: 5}
+    }
+    expect(reducer(state, action).calibration).toEqual({
+      pickupRequest: {inProgress: true, error: null, slot: 5},
+      labwareBySlot: {5: constants.PICKING_UP}
+    })
+  })
+
+  test('handles PICKUP_AND_HOME_RESPONSE success', () => {
+
+  })
+
+  test('handles PICKUP_AND_HOME_RESPONSE failure', () => {
+
+  })
 
   test('handles MOVE_TO_FRONT action', () => {
     const state = {

@@ -29,7 +29,7 @@ export const UNCONFIRMED = 'unconfirmed'
 export const MOVING_TO_SLOT = 'moving-to-slot'
 export const OVER_SLOT = 'over-slot'
 export const CONFIRMED = 'confirmed'
-export const HOMING = 'homing'
+export const PICKING_UP = 'picking-up'
 export const HOMED = 'homed'
 
 // deck layout

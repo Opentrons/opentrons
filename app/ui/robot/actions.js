@@ -26,8 +26,8 @@ export const actionTypes = {
   SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
-  HOME: makeRobotActionName('HOME'),
-  HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
+  PICKUP_AND_HOME_RESPONSE: makeRobotActionName('PICKUP_AND_HOME_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
@@ -117,18 +117,21 @@ export const actions = {
     return {type: actionTypes.SET_LABWARE_REVIEWED, payload}
   },
 
-  home (instrument) {
-    return makeRobotAction({
-      type: actionTypes.HOME,
-      payload: {instrument}
+  pickupAndHome (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.PICKUP_AND_HOME,
+      payload: {instrument, labware}
     })
   },
 
-  homeResponse (instrument) {
-    return makeRobotAction({
-      type: actionTypes.HOME_RESPONSE,
-      payload: {instrument}
-    })
+  pickupAndHomeResponse (error = null) {
+    const action = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
   },
 
   moveToFront (instrument) {

@@ -348,6 +348,23 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
+    test('handles PICKUP_AND_HOME success', () => {
+      const action = actions.pickupAndHome('left', 5)
+      const expectedResponse = actions.pickupAndHomeResponse()
+
+      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.pick_up_tip)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-2'})
+          expect(calibrationManager.home)
+            .toHaveBeenCalledWith({_id: 'inst-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
     test('handles JOG success', () => {
       const action = actions.jog('left', 'y', -1)
       const expectedResponse = actions.jogResponse()

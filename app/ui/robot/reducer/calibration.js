@@ -12,16 +12,16 @@ import {
   MOVING_TO_SLOT,
   OVER_SLOT,
   CONFIRMED,
-  HOMING,
-  HOMED
+  PICKING_UP
+  // HOMED
 } from '../constants'
 
 const {
   SESSION,
   DISCONNECT_RESPONSE,
   SET_LABWARE_REVIEWED,
-  HOME,
-  HOME_RESPONSE,
+  PICKUP_AND_HOME,
+  // HOME_RESPONSE,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
@@ -51,8 +51,8 @@ const INITIAL_STATE = {
   labwareBySlot: {},
   confirmedBySlot: {},
 
-  homeRequest: {inProgress: false, error: null},
-  moveToFrontRequest: {inProgress: false, error: null},
+  pickupRequest: {inProgress: false, error: null, slot: 0},
+  moveToFrontRequest: {inProgress: false, error: null, axis: ''},
   probeTipRequest: {inProgress: false, error: null},
   moveToRequest: {inProgress: false, error: null},
   jogRequest: {inProgress: false, error: null},
@@ -66,8 +66,7 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case SET_LABWARE_REVIEWED: return handleSetLabwareReviewed(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
-    case HOME: return handleHome(state, action)
-    case HOME_RESPONSE: return handleHomeResponse(state, action)
+    case PICKUP_AND_HOME: return handlePickupAndHome(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
     case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
@@ -215,31 +214,31 @@ function handleMoveToResponse (state, action) {
   }
 }
 
-function handleHome (state, action) {
-  const {payload: {instrument: axis}} = action
+function handlePickupAndHome (state, action) {
+  const {payload: {labware: slot}} = action
 
   return {
     ...state,
-    homeRequest: {inProgress: true, error: null, axis},
-    instrumentsByAxis: {...state.instrumentsByAxis, [axis]: HOMING}
+    pickupRequest: {inProgress: true, error: null, slot},
+    labwareBySlot: {...state.labwareBySlot, [slot]: PICKING_UP}
   }
 }
 
-function handleHomeResponse (state, action) {
-  const {homeRequest: {axis}} = state
-  const {payload, error} = action
+// function handleHomeResponse (state, action) {
+//   const {homeRequest: {axis}} = state
+//   const {payload, error} = action
 
-  return {
-    ...state,
-    homeRequest: {
-      ...state.homeRequest,
-      inProgress: false,
-      error: error
-        ? payload
-        : null
-    }
-  }
-}
+//   return {
+//     ...state,
+//     homeRequest: {
+//       ...state.homeRequest,
+//       inProgress: false,
+//       error: error
+//         ? payload
+//         : null
+//     }
+//   }
+// }
 
 function handleJog (state, action) {
   return {...state, jogRequest: {inProgress: true, error: null}}

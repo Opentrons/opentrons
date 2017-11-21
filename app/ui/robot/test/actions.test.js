@@ -154,6 +154,31 @@ describe('robot actions', () => {
     expect(actions.moveToFrontResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('pick up tip and home action', () => {
+    const action = {
+      type: actionTypes.PICKUP_AND_HOME,
+      payload: {instrument: 'left', labware: 5},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.pickupAndHome('left', 5)).toEqual(action)
+  })
+
+  test('pick up tip and home response action', () => {
+    const success = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.pickupAndHomeResponse()).toEqual(success)
+    expect(actions.pickupAndHomeResponse(new Error('AH'))).toEqual(failure)
+  })
+
   test('probe tip action', () => {
     const expected = {
       type: actionTypes.PROBE_TIP,
