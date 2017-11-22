@@ -9,7 +9,7 @@ Sphinx==1.4.8
 twine==1.9.1
 dill==0.2.5
 Flask==0.10.1
-Flask-Cors==3.0.2
+Flask-Cors==3.0.3
 Flask-Script==2.0.5
 Flask-SocketIO==2.5
 requests==2.9.1
