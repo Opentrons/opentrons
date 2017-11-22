@@ -7,7 +7,7 @@ PLUNGER_CURRENT_LOW = 0.1
 DEFAULT_ACCELERATION = 'M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000'
 DEFAULT_CURRENT = 'M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW)
 DEFAULT_MAX_SPEEDS = 'M203.1 X300 Y200 Z50 A50 B8 C8'
-DEFAULT_STEPS_PER_MM = 'M92 X80.0254 Y80.16 Z400 A400 B767.38 C767.38'
+DEFAULT_STEPS_PER_MM = 'M92 X80.0254 Y80.16 Z400 A400 B768 C768'
 
 
 
@@ -166,7 +166,7 @@ class SmoothieDriver_3_0_0:
         from numpy import isclose
         target_position = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c}
 
-        print("speed is ", speed)
+        #print("speed is ", speed)
         def valid_movement(coords, axis):
             return not (
                 (axis in DISABLED_AXES) or
