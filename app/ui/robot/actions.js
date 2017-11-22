@@ -4,6 +4,7 @@ import {makeActionName} from '../util'
 import {tagAction as tagForAnalytics} from '../analytics'
 import {_NAME as NAME} from './constants'
 
+// TODO(mc, 2017-11-22): rename this function to actionType
 const makeRobotActionName = (action) => makeActionName(NAME, action)
 const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
@@ -28,6 +29,10 @@ export const actionTypes = {
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
   PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
   PICKUP_AND_HOME_RESPONSE: makeRobotActionName('PICKUP_AND_HOME_RESPONSE'),
+  HOME_INSTRUMENT: makeRobotActionName('HOME_INSTRUMENT'),
+  HOME_INSTRUMENT_RESPONSE: makeRobotActionName('HOME_INSTRUMENT_RESPONSE'),
+  CONFIRM_TIPRACK: makeRobotActionName('CONFIRM_TIPRACK'),
+  CONFIRM_TIPRACK_RESPONSE: makeRobotActionName('CONFIRM_TIPRACK_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
@@ -127,6 +132,45 @@ export const actions = {
   pickupAndHomeResponse (error = null) {
     const action = {
       type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  // TODO(mc, 2017-11-22): homeInstrument takes a slot at the moment because
+  // this action is performed in the context of confirming a tiprack labware.
+  // This is confusing though, so refactor these actions + state-management
+  // as necessary
+  homeInstrument (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.HOME_INSTRUMENT,
+      payload: {instrument, labware}
+    })
+  },
+
+  homeInstrumentResponse (error = null) {
+    const action = {
+      type: actionTypes.HOME_INSTRUMENT_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  // confirm tiprack action drops the tip unless the tiprack is last
+  confirmTiprack (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.CONFIRM_TIPRACK,
+      payload: {instrument, labware}
+    })
+  },
+
+  confirmTiprackResponse (error = null) {
+    const action = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
       error: error != null
     }
     if (error) action.payload = error

@@ -39,6 +39,8 @@ export default function client (dispatch) {
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
       case actionTypes.PICKUP_AND_HOME: return pickupAndHome(state, action)
+      case actionTypes.HOME_INSTRUMENT: return homeInstrument(state, action)
+      case actionTypes.CONFIRM_TIPRACK: return confirmTiprack(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
       case actionTypes.MOVE_TO: return moveTo(state, action)
@@ -110,7 +112,7 @@ export default function client (dispatch) {
 
   function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
@@ -122,8 +124,8 @@ export default function client (dispatch) {
 
   function pickupAndHome (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
-    const labware = selectors.getLabwareBySlot(state)[slot]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     remote.calibration_manager.pick_up_tip(instrument, labware)
       .then(() => remote.calibration_manager.home(instrument))
@@ -131,9 +133,33 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
   }
 
+  function homeInstrument (state, action) {
+    const {payload: {instrument: axis}} = action
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+
+    remote.calibration_manager.home(instrument)
+      .then(() => dispatch(actions.homeInstrumentResponse()))
+      .catch((error) => dispatch(actions.homeInstrumentResponse(error)))
+  }
+
+  // drop the tip unless the tiprack is the last one to be confirmed
+  function confirmTiprack (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
+
+    if (selectors.getUnconfirmedTipracks(state).length === 1) {
+      return dispatch(actions.confirmTiprackResponse())
+    }
+
+    remote.calibration_manager.drop_tip(instrument, labware)
+      .then(() => dispatch(actions.confirmTiprackResponse()))
+      .catch((error) => dispatch(actions.confirmTiprackResponse(error)))
+  }
+
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
@@ -145,8 +171,8 @@ export default function client (dispatch) {
 
   function moveTo (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
-    const labware = selectors.getLabwareBySlot(state)[slot]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
@@ -174,8 +200,8 @@ export default function client (dispatch) {
 
   function updateOffset (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
-    const labware = selectors.getLabwareBySlot(state)[slot]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {

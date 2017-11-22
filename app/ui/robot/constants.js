@@ -28,9 +28,11 @@ export const PROBED = 'probed'
 export const UNCONFIRMED = 'unconfirmed'
 export const MOVING_TO_SLOT = 'moving-to-slot'
 export const OVER_SLOT = 'over-slot'
-export const CONFIRMED = 'confirmed'
 export const PICKING_UP = 'picking-up'
+export const HOMING = 'homing'
 export const HOMED = 'homed'
+export const CONFIRMING = 'confirming'
+export const CONFIRMED = 'confirmed'
 
 // deck layout
 export const INSTRUMENT_AXES = ['left', 'right']

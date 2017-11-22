@@ -252,15 +252,19 @@ describe('api client', () => {
     beforeEach(() => {
       state = {
         [NAME]: {
+          calibration: {
+            confirmedBySlot: {},
+            labwareBySlot: {}
+          },
           session: {
             protocolInstrumentsByAxis: {
               left: {_id: 'inst-2'},
               right: {_id: 'inst-1'}
             },
             protocolLabwareBySlot: {
-              1: {_id: 'lab-1'},
-              5: {_id: 'lab-2'},
-              9: {_id: 'lab-3'}
+              1: {_id: 'lab-1', type: '96-flat'},
+              5: {_id: 'lab-2', type: 'tiprack-200ul', isTiprack: true},
+              9: {_id: 'lab-3', type: 'tiprack-200ul', isTiprack: true}
             }
           }
         }
@@ -353,6 +357,7 @@ describe('api client', () => {
       const expectedResponse = actions.pickupAndHomeResponse()
 
       calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home.mockReturnValue(Promise.resolve())
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -363,6 +368,99 @@ describe('api client', () => {
             .toHaveBeenCalledWith({_id: 'inst-2'})
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
+    })
+
+    test('handles PICKUP_AND_HOME failure during pickup', () => {
+      const action = actions.pickupAndHome('left', 5)
+      const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
+
+      calibrationManager.pick_up_tip
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles PICKUP_AND_HOME failure during home', () => {
+      const action = actions.pickupAndHome('left', 5)
+      const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
+
+      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles HOME_INSTRUMENT success', () => {
+      const action = actions.homeInstrument('right', 9)
+      const expectedResponse = actions.homeInstrumentResponse()
+
+      calibrationManager.home.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.home).toHaveBeenCalledWith({_id: 'inst-1'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles HOME_INSTRUMENT failure', () => {
+      const action = actions.homeInstrument('right', 9)
+      const expectedResponse = actions.homeInstrumentResponse(new Error('AH'))
+
+      calibrationManager.home.mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('CONFIRM_TIPRACK drops tip if not last tiprack', () => {
+      const action = actions.confirmTiprack('left', 9)
+      const expectedResponse = actions.confirmTiprackResponse()
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.drop_tip)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-3'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('CONFIRM_TIPRACK noops if last tiprack', () => {
+      state[NAME].calibration.confirmedBySlot[5] = true
+
+      const action = actions.confirmTiprack('left', 9)
+      const expectedResponse = actions.confirmTiprackResponse()
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.drop_tip).not.toHaveBeenCalled()
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles CONFIRM_TIPRACK drop tip failure', () => {
+      const action = actions.confirmTiprack('left', 9)
+      const expectedResponse = actions.confirmTiprackResponse(new Error('AH'))
+
+      calibrationManager.drop_tip
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
     test('handles JOG success', () => {

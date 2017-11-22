@@ -179,6 +179,58 @@ describe('robot actions', () => {
     expect(actions.pickupAndHomeResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('home instrument action', () => {
+    const action = {
+      type: actionTypes.HOME_INSTRUMENT,
+      payload: {instrument: 'right', labware: 5},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.homeInstrument('right', 5)).toEqual(action)
+  })
+
+  test('home instrument response action', () => {
+    const success = {
+      type: actionTypes.HOME_INSTRUMENT_RESPONSE,
+      error: false
+    }
+
+    const failure = {
+      type: actionTypes.HOME_INSTRUMENT_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.homeInstrumentResponse()).toEqual(success)
+    expect(actions.homeInstrumentResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('confirm tiprack action', () => {
+    const action = {
+      type: actionTypes.CONFIRM_TIPRACK,
+      payload: {instrument: 'left', labware: 9},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.confirmTiprack('left', 9)).toEqual(action)
+  })
+
+  test('confirm tiprack response action', () => {
+    const success = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      error: false
+    }
+
+    const failure = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.confirmTiprackResponse()).toEqual(success)
+    expect(actions.confirmTiprackResponse(new Error('AH'))).toEqual(failure)
+  })
+
   test('probe tip action', () => {
     const expected = {
       type: actionTypes.PROBE_TIP,

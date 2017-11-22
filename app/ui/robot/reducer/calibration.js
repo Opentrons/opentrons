@@ -11,9 +11,11 @@ import {
   UNCONFIRMED,
   MOVING_TO_SLOT,
   OVER_SLOT,
-  CONFIRMED,
   PICKING_UP,
-  HOMED
+  HOMING,
+  HOMED,
+  CONFIRMING,
+  CONFIRMED
 } from '../constants'
 
 const {
@@ -22,6 +24,10 @@ const {
   SET_LABWARE_REVIEWED,
   PICKUP_AND_HOME,
   PICKUP_AND_HOME_RESPONSE,
+  HOME_INSTRUMENT,
+  HOME_INSTRUMENT_RESPONSE,
+  CONFIRM_TIPRACK,
+  CONFIRM_TIPRACK_RESPONSE,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
@@ -51,7 +57,12 @@ const INITIAL_STATE = {
   labwareBySlot: {},
   confirmedBySlot: {},
 
+  // TODO(mc, 2017-11-22): collapse all these into a single
+  // instrumentRequest object. We can't have simultaneous instrument
+  // movements so split state hurts us without benefit
   pickupRequest: {inProgress: false, error: null, slot: 0},
+  homeRequest: {inProgress: false, error: null, slot: 0},
+  confirmTiprackRequest: {inProgress: false, error: null, slot: 0},
   moveToFrontRequest: {inProgress: false, error: null, axis: ''},
   probeTipRequest: {inProgress: false, error: null},
   moveToRequest: {inProgress: false, error: null},
@@ -69,6 +80,11 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case PICKUP_AND_HOME: return handlePickupAndHome(state, action)
     case PICKUP_AND_HOME_RESPONSE:
       return handlePickupAndHomeResponse(state, action)
+    case HOME_INSTRUMENT: return handleHomeInstrument(state, action)
+    case HOME_INSTRUMENT_RESPONSE:
+      return handleHomeInstrumentResponse(state, action)
+    case CONFIRM_TIPRACK: return handleConfirmTiprack(state, action)
+    case CONFIRM_TIPRACK_RESPONSE: return handleConfirmTiprackResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
     case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
@@ -216,6 +232,8 @@ function handleMoveToResponse (state, action) {
   }
 }
 
+// TODO(mc, 2017-11-22): collapse all these calibration handlers into one
+// See state TODO above
 function handlePickupAndHome (state, action) {
   const {payload: {labware: slot}} = action
 
@@ -244,6 +262,74 @@ function handlePickupAndHomeResponse (state, action) {
       [slot]: error
         ? UNCONFIRMED
         : HOMED
+    }
+  }
+}
+
+function handleHomeInstrument (state, action) {
+  const {payload: {labware: slot}} = action
+
+  return {
+    ...state,
+    homeRequest: {inProgress: true, error: null, slot},
+    labwareBySlot: {...state.labwareBySlot, [slot]: HOMING}
+  }
+}
+
+function handleHomeInstrumentResponse (state, action) {
+  const {homeRequest: {slot}} = state
+  const {payload, error} = action
+
+  return {
+    ...state,
+    homeRequest: {
+      ...state.homeRequest,
+      inProgress: false,
+      error: error
+        ? payload
+        : null
+    },
+    labwareBySlot: {
+      ...state.labwareBySlot,
+      [slot]: error
+        ? UNCONFIRMED
+        : HOMED
+    }
+  }
+}
+
+function handleConfirmTiprack (state, action) {
+  const {payload: {labware: slot}} = action
+
+  return {
+    ...state,
+    confirmTiprackRequest: {inProgress: true, error: null, slot},
+    labwareBySlot: {...state.labwareBySlot, [slot]: CONFIRMING}
+  }
+}
+
+function handleConfirmTiprackResponse (state, action) {
+  const {confirmTiprackRequest: {slot}} = state
+  const {payload, error} = action
+
+  return {
+    ...state,
+    confirmTiprackRequest: {
+      ...state.confirmTiprackRequest,
+      inProgress: false,
+      error: error
+        ? payload
+        : null
+    },
+    labwareBySlot: {
+      ...state.labwareBySlot,
+      [slot]: error
+        ? UNCONFIRMED
+        : CONFIRMED
+    },
+    confirmedBySlot: {
+      ...state.confirmedBySlot,
+      [slot]: error == null
     }
   }
 }

@@ -221,7 +221,7 @@ export function getLabware (state) {
   return DECK_SLOTS.map((slot) => {
     let labware = protocolLabwareBySlot[slot] || {slot}
 
-    if (labware.name) {
+    if (labware.type) {
       labware = {
         ...labware,
         calibration: calibrationBySlot[slot] || UNCONFIRMED,
