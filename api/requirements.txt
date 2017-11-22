@@ -1,19 +1,19 @@
-pylama
-pytest
-pytest-cov
+pylama==7.4.3
+pytest==3.2.5
+pytest-cov==2.5.1
 
-numpydoc==0.6.0
+numpydoc==0.7.0
 # June 15 2017 (artyom) : https://github.com/pyinstaller/pyinstaller/issues/2434
 git+https://github.com/pyinstaller/pyinstaller.git@7e814646474efc868206beb8fb9dfe45af527109
-Sphinx==1.4.8
+Sphinx==1.6.5
 twine==1.9.1
-dill==0.2.5
-Flask==0.10.1
-Flask-Cors==3.0.2
-Flask-Script==2.0.5
-Flask-SocketIO==2.5
-requests==2.9.1
-psutil==4.3.1
+dill==0.2.7.1
+Flask==0.12.2
+Flask-Cors==3.0.3
+Flask-Script==2.0.6
+Flask-SocketIO==2.9.2
+requests==2.18.4
+psutil==5.4.1
 greenlet==0.4.12
 gevent==1.2.2
-wheel==0.29.0
+wheel==0.30.0
