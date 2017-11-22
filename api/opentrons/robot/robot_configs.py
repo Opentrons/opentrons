@@ -110,12 +110,11 @@ def load(filename=None):
 
 def save(config, filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
-    default_dict = dict(children(default._asdict()))
+    _default = children(default._asdict())
 
     diff = build([
-        (key, value)
-        for key, value in children(config._asdict())
-        if default_dict[key] != value
+        item for item in children(config._asdict())
+        if item not in _default
     ])
 
     with open(filename, 'w') as file:
