@@ -1,5 +1,5 @@
 pylama
-pytest
+pytest==3.2.5
 pytest-cov
 
 numpydoc==0.6.0
