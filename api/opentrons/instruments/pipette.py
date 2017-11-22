@@ -809,7 +809,9 @@ class Pipette:
                     self.current_tip().top(0),
                     strategy='direct',
                     low_power_z=low_power_z)
-            self._add_tip()
+            self._add_tip(
+                length=self.robot.config.tip_length[self.mount][self.type]
+            )
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
             return self
 
@@ -883,7 +885,9 @@ class Pipette:
 
             self.current_volume = 0
             self.current_tip(None)
-            self._remove_tip()
+            self._remove_tip(
+                length=self.robot.config.tip_length[self.mount][self.type]
+            )
             return self
         return _drop_tip(location)
 
@@ -1473,28 +1477,24 @@ class Pipette:
             value = self.instrument_mover.probe(axis, movement)
         return value
 
-    def _add_tip(self):
+    def _add_tip(self, length):
         x, y, z = pose_tracker.change_base(
             self.robot.poses,
             src=self,
             dst=self.mount)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
-                x, y, z - self.tip_length))
+                x, y, z - length))
 
-    def _remove_tip(self):
+    def _remove_tip(self, length):
         x, y, z = pose_tracker.change_base(
             self.robot.poses,
             src=self,
             dst=self.mount)
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
-                x, y, z + self.tip_length))
+                x, y, z + length))
 
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'
-
-    @property
-    def tip_length(self):
-        return self.robot.config.tip_length[self.mount][self.type]

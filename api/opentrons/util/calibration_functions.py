@@ -71,7 +71,9 @@ def probe_instrument(instrument, robot):
     ]
 
     coords = [switch[:-1] * probe_size / 2.0 + center for switch in switches]
-    instrument._add_tip()
+    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
+
+    instrument._add_tip(tip_length)
 
     values = {'x': [], 'y': [], 'z': []}
 
@@ -101,17 +103,18 @@ def probe_instrument(instrument, robot):
             x=(x + sx * 5),
             y=(y + sy * 5))
 
-    instrument._remove_tip()
+    instrument._remove_tip(tip_length)
     robot.home()
 
 
 def move_instrument_for_probing_prep(instrument, robot):
+    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
     # TODO(artyom, ben 20171026): calculate from robot dimensions
     robot.poses = instrument._move(
         robot.poses,
         x=191.5,
         y=75.0,
-        z=128 + instrument.tip_length
+        z=128 + tip_length
     )
 
 

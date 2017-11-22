@@ -319,8 +319,8 @@ class PipetteTest(unittest.TestCase):
         flipped in pose tracking logic
         """
         prior_position = pose_tracker.absolute(self.robot.poses, self.p200)
-        self.p200._add_tip()
-        self.p200._remove_tip()
+        self.p200._add_tip(42)
+        self.p200._remove_tip(42)
         new_position = pose_tracker.absolute(self.robot.poses, self.p200)
 
         assert (new_position == prior_position).all()
