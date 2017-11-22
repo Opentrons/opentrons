@@ -1,4 +1,3 @@
-import pytest
 from opentrons.trackers.pose_tracker import (
     change_base, init, ROOT
 )
