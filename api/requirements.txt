@@ -7,7 +7,7 @@ numpydoc==0.7.0
 git+https://github.com/pyinstaller/pyinstaller.git@7e814646474efc868206beb8fb9dfe45af527109
 Sphinx==1.6.5
 twine==1.9.1
-dill==0.2.5
+dill==0.2.7.1
 Flask==0.10.1
 Flask-Cors==3.0.2
 Flask-Script==2.0.5
