@@ -1,4 +1,4 @@
-pylama
+pylama==7.4.3
 pytest
 pytest-cov
 
