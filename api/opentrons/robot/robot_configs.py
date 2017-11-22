@@ -97,15 +97,16 @@ default = robot_config(
 
 def load(filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
-    config = default
+    result = default
 
     try:
         with open(filename, 'r') as file:
             local = json.load(file)
-            return robot_config(**merge([default._asdict(), local]))
+            result = robot_config(**merge([default._asdict(), local]))
     except FileNotFoundError as e:
         log.info('Config {0} not found. Loading defaults'.format(filename))
-        return default
+
+    return result
 
 
 def save(config, filename=None):
