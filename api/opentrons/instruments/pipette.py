@@ -10,9 +10,6 @@ from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
 
 
-# This should come from configuration if tip length is not already in db
-DEFAULT_TIP_LENGTH = 46
-
 PLUNGER_POSITIONS = {
     'top': 17,
     'bottom': 2,
@@ -107,7 +104,6 @@ class Pipette:
         self.attached_tip = None
         self.instrument_actuator = None
         self.instrument_mover = None
-        self.tip_length = DEFAULT_TIP_LENGTH
 
         if not name:
             name = self.__class__.__name__
@@ -813,7 +809,9 @@ class Pipette:
                     self.current_tip().top(0),
                     strategy='direct',
                     low_power_z=low_power_z)
-            self._add_tip(self.tip_length)
+            self._add_tip(
+                length=self.robot.config.tip_length[self.mount][self.type]
+            )
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
             return self
 
@@ -887,7 +885,9 @@ class Pipette:
 
             self.current_volume = 0
             self.current_tip(None)
-            self._remove_tip(self.tip_length)
+            self._remove_tip(
+                length=self.robot.config.tip_length[self.mount][self.type]
+            )
             return self
         return _drop_tip(location)
 
@@ -1494,3 +1494,7 @@ class Pipette:
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z + length))
+
+    @property
+    def type(self):
+        return 'single' if self.channels == 1 else 'multi'

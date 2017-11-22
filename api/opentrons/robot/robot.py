@@ -5,7 +5,6 @@ from numpy import add, subtract
 from opentrons import commands, containers, drivers, helpers
 from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 from opentrons.robot.mover import Mover
-from opentrons.robot.robot_configs import config
 from opentrons.containers import Container
 from opentrons.util.log import get_logger
 from opentrons.trackers import pose_tracker
@@ -13,16 +12,11 @@ from opentrons.data_storage import database
 from opentrons.broker import subscribe
 import opentrons.util.calibration_functions as calib
 
+from opentrons.robot.robot_configs import load
+
 log = get_logger(__name__)
 
 TIP_CLEARANCE = 42
-
-CALIBRATION = config.gantry_calibration
-
-MOUNT_OFFSETS = {
-    'right': pose_tracker.Point(0.0, 0.0, 0.0),
-    'left': pose_tracker.Point(*config.instrument_offset)
-}
 
 
 class InstrumentMosfet(object):
@@ -152,7 +146,7 @@ class Robot(object):
     ['Aspirating 200 uL from <Well A1> at 1.0 speed']
     """
 
-    def __init__(self):
+    def __init__(self, config=None):
         """
         Initializes a robot instance.
 
@@ -162,14 +156,15 @@ class Robot(object):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self._driver = driver_3_0.SmoothieDriver_3_0_0()
+        self.config = config or load()
+        self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
 
         self._actuators = {
             'left': {
                 'carriage': Mover(
                     driver=self._driver,
                     src=pose_tracker.ROOT,
-                    dst=id(CALIBRATION),
+                    dst=id(self.config.gantry_calibration),
                     axis_mapping={'z': 'Z'}),
                 'plunger': Mover(
                     driver=self._driver,
@@ -181,7 +176,7 @@ class Robot(object):
                 'carriage': Mover(
                     driver=self._driver,
                     src=pose_tracker.ROOT,
-                    dst=id(CALIBRATION),
+                    dst=id(self.config.gantry_calibration),
                     axis_mapping={'z': 'A'}),
                 'plunger': Mover(
                     driver=self._driver,
@@ -229,7 +224,7 @@ class Robot(object):
         self._unsubscribe_commands = None
         self.reset()
 
-    def reset(self, calibration=CALIBRATION):
+    def reset(self):
         """
         Resets the state of the robot and clears:
             * Deck
@@ -269,16 +264,18 @@ class Robot(object):
             driver=driver,
             axis_mapping={'x': 'X', 'y': 'Y'},
             src=pose_tracker.ROOT,
-            dst=id(CALIBRATION)
+            dst=id(self.config.gantry_calibration)
         )
 
         # Extract only transformation component
         inverse_transform = pose_tracker.inverse(
-            pose_tracker.extract_transform(CALIBRATION))
+            pose_tracker.extract_transform(self.config.gantry_calibration))
 
         self.poses = pose_tracker.bind(self.poses) \
-            .add(obj=id(CALIBRATION), transform=CALIBRATION) \
-            .add(obj=self.gantry, parent=id(CALIBRATION)) \
+            .add(
+                obj=id(self.config.gantry_calibration),
+                transform=self.config.gantry_calibration) \
+            .add(obj=self.gantry, parent=id(self.config.gantry_calibration)) \
             .add(obj=left_carriage, parent=self.gantry) \
             .add(obj=right_carriage, parent=self.gantry) \
             .add(
@@ -329,7 +326,7 @@ class Robot(object):
             self.poses,
             instrument,
             parent=mount,
-            point=MOUNT_OFFSETS[mount]
+            point=self.config.instrument_offsets[mount][instrument.type]
         )
 
     def add_warning(self, warning_msg):

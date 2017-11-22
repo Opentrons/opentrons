@@ -47,6 +47,7 @@ def refresh():
 
     settings.update({
         'APP_DATA_DIR': APP_DATA_DIR,
+        'OT_CONFIG_FILE': os.path.join(APP_DATA_DIR, 'config.json'),
         'LOG_DIR': os.path.join(APP_DATA_DIR, 'logs'),
         'LOG_FILE': os.path.join(APP_DATA_DIR, 'logs', 'api.log'),
         'CONTAINERS_DIR': os.path.join(APP_DATA_DIR, 'containers'),

@@ -2,17 +2,11 @@ from numpy import array
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
-from opentrons.instruments.pipette import DEFAULT_TIP_LENGTH
 from opentrons.data_storage import database
-from ..robot.robot_configs import config
 
 
 # maximum distance to move during calibration attempt
 PROBE_TRAVEL_DISTANCE = 30
-# size along X, Y and Z
-PROBE_SIZE = array(config.probe_dimensions)
-# coordinates of the top of the probe
-PROBE_TOP_COORDINATES = array(config.probe_center)
 
 
 def calibrate_container_with_delta(
@@ -41,9 +35,15 @@ def calibrate_pipette(probing_values, probe):
 def probe_instrument(instrument, robot):
     robot.home()
 
-    *_, height = PROBE_SIZE
+    # size along X, Y and Z
+    probe_size = array(robot.config.probe_dimensions)
 
-    center = PROBE_TOP_COORDINATES * (1, 1, 0) + (0, 0, height / 2.0)
+    # coordinates of the top of the probe
+    probe_top_coordinates = array(robot.config.probe_center)
+
+    *_, height = probe_size
+
+    center = probe_top_coordinates * (1, 1, 0) + (0, 0, height / 2.0)
 
     #       Y ^
     #         * 1
@@ -70,8 +70,10 @@ def probe_instrument(instrument, robot):
         (0,  0,    1, -1),
     ]
 
-    coords = [switch[:-1] * PROBE_SIZE / 2.0 + center for switch in switches]
-    instrument._add_tip(DEFAULT_TIP_LENGTH)
+    coords = [switch[:-1] * probe_size / 2.0 + center for switch in switches]
+    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
+
+    instrument._add_tip(tip_length)
 
     values = {'x': [], 'y': [], 'z': []}
 
@@ -101,17 +103,18 @@ def probe_instrument(instrument, robot):
             x=(x + sx * 5),
             y=(y + sy * 5))
 
-    instrument._remove_tip(DEFAULT_TIP_LENGTH)
+    instrument._remove_tip(tip_length)
     robot.home()
 
 
 def move_instrument_for_probing_prep(instrument, robot):
+    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
     # TODO(artyom, ben 20171026): calculate from robot dimensions
     robot.poses = instrument._move(
         robot.poses,
         x=191.5,
         y=75.0,
-        z=128 + DEFAULT_TIP_LENGTH
+        z=128 + tip_length
     )
 
 

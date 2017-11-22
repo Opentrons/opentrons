@@ -1,8 +1,5 @@
 from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
-from opentrons.robot.robot_configs import (
-    config, PLUNGER_CURRENT_LOW, PLUNGER_CURRENT_HIGH, DEFAULT_POWER
-)
 from threading import Event
 from copy import copy
 
@@ -48,6 +45,7 @@ GCODES = {'HOME': 'G28.2',
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
+SMOOTHIE_BOARD_NAME = 'FT232R'
 
 
 def _parse_axis_values(raw_axis_values):
@@ -60,16 +58,17 @@ def _parse_axis_values(raw_axis_values):
 
 
 class SmoothieDriver_3_0_0:
-    def __init__(self):
+    def __init__(self, config):
         self.run_flag = Event()
         self.run_flag.set()
 
         self._position = {}
-        self._power_settings = DEFAULT_POWER
         self.log = []
         self._update_position({axis: 0 for axis in AXES})
         self.simulating = True
         self._connection = None
+        self._config = config
+        self._power_settings = config.default_power
 
     def _update_position(self, target):
         self._position.update({
@@ -110,7 +109,10 @@ class SmoothieDriver_3_0_0:
             self.simulating = True
             return
 
-        self._connection = serial_communication.connect()
+        self._connection = serial_communication.connect(
+            device_name=SMOOTHIE_BOARD_NAME,
+            baudrate=self._config.serial_speed
+        )
         self._setup()
 
     def disconnect(self):
@@ -193,25 +195,25 @@ class SmoothieDriver_3_0_0:
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
 
             if moving_plunger:
-                self.set_power({axis: PLUNGER_CURRENT_HIGH
-                                for axis in 'BC'})
+                self.set_power({axis: self._config.plunger_current_high
+                               for axis in 'BC'})
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
 
             if moving_plunger:
-                self.set_power({axis: PLUNGER_CURRENT_LOW
-                                for axis in 'BC'})
+                self.set_power({axis: self._config.plunger_current_low
+                               for axis in 'BC'})
 
             return ret_code
 
     def _setup(self):
         self._reset_from_error()
-        self._send_command(config.acceleration)
-        self._send_command(config.current)
-        self._send_command(config.max_speeds)
-        self._send_command(config.steps_per_mm)
+        self._send_command(self._config.acceleration)
+        self._send_command(self._config.current)
+        self._send_command(self._config.max_speeds)
+        self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
     # ----------- END Private functions ----------- #
 

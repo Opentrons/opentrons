@@ -52,7 +52,7 @@ def test_aspirate_move_to(robot):
     assert (current_pos == (9.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p200)
-    assert isclose(current_pos, (175.34,  127.94,   10)).all()
+    assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
 
 
 def test_blow_out_move_to(robot):
@@ -318,10 +318,9 @@ class PipetteTest(unittest.TestCase):
         This deals with z accrual behavior during tip add/remove, when +/- get
         flipped in pose tracking logic
         """
-        tip_length = 50
         prior_position = pose_tracker.absolute(self.robot.poses, self.p200)
-        self.p200._add_tip(tip_length)
-        self.p200._remove_tip(tip_length)
+        self.p200._add_tip(42)
+        self.p200._remove_tip(42)
         new_position = pose_tracker.absolute(self.robot.poses, self.p200)
 
         assert (new_position == prior_position).all()

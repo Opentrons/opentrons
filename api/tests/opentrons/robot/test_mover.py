@@ -1,4 +1,3 @@
-import pytest
 from opentrons.trackers.pose_tracker import (
     change_base, init, ROOT
 )
@@ -8,12 +7,7 @@ from numpy import array, isclose
 from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
 
 
-@pytest.fixture
-def driver():
-    return SmoothieDriver_3_0_0()
-
-
-def test_functional(driver):
+def test_functional(smoothie):
     scale = array([
         [2, 0, 0, -1],
         [0, 2, 0, -2],
@@ -29,17 +23,17 @@ def test_functional(driver):
     ])
 
     left = Mover(
-        driver=driver,
+        driver=smoothie,
         axis_mapping={'z': 'Z'},
         src=ROOT,
         dst=id(scale))
     right = Mover(
-        driver=driver,
+        driver=smoothie,
         axis_mapping={'z': 'A'},
         src=ROOT,
         dst=id(scale))
     gantry = Mover(
-        driver=driver,
+        driver=smoothie,
         axis_mapping={'x': 'X', 'y': 'Y'},
         src=ROOT,
         dst=id(scale),

@@ -1,31 +1,19 @@
 import pytest
 
 from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import (
-    AXES, HOMED_POSITION, SmoothieDriver_3_0_0
+    AXES, HOMED_POSITION
 )
 
 POSITION_ON_BOOT = {axis: 0 for axis in AXES}
 
 
-@pytest.fixture
-def driver():
-    return SmoothieDriver_3_0_0()
+def test_driver_init(smoothie):
+    assert smoothie.position == POSITION_ON_BOOT
 
 
-@pytest.fixture
-def homed_driver():
-    driver = SmoothieDriver_3_0_0()
-    driver.home()
-    return driver
-
-
-def test_driver_init(driver):
-    assert driver.position == POSITION_ON_BOOT
-
-
-def test_home(driver):
-    driver.home()
-    assert driver.position == HOMED_POSITION
+def test_home(smoothie):
+    smoothie.home()
+    assert smoothie.position == HOMED_POSITION
 
 
 @pytest.mark.parametrize("target_movement, expected_new_position", [
@@ -42,6 +30,7 @@ def test_home(driver):
         {'X': 394, 'Y': 344, 'Z': 10, 'A': 227, 'B': 21, 'C': 1}
     )
 ])
-def test_move(target_movement, expected_new_position, homed_driver):
-    homed_driver.move(target_movement)
-    assert homed_driver.position == expected_new_position
+def test_move(target_movement, expected_new_position, smoothie):
+    smoothie.home()
+    smoothie.move(target_movement)
+    assert smoothie.position == expected_new_position

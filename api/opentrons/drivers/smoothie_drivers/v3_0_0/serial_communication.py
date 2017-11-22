@@ -1,18 +1,14 @@
 import serial
 from serial.tools import list_ports
-from opentrons.robot.robot_configs import config
 import contextlib
 
 DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
-SMOOTHIE_BOARD_NAME = 'FT232R'
 
 ERROR_KEYWORD = b'error'
 ALARM_KEYWORD = b'ALARM'
-
-BAUDRATE = config.serial_speed
 
 
 def get_ports(device_name):
@@ -95,11 +91,11 @@ def write_and_return(
     return response
 
 
-def connect(device_name=SMOOTHIE_BOARD_NAME):
+def connect(device_name, baudrate):
     '''
     Creates a serial connection
     :param device_name: defaults to 'Smoothieboard'
     :return: serial.Serial connection
     '''
     smoothie_port = get_ports(device_name=device_name)[0]
-    return _connect(port_name=smoothie_port, baudrate=BAUDRATE)
+    return _connect(port_name=smoothie_port, baudrate=baudrate)
