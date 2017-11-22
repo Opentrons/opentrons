@@ -12,7 +12,7 @@ from opentrons.data_storage import database
 from opentrons.broker import subscribe
 import opentrons.util.calibration_functions as calib
 
-from .robot_configs import load
+from opentrons.robot.robot_configs import load
 
 log = get_logger(__name__)
 
@@ -326,7 +326,7 @@ class Robot(object):
             self.poses,
             instrument,
             parent=mount,
-            point=self.config.instrument_offsets['left'][instrument.type]
+            point=self.config.instrument_offsets[mount][instrument.type]
         )
 
     def add_warning(self, warning_msg):

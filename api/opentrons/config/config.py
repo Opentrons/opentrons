@@ -1,4 +1,11 @@
-def children(value, path=None):
+from typing import List, Tuple
+
+
+def children(value, path=None) -> List[Tuple[tuple, object]]:
+    """
+    Returns list of tuples containing the full path to the value
+    and the value itself
+    """
     path = path or []
 
     return sum([
@@ -9,7 +16,11 @@ def children(value, path=None):
     ]
 
 
-def build(pairs):
+def build(pairs: List[Tuple[tuple, object]]) -> dict:
+    """
+    Builds a tree out of key-value pairs consisting of full
+    path to the value and the value itself
+    """
     tree = {}
 
     def append(tree, path, value):
@@ -30,5 +41,9 @@ def build(pairs):
     return tree
 
 
-def merge(trees):
+def merge(trees: List[dict]) -> dict:
+    """
+    Merges trees observing the order,
+    adding new elements and overriding existing ones
+    """
     return build(sum([children(tree) for tree in trees], []))
