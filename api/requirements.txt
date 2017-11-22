@@ -5,7 +5,7 @@ pytest-cov
 numpydoc==0.6.0
 # June 15 2017 (artyom) : https://github.com/pyinstaller/pyinstaller/issues/2434
 git+https://github.com/pyinstaller/pyinstaller.git@7e814646474efc868206beb8fb9dfe45af527109
-Sphinx==1.4.8
+Sphinx==1.6.5
 twine==1.9.1
 dill==0.2.5
 Flask==0.10.1
