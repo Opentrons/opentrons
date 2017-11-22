@@ -2,7 +2,7 @@ pylama==7.4.3
 pytest==3.2.5
 pytest-cov==2.5.1
 
-numpydoc==0.6.0
+numpydoc==0.7.0
 # June 15 2017 (artyom) : https://github.com/pyinstaller/pyinstaller/issues/2434
 git+https://github.com/pyinstaller/pyinstaller.git@7e814646474efc868206beb8fb9dfe45af527109
 Sphinx==1.4.8
