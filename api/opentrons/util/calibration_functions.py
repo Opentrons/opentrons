@@ -5,6 +5,7 @@ from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
 from opentrons.data_storage import database
+from opentrons.trackers.pose_tracker import absolute
 
 
 def calibrate_container_with_delta(
@@ -50,12 +51,13 @@ def probe_instrument(instrument, robot):
 
     # size along X, Y and Z
     probe_size = array(robot.config.probe_dimensions)
+    _, _, height = probe_size
     switches = [
-        (0.2,   -1, 0),
-        (0.2,    1, 0),
-        ( -1, -0.2, 0),
-        (  1, -0.2, 0),
-        (  0, -0.2, 1),
+        (0.2,   -1, 0, 'y'),
+        (0.2,    1, 0, 'y'),
+        ( -1, -0.2, 0, 'x'),
+        (  1, -0.2, 0, 'x'),
+        (  0, -0.2, 1, 'z'),
     ]
     center = array(robot.config.probe_center)
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
@@ -64,22 +66,15 @@ def probe_instrument(instrument, robot):
 
     acc = []
 
-    for switch in switches:
-        mask = [abs(s) == 1 for s in switch]
-        inv_mask = [not bit for bit in mask]
-
+    for *switch, axis in switches:
         sx, sy, sz = switch
         probing_vector = array((sx, sy, sz)) * probe_size
         x, y, z = probing_vector + center
 
-        if abs(sx) == 1:
-            axis = 'x'
-        elif abs(sy) == 1:
-            axis = 'y'
-        else:
-            axis = 'z'
+        mask = [axis == a for a in 'xyz']
+        inv_mask = [not bit for bit in mask]
 
-        robot.poses = instrument._move(robot.poses, z=size_z * 1.2)
+        robot.poses = instrument._move(robot.poses, z=height * 1.2)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
@@ -90,7 +85,7 @@ def probe_instrument(instrument, robot):
         )
 
         x, y, z = absolute(robot.poses, instrument) * mask
-        acc.append(array(x, y, z))
+        acc.append(array((x, y, z)))
 
         # after probing two points along the same axis
         # average them out, update center and clear accumulator

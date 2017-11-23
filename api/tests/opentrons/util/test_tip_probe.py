@@ -42,28 +42,32 @@ def fixture(config, monkeypatch):
     from opentrons.robot.robot import Robot
     from opentrons.instruments.pipette import Pipette
     from collections import namedtuple
+    from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
 
     log = []
 
-    def move(self, **kwargs) {
-        log.append(kwargs)
-    }
+    def move(self, *args, **kwargs):
+        log.append((args, kwargs))
 
     monkeypatch.setattr(
-        'opentrons.drivers.v3_0_0.driver_3_0.SmoothieDriver_3_0_0.move',
+        driver_3_0.SmoothieDriver_3_0_0,
+        'move',
         move
     )
 
     robot = Robot(config=config)
     pipette = Pipette(robot, mount='right')
+    robot.home()
 
-    return namedtuple('fixture', 'robot pipette log')(
+    return namedtuple('fixture', 'robot instrument log')(
             robot=robot,
-            pipette=pipette,
+            instrument=pipette,
             log=log
         )
 
 
 def test_tip_probe(fixture):
     from opentrons.util.calibration_functions import probe_instrument
-    probe_instrument(instrument=fixture.instrument, robot=fixture.robt)
+    probe_instrument(instrument=fixture.instrument, robot=fixture.robot)
+    from pprint import pprint
+    pprint(fixture.log)
