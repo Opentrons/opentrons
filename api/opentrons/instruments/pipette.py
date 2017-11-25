@@ -1439,25 +1439,28 @@ class Pipette:
             pose_tree,
             self)
 
-        x = current_x if x is None else x
-        y = current_y if y is None else y
-        z = current_z if z is None else z
+        _x = current_x if x is None else x
+        _y = current_y if y is None else y
+        _z = current_z if z is None else z
 
         dx, dy, dz = pose_tracker.change_base(
             pose_tree,
             src=self,
             dst=self.mount)
 
-        x, y, z = x and x - dx, y and y - dy, z and z - dz
+        _x, _y, _z = _x - dx, _y - dy, _z - dz
 
-        pose_tree = self.robot.gantry.move(
-            pose_tree,
-            x=x,
-            y=y)
-        pose_tree = self.instrument_mover.move(
-            pose_tree,
-            z=z,
-            low_power_z=low_power_z)
+        if x is not None or y is not None:
+            pose_tree = self.robot.gantry.move(
+                pose_tree,
+                x=_x,
+                y=_y)
+
+        if z is not None:
+            pose_tree = self.instrument_mover.move(
+                pose_tree,
+                z=_z,
+                low_power_z=low_power_z)
 
         return pose_tree
 
@@ -1473,9 +1476,9 @@ class Pipette:
     def _probe(self, pose_tree, axis, movement):
         assert axis in 'xyz', "Axis must be 'x', 'y', or 'z'"
         if axis in 'xy':
-            value = self.robot.gantry.probe(pose_tree, axis, movement)
+            pose_tree = self.robot.gantry.probe(pose_tree, axis, movement)
         elif axis == 'z':
-            value = self.instrument_mover.probe(pose_tree, axis, movement)
+            pose_tree = self.instrument_mover.probe(pose_tree, axis, movement)
 
         return pose_tree
 

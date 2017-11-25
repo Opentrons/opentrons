@@ -36,6 +36,7 @@ class CalibrationManager:
 
         calibration_functions.probe_instrument(
             inst, inst.robot)
+
         self._set_state('ready')
 
     def pick_up_tip(self, instrument, container):

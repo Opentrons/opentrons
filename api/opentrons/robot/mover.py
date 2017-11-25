@@ -68,9 +68,9 @@ class Mover:
         # map from driver axis names to xyz and expand position
         # into point object
         point = Point(
-            x=position.get(self._axis_mapping.get('x', 'X'), 0.0),
-            y=position.get(self._axis_mapping.get('y', 'Y'), 0.0),
-            z=position.get(self._axis_mapping.get('z', 'Z'), 0.0)
+            x=position.get(self._axis_mapping.get('x', ''), 0.0),
+            y=position.get(self._axis_mapping.get('y', ''), 0.0),
+            z=position.get(self._axis_mapping.get('z', ''), 0.0)
         )
 
         return update(pose_tree, self, point)
@@ -91,11 +91,10 @@ class Mover:
             position = self._driver.probe_axis(
                 self._axis_mapping[axis],
                 movement)
-
             point = Point(
-                x=position.get(self._axis_mapping.get('x', 'X'), 0.0),
-                y=position.get(self._axis_mapping.get('y', 'Y'), 0.0),
-                z=position.get(self._axis_mapping.get('z', 'Z'), 0.0)
+                x=position.get(self._axis_mapping.get('x', ''), 0.0),
+                y=position.get(self._axis_mapping.get('y', ''), 0.0),
+                z=position.get(self._axis_mapping.get('z', ''), 0.0)
             )
 
             return update(pose_tree, self, point)

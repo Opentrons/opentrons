@@ -1,5 +1,4 @@
 from numpy import array
-from numpy.linalg import norm
 
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
@@ -33,7 +32,6 @@ def calibrate_pipette(probing_values, probe):
 
 def probe_instrument(instrument, robot):
     robot.home()
-
     #       Y ^
     #         * 1
     #         |
@@ -45,64 +43,64 @@ def probe_instrument(instrument, robot):
     # We are using above mental model to define
     # left, right, forward, backward, center on a probe
     #
-    # X, Y, Z point and travel direction
     # Z = 0 denotes the tip down for XY calibration
     # Z = 1 denotes the tip up to begin Z calibration
 
-    # size along X, Y and Z
-    probe_size = array(robot.config.probe_dimensions)
-    _, _, height = probe_size
-    switches = [
-        (0.2,   -1, 0, 'y'),
-        (0.2,    1, 0, 'y'),
-        ( -1, -0.2, 0, 'x'),
-        (  1, -0.2, 0, 'x'),
-        (  0, -0.2, 1, 'z'),
+    size_x, size_y, size_z = robot.config.probe_dimensions
+
+    # Each list item defines axis we are probing for
+    # and position within probing bounding box, where
+    # -1 is minimum value and 1 is maximum value
+    # (i.e. leftmost, rightmost, top, bottom, etc)
+    hot_spots = [
+        ('y', 0.2*size_x,   -1*size_y, 0*size_z),
+        ('y', 0.2*size_x,    1*size_y, 0*size_z),
+        ('x',  -1*size_x, -0.2*size_y, 0*size_z),
+        ('x',   1*size_x, -0.2*size_y, 0*size_z),
+        ('z',   0*size_x, -0.2*size_y, 1*size_z),
     ]
-    center = array(robot.config.probe_center)
+
+    center = Point(*robot.config.probe_center)
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
 
     instrument._add_tip(tip_length)
 
     acc = []
 
-    for *switch, axis in switches:
-        sx, sy, sz = switch
-        probing_vector = array((sx, sy, sz)) * probe_size
-        x, y, z = probing_vector + center
+    for axis, *probing_vector in hot_spots:
+        x, y, z = array(probing_vector) + center
+        index = 'xyz'.index(axis)
 
-        mask = [axis == a for a in 'xyz']
-        inv_mask = [not bit for bit in mask]
-
-        robot.poses = instrument._move(robot.poses, z=height * 1.2)
+        robot.poses = instrument._move(robot.poses, z=size_z * 1.2)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
         robot.poses = instrument._probe(
             robot.poses,
             axis,
-            -norm(probing_vector)
+            -probing_vector[index]
         )
 
-        x, y, z = absolute(robot.poses, instrument) * mask
-        acc.append(array((x, y, z)))
+        value = absolute(robot.poses, instrument)[index]
+        acc.append(value)
 
         # after probing two points along the same axis
         # average them out, update center and clear accumulator
         if len(acc) == 2:
-            center = center * inv_mask + (acc[0] * mask + acc[1] * mask) / 2.0
+            center = center._replace(**{axis: (acc[0] + acc[1]) / 2.0})
             acc.clear()
 
+        # Bounce back to release end stop
+        bounce = value + 5 * probing_vector[index] / abs(probing_vector[index])
         robot.poses = instrument._move(
             robot.poses,
-            x=(x + sx * 5),
-            y=(y + sy * 5),
-            z=(z + sz * 5))
+            **{axis: bounce}
+        )
 
     instrument._remove_tip(tip_length)
     robot.home()
 
-    return acc.pop()
+    return center._replace(**{axis: acc.pop()})
 
 
 def move_instrument_for_probing_prep(instrument, robot):
