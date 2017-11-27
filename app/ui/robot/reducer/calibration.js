@@ -15,7 +15,10 @@ import {
   HOMING,
   HOMED,
   CONFIRMING,
-  CONFIRMED
+  CONFIRMED,
+
+  JOG_DISTANCE_SLOW_MM,
+  JOG_DISTANCE_FAST_MM
 } from '../constants'
 
 const {
@@ -35,6 +38,7 @@ const {
   RESET_TIP_PROBE,
   MOVE_TO,
   MOVE_TO_RESPONSE,
+  TOGGLE_JOG_DISTANCE,
   JOG,
   JOG_RESPONSE,
   UPDATE_OFFSET,
@@ -44,6 +48,7 @@ const {
 
 const INITIAL_STATE = {
   labwareReviewed: false,
+  jogDistance: JOG_DISTANCE_SLOW_MM,
 
   // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
   // axis. probedByAxis holds a flag for whether the instrument has been
@@ -90,6 +95,7 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
     case MOVE_TO: return handleMoveTo(state, action)
     case MOVE_TO_RESPONSE: return handleMoveToResponse(state, action)
+    case TOGGLE_JOG_DISTANCE: return handleToggleJog(state, action)
     case JOG: return handleJog(state, action)
     case JOG_RESPONSE: return handleJogResponse(state, action)
     case UPDATE_OFFSET: return handleUpdateOffset(state, action)
@@ -331,6 +337,15 @@ function handleConfirmTiprackResponse (state, action) {
       ...state.confirmedBySlot,
       [slot]: error == null
     }
+  }
+}
+
+function handleToggleJog (state, action) {
+  return {
+    ...state,
+    jogDistance: state.jogDistance === JOG_DISTANCE_SLOW_MM
+      ? JOG_DISTANCE_FAST_MM
+      : JOG_DISTANCE_SLOW_MM
   }
 }
 

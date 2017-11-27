@@ -264,3 +264,7 @@ export function getJogInProgress (state) {
 export function getOffsetUpdateInProgress (state) {
   return getCalibrationState(state).updateOffsetRequest.inProgress
 }
+
+export function getJogDistance (state) {
+  return getCalibrationState(state).jogDistance
+}

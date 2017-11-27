@@ -290,6 +290,12 @@ describe('robot actions', () => {
     expect(actions.moveToResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('toggle jog distance action', () => {
+    const expected = {type: actionTypes.TOGGLE_JOG_DISTANCE}
+
+    expect(actions.toggleJogDistance()).toEqual(expected)
+  })
+
   test('jog action', () => {
     const expected = {
       type: actionTypes.JOG,

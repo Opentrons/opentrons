@@ -7,7 +7,7 @@ describe('robot reducer - calibration', () => {
 
     expect(state).toEqual({
       labwareReviewed: false,
-
+      jogDistance: constants.JOG_DISTANCE_SLOW_MM,
       // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
       // axis. probedByAxis holds a flag for whether the instrument has been
       // probed at least once by axis. Rethink or combine these states
@@ -421,6 +421,19 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, failure).calibration).toEqual({
       moveToRequest: {inProgress: false, error: new Error('AH'), slot: 5},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UNCONFIRMED}
+    })
+  })
+
+  test('handles TOGGLE_JOG_DISTANCE action', () => {
+    const slow = {calibration: {jogDistance: constants.JOG_DISTANCE_SLOW_MM}}
+    const fast = {calibration: {jogDistance: constants.JOG_DISTANCE_FAST_MM}}
+    const action = {type: actionTypes.TOGGLE_JOG_DISTANCE}
+
+    expect(reducer(slow, action).calibration).toEqual({
+      jogDistance: constants.JOG_DISTANCE_FAST_MM
+    })
+    expect(reducer(fast, action).calibration).toEqual({
+      jogDistance: constants.JOG_DISTANCE_SLOW_MM
     })
   })
 

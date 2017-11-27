@@ -40,6 +40,7 @@ export const actionTypes = {
   RESET_TIP_PROBE: makeRobotActionName('RESET_TIP_PROBE'),
   MOVE_TO: makeRobotActionName('MOVE_TO'),
   MOVE_TO_RESPONSE: makeRobotActionName('MOVE_TO_RESPONSE'),
+  TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
   JOG: makeRobotActionName('JOG'),
   JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
   UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
@@ -222,6 +223,10 @@ export const actions = {
     if (error) action.payload = error
 
     return action
+  },
+
+  toggleJogDistance () {
+    return {type: actionTypes.TOGGLE_JOG_DISTANCE}
   },
 
   jog (instrument, axis, direction) {

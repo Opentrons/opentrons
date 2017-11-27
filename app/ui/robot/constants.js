@@ -41,3 +41,9 @@ export const DECK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 // pipette channels
 export const SINGLE_CHANNEL = 'single'
 export const MULTI_CHANNEL = 'multi'
+
+// jogging
+export const JOG_DIRECTION_NEG = -1
+export const JOG_DIRECTION_POS = 1
+export const JOG_DISTANCE_SLOW_MM = 0.25
+export const JOG_DISTANCE_FAST_MM = 4
