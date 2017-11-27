@@ -37,6 +37,9 @@ class CalibrationManager:
         calibration_functions.probe_instrument(
             inst, inst.robot)
 
+        # TODO: update pose tree and robot.config pipette offset
+        # base on the value returned
+
         self._set_state('ready')
 
     def pick_up_tip(self, instrument, container):

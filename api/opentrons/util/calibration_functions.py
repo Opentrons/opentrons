@@ -7,6 +7,15 @@ from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
 
 
+X_SWITCH_OFFSET_MM = -5.0
+Y_SWITCH_OFFSET_MM = 5.0
+Z_SWITCH_OFFSET_MM = -5.0
+Z_DECK_CLEARANCE_MM = 5.0
+
+BOUNCE_DISTANCE_MM = 5.0
+Z_MARGIN = 1.2  # Coefficient to multiply z-size by to clear probe top
+
+
 def calibrate_container_with_delta(
         pose_tree, container, delta_x,
         delta_y, delta_z, save, new_container_name=None
@@ -53,11 +62,11 @@ def probe_instrument(instrument, robot):
     # -1 is minimum value and 1 is maximum value
     # (i.e. leftmost, rightmost, top, bottom, etc)
     hot_spots = [
-        ('y', 0.2*size_x,   -1*size_y, 0*size_z),
-        ('y', 0.2*size_x,    1*size_y, 0*size_z),
-        ('x',  -1*size_x, -0.2*size_y, 0*size_z),
-        ('x',   1*size_x, -0.2*size_y, 0*size_z),
-        ('z',   0*size_x, -0.2*size_y, 1*size_z),
+        ('y', Y_SWITCH_OFFSET_MM,            -size_y, Z_DECK_CLEARANCE_MM),
+        ('y', Y_SWITCH_OFFSET_MM,             size_y, Z_DECK_CLEARANCE_MM),
+        ('x',            -size_x, X_SWITCH_OFFSET_MM, Z_DECK_CLEARANCE_MM),
+        ('x',             size_x, X_SWITCH_OFFSET_MM, Z_DECK_CLEARANCE_MM),
+        ('z',                0.0, Z_SWITCH_OFFSET_MM,   size_z * Z_MARGIN),
     ]
 
     center = Point(*robot.config.probe_center)
@@ -69,19 +78,19 @@ def probe_instrument(instrument, robot):
 
     for axis, *probing_vector in hot_spots:
         x, y, z = array(probing_vector) + center
-        index = 'xyz'.index(axis)
+        axis_index = 'xyz'.index(axis)
 
-        robot.poses = instrument._move(robot.poses, z=size_z * 1.2)
+        robot.poses = instrument._move(robot.poses, z=size_z * Z_MARGIN)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
         robot.poses = instrument._probe(
             robot.poses,
             axis,
-            -probing_vector[index]
+            -probing_vector[axis_index]
         )
 
-        value = absolute(robot.poses, instrument)[index]
+        value = absolute(robot.poses, instrument)[axis_index]
         acc.append(value)
 
         # after probing two points along the same axis
@@ -91,7 +100,10 @@ def probe_instrument(instrument, robot):
             acc.clear()
 
         # Bounce back to release end stop
-        bounce = value + 5 * probing_vector[index] / abs(probing_vector[index])
+        bounce = value + (
+            BOUNCE_DISTANCE_MM * (
+                probing_vector[axis_index] / abs(probing_vector[axis_index])))
+
         robot.poses = instrument._move(
             robot.poses,
             **{axis: bounce}
