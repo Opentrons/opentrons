@@ -8,8 +8,10 @@ RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
 
-# Note: FT232R is the board id for communication over usb on UNIX systems.
-# This is set for serial communication in the Dockerfile
+# Note: FT232R is the chip id for the serial-to-UART cables used to connect to
+# the robot. This value will usually be correct, if using a usb-to-UART cable
+# with this chip. Otherwise, set the env var to whatever identifier is used for
+# the serial connection.
 smoothie_id = os.environ.get('OT_SMOOTHIE_ID', 'FT232R')
 
 ERROR_KEYWORD = b'error'
