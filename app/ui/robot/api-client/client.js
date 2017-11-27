@@ -20,8 +20,6 @@ const INSTRUMENT_AXES = {
   a: 'right'
 }
 
-const DEFAULT_JOG_DISTANCE_MM = '0.25'
-
 export default function client (dispatch) {
   let rpcClient
   let remote
@@ -188,7 +186,7 @@ export default function client (dispatch) {
   function jog (state, action) {
     const {payload: {instrument: instrumentAxis, axis, direction}} = action
     const instrument = selectors.getInstrumentsByAxis(state)[instrumentAxis]
-    const distance = DEFAULT_JOG_DISTANCE_MM * direction
+    const distance = selectors.getJogDistance(state) * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => dispatch(actions.jogResponse()), 1000)

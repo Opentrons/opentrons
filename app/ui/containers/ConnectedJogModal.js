@@ -7,41 +7,31 @@ import {
 
 import JogModal from '../components/JogModal'
 
-const mapStateToProps = (state) => ({
-  isJogging: robotSelectors.getJogInProgress(state),
-  isUpdating: robotSelectors.getOffsetUpdateInProgress(state),
-  singleChannel: robotSelectors.getSingleChannel(state)
-})
+export default connect(mapStateToProps, null, mergeProps)(JogModal)
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  const {slot} = ownProps
-
+function mapStateToProps (state) {
   return {
-    // TODO(mc, 2017-10-06): make jog buttons containers so we can get rid
-    // of this supercurried function
-    jog: (instrument) => (axis, direction) => () => {
-      dispatch(robotActions.jog(instrument, axis, direction))
-    },
-    updateOffset: (instrument) => () => {
-      dispatch(robotActions.updateOffset(instrument, slot))
-    }
+    jogDistance: robotSelectors.getJogDistance(state),
+    isJogging: robotSelectors.getJogInProgress(state),
+    isUpdating: robotSelectors.getOffsetUpdateInProgress(state),
+    singleChannel: robotSelectors.getSingleChannel(state)
   }
 }
 
-// TODO(mc, 2017-11-03): investigate whether or not we can just get access to
-// dispatch and/or state in here. I think we're overcomplicating things
-const mergeProps = (stateProps, dispatchProps, ownProps) => {
-  const props = {...stateProps, ...dispatchProps, ...ownProps}
-  const {singleChannel, jog, updateOffset} = props
+function mergeProps (stateProps, dispatchProps, ownProps) {
+  const {singleChannel} = stateProps
+  const {dispatch} = dispatchProps
+  const {slot} = ownProps
 
-  props.jog = jog(singleChannel.axis)
-  props.updateOffset = updateOffset(singleChannel.axis)
-
-  return props
+  return {
+    ...ownProps,
+    ...stateProps,
+    jog: (axis, direction) => () => {
+      dispatch(robotActions.jog(singleChannel.axis, axis, direction))
+    },
+    updateOffset: () => {
+      dispatch(robotActions.updateOffset(singleChannel, slot))
+    },
+    toggleJogDistance: () => dispatch(robotActions.toggleJogDistance())
+  }
 }
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-  mergeProps
-)(JogModal)

@@ -2,7 +2,7 @@
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
-import {NAME, actions} from '../'
+import {NAME, actions, constants} from '../'
 
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
@@ -254,7 +254,8 @@ describe('api client', () => {
         [NAME]: {
           calibration: {
             confirmedBySlot: {},
-            labwareBySlot: {}
+            labwareBySlot: {},
+            jogDistance: constants.JOG_DISTANCE_FAST_MM
           },
           session: {
             protocolInstrumentsByAxis: {
@@ -472,8 +473,11 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.jog)
-            .toHaveBeenCalledWith({_id: 'inst-2'}, -0.25, 'y')
+          expect(calibrationManager.jog).toHaveBeenCalledWith(
+            {_id: 'inst-2'},
+            -constants.JOG_DISTANCE_FAST_MM,
+            'y'
+          )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
