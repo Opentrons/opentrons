@@ -27,26 +27,57 @@ export default function ConfirmCalibrationPrompt (props) {
   const {currentLabware, slot} = props
   const {calibration, isTiprack, type} = currentLabware
   const toolTipMessage = <Diagram isTiprack={isTiprack} type={type} />
+
   if (!calibration || calibration === MOVING_TO_SLOT) return null
+
   if (calibration === OVER_SLOT) {
     return (
       <div className={styles.prompt}>
-        <h3>
-          <strong>Is Pipette &nbsp;</strong>
-          <span className={classnames(styles.centered_prompt, tooltipStyles.parent)}>
-            accurately centered
-            <ToolTip style={TOP}>{toolTipMessage}</ToolTip>
-          </span>
-          &nbsp; over the A1 well of slot {slot}?
-        </h3>
+        <OverSlotCalibrationMessage
+          isTiprack={isTiprack}
+          slot={slot}
+          toolTipMessage={toolTipMessage}
+        />
         <ConfirmCalibrationButton slot={slot} />
-        <CalibrationLink to={`/setup-deck/${slot}/jog`}>No</CalibrationLink>
+        <CalibrationLink to={`/setup-deck/${slot}/jog`}>
+          No
+        </CalibrationLink>
       </div>
     )
   }
+
   return (
     <div className={styles.prompt}>
       <NextLabwareLink />
     </div>
+  )
+}
+
+const overSlotStatusStyle = classnames(
+  styles.centered_prompt,
+  tooltipStyles.parent
+)
+
+function OverSlotCalibrationMessage (props) {
+  const {isTiprack, slot, toolTipMessage} = props
+  const question = isTiprack
+    ? 'Did pipette '
+    : 'Is pipette '
+  const status = isTiprack
+    ? 'pick up tip'
+    : 'accurately centered'
+  const location = isTiprack
+    ? ` A1 from tiprack in slot ${slot}?`
+    : ` over well A1 of slot ${slot}?`
+
+  return (
+    <h3>
+      <strong>{question}</strong>
+      <span className={overSlotStatusStyle}>
+        {status}
+        <ToolTip style={TOP}>{toolTipMessage}</ToolTip>
+      </span>
+      {location}
+    </h3>
   )
 }
