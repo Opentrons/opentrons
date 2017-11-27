@@ -34,11 +34,18 @@ class CalibrationManager:
         log.debug('Probing tip with {}'.format(instrument.name))
         self._set_state('probing')
 
-        calibration_functions.probe_instrument(
-            inst, inst.robot)
+        measured_center = calibration_functions.probe_instrument(
+            instrument=inst,
+            robot=inst.robot)
 
-        # TODO: update pose tree and robot.config pipette offset
-        # base on the value returned
+        log.debug('Measured probe top center: {0}'.format(measured_center))
+
+        config = calibration_functions.update_instrument_config(
+            instrument=inst,
+            measured_center=measured_center
+        )
+
+        log.debug('New config: {0}'.format(config))
 
         self._set_state('ready')
 

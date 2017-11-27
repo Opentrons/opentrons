@@ -3,6 +3,7 @@ from numpy import array
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
+from opentrons.robot import robot_configs
 from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
 
@@ -13,7 +14,7 @@ Z_SWITCH_OFFSET_MM = -5.0
 Z_DECK_CLEARANCE_MM = 5.0
 
 BOUNCE_DISTANCE_MM = 5.0
-Z_MARGIN = 1.2  # Coefficient to multiply z-size by to clear probe top
+Z_MARGIN = 0.2  # How much of z height to be added to clear the top
 
 
 def calibrate_container_with_delta(
@@ -34,61 +35,36 @@ def calibrate_container_with_delta(
     return pose_tree
 
 
-def calibrate_pipette(probing_values, probe):
-    ''' Interprets values generated from tip probing returns '''
-    pass
-
-
-def probe_instrument(instrument, robot):
+def probe_instrument(instrument, robot) -> Point:
     robot.home()
-    #       Y ^
-    #         * 1
-    #         |
-    #   --*---+---*-->
-    #     -1  |   1  X
-    #         * -1
-    #         |
-    #
-    # We are using above mental model to define
-    # left, right, forward, backward, center on a probe
-    #
-    # Z = 0 denotes the tip down for XY calibration
-    # Z = 1 denotes the tip up to begin Z calibration
 
     size_x, size_y, size_z = robot.config.probe_dimensions
+    center = Point(*robot.config.probe_center)
 
-    # Each list item defines axis we are probing for
-    # and position within probing bounding box, where
-    # -1 is minimum value and 1 is maximum value
-    # (i.e. leftmost, rightmost, top, bottom, etc)
+    # Each list item defines axis we are probing for, starting position vector
+    # relative to probe top center and travel distance
     hot_spots = [
-        ('y', Y_SWITCH_OFFSET_MM,            -size_y, Z_DECK_CLEARANCE_MM),
-        ('y', Y_SWITCH_OFFSET_MM,             size_y, Z_DECK_CLEARANCE_MM),
-        ('x',            -size_x, X_SWITCH_OFFSET_MM, Z_DECK_CLEARANCE_MM),
-        ('x',             size_x, X_SWITCH_OFFSET_MM, Z_DECK_CLEARANCE_MM),
-        ('z',                0.0, Z_SWITCH_OFFSET_MM,   size_z * Z_MARGIN),
+        ('y', Y_SWITCH_OFFSET_MM,            -size_y, -center.z + Z_DECK_CLEARANCE_MM,  size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,             size_y, -center.z + Z_DECK_CLEARANCE_MM, -size_y),  # NOQA
+        ('x',            -size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,  size_x),  # NOQA
+        ('x',             size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM, -size_x),  # NOQA
+        ('z',                0.0, Z_SWITCH_OFFSET_MM,               size_z * Z_MARGIN, -size_z)   # NOQA
     ]
 
-    center = Point(*robot.config.probe_center)
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
 
     instrument._add_tip(tip_length)
 
     acc = []
 
-    for axis, *probing_vector in hot_spots:
+    for axis, *probing_vector, distance in hot_spots:
         x, y, z = array(probing_vector) + center
         axis_index = 'xyz'.index(axis)
-
-        robot.poses = instrument._move(robot.poses, z=size_z * Z_MARGIN)
+        robot.poses = instrument._move(robot.poses, z=center.z + size_z * Z_MARGIN)  # NOQA
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
-        robot.poses = instrument._probe(
-            robot.poses,
-            axis,
-            -probing_vector[axis_index]
-        )
+        robot.poses = instrument._probe(robot.poses, axis, distance)
 
         value = absolute(robot.poses, instrument)[axis_index]
         acc.append(value)
@@ -100,19 +76,47 @@ def probe_instrument(instrument, robot):
             acc.clear()
 
         # Bounce back to release end stop
-        bounce = value + (
-            BOUNCE_DISTANCE_MM * (
-                probing_vector[axis_index] / abs(probing_vector[axis_index])))
+        bounce = value + (BOUNCE_DISTANCE_MM * (-distance / abs(distance)))
 
-        robot.poses = instrument._move(
-            robot.poses,
-            **{axis: bounce}
-        )
+        robot.poses = instrument._move(robot.poses, **{axis: bounce})
 
     instrument._remove_tip(tip_length)
     robot.home()
 
     return center._replace(**{axis: acc.pop()})
+
+
+def update_instrument_config(instrument, measured_center) -> (Point, float):
+    """
+    Update instrument's x and y offsets and tip length based on delta between
+    probe center and measured_center, persist updated config and return it
+    """
+    from copy import deepcopy
+
+    config = instrument.robot.config
+    dx, dy, dz = array(measured_center) - config.probe_center
+
+    tip_length = deepcopy(config.tip_length)
+    instrument_offset = deepcopy(config.instrument_offset)
+
+    offset = \
+        array(instrument_offset[instrument.mount][instrument.type]) + \
+        (dx, dy, 0)
+
+    instrument_offset[instrument.mount][instrument.type] = tuple(offset)
+    tip_length[instrument.mount][instrument.type] = \
+        tip_length[instrument.mount][instrument.type] + \
+        dz
+
+    config = config \
+        ._replace(instrument_offset=instrument_offset) \
+        ._replace(tip_length=tip_length)
+
+    instrument.robot.config = config
+
+    robot_configs.save(config)
+
+    return instrument.robot.config
 
 
 def move_instrument_for_probing_prep(instrument, robot):

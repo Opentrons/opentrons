@@ -41,7 +41,7 @@ robot_config = namedtuple(
         'acceleration',
         'current',
         'gantry_calibration',
-        'instrument_offsets',
+        'instrument_offset',
         'probe_center',
         'probe_dimensions',
         'serial_speed',
@@ -68,7 +68,7 @@ default = robot_config(
         [ 0.00, 0.00, 0.00,   1.00]
     ],
     # left relative to right
-    instrument_offsets={
+    instrument_offset={
         'right': {
             'single': (0.0, 0.0, 0.0),
             'multi': (0.0, 31.5, -0.5)

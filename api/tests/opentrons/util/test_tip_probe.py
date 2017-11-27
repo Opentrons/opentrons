@@ -1,6 +1,7 @@
 import pytest
 from opentrons.util.calibration_functions import (
     probe_instrument,
+    update_instrument_config,
     BOUNCE_DISTANCE_MM,
     X_SWITCH_OFFSET_MM,
     Y_SWITCH_OFFSET_MM,
@@ -8,12 +9,16 @@ from opentrons.util.calibration_functions import (
     Z_DECK_CLEARANCE_MM,
     Z_MARGIN
 )
+from opentrons.util import environment
+from opentrons.robot import robot_configs
 
 
 @pytest.fixture
-def config():
-    from opentrons.robot.robot_configs import default
-    return default._replace(
+def config(monkeypatch, tmpdir):
+    monkeypatch.setenv('APP_DATA_DIR', str(tmpdir))
+    environment.refresh()
+
+    default = robot_configs.default._replace(
             gantry_calibration=[
                 [1.0, 0.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0, 0.0],
@@ -21,11 +26,11 @@ def config():
                 [0.0, 0.0, 0.0, 1.0]
             ],
             # probe top center
-            probe_center=(5.0, 5.0, 0.0),
+            probe_center=(5.0, 5.0, 100.0),
             # Bounding box relative to top center
             probe_dimensions=(50.0, 50.0, 100.0),
             # left relative to right
-            instrument_offsets={
+            instrument_offset={
                 'right': {
                     'single': (0.0, 0.0, 0.0),
                     'multi':  (0.0, 5.0, 0.0)
@@ -46,6 +51,8 @@ def config():
                 }
             }
         )
+    monkeypatch.setattr(robot_configs, 'default', default)
+    return default
 
 
 @pytest.fixture
@@ -114,7 +121,7 @@ def test_tip_probe(fixture):
     assert fixture.log == [
         # Clear probe top
         ('move', {
-            'A': tip_length + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to min Y hot spot
         ('move', {
             'X': center_x + Y_SWITCH_OFFSET_MM,
@@ -131,7 +138,7 @@ def test_tip_probe(fixture):
             'Y': min_y - BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to max Y hot spot
         ('move', {
             'X': center_x + Y_SWITCH_OFFSET_MM,
@@ -148,7 +155,7 @@ def test_tip_probe(fixture):
             'Y': max_y + BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to min X hot spot
         ('move', {
             'X': center_x - size_x,
@@ -165,7 +172,7 @@ def test_tip_probe(fixture):
             'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to max X hot spot
         ('move', {
             'X': center_x + size_x,
@@ -182,17 +189,59 @@ def test_tip_probe(fixture):
             'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to Z hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0,
             'Y': (min_y + max_y) / 2.0 + Z_SWITCH_OFFSET_MM}),
         ('move', {
-            'A': tip_length + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Probe in the direction opposite of Z axis
         ('probe_axis',
-            'A', -size_z * Z_MARGIN),
+            'A', -size_z),
         # Bounce back along Z
         ('move',
             {'A': max_z + BOUNCE_DISTANCE_MM})]
     assert res == (0.0, 0.0, 100.0)
+
+
+def test_update_instrument_config(fixture, monkeypatch):
+    from numpy import array
+    import json
+
+    robot = fixture.robot
+    instrument = fixture.instrument
+
+    tip_length = robot.config. \
+        tip_length[instrument.mount][instrument.type]
+    instrument_offset = robot.config. \
+        instrument_offset[instrument.mount][instrument.type]
+
+    config = update_instrument_config(
+        instrument=instrument,
+        measured_center=(0.0, 0.0, 105.0)
+    )
+
+    new_tip_length = config \
+        .tip_length[instrument.mount][instrument.type]
+    new_instrument_offset = config \
+        .instrument_offset[instrument.mount][instrument.type]
+
+    assert new_tip_length == tip_length + 5.0
+    assert new_instrument_offset == \
+        tuple(array(instrument_offset) - (5.0, 5.0, 0.0))
+
+    filename = environment.get_path('OT_CONFIG_FILE')
+    with open(filename, 'r') as file:
+        assert json.load(file) == {
+            'instrument_offset': {
+                'right': {
+                    'single': [-5.0, -5.0, 0.0]
+                }
+            },
+            'tip_length': {
+                'right': {
+                    'single': 55.0
+                }
+            }
+        }

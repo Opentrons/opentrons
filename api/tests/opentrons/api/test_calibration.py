@@ -22,15 +22,26 @@ async def test_tip_probe_functional(main_router, model):
 
 async def test_tip_probe(main_router, model):
     with mock.patch(
-         'opentrons.util.calibration_functions.probe_instrument') as patch:
-        main_router.calibration_manager.tip_probe(model.instrument)
+            'opentrons.util.calibration_functions.probe_instrument'
+         ) as probe_patch:
+        probe_patch.return_value = (0, 0, 0)
 
-        patch.assert_called_with(
-            model.instrument._instrument,
-            model.robot)
+        with mock.patch(
+                'opentrons.util.calibration_functions.update_instrument_config'
+             ) as update_patch:
 
-        await main_router.wait_until(state('probing'))
-        await main_router.wait_until(state('ready'))
+            main_router.calibration_manager.tip_probe(model.instrument)
+
+            probe_patch.assert_called_with(
+                instrument=model.instrument._instrument,
+                robot=model.robot)
+
+            update_patch.assert_called_with(
+                instrument=model.instrument._instrument,
+                measured_center=(0, 0, 0))
+
+    await main_router.wait_until(state('probing'))
+    await main_router.wait_until(state('ready'))
 
 
 async def test_move_to_front(main_router, model):
@@ -40,7 +51,6 @@ async def test_move_to_front(main_router, model):
 
     with mock.patch(
          'opentrons.util.calibration_functions.move_instrument_for_probing_prep') as patch:  # NOQA
-
         main_router.calibration_manager.move_to_front(model.instrument)
         patch.assert_called_with(
             model.instrument._instrument,
