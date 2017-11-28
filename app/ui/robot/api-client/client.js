@@ -176,7 +176,6 @@ export default function client (dispatch) {
     // return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
 
     remote.calibration_manager.move_to(instrument, labware)
-
       .then(() => dispatch(actions.moveToResponse()))
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
@@ -198,8 +197,11 @@ export default function client (dispatch) {
 
   function updateOffset (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
+    const labwareObject = selectors.getLabwareBySlot(state)[slot]
+
     const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
-    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
+    const labware = {_id: labwareObject._id}
+    const isTiprack = labwareObject.isTiprack
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {
@@ -208,12 +210,7 @@ export default function client (dispatch) {
     // }, 2000)
 
     remote.calibration_manager.update_container_offset(labware, instrument)
-      .then(() => {
-        // TODO(mc, 2017-10-06): do this without a double dispatch
-        // also this hardcoded URL is a bad idea™
-        dispatch(actions.updateOffsetResponse())
-        dispatch(push(`/setup-deck/${slot}`))
-      })
+      .then(() => dispatch(actions.updateOffsetResponse(null, isTiprack)))
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
 

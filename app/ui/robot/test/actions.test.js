@@ -334,7 +334,8 @@ describe('robot actions', () => {
   test('update offset response action', () => {
     const success = {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
-      error: false
+      error: false,
+      payload: {isTiprack: true}
     }
     const failure = {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
@@ -342,7 +343,7 @@ describe('robot actions', () => {
       payload: new Error('AH')
     }
 
-    expect(actions.updateOffsetResponse()).toEqual(success)
+    expect(actions.updateOffsetResponse(null, true)).toEqual(success)
     expect(actions.updateOffsetResponse(new Error('AH'))).toEqual(failure)
   })
 

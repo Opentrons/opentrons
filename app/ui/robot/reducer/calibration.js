@@ -335,7 +335,7 @@ function handleConfirmTiprackResponse (state, action) {
     },
     confirmedBySlot: {
       ...state.confirmedBySlot,
-      [slot]: error == null
+      [slot]: !error
     }
   }
 }
@@ -376,21 +376,29 @@ function handleUpdateOffset (state, action) {
 function handleUpdateResponse (state, action) {
   const {updateOffsetRequest: {slot}} = state
   const {error, payload} = action
-  const confirmationStatus = !error
-    ? CONFIRMED
-    : OVER_SLOT
+  let labwareBySlot = {...state.labwareBySlot}
+  let confirmedBySlot = {...state.confirmedBySlot}
+
+  // set status and confirmed flag for non-tipracks
+  // tipracks are handled by confirmTiprack so we don't want to touch them here
+  if (!payload.isTiprack) {
+    confirmedBySlot[slot] = !error
+    labwareBySlot[slot] = !error
+      ? CONFIRMED
+      : OVER_SLOT
+  }
 
   return {
     ...state,
+    labwareBySlot,
+    confirmedBySlot,
     updateOffsetRequest: {
       ...state.updateOffsetRequest,
       inProgress: false,
       error: error
         ? payload
         : null
-    },
-    labwareBySlot: {...state.labwareBySlot, [slot]: confirmationStatus},
-    confirmedBySlot: {...state.confirmedBySlot, [slot]: !error}
+    }
   }
 }
 

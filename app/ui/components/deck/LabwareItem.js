@@ -17,19 +17,14 @@ import troughImgSrcActive from '../../img/labware/deckmap/trough-12row-active.pn
 import tubeImgSrc from '../../img/labware/deckmap/tube-rack-2ml.png'
 import tubeImgSrcActive from '../../img/labware/deckmap/tube-rack-2ml-active.png'
 
-const {UNCONFIRMED, MOVING_TO_SLOT, OVER_SLOT, CONFIRMED} = robotConstants
+const {UNCONFIRMED, MOVING_TO_SLOT, CONFIRMED} = robotConstants
 
 LabwareItem.propTypes = {
   slot: PropTypes.number.isRequired,
   type: PropTypes.string,
   isCurrent: PropTypes.bool,
   isDisabled: PropTypes.bool,
-  calibration: PropTypes.oneOf([
-    UNCONFIRMED,
-    MOVING_TO_SLOT,
-    OVER_SLOT,
-    CONFIRMED
-  ])
+  calibration: robotConstants.LABWARE_CONFIRMATION_TYPE
 }
 
 export default function LabwareItem (props) {

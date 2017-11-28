@@ -21,7 +21,7 @@ JogModal.propTypes = {
     JOG_DISTANCE_FAST_MM
   ]).isRequired,
   jog: PropTypes.func.isRequired,
-  updateOffset: PropTypes.func.isRequired,
+  onConfirmClick: PropTypes.func.isRequired,
   toggleJogDistance: PropTypes.func.isRequired,
   isJogging: PropTypes.bool.isRequired,
   isUpdating: PropTypes.bool.isRequired
@@ -37,7 +37,7 @@ const BUTTONS = [
 ]
 
 export default function JogModal (props) {
-  const {slot, jog, updateOffset, isJogging, isUpdating} = props
+  const {slot, jog, onConfirmClick, isJogging, isUpdating} = props
   const url = `/setup-deck/${slot}`
   const isDisabled = isJogging || isUpdating
   const confirmButtonContents = isUpdating
@@ -64,13 +64,14 @@ export default function JogModal (props) {
           <label className={styles.jog_z}>Z Axis</label>
         </div>
         <Link to={url} className={styles.close}>X</Link>
-        <button
-          className={styles.btn_confirm}
-          disabled={isDisabled}
-          onClick={updateOffset}
+
+        <Link
+          className={classnames(styles.btn_confirm, {disabled: isDisabled})}
+          to={`/setup-deck/${slot}`}
+          onClick={onConfirmClick}
         >
           {confirmButtonContents}
-        </button>
+        </Link>
       </div>
     </div>
   )

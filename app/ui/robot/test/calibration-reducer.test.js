@@ -489,17 +489,31 @@ describe('robot reducer - calibration', () => {
       }
     }
 
-    const success = {type: actionTypes.UPDATE_OFFSET_RESPONSE, error: false}
+    const successNonTiprack = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: false,
+      payload: {isTiprack: false}
+    }
+    const successTiprack = {
+      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      error: false,
+      payload: {isTiprack: true}
+    }
     const failure = {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
       error: true,
       payload: new Error('AH')
     }
 
-    expect(reducer(state, success).calibration).toEqual({
+    expect(reducer(state, successNonTiprack).calibration).toEqual({
       updateOffsetRequest: {inProgress: false, error: null, slot: 5},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.CONFIRMED},
       confirmedBySlot: {5: true}
+    })
+    expect(reducer(state, successTiprack).calibration).toEqual({
+      updateOffsetRequest: {inProgress: false, error: null, slot: 5},
+      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+      confirmedBySlot: {}
     })
     expect(reducer(state, failure).calibration).toEqual({
       updateOffsetRequest: {inProgress: false, error: new Error('AH'), slot: 5},

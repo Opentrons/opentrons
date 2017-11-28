@@ -495,7 +495,7 @@ describe('api client', () => {
 
     test('handles UPDATE_OFFSET success', () => {
       const action = actions.updateOffset('left', 9)
-      const expectedResponse = actions.updateOffsetResponse()
+      const expectedResponse = actions.updateOffsetResponse(null, true)
 
       calibrationManager.update_container_offset
         .mockReturnValue(Promise.resolve())

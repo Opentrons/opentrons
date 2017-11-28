@@ -6,8 +6,7 @@ import {constants as robotConstants} from '../../robot'
 
 import ToolTip, {TOP} from '../ToolTip'
 import Diagram from '../Diagram'
-import CalibrationLink from './CalibrationLink'
-import ConfirmCalibrationButton from './ConfirmCalibrationButton'
+import ConfirmCalibrationButtons from './ConfirmCalibrationButtons'
 import NextLabwareLink from './NextLabwareLink'
 import styles from './deck.css'
 import tooltipStyles from '../ToolTip.css'
@@ -17,38 +16,42 @@ ConfirmCalibrationPrompt.propTypes = {
   currentLabware: PropTypes.shape({
     slot: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
-    isTiprack: PropTypes.bool
+    isTiprack: PropTypes.bool,
+    calibration: robotConstants.LABWARE_CONFIRMATION_TYPE
   }).isRequired
 }
 
-const {MOVING_TO_SLOT, OVER_SLOT} = robotConstants
+const {MOVING_TO_SLOT, PICKING_UP, HOMING, CONFIRMED} = robotConstants
 
 export default function ConfirmCalibrationPrompt (props) {
   const {currentLabware, slot} = props
   const {calibration, isTiprack, type} = currentLabware
   const toolTipMessage = <Diagram isTiprack={isTiprack} type={type} />
 
-  if (!calibration || calibration === MOVING_TO_SLOT) return null
+  // TODO(mc, 2017-11-27): spinner?
+  if (
+    !calibration ||
+    calibration === MOVING_TO_SLOT ||
+    calibration === PICKING_UP ||
+    calibration === HOMING
+  ) return null
 
-  if (calibration === OVER_SLOT) {
+  if (calibration === CONFIRMED) {
     return (
       <div className={styles.prompt}>
-        <OverSlotCalibrationMessage
-          isTiprack={isTiprack}
-          slot={slot}
-          toolTipMessage={toolTipMessage}
-        />
-        <ConfirmCalibrationButton slot={slot} />
-        <CalibrationLink to={`/setup-deck/${slot}/jog`}>
-          No
-        </CalibrationLink>
+        <NextLabwareLink />
       </div>
     )
   }
 
   return (
     <div className={styles.prompt}>
-      <NextLabwareLink />
+      <OverSlotCalibrationMessage
+        isTiprack={isTiprack}
+        slot={slot}
+        toolTipMessage={toolTipMessage}
+      />
+      <ConfirmCalibrationButtons slot={slot} />
     </div>
   )
 }

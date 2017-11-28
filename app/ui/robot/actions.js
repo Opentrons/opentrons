@@ -250,14 +250,12 @@ export const actions = {
     })
   },
 
-  updateOffsetResponse (error = null) {
-    const action = {
+  updateOffsetResponse (error = null, isTiprack) {
+    return {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
-      error: error != null
+      error: error != null,
+      payload: error || {isTiprack}
     }
-    if (error) action.payload = error
-
-    return action
   },
 
   confirmLabware (labware) {

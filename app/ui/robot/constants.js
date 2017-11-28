@@ -1,5 +1,5 @@
-// robot redux module name constant
-// TODO(mc, 2017-08-29): maybe do a package.json instead?
+// robot redux module constants
+import PropTypes from 'prop-types'
 
 export const _NAME = 'robot'
 
@@ -23,6 +23,13 @@ export const PREPARING_TO_PROBE = 'preparing-to-probe'
 export const READY_TO_PROBE = 'ready-to-probe'
 export const PROBING = 'probing'
 export const PROBED = 'probed'
+export const INSTRUMENT_CALIBRATION_TYPE = PropTypes.oneOf([
+  UNPROBED,
+  PREPARING_TO_PROBE,
+  READY_TO_PROBE,
+  PROBING,
+  PROBED
+])
 
 // labware confirmation states
 export const UNCONFIRMED = 'unconfirmed'
@@ -33,6 +40,16 @@ export const HOMING = 'homing'
 export const HOMED = 'homed'
 export const CONFIRMING = 'confirming'
 export const CONFIRMED = 'confirmed'
+export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
+  UNCONFIRMED,
+  MOVING_TO_SLOT,
+  OVER_SLOT,
+  PICKING_UP,
+  HOMING,
+  HOMED,
+  CONFIRMING,
+  CONFIRMED
+])
 
 // deck layout
 export const INSTRUMENT_AXES = ['left', 'right']

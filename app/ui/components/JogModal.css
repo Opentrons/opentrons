@@ -121,6 +121,7 @@ a.close {
 }
 
 .btn_confirm {
+  display: inline-block;
   margin: 1rem;
   font-size: 1rem;
   width: 16rem;
@@ -138,6 +139,11 @@ a.close {
 
 .btn_confirm:hover {
   background-color: #555;
+}
+
+.btn_confirm.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .spinner {
