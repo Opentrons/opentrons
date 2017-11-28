@@ -59,33 +59,33 @@ default = robot_config(
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
     current='M907 ' + DEFAULT_POWER_STRING,
-    probe_center=(287, 295, 55.0),
-    probe_dimensions=(60.0, 60.0, 60.0),
+    probe_center=(295.0, 300.0, 55.0),
+    probe_dimensions=(35.0, 40.0, 60.0),
     gantry_calibration=[
-        [ 1.00, 0.00, 0.00, -35.23],
-        [ 0.00, 1.00, 0.00,  -1.81],
-        [ 0.00, 0.00, 1.00,   0.00],
+        [ 1.00, 0.00, 0.00,  -27.0],
+        [ 0.00, 1.00, 0.00,   -7.5],
+        [ 0.00, 0.00, 1.00,  -22.3],
         [ 0.00, 0.00, 0.00,   1.00]
     ],
     # left relative to right
     instrument_offset={
         'right': {
             'single': (0.0, 0.0, 0.0),
-            'multi': (0.0, 31.5, -0.5)
+            'multi': (0.0, 31.6, -28.0)
         },
         'left': {
-            'multi': (-37.5,  31.5,  -0.5),
-            'single': (-37.5, 0.0, 0.0)
+            'single': (-31.8, 0.0, 0.0),
+            'multi': (-31.8,  31.6, -28.0)
         }
     },
     tip_length={
         'left': {
-            'single': 51.5,
-            'multi': 51.5
+            'single': 51.7,
+            'multi': 51.7
         },
         'right': {
-            'single': 51.5,
-            'multi': 51.5
+            'single': 51.7,
+            'multi': 51.7
         }
     },
     serial_speed=115200,

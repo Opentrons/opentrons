@@ -229,7 +229,7 @@ def test_update_instrument_config(fixture, monkeypatch):
 
     assert new_tip_length == tip_length + 5.0
     assert new_instrument_offset == \
-        tuple(array(instrument_offset) - (5.0, 5.0, 0.0))
+        tuple(array(instrument_offset) + (-5.0, -5.0, 0.0))
 
     filename = environment.get_path('OT_CONFIG_FILE')
     with open(filename, 'r') as file:

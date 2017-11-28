@@ -6,15 +6,15 @@ import asyncio
 import urwid
 from numpy.linalg import inv
 from numpy import dot, array, insert
+from opentrons import robot, instruments
 from opentrons.robot import robot_configs
-from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
+from opentrons.util.calibration_functions import probe_instrument
 from solve import solve
 
-config = robot_configs.load()
-driver = SmoothieDriver_3_0_0(config=config)
+pipette = instruments.Pipette(mount='right')
 
 # Distance increments for jog
-steps = [0.25, 0.5, 1, 5, 10, 20, 40, 80]
+steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
 # Index of selected step
 step_index = 2
 
@@ -30,7 +30,7 @@ current_position = (0, 0, 0)
 # 200uL tip. Used during calibration process
 # The actual calibration represents end of a pipette
 # without tip on
-TIP_LENGTH = 47
+TIP_LENGTH = 51.7
 
 # Reference point being calibrated
 point_number = 0
@@ -38,9 +38,9 @@ point_number = 0
 # (0, 0) is in bottom-left corner
 # Expected reference points
 expected = [
-    (64.0, 92.8),       # dimple 4
-    (329.0, 92.8),      # dimple 6
-    (196.50, 273.80)    # dimple 11
+    (108.75, 92.8),       # dimple 4
+    (373.75, 92.8),      # dimple 6
+    (241.25, 273.80)    # dimple 11
 ]
 
 # Actuals get overridden when ENTER is pressed
@@ -57,7 +57,7 @@ test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
     ]
 
 
-T = config.gantry_calibration
+T = robot.config.gantry_calibration
 XY = None
 
 # 3rd row, 4th column corresponds to Z-shift in
@@ -88,7 +88,7 @@ def position():
     to the axis of a pipette currently used
     """
     try:
-        p = driver.position
+        p = robot._driver.position
         res = (p['X'], p['Y'], p[current_pipette.upper()])
     except KeyError:
         # for some reason we are sometimes getting
@@ -125,7 +125,7 @@ def status(text):
 
 def jog(axis, direction, step):
     global current_position
-    driver.move({axis: driver.position[axis] + direction * step})
+    robot._driver.move({axis: robot._driver.position[axis] + direction * step})
     current_position = position()
     status('Jog: ' + repr([axis, str(direction), str(step)]))
 
@@ -141,7 +141,8 @@ key_mappings = {
 
 
 def key_pressed(key):
-    global current_position, current_pipette, step_index, point_number, XY, T
+    global current_position, current_pipette, step_index, \
+        point_number, XY, T
 
     if key == 'z':
         current_pipette = left if current_pipette == right else right
@@ -163,11 +164,27 @@ def key_pressed(key):
         if (point_number < len(actual) - 1):
             point_number += 1
         status('skipped #{0}'.format(point_number))
+    # run tip probe
+    elif key == 'p':
+        probe_center = probe_instrument(pipette, robot)
+        robot.config = robot.config._replace(
+            probe_center=probe_center
+        )
+        status('Tip probe')
     # save calibration point and move to next
     elif key == 'enter':
         actual[point_number] = position()[:-1]
         if (point_number < len(actual) - 1):
             point_number += 1
+
+        # On last point update gantry calibration
+        if point_number == 3:
+            XY = solve(expected, actual)
+            T = add_z(XY)
+            robot.config = robot.config._replace(
+                    gantry_calibration=T,
+                )
+
         status('saved #{0}: {1}'.format(point_number, actual[point_number]))
     # move to previous calibration point
     elif key == 'backspace':
@@ -176,9 +193,7 @@ def key_pressed(key):
         status('')
     # home
     elif key == '\\':
-        driver.home('za')
-        driver.home('x')
-        driver.home()
+        robot.home()
         current_position = position()
         status('Homed')
     # calculate transformation matrix
@@ -186,12 +201,12 @@ def key_pressed(key):
         raise urwid.ExitMainLoop
     elif key == ' ':
         try:
-            XY = solve(expected, actual)
-            T = add_z(XY)
+            diff = robot_configs.save(robot.config)
+            status('Saved')
         except Exception as e:
             status(repr(e))
         else:
-            status(repr(XY))
+            status(str(diff))
     else:
         try:
             key_mappings[key]()
@@ -206,15 +221,15 @@ def validate(index):
 
     if z < SAFE_HEIGHT:
         _, _, z, _ = dot(T, [x, y, SAFE_HEIGHT, 1])
-        driver.move({current_pipette: z})
+        robot._driver.move({current_pipette: z})
 
     x, y, z, _ = dot(T, v)
-    driver.move({'X': x, 'Y': y})
-    driver.move({current_pipette: z})
+    robot._driver.move({'X': x, 'Y': y})
+    robot._driver.move({current_pipette: z})
 
 
 def main():
-    driver.connect()
+    robot.connect()
     tip = urwid.Text(u"X/Y/Z: left,right/up,down/q,a; Pipette (swap): z; Steps: -/=; Test points: 1, 2, 3")   # NOQA
     pile = urwid.Pile([tip, status_text])
     root = urwid.Filler(pile, 'top')
@@ -229,7 +244,7 @@ def main():
     status('Hello!')
     ui_loop.run()
 
-    print('Calibration data: \n', repr(T))
+    print('Robot config: \n', robot.config)
 
 
 if __name__ == "__main__":

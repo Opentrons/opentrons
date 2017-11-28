@@ -8,10 +8,10 @@ from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
 
 
-X_SWITCH_OFFSET_MM = -5.0
+X_SWITCH_OFFSET_MM = 5.0
 Y_SWITCH_OFFSET_MM = 5.0
-Z_SWITCH_OFFSET_MM = -5.0
-Z_DECK_CLEARANCE_MM = 5.0
+Z_SWITCH_OFFSET_MM = 5.0
+Z_DECK_CLEARANCE_MM = 25.0
 
 BOUNCE_DISTANCE_MM = 5.0
 Z_MARGIN = 0.2  # How much of z height to be added to clear the top
@@ -36,6 +36,8 @@ def calibrate_container_with_delta(
 
 
 def probe_instrument(instrument, robot) -> Point:
+    from statistics import mean
+
     robot.home()
 
     size_x, size_y, size_z = robot.config.probe_dimensions
@@ -57,16 +59,25 @@ def probe_instrument(instrument, robot) -> Point:
 
     acc = []
 
+    res = {
+        'x': [], 'y': [], 'z': []
+    }
+
     for axis, *probing_vector, distance in hot_spots:
         x, y, z = array(probing_vector) + center
-        axis_index = 'xyz'.index(axis)
+
         robot.poses = instrument._move(robot.poses, z=center.z + size_z * Z_MARGIN)  # NOQA
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
+        axis_index = 'xyz'.index(axis)
         robot.poses = instrument._probe(robot.poses, axis, distance)
 
         value = absolute(robot.poses, instrument)[axis_index]
+        node = instrument if axis == 'z' else instrument.instrument_mover
+        res[axis].append(
+            absolute(robot.poses, node)[axis_index]
+        )
         acc.append(value)
 
         # after probing two points along the same axis
@@ -83,7 +94,10 @@ def probe_instrument(instrument, robot) -> Point:
     instrument._remove_tip(tip_length)
     robot.home()
 
-    return center._replace(**{axis: acc.pop()})
+    return center._replace(**{
+        axis: mean(values)
+        for axis, values in res.items()
+    })
 
 
 def update_instrument_config(instrument, measured_center) -> (Point, float):
@@ -94,16 +108,14 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
     from copy import deepcopy
 
     config = instrument.robot.config
+    instrument_offset = deepcopy(config.instrument_offset)
+
+    _, _, z = instrument_offset[instrument.mount][instrument.type]
     dx, dy, dz = array(measured_center) - config.probe_center
 
     tip_length = deepcopy(config.tip_length)
-    instrument_offset = deepcopy(config.instrument_offset)
 
-    offset = \
-        array(instrument_offset[instrument.mount][instrument.type]) + \
-        (dx, dy, 0)
-
-    instrument_offset[instrument.mount][instrument.type] = tuple(offset)
+    instrument_offset[instrument.mount][instrument.type] = (-dx, -dy, z)
     tip_length[instrument.mount][instrument.type] = \
         tip_length[instrument.mount][instrument.type] + \
         dz
