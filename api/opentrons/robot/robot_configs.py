@@ -71,11 +71,11 @@ default = robot_config(
     instrument_offset={
         'right': {
             'single': (0.0, 0.0, 0.0),
-            'multi': (0.0, 31.6, -28.0)
+            'multi': (0.0, 31.6, -27.5)
         },
         'left': {
             'single': (-31.8, 0.0, 0.0),
-            'multi': (-31.8,  31.6, -28.0)
+            'multi': (-31.8,  31.6, -27.5)
         }
     },
     tip_length={

@@ -184,6 +184,7 @@ def key_pressed(key):
             robot.config = robot.config._replace(
                     gantry_calibration=T,
                 )
+            robot.reset()
 
         status('saved #{0}: {1}'.format(point_number, actual[point_number]))
     # move to previous calibration point

@@ -9,12 +9,13 @@ from opentrons.trackers.pose_tracker import absolute
 
 
 X_SWITCH_OFFSET_MM = 5.0
-Y_SWITCH_OFFSET_MM = 5.0
+Y_SWITCH_OFFSET_MM = 2.0
 Z_SWITCH_OFFSET_MM = 5.0
+
 Z_DECK_CLEARANCE_MM = 25.0
 
 BOUNCE_DISTANCE_MM = 5.0
-Z_MARGIN = 0.2  # How much of z height to be added to clear the top
+Z_MARGIN = 1.0  # How much of z height to be added to clear the top
 
 
 def calibrate_container_with_delta(
@@ -46,11 +47,11 @@ def probe_instrument(instrument, robot) -> Point:
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('y', Y_SWITCH_OFFSET_MM,            -size_y, -center.z + Z_DECK_CLEARANCE_MM,  size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,             size_y, -center.z + Z_DECK_CLEARANCE_MM, -size_y),  # NOQA
-        ('x',            -size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,  size_x),  # NOQA
-        ('x',             size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM, -size_x),  # NOQA
-        ('z',                0.0, Z_SWITCH_OFFSET_MM,               size_z * Z_MARGIN, -size_z)   # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,            -size_y, -center.z + Z_DECK_CLEARANCE_MM,      size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,             size_y, -center.z + Z_DECK_CLEARANCE_MM,     -size_y),  # NOQA
+        ('x',            -size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,      size_x),  # NOQA
+        ('x',             size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,     -size_x),  # NOQA
+        ('z',                0.0, Z_SWITCH_OFFSET_MM,               size_z * Z_MARGIN, -1.5*size_z)   # NOQA
     ]
 
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
@@ -102,12 +103,15 @@ def probe_instrument(instrument, robot) -> Point:
 
 def update_instrument_config(instrument, measured_center) -> (Point, float):
     """
-    Update instrument's x and y offsets and tip length based on delta between
-    probe center and measured_center, persist updated config and return it
+    Update config and pose tree with instrument's x and y offsets
+    and tip length based on delta between probe center and measured_center,
+    persist updated config and return it
     """
     from copy import deepcopy
+    from opentrons.trackers.pose_tracker import update
 
-    config = instrument.robot.config
+    robot = instrument.robot
+    config = robot.config
     instrument_offset = deepcopy(config.instrument_offset)
 
     _, _, z = instrument_offset[instrument.mount][instrument.type]
@@ -117,16 +121,16 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
 
     instrument_offset[instrument.mount][instrument.type] = (-dx, -dy, z)
     tip_length[instrument.mount][instrument.type] = \
-        tip_length[instrument.mount][instrument.type] + \
-        dz
+        tip_length[instrument.mount][instrument.type] + dz
 
     config = config \
         ._replace(instrument_offset=instrument_offset) \
         ._replace(tip_length=tip_length)
-
-    instrument.robot.config = config
+    robot.config = config
 
     robot_configs.save(config)
+
+    robot.poses = update(robot.poses, instrument, (-dx, -dy, z))
 
     return instrument.robot.config
 

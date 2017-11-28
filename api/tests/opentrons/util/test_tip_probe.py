@@ -198,7 +198,7 @@ def test_tip_probe(fixture):
             'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Probe in the direction opposite of Z axis
         ('probe_axis',
-            'A', -size_z),
+            'A', -1.5*size_z),
         # Bounce back along Z
         ('move',
             {'A': max_z + BOUNCE_DISTANCE_MM})]
@@ -206,6 +206,7 @@ def test_tip_probe(fixture):
 
 
 def test_update_instrument_config(fixture, monkeypatch):
+    from opentrons.trackers.pose_tracker import change_base
     from numpy import array
     import json
 
@@ -229,14 +230,19 @@ def test_update_instrument_config(fixture, monkeypatch):
 
     assert new_tip_length == tip_length + 5.0
     assert new_instrument_offset == \
-        tuple(array(instrument_offset) + (-5.0, -5.0, 0.0))
+        tuple(array(instrument_offset) + (5.0, 5.0, 0.0))
+    assert tuple(change_base(
+        robot.poses,
+        src=instrument,
+        dst=instrument.instrument_mover)) == (5.0, 5.0, 0), \
+        "Expected instrument position to update relative to mover in pose tree"
 
     filename = environment.get_path('OT_CONFIG_FILE')
     with open(filename, 'r') as file:
         assert json.load(file) == {
             'instrument_offset': {
                 'right': {
-                    'single': [-5.0, -5.0, 0.0]
+                    'single': [5.0, 5.0, 0.0]
                 }
             },
             'tip_length': {
