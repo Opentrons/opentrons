@@ -24,7 +24,7 @@ publish:
 	cd scripts && publish.sh && doc-deploy.sh
 
 dev:
-	python opentrons/server/main.py
+	python opentrons/server/main.py -P 31950
 
 
 ########## [START] RESIN DEVICE ##########
