@@ -74,12 +74,17 @@ def probe_instrument(instrument, robot) -> Point:
         axis_index = 'xyz'.index(axis)
         robot.poses = instrument._probe(robot.poses, axis, distance)
 
+        # Tip position is stored in accumulator and averaged for each axis
+        # to be used for more accurate positioning for the next axis
         value = absolute(robot.poses, instrument)[axis_index]
+        acc.append(value)
+
+        # Since we are measuring to update instrument offset and tip length
+        # store mover position for XY and tip's Z
         node = instrument if axis == 'z' else instrument.instrument_mover
         res[axis].append(
             absolute(robot.poses, node)[axis_index]
         )
-        acc.append(value)
 
         # after probing two points along the same axis
         # average them out, update center and clear accumulator
