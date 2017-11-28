@@ -79,6 +79,7 @@ describe('robot reducer - calibration', () => {
   test('handles PICKUP_AND_HOME action', () => {
     const state = {
       calibration: {
+        labwareReviewed: false,
         pickupRequest: {inProgress: false, error: new Error(), slot: 0},
         labwareBySlot: {5: constants.UNCONFIRMED}
       }
@@ -89,6 +90,7 @@ describe('robot reducer - calibration', () => {
       payload: {instrument: 'left', labware: 5}
     }
     expect(reducer(state, action).calibration).toEqual({
+      labwareReviewed: true,
       pickupRequest: {inProgress: true, error: null, slot: 5},
       labwareBySlot: {5: constants.PICKING_UP}
     })

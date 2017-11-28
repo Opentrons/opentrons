@@ -245,6 +245,7 @@ function handlePickupAndHome (state, action) {
 
   return {
     ...state,
+    labwareReviewed: true,
     pickupRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: PICKING_UP}
   }
