@@ -17,6 +17,8 @@ PLUNGER_POSITIONS = {
     'drop_tip': -7
 }
 
+P300_UL_PER_MM = 18.51
+
 
 class PipetteTip:
     def __init__(self, length):
@@ -336,16 +338,14 @@ class Pipette:
                     self.current_volume + volume)
             )
 
-        distance = self._plunge_distance(self.current_volume + volume)
-        bottom = self._get_plunger_position('bottom')
-        destination = bottom - distance
+        mm_position = self._ul_to_mm(self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
         self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
-            x=destination
+            x=mm_position
         )
         self.current_volume += volume  # update after actual aspirate
         return self
@@ -422,16 +422,13 @@ class Pipette:
 
         self.move_to(location, strategy='arc')  # position robot above location
 
-        # TODO(ahmed): revisit this
-        distance = self._plunge_distance(self.current_volume - volume)
-        bottom = self._get_plunger_position('bottom')
-        destination = bottom - distance
+        mm_position = self._ul_to_mm(self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
-            x=destination)
+            x=mm_position)
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -1231,22 +1228,18 @@ class Pipette:
                 'Plunger position "{}" does not exist'.format(
                     position))
 
-    def _plunge_distance(self, volume):
+    def _ul_to_mm(self, ul):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
         on the axis associated with this pipette.
 
-        Calibration of the top and bottom positions are necessary for
-        these calculations to work.
+        Calibration of the pipette motor's ul-to-mm conversion is required
         """
-        percent = self._volume_percentage(volume)
-        top = self._get_plunger_position('top')
-        bottom = self._get_plunger_position('bottom')
-        travel = bottom - top
-        if travel <= 0:
-            self.robot.add_warning('Plunger calibrated incorrectly')
-        return travel * percent
+
+        millimeters = ul / P300_UL_PER_MM
+        destination_mm = self._get_plunger_position('bottom') + millimeters
+        return destination_mm
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
