@@ -6,7 +6,7 @@
 * [Running Container](#runtime)
 * [Flashing a device](#flashing)
 * [Deploying a container](#deployment)
-
+* [Things to know](#misc)
 
 
 Welcome to the compute directory! The Opentrons API runs on a Raspberry Pi 3 running ResinOS.
@@ -40,7 +40,7 @@ In the top-right corner of your application page, you'll find the command to add
 
 
 ## Running Container
-There are a few small things to note about the runtime envionrment of compute device
+There are a few small things to note about the runtime environment of compute device
 such as enviornment variables in the `OT` and `RESIN` namespaces.
 
 **OT environment variables**
@@ -81,8 +81,13 @@ However, this list is subject to change. When adding remote targets, as indicate
 naming the targets according to the application they correspond to so you can run `git push devbots`.
 
 
+## Things to know
+Here are some things to know - many of these are resin or compute gotchas.
 
-
+**Communicating over serial**
+Make sure that `RESIN_HOST_CONFIG_dtoverlay` is set to `pi3-miniuart-bt` for the Fleet configuration on any fleet of bots.
+This allows the Pi to utilize the uart pins to communicate with smoothie. Without this envvar set, serial communication
+between the pi and smoothie will not work.
 
 
 
