@@ -232,21 +232,28 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        backlash_target = {}
-        for plunger_axis in 'BC':
-            if plunger_axis in target:
-                # only compensate for backlash if we are moving UPWARDS
-                if self._position[plunger_axis] < target[plunger_axis]:
-                    backlash_target[plunger_axis] = target[plunger_axis]
-                    target[plunger_axis] += PLUNGER_BACKLASH_MM
+        def needs_backlash(axis, value):
+            nonlocal target
+            if axis in 'BC' and self._position[axis] < value:
+                # over-extend the plunger axes when moving UPWARDS
+                target[plunger_axis] += PLUNGER_BACKLASH_MM
+                return True
 
-        coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                  for axis, coords in sorted(target.items())
-                  if valid_movement(coords, axis)]
+        def create_coords_list(coords_dict):
+            return [
+                axis + str(round(coords, GCODE_ROUNDING_PRECISION))
+                for axis, coords in sorted(coords_dict.items())
+                if valid_movement(coords, axis)
+            ]
 
-        backlash_coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                  for axis, coords in sorted(backlash_target.items())
-                  if valid_movement(coords, axis)]
+        backlash_target = {
+            axis: value
+            for axis, value in sorted(target.items())
+            if needs_backlash(axis, value)
+        }
+
+        coords = create_coords_list(target)
+        backlash_coords = create_coords_list(backlash_target)
 
         low_power_axes = [axis
                           for axis, _ in sorted(target.items())
@@ -262,6 +269,7 @@ class SmoothieDriver_3_0_0:
             command = GCODES['MOVE'] + ''.join(coords)
             self._send_command(command)
             if backlash_coords:
+                # correct the over-extended plunger axes
                 command = GCODES['MOVE'] + ''.join(backlash_coords)
                 self._send_command(command)
             self._update_position(target)
