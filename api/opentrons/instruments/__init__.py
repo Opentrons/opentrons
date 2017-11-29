@@ -1,9 +1,13 @@
 from opentrons.instruments.magbead import Magbead
 from opentrons.instruments.pipette import Pipette
+from opentrons.instruments.temperaturePlate import TemperaturePlate
+
 
 __all__ = [
     Magbead,
-    Pipette]
+    Pipette,
+    TemperaturePlate
+]
 
 
 def load(axis, name):

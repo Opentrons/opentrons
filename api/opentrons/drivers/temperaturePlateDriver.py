@@ -52,6 +52,7 @@ class TemperaturePlateDriver:
             return ret_code
 
     def set_temp(self, temp, wait=False):
+        self.target_temp = temp
         self._send_command(GCODES['SET_TEMP'].format(temp=temp))
 
 
@@ -60,7 +61,6 @@ class TemperaturePlateDriver:
             return self.target_temp
         else:
             raw_temp = self._send_command(GCODES['GET_TEMP'])
-            print(raw_temp)
             return _parse_temp(raw_temp)
 
     def shutdown(self):
