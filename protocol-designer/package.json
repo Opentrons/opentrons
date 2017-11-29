@@ -7,7 +7,7 @@
     "name": "Opentrons Labworks",
     "email": "engineering@opentrons.com"
   },
-  "name": "@opentrons/protocol-designer",
+  "name": "protocol-designer",
   "version": "1.0.0",
   "description": "Protocol designer app",
   "main": "index.js",
