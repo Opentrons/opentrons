@@ -232,13 +232,6 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        def apply_backlash(axis, value):
-            nonlocal target
-            if axis in 'BC' and self._position[axis] < value:
-                # over-extend the plunger axes when moving UPWARDS
-                target[axis] += PLUNGER_BACKLASH_MM
-                return True
-
         def create_coords_list(coords_dict):
             return [
                 axis + str(round(coords, GCODE_ROUNDING_PRECISION))
@@ -246,13 +239,14 @@ class SmoothieDriver_3_0_0:
                 if valid_movement(coords, axis)
             ]
 
-        backlash_target = {
-            axis: value
+        backlash_target = target.copy()
+        backlash_target.update({
+            axis: value + PLUNGER_BACKLASH_MM
             for axis, value in sorted(target.items())
-            if apply_backlash(axis, value)
-        }
+            if axis in 'BC' and self._position[axis] < value
+        })
 
-        coords = create_coords_list(target)
+        target_coords = create_coords_list(target)
         backlash_coords = create_coords_list(backlash_target)
 
         low_power_axes = [axis
@@ -265,13 +259,12 @@ class SmoothieDriver_3_0_0:
                          for axis in low_power_axes}
             self.set_power(new_power)
 
-        if coords:
-            command = GCODES['MOVE'] + ''.join(coords)
-            self._send_command(command)
-            if backlash_coords:
-                # correct the over-extended plunger axes
+        if target_coords:
+            if backlash_coords != target_coords:
                 command = GCODES['MOVE'] + ''.join(backlash_coords)
                 self._send_command(command)
+            command = GCODES['MOVE'] + ''.join(target_coords)
+            self._send_command(command)
             self._update_position(target)
 
         if low_power_z:
