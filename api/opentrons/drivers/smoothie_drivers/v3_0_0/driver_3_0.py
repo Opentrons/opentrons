@@ -232,11 +232,11 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        def needs_backlash(axis, value):
+        def apply_backlash(axis, value):
             nonlocal target
             if axis in 'BC' and self._position[axis] < value:
                 # over-extend the plunger axes when moving UPWARDS
-                target[plunger_axis] += PLUNGER_BACKLASH_MM
+                target[axis] += PLUNGER_BACKLASH_MM
                 return True
 
         def create_coords_list(coords_dict):
@@ -249,7 +249,7 @@ class SmoothieDriver_3_0_0:
         backlash_target = {
             axis: value
             for axis, value in sorted(target.items())
-            if needs_backlash(axis, value)
+            if apply_backlash(axis, value)
         }
 
         coords = create_coords_list(target)
