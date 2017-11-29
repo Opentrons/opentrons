@@ -9,7 +9,7 @@ from numpy import dot, array, insert
 from opentrons import robot, instruments
 from opentrons.robot import robot_configs
 from opentrons.util.calibration_functions import probe_instrument
-from solve import solve
+from opentrons.solve import solve
 
 pipette = instruments.Pipette(mount='right')
 
