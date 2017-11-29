@@ -1,7 +1,7 @@
 #!/sbin/openrc-run
 # Opentrons updates server start script
 
-PORT_NUMBER=8080
+UPDATES_PORT_NUMBER=8080
 
 depend() {
   need localmount
@@ -10,13 +10,17 @@ depend() {
 start() {
   local retval
 
+  if [ ! -e /data/packages/ ] ; then
+    mkdir /data/packages/
+  fi
+
   ebegin "Starting updates proxy"
   start-stop-daemon --start \
       --background \
       --pidfile /var/run/updates.pid \
       --make-pidfile \
       --startas /bin/bash \
-      -- -c "exec nc -lk -e updates.sh 127.0.0.1 $PORT_NUMBER > /var/log/updates.log 2>&1"
+      -- -c "exec nc -lk -e updates.sh 127.0.0.1 $UPDATES_PORT_NUMBER > /var/log/updates.log 2>&1"
   retval=$?
   eend ${retval}
   return ${retval}

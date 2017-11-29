@@ -8,10 +8,10 @@ FROM resin/raspberrypi3-alpine:3.6
 ENV INITSYSTEM on
 ENV RUNNING_ON_PI 1
 
-RUN mkdir -p /data/packages/
 ENV PYTHONPATH /data/packages/
 
 RUN apk add --update \
+      dropbear \
       avahi \
       gnupg \
       gcc \
@@ -41,6 +41,7 @@ COPY ./compute/alpine/services/api /etc/init.d/
 COPY ./compute/alpine/services/nginx /etc/init.d/
 COPY ./compute/alpine/services/updates /etc/init.d/
 COPY ./compute/alpine/services/networking /etc/init.d/
+COPY ./compute/alpine/services/dropbear /etc/init.d/
 
 COPY ./compute/alpine/services/avahi/api.service /etc/avahi/services/
 RUN rm /etc/avahi/services/ssh.service
@@ -51,6 +52,7 @@ COPY ./compute/scripts/announce_mdns.py /usr/local/bin/
 RUN rc-update add api && \
     rc-update add nginx && \
     rc-update add updates && \
+    rc-update add dropbear && \
     rc-update add avahi-daemon
 
 COPY ./compute/alpine/conf/rc.conf /etc/rc.conf
@@ -59,6 +61,7 @@ COPY ./compute/alpine/conf/interfaces /etc/network/interfaces
 
 COPY ./compute/alpine/static /usr/share/nginx/html
 
-EXPOSE 80 443 31950
+# Updates, HTTPS (for future use), API, SSH for link-local over USB
+EXPOSE 80 443 31950 50022
 
 STOPSIGNAL SIGTERM

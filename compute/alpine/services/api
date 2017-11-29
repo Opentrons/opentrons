@@ -1,6 +1,8 @@
 #!/sbin/openrc-run
 # Opentrons API server start script
 
+API_PORT_NUMBER=31950
+
 depend() {
   need localmount
 }
@@ -16,7 +18,7 @@ start() {
       --pidfile /var/run/api.pid \
       --make-pidfile \
       --startas /bin/bash \
-      -- -c "python -m opentrons.server.main 0.0.0.0:31950 > /var/log/api.log 2>&1"
+      -- -c "python -m opentrons.server.main -H :: -P $API_PORT_NUMBER > /var/log/api.log 2>&1"
   retval=$?
   eend ${retval}
   return ${retval}
