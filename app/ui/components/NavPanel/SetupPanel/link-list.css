@@ -1,0 +1,66 @@
+@value light_grey, grey, dark_grey,from '../../App.global.css';
+
+.list_title {
+  color: dark_grey;
+  text-decoration: none;
+  font-size: 1rem;
+  background-color: light_grey;
+  display: block;
+  height: 3rem;
+  line-height: 3;
+  padding-left: 0.5rem;
+}
+
+.labeled_list {
+  list-style-type: none;
+  margin-bottom: 1rem;
+}
+
+.labeled_list li {
+  background-color: light_grey;
+  width: 100%;
+  display: block;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 0.75rem;
+  border-bottom: 2px solid #ddd;
+}
+
+.labeled_list a:hover,
+.active {
+  background-color: #eee;
+}
+
+.labeled_list a {
+  color: black;
+  display: block;
+  padding: 0 0.5rem;
+}
+
+.icon {
+  width: 2rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* TODO: revisit this once we have icons as svg */
+.icon::before {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  content: '';
+  text-align: center;
+  color: white;
+  border: 2px solid #333;
+  border-radius: 50%;
+}
+
+.info {
+  width: calc(100% - 2rem);
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: top;
+}

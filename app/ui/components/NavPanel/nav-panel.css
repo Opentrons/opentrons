@@ -9,6 +9,11 @@
   transition: all 0.5s ease-in-out;
 }
 
+.upload,
+.setup {
+  padding: 1rem;
+}
+
 .closed {
   width: 0;
   border-right-width: 0;

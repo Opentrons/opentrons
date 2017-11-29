@@ -10,6 +10,8 @@ import {
 
 import SidePanel from './SidePanel'
 import ConnectPanel from './ConnectPanel'
+import UploadPanel from './UploadPanel'
+import SetupPanel from './SetupPanel'
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavPanel)
 
@@ -21,9 +23,9 @@ const PANELS = [
 ]
 
 const PANELS_BY_NAME = {
-  connect: ConnectPanel
-  // upload: UploadPanel,
-  // setup: ConnectedSetupPanel
+  connect: ConnectPanel,
+  upload: UploadPanel,
+  setup: SetupPanel
 }
 
 NavPanel.propTypes = {
@@ -38,7 +40,11 @@ function NavPanel (props) {
   const panelProps = PANELS.find((p) => p.name === panel) || {}
 
   return (
-    <SidePanel isOpen={isOpen} close={close} title={panelProps.title}>
+    <SidePanel
+      isOpen={isOpen}
+      close={close}
+      title={panelProps.title}
+      name={panelProps.name}>
       <PanelContents />
     </SidePanel>
   )

@@ -8,11 +8,12 @@ import styles from './nav-panel.css'
 SidePanel.propTypes = {
   title: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  name: PropTypes.string
 }
 
 export default function SidePanel (props) {
-  const {title, isOpen, close} = props
+  const {name, title, isOpen, close} = props
   const className = classnames(styles.panel, {[styles.closed]: !isOpen})
 
   return (
@@ -25,7 +26,7 @@ export default function SidePanel (props) {
           X
         </button>
       </div>
-      <div className={styles.panel_contents}>
+      <div className={classnames(styles.panel_contents, styles[name])}>
         {props.children}
       </div>
     </div>
