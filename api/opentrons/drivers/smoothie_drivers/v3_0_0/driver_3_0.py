@@ -23,6 +23,8 @@ HOMED_POSITION = {
     'C': 18.9997
 }
 
+PLUNGER_BACKLASH_MM = 0.3
+
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
@@ -230,8 +232,20 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
+        backlash_target = {}
+        for plunger_axis in 'BC':
+            if plunger_axis in target:
+                # only compensate for backlash if we are moving UPWARDS
+                if self._position[plunger_axis] < target[plunger_axis]:
+                    backlash_target[plunger_axis] = target[plunger_axis]
+                    target[plunger_axis] += PLUNGER_BACKLASH_MM
+
         coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
                   for axis, coords in sorted(target.items())
+                  if valid_movement(coords, axis)]
+
+        backlash_coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
+                  for axis, coords in sorted(backlash_target.items())
                   if valid_movement(coords, axis)]
 
         low_power_axes = [axis
@@ -247,6 +261,9 @@ class SmoothieDriver_3_0_0:
         if coords:
             command = GCODES['MOVE'] + ''.join(coords)
             self._send_command(command)
+            if backlash_coords:
+                command = GCODES['MOVE'] + ''.join(backlash_coords)
+                self._send_command(command)
             self._update_position(target)
 
         if low_power_z:
