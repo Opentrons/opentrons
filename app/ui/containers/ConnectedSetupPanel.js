@@ -7,44 +7,50 @@ import {
 } from '../robot'
 import SetupPanel from '../components/SetupPanel'
 
-const mapStateToProps = (state) => ({
-  instruments: robotSelectors.getInstruments(state),
-  labware: robotSelectors.getLabware(state),
-  labwareReviewed: robotSelectors.getLabwareReviewed(state),
-  instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
-  tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-  labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
-  singleChannel: robotSelectors.getSingleChannel(state),
-  isRunning: robotSelectors.getIsRunning(state)
-})
-
-const mapDispatchToProps = (dispatch) => ({
-  clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false)),
-  setLabware: (slot) => () => dispatch(push(`/setup-deck/${slot}`)),
-  moveToLabware: (axis, slot) => () => dispatch(robotActions.moveTo(axis, slot)),
-  run: () => dispatch(robotActions.run())
-})
-
-const mergeProps = (stateProps, dispatchProps) => {
-  const props = {...stateProps, ...dispatchProps}
-
-  // TODO(mc, 2017-11-03): this assumes a single channel pipette will be
-  // available, so revisit so we don't have to make that assumption
-  if (props.labwareReviewed) {
-    const {singleChannel, setLabware, moveToLabware} = props
-
-    props.setLabware = (slot) => () => {
-      // TODO(mc, 2017-10-06): batch or rethink this double dispatch
-      setLabware(slot)()
-      moveToLabware(singleChannel.axis, slot)()
-    }
-  }
-
-  return props
-}
-
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  null,
   mergeProps
 )(SetupPanel)
+
+function mapStateToProps (state) {
+  return {
+    instruments: robotSelectors.getInstruments(state),
+    labware: robotSelectors.getLabware(state),
+    labwareBySlot: robotSelectors.getLabwareBySlot(state),
+    labwareReviewed: robotSelectors.getLabwareReviewed(state),
+    instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
+    tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
+    labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
+    singleChannel: robotSelectors.getSingleChannel(state),
+    isRunning: robotSelectors.getIsRunning(state)
+  }
+}
+
+function mergeProps (stateProps, dispatchProps) {
+  const {labwareReviewed, labwareBySlot, singleChannel} = stateProps
+  const {dispatch} = dispatchProps
+
+  return {
+    ...stateProps,
+    run: () => dispatch(robotActions.run()),
+    clearLabwareReviewed: () => {
+      dispatch(robotActions.setLabwareReviewed(false))
+    },
+    setLabware: (slot) => () => {
+      const {isTiprack} = labwareBySlot[slot] || {}
+
+      // TODO(mc, 2017-10-06): use nav link instead of double dispatch (PR 426)
+      dispatch(push(`/setup-deck/${slot}`))
+
+      // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
+      // Deck, and ConnectedSetupPanel); could also move logic to the API client
+      if (labwareReviewed) {
+        if (isTiprack) {
+          return dispatch(robotActions.pickupAndHome(singleChannel.axis, slot))
+        }
+        dispatch(robotActions.moveTo(singleChannel.axis, slot))
+      }
+    }
+  }
+}

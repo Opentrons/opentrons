@@ -493,9 +493,9 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles UPDATE_OFFSET success', () => {
-      const action = actions.updateOffset('left', 9)
-      const expectedResponse = actions.updateOffsetResponse(null, true)
+    test('handles UPDATE_OFFSET success with labware', () => {
+      const action = actions.updateOffset('left', 1)
+      const expectedResponse = actions.updateOffsetResponse(null, false)
 
       calibrationManager.update_container_offset
         .mockReturnValue(Promise.resolve())
@@ -504,7 +504,29 @@ describe('api client', () => {
         .then(() => sendToClient(state, action))
         .then(() => {
           expect(calibrationManager.update_container_offset)
+            .toHaveBeenCalledWith({_id: 'lab-1'}, {_id: 'inst-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles UPDATE_OFFSET success with tiprack', () => {
+      const action = actions.updateOffset('left', 9)
+      const expectedResponse = actions.updateOffsetResponse(null, true)
+
+      calibrationManager.update_container_offset
+        .mockReturnValue(Promise.resolve())
+      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.update_container_offset)
             .toHaveBeenCalledWith({_id: 'lab-3'}, {_id: 'inst-2'})
+          expect(calibrationManager.pick_up_tip)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-3'})
+          expect(calibrationManager.home)
+            .toHaveBeenCalledWith({_id: 'inst-2'})
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })

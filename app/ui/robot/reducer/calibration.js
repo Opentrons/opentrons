@@ -14,6 +14,8 @@ import {
   PICKING_UP,
   HOMING,
   HOMED,
+  UPDATING,
+  UPDATED,
   CONFIRMING,
   CONFIRMED,
 
@@ -371,7 +373,14 @@ function handleJogResponse (state, action) {
 function handleUpdateOffset (state, action) {
   const {payload: {labware: slot}} = action
 
-  return {...state, updateOffsetRequest: {inProgress: true, error: null, slot}}
+  return {
+    ...state,
+    updateOffsetRequest: {inProgress: true, error: null, slot},
+    labwareBySlot: {
+      ...state.labwareBySlot,
+      [slot]: UPDATING
+    }
+  }
 }
 
 function handleUpdateResponse (state, action) {
@@ -386,7 +395,11 @@ function handleUpdateResponse (state, action) {
     confirmedBySlot[slot] = !error
     labwareBySlot[slot] = !error
       ? CONFIRMED
-      : OVER_SLOT
+      : UNCONFIRMED
+  } else {
+    labwareBySlot[slot] = !error
+      ? UPDATED
+      : UNCONFIRMED
   }
 
   return {

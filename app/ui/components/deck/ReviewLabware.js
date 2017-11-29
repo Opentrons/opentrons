@@ -29,6 +29,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     ...stateProps,
     ...ownProps,
     setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
+    // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
+    // Deck, and ConnectedSetupPanel); could also move logic to the API client
     moveToLabware: () => {
       if (isTiprack) return dispatch(robotActions.pickupAndHome(axis, slot))
       dispatch(robotActions.moveTo(axis, slot))

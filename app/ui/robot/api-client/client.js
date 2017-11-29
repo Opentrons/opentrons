@@ -201,7 +201,7 @@ export default function client (dispatch) {
 
     const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
     const labware = {_id: labwareObject._id}
-    const isTiprack = labwareObject.isTiprack
+    const isTiprack = labwareObject.isTiprack || false
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {
@@ -209,7 +209,17 @@ export default function client (dispatch) {
     //   dispatch(push(`/setup-deck/${slot}`))
     // }, 2000)
 
-    remote.calibration_manager.update_container_offset(labware, instrument)
+    let request = remote.calibration_manager
+      .update_container_offset(labware, instrument)
+
+    // TODO(mc, 2017-11-29): DRY this up (reuses logic from pickup and home)
+    if (isTiprack) {
+      request = request
+        .then(() => remote.calibration_manager.pick_up_tip(instrument, labware))
+        .then(() => remote.calibration_manager.home(instrument))
+    }
+
+    request
       .then(() => dispatch(actions.updateOffsetResponse(null, isTiprack)))
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }

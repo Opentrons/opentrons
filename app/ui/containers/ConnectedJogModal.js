@@ -9,20 +9,17 @@ import JogModal from '../components/JogModal'
 
 export default connect(mapStateToProps, null, mergeProps)(JogModal)
 
-function mapStateToProps (state, ownProps) {
-  const {slot} = ownProps
-
+function mapStateToProps (state) {
   return {
     jogDistance: robotSelectors.getJogDistance(state),
     isJogging: robotSelectors.getJogInProgress(state),
     isUpdating: robotSelectors.getOffsetUpdateInProgress(state),
-    singleChannel: robotSelectors.getSingleChannel(state),
-    isTiprack: robotSelectors.getLabwareBySlot(state)[slot].isTiprack
+    singleChannel: robotSelectors.getSingleChannel(state)
   }
 }
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
-  const {isTiprack, singleChannel: {axis: instrument}} = stateProps
+  const {singleChannel: {axis: instrument}} = stateProps
   const {dispatch} = dispatchProps
   const {slot} = ownProps
 
@@ -34,12 +31,7 @@ function mergeProps (stateProps, dispatchProps, ownProps) {
       dispatch(robotActions.jog(instrument, axis, direction))
     },
     // TODO(mc, 2017-11-27): refactor to remove double-dispatch
-    onConfirmClick: () => {
-      dispatch(robotActions.updateOffset(instrument, slot))
-      if (isTiprack) {
-        dispatch(robotActions.pickupAndHome(instrument, slot))
-      }
-    },
+    onConfirmClick: () => dispatch(robotActions.updateOffset(instrument, slot)),
     toggleJogDistance: () => dispatch(robotActions.toggleJogDistance())
   }
 }

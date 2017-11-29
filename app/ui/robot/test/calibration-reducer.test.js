@@ -472,13 +472,15 @@ describe('robot reducer - calibration', () => {
   test('handles UPDATE_OFFSET action', () => {
     const state = {
       calibration: {
-        updateOffsetRequest: {inProgress: false, error: new Error()}
+        updateOffsetRequest: {inProgress: false, error: new Error()},
+        labwareBySlot: {}
       }
     }
     const action = {type: actionTypes.UPDATE_OFFSET, payload: {labware: 5}}
 
     expect(reducer(state, action).calibration).toEqual({
-      updateOffsetRequest: {inProgress: true, error: null, slot: 5}
+      updateOffsetRequest: {inProgress: true, error: null, slot: 5},
+      labwareBySlot: {5: constants.UPDATING}
     })
   })
 
@@ -486,7 +488,7 @@ describe('robot reducer - calibration', () => {
     const state = {
       calibration: {
         updateOffsetRequest: {inProgress: true, error: null, slot: 5},
-        labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+        labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UPDATING},
         confirmedBySlot: {}
       }
     }
@@ -514,12 +516,12 @@ describe('robot reducer - calibration', () => {
     })
     expect(reducer(state, successTiprack).calibration).toEqual({
       updateOffsetRequest: {inProgress: false, error: null, slot: 5},
-      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UPDATED},
       confirmedBySlot: {}
     })
     expect(reducer(state, failure).calibration).toEqual({
       updateOffsetRequest: {inProgress: false, error: new Error('AH'), slot: 5},
-      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT},
+      labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UNCONFIRMED},
       confirmedBySlot: {5: false}
     })
   })

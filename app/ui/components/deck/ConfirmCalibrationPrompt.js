@@ -21,7 +21,7 @@ ConfirmCalibrationPrompt.propTypes = {
   }).isRequired
 }
 
-const {MOVING_TO_SLOT, PICKING_UP, HOMING, CONFIRMED} = robotConstants
+const {MOVING_TO_SLOT, PICKING_UP, HOMING, UPDATING, CONFIRMED} = robotConstants
 
 export default function ConfirmCalibrationPrompt (props) {
   const {currentLabware, slot} = props
@@ -33,7 +33,8 @@ export default function ConfirmCalibrationPrompt (props) {
     !calibration ||
     calibration === MOVING_TO_SLOT ||
     calibration === PICKING_UP ||
-    calibration === HOMING
+    calibration === HOMING ||
+    calibration === UPDATING
   ) return null
 
   if (calibration === CONFIRMED) {

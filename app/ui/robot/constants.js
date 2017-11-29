@@ -32,12 +32,15 @@ export const INSTRUMENT_CALIBRATION_TYPE = PropTypes.oneOf([
 ])
 
 // labware confirmation states
+// several are redundant and could be collapsed into something like MOVING
 export const UNCONFIRMED = 'unconfirmed'
 export const MOVING_TO_SLOT = 'moving-to-slot'
 export const OVER_SLOT = 'over-slot'
 export const PICKING_UP = 'picking-up'
 export const HOMING = 'homing'
 export const HOMED = 'homed'
+export const UPDATING = 'updating'
+export const UPDATED = 'updated'
 export const CONFIRMING = 'confirming'
 export const CONFIRMED = 'confirmed'
 export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
@@ -47,6 +50,8 @@ export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
   PICKING_UP,
   HOMING,
   HOMED,
+  UPDATING,
+  UPDATED,
   CONFIRMING,
   CONFIRMED
 ])

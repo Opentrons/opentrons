@@ -22,6 +22,7 @@ const {
   MOVING_TO_SLOT,
   PICKING_UP,
   HOMING,
+  UPDATING,
   CONFIRMING,
   CONFIRMED
 } = robotConstants
@@ -49,6 +50,7 @@ export default function LabwareItem (props) {
     calibration === MOVING_TO_SLOT ||
     calibration === PICKING_UP ||
     calibration === HOMING ||
+    calibration === UPDATING ||
     calibration === CONFIRMING
   )
   const isConfirmed = calibration === CONFIRMED
