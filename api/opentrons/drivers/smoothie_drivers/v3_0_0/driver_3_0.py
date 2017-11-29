@@ -45,7 +45,6 @@ GCODES = {'HOME': 'G28.2',
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
-SMOOTHIE_BOARD_NAME = 'FT232R'
 
 
 def _parse_axis_values(raw_axis_values):
@@ -109,8 +108,9 @@ class SmoothieDriver_3_0_0:
             self.simulating = True
             return
 
+        smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
         self._connection = serial_communication.connect(
-            device_name=SMOOTHIE_BOARD_NAME,
+            device_name=smoothie_id,
             baudrate=self._config.serial_speed
         )
         self._setup()
