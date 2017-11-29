@@ -1,12 +1,21 @@
 from numpy import array
+
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
+from opentrons.robot import robot_configs
 from opentrons.data_storage import database
+from opentrons.trackers.pose_tracker import absolute
 
 
-# maximum distance to move during calibration attempt
-PROBE_TRAVEL_DISTANCE = 30
+X_SWITCH_OFFSET_MM = 5.0
+Y_SWITCH_OFFSET_MM = 2.0
+Z_SWITCH_OFFSET_MM = 5.0
+
+Z_DECK_CLEARANCE_MM = 25.0
+
+BOUNCE_DISTANCE_MM = 5.0
+Z_MARGIN = 1.0  # How much of z height to be added to clear the top
 
 
 def calibrate_container_with_delta(
@@ -27,84 +36,108 @@ def calibrate_container_with_delta(
     return pose_tree
 
 
-def calibrate_pipette(probing_values, probe):
-    ''' Interprets values generated from tip probing returns '''
-    pass
+def probe_instrument(instrument, robot) -> Point:
+    from statistics import mean
 
-
-def probe_instrument(instrument, robot):
     robot.home()
 
-    # size along X, Y and Z
-    probe_size = array(robot.config.probe_dimensions)
+    size_x, size_y, size_z = robot.config.probe_dimensions
+    center = Point(*robot.config.probe_center)
 
-    # coordinates of the top of the probe
-    probe_top_coordinates = array(robot.config.probe_center)
-
-    *_, height = probe_size
-
-    center = probe_top_coordinates * (1, 1, 0) + (0, 0, height / 2.0)
-
-    #       Y ^
-    #         * 1
-    #         |
-    #   --*---+---*-->
-    #     -1  |   1  X
-    #         * -1
-    #         |
-    #
-    # We are using above mental model to define
-    # left, right, forward, backward, center on a probe
-    #
-    # X, Y, Z point and travel direction
-    # Z = -1 denotes the tip down for XY calibration
-    # Z =  1 denotes the tip up to begin Z calibration
-    # Travel direction is in the same axis as the non-zero
-    #   XY coordinate, or in the Z axis if both X and Y
-    #   are zero
-    switches = [
-        (-1, 0, -0.5,  1),
-        (1,  0, -0.5, -1),
-        (0, -1, -0.5,  1),
-        (0,  1, -0.5, -1),
-        (0,  0,    1, -1),
+    # Each list item defines axis we are probing for, starting position vector
+    # relative to probe top center and travel distance
+    hot_spots = [
+        ('y', Y_SWITCH_OFFSET_MM,            -size_y, -center.z + Z_DECK_CLEARANCE_MM,      size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,             size_y, -center.z + Z_DECK_CLEARANCE_MM,     -size_y),  # NOQA
+        ('x',            -size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,      size_x),  # NOQA
+        ('x',             size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,     -size_x),  # NOQA
+        ('z',                0.0, Z_SWITCH_OFFSET_MM,               size_z * Z_MARGIN, -1.5*size_z)   # NOQA
     ]
 
-    coords = [switch[:-1] * probe_size / 2.0 + center for switch in switches]
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
 
     instrument._add_tip(tip_length)
 
-    values = {'x': [], 'y': [], 'z': []}
+    acc = []
 
-    for coord, switch in zip(coords, switches):
-        x, y, z = coord
-        sx, sy, sz, direction = switch
+    res = {
+        'x': [], 'y': [], 'z': []
+    }
 
-        axis = 'z'
-        if sx:
-            axis = 'x'
-        elif sy:
-            axis = 'y'
+    for axis, *probing_vector, distance in hot_spots:
+        x, y, z = array(probing_vector) + center
 
-        robot.poses = instrument._move(robot.poses, z=height * 1.2)
+        robot.poses = instrument._move(robot.poses, z=center.z + size_z * Z_MARGIN)  # NOQA
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
-        values[axis].append(
-            instrument._probe(
-                axis,
-                direction * PROBE_TRAVEL_DISTANCE
-            )
+        axis_index = 'xyz'.index(axis)
+        robot.poses = instrument._probe(robot.poses, axis, distance)
+
+        # Tip position is stored in accumulator and averaged for each axis
+        # to be used for more accurate positioning for the next axis
+        value = absolute(robot.poses, instrument)[axis_index]
+        acc.append(value)
+
+        # Since we are measuring to update instrument offset and tip length
+        # store mover position for XY and tip's Z
+        node = instrument if axis == 'z' else instrument.instrument_mover
+        res[axis].append(
+            absolute(robot.poses, node)[axis_index]
         )
 
-        robot.poses = instrument._move(
-            robot.poses,
-            x=(x + sx * 5),
-            y=(y + sy * 5))
+        # after probing two points along the same axis
+        # average them out, update center and clear accumulator
+        if len(acc) == 2:
+            center = center._replace(**{axis: (acc[0] + acc[1]) / 2.0})
+            acc.clear()
+
+        # Bounce back to release end stop
+        bounce = value + (BOUNCE_DISTANCE_MM * (-distance / abs(distance)))
+
+        robot.poses = instrument._move(robot.poses, **{axis: bounce})
 
     instrument._remove_tip(tip_length)
     robot.home()
+
+    return center._replace(**{
+        axis: mean(values)
+        for axis, values in res.items()
+    })
+
+
+def update_instrument_config(instrument, measured_center) -> (Point, float):
+    """
+    Update config and pose tree with instrument's x and y offsets
+    and tip length based on delta between probe center and measured_center,
+    persist updated config and return it
+    """
+    from copy import deepcopy
+    from opentrons.trackers.pose_tracker import update
+
+    robot = instrument.robot
+    config = robot.config
+    instrument_offset = deepcopy(config.instrument_offset)
+
+    _, _, z = instrument_offset[instrument.mount][instrument.type]
+    dx, dy, dz = array(measured_center) - config.probe_center
+
+    tip_length = deepcopy(config.tip_length)
+
+    instrument_offset[instrument.mount][instrument.type] = (-dx, -dy, z)
+    tip_length[instrument.mount][instrument.type] = \
+        tip_length[instrument.mount][instrument.type] + dz
+
+    config = config \
+        ._replace(instrument_offset=instrument_offset) \
+        ._replace(tip_length=tip_length)
+    robot.config = config
+
+    robot_configs.save(config)
+
+    robot.poses = update(robot.poses, instrument, (-dx, -dy, z))
+
+    return instrument.robot.config
 
 
 def move_instrument_for_probing_prep(instrument, robot):

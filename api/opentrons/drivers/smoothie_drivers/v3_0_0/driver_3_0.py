@@ -2,7 +2,7 @@ from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
 from threading import Event
 from copy import copy
-
+from typing import Dict
 
 '''
 - Driver is responsible for providing an interface for motion control
@@ -312,12 +312,12 @@ class SmoothieDriver_3_0_0:
         )
         self._send_command(command)
 
-    def probe_axis(self, axis, probing_distance):
+    def probe_axis(self, axis, probing_distance) -> Dict[str, float]:
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
             self.update_position(self._position)
-            return self._position[axis.upper()]
+            return self._position
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
