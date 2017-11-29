@@ -2,7 +2,7 @@ from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
 from os import environ
 from threading import Event
 from copy import copy
-
+from typing import Dict
 
 '''
 - Driver is responsible for providing an interface for motion control
@@ -47,7 +47,6 @@ GCODES = {'HOME': 'G28.2',
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
-SMOOTHIE_BOARD_NAME = 'FT232R'
 
 
 def _parse_axis_values(raw_axis_values):
@@ -111,8 +110,9 @@ class SmoothieDriver_3_0_0:
             self.simulating = True
             return
 
+        smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
         self._connection = serial_communication.connect(
-            device_name=SMOOTHIE_BOARD_NAME,
+            device_name=smoothie_id,
             baudrate=self._config.serial_speed
         )
         self._setup()
@@ -337,12 +337,12 @@ class SmoothieDriver_3_0_0:
         )
         self._send_command(command)
 
-    def probe_axis(self, axis, probing_distance):
+    def probe_axis(self, axis, probing_distance) -> Dict[str, float]:
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
             self.update_position(self._position)
-            return self._position[axis.upper()]
+            return self._position
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 

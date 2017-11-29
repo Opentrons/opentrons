@@ -326,7 +326,7 @@ class Robot(object):
             self.poses,
             instrument,
             parent=mount,
-            point=self.config.instrument_offsets[mount][instrument.type]
+            point=self.config.instrument_offset[mount][instrument.type]
         )
 
     def add_warning(self, warning_msg):
