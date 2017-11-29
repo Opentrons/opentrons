@@ -11,7 +11,7 @@ from opentrons.trackers import pose_tracker
 
 
 PLUNGER_POSITIONS = {
-    'top': 17,
+    'top': 18.5,
     'bottom': 2,
     'blow_out': 0,
     'drop_tip': -7
@@ -134,17 +134,12 @@ class Pipette:
             'dispense': dispense_speed
         }
 
+        self.plunger_positions = PLUNGER_POSITIONS.copy()
+
         self.min_volume = min_volume
-        self.max_volume = max_volume or (min_volume + 1)
-
-        # FIXME
-        default_plunger_positions = PLUNGER_POSITIONS
-        self.plunger_positions = {}
-        self.plunger_positions.update(default_plunger_positions)
-
-        for key, val in self.plunger_positions.items():
-            if val is None:
-                self.plunger_positions[key] = default_plunger_positions[key]
+        t = self._get_plunger_position('top')
+        b = self._get_plunger_position('bottom')
+        self.max_volume = (t - b) * P300_UL_PER_MM
 
     def reset(self):
         """
@@ -1239,7 +1234,7 @@ class Pipette:
 
         millimeters = ul / P300_UL_PER_MM
         destination_mm = self._get_plunger_position('bottom') + millimeters
-        return destination_mm
+        return round(destination_mm, 3)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
