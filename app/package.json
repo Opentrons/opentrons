@@ -1,5 +1,6 @@
 {
   "name": "ot-app",
+  "private": true,
   "version": "3.0.0-alpha",
   "description": "Opentrons desktop application",
   "main": "shell/main.js",
