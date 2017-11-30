@@ -55,7 +55,10 @@ async def test_load_from_text(session_manager, protocol):
             traverse(command['children'])
     traverse(session.commands)
 
-    assert len(acc) == 105
+    from pprint import pprint as pp
+    pp(protocol.text)
+    pp(acc)
+    assert len(acc) == 90
 
 
 async def test_async_notifications(main_router):
