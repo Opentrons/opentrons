@@ -15,6 +15,7 @@ from numpy import isclose
 def test_drop_tip_move_to(robot):
     plate = containers_load(robot, '96-flat', 'A1')
     p200 = Pipette(robot, mount='left')
+    p200.tip_attached = True
     x, y, z = (161.0, 116.7, 3.0)
 
     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
@@ -1420,6 +1421,7 @@ class PipetteTest(unittest.TestCase):
     def test_tip_tracking_simple(self):
         self.p200.move_to = mock.Mock()
         self.p200.pick_up_tip()
+        self.p200.tip_attached = False  # prior expectation, for test only
         self.p200.pick_up_tip()
 
         assert self.p200.move_to.mock_calls == \
@@ -1449,6 +1451,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.drop_tip()
 
     def test_tip_tracking_chain(self):
+        # TODO (ben 20171130): revise this test to make more sense in the
+        # context of required tip pick_up/drop sequencing, etc.
 
         total_tips_per_plate = 4
 
@@ -1486,6 +1490,7 @@ class PipetteTest(unittest.TestCase):
 
         for _ in range(0, total_tips_per_plate * 2):
             self.p200.pick_up_tip()
+            self.p200.tip_attached = False  # prior expectation, for test only
 
         expected = []
         for i in range(0, total_tips_per_plate):
@@ -1509,9 +1514,21 @@ class PipetteTest(unittest.TestCase):
         self.p200.reset()
         for _ in range(0, total_tips_per_plate * 2):
             self.p200.pick_up_tip()
+            self.p200.tip_attached = False  # prior expectation, for test only
+
         self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
+    def test_assert_on_double_pick_up_tip(self):
+        self.p200.pick_up_tip()
+        self.assertRaises(AssertionError, self.p200.pick_up_tip)
+
+    def test_assert_on_drop_without_tip(self):
+        self.assertRaises(AssertionError, self.p200.drop_tip)
+
     def test_tip_tracking_chain_multi_channel(self):
+        # TODO (ben 20171130): revise this test to make more sense in the
+        # context of required tip pick_up/drop sequencing, etc.
+
         p200_multi = Pipette(
             self.robot,
             trash_container=self.trash,
@@ -1528,6 +1545,7 @@ class PipetteTest(unittest.TestCase):
 
         for _ in range(0, 12 * 2):
             p200_multi.pick_up_tip()
+            p200_multi.tip_attached = False  # prior expectation, for test only
 
         expected = []
         for i in range(0, 12):
@@ -1550,10 +1568,15 @@ class PipetteTest(unittest.TestCase):
         self.assertEquals(self.tiprack1['B2'], self.p200.current_tip())
 
     def test_tip_tracking_return(self):
+        # Note: because this test mocks out `drop_tip`, as a side-effect
+        # `tip_attached` must be manually set as it would be under the
+        # `return_tip` callstack, making this tesk somewhat fragile
+
         self.p200.drop_tip = mock.Mock()
 
         self.p200.pick_up_tip()
         self.p200.return_tip()
+        self.p200.tip_attached = False
 
         self.p200.pick_up_tip()
         self.p200.return_tip()
