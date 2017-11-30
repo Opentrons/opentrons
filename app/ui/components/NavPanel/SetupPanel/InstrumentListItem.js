@@ -4,11 +4,12 @@ import capitalize from 'lodash/capitalize'
 import LinkItem from './LinkItem'
 
 export default function InstrumentListItem (props) {
-  const {isRunning, name, axis, volume, channels} = props
+  const {isRunning, name, axis, volume, channels, probed} = props
   const isDisabled = name == null
   const url = isRunning
   ? '#'
   : `/setup-instruments/${axis}`
+  const confirmed = isDisabled || probed
 
   const description = !isDisabled
     ? `${capitalize(channels)}-channel`
@@ -19,6 +20,7 @@ export default function InstrumentListItem (props) {
       <LinkItem
         isDisabled={isDisabled}
         url={url}
+        confirmed={confirmed}
       >
         <span>{axis}</span>
         <span>{description}</span>

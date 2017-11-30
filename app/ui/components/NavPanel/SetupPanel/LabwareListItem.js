@@ -5,12 +5,12 @@ export default function LabwareListItem (props) {
   const {
     name,
     slot,
-    // confirmed,
+    confirmed,
     isTiprack,
     instrumentsCalibrated,
     tipracksConfirmed,
     isRunning,
-    onClick
+    moveToLabware
   } = props
 
   const url = isRunning
@@ -23,8 +23,9 @@ export default function LabwareListItem (props) {
     <li>
       <LinkItem
         isDisabled={isDisabled}
-        onClick={onClick}
         url={url}
+        onClick={moveToLabware}
+        confirmed={confirmed}
       >
         <span>{name}</span>
       </LinkItem>

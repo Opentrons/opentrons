@@ -1,4 +1,4 @@
-@value light_grey, grey, dark_grey,from '../../App.global.css';
+@value light_grey, grey, dark_grey from '../../App.global.css';
 
 .list_title {
   color: dark_grey;
@@ -23,7 +23,7 @@
   height: 3rem;
   line-height: 3rem;
   font-size: 0.75rem;
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid grey;
 }
 
 .labeled_list a:hover,
@@ -35,6 +35,11 @@
   color: black;
   display: block;
   padding: 0 0.5rem;
+}
+
+a[disabled] {
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .icon {
@@ -50,10 +55,17 @@
   width: 1rem;
   height: 1rem;
   content: '';
+  line-height: 1rem;
   text-align: center;
-  color: white;
-  border: 2px solid #333;
+  color: dark_grey;
+  border: 2px solid dark_grey;
   border-radius: 50%;
+}
+
+.icon.confirmed::before {
+  background-color: dark_grey;
+  content: '✓';
+  color: white;
 }
 
 .info {
@@ -64,3 +76,13 @@
   align-items: center;
   vertical-align: top;
 }
+
+.labeled_list li.alert {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #eee;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-style: italic;
+}
+
