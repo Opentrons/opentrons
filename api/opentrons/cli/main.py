@@ -9,9 +9,8 @@ from numpy import dot, array, insert
 from opentrons import robot, instruments
 from opentrons.robot import robot_configs
 from opentrons.util.calibration_functions import probe_instrument
-from opentrons.solve import solve
+from opentrons.cli.solve import solve
 
-pipette = instruments.Pipette(mount='right')
 
 # Distance increments for jog
 steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
@@ -166,27 +165,30 @@ def key_pressed(key):
         status('skipped #{0}'.format(point_number))
     # run tip probe
     elif key == 'p':
-        probe_center = probe_instrument(pipette, robot)
+        robot.reset()
+        pipette = instruments.Pipette(mount='right', channels=1)
+        probe_center = tuple(probe_instrument(pipette, robot))
         robot.config = robot.config._replace(
             probe_center=probe_center
         )
         status('Tip probe')
     # save calibration point and move to next
     elif key == 'enter':
-        actual[point_number] = position()[:-1]
-        if (point_number < len(actual) - 1):
+        if (point_number < len(actual)):
+            actual[point_number] = position()[:-1]
             point_number += 1
+
+        status('saved #{0}: {1}'.format(point_number, actual[point_number-1]))
 
         # On last point update gantry calibration
         if point_number == 3:
             XY = solve(expected, actual)
             T = add_z(XY)
             robot.config = robot.config._replace(
-                    gantry_calibration=T,
+                    gantry_calibration=list(map(lambda i: list(i), T)),
                 )
-            robot.reset()
+            status(str(robot.config))
 
-        status('saved #{0}: {1}'.format(point_number, actual[point_number]))
     # move to previous calibration point
     elif key == 'backspace':
         if (point_number > 0):

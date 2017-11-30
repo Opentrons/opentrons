@@ -158,6 +158,30 @@ class Robot(object):
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
 
+        self.dimensions = (395, 345, 228)
+
+        self.INSTRUMENT_DRIVERS_CACHE = {}
+
+        self.arc_height = TIP_CLEARANCE
+
+        # TODO (artyom, 09182017): once protocol development experience
+        # in the light of Session concept is fully fleshed out, we need
+        # to properly communicate deprecation of commands. For now we'll
+        # leave it as is for compatibility with documentation.
+        self._commands = []
+        self._unsubscribe_commands = None
+        self.reset()
+
+    def reset(self):
+        """
+        Resets the state of the robot and clears:
+            * Deck
+            * Instruments
+            * Command queue
+            * Runtime warnings
+
+        """
+
         self._actuators = {
             'left': {
                 'carriage': Mover(
@@ -185,29 +209,6 @@ class Robot(object):
             }
         }
 
-        self.dimensions = (395, 345, 228)
-
-        self.INSTRUMENT_DRIVERS_CACHE = {}
-
-        self.arc_height = TIP_CLEARANCE
-
-        # TODO (artyom, 09182017): once protocol development experience
-        # in the light of Session concept is fully fleshed out, we need
-        # to properly communicate deprecation of commands. For now we'll
-        # leave it as is for compatibility with documentation.
-        self._commands = []
-        self._unsubscribe_commands = None
-        self.reset()
-
-    def reset(self):
-        """
-        Resets the state of the robot and clears:
-            * Deck
-            * Instruments
-            * Command queue
-            * Runtime warnings
-
-        """
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
