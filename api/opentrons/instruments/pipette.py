@@ -36,13 +36,18 @@ class Pipette:
 
     Here are the typical steps of using the Pipette:
         * Instantiate a pipette with a maximum volume (uL)
-        and an axis (`a` or `b`)
+        and an axis (`left` or `right`)
         * Design your protocol through the pipette's liquid-handling commands
+
+    Methods in this class include assertions where needed to ensure that any
+    action that requires a tip must be preceeded by `pick_up_tip`. For example:
+    `mix`, `transfer`, `aspirate`, `blow_out`, and `drop_tip`.
 
     Parameters
     ----------
-    axis : str
-        The axis of the pipette's actuator on the Opentrons robot ('a' or 'b')
+    mount : str
+        The axis of the pipette's actuator on the Opentrons robot
+        ('left' or 'right')
     name : str
         Assigns the pipette a unique name for saving it's calibrations
     channels : int
@@ -102,7 +107,7 @@ class Pipette:
         self.mount = mount
         self.channels = channels
 
-        self.attached_tip = None
+        self.tip_attached = False
         self.instrument_actuator = None
         self.instrument_mover = None
 
@@ -146,6 +151,7 @@ class Pipette:
         Resets the state of this pipette, removing associated placeables,
         setting current volume to zero, and resetting tip tracking
         """
+        self.tip_attached = False
         self.placeables = []
         self.previous_placeable = None
         self.current_volume = 0
@@ -313,6 +319,7 @@ class Pipette:
         >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -403,6 +410,8 @@ class Pipette:
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
+
         if not helpers.is_number(volume):
             if volume and not location:
                 location = volume
@@ -433,6 +442,7 @@ class Pipette:
         Position this :any:`Pipette` for an aspiration,
         given it's current state
         """
+        assert self.tip_attached
 
         # first go to the destination
         if location:
@@ -505,6 +515,7 @@ class Pipette:
         >>> p200.mix(3) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
 
         if volume is None:
             volume = self.max_volume
@@ -550,6 +561,7 @@ class Pipette:
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
 
         self.move_to(location, strategy='arc')
         self.robot.poses = self.instrument_actuator.move(
@@ -601,6 +613,8 @@ class Pipette:
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
+
         height_offset = 0
 
         if helpers.is_number(location):
@@ -665,6 +679,7 @@ class Pipette:
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
 
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
@@ -712,6 +727,7 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
 
         if not self.current_tip():
             self.robot.add_warning(
@@ -769,6 +785,7 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert not self.tip_attached
 
         if not location:
             location = self.get_next_tip()
@@ -783,7 +800,8 @@ class Pipette:
         presses = (1 if not helpers.is_number(presses) else presses)
 
         @commands.publish.both(command=commands.pick_up_tip)
-        def _pick_up_tip(self, location):
+        def _pick_up_tip(
+                self, location, presses, plunge_depth):
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
@@ -791,10 +809,9 @@ class Pipette:
             self.current_volume = 0
             self.move_to(self.current_tip().top(0), strategy='arc')
 
-            tip_plunge = -7
             for i in range(int(presses) - 1):
                 self.move_to(
-                    self.current_tip().top(tip_plunge),
+                    self.current_tip().top(plunge_depth),
                     strategy='direct')
                 # add power setting here
                 self.move_to(
@@ -805,9 +822,11 @@ class Pipette:
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
+
             return self
 
-        return _pick_up_tip(self, location)
+        return _pick_up_tip(
+            self, location=location, presses=presses, plunge_depth=-7)
 
     def drop_tip(self, location=None, home_after=True):
         """
@@ -849,6 +868,7 @@ class Pipette:
         >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        assert self.tip_attached
 
         if not location and self.trash_container:
             location = self.trash_container
@@ -880,6 +900,7 @@ class Pipette:
             self._remove_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
+
             return self
         return _drop_tip(location)
 
@@ -936,6 +957,10 @@ class Pipette:
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        # Note: currently it varies whether the pipette should have a tip on
+        # or not depending on the parameters for this call, so we cannot
+        # create a very reliable assertion on tip status
+
         args = [volume, source, dest, *args]
         kwargs['mode'] = 'distribute'
         kwargs['mix_after'] = (0, 0)
@@ -965,6 +990,7 @@ class Pipette:
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+
         kwargs['mode'] = 'consolidate'
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
@@ -1064,6 +1090,9 @@ class Pipette:
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
+        # Note: currently it varies whether the pipette should have a tip on
+        # or not depending on the parameters for this call, so we cannot
+        # create a very reliable assertion on tip status
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 
@@ -1471,6 +1500,7 @@ class Pipette:
         return pose_tree
 
     def _add_tip(self, length):
+        assert not self.tip_attached
         x, y, z = pose_tracker.change_base(
             self.robot.poses,
             src=self,
@@ -1478,8 +1508,10 @@ class Pipette:
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z - length))
+        self.tip_attached = True
 
     def _remove_tip(self, length):
+        assert self.tip_attached
         x, y, z = pose_tracker.change_base(
             self.robot.poses,
             src=self,
@@ -1487,6 +1519,7 @@ class Pipette:
         self.robot.poses = pose_tracker.update(
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z + length))
+        self.tip_attached = False
 
     @property
     def type(self):
