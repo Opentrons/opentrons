@@ -123,7 +123,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles HOME_INSTRUMENT action', () => {
+  test('handles DROP_TIP_AND_HOME action', () => {
     const state = {
       calibration: {
         homeRequest: {inProgress: false, error: new Error('AH'), slot: 0},
@@ -131,7 +131,7 @@ describe('robot reducer - calibration', () => {
       }
     }
     const action = {
-      type: actionTypes.HOME_INSTRUMENT,
+      type: actionTypes.DROP_TIP_AND_HOME,
       payload: {instrument: 'right', labware: 5}
     }
 
@@ -141,7 +141,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles HOME_INSTRUMENT_RESPONSE action', () => {
+  test('handles DROP_TIP_AND_HOME_RESPONSE action', () => {
     const state = {
       calibration: {
         homeRequest: {inProgress: true, error: null, slot: 5},
@@ -149,10 +149,10 @@ describe('robot reducer - calibration', () => {
       }
     }
 
-    const success = {type: actionTypes.HOME_INSTRUMENT_RESPONSE}
+    const success = {type: actionTypes.DROP_TIP_AND_HOME_RESPONSE}
 
     const failure = {
-      type: actionTypes.HOME_INSTRUMENT_RESPONSE,
+      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
       error: true,
       payload: new Error('AH')
     }

@@ -60,7 +60,7 @@ function mergeProps (stateProps, dispatchProps, ownProps) {
 
   if (isTiprack) {
     props.onNoClick = () => {
-      dispatch(robotActions.homeInstrument(singleChannel.axis, slot))
+      dispatch(robotActions.dropTipAndHome(singleChannel.axis, slot))
     }
   }
 

@@ -396,24 +396,40 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles HOME_INSTRUMENT success', () => {
-      const action = actions.homeInstrument('right', 9)
-      const expectedResponse = actions.homeInstrumentResponse()
+    test('handles DROP_TIP_AND_HOME success', () => {
+      const action = actions.dropTipAndHome('right', 9)
+      const expectedResponse = actions.dropTipAndHomeResponse()
 
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
       calibrationManager.home.mockReturnValue(Promise.resolve())
 
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
+          expect(calibrationManager.drop_tip)
+            .toHaveBeenCalledWith({_id: 'inst-1'}, {_id: 'lab-3'})
           expect(calibrationManager.home).toHaveBeenCalledWith({_id: 'inst-1'})
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
 
-    test('handles HOME_INSTRUMENT failure', () => {
-      const action = actions.homeInstrument('right', 9)
-      const expectedResponse = actions.homeInstrumentResponse(new Error('AH'))
+    test('handles DROP_TIP_AND_HOME failure in drop_tip', () => {
+      const action = actions.dropTipAndHome('right', 9)
+      const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
+      calibrationManager.drop_tip
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles DROP_TIP_AND_HOME failure in home', () => {
+      const action = actions.dropTipAndHome('right', 9)
+      const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
       calibrationManager.home.mockReturnValue(Promise.reject(new Error('AH')))
 
       return sendConnect()

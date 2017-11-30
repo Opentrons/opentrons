@@ -37,7 +37,7 @@ export default function client (dispatch) {
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
       case actionTypes.PICKUP_AND_HOME: return pickupAndHome(state, action)
-      case actionTypes.HOME_INSTRUMENT: return homeInstrument(state, action)
+      case actionTypes.DROP_TIP_AND_HOME: return dropTipAndHome(state, action)
       case actionTypes.CONFIRM_TIPRACK: return confirmTiprack(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
@@ -131,13 +131,15 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
   }
 
-  function homeInstrument (state, action) {
-    const {payload: {instrument: axis}} = action
+  function dropTipAndHome (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
     const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
-    remote.calibration_manager.home(instrument)
-      .then(() => dispatch(actions.homeInstrumentResponse()))
-      .catch((error) => dispatch(actions.homeInstrumentResponse(error)))
+    remote.calibration_manager.drop_tip(instrument, labware)
+      .then(() => remote.calibration_manager.home(instrument))
+      .then(() => dispatch(actions.dropTipAndHomeResponse()))
+      .catch((error) => dispatch(actions.dropTipAndHomeResponse(error)))
   }
 
   // drop the tip unless the tiprack is the last one to be confirmed

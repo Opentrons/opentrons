@@ -29,8 +29,8 @@ const {
   SET_LABWARE_REVIEWED,
   PICKUP_AND_HOME,
   PICKUP_AND_HOME_RESPONSE,
-  HOME_INSTRUMENT,
-  HOME_INSTRUMENT_RESPONSE,
+  DROP_TIP_AND_HOME,
+  DROP_TIP_AND_HOME_RESPONSE,
   CONFIRM_TIPRACK,
   CONFIRM_TIPRACK_RESPONSE,
   MOVE_TO_FRONT,
@@ -87,8 +87,8 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
     case PICKUP_AND_HOME: return handlePickupAndHome(state, action)
     case PICKUP_AND_HOME_RESPONSE:
       return handlePickupAndHomeResponse(state, action)
-    case HOME_INSTRUMENT: return handleHomeInstrument(state, action)
-    case HOME_INSTRUMENT_RESPONSE:
+    case DROP_TIP_AND_HOME: return handleHomeInstrument(state, action)
+    case DROP_TIP_AND_HOME_RESPONSE:
       return handleHomeInstrumentResponse(state, action)
     case CONFIRM_TIPRACK: return handleConfirmTiprack(state, action)
     case CONFIRM_TIPRACK_RESPONSE: return handleConfirmTiprackResponse(state, action)

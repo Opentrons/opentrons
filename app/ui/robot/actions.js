@@ -29,8 +29,8 @@ export const actionTypes = {
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
   PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
   PICKUP_AND_HOME_RESPONSE: makeRobotActionName('PICKUP_AND_HOME_RESPONSE'),
-  HOME_INSTRUMENT: makeRobotActionName('HOME_INSTRUMENT'),
-  HOME_INSTRUMENT_RESPONSE: makeRobotActionName('HOME_INSTRUMENT_RESPONSE'),
+  DROP_TIP_AND_HOME: makeRobotActionName('DROP_TIP_AND_HOME'),
+  DROP_TIP_AND_HOME_RESPONSE: makeRobotActionName('DROP_TIP_AND_HOME_RESPONSE'),
   CONFIRM_TIPRACK: makeRobotActionName('CONFIRM_TIPRACK'),
   CONFIRM_TIPRACK_RESPONSE: makeRobotActionName('CONFIRM_TIPRACK_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
@@ -140,20 +140,20 @@ export const actions = {
     return action
   },
 
-  // TODO(mc, 2017-11-22): homeInstrument takes a slot at the moment because
+  // TODO(mc, 2017-11-22): dropTipAndHome takes a slot at the moment because
   // this action is performed in the context of confirming a tiprack labware.
   // This is confusing though, so refactor these actions + state-management
   // as necessary
-  homeInstrument (instrument, labware) {
+  dropTipAndHome (instrument, labware) {
     return tagForRobotApi({
-      type: actionTypes.HOME_INSTRUMENT,
+      type: actionTypes.DROP_TIP_AND_HOME,
       payload: {instrument, labware}
     })
   },
 
-  homeInstrumentResponse (error = null) {
+  dropTipAndHomeResponse (error = null) {
     const action = {
-      type: actionTypes.HOME_INSTRUMENT_RESPONSE,
+      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
       error: error != null
     }
     if (error) action.payload = error
