@@ -13,11 +13,10 @@ def test_new_containers(robot):
     p200 = pipette.Pipette(
         robot, mount='right', max_volume=1000, name='test-pipette'
     )
-    p200.aspirate(100, wheaton_vial_rack[0])
-    p200.aspirate(100, tube_rack_80well[0])
-    p200.aspirate(100, T75_flask[0])
-    p200.aspirate(100, T25_flask[0])
-    p200.dispense(trash_box)
+    p200.aspirate(100, wheaton_vial_rack[0]).dispense(trash_box)
+    p200.aspirate(100, tube_rack_80well[0]).dispense(trash_box)
+    p200.aspirate(100, T75_flask[0]).dispense(trash_box)
+    p200.aspirate(100, T25_flask[0]).dispense(trash_box)
 
 
 def test_fixed_trash(robot, dummy_db):

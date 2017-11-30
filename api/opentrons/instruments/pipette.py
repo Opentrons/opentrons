@@ -11,7 +11,7 @@ from opentrons.trackers import pose_tracker
 
 
 PLUNGER_POSITIONS = {
-    'top': 17,
+    'top': 18.5,
     'bottom': 2,
     'blow_out': 0,
     'drop_tip': -7
@@ -92,6 +92,7 @@ class Pipette:
             channels=1,
             min_volume=0,
             max_volume=None,
+            ul_per_mm=18.51,
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
@@ -132,17 +133,13 @@ class Pipette:
             'dispense': dispense_speed
         }
 
+        self.plunger_positions = PLUNGER_POSITIONS.copy()
+
+        self.ul_per_mm = ul_per_mm
         self.min_volume = min_volume
-        self.max_volume = max_volume or (min_volume + 1)
-
-        # FIXME
-        default_plunger_positions = PLUNGER_POSITIONS
-        self.plunger_positions = {}
-        self.plunger_positions.update(default_plunger_positions)
-
-        for key, val in self.plunger_positions.items():
-            if val is None:
-                self.plunger_positions[key] = default_plunger_positions[key]
+        t = self._get_plunger_position('top')
+        b = self._get_plunger_position('bottom')
+        self.max_volume = (t - b) * self.ul_per_mm
 
     def reset(self):
         """
@@ -336,16 +333,14 @@ class Pipette:
                     self.current_volume + volume)
             )
 
-        distance = self._plunge_distance(self.current_volume + volume)
-        bottom = self._get_plunger_position('bottom')
-        destination = bottom - distance
+        mm_position = self._ul_to_mm(self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
         self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
-            x=destination
+            x=mm_position
         )
         self.current_volume += volume  # update after actual aspirate
         return self
@@ -422,16 +417,13 @@ class Pipette:
 
         self.move_to(location, strategy='arc')  # position robot above location
 
-        # TODO(ahmed): revisit this
-        distance = self._plunge_distance(self.current_volume - volume)
-        bottom = self._get_plunger_position('bottom')
-        destination = bottom - distance
+        mm_position = self._ul_to_mm(self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
-            x=destination)
+            x=mm_position)
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -1231,22 +1223,18 @@ class Pipette:
                 'Plunger position "{}" does not exist'.format(
                     position))
 
-    def _plunge_distance(self, volume):
+    def _ul_to_mm(self, ul):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
         on the axis associated with this pipette.
 
-        Calibration of the top and bottom positions are necessary for
-        these calculations to work.
+        Calibration of the pipette motor's ul-to-mm conversion is required
         """
-        percent = self._volume_percentage(volume)
-        top = self._get_plunger_position('top')
-        bottom = self._get_plunger_position('bottom')
-        travel = bottom - top
-        if travel <= 0:
-            self.robot.add_warning('Plunger calibrated incorrectly')
-        return travel * percent
+
+        millimeters = ul / self.ul_per_mm
+        destination_mm = self._get_plunger_position('bottom') + millimeters
+        return round(destination_mm, 3)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
