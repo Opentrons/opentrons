@@ -1,6 +1,6 @@
 pylama
 pyserial==3.2.1
-pytest
+pytest==3.2.5
 pytest-cov
 pytest-aiohttp
 dill
