@@ -1,8 +1,6 @@
 from setuptools import setup
 
-INSTALL_REQUIRES = [
-    'pydbus>=0.6.0'
-]
+INSTALL_REQUIRES = []
 
 setup(name='avahi_tools',
       version='0.1',

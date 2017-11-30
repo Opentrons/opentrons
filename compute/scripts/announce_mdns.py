@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from opentrons.server.avahi.service import AvahiService
+from avahi_tools import AvahiService
 
 
 DEVICE_NAME = os.environ.get('RESIN_DEVICE_NAME_AT_INIT')

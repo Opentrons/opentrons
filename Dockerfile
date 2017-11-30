@@ -1,33 +1,37 @@
 # Use this for local development
-# FROM resin/amd64-alpine:3.6
+# FROM resin/amd64-alpine-python:3.6-slim
 
 # Use this for running on a robot
-FROM resin/raspberrypi3-alpine:3.6
+FROM resin/raspberrypi3-alpine-python:3.6-slim
 
 # enable container init system.
 ENV INITSYSTEM on
 ENV RUNNING_ON_PI 1
 ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-ENV PYTHONPATH /data/packages/
+ENV PYTHONPATH $PYTHONPATH:/data/packages
+
+RUN echo 'export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS' >> /etc/profile && \
+    echo 'export PYTHONPATH=$PYTHONPATH' >> /etc/profile && \
+    echo 'export RUNNING_ON_PI=$RUNNING_ON_PI' >> /etc/profile
 
 RUN apk add --update \
       dropbear \
       gnupg \
       nginx \
-      dbus \
-      python3 \
+      networkmanager \
       py3-urwid \
       py3-numpy \
       && rm -rf /var/cache/apk/*
 
+RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
+    rm -rf /usr/lib/python3.6
+
 COPY ./api /tmp/api
 COPY ./compute/alpine/avahi_tools /tmp/avahi_tools
-RUN pip3 install /tmp/api && \
-    pip3 install /tmp/avahi_tools && \
-    rm -rf /tmp/api
-
-RUN ln -s /usr/bin/python3 /usr/bin/python && \
-    ln -s /usr/bin/pip3 /usr/bin/pip
+RUN pip install /tmp/api && \
+    pip install /tmp/avahi_tools && \
+    rm -rf /tmp/api && \
+    rm -rf /tmp/avahi_tools
 
 COPY ./compute/alpine/opentrons.asc .
 RUN gpg --import opentrons.asc && rm opentrons.asc
