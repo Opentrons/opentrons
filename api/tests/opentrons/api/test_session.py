@@ -54,8 +54,7 @@ async def test_load_from_text(session_manager, protocol):
             acc.append(command)
             traverse(command['children'])
     traverse(session.commands)
-
-    assert len(acc) == 105
+    assert len(acc) == 90
 
 
 async def test_async_notifications(main_router):
