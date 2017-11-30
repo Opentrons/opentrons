@@ -260,10 +260,10 @@ class SmoothieDriver_3_0_0:
             self.set_power(new_power)
 
         if target_coords:
+            command = ''
             if backlash_coords != target_coords:
-                command = GCODES['MOVE'] + ''.join(backlash_coords)
-                self._send_command(command)
-            command = GCODES['MOVE'] + ''.join(target_coords)
+                command += GCODES['MOVE'] + ''.join(backlash_coords)
+            command += GCODES['MOVE'] + ''.join(target_coords)
             self._send_command(command)
             self._update_position(target)
 
