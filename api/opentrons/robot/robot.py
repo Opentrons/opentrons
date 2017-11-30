@@ -159,33 +159,6 @@ class Robot(object):
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
 
-        self._actuators = {
-            'left': {
-                'carriage': Mover(
-                    driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst=id(self.config.gantry_calibration),
-                    axis_mapping={'z': 'Z'}),
-                'plunger': Mover(
-                    driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst='volume-calibration-left',
-                    axis_mapping={'x': 'B'})
-            },
-            'right': {
-                'carriage': Mover(
-                    driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst=id(self.config.gantry_calibration),
-                    axis_mapping={'z': 'A'}),
-                'plunger': Mover(
-                    driver=self._driver,
-                    src=pose_tracker.ROOT,
-                    dst='volume-calibration-right',
-                    axis_mapping={'x': 'C'})
-            }
-        }
-
         self.dimensions = (395, 345, 228)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -233,6 +206,34 @@ class Robot(object):
             * Runtime warnings
 
         """
+
+        self._actuators = {
+            'left': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst=id(self.config.gantry_calibration),
+                    axis_mapping={'z': 'Z'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst='volume-calibration-left',
+                    axis_mapping={'x': 'B'})
+            },
+            'right': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst=id(self.config.gantry_calibration),
+                    axis_mapping={'z': 'A'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst='volume-calibration-right',
+                    axis_mapping={'x': 'C'})
+            }
+        }
+
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
