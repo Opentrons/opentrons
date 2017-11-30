@@ -260,6 +260,9 @@ class SmoothieDriver_3_0_0:
             self.set_power(new_power)
 
         if target_coords:
+            # TODO (andy) comging gcode commands during a move is important
+            # in order to allow the machine to move as quickly as smoothly
+            # as possible between motions
             command = ''
             if backlash_coords != target_coords:
                 command += GCODES['MOVE'] + ''.join(backlash_coords)
