@@ -34,6 +34,7 @@ class PersistedContainersTestCase(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(environment.get_path('APP_DATA_DIR'))
         del os.environ['APP_DATA_DIR']
+        environment.refresh()
 
     def test_get_custom_container_files(self):
         old_container_loading.get_custom_container_files()

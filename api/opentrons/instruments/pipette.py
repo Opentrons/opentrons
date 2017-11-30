@@ -319,7 +319,7 @@ class Pipette:
         >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -410,7 +410,7 @@ class Pipette:
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         if not helpers.is_number(volume):
             if volume and not location:
@@ -442,7 +442,7 @@ class Pipette:
         Position this :any:`Pipette` for an aspiration,
         given it's current state
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         # first go to the destination
         if location:
@@ -515,7 +515,7 @@ class Pipette:
         >>> p200.mix(3) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         if volume is None:
             volume = self.max_volume
@@ -561,7 +561,7 @@ class Pipette:
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         self.move_to(location, strategy='arc')
         self.robot.poses = self.instrument_actuator.move(
@@ -613,7 +613,7 @@ class Pipette:
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         height_offset = 0
 
@@ -679,7 +679,7 @@ class Pipette:
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
@@ -727,7 +727,7 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         if not self.current_tip():
             self.robot.add_warning(
@@ -785,7 +785,7 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert not self.tip_attached
+        assert not self.tip_attached
 
         if not location:
             location = self.get_next_tip()
@@ -868,7 +868,7 @@ class Pipette:
         >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        assert self.tip_attached
 
         if not location and self.trash_container:
             location = self.trash_container
@@ -957,7 +957,9 @@ class Pipette:
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        # Note: currently it varies whether the pipette should have a tip on
+        # or not depending on the parameters for this call, so we cannot
+        # create a very reliable assertion on tip status
 
         args = [volume, source, dest, *args]
         kwargs['mode'] = 'distribute'
@@ -988,7 +990,6 @@ class Pipette:
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
 
         kwargs['mode'] = 'consolidate'
         kwargs['mix_before'] = (0, 0)
@@ -1089,7 +1090,9 @@ class Pipette:
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        # assert self.tip_attached
+        # Note: currently it varies whether the pipette should have a tip on
+        # or not depending on the parameters for this call, so we cannot
+        # create a very reliable assertion on tip status
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 

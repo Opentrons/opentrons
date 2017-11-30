@@ -14,7 +14,8 @@ from numpy import isclose
 
 def test_drop_tip_move_to(robot):
     plate = containers_load(robot, '96-flat', 'A1')
-    p200 = Pipette(robot, mount='left')
+    tiprack = containers_load(robot, 'tiprack-200ul', 'C1')
+    p200 = Pipette(robot, mount='left', tip_racks=[tiprack])
     p200.tip_attached = True
     x, y, z = (161.0, 116.7, 3.0)
 
@@ -35,7 +36,11 @@ def test_drop_tip_move_to(robot):
 
 
 def test_aspirate_move_to(robot):
-    p200 = Pipette(robot, mount='left', max_volume=200)
+    tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
+    p200 = Pipette(robot,
+                   mount='left',
+                   tip_racks=[tip_rack],
+                   max_volume=200)
 
     x, y, z = (161.0, 116.7, 0)
     plate = containers_load(robot, '96-flat', 'A1')
@@ -46,6 +51,7 @@ def test_aspirate_move_to(robot):
     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
     robot.calibrate_container_with_instrument(plate, p200, False)
 
+    p200.pick_up_tip()
     p200.aspirate(100, location)
     current_pos = pose_tracker.absolute(
         robot.poses,
@@ -57,7 +63,9 @@ def test_aspirate_move_to(robot):
 
 
 def test_blow_out_move_to(robot):
-    p200 = Pipette(robot, mount='left')
+    tiprack = containers_load(robot, 'tiprack-200ul', 'C1')
+    p200 = Pipette(robot, mount='left', tip_racks=[tiprack])
+    p200.pick_up_tip()
 
     plate = containers_load(robot, '96-flat', 'A1')
     x, y, z = (161.0, 116.7, 3.0)
@@ -78,7 +86,12 @@ def test_blow_out_move_to(robot):
 
 
 def test_dispense_move_to(robot):
-    p200 = Pipette(robot, mount='left', max_volume=200)
+    tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
+    p200 = Pipette(robot,
+                   mount='left',
+                   tip_racks=[tip_rack],
+                   max_volume=200)
+
     plate = containers_load(robot, '96-flat', 'A1')
     x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
@@ -91,6 +104,7 @@ def test_dispense_move_to(robot):
 
     robot.home()
 
+    p200.pick_up_tip()
     p200.aspirate(100, location)
     p200.dispense(100, location)
 
@@ -143,6 +157,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_aspirate_zero_volume(self):
         assert self.robot.commands() == []
+        self.p200.tip_attached = True
         self.p200.aspirate(0)
         assert self.robot.commands() == ['Aspirating 0 uL from ? at 1.0 speed']  # noqa
 
@@ -163,10 +178,12 @@ class PipetteTest(unittest.TestCase):
     def test_set_max_volume(self):
 
         self.p200.reset()
+        self.p200.pick_up_tip()
         self.p200.aspirate()
         self.assertEquals(self.p200.current_volume, 200)
 
         self.p200.reset()
+        self.p200.pick_up_tip()
         self.p200.set_max_volume(202)
         self.p200.aspirate()
         self.assertEquals(self.p200.current_volume, 202)
@@ -196,6 +213,7 @@ class PipetteTest(unittest.TestCase):
         self.assertListEqual(result, [('right', self.p1000)])
 
     def test_placeables_reference(self):
+        self.p200.tip_attached = True
         self.p200.aspirate(100, self.plate[0])
         self.p200.dispense(100, self.plate[0])
         self.p200.aspirate(100, self.plate[20])
@@ -266,6 +284,7 @@ class PipetteTest(unittest.TestCase):
     #     )
 
     def test_aspirate_invalid_max_volume(self):
+        self.p200.tip_attached = True
         with self.assertRaises(RuntimeWarning):
             self.p200.aspirate(500)
 
@@ -400,6 +419,8 @@ class PipetteTest(unittest.TestCase):
 
     def test_distribute(self):
         self.p200.reset()
+        # Setting true instead of calling pick_up_tip because the test is
+        # currently based on an exact command list. Should make this better.
         self.p200.distribute(
             30,
             self.plate[0],
@@ -432,6 +453,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
+        self.p200.tip_attached = True
         self.p200.distribute(
             30,
             self.plate[0],
@@ -538,6 +560,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
         self.p200.reset()
+        self.p200.tip_attached = True
         self.p200.consolidate(
             30,
             self.plate[0:8],
@@ -881,6 +904,11 @@ class PipetteTest(unittest.TestCase):
             'Dispensing 199.0 uL into <Well B1>',
             'Dropping tip None']
 
+        # assert expected == list(filter(
+        #     lambda s: 'Moving to' not in s,
+        #     self.robot.commands()
+        # ))
+
         self.robot.clear_commands()
 
         self.p200.reset()
@@ -920,6 +948,11 @@ class PipetteTest(unittest.TestCase):
             'Aspirating 80.0 uL from <Well A1> at 1 speed',
             'Dispensing 80.0 uL into <Well H2>',
             'Blowing out at None', 'Dropping tip None']
+
+        # assert expected == list(filter(
+        #     lambda s: 'Moving to' not in s,
+        #     self.robot.commands()
+        # ))
 
         self.robot.clear_commands()
 
@@ -998,6 +1031,11 @@ class PipetteTest(unittest.TestCase):
              'Blowing out at <Well A1>',
              'Touching tip',
              'Dropping tip None']
+
+        # assert expected == list(filter(
+        #     lambda s: 'Moving to' not in s,
+        #     self.robot.commands()
+        # ))
 
     def test_transfer_mix(self):
         self.p200.reset()
@@ -1272,6 +1310,7 @@ class PipetteTest(unittest.TestCase):
         self.robot.clear_commands()
 
     def test_touch_tip(self):
+        self.p200.pick_up_tip()
         self.p200.robot.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])
         self.p200.touch_tip(-3)
@@ -1353,6 +1392,7 @@ class PipetteTest(unittest.TestCase):
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
         # so that you have liquid
+        self.p200.pick_up_tip()
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.mix(3, 100, self.plate[1])
@@ -1372,6 +1412,7 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(self.p200.aspirate.mock_calls, aspirate_expected)
 
     def test_air_gap(self):
+        self.p200.pick_up_tip()
         self.p200.aspirate(50, self.plate[0])
         self.p200.air_gap()
         self.assertEquals(self.p200.current_volume, 200)
@@ -1397,6 +1438,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_mix_with_named_args(self):
         self.p200.current_volume = 100
+        self.p200.pick_up_tip()
         self.p200.aspirate = mock.Mock()
         self.p200.dispense = mock.Mock()
         self.p200.mix(volume=50, repetitions=2)
@@ -1412,7 +1454,7 @@ class PipetteTest(unittest.TestCase):
             self.p200.aspirate.mock_calls,
             [
                 mock.call.aspirate(volume=50,
-                                   location=None,
+                                   location=self.p200.tip_racks[0][0],
                                    rate=1.0),
                 mock.call.aspirate(50, rate=1.0)
             ]
