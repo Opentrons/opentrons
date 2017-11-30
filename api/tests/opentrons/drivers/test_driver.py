@@ -50,12 +50,6 @@ def test_plunger_commands(smoothie, monkeypatch):
             ['G0.+[BC].+ M400'],                  # Move (including BC)
             ['M907 B0.1 C0.1 M400'],              # Set plunger current low
             ['G4P0.05 M400'],                     # Dwell
-
-            ['M907 B0.5 C0.5 M400'],              # Move again for backlash
-            ['G4P0.05 M400'],
-            ['G0.+[BC].+ M400'],
-            ['M907 B0.1 C0.1 M400'],
-            ['G4P0.05 M400']
         ]
     )
 
