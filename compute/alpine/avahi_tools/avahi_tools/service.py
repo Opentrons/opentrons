@@ -3,8 +3,7 @@
 
 import dbus
 from time import sleep
-
-from .server import AvahiServer
+from avahi_tools.server import AvahiServer
 
 
 class AvahiService:
