@@ -17,8 +17,6 @@ PLUNGER_POSITIONS = {
     'drop_tip': -7
 }
 
-P300_UL_PER_MM = 18.51
-
 
 class PipetteTip:
     def __init__(self, length):
@@ -94,6 +92,7 @@ class Pipette:
             channels=1,
             min_volume=0,
             max_volume=None,
+            ul_per_mm=18.51,
             trash_container=None,
             tip_racks=[],
             aspirate_speed=300,
@@ -136,10 +135,11 @@ class Pipette:
 
         self.plunger_positions = PLUNGER_POSITIONS.copy()
 
+        self.ul_per_mm = ul_per_mm
         self.min_volume = min_volume
         t = self._get_plunger_position('top')
         b = self._get_plunger_position('bottom')
-        self.max_volume = (t - b) * P300_UL_PER_MM
+        self.max_volume = (t - b) * self.ul_per_mm
 
     def reset(self):
         """
@@ -1232,7 +1232,7 @@ class Pipette:
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
 
-        millimeters = ul / P300_UL_PER_MM
+        millimeters = ul / self.ul_per_mm
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 3)
 

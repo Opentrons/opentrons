@@ -54,10 +54,6 @@ async def test_load_from_text(session_manager, protocol):
             acc.append(command)
             traverse(command['children'])
     traverse(session.commands)
-
-    from pprint import pprint as pp
-    pp(protocol.text)
-    pp(acc)
     assert len(acc) == 90
 
 
