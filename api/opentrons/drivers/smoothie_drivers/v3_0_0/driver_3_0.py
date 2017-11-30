@@ -23,6 +23,8 @@ HOMED_POSITION = {
     'C': 18.9997
 }
 
+PLUNGER_BACKLASH_MM = 0.3
+
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
@@ -230,9 +232,22 @@ class SmoothieDriver_3_0_0:
                 isclose(coords, self._position[axis])
             )
 
-        coords = [axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                  for axis, coords in sorted(target.items())
-                  if valid_movement(coords, axis)]
+        def create_coords_list(coords_dict):
+            return [
+                axis + str(round(coords, GCODE_ROUNDING_PRECISION))
+                for axis, coords in sorted(coords_dict.items())
+                if valid_movement(coords, axis)
+            ]
+
+        backlash_target = target.copy()
+        backlash_target.update({
+            axis: value + PLUNGER_BACKLASH_MM
+            for axis, value in sorted(target.items())
+            if axis in 'BC' and self._position[axis] < value
+        })
+
+        target_coords = create_coords_list(target)
+        backlash_coords = create_coords_list(backlash_target)
 
         low_power_axes = [axis
                           for axis, _ in sorted(target.items())
@@ -244,8 +259,11 @@ class SmoothieDriver_3_0_0:
                          for axis in low_power_axes}
             self.set_power(new_power)
 
-        if coords:
-            command = GCODES['MOVE'] + ''.join(coords)
+        if target_coords:
+            command = ''
+            if backlash_coords != target_coords:
+                command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
+            command += GCODES['MOVE'] + ''.join(target_coords)
             self._send_command(command)
             self._update_position(target)
 

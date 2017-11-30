@@ -32,7 +32,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         'A': 3,
         'B': 4,
         'C': 5})
-
     fuzzy_assert(
         result=command_log,
         expected=[
