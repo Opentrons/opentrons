@@ -190,31 +190,7 @@ class Robot(object):
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
-        self.mode = None
-        self._smoothie_drivers = {
-            'live': None,
-            'simulate': drivers.get_virtual_driver(
-                options={'limit_switches': False}
-            ),
-            'simulate_switches': drivers.get_virtual_driver(
-                options={'limit_switches': True}
-            )
-        }
-
-        null_driver = drivers.get_virtual_driver()
-
-        def _null(*args, **kwargs):
-            return
-
-        null_driver.move = _null
-        null_driver.home = _null
-        self._smoothie_drivers['null'] = null_driver
-
-        # self._driver = drivers.get_virtual_driver()
-        # self.disconnect()
         self.arc_height = TIP_CLEARANCE
-
-        # self.set_connection('simulate')
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -619,28 +595,6 @@ class Robot(object):
         ]
 
         return strategy
-
-    # DEPRECATED
-    def set_connection(self, mode):
-        if mode not in self._smoothie_drivers:
-            raise ValueError(
-                'mode expected to be "live", "simulate_switches", '
-                'or "simulate", {} provided'.format(mode)
-            )
-
-        d = self._smoothie_drivers[mode]
-
-        # set VirtualSmoothie's coordinates to be the same as physical robot
-        if d and d.is_simulating():
-            if self._driver and self._driver.is_connected():
-                d.connection.serial_port.set_position_from_arguments({
-                    ax.upper(): val
-                    for ax, val in self._driver.get_current_position().items()
-                })
-
-        self._driver = d
-        if self._driver and not self._driver.is_connected():
-            self._driver.toggle_port()
 
     # DEPRECATED
     def disconnect(self):
