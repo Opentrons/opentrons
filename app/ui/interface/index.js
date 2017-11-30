@@ -9,7 +9,7 @@ const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
   isPanelOpen: false,
-  currentPanel: ''
+  currentPanel: 'connect'
 }
 
 export const selectors = {

@@ -80,3 +80,5 @@ calibrations/
 
 # app api assets
 *.pid
+
+.DS_Store
