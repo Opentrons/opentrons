@@ -161,6 +161,9 @@ def key_pressed(key):
         status('skipped #{0}'.format(point_number))
     # run tip probe
     elif key == 'p':
+
+        robot.reset()
+
         pipette = instruments.Pipette(mount='right', channels=1)
         probe_center = tuple(probe_instrument(pipette, robot))
         robot.config = robot.config._replace(
@@ -169,7 +172,7 @@ def key_pressed(key):
         status('Tip probe')
     # save calibration point and move to next
     elif key == 'enter':
-        if (point_number >= len(actual)):
+        if point_number >= len(actual):
             return
 
         if point_number < 0:
@@ -195,7 +198,7 @@ def key_pressed(key):
 
     # move to previous calibration point
     elif key == 'backspace':
-        if (point_number > 0):
+        if point_number > 0:
             point_number -= 1
         status('')
     # home
