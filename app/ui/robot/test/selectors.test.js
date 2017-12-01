@@ -25,7 +25,8 @@ const {
   getLabware,
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
-  getNextLabware
+  getNextLabware,
+  getJogDistance
 } = selectors
 
 describe('robot selectors', () => {
@@ -360,6 +361,14 @@ describe('robot selectors', () => {
         probed: false
       }
     ])
+  })
+
+  test('get jog distance', () => {
+    const state = makeState({
+      calibration: {jogDistance: constants.JOG_DISTANCE_SLOW_MM}
+    })
+
+    expect(getJogDistance(state)).toBe(constants.JOG_DISTANCE_SLOW_MM)
   })
 
   test('get single channel', () => {

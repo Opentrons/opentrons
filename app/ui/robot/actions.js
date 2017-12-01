@@ -4,6 +4,7 @@ import {makeActionName} from '../util'
 import {tagAction as tagForAnalytics} from '../analytics'
 import {_NAME as NAME} from './constants'
 
+// TODO(mc, 2017-11-22): rename this function to actionType
 const makeRobotActionName = (action) => makeActionName(NAME, action)
 const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
@@ -26,8 +27,12 @@ export const actionTypes = {
   SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
-  // HOME: makeRobotActionName('HOME'),
-  // HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
+  PICKUP_AND_HOME_RESPONSE: makeRobotActionName('PICKUP_AND_HOME_RESPONSE'),
+  DROP_TIP_AND_HOME: makeRobotActionName('DROP_TIP_AND_HOME'),
+  DROP_TIP_AND_HOME_RESPONSE: makeRobotActionName('DROP_TIP_AND_HOME_RESPONSE'),
+  CONFIRM_TIPRACK: makeRobotActionName('CONFIRM_TIPRACK'),
+  CONFIRM_TIPRACK_RESPONSE: makeRobotActionName('CONFIRM_TIPRACK_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
@@ -35,6 +40,7 @@ export const actionTypes = {
   RESET_TIP_PROBE: makeRobotActionName('RESET_TIP_PROBE'),
   MOVE_TO: makeRobotActionName('MOVE_TO'),
   MOVE_TO_RESPONSE: makeRobotActionName('MOVE_TO_RESPONSE'),
+  TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
   JOG: makeRobotActionName('JOG'),
   JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
   UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
@@ -117,6 +123,62 @@ export const actions = {
     return {type: actionTypes.SET_LABWARE_REVIEWED, payload}
   },
 
+  pickupAndHome (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.PICKUP_AND_HOME,
+      payload: {instrument, labware}
+    })
+  },
+
+  pickupAndHomeResponse (error = null) {
+    const action = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  // TODO(mc, 2017-11-22): dropTipAndHome takes a slot at the moment because
+  // this action is performed in the context of confirming a tiprack labware.
+  // This is confusing though, so refactor these actions + state-management
+  // as necessary
+  dropTipAndHome (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.DROP_TIP_AND_HOME,
+      payload: {instrument, labware}
+    })
+  },
+
+  dropTipAndHomeResponse (error = null) {
+    const action = {
+      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  // confirm tiprack action drops the tip unless the tiprack is last
+  confirmTiprack (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.CONFIRM_TIPRACK,
+      payload: {instrument, labware}
+    })
+  },
+
+  confirmTiprackResponse (error = null) {
+    const action = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
   moveToFront (instrument) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
@@ -163,6 +225,10 @@ export const actions = {
     return action
   },
 
+  toggleJogDistance () {
+    return {type: actionTypes.TOGGLE_JOG_DISTANCE}
+  },
+
   jog (instrument, axis, direction) {
     return tagForRobotApi({
       type: actionTypes.JOG,
@@ -184,14 +250,12 @@ export const actions = {
     })
   },
 
-  updateOffsetResponse (error = null) {
-    const action = {
+  updateOffsetResponse (error = null, isTiprack) {
+    return {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
-      error: error != null
+      error: error != null,
+      payload: error || {isTiprack}
     }
-    if (error) action.payload = error
-
-    return action
   },
 
   confirmLabware (labware) {

@@ -221,7 +221,7 @@ export function getLabware (state) {
   return DECK_SLOTS.map((slot) => {
     let labware = protocolLabwareBySlot[slot] || {slot}
 
-    if (labware.name) {
+    if (labware.type) {
       labware = {
         ...labware,
         calibration: calibrationBySlot[slot] || UNCONFIRMED,
@@ -263,4 +263,8 @@ export function getJogInProgress (state) {
 
 export function getOffsetUpdateInProgress (state) {
   return getCalibrationState(state).updateOffsetRequest.inProgress
+}
+
+export function getJogDistance (state) {
+  return getCalibrationState(state).jogDistance
 }

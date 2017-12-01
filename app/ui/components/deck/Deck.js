@@ -21,11 +21,18 @@ const mapStateToProps = (state) => {
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
   const {singleChannel: {axis}} = stateProps
   const {dispatch} = dispatchProps
-  const {slot} = ownProps
+  const {slot} = ownProps || {}
   const labware = stateProps.labware.map(lw => ({
     ...lw,
     isCurrent: (lw.slot === slot),
-    moveToLabware: () => dispatch(robotActions.moveTo(axis, lw.slot)),
+    // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
+    // Deck, and ConnectedSetupPanel); could also move logic to the API client
+    moveToLabware: () => {
+      if (lw.isTiprack) {
+        return dispatch(robotActions.pickupAndHome(axis, lw.slot))
+      }
+      dispatch(robotActions.moveTo(axis, lw.slot))
+    },
     setLabwareConfirmed: () => dispatch(robotActions.confirmLabware(lw.slot))
   }))
 

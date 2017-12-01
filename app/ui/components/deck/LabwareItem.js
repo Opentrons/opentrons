@@ -17,19 +17,22 @@ import troughImgSrcActive from '../../img/labware/deckmap/trough-12row-active.pn
 import tubeImgSrc from '../../img/labware/deckmap/tube-rack-2ml.png'
 import tubeImgSrcActive from '../../img/labware/deckmap/tube-rack-2ml-active.png'
 
-const {UNCONFIRMED, MOVING_TO_SLOT, OVER_SLOT, CONFIRMED} = robotConstants
+const {
+  UNCONFIRMED,
+  MOVING_TO_SLOT,
+  PICKING_UP,
+  HOMING,
+  UPDATING,
+  CONFIRMING,
+  CONFIRMED
+} = robotConstants
 
 LabwareItem.propTypes = {
   slot: PropTypes.number.isRequired,
   type: PropTypes.string,
   isCurrent: PropTypes.bool,
   isDisabled: PropTypes.bool,
-  calibration: PropTypes.oneOf([
-    UNCONFIRMED,
-    MOVING_TO_SLOT,
-    OVER_SLOT,
-    CONFIRMED
-  ])
+  calibration: robotConstants.LABWARE_CONFIRMATION_TYPE
 }
 
 export default function LabwareItem (props) {
@@ -43,7 +46,13 @@ export default function LabwareItem (props) {
     calibration
   } = props
 
-  const isMoving = calibration === MOVING_TO_SLOT
+  const isMoving = (
+    calibration === MOVING_TO_SLOT ||
+    calibration === PICKING_UP ||
+    calibration === HOMING ||
+    calibration === UPDATING ||
+    calibration === CONFIRMING
+  )
   const isConfirmed = calibration === CONFIRMED
   const isUnconfirmed = calibration === UNCONFIRMED
   const url = `/setup-deck/${slot}`

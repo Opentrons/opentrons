@@ -59,7 +59,8 @@ function LabwareLinks (props) {
   const isDisabled = !instrumentsCalibrated || !(isTiprack || tipracksConfirmed)
 
   const buttonStyle = classnames(styles.btn_labware, {
-    [styles.disabled]: isDisabled
+    // tipracks can only be confirmed once because of the whole pick-up process
+    [styles.disabled]: isDisabled || (isTiprack && confirmed)
   })
 
   const statusStyle = classnames({
@@ -209,25 +210,14 @@ SetupPanel.propTypes = {
     name: PropTypes.string,
     channels: PropTypes.string,
     volume: PropTypes.number,
-    calibration: PropTypes.oneOf([
-      robotConstants.UNPROBED,
-      robotConstants.PREPARING_TO_PROBE,
-      robotConstants.READY_TO_PROBE,
-      robotConstants.PROBING,
-      robotConstants.PROBED
-    ])
+    calibration: robotConstants.INSTRUMENT_CALIBRATION_TYPE
   })).isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     slot: PropTypes.number.isRequired,
     name: PropTypes.string,
     type: PropTypes.string,
     isTiprack: PropTypes.bool,
-    calibration: PropTypes.oneOf([
-      robotConstants.UNCONFIRMED,
-      robotConstants.MOVING_TO_SLOT,
-      robotConstants.OVER_SLOT,
-      robotConstants.CONFIRMED
-    ])
+    calibration: robotConstants.LABWARE_CONFIRMATION_TYPE
   })).isRequired,
   clearLabwareReviewed: PropTypes.func.isRequired,
   instrumentsCalibrated: PropTypes.bool.isRequired,

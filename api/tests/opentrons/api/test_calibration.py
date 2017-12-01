@@ -154,7 +154,10 @@ async def test_jog_calibrate(dummy_db, main_router, model):
     robot = model.robot
 
     container = model.container._container
-    pos1 = pose_tracker.change_base(robot.poses, src=container, dst=robot.deck)
+    pos1 = pose_tracker.change_base(
+        robot.poses,
+        src=container[0],
+        dst=robot.deck)
     coordinates1 = container.coordinates()
 
     main_router.calibration_manager.move_to(model.instrument, model.container)
@@ -167,10 +170,21 @@ async def test_jog_calibrate(dummy_db, main_router, model):
         model.instrument
     )
 
-    pos2 = pose_tracker.absolute(robot.poses, container)
+    pos2 = pose_tracker.absolute(robot.poses, container[0])
     coordinates2 = container.coordinates()
 
     assert isclose(pos1 + (1, 2, 3), pos2).all()
     assert isclose(
         array([*coordinates1]) + (1, 2, 3),
         array([*coordinates2])).all()
+
+    main_router.calibration_manager.pick_up_tip(
+        model.instrument,
+        model.container
+    )
+
+    # NOTE: only check XY, as the instrument moves up after tip pickup
+    assert isclose(
+        pose_tracker.absolute(robot.poses, container[0])[:-1],
+        pose_tracker.absolute(robot.poses, model.instrument._instrument)[:-1]
+    ).all()

@@ -20,12 +20,17 @@ const mergeProps = (stateProps, dispatchProps) => {
   const {nextLabware} = stateProps
   if (!nextLabware) return {}
 
-  const {singleChannel: {axis}, nextLabware: {slot}} = stateProps
+  const {singleChannel: {axis}, nextLabware: {slot, isTiprack}} = stateProps
   const {dispatch} = dispatchProps
   return {
     ...stateProps,
     to: `/setup-deck/${slot}`,
-    onClick: () => dispatch(robotActions.moveTo(axis, slot))
+    // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
+    // Deck, and ConnectedSetupPanel); could also move logic to the API client
+    onClick: () => {
+      if (isTiprack) return dispatch(robotActions.pickupAndHome(axis, slot))
+      dispatch(robotActions.moveTo(axis, slot))
+    }
   }
 }
 

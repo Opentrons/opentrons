@@ -11,8 +11,9 @@ CalibrationButton.propTypes = {
 
 export default function CalibrationButton (props) {
   const style = classnames('btn', styles.btn_calibrate)
+
   return (
-    <Button style={style} onClick={props.onButtonClick} >
+    <Button style={style} onClick={props.onClick} >
       {props.children}
     </Button>
   )

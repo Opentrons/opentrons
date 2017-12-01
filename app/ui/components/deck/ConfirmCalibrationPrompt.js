@@ -6,8 +6,7 @@ import {constants as robotConstants} from '../../robot'
 
 import ToolTip, {TOP} from '../ToolTip'
 import Diagram from '../Diagram'
-import CalibrationLink from './CalibrationLink'
-import ConfirmCalibrationButton from './ConfirmCalibrationButton'
+import ConfirmCalibrationButtons from './ConfirmCalibrationButtons'
 import NextLabwareLink from './NextLabwareLink'
 import styles from './deck.css'
 import tooltipStyles from '../ToolTip.css'
@@ -17,36 +16,72 @@ ConfirmCalibrationPrompt.propTypes = {
   currentLabware: PropTypes.shape({
     slot: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
-    isTiprack: PropTypes.bool
+    isTiprack: PropTypes.bool,
+    calibration: robotConstants.LABWARE_CONFIRMATION_TYPE
   }).isRequired
 }
 
-const {MOVING_TO_SLOT, OVER_SLOT} = robotConstants
+const {MOVING_TO_SLOT, PICKING_UP, HOMING, UPDATING, CONFIRMED} = robotConstants
 
 export default function ConfirmCalibrationPrompt (props) {
   const {currentLabware, slot} = props
   const {calibration, isTiprack, type} = currentLabware
   const toolTipMessage = <Diagram isTiprack={isTiprack} type={type} />
-  if (!calibration || calibration === MOVING_TO_SLOT) return null
-  if (calibration === OVER_SLOT) {
+
+  // TODO(mc, 2017-11-27): spinner?
+  if (
+    !calibration ||
+    calibration === MOVING_TO_SLOT ||
+    calibration === PICKING_UP ||
+    calibration === HOMING ||
+    calibration === UPDATING
+  ) return null
+
+  if (calibration === CONFIRMED) {
     return (
       <div className={styles.prompt}>
-        <h3>
-          <strong>Is Pipette &nbsp;</strong>
-          <span className={classnames(styles.centered_prompt, tooltipStyles.parent)}>
-            accurately centered
-            <ToolTip style={TOP}>{toolTipMessage}</ToolTip>
-          </span>
-          &nbsp; over the A1 well of slot {slot}?
-        </h3>
-        <ConfirmCalibrationButton slot={slot} />
-        <CalibrationLink to={`/setup-deck/${slot}/jog`}>No</CalibrationLink>
+        <NextLabwareLink />
       </div>
     )
   }
+
   return (
     <div className={styles.prompt}>
-      <NextLabwareLink />
+      <OverSlotCalibrationMessage
+        isTiprack={isTiprack}
+        slot={slot}
+        toolTipMessage={toolTipMessage}
+      />
+      <ConfirmCalibrationButtons slot={slot} />
     </div>
+  )
+}
+
+const overSlotStatusStyle = classnames(
+  styles.centered_prompt,
+  tooltipStyles.parent
+)
+
+function OverSlotCalibrationMessage (props) {
+  const {isTiprack, slot, toolTipMessage} = props
+  const question = isTiprack
+    ? 'Did pipette '
+    : 'Is pipette '
+  const status = isTiprack
+    ? 'pick up tip'
+    : 'accurately centered'
+  const location = isTiprack
+    ? ` A1 from tiprack in slot ${slot}?`
+    : ` over well A1 of slot ${slot}?`
+
+  return (
+    <h3>
+      <strong>{question}</strong>
+      <span className={overSlotStatusStyle}>
+        {status}
+        <ToolTip style={TOP}>{toolTipMessage}</ToolTip>
+      </span>
+      {location}
+    </h3>
   )
 }

@@ -154,6 +154,83 @@ describe('robot actions', () => {
     expect(actions.moveToFrontResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('pick up tip and home action', () => {
+    const action = {
+      type: actionTypes.PICKUP_AND_HOME,
+      payload: {instrument: 'left', labware: 5},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.pickupAndHome('left', 5)).toEqual(action)
+  })
+
+  test('pick up tip and home response action', () => {
+    const success = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: false
+    }
+    const failure = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.pickupAndHomeResponse()).toEqual(success)
+    expect(actions.pickupAndHomeResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('drop tip and home action', () => {
+    const action = {
+      type: actionTypes.DROP_TIP_AND_HOME,
+      payload: {instrument: 'right', labware: 5},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.dropTipAndHome('right', 5)).toEqual(action)
+  })
+
+  test('drop tip and home response action', () => {
+    const success = {
+      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
+      error: false
+    }
+
+    const failure = {
+      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.dropTipAndHomeResponse()).toEqual(success)
+    expect(actions.dropTipAndHomeResponse(new Error('AH'))).toEqual(failure)
+  })
+
+  test('confirm tiprack action', () => {
+    const action = {
+      type: actionTypes.CONFIRM_TIPRACK,
+      payload: {instrument: 'left', labware: 9},
+      meta: {robotCommand: true}
+    }
+
+    expect(actions.confirmTiprack('left', 9)).toEqual(action)
+  })
+
+  test('confirm tiprack response action', () => {
+    const success = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      error: false
+    }
+
+    const failure = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      error: true,
+      payload: new Error('AH')
+    }
+
+    expect(actions.confirmTiprackResponse()).toEqual(success)
+    expect(actions.confirmTiprackResponse(new Error('AH'))).toEqual(failure)
+  })
+
   test('probe tip action', () => {
     const expected = {
       type: actionTypes.PROBE_TIP,
@@ -213,6 +290,12 @@ describe('robot actions', () => {
     expect(actions.moveToResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('toggle jog distance action', () => {
+    const expected = {type: actionTypes.TOGGLE_JOG_DISTANCE}
+
+    expect(actions.toggleJogDistance()).toEqual(expected)
+  })
+
   test('jog action', () => {
     const expected = {
       type: actionTypes.JOG,
@@ -251,7 +334,8 @@ describe('robot actions', () => {
   test('update offset response action', () => {
     const success = {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
-      error: false
+      error: false,
+      payload: {isTiprack: true}
     }
     const failure = {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
@@ -259,7 +343,7 @@ describe('robot actions', () => {
       payload: new Error('AH')
     }
 
-    expect(actions.updateOffsetResponse()).toEqual(success)
+    expect(actions.updateOffsetResponse(null, true)).toEqual(success)
     expect(actions.updateOffsetResponse(new Error('AH'))).toEqual(failure)
   })
 
