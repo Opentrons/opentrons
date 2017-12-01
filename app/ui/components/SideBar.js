@@ -19,6 +19,6 @@ export default function SideBar (props) {
 }
 
 SideBar.propTypes = {
-  isPanelOpen: PropTypes.bool.isRequired,
+  isPanelOpen: PropTypes.bool,
   close: PropTypes.func.isRequired
 }

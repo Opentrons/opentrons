@@ -7,14 +7,16 @@ import {
 } from '../interface'
 
 import {
-  actions as robotActions
+  actions as robotActions,
+  selectors as robotSelectors
 } from '../robot'
 
 import SideBar from '../components/SideBar'
 
 const mapStateToProps = (state) => ({
   isOpen: interfaceSelectors.getIsPanelOpen(state),
-  currentPanel: interfaceSelectors.getCurrentPanel(state)
+  currentPanel: interfaceSelectors.getCurrentPanel(state),
+  isSessionLoaded: robotSelectors.getSessionIsLoaded(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({

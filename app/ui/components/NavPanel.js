@@ -6,6 +6,18 @@ import Connection from '../containers/Connection'
 import styles from './NavPanel.css'
 
 const UploadPanel = props => {
+  const {isSessionLoaded} = props
+  let warning
+  if (isSessionLoaded) {
+    warning = (
+      <div className={styles.confirm_reupload}>
+        <h3>Warning:</h3>
+        <p>Opening a new protocol will close the one you currently have open.
+         This will clear out current calibration data.</p>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.nav_panel}>
       <section className={styles.choose_file}>
@@ -27,8 +39,9 @@ const UploadPanel = props => {
             onChange={props.onUpload}
           />
         </label>
-
+        {warning}
       </section>
+
     </div>
   )
 }

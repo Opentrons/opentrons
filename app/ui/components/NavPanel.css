@@ -57,3 +57,10 @@
   font-size: 1rem;
   text-align: center;
 }
+
+.confirm_reupload {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: black;
+}
