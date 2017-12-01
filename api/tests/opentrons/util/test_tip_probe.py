@@ -118,48 +118,14 @@ def test_tip_probe(fixture):
 
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
 
-    assert fixture.log == [
-        # Clear probe top
-        ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
-        # Move to min Y hot spot
-        ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': center_y - size_y}),
-        # Lower Z
-        ('move', {
-            'A': tip_length + Z_DECK_CLEARANCE_MM}),
-        # Probe in the direction of Y axis
-        ('probe_axis',
-            'Y', size_y),
-        # Bounce back along Y
-        ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': min_y - BOUNCE_DISTANCE_MM}),
-        # Clear probe top
-        ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
-        # Move to max Y hot spot
-        ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': center_y + size_y}),
-        # Lower Z
-        ('move', {
-            'A': tip_length + Z_DECK_CLEARANCE_MM}),
-        # Probe in the direction opposite of Y axis
-        ('probe_axis',
-            'Y', -size_y),
-        # Bounce back along Y
-        ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': max_y + BOUNCE_DISTANCE_MM}),
+    expected_log = [
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to min X hot spot
         ('move', {
             'X': center_x - size_x,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
             'A': tip_length + Z_DECK_CLEARANCE_MM}),
@@ -169,14 +135,14 @@ def test_tip_probe(fixture):
         # Bounce back along X
         ('move', {
             'X': min_x - BOUNCE_DISTANCE_MM,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + size_z * Z_MARGIN}),
         # Move to max X hot spot
         ('move', {
             'X': center_x + size_x,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
             'A': tip_length + Z_DECK_CLEARANCE_MM}),
@@ -186,7 +152,41 @@ def test_tip_probe(fixture):
         # Bounce back along X
         ('move', {
             'X': max_x + BOUNCE_DISTANCE_MM,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
+        # Clear probe top
+        ('move', {
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
+        # Move to min Y hot spot
+        ('move', {
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': center_y - size_y}),
+        # Lower Z
+        ('move', {
+            'A': tip_length + Z_DECK_CLEARANCE_MM}),
+        # Probe in the direction of Y axis
+        ('probe_axis',
+            'Y', size_y),
+        # Bounce back along Y
+        ('move', {
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': min_y - BOUNCE_DISTANCE_MM}),
+        # Clear probe top
+        ('move', {
+            'A': tip_length + center_z + size_z * Z_MARGIN}),
+        # Move to max Y hot spot
+        ('move', {
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': center_y + size_y}),
+        # Lower Z
+        ('move', {
+            'A': tip_length + Z_DECK_CLEARANCE_MM}),
+        # Probe in the direction opposite of Y axis
+        ('probe_axis',
+            'Y', -size_y),
+        # Bounce back along Y
+        ('move', {
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': max_y + BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + size_z * Z_MARGIN}),
@@ -202,6 +202,15 @@ def test_tip_probe(fixture):
         # Bounce back along Z
         ('move',
             {'A': max_z + BOUNCE_DISTANCE_MM})]
+
+    from pprint import pprint as pp
+    for i in range(len(fixture.log)):
+        if fixture.log[i] != expected_log[i]:
+            pp(i)
+            pp('measured:',  fixture.log[i])
+            pp('actual:', expected_log[i])
+
+    assert fixture.log == expected_log
     assert res == (0.0, 0.0, 100.0)
 
 
