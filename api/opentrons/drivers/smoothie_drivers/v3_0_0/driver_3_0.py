@@ -53,7 +53,9 @@ def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.split(' ')
     parsed_values = parsed_values[2:]
     return {
-        s.split(':')[0].upper(): float(s.split(':')[1])
+        s.split(':')[0].upper(): round(
+            float(s.split(':')[1]),
+            GCODE_ROUNDING_PRECISION)
         for s in parsed_values
     }
 
