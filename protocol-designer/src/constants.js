@@ -61,7 +61,7 @@ export const containerDims = containerType => {
 }
 
 // The '.ot-selectable' classname is used to find collisions with SelectionRect
-export const SELECTABLE_CLASS = 'ot-selectable'
+export const SELECTABLE_WELL_CLASS = 'ot-selectable-well'
 
 // TODO factor into CSS or constants or elsewhere
 export const swatchColors = n => {
