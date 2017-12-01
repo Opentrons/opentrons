@@ -1,10 +1,9 @@
+from numpy import array, isclose
+from opentrons.instruments import Pipette
+from opentrons.robot.mover import Mover
 from opentrons.trackers.pose_tracker import (
     change_base, init, ROOT
 )
-from opentrons.instruments import Pipette
-from opentrons.robot.mover import Mover
-from numpy import array, isclose
-from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import SmoothieDriver_3_0_0  # NOQA
 
 
 def test_functional(smoothie):

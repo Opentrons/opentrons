@@ -1,4 +1,6 @@
 import pytest
+from opentrons.robot import robot_configs
+from opentrons.util import environment
 from opentrons.util.calibration_functions import (
     probe_instrument,
     update_instrument_config,
@@ -9,8 +11,6 @@ from opentrons.util.calibration_functions import (
     Z_DECK_CLEARANCE_MM,
     Z_MARGIN
 )
-from opentrons.util import environment
-from opentrons.robot import robot_configs
 
 
 @pytest.fixture
@@ -60,7 +60,7 @@ def fixture(config, monkeypatch):
     from opentrons.robot.robot import Robot
     from opentrons.instruments.pipette import Pipette
     from collections import namedtuple
-    from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
+    from opentrons.drivers.smoothie_drivers import driver_3_0
 
     log = []
     X = (-25, 25)

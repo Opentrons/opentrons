@@ -3,18 +3,17 @@
 # from logging.config import dictConfig
 
 import asyncio
-import pytest
 import os
-import shutil
 import re
-
+import shutil
 from collections import namedtuple
 from functools import partial
-from opentrons.server import rpc
 from uuid import uuid4 as uuid
-from opentrons.data_storage import database
-from opentrons.api import models
 
+import pytest
+from opentrons.api import models
+from opentrons.data_storage import database
+from opentrons.server import rpc
 
 # Uncomment to enable logging during tests
 
@@ -248,7 +247,7 @@ def model(robot):
 
 @pytest.fixture
 def smoothie(monkeypatch):
-    from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import \
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
          SmoothieDriver_3_0_0 as SmoothieDriver
     from opentrons.robot import robot_configs
 

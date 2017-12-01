@@ -1,8 +1,9 @@
-from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
+from copy import copy
 from os import environ
 from threading import Event
-from copy import copy
 from typing import Dict
+
+from opentrons.drivers.smoothie_drivers import serial_communication
 
 '''
 - Driver is responsible for providing an interface for motion control
