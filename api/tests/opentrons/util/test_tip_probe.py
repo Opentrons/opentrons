@@ -119,75 +119,75 @@ def test_tip_probe(fixture):
     # tip_length = robot.config.tip_length[instrument.mount][instrument.type]
     tip_length = 0
 
-    assert fixture.log == [
+    expected_log = [
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to min X hot spot
         ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': center_y - size_y}),
+            'X': center_x - size_x,
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
             'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction of X axis
         ('probe_axis',
-            'Y', size_y),
-        # Bounce back along Y
+            'X', size_x),
+        # Bounce back along X
         ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': min_y - BOUNCE_DISTANCE_MM}),
+            'X': min_x - BOUNCE_DISTANCE_MM,
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to max X hot spot
         ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': center_y + size_y}),
+            'X': center_x + size_x,
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
             'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction opposite of X axis
         ('probe_axis',
-            'Y', -size_y),
-        # Bounce back along Y
+            'X', -size_x),
+        # Bounce back along X
         ('move', {
-            'X': center_x + Y_SWITCH_OFFSET_MM,
-            'Y': max_y + BOUNCE_DISTANCE_MM}),
+            'X': max_x + BOUNCE_DISTANCE_MM,
+            'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to min Y hot spot
         ('move', {
-            'X': center_x - size_x,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': center_y - size_y}),
         # Lower Z
         ('move', {
             'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction of Y axis
         ('probe_axis',
-            'X', size_x),
-        # Bounce back along X
+            'Y', size_y),
+        # Bounce back along Y
         ('move', {
-            'X': min_x - BOUNCE_DISTANCE_MM,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': min_y - BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to max Y hot spot
         ('move', {
-            'X': center_x + size_x,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': center_y + size_y}),
         # Lower Z
         ('move', {
             'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction opposite of Y axis
         ('probe_axis',
-            'X', -size_x),
-        # Bounce back along X
+            'Y', -size_y),
+        # Bounce back along Y
         ('move', {
-            'X': max_x + BOUNCE_DISTANCE_MM,
-            'Y': (min_y + max_y) / 2.0 + X_SWITCH_OFFSET_MM}),
+            'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
+            'Y': max_y + BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
             'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
