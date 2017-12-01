@@ -8,7 +8,13 @@ export const slotnames = [
 ]
 
 // These 'nonfillable' container types render on the deck as an image instead of Wells
-export const nonFillableContainers = ['trash-box', 'tiprack-10ul', 'tiprack-200ul', 'tiprack-1000ul', 'tiprack-1000ul-chem']
+export const nonFillableContainers = [
+  'trash-box',
+  'tiprack-10ul',
+  'tiprack-200ul',
+  'tiprack-1000ul',
+  'tiprack-1000ul-chem'
+]
 
 export const getMaxVolumes = containerType => {
   const cont = defaultContainers.containers[containerType]
@@ -50,14 +56,12 @@ export const containerDims = containerType => {
   //   return {rows: 1, columns: 8, wellShape: 'circle'}
   // }
 
-  // TODO: handle tipracks and trash container
-
   console.warn(`Warning: no container type ${containerType} not in containerDims. Defaulting to 12x8`)
   return {rows: 12, columns: 8, wellShape: 'circle', maxVolumes: {default: 400}}
 }
 
 // The '.ot-selectable' classname is used to find collisions with SelectionRect
-export const SELECTABLE_CLASS = 'ot-selectable'
+export const SELECTABLE_WELL_CLASS = 'ot-selectable-well'
 
 // TODO factor into CSS or constants or elsewhere
 export const swatchColors = n => {
@@ -85,14 +89,4 @@ export const swatchColors = n => {
     '#000000'
   ]
   return colors[n % colors.length]
-}
-
-// These utils are great candidates for unit tests
-export const toWellName = ({rowNum, colNum}) => (
-  String.fromCharCode(colNum + 65) + (rowNum + 1)
-)
-
-export const wellKeyToXYList = wellKey => {
-  const [x, y] = wellKey.split(',').map(s => parseInt(s, 10))
-  return toWellName({rowNum: parseInt(y), colNum: x})
 }

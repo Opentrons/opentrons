@@ -11,8 +11,8 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
-import { containerDims, toWellName, getMaxVolumes, wellKeyToXYList } from '../constants.js'
-import { uuid } from '../utils.js'
+import { containerDims, getMaxVolumes } from '../constants.js'
+import { uuid, toWellName, wellKeyToXYList } from '../utils.js'
 
 const sortedSlotnames = ['A1', 'B1', 'C1', 'D1', 'E1', 'A2', 'B2', 'C2', 'D2', 'E2', 'A3', 'B3', 'C3', 'D3', 'E3']
 
@@ -64,23 +64,7 @@ export const containers = handleActions({
       name: null // create with null name, so we force explicit naming.
     }
   }),
-  DELETE_CONTAINER: (state, action) => {
-    // For leaving open slots functionality, do this one-liner instead
-    return pickBy(state, (value, key) => key !== action.payload.containerId)
-
-    // TODO: make the slots slide backward again
-
-    // const deletedSlot = action.payload
-    // const deletedIdx = sortedSlotnames.findIndex(slot => slot === deletedSlot)
-    // // Summary:
-    // //  {A1: 'alex', B1: 'brock', C1: 'charlie'} ==(delete slot B1)==> {A1: 'alex', B1: 'charlie'}
-    // const nextState = sortedSlotnames.reduce((acc, slotName, i) => slotName === deletedSlot || !(slotName in state)
-    //   ? acc
-    //   : ({...acc, [sortedSlotnames[i < deletedIdx ? i : i - 1]]: state[slotName]}),
-    //   {})
-    //
-    // return nextState
-  },
+  DELETE_CONTAINER: (state, action) => pickBy(state, (value, key) => key !== action.payload.containerId),
   MODIFY_CONTAINER: (state, action) => {
     const { containerId, modify } = action.payload
     return {...state, [containerId]: {...state[containerId], ...modify}}
@@ -258,7 +242,6 @@ const selectedContainerType = createSelector(
 
 // Given ingredientsForContainer obj and rowNum, colNum,
 // returns the ingred data for that well, or `undefined`
-// TODO SOON: document the ingredientsForContainer obj returned by that selector (it's upstream of this fn!)
 const _ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
   const wellName = toWellName({rowNum, colNum})
   const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
