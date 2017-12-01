@@ -5,7 +5,7 @@
 
 .wrapper {
   width: 1024px;
-  height: 768px;
+  height: 100vh;
   display: flex;
   flex-direction: row;
   font-family: 'sans';

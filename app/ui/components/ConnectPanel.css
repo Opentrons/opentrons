@@ -5,7 +5,8 @@
 }
 
 .robot_results {
-  height: 85%;
+  height: calc(100vh - 62px);
+  overflow: scroll;
 }
 
 .robot_results.centered {
@@ -69,7 +70,12 @@ h1 {
 }
 
 .connection_name {
+  width: 12.5rem;
+  overflow: hidden;
+  text-align: center;
   line-height: 3rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .connection_name,
