@@ -7,7 +7,12 @@ iface lo inet loopback
 auto eth0
 
 # https://en.wikipedia.org/wiki/IPv6#Link_local_address
+# iface eth0 inet6 manual
+#        pre-up echo 1 > /proc/sys/net/ipv6/conf/eth0/accept_ra
+
 iface eth0 inet6 manual
-        pre-up echo 1 > /proc/sys/net/ipv6/conf/eth0/accept_ra
+  address fe80::0000:cafe:fefe:0
+  netmask 64
+  pre-up echo 0 > /proc/sys/net/ipv6/conf/eth0/accept_ra
 
 iface eth0 inet dhcp
