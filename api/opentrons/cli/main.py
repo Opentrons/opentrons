@@ -165,9 +165,10 @@ def key_pressed(key):
         robot.reset()
 
         pipette = instruments.Pipette(mount='right', channels=1)
-        probe_center = tuple(probe_instrument(pipette, robot))
+        px, py, pz = tuple(probe_instrument(pipette, robot))
+        pz -= TIP_LENGTH
         robot.config = robot.config._replace(
-            probe_center=probe_center
+            probe_center=(px, py, pz)
         )
         status('Tip probe')
     # save calibration point and move to next
