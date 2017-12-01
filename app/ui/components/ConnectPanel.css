@@ -5,7 +5,8 @@
 }
 
 .robot_results {
-  height: 85%;
+  height: calc(100vh - 62px);
+  overflow: scroll;
 }
 
 .robot_results.centered {
