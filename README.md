@@ -116,8 +116,8 @@ See the [App README][app-readme] for instructions.
 
 Enjoy!
 
-[travis]: https://travis-ci.org/OpenTrons/opentrons/branches
-[travis-badge]: https://img.shields.io/travis/OpenTrons/opentrons/app-3-0.svg?style=flat-square&maxAge=3600
-[codecov]: https://codecov.io/gh/OpenTrons/opentrons/branches
-[codecov-badge]: https://img.shields.io/codecov/c/github/OpenTrons/opentrons/app-3-0.svg?style=flat-square&maxAge=3600
+[travis]: https://travis-ci.org/Opentrons/opentrons/branches
+[travis-badge]: https://img.shields.io/travis/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600
+[codecov]: https://codecov.io/gh/Opentrons/opentrons/branches
+[codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600
 [app-readme]: ./app/README.md
