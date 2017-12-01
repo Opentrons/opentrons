@@ -8,8 +8,8 @@ from opentrons.util.calibration_functions import (
     X_SWITCH_OFFSET_MM,
     Y_SWITCH_OFFSET_MM,
     Z_SWITCH_OFFSET_MM,
-    Z_DECK_CLEARANCE_MM,
-    Z_MARGIN
+    Z_PROBE_CLEARANCE_MM,
+    Z_CROSSOVER_CLEARANCE
 )
 
 
@@ -65,7 +65,7 @@ def fixture(config, monkeypatch):
     log = []
     X = (-25, 25)
     Y = (-25, 25)
-    Z = (0, 150)
+    Z = (0, 100)
 
     def move(self, target, *args, **kwargs):
         log.append(('move', target))
@@ -116,19 +116,20 @@ def test_tip_probe(fixture):
     min_y, max_y = fixture.Y
     min_z, max_z = fixture.Z
 
-    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
+    # tip_length = robot.config.tip_length[instrument.mount][instrument.type]
+    tip_length = 0
 
     expected_log = [
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to min X hot spot
         ('move', {
             'X': center_x - size_x,
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
-            'A': tip_length + Z_DECK_CLEARANCE_MM}),
+            'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction of X axis
         ('probe_axis',
             'X', size_x),
@@ -138,14 +139,14 @@ def test_tip_probe(fixture):
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to max X hot spot
         ('move', {
             'X': center_x + size_x,
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
-            'A': tip_length + Z_DECK_CLEARANCE_MM}),
+            'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction opposite of X axis
         ('probe_axis',
             'X', -size_x),
@@ -155,14 +156,14 @@ def test_tip_probe(fixture):
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to min Y hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
             'Y': center_y - size_y}),
         # Lower Z
         ('move', {
-            'A': tip_length + Z_DECK_CLEARANCE_MM}),
+            'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction of Y axis
         ('probe_axis',
             'Y', size_y),
@@ -172,14 +173,14 @@ def test_tip_probe(fixture):
             'Y': min_y - BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to max Y hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
             'Y': center_y + size_y}),
         # Lower Z
         ('move', {
-            'A': tip_length + Z_DECK_CLEARANCE_MM}),
+            'A': center_z + Z_PROBE_CLEARANCE_MM}),
         # Probe in the direction opposite of Y axis
         ('probe_axis',
             'Y', -size_y),
@@ -189,26 +190,19 @@ def test_tip_probe(fixture):
             'Y': max_y + BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to Z hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0,
             'Y': (min_y + max_y) / 2.0 + Z_SWITCH_OFFSET_MM}),
         ('move', {
-            'A': tip_length + center_z + size_z * Z_MARGIN}),
+            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
         # Probe in the direction opposite of Z axis
         ('probe_axis',
-            'A', -1.5*size_z),
+            'A', -Z_CROSSOVER_CLEARANCE),
         # Bounce back along Z
         ('move',
             {'A': max_z + BOUNCE_DISTANCE_MM})]
-
-    from pprint import pprint as pp
-    for i in range(len(fixture.log)):
-        if fixture.log[i] != expected_log[i]:
-            pp(i)
-            pp('measured:',  fixture.log[i])
-            pp('actual:', expected_log[i])
 
     assert fixture.log == expected_log
     assert res == (0.0, 0.0, 100.0)
@@ -237,7 +231,7 @@ def test_update_instrument_config(fixture, monkeypatch):
     new_instrument_offset = config \
         .instrument_offset[instrument.mount][instrument.type]
 
-    assert new_tip_length == tip_length + 5.0
+    assert new_tip_length == 5.0
     assert new_instrument_offset == \
         tuple(array(instrument_offset) + (5.0, 5.0, 0.0))
     assert tuple(change_base(
@@ -256,7 +250,7 @@ def test_update_instrument_config(fixture, monkeypatch):
             },
             'tip_length': {
                 'right': {
-                    'single': 55.0
+                    'single': 5.0
                 }
             }
         }
