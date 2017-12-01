@@ -47,10 +47,10 @@ def probe_instrument(instrument, robot) -> Point:
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('y', Y_SWITCH_OFFSET_MM,            -size_y, -center.z + Z_DECK_CLEARANCE_MM,      size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,             size_y, -center.z + Z_DECK_CLEARANCE_MM,     -size_y),  # NOQA
         ('x',            -size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,      size_x),  # NOQA
         ('x',             size_x, X_SWITCH_OFFSET_MM, -center.z + Z_DECK_CLEARANCE_MM,     -size_x),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,            -size_y, -center.z + Z_DECK_CLEARANCE_MM,      size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,             size_y, -center.z + Z_DECK_CLEARANCE_MM,     -size_y),  # NOQA
         ('z',                0.0, Z_SWITCH_OFFSET_MM,               size_z * Z_MARGIN, -1.5*size_z)   # NOQA
     ]
 
