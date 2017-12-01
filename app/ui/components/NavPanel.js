@@ -12,7 +12,8 @@ const UploadPanel = props => {
     warning = (
       <div className={styles.confirm_reupload}>
         <h3>Warning:</h3>
-        <p>Uploading a new protocol file will clear out current calibration data.</p>
+        <p>Opening a new protocol will close the one you currently have open.
+         This will clear out current calibration data.</p>
       </div>
     )
   }
