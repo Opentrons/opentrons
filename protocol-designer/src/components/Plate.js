@@ -3,16 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import styles from './Plate.css'
-
-// Copied from parametric-protocols/src/js/utils
-// TODO refactor
-const intToAlphabetLetter = (i, lowerCase = false) =>
-  String.fromCharCode((lowerCase ? 96 : 65) + i)
-
-// TODO factor out. (NEW)
-const transpose = matrix => matrix[0].map((_col, i) =>
-  matrix.map(row => row[i])
-)
+import { intToAlphabetLetter, transpose } from '../utils.js'
 
 class Plate extends React.Component {
   static propTypes = {
