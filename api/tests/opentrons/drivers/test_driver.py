@@ -1,5 +1,6 @@
-from tests.opentrons.conftest import fuzzy_assert
 from threading import Thread
+
+from tests.opentrons.conftest import fuzzy_assert
 
 
 def position(x, y, z, a, b, c):
@@ -7,8 +8,8 @@ def position(x, y, z, a, b, c):
 
 
 def test_plunger_commands(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication
-    from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie.simulating = False
 
@@ -52,7 +53,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
 
 def test_functional(smoothie):
-    from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import HOMED_POSITION  # NOQA
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION  # NOQA
 
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
