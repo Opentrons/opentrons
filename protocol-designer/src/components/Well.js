@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import { SELECTABLE_CLASS, swatchColors } from '../constants.js'
+import { SELECTABLE_WELL_CLASS, swatchColors } from '../constants.js'
 import WellToolTip from '../components/WellToolTip.js'
 
 import styles from '../css/style.css' // TODO use own styles
@@ -31,7 +31,7 @@ export default function Well ({x, y, wellContent, selectable, ...otherProps}) {
           selected,
           [styles.preselected]: preselected,
           [styles.highlighted]: highlighted,
-          [SELECTABLE_CLASS]: selectable && !isFilled}
+          [SELECTABLE_WELL_CLASS]: selectable && !isFilled}
       )}
       data-well-x={x}
       data-well-y={y}

@@ -68,6 +68,24 @@ Colors are assigned by position in the outermost array, as is the order top to b
 
 (I'm on the fence about whether `individualize` should really just be `!!wellDetails`... but it might as well be more explicit for now. This gives us the ability to store well details, toggle them off, then toggle back on.)
 
+### `ingredientsForContainer` selector
+
+Used by IngredientsList. An array of objects that each represent an ingredient group **in the currently selected container only**.
+
+```javascript
+[
+  {
+    concentration:
+    description:
+    groupId: '<ingredient group id>'
+    individualize: false,
+    name: 'Rat Samples',
+    serializeName: null, // or a string like 'Sample'
+    volume: 20, // in uL
+    wells: ['C9', 'C8', 'E9', 'E8'] // <- Wells containing this ingred in the currently selected container. Order is arbitrary.
+  }
+]
+```
 
 ## Containers state shape
 

@@ -1,6 +1,6 @@
 import pytest
 
-from opentrons.drivers.smoothie_drivers.v3_0_0.driver_3_0 import (
+from opentrons.drivers.smoothie_drivers.driver_3_0 import (
     AXES, HOMED_POSITION
 )
 
