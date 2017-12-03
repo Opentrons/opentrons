@@ -76,13 +76,10 @@ class Mover:
         return update(pose_tree, self, point)
 
     def set_speed(self, value):
-        pass
-        # TODO (artyom 20171105): uncomment once proper plunger speeds are
-        # defined
-        # self._driver.set_speed({
-        #     axis: value
-        #     for axis in self._axis_mapping.values()
-        # })
+        self._driver.set_axis_speed_limit({
+            axis: value
+            for axis in self._axis_mapping.values()
+        })
 
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis
