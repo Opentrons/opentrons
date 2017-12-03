@@ -126,7 +126,6 @@ export default function client (dispatch) {
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     remote.calibration_manager.pick_up_tip(instrument, labware)
-      .then(() => remote.calibration_manager.home(instrument))
       .then(() => dispatch(actions.pickupAndHomeResponse()))
       .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
   }
