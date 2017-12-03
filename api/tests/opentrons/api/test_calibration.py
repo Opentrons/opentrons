@@ -1,6 +1,6 @@
 from unittest import mock
 from functools import partial
-from tests.opentrons.conftest import state, log_by_axis
+from tests.opentrons.conftest import state
 
 print('one')
 state = partial(state, 'calibration')
