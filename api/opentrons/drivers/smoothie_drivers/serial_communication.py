@@ -58,8 +58,8 @@ def _write_to_device_and_return(cmd, device_connection):
 
     clean_response = _parse_smoothie_response(response)
     if clean_response:
-        clean_response = clean_response.decode()
-    return clean_response
+        return clean_response.decode()
+    return ''
 
 
 def _connect(port_name, baudrate):
