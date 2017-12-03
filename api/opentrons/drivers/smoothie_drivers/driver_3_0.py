@@ -26,6 +26,7 @@ HOMED_POSITION = {
 
 PLUNGER_BACKLASH_MM = 0.3
 LOW_POWER_Z_SPEED = 30
+POWER_CHANGE_DELAY = 0.05
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
@@ -43,9 +44,9 @@ GCODES = {'HOME': 'G28.2',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
-          'SET_SPEED': 'M120G0F',
-          'SET_SPEED_LIMIT': 'M203.1',
-          'DEFAULT_SPEED': 'M121',
+          'PUSH_SPEED': 'M120',
+          'POP_SPEED': 'M121',
+          'SET_SPEED': 'G0F',
           'SET_CURRENT': 'M907'}
 
 # Number of digits after the decimal point for coordinates being sent
@@ -153,19 +154,13 @@ class SmoothieDriver_3_0_0:
     def speed(self):
         pass
 
-    def set_speed(self, value=None):
-        ''' set total movement speed in mm/second'''
-        if value is None:
-            self._send_command(GCODES['DEFAULT_SPEED'])
-            return
-        speed = value * SEC_PER_MIN
-        command = GCODES['SET_SPEED'] + str(speed)
-        self._send_command(command)
-
-    def set_axis_speed_limit(self, axis, value):
-        ''' set total movement speed in mm/second'''
-        speed = value
-        command = GCODES['SET_SPEED_LIMIT'] + axis + str(speed)
+    def set_speed(self, value='default'):
+        ''' set total axes movement speed in mm/second'''
+        command = GCODES['POP_SPEED']
+        if value is not 'default':
+            speed = value * SEC_PER_MIN
+            command += ' ' + GCODES['PUSH_SPEED']
+            command += ' ' + GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
     def set_power(self, settings):
@@ -182,7 +177,7 @@ class SmoothieDriver_3_0_0:
             ' '.join(values)
         )
         self._send_command(command)
-        self.delay(0.1)
+        self.delay(POWER_CHANGE_DELAY)
 
     # ----------- Private functions --------------- #
 
@@ -290,7 +285,7 @@ class SmoothieDriver_3_0_0:
 
         if low_power_z:
             self.set_power(prior_power)
-            self.set_speed()
+            self.set_speed('default')
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 
