@@ -25,6 +25,7 @@ HOMED_POSITION = {
 }
 
 PLUNGER_BACKLASH_MM = 0.3
+LOW_POWER_Z_SPEED = 30
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
@@ -42,7 +43,9 @@ GCODES = {'HOME': 'G28.2',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
-          'SET_SPEED': 'G0F',
+          'SET_SPEED': 'M120G0F',
+          'SET_SPEED_LIMIT': 'M203.1',
+          'DEFAULT_SPEED': 'M121',
           'SET_CURRENT': 'M907'}
 
 # Number of digits after the decimal point for coordinates being sent
@@ -119,6 +122,7 @@ class SmoothieDriver_3_0_0:
             baudrate=self._config.serial_speed
         )
         self._setup()
+        self.home()
 
     def disconnect(self):
         self.simulating = True
@@ -149,10 +153,19 @@ class SmoothieDriver_3_0_0:
     def speed(self):
         pass
 
-    def set_speed(self, value):
+    def set_speed(self, value=None):
         ''' set total movement speed in mm/second'''
+        if value is None:
+            self._send_command(GCODES['DEFAULT_SPEED'])
+            return
         speed = value * SEC_PER_MIN
         command = GCODES['SET_SPEED'] + str(speed)
+        self._send_command(command)
+
+    def set_axis_speed_limit(self, axis, value):
+        ''' set total movement speed in mm/second'''
+        speed = value
+        command = GCODES['SET_SPEED_LIMIT'] + axis + str(speed)
         self._send_command(command)
 
     def set_power(self, settings):
@@ -169,7 +182,7 @@ class SmoothieDriver_3_0_0:
             ' '.join(values)
         )
         self._send_command(command)
-        self.delay(0.05)
+        self.delay(0.1)
 
     # ----------- Private functions --------------- #
 
@@ -206,6 +219,10 @@ class SmoothieDriver_3_0_0:
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
+
+            if ret_code and 'alarm' in ret_code.lower():
+                self._reset_from_error()
+                return self._send_command(command, timeout=timeout)
 
             if moving_plunger:
                 self.set_power({axis: self._config.plunger_current_low
@@ -261,6 +278,7 @@ class SmoothieDriver_3_0_0:
             new_power = {axis: 0.1
                          for axis in low_power_axes}
             self.set_power(new_power)
+            self.set_speed(LOW_POWER_Z_SPEED)
 
         if target_coords:
             command = ''
@@ -272,6 +290,7 @@ class SmoothieDriver_3_0_0:
 
         if low_power_z:
             self.set_power(prior_power)
+            self.set_speed()
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 
