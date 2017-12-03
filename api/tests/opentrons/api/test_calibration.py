@@ -2,7 +2,10 @@ from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state, log_by_axis
 
+print('one')
 state = partial(state, 'calibration')
+
+print('here')
 
 
 async def test_tip_probe(main_router, model):
@@ -65,7 +68,7 @@ async def test_drop_tip(main_router, model):
             model.container)
 
         drop_tip.assert_called_with(
-            model.container._container[0], home_after=False)
+            model.container._container[0], home_after=True)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))

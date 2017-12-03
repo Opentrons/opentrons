@@ -9,7 +9,8 @@ from opentrons.util.calibration_functions import (
     Y_SWITCH_OFFSET_MM,
     Z_SWITCH_OFFSET_MM,
     Z_PROBE_CLEARANCE_MM,
-    Z_CROSSOVER_CLEARANCE
+    Z_CROSSOVER_CLEARANCE,
+    XY_CLEARANCE
 )
 
 
@@ -116,16 +117,16 @@ def test_tip_probe(fixture):
     min_y, max_y = fixture.Y
     min_z, max_z = fixture.Z
 
-    # tip_length = robot.config.tip_length[instrument.mount][instrument.type]
-    tip_length = 0
+    x_hotspot_offset = (size_x / 2) + XY_CLEARANCE
+    y_hotspot_offset = (size_y / 2) + XY_CLEARANCE
 
     expected_log = [
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to min X hot spot
         ('move', {
-            'X': center_x - size_x,
+            'X': center_x - x_hotspot_offset,
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
@@ -139,10 +140,10 @@ def test_tip_probe(fixture):
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to max X hot spot
         ('move', {
-            'X': center_x + size_x,
+            'X': center_x + x_hotspot_offset,
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
@@ -156,11 +157,11 @@ def test_tip_probe(fixture):
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to min Y hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
-            'Y': center_y - size_y}),
+            'Y': center_y - y_hotspot_offset}),
         # Lower Z
         ('move', {
             'A': center_z + Z_PROBE_CLEARANCE_MM}),
@@ -173,11 +174,11 @@ def test_tip_probe(fixture):
             'Y': min_y - BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to max Y hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0 + Y_SWITCH_OFFSET_MM,
-            'Y': center_y + size_y}),
+            'Y': center_y + y_hotspot_offset}),
         # Lower Z
         ('move', {
             'A': center_z + Z_PROBE_CLEARANCE_MM}),
@@ -190,19 +191,23 @@ def test_tip_probe(fixture):
             'Y': max_y + BOUNCE_DISTANCE_MM}),
         # Clear probe top
         ('move', {
-            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
         # Move to Z hot spot
         ('move', {
             'X': (min_x + max_x) / 2.0,
             'Y': (min_y + max_y) / 2.0 + Z_SWITCH_OFFSET_MM}),
         ('move', {
-            'A': tip_length + center_z + Z_CROSSOVER_CLEARANCE}),
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
         # Probe in the direction opposite of Z axis
         ('probe_axis',
             'A', -Z_CROSSOVER_CLEARANCE),
         # Bounce back along Z
         ('move',
-            {'A': max_z + BOUNCE_DISTANCE_MM})]
+            {'A': max_z + BOUNCE_DISTANCE_MM}),
+        # Clear probe top
+        ('move', {
+            'A': center_z + Z_CROSSOVER_CLEARANCE}),
+    ]
 
     assert fixture.log == expected_log
     assert res == (0.0, 0.0, 100.0)
