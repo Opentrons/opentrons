@@ -101,6 +101,27 @@ def test_low_power_z(model):
     assert power == [{'A': 0.1}, DEFAULT_POWER]
 
 
+def test_fast_home(model):
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
+    import types
+    driver = model.robot._driver
+
+    move = driver.move
+    coords = []
+
+    def move_mock(self, target):
+        nonlocal coords
+        coords.append(target)
+        move(target)
+
+    driver.move = types.MethodType(move_mock, driver)
+
+    assert coords == []
+    driver.fast_home(axis='X', safety_margin=12)
+    assert coords == [{'X': HOMED_POSITION['X'] - 12}]
+    assert driver.position['X'] == HOMED_POSITION['X']
+
+
 def test_pause_resume(model):
     from numpy import isclose
     from opentrons.trackers import pose_tracker

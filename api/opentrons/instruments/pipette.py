@@ -454,17 +454,6 @@ class Pipette:
                 location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 
-    def _move_plunger(self, position):
-        if isinstance(position, str):
-            position = self._get_plunger_position(position)
-        self.robot.poses = self.instrument_actuator.move(
-            self.robot.poses,
-            x=position
-        )
-
-    def _home_plunger(self):
-        self.robot.poses = self.instrument_actuator.home(self.robot.poses)
-
     @commands.publish.both(command=commands.mix)
     def mix(self,
             repetitions=1,
@@ -816,7 +805,9 @@ class Pipette:
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
-            self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            stall_distance = abs(plunge_depth)
+            self.robot.poses = self.instrument_mover.fast_home(
+                self.robot.poses, safety_margin=stall_distance)
 
             return self
 
@@ -880,13 +871,12 @@ class Pipette:
             self._move_plunger('bottom')
             self._move_plunger('drop_tip')
 
-            t = self._get_plunger_position('top')
             b = self._get_plunger_position('bottom')
             d = self._get_plunger_position('drop_tip')
-            safe_position = t - (b - d)
-            self._move_plunger(safe_position)
+            stall_distance = abs(b - d)
             if home_after:
-                self._home_plunger()
+                self.robot.poses = self.instrument_actuator.fast_home(
+                    self.robot.poses, safety_margin=stall_distance)
 
             self._move_plunger('bottom')
 
@@ -922,7 +912,8 @@ class Pipette:
         @commands.publish.both(command=commands.home)
         def _home(mount):
             self.current_volume = 0
-            self._home_plunger()
+            self.robot.poses = self.instrument_actuator.home(
+                self.robot.poses)
             # TODO(artyom, 20171103): confirm expected behavior on pipette.home
             # Are we homing stage and plunger or plunger only?
             # self.robot.poses = self.instrument_mover.home(self.robot.poses)
@@ -1227,6 +1218,14 @@ class Pipette:
                     self.max_volume, self.min_volume))
 
         return self
+
+    def _move_plunger(self, position):
+        if isinstance(position, str):
+            position = self._get_plunger_position(position)
+        self.robot.poses = self.instrument_actuator.move(
+            self.robot.poses,
+            x=position
+        )
 
     def _get_plunger_position(self, position):
         """
