@@ -16,7 +16,7 @@ Z_PROBE_CLEARANCE_MM = 5.0
 
 BOUNCE_DISTANCE_MM = 5.0
 XY_CLEARANCE = 7.5
-Z_CROSSOVER_CLEARANCE = 80  # How much of z height to be added to nozzle to clear the top
+Z_CROSSOVER_CLEARANCE = 80  # Z mm between nozzle and probe
 
 
 def calibrate_container_with_delta(
@@ -56,8 +56,6 @@ def probe_instrument(instrument, robot) -> Point:
         ('y', Y_SWITCH_OFFSET_MM,        rel_y_start, Z_PROBE_CLEARANCE_MM,                -size_y),  # NOQA
         ('z',                0.0, Z_SWITCH_OFFSET_MM,          rel_z_start, -Z_CROSSOVER_CLEARANCE)   # NOQA
     ]
-
-    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
 
     acc = []
 
@@ -143,13 +141,12 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
 
 
 def move_instrument_for_probing_prep(instrument, robot):
-    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
     # TODO(artyom, ben 20171026): calculate from robot dimensions
     robot.poses = instrument._move(
         robot.poses,
         x=191.5,
         y=75.0,
-        z=128 + tip_length
+        z=128
     )
 
 
