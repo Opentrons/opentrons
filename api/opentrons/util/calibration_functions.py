@@ -65,14 +65,14 @@ def probe_instrument(instrument, robot) -> Point:
         'x': [], 'y': [], 'z': []
     }
 
+    safe_height = center.z + Z_CROSSOVER_CLEARANCE
+
     robot.home()
+    robot.poses = instrument._move(robot.poses, z=safe_height)
 
     for axis, *probing_vector, distance in hot_spots:
         x, y, z = array(probing_vector) + center
 
-        safe_height = center.z + Z_CROSSOVER_CLEARANCE
-
-        robot.poses = instrument._move(robot.poses, z=safe_height)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
