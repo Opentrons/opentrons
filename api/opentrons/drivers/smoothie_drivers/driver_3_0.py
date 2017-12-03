@@ -249,7 +249,7 @@ class SmoothieDriver_3_0_0:
             return not (
                 (axis in DISABLE_AXES) or
                 (coords is None) or
-                isclose(coords, self._position[axis])
+                isclose(coords, self.position[axis])
             )
 
         def create_coords_list(coords_dict):
@@ -263,7 +263,7 @@ class SmoothieDriver_3_0_0:
         backlash_target.update({
             axis: value + PLUNGER_BACKLASH_MM
             for axis, value in sorted(target.items())
-            if axis in 'BC' and self._position[axis] < value
+            if axis in 'BC' and self.position[axis] < value
         })
 
         target_coords = create_coords_list(target)
@@ -325,17 +325,28 @@ class SmoothieDriver_3_0_0:
         command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
 
-        position = HOMED_POSITION
-
         # Only update axes that have been selected for homing
         homed = {
-            ax: position[ax]
+            ax: HOMED_POSITION.get(ax)
             for ax in ''.join(home_sequence)
         }
 
         self.update_position(default=homed)
 
         return homed
+
+    def fast_home(self, axis=AXES, safety_margin=10):
+        # move some mm distance away from the target axes endstop switch(es)
+        self.set_speed()
+        destination = {
+            ax: HOMED_POSITION.get(ax) - abs(safety_margin)
+            for ax in axis.upper()
+        }
+        self.move(destination)
+
+        # then home once we're closer to the endstop(s)
+        disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])
+        return self.home(axis=axis, disabled=disabled)
 
     def pause(self):
         self.run_flag.clear()
@@ -356,8 +367,8 @@ class SmoothieDriver_3_0_0:
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
-            self.update_position(self._position)
-            return self._position
+            self.update_position(self.position)
+            return self.position
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
