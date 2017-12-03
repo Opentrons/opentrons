@@ -108,7 +108,6 @@ def fixture(config, monkeypatch):
 
 def test_tip_probe(fixture):
     robot = fixture.robot
-    instrument = fixture.instrument
 
     res = probe_instrument(instrument=fixture.instrument, robot=fixture.robot)
     center_x, center_y, center_z = robot.config.probe_center
@@ -221,8 +220,8 @@ def test_update_instrument_config(fixture, monkeypatch):
     robot = fixture.robot
     instrument = fixture.instrument
 
-    tip_length = robot.config. \
-        tip_length[instrument.mount][instrument.type]
+    # tip_length = robot.config. \
+    #     tip_length[instrument.mount][instrument.type]
     instrument_offset = robot.config. \
         instrument_offset[instrument.mount][instrument.type]
 
