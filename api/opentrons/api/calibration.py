@@ -72,14 +72,13 @@ class CalibrationManager:
         log.debug('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        inst.drop_tip(container._container[0], home_after=False)
+        inst.drop_tip(container._container[0], home_after=True)
         self._set_state('ready')
 
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.debug('Moving {}'.format(instrument.name))
         self._set_state('moving')
-        inst.robot.home()
         calibration_functions.move_instrument_for_probing_prep(
             inst, inst.robot
         )
