@@ -12,10 +12,11 @@ X_SWITCH_OFFSET_MM = 5.0
 Y_SWITCH_OFFSET_MM = 2.0
 Z_SWITCH_OFFSET_MM = 5.0
 
-Z_PROBE_CLEARANCE_MM = 10.0
+Z_PROBE_CLEARANCE_MM = 5.0
 
 BOUNCE_DISTANCE_MM = 5.0
-Z_CROSSOVER_CLEARANCE = 120  # How much of z height to be added to nozzle to clear the top
+XY_CLEARANCE = 7.5
+Z_CROSSOVER_CLEARANCE = 80  # How much of z height to be added to nozzle to clear the top
 
 
 def calibrate_container_with_delta(
@@ -42,19 +43,21 @@ def probe_instrument(instrument, robot) -> Point:
     size_x, size_y, size_z = robot.config.probe_dimensions
     center = Point(*robot.config.probe_center)
 
+    rel_x_start = (size_x / 2) + XY_CLEARANCE
+    rel_y_start = (size_y / 2) + XY_CLEARANCE
+    rel_z_start = Z_CROSSOVER_CLEARANCE
+
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('x',            -size_x, X_SWITCH_OFFSET_MM, Z_PROBE_CLEARANCE_MM,      size_x),  # NOQA
-        ('x',             size_x, X_SWITCH_OFFSET_MM, Z_PROBE_CLEARANCE_MM,     -size_x),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,            -size_y, Z_PROBE_CLEARANCE_MM,      size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,             size_y, Z_PROBE_CLEARANCE_MM,     -size_y),  # NOQA
-        ('z',                0.0, Z_SWITCH_OFFSET_MM, Z_CROSSOVER_CLEARANCE, -Z_CROSSOVER_CLEARANCE)   # NOQA
+        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM, Z_PROBE_CLEARANCE_MM,                 size_x),  # NOQA
+        ('x',        rel_x_start, X_SWITCH_OFFSET_MM, Z_PROBE_CLEARANCE_MM,                -size_x),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start, Z_PROBE_CLEARANCE_MM,                 size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start, Z_PROBE_CLEARANCE_MM,                -size_y),  # NOQA
+        ('z',                0.0, Z_SWITCH_OFFSET_MM,          rel_z_start, -Z_CROSSOVER_CLEARANCE)   # NOQA
     ]
 
     tip_length = robot.config.tip_length[instrument.mount][instrument.type]
-
-    # instrument._add_tip(tip_length)
 
     acc = []
 
@@ -62,10 +65,14 @@ def probe_instrument(instrument, robot) -> Point:
         'x': [], 'y': [], 'z': []
     }
 
+    robot.home()
+
     for axis, *probing_vector, distance in hot_spots:
         x, y, z = array(probing_vector) + center
 
-        robot.poses = instrument._move(robot.poses, z=center.z + Z_CROSSOVER_CLEARANCE)  # NOQA
+        safe_height = center.z + Z_CROSSOVER_CLEARANCE
+
+        robot.poses = instrument._move(robot.poses, z=safe_height)
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
@@ -94,9 +101,7 @@ def probe_instrument(instrument, robot) -> Point:
         bounce = value + (BOUNCE_DISTANCE_MM * (-distance / abs(distance)))
 
         robot.poses = instrument._move(robot.poses, **{axis: bounce})
-
-    # instrument._remove_tip(tip_length)
-    robot.home()
+        robot.poses = instrument._move(robot.poses, z=safe_height)
 
     return center._replace(**{
         axis: mean(values)
