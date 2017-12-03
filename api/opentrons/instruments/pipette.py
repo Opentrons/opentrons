@@ -346,6 +346,7 @@ class Pipette:
         self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
         self._move_plunger(mm_position)
+        self.instrument_actuator.set_speed('default')
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -428,6 +429,7 @@ class Pipette:
 
         self.instrument_actuator.set_speed(speed)
         self._move_plunger(mm_position)
+        self.instrument_actuator.set_speed('default')
         self.current_volume -= volume  # update after actual dispense
 
         return self
