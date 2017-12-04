@@ -1,12 +1,13 @@
 .connect_panel {
   color: silver;
   height: 100%;
-  width: 17.2rem;
+  width: 275px;
 }
 
 .robot_results {
   height: calc(100vh - 62px);
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .robot_results.centered {
@@ -57,10 +58,10 @@ h1 {
 }
 
 .connection_type {
-  margin: -1rem 1rem 0;
-  height: 3rem;
+  margin: 0 0.5rem;
+  height: 2.5rem;
   display: inline-block;
-  vertical-align: baseline;
+  padding-bottom: 0.5rem;
 }
 
 .connection_info {
