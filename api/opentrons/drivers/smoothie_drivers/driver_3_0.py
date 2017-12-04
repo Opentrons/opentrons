@@ -333,7 +333,12 @@ class SmoothieDriver_3_0_0:
 
         return homed
 
-    def fast_home(self, axis=AXES, safety_margin=10):
+    def fast_home(self, axis, safety_margin):
+        ''' home after a controlled motor stall
+
+        Given a known distance we have just stalled along an axis, move
+        that distance away from the homing switch. Then finish with home.
+        '''
         # move some mm distance away from the target axes endstop switch(es)
         self.set_speed()
         destination = {
