@@ -11,13 +11,10 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
-import { containerDims, getMaxVolumes } from '../constants.js'
+import { containerDims, getMaxVolumes, sortedSlotnames } from '../constants.js'
 import { uuid, toWellName, wellKeyToXYList } from '../utils.js'
 
-const sortedSlotnames = ['A1', 'B1', 'C1', 'D1', 'E1', 'A2', 'B2', 'C2', 'D2', 'E2', 'A3', 'B3', 'C3', 'D3', 'E3']
-
 // UTILS
-
 const nextEmptySlot = loadedContainersSubstate => {
   // Next empty slot in the sorted slotnames order. Or null if no more slots.
   const nextEmptySlotIdx = sortedSlotnames.findIndex(slot => !(slot in loadedContainersSubstate))

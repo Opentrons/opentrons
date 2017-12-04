@@ -1,31 +1,35 @@
 import React from 'react'
 
-import { slotnames } from '../constants.js'
-import styles from '../css/style.css'
+import { SLOTNAME_MATRIX, DECK_WIDTH, DECK_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT, SLOT_SPACING } from '../constants.js'
+// import styles from '../css/style.css'
 
 import LabwareContainer from '../containers/LabwareContainer.js'
-import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 
 export default function Deck (props) {
-  const {
-    activeModals,
-    closeIngredientSelector
-  } = props
-
   return (
-    <div className={styles.deck}>
+    // <div className={styles.deck}>
+    // TODO css not inline style on svg
+    <svg viewBox={`0 0 ${DECK_WIDTH} ${DECK_HEIGHT}`} style={{maxHeight: '55vw'}}>
+      {/* Deck rect */}
+      <rect x='0' y='0' width='100%' height='100%' fill='rgba(0,0,0,0.25)' />
 
-      {activeModals.ingredientSelection && activeModals.ingredientSelection.slotName &&
-        <IngredientSelectionModal onClose={closeIngredientSelector} />
-      }
+      {/* All containers */}
+      {SLOTNAME_MATRIX.reduce((acc, slotRow, row) => {
+        slotRow.forEach((slotName, col) =>
+          acc.push(
+            <g key={slotName}
+              transform={`translate(${
+                SLOT_WIDTH * col + SLOT_SPACING * (col + 1)}, ${
+                SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)})`}
+            >
+              <LabwareContainer slotName={slotName} width={SLOT_WIDTH} height={SLOT_HEIGHT} />
+            </g>
+          )
+        )
+        return acc
+      }, [])}
 
-      {/* The actual deck, just a bunch of LabwareContainer containers */}
-      {slotnames.map((slotName, i) =>
-        <LabwareContainer
-          key={i}
-          slotName={slotName}
-        />
-      )}
-    </div>
+    </svg>
+    // {/* </div> */}
   )
 }

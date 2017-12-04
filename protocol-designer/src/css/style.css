@@ -239,6 +239,7 @@ textarea {
 }
 
 .add_labware {
+  /*
   position: absolute;
   left: 2px;
   right: 2px;
@@ -246,7 +247,10 @@ textarea {
   bottom: 2px;
   padding-top: 50%;
   font-size: 12pt;
-  background-color: gray;
+  */
+  width: 100%;
+  height: 100%;
+  fill: gray;
   color: black;
   margin: 10px;
   cursor: pointer;
@@ -375,6 +379,10 @@ textarea {
   display: inline-block;
   height: 100%;
   width: calc(100% - ingredient_panel_sidebar_width - 3px);
+}
+
+.container_detail {
+  margin: 0 2%;
 }
 
 .container_detail::after {
