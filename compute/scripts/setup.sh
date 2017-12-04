@@ -3,11 +3,17 @@
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
 # Network Manager Setup
-nmcli connection modify "Wired connection 1" ipv6.address fe80::cafe:fefe:cafe:fefe/64
-nmcli connection modify "Wired connection 1" ipv6.method manual
-nmcli connection up "Wired connection 1"
-nmcli connection reload
+nmcli connection add \
+  save no \
+  con-name 'local-ethernet' \
+  autoconnect yes \
+  type ethernet \
+  ifname eth0 \
+  ipv6.method manual \
+  ipv6.address fe80::cafe:fefe/64 \
+  ipv4.method link-local
 
+echo "fe80::cafe:fefe%eth0 local-ethernet" >> /etc/hosts
 
 # Dropbear config
 if [ ! -e /etc/dropbear/ ] ; then

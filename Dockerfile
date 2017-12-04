@@ -8,9 +8,9 @@ ENV RUNNING_ON_PI 1
 ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 ENV PYTHONPATH $PYTHONPATH:/data/packages
 
-RUN echo 'export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS' >> /etc/profile && \
-    echo 'export PYTHONPATH=$PYTHONPATH' >> /etc/profile && \
-    echo 'export RUNNING_ON_PI=$RUNNING_ON_PI' >> /etc/profile
+RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
+    echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
+    echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile
 
 RUN apk add --update \
       dumb-init \
@@ -32,11 +32,17 @@ RUN pip install /tmp/api && \
     rm -rf /tmp/api && \
     rm -rf /tmp/avahi_tools
 
+# Redirect nginx logs to stdout and stderr
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
+
 COPY ./compute/alpine/opentrons.asc .
 RUN gpg --import opentrons.asc && rm opentrons.asc
 
 COPY ./compute/alpine/scripts/* /usr/local/bin/
 COPY ./compute/scripts/* /usr/local/bin/
+
+COPY ./compute/alpine/conf/inetd.conf /etc/inetd.conf
 
 COPY ./compute/alpine/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/alpine/static /usr/share/nginx/html
