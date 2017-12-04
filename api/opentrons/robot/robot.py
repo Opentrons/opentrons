@@ -158,6 +158,7 @@ class Robot(object):
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
 
+        # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
