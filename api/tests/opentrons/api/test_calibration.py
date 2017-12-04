@@ -2,10 +2,7 @@ from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
 
-print('one')
 state = partial(state, 'calibration')
-
-print('here')
 
 
 async def test_tip_probe(main_router, model):
