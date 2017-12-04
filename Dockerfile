@@ -13,8 +13,10 @@ RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profi
     echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile
 
 RUN apk add --update \
+      avahi \
       dumb-init \
       dropbear \
+      dropbear-scp \
       gnupg \
       nginx \
       networkmanager \
@@ -47,6 +49,7 @@ COPY ./compute/alpine/conf/inetd.conf /etc/inetd.conf
 COPY ./compute/alpine/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/alpine/static /usr/share/nginx/html
 
+# All newly installed packages will go to persistent storage
 ENV PIP_ROOT /data/packages
 RUN echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile
 

@@ -26,11 +26,13 @@ publish:
 dev:
 	python opentrons/server/main.py -P 31950
 
-dist/update.whl:
+dist/update.base64:
+	rm -rf dist/* && \
 	python setup.py bdist_wheel && \
-	echo '---OT UPDATE BEGIN---' > dist/update.whl && \
-	bash -c 'cat $(ls dist/opentrons*) | base64 >> dist/update.whl' && \
-	echo '---OT UPDATE END---' >> dist/update.whl
+	tar -C dist -cf /tmp/update . && \
+	echo -e "---OT UPDATE BEGIN---" > dist/update.base64 && \
+	base64 -b 50 -i /tmp/update >> dist/update.base64 && \
+  echo -e "\n---OT UPDATE END---" >> dist/update.base64
 
 
 ########## [START] RESIN DEVICE ##########
@@ -60,7 +62,6 @@ ssh_device:
 
 clean:
 	rm -rf \
-		dist/update.whl \
 		__pycache__ \
 		*.egg-info \
 		build \
