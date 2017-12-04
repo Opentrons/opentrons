@@ -12,7 +12,7 @@ X_SWITCH_OFFSET_MM = 5.0
 Y_SWITCH_OFFSET_MM = 2.0
 Z_SWITCH_OFFSET_MM = 5.0
 
-Z_PROBE_CLEARANCE_MM = 5.0
+Z_OFFSET_DURING_PROBE = 5.0
 
 BOUNCE_DISTANCE_MM = 5.0
 XY_CLEARANCE = 7.5
@@ -50,10 +50,10 @@ def probe_instrument(instrument, robot) -> Point:
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM, Z_PROBE_CLEARANCE_MM,                 size_x),  # NOQA
-        ('x',        rel_x_start, X_SWITCH_OFFSET_MM, Z_PROBE_CLEARANCE_MM,                -size_x),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start, Z_PROBE_CLEARANCE_MM,                 size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start, Z_PROBE_CLEARANCE_MM,                -size_y),  # NOQA
+        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM, Z_OFFSET_DURING_PROBE,                 size_x),  # NOQA
+        ('x',        rel_x_start, X_SWITCH_OFFSET_MM, Z_OFFSET_DURING_PROBE,                -size_x),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start, Z_OFFSET_DURING_PROBE,                 size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start, Z_OFFSET_DURING_PROBE,                -size_y),  # NOQA
         ('z',                0.0, Z_SWITCH_OFFSET_MM,          rel_z_start, -Z_CROSSOVER_CLEARANCE)   # NOQA
     ]
 
@@ -67,6 +67,10 @@ def probe_instrument(instrument, robot) -> Point:
 
     robot.home()
     robot.poses = instrument._move(robot.poses, z=safe_height)
+
+    # TODO (andy) we physically have a tip attached during probe
+    #    so it would seem to make more sense to probe also with a virtual tip
+    #    attached to the pipette
 
     for axis, *probing_vector, distance in hot_spots:
         x, y, z = array(probing_vector) + center
