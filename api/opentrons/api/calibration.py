@@ -47,6 +47,10 @@ class CalibrationManager:
 
         log.debug('New config: {0}'.format(config))
 
+        calibration_functions.move_instrument_for_probing_prep(
+            inst, inst.robot
+        )
+
         self._set_state('ready')
 
     def pick_up_tip(self, instrument, container):
