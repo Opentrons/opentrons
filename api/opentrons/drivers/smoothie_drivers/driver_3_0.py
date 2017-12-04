@@ -155,9 +155,13 @@ class SmoothieDriver_3_0_0:
 
     def set_speed(self, value='default'):
         ''' set total axes movement speed in mm/second'''
+
+        # POP will always return speed to the default robot_config speed
         command = GCODES['POP_SPEED']
         if value is not 'default':
             speed = value * SEC_PER_MIN
+
+            # PUSH to save the current speed (default robot_config speed)
             command += ' ' + GCODES['PUSH_SPEED']
             command += ' ' + GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
