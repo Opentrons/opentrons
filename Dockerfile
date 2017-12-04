@@ -6,7 +6,7 @@ FROM resin/raspberrypi3-alpine-python:3.6-slim
 
 ENV RUNNING_ON_PI 1
 ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-ENV PYTHONPATH $PYTHONPATH:/data/packages
+ENV PYTHONPATH $PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
 
 RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
     echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
@@ -46,6 +46,9 @@ COPY ./compute/alpine/conf/inetd.conf /etc/inetd.conf
 
 COPY ./compute/alpine/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/alpine/static /usr/share/nginx/html
+
+ENV PIP_ROOT /data/packages
+RUN echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile
 
 # Updates, HTTPS (for future use), API, SSH for link-local over USB
 EXPOSE 80 443 31950 50022
