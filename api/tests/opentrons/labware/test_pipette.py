@@ -1634,11 +1634,11 @@ class PipetteTest(unittest.TestCase):
         plunge = -10
         return [
             mock.call(well.top(), strategy='arc'),
-            mock.call(well.top(plunge), low_power_z=False, strategy='direct'),
+            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_power_z=False, strategy='direct'),
+            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_power_z=False, strategy='direct'),
+            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]
 
