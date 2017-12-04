@@ -57,6 +57,10 @@ def probe_instrument(instrument, robot) -> Point:
         ('z',                0.0, Z_SWITCH_OFFSET_MM,          rel_z_start, -Z_CROSSOVER_CLEARANCE)   # NOQA
     ]
 
+    # TODO (andy) we physically have a tip attached during probe
+    #    so it would seem to make more sense to probe also with a virtual tip
+    #    attached to the pipette
+
     acc = []
 
     res = {
@@ -67,10 +71,6 @@ def probe_instrument(instrument, robot) -> Point:
 
     robot.home()
     robot.poses = instrument._move(robot.poses, z=safe_height)
-
-    # TODO (andy) we physically have a tip attached during probe
-    #    so it would seem to make more sense to probe also with a virtual tip
-    #    attached to the pipette
 
     for axis, *probing_vector, distance in hot_spots:
         x, y, z = array(probing_vector) + center
