@@ -123,7 +123,6 @@ class SmoothieDriver_3_0_0:
             baudrate=self._config.serial_speed
         )
         self._setup()
-        self.home()
 
     def disconnect(self):
         self.simulating = True
