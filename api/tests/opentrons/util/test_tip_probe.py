@@ -8,7 +8,7 @@ from opentrons.util.calibration_functions import (
     X_SWITCH_OFFSET_MM,
     Y_SWITCH_OFFSET_MM,
     Z_SWITCH_OFFSET_MM,
-    Z_PROBE_CLEARANCE_MM,
+    Z_OFFSET_DURING_PROBE,
     Z_CROSSOVER_CLEARANCE,
     XY_CLEARANCE
 )
@@ -129,7 +129,7 @@ def test_tip_probe(fixture):
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
-            'A': center_z + Z_PROBE_CLEARANCE_MM}),
+            'A': center_z + Z_OFFSET_DURING_PROBE}),
         # Probe in the direction of X axis
         ('probe_axis',
             'X', size_x),
@@ -146,7 +146,7 @@ def test_tip_probe(fixture):
             'Y': center_y + X_SWITCH_OFFSET_MM}),
         # Lower Z
         ('move', {
-            'A': center_z + Z_PROBE_CLEARANCE_MM}),
+            'A': center_z + Z_OFFSET_DURING_PROBE}),
         # Probe in the direction opposite of X axis
         ('probe_axis',
             'X', -size_x),
@@ -163,7 +163,7 @@ def test_tip_probe(fixture):
             'Y': center_y - y_hotspot_offset}),
         # Lower Z
         ('move', {
-            'A': center_z + Z_PROBE_CLEARANCE_MM}),
+            'A': center_z + Z_OFFSET_DURING_PROBE}),
         # Probe in the direction of Y axis
         ('probe_axis',
             'Y', size_y),
@@ -180,7 +180,7 @@ def test_tip_probe(fixture):
             'Y': center_y + y_hotspot_offset}),
         # Lower Z
         ('move', {
-            'A': center_z + Z_PROBE_CLEARANCE_MM}),
+            'A': center_z + Z_OFFSET_DURING_PROBE}),
         # Probe in the direction opposite of Y axis
         ('probe_axis',
             'Y', -size_y),

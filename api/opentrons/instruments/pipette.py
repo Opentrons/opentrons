@@ -902,9 +902,9 @@ class Pipette:
                     self.robot.poses, safety_margin=stall_distance)
 
                 self.robot.poses = self.instrument_actuator.move(
-                self.robot.poses,
-                x=self._get_plunger_position('bottom')
-            )
+                    self.robot.poses,
+                    x=self._get_plunger_position('bottom')
+                )
 
             self.current_volume = 0
             self.current_tip(None)
