@@ -70,12 +70,12 @@ default = robot_config(
     # left relative to right
     instrument_offset={
         'right': {
-            'single': (0.0, 0.0, 0.0),
-            'multi': (0.0, (9 * 3.5), -25.8)
+            'single': (0.0, 0.0, 0.0),        # numbers are from CAD
+            'multi': (0.0, (9 * 3.5), -25.8)  # numbers are from CAD
         },
         'left': {
-            'single': (-34, 0.0, 0.0),
-            'multi': (-34,  (9 * 3.5), -25.8)
+            'single': (-34, 0.0, 0.0),        # numbers are from CAD
+            'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
         }
     },
     tip_length={
