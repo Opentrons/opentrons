@@ -727,7 +727,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3, low_power_z=False):
+    def pick_up_tip(self, location=None, presses=3, low_power_z=True):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 

@@ -217,7 +217,7 @@ class SmoothieDriver_3_0_0:
 
             if ret_code and 'alarm' in ret_code.lower():
                 self._reset_from_error()
-                return self._send_command(command, timeout=timeout)
+                raise RuntimeError('Smoothieware Error: {}'.format(ret_code))
 
             if moving_plunger:
                 self.set_power({axis: self._config.plunger_current_low
