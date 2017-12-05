@@ -1,16 +1,13 @@
 .setup_panel {
   display: grid;
-  width: 275px;
-  height: 100%;
-  padding: 0 1rem;
   grid-template:
-    'title' 4rem
-    'details' 40rem
+    'details' 41rem
     'btn_bottom' auto;
   font-family: 'sans';
   font-size: 14px;
   line-height: 2rem;
   color: grey;
+  padding: 1rem;
 }
 
 .close {

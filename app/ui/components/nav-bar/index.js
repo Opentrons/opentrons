@@ -4,11 +4,7 @@ import React from 'react'
 import NavButton from './NavButton'
 import styles from './nav.css'
 
-const PANELS = [
-  {name: 'upload', title: 'Upload File'},
-  {name: 'setup', title: 'Prep for Run'},
-  {name: 'connect', title: 'Connect Robot'}
-]
+import {PANELS} from '../../interface'
 
 export default function NavBar (props) {
   return (

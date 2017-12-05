@@ -1,7 +1,7 @@
 .connect_panel {
   color: silver;
   height: 100%;
-  width: 275px;
+  width: 18rem;
 }
 
 .robot_results {
@@ -38,7 +38,7 @@ h1 {
 .refresh_icon {
   position: absolute;
   right: 2rem;
-  top: 1rem;
+  top: 0.15rem;
   width: 2rem;
   height: 2rem;
   background-color: transparent;
