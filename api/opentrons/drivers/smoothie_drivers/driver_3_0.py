@@ -235,6 +235,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.max_speeds)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
+        self.update_position(default=HOMED_POSITION)
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #

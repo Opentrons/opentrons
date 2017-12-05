@@ -113,11 +113,10 @@ class Session(object):
         try:
             # TODO (artyom, 20171005): this will go away
             # once robot / driver simulation flow is fixed
-            prev_simulate_state = robot._driver.simulating
-            robot._driver.simulating = True
+            robot._driver.disconnect()
             exec(self._protocol, {})
         finally:
-            robot._driver.simulating = prev_simulate_state
+            robot._driver.connect()
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands
